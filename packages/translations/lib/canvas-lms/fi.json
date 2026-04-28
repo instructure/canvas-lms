@@ -1,306 +1,306 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Peruuta",
-    "Confirm": "Vahvista"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "Merkitse tärkeäksi päivämääräksi ja näytä homeroom-sivupalkissa"
-  },
-  "GradingSchemeManagement": {
-    "Account default grading scheme": "Tilin arvosanojen oletusantoasteikko",
-    "Account default grading scheme was successfully saved.": "Tilin arvosanojen oletusantoasteikko tallennettu onnistuneesti.",
-    "Active Grading Schemes": "Arvosanojen antoasteikkosi",
-    "Applied": "Käytössä",
-    "Apply": "Käytä",
-    "Archive Grading Scheme": "Arkistoi arvosanojen antoasteikkoja",
-    "Archived": "Arkistoitu",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Arkistoituoja käytössä olevia vaiheita voidaan vielä käyttää, mutta niitä ei voida lisätä uusiin kursseihin tai tehtäviin.",
-    "Are you sure you want to delete this grading scheme?": "Haluatko varmasti poistaa tämän arviointiasteikon?",
-    "Cancel": "Peruuta",
-    "Canvas Default": "Canvasin oletus",
-    "Close": "Sulje",
-    "Confirm": "Vahvista",
-    "Confirm Default Grading Scheme Change": "Vahvista oletusarvosanojen antoohjelman muutos",
-    "Delete Grading Scheme": "Poista arvosanojen asteikko",
-    "Duplicate Grading Scheme": "Arkistoi oletusarvosanojen antoasteikko",
-    "Edit Grading Scheme": "Muokkaa arvosanojen asteikkoa",
-    "Grading Scheme Name": "Arvosanojen antoasteikon nimi",
-    "Grading scheme was successfully archived.": "Arvosanojen antoasteikon arkistointi onnistui.",
-    "Grading scheme was successfully created.": "Arvosanojen antoasteikon luonti onnistui.",
-    "Grading scheme was successfully removed.": "Arvosanojen antoasteikon poisto onnistui.",
-    "Grading scheme was successfully saved.": "Arvosanojen antoasteikon tallennus onnistui.",
-    "Grading scheme was successfully unarchived.": "Arvosanojen antoasteikon arkistoinnin peruutus onnistui.",
-    "Locations Used": "Käytetyt paikat",
-    "Lower limit of range": "Vaihteluvälin alaraja",
-    "New Grading Scheme": "Uusi oletusarvosanojen antoasteikko",
-    "Next Page": "Seuraava sivu",
-    "No account default": "Ei tilin oletusta",
-    "Previous Page": "Edellinen sivu",
-    "Save": "Tallenna",
-    "Search": "Hae",
-    "Search...": "Etsitään...",
-    "Show courses and assignments": "Näytä kurssit ja tehtävät",
-    "Show locations used": "Näytä käytetyt sijainnit",
-    "Sort by": "Lajitteluperuste",
-    "There was an error while archiving the grading scheme": "Arvosanojen antoasteikon arikistoinnissa ilmeni virhe",
-    "There was an error while creating the grading scheme": "Arvosanojen antoasteikon viennissä ilmeni virhe",
-    "There was an error while loading grading schemes": "Arvosanojen antoasteikkojen latauksessa ilmeni virhe.",
-    "There was an error while loading the default canvas grading scheme": "Canvasin oletusarvosanojen antoasteikon latauksessa ilmeni virhe.",
-    "There was an error while loading the default grading scheme": "Oletusarvosanojen antoasteikon latauksessa ilmeni virhe.",
-    "There was an error while removing the grading scheme": "Arvosanojen antoasteikon poistamisessa ilmeni virhe",
-    "There was an error while unarchiving the grading scheme": "Arvosanojen antoasteikon arikistoinnissa ilmeni virhe",
-    "There was an error while updating the default grading scheme": "Oletusarvosanojen antoasteikon päivityksessä ilmeni virhe.",
-    "There was an error while updating the grading scheme": "Arvosanojen antoasteikon päivityksessä ilmeni virhe",
-    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Tämä muutos vaikuttaa kaikkiin aktiivisiin kursseihin ja tehtäviin, jotka tällä hetkellä perivät tilin oletusasetukset. Tämän muutoksen valmistuminen kestää jonkin aikaa, koska kaikki kurssien ja tehtävien arvosanat lasketaan uudelleen uuden tilin oletusarvostelujärjestelmän mukaisesti.",
-    "Unarchive Grading Scheme": "Poista oletusarvosanojen antoasteikon arkistointi",
-    "Upper limit of range": "Vaihteluvälin yläraja",
-    "View Grading Scheme": "Näytä arviointiasteikko",
-    "View/Copy Grading Scheme": "Näytä/Kopioi arviointiasteikko",
-    "View/Edit Grading Scheme": "Näytä/Muokkaa arviointiasteikkoa",
-    "You can't archive this grading scheme because it is set as a default for a course or account.": "Et voi arkistoida tätä arvosanajärjestelmää, koska se on asetettu oletusarvoksi kurssille tai tilille.",
-    "You can't delete this grading scheme because it is in use.": "Et voi poistaa tätä arvosanojen antoasteikkoa, koska se on käytössä.",
-    "You have no active grading schemes.": "Sinulla ei ole aktiivisa arvosanojen antovaiheita.",
-    "You have no archived grading schemes.": "Sinulla ei ole arkistoituja arvosanojen antovaiheita.",
-    "to": "-"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Haluatko varmasti poistaa tämän arviointiasteikon?",
-    "Are you sure you want to duplicate this grading scheme?": "Haluatko varmasti kopioida tämän arvosana-asteikon antaimisen vaiheen?",
-    "Cancel": "Peruuta",
-    "Close": "Sulje",
-    "Delete": "Poista",
-    "Delete ": "Delete ",
-    "Duplicate": "Kopioi",
-    "Duplicate ": "Kopioi ",
-    "Edit Grading Scheme": "Muokkaa arvosanojen asteikkoa",
-    "New Grading Scheme": "Uusi oletusarvosanojen antoasteikko",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "Prosentteja ja pisteitä ei voi muokata, koska se on tilitason arvosanojen antojärjestelmä.",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Prosentteja ja pisteitä ei voi muokata, koska niitä käytetään oletusarvosanan antojärjestelmänä.",
-    "Percentages and points can't be edited because it is currently being used.": "Prosentteja ja pisteitä ei voi muokata, koska ne ovat parhaillaan käytössä.",
-    "Save": "Tallenna"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Taulukko, jossa on arviointiasteikon oletustiedot.  Jokainen rivi sisältää nimen, maksimiprosenttiosuuden ja minimiprosenttiosuuden.",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Taulukko, jossa on arviointiasteikon tiedot.  Jokainen rivi sisältää nimen, maksimiprosenttiosuuden ja minimiprosenttiosuuden.",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Kaksinkertaisia tai tyhjiä rivinimiä ei sallita. Korjaa nimet ja yritä napsauttaa uudelleen ”Tallenna”.",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Ei voi olla päällekkäisiä tai tyhjiä alueita- Korjaa alueet ja yritä napsauttaa uudelleen ”Tallenna”.",
-    "Delete grading scheme": "Poista arvosanojen antoasteikko",
-    "Edit Grading Scheme": "Muokkaa arvosanojen asteikkoa",
-    "Edit a copy of this grading scheme": "Muokkaa tämän arvosanojen antoasteikon kopiota",
-    "Edit grading scheme": "Muokkaa arvosanojen antoasteikkoa",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Arvosanojen antoasteikon nimi vaaditaan. Lisää nimi ja yritä tallentaa uudelleen napsauttamalla ”Tallenna”.",
-    "Grading scheme title": "Arvosanojen antoasteikon otsikko",
-    "Invalid grading scheme": "Virheellinen arvosanojen antoasteikko",
-    "Letter Grade": "Kirjainarvosana",
-    "Looks great!": "Näyttää hyvältä!",
-    "Percentage": "Prosenttimäärä",
-    "Points": "Pisteet",
-    "Range": "Vaihteluväli",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Välin täytyy olla pätevä numero Ei voi olla negatiivisia numeroita tai numeroita, jotka ovat suurempia kuin 100. Korjaa alueet ja yritä napsauttaa uudelleen ”Tallenna”.",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Välin täytyy olla pätevä numero Ei voi olla negatiivisia numeroita tai numeroita, jotka ovat suurempia kuin vaihteluvälin ylin numero. Korjaa alueet ja yritä napsauttaa uudelleen ”Tallenna”.",
-    "edit a copy": "muokkaa kopiota"
-  },
-  "OutcomeManagement": {
-    "Course": "Kurssi",
-    "Institution": "Organisaatio"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Tilit",
-    "Close": "Sulje",
-    "Concluded": "Viety päätökseen",
-    "Courses": "Kurssit",
-    "Failed to load account used locations": "Tilin käytettyjen sijaintien lataus epäonnistui",
-    "Failed to load assignments used locations": "Tehtävien käytettyjen sijaintien lataus epäonnistui",
-    "Failed to load used locations": "Käytettyjen sijaintien lataus epäonnistui",
-    "Load Assignments ...": "Tehtäviä ladataan...",
-    "Load More Assignments ...": "Lataa lisää tehtäviä...",
-    "Loading": "Ladataan",
-    "Locations Used": "Käytetyt paikat",
-    "Search": "Hae",
-    "Search...": "Etsitään..."
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "Sallitun käytön menettely",
-    "Close": "Sulje",
-    "Loading page": "Ladataan sivua",
-    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Hyväksytyn käytön käytäntö ei ole parhaillaan saatavilla. Tarkista myöhemmin uudelleen tai ota yhteyttä tukeen, jos tarvitset lisäapua.",
-    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Hyväksytyn käytön käytäntöä ei voi ladata. Yritä myöhemmin uudelleen tai ota yhteyttä tukeen, mikäli ongelma jatkuu."
-  },
-  "account_reports": {
-    "Close": "Sulje",
-    "Invalid date and time.": "Virheellinen päivämäärä ja aika.",
-    "Next month": "Seuraava kuukausi",
-    "Previous month": "Edellinen kuukausi",
-    "Time": "Aika"
-  },
-  "admin_split": {
-    "Cancel": "Peruuta",
-    "Failed to split users.": "Käyttäjien jakaminen epäonnistui.",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "HUOM.: Tämä yrittää kumota yhdistämisen niin täysin kuin mahdollista; yhdistettyjä käyttäjiä ei kuitenkaan ehkä voida palauttaa täysin niiden aikaisempaan vaiheeseen.",
-    "OK": "OK",
-    "Split": "Jaa",
-    "The following users will be split into separate user accounts:": "Seuraavat käyttäjät jaetaan erillisille käyttäjätileille:",
-    "There are no user accounts to split from this user.": "Tältä käyttäjätä ei ole käyttäjätilejä jaettavaksi.",
-    "User split complete. Links to split user accounts follow:": "Käyttäjien jakaminen valmis. Linkit käyttäjätilien jakamiseen seuraavat:"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Kuvaus"
-  },
-  "assignment_footer": {
-    "Next": "Seuraava",
-    "Previous": "Edellinen"
-  },
-  "assignment_tabs": {
-    "Assignment": "Tehtävä",
-    "Peer Review": "Vertaisarviointi"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "(kurssin oletus)",
-    "Account Level": "Tilin taso",
-    "Canvas Grading Scheme (course default)": "Canvas-arvosanan antoasteikko (kurssin oletus)",
-    "Close": "Sulje",
-    "Course Level": "Kurssitaso",
-    "Default Canvas Grading Scheme": "Canvasin oletusarvosanan antoasteikko",
-    "Grading scheme was successfully removed.": "Arvosanojen antoasteikon poisto onnistui.",
-    "Grading scheme was successfully updated.": "Arvosanojen antoasteikon päivitys onnistui.",
-    "Manage All Grading Schemes": "Hallitse kaikkia arvosanojen antoasteikkoja",
-    "New Grading Scheme": "Uusi oletusarvosanojen antoasteikko",
-    "Select a grading scheme": "Valitse arvosanan antoasteikko",
-    "There was an error while loading grading schemes": "Arvosanojen antoasteikkojen latauksessa ilmeni virhe.",
-    "There was an error while loading the grading scheme": "Arvosanojen antoasteikon latauksessi ilmeni virhe",
-    "There was an error while refreshing grading schemes": "Arvosanojen antoasteikkojen päivityksessä ilmeni virhe.",
-    "There was an error while removing the grading scheme": "Arvosanojen antoasteikon poistamisessa ilmeni virhe",
-    "View": "Tarkastele"
-  },
-  "assignments_2": {
-    "Assignments 2 Teacher Error Page": "Tehtävät 2 Opettajan virhesivu",
-    "Assignments 2 Teacher initial query error": "Tehtävät 2 Opiskelijan alkuperäisen kyselyn virhe",
-    "Loading": "Ladataan"
-  },
-  "catalog": {
-    "Course Catalog": "Kurssiluettelo"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "Hienoa! Canvasin kehittäjiltä"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Peruuta",
-    "Copy course": "Kopioi kurssi",
-    "Course code": "Kurssin koodi",
-    "Course code must be 255 characters or less": "Kurssin koodi saa olla enintään 255 merkkiä",
-    "Course name must be 255 characters or less": "Kurssin nimi saa olla enintään 255 merkkiä",
-    "Create course": "Luo kurssi",
-    "Creating...": "Luodaan...",
-    "End date": "Päättymispäivämäärä",
-    "End date must be after start date": "Päättymispäivän on oltava alkamispäivän jälkeen",
-    "Name": "Nimi",
-    "No results": "Ei tuloksia",
-    "Please enter the details for the new course.": "Anna uuden kurssin tiedot.",
-    "Select a new beginning date": "Valitse uusi alkamispäivämäärä",
-    "Select a new end date": "Valitse uusi päättymispäivämäärä",
-    "Select end date": "Valitse päättymispäivämäärä",
-    "Select start date": "Valitse alkamispäivä",
-    "Start date": "Aloituspäivämäärä",
-    "Start date must be before end date": "Kaikkien alkamispäivämäärien täytyy olla ennen päättymisaikaa",
-    "Start typing to search...": "Aloita kirjoittamaan hakeaksesi...",
-    "Term": "Lukukausi",
-    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Kauden alkamis- ja päättymispäiviä ei voi muuttaa täällä, vain Hallinta-kohdan Termitiedot -sivulla.",
-    "Use arrow keys to navigate options.": "Siirry vaihtoehdoissa nuolinäppäinten avulla."
-  },
-  "content_share_preview_overlay": {
-    "Close": "Sulje",
-    "Content Share Preview": "Sisällön jakamisen esikatselu",
-    "Preview": "Esikatsele"
-  },
-  "copy_warnings_modal": {
-    "Attention": "Huomio"
-  },
-  "course_logging_content": {
-    "No results": "Ei tuloksia",
-    "Type to search": "Kirjoita hakeaksesi"
-  },
-  "create_course_modal": {
-    "Cancel": "Peruuta",
-    "Course Details": "Kurssin tiedot",
-    "Course Name": "Kurssin nimi",
-    "Create": "Luo",
-    "Create Course": "Luo kurssi",
-    "Create Subject": "Luo aihe",
-    "Creating new course...": "Luo uusi kurssi",
-    "Creating new subject...": "Luodaan uutta aihetta...",
-    "Error creating new course": "Virhe luotaessa uutta kurssia",
-    "Error creating new subject": "Virhe luotaessa uutta aihetta",
-    "Loading accounts...": "Tilejä ladataan...",
-    "Name...": "Nimi...",
-    "No Results": "Ei tuloksia",
-    "Select a homeroom": "Valitse homeroom",
-    "Subject Name": "Aiheen nimi",
-    "Unable to get accounts": "Tilien saanti ei onnistu",
-    "Unable to get homerooms": "Homeroomien saanti ei onnistu",
-    "Use arrow keys to navigate options.": "Siirry vaihtoehdoissa nuolinäppäinten avulla.",
-    "Which account will this course be associated with?": "Mille tilille tämä kurssi liitetään?",
-    "Which account will this subject be associated with?": "Mihin tiliin tämä kurssi liitetään?"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "Lopullisen arvosanan ohitus"
-  },
-  "feature_flags": {
-    "Accept": "Hyväksy",
-    "Cancel": "Peruuta"
-  },
-  "filter_bar": {
-    "All": "Kaikki",
-    "Clear": "Tyhjennä",
-    "Filter by": "Suodatusperuste",
-    "Search": "Hae",
-    "Use arrow keys to navigate options.": "Siirry vaihtoehdoissa nuolinäppäinten avulla."
-  },
-  "groupNavigationSelector": {
-    "Select Group": "Valitse ryhmä",
-    "Use arrow keys to navigate options.": "Siirry vaihtoehdoissa nuolinäppäinten avulla."
-  },
-  "jobs": {
-    "Close": "Sulje"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Luo uusi moduuli"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "Ahkera panda",
-    "Moves:": "Liikkeitä:"
-  },
-  "overview_page": {
-    "Edit home page": "Muokkaa aloitussivua",
-    "Subject Home Page": "Aiheen etusivu"
-  },
-  "pages_edit_title": {
-    "Page Title": "Sivun otsikko"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Peruuta",
-    "Close": "Sulje"
-  },
-  "study_assist": {
-    "Back": "Takaisin",
-    "Close": "Sulje",
-    "Page": "Sivu"
-  },
-  "submit_online_url_assignment": {
-    "A valid URL is required": "Vaaditaan voimassa oleva URL",
-    "Website URL": "Verkkosivuston URL"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "Sallitun käytön menettely",
-    "Loading...": "Ladataan...",
-    "Preview": "Esikatsele"
-  },
-  "todos_page": {
-    "Failed to load todos": "Todon lataus epäonnistui",
-    "Loading Additional Todo Details": "Ladataan Todo-lisätietoja",
-    "Loading Todo Course Name": "Ladataan Todo-kurssin nimeä",
-    "Loading Todo Title": "Ladataan Todo-otsikkoa"
-  },
-  "tray": {
-    "Close": "Sulje"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Peruuta",
+        "Confirm": "Vahvista"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Merkitse tärkeäksi päivämääräksi ja näytä homeroom-sivupalkissa"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Tilin arvosanojen oletusantoasteikko",
+        "Account default grading scheme was successfully saved.": "Tilin arvosanojen oletusantoasteikko tallennettu onnistuneesti.",
+        "Active Grading Schemes": "Arvosanojen antoasteikkosi",
+        "Applied": "Käytössä",
+        "Apply": "Käytä",
+        "Archive Grading Scheme": "Arkistoi arvosanojen antoasteikkoja",
+        "Archived": "Arkistoitu",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Arkistoituoja käytössä olevia vaiheita voidaan vielä käyttää, mutta niitä ei voida lisätä uusiin kursseihin tai tehtäviin.",
+        "Are you sure you want to delete this grading scheme?": "Haluatko varmasti poistaa tämän arviointiasteikon?",
+        "Cancel": "Peruuta",
+        "Canvas Default": "Canvasin oletus",
+        "Close": "Sulje",
+        "Confirm": "Vahvista",
+        "Confirm Default Grading Scheme Change": "Vahvista oletusarvosanojen antoohjelman muutos",
+        "Delete Grading Scheme": "Poista arvosanojen asteikko",
+        "Duplicate Grading Scheme": "Arkistoi oletusarvosanojen antoasteikko",
+        "Edit Grading Scheme": "Muokkaa arvosanojen asteikkoa",
+        "Grading Scheme Name": "Arvosanojen antoasteikon nimi",
+        "Grading scheme was successfully archived.": "Arvosanojen antoasteikon arkistointi onnistui.",
+        "Grading scheme was successfully created.": "Arvosanojen antoasteikon luonti onnistui.",
+        "Grading scheme was successfully removed.": "Arvosanojen antoasteikon poisto onnistui.",
+        "Grading scheme was successfully saved.": "Arvosanojen antoasteikon tallennus onnistui.",
+        "Grading scheme was successfully unarchived.": "Arvosanojen antoasteikon arkistoinnin peruutus onnistui.",
+        "Locations Used": "Käytetyt paikat",
+        "Lower limit of range": "Vaihteluvälin alaraja",
+        "New Grading Scheme": "Uusi oletusarvosanojen antoasteikko",
+        "Next Page": "Seuraava sivu",
+        "No account default": "Ei tilin oletusta",
+        "Previous Page": "Edellinen sivu",
+        "Save": "Tallenna",
+        "Search": "Hae",
+        "Search...": "Etsitään...",
+        "Show courses and assignments": "Näytä kurssit ja tehtävät",
+        "Show locations used": "Näytä käytetyt sijainnit",
+        "Sort by": "Lajitteluperuste",
+        "There was an error while archiving the grading scheme": "Arvosanojen antoasteikon arikistoinnissa ilmeni virhe",
+        "There was an error while creating the grading scheme": "Arvosanojen antoasteikon viennissä ilmeni virhe",
+        "There was an error while loading grading schemes": "Arvosanojen antoasteikkojen latauksessa ilmeni virhe.",
+        "There was an error while loading the default canvas grading scheme": "Canvasin oletusarvosanojen antoasteikon latauksessa ilmeni virhe.",
+        "There was an error while loading the default grading scheme": "Oletusarvosanojen antoasteikon latauksessa ilmeni virhe.",
+        "There was an error while removing the grading scheme": "Arvosanojen antoasteikon poistamisessa ilmeni virhe",
+        "There was an error while unarchiving the grading scheme": "Arvosanojen antoasteikon arikistoinnissa ilmeni virhe",
+        "There was an error while updating the default grading scheme": "Oletusarvosanojen antoasteikon päivityksessä ilmeni virhe.",
+        "There was an error while updating the grading scheme": "Arvosanojen antoasteikon päivityksessä ilmeni virhe",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Tämä muutos vaikuttaa kaikkiin aktiivisiin kursseihin ja tehtäviin, jotka tällä hetkellä perivät tilin oletusasetukset. Tämän muutoksen valmistuminen kestää jonkin aikaa, koska kaikki kurssien ja tehtävien arvosanat lasketaan uudelleen uuden tilin oletusarvostelujärjestelmän mukaisesti.",
+        "Unarchive Grading Scheme": "Poista oletusarvosanojen antoasteikon arkistointi",
+        "Upper limit of range": "Vaihteluvälin yläraja",
+        "View Grading Scheme": "Näytä arviointiasteikko",
+        "View/Copy Grading Scheme": "Näytä/Kopioi arviointiasteikko",
+        "View/Edit Grading Scheme": "Näytä/Muokkaa arviointiasteikkoa",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Et voi arkistoida tätä arvosanajärjestelmää, koska se on asetettu oletusarvoksi kurssille tai tilille.",
+        "You can't delete this grading scheme because it is in use.": "Et voi poistaa tätä arvosanojen antoasteikkoa, koska se on käytössä.",
+        "You have no active grading schemes.": "Sinulla ei ole aktiivisa arvosanojen antovaiheita.",
+        "You have no archived grading schemes.": "Sinulla ei ole arkistoituja arvosanojen antovaiheita.",
+        "to": "-"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Haluatko varmasti poistaa tämän arviointiasteikon?",
+        "Are you sure you want to duplicate this grading scheme?": "Haluatko varmasti kopioida tämän arvosana-asteikon antaimisen vaiheen?",
+        "Cancel": "Peruuta",
+        "Close": "Sulje",
+        "Delete": "Poista",
+        "Delete ": "Delete ",
+        "Duplicate": "Kopioi",
+        "Duplicate ": "Kopioi ",
+        "Edit Grading Scheme": "Muokkaa arvosanojen asteikkoa",
+        "New Grading Scheme": "Uusi oletusarvosanojen antoasteikko",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Prosentteja ja pisteitä ei voi muokata, koska se on tilitason arvosanojen antojärjestelmä.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Prosentteja ja pisteitä ei voi muokata, koska niitä käytetään oletusarvosanan antojärjestelmänä.",
+        "Percentages and points can't be edited because it is currently being used.": "Prosentteja ja pisteitä ei voi muokata, koska ne ovat parhaillaan käytössä.",
+        "Save": "Tallenna"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Taulukko, jossa on arviointiasteikon oletustiedot.  Jokainen rivi sisältää nimen, maksimiprosenttiosuuden ja minimiprosenttiosuuden.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Taulukko, jossa on arviointiasteikon tiedot.  Jokainen rivi sisältää nimen, maksimiprosenttiosuuden ja minimiprosenttiosuuden.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Kaksinkertaisia tai tyhjiä rivinimiä ei sallita. Korjaa nimet ja yritä napsauttaa uudelleen ”Tallenna”.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Ei voi olla päällekkäisiä tai tyhjiä alueita- Korjaa alueet ja yritä napsauttaa uudelleen ”Tallenna”.",
+        "Delete grading scheme": "Poista arvosanojen antoasteikko",
+        "Edit Grading Scheme": "Muokkaa arvosanojen asteikkoa",
+        "Edit a copy of this grading scheme": "Muokkaa tämän arvosanojen antoasteikon kopiota",
+        "Edit grading scheme": "Muokkaa arvosanojen antoasteikkoa",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Arvosanojen antoasteikon nimi vaaditaan. Lisää nimi ja yritä tallentaa uudelleen napsauttamalla ”Tallenna”.",
+        "Grading scheme title": "Arvosanojen antoasteikon otsikko",
+        "Invalid grading scheme": "Virheellinen arvosanojen antoasteikko",
+        "Letter Grade": "Kirjainarvosana",
+        "Looks great!": "Näyttää hyvältä!",
+        "Percentage": "Prosenttimäärä",
+        "Points": "Pisteet",
+        "Range": "Vaihteluväli",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Välin täytyy olla pätevä numero Ei voi olla negatiivisia numeroita tai numeroita, jotka ovat suurempia kuin 100. Korjaa alueet ja yritä napsauttaa uudelleen ”Tallenna”.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Välin täytyy olla pätevä numero Ei voi olla negatiivisia numeroita tai numeroita, jotka ovat suurempia kuin vaihteluvälin ylin numero. Korjaa alueet ja yritä napsauttaa uudelleen ”Tallenna”.",
+        "edit a copy": "muokkaa kopiota"
+    },
+    "OutcomeManagement": {
+        "Course": "Kurssi",
+        "Institution": "Organisaatio"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Tilit",
+        "Close": "Sulje",
+        "Concluded": "Viety päätökseen",
+        "Courses": "Kurssit",
+        "Failed to load account used locations": "Tilin käytettyjen sijaintien lataus epäonnistui",
+        "Failed to load assignments used locations": "Tehtävien käytettyjen sijaintien lataus epäonnistui",
+        "Failed to load used locations": "Käytettyjen sijaintien lataus epäonnistui",
+        "Load Assignments ...": "Tehtäviä ladataan...",
+        "Load More Assignments ...": "Lataa lisää tehtäviä...",
+        "Loading": "Ladataan",
+        "Locations Used": "Käytetyt paikat",
+        "Search": "Hae",
+        "Search...": "Etsitään..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Sallitun käytön menettely",
+        "Close": "Sulje",
+        "Loading page": "Ladataan sivua",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Hyväksytyn käytön käytäntö ei ole parhaillaan saatavilla. Tarkista myöhemmin uudelleen tai ota yhteyttä tukeen, jos tarvitset lisäapua.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Hyväksytyn käytön käytäntöä ei voi ladata. Yritä myöhemmin uudelleen tai ota yhteyttä tukeen, mikäli ongelma jatkuu."
+    },
+    "account_reports": {
+        "Close": "Sulje",
+        "Invalid date and time.": "Virheellinen päivämäärä ja aika.",
+        "Next month": "Seuraava kuukausi",
+        "Previous month": "Edellinen kuukausi",
+        "Time": "Aika"
+    },
+    "admin_split": {
+        "Cancel": "Peruuta",
+        "Failed to split users.": "Käyttäjien jakaminen epäonnistui.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "HUOM.: Tämä yrittää kumota yhdistämisen niin täysin kuin mahdollista; yhdistettyjä käyttäjiä ei kuitenkaan ehkä voida palauttaa täysin niiden aikaisempaan vaiheeseen.",
+        "OK": "OK",
+        "Split": "Jaa",
+        "The following users will be split into separate user accounts:": "Seuraavat käyttäjät jaetaan erillisille käyttäjätileille:",
+        "There are no user accounts to split from this user.": "Tältä käyttäjätä ei ole käyttäjätilejä jaettavaksi.",
+        "User split complete. Links to split user accounts follow:": "Käyttäjien jakaminen valmis. Linkit käyttäjätilien jakamiseen seuraavat:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Kuvaus"
+    },
+    "assignment_footer": {
+        "Next": "Seuraava",
+        "Previous": "Edellinen"
+    },
+    "assignment_tabs": {
+        "Assignment": "Tehtävä",
+        "Peer Review": "Vertaisarviointi"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(kurssin oletus)",
+        "Account Level": "Tilin taso",
+        "Canvas Grading Scheme (course default)": "Canvas-arvosanan antoasteikko (kurssin oletus)",
+        "Close": "Sulje",
+        "Course Level": "Kurssitaso",
+        "Default Canvas Grading Scheme": "Canvasin oletusarvosanan antoasteikko",
+        "Grading scheme was successfully removed.": "Arvosanojen antoasteikon poisto onnistui.",
+        "Grading scheme was successfully updated.": "Arvosanojen antoasteikon päivitys onnistui.",
+        "Manage All Grading Schemes": "Hallitse kaikkia arvosanojen antoasteikkoja",
+        "New Grading Scheme": "Uusi oletusarvosanojen antoasteikko",
+        "Select a grading scheme": "Valitse arvosanan antoasteikko",
+        "There was an error while loading grading schemes": "Arvosanojen antoasteikkojen latauksessa ilmeni virhe.",
+        "There was an error while loading the grading scheme": "Arvosanojen antoasteikon latauksessi ilmeni virhe",
+        "There was an error while refreshing grading schemes": "Arvosanojen antoasteikkojen päivityksessä ilmeni virhe.",
+        "There was an error while removing the grading scheme": "Arvosanojen antoasteikon poistamisessa ilmeni virhe",
+        "View": "Tarkastele"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Tehtävät 2 Opettajan virhesivu",
+        "Assignments 2 Teacher initial query error": "Tehtävät 2 Opiskelijan alkuperäisen kyselyn virhe",
+        "Loading": "Ladataan"
+    },
+    "catalog": {
+        "Course Catalog": "Kurssiluettelo"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Hienoa! Canvasin kehittäjiltä"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Peruuta",
+        "Copy course": "Kopioi kurssi",
+        "Course code": "Kurssin koodi",
+        "Course code must be 255 characters or less": "Kurssin koodi saa olla enintään 255 merkkiä",
+        "Course name must be 255 characters or less": "Kurssin nimi saa olla enintään 255 merkkiä",
+        "Create course": "Luo kurssi",
+        "Creating...": "Luodaan...",
+        "End date": "Päättymispäivämäärä",
+        "End date must be after start date": "Päättymispäivän on oltava alkamispäivän jälkeen",
+        "Name": "Nimi",
+        "No results": "Ei tuloksia",
+        "Please enter the details for the new course.": "Anna uuden kurssin tiedot.",
+        "Select a new beginning date": "Valitse uusi alkamispäivämäärä",
+        "Select a new end date": "Valitse uusi päättymispäivämäärä",
+        "Select end date": "Valitse päättymispäivämäärä",
+        "Select start date": "Valitse alkamispäivä",
+        "Start date": "Aloituspäivämäärä",
+        "Start date must be before end date": "Kaikkien alkamispäivämäärien täytyy olla ennen päättymisaikaa",
+        "Start typing to search...": "Aloita kirjoittamaan hakeaksesi...",
+        "Term": "Lukukausi",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Kauden alkamis- ja päättymispäiviä ei voi muuttaa täällä, vain Hallinta-kohdan Termitiedot -sivulla.",
+        "Use arrow keys to navigate options.": "Siirry vaihtoehdoissa nuolinäppäinten avulla."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Sulje",
+        "Content Share Preview": "Sisällön jakamisen esikatselu",
+        "Preview": "Esikatsele"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Huomio"
+    },
+    "course_logging_content": {
+        "No results": "Ei tuloksia",
+        "Type to search": "Kirjoita hakeaksesi"
+    },
+    "create_course_modal": {
+        "Cancel": "Peruuta",
+        "Course Details": "Kurssin tiedot",
+        "Course Name": "Kurssin nimi",
+        "Create": "Luo",
+        "Create Course": "Luo kurssi",
+        "Create Subject": "Luo aihe",
+        "Creating new course...": "Luo uusi kurssi",
+        "Creating new subject...": "Luodaan uutta aihetta...",
+        "Error creating new course": "Virhe luotaessa uutta kurssia",
+        "Error creating new subject": "Virhe luotaessa uutta aihetta",
+        "Loading accounts...": "Tilejä ladataan...",
+        "Name...": "Nimi...",
+        "No Results": "Ei tuloksia",
+        "Select a homeroom": "Valitse homeroom",
+        "Subject Name": "Aiheen nimi",
+        "Unable to get accounts": "Tilien saanti ei onnistu",
+        "Unable to get homerooms": "Homeroomien saanti ei onnistu",
+        "Use arrow keys to navigate options.": "Siirry vaihtoehdoissa nuolinäppäinten avulla.",
+        "Which account will this course be associated with?": "Mille tilille tämä kurssi liitetään?",
+        "Which account will this subject be associated with?": "Mihin tiliin tämä kurssi liitetään?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Lopullisen arvosanan ohitus"
+    },
+    "feature_flags": {
+        "Accept": "Hyväksy",
+        "Cancel": "Peruuta"
+    },
+    "filter_bar": {
+        "All": "Kaikki",
+        "Clear": "Tyhjennä",
+        "Filter by": "Suodatusperuste",
+        "Search": "Hae",
+        "Use arrow keys to navigate options.": "Siirry vaihtoehdoissa nuolinäppäinten avulla."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Valitse ryhmä",
+        "Use arrow keys to navigate options.": "Siirry vaihtoehdoissa nuolinäppäinten avulla."
+    },
+    "jobs": {
+        "Close": "Sulje"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Luo uusi moduuli"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Ahkera panda",
+        "Moves:": "Liikkeitä:"
+    },
+    "overview_page": {
+        "Edit home page": "Muokkaa aloitussivua",
+        "Subject Home Page": "Aiheen etusivu"
+    },
+    "pages_edit_title": {
+        "Page Title": "Sivun otsikko"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Peruuta",
+        "Close": "Sulje"
+    },
+    "study_assist": {
+        "Back": "Takaisin",
+        "Close": "Sulje",
+        "Page": "Sivu"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "Vaaditaan voimassa oleva URL",
+        "Website URL": "Verkkosivuston URL"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Sallitun käytön menettely",
+        "Loading...": "Ladataan...",
+        "Preview": "Esikatsele"
+    },
+    "todos_page": {
+        "Failed to load todos": "Todon lataus epäonnistui",
+        "Loading Additional Todo Details": "Ladataan Todo-lisätietoja",
+        "Loading Todo Course Name": "Ladataan Todo-kurssin nimeä",
+        "Loading Todo Title": "Ladataan Todo-otsikkoa"
+    },
+    "tray": {
+        "Close": "Sulje"
+    }
 }

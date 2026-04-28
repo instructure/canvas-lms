@@ -1,306 +1,306 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Anile",
-    "Confirm": "Konfime"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "Kòm dat enpòtan epi afiche sou ba lateral sal akèy la"
-  },
-  "GradingSchemeManagement": {
-    "Account default grading scheme": "Sistèm Notasyon Kont Pa Defo",
-    "Account default grading scheme was successfully saved.": "Sistèm notasyon kont pa defo sovgade avèk siksè.",
-    "Active Grading Schemes": "Aktive Sistèm Notasyon",
-    "Applied": "Aplike",
-    "Apply": "Aplike",
-    "Archive Grading Scheme": "Chema Notasyon nan Achiv",
-    "Archived": "Achive",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Yo ka toujou itilize sistèm notasyon nan achiv la, men yo paka ajoute l nan nouvo kou ni nan nouvo travay.",
-    "Are you sure you want to delete this grading scheme?": "Ou kwè vrèman ou vle efase sistèm klasman sa a?",
-    "Cancel": "Anile",
-    "Canvas Default": "Defo Canvas",
-    "Close": "Fèmen",
-    "Confirm": "Konfime",
-    "Confirm Default Grading Scheme Change": "Konfime Modifikasyon Modèl Notasyon pa Defo",
-    "Delete Grading Scheme": "Efase sistèm notasyon",
-    "Duplicate Grading Scheme": "Double Chema Notasyon",
-    "Edit Grading Scheme": "Modifye Sistèm Notasyon",
-    "Grading Scheme Name": "Non Sistèm Notasyon",
-    "Grading scheme was successfully archived.": "Sistèm Notasyon an ale nan achiv avèk siksè.",
-    "Grading scheme was successfully created.": "Sistèm notasyon an te kreye avèk siksè.",
-    "Grading scheme was successfully removed.": "Sistèm notasyon an te elimine avèk siksè.",
-    "Grading scheme was successfully saved.": "Sistèm notasyon an te sovgade avèk siksè.",
-    "Grading scheme was successfully unarchived.": "Sistèm Notasyon an soti nan achiv avèk siksè.",
-    "Locations Used": "Lokalizasyon Itilize",
-    "Lower limit of range": "Limit gam enferyè",
-    "New Grading Scheme": "Nouvo Sistèm notasyon",
-    "Next Page": "Pwochen Paj",
-    "No account default": "Pa gen kont pa defo",
-    "Previous Page": "Paj Anvan",
-    "Save": "Anrejistre",
-    "Search": "Chèche",
-    "Search...": "Chèche...",
-    "Show courses and assignments": "Montre kou yo ak atribisyon yo",
-    "Show locations used": "Montre lokalizasyon itilize",
-    "Sort by": "Klase pa",
-    "There was an error while archiving the grading scheme": "Te gen yon erè pandan y ap mete sistèm notasyon an nan achiv",
-    "There was an error while creating the grading scheme": "Te gen yon erè pandan kreyasyon sistèm notasyon an",
-    "There was an error while loading grading schemes": "Gen yon erè ki fèt pandan chajman sistèm notasyon yo",
-    "There was an error while loading the default canvas grading scheme": "Te gen yon erè pandan chajman sistèm notasyon pa defo canvas la",
-    "There was an error while loading the default grading scheme": "Te gen yon erè pandan chajman sistèm notasyon pa defo a",
-    "There was an error while removing the grading scheme": "Te gen yon erè pandan eliminasyon sistèm notasyon an",
-    "There was an error while unarchiving the grading scheme": "Te gen yon erè pandan y ap retire sistèm notasyon an nan achiv",
-    "There was an error while updating the default grading scheme": "Te gen yon erè ki fèt pandan mizajou sistèm notasyon pa defo a",
-    "There was an error while updating the grading scheme": "Te gen yon erè pandan aktyalizasyon sistèm notasyon an",
-    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Modifikasyon sa a ap afekte tout kou ak devwa aktif yo ki eritye kont pa defo a aktyèlman. Modifikasyon sa a ap pran yon tan, paske tout nòt kou ak travay yo ap re kalkile an fonksyon de nouvo sistèm notasyon kont pa defo a.",
-    "Unarchive Grading Scheme": "Sistèm Notasyon Soti nan Achiv",
-    "Upper limit of range": "Limit siperyè gam",
-    "View Grading Scheme": "Afiche Sistèm Notasyon",
-    "View/Copy Grading Scheme": "Afiche/Kopye Sistèm Notasyon an",
-    "View/Edit Grading Scheme": "Afiche/Modifye Sistèm Notasyon",
-    "You can't archive this grading scheme because it is set as a default for a course or account.": "Ou paka mete sistèm notasyon sa a nan achiv paske li defini pa defo pou yon kou oswa pou yon kont.",
-    "You can't delete this grading scheme because it is in use.": "Ou paka elimine sistèm notasyon sa a paske y ap itilize li.",
-    "You have no active grading schemes.": "Ou pa gen sistèm notasyon ki aktif.",
-    "You have no archived grading schemes.": "Ou pa gen sistèm notasyon ki nan achiv.",
-    "to": "pou"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Ou kwè vrèman ou vle efase sistèm klasman sa a?",
-    "Are you sure you want to duplicate this grading scheme?": "Èske vrèman ou vle double sistèm notasyon sa a?",
-    "Cancel": "Anile",
-    "Close": "Fèmen",
-    "Delete": "Efase",
-    "Delete ": "Efase ",
-    "Duplicate": "kopi",
-    "Duplicate ": "Kopye ",
-    "Edit Grading Scheme": "Modifye Sistèm Notasyon",
-    "New Grading Scheme": "Nouvo Sistèm notasyon",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "Pousataj yo ak pwen yo paka modifye paske se yon sistèm notasyon onivo kont lan.",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Pousataj yo ak pwen yo paka modifye paske se sistèm notasyon pa defo a",
-    "Percentages and points can't be edited because it is currently being used.": "Pousataj yo ak pwen yo paka modifye paske y ap itilize yo.",
-    "Save": "Anrejistre"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Yon tablo ki gen done sistèm notasyon ka defo canvas la.  chak liy gen yon non, yon pousantaj maksimòm ak yon pousantaj minimòm.",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Yon tablo ki gen done sistèm notasyon an.  chak liy gen yon non, yon pousantaj maksimòm ak yon pousantaj minimòm.",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Pa dwe gen non liy an doub oswa ki vid. Ranje non yo epi eseye klike sou 'Anrejistre' ankò.",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Limit yo pa dwe monte yonn sou lòt ni yo pa dwe vid. Ranje limit yo epi eseye klike sou 'Anrejistre' ankò.",
-    "Delete grading scheme": "Elimine sistèm notasyon",
-    "Edit Grading Scheme": "Modifye Sistèm Notasyon",
-    "Edit a copy of this grading scheme": "Modifye yon kopi sistèm evalyasyon sa a",
-    "Edit grading scheme": "Modifye sistèm notasyon",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Non Sistèm Notasyon an nesesè. Ajoute yon non epi eseye klike sou 'Anrejistre' ankò.",
-    "Grading scheme title": "Tit sistèm notasyon",
-    "Invalid grading scheme": "Sistèm notasyon envalid",
-    "Letter Grade": "Notasyon an Lèt",
-    "Looks great!": "Sa bon!",
-    "Percentage": "Pousantaj",
-    "Points": "Pwen",
-    "Range": "Entèval",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Entèval la dwe se yon chif valid. Pa dwe gen nonm negatif, ni chif ki depase 100. Ranje limit yo epi eseye klike sou 'Anrejistre' ankò.",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Entèval la dwe se yon nonm valid. Pa dwe gen nonm negatif, ni chif ki depase entèval pwen ki pi wo a. Ranje limit yo epi eseye klike sou 'Anrejistre' ankò.",
-    "edit a copy": "modifye yon kopi"
-  },
-  "OutcomeManagement": {
-    "Course": "Kou",
-    "Institution": "Enstitisyon"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Kont",
-    "Close": "Fèmen",
-    "Concluded": "Fini",
-    "Courses": "Kou",
-    "Failed to load account used locations": "Echèk chajman anplasman yo itilize sou kont la",
-    "Failed to load assignments used locations": "Echèk chajman afektasyon yo itilize yo",
-    "Failed to load used locations": "Echèk chajman anplasman yo itilize yo",
-    "Load Assignments ...": "Chaje Devwa yo ...",
-    "Load More Assignments ...": "Chaje plis Devwa ...",
-    "Loading": "Chajman",
-    "Locations Used": "Lokalizasyon Itilize",
-    "Search": "Chèche",
-    "Search...": "Chèche..."
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "Politik Itilizsyon Akseptab",
-    "Close": "Fèmen",
-    "Loading page": "Chajman paj",
-    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Politik Itilizasyon Akseptab la pa disponib kounye a. Re gade ankò pita oswa kontakte sèvis asistans lan si w bezwen èd.",
-    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Enposib pou chaje Politik Itilizasyon Akseptab la. Tanpri eseye ankò pita, oswa kontakte sèvis sipò si pwoblèm nan pèsiste."
-  },
-  "account_reports": {
-    "Close": "Fèmen",
-    "Invalid date and time.": "Dat ak lè envalid.",
-    "Next month": "Mwa pwochen",
-    "Previous month": "Mwa pase",
-    "Time": "Tan"
-  },
-  "admin_split": {
-    "Cancel": "Anile",
-    "Failed to split users.": "Echèk nan divizyon itilizatè.",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NÒT: Konsa n ap eseye anile fizyon an toutotan nou kapab; men itilizatè ki fè yon sèl yo gen risk pou yo pa retabli kòrèkteman jan yo te ye anvan an.",
-    "OK": "OK",
-    "Split": "Separe",
-    "The following users will be split into separate user accounts:": "Itilizatè annapre yo ap separe sou de kont itilizatè diferan:",
-    "There are no user accounts to split from this user.": "Pa gen kont itilizatè pou separe ak itilizatè sa a.",
-    "User split complete. Links to split user accounts follow:": "Divizyon Itilizatè konplè. Lyen pou divize kont itilizatè swiv:"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Deskripsyon"
-  },
-  "assignment_footer": {
-    "Next": "Pwochen",
-    "Previous": "Anvan"
-  },
-  "assignment_tabs": {
-    "Assignment": "Sesyon",
-    "Peer Review": "Revisyon Kamarad"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "(kou pa defo)",
-    "Account Level": "Nivo Kont",
-    "Canvas Grading Scheme (course default)": "Sistèm Evalyasyon Canvas (kou pa defo)",
-    "Close": "Fèmen",
-    "Course Level": "Nivo Kou",
-    "Default Canvas Grading Scheme": "Sistèm Evalyasyon pa Defo Canvas",
-    "Grading scheme was successfully removed.": "Sistèm notasyon an te elimine avèk siksè.",
-    "Grading scheme was successfully updated.": "Sistèm notasyon an aktyalize avèk siksè.",
-    "Manage All Grading Schemes": "Jere Tout Sistèm notasyon yo",
-    "New Grading Scheme": "Nouvo Sistèm notasyon",
-    "Select a grading scheme": "Seleksyone yon sistèm notasyon",
-    "There was an error while loading grading schemes": "Gen yon erè ki fèt pandan chajman sistèm notasyon yo",
-    "There was an error while loading the grading scheme": "Te gen yon erè pandan chajman sistèm notasyon an",
-    "There was an error while refreshing grading schemes": "Gen yon erè pandan aktyalizasyon sistèm notasyon yo",
-    "There was an error while removing the grading scheme": "Te gen yon erè pandan eliminasyon sistèm notasyon an",
-    "View": "Afiche"
-  },
-  "assignments_2": {
-    "Assignments 2 Teacher Error Page": "Devwa 2 paj Erè Pwofesè",
-    "Assignments 2 Teacher initial query error": "Devwa 2 Erè Demann Inisyal Pwofesè",
-    "Loading": "Chajman"
-  },
-  "catalog": {
-    "Course Catalog": "Katalòg Kou"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "Bel travay! De devlopè Canvas yo"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Anile",
-    "Copy course": "Kopye kou",
-    "Course code": "Kòd Kou",
-    "Course code must be 255 characters or less": "Kòd kou a dwe gen 255 karaktè oswa mwens",
-    "Course name must be 255 characters or less": "Non kou a dwe gen 255 karaktè oswa mwens",
-    "Create course": "Kreye kou",
-    "Creating...": "Kreyasyon...",
-    "End date": "Dat finisman",
-    "End date must be after start date": "Dat finisman an dwe aprè dat kòmansman an",
-    "Name": "Non",
-    "No results": "Okenn rezilta",
-    "Please enter the details for the new course.": "Tanpri antre detay nouvo kou a.",
-    "Select a new beginning date": "Seleksyone yon nouvo dat kòmansman",
-    "Select a new end date": "Seleksyone yon nouvo dat finisman",
-    "Select end date": "Seleksyone dat finisman an",
-    "Select start date": "Seleksyone dat kòmansman an",
-    "Start date": "Dat kòmansman",
-    "Start date must be before end date": "Dat kòmansman an dwe avan dat finisman  an",
-    "Start typing to search...": "Kòmanse tape pou chèche...",
-    "Term": "Tèm",
-    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Dat kòmansman ak fen trimès yo paka chanje isit la, men sèlman sou paj Detay trimès la, nan seksyon Admin nan.",
-    "Use arrow keys to navigate options.": "Itilize tout fllèch yo pou ka navige nan opsyon yo."
-  },
-  "content_share_preview_overlay": {
-    "Close": "Fèmen",
-    "Content Share Preview": "Apèsi Pataj Kontni",
-    "Preview": "Apèsi"
-  },
-  "copy_warnings_modal": {
-    "Attention": "Atansyon"
-  },
-  "course_logging_content": {
-    "No results": "Okenn rezilta",
-    "Type to search": "Tip rechèch"
-  },
-  "create_course_modal": {
-    "Cancel": "Anile",
-    "Course Details": "Detay Kou",
-    "Course Name": "Non Kou",
-    "Create": "Kreye",
-    "Create Course": "Kreye Kou",
-    "Create Subject": "Kreye Sijè",
-    "Creating new course...": "Kreyasyon nouvo kou...",
-    "Creating new subject...": "Kreyasyon nouvo sijè...",
-    "Error creating new course": "Erè nan kreyasyon nouvo kou",
-    "Error creating new subject": "Erè nan kreyasyon nouvo sijè",
-    "Loading accounts...": "Chanjman kont...",
-    "Name...": "Non..",
-    "No Results": "Okenn Rezilta",
-    "Select a homeroom": "Seleksyone yon klas akèy",
-    "Subject Name": "Non Sijè",
-    "Unable to get accounts": "Enposib pou jwenn kont",
-    "Unable to get homerooms": "Enposib pou jwenn klas dakèy.",
-    "Use arrow keys to navigate options.": "Itilize tout fllèch yo pou ka navige nan opsyon yo.",
-    "Which account will this course be associated with?": "A ki kont kou sa a ap asosye?",
-    "Which account will this subject be associated with?": "A ki kont y ap asosye sijè sa a?"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "Ranplasman Nòt Final"
-  },
-  "feature_flags": {
-    "Accept": "Aksepte",
-    "Cancel": "Anile"
-  },
-  "filter_bar": {
-    "All": "Tout",
-    "Clear": "Efase",
-    "Filter by": "Klase pa",
-    "Search": "Chèche",
-    "Use arrow keys to navigate options.": "Itilize tout fllèch yo pou ka navige nan opsyon yo."
-  },
-  "groupNavigationSelector": {
-    "Select Group": "Seleksyone Gwoup",
-    "Use arrow keys to navigate options.": "Itilize tout fllèch yo pou ka navige nan opsyon yo."
-  },
-  "jobs": {
-    "Close": "Fèmen"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Kreye yon nouvo Modil"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "Yon panda k ap etidye",
-    "Moves:": "Deplasman:"
-  },
-  "overview_page": {
-    "Edit home page": "Modifye paj dakèy",
-    "Subject Home Page": "Pat Dakèy Matyè a"
-  },
-  "pages_edit_title": {
-    "Page Title": "Tit Paj"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Anile",
-    "Close": "Fèmen"
-  },
-  "study_assist": {
-    "Back": "Retounen",
-    "Close": "Fèmen",
-    "Page": "Paj"
-  },
-  "submit_online_url_assignment": {
-    "A valid URL is required": "Yon URL valid nesesè",
-    "Website URL": "URL sit Web"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "Politik Itilizsyon Akseptab",
-    "Loading...": "Chajman...",
-    "Preview": "Apèsi"
-  },
-  "todos_page": {
-    "Failed to load todos": "Enposib pou chaje todos",
-    "Loading Additional Todo Details": "Chajman Detay Tach Adisyonèl",
-    "Loading Todo Course Name": "Chajman Non Kou pou Fè yo",
-    "Loading Todo Title": "Chajman Tit Tach"
-  },
-  "tray": {
-    "Close": "Fèmen"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Anile",
+        "Confirm": "Konfime"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Kòm dat enpòtan epi afiche sou ba lateral sal akèy la"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Sistèm Notasyon Kont Pa Defo",
+        "Account default grading scheme was successfully saved.": "Sistèm notasyon kont pa defo sovgade avèk siksè.",
+        "Active Grading Schemes": "Aktive Sistèm Notasyon",
+        "Applied": "Aplike",
+        "Apply": "Aplike",
+        "Archive Grading Scheme": "Chema Notasyon nan Achiv",
+        "Archived": "Achive",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Yo ka toujou itilize sistèm notasyon nan achiv la, men yo paka ajoute l nan nouvo kou ni nan nouvo travay.",
+        "Are you sure you want to delete this grading scheme?": "Ou kwè vrèman ou vle efase sistèm klasman sa a?",
+        "Cancel": "Anile",
+        "Canvas Default": "Defo Canvas",
+        "Close": "Fèmen",
+        "Confirm": "Konfime",
+        "Confirm Default Grading Scheme Change": "Konfime Modifikasyon Modèl Notasyon pa Defo",
+        "Delete Grading Scheme": "Efase sistèm notasyon",
+        "Duplicate Grading Scheme": "Double Chema Notasyon",
+        "Edit Grading Scheme": "Modifye Sistèm Notasyon",
+        "Grading Scheme Name": "Non Sistèm Notasyon",
+        "Grading scheme was successfully archived.": "Sistèm Notasyon an ale nan achiv avèk siksè.",
+        "Grading scheme was successfully created.": "Sistèm notasyon an te kreye avèk siksè.",
+        "Grading scheme was successfully removed.": "Sistèm notasyon an te elimine avèk siksè.",
+        "Grading scheme was successfully saved.": "Sistèm notasyon an te sovgade avèk siksè.",
+        "Grading scheme was successfully unarchived.": "Sistèm Notasyon an soti nan achiv avèk siksè.",
+        "Locations Used": "Lokalizasyon Itilize",
+        "Lower limit of range": "Limit gam enferyè",
+        "New Grading Scheme": "Nouvo Sistèm notasyon",
+        "Next Page": "Pwochen Paj",
+        "No account default": "Pa gen kont pa defo",
+        "Previous Page": "Paj Anvan",
+        "Save": "Anrejistre",
+        "Search": "Chèche",
+        "Search...": "Chèche...",
+        "Show courses and assignments": "Montre kou yo ak atribisyon yo",
+        "Show locations used": "Montre lokalizasyon itilize",
+        "Sort by": "Klase pa",
+        "There was an error while archiving the grading scheme": "Te gen yon erè pandan y ap mete sistèm notasyon an nan achiv",
+        "There was an error while creating the grading scheme": "Te gen yon erè pandan kreyasyon sistèm notasyon an",
+        "There was an error while loading grading schemes": "Gen yon erè ki fèt pandan chajman sistèm notasyon yo",
+        "There was an error while loading the default canvas grading scheme": "Te gen yon erè pandan chajman sistèm notasyon pa defo canvas la",
+        "There was an error while loading the default grading scheme": "Te gen yon erè pandan chajman sistèm notasyon pa defo a",
+        "There was an error while removing the grading scheme": "Te gen yon erè pandan eliminasyon sistèm notasyon an",
+        "There was an error while unarchiving the grading scheme": "Te gen yon erè pandan y ap retire sistèm notasyon an nan achiv",
+        "There was an error while updating the default grading scheme": "Te gen yon erè ki fèt pandan mizajou sistèm notasyon pa defo a",
+        "There was an error while updating the grading scheme": "Te gen yon erè pandan aktyalizasyon sistèm notasyon an",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Modifikasyon sa a ap afekte tout kou ak devwa aktif yo ki eritye kont pa defo a aktyèlman. Modifikasyon sa a ap pran yon tan, paske tout nòt kou ak travay yo ap re kalkile an fonksyon de nouvo sistèm notasyon kont pa defo a.",
+        "Unarchive Grading Scheme": "Sistèm Notasyon Soti nan Achiv",
+        "Upper limit of range": "Limit siperyè gam",
+        "View Grading Scheme": "Afiche Sistèm Notasyon",
+        "View/Copy Grading Scheme": "Afiche/Kopye Sistèm Notasyon an",
+        "View/Edit Grading Scheme": "Afiche/Modifye Sistèm Notasyon",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Ou paka mete sistèm notasyon sa a nan achiv paske li defini pa defo pou yon kou oswa pou yon kont.",
+        "You can't delete this grading scheme because it is in use.": "Ou paka elimine sistèm notasyon sa a paske y ap itilize li.",
+        "You have no active grading schemes.": "Ou pa gen sistèm notasyon ki aktif.",
+        "You have no archived grading schemes.": "Ou pa gen sistèm notasyon ki nan achiv.",
+        "to": "pou"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Ou kwè vrèman ou vle efase sistèm klasman sa a?",
+        "Are you sure you want to duplicate this grading scheme?": "Èske vrèman ou vle double sistèm notasyon sa a?",
+        "Cancel": "Anile",
+        "Close": "Fèmen",
+        "Delete": "Efase",
+        "Delete ": "Efase ",
+        "Duplicate": "kopi",
+        "Duplicate ": "Kopye ",
+        "Edit Grading Scheme": "Modifye Sistèm Notasyon",
+        "New Grading Scheme": "Nouvo Sistèm notasyon",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Pousataj yo ak pwen yo paka modifye paske se yon sistèm notasyon onivo kont lan.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Pousataj yo ak pwen yo paka modifye paske se sistèm notasyon pa defo a",
+        "Percentages and points can't be edited because it is currently being used.": "Pousataj yo ak pwen yo paka modifye paske y ap itilize yo.",
+        "Save": "Anrejistre"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Yon tablo ki gen done sistèm notasyon ka defo canvas la.  chak liy gen yon non, yon pousantaj maksimòm ak yon pousantaj minimòm.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Yon tablo ki gen done sistèm notasyon an.  chak liy gen yon non, yon pousantaj maksimòm ak yon pousantaj minimòm.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Pa dwe gen non liy an doub oswa ki vid. Ranje non yo epi eseye klike sou 'Anrejistre' ankò.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Limit yo pa dwe monte yonn sou lòt ni yo pa dwe vid. Ranje limit yo epi eseye klike sou 'Anrejistre' ankò.",
+        "Delete grading scheme": "Elimine sistèm notasyon",
+        "Edit Grading Scheme": "Modifye Sistèm Notasyon",
+        "Edit a copy of this grading scheme": "Modifye yon kopi sistèm evalyasyon sa a",
+        "Edit grading scheme": "Modifye sistèm notasyon",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Non Sistèm Notasyon an nesesè. Ajoute yon non epi eseye klike sou 'Anrejistre' ankò.",
+        "Grading scheme title": "Tit sistèm notasyon",
+        "Invalid grading scheme": "Sistèm notasyon envalid",
+        "Letter Grade": "Notasyon an Lèt",
+        "Looks great!": "Sa bon!",
+        "Percentage": "Pousantaj",
+        "Points": "Pwen",
+        "Range": "Entèval",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Entèval la dwe se yon chif valid. Pa dwe gen nonm negatif, ni chif ki depase 100. Ranje limit yo epi eseye klike sou 'Anrejistre' ankò.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Entèval la dwe se yon nonm valid. Pa dwe gen nonm negatif, ni chif ki depase entèval pwen ki pi wo a. Ranje limit yo epi eseye klike sou 'Anrejistre' ankò.",
+        "edit a copy": "modifye yon kopi"
+    },
+    "OutcomeManagement": {
+        "Course": "Kou",
+        "Institution": "Enstitisyon"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Kont",
+        "Close": "Fèmen",
+        "Concluded": "Fini",
+        "Courses": "Kou",
+        "Failed to load account used locations": "Echèk chajman anplasman yo itilize sou kont la",
+        "Failed to load assignments used locations": "Echèk chajman afektasyon yo itilize yo",
+        "Failed to load used locations": "Echèk chajman anplasman yo itilize yo",
+        "Load Assignments ...": "Chaje Devwa yo ...",
+        "Load More Assignments ...": "Chaje plis Devwa ...",
+        "Loading": "Chajman",
+        "Locations Used": "Lokalizasyon Itilize",
+        "Search": "Chèche",
+        "Search...": "Chèche..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Politik Itilizsyon Akseptab",
+        "Close": "Fèmen",
+        "Loading page": "Chajman paj",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Politik Itilizasyon Akseptab la pa disponib kounye a. Re gade ankò pita oswa kontakte sèvis asistans lan si w bezwen èd.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Enposib pou chaje Politik Itilizasyon Akseptab la. Tanpri eseye ankò pita, oswa kontakte sèvis sipò si pwoblèm nan pèsiste."
+    },
+    "account_reports": {
+        "Close": "Fèmen",
+        "Invalid date and time.": "Dat ak lè envalid.",
+        "Next month": "Mwa pwochen",
+        "Previous month": "Mwa pase",
+        "Time": "Tan"
+    },
+    "admin_split": {
+        "Cancel": "Anile",
+        "Failed to split users.": "Echèk nan divizyon itilizatè.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NÒT: Konsa n ap eseye anile fizyon an toutotan nou kapab; men itilizatè ki fè yon sèl yo gen risk pou yo pa retabli kòrèkteman jan yo te ye anvan an.",
+        "OK": "OK",
+        "Split": "Separe",
+        "The following users will be split into separate user accounts:": "Itilizatè annapre yo ap separe sou de kont itilizatè diferan:",
+        "There are no user accounts to split from this user.": "Pa gen kont itilizatè pou separe ak itilizatè sa a.",
+        "User split complete. Links to split user accounts follow:": "Divizyon Itilizatè konplè. Lyen pou divize kont itilizatè swiv:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Deskripsyon"
+    },
+    "assignment_footer": {
+        "Next": "Pwochen",
+        "Previous": "Anvan"
+    },
+    "assignment_tabs": {
+        "Assignment": "Sesyon",
+        "Peer Review": "Revisyon Kamarad"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(kou pa defo)",
+        "Account Level": "Nivo Kont",
+        "Canvas Grading Scheme (course default)": "Sistèm Evalyasyon Canvas (kou pa defo)",
+        "Close": "Fèmen",
+        "Course Level": "Nivo Kou",
+        "Default Canvas Grading Scheme": "Sistèm Evalyasyon pa Defo Canvas",
+        "Grading scheme was successfully removed.": "Sistèm notasyon an te elimine avèk siksè.",
+        "Grading scheme was successfully updated.": "Sistèm notasyon an aktyalize avèk siksè.",
+        "Manage All Grading Schemes": "Jere Tout Sistèm notasyon yo",
+        "New Grading Scheme": "Nouvo Sistèm notasyon",
+        "Select a grading scheme": "Seleksyone yon sistèm notasyon",
+        "There was an error while loading grading schemes": "Gen yon erè ki fèt pandan chajman sistèm notasyon yo",
+        "There was an error while loading the grading scheme": "Te gen yon erè pandan chajman sistèm notasyon an",
+        "There was an error while refreshing grading schemes": "Gen yon erè pandan aktyalizasyon sistèm notasyon yo",
+        "There was an error while removing the grading scheme": "Te gen yon erè pandan eliminasyon sistèm notasyon an",
+        "View": "Afiche"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Devwa 2 paj Erè Pwofesè",
+        "Assignments 2 Teacher initial query error": "Devwa 2 Erè Demann Inisyal Pwofesè",
+        "Loading": "Chajman"
+    },
+    "catalog": {
+        "Course Catalog": "Katalòg Kou"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Bel travay! De devlopè Canvas yo"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Anile",
+        "Copy course": "Kopye kou",
+        "Course code": "Kòd Kou",
+        "Course code must be 255 characters or less": "Kòd kou a dwe gen 255 karaktè oswa mwens",
+        "Course name must be 255 characters or less": "Non kou a dwe gen 255 karaktè oswa mwens",
+        "Create course": "Kreye kou",
+        "Creating...": "Kreyasyon...",
+        "End date": "Dat finisman",
+        "End date must be after start date": "Dat finisman an dwe aprè dat kòmansman an",
+        "Name": "Non",
+        "No results": "Okenn rezilta",
+        "Please enter the details for the new course.": "Tanpri antre detay nouvo kou a.",
+        "Select a new beginning date": "Seleksyone yon nouvo dat kòmansman",
+        "Select a new end date": "Seleksyone yon nouvo dat finisman",
+        "Select end date": "Seleksyone dat finisman an",
+        "Select start date": "Seleksyone dat kòmansman an",
+        "Start date": "Dat kòmansman",
+        "Start date must be before end date": "Dat kòmansman an dwe avan dat finisman  an",
+        "Start typing to search...": "Kòmanse tape pou chèche...",
+        "Term": "Tèm",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Dat kòmansman ak fen trimès yo paka chanje isit la, men sèlman sou paj Detay trimès la, nan seksyon Admin nan.",
+        "Use arrow keys to navigate options.": "Itilize tout fllèch yo pou ka navige nan opsyon yo."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Fèmen",
+        "Content Share Preview": "Apèsi Pataj Kontni",
+        "Preview": "Apèsi"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Atansyon"
+    },
+    "course_logging_content": {
+        "No results": "Okenn rezilta",
+        "Type to search": "Tip rechèch"
+    },
+    "create_course_modal": {
+        "Cancel": "Anile",
+        "Course Details": "Detay Kou",
+        "Course Name": "Non Kou",
+        "Create": "Kreye",
+        "Create Course": "Kreye Kou",
+        "Create Subject": "Kreye Sijè",
+        "Creating new course...": "Kreyasyon nouvo kou...",
+        "Creating new subject...": "Kreyasyon nouvo sijè...",
+        "Error creating new course": "Erè nan kreyasyon nouvo kou",
+        "Error creating new subject": "Erè nan kreyasyon nouvo sijè",
+        "Loading accounts...": "Chanjman kont...",
+        "Name...": "Non..",
+        "No Results": "Okenn Rezilta",
+        "Select a homeroom": "Seleksyone yon klas akèy",
+        "Subject Name": "Non Sijè",
+        "Unable to get accounts": "Enposib pou jwenn kont",
+        "Unable to get homerooms": "Enposib pou jwenn klas dakèy.",
+        "Use arrow keys to navigate options.": "Itilize tout fllèch yo pou ka navige nan opsyon yo.",
+        "Which account will this course be associated with?": "A ki kont kou sa a ap asosye?",
+        "Which account will this subject be associated with?": "A ki kont y ap asosye sijè sa a?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Ranplasman Nòt Final"
+    },
+    "feature_flags": {
+        "Accept": "Aksepte",
+        "Cancel": "Anile"
+    },
+    "filter_bar": {
+        "All": "Tout",
+        "Clear": "Efase",
+        "Filter by": "Klase pa",
+        "Search": "Chèche",
+        "Use arrow keys to navigate options.": "Itilize tout fllèch yo pou ka navige nan opsyon yo."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Seleksyone Gwoup",
+        "Use arrow keys to navigate options.": "Itilize tout fllèch yo pou ka navige nan opsyon yo."
+    },
+    "jobs": {
+        "Close": "Fèmen"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Kreye yon nouvo Modil"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Yon panda k ap etidye",
+        "Moves:": "Deplasman:"
+    },
+    "overview_page": {
+        "Edit home page": "Modifye paj dakèy",
+        "Subject Home Page": "Pat Dakèy Matyè a"
+    },
+    "pages_edit_title": {
+        "Page Title": "Tit Paj"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Anile",
+        "Close": "Fèmen"
+    },
+    "study_assist": {
+        "Back": "Retounen",
+        "Close": "Fèmen",
+        "Page": "Paj"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "Yon URL valid nesesè",
+        "Website URL": "URL sit Web"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Politik Itilizsyon Akseptab",
+        "Loading...": "Chajman...",
+        "Preview": "Apèsi"
+    },
+    "todos_page": {
+        "Failed to load todos": "Enposib pou chaje todos",
+        "Loading Additional Todo Details": "Chajman Detay Tach Adisyonèl",
+        "Loading Todo Course Name": "Chajman Non Kou pou Fè yo",
+        "Loading Todo Title": "Chajman Tit Tach"
+    },
+    "tray": {
+        "Close": "Fèmen"
+    }
 }

@@ -1,306 +1,306 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Cealaigh",
-    "Confirm": "Deimhnigh"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "Marcáil mar dháta tábhachtach agus taispeáin ar bharra taoibh an tseomra tí"
-  },
-  "GradingSchemeManagement": {
-    "Account default grading scheme": "Scéim marcála réamhshocraithe an chuntais",
-    "Account default grading scheme was successfully saved.": "Sábháladh scéim marcála réamhshocraithe an chuntais.",
-    "Active Grading Schemes": "Scéimeanna Marcála Gníomhacha",
-    "Applied": "Fheidhmeach",
-    "Apply": "Feidhmigh",
-    "Archive Grading Scheme": "Cuir Scéim Marcála i gCartlann",
-    "Archived": "Cartlannaithe",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Is féidir scéimeanna marcála cartlainne atá in úsáid a úsáid go fóill, ach ní féidir iad a chur le cúrsaí nó tascanna nua.",
-    "Are you sure you want to delete this grading scheme?": "An bhfuil tú cinnte gur mhaith leat an scéim mharcála seo a scriosadh?",
-    "Cancel": "Cealaigh",
-    "Canvas Default": "Réamhshocrú Canvas",
-    "Close": "Dún",
-    "Confirm": "Deimhnigh",
-    "Confirm Default Grading Scheme Change": "Deimhnigh Athrú ar an Scéim Marcála Réamhshocraithe",
-    "Delete Grading Scheme": "Scrios an Scéim Marcála",
-    "Duplicate Grading Scheme": "Cóipeáil Scéim Marcála",
-    "Edit Grading Scheme": "Cuir an Scéim Marcála in Eagar",
-    "Grading Scheme Name": "Ainm na Scéime Marcála",
-    "Grading scheme was successfully archived.": "D'éirigh leis an scéim marcála a chur i gcartlann.",
-    "Grading scheme was successfully created.": "Cruthaíodh scéim Marcála go rathúil.",
-    "Grading scheme was successfully removed.": "Baineadh an scéim Marcála go rathúil.",
-    "Grading scheme was successfully saved.": "Sábháladh an scéim Marcála go rathúil.",
-    "Grading scheme was successfully unarchived.": "D'éirigh leis an scéim marcála a bhaint ón gcartlann.",
-    "Locations Used": "Suímh a Úsáideadh",
-    "Lower limit of range": "Teorainn raoin ísle",
-    "New Grading Scheme": "Scéim Marcála Nua",
-    "Next Page": "An Chéad Leathanach Eile",
-    "No account default": "Gan réamhshocrú cuntais",
-    "Previous Page": "Leathanach Roimhe Seo",
-    "Save": "Sábháil",
-    "Search": "Cuardaigh",
-    "Search...": "Cuardaigh...",
-    "Show courses and assignments": "Taispeáin cúrsaí agus tascanna",
-    "Show locations used": "Taispeáin na láithreacha a úsáideadh",
-    "Sort by": "Sórtáil de réir",
-    "There was an error while archiving the grading scheme": "Tharla earráid agus an scéim marcála a chur i gcartlann",
-    "There was an error while creating the grading scheme": "Tharla earráid agus an scéim marcála á cruthú",
-    "There was an error while loading grading schemes": "Tharla earráid agus scéimeanna marcála á lódáil",
-    "There was an error while loading the default canvas grading scheme": "Tharla earráid agus an scéim marcála canvas réamhshocraithe á lódáil",
-    "There was an error while loading the default grading scheme": "Tharla earráid agus an scéim marcála réamhshocraithe á lódáil",
-    "There was an error while removing the grading scheme": "Tharla earráid agus an scéim marcála á bhaint",
-    "There was an error while unarchiving the grading scheme": "Tharla earráid agus an scéim marcála a bhaint ón gcartlann",
-    "There was an error while updating the default grading scheme": "Tharla earráid agus an scéim marcála réamhshocraithe á nuashonrú",
-    "There was an error while updating the grading scheme": "Tharla earráid agus an scéim marcála á nuashonrú",
-    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Rachaidh an t-athrú seo i bhfeidhm ar gach cúrsa agus tasc gníomhach atá ag fáil réamhshocraithe an chuntais le hoidhreacht faoi láthair. Tógfaidh an t-athrú seo tamall le críochnú toisc go ndéantar gach grád cúrsa agus tasc a athríomh maidir le scéim marcála réamhshocraithe an chuntais nua.",
-    "Unarchive Grading Scheme": "Bain Scéim Marcála ón gCartlann",
-    "Upper limit of range": "Teorainn uachtarach an raoin",
-    "View Grading Scheme": "Amharc ar an Scéim Marcála",
-    "View/Copy Grading Scheme": "Amharc/Cóipeáil an Scéim Marcála",
-    "View/Edit Grading Scheme": "Amharc ar/Cuir Scéim Ghrádaithe in Eagar",
-    "You can't archive this grading scheme because it is set as a default for a course or account.": "Ní féidir leat an scéim marcála seo a chur sa chartlann toisc go bhfuil sé socraithe mar réamhshocrú do chúrsa nó cuntas.",
-    "You can't delete this grading scheme because it is in use.": "Ní féidir leat an scéim marcála seo a scriosadh toisc go bhfuil sí in úsáid.",
-    "You have no active grading schemes.": "Níl aon scéimeanna marcála gníomhacha agat.",
-    "You have no archived grading schemes.": "Níl aon scéimeanna marcála i gcartlann agat.",
-    "to": "go dtí"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "An bhfuil tú cinnte gur mhaith leat an scéim mharcála seo a scriosadh?",
-    "Are you sure you want to duplicate this grading scheme?": "An bhfuil tú cinnte gur mhaith leat an scéim marcála seo a dhúbailt?",
-    "Cancel": "Cealaigh",
-    "Close": "Dún",
-    "Delete": "Scrios",
-    "Delete ": "Scrios ",
-    "Duplicate": "Dúbláil",
-    "Duplicate ": "Dúbláil ",
-    "Edit Grading Scheme": "Cuir an Scéim Marcála in Eagar",
-    "New Grading Scheme": "Scéim Marcála Nua",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "Ní féidir céatadáin agus pointí a chur in eagar toisc gur scéim marcála ar leibhéal cuntais é.",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Ní féidir céatadáin agus pointí a chur in eagar toisc go bhfuil siad á n-úsáid mar an scéim marcála réamhshocraithe.",
-    "Percentages and points can't be edited because it is currently being used.": "Ní féidir céatadáin agus pointí a chur in eagar toisc go bhfuil siad in úsáid faoi láthair.",
-    "Save": "Sábháil"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tábla ina bhfuil sonraí na scéime marcála canvas réamhshocraithe.  Tá ainm, uaschéatadán, agus íoschéatadán i ngach ró.",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tábla ina bhfuil sonraí na scéime marcála.  Tá ainm, uaschéatadán, agus íoschéatadán i ngach ró.",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Ní féidir ainmneacha sraitheanna dúblacha nó folamh a bheith ann. Deisigh na hainmneacha agus déan iarracht 'Sábháil' a chliceáil arís.",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Ní féidir raonta forluiteacha nó folmha a bheith ann. Deisigh na raonta agus déan iarracht 'Sábháil' a chliceáil arís.",
-    "Delete grading scheme": "Scrios an scéim marcála",
-    "Edit Grading Scheme": "Cuir an Scéim Marcála in Eagar",
-    "Edit a copy of this grading scheme": "Cuir cóip den scéim Marcála seo in eagar",
-    "Edit grading scheme": "Cuir scéim Marcála in eagar",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Tá Ainm na Scéime Marcála ag teastáil. Cuir ainm leis agus bain triail eile as 'Sábháil' a chliceáil.",
-    "Grading scheme title": "Teideal scéim Marcála",
-    "Invalid grading scheme": "Scéim marcála neamhbhailí",
-    "Letter Grade": "Marc Litreach",
-    "Looks great!": "Tá cuma iontach air!",
-    "Percentage": "Céatadán",
-    "Points": "Pointí",
-    "Range": "Raon",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Caithfidh an raon a bheith ina uimhir bhailí. Ní féidir uimhreacha diúltacha nó uimhreacha atá níos mó ná 100 a bheith ann. Deisigh na raonta agus déan iarracht 'Sábháil' a chliceáil arís.",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Caithfidh an raon a bheith ina uimhir bhailí. Ní féidir uimhreacha diúltacha nó uimhreacha atá níos mó ná raon na bpointí uachtaracha a bheith ann. Deisigh na raonta agus déan iarracht 'Sábháil' a chliceáil arís.",
-    "edit a copy": "cuir cóip in eagar"
-  },
-  "OutcomeManagement": {
-    "Course": "Cúrsa",
-    "Institution": "Institiúid"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Cuntais",
-    "Close": "Dún",
-    "Concluded": "Críochnaithe",
-    "Courses": "Cúrsaí",
-    "Failed to load account used locations": "Theip ar lódáil na suíomhanna a úsáideadh ar chuntais",
-    "Failed to load assignments used locations": "Theip ar lódáil na suíomhanna a úsáideadh",
-    "Failed to load used locations": "Theip ar láithreacha úsáidte a lódáil",
-    "Load Assignments ...": "Lódáil Tascanna...",
-    "Load More Assignments ...": "Lódáil Tuilleadh Tascanna...",
-    "Loading": "Ag lódáil",
-    "Locations Used": "Suímh a Úsáideadh",
-    "Search": "Cuardaigh",
-    "Search...": "Cuardaigh..."
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "Polasaí maidir le hÚsáid Inghlactha",
-    "Close": "Dún",
-    "Loading page": "Leathanach á lódáil",
-    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Níl an Polasaí um Úsáid Inghlactha ar fáil faoi láthair. Seiceáil ar ais ar ball le do thoil nó déan teagmháil le tacaíocht má tá tuilleadh cúnaimh uait.",
-    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Ní féidir an Polasaí um Úsáid Inghlactha a lódáil. Bain triail eile as ar ball le do thoil nó déan teagmháil le tacaíocht má leanann an cheist."
-  },
-  "account_reports": {
-    "Close": "Dún",
-    "Invalid date and time.": "Dáta agus am neamhbhailí.",
-    "Next month": "An mhí seo chugainn",
-    "Previous month": "An mhí roimhe sin",
-    "Time": "Am"
-  },
-  "admin_split": {
-    "Cancel": "Cealaigh",
-    "Failed to split users.": "Theip ar úsáideoirí a scoilteadh.",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NÓTA: Déanfaidh sé seo iarracht an cumasc a chealú chomh hiomlán agus is féidir; mar sin féin, d'fhéadfadh sé nach mbeidh úsáideoirí cumaisc curtha ar ais go foirfe ina staid roimhe sin.",
-    "OK": "CGL",
-    "Split": "Scoilt",
-    "The following users will be split into separate user accounts:": "Roinnfear na húsáideoirí seo a leanas i gcuntais úsáideora ar leith:",
-    "There are no user accounts to split from this user.": "Níl aon chuntais úsáideora le scoilt ón úsáideoir seo.",
-    "User split complete. Links to split user accounts follow:": "Scoilt úsáideora críochnaithe. Leanann naisc chuig cuntais úsáideora scoilte:"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Cur Síos"
-  },
-  "assignment_footer": {
-    "Next": "Ar aghaidh",
-    "Previous": "Roimhe Seo"
-  },
-  "assignment_tabs": {
-    "Assignment": "Tasc",
-    "Peer Review": "Piarmheasúnú"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "réamhshocrú cúrsa)",
-    "Account Level": "Leibhéal an Chuntais",
-    "Canvas Grading Scheme (course default)": "Scéim Marcála Canvas (réamhshocrú an chúrsa)",
-    "Close": "Dún",
-    "Course Level": "Leibhéal an Chúrsa",
-    "Default Canvas Grading Scheme": "Scéim Marcála Canvas Réamhshocraithe",
-    "Grading scheme was successfully removed.": "Baineadh an scéim Marcála go rathúil.",
-    "Grading scheme was successfully updated.": "Nuashonraíodh an scéim marcála go rathúil.",
-    "Manage All Grading Schemes": "Bainistigh na Scéimeanna Marcaithe go léir",
-    "New Grading Scheme": "Scéim Marcála Nua",
-    "Select a grading scheme": "Roghnaigh scéim marcála",
-    "There was an error while loading grading schemes": "Tharla earráid agus scéimeanna marcála á lódáil",
-    "There was an error while loading the grading scheme": "Tharla earráid agus an scéim marcála á lódáil",
-    "There was an error while refreshing grading schemes": "Tharla earráid agus scéimeanna marcála á athnuachan",
-    "There was an error while removing the grading scheme": "Tharla earráid agus an scéim marcála á bhaint",
-    "View": "Amharc"
-  },
-  "assignments_2": {
-    "Assignments 2 Teacher Error Page": "Tascanna 2 Leathanach Earráidí an Mhúinteora",
-    "Assignments 2 Teacher initial query error": "Tascanna 2 Earráid bhuncheiste an Mhúinteora",
-    "Loading": "Ag lódáil"
-  },
-  "catalog": {
-    "Course Catalog": "Catalóg Cúrsa"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "Obair iontach! Ó fhorbróirí Canvas"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Cealaigh",
-    "Copy course": "Cóipeáil cúrsa",
-    "Course code": "Cód cúrsa",
-    "Course code must be 255 characters or less": "Caithfidh 255 carachtar nó níos lú a bheith i gcód an chúrsa",
-    "Course name must be 255 characters or less": "Caithfidh 255 carachtar nó níos lú a bheith in ainm an chúrsa",
-    "Create course": "Cruthaigh cúrsa",
-    "Creating...": "Ag cruthú...",
-    "End date": "Dáta deiridh",
-    "End date must be after start date": "Caithfidh an dáta deiridh a bheith tar éis an dáta tosaithe",
-    "Name": "Ainm",
-    "No results": "Níl aon thorthaí",
-    "Please enter the details for the new course.": "Cuir isteach sonraí an chúrsa nua le do thoil.",
-    "Select a new beginning date": "Roghnaigh dáta tosaigh nua",
-    "Select a new end date": "Roghnaigh dáta deiridh nua",
-    "Select end date": "Roghnaigh dáta deiridh",
-    "Select start date": "Roghnaigh dáta tosaithe",
-    "Start date": "Dáta tosaithe",
-    "Start date must be before end date": "Ní mór an dáta tosaithe a bheith roimh an dáta deiridh",
-    "Start typing to search...": "Tosaigh ag clóscríobh chun cuardach a dhéanamh...",
-    "Term": "Seimeaster",
-    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Ní féidir dátaí tosaithe agus deiridh na dtéarmaí a mhodhnú anseo, ach amháin ar an leathanach Sonraí Téarma faoi Riarachán.",
-    "Use arrow keys to navigate options.": "Bain úsáid as saigheadeochracha chun nascleanúint a dhéanamh ar roghanna."
-  },
-  "content_share_preview_overlay": {
-    "Close": "Dún",
-    "Content Share Preview": "Réamhamharc Comhroinn Ábhar",
-    "Preview": "Réamhamharc"
-  },
-  "copy_warnings_modal": {
-    "Attention": "Aird"
-  },
-  "course_logging_content": {
-    "No results": "Níl aon thorthaí",
-    "Type to search": "Clóscríobh chun cuardach a dhéanamh"
-  },
-  "create_course_modal": {
-    "Cancel": "Cealaigh",
-    "Course Details": "Sonraí an Chúrsa",
-    "Course Name": "Ainm an Chúrsa",
-    "Create": "Cruthaigh",
-    "Create Course": "Cruthaigh Cúrsa",
-    "Create Subject": "Cruthaigh Ábhar",
-    "Creating new course...": "Cúrsa nua á chruthú...",
-    "Creating new subject...": "Ábhar nua á chruthú...",
-    "Error creating new course": "Earráid ag cruthú cúrsa nua",
-    "Error creating new subject": "Earráid ag cruthú ábhar nua",
-    "Loading accounts...": "Cuntais á lódáil...",
-    "Name...": "Ainm...",
-    "No Results": "Níl aon Thorthaí",
-    "Select a homeroom": "Roghnaigh seomra baile",
-    "Subject Name": "Ainm an Ábhair",
-    "Unable to get accounts": "Ní féidir cuntais a fháil",
-    "Unable to get homerooms": "Ní féidir seomraí baile a fháil",
-    "Use arrow keys to navigate options.": "Bain úsáid as saigheadeochracha chun nascleanúint a dhéanamh ar roghanna.",
-    "Which account will this course be associated with?": "Cén cuntas a mbeidh baint ag an gcúrsa seo leis?",
-    "Which account will this subject be associated with?": "Cén cuntas a mbeidh baint ag an ábhar seo leis?"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "Sárú Marc Deiridh"
-  },
-  "feature_flags": {
-    "Accept": "Glac",
-    "Cancel": "Cealaigh"
-  },
-  "filter_bar": {
-    "All": "Gach",
-    "Clear": "Glan",
-    "Filter by": "Scag de réir",
-    "Search": "Cuardaigh",
-    "Use arrow keys to navigate options.": "Bain úsáid as saigheadeochracha chun nascleanúint a dhéanamh ar roghanna."
-  },
-  "groupNavigationSelector": {
-    "Select Group": "Roghnaigh Grúpa",
-    "Use arrow keys to navigate options.": "Bain úsáid as saigheadeochracha chun nascleanúint a dhéanamh ar roghanna."
-  },
-  "jobs": {
-    "Close": "Dún"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Cruthaigh Modúl nua"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "Panda staidéarach",
-    "Moves:": "Bogann:"
-  },
-  "overview_page": {
-    "Edit home page": "Cuir leathanach baile in eagar",
-    "Subject Home Page": "Leathanach Baile an Ábhair"
-  },
-  "pages_edit_title": {
-    "Page Title": "Teideal an Leathanaigh"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Cealaigh",
-    "Close": "Dún"
-  },
-  "study_assist": {
-    "Back": "Siar",
-    "Close": "Dún",
-    "Page": "Leathanach"
-  },
-  "submit_online_url_assignment": {
-    "A valid URL is required": "Tá URL bailí ag teastáil",
-    "Website URL": "URL an tsuímh Gréasáin"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "Polasaí maidir le hÚsáid Inghlactha",
-    "Loading...": "Ag lódáil..",
-    "Preview": "Réamhamharc"
-  },
-  "todos_page": {
-    "Failed to load todos": "Theip ar rudaí atá le déanamh a lódáil",
-    "Loading Additional Todo Details": "Sonraí Breise Le Déanamh a lódáil",
-    "Loading Todo Course Name": "Ainm an Chúrsa Le Déanamh á Lódáil",
-    "Loading Todo Title": "Teideal Le Déanamh á Lódáil"
-  },
-  "tray": {
-    "Close": "Dún"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Cealaigh",
+        "Confirm": "Deimhnigh"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Marcáil mar dháta tábhachtach agus taispeáin ar bharra taoibh an tseomra tí"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Scéim marcála réamhshocraithe an chuntais",
+        "Account default grading scheme was successfully saved.": "Sábháladh scéim marcála réamhshocraithe an chuntais.",
+        "Active Grading Schemes": "Scéimeanna Marcála Gníomhacha",
+        "Applied": "Fheidhmeach",
+        "Apply": "Feidhmigh",
+        "Archive Grading Scheme": "Cuir Scéim Marcála i gCartlann",
+        "Archived": "Cartlannaithe",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Is féidir scéimeanna marcála cartlainne atá in úsáid a úsáid go fóill, ach ní féidir iad a chur le cúrsaí nó tascanna nua.",
+        "Are you sure you want to delete this grading scheme?": "An bhfuil tú cinnte gur mhaith leat an scéim mharcála seo a scriosadh?",
+        "Cancel": "Cealaigh",
+        "Canvas Default": "Réamhshocrú Canvas",
+        "Close": "Dún",
+        "Confirm": "Deimhnigh",
+        "Confirm Default Grading Scheme Change": "Deimhnigh Athrú ar an Scéim Marcála Réamhshocraithe",
+        "Delete Grading Scheme": "Scrios an Scéim Marcála",
+        "Duplicate Grading Scheme": "Cóipeáil Scéim Marcála",
+        "Edit Grading Scheme": "Cuir an Scéim Marcála in Eagar",
+        "Grading Scheme Name": "Ainm na Scéime Marcála",
+        "Grading scheme was successfully archived.": "D'éirigh leis an scéim marcála a chur i gcartlann.",
+        "Grading scheme was successfully created.": "Cruthaíodh scéim Marcála go rathúil.",
+        "Grading scheme was successfully removed.": "Baineadh an scéim Marcála go rathúil.",
+        "Grading scheme was successfully saved.": "Sábháladh an scéim Marcála go rathúil.",
+        "Grading scheme was successfully unarchived.": "D'éirigh leis an scéim marcála a bhaint ón gcartlann.",
+        "Locations Used": "Suímh a Úsáideadh",
+        "Lower limit of range": "Teorainn raoin ísle",
+        "New Grading Scheme": "Scéim Marcála Nua",
+        "Next Page": "An Chéad Leathanach Eile",
+        "No account default": "Gan réamhshocrú cuntais",
+        "Previous Page": "Leathanach Roimhe Seo",
+        "Save": "Sábháil",
+        "Search": "Cuardaigh",
+        "Search...": "Cuardaigh...",
+        "Show courses and assignments": "Taispeáin cúrsaí agus tascanna",
+        "Show locations used": "Taispeáin na láithreacha a úsáideadh",
+        "Sort by": "Sórtáil de réir",
+        "There was an error while archiving the grading scheme": "Tharla earráid agus an scéim marcála a chur i gcartlann",
+        "There was an error while creating the grading scheme": "Tharla earráid agus an scéim marcála á cruthú",
+        "There was an error while loading grading schemes": "Tharla earráid agus scéimeanna marcála á lódáil",
+        "There was an error while loading the default canvas grading scheme": "Tharla earráid agus an scéim marcála canvas réamhshocraithe á lódáil",
+        "There was an error while loading the default grading scheme": "Tharla earráid agus an scéim marcála réamhshocraithe á lódáil",
+        "There was an error while removing the grading scheme": "Tharla earráid agus an scéim marcála á bhaint",
+        "There was an error while unarchiving the grading scheme": "Tharla earráid agus an scéim marcála a bhaint ón gcartlann",
+        "There was an error while updating the default grading scheme": "Tharla earráid agus an scéim marcála réamhshocraithe á nuashonrú",
+        "There was an error while updating the grading scheme": "Tharla earráid agus an scéim marcála á nuashonrú",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Rachaidh an t-athrú seo i bhfeidhm ar gach cúrsa agus tasc gníomhach atá ag fáil réamhshocraithe an chuntais le hoidhreacht faoi láthair. Tógfaidh an t-athrú seo tamall le críochnú toisc go ndéantar gach grád cúrsa agus tasc a athríomh maidir le scéim marcála réamhshocraithe an chuntais nua.",
+        "Unarchive Grading Scheme": "Bain Scéim Marcála ón gCartlann",
+        "Upper limit of range": "Teorainn uachtarach an raoin",
+        "View Grading Scheme": "Amharc ar an Scéim Marcála",
+        "View/Copy Grading Scheme": "Amharc/Cóipeáil an Scéim Marcála",
+        "View/Edit Grading Scheme": "Amharc ar/Cuir Scéim Ghrádaithe in Eagar",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Ní féidir leat an scéim marcála seo a chur sa chartlann toisc go bhfuil sé socraithe mar réamhshocrú do chúrsa nó cuntas.",
+        "You can't delete this grading scheme because it is in use.": "Ní féidir leat an scéim marcála seo a scriosadh toisc go bhfuil sí in úsáid.",
+        "You have no active grading schemes.": "Níl aon scéimeanna marcála gníomhacha agat.",
+        "You have no archived grading schemes.": "Níl aon scéimeanna marcála i gcartlann agat.",
+        "to": "go dtí"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "An bhfuil tú cinnte gur mhaith leat an scéim mharcála seo a scriosadh?",
+        "Are you sure you want to duplicate this grading scheme?": "An bhfuil tú cinnte gur mhaith leat an scéim marcála seo a dhúbailt?",
+        "Cancel": "Cealaigh",
+        "Close": "Dún",
+        "Delete": "Scrios",
+        "Delete ": "Scrios ",
+        "Duplicate": "Dúbláil",
+        "Duplicate ": "Dúbláil ",
+        "Edit Grading Scheme": "Cuir an Scéim Marcála in Eagar",
+        "New Grading Scheme": "Scéim Marcála Nua",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Ní féidir céatadáin agus pointí a chur in eagar toisc gur scéim marcála ar leibhéal cuntais é.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Ní féidir céatadáin agus pointí a chur in eagar toisc go bhfuil siad á n-úsáid mar an scéim marcála réamhshocraithe.",
+        "Percentages and points can't be edited because it is currently being used.": "Ní féidir céatadáin agus pointí a chur in eagar toisc go bhfuil siad in úsáid faoi láthair.",
+        "Save": "Sábháil"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tábla ina bhfuil sonraí na scéime marcála canvas réamhshocraithe.  Tá ainm, uaschéatadán, agus íoschéatadán i ngach ró.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tábla ina bhfuil sonraí na scéime marcála.  Tá ainm, uaschéatadán, agus íoschéatadán i ngach ró.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Ní féidir ainmneacha sraitheanna dúblacha nó folamh a bheith ann. Deisigh na hainmneacha agus déan iarracht 'Sábháil' a chliceáil arís.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Ní féidir raonta forluiteacha nó folmha a bheith ann. Deisigh na raonta agus déan iarracht 'Sábháil' a chliceáil arís.",
+        "Delete grading scheme": "Scrios an scéim marcála",
+        "Edit Grading Scheme": "Cuir an Scéim Marcála in Eagar",
+        "Edit a copy of this grading scheme": "Cuir cóip den scéim Marcála seo in eagar",
+        "Edit grading scheme": "Cuir scéim Marcála in eagar",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Tá Ainm na Scéime Marcála ag teastáil. Cuir ainm leis agus bain triail eile as 'Sábháil' a chliceáil.",
+        "Grading scheme title": "Teideal scéim Marcála",
+        "Invalid grading scheme": "Scéim marcála neamhbhailí",
+        "Letter Grade": "Marc Litreach",
+        "Looks great!": "Tá cuma iontach air!",
+        "Percentage": "Céatadán",
+        "Points": "Pointí",
+        "Range": "Raon",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Caithfidh an raon a bheith ina uimhir bhailí. Ní féidir uimhreacha diúltacha nó uimhreacha atá níos mó ná 100 a bheith ann. Deisigh na raonta agus déan iarracht 'Sábháil' a chliceáil arís.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Caithfidh an raon a bheith ina uimhir bhailí. Ní féidir uimhreacha diúltacha nó uimhreacha atá níos mó ná raon na bpointí uachtaracha a bheith ann. Deisigh na raonta agus déan iarracht 'Sábháil' a chliceáil arís.",
+        "edit a copy": "cuir cóip in eagar"
+    },
+    "OutcomeManagement": {
+        "Course": "Cúrsa",
+        "Institution": "Institiúid"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Cuntais",
+        "Close": "Dún",
+        "Concluded": "Críochnaithe",
+        "Courses": "Cúrsaí",
+        "Failed to load account used locations": "Theip ar lódáil na suíomhanna a úsáideadh ar chuntais",
+        "Failed to load assignments used locations": "Theip ar lódáil na suíomhanna a úsáideadh",
+        "Failed to load used locations": "Theip ar láithreacha úsáidte a lódáil",
+        "Load Assignments ...": "Lódáil Tascanna...",
+        "Load More Assignments ...": "Lódáil Tuilleadh Tascanna...",
+        "Loading": "Ag lódáil",
+        "Locations Used": "Suímh a Úsáideadh",
+        "Search": "Cuardaigh",
+        "Search...": "Cuardaigh..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Polasaí maidir le hÚsáid Inghlactha",
+        "Close": "Dún",
+        "Loading page": "Leathanach á lódáil",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Níl an Polasaí um Úsáid Inghlactha ar fáil faoi láthair. Seiceáil ar ais ar ball le do thoil nó déan teagmháil le tacaíocht má tá tuilleadh cúnaimh uait.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Ní féidir an Polasaí um Úsáid Inghlactha a lódáil. Bain triail eile as ar ball le do thoil nó déan teagmháil le tacaíocht má leanann an cheist."
+    },
+    "account_reports": {
+        "Close": "Dún",
+        "Invalid date and time.": "Dáta agus am neamhbhailí.",
+        "Next month": "An mhí seo chugainn",
+        "Previous month": "An mhí roimhe sin",
+        "Time": "Am"
+    },
+    "admin_split": {
+        "Cancel": "Cealaigh",
+        "Failed to split users.": "Theip ar úsáideoirí a scoilteadh.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NÓTA: Déanfaidh sé seo iarracht an cumasc a chealú chomh hiomlán agus is féidir; mar sin féin, d'fhéadfadh sé nach mbeidh úsáideoirí cumaisc curtha ar ais go foirfe ina staid roimhe sin.",
+        "OK": "CGL",
+        "Split": "Scoilt",
+        "The following users will be split into separate user accounts:": "Roinnfear na húsáideoirí seo a leanas i gcuntais úsáideora ar leith:",
+        "There are no user accounts to split from this user.": "Níl aon chuntais úsáideora le scoilt ón úsáideoir seo.",
+        "User split complete. Links to split user accounts follow:": "Scoilt úsáideora críochnaithe. Leanann naisc chuig cuntais úsáideora scoilte:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Cur Síos"
+    },
+    "assignment_footer": {
+        "Next": "Ar aghaidh",
+        "Previous": "Roimhe Seo"
+    },
+    "assignment_tabs": {
+        "Assignment": "Tasc",
+        "Peer Review": "Piarmheasúnú"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "réamhshocrú cúrsa)",
+        "Account Level": "Leibhéal an Chuntais",
+        "Canvas Grading Scheme (course default)": "Scéim Marcála Canvas (réamhshocrú an chúrsa)",
+        "Close": "Dún",
+        "Course Level": "Leibhéal an Chúrsa",
+        "Default Canvas Grading Scheme": "Scéim Marcála Canvas Réamhshocraithe",
+        "Grading scheme was successfully removed.": "Baineadh an scéim Marcála go rathúil.",
+        "Grading scheme was successfully updated.": "Nuashonraíodh an scéim marcála go rathúil.",
+        "Manage All Grading Schemes": "Bainistigh na Scéimeanna Marcaithe go léir",
+        "New Grading Scheme": "Scéim Marcála Nua",
+        "Select a grading scheme": "Roghnaigh scéim marcála",
+        "There was an error while loading grading schemes": "Tharla earráid agus scéimeanna marcála á lódáil",
+        "There was an error while loading the grading scheme": "Tharla earráid agus an scéim marcála á lódáil",
+        "There was an error while refreshing grading schemes": "Tharla earráid agus scéimeanna marcála á athnuachan",
+        "There was an error while removing the grading scheme": "Tharla earráid agus an scéim marcála á bhaint",
+        "View": "Amharc"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Tascanna 2 Leathanach Earráidí an Mhúinteora",
+        "Assignments 2 Teacher initial query error": "Tascanna 2 Earráid bhuncheiste an Mhúinteora",
+        "Loading": "Ag lódáil"
+    },
+    "catalog": {
+        "Course Catalog": "Catalóg Cúrsa"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Obair iontach! Ó fhorbróirí Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Cealaigh",
+        "Copy course": "Cóipeáil cúrsa",
+        "Course code": "Cód cúrsa",
+        "Course code must be 255 characters or less": "Caithfidh 255 carachtar nó níos lú a bheith i gcód an chúrsa",
+        "Course name must be 255 characters or less": "Caithfidh 255 carachtar nó níos lú a bheith in ainm an chúrsa",
+        "Create course": "Cruthaigh cúrsa",
+        "Creating...": "Ag cruthú...",
+        "End date": "Dáta deiridh",
+        "End date must be after start date": "Caithfidh an dáta deiridh a bheith tar éis an dáta tosaithe",
+        "Name": "Ainm",
+        "No results": "Níl aon thorthaí",
+        "Please enter the details for the new course.": "Cuir isteach sonraí an chúrsa nua le do thoil.",
+        "Select a new beginning date": "Roghnaigh dáta tosaigh nua",
+        "Select a new end date": "Roghnaigh dáta deiridh nua",
+        "Select end date": "Roghnaigh dáta deiridh",
+        "Select start date": "Roghnaigh dáta tosaithe",
+        "Start date": "Dáta tosaithe",
+        "Start date must be before end date": "Ní mór an dáta tosaithe a bheith roimh an dáta deiridh",
+        "Start typing to search...": "Tosaigh ag clóscríobh chun cuardach a dhéanamh...",
+        "Term": "Seimeaster",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Ní féidir dátaí tosaithe agus deiridh na dtéarmaí a mhodhnú anseo, ach amháin ar an leathanach Sonraí Téarma faoi Riarachán.",
+        "Use arrow keys to navigate options.": "Bain úsáid as saigheadeochracha chun nascleanúint a dhéanamh ar roghanna."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Dún",
+        "Content Share Preview": "Réamhamharc Comhroinn Ábhar",
+        "Preview": "Réamhamharc"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Aird"
+    },
+    "course_logging_content": {
+        "No results": "Níl aon thorthaí",
+        "Type to search": "Clóscríobh chun cuardach a dhéanamh"
+    },
+    "create_course_modal": {
+        "Cancel": "Cealaigh",
+        "Course Details": "Sonraí an Chúrsa",
+        "Course Name": "Ainm an Chúrsa",
+        "Create": "Cruthaigh",
+        "Create Course": "Cruthaigh Cúrsa",
+        "Create Subject": "Cruthaigh Ábhar",
+        "Creating new course...": "Cúrsa nua á chruthú...",
+        "Creating new subject...": "Ábhar nua á chruthú...",
+        "Error creating new course": "Earráid ag cruthú cúrsa nua",
+        "Error creating new subject": "Earráid ag cruthú ábhar nua",
+        "Loading accounts...": "Cuntais á lódáil...",
+        "Name...": "Ainm...",
+        "No Results": "Níl aon Thorthaí",
+        "Select a homeroom": "Roghnaigh seomra baile",
+        "Subject Name": "Ainm an Ábhair",
+        "Unable to get accounts": "Ní féidir cuntais a fháil",
+        "Unable to get homerooms": "Ní féidir seomraí baile a fháil",
+        "Use arrow keys to navigate options.": "Bain úsáid as saigheadeochracha chun nascleanúint a dhéanamh ar roghanna.",
+        "Which account will this course be associated with?": "Cén cuntas a mbeidh baint ag an gcúrsa seo leis?",
+        "Which account will this subject be associated with?": "Cén cuntas a mbeidh baint ag an ábhar seo leis?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Sárú Marc Deiridh"
+    },
+    "feature_flags": {
+        "Accept": "Glac",
+        "Cancel": "Cealaigh"
+    },
+    "filter_bar": {
+        "All": "Gach",
+        "Clear": "Glan",
+        "Filter by": "Scag de réir",
+        "Search": "Cuardaigh",
+        "Use arrow keys to navigate options.": "Bain úsáid as saigheadeochracha chun nascleanúint a dhéanamh ar roghanna."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Roghnaigh Grúpa",
+        "Use arrow keys to navigate options.": "Bain úsáid as saigheadeochracha chun nascleanúint a dhéanamh ar roghanna."
+    },
+    "jobs": {
+        "Close": "Dún"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Cruthaigh Modúl nua"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Panda staidéarach",
+        "Moves:": "Bogann:"
+    },
+    "overview_page": {
+        "Edit home page": "Cuir leathanach baile in eagar",
+        "Subject Home Page": "Leathanach Baile an Ábhair"
+    },
+    "pages_edit_title": {
+        "Page Title": "Teideal an Leathanaigh"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Cealaigh",
+        "Close": "Dún"
+    },
+    "study_assist": {
+        "Back": "Siar",
+        "Close": "Dún",
+        "Page": "Leathanach"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "Tá URL bailí ag teastáil",
+        "Website URL": "URL an tsuímh Gréasáin"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Polasaí maidir le hÚsáid Inghlactha",
+        "Loading...": "Ag lódáil..",
+        "Preview": "Réamhamharc"
+    },
+    "todos_page": {
+        "Failed to load todos": "Theip ar rudaí atá le déanamh a lódáil",
+        "Loading Additional Todo Details": "Sonraí Breise Le Déanamh a lódáil",
+        "Loading Todo Course Name": "Ainm an Chúrsa Le Déanamh á Lódáil",
+        "Loading Todo Title": "Teideal Le Déanamh á Lódáil"
+    },
+    "tray": {
+        "Close": "Dún"
+    }
 }

@@ -1,306 +1,306 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "取消",
-    "Confirm": "確認"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "標示為重要日期並顯示在主教室側欄中"
-  },
-  "GradingSchemeManagement": {
-    "Account default grading scheme": "帳戶預設等級評分方式",
-    "Account default grading scheme was successfully saved.": "帳戶預設等級評分方式已成功儲存。",
-    "Active Grading Schemes": "啟用的等級評分方式",
-    "Applied": "應用",
-    "Apply": "應用",
-    "Archive Grading Scheme": "存檔等級評分方式",
-    "Archived": "已存檔",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "使用中的存檔的等級評分方式仍可使用，但無法添加至新課程或作業列表。",
-    "Are you sure you want to delete this grading scheme?": "是否確定要刪除此評分方案？",
-    "Cancel": "取消",
-    "Canvas Default": "Canvas 預設值",
-    "Close": "關閉",
-    "Confirm": "確認",
-    "Confirm Default Grading Scheme Change": "確認預設評分方式變更",
-    "Delete Grading Scheme": "刪除評分方案",
-    "Duplicate Grading Scheme": "重複的等級評分方式",
-    "Edit Grading Scheme": "編輯評分方案",
-    "Grading Scheme Name": "等級評分方式名稱",
-    "Grading scheme was successfully archived.": "評分方案已成功存檔。",
-    "Grading scheme was successfully created.": "成功建立等級評分方式。",
-    "Grading scheme was successfully removed.": "成功移除等級評分方式。",
-    "Grading scheme was successfully saved.": "成功儲存等級評分方式。",
-    "Grading scheme was successfully unarchived.": "評分方案已成功取消存檔。",
-    "Locations Used": "使用的位置",
-    "Lower limit of range": "範圍下限",
-    "New Grading Scheme": "新的等級評分方式",
-    "Next Page": "下一頁",
-    "No account default": "沒有帳戶預設值",
-    "Previous Page": "上一頁",
-    "Save": "保存",
-    "Search": "搜尋",
-    "Search...": "搜尋...",
-    "Show courses and assignments": "顯示課程和作業列表",
-    "Show locations used": "顯示使用的位置",
-    "Sort by": "排序規則為",
-    "There was an error while archiving the grading scheme": "存檔等級評分方式時發生錯誤",
-    "There was an error while creating the grading scheme": "建立等級評分方式時發生錯誤",
-    "There was an error while loading grading schemes": "載入等級評分方式時發生錯誤",
-    "There was an error while loading the default canvas grading scheme": "載入預設的 Canvas 等級評分方式時發生錯誤",
-    "There was an error while loading the default grading scheme": "載入預設的等級評分方式時發生錯誤",
-    "There was an error while removing the grading scheme": "移除等級評分方式時發生錯誤",
-    "There was an error while unarchiving the grading scheme": "取消存檔等級評分方式時發生錯誤",
-    "There was an error while updating the default grading scheme": "更新預設等級評分方式時發生錯誤",
-    "There was an error while updating the grading scheme": "更新等級評分方式時發生錯誤",
-    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "此變更將影響目前繼承帳戶預設值的所有現行課程和作業列表。此變更需要一段時間才能完成，因為所有課程和作業成績都會根據新帳戶預設評分方式重新計算。",
-    "Unarchive Grading Scheme": "取消存檔等級評分方式",
-    "Upper limit of range": "範圍上限",
-    "View Grading Scheme": "檢視評分方案",
-    "View/Copy Grading Scheme": "檢視/複製等級評分方式",
-    "View/Edit Grading Scheme": "檢視/編輯評分方案",
-    "You can't archive this grading scheme because it is set as a default for a course or account.": "您無法存檔此等級評分方式，因為它已設定為課程或帳戶的預設值。",
-    "You can't delete this grading scheme because it is in use.": "您無法刪除此等級評分方式，因為它正在使用中。",
-    "You have no active grading schemes.": "您沒有啟用的等級評分方式。",
-    "You have no archived grading schemes.": "您沒有存檔的等級評分方式。",
-    "to": "至"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "是否確定要刪除此評分方案？",
-    "Are you sure you want to duplicate this grading scheme?": "是否確定要複製此等級評分方式？",
-    "Cancel": "取消",
-    "Close": "關閉",
-    "Delete": "刪除",
-    "Delete ": "刪除 ",
-    "Duplicate": "重覆",
-    "Duplicate ": "重覆 ",
-    "Edit Grading Scheme": "編輯評分方案",
-    "New Grading Scheme": "新的等級評分方式",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "無法編輯百分比和分數，因為它是帳戶級別等級評分方式。",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "無法編輯百分比和分數，因為目前正在作為預設的等級評分方式。",
-    "Percentages and points can't be edited because it is currently being used.": "無法編輯百分比和分數，因為它目前正在使用中。",
-    "Save": "保存"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "包含預設的 Canvas 等級評分方式資料的表格。每一列都有一個名稱、一個最大百分比和最小百分比。",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "包含等級評分方式資料的表格。每一列都有一個名稱、一個最大百分比和最小百分比。",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "不可有重複或空白的行名稱。修復名稱，然後嘗試再按一下「儲存」。",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "不可有重疊或空白的範圍。修復範圍，然後嘗試再按一下「儲存」。",
-    "Delete grading scheme": "刪除等級評分方式",
-    "Edit Grading Scheme": "編輯評分方案",
-    "Edit a copy of this grading scheme": "編輯此等級評分方式的副本",
-    "Edit grading scheme": "編輯等級評分方式",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "等級評分方式名稱必填。添加名稱，然後嘗試再按一下「儲存」。",
-    "Grading scheme title": "等級評分方式標題",
-    "Invalid grading scheme": "無效的等級評分方式",
-    "Letter Grade": "字母成績",
-    "Looks great!": "非常棒！",
-    "Percentage": "百分比",
-    "Points": "分數",
-    "Range": "範圍",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "範圍必須為有效數字。不可有負數或大於 100 的數字。修復範圍，然後嘗試再按一下「儲存」。",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "範圍必須為有效數字。不可有負數或大於高分範圍的數字。修復範圍，然後嘗試再按一下「儲存」。",
-    "edit a copy": "編輯副本"
-  },
-  "OutcomeManagement": {
-    "Course": "課程",
-    "Institution": "機構"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "帳戶",
-    "Close": "關閉",
-    "Concluded": "結束",
-    "Courses": "課程",
-    "Failed to load account used locations": "無法載入帳戶使用的位置",
-    "Failed to load assignments used locations": "無法載入作業列表使用的位置",
-    "Failed to load used locations": "無法載入使用的位置",
-    "Load Assignments ...": "載入作業列表...",
-    "Load More Assignments ...": "載入更多作業列表...",
-    "Loading": "正在載入",
-    "Locations Used": "使用的位置",
-    "Search": "搜尋",
-    "Search...": "搜尋..."
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "可接受使用政策",
-    "Close": "關閉",
-    "Loading page": "載入頁面",
-    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "可接受的使用政策目前無法使用。如果您需要進一步協助，請稍後再回來查看或聯絡支援人員。",
-    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "無法載入「可接受的使用政策」。請稍後重試，或如果問題仍然存在，請聯絡支援人員。"
-  },
-  "account_reports": {
-    "Close": "關閉",
-    "Invalid date and time.": "日期和時間無效。",
-    "Next month": "下個月",
-    "Previous month": "上個月",
-    "Time": "時間"
-  },
-  "admin_split": {
-    "Cancel": "取消",
-    "Failed to split users.": "無法分拆使用者。",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "備註：將嘗試盡量完整復原為合併前的狀態；合併的使用者可能無法完全回復為之前的狀態。",
-    "OK": "確定",
-    "Split": "分拆",
-    "The following users will be split into separate user accounts:": "以下使用者將被分拆成獨立的使用者帳戶：",
-    "There are no user accounts to split from this user.": "無使用者帳戶可從此使用者中分拆出來。",
-    "User split complete. Links to split user accounts follow:": "已分拆使用者。分拆以下使用者帳戶的連結："
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "說明"
-  },
-  "assignment_footer": {
-    "Next": "下一個",
-    "Previous": "上一個"
-  },
-  "assignment_tabs": {
-    "Assignment": "作業",
-    "Peer Review": "同儕互評"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "（課程預設值）",
-    "Account Level": "帳戶級別",
-    "Canvas Grading Scheme (course default)": "Canvas 等級評分方式（課程預設值）",
-    "Close": "關閉",
-    "Course Level": "課程級別",
-    "Default Canvas Grading Scheme": "預設的 Canvas 等級評分分式",
-    "Grading scheme was successfully removed.": "成功移除等級評分方式。",
-    "Grading scheme was successfully updated.": "等級評分方式已成功更新。",
-    "Manage All Grading Schemes": "管理所有等級評分方式",
-    "New Grading Scheme": "新的等級評分方式",
-    "Select a grading scheme": "選取一個等級評分方式",
-    "There was an error while loading grading schemes": "載入等級評分方式時發生錯誤",
-    "There was an error while loading the grading scheme": "載入等級評分方式時發生錯誤",
-    "There was an error while refreshing grading schemes": "重新整理等級評分方式時發生錯誤",
-    "There was an error while removing the grading scheme": "移除等級評分方式時發生錯誤",
-    "View": "檢視"
-  },
-  "assignments_2": {
-    "Assignments 2 Teacher Error Page": "作業列表 2 教師錯誤頁面",
-    "Assignments 2 Teacher initial query error": "作業列表 2 教師初始查詢錯誤",
-    "Loading": "正在載入"
-  },
-  "catalog": {
-    "Course Catalog": "課程目錄"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "做得好！來自 Canvas 開發人員"
-  },
-  "content_copy_redesign": {
-    "Cancel": "取消",
-    "Copy course": "複製課程",
-    "Course code": "課程代碼",
-    "Course code must be 255 characters or less": "課程代碼不可超過 255 個字元",
-    "Course name must be 255 characters or less": "課程名稱不可超過 255 個字元",
-    "Create course": "創建課程",
-    "Creating...": "正在建立...",
-    "End date": "結束日期",
-    "End date must be after start date": "結束日期不可早於開始日期",
-    "Name": "名稱",
-    "No results": "無結果",
-    "Please enter the details for the new course.": "請輸入新課程的詳細資料。",
-    "Select a new beginning date": "選擇新的開始日期",
-    "Select a new end date": "選取新的結束日期",
-    "Select end date": "選取結束日期",
-    "Select start date": "選取開始日期",
-    "Start date": "開始日期",
-    "Start date must be before end date": "開始日期必須早於結束日期",
-    "Start typing to search...": "開始輸入以搜尋...",
-    "Term": "學期",
-    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "不可在此處修改學期開始和結束日期，僅限在「管理員」下的「學期詳細資料」頁面上修改。",
-    "Use arrow keys to navigate options.": "使用箭頭鍵導航選項。"
-  },
-  "content_share_preview_overlay": {
-    "Close": "關閉",
-    "Content Share Preview": "內容共用預覽",
-    "Preview": "預覽"
-  },
-  "copy_warnings_modal": {
-    "Attention": "注意"
-  },
-  "course_logging_content": {
-    "No results": "無結果",
-    "Type to search": "輸入以搜尋"
-  },
-  "create_course_modal": {
-    "Cancel": "取消",
-    "Course Details": "課程詳細資料",
-    "Course Name": "課程名稱",
-    "Create": "創建",
-    "Create Course": "建立課程",
-    "Create Subject": "建立主題",
-    "Creating new course...": "建立新課程...",
-    "Creating new subject...": "正在建立新主題...",
-    "Error creating new course": "建立新課程時發生錯誤",
-    "Error creating new subject": "建立新主題時發生錯誤",
-    "Loading accounts...": "載入帳戶中...",
-    "Name...": "名稱...",
-    "No Results": "沒有結果",
-    "Select a homeroom": "選擇主教室",
-    "Subject Name": "主題名稱",
-    "Unable to get accounts": "無法取得帳戶",
-    "Unable to get homerooms": "無法取得主教室",
-    "Use arrow keys to navigate options.": "使用箭頭鍵導航選項。",
-    "Which account will this course be associated with?": "此課程將與哪一個帳戶關聯？",
-    "Which account will this subject be associated with?": "此主題將與哪一個帳戶關聯？"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "最終評分重寫"
-  },
-  "feature_flags": {
-    "Accept": "接受",
-    "Cancel": "取消"
-  },
-  "filter_bar": {
-    "All": "全部",
-    "Clear": "清除",
-    "Filter by": "篩選條件",
-    "Search": "搜尋",
-    "Use arrow keys to navigate options.": "使用箭頭鍵導航選項。"
-  },
-  "groupNavigationSelector": {
-    "Select Group": "選擇群組",
-    "Use arrow keys to navigate options.": "使用箭頭鍵導航選項。"
-  },
-  "jobs": {
-    "Close": "關閉"
-  },
-  "modules_home_page": {
-    "Create a new Module": "創建一個新單元"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "一隻勤奮好學的熊貓",
-    "Moves:": "移動："
-  },
-  "overview_page": {
-    "Edit home page": "編輯主頁",
-    "Subject Home Page": "科目主頁"
-  },
-  "pages_edit_title": {
-    "Page Title": "頁面標題"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "取消",
-    "Close": "關閉"
-  },
-  "study_assist": {
-    "Back": "返回",
-    "Close": "關閉",
-    "Page": "頁面"
-  },
-  "submit_online_url_assignment": {
-    "A valid URL is required": "有效的 URL 必填",
-    "Website URL": "網站 URL"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "可接受使用政策",
-    "Loading...": "正在載入……",
-    "Preview": "預覽"
-  },
-  "todos_page": {
-    "Failed to load todos": "無法載入待辦事項",
-    "Loading Additional Todo Details": "正在載入額外待辦事項詳細資料",
-    "Loading Todo Course Name": "正在載入待辦事項課程名稱",
-    "Loading Todo Title": "正在載入待辦事項標題"
-  },
-  "tray": {
-    "Close": "關閉"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "取消",
+        "Confirm": "確認"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "標示為重要日期並顯示在主教室側欄中"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "帳戶預設等級評分方式",
+        "Account default grading scheme was successfully saved.": "帳戶預設等級評分方式已成功儲存。",
+        "Active Grading Schemes": "啟用的等級評分方式",
+        "Applied": "應用",
+        "Apply": "應用",
+        "Archive Grading Scheme": "存檔等級評分方式",
+        "Archived": "已存檔",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "使用中的存檔的等級評分方式仍可使用，但無法添加至新課程或作業列表。",
+        "Are you sure you want to delete this grading scheme?": "是否確定要刪除此評分方案？",
+        "Cancel": "取消",
+        "Canvas Default": "Canvas 預設值",
+        "Close": "關閉",
+        "Confirm": "確認",
+        "Confirm Default Grading Scheme Change": "確認預設評分方式變更",
+        "Delete Grading Scheme": "刪除評分方案",
+        "Duplicate Grading Scheme": "重複的等級評分方式",
+        "Edit Grading Scheme": "編輯評分方案",
+        "Grading Scheme Name": "等級評分方式名稱",
+        "Grading scheme was successfully archived.": "評分方案已成功存檔。",
+        "Grading scheme was successfully created.": "成功建立等級評分方式。",
+        "Grading scheme was successfully removed.": "成功移除等級評分方式。",
+        "Grading scheme was successfully saved.": "成功儲存等級評分方式。",
+        "Grading scheme was successfully unarchived.": "評分方案已成功取消存檔。",
+        "Locations Used": "使用的位置",
+        "Lower limit of range": "範圍下限",
+        "New Grading Scheme": "新的等級評分方式",
+        "Next Page": "下一頁",
+        "No account default": "沒有帳戶預設值",
+        "Previous Page": "上一頁",
+        "Save": "保存",
+        "Search": "搜尋",
+        "Search...": "搜尋...",
+        "Show courses and assignments": "顯示課程和作業列表",
+        "Show locations used": "顯示使用的位置",
+        "Sort by": "排序規則為",
+        "There was an error while archiving the grading scheme": "存檔等級評分方式時發生錯誤",
+        "There was an error while creating the grading scheme": "建立等級評分方式時發生錯誤",
+        "There was an error while loading grading schemes": "載入等級評分方式時發生錯誤",
+        "There was an error while loading the default canvas grading scheme": "載入預設的 Canvas 等級評分方式時發生錯誤",
+        "There was an error while loading the default grading scheme": "載入預設的等級評分方式時發生錯誤",
+        "There was an error while removing the grading scheme": "移除等級評分方式時發生錯誤",
+        "There was an error while unarchiving the grading scheme": "取消存檔等級評分方式時發生錯誤",
+        "There was an error while updating the default grading scheme": "更新預設等級評分方式時發生錯誤",
+        "There was an error while updating the grading scheme": "更新等級評分方式時發生錯誤",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "此變更將影響目前繼承帳戶預設值的所有現行課程和作業列表。此變更需要一段時間才能完成，因為所有課程和作業成績都會根據新帳戶預設評分方式重新計算。",
+        "Unarchive Grading Scheme": "取消存檔等級評分方式",
+        "Upper limit of range": "範圍上限",
+        "View Grading Scheme": "檢視評分方案",
+        "View/Copy Grading Scheme": "檢視/複製等級評分方式",
+        "View/Edit Grading Scheme": "檢視/編輯評分方案",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "您無法存檔此等級評分方式，因為它已設定為課程或帳戶的預設值。",
+        "You can't delete this grading scheme because it is in use.": "您無法刪除此等級評分方式，因為它正在使用中。",
+        "You have no active grading schemes.": "您沒有啟用的等級評分方式。",
+        "You have no archived grading schemes.": "您沒有存檔的等級評分方式。",
+        "to": "至"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "是否確定要刪除此評分方案？",
+        "Are you sure you want to duplicate this grading scheme?": "是否確定要複製此等級評分方式？",
+        "Cancel": "取消",
+        "Close": "關閉",
+        "Delete": "刪除",
+        "Delete ": "刪除 ",
+        "Duplicate": "重覆",
+        "Duplicate ": "重覆 ",
+        "Edit Grading Scheme": "編輯評分方案",
+        "New Grading Scheme": "新的等級評分方式",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "無法編輯百分比和分數，因為它是帳戶級別等級評分方式。",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "無法編輯百分比和分數，因為目前正在作為預設的等級評分方式。",
+        "Percentages and points can't be edited because it is currently being used.": "無法編輯百分比和分數，因為它目前正在使用中。",
+        "Save": "保存"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "包含預設的 Canvas 等級評分方式資料的表格。每一列都有一個名稱、一個最大百分比和最小百分比。",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "包含等級評分方式資料的表格。每一列都有一個名稱、一個最大百分比和最小百分比。",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "不可有重複或空白的行名稱。修復名稱，然後嘗試再按一下「儲存」。",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "不可有重疊或空白的範圍。修復範圍，然後嘗試再按一下「儲存」。",
+        "Delete grading scheme": "刪除等級評分方式",
+        "Edit Grading Scheme": "編輯評分方案",
+        "Edit a copy of this grading scheme": "編輯此等級評分方式的副本",
+        "Edit grading scheme": "編輯等級評分方式",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "等級評分方式名稱必填。添加名稱，然後嘗試再按一下「儲存」。",
+        "Grading scheme title": "等級評分方式標題",
+        "Invalid grading scheme": "無效的等級評分方式",
+        "Letter Grade": "字母成績",
+        "Looks great!": "非常棒！",
+        "Percentage": "百分比",
+        "Points": "分數",
+        "Range": "範圍",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "範圍必須為有效數字。不可有負數或大於 100 的數字。修復範圍，然後嘗試再按一下「儲存」。",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "範圍必須為有效數字。不可有負數或大於高分範圍的數字。修復範圍，然後嘗試再按一下「儲存」。",
+        "edit a copy": "編輯副本"
+    },
+    "OutcomeManagement": {
+        "Course": "課程",
+        "Institution": "機構"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "帳戶",
+        "Close": "關閉",
+        "Concluded": "結束",
+        "Courses": "課程",
+        "Failed to load account used locations": "無法載入帳戶使用的位置",
+        "Failed to load assignments used locations": "無法載入作業列表使用的位置",
+        "Failed to load used locations": "無法載入使用的位置",
+        "Load Assignments ...": "載入作業列表...",
+        "Load More Assignments ...": "載入更多作業列表...",
+        "Loading": "正在載入",
+        "Locations Used": "使用的位置",
+        "Search": "搜尋",
+        "Search...": "搜尋..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "可接受使用政策",
+        "Close": "關閉",
+        "Loading page": "載入頁面",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "可接受的使用政策目前無法使用。如果您需要進一步協助，請稍後再回來查看或聯絡支援人員。",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "無法載入「可接受的使用政策」。請稍後重試，或如果問題仍然存在，請聯絡支援人員。"
+    },
+    "account_reports": {
+        "Close": "關閉",
+        "Invalid date and time.": "日期和時間無效。",
+        "Next month": "下個月",
+        "Previous month": "上個月",
+        "Time": "時間"
+    },
+    "admin_split": {
+        "Cancel": "取消",
+        "Failed to split users.": "無法分拆使用者。",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "備註：將嘗試盡量完整復原為合併前的狀態；合併的使用者可能無法完全回復為之前的狀態。",
+        "OK": "確定",
+        "Split": "分拆",
+        "The following users will be split into separate user accounts:": "以下使用者將被分拆成獨立的使用者帳戶：",
+        "There are no user accounts to split from this user.": "無使用者帳戶可從此使用者中分拆出來。",
+        "User split complete. Links to split user accounts follow:": "已分拆使用者。分拆以下使用者帳戶的連結："
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "說明"
+    },
+    "assignment_footer": {
+        "Next": "下一個",
+        "Previous": "上一個"
+    },
+    "assignment_tabs": {
+        "Assignment": "作業",
+        "Peer Review": "同儕互評"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "（課程預設值）",
+        "Account Level": "帳戶級別",
+        "Canvas Grading Scheme (course default)": "Canvas 等級評分方式（課程預設值）",
+        "Close": "關閉",
+        "Course Level": "課程級別",
+        "Default Canvas Grading Scheme": "預設的 Canvas 等級評分分式",
+        "Grading scheme was successfully removed.": "成功移除等級評分方式。",
+        "Grading scheme was successfully updated.": "等級評分方式已成功更新。",
+        "Manage All Grading Schemes": "管理所有等級評分方式",
+        "New Grading Scheme": "新的等級評分方式",
+        "Select a grading scheme": "選取一個等級評分方式",
+        "There was an error while loading grading schemes": "載入等級評分方式時發生錯誤",
+        "There was an error while loading the grading scheme": "載入等級評分方式時發生錯誤",
+        "There was an error while refreshing grading schemes": "重新整理等級評分方式時發生錯誤",
+        "There was an error while removing the grading scheme": "移除等級評分方式時發生錯誤",
+        "View": "檢視"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "作業列表 2 教師錯誤頁面",
+        "Assignments 2 Teacher initial query error": "作業列表 2 教師初始查詢錯誤",
+        "Loading": "正在載入"
+    },
+    "catalog": {
+        "Course Catalog": "課程目錄"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "做得好！來自 Canvas 開發人員"
+    },
+    "content_copy_redesign": {
+        "Cancel": "取消",
+        "Copy course": "複製課程",
+        "Course code": "課程代碼",
+        "Course code must be 255 characters or less": "課程代碼不可超過 255 個字元",
+        "Course name must be 255 characters or less": "課程名稱不可超過 255 個字元",
+        "Create course": "創建課程",
+        "Creating...": "正在建立...",
+        "End date": "結束日期",
+        "End date must be after start date": "結束日期不可早於開始日期",
+        "Name": "名稱",
+        "No results": "無結果",
+        "Please enter the details for the new course.": "請輸入新課程的詳細資料。",
+        "Select a new beginning date": "選擇新的開始日期",
+        "Select a new end date": "選取新的結束日期",
+        "Select end date": "選取結束日期",
+        "Select start date": "選取開始日期",
+        "Start date": "開始日期",
+        "Start date must be before end date": "開始日期必須早於結束日期",
+        "Start typing to search...": "開始輸入以搜尋...",
+        "Term": "學期",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "不可在此處修改學期開始和結束日期，僅限在「管理員」下的「學期詳細資料」頁面上修改。",
+        "Use arrow keys to navigate options.": "使用箭頭鍵導航選項。"
+    },
+    "content_share_preview_overlay": {
+        "Close": "關閉",
+        "Content Share Preview": "內容共用預覽",
+        "Preview": "預覽"
+    },
+    "copy_warnings_modal": {
+        "Attention": "注意"
+    },
+    "course_logging_content": {
+        "No results": "無結果",
+        "Type to search": "輸入以搜尋"
+    },
+    "create_course_modal": {
+        "Cancel": "取消",
+        "Course Details": "課程詳細資料",
+        "Course Name": "課程名稱",
+        "Create": "創建",
+        "Create Course": "建立課程",
+        "Create Subject": "建立主題",
+        "Creating new course...": "建立新課程...",
+        "Creating new subject...": "正在建立新主題...",
+        "Error creating new course": "建立新課程時發生錯誤",
+        "Error creating new subject": "建立新主題時發生錯誤",
+        "Loading accounts...": "載入帳戶中...",
+        "Name...": "名稱...",
+        "No Results": "沒有結果",
+        "Select a homeroom": "選擇主教室",
+        "Subject Name": "主題名稱",
+        "Unable to get accounts": "無法取得帳戶",
+        "Unable to get homerooms": "無法取得主教室",
+        "Use arrow keys to navigate options.": "使用箭頭鍵導航選項。",
+        "Which account will this course be associated with?": "此課程將與哪一個帳戶關聯？",
+        "Which account will this subject be associated with?": "此主題將與哪一個帳戶關聯？"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "最終評分重寫"
+    },
+    "feature_flags": {
+        "Accept": "接受",
+        "Cancel": "取消"
+    },
+    "filter_bar": {
+        "All": "全部",
+        "Clear": "清除",
+        "Filter by": "篩選條件",
+        "Search": "搜尋",
+        "Use arrow keys to navigate options.": "使用箭頭鍵導航選項。"
+    },
+    "groupNavigationSelector": {
+        "Select Group": "選擇群組",
+        "Use arrow keys to navigate options.": "使用箭頭鍵導航選項。"
+    },
+    "jobs": {
+        "Close": "關閉"
+    },
+    "modules_home_page": {
+        "Create a new Module": "創建一個新單元"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "一隻勤奮好學的熊貓",
+        "Moves:": "移動："
+    },
+    "overview_page": {
+        "Edit home page": "編輯主頁",
+        "Subject Home Page": "科目主頁"
+    },
+    "pages_edit_title": {
+        "Page Title": "頁面標題"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "取消",
+        "Close": "關閉"
+    },
+    "study_assist": {
+        "Back": "返回",
+        "Close": "關閉",
+        "Page": "頁面"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "有效的 URL 必填",
+        "Website URL": "網站 URL"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "可接受使用政策",
+        "Loading...": "正在載入……",
+        "Preview": "預覽"
+    },
+    "todos_page": {
+        "Failed to load todos": "無法載入待辦事項",
+        "Loading Additional Todo Details": "正在載入額外待辦事項詳細資料",
+        "Loading Todo Course Name": "正在載入待辦事項課程名稱",
+        "Loading Todo Title": "正在載入待辦事項標題"
+    },
+    "tray": {
+        "Close": "關閉"
+    }
 }

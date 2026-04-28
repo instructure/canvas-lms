@@ -1,306 +1,306 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Annuleren",
-    "Confirm": "Bevestigen"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "Markeren als belangrijke datum en tonen op klaszijbalk"
-  },
-  "GradingSchemeManagement": {
-    "Account default grading scheme": "Standaard beoordelingsschema account",
-    "Account default grading scheme was successfully saved.": "Beoordelingsschema account is opgeslagen.",
-    "Active Grading Schemes": "Actieve beoordelingsschema's",
-    "Applied": "Toegepast",
-    "Apply": "Toepassen",
-    "Archive Grading Scheme": "Beoordelingsschema archiveren",
-    "Archived": "Gearchiveerd",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Gearchiveerde beoordelingsschema's die in gebruik zijn, kunnen gewoon worden gebruikt, maar kunnen niet worden toegevoegd aan nieuwe cursussen of opdrachten.",
-    "Are you sure you want to delete this grading scheme?": "Weet je zeker dat je dit beoordelingsschema wilt verwijderen?",
-    "Cancel": "Annuleren",
-    "Canvas Default": "Canvas-standaard",
-    "Close": "Sluiten",
-    "Confirm": "Bevestigen",
-    "Confirm Default Grading Scheme Change": "Wijziging van standaard beoordelingsschema bevestigen",
-    "Delete Grading Scheme": "Beoordelingsschema verwijderen",
-    "Duplicate Grading Scheme": "Beoordelingsschema dupliceren",
-    "Edit Grading Scheme": "Beoordelingsschema bewerken",
-    "Grading Scheme Name": "Naam beoordelingsschema",
-    "Grading scheme was successfully archived.": "Beoordelingsschema is gearchiveerd.",
-    "Grading scheme was successfully created.": "Beoordelingsschema is gemaakt.",
-    "Grading scheme was successfully removed.": "Beoordelingsschema is verwijderd.",
-    "Grading scheme was successfully saved.": "Beoordelingsschema is opgeslagen.",
-    "Grading scheme was successfully unarchived.": "Archivering van beoordelingsschema is ongedaan gemaakt.",
-    "Locations Used": "Gebruikte locaties",
-    "Lower limit of range": "Ondergrens van bereik",
-    "New Grading Scheme": "Nieuw beoordelingsschema",
-    "Next Page": "Volgende pagina",
-    "No account default": "Geen accountstandaard",
-    "Previous Page": "Vorige pagina",
-    "Save": "Opslaan",
-    "Search": "Zoeken",
-    "Search...": "Zoeken...",
-    "Show courses and assignments": "Cursussen en opdrachten weergeven",
-    "Show locations used": "Gebruikte locaties tonen",
-    "Sort by": "Sorteren op",
-    "There was an error while archiving the grading scheme": "Er is een fout opgetreden tijdens het archiveren van het beoordelingsschema",
-    "There was an error while creating the grading scheme": "Er is een fout opgetreden bij het maken van het beoordelingsschema",
-    "There was an error while loading grading schemes": "Er is een fout opgetreden bij het laden van beoordelingsschema's",
-    "There was an error while loading the default canvas grading scheme": "Er is een fout opgetreden bij het laden van het standaard Canvas-beoordelingsschema",
-    "There was an error while loading the default grading scheme": "Er is een fout opgetreden bij het laden van het standaard beoordelingsschema",
-    "There was an error while removing the grading scheme": "Er is een fout opgetreden bij het verwijderen van het beoordelingsschema",
-    "There was an error while unarchiving the grading scheme": "Er is een fout opgetreden tijdens het ongedaan maken van de archivering van het beoordelingsschema",
-    "There was an error while updating the default grading scheme": "Er is een fout opgetreden bij het bijwerken van het standaard beoordelingsschema",
-    "There was an error while updating the grading scheme": "Er is een fout opgetreden bij het bijwerken van het beoordelingsschema",
-    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Deze wijziging heeft gevolgen voor alle actieve cursussen en opdrachten die momenteel de standaard van de account overnemen. Het duurt een tijdje voordat deze wijziging volledig uitgevoerd is omdat alle cijfers voor cursussen en opdrachten opnieuw worden berekend op basis van het nieuwe standaard beoordelingsschema voor de account.",
-    "Unarchive Grading Scheme": "Archivering van beoordelingsschema ongedaan maken",
-    "Upper limit of range": "Bovengrens van het bereik",
-    "View Grading Scheme": "Beoordelingsschema weergeven",
-    "View/Copy Grading Scheme": "Beoordelingsschema bekijken/kopiëren",
-    "View/Edit Grading Scheme": "Beoordelingsschema weergeven/bewerken",
-    "You can't archive this grading scheme because it is set as a default for a course or account.": "Je kunt dit beoordelingsschema niet archiveren omdat het als standaard is ingesteld voor een cursus of account.",
-    "You can't delete this grading scheme because it is in use.": "Je kunt dit beoordelingsschema niet verwijderen omdat het in gebruik is.",
-    "You have no active grading schemes.": "Er zijn geen actieve beoordelingsschema's.",
-    "You have no archived grading schemes.": "Er zijn geen gearchiveerde beoordelingsschema's.",
-    "to": "tot"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Weet je zeker dat je dit beoordelingsschema wilt verwijderen?",
-    "Are you sure you want to duplicate this grading scheme?": "Weet je zeker dat je dit beoordelingsschema wilt dupliceren?",
-    "Cancel": "Annuleren",
-    "Close": "Sluiten",
-    "Delete": "Verwijderen",
-    "Delete ": "Verwijderen ",
-    "Duplicate": "Dupliceren",
-    "Duplicate ": "Dupliceren ",
-    "Edit Grading Scheme": "Beoordelingsschema bewerken",
-    "New Grading Scheme": "Nieuw beoordelingsschema",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "Percentages en punten kunnen niet worden bewerkt omdat dit een beoordelingsschema op accountniveau is.",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Percentages en punten kunnen niet worden bewerkt omdat dit momenteel wordt gebruikt als het standaard beoordelingsschema.",
-    "Percentages and points can't be edited because it is currently being used.": "Percentages en punten kunnen niet worden bewerkt omdat dit momenteel wordt gebruikt.",
-    "Save": "Opslaan"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Een tabel die de gegevens voor het standaard Canvas-beoordelingsschema bevat.  Elke rij bevat een naam, een maximumpercentage en een minimumpercentage.",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Een tabel die de gegevens van het beoordelingsschema bevat.  Elke rij bevat een naam, een maximumpercentage en een minimumpercentage.",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Dubbele of lege rijnamen zijn niet toegestaan. Leg de namen vast en probeer nogmaals op 'Opslaan' te klikken.",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Overlappende of lege bereiken zijn niet toegestaan. Leg de bereiken vast en probeer nogmaals op 'Opslaan' te klikken.",
-    "Delete grading scheme": "Beoordelingsschema verwijderen",
-    "Edit Grading Scheme": "Beoordelingsschema bewerken",
-    "Edit a copy of this grading scheme": "Bewerk een kopie van dit beoordelingsschema",
-    "Edit grading scheme": "Beoordelingsschema bewerken",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Naam beoordelingsschema is vereist. Voeg een naam toe en probeer nogmaals op 'Opslaan' te klikken.",
-    "Grading scheme title": "Titel beoordelingsschema",
-    "Invalid grading scheme": "Ongeldig beoordelingsschema",
-    "Letter Grade": "Beoordeling in lettervorm",
-    "Looks great!": "Ziet er goed uit!",
-    "Percentage": "Percentage",
-    "Points": "Punten",
-    "Range": "Bereik",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Bereik moet een geldig getal zijn. Negatieve getallen of getallen groter dan 100 zijn niet toegestaan. Leg de bereiken vast en probeer nogmaals op 'Opslaan' te klikken.",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Bereik moet een geldig getal zijn. Negatieve getallen of getallen groter dan de bovengrens van het puntenbereik. Leg de bereiken vast en probeer nogmaals op 'Opslaan' te klikken.",
-    "edit a copy": "een kopie bewerken"
-  },
-  "OutcomeManagement": {
-    "Course": "Cursus",
-    "Institution": "Instituut"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Accounts",
-    "Close": "Sluiten",
-    "Concluded": "Voltooid",
-    "Courses": "Cursussen",
-    "Failed to load account used locations": "Kan geen in account gebruikte locaties laden",
-    "Failed to load assignments used locations": "Kan geen in opdrachten gebruikte locaties laden",
-    "Failed to load used locations": "Kan geen gebruikte locaties laden",
-    "Load Assignments ...": "Opdrachten laden...",
-    "Load More Assignments ...": "Meer opdrachten laden...",
-    "Loading": "Bezig met laden...",
-    "Locations Used": "Gebruikte locaties",
-    "Search": "Zoeken",
-    "Search...": "Zoeken..."
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "Acceptabel gebruiksbeleid",
-    "Close": "Sluiten",
-    "Loading page": "Pagina wordt geladen",
-    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Het beleid voor acceptabel gebruik is momenteel niet beschikbaar. Kom later nog eens terug of neem contact op met de ondersteuning als je meer hulp nodig hebt.",
-    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Beleid voor acceptabel gebruik kon niet worden geladen. Probeer het opnieuw of neem contact op met de ondersteuning als het probleem blijft optreden."
-  },
-  "account_reports": {
-    "Close": "Sluiten",
-    "Invalid date and time.": "Ongeldige datum en tijd.",
-    "Next month": "Volgende maand",
-    "Previous month": "Vorige maand",
-    "Time": "Tijd"
-  },
-  "admin_split": {
-    "Cancel": "Annuleren",
-    "Failed to split users.": "Splitsen van gebruikers is mislukt.",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "OPMERKING: Hiermee wordt geprobeerd om de samenvoeging zoveel mogelijk ongedaan te maken; het kan echter gebeuren dat samengevoegde gebruikers niet perfect naar hun vorige toestand worden hersteld.",
-    "OK": "OK",
-    "Split": "Splitsen",
-    "The following users will be split into separate user accounts:": "De volgende gebruikers worden gesplitst in afzonderlijke gebruikersaccounts:",
-    "There are no user accounts to split from this user.": "Er zijn geen gebruikersaccounts om te splitsen van deze gebruiker.",
-    "User split complete. Links to split user accounts follow:": "Gebruikers splitsen is voltooid. Links om gebruikersaccounts te splitsen volgen:"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Beschrijving"
-  },
-  "assignment_footer": {
-    "Next": "Volgende",
-    "Previous": "Vorige"
-  },
-  "assignment_tabs": {
-    "Assignment": "Opdracht",
-    "Peer Review": "Peerbeoordeling"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "(standaard voor cursussen)",
-    "Account Level": "Accountniveau",
-    "Canvas Grading Scheme (course default)": "Canvas-beoordelingsschema (standaard voor cursussen)",
-    "Close": "Sluiten",
-    "Course Level": "Cursusniveau",
-    "Default Canvas Grading Scheme": "Standaard Canvas-beoordelingsschema",
-    "Grading scheme was successfully removed.": "Beoordelingsschema is verwijderd.",
-    "Grading scheme was successfully updated.": "Beoordelingsschema is bijgewerkt.",
-    "Manage All Grading Schemes": "Alle beoordelingsschema's beheren",
-    "New Grading Scheme": "Nieuw beoordelingsschema",
-    "Select a grading scheme": "Selecteer een beoordelingsschema",
-    "There was an error while loading grading schemes": "Er is een fout opgetreden bij het laden van beoordelingsschema's",
-    "There was an error while loading the grading scheme": "Er is een fout opgetreden tijdens het laden van het beoordelingsschema",
-    "There was an error while refreshing grading schemes": "Er is een fout opgetreden bij het vernieuwen van beoordelingsschema's",
-    "There was an error while removing the grading scheme": "Er is een fout opgetreden bij het verwijderen van het beoordelingsschema",
-    "View": "Weergeven"
-  },
-  "assignments_2": {
-    "Assignments 2 Teacher Error Page": "Foutpagina Opdrachten 2 Docent",
-    "Assignments 2 Teacher initial query error": "Initiële queryfout Opdrachten 2 Docent",
-    "Loading": "Bezig met laden..."
-  },
-  "catalog": {
-    "Course Catalog": "Catalogus van de cursus"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "Prima werk! Van de ontwikkelaars van Canvas"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Annuleren",
-    "Copy course": "Cursus kopiëren",
-    "Course code": "Cursuscode",
-    "Course code must be 255 characters or less": "Cursuscode moet uit 255 tekens of minder bestaan",
-    "Course name must be 255 characters or less": "Cursusnaam moet uit 255 tekens of minder bestaan",
-    "Create course": "Cursus maken",
-    "Creating...": "Wordt gemaakt...",
-    "End date": "Einddatum",
-    "End date must be after start date": "Einddatum moet na startdatum liggen",
-    "Name": "Naam",
-    "No results": "Geen resultaten",
-    "Please enter the details for the new course.": "Voer de details voor de nieuwe cursus in.",
-    "Select a new beginning date": "Een nieuwe begindatum selecteren",
-    "Select a new end date": "Een nieuwe einddatum selecteren",
-    "Select end date": "Einddatum selecteren",
-    "Select start date": "Startdatum selecteren",
-    "Start date": "Startdatum",
-    "Start date must be before end date": "Startdatum moet vóór einddatum liggen",
-    "Start typing to search...": "Begin met typen om te zoeken...",
-    "Term": "Periode",
-    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "De begin- en einddatums van de periode kunnen hier niet worden gewijzigd. Ze kunnen alleen worden gewijzigd op de pagina Periodegegevens (Term Details) onder Admin.",
-    "Use arrow keys to navigate options.": "Gebruik de pijltoetsen om door opties te navigeren."
-  },
-  "content_share_preview_overlay": {
-    "Close": "Sluiten",
-    "Content Share Preview": "Voorbeeld contentshare",
-    "Preview": "Voorbeeld"
-  },
-  "copy_warnings_modal": {
-    "Attention": "Let op"
-  },
-  "course_logging_content": {
-    "No results": "Geen resultaten",
-    "Type to search": "Typ om te zoeken"
-  },
-  "create_course_modal": {
-    "Cancel": "Annuleren",
-    "Course Details": "Cursusdetails",
-    "Course Name": "Cursusnaam",
-    "Create": "Aanmaken",
-    "Create Course": "Cursus maken",
-    "Create Subject": "Vak maken",
-    "Creating new course...": "Nieuwe cursus wordt gemaakt...",
-    "Creating new subject...": "Nieuw vak wordt gemaakt...",
-    "Error creating new course": "Fout bij maken van nieuwe cursus",
-    "Error creating new subject": "Fout bij maken van nieuw vak",
-    "Loading accounts...": "Accounts worden geladen...",
-    "Name...": "Naam...",
-    "No Results": "Geen resultaten",
-    "Select a homeroom": "Een klas selecteren",
-    "Subject Name": "Vaknaam",
-    "Unable to get accounts": "Kan geen accounts krijgen",
-    "Unable to get homerooms": "Kan geen klassen krijgen",
-    "Use arrow keys to navigate options.": "Gebruik de pijltoetsen om door opties te navigeren.",
-    "Which account will this course be associated with?": "Aan welk account wordt deze cursus gekoppeld?",
-    "Which account will this subject be associated with?": "Aan welk account wordt dit vak gekoppeld?"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "Overschrijving eindcijfers"
-  },
-  "feature_flags": {
-    "Accept": "Accepteren",
-    "Cancel": "Annuleren"
-  },
-  "filter_bar": {
-    "All": "Alle(n)",
-    "Clear": "Wissen",
-    "Filter by": "Filteren op",
-    "Search": "Zoeken",
-    "Use arrow keys to navigate options.": "Gebruik de pijltoetsen om door opties te navigeren."
-  },
-  "groupNavigationSelector": {
-    "Select Group": "Groep selecteren",
-    "Use arrow keys to navigate options.": "Gebruik de pijltoetsen om door opties te navigeren."
-  },
-  "jobs": {
-    "Close": "Sluiten"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Een nieuwe module maken"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "Een leergierige panda",
-    "Moves:": "Verplaatst:"
-  },
-  "overview_page": {
-    "Edit home page": "Startpagina bewerken",
-    "Subject Home Page": "Startpagina van vak"
-  },
-  "pages_edit_title": {
-    "Page Title": "Paginatitel"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Annuleren",
-    "Close": "Sluiten"
-  },
-  "study_assist": {
-    "Back": "Terug",
-    "Close": "Sluiten",
-    "Page": "Pagina"
-  },
-  "submit_online_url_assignment": {
-    "A valid URL is required": "Er is een geldige URL vereist",
-    "Website URL": "Website-URL"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "Acceptabel gebruiksbeleid",
-    "Loading...": "Bezig met laden...",
-    "Preview": "Voorbeeld"
-  },
-  "todos_page": {
-    "Failed to load todos": "Laden van to-do's is mislukt",
-    "Loading Additional Todo Details": "Laden van aanvullende to-do details",
-    "Loading Todo Course Name": "Laden van to-do cursusnaam",
-    "Loading Todo Title": "Laden van to-do titel"
-  },
-  "tray": {
-    "Close": "Sluiten"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Annuleren",
+        "Confirm": "Bevestigen"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Markeren als belangrijke datum en tonen op klaszijbalk"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Standaard beoordelingsschema account",
+        "Account default grading scheme was successfully saved.": "Beoordelingsschema account is opgeslagen.",
+        "Active Grading Schemes": "Actieve beoordelingsschema's",
+        "Applied": "Toegepast",
+        "Apply": "Toepassen",
+        "Archive Grading Scheme": "Beoordelingsschema archiveren",
+        "Archived": "Gearchiveerd",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Gearchiveerde beoordelingsschema's die in gebruik zijn, kunnen gewoon worden gebruikt, maar kunnen niet worden toegevoegd aan nieuwe cursussen of opdrachten.",
+        "Are you sure you want to delete this grading scheme?": "Weet je zeker dat je dit beoordelingsschema wilt verwijderen?",
+        "Cancel": "Annuleren",
+        "Canvas Default": "Canvas-standaard",
+        "Close": "Sluiten",
+        "Confirm": "Bevestigen",
+        "Confirm Default Grading Scheme Change": "Wijziging van standaard beoordelingsschema bevestigen",
+        "Delete Grading Scheme": "Beoordelingsschema verwijderen",
+        "Duplicate Grading Scheme": "Beoordelingsschema dupliceren",
+        "Edit Grading Scheme": "Beoordelingsschema bewerken",
+        "Grading Scheme Name": "Naam beoordelingsschema",
+        "Grading scheme was successfully archived.": "Beoordelingsschema is gearchiveerd.",
+        "Grading scheme was successfully created.": "Beoordelingsschema is gemaakt.",
+        "Grading scheme was successfully removed.": "Beoordelingsschema is verwijderd.",
+        "Grading scheme was successfully saved.": "Beoordelingsschema is opgeslagen.",
+        "Grading scheme was successfully unarchived.": "Archivering van beoordelingsschema is ongedaan gemaakt.",
+        "Locations Used": "Gebruikte locaties",
+        "Lower limit of range": "Ondergrens van bereik",
+        "New Grading Scheme": "Nieuw beoordelingsschema",
+        "Next Page": "Volgende pagina",
+        "No account default": "Geen accountstandaard",
+        "Previous Page": "Vorige pagina",
+        "Save": "Opslaan",
+        "Search": "Zoeken",
+        "Search...": "Zoeken...",
+        "Show courses and assignments": "Cursussen en opdrachten weergeven",
+        "Show locations used": "Gebruikte locaties tonen",
+        "Sort by": "Sorteren op",
+        "There was an error while archiving the grading scheme": "Er is een fout opgetreden tijdens het archiveren van het beoordelingsschema",
+        "There was an error while creating the grading scheme": "Er is een fout opgetreden bij het maken van het beoordelingsschema",
+        "There was an error while loading grading schemes": "Er is een fout opgetreden bij het laden van beoordelingsschema's",
+        "There was an error while loading the default canvas grading scheme": "Er is een fout opgetreden bij het laden van het standaard Canvas-beoordelingsschema",
+        "There was an error while loading the default grading scheme": "Er is een fout opgetreden bij het laden van het standaard beoordelingsschema",
+        "There was an error while removing the grading scheme": "Er is een fout opgetreden bij het verwijderen van het beoordelingsschema",
+        "There was an error while unarchiving the grading scheme": "Er is een fout opgetreden tijdens het ongedaan maken van de archivering van het beoordelingsschema",
+        "There was an error while updating the default grading scheme": "Er is een fout opgetreden bij het bijwerken van het standaard beoordelingsschema",
+        "There was an error while updating the grading scheme": "Er is een fout opgetreden bij het bijwerken van het beoordelingsschema",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Deze wijziging heeft gevolgen voor alle actieve cursussen en opdrachten die momenteel de standaard van de account overnemen. Het duurt een tijdje voordat deze wijziging volledig uitgevoerd is omdat alle cijfers voor cursussen en opdrachten opnieuw worden berekend op basis van het nieuwe standaard beoordelingsschema voor de account.",
+        "Unarchive Grading Scheme": "Archivering van beoordelingsschema ongedaan maken",
+        "Upper limit of range": "Bovengrens van het bereik",
+        "View Grading Scheme": "Beoordelingsschema weergeven",
+        "View/Copy Grading Scheme": "Beoordelingsschema bekijken/kopiëren",
+        "View/Edit Grading Scheme": "Beoordelingsschema weergeven/bewerken",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Je kunt dit beoordelingsschema niet archiveren omdat het als standaard is ingesteld voor een cursus of account.",
+        "You can't delete this grading scheme because it is in use.": "Je kunt dit beoordelingsschema niet verwijderen omdat het in gebruik is.",
+        "You have no active grading schemes.": "Er zijn geen actieve beoordelingsschema's.",
+        "You have no archived grading schemes.": "Er zijn geen gearchiveerde beoordelingsschema's.",
+        "to": "tot"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Weet je zeker dat je dit beoordelingsschema wilt verwijderen?",
+        "Are you sure you want to duplicate this grading scheme?": "Weet je zeker dat je dit beoordelingsschema wilt dupliceren?",
+        "Cancel": "Annuleren",
+        "Close": "Sluiten",
+        "Delete": "Verwijderen",
+        "Delete ": "Verwijderen ",
+        "Duplicate": "Dupliceren",
+        "Duplicate ": "Dupliceren ",
+        "Edit Grading Scheme": "Beoordelingsschema bewerken",
+        "New Grading Scheme": "Nieuw beoordelingsschema",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Percentages en punten kunnen niet worden bewerkt omdat dit een beoordelingsschema op accountniveau is.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Percentages en punten kunnen niet worden bewerkt omdat dit momenteel wordt gebruikt als het standaard beoordelingsschema.",
+        "Percentages and points can't be edited because it is currently being used.": "Percentages en punten kunnen niet worden bewerkt omdat dit momenteel wordt gebruikt.",
+        "Save": "Opslaan"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Een tabel die de gegevens voor het standaard Canvas-beoordelingsschema bevat.  Elke rij bevat een naam, een maximumpercentage en een minimumpercentage.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Een tabel die de gegevens van het beoordelingsschema bevat.  Elke rij bevat een naam, een maximumpercentage en een minimumpercentage.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Dubbele of lege rijnamen zijn niet toegestaan. Leg de namen vast en probeer nogmaals op 'Opslaan' te klikken.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Overlappende of lege bereiken zijn niet toegestaan. Leg de bereiken vast en probeer nogmaals op 'Opslaan' te klikken.",
+        "Delete grading scheme": "Beoordelingsschema verwijderen",
+        "Edit Grading Scheme": "Beoordelingsschema bewerken",
+        "Edit a copy of this grading scheme": "Bewerk een kopie van dit beoordelingsschema",
+        "Edit grading scheme": "Beoordelingsschema bewerken",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Naam beoordelingsschema is vereist. Voeg een naam toe en probeer nogmaals op 'Opslaan' te klikken.",
+        "Grading scheme title": "Titel beoordelingsschema",
+        "Invalid grading scheme": "Ongeldig beoordelingsschema",
+        "Letter Grade": "Beoordeling in lettervorm",
+        "Looks great!": "Ziet er goed uit!",
+        "Percentage": "Percentage",
+        "Points": "Punten",
+        "Range": "Bereik",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Bereik moet een geldig getal zijn. Negatieve getallen of getallen groter dan 100 zijn niet toegestaan. Leg de bereiken vast en probeer nogmaals op 'Opslaan' te klikken.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Bereik moet een geldig getal zijn. Negatieve getallen of getallen groter dan de bovengrens van het puntenbereik. Leg de bereiken vast en probeer nogmaals op 'Opslaan' te klikken.",
+        "edit a copy": "een kopie bewerken"
+    },
+    "OutcomeManagement": {
+        "Course": "Cursus",
+        "Institution": "Instituut"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Accounts",
+        "Close": "Sluiten",
+        "Concluded": "Voltooid",
+        "Courses": "Cursussen",
+        "Failed to load account used locations": "Kan geen in account gebruikte locaties laden",
+        "Failed to load assignments used locations": "Kan geen in opdrachten gebruikte locaties laden",
+        "Failed to load used locations": "Kan geen gebruikte locaties laden",
+        "Load Assignments ...": "Opdrachten laden...",
+        "Load More Assignments ...": "Meer opdrachten laden...",
+        "Loading": "Bezig met laden...",
+        "Locations Used": "Gebruikte locaties",
+        "Search": "Zoeken",
+        "Search...": "Zoeken..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Acceptabel gebruiksbeleid",
+        "Close": "Sluiten",
+        "Loading page": "Pagina wordt geladen",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Het beleid voor acceptabel gebruik is momenteel niet beschikbaar. Kom later nog eens terug of neem contact op met de ondersteuning als je meer hulp nodig hebt.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Beleid voor acceptabel gebruik kon niet worden geladen. Probeer het opnieuw of neem contact op met de ondersteuning als het probleem blijft optreden."
+    },
+    "account_reports": {
+        "Close": "Sluiten",
+        "Invalid date and time.": "Ongeldige datum en tijd.",
+        "Next month": "Volgende maand",
+        "Previous month": "Vorige maand",
+        "Time": "Tijd"
+    },
+    "admin_split": {
+        "Cancel": "Annuleren",
+        "Failed to split users.": "Splitsen van gebruikers is mislukt.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "OPMERKING: Hiermee wordt geprobeerd om de samenvoeging zoveel mogelijk ongedaan te maken; het kan echter gebeuren dat samengevoegde gebruikers niet perfect naar hun vorige toestand worden hersteld.",
+        "OK": "OK",
+        "Split": "Splitsen",
+        "The following users will be split into separate user accounts:": "De volgende gebruikers worden gesplitst in afzonderlijke gebruikersaccounts:",
+        "There are no user accounts to split from this user.": "Er zijn geen gebruikersaccounts om te splitsen van deze gebruiker.",
+        "User split complete. Links to split user accounts follow:": "Gebruikers splitsen is voltooid. Links om gebruikersaccounts te splitsen volgen:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Beschrijving"
+    },
+    "assignment_footer": {
+        "Next": "Volgende",
+        "Previous": "Vorige"
+    },
+    "assignment_tabs": {
+        "Assignment": "Opdracht",
+        "Peer Review": "Peerbeoordeling"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(standaard voor cursussen)",
+        "Account Level": "Accountniveau",
+        "Canvas Grading Scheme (course default)": "Canvas-beoordelingsschema (standaard voor cursussen)",
+        "Close": "Sluiten",
+        "Course Level": "Cursusniveau",
+        "Default Canvas Grading Scheme": "Standaard Canvas-beoordelingsschema",
+        "Grading scheme was successfully removed.": "Beoordelingsschema is verwijderd.",
+        "Grading scheme was successfully updated.": "Beoordelingsschema is bijgewerkt.",
+        "Manage All Grading Schemes": "Alle beoordelingsschema's beheren",
+        "New Grading Scheme": "Nieuw beoordelingsschema",
+        "Select a grading scheme": "Selecteer een beoordelingsschema",
+        "There was an error while loading grading schemes": "Er is een fout opgetreden bij het laden van beoordelingsschema's",
+        "There was an error while loading the grading scheme": "Er is een fout opgetreden tijdens het laden van het beoordelingsschema",
+        "There was an error while refreshing grading schemes": "Er is een fout opgetreden bij het vernieuwen van beoordelingsschema's",
+        "There was an error while removing the grading scheme": "Er is een fout opgetreden bij het verwijderen van het beoordelingsschema",
+        "View": "Weergeven"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Foutpagina Opdrachten 2 Docent",
+        "Assignments 2 Teacher initial query error": "Initiële queryfout Opdrachten 2 Docent",
+        "Loading": "Bezig met laden..."
+    },
+    "catalog": {
+        "Course Catalog": "Catalogus van de cursus"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Prima werk! Van de ontwikkelaars van Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Annuleren",
+        "Copy course": "Cursus kopiëren",
+        "Course code": "Cursuscode",
+        "Course code must be 255 characters or less": "Cursuscode moet uit 255 tekens of minder bestaan",
+        "Course name must be 255 characters or less": "Cursusnaam moet uit 255 tekens of minder bestaan",
+        "Create course": "Cursus maken",
+        "Creating...": "Wordt gemaakt...",
+        "End date": "Einddatum",
+        "End date must be after start date": "Einddatum moet na startdatum liggen",
+        "Name": "Naam",
+        "No results": "Geen resultaten",
+        "Please enter the details for the new course.": "Voer de details voor de nieuwe cursus in.",
+        "Select a new beginning date": "Een nieuwe begindatum selecteren",
+        "Select a new end date": "Een nieuwe einddatum selecteren",
+        "Select end date": "Einddatum selecteren",
+        "Select start date": "Startdatum selecteren",
+        "Start date": "Startdatum",
+        "Start date must be before end date": "Startdatum moet vóór einddatum liggen",
+        "Start typing to search...": "Begin met typen om te zoeken...",
+        "Term": "Periode",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "De begin- en einddatums van de periode kunnen hier niet worden gewijzigd. Ze kunnen alleen worden gewijzigd op de pagina Periodegegevens (Term Details) onder Admin.",
+        "Use arrow keys to navigate options.": "Gebruik de pijltoetsen om door opties te navigeren."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Sluiten",
+        "Content Share Preview": "Voorbeeld contentshare",
+        "Preview": "Voorbeeld"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Let op"
+    },
+    "course_logging_content": {
+        "No results": "Geen resultaten",
+        "Type to search": "Typ om te zoeken"
+    },
+    "create_course_modal": {
+        "Cancel": "Annuleren",
+        "Course Details": "Cursusdetails",
+        "Course Name": "Cursusnaam",
+        "Create": "Aanmaken",
+        "Create Course": "Cursus maken",
+        "Create Subject": "Vak maken",
+        "Creating new course...": "Nieuwe cursus wordt gemaakt...",
+        "Creating new subject...": "Nieuw vak wordt gemaakt...",
+        "Error creating new course": "Fout bij maken van nieuwe cursus",
+        "Error creating new subject": "Fout bij maken van nieuw vak",
+        "Loading accounts...": "Accounts worden geladen...",
+        "Name...": "Naam...",
+        "No Results": "Geen resultaten",
+        "Select a homeroom": "Een klas selecteren",
+        "Subject Name": "Vaknaam",
+        "Unable to get accounts": "Kan geen accounts krijgen",
+        "Unable to get homerooms": "Kan geen klassen krijgen",
+        "Use arrow keys to navigate options.": "Gebruik de pijltoetsen om door opties te navigeren.",
+        "Which account will this course be associated with?": "Aan welk account wordt deze cursus gekoppeld?",
+        "Which account will this subject be associated with?": "Aan welk account wordt dit vak gekoppeld?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Overschrijving eindcijfers"
+    },
+    "feature_flags": {
+        "Accept": "Accepteren",
+        "Cancel": "Annuleren"
+    },
+    "filter_bar": {
+        "All": "Alle(n)",
+        "Clear": "Wissen",
+        "Filter by": "Filteren op",
+        "Search": "Zoeken",
+        "Use arrow keys to navigate options.": "Gebruik de pijltoetsen om door opties te navigeren."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Groep selecteren",
+        "Use arrow keys to navigate options.": "Gebruik de pijltoetsen om door opties te navigeren."
+    },
+    "jobs": {
+        "Close": "Sluiten"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Een nieuwe module maken"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Een leergierige panda",
+        "Moves:": "Verplaatst:"
+    },
+    "overview_page": {
+        "Edit home page": "Startpagina bewerken",
+        "Subject Home Page": "Startpagina van vak"
+    },
+    "pages_edit_title": {
+        "Page Title": "Paginatitel"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Annuleren",
+        "Close": "Sluiten"
+    },
+    "study_assist": {
+        "Back": "Terug",
+        "Close": "Sluiten",
+        "Page": "Pagina"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "Er is een geldige URL vereist",
+        "Website URL": "Website-URL"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Acceptabel gebruiksbeleid",
+        "Loading...": "Bezig met laden...",
+        "Preview": "Voorbeeld"
+    },
+    "todos_page": {
+        "Failed to load todos": "Laden van to-do's is mislukt",
+        "Loading Additional Todo Details": "Laden van aanvullende to-do details",
+        "Loading Todo Course Name": "Laden van to-do cursusnaam",
+        "Loading Todo Title": "Laden van to-do titel"
+    },
+    "tray": {
+        "Close": "Sluiten"
+    }
 }

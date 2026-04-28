@@ -1,306 +1,306 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Canslo",
-    "Confirm": "Cadarnhau"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "Nodi’n ddyddiad pwysig a dangos ar far ochr homeroom"
-  },
-  "GradingSchemeManagement": {
-    "Account default grading scheme": "Cynllun graddau diofyn cyfrif",
-    "Account default grading scheme was successfully saved.": "Wedi llwyddo i gadw cynllun graddau diofyn cyfrif.",
-    "Active Grading Schemes": "Cynlluniau Graddau Gweithredol",
-    "Applied": "Wedi rhoi ar waith",
-    "Apply": "Rhoi ar waith",
-    "Archive Grading Scheme": "Archifo Cynllun Graddau",
-    "Archived": "Wedi archifo",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Mae modd defnyddio cynlluniau Graddau wedi’u Harchifo o hyd, ond does dim modd eu hychwanegu at gyrsiau neu aseiniadau newydd.",
-    "Are you sure you want to delete this grading scheme?": "Ydych chi’n siŵr eich bod am ddileu’r cynllun graddau hwn?",
-    "Cancel": "Canslo",
-    "Canvas Default": "Canvas Diofyn",
-    "Close": "Cau",
-    "Confirm": "Cadarnhau",
-    "Confirm Default Grading Scheme Change": "Cadarnhau'r Newid i’r Cynllun Graddau Diofyn",
-    "Delete Grading Scheme": "Dileu Cynllun Graddau",
-    "Duplicate Grading Scheme": "Dyblygu Cynllun Graddau",
-    "Edit Grading Scheme": "Golygu Cynllun Graddau",
-    "Grading Scheme Name": "Enw’r Cynllun Graddio",
-    "Grading scheme was successfully archived.": "Wedi llwyddo i archifo’r cynllun graddau.",
-    "Grading scheme was successfully created.": "Wedi llwyddo i greu cynllun graddau.",
-    "Grading scheme was successfully removed.": "Wedi llwyddo i dynnu cynllun graddau.",
-    "Grading scheme was successfully saved.": "Wedi llwyddo i gadw cynllun graddau.",
-    "Grading scheme was successfully unarchived.": "Wedi llwyddo i ddad-archifo’r cynllun graddau.",
-    "Locations Used": "Lleoliadau wedi’u Ddefnyddio",
-    "Lower limit of range": "Terfyn isaf yr ystod",
-    "New Grading Scheme": "Cynllun Graddau Newydd",
-    "Next Page": "Tudalen Nesaf",
-    "No account default": "Dim cyfrif diofyn",
-    "Previous Page": "Tudalen Flaenorol",
-    "Save": "Cadw",
-    "Search": "Chwilio",
-    "Search...": "Chwilio…",
-    "Show courses and assignments": "Dangos cyrsiau ac aseiniadau",
-    "Show locations used": "Dangos y lleoliadau sydd wedi’u defnyddio",
-    "Sort by": "Trefnu yn ôl",
-    "There was an error while archiving the grading scheme": "Gwall wrth archifo'r cynllun graddau",
-    "There was an error while creating the grading scheme": "Gwall wrth greu'r cynllun graddau",
-    "There was an error while loading grading schemes": "Gwall wrth lwytho cynllun graddau",
-    "There was an error while loading the default canvas grading scheme": "Gwall wrth lwytho cynllun graddau diofyn canvas",
-    "There was an error while loading the default grading scheme": "Gwall wrth lwytho’r cynllun graddau diofyn",
-    "There was an error while removing the grading scheme": "Gwall wrth dynnu’r cynllun graddau",
-    "There was an error while unarchiving the grading scheme": "Gwall wrth ddad-archifo'r cynllun graddau",
-    "There was an error while updating the default grading scheme": "Gwall wrth ddiweddaru’r cynllun graddau diofyn",
-    "There was an error while updating the grading scheme": "Gwall wrth ddiweddaru'r cynllun graddau",
-    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Bydd y newid hwn yn effeithio ar yr holl gyrsiau ac aseiniadau gweithredol sy'n etifeddu gosodiadau diofyn y cyfrif ar hyn o bryd. Bydd y newid hwn yn cymryd peth amser i’w gwblhau wrth i holl raddau’r cwrs a'r aseiniadau gael eu hailgyfrifo yng nghyd-destun cynllun graddio diofyn y cyfrif newydd.",
-    "Unarchive Grading Scheme": "Dad-archifo Cynllun Graddau",
-    "Upper limit of range": "Terfyn uchaf yr ystod",
-    "View Grading Scheme": "Gweld Cynllun Graddau",
-    "View/Copy Grading Scheme": "Gweld/Copïo Cynllun Graddau",
-    "View/Edit Grading Scheme": "Gweld/Golygu Cynllun Graddau",
-    "You can't archive this grading scheme because it is set as a default for a course or account.": "Does dim modd i chi archifo’r cynllun graddau hwn oherwydd ei fod wedi’i osod yn ddiofyn ar gyfer cwrs neu gyfrif.",
-    "You can't delete this grading scheme because it is in use.": "Does dim modd i chi ddileu’r cynllun graddau oherwydd ei fod yn cael ei ddefnyddio.",
-    "You have no active grading schemes.": "Does gennych chi ddim cynlluniau graddau gweithredol.",
-    "You have no archived grading schemes.": "Does gennych chi ddim cynlluniau graddau wedi’u harchifo.",
-    "to": "at"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Ydych chi’n siŵr eich bod am ddileu’r cynllun graddau hwn?",
-    "Are you sure you want to duplicate this grading scheme?": "Ydych chi’n siŵr eich bod am ddyblygu’r cynllun graddau hwn?",
-    "Cancel": "Canslo",
-    "Close": "Cau",
-    "Delete": "Dileu",
-    "Delete ": "Dileu ",
-    "Duplicate": "Dyblygu",
-    "Duplicate ": "Dyblygu ",
-    "Edit Grading Scheme": "Golygu Cynllun Graddau",
-    "New Grading Scheme": "Cynllun Graddau Newydd",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "Does dim modd golygu canrannau a phwyntiau oherwydd ei fod yn gynllun graddio lefel cyfrif.",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Does dim modd golygu canrannau a phwyntiau oherwydd ei fod yn cael ei ddefnyddio fel y cynllun graddau diofyn.",
-    "Percentages and points can't be edited because it is currently being used.": "Does dim modd golygu canrannau a phwyntiau oherwydd ei fod yn cael ei ddefnyddio ar hyn o bryd.",
-    "Save": "Cadw"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tabl sy’n cynnwys data’r cynllun graddau canvas diofyn.  Mae pob rhes yn cynnwys enw, canran fwyaf a chanran isaf.",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tabl sy’n cynnwys data’r cynllun graddau.  Mae pob rhes yn cynnwys enw, canran fwyaf a chanran isaf.",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Does dim modd cael enwau rhesi gwag neu ddyblyg. Datryswch yr enwau a chlicio ‘Cadw’ eto.",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Does dim modd cael ystodau gwag neu rai sy’n gorgyffwrdd. Datryswch yr ystodau a chlicio ‘Cadw’ eto.",
-    "Delete grading scheme": "Dileu cynllun graddau",
-    "Edit Grading Scheme": "Golygu Cynllun Graddau",
-    "Edit a copy of this grading scheme": "Golygu copi o’r cynllun graddau hwn",
-    "Edit grading scheme": "Golygu cynllun graddau",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Mae angen Enw ar y Cynllun Graddio Ychwanegwch enw a chlicio ‘Cadw’ eto.",
-    "Grading scheme title": "Teitl y cynllun graddio",
-    "Invalid grading scheme": "Cynllun graddau annilys",
-    "Letter Grade": "Gradd Llythyren",
-    "Looks great!": "Mae'n edrych yn wych!",
-    "Percentage": "Canran",
-    "Points": "Pwynt",
-    "Range": "Ystod",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Rhad i’r ystod fod yn rhif dilys. Does dim modd cael rhifau negyddol neu rifau sy’n fwy na 100. Datryswch yr ystodau a chlicio ‘Cadw’ eto.",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Rhad i’r ystod fod yn rhif dilys. Does dim modd cael rhifau negyddol neu rifau sy’n fwy na’r ystod pwyntiau uchaf. Datryswch yr ystodau a chlicio ‘Cadw’ eto.",
-    "edit a copy": "golygu copi."
-  },
-  "OutcomeManagement": {
-    "Course": "Cwrs",
-    "Institution": "Sefydliad"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Cyfrifon",
-    "Close": "Cau",
-    "Concluded": "Wedi dirwyn i ben",
-    "Courses": "Cyrsiau",
-    "Failed to load account used locations": "Wedi methu llwytho lleoliadau wedi’u defnyddio cyfrif",
-    "Failed to load assignments used locations": "Wedi methu llwytho lleoliadau wedi’u defnyddio aseiniadau",
-    "Failed to load used locations": "Wedi methu llwytho lleoliadau wedi’u defnyddio",
-    "Load Assignments ...": "Llwytho Aseiniadau...",
-    "Load More Assignments ...": "Llwytho Rhagor o Aseiniadau...",
-    "Loading": "Wrthi’n llwytho",
-    "Locations Used": "Lleoliadau wedi’u Ddefnyddio",
-    "Search": "Chwilio",
-    "Search...": "Chwilio…"
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "Polisi Defnydd Derbyniol",
-    "Close": "Cau",
-    "Loading page": "Wrthi’n llwytho tudalen",
-    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Nid yw’r Polisi Defnydd Derbyniol ar gael ar hyn o bryd. Edrychwch eto yn nes ymlaen neu cysylltwch â'r adran gymorth os oes angen rhagor o gymorth arnoch.",
-    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Galluogi er mwyn llwytho’r Polisi Defnydd Derbyniol. Rhowch gynnig arni yn nes ymlaen, neu cysylltwch â'r adran gymorth o’r yw’r broblem yn parhau."
-  },
-  "account_reports": {
-    "Close": "Cau",
-    "Invalid date and time.": "Dyddiad ac amser annilys.",
-    "Next month": "Mis nesaf",
-    "Previous month": "Mis blaenorol",
-    "Time": "Amser"
-  },
-  "admin_split": {
-    "Cancel": "Canslo",
-    "Failed to split users.": "Wedi methu hollti defnyddwyr.",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NODYN: Bydd hyn yn ceisio dadwneud yr uno mor llawn â phosib; fodd bynnag, efallai na fydd defnyddwyr sydd wedi’u huno yn cael eu hadfer i’w cyflwr blaenorol yn berffaith.",
-    "OK": "Iawn",
-    "Split": "Hollti",
-    "The following users will be split into separate user accounts:": "Bydd y defnyddwyr canlynol yn cael eu hollti’n gyfrifon defnyddwyr ar wahân:",
-    "There are no user accounts to split from this user.": "Does dim cyfrifon i’w hollti o’r defnyddiwr hwn.",
-    "User split complete. Links to split user accounts follow:": "Wedi gorffen hollti defnyddwyr. Mae dolenni i hollti cyfrifon defnyddwyr yn dilyn:"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Disgrifiad"
-  },
-  "assignment_footer": {
-    "Next": "Nesaf",
-    "Previous": "Blaenorol"
-  },
-  "assignment_tabs": {
-    "Assignment": "Aseiniad",
-    "Peer Review": "Adolygiad gan Gyd-fyfyrwyr"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "(dewis diofyn y cwrs)",
-    "Account Level": "Lefel Cyfrif",
-    "Canvas Grading Scheme (course default)": "Cynlluniau Graddau Canvas (dewis diofyn y cwrs)",
-    "Close": "Cau",
-    "Course Level": "Lefel Cwrs",
-    "Default Canvas Grading Scheme": "Cynllun Graddau Diofyn Canvas",
-    "Grading scheme was successfully removed.": "Wedi llwyddo i dynnu cynllun graddau.",
-    "Grading scheme was successfully updated.": "Wedi llwyddo i ddiweddaru’r cynllun graddau.",
-    "Manage All Grading Schemes": "Rheoli Pob Cynllun Graddau",
-    "New Grading Scheme": "Cynllun Graddau Newydd",
-    "Select a grading scheme": "Dewiswch gynllun graddio",
-    "There was an error while loading grading schemes": "Gwall wrth lwytho cynllun graddau",
-    "There was an error while loading the grading scheme": "Gwall wrth lwytho'r cynllun graddau",
-    "There was an error while refreshing grading schemes": "Gwall wrth adnewyddu’r cynlluniau graddau",
-    "There was an error while removing the grading scheme": "Gwall wrth dynnu’r cynllun graddau",
-    "View": "Gweld"
-  },
-  "assignments_2": {
-    "Assignments 2 Teacher Error Page": "Aseiniadau i’r Athro – Tudalen Gwall",
-    "Assignments 2 Teacher initial query error": "Aseiniadau i’r Athro – Gwall ymholiad cyntaf",
-    "Loading": "Wrthi’n llwytho"
-  },
-  "catalog": {
-    "Course Catalog": "Catalog cyrsiau"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "Gwaith gwych! Gan ddatblygwyr Canvas"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Canslo",
-    "Copy course": "Copïo'r cwrs",
-    "Course code": "Cod y cwrs",
-    "Course code must be 255 characters or less": "Rhaid i god y cwrs gynnwys 255 nod neu lai",
-    "Course name must be 255 characters or less": "Rhai i enw’r cwrs gynnwys 255 nod neu lai",
-    "Create course": "Creu cwrs",
-    "Creating...": "Wrthi’n creu...",
-    "End date": "Dyddiad gorffen",
-    "End date must be after start date": "Rhaid i’r dyddiad gorffen fod ar ôl y dyddiad dechrau",
-    "Name": "Enw",
-    "No results": "Dim canlyniadau",
-    "Please enter the details for the new course.": "Rhowch fanylion y cwrs newydd.",
-    "Select a new beginning date": "Dewiswch ddyddiad dechrau newydd",
-    "Select a new end date": "Dewiswch ddyddiad gorffen newydd",
-    "Select end date": "Dewis dyddiad gorffen",
-    "Select start date": "Dewis dyddiad dechrau",
-    "Start date": "Dyddiad Dechrau",
-    "Start date must be before end date": "Mae’n rhaid i bob dyddiad dechrau fod cyn dyddiad gorffen",
-    "Start typing to search...": "Dechreuwch deipio i chwilio...",
-    "Term": "Tymor",
-    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Does dim modd addasu dyddiadau dechrau a gorffen tymor yma, dim ond ar y dudalen Manylion Tymor o dan Gweinyddol y mae modd gwneud hyn.",
-    "Use arrow keys to navigate options.": "Defnyddiwch fysellau saeth i symud drwy'r opsiynau."
-  },
-  "content_share_preview_overlay": {
-    "Close": "Cau",
-    "Content Share Preview": "Rhagolwg Rhannu Cynnwys",
-    "Preview": "Rhagolwg"
-  },
-  "copy_warnings_modal": {
-    "Attention": "Gofal"
-  },
-  "course_logging_content": {
-    "No results": "Dim canlyniadau",
-    "Type to search": "Teipiwch i chwilio"
-  },
-  "create_course_modal": {
-    "Cancel": "Canslo",
-    "Course Details": "Manylion Cwrs",
-    "Course Name": "Enw’r Cwrs",
-    "Create": "Creu",
-    "Create Course": "Creu Cwrs",
-    "Create Subject": "Creu Pwnc",
-    "Creating new course...": "Wrthi’n creu cwrs newydd...",
-    "Creating new subject...": "Wrthi’n creu pwnc newydd...",
-    "Error creating new course": "Gwall wrth greu cwrs newydd",
-    "Error creating new subject": "Gwall wrth greu pwnc newydd",
-    "Loading accounts...": "Wrthi’n llwytho cyfrifon...",
-    "Name...": "Enw...",
-    "No Results": "Dim Canlyniadau",
-    "Select a homeroom": "Dewis homeroom",
-    "Subject Name": "Enw’r Pwnc",
-    "Unable to get accounts": "Doedd dim modd nôl cyfrifon",
-    "Unable to get homerooms": "Does dim modd nôl homerooms",
-    "Use arrow keys to navigate options.": "Defnyddiwch fysellau saeth i symud drwy'r opsiynau.",
-    "Which account will this course be associated with?": "Pa gyfrif fydd yn gysylltiedig â’r cwrs hwn,?",
-    "Which account will this subject be associated with?": "Pa gyfrif fydd yn gysylltiedig â’r pwnc hwn,?"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "Disodli Gradd Derfynol"
-  },
-  "feature_flags": {
-    "Accept": "Derbyn",
-    "Cancel": "Canslo"
-  },
-  "filter_bar": {
-    "All": "Y cyfan",
-    "Clear": "Clirio",
-    "Filter by": "Hidlo yn ôl",
-    "Search": "Chwilio",
-    "Use arrow keys to navigate options.": "Defnyddiwch fysellau saeth i symud drwy'r opsiynau."
-  },
-  "groupNavigationSelector": {
-    "Select Group": "Dewis Grŵp",
-    "Use arrow keys to navigate options.": "Defnyddiwch fysellau saeth i symud drwy'r opsiynau."
-  },
-  "jobs": {
-    "Close": "Cau"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Creu Modiwl newydd"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "Panda yn astudio",
-    "Moves:": "Yn Symud:"
-  },
-  "overview_page": {
-    "Edit home page": "Golygu tudalen hafan",
-    "Subject Home Page": "Tudalen Hafan Pwnc"
-  },
-  "pages_edit_title": {
-    "Page Title": "Teitl y Dudalen"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Canslo",
-    "Close": "Cau"
-  },
-  "study_assist": {
-    "Back": "Yn ôl",
-    "Close": "Cau",
-    "Page": "Tudalen"
-  },
-  "submit_online_url_assignment": {
-    "A valid URL is required": "Mae angen URL dilys",
-    "Website URL": "URL Gwefan"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "Polisi Defnydd Derbyniol",
-    "Loading...": "Wrthi’n llwytho...",
-    "Preview": "Rhagolwg"
-  },
-  "todos_page": {
-    "Failed to load todos": "Wedi methu llwytho rhestr tasgau i’w gwneud",
-    "Loading Additional Todo Details": "Wrthi’n Llwytho Manylion Rhestr Tasgau i’w Gwneud Ychwanegol",
-    "Loading Todo Course Name": "Wrthi’n Llwytho Enw Cwrs Rhestr Tasgau i’w Gwneud",
-    "Loading Todo Title": "Wrthi’n Llwytho Teitl Rhestr Tasgau i'w Gwneud"
-  },
-  "tray": {
-    "Close": "Cau"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Canslo",
+        "Confirm": "Cadarnhau"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Nodi’n ddyddiad pwysig a dangos ar far ochr homeroom"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Cynllun graddau diofyn cyfrif",
+        "Account default grading scheme was successfully saved.": "Wedi llwyddo i gadw cynllun graddau diofyn cyfrif.",
+        "Active Grading Schemes": "Cynlluniau Graddau Gweithredol",
+        "Applied": "Wedi rhoi ar waith",
+        "Apply": "Rhoi ar waith",
+        "Archive Grading Scheme": "Archifo Cynllun Graddau",
+        "Archived": "Wedi archifo",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Mae modd defnyddio cynlluniau Graddau wedi’u Harchifo o hyd, ond does dim modd eu hychwanegu at gyrsiau neu aseiniadau newydd.",
+        "Are you sure you want to delete this grading scheme?": "Ydych chi’n siŵr eich bod am ddileu’r cynllun graddau hwn?",
+        "Cancel": "Canslo",
+        "Canvas Default": "Canvas Diofyn",
+        "Close": "Cau",
+        "Confirm": "Cadarnhau",
+        "Confirm Default Grading Scheme Change": "Cadarnhau'r Newid i’r Cynllun Graddau Diofyn",
+        "Delete Grading Scheme": "Dileu Cynllun Graddau",
+        "Duplicate Grading Scheme": "Dyblygu Cynllun Graddau",
+        "Edit Grading Scheme": "Golygu Cynllun Graddau",
+        "Grading Scheme Name": "Enw’r Cynllun Graddio",
+        "Grading scheme was successfully archived.": "Wedi llwyddo i archifo’r cynllun graddau.",
+        "Grading scheme was successfully created.": "Wedi llwyddo i greu cynllun graddau.",
+        "Grading scheme was successfully removed.": "Wedi llwyddo i dynnu cynllun graddau.",
+        "Grading scheme was successfully saved.": "Wedi llwyddo i gadw cynllun graddau.",
+        "Grading scheme was successfully unarchived.": "Wedi llwyddo i ddad-archifo’r cynllun graddau.",
+        "Locations Used": "Lleoliadau wedi’u Ddefnyddio",
+        "Lower limit of range": "Terfyn isaf yr ystod",
+        "New Grading Scheme": "Cynllun Graddau Newydd",
+        "Next Page": "Tudalen Nesaf",
+        "No account default": "Dim cyfrif diofyn",
+        "Previous Page": "Tudalen Flaenorol",
+        "Save": "Cadw",
+        "Search": "Chwilio",
+        "Search...": "Chwilio…",
+        "Show courses and assignments": "Dangos cyrsiau ac aseiniadau",
+        "Show locations used": "Dangos y lleoliadau sydd wedi’u defnyddio",
+        "Sort by": "Trefnu yn ôl",
+        "There was an error while archiving the grading scheme": "Gwall wrth archifo'r cynllun graddau",
+        "There was an error while creating the grading scheme": "Gwall wrth greu'r cynllun graddau",
+        "There was an error while loading grading schemes": "Gwall wrth lwytho cynllun graddau",
+        "There was an error while loading the default canvas grading scheme": "Gwall wrth lwytho cynllun graddau diofyn canvas",
+        "There was an error while loading the default grading scheme": "Gwall wrth lwytho’r cynllun graddau diofyn",
+        "There was an error while removing the grading scheme": "Gwall wrth dynnu’r cynllun graddau",
+        "There was an error while unarchiving the grading scheme": "Gwall wrth ddad-archifo'r cynllun graddau",
+        "There was an error while updating the default grading scheme": "Gwall wrth ddiweddaru’r cynllun graddau diofyn",
+        "There was an error while updating the grading scheme": "Gwall wrth ddiweddaru'r cynllun graddau",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Bydd y newid hwn yn effeithio ar yr holl gyrsiau ac aseiniadau gweithredol sy'n etifeddu gosodiadau diofyn y cyfrif ar hyn o bryd. Bydd y newid hwn yn cymryd peth amser i’w gwblhau wrth i holl raddau’r cwrs a'r aseiniadau gael eu hailgyfrifo yng nghyd-destun cynllun graddio diofyn y cyfrif newydd.",
+        "Unarchive Grading Scheme": "Dad-archifo Cynllun Graddau",
+        "Upper limit of range": "Terfyn uchaf yr ystod",
+        "View Grading Scheme": "Gweld Cynllun Graddau",
+        "View/Copy Grading Scheme": "Gweld/Copïo Cynllun Graddau",
+        "View/Edit Grading Scheme": "Gweld/Golygu Cynllun Graddau",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Does dim modd i chi archifo’r cynllun graddau hwn oherwydd ei fod wedi’i osod yn ddiofyn ar gyfer cwrs neu gyfrif.",
+        "You can't delete this grading scheme because it is in use.": "Does dim modd i chi ddileu’r cynllun graddau oherwydd ei fod yn cael ei ddefnyddio.",
+        "You have no active grading schemes.": "Does gennych chi ddim cynlluniau graddau gweithredol.",
+        "You have no archived grading schemes.": "Does gennych chi ddim cynlluniau graddau wedi’u harchifo.",
+        "to": "at"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Ydych chi’n siŵr eich bod am ddileu’r cynllun graddau hwn?",
+        "Are you sure you want to duplicate this grading scheme?": "Ydych chi’n siŵr eich bod am ddyblygu’r cynllun graddau hwn?",
+        "Cancel": "Canslo",
+        "Close": "Cau",
+        "Delete": "Dileu",
+        "Delete ": "Dileu ",
+        "Duplicate": "Dyblygu",
+        "Duplicate ": "Dyblygu ",
+        "Edit Grading Scheme": "Golygu Cynllun Graddau",
+        "New Grading Scheme": "Cynllun Graddau Newydd",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Does dim modd golygu canrannau a phwyntiau oherwydd ei fod yn gynllun graddio lefel cyfrif.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Does dim modd golygu canrannau a phwyntiau oherwydd ei fod yn cael ei ddefnyddio fel y cynllun graddau diofyn.",
+        "Percentages and points can't be edited because it is currently being used.": "Does dim modd golygu canrannau a phwyntiau oherwydd ei fod yn cael ei ddefnyddio ar hyn o bryd.",
+        "Save": "Cadw"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tabl sy’n cynnwys data’r cynllun graddau canvas diofyn.  Mae pob rhes yn cynnwys enw, canran fwyaf a chanran isaf.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tabl sy’n cynnwys data’r cynllun graddau.  Mae pob rhes yn cynnwys enw, canran fwyaf a chanran isaf.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Does dim modd cael enwau rhesi gwag neu ddyblyg. Datryswch yr enwau a chlicio ‘Cadw’ eto.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Does dim modd cael ystodau gwag neu rai sy’n gorgyffwrdd. Datryswch yr ystodau a chlicio ‘Cadw’ eto.",
+        "Delete grading scheme": "Dileu cynllun graddau",
+        "Edit Grading Scheme": "Golygu Cynllun Graddau",
+        "Edit a copy of this grading scheme": "Golygu copi o’r cynllun graddau hwn",
+        "Edit grading scheme": "Golygu cynllun graddau",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Mae angen Enw ar y Cynllun Graddio Ychwanegwch enw a chlicio ‘Cadw’ eto.",
+        "Grading scheme title": "Teitl y cynllun graddio",
+        "Invalid grading scheme": "Cynllun graddau annilys",
+        "Letter Grade": "Gradd Llythyren",
+        "Looks great!": "Mae'n edrych yn wych!",
+        "Percentage": "Canran",
+        "Points": "Pwynt",
+        "Range": "Ystod",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Rhad i’r ystod fod yn rhif dilys. Does dim modd cael rhifau negyddol neu rifau sy’n fwy na 100. Datryswch yr ystodau a chlicio ‘Cadw’ eto.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Rhad i’r ystod fod yn rhif dilys. Does dim modd cael rhifau negyddol neu rifau sy’n fwy na’r ystod pwyntiau uchaf. Datryswch yr ystodau a chlicio ‘Cadw’ eto.",
+        "edit a copy": "golygu copi."
+    },
+    "OutcomeManagement": {
+        "Course": "Cwrs",
+        "Institution": "Sefydliad"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Cyfrifon",
+        "Close": "Cau",
+        "Concluded": "Wedi dirwyn i ben",
+        "Courses": "Cyrsiau",
+        "Failed to load account used locations": "Wedi methu llwytho lleoliadau wedi’u defnyddio cyfrif",
+        "Failed to load assignments used locations": "Wedi methu llwytho lleoliadau wedi’u defnyddio aseiniadau",
+        "Failed to load used locations": "Wedi methu llwytho lleoliadau wedi’u defnyddio",
+        "Load Assignments ...": "Llwytho Aseiniadau...",
+        "Load More Assignments ...": "Llwytho Rhagor o Aseiniadau...",
+        "Loading": "Wrthi’n llwytho",
+        "Locations Used": "Lleoliadau wedi’u Ddefnyddio",
+        "Search": "Chwilio",
+        "Search...": "Chwilio…"
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Polisi Defnydd Derbyniol",
+        "Close": "Cau",
+        "Loading page": "Wrthi’n llwytho tudalen",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Nid yw’r Polisi Defnydd Derbyniol ar gael ar hyn o bryd. Edrychwch eto yn nes ymlaen neu cysylltwch â'r adran gymorth os oes angen rhagor o gymorth arnoch.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Galluogi er mwyn llwytho’r Polisi Defnydd Derbyniol. Rhowch gynnig arni yn nes ymlaen, neu cysylltwch â'r adran gymorth o’r yw’r broblem yn parhau."
+    },
+    "account_reports": {
+        "Close": "Cau",
+        "Invalid date and time.": "Dyddiad ac amser annilys.",
+        "Next month": "Mis nesaf",
+        "Previous month": "Mis blaenorol",
+        "Time": "Amser"
+    },
+    "admin_split": {
+        "Cancel": "Canslo",
+        "Failed to split users.": "Wedi methu hollti defnyddwyr.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NODYN: Bydd hyn yn ceisio dadwneud yr uno mor llawn â phosib; fodd bynnag, efallai na fydd defnyddwyr sydd wedi’u huno yn cael eu hadfer i’w cyflwr blaenorol yn berffaith.",
+        "OK": "Iawn",
+        "Split": "Hollti",
+        "The following users will be split into separate user accounts:": "Bydd y defnyddwyr canlynol yn cael eu hollti’n gyfrifon defnyddwyr ar wahân:",
+        "There are no user accounts to split from this user.": "Does dim cyfrifon i’w hollti o’r defnyddiwr hwn.",
+        "User split complete. Links to split user accounts follow:": "Wedi gorffen hollti defnyddwyr. Mae dolenni i hollti cyfrifon defnyddwyr yn dilyn:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Disgrifiad"
+    },
+    "assignment_footer": {
+        "Next": "Nesaf",
+        "Previous": "Blaenorol"
+    },
+    "assignment_tabs": {
+        "Assignment": "Aseiniad",
+        "Peer Review": "Adolygiad gan Gyd-fyfyrwyr"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(dewis diofyn y cwrs)",
+        "Account Level": "Lefel Cyfrif",
+        "Canvas Grading Scheme (course default)": "Cynlluniau Graddau Canvas (dewis diofyn y cwrs)",
+        "Close": "Cau",
+        "Course Level": "Lefel Cwrs",
+        "Default Canvas Grading Scheme": "Cynllun Graddau Diofyn Canvas",
+        "Grading scheme was successfully removed.": "Wedi llwyddo i dynnu cynllun graddau.",
+        "Grading scheme was successfully updated.": "Wedi llwyddo i ddiweddaru’r cynllun graddau.",
+        "Manage All Grading Schemes": "Rheoli Pob Cynllun Graddau",
+        "New Grading Scheme": "Cynllun Graddau Newydd",
+        "Select a grading scheme": "Dewiswch gynllun graddio",
+        "There was an error while loading grading schemes": "Gwall wrth lwytho cynllun graddau",
+        "There was an error while loading the grading scheme": "Gwall wrth lwytho'r cynllun graddau",
+        "There was an error while refreshing grading schemes": "Gwall wrth adnewyddu’r cynlluniau graddau",
+        "There was an error while removing the grading scheme": "Gwall wrth dynnu’r cynllun graddau",
+        "View": "Gweld"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Aseiniadau i’r Athro – Tudalen Gwall",
+        "Assignments 2 Teacher initial query error": "Aseiniadau i’r Athro – Gwall ymholiad cyntaf",
+        "Loading": "Wrthi’n llwytho"
+    },
+    "catalog": {
+        "Course Catalog": "Catalog cyrsiau"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Gwaith gwych! Gan ddatblygwyr Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Canslo",
+        "Copy course": "Copïo'r cwrs",
+        "Course code": "Cod y cwrs",
+        "Course code must be 255 characters or less": "Rhaid i god y cwrs gynnwys 255 nod neu lai",
+        "Course name must be 255 characters or less": "Rhai i enw’r cwrs gynnwys 255 nod neu lai",
+        "Create course": "Creu cwrs",
+        "Creating...": "Wrthi’n creu...",
+        "End date": "Dyddiad gorffen",
+        "End date must be after start date": "Rhaid i’r dyddiad gorffen fod ar ôl y dyddiad dechrau",
+        "Name": "Enw",
+        "No results": "Dim canlyniadau",
+        "Please enter the details for the new course.": "Rhowch fanylion y cwrs newydd.",
+        "Select a new beginning date": "Dewiswch ddyddiad dechrau newydd",
+        "Select a new end date": "Dewiswch ddyddiad gorffen newydd",
+        "Select end date": "Dewis dyddiad gorffen",
+        "Select start date": "Dewis dyddiad dechrau",
+        "Start date": "Dyddiad Dechrau",
+        "Start date must be before end date": "Mae’n rhaid i bob dyddiad dechrau fod cyn dyddiad gorffen",
+        "Start typing to search...": "Dechreuwch deipio i chwilio...",
+        "Term": "Tymor",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Does dim modd addasu dyddiadau dechrau a gorffen tymor yma, dim ond ar y dudalen Manylion Tymor o dan Gweinyddol y mae modd gwneud hyn.",
+        "Use arrow keys to navigate options.": "Defnyddiwch fysellau saeth i symud drwy'r opsiynau."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Cau",
+        "Content Share Preview": "Rhagolwg Rhannu Cynnwys",
+        "Preview": "Rhagolwg"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Gofal"
+    },
+    "course_logging_content": {
+        "No results": "Dim canlyniadau",
+        "Type to search": "Teipiwch i chwilio"
+    },
+    "create_course_modal": {
+        "Cancel": "Canslo",
+        "Course Details": "Manylion Cwrs",
+        "Course Name": "Enw’r Cwrs",
+        "Create": "Creu",
+        "Create Course": "Creu Cwrs",
+        "Create Subject": "Creu Pwnc",
+        "Creating new course...": "Wrthi’n creu cwrs newydd...",
+        "Creating new subject...": "Wrthi’n creu pwnc newydd...",
+        "Error creating new course": "Gwall wrth greu cwrs newydd",
+        "Error creating new subject": "Gwall wrth greu pwnc newydd",
+        "Loading accounts...": "Wrthi’n llwytho cyfrifon...",
+        "Name...": "Enw...",
+        "No Results": "Dim Canlyniadau",
+        "Select a homeroom": "Dewis homeroom",
+        "Subject Name": "Enw’r Pwnc",
+        "Unable to get accounts": "Doedd dim modd nôl cyfrifon",
+        "Unable to get homerooms": "Does dim modd nôl homerooms",
+        "Use arrow keys to navigate options.": "Defnyddiwch fysellau saeth i symud drwy'r opsiynau.",
+        "Which account will this course be associated with?": "Pa gyfrif fydd yn gysylltiedig â’r cwrs hwn,?",
+        "Which account will this subject be associated with?": "Pa gyfrif fydd yn gysylltiedig â’r pwnc hwn,?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Disodli Gradd Derfynol"
+    },
+    "feature_flags": {
+        "Accept": "Derbyn",
+        "Cancel": "Canslo"
+    },
+    "filter_bar": {
+        "All": "Y cyfan",
+        "Clear": "Clirio",
+        "Filter by": "Hidlo yn ôl",
+        "Search": "Chwilio",
+        "Use arrow keys to navigate options.": "Defnyddiwch fysellau saeth i symud drwy'r opsiynau."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Dewis Grŵp",
+        "Use arrow keys to navigate options.": "Defnyddiwch fysellau saeth i symud drwy'r opsiynau."
+    },
+    "jobs": {
+        "Close": "Cau"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Creu Modiwl newydd"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Panda yn astudio",
+        "Moves:": "Yn Symud:"
+    },
+    "overview_page": {
+        "Edit home page": "Golygu tudalen hafan",
+        "Subject Home Page": "Tudalen Hafan Pwnc"
+    },
+    "pages_edit_title": {
+        "Page Title": "Teitl y Dudalen"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Canslo",
+        "Close": "Cau"
+    },
+    "study_assist": {
+        "Back": "Yn ôl",
+        "Close": "Cau",
+        "Page": "Tudalen"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "Mae angen URL dilys",
+        "Website URL": "URL Gwefan"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Polisi Defnydd Derbyniol",
+        "Loading...": "Wrthi’n llwytho...",
+        "Preview": "Rhagolwg"
+    },
+    "todos_page": {
+        "Failed to load todos": "Wedi methu llwytho rhestr tasgau i’w gwneud",
+        "Loading Additional Todo Details": "Wrthi’n Llwytho Manylion Rhestr Tasgau i’w Gwneud Ychwanegol",
+        "Loading Todo Course Name": "Wrthi’n Llwytho Enw Cwrs Rhestr Tasgau i’w Gwneud",
+        "Loading Todo Title": "Wrthi’n Llwytho Teitl Rhestr Tasgau i'w Gwneud"
+    },
+    "tray": {
+        "Close": "Cau"
+    }
 }

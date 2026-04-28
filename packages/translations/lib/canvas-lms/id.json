@@ -1,306 +1,306 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Batal",
-    "Confirm": "Konfirmasi"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "Tandai sebagai tanggal penting dan tampilkan di bilah sisi homeroom"
-  },
-  "GradingSchemeManagement": {
-    "Account default grading scheme": "Skema penilaian default akun",
-    "Account default grading scheme was successfully saved.": "Skema penilaian default akun berhasil disimpan.",
-    "Active Grading Schemes": "Skema Penilaian Aktif",
-    "Applied": "Diterapkan",
-    "Apply": "Terapkan",
-    "Archive Grading Scheme": "Arsipkan Skema Penilaian",
-    "Archived": "Diarsipkan",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Skema penilaian yang diarsipkan yang digunakan masih dapat digunakan, tetapi tidak dapat ditambahkan ke kursus atau tugas baru.",
-    "Are you sure you want to delete this grading scheme?": "Anda yakin mau menghapus skema penilaian ini?",
-    "Cancel": "Batal",
-    "Canvas Default": "Default Canvas",
-    "Close": "Tutup",
-    "Confirm": "Konfirmasi",
-    "Confirm Default Grading Scheme Change": "Konfirmasi Perubahan Skema Penilaian Default",
-    "Delete Grading Scheme": "Hapus Skema Penilaian",
-    "Duplicate Grading Scheme": "Duplikatkan Skema Penilaian",
-    "Edit Grading Scheme": "Edit Skema Penilaian",
-    "Grading Scheme Name": "Nama Skema Penilaian",
-    "Grading scheme was successfully archived.": "Skema penilaian berhasil diarsipkan.",
-    "Grading scheme was successfully created.": "Skema penilaian berhasil dibuat.",
-    "Grading scheme was successfully removed.": "Skema penilaian berhasil dihapus.",
-    "Grading scheme was successfully saved.": "Skema penilaian berhasil disimpan.",
-    "Grading scheme was successfully unarchived.": "Skema penilaian berhasil dikeluarkan dari arsip.",
-    "Locations Used": "Lokasi Digunakan",
-    "Lower limit of range": "Batas rentang bawah",
-    "New Grading Scheme": "Skema Penilaian Baru",
-    "Next Page": "Halaman Selanjutnya",
-    "No account default": "Tidak ada akun default",
-    "Previous Page": "Halaman Sebelumnya",
-    "Save": "Simpan",
-    "Search": "Cari",
-    "Search...": "Cari...",
-    "Show courses and assignments": "Tampilkan kursus dan tugas",
-    "Show locations used": "Tampilkan lokasi yang digunakan",
-    "Sort by": "Sortir menurut",
-    "There was an error while archiving the grading scheme": "Terjadi kesalahan saat mengarsipkan skema penilaian",
-    "There was an error while creating the grading scheme": "Terjadi kesalahan saat membuat skema penilaian",
-    "There was an error while loading grading schemes": "Terjadi kesalahan saat memuat skema penilaian",
-    "There was an error while loading the default canvas grading scheme": "Terjadi kesalahan saat memuat skema penilaian canvas default",
-    "There was an error while loading the default grading scheme": "Terjadi kesalahan saat memuat skema penilaian default",
-    "There was an error while removing the grading scheme": "Terjadi kesalahan saat menghapus skema penilaian",
-    "There was an error while unarchiving the grading scheme": "Terjadi kesalahan saat mengeluarkan skema penilaian dari arsip",
-    "There was an error while updating the default grading scheme": "Terjadi kesalahan saat memperbarui skema penilaian default",
-    "There was an error while updating the grading scheme": "Terjadi kesalahan saat memperbarui skema penilaian",
-    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Perubahan ini akan mempengaruhi semua kursus dan tugas aktif yang saat ini mewarisi default akun. Perubahan ini membutuhkan waktu hingga selesai karena semua kursus dan nilai tugas dihitung ulang sehubungan dengan skema penilaian default akun baru.",
-    "Unarchive Grading Scheme": "Keluarkan Skema Penilaian dari Arsip",
-    "Upper limit of range": "Batas rentang atas",
-    "View Grading Scheme": "Lihat Skema Penilaian",
-    "View/Copy Grading Scheme": "Lihat/Salin Skema Penilaian",
-    "View/Edit Grading Scheme": "Lihat/Edit Skema Penilaian",
-    "You can't archive this grading scheme because it is set as a default for a course or account.": "Anda tidak dapat mengarsipkan skema penilaian ini karena ini diatur sebagai default untuk suatu kursus atau akun.",
-    "You can't delete this grading scheme because it is in use.": "Anda tidak dapat menghapus skema penilaian ini karena sedang digunakan.",
-    "You have no active grading schemes.": "Anda tidak memiliki skema penilaian yang aktif.",
-    "You have no archived grading schemes.": "Anda tidak memiliki skema penilaian yang diarsipkan.",
-    "to": "kepada"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Anda yakin mau menghapus skema penilaian ini?",
-    "Are you sure you want to duplicate this grading scheme?": "Anda yakin mau menduplikasi skema penilaian ini?",
-    "Cancel": "Batal",
-    "Close": "Tutup",
-    "Delete": "Hapus",
-    "Delete ": "Hapus ",
-    "Duplicate": "Duplikat",
-    "Duplicate ": "Duplikat ",
-    "Edit Grading Scheme": "Edit Skema Penilaian",
-    "New Grading Scheme": "Skema Penilaian Baru",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "Persentase dan poin tidak dapat diedit karena merupakan skema penilaian level akun.",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Persentase dan poin tidak dapat diedit karena digunakan sebagai skema penilaian default.",
-    "Percentages and points can't be edited because it is currently being used.": "Persentase dan poin tidak dapat diedit karena sedang digunakan.",
-    "Save": "Simpan"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tabel yang mengandung data skema penilaian canvas default.  Setiap baris memuat nama, persentase maksimum, dan persentasi minimum.",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tabel yang mengandung data skema penilaian.  Setiap baris memuat nama, persentase maksimum, dan persentasi minimum.",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Tidak dapat memiliki nama duplikat atau baris kosong. Perbaiki nama dan coba klik ‘Simpan’ lagi.",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Rentang tidak boleh berimpitan atau kosong. Perbaiki rentang dan coba klik ‘Simpan’ lagi.",
-    "Delete grading scheme": "Hapus skema penilaian",
-    "Edit Grading Scheme": "Edit Skema Penilaian",
-    "Edit a copy of this grading scheme": "Edit salinan dari skema penilaian ini",
-    "Edit grading scheme": "Edit skema penilaian",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Nama Skema Penilaian harus ada. Tambah nama dan coba klik ‘Simpan’ lagi.",
-    "Grading scheme title": "Judul skema penilaian",
-    "Invalid grading scheme": "Skema penilaian tidak valid",
-    "Letter Grade": "Nilai Dalam Huruf",
-    "Looks great!": "Bagus sekali!",
-    "Percentage": "Persentase",
-    "Points": "Poin",
-    "Range": "Rentang",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Rentang harus angka yang valid. Tidak boleh angka negatif atau angka yang lebih dari 100. Perbaiki rentang dan coba klik ‘Simpan’ lagi.",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Rentang harus angka yang valid. Tidak boleh angka negatif atau angka yang lebih dari rentang titik atas. Perbaiki rentang dan coba klik ‘Simpan’ lagi.",
-    "edit a copy": "edit salinan"
-  },
-  "OutcomeManagement": {
-    "Course": "Kursus",
-    "Institution": "Institusi"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Akun",
-    "Close": "Tutup",
-    "Concluded": "Dirampungkan",
-    "Courses": "Kursus",
-    "Failed to load account used locations": "Gagal memuat lokasi yang digunakan akun",
-    "Failed to load assignments used locations": "Gagal memuat lokasi yang digunakan tugas",
-    "Failed to load used locations": "Gagal memuat lokasi yang digunakan",
-    "Load Assignments ...": "Memuat Tugas...",
-    "Load More Assignments ...": "Memuat Tugas Lain...",
-    "Loading": "Memuat",
-    "Locations Used": "Lokasi Digunakan",
-    "Search": "Cari",
-    "Search...": "Cari..."
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "Kebijakan Penggunaan yang Dapat Diterima",
-    "Close": "Tutup",
-    "Loading page": "Memuat halaman",
-    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Kebijakan Penggunaan yang Dapat Diterima saat ini tidak tersedia. Silakan periksa lagi nanti atau hubungi bagian dukungan jika Anda membutuhkan bantuan lebih lanjut.",
-    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Tidak dapat memuat Kebijakan Penggunaan yang Dapat Diterima. Silakan coba lagi atau hubungi bagian dukungan jika masalah berlanjut."
-  },
-  "account_reports": {
-    "Close": "Tutup",
-    "Invalid date and time.": "Tanggal dan waktu tidak valid.",
-    "Next month": "Bulan berikutnya",
-    "Previous month": "Bulan sebelumnya",
-    "Time": "Waktu"
-  },
-  "admin_split": {
-    "Cancel": "Batal",
-    "Failed to split users.": "Gagal memecah pengguna",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "CATATAN: Ini akan berupaya mengurungkan penggabungan semaksimum mungkin; namun, pengguna yang digabungkan mungkin tidak secara sempurna dipulihkan ke kondisi sebelumnya.",
-    "OK": "OK",
-    "Split": "Pisah",
-    "The following users will be split into separate user accounts:": "Pengguna berikut akan dipisah ke dalam akun pengguna terpisah:",
-    "There are no user accounts to split from this user.": "Tidak ada akun pengguna yang dapat dipisahkan dari pengguna ini.",
-    "User split complete. Links to split user accounts follow:": "Pemisahan pengguna selesai. Tautan untuk memisah akun pengguna berikut ini:"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Deskripsi"
-  },
-  "assignment_footer": {
-    "Next": "Berikutnya",
-    "Previous": "Sebelumnya"
-  },
-  "assignment_tabs": {
-    "Assignment": "Tugas",
-    "Peer Review": "Tinjauan Sejawat"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "(default kursus)",
-    "Account Level": "Level Akun",
-    "Canvas Grading Scheme (course default)": "Skema Penilaian Canvas (default kursus)",
-    "Close": "Tutup",
-    "Course Level": "Level Kursus",
-    "Default Canvas Grading Scheme": "Skema Penilaian Canvas Default",
-    "Grading scheme was successfully removed.": "Skema penilaian berhasil dihapus.",
-    "Grading scheme was successfully updated.": "Skema penilaian berhasil diperbarui.",
-    "Manage All Grading Schemes": "Kelola Semua Skema Penilaian",
-    "New Grading Scheme": "Skema Penilaian Baru",
-    "Select a grading scheme": "Pilih skema penilaian",
-    "There was an error while loading grading schemes": "Terjadi kesalahan saat memuat skema penilaian",
-    "There was an error while loading the grading scheme": "Terjadi kesalahan saat memuat skema penilaian",
-    "There was an error while refreshing grading schemes": "Terjadi kesalahan saat memuat ulang skema penilaian",
-    "There was an error while removing the grading scheme": "Terjadi kesalahan saat menghapus skema penilaian",
-    "View": "Lihat"
-  },
-  "assignments_2": {
-    "Assignments 2 Teacher Error Page": "Tugas 2 Halaman Kesalahan Tampilan Guru",
-    "Assignments 2 Teacher initial query error": "Tugas 2 Kesalahan kueri awal guru",
-    "Loading": "Memuat"
-  },
-  "catalog": {
-    "Course Catalog": "Katalog Kursus"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "Luar biasa! Dari para pengembang Canvas"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Batal",
-    "Copy course": "Salin kursus",
-    "Course code": "Kode kursus",
-    "Course code must be 255 characters or less": "Kode kursus tidak boleh lebih dari 255 karakter",
-    "Course name must be 255 characters or less": "Nama kursus tidak boleh lebih dari 255 karakter",
-    "Create course": "Buat kursus",
-    "Creating...": "Membuat...",
-    "End date": "Tanggal akhir",
-    "End date must be after start date": "Tanggal akhir harus setelah tanggal mulai",
-    "Name": "Nama",
-    "No results": "Tidak ada hasil",
-    "Please enter the details for the new course.": "Silakan masukkan detail untuk kursus baru.",
-    "Select a new beginning date": "Pilih tanggal mulai baru",
-    "Select a new end date": "Pilih tanggal selesai baru",
-    "Select end date": "Pilih tanggal akhir",
-    "Select start date": "Pilih tanggal mulai",
-    "Start date": "Tanggal mulai",
-    "Start date must be before end date": "Tanggal mulai harus sebelum tanggal akhir",
-    "Start typing to search...": "Mulailah mengetik untuk mencari...",
-    "Term": "Durasi Akademis",
-    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Tanggal awal dan akhir durasi akademis tidak dapat diubah di sini, hanya di halaman Detail Durasi Akademis di bagian Admin.",
-    "Use arrow keys to navigate options.": "Gunakan tombol panah untuk memilih opsi."
-  },
-  "content_share_preview_overlay": {
-    "Close": "Tutup",
-    "Content Share Preview": "Pratinjau Berbagi Konten",
-    "Preview": "Pratinjau"
-  },
-  "copy_warnings_modal": {
-    "Attention": "Perhatian"
-  },
-  "course_logging_content": {
-    "No results": "Tidak ada hasil",
-    "Type to search": "Ketik untuk mencari"
-  },
-  "create_course_modal": {
-    "Cancel": "Batal",
-    "Course Details": "Detail Kursus",
-    "Course Name": "Nama Kursus",
-    "Create": "Buat",
-    "Create Course": "Buat Kursus",
-    "Create Subject": "Buat Subjek",
-    "Creating new course...": "Buat kursus baru...",
-    "Creating new subject...": "Buat subjek baru...",
-    "Error creating new course": "Kesalahan saat membuat kursus baru",
-    "Error creating new subject": "Kesalahan saat membuat subjek baru",
-    "Loading accounts...": "Memuat akun...",
-    "Name...": "Nama...",
-    "No Results": "Tidak Ada Hasil",
-    "Select a homeroom": "Pilih homeroom",
-    "Subject Name": "Nama Subjek",
-    "Unable to get accounts": "Tidak dapat mengambil akun",
-    "Unable to get homerooms": "Tidak dapat mengambil homeroom",
-    "Use arrow keys to navigate options.": "Gunakan tombol panah untuk memilih opsi.",
-    "Which account will this course be associated with?": "Dengan akun manakah kursus ini akan dikaitkan?",
-    "Which account will this subject be associated with?": "Dengan akun manakah kursus ini akan dikaitkan?"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "Override Nilai Final"
-  },
-  "feature_flags": {
-    "Accept": "Terima",
-    "Cancel": "Batal"
-  },
-  "filter_bar": {
-    "All": "Semua",
-    "Clear": "Kosongkan",
-    "Filter by": "Filter menurut",
-    "Search": "Cari",
-    "Use arrow keys to navigate options.": "Gunakan tombol panah untuk memilih opsi."
-  },
-  "groupNavigationSelector": {
-    "Select Group": "Pilih Grup",
-    "Use arrow keys to navigate options.": "Gunakan tombol panah untuk memilih opsi."
-  },
-  "jobs": {
-    "Close": "Tutup"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Buat Modul baru"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "Panda rajin",
-    "Moves:": "Pergerakan:"
-  },
-  "overview_page": {
-    "Edit home page": "Edit halaman awal",
-    "Subject Home Page": "Halaman Awal Subjek"
-  },
-  "pages_edit_title": {
-    "Page Title": "Halaman Judul"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Batal",
-    "Close": "Tutup"
-  },
-  "study_assist": {
-    "Back": "Kembali",
-    "Close": "Tutup",
-    "Page": "Halaman"
-  },
-  "submit_online_url_assignment": {
-    "A valid URL is required": "URL yang valid dibutuhkan",
-    "Website URL": "URL Situs Web"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "Kebijakan Penggunaan yang Dapat Diterima",
-    "Loading...": "Memuat...",
-    "Preview": "Pratinjau"
-  },
-  "todos_page": {
-    "Failed to load todos": "Gagal memuat tugas yang harus dilakukan",
-    "Loading Additional Todo Details": "Memuat Detail Tugas Tambahan",
-    "Loading Todo Course Name": "Memuat Nama Kursus Yang Harus Diambil",
-    "Loading Todo Title": "Memuat Nama Yang Harus Diambil"
-  },
-  "tray": {
-    "Close": "Tutup"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Batal",
+        "Confirm": "Konfirmasi"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Tandai sebagai tanggal penting dan tampilkan di bilah sisi homeroom"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Skema penilaian default akun",
+        "Account default grading scheme was successfully saved.": "Skema penilaian default akun berhasil disimpan.",
+        "Active Grading Schemes": "Skema Penilaian Aktif",
+        "Applied": "Diterapkan",
+        "Apply": "Terapkan",
+        "Archive Grading Scheme": "Arsipkan Skema Penilaian",
+        "Archived": "Diarsipkan",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Skema penilaian yang diarsipkan yang digunakan masih dapat digunakan, tetapi tidak dapat ditambahkan ke kursus atau tugas baru.",
+        "Are you sure you want to delete this grading scheme?": "Anda yakin mau menghapus skema penilaian ini?",
+        "Cancel": "Batal",
+        "Canvas Default": "Default Canvas",
+        "Close": "Tutup",
+        "Confirm": "Konfirmasi",
+        "Confirm Default Grading Scheme Change": "Konfirmasi Perubahan Skema Penilaian Default",
+        "Delete Grading Scheme": "Hapus Skema Penilaian",
+        "Duplicate Grading Scheme": "Duplikatkan Skema Penilaian",
+        "Edit Grading Scheme": "Edit Skema Penilaian",
+        "Grading Scheme Name": "Nama Skema Penilaian",
+        "Grading scheme was successfully archived.": "Skema penilaian berhasil diarsipkan.",
+        "Grading scheme was successfully created.": "Skema penilaian berhasil dibuat.",
+        "Grading scheme was successfully removed.": "Skema penilaian berhasil dihapus.",
+        "Grading scheme was successfully saved.": "Skema penilaian berhasil disimpan.",
+        "Grading scheme was successfully unarchived.": "Skema penilaian berhasil dikeluarkan dari arsip.",
+        "Locations Used": "Lokasi Digunakan",
+        "Lower limit of range": "Batas rentang bawah",
+        "New Grading Scheme": "Skema Penilaian Baru",
+        "Next Page": "Halaman Selanjutnya",
+        "No account default": "Tidak ada akun default",
+        "Previous Page": "Halaman Sebelumnya",
+        "Save": "Simpan",
+        "Search": "Cari",
+        "Search...": "Cari...",
+        "Show courses and assignments": "Tampilkan kursus dan tugas",
+        "Show locations used": "Tampilkan lokasi yang digunakan",
+        "Sort by": "Sortir menurut",
+        "There was an error while archiving the grading scheme": "Terjadi kesalahan saat mengarsipkan skema penilaian",
+        "There was an error while creating the grading scheme": "Terjadi kesalahan saat membuat skema penilaian",
+        "There was an error while loading grading schemes": "Terjadi kesalahan saat memuat skema penilaian",
+        "There was an error while loading the default canvas grading scheme": "Terjadi kesalahan saat memuat skema penilaian canvas default",
+        "There was an error while loading the default grading scheme": "Terjadi kesalahan saat memuat skema penilaian default",
+        "There was an error while removing the grading scheme": "Terjadi kesalahan saat menghapus skema penilaian",
+        "There was an error while unarchiving the grading scheme": "Terjadi kesalahan saat mengeluarkan skema penilaian dari arsip",
+        "There was an error while updating the default grading scheme": "Terjadi kesalahan saat memperbarui skema penilaian default",
+        "There was an error while updating the grading scheme": "Terjadi kesalahan saat memperbarui skema penilaian",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Perubahan ini akan mempengaruhi semua kursus dan tugas aktif yang saat ini mewarisi default akun. Perubahan ini membutuhkan waktu hingga selesai karena semua kursus dan nilai tugas dihitung ulang sehubungan dengan skema penilaian default akun baru.",
+        "Unarchive Grading Scheme": "Keluarkan Skema Penilaian dari Arsip",
+        "Upper limit of range": "Batas rentang atas",
+        "View Grading Scheme": "Lihat Skema Penilaian",
+        "View/Copy Grading Scheme": "Lihat/Salin Skema Penilaian",
+        "View/Edit Grading Scheme": "Lihat/Edit Skema Penilaian",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Anda tidak dapat mengarsipkan skema penilaian ini karena ini diatur sebagai default untuk suatu kursus atau akun.",
+        "You can't delete this grading scheme because it is in use.": "Anda tidak dapat menghapus skema penilaian ini karena sedang digunakan.",
+        "You have no active grading schemes.": "Anda tidak memiliki skema penilaian yang aktif.",
+        "You have no archived grading schemes.": "Anda tidak memiliki skema penilaian yang diarsipkan.",
+        "to": "kepada"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Anda yakin mau menghapus skema penilaian ini?",
+        "Are you sure you want to duplicate this grading scheme?": "Anda yakin mau menduplikasi skema penilaian ini?",
+        "Cancel": "Batal",
+        "Close": "Tutup",
+        "Delete": "Hapus",
+        "Delete ": "Hapus ",
+        "Duplicate": "Duplikat",
+        "Duplicate ": "Duplikat ",
+        "Edit Grading Scheme": "Edit Skema Penilaian",
+        "New Grading Scheme": "Skema Penilaian Baru",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Persentase dan poin tidak dapat diedit karena merupakan skema penilaian level akun.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Persentase dan poin tidak dapat diedit karena digunakan sebagai skema penilaian default.",
+        "Percentages and points can't be edited because it is currently being used.": "Persentase dan poin tidak dapat diedit karena sedang digunakan.",
+        "Save": "Simpan"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tabel yang mengandung data skema penilaian canvas default.  Setiap baris memuat nama, persentase maksimum, dan persentasi minimum.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tabel yang mengandung data skema penilaian.  Setiap baris memuat nama, persentase maksimum, dan persentasi minimum.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Tidak dapat memiliki nama duplikat atau baris kosong. Perbaiki nama dan coba klik ‘Simpan’ lagi.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Rentang tidak boleh berimpitan atau kosong. Perbaiki rentang dan coba klik ‘Simpan’ lagi.",
+        "Delete grading scheme": "Hapus skema penilaian",
+        "Edit Grading Scheme": "Edit Skema Penilaian",
+        "Edit a copy of this grading scheme": "Edit salinan dari skema penilaian ini",
+        "Edit grading scheme": "Edit skema penilaian",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Nama Skema Penilaian harus ada. Tambah nama dan coba klik ‘Simpan’ lagi.",
+        "Grading scheme title": "Judul skema penilaian",
+        "Invalid grading scheme": "Skema penilaian tidak valid",
+        "Letter Grade": "Nilai Dalam Huruf",
+        "Looks great!": "Bagus sekali!",
+        "Percentage": "Persentase",
+        "Points": "Poin",
+        "Range": "Rentang",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Rentang harus angka yang valid. Tidak boleh angka negatif atau angka yang lebih dari 100. Perbaiki rentang dan coba klik ‘Simpan’ lagi.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Rentang harus angka yang valid. Tidak boleh angka negatif atau angka yang lebih dari rentang titik atas. Perbaiki rentang dan coba klik ‘Simpan’ lagi.",
+        "edit a copy": "edit salinan"
+    },
+    "OutcomeManagement": {
+        "Course": "Kursus",
+        "Institution": "Institusi"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Akun",
+        "Close": "Tutup",
+        "Concluded": "Dirampungkan",
+        "Courses": "Kursus",
+        "Failed to load account used locations": "Gagal memuat lokasi yang digunakan akun",
+        "Failed to load assignments used locations": "Gagal memuat lokasi yang digunakan tugas",
+        "Failed to load used locations": "Gagal memuat lokasi yang digunakan",
+        "Load Assignments ...": "Memuat Tugas...",
+        "Load More Assignments ...": "Memuat Tugas Lain...",
+        "Loading": "Memuat",
+        "Locations Used": "Lokasi Digunakan",
+        "Search": "Cari",
+        "Search...": "Cari..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Kebijakan Penggunaan yang Dapat Diterima",
+        "Close": "Tutup",
+        "Loading page": "Memuat halaman",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Kebijakan Penggunaan yang Dapat Diterima saat ini tidak tersedia. Silakan periksa lagi nanti atau hubungi bagian dukungan jika Anda membutuhkan bantuan lebih lanjut.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Tidak dapat memuat Kebijakan Penggunaan yang Dapat Diterima. Silakan coba lagi atau hubungi bagian dukungan jika masalah berlanjut."
+    },
+    "account_reports": {
+        "Close": "Tutup",
+        "Invalid date and time.": "Tanggal dan waktu tidak valid.",
+        "Next month": "Bulan berikutnya",
+        "Previous month": "Bulan sebelumnya",
+        "Time": "Waktu"
+    },
+    "admin_split": {
+        "Cancel": "Batal",
+        "Failed to split users.": "Gagal memecah pengguna",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "CATATAN: Ini akan berupaya mengurungkan penggabungan semaksimum mungkin; namun, pengguna yang digabungkan mungkin tidak secara sempurna dipulihkan ke kondisi sebelumnya.",
+        "OK": "OK",
+        "Split": "Pisah",
+        "The following users will be split into separate user accounts:": "Pengguna berikut akan dipisah ke dalam akun pengguna terpisah:",
+        "There are no user accounts to split from this user.": "Tidak ada akun pengguna yang dapat dipisahkan dari pengguna ini.",
+        "User split complete. Links to split user accounts follow:": "Pemisahan pengguna selesai. Tautan untuk memisah akun pengguna berikut ini:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Deskripsi"
+    },
+    "assignment_footer": {
+        "Next": "Berikutnya",
+        "Previous": "Sebelumnya"
+    },
+    "assignment_tabs": {
+        "Assignment": "Tugas",
+        "Peer Review": "Tinjauan Sejawat"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(default kursus)",
+        "Account Level": "Level Akun",
+        "Canvas Grading Scheme (course default)": "Skema Penilaian Canvas (default kursus)",
+        "Close": "Tutup",
+        "Course Level": "Level Kursus",
+        "Default Canvas Grading Scheme": "Skema Penilaian Canvas Default",
+        "Grading scheme was successfully removed.": "Skema penilaian berhasil dihapus.",
+        "Grading scheme was successfully updated.": "Skema penilaian berhasil diperbarui.",
+        "Manage All Grading Schemes": "Kelola Semua Skema Penilaian",
+        "New Grading Scheme": "Skema Penilaian Baru",
+        "Select a grading scheme": "Pilih skema penilaian",
+        "There was an error while loading grading schemes": "Terjadi kesalahan saat memuat skema penilaian",
+        "There was an error while loading the grading scheme": "Terjadi kesalahan saat memuat skema penilaian",
+        "There was an error while refreshing grading schemes": "Terjadi kesalahan saat memuat ulang skema penilaian",
+        "There was an error while removing the grading scheme": "Terjadi kesalahan saat menghapus skema penilaian",
+        "View": "Lihat"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Tugas 2 Halaman Kesalahan Tampilan Guru",
+        "Assignments 2 Teacher initial query error": "Tugas 2 Kesalahan kueri awal guru",
+        "Loading": "Memuat"
+    },
+    "catalog": {
+        "Course Catalog": "Katalog Kursus"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Luar biasa! Dari para pengembang Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Batal",
+        "Copy course": "Salin kursus",
+        "Course code": "Kode kursus",
+        "Course code must be 255 characters or less": "Kode kursus tidak boleh lebih dari 255 karakter",
+        "Course name must be 255 characters or less": "Nama kursus tidak boleh lebih dari 255 karakter",
+        "Create course": "Buat kursus",
+        "Creating...": "Membuat...",
+        "End date": "Tanggal akhir",
+        "End date must be after start date": "Tanggal akhir harus setelah tanggal mulai",
+        "Name": "Nama",
+        "No results": "Tidak ada hasil",
+        "Please enter the details for the new course.": "Silakan masukkan detail untuk kursus baru.",
+        "Select a new beginning date": "Pilih tanggal mulai baru",
+        "Select a new end date": "Pilih tanggal selesai baru",
+        "Select end date": "Pilih tanggal akhir",
+        "Select start date": "Pilih tanggal mulai",
+        "Start date": "Tanggal mulai",
+        "Start date must be before end date": "Tanggal mulai harus sebelum tanggal akhir",
+        "Start typing to search...": "Mulailah mengetik untuk mencari...",
+        "Term": "Durasi Akademis",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Tanggal awal dan akhir durasi akademis tidak dapat diubah di sini, hanya di halaman Detail Durasi Akademis di bagian Admin.",
+        "Use arrow keys to navigate options.": "Gunakan tombol panah untuk memilih opsi."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Tutup",
+        "Content Share Preview": "Pratinjau Berbagi Konten",
+        "Preview": "Pratinjau"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Perhatian"
+    },
+    "course_logging_content": {
+        "No results": "Tidak ada hasil",
+        "Type to search": "Ketik untuk mencari"
+    },
+    "create_course_modal": {
+        "Cancel": "Batal",
+        "Course Details": "Detail Kursus",
+        "Course Name": "Nama Kursus",
+        "Create": "Buat",
+        "Create Course": "Buat Kursus",
+        "Create Subject": "Buat Subjek",
+        "Creating new course...": "Buat kursus baru...",
+        "Creating new subject...": "Buat subjek baru...",
+        "Error creating new course": "Kesalahan saat membuat kursus baru",
+        "Error creating new subject": "Kesalahan saat membuat subjek baru",
+        "Loading accounts...": "Memuat akun...",
+        "Name...": "Nama...",
+        "No Results": "Tidak Ada Hasil",
+        "Select a homeroom": "Pilih homeroom",
+        "Subject Name": "Nama Subjek",
+        "Unable to get accounts": "Tidak dapat mengambil akun",
+        "Unable to get homerooms": "Tidak dapat mengambil homeroom",
+        "Use arrow keys to navigate options.": "Gunakan tombol panah untuk memilih opsi.",
+        "Which account will this course be associated with?": "Dengan akun manakah kursus ini akan dikaitkan?",
+        "Which account will this subject be associated with?": "Dengan akun manakah kursus ini akan dikaitkan?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Override Nilai Final"
+    },
+    "feature_flags": {
+        "Accept": "Terima",
+        "Cancel": "Batal"
+    },
+    "filter_bar": {
+        "All": "Semua",
+        "Clear": "Kosongkan",
+        "Filter by": "Filter menurut",
+        "Search": "Cari",
+        "Use arrow keys to navigate options.": "Gunakan tombol panah untuk memilih opsi."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Pilih Grup",
+        "Use arrow keys to navigate options.": "Gunakan tombol panah untuk memilih opsi."
+    },
+    "jobs": {
+        "Close": "Tutup"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Buat Modul baru"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Panda rajin",
+        "Moves:": "Pergerakan:"
+    },
+    "overview_page": {
+        "Edit home page": "Edit halaman awal",
+        "Subject Home Page": "Halaman Awal Subjek"
+    },
+    "pages_edit_title": {
+        "Page Title": "Halaman Judul"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Batal",
+        "Close": "Tutup"
+    },
+    "study_assist": {
+        "Back": "Kembali",
+        "Close": "Tutup",
+        "Page": "Halaman"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "URL yang valid dibutuhkan",
+        "Website URL": "URL Situs Web"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Kebijakan Penggunaan yang Dapat Diterima",
+        "Loading...": "Memuat...",
+        "Preview": "Pratinjau"
+    },
+    "todos_page": {
+        "Failed to load todos": "Gagal memuat tugas yang harus dilakukan",
+        "Loading Additional Todo Details": "Memuat Detail Tugas Tambahan",
+        "Loading Todo Course Name": "Memuat Nama Kursus Yang Harus Diambil",
+        "Loading Todo Title": "Memuat Nama Yang Harus Diambil"
+    },
+    "tray": {
+        "Close": "Tutup"
+    }
 }

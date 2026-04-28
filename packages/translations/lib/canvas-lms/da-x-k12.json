@@ -1,306 +1,306 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Annuller",
-    "Confirm": "Bekræft"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "Marker som vigtig dato, og vis den på sidebjælken Klasseværelse"
-  },
-  "GradingSchemeManagement": {
-    "Account default grading scheme": "Kontoens standard vurderingssystem",
-    "Account default grading scheme was successfully saved.": "Kontoens standard vurderingssystem blev gemt.",
-    "Active Grading Schemes": "Aktive vurderingssystemer",
-    "Applied": "Anvendt",
-    "Apply": "Tildel",
-    "Archive Grading Scheme": "Arkiver vurderingssystem",
-    "Archived": "Arkiveret",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Arkiverede vurderingssystemer i brug kan stadig bruges, men kan ikke tilføjes til nye fag eller opgaver.",
-    "Are you sure you want to delete this grading scheme?": "Er du sikker på, at du vil slette denne vurderingsordning?",
-    "Cancel": "Annuller",
-    "Canvas Default": "Canvas-standard",
-    "Close": "Luk",
-    "Confirm": "Bekræft",
-    "Confirm Default Grading Scheme Change": "Bekræft ændring af standard vurderingssystem",
-    "Delete Grading Scheme": "Slet vurderingssystem",
-    "Duplicate Grading Scheme": "Dubliker vurderingssystem",
-    "Edit Grading Scheme": "Rediger vurderingssystem",
-    "Grading Scheme Name": "Navn på vurderingssystem",
-    "Grading scheme was successfully archived.": "Vurderingssystemet blev arkiveret.",
-    "Grading scheme was successfully created.": "Vurderingssystem blev oprettet.",
-    "Grading scheme was successfully removed.": "Vurderingssystem blev fjernet.",
-    "Grading scheme was successfully saved.": "Vurderingssystem blev gemt.",
-    "Grading scheme was successfully unarchived.": "Vurderingssystemet blev fjernet fra arkivet.",
-    "Locations Used": "Placeringer brugt",
-    "Lower limit of range": "Lavere intervalgrænse",
-    "New Grading Scheme": "Nyt vurderingssystem",
-    "Next Page": "Næste side",
-    "No account default": "Ingen kontostandard",
-    "Previous Page": "Forrige side",
-    "Save": "Gem",
-    "Search": "Søg",
-    "Search...": "Søg ...",
-    "Show courses and assignments": "Vis fag og opgaver",
-    "Show locations used": "Vis anvendte steder",
-    "Sort by": "Sorter efter",
-    "There was an error while archiving the grading scheme": "Der opstod en fejl under arkivering af vurderingssystemet",
-    "There was an error while creating the grading scheme": "Der opstod en fejl under oprettelse af vurderingssystemet",
-    "There was an error while loading grading schemes": "Der opstod en fejl under indlæsning af vurderingssystemet",
-    "There was an error while loading the default canvas grading scheme": "Der opstod en fejl under indlæsning af standard vurderingssystemet for Canvas",
-    "There was an error while loading the default grading scheme": "Der opstod en fejl under indlæsning af standard vurderingssystemet",
-    "There was an error while removing the grading scheme": "Der opstod en fejl under fjernelse af vurderingssystemet",
-    "There was an error while unarchiving the grading scheme": "Der opstod en fejl under fjernelse af arkivering af vurderingssystemet",
-    "There was an error while updating the default grading scheme": "Der opstod en fejl under opdatering af standard vurderingssystemet",
-    "There was an error while updating the grading scheme": "Der opstod en fejl under opdatering af vurderingssystemet",
-    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Denne ændring vil påvirke alle aktive fag og opgaver, der i øjeblikket arver kontostandarden. Denne ændring vil tage et stykke tid at afslutte, da alle fag- og opgavevurderinger genberegnes i forhold til den nye kontos standard vurderingssystem.",
-    "Unarchive Grading Scheme": "Fjern arkivering af vurderingssystem",
-    "Upper limit of range": "Intervallets øvre grænse",
-    "View Grading Scheme": "Vis vurderingsordning",
-    "View/Copy Grading Scheme": "Vis/kopier vurderingsordning",
-    "View/Edit Grading Scheme": "Vis/rediger vurderingsordning",
-    "You can't archive this grading scheme because it is set as a default for a course or account.": "Du kan ikke arkivere dette vurderingssystem, fordi det er indstillet som standard for et fag eller en konto.",
-    "You can't delete this grading scheme because it is in use.": "Du kan ikke slette dette vurderingssystem, fordi det er i brug.",
-    "You have no active grading schemes.": "Du har ingen aktive vurderingssystemer.",
-    "You have no archived grading schemes.": "Du har ingen arkiverede vurderingssystemer.",
-    "to": "til"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Er du sikker på, at du vil slette denne vurderingsordning?",
-    "Are you sure you want to duplicate this grading scheme?": "Er du sikker på, at du vil duplikere dette vurderingssystem?",
-    "Cancel": "Annuller",
-    "Close": "Luk",
-    "Delete": "Slet",
-    "Delete ": "Slet ",
-    "Duplicate": "Dupliker",
-    "Duplicate ": "Dupliker ",
-    "Edit Grading Scheme": "Rediger vurderingssystem",
-    "New Grading Scheme": "Nyt vurderingssystem",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "Procentsatser og point kan ikke redigeres, fordi det er et vurderingssystem på kontoniveau.",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Procentsatser og point kan ikke redigeres, fordi det bruges som standard vurderingssystem.",
-    "Percentages and points can't be edited because it is currently being used.": "Procentsatser og point kan ikke redigeres, da det er i brug i øjeblikket.",
-    "Save": "Gem"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "En tabel, der indeholder Canvas’ standard vurderingssystemdata.  Hver række indeholder et navn, en maksimal procentdel og en minimal procentdel.",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "En tabel, der indeholder data fra vurderingssystemet.  Hver række indeholder et navn, en maksimal procentdel og en minimal procentdel.",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Kan ikke have duplikerede eller tomme rækkenavne. Ret navnene, og prøv at klikke på 'Gem' igen.",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Kan ikke have overlappende eller tomme områder. Ret intervallerne, og prøv at klikke på 'Gem' igen.",
-    "Delete grading scheme": "Slet vurderingssystem",
-    "Edit Grading Scheme": "Rediger vurderingssystem",
-    "Edit a copy of this grading scheme": "Rediger en kopi af dette vurderingssystem",
-    "Edit grading scheme": "Rediger vurderingssystem",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Navn på vurderingssystem er påkrævet. Tilføj et navn, og prøv at klikke på 'Gem' igen.",
-    "Grading scheme title": "Vurderingssystemets titel",
-    "Invalid grading scheme": "Ugyldigt vurderingssystem",
-    "Letter Grade": "Bogstavvurderinger",
-    "Looks great!": "Det ser godt ud!",
-    "Percentage": "Procentdel",
-    "Points": "Point",
-    "Range": "Interval",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Intervallet skal være et gyldigt nummer. Må ikke indeholde negative tal eller tal, der er større end 100. Ret intervallerne, og prøv at klikke på 'Gem' igen.",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Intervallet skal være et gyldigt nummer. Må ikke indeholde negative tal eller tal, der er større end det øvre pointområde. Ret intervallerne, og prøv at klikke på 'Gem' igen.",
-    "edit a copy": "rediger en kopi"
-  },
-  "OutcomeManagement": {
-    "Course": "Fag",
-    "Institution": "Institution"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Konti",
-    "Close": "Luk",
-    "Concluded": "Afsluttet",
-    "Courses": "Fag",
-    "Failed to load account used locations": "Kunne ikke indlæse kontoens brugte placeringer",
-    "Failed to load assignments used locations": "Kunne ikke indlæse opgaver brugte placeringer",
-    "Failed to load used locations": "Kunne ikke indlæse brugte placeringer",
-    "Load Assignments ...": "Indlæs opgaver ...",
-    "Load More Assignments ...": "Indlæs flere opgaver ...",
-    "Loading": "Indlæser",
-    "Locations Used": "Placeringer brugt",
-    "Search": "Søg",
-    "Search...": "Søg ..."
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "Acceptabel brugspolitik",
-    "Close": "Luk",
-    "Loading page": "Indlæser side",
-    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Politikken for acceptabel brug er i øjeblikket ikke tilgængelig. Vend tilbage senere, eller kontakt support, hvis du har brug for yderligere hjælp.",
-    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Kan ikke indlæse politikken for acceptabel brug. Prøv igen senere, eller kontakt support, hvis problemet fortsætter."
-  },
-  "account_reports": {
-    "Close": "Luk",
-    "Invalid date and time.": "Ugyldig dato og klokkeslæt.",
-    "Next month": "Næste måned",
-    "Previous month": "Forrige måned",
-    "Time": "Tidspunkt"
-  },
-  "admin_split": {
-    "Cancel": "Annuller",
-    "Failed to split users.": "Det mislykkedes at opdele brugere.",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "BEMÆRK: Dette vil forsøge at fortryde fletningen så vidt muligt, men flettede brugere gendannes muligvis ikke perfekt til deres tidligere tilstand.",
-    "OK": "OK",
-    "Split": "Opdel",
-    "The following users will be split into separate user accounts:": "Følgende brugere opdeles i separate brugerkonti:",
-    "There are no user accounts to split from this user.": "Der er ingen brugerkonti, der kan deles fra denne bruger.",
-    "User split complete. Links to split user accounts follow:": "Opdeling af brugere afsluttet. Links til opdelte brugerkonti følger:"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Beskrivelse"
-  },
-  "assignment_footer": {
-    "Next": "Næste",
-    "Previous": "Forrige"
-  },
-  "assignment_tabs": {
-    "Assignment": "Opgave",
-    "Peer Review": "Elev-elev vurdering"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "(fagstandard)",
-    "Account Level": "Kontoniveau",
-    "Canvas Grading Scheme (course default)": "Canvas-vurderingssystem (fagstandard)",
-    "Close": "Luk",
-    "Course Level": "Fagniveau",
-    "Default Canvas Grading Scheme": "Standard Canvas vurderingssystem",
-    "Grading scheme was successfully removed.": "Vurderingssystem blev fjernet.",
-    "Grading scheme was successfully updated.": "Vurderingssystemet blev opdateret.",
-    "Manage All Grading Schemes": "Administrer alle vurderingssystemer",
-    "New Grading Scheme": "Nyt vurderingssystem",
-    "Select a grading scheme": "Vælg et vurderingssystem",
-    "There was an error while loading grading schemes": "Der opstod en fejl under indlæsning af vurderingssystemet",
-    "There was an error while loading the grading scheme": "Der opstod en fejl under indlæsning af vurderingssystemet",
-    "There was an error while refreshing grading schemes": "Der opstod en fejl under opdatering af vurderingssystemer",
-    "There was an error while removing the grading scheme": "Der opstod en fejl under fjernelse af vurderingssystemet",
-    "View": "Vis"
-  },
-  "assignments_2": {
-    "Assignments 2 Teacher Error Page": "Opgaver 2 Lærer Fejlside",
-    "Assignments 2 Teacher initial query error": "Opgaver 2 Lærer første forespørgselsfejl",
-    "Loading": "Indlæser"
-  },
-  "catalog": {
-    "Course Catalog": "Fag-katalog"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "Godt klaret! Fra Canvas-udviklerne"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Annuller",
-    "Copy course": "Kopiér fag",
-    "Course code": "Fagkode",
-    "Course code must be 255 characters or less": "Fagkoden skal være på 255 tegn eller derunder",
-    "Course name must be 255 characters or less": "Fagnavn skal være på 255 tegn eller derunder",
-    "Create course": "Opret fag",
-    "Creating...": "Opretter ...",
-    "End date": "Slutdato",
-    "End date must be after start date": "Slutdato skal være efter startdato",
-    "Name": "Navn",
-    "No results": "Ingen resultater",
-    "Please enter the details for the new course.": "Indtast nærmere oplysninger for det nye fag.",
-    "Select a new beginning date": "Vælg en ny startdato",
-    "Select a new end date": "Vælg en ny slutdato",
-    "Select end date": "Vælg slutdato",
-    "Select start date": "Vælg startdato",
-    "Start date": "Startdato",
-    "Start date must be before end date": "Startdato skal være før slutdato",
-    "Start typing to search...": "Begynd at skrive for at søge ...",
-    "Term": "Skoleår",
-    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Skoleårets start- og slutdatoer kan ikke ændres her, kun på siden med skoleårsoplysninger under Admin.",
-    "Use arrow keys to navigate options.": "Brug piletasterne til at navigere indstillinger."
-  },
-  "content_share_preview_overlay": {
-    "Close": "Luk",
-    "Content Share Preview": "Forhåndsvisning af indholdsdeling",
-    "Preview": "Eksempel"
-  },
-  "copy_warnings_modal": {
-    "Attention": "Opmærksomhed"
-  },
-  "course_logging_content": {
-    "No results": "Ingen resultater",
-    "Type to search": "Indtast for at søge"
-  },
-  "create_course_modal": {
-    "Cancel": "Annuller",
-    "Course Details": "Fagoplysninger",
-    "Course Name": "Fagets navn",
-    "Create": "Opret",
-    "Create Course": "Opret fag",
-    "Create Subject": "Opret emne",
-    "Creating new course...": "Opretter nyt fag ...",
-    "Creating new subject...": "Opretter nyt emne ...",
-    "Error creating new course": "Fejl ved oprettelse af nyt fag",
-    "Error creating new subject": "Fejl ved oprettelse af nyt emne",
-    "Loading accounts...": "Indlæser konti ...",
-    "Name...": "Navn ...",
-    "No Results": "Ingen resultater",
-    "Select a homeroom": "Vælg et klasseværelse",
-    "Subject Name": "Emnets navn",
-    "Unable to get accounts": "Ikke i stand til at hente konti",
-    "Unable to get homerooms": "Kan ikke hente klasseværelser",
-    "Use arrow keys to navigate options.": "Brug piletasterne til at navigere indstillinger.",
-    "Which account will this course be associated with?": "Hvilken konto vil dette fag være tilknyttet?",
-    "Which account will this subject be associated with?": "Hvilken konto vil dette emne være tilknyttet?"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "Tilsidesættelse af endelig vurdering"
-  },
-  "feature_flags": {
-    "Accept": "Acceptér",
-    "Cancel": "Annuller"
-  },
-  "filter_bar": {
-    "All": "Alle",
-    "Clear": "Ryd",
-    "Filter by": "Filtrere efter",
-    "Search": "Søg",
-    "Use arrow keys to navigate options.": "Brug piletasterne til at navigere indstillinger."
-  },
-  "groupNavigationSelector": {
-    "Select Group": "Vælg gruppe",
-    "Use arrow keys to navigate options.": "Brug piletasterne til at navigere indstillinger."
-  },
-  "jobs": {
-    "Close": "Luk"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Opret et nyt forløb"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "En læselysten panda",
-    "Moves:": "Flytter:"
-  },
-  "overview_page": {
-    "Edit home page": "Rediger hjemmeside",
-    "Subject Home Page": "Emnets startside"
-  },
-  "pages_edit_title": {
-    "Page Title": "Sidetitel"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Annuller",
-    "Close": "Luk"
-  },
-  "study_assist": {
-    "Back": "Tilbage",
-    "Close": "Luk",
-    "Page": "Side"
-  },
-  "submit_online_url_assignment": {
-    "A valid URL is required": "En gyldig URL er påkrævet",
-    "Website URL": "Webside URL"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "Acceptabel brugspolitik",
-    "Loading...": "Indlæser ...",
-    "Preview": "Eksempel"
-  },
-  "todos_page": {
-    "Failed to load todos": "Kunne ikke indlæse opgavelisten",
-    "Loading Additional Todo Details": "Indlæser yderligere detaljer på opgavelisten",
-    "Loading Todo Course Name": "Indlæser fagnavn for opgaveliste",
-    "Loading Todo Title": "Indlæser titel på opgaveliste"
-  },
-  "tray": {
-    "Close": "Luk"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Annuller",
+        "Confirm": "Bekræft"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Marker som vigtig dato, og vis den på sidebjælken Klasseværelse"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Kontoens standard vurderingssystem",
+        "Account default grading scheme was successfully saved.": "Kontoens standard vurderingssystem blev gemt.",
+        "Active Grading Schemes": "Aktive vurderingssystemer",
+        "Applied": "Anvendt",
+        "Apply": "Tildel",
+        "Archive Grading Scheme": "Arkiver vurderingssystem",
+        "Archived": "Arkiveret",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Arkiverede vurderingssystemer i brug kan stadig bruges, men kan ikke tilføjes til nye fag eller opgaver.",
+        "Are you sure you want to delete this grading scheme?": "Er du sikker på, at du vil slette denne vurderingsordning?",
+        "Cancel": "Annuller",
+        "Canvas Default": "Canvas-standard",
+        "Close": "Luk",
+        "Confirm": "Bekræft",
+        "Confirm Default Grading Scheme Change": "Bekræft ændring af standard vurderingssystem",
+        "Delete Grading Scheme": "Slet vurderingssystem",
+        "Duplicate Grading Scheme": "Dubliker vurderingssystem",
+        "Edit Grading Scheme": "Rediger vurderingssystem",
+        "Grading Scheme Name": "Navn på vurderingssystem",
+        "Grading scheme was successfully archived.": "Vurderingssystemet blev arkiveret.",
+        "Grading scheme was successfully created.": "Vurderingssystem blev oprettet.",
+        "Grading scheme was successfully removed.": "Vurderingssystem blev fjernet.",
+        "Grading scheme was successfully saved.": "Vurderingssystem blev gemt.",
+        "Grading scheme was successfully unarchived.": "Vurderingssystemet blev fjernet fra arkivet.",
+        "Locations Used": "Placeringer brugt",
+        "Lower limit of range": "Lavere intervalgrænse",
+        "New Grading Scheme": "Nyt vurderingssystem",
+        "Next Page": "Næste side",
+        "No account default": "Ingen kontostandard",
+        "Previous Page": "Forrige side",
+        "Save": "Gem",
+        "Search": "Søg",
+        "Search...": "Søg ...",
+        "Show courses and assignments": "Vis fag og opgaver",
+        "Show locations used": "Vis anvendte steder",
+        "Sort by": "Sorter efter",
+        "There was an error while archiving the grading scheme": "Der opstod en fejl under arkivering af vurderingssystemet",
+        "There was an error while creating the grading scheme": "Der opstod en fejl under oprettelse af vurderingssystemet",
+        "There was an error while loading grading schemes": "Der opstod en fejl under indlæsning af vurderingssystemet",
+        "There was an error while loading the default canvas grading scheme": "Der opstod en fejl under indlæsning af standard vurderingssystemet for Canvas",
+        "There was an error while loading the default grading scheme": "Der opstod en fejl under indlæsning af standard vurderingssystemet",
+        "There was an error while removing the grading scheme": "Der opstod en fejl under fjernelse af vurderingssystemet",
+        "There was an error while unarchiving the grading scheme": "Der opstod en fejl under fjernelse af arkivering af vurderingssystemet",
+        "There was an error while updating the default grading scheme": "Der opstod en fejl under opdatering af standard vurderingssystemet",
+        "There was an error while updating the grading scheme": "Der opstod en fejl under opdatering af vurderingssystemet",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Denne ændring vil påvirke alle aktive fag og opgaver, der i øjeblikket arver kontostandarden. Denne ændring vil tage et stykke tid at afslutte, da alle fag- og opgavevurderinger genberegnes i forhold til den nye kontos standard vurderingssystem.",
+        "Unarchive Grading Scheme": "Fjern arkivering af vurderingssystem",
+        "Upper limit of range": "Intervallets øvre grænse",
+        "View Grading Scheme": "Vis vurderingsordning",
+        "View/Copy Grading Scheme": "Vis/kopier vurderingsordning",
+        "View/Edit Grading Scheme": "Vis/rediger vurderingsordning",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Du kan ikke arkivere dette vurderingssystem, fordi det er indstillet som standard for et fag eller en konto.",
+        "You can't delete this grading scheme because it is in use.": "Du kan ikke slette dette vurderingssystem, fordi det er i brug.",
+        "You have no active grading schemes.": "Du har ingen aktive vurderingssystemer.",
+        "You have no archived grading schemes.": "Du har ingen arkiverede vurderingssystemer.",
+        "to": "til"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Er du sikker på, at du vil slette denne vurderingsordning?",
+        "Are you sure you want to duplicate this grading scheme?": "Er du sikker på, at du vil duplikere dette vurderingssystem?",
+        "Cancel": "Annuller",
+        "Close": "Luk",
+        "Delete": "Slet",
+        "Delete ": "Slet ",
+        "Duplicate": "Dupliker",
+        "Duplicate ": "Dupliker ",
+        "Edit Grading Scheme": "Rediger vurderingssystem",
+        "New Grading Scheme": "Nyt vurderingssystem",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Procentsatser og point kan ikke redigeres, fordi det er et vurderingssystem på kontoniveau.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Procentsatser og point kan ikke redigeres, fordi det bruges som standard vurderingssystem.",
+        "Percentages and points can't be edited because it is currently being used.": "Procentsatser og point kan ikke redigeres, da det er i brug i øjeblikket.",
+        "Save": "Gem"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "En tabel, der indeholder Canvas’ standard vurderingssystemdata.  Hver række indeholder et navn, en maksimal procentdel og en minimal procentdel.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "En tabel, der indeholder data fra vurderingssystemet.  Hver række indeholder et navn, en maksimal procentdel og en minimal procentdel.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Kan ikke have duplikerede eller tomme rækkenavne. Ret navnene, og prøv at klikke på 'Gem' igen.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Kan ikke have overlappende eller tomme områder. Ret intervallerne, og prøv at klikke på 'Gem' igen.",
+        "Delete grading scheme": "Slet vurderingssystem",
+        "Edit Grading Scheme": "Rediger vurderingssystem",
+        "Edit a copy of this grading scheme": "Rediger en kopi af dette vurderingssystem",
+        "Edit grading scheme": "Rediger vurderingssystem",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Navn på vurderingssystem er påkrævet. Tilføj et navn, og prøv at klikke på 'Gem' igen.",
+        "Grading scheme title": "Vurderingssystemets titel",
+        "Invalid grading scheme": "Ugyldigt vurderingssystem",
+        "Letter Grade": "Bogstavvurderinger",
+        "Looks great!": "Det ser godt ud!",
+        "Percentage": "Procentdel",
+        "Points": "Point",
+        "Range": "Interval",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Intervallet skal være et gyldigt nummer. Må ikke indeholde negative tal eller tal, der er større end 100. Ret intervallerne, og prøv at klikke på 'Gem' igen.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Intervallet skal være et gyldigt nummer. Må ikke indeholde negative tal eller tal, der er større end det øvre pointområde. Ret intervallerne, og prøv at klikke på 'Gem' igen.",
+        "edit a copy": "rediger en kopi"
+    },
+    "OutcomeManagement": {
+        "Course": "Fag",
+        "Institution": "Institution"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Konti",
+        "Close": "Luk",
+        "Concluded": "Afsluttet",
+        "Courses": "Fag",
+        "Failed to load account used locations": "Kunne ikke indlæse kontoens brugte placeringer",
+        "Failed to load assignments used locations": "Kunne ikke indlæse opgaver brugte placeringer",
+        "Failed to load used locations": "Kunne ikke indlæse brugte placeringer",
+        "Load Assignments ...": "Indlæs opgaver ...",
+        "Load More Assignments ...": "Indlæs flere opgaver ...",
+        "Loading": "Indlæser",
+        "Locations Used": "Placeringer brugt",
+        "Search": "Søg",
+        "Search...": "Søg ..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Acceptabel brugspolitik",
+        "Close": "Luk",
+        "Loading page": "Indlæser side",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Politikken for acceptabel brug er i øjeblikket ikke tilgængelig. Vend tilbage senere, eller kontakt support, hvis du har brug for yderligere hjælp.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Kan ikke indlæse politikken for acceptabel brug. Prøv igen senere, eller kontakt support, hvis problemet fortsætter."
+    },
+    "account_reports": {
+        "Close": "Luk",
+        "Invalid date and time.": "Ugyldig dato og klokkeslæt.",
+        "Next month": "Næste måned",
+        "Previous month": "Forrige måned",
+        "Time": "Tidspunkt"
+    },
+    "admin_split": {
+        "Cancel": "Annuller",
+        "Failed to split users.": "Det mislykkedes at opdele brugere.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "BEMÆRK: Dette vil forsøge at fortryde fletningen så vidt muligt, men flettede brugere gendannes muligvis ikke perfekt til deres tidligere tilstand.",
+        "OK": "OK",
+        "Split": "Opdel",
+        "The following users will be split into separate user accounts:": "Følgende brugere opdeles i separate brugerkonti:",
+        "There are no user accounts to split from this user.": "Der er ingen brugerkonti, der kan deles fra denne bruger.",
+        "User split complete. Links to split user accounts follow:": "Opdeling af brugere afsluttet. Links til opdelte brugerkonti følger:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Beskrivelse"
+    },
+    "assignment_footer": {
+        "Next": "Næste",
+        "Previous": "Forrige"
+    },
+    "assignment_tabs": {
+        "Assignment": "Opgave",
+        "Peer Review": "Elev-elev vurdering"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(fagstandard)",
+        "Account Level": "Kontoniveau",
+        "Canvas Grading Scheme (course default)": "Canvas-vurderingssystem (fagstandard)",
+        "Close": "Luk",
+        "Course Level": "Fagniveau",
+        "Default Canvas Grading Scheme": "Standard Canvas vurderingssystem",
+        "Grading scheme was successfully removed.": "Vurderingssystem blev fjernet.",
+        "Grading scheme was successfully updated.": "Vurderingssystemet blev opdateret.",
+        "Manage All Grading Schemes": "Administrer alle vurderingssystemer",
+        "New Grading Scheme": "Nyt vurderingssystem",
+        "Select a grading scheme": "Vælg et vurderingssystem",
+        "There was an error while loading grading schemes": "Der opstod en fejl under indlæsning af vurderingssystemet",
+        "There was an error while loading the grading scheme": "Der opstod en fejl under indlæsning af vurderingssystemet",
+        "There was an error while refreshing grading schemes": "Der opstod en fejl under opdatering af vurderingssystemer",
+        "There was an error while removing the grading scheme": "Der opstod en fejl under fjernelse af vurderingssystemet",
+        "View": "Vis"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Opgaver 2 Lærer Fejlside",
+        "Assignments 2 Teacher initial query error": "Opgaver 2 Lærer første forespørgselsfejl",
+        "Loading": "Indlæser"
+    },
+    "catalog": {
+        "Course Catalog": "Fag-katalog"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Godt klaret! Fra Canvas-udviklerne"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Annuller",
+        "Copy course": "Kopiér fag",
+        "Course code": "Fagkode",
+        "Course code must be 255 characters or less": "Fagkoden skal være på 255 tegn eller derunder",
+        "Course name must be 255 characters or less": "Fagnavn skal være på 255 tegn eller derunder",
+        "Create course": "Opret fag",
+        "Creating...": "Opretter ...",
+        "End date": "Slutdato",
+        "End date must be after start date": "Slutdato skal være efter startdato",
+        "Name": "Navn",
+        "No results": "Ingen resultater",
+        "Please enter the details for the new course.": "Indtast nærmere oplysninger for det nye fag.",
+        "Select a new beginning date": "Vælg en ny startdato",
+        "Select a new end date": "Vælg en ny slutdato",
+        "Select end date": "Vælg slutdato",
+        "Select start date": "Vælg startdato",
+        "Start date": "Startdato",
+        "Start date must be before end date": "Startdato skal være før slutdato",
+        "Start typing to search...": "Begynd at skrive for at søge ...",
+        "Term": "Skoleår",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Skoleårets start- og slutdatoer kan ikke ændres her, kun på siden med skoleårsoplysninger under Admin.",
+        "Use arrow keys to navigate options.": "Brug piletasterne til at navigere indstillinger."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Luk",
+        "Content Share Preview": "Forhåndsvisning af indholdsdeling",
+        "Preview": "Eksempel"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Opmærksomhed"
+    },
+    "course_logging_content": {
+        "No results": "Ingen resultater",
+        "Type to search": "Indtast for at søge"
+    },
+    "create_course_modal": {
+        "Cancel": "Annuller",
+        "Course Details": "Fagoplysninger",
+        "Course Name": "Fagets navn",
+        "Create": "Opret",
+        "Create Course": "Opret fag",
+        "Create Subject": "Opret emne",
+        "Creating new course...": "Opretter nyt fag ...",
+        "Creating new subject...": "Opretter nyt emne ...",
+        "Error creating new course": "Fejl ved oprettelse af nyt fag",
+        "Error creating new subject": "Fejl ved oprettelse af nyt emne",
+        "Loading accounts...": "Indlæser konti ...",
+        "Name...": "Navn ...",
+        "No Results": "Ingen resultater",
+        "Select a homeroom": "Vælg et klasseværelse",
+        "Subject Name": "Emnets navn",
+        "Unable to get accounts": "Ikke i stand til at hente konti",
+        "Unable to get homerooms": "Kan ikke hente klasseværelser",
+        "Use arrow keys to navigate options.": "Brug piletasterne til at navigere indstillinger.",
+        "Which account will this course be associated with?": "Hvilken konto vil dette fag være tilknyttet?",
+        "Which account will this subject be associated with?": "Hvilken konto vil dette emne være tilknyttet?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Tilsidesættelse af endelig vurdering"
+    },
+    "feature_flags": {
+        "Accept": "Acceptér",
+        "Cancel": "Annuller"
+    },
+    "filter_bar": {
+        "All": "Alle",
+        "Clear": "Ryd",
+        "Filter by": "Filtrere efter",
+        "Search": "Søg",
+        "Use arrow keys to navigate options.": "Brug piletasterne til at navigere indstillinger."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Vælg gruppe",
+        "Use arrow keys to navigate options.": "Brug piletasterne til at navigere indstillinger."
+    },
+    "jobs": {
+        "Close": "Luk"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Opret et nyt forløb"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "En læselysten panda",
+        "Moves:": "Flytter:"
+    },
+    "overview_page": {
+        "Edit home page": "Rediger hjemmeside",
+        "Subject Home Page": "Emnets startside"
+    },
+    "pages_edit_title": {
+        "Page Title": "Sidetitel"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Annuller",
+        "Close": "Luk"
+    },
+    "study_assist": {
+        "Back": "Tilbage",
+        "Close": "Luk",
+        "Page": "Side"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "En gyldig URL er påkrævet",
+        "Website URL": "Webside URL"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Acceptabel brugspolitik",
+        "Loading...": "Indlæser ...",
+        "Preview": "Eksempel"
+    },
+    "todos_page": {
+        "Failed to load todos": "Kunne ikke indlæse opgavelisten",
+        "Loading Additional Todo Details": "Indlæser yderligere detaljer på opgavelisten",
+        "Loading Todo Course Name": "Indlæser fagnavn for opgaveliste",
+        "Loading Todo Title": "Indlæser titel på opgaveliste"
+    },
+    "tray": {
+        "Close": "Luk"
+    }
 }
