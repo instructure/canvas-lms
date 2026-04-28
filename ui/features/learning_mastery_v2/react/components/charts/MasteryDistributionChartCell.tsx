@@ -43,6 +43,7 @@ export interface MasteryDistributionChartCellProps {
   courseId?: string
   isLoading: boolean
   loadingTitle?: string
+  isHovered?: boolean
 }
 
 const containerStyle: React.CSSProperties = {
@@ -62,11 +63,11 @@ export const MasteryDistributionChartCell: React.FC<MasteryDistributionChartCell
   courseId,
   isLoading,
   loadingTitle = 'Loading distribution',
+  isHovered = false,
 }) => {
-  const [hovered, setHovered] = useState(false)
   const [focused, setFocused] = useState(false)
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
-  const visible = hovered || focused
+  const visible = isHovered || focused
 
   const canExpand = !!courseId
 
@@ -103,10 +104,7 @@ export const MasteryDistributionChartCell: React.FC<MasteryDistributionChartCell
           distributionStudents={distributionStudents}
           courseId={courseId}
           isOpen={isPopoverOpen}
-          onCloseHandler={() => {
-            setIsPopoverOpen(false)
-            setHovered(false)
-          }}
+          onCloseHandler={() => setIsPopoverOpen(false)}
           renderTrigger={expandButtonTrigger}
         />
       ) : (
@@ -128,12 +126,7 @@ export const MasteryDistributionChartCell: React.FC<MasteryDistributionChartCell
   const chartData = distributionData ?? []
 
   return (
-    <div
-      data-testid={`mastery-distribution-chart-cell-${outcome.id}`}
-      style={containerStyle}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
+    <div data-testid={`mastery-distribution-chart-cell-${outcome.id}`} style={containerStyle}>
       {expandButton}
       <MasteryDistributionChart
         outcome={outcome}
