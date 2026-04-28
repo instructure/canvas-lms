@@ -49,13 +49,13 @@ const FormHeader: React.FC<FormHeaderProps> = ({isEdit, title, onCancel, isLoadi
   }
 
   return (
-    <Flex justifyItems="space-between" alignItems="start" margin="0 0 large 0">
-      <Flex.Item shouldGrow>
+    <Flex justifyItems="space-between" alignItems="center" margin="0 0 large 0">
+      <Flex.Item shouldGrow shouldShrink>
         <Heading level="h1" margin="0">
           {getHeading()}
         </Heading>
       </Flex.Item>
-      <Flex.Item>
+      <Flex.Item margin="0 0 0 medium">
         <Flex alignItems="center" gap="x-small">
           <Flex.Item>
             <IconPublishSolid color="secondary" />

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useCallback} from 'react'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
@@ -26,7 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
 import {Alert} from '@instructure/ui-alerts'
-import {IconRefreshLine, IconFullScreenLine} from '@instructure/ui-icons'
+import {IconRefreshLine, IconFullScreenLine, IconAiSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {
@@ -96,6 +96,42 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   const normalModeBottomRef = useRef<HTMLDivElement | null>(null)
   const focusModeBottomRef = useRef<HTMLDivElement | null>(null)
   const hasInitializedRef = useRef(false)
+  const messagesRef = useRef(messages)
+  messagesRef.current = messages
+
+  const initializeConversation = useCallback(async () => {
+    setIsInitializing(true)
+    setError(null)
+    try {
+      const {json: activeConversation} = await doFetchApi<ConversationResponse>({
+        path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/conversations`,
+        method: 'GET',
+      })
+
+      if (activeConversation?.id && activeConversation?.messages) {
+        setConversationId(activeConversation.id)
+        setMessages(activeConversation.messages)
+        setProgress(activeConversation.progress || null)
+        setError(null)
+      } else {
+        const {json: newConversation} = await doFetchApi<ConversationResponse>({
+          path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/conversations`,
+          method: 'POST',
+        })
+
+        if (newConversation?.id && newConversation?.messages) {
+          setConversationId(newConversation.id)
+          setMessages(newConversation.messages)
+          setProgress(newConversation.progress || null)
+          setError(null)
+        }
+      }
+    } catch (_error) {
+      setError(I18n.t('Failed to start conversation. Please try again.'))
+    } finally {
+      setIsInitializing(false)
+    }
+  }, [courseId, aiExperienceId])
 
   useEffect(() => {
     // Reset on new initialization so instant-scroll applies again after restart
@@ -113,16 +149,13 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
   }, [messages, isLoading, isFocusModeOpen, isInitializing])
 
   useEffect(() => {
-    if (isOpen && isExpanded && messages.length === 0) {
-      // Backend will check for existing conversation automatically
+    if (isOpen && isExpanded && messagesRef.current.length === 0) {
       initializeConversation()
     }
-    // Focus the close button when the conversation is expanded
     if (isOpen && isExpanded && closeButtonRef.current) {
       closeButtonRef.current.focus()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, isExpanded])
+  }, [isOpen, isExpanded, initializeConversation])
 
   // Announce new Assistant messages to screen readers
   useEffect(() => {
@@ -146,43 +179,6 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
       setScreenReaderAnnouncement(I18n.t('Initializing conversation...'))
     }
   }, [isInitializing])
-
-  const initializeConversation = async () => {
-    setIsInitializing(true)
-    setError(null)
-    try {
-      // First, check if there's an active conversation
-      const {json: activeConversation} = await doFetchApi<ConversationResponse>({
-        path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/conversations`,
-        method: 'GET',
-      })
-
-      // If active conversation exists, use it
-      if (activeConversation?.id && activeConversation?.messages) {
-        setConversationId(activeConversation.id)
-        setMessages(activeConversation.messages)
-        setProgress(activeConversation.progress || null)
-        setError(null)
-      } else {
-        // No active conversation, create a new one
-        const {json: newConversation} = await doFetchApi<ConversationResponse>({
-          path: `/api/v1/courses/${courseId}/ai_experiences/${aiExperienceId}/conversations`,
-          method: 'POST',
-        })
-
-        if (newConversation?.id && newConversation?.messages) {
-          setConversationId(newConversation.id)
-          setMessages(newConversation.messages)
-          setProgress(newConversation.progress || null)
-          setError(null)
-        }
-      }
-    } catch (error) {
-      setError(I18n.t('Failed to start conversation. Please try again.'))
-    } finally {
-      setIsInitializing(false)
-    }
-  }
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading || !conversationId) return
@@ -215,7 +211,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
         setProgress(json.progress || null)
         setError(null)
       }
-    } catch (error) {
+    } catch (_error) {
       setError(I18n.t('Failed to send message. Please try again.'))
       // Remove the optimistically added message on error
       setMessages(prev => prev.slice(0, -1))
@@ -257,7 +253,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
         setProgress(json.progress || null)
         setError(null)
       }
-    } catch (error) {
+    } catch (_error) {
       setError(I18n.t('Failed to restart conversation. Please try again.'))
       // Focus text input after error
       textAreaRef.current?.focus({preventScroll: true})
@@ -266,7 +262,7 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
     }
   }
 
-  const renderConversationContent = (inFocusMode = false) => (
+  const renderConversationContent = (_inFocusMode = false) => (
     <View as="div" padding="medium" background="primary">
       {error && (
         <Alert
@@ -358,13 +354,13 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
             <View as="div" padding="x-large" background="primary" textAlign="center">
               <View as="div" margin="0 0 small 0">
                 <Heading level="h3">
-                  <span style={gradientTextStyle}>{I18n.t('Start chatting')}</span>
+                  <span style={gradientTextStyle}>{I18n.t('Preview the chat')}</span>
                 </Heading>
               </View>
               <View as="div" margin="0 0 medium 0">
                 <Text>
                   {isTeacherPreview
-                    ? I18n.t('Here, you can have a chat with the AI just like a student would.')
+                    ? I18n.t('Chat with the AI just like a learner')
                     : I18n.t(
                         'Show what you know. %{count} learning targets to complete this activity.',
                         {count: objectivesCount},
@@ -379,7 +375,10 @@ const LLMConversationView: React.FC<LLMConversationViewProps> = ({
                   withBackground={false}
                   themeOverride={{borderRadius: '0.5rem'}}
                 >
-                  ✦ {I18n.t('Test as learner')}
+                  <span style={{display: 'flex', alignItems: 'center', gap: '0.375rem'}}>
+                    <IconAiSolid />
+                    {I18n.t('Test as learner')}
+                  </span>
                 </Button>
               </div>
             </View>

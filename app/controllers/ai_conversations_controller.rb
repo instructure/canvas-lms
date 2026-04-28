@@ -29,36 +29,6 @@ class AiConversationsController < ApplicationController
   before_action :load_experience
   before_action :load_conversation, only: %i[post_message destroy show evaluation create_feedback delete_feedback]
 
-  # Display the page for teachers to view all student AI conversations
-  # Returns HTML for teachers, JSON for students (their active conversation)
-  #
-  # @returns HTML page or JSON
-  def index
-    # Teacher view - show all student conversations
-    permissions = %i[manage_assignments_add manage_assignments_edit manage_assignments_delete]
-    unless @context.grants_any_right?(@current_user, *permissions)
-      return render_unauthorized_action
-    end
-
-    set_active_tab "ai_experiences"
-    add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
-    add_crumb @experience.title, course_ai_experience_path(@context, @experience)
-    add_crumb t("#crumbs.ai_conversations", "AI Conversations")
-
-    @page_title = t("#page_title.ai_conversations", "%{title} - AI Conversations", title: @experience.title)
-    js_bundle :ai_experiences_ai_conversations
-
-    can_manage = @context.grants_any_right?(@current_user, *permissions)
-
-    js_env({
-             AI_EXPERIENCE: ai_experience_json(@experience, @current_user, session, can_manage:),
-             COURSE_ID: @context.id,
-             ai_experiences_evaluation_enabled: @context.feature_enabled?(:ai_experiences_evaluation)
-           })
-
-    render html: view_context.content_tag(:div, nil, id: "ai_experiences_ai_conversations"), layout: true
-  end
-
   # @API Show conversation
   #
   # Get a specific conversation by ID (for teachers viewing student conversations)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -20,7 +20,6 @@ import {useState, useEffect} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {StudentConversation, ConversationDetail} from '../../types'
 
-// Hook to fetch all student conversations
 export const useStudentConversations = (
   courseId: string | number,
   aiExperienceId: string | number,
@@ -51,7 +50,6 @@ export const useStudentConversations = (
   return {conversations, isLoading, error}
 }
 
-// Hook to fetch specific conversation details
 export const useConversationDetail = (
   courseId: string | number,
   aiExperienceId: string | number,

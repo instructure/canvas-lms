@@ -51,7 +51,7 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
             method: 'GET',
           })
           setAIExperience(json as AIExperience)
-        } catch (error) {
+        } catch (_error) {
           // TODO: Show flash alert to user for fetch error
         } finally {
           setIsInitialLoading(false)
@@ -63,7 +63,7 @@ const AIExperienceManager: React.FC<AIExperienceManagerProps> = ({
     }
 
     fetchAIExperience()
-  }, [])
+  }, [aiExperience])
 
   const handleSubmit = async (formData: AIExperienceFormData) => {
     setIsLoading(true)
