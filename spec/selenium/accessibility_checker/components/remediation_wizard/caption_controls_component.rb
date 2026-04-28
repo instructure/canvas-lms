@@ -19,15 +19,35 @@
 
 require_relative "../../../common"
 
-class RadioInputControlsComponent
+class CaptionControlsComponent
   include SeleniumDependencies
 
-  def select_option(label)
-    f("[data-testid=\"radio-#{label}\"]").find_element(:xpath, "following-sibling::label[1]").click
+  def caption_input
+    f("[role='dialog'] [data-testid='text-input-form']")
+  end
+
+  def enter_caption(text)
+    caption_input.clear
+    caption_input.send_keys(text)
     wait_for_ajaximations
   end
 
-  def option_displayed?(label)
-    element_exists?("[data-testid=\"radio-#{label}\"]")
+  def clear_caption
+    caption_input.send_keys([:control, "a"], :backspace)
+    wait_for_ajaximations
+  end
+
+  def caption_input_value
+    caption_input.attribute("value")
+  end
+
+  def caption_input_disabled?
+    caption_input.attribute("disabled") == "true"
+  end
+
+  def caption_required_message_visible?
+    !!fj("[role='dialog'] span:contains('Caption cannot be empty.')")&.displayed?
+  rescue
+    false
   end
 end

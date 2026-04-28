@@ -22,6 +22,7 @@ require_relative "wizard_header_component"
 require_relative "wizard_footer_component"
 require_relative "problem_area_component"
 require_relative "alt_text_controls_component"
+require_relative "caption_controls_component"
 require_relative "radio_input_controls_component"
 
 class RemediationWizardComponent
@@ -139,6 +140,10 @@ class RemediationWizardComponent
 
   def alt_text_controls
     @alt_text_controls ||= AltTextControlsComponent.new
+  end
+
+  def caption_controls
+    @caption_controls ||= CaptionControlsComponent.new
   end
 
   def radio_input_controls
