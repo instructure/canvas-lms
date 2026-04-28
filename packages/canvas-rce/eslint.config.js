@@ -1,26 +1,20 @@
 const globals = require('globals')
-const pluginJs = require('@eslint/js')
-const tseslint = require('typescript-eslint')
-const pluginReact = require('eslint-plugin-react')
+const tsParser = require('@typescript-eslint/parser')
 const jsxA11y = require('eslint-plugin-jsx-a11y')
-const pluginReactHooks = require('eslint-plugin-react-hooks')
-const pluginPromise = require('eslint-plugin-promise')
-const importPlugin = require('eslint-plugin-import')
 const notice = require('eslint-plugin-notice')
 const comments = require('@eslint-community/eslint-plugin-eslint-comments/configs')
 const pluginJest = require('eslint-plugin-jest')
 
 /** @type {import('eslint').Linter.Config[]} */
-module.exports = tseslint.config(
-  // General
+module.exports = [
   {
-    files: ['src/**/*.ts'],
+    files: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.js', 'src/**/*.jsx'],
   },
   {
     ignores: ['es/**/*', './src/translations/*/*', 'scripts', 'webpack.*.config.js'],
   },
 
-  // Globals
+  // Globals (needed for ESLint to resolve references in remaining rules)
   {
     languageOptions: {
       ecmaVersion: 'latest',
@@ -38,104 +32,20 @@ module.exports = tseslint.config(
     },
   },
 
+  // TypeScript parser (needed to parse .ts/.tsx files)
   {
-    rules: {
-      'no-console': 'warn',
-      'no-undef': 'warn',
-      'no-unused-private-class-members': 'warn',
-      'prefer-const': 'warn',
-      'prefer-rest-params': 'off',
-    },
-  },
-
-  // TypeScript
-  ...tseslint.configs.recommended,
-  {
-    rules: {
-      '@typescript-eslint/ban-ts-comment': 'off',
-      '@typescript-eslint/no-empty-object-type': 'warn',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-non-null-asserted-optional-chain': 'warn',
-      '@typescript-eslint/no-require-imports': 'off',
-      '@typescript-eslint/no-this-alias': 'off',
-      '@typescript-eslint/no-unsafe-function-type': 'warn',
-      '@typescript-eslint/no-unused-expressions': 'warn',
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        {
-          args: 'all',
-          argsIgnorePattern: '^_',
-          caughtErrors: 'all',
-          caughtErrorsIgnorePattern: '^_',
-          destructuredArrayIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-          ignoreRestSiblings: true,
-        },
-      ],
-      '@typescript-eslint/no-wrapper-object-types': 'warn',
-      'no-undef': 'warn',
-    },
+    files: ['**/*.{ts,tsx}'],
     languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'commonjs',
-      globals: {
-        ...globals.typescript,
-      },
+      parser: tsParser,
     },
   },
 
-  // JavaScript
-  pluginJs.configs.recommended,
-  {
-    rules: {
-      'no-constant-binary-expression': 'warn',
-      'no-dupe-class-members': 'warn',
-      'no-dupe-keys': 'warn',
-      'no-import-assign': 'warn',
-      'no-loss-of-precision': 'warn',
-      'no-prototype-builtins': 'off',
-      'no-redeclare': 'warn',
-      'no-unexpected-multiline': 'warn',
-      'no-unsafe-optional-chaining': 'warn',
-      'no-unused-expressions': 'off',
-      'no-unused-vars': 'off', // use @typescript-eslint/no-unused-vars instead
-      'no-useless-escape': 'warn',
-      'prefer-const': 'warn',
-      'prefer-rest-params': 'off',
-    },
-  },
-
-  // React
-  pluginReact.configs.flat.recommended,
-  {
-    plugins: {react: pluginReact},
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
-    rules: {
-      'react/no-deprecated': 'warn',
-      'react/prop-types': 'warn',
-      'react/display-name': 'off',
-      'react/jsx-key': 'warn',
-      'react/no-string-refs': 'warn',
-      'react/no-find-dom-node': 'warn',
-      'react/no-unknown-property': 'warn',
-      'react/jsx-no-target-blank': 'warn',
-    },
-  },
-
-  // Copyright / Open Source Header
+  // Copyright / Open Source Header — not in oxlint
   {
     files: ['src/**/*.{js,mjs,ts,jsx,tsx}'],
     ignores: ['**/*.config.js', 'es/**/*', 'src/translations/**/*'],
-    plugins: {
-      notice,
-    },
+    plugins: {notice},
     rules: {
-      // Lenient so we don't automatically put our copyright notice on
-      //   top of something already copyrighted by someone else.
       'notice/notice': [
         'error',
         {
@@ -146,62 +56,24 @@ module.exports = tseslint.config(
     },
   },
 
-  // Promises
-  pluginPromise.configs['flat/recommended'],
+  // JSX A11y — only the rule pending in oxlint
   {
-    rules: {
-      'promise/always-return': 'off',
-      'promise/catch-or-return': 'off',
-    },
-  },
-
-  // Imports
-  importPlugin.flatConfigs.recommended,
-  {
-    files: ['__tests__/**/*.{js,mjs,ts,jsx,tsx}', 'src/**/*.{js,mjs,ts,jsx,tsx}'],
-    ignores: ['src/translations/**'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'commonjs',
-    },
-    rules: {
-      'import/no-dynamic-require': 'warn',
-      'import/no-nodejs-modules': 'warn',
-      'import/no-unresolved': 'off', // not working properly
-      'import/named': 'off',
-      'import/namespace': 'off',
-    },
-  },
-
-  // React Hooks
-  {
-    plugins: {'react-hooks': pluginReactHooks},
-    rules: {
-      'react-hooks/rules-of-hooks': 'warn',
-      'react-hooks/exhaustive-deps': 'warn',
-    },
-  },
-
-  // JSX A11y
-  jsxA11y.flatConfigs.recommended,
-  {
+    plugins: {'jsx-a11y': jsxA11y},
     rules: {
       'jsx-a11y/no-interactive-element-to-noninteractive-role': 'warn',
-      '@eslint-community/eslint-comments/no-duplicate-disable': 'warn',
-      'jsx-a11y/role-has-required-aria-props': 'warn',
-      'jsx-a11y/no-autofocus': 'warn',
     },
   },
 
-  // Extra ESLint Comment rules
+  // ESLint Comments — not in oxlint
   comments.recommended,
   {
     rules: {
       '@eslint-community/eslint-comments/disable-enable-pair': ['error', {allowWholeFile: true}],
+      '@eslint-community/eslint-comments/no-duplicate-disable': 'warn',
     },
   },
 
-  // Jest
+  // Jest — only rules not in oxlint
   {
     files: [
       '__tests__/**/*.{js,mjs,ts,jsx,tsx}',
@@ -217,12 +89,9 @@ module.exports = tseslint.config(
       },
     },
     rules: {
-      'jest/no-disabled-tests': 'warn',
-      'jest/no-focused-tests': 'error',
+      // jest/no-disabled-tests, jest/no-focused-tests, jest/valid-expect → oxlint
       'jest/no-identical-title': 'warn',
       'jest/prefer-to-have-length': 'warn',
-      'jest/valid-expect': 'error',
-      'react/no-deprecated': 'warn',
     },
   },
-)
+]
