@@ -30,10 +30,10 @@ const server = setupServer(
     return HttpResponse.json({})
   }),
   http.post('/api/v1/courses/123/ai_experiences/1/conversations', () => {
-    return HttpResponse.json({
-      id: 1,
-      messages: [],
-    })
+    return HttpResponse.json({id: 1, messages: []})
+  }),
+  http.get('/api/v1/courses/123/ai_experiences/1/ai_conversations', () => {
+    return HttpResponse.json({conversations: []})
   }),
 )
 
@@ -107,9 +107,7 @@ describe('AIExperienceShow', () => {
   it('renders preview in collapsed state by default', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
     expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
-    expect(
-      screen.getByText('Here, you can have a chat with the AI just like a student would.'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Chat with the AI just like a learner')).toBeInTheDocument()
     expect(screen.queryByText('Reset')).not.toBeInTheDocument()
   })
 
@@ -147,19 +145,26 @@ describe('AIExperienceShow', () => {
     expect(screen.getByTestId('ai-experience-show-edit-button')).toBeInTheDocument()
   })
 
-  it('renders View conversations button', () => {
+  it('renders Knowledge chat and Conversations tabs for teachers', () => {
     render(<AIExperienceShow aiExperience={mockAiExperience} />)
-    expect(screen.getByTestId('ai-experience-show-ai-conversations-button')).toHaveTextContent(
-      'View conversations',
-    )
+    expect(screen.getByText('Knowledge chat')).toBeInTheDocument()
+    expect(screen.getAllByText('Conversations')[0]).toBeInTheDocument()
   })
 
-  it('does not render Edit button or View conversations button when can_manage is false', () => {
+  it('switches to Conversations tab and shows student filter', async () => {
+    render(<AIExperienceShow aiExperience={mockAiExperience} />)
+
+    fireEvent.click(screen.getAllByText('Conversations')[0])
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Filter by student')).toBeInTheDocument()
+    })
+  })
+
+  it('does not render tabs or Edit button when can_manage is false', () => {
     render(<AIExperienceShow aiExperience={{...mockAiExperience, can_manage: false}} />)
     expect(screen.queryByTestId('ai-experience-show-edit-button')).not.toBeInTheDocument()
-    expect(
-      screen.queryByTestId('ai-experience-show-ai-conversations-button'),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Knowledge chat')).not.toBeInTheDocument()
   })
 
   it('opens delete confirmation modal when Delete is clicked', async () => {
@@ -290,21 +295,6 @@ describe('AIExperienceShow', () => {
       expect(screen.queryByText('Preview')).not.toBeInTheDocument()
     })
 
-    it('disables AI Conversations button when context_ready is false', () => {
-      render(
-        <AIExperienceShow
-          aiExperience={{
-            ...mockAiExperience,
-            context_ready: false,
-            context_index_status: 'in_progress',
-            can_manage: true,
-          }}
-        />,
-      )
-      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
-      expect(aiConversationsButton).toHaveAttribute('disabled')
-    })
-
     it('does not show indexing notice when context_ready is true', () => {
       render(
         <AIExperienceShow
@@ -314,21 +304,13 @@ describe('AIExperienceShow', () => {
       expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
     })
 
-    it('shows preview and enables AI Conversations button when context_ready is true', () => {
+    it('shows preview when context_ready is true', () => {
       render(
         <AIExperienceShow
           aiExperience={{...mockAiExperience, context_ready: true, can_manage: true}}
         />,
       )
-      // LLMConversationView is shown
       expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
-      // AI Conversations button is enabled (has href, not disabled)
-      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
-      expect(aiConversationsButton).not.toHaveAttribute('disabled')
-      expect(aiConversationsButton).toHaveAttribute(
-        'href',
-        `/courses/${mockAiExperience.course_id}/ai_experiences/${mockAiExperience.id}/ai_conversations`,
-      )
     })
 
     it('students always see the preview even when context_ready is false', () => {
@@ -382,21 +364,6 @@ describe('AIExperienceShow', () => {
       expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
     })
 
-    it('disables AI Conversations button with failed tooltip when context_index_status is failed', () => {
-      render(
-        <AIExperienceShow
-          aiExperience={{
-            ...mockAiExperience,
-            context_ready: false,
-            context_index_status: 'failed',
-            can_manage: true,
-          }}
-        />,
-      )
-      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
-      expect(aiConversationsButton).toHaveAttribute('disabled')
-    })
-
     it('does not show failed notice for students', () => {
       render(
         <AIExperienceShow
@@ -425,20 +392,6 @@ describe('AIExperienceShow', () => {
       )
       expect(screen.queryByTestId('ai-experience-show-indexing-notice')).not.toBeInTheDocument()
       expect(screen.getAllByText(/Knowledge Chat/)[0]).toBeInTheDocument()
-    })
-
-    it('enables AI Conversations button when context_index_status is not_started', () => {
-      render(
-        <AIExperienceShow
-          aiExperience={{
-            ...mockAiExperience,
-            context_index_status: 'not_started',
-            can_manage: true,
-          }}
-        />,
-      )
-      const aiConversationsButton = screen.getByTestId('ai-experience-show-ai-conversations-button')
-      expect(aiConversationsButton).not.toHaveAttribute('disabled')
     })
   })
 

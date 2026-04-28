@@ -79,9 +79,9 @@ describe('LLMConversationView', () => {
   it('renders collapsed state when not expanded (teacher preview)', () => {
     render(<LLMConversationView {...defaultProps} isExpanded={false} isTeacherPreview={true} />)
     expect(screen.getByText(/Knowledge Chat/)).toBeInTheDocument()
-    expect(
-      screen.getByText('Here, you can have a chat with the AI just like a student would.'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Preview the chat')).toBeInTheDocument()
+    expect(screen.getByText('Chat with the AI just like a learner')).toBeInTheDocument()
+    expect(screen.getByTestId('llm-conversation-start-button')).toHaveTextContent('Test as learner')
   })
 
   it('renders collapsed state when not expanded (student view)', () => {

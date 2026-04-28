@@ -16,6 +16,58 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export interface AIExperience {
+  id: string
+  course_id: string | number
+  title: string
+  description?: string
+  facts?: string
+  learning_objective?: string
+  pedagogical_guidance?: string
+  can_manage: boolean
+}
+
+export interface StudentConversation {
+  id: string | null
+  user_id: string
+  llm_conversation_id?: string
+  workflow_state?: 'active' | 'completed' | 'deleted'
+  created_at?: string
+  updated_at?: string
+  has_conversation?: boolean
+  student: {
+    id: string
+    name: string
+    avatar_url?: string
+  }
+}
+
+export interface ConversationMessage {
+  id?: string
+  role: 'user' | 'assistant' | 'User' | 'Assistant'
+  content?: string
+  text?: string
+  timestamp?: string
+  feedback?: Array<{
+    id: string
+    user_id: string
+    vote: 'liked' | 'disliked'
+    feedback_message: string | null
+    created_at: string
+    updated_at: string
+  }>
+}
+
+export interface ConversationDetail extends StudentConversation {
+  messages: ConversationMessage[]
+  progress?: {
+    current: number
+    total: number
+    percentage: number
+    objectives: Array<{objective: string; status: '' | 'covered'}>
+  }
+}
+
 export interface FeedbackItem {
   id: string
   user_id: string

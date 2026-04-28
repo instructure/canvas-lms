@@ -592,9 +592,7 @@ CanvasRails::Application.routes.draw do
 
     resources :accessibility_issues, only: [:update]
 
-    resources :ai_experiences, only: %i[index create new show edit update destroy] do
-      get "ai_conversations", to: "ai_conversations#index", as: :ai_conversations
-    end
+    resources :ai_experiences, only: %i[index create new show edit update destroy]
     resources :ai_experiences, only: %i[index show new edit]
 
     get "notebook" => "notebook#index", :as => :notebook
