@@ -744,6 +744,49 @@ describe RoleOverride do
       end
     end
 
+    describe "manage_institutional_tags" do
+      let(:view_perm) { RoleOverride.permissions[:manage_institutional_tags_view] }
+      let(:create_perm) { RoleOverride.permissions[:manage_institutional_tags_create] }
+      let(:edit_perm) { RoleOverride.permissions[:manage_institutional_tags_edit] }
+      let(:sub_account) { @account.sub_accounts.create! }
+      let(:sub_admin) { account_admin_user(account: sub_account) }
+
+      it "is not restricted to root accounts" do
+        expect(view_perm[:account_only]).to be_nil
+        expect(create_perm[:account_only]).to be_nil
+        expect(edit_perm[:account_only]).to be_nil
+      end
+
+      it "grants the permissions to a sub-account AccountAdmin when the flag is enabled at the root" do
+        @account.enable_feature!(:institutional_tags)
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_view)).to be_truthy
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_create)).to be_truthy
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_edit)).to be_truthy
+      end
+
+      it "grants the permissions when the flag is enabled only on the sub-account" do
+        @account.allow_feature!(:institutional_tags)
+        sub_account.enable_feature!(:institutional_tags)
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_view)).to be_truthy
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_create)).to be_truthy
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_edit)).to be_truthy
+      end
+
+      it "denies the permissions when the sub-account disables the flag even though the root has it on" do
+        @account.enable_feature!(:institutional_tags)
+        sub_account.disable_feature!(:institutional_tags)
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_view)).to be_falsey
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_create)).to be_falsey
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_edit)).to be_falsey
+      end
+
+      it "denies the permissions when the flag is not enabled anywhere in the chain" do
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_view)).to be_falsey
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_create)).to be_falsey
+        expect(sub_account.grants_right?(sub_admin, :manage_institutional_tags_edit)).to be_falsey
+      end
+    end
+
     describe "manage_course_details" do
       let(:permission) { RoleOverride.permissions[:manage_course_details] }
 
