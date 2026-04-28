@@ -48,5 +48,21 @@ module AccessibilityChecker
     def content_image_alt_text
       f(".show-content img").attribute("alt")
     end
+
+    def table_caption_text
+      f(".show-content table caption").text
+    end
+
+    def table_first_row_all_headers?
+      !element_exists?(".show-content table tr:first-child td")
+    end
+
+    def table_first_column_all_headers?
+      !element_exists?(".show-content table tr td:first-child")
+    end
+
+    def table_header_scope
+      f(".show-content table th").attribute("scope")
+    end
   end
 end
