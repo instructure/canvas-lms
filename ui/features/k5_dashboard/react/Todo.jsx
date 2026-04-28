@@ -109,9 +109,11 @@ const Todo = ({
           {context_name}
         </Text>
         <Text color="secondary">
-          <View>
-            {I18n.t({one: '1 point', other: '%{count} points'}, {count: points_possible})}
-          </View>
+          {points_possible != null && (
+            <View>
+              {I18n.t({one: '1 point', other: '%{count} points'}, {count: points_possible})}
+            </View>
+          )}
           {/* The dot is tiny in Balsamiq Sans, which is why we're forcing Lato here */}
           <PresentationContent>
             <View margin="0 small" themeOverride={{fontFamily: 'Lato, Arial, sans-serif'}}>
@@ -157,7 +159,7 @@ Todo.propTypes = {
     all_dates_count: PropTypes.number,
     due_at: PropTypes.string,
     name: PropTypes.string.isRequired,
-    points_possible: PropTypes.number.isRequired,
+    points_possible: PropTypes.number,
   }),
   context_name: PropTypes.string.isRequired,
   html_url: PropTypes.string.isRequired,
