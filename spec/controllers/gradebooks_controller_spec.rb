@@ -1886,18 +1886,14 @@ describe GradebooksController do
           expect(preferred_gradebook_view).to eql("learning_mastery")
         end
 
-        it "redirects to the gradebook when the requested view is 'learning_mastery'" do
+        it "renders learning_mastery directly when the requested view is 'learning_mastery'" do
           get "show", params: { course_id: @course.id, view: "learning_mastery" }
-          expect(response).to redirect_to(action: "show")
+          expect(response).to render_template("gradebooks/learning_mastery")
         end
 
         it "increments inst_statsd when learning mastery gradebook is visited" do
-          # The initial show view will redirect to show without the view query param the first time,
-          #  and because RSpec doesn't follow redirects well, we stub out a few things to simulate
-          #  the redirects
           allow(InstStatsd::Statsd).to receive(:distributed_increment)
-          allow_any_instance_of(GradebooksController).to receive(:preferred_gradebook_view).and_return("learning_mastery")
-          get "show", params: { course_id: @course.id, view: "" }
+          get "show", params: { course_id: @course.id, view: "learning_mastery" }
           expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "outcomes_page_views",
             tags: { type: "teacher_lmgb" }
@@ -1932,9 +1928,9 @@ describe GradebooksController do
           expect(preferred_gradebook_view).to eql("learning_mastery")
         end
 
-        it "redirects to the gradebook when changing the requested view" do
+        it "renders 'learning_mastery' directly when changing the requested view" do
           get "show", params: { course_id: @course.id, view: "learning_mastery" }
-          expect(response).to redirect_to(action: "show")
+          expect(response).to render_template("gradebooks/learning_mastery")
         end
       end
 
@@ -1954,9 +1950,9 @@ describe GradebooksController do
           expect(response).to render_template("gradebooks/learning_mastery")
         end
 
-        it "redirects to the gradebook when requesting the preferred view" do
+        it "renders 'learning_mastery' directly when requesting the preferred view" do
           get "show", params: { course_id: @course.id, view: "learning_mastery" }
-          expect(response).to redirect_to(action: "show")
+          expect(response).to render_template("gradebooks/learning_mastery")
         end
 
         it "updates the user's preference when the requested view is 'gradebook'" do
