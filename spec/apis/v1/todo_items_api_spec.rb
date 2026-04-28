@@ -152,6 +152,112 @@ describe UsersController, type: :request do
     expect(strip_secure_params(json.second)).to eq strip_secure_params(@a2_json)
   end
 
+  context "educator_dashboard feature flag" do
+    let(:metrics_keys) do
+      %w[on_time_needs_grading_count
+         late_needs_grading_count
+         resubmitted_needs_grading_count
+         submitted_submissions_count
+         total_submissions_count]
+    end
+
+    context "when educator_dashboard flag is enabled" do
+      before do
+        Account.default.enable_feature!(:educator_dashboard)
+      end
+
+      it "includes teacher todo metrics in grading todo items when grading_counts is requested" do
+        json = api_call(:get,
+                        "/api/v1/users/self/todo?include[]=grading_counts",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json",
+                        include: ["grading_counts"])
+        grading_item = json.find { |t| t["type"] == "grading" }
+        expect(grading_item).not_to be_nil
+        metrics_keys.each { |key| expect(grading_item).to have_key(key) }
+        expect(grading_item["on_time_needs_grading_count"]).to be 1
+        expect(grading_item["submitted_submissions_count"]).to be 1
+        expect(grading_item["total_submissions_count"]).to be 1
+        expect(grading_item).to have_key("needs_grading_count")
+      end
+
+      it "omits metrics when grading_counts is not requested" do
+        json = api_call(:get,
+                        "/api/v1/users/self/todo",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json")
+        grading_item = json.find { |t| t["type"] == "grading" }
+        expect(grading_item).not_to be_nil
+        metrics_keys.each { |key| expect(grading_item).not_to have_key(key) }
+        expect(grading_item).to have_key("needs_grading_count")
+      end
+
+      it "does not include metrics in submitting todo items" do
+        json = api_call(:get,
+                        "/api/v1/users/self/todo?include[]=grading_counts",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json",
+                        include: ["grading_counts"])
+        submitting_item = json.find { |t| t["type"] == "submitting" }
+        expect(submitting_item).not_to be_nil
+        metrics_keys.each { |key| expect(submitting_item).not_to have_key(key) }
+      end
+
+      it "includes metrics on checkpoint grading todos" do
+        @teacher_course.account.enable_feature!(:discussion_checkpoints)
+        reply_to_topic_checkpoint, = graded_discussion_topic_with_checkpoints(context: @teacher_course)
+        student = @teacher_course.students.first
+        reply_to_topic_checkpoint.submit_homework(student, body: "checkpoint submission")
+
+        json = api_call(:get,
+                        "/api/v1/users/self/todo?include[]=grading_counts",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json",
+                        include: ["grading_counts"])
+
+        checkpoint_grading_todo = json.find do |item|
+          item["type"] == "grading" && item["checkpoint_label"] == CheckpointLabels::REPLY_TO_TOPIC
+        end
+        expect(checkpoint_grading_todo).to be_present
+        expect(checkpoint_grading_todo["on_time_needs_grading_count"]).to eq 1
+        expect(checkpoint_grading_todo["late_needs_grading_count"]).to eq 0
+        expect(checkpoint_grading_todo["resubmitted_needs_grading_count"]).to eq 0
+        expect(checkpoint_grading_todo["submitted_submissions_count"]).to eq 1
+        expect(checkpoint_grading_todo["total_submissions_count"]).to eq 1
+      end
+    end
+
+    context "when educator_dashboard flag is disabled" do
+      it "does not include teacher todo metrics" do
+        json = api_call(:get,
+                        "/api/v1/users/self/todo",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json")
+        grading_item = json.find { |t| t["type"] == "grading" }
+        expect(grading_item).not_to be_nil
+        metrics_keys.each { |key| expect(grading_item).not_to have_key(key) }
+        expect(grading_item).to have_key("needs_grading_count")
+      end
+
+      it "ignores include[]=grading_counts when flag is off" do
+        json = api_call(:get,
+                        "/api/v1/users/self/todo?include[]=grading_counts",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json",
+                        include: ["grading_counts"])
+        grading_item = json.find { |t| t["type"] == "grading" }
+        expect(grading_item).not_to be_nil
+        metrics_keys.each { |key| expect(grading_item).not_to have_key(key) }
+      end
+    end
+  end
+
   it "returns a course-specific todo list for a student" do
     json = api_call(:get,
                     "/api/v1/courses/#{@student_course.id}/todo",

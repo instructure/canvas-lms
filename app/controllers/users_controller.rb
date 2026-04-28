@@ -900,9 +900,14 @@ class UsersController < ApplicationController
   # @API List the TODO items
   # A paginated list of the current user's list of todo items.
   #
-  # @argument include[] [String, "ungraded_quizzes"]
+  # @argument include[] [String, "ungraded_quizzes"|"grading_counts"]
   #   "ungraded_quizzes":: Optionally include ungraded quizzes (such as practice quizzes and surveys) in the list.
   #                        These will be returned under a +quiz+ key instead of an +assignment+ key in response elements.
+  #   "grading_counts":: Optionally include segmented submission counts on grading-type items:
+  #                      +on_time_needs_grading_count+, +late_needs_grading_count+,
+  #                      +resubmitted_needs_grading_count+, +submitted_submissions_count+, and
+  #                      +total_submissions_count+. Only honored when the account has the
+  #                      +educator_dashboard+ feature enabled; otherwise silently ignored.
   #
   # @argument course_ids[] [String]
   #   Restrict results to todo items in the given courses. Accepts numeric IDs
@@ -956,6 +961,7 @@ class UsersController < ApplicationController
   def todo_items
     GuardRail.activate(:secondary) do
       bookmark = Plannable::Bookmarker.new(Assignment, false, [:due_at, :created_at], :id)
+      include_grading_counts = Array(params[:include]).include?("grading_counts")
       # Assumes Shard.current == @current_user.shard (true for /self/todo).
       # Cross-shard callers would need Shard.relative_id_for translation here.
       course_ids_filter = api_find_all(Course, Array(params[:course_ids])).pluck(:id) if params.key?(:course_ids)
@@ -979,7 +985,7 @@ class UsersController < ApplicationController
         assignment.context.grants_right?(@current_user, session, :manage_grades)
       end
       grading_collection = BookmarkedCollection.transform(grading_collection) do |a|
-        todo_item_json(a, @current_user, session, "grading")
+        todo_item_json(a, @current_user, session, "grading", include_grading_counts:)
       end
       submitting_collection = BookmarkedCollection.wrap(bookmark, submitting_scope)
       submitting_collection = BookmarkedCollection.transform(submitting_collection) do |a|
@@ -1007,7 +1013,7 @@ class UsersController < ApplicationController
           assignment.context.grants_right?(@current_user, session, :manage_grades)
         end
         checkpoint_grading_collection = BookmarkedCollection.transform(checkpoint_grading_collection) do |a|
-          todo_item_json(a, @current_user, session, "grading")
+          todo_item_json(a, @current_user, session, "grading", include_grading_counts:)
         end
         collections << ["checkpoint_grading", checkpoint_grading_collection]
 
