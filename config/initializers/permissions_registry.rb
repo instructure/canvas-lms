@@ -2265,7 +2265,6 @@ BASE_PERMISSIONS = {
     group: :manage_institutional_tags,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
-    account_only: :root,
     account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
     account_details: [
       { title: -> { I18n.t("Institutional Tags") },
@@ -2277,7 +2276,6 @@ BASE_PERMISSIONS = {
     group: :manage_institutional_tags,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
-    account_only: :root,
     account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
     account_details: [
       { title: -> { I18n.t("Institutional Tags") },
@@ -2289,7 +2287,6 @@ BASE_PERMISSIONS = {
     group: :manage_institutional_tags,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
-    account_only: :root,
     account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
     account_details: [
       { title: -> { I18n.t("Institutional Tags") },
