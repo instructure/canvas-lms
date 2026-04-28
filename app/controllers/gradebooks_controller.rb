@@ -374,6 +374,10 @@ class GradebooksController < ApplicationController
         if requested_gradebook_view != preferred_gradebook_view
           update_preferred_gradebook_view!(requested_gradebook_view)
         end
+        if requested_gradebook_view == "learning_mastery" && outcome_gradebook_enabled?
+          show_learning_mastery
+          return
+        end
         redirect_to polymorphic_url([@context, :gradebook])
         return
       end
