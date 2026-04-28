@@ -3003,6 +3003,7 @@ describe FilesController do
     context "when log_cross_domain_file_access is enabled" do
       before do
         Account.site_admin.enable_feature!(:log_cross_domain_file_access)
+        Account.site_admin.enable_feature!(:log_uuid_verifier_usage)
       end
 
       it "detects cross-domain referrer correctly" do
@@ -3075,6 +3076,23 @@ describe FilesController do
       it "does not emit a cross-domain event even with a foreign Canvas referrer" do
         expect(InstStatsd::Statsd).not_to receive(:event).with(
           "File accessed from different Canvas domain",
+          anything,
+          anything
+        )
+
+        request.env["HTTP_REFERER"] = "https://canvas.other.edu/path"
+        get :show, params: { id: @file.id, verifier: @file.uuid }
+      end
+    end
+
+    context "when log_uuid_verifier_usage is disabled" do
+      before do
+        Account.site_admin.enable_feature!(:log_cross_domain_file_access)
+      end
+
+      it "does not emit a uuid_verifier_usage event" do
+        expect(InstStatsd::Statsd).not_to receive(:event).with(
+          "File accessed with UUID verifier",
           anything,
           anything
         )
