@@ -1,306 +1,306 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Hủy",
-    "Confirm": "Xác Nhận"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "Đánh dấu là ngày quan trọng và hiển thị trên thanh bên chủ nhiệm"
-  },
-  "GradingSchemeManagement": {
-    "Account default grading scheme": "Chế độ cho điểm mặc định của tài khoản",
-    "Account default grading scheme was successfully saved.": "Chế độ cho điểm mặc định của tài khoản đã được lưu thành công.",
-    "Active Grading Schemes": "Các Chế Độ Cho Điểm Đang Hoạt Động",
-    "Applied": "Đã áp dụng",
-    "Apply": "Áp dụng",
-    "Archive Grading Scheme": "Lưu Trữ Chế Độ Cho Điểm",
-    "Archived": "Đã lưu trữ",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Bạn vẫn có thể sử dụng chế độ cho điểm được lưu trữ đang sử dụng nhưng không thể thêm vào các khóa học hoặc bài tập mới.",
-    "Are you sure you want to delete this grading scheme?": "Bạn có chắc chắn muốn xóa chế độ cho điểm này không?",
-    "Cancel": "Hủy",
-    "Canvas Default": "Mặc Định Canvas",
-    "Close": "Đóng",
-    "Confirm": "Xác Nhận",
-    "Confirm Default Grading Scheme Change": "Xác Nhận Thay Đổi Chế Độ Cho Điểm Mặc Định",
-    "Delete Grading Scheme": "Xóa Chế Độ Cho Điểm",
-    "Duplicate Grading Scheme": "Sao Chép Chế Độ Cho Điểm",
-    "Edit Grading Scheme": "Chỉnh Sửa Chế Độ Cho Điểm",
-    "Grading Scheme Name": "Tên Chế Độ Cho Điểm",
-    "Grading scheme was successfully archived.": "Đã lưu trữ chế độ cho điểm thành công.",
-    "Grading scheme was successfully created.": "Đã tạo chế độ cho điểm thành công.",
-    "Grading scheme was successfully removed.": "Đã gỡ chế độ cho điểm thành công.",
-    "Grading scheme was successfully saved.": "Đã lưu chế độ cho điểm thành công.",
-    "Grading scheme was successfully unarchived.": "Đã bỏ lưu trữ chế độ cho điểm thành công.",
-    "Locations Used": "Các Vị Trí Sử Dụng",
-    "Lower limit of range": "Giới hạn dưới của phạm vi",
-    "New Grading Scheme": "Chế Độ Cho Điểm Mới",
-    "Next Page": "Trang Sau",
-    "No account default": "Không có mặc định tài khoản",
-    "Previous Page": "Trang Trước",
-    "Save": "Lưu",
-    "Search": "Tìm kiếm",
-    "Search...": "Đang tìm kiếm...",
-    "Show courses and assignments": "Hiển thị khóa học và bài tập",
-    "Show locations used": "Hiển thị vị trí được sử dụng",
-    "Sort by": "Sắp xếp theo",
-    "There was an error while archiving the grading scheme": "Đã xảy ra lỗi khi lưu trữ chế độ cho điểm",
-    "There was an error while creating the grading scheme": "Đã xảy ra lỗi khi tạo chế độ cho điểm",
-    "There was an error while loading grading schemes": "Đã xảy ra lỗi khi tải chế độ cho điểm",
-    "There was an error while loading the default canvas grading scheme": "Đã xảy ra lỗi khi tải chế độ cho điểm canvas mặc định",
-    "There was an error while loading the default grading scheme": "Đã xảy ra lỗi khi tải chế độ cho điểm mặc định",
-    "There was an error while removing the grading scheme": "Đã xảy ra lỗi khi xóa chế độ cho điểm",
-    "There was an error while unarchiving the grading scheme": "Đã xảy ra lỗi khi bỏ lưu trữ chế độ cho điểm",
-    "There was an error while updating the default grading scheme": "Đã xảy ra lỗi khi cập nhật chế độ cho điểm mặc định",
-    "There was an error while updating the grading scheme": "Đã xảy ra lỗi khi cập nhật chế độ cho điểm",
-    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Thay đổi này sẽ ảnh hưởng đến tất cả các khóa học và bài tập đang hoạt động hiện đang kế thừa tài khoản mặc định. Thay đổi này sẽ mất một thời gian để hoàn thành vì tất cả điểm khóa học và điểm bài tập đều được tính toán lại theo chế độ cho điểm mặc định của tài khoản mới.",
-    "Unarchive Grading Scheme": "Bỏ Lưu Trữ Chế Độ Cho Điểm",
-    "Upper limit of range": "Giới hạn trên của phạm vi",
-    "View Grading Scheme": "Xem Chế Độ Cho Điểm",
-    "View/Copy Grading Scheme": "Xem/Sao Chép Chế Độ Cho Điểm",
-    "View/Edit Grading Scheme": "Xem/Chỉnh Sửa Chế Độ Cho Điểm",
-    "You can't archive this grading scheme because it is set as a default for a course or account.": "Bạn không thể lưu trữ chế độ cho điểm này vì chế độ này được đặt là mặc định cho một khóa học hoặc tài khoản.",
-    "You can't delete this grading scheme because it is in use.": "Bạn không thể xóa chế độ cho điểm này vì nó đang được sử dụng.",
-    "You have no active grading schemes.": "Bạn không có chế độ cho điểm nào đang hoạt động.",
-    "You have no archived grading schemes.": "Bạn không có chế độ cho điểm nào được lưu trữ.",
-    "to": "đến"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Bạn có chắc chắn muốn xóa chế độ cho điểm này không?",
-    "Are you sure you want to duplicate this grading scheme?": "Bạn có chắc chắn muốn tạo bản sao của chế độ cho điểm này không?",
-    "Cancel": "Hủy",
-    "Close": "Đóng",
-    "Delete": "Xóa",
-    "Delete ": "Xóa ",
-    "Duplicate": "Nhân Bản",
-    "Duplicate ": "Tạo Bản Sao ",
-    "Edit Grading Scheme": "Chỉnh Sửa Chế Độ Cho Điểm",
-    "New Grading Scheme": "Chế Độ Cho Điểm Mới",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "Không thể chỉnh sửa phần trăm và điểm vì đây là chế độ cho điểm cấp độ tài khoản.",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Không thể chỉnh sửa phần trăm và điểm vì chế độ đang được sử dụng như chế độ cho điểm mặc định.",
-    "Percentages and points can't be edited because it is currently being used.": "Không thể chỉnh sửa phần trăm và điểm vì chế độ đang được sử dụng.",
-    "Save": "Lưu"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Một bảng chứa dữ liệu chế độ cho điểm canvas mặc định.  Mỗi hàng chứa một tên, một tỷ lệ phần trăm tối đa và một tỷ lệ phần trăm tối thiểu.",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Một bảng chứa dữ liệu chế độ cho điểm.  Mỗi hàng chứa một tên, một tỷ lệ phần trăm tối đa và một tỷ lệ phần trăm tối thiểu.",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Không thể có tên hàng trùng lặp hoặc trống. Hãy đổi tên và thử nhấp lại vào “Lưu”.",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Không thể có các phạm vi chồng chéo lên nhau hoặc phạm vi trống. Hãy sửa phạm vi và thử nhấp lại vào “Lưu”.",
-    "Delete grading scheme": "Xóa chế độ cho điểm",
-    "Edit Grading Scheme": "Chỉnh Sửa Chế Độ Cho Điểm",
-    "Edit a copy of this grading scheme": "Chỉnh sửa bản sao của chế độ cho điểm này",
-    "Edit grading scheme": "Chỉnh sửa chế độ cho điểm",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Yêu cầu có Tên Chế Độ Cho Điểm. Hãy thêm tên và thử nhấp lại vào 'Lưu'.",
-    "Grading scheme title": "Tiêu đề chế độ cho điểm",
-    "Invalid grading scheme": "Chế độ cho điểm không hợp lệ",
-    "Letter Grade": "Điểm Chữ",
-    "Looks great!": "Trông rất tuyệt!",
-    "Percentage": "Phần trăm",
-    "Points": "Điểm",
-    "Range": "Phạm vi",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Phạm vi phải là số hợp lệ. Không thể có số âm hoặc số lớn hơn 100. Hãy sửa các phạm vi và thử nhấp lại vào “Lưu”.",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Phạm vi phải là số hợp lệ. Không thể có số âm hoặc số lớn hơn phạm vi trên của điểm thành phần. Hãy sửa các phạm vi và thử nhấp lại vào “Lưu”.",
-    "edit a copy": "chỉnh sửa bản sao"
-  },
-  "OutcomeManagement": {
-    "Course": "Khóa Học",
-    "Institution": "Tổ chức"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Tài khoản",
-    "Close": "Đóng",
-    "Concluded": "Đã Kết Thúc",
-    "Courses": "Khóa Học",
-    "Failed to load account used locations": "Tải vị trí đã được sử dụng của tài khoản không thành công",
-    "Failed to load assignments used locations": "Tải vị trí đã được sử dụng của bài tập không thành công",
-    "Failed to load used locations": "Không thể tải vị trí đã được sử dụng",
-    "Load Assignments ...": "Tải Bài Tập...",
-    "Load More Assignments ...": "Tải Thêm Bài Tập ...",
-    "Loading": "Đang tải",
-    "Locations Used": "Các Vị Trí Sử Dụng",
-    "Search": "Tìm kiếm",
-    "Search...": "Đang tìm kiếm..."
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "Chính Sách Sử Dụng Có Thể Chấp Nhận Được",
-    "Close": "Đóng",
-    "Loading page": "Đang tải trang",
-    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Chính Sách Sử Dụng Được Chấp Nhận hiện không khả dụng. Vui lòng kiểm tra lại sau hoặc liên hệ hỗ trợ nếu bạn cần thêm trợ giúp.",
-    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Không thể tải Chính Sách Sử Dụng Được Chấp Nhận. Vui lòng thử lại sau hoặc liên hệ hỗ trợ nếu vấn đề tiếp diễn."
-  },
-  "account_reports": {
-    "Close": "Đóng",
-    "Invalid date and time.": "Ngày và giờ không hợp lệ.",
-    "Next month": "Tháng sau",
-    "Previous month": "Tháng trước",
-    "Time": "Thời gian"
-  },
-  "admin_split": {
-    "Cancel": "Hủy",
-    "Failed to split users.": "Không chia được người dùng.",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "GHI CHÚ: Việc này sẽ cố gắng hoàn tác quá trình hợp nhất đầy đủ nhất có thể; tuy nhiên, người dùng được hợp nhất có thể không được khôi phục hoàn toàn trạng thái trước đó của họ.",
-    "OK": "OK",
-    "Split": "Tách",
-    "The following users will be split into separate user accounts:": "Người người dùng sau sẽ được tách thành các tài khoản người dùng riêng biệt:",
-    "There are no user accounts to split from this user.": "Không có tài khoản người dùng nào để chia từ người dùng này.",
-    "User split complete. Links to split user accounts follow:": "Tách người dùng thành công. Các liên kết để tách các tài khoản người dùng như sau:"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Mô Tả"
-  },
-  "assignment_footer": {
-    "Next": "Tiếp theo",
-    "Previous": "Trước"
-  },
-  "assignment_tabs": {
-    "Assignment": "Bài Tập",
-    "Peer Review": "Bình Duyệt"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "(khóa học mặc định)",
-    "Account Level": "Cấp Độ Tài Khoản",
-    "Canvas Grading Scheme (course default)": "Chế Độ Cho Điểm Canvas (khóa học mặc định)",
-    "Close": "Đóng",
-    "Course Level": "Cấp Độ Khóa Học",
-    "Default Canvas Grading Scheme": "Chế Độ Cho Điểm Canvas Mặc Định",
-    "Grading scheme was successfully removed.": "Đã gỡ chế độ cho điểm thành công.",
-    "Grading scheme was successfully updated.": "Đã cập nhật chế độ cho điểm thành công.",
-    "Manage All Grading Schemes": "Quản Lý Tất Cả Chế Độ Cho Điểm",
-    "New Grading Scheme": "Chế Độ Cho Điểm Mới",
-    "Select a grading scheme": "Chọn chế độ cho điểm",
-    "There was an error while loading grading schemes": "Đã xảy ra lỗi khi tải chế độ cho điểm",
-    "There was an error while loading the grading scheme": "Đã xảy ra lỗi khi tải chế độ cho điểm",
-    "There was an error while refreshing grading schemes": "Đã xảy ra lỗi khi làm mới chế độ cho điểm",
-    "There was an error while removing the grading scheme": "Đã xảy ra lỗi khi xóa chế độ cho điểm",
-    "View": "Xem"
-  },
-  "assignments_2": {
-    "Assignments 2 Teacher Error Page": "Bài Tập 2 Trang Lỗi của Giáo Viên",
-    "Assignments 2 Teacher initial query error": "Bài Tập 2 Lỗi truy vấn ban đầu của Giáo Viên",
-    "Loading": "Đang tải"
-  },
-  "catalog": {
-    "Course Catalog": "Mục Lục Khóa Học"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "Rất tốt! Từ các nhà phát triển Canvas"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Hủy",
-    "Copy course": "Sao chép khóa học",
-    "Course code": "Mã khóa học",
-    "Course code must be 255 characters or less": "Mã khóa học phải từ 255 ký tự trở xuống",
-    "Course name must be 255 characters or less": "Tên khóa học phải từ 255 ký tự trở xuống",
-    "Create course": "Tạo khóa học",
-    "Creating...": "Đang tạo...",
-    "End date": "Ngày kết thúc",
-    "End date must be after start date": "Ngày kết thúc phải sau ngày bắt đầu",
-    "Name": "Tên",
-    "No results": "Không có kết quả",
-    "Please enter the details for the new course.": "Vui lòng nhập thông tin chi tiết cho khóa học mới.",
-    "Select a new beginning date": "Chọn một ngày bắt đầu mới",
-    "Select a new end date": "Chọn một ngày kết thúc mới",
-    "Select end date": "Chọn ngày kết thúc",
-    "Select start date": "Chọn ngày bắt đầu",
-    "Start date": "Ngày bắt đầu",
-    "Start date must be before end date": "Ngày bắt đầu phải trước ngày kết thúc",
-    "Start typing to search...": "Bắt đầu nhập để tìm kiếm...",
-    "Term": "Học Kì",
-    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Ngày bắt đầu và ngày kết thúc học kỳ không thể được sửa đổi ở đây, chỉ có thể sửa đổi trên trang Chi Tiết về Học Kỳ trong mục Quản Trị.",
-    "Use arrow keys to navigate options.": "Sử dụng các phím mũi tên để điều hướng tùy chọn."
-  },
-  "content_share_preview_overlay": {
-    "Close": "Đóng",
-    "Content Share Preview": "Xem Trước Nội Dung Chia Sẻ",
-    "Preview": "Xem trước"
-  },
-  "copy_warnings_modal": {
-    "Attention": "Chú ý"
-  },
-  "course_logging_content": {
-    "No results": "Không có kết quả",
-    "Type to search": "Nhập để tìm kiếm"
-  },
-  "create_course_modal": {
-    "Cancel": "Hủy",
-    "Course Details": "Chi Tiết Khóa Học",
-    "Course Name": "Tên Khóa Học",
-    "Create": "Tạo",
-    "Create Course": "Tạo Khóa Học",
-    "Create Subject": "Tạo Chủ Thể",
-    "Creating new course...": "Đang tạo khóa học mới...",
-    "Creating new subject...": "Tạo chủ thể mới...",
-    "Error creating new course": "Lỗi tạo khóa học mới",
-    "Error creating new subject": "Lỗi tạo môn học mới",
-    "Loading accounts...": "Đang tải các tài khoản...",
-    "Name...": "Tên...",
-    "No Results": "Không Có Kết Quả",
-    "Select a homeroom": "Chọn một chủ nhiệm",
-    "Subject Name": "Tên Chủ Thể",
-    "Unable to get accounts": "Không thể lấy tài khoản",
-    "Unable to get homerooms": "Không thể lấy lớp chủ nhiệm",
-    "Use arrow keys to navigate options.": "Sử dụng các phím mũi tên để điều hướng tùy chọn.",
-    "Which account will this course be associated with?": "Khóa học này sẽ được liên kết với tài khoản nào?",
-    "Which account will this subject be associated with?": "Môn học này sẽ được liên kết với tài khoản nào?"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "Ghi Đè Điểm Cuối Cùng"
-  },
-  "feature_flags": {
-    "Accept": "Chấp nhận",
-    "Cancel": "Hủy"
-  },
-  "filter_bar": {
-    "All": "Tất cả",
-    "Clear": "Xóa",
-    "Filter by": "Lọc theo",
-    "Search": "Tìm kiếm",
-    "Use arrow keys to navigate options.": "Sử dụng các phím mũi tên để điều hướng tùy chọn."
-  },
-  "groupNavigationSelector": {
-    "Select Group": "Chọn Nhóm",
-    "Use arrow keys to navigate options.": "Sử dụng các phím mũi tên để điều hướng tùy chọn."
-  },
-  "jobs": {
-    "Close": "Đóng"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Tạo một Học Phần mới"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "Một chú gấu trúc chăm học",
-    "Moves:": "Di Chuyển:"
-  },
-  "overview_page": {
-    "Edit home page": "Chỉnh sửa trang chủ",
-    "Subject Home Page": "Trang Chủ Môn Học"
-  },
-  "pages_edit_title": {
-    "Page Title": "Tiêu Đề Trang"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Hủy",
-    "Close": "Đóng"
-  },
-  "study_assist": {
-    "Back": "Quay lại",
-    "Close": "Đóng",
-    "Page": "Trang"
-  },
-  "submit_online_url_assignment": {
-    "A valid URL is required": "Bắt buộc phải có một URL hợp lệ",
-    "Website URL": "URL Trang Web"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "Chính Sách Sử Dụng Có Thể Chấp Nhận Được",
-    "Loading...": "Đang tải...",
-    "Preview": "Xem trước"
-  },
-  "todos_page": {
-    "Failed to load todos": "Không tải được các việc cần làm",
-    "Loading Additional Todo Details": "Đang Tải Các Chi Tiết Todo Bổ Sung",
-    "Loading Todo Course Name": "Đang Tải Tên Khóa Học Todo",
-    "Loading Todo Title": "Đang Tải Tiêu Đề Todo"
-  },
-  "tray": {
-    "Close": "Đóng"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Hủy",
+        "Confirm": "Xác Nhận"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Đánh dấu là ngày quan trọng và hiển thị trên thanh bên chủ nhiệm"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Chế độ cho điểm mặc định của tài khoản",
+        "Account default grading scheme was successfully saved.": "Chế độ cho điểm mặc định của tài khoản đã được lưu thành công.",
+        "Active Grading Schemes": "Các Chế Độ Cho Điểm Đang Hoạt Động",
+        "Applied": "Đã áp dụng",
+        "Apply": "Áp dụng",
+        "Archive Grading Scheme": "Lưu Trữ Chế Độ Cho Điểm",
+        "Archived": "Đã lưu trữ",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Bạn vẫn có thể sử dụng chế độ cho điểm được lưu trữ đang sử dụng nhưng không thể thêm vào các khóa học hoặc bài tập mới.",
+        "Are you sure you want to delete this grading scheme?": "Bạn có chắc chắn muốn xóa chế độ cho điểm này không?",
+        "Cancel": "Hủy",
+        "Canvas Default": "Mặc Định Canvas",
+        "Close": "Đóng",
+        "Confirm": "Xác Nhận",
+        "Confirm Default Grading Scheme Change": "Xác Nhận Thay Đổi Chế Độ Cho Điểm Mặc Định",
+        "Delete Grading Scheme": "Xóa Chế Độ Cho Điểm",
+        "Duplicate Grading Scheme": "Sao Chép Chế Độ Cho Điểm",
+        "Edit Grading Scheme": "Chỉnh Sửa Chế Độ Cho Điểm",
+        "Grading Scheme Name": "Tên Chế Độ Cho Điểm",
+        "Grading scheme was successfully archived.": "Đã lưu trữ chế độ cho điểm thành công.",
+        "Grading scheme was successfully created.": "Đã tạo chế độ cho điểm thành công.",
+        "Grading scheme was successfully removed.": "Đã gỡ chế độ cho điểm thành công.",
+        "Grading scheme was successfully saved.": "Đã lưu chế độ cho điểm thành công.",
+        "Grading scheme was successfully unarchived.": "Đã bỏ lưu trữ chế độ cho điểm thành công.",
+        "Locations Used": "Các Vị Trí Sử Dụng",
+        "Lower limit of range": "Giới hạn dưới của phạm vi",
+        "New Grading Scheme": "Chế Độ Cho Điểm Mới",
+        "Next Page": "Trang Sau",
+        "No account default": "Không có mặc định tài khoản",
+        "Previous Page": "Trang Trước",
+        "Save": "Lưu",
+        "Search": "Tìm kiếm",
+        "Search...": "Đang tìm kiếm...",
+        "Show courses and assignments": "Hiển thị khóa học và bài tập",
+        "Show locations used": "Hiển thị vị trí được sử dụng",
+        "Sort by": "Sắp xếp theo",
+        "There was an error while archiving the grading scheme": "Đã xảy ra lỗi khi lưu trữ chế độ cho điểm",
+        "There was an error while creating the grading scheme": "Đã xảy ra lỗi khi tạo chế độ cho điểm",
+        "There was an error while loading grading schemes": "Đã xảy ra lỗi khi tải chế độ cho điểm",
+        "There was an error while loading the default canvas grading scheme": "Đã xảy ra lỗi khi tải chế độ cho điểm canvas mặc định",
+        "There was an error while loading the default grading scheme": "Đã xảy ra lỗi khi tải chế độ cho điểm mặc định",
+        "There was an error while removing the grading scheme": "Đã xảy ra lỗi khi xóa chế độ cho điểm",
+        "There was an error while unarchiving the grading scheme": "Đã xảy ra lỗi khi bỏ lưu trữ chế độ cho điểm",
+        "There was an error while updating the default grading scheme": "Đã xảy ra lỗi khi cập nhật chế độ cho điểm mặc định",
+        "There was an error while updating the grading scheme": "Đã xảy ra lỗi khi cập nhật chế độ cho điểm",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Thay đổi này sẽ ảnh hưởng đến tất cả các khóa học và bài tập đang hoạt động hiện đang kế thừa tài khoản mặc định. Thay đổi này sẽ mất một thời gian để hoàn thành vì tất cả điểm khóa học và điểm bài tập đều được tính toán lại theo chế độ cho điểm mặc định của tài khoản mới.",
+        "Unarchive Grading Scheme": "Bỏ Lưu Trữ Chế Độ Cho Điểm",
+        "Upper limit of range": "Giới hạn trên của phạm vi",
+        "View Grading Scheme": "Xem Chế Độ Cho Điểm",
+        "View/Copy Grading Scheme": "Xem/Sao Chép Chế Độ Cho Điểm",
+        "View/Edit Grading Scheme": "Xem/Chỉnh Sửa Chế Độ Cho Điểm",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Bạn không thể lưu trữ chế độ cho điểm này vì chế độ này được đặt là mặc định cho một khóa học hoặc tài khoản.",
+        "You can't delete this grading scheme because it is in use.": "Bạn không thể xóa chế độ cho điểm này vì nó đang được sử dụng.",
+        "You have no active grading schemes.": "Bạn không có chế độ cho điểm nào đang hoạt động.",
+        "You have no archived grading schemes.": "Bạn không có chế độ cho điểm nào được lưu trữ.",
+        "to": "đến"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Bạn có chắc chắn muốn xóa chế độ cho điểm này không?",
+        "Are you sure you want to duplicate this grading scheme?": "Bạn có chắc chắn muốn tạo bản sao của chế độ cho điểm này không?",
+        "Cancel": "Hủy",
+        "Close": "Đóng",
+        "Delete": "Xóa",
+        "Delete ": "Xóa ",
+        "Duplicate": "Nhân Bản",
+        "Duplicate ": "Tạo Bản Sao ",
+        "Edit Grading Scheme": "Chỉnh Sửa Chế Độ Cho Điểm",
+        "New Grading Scheme": "Chế Độ Cho Điểm Mới",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Không thể chỉnh sửa phần trăm và điểm vì đây là chế độ cho điểm cấp độ tài khoản.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Không thể chỉnh sửa phần trăm và điểm vì chế độ đang được sử dụng như chế độ cho điểm mặc định.",
+        "Percentages and points can't be edited because it is currently being used.": "Không thể chỉnh sửa phần trăm và điểm vì chế độ đang được sử dụng.",
+        "Save": "Lưu"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Một bảng chứa dữ liệu chế độ cho điểm canvas mặc định.  Mỗi hàng chứa một tên, một tỷ lệ phần trăm tối đa và một tỷ lệ phần trăm tối thiểu.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Một bảng chứa dữ liệu chế độ cho điểm.  Mỗi hàng chứa một tên, một tỷ lệ phần trăm tối đa và một tỷ lệ phần trăm tối thiểu.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Không thể có tên hàng trùng lặp hoặc trống. Hãy đổi tên và thử nhấp lại vào “Lưu”.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Không thể có các phạm vi chồng chéo lên nhau hoặc phạm vi trống. Hãy sửa phạm vi và thử nhấp lại vào “Lưu”.",
+        "Delete grading scheme": "Xóa chế độ cho điểm",
+        "Edit Grading Scheme": "Chỉnh Sửa Chế Độ Cho Điểm",
+        "Edit a copy of this grading scheme": "Chỉnh sửa bản sao của chế độ cho điểm này",
+        "Edit grading scheme": "Chỉnh sửa chế độ cho điểm",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Yêu cầu có Tên Chế Độ Cho Điểm. Hãy thêm tên và thử nhấp lại vào 'Lưu'.",
+        "Grading scheme title": "Tiêu đề chế độ cho điểm",
+        "Invalid grading scheme": "Chế độ cho điểm không hợp lệ",
+        "Letter Grade": "Điểm Chữ",
+        "Looks great!": "Trông rất tuyệt!",
+        "Percentage": "Phần trăm",
+        "Points": "Điểm",
+        "Range": "Phạm vi",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Phạm vi phải là số hợp lệ. Không thể có số âm hoặc số lớn hơn 100. Hãy sửa các phạm vi và thử nhấp lại vào “Lưu”.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Phạm vi phải là số hợp lệ. Không thể có số âm hoặc số lớn hơn phạm vi trên của điểm thành phần. Hãy sửa các phạm vi và thử nhấp lại vào “Lưu”.",
+        "edit a copy": "chỉnh sửa bản sao"
+    },
+    "OutcomeManagement": {
+        "Course": "Khóa Học",
+        "Institution": "Tổ chức"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Tài khoản",
+        "Close": "Đóng",
+        "Concluded": "Đã Kết Thúc",
+        "Courses": "Khóa Học",
+        "Failed to load account used locations": "Tải vị trí đã được sử dụng của tài khoản không thành công",
+        "Failed to load assignments used locations": "Tải vị trí đã được sử dụng của bài tập không thành công",
+        "Failed to load used locations": "Không thể tải vị trí đã được sử dụng",
+        "Load Assignments ...": "Tải Bài Tập...",
+        "Load More Assignments ...": "Tải Thêm Bài Tập ...",
+        "Loading": "Đang tải",
+        "Locations Used": "Các Vị Trí Sử Dụng",
+        "Search": "Tìm kiếm",
+        "Search...": "Đang tìm kiếm..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Chính Sách Sử Dụng Có Thể Chấp Nhận Được",
+        "Close": "Đóng",
+        "Loading page": "Đang tải trang",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Chính Sách Sử Dụng Được Chấp Nhận hiện không khả dụng. Vui lòng kiểm tra lại sau hoặc liên hệ hỗ trợ nếu bạn cần thêm trợ giúp.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Không thể tải Chính Sách Sử Dụng Được Chấp Nhận. Vui lòng thử lại sau hoặc liên hệ hỗ trợ nếu vấn đề tiếp diễn."
+    },
+    "account_reports": {
+        "Close": "Đóng",
+        "Invalid date and time.": "Ngày và giờ không hợp lệ.",
+        "Next month": "Tháng sau",
+        "Previous month": "Tháng trước",
+        "Time": "Thời gian"
+    },
+    "admin_split": {
+        "Cancel": "Hủy",
+        "Failed to split users.": "Không chia được người dùng.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "GHI CHÚ: Việc này sẽ cố gắng hoàn tác quá trình hợp nhất đầy đủ nhất có thể; tuy nhiên, người dùng được hợp nhất có thể không được khôi phục hoàn toàn trạng thái trước đó của họ.",
+        "OK": "OK",
+        "Split": "Tách",
+        "The following users will be split into separate user accounts:": "Người người dùng sau sẽ được tách thành các tài khoản người dùng riêng biệt:",
+        "There are no user accounts to split from this user.": "Không có tài khoản người dùng nào để chia từ người dùng này.",
+        "User split complete. Links to split user accounts follow:": "Tách người dùng thành công. Các liên kết để tách các tài khoản người dùng như sau:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Mô Tả"
+    },
+    "assignment_footer": {
+        "Next": "Tiếp theo",
+        "Previous": "Trước"
+    },
+    "assignment_tabs": {
+        "Assignment": "Bài Tập",
+        "Peer Review": "Bình Duyệt"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(khóa học mặc định)",
+        "Account Level": "Cấp Độ Tài Khoản",
+        "Canvas Grading Scheme (course default)": "Chế Độ Cho Điểm Canvas (khóa học mặc định)",
+        "Close": "Đóng",
+        "Course Level": "Cấp Độ Khóa Học",
+        "Default Canvas Grading Scheme": "Chế Độ Cho Điểm Canvas Mặc Định",
+        "Grading scheme was successfully removed.": "Đã gỡ chế độ cho điểm thành công.",
+        "Grading scheme was successfully updated.": "Đã cập nhật chế độ cho điểm thành công.",
+        "Manage All Grading Schemes": "Quản Lý Tất Cả Chế Độ Cho Điểm",
+        "New Grading Scheme": "Chế Độ Cho Điểm Mới",
+        "Select a grading scheme": "Chọn chế độ cho điểm",
+        "There was an error while loading grading schemes": "Đã xảy ra lỗi khi tải chế độ cho điểm",
+        "There was an error while loading the grading scheme": "Đã xảy ra lỗi khi tải chế độ cho điểm",
+        "There was an error while refreshing grading schemes": "Đã xảy ra lỗi khi làm mới chế độ cho điểm",
+        "There was an error while removing the grading scheme": "Đã xảy ra lỗi khi xóa chế độ cho điểm",
+        "View": "Xem"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Bài Tập 2 Trang Lỗi của Giáo Viên",
+        "Assignments 2 Teacher initial query error": "Bài Tập 2 Lỗi truy vấn ban đầu của Giáo Viên",
+        "Loading": "Đang tải"
+    },
+    "catalog": {
+        "Course Catalog": "Mục Lục Khóa Học"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Rất tốt! Từ các nhà phát triển Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Hủy",
+        "Copy course": "Sao chép khóa học",
+        "Course code": "Mã khóa học",
+        "Course code must be 255 characters or less": "Mã khóa học phải từ 255 ký tự trở xuống",
+        "Course name must be 255 characters or less": "Tên khóa học phải từ 255 ký tự trở xuống",
+        "Create course": "Tạo khóa học",
+        "Creating...": "Đang tạo...",
+        "End date": "Ngày kết thúc",
+        "End date must be after start date": "Ngày kết thúc phải sau ngày bắt đầu",
+        "Name": "Tên",
+        "No results": "Không có kết quả",
+        "Please enter the details for the new course.": "Vui lòng nhập thông tin chi tiết cho khóa học mới.",
+        "Select a new beginning date": "Chọn một ngày bắt đầu mới",
+        "Select a new end date": "Chọn một ngày kết thúc mới",
+        "Select end date": "Chọn ngày kết thúc",
+        "Select start date": "Chọn ngày bắt đầu",
+        "Start date": "Ngày bắt đầu",
+        "Start date must be before end date": "Ngày bắt đầu phải trước ngày kết thúc",
+        "Start typing to search...": "Bắt đầu nhập để tìm kiếm...",
+        "Term": "Học Kì",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Ngày bắt đầu và ngày kết thúc học kỳ không thể được sửa đổi ở đây, chỉ có thể sửa đổi trên trang Chi Tiết về Học Kỳ trong mục Quản Trị.",
+        "Use arrow keys to navigate options.": "Sử dụng các phím mũi tên để điều hướng tùy chọn."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Đóng",
+        "Content Share Preview": "Xem Trước Nội Dung Chia Sẻ",
+        "Preview": "Xem trước"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Chú ý"
+    },
+    "course_logging_content": {
+        "No results": "Không có kết quả",
+        "Type to search": "Nhập để tìm kiếm"
+    },
+    "create_course_modal": {
+        "Cancel": "Hủy",
+        "Course Details": "Chi Tiết Khóa Học",
+        "Course Name": "Tên Khóa Học",
+        "Create": "Tạo",
+        "Create Course": "Tạo Khóa Học",
+        "Create Subject": "Tạo Chủ Thể",
+        "Creating new course...": "Đang tạo khóa học mới...",
+        "Creating new subject...": "Tạo chủ thể mới...",
+        "Error creating new course": "Lỗi tạo khóa học mới",
+        "Error creating new subject": "Lỗi tạo môn học mới",
+        "Loading accounts...": "Đang tải các tài khoản...",
+        "Name...": "Tên...",
+        "No Results": "Không Có Kết Quả",
+        "Select a homeroom": "Chọn một chủ nhiệm",
+        "Subject Name": "Tên Chủ Thể",
+        "Unable to get accounts": "Không thể lấy tài khoản",
+        "Unable to get homerooms": "Không thể lấy lớp chủ nhiệm",
+        "Use arrow keys to navigate options.": "Sử dụng các phím mũi tên để điều hướng tùy chọn.",
+        "Which account will this course be associated with?": "Khóa học này sẽ được liên kết với tài khoản nào?",
+        "Which account will this subject be associated with?": "Môn học này sẽ được liên kết với tài khoản nào?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Ghi Đè Điểm Cuối Cùng"
+    },
+    "feature_flags": {
+        "Accept": "Chấp nhận",
+        "Cancel": "Hủy"
+    },
+    "filter_bar": {
+        "All": "Tất cả",
+        "Clear": "Xóa",
+        "Filter by": "Lọc theo",
+        "Search": "Tìm kiếm",
+        "Use arrow keys to navigate options.": "Sử dụng các phím mũi tên để điều hướng tùy chọn."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Chọn Nhóm",
+        "Use arrow keys to navigate options.": "Sử dụng các phím mũi tên để điều hướng tùy chọn."
+    },
+    "jobs": {
+        "Close": "Đóng"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Tạo một Học Phần mới"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Một chú gấu trúc chăm học",
+        "Moves:": "Di Chuyển:"
+    },
+    "overview_page": {
+        "Edit home page": "Chỉnh sửa trang chủ",
+        "Subject Home Page": "Trang Chủ Môn Học"
+    },
+    "pages_edit_title": {
+        "Page Title": "Tiêu Đề Trang"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Hủy",
+        "Close": "Đóng"
+    },
+    "study_assist": {
+        "Back": "Quay lại",
+        "Close": "Đóng",
+        "Page": "Trang"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "Bắt buộc phải có một URL hợp lệ",
+        "Website URL": "URL Trang Web"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Chính Sách Sử Dụng Có Thể Chấp Nhận Được",
+        "Loading...": "Đang tải...",
+        "Preview": "Xem trước"
+    },
+    "todos_page": {
+        "Failed to load todos": "Không tải được các việc cần làm",
+        "Loading Additional Todo Details": "Đang Tải Các Chi Tiết Todo Bổ Sung",
+        "Loading Todo Course Name": "Đang Tải Tên Khóa Học Todo",
+        "Loading Todo Title": "Đang Tải Tiêu Đề Todo"
+    },
+    "tray": {
+        "Close": "Đóng"
+    }
 }

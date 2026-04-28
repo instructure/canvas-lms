@@ -1,275 +1,275 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Mégse",
-    "Confirm": "Jóváhagyás"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "Jelölje meg fontos dátumként, és jelenítse meg az Osztályfőnöki kurzus oldalsávján."
-  },
-  "GradingSchemeManagement": {
-    "Active Grading Schemes": "Aktív Osztályozási Rendszerek",
-    "Applied": "Alkalmazott",
-    "Apply": "Alkalmazás",
-    "Archive Grading Scheme": "Archívum besorolási rendszer",
-    "Archived": "Archivált",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Az archivált, használatban lévő osztályozási sémák továbbra is használhatók, de nem adhatók hozzá új kurzusokhoz vagy feladatokhoz.",
-    "Are you sure you want to delete this grading scheme?": "Biztos benne, hogy törli ezt az osztályzási rendszert?",
-    "Cancel": "Mégse",
-    "Canvas Default": "Canvas alapértelmezés",
-    "Close": "Bezárás",
-    "Confirm": "Jóváhagyás",
-    "Delete Grading Scheme": "Osztályzási rendszer törlése",
-    "Duplicate Grading Scheme": "Duplikált Osztályozási rendszer",
-    "Edit Grading Scheme": "Osztályzási rendszer szerkesztése",
-    "Grading Scheme Name": "Osztályzási rendszer Név",
-    "Grading scheme was successfully archived.": "Az osztályzási rendszert sikeresen archiválták.",
-    "Grading scheme was successfully created.": "Sikeresen létrehozták az osztályzási rendszert.",
-    "Grading scheme was successfully removed.": "Az osztályzási rendszert sikeresen eltávolították.",
-    "Grading scheme was successfully saved.": "Az osztályzási rendszer sikeresen el lett mentve.",
-    "Grading scheme was successfully unarchived.": "Az osztályzási sémát sikeresen archiválták.",
-    "Locations Used": "Használt helyszínek",
-    "Lower limit of range": "Intervallum alsó határa",
-    "New Grading Scheme": "Új osztályozási rendszer",
-    "Next Page": "Következő oldal",
-    "Previous Page": "Előző oldal",
-    "Save": "Mentés",
-    "Search": "Keresés",
-    "Search...": "Keresés...",
-    "Show courses and assignments": "kurzusok és feladatok megjelenítése",
-    "Sort by": "Rendezési feltétel",
-    "There was an error while archiving the grading scheme": "Hiba történt az osztályozási séma archiválásakor",
-    "There was an error while creating the grading scheme": "Hiba történt az osztályozási séma létrehozása során",
-    "There was an error while loading grading schemes": "Hiba történt az osztályozási sémák betöltése közben",
-    "There was an error while loading the default canvas grading scheme": "Hiba történt az alapértelmezett Canvas osztályozási séma betöltésekor",
-    "There was an error while loading the default grading scheme": "Hiba történt az alapértelmezett osztályozási séma betöltésekor",
-    "There was an error while removing the grading scheme": "Hiba történt az osztályozási rendszer eltávolítása során",
-    "There was an error while unarchiving the grading scheme": "Hiba történt az osztályozási séma archiválásának feloldásakor",
-    "There was an error while updating the grading scheme": "Hiba történt az osztályozási séma frissítése során",
-    "Unarchive Grading Scheme": "Osztályozási rendszer Arvhiválás visszavonás",
-    "Upper limit of range": "Intervallum felső határa",
-    "View Grading Scheme": "Osztályzási rendszer megtekintése",
-    "View/Copy Grading Scheme": "Nézet/másolat Osztályozási rendszer",
-    "View/Edit Grading Scheme": "Osztályzási rendszer megtekintése/szerkesztése",
-    "You can't delete this grading scheme because it is in use.": "Ezt az osztályozási sémát nem lehet törölni, mert használatban van.",
-    "You have no active grading schemes.": "Nincsenek aktív osztályozási rendszerek.",
-    "You have no archived grading schemes.": "Nincsenek archivált osztályozási sémái.",
-    "to": " - "
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Biztos benne, hogy törli ezt az osztályzási rendszert?",
-    "Are you sure you want to duplicate this grading scheme?": "Biztos, hogy duplikálni szeretné ezt az osztályozási rendszert?",
-    "Cancel": "Mégse",
-    "Close": "Bezárás",
-    "Delete": "Törlés",
-    "Delete ": "Törlés",
-    "Duplicate": "Duplikálás",
-    "Duplicate ": "Duplikátum ",
-    "Edit Grading Scheme": "Osztályzási rendszer szerkesztése",
-    "New Grading Scheme": "Új osztályozási rendszer",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "|-",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "A százalékok és a pontok nem szerkeszthetők, mivel ez az alapértelmezett osztályozási séma.",
-    "Percentages and points can't be edited because it is currently being used.": "A százalékok és a pontok nem szerkeszthetők, mert éppen használatban vannak.",
-    "Save": "Mentés"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Egy táblázat, amely az alapértelmezett Canvas osztályozási séma adatait tartalmazza. Minden sor tartalmaz egy nevet, egy maximális és egy minimális százalékos értéket.",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Az osztályozási rendszer adatait tartalmazó táblázat. Minden sor tartalmaz egy nevet, egy maximális és egy minimális százalékos értéket.",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": " Nem lehetnek duplikált vagy üres sornevek. Javítsa ki a neveket, és próbálja meg újra a 'Mentés' gombra\\n\\",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": " Nem lehetnek átfedő vagy üres tartományok. Javítsa ki a tartományokat, és próbálja meg újra a 'Mentés'\\n\\",
-    "Delete grading scheme": "Osztályozási rendszer törlése",
-    "Edit Grading Scheme": "Osztályzási rendszer szerkesztése",
-    "Edit a copy of this grading scheme": "Az osztályozási rendszer egy példányának szerkesztése",
-    "Edit grading scheme": "Osztályozási séma szerkesztése",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": " Az osztályzási rendszer neve kötelező. Adjon hozzá egy nevet, és kattintson újra a 'Mentés' gombra.",
-    "Grading scheme title": "Az osztályozási rendszer címe",
-    "Invalid grading scheme": "Érvénytelen osztályozási rendszer",
-    "Letter Grade": "Betű alapú osztályzat",
-    "Looks great!": "Szép munka!",
-    "Percentage": "Százalék",
-    "Points": "Pont",
-    "Range": "Tartomány",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": " A tartománynak érvényes számnak kell lennie. ",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": " A tartománynak érvényes számnak kell lennie. ",
-    "edit a copy": "másolat szerkesztése"
-  },
-  "OutcomeManagement": {
-    "Course": "Kurzus",
-    "Institution": "Intézmény"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Fiókok",
-    "Close": "Bezárás",
-    "Concluded": "Befejeződött",
-    "Courses": "Kurzusok",
-    "Failed to load used locations": "Nem sikerült betölteni a használt helyeket",
-    "Loading": "Töltődik",
-    "Locations Used": "Használt helyszínek",
-    "Search": "Keresés",
-    "Search...": "Keresés..."
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "Felhasználói szabályzat",
-    "Close": "Bezárás",
-    "Loading page": "Oldal betöltése"
-  },
-  "account_reports": {
-    "Close": "Bezárás",
-    "Next month": "Következő hónap",
-    "Previous month": "Előző hónap",
-    "Time": "Idő"
-  },
-  "admin_split": {
-    "Cancel": "Mégse",
-    "Failed to split users.": "Nem sikerült felosztani a felhasználókat.",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "MEGJEGYZÉS:Ez megpróbálja a lehető legteljesebb mértékben visszacsinálni az egyesítést; azonban előfordulhat, hogy az egyesített felhasználók nem állnak vissza tökéletesen a korábbi állapotukba.",
-    "OK": "OK",
-    "Split": "Feloszt",
-    "The following users will be split into separate user accounts:": "A következő felhasználók külön felhasználói fiókokba lesznek osztva:",
-    "There are no user accounts to split from this user.": "Nincs olyan felhasználói fiók, amelyet erről a felhasználóról le lehetne választani.                        ",
-    "User split complete. Links to split user accounts follow:": " Felhasználói megosztás befejeződött. "
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Leírás"
-  },
-  "assignment_footer": {
-    "Next": "Következő",
-    "Previous": "Előző"
-  },
-  "assignment_tabs": {
-    "Assignment": "Feladat",
-    "Peer Review": "Társértékelés"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "(kurzus alapértelmezett)",
-    "Account Level": "Fiókszint",
-    "Canvas Grading Scheme (course default)": "Canvas osztályozási rendszer (kurzus alapértelmezett)",
-    "Close": "Bezárás",
-    "Course Level": "Kurzus szintje",
-    "Default Canvas Grading Scheme": "Alapértelmezett Canvas osztályozási rendszer",
-    "Grading scheme was successfully removed.": "Az osztályzási rendszert sikeresen eltávolították.",
-    "Grading scheme was successfully updated.": "Az osztályzási rendszert sikeresen frissítették.",
-    "Manage All Grading Schemes": "Minden osztályozási rendszer kezelése",
-    "New Grading Scheme": "Új osztályozási rendszer",
-    "Select a grading scheme": "Válasszon ki egy osztályozási rendszert",
-    "There was an error while loading grading schemes": "Hiba történt az osztályozási sémák betöltése közben",
-    "There was an error while loading the grading scheme": "Hiba történt az osztályozási séma betöltésekor",
-    "There was an error while refreshing grading schemes": "Hiba történt az osztályozási sémák frissítése közben",
-    "There was an error while removing the grading scheme": "Hiba történt az osztályozási rendszer eltávolítása során",
-    "View": "Megtekintés"
-  },
-  "assignments_2": {
-    "Loading": "Töltődik"
-  },
-  "catalog": {
-    "Course Catalog": "Kurzuskatalógus"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "Nagyszerű munka! A Canvas fejlesztőitől"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Mégse",
-    "Create course": "Kurzus létrehozása",
-    "End date must be after start date": "A végdátumnak a kezdeti dátum után kell lennie",
-    "Name": "Név",
-    "No results": "Nincsenek eredmények",
-    "Please enter the details for the new course.": "Kérjük, adja meg az új kurzus részleteit.",
-    "Start date must be before end date": "A kezdeti dátumnak a végdátum előtt kell lennie",
-    "Term": "Félév",
-    "Use arrow keys to navigate options.": "Használja a nyíl billentyűket az opció kiválasztására!"
-  },
-  "content_share_preview_overlay": {
-    "Close": "Bezárás",
-    "Content Share Preview": "Tartalommegosztás előnézete",
-    "Preview": "Előnézet"
-  },
-  "copy_warnings_modal": {
-    "Attention": "Figyelem"
-  },
-  "course_logging_content": {
-    "No results": "Nincsenek eredmények",
-    "Type to search": "Gépeljen a keresés megkezdéséhez"
-  },
-  "create_course_modal": {
-    "Cancel": "Mégse",
-    "Course Details": "Kurzusrészletek",
-    "Course Name": "Kurzus neve",
-    "Create": "Létrehozás",
-    "Create Course": "Kurzus létrehozása",
-    "Create Subject": "Tárgy létrehozása",
-    "Creating new course...": "Új kurzus létrehozása...",
-    "Creating new subject...": "Új téma létrehozása...",
-    "Error creating new course": "Hiba az új kurzus létrehozásakor",
-    "Error creating new subject": "Hiba az új téma létrehozásakor",
-    "Loading accounts...": "Fiókok betöltése...",
-    "Name...": "Név...",
-    "No Results": "Nincsenek eredmények",
-    "Select a homeroom": "Válasszon egy osztályt",
-    "Subject Name": "Tárgy neve",
-    "Unable to get accounts": "Nem tudok számlákat szerezni",
-    "Unable to get homerooms": "Nem lehet a Osztályfőnöki kurzusba eljutni",
-    "Use arrow keys to navigate options.": "Használja a nyíl billentyűket az opció kiválasztására!",
-    "Which account will this course be associated with?": "Melyik fiókhoz fog kapcsolódni ez a kurzus?",
-    "Which account will this subject be associated with?": "Melyik fiókhoz kapcsolódik ez a téma?"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "Végső érdemjegy felülbírálása"
-  },
-  "feature_flags": {
-    "Accept": "Elfogad",
-    "Cancel": "Mégse"
-  },
-  "filter_bar": {
-    "All": "Összes",
-    "Clear": "Törlés",
-    "Filter by": "Szűrés",
-    "Search": "Keresés",
-    "Use arrow keys to navigate options.": "Használja a nyíl billentyűket az opció kiválasztására!"
-  },
-  "groupNavigationSelector": {
-    "Select Group": "Csoport kiválasztása",
-    "Use arrow keys to navigate options.": "Használja a nyíl billentyűket az opció kiválasztására!"
-  },
-  "jobs": {
-    "Close": "Bezárás"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Új modul létrehozása"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "Egy szorgalmas panda",
-    "Moves:": "Áthelyezések:"
-  },
-  "overview_page": {
-    "Edit home page": "Kezdőlap szerkesztése",
-    "Subject Home Page": "Téma Főoldal"
-  },
-  "pages_edit_title": {
-    "Page Title": "Oldal címe"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Mégse",
-    "Close": "Bezárás"
-  },
-  "study_assist": {
-    "Back": "Vissza",
-    "Close": "Bezárás",
-    "Page": "Oldal"
-  },
-  "submit_online_url_assignment": {
-    "Website URL": "Webcím"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "Felhasználói szabályzat",
-    "Loading...": "Töltődik...",
-    "Preview": "Előnézet"
-  },
-  "todos_page": {
-    "Failed to load todos": "Nem sikerült betölteni a tennivalókat",
-    "Loading Additional Todo Details": "További teendő részletek betöltése...",
-    "Loading Todo Course Name": "Teendő Kurzus nevének betöltése",
-    "Loading Todo Title": "Teendő cím betöltése"
-  },
-  "tray": {
-    "Close": "Bezárás"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Mégse",
+        "Confirm": "Jóváhagyás"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Jelölje meg fontos dátumként, és jelenítse meg az Osztályfőnöki kurzus oldalsávján."
+    },
+    "GradingSchemeManagement": {
+        "Active Grading Schemes": "Aktív Osztályozási Rendszerek",
+        "Applied": "Alkalmazott",
+        "Apply": "Alkalmazás",
+        "Archive Grading Scheme": "Archívum besorolási rendszer",
+        "Archived": "Archivált",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Az archivált, használatban lévő osztályozási sémák továbbra is használhatók, de nem adhatók hozzá új kurzusokhoz vagy feladatokhoz.",
+        "Are you sure you want to delete this grading scheme?": "Biztos benne, hogy törli ezt az osztályzási rendszert?",
+        "Cancel": "Mégse",
+        "Canvas Default": "Canvas alapértelmezés",
+        "Close": "Bezárás",
+        "Confirm": "Jóváhagyás",
+        "Delete Grading Scheme": "Osztályzási rendszer törlése",
+        "Duplicate Grading Scheme": "Duplikált Osztályozási rendszer",
+        "Edit Grading Scheme": "Osztályzási rendszer szerkesztése",
+        "Grading Scheme Name": "Osztályzási rendszer Név",
+        "Grading scheme was successfully archived.": "Az osztályzási rendszert sikeresen archiválták.",
+        "Grading scheme was successfully created.": "Sikeresen létrehozták az osztályzási rendszert.",
+        "Grading scheme was successfully removed.": "Az osztályzási rendszert sikeresen eltávolították.",
+        "Grading scheme was successfully saved.": "Az osztályzási rendszer sikeresen el lett mentve.",
+        "Grading scheme was successfully unarchived.": "Az osztályzási sémát sikeresen archiválták.",
+        "Locations Used": "Használt helyszínek",
+        "Lower limit of range": "Intervallum alsó határa",
+        "New Grading Scheme": "Új osztályozási rendszer",
+        "Next Page": "Következő oldal",
+        "Previous Page": "Előző oldal",
+        "Save": "Mentés",
+        "Search": "Keresés",
+        "Search...": "Keresés...",
+        "Show courses and assignments": "kurzusok és feladatok megjelenítése",
+        "Sort by": "Rendezési feltétel",
+        "There was an error while archiving the grading scheme": "Hiba történt az osztályozási séma archiválásakor",
+        "There was an error while creating the grading scheme": "Hiba történt az osztályozási séma létrehozása során",
+        "There was an error while loading grading schemes": "Hiba történt az osztályozási sémák betöltése közben",
+        "There was an error while loading the default canvas grading scheme": "Hiba történt az alapértelmezett Canvas osztályozási séma betöltésekor",
+        "There was an error while loading the default grading scheme": "Hiba történt az alapértelmezett osztályozási séma betöltésekor",
+        "There was an error while removing the grading scheme": "Hiba történt az osztályozási rendszer eltávolítása során",
+        "There was an error while unarchiving the grading scheme": "Hiba történt az osztályozási séma archiválásának feloldásakor",
+        "There was an error while updating the grading scheme": "Hiba történt az osztályozási séma frissítése során",
+        "Unarchive Grading Scheme": "Osztályozási rendszer Arvhiválás visszavonás",
+        "Upper limit of range": "Intervallum felső határa",
+        "View Grading Scheme": "Osztályzási rendszer megtekintése",
+        "View/Copy Grading Scheme": "Nézet/másolat Osztályozási rendszer",
+        "View/Edit Grading Scheme": "Osztályzási rendszer megtekintése/szerkesztése",
+        "You can't delete this grading scheme because it is in use.": "Ezt az osztályozási sémát nem lehet törölni, mert használatban van.",
+        "You have no active grading schemes.": "Nincsenek aktív osztályozási rendszerek.",
+        "You have no archived grading schemes.": "Nincsenek archivált osztályozási sémái.",
+        "to": " - "
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Biztos benne, hogy törli ezt az osztályzási rendszert?",
+        "Are you sure you want to duplicate this grading scheme?": "Biztos, hogy duplikálni szeretné ezt az osztályozási rendszert?",
+        "Cancel": "Mégse",
+        "Close": "Bezárás",
+        "Delete": "Törlés",
+        "Delete ": "Törlés",
+        "Duplicate": "Duplikálás",
+        "Duplicate ": "Duplikátum ",
+        "Edit Grading Scheme": "Osztályzási rendszer szerkesztése",
+        "New Grading Scheme": "Új osztályozási rendszer",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "|-",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "A százalékok és a pontok nem szerkeszthetők, mivel ez az alapértelmezett osztályozási séma.",
+        "Percentages and points can't be edited because it is currently being used.": "A százalékok és a pontok nem szerkeszthetők, mert éppen használatban vannak.",
+        "Save": "Mentés"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Egy táblázat, amely az alapértelmezett Canvas osztályozási séma adatait tartalmazza. Minden sor tartalmaz egy nevet, egy maximális és egy minimális százalékos értéket.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Az osztályozási rendszer adatait tartalmazó táblázat. Minden sor tartalmaz egy nevet, egy maximális és egy minimális százalékos értéket.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": " Nem lehetnek duplikált vagy üres sornevek. Javítsa ki a neveket, és próbálja meg újra a 'Mentés' gombra\\n\\",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": " Nem lehetnek átfedő vagy üres tartományok. Javítsa ki a tartományokat, és próbálja meg újra a 'Mentés'\\n\\",
+        "Delete grading scheme": "Osztályozási rendszer törlése",
+        "Edit Grading Scheme": "Osztályzási rendszer szerkesztése",
+        "Edit a copy of this grading scheme": "Az osztályozási rendszer egy példányának szerkesztése",
+        "Edit grading scheme": "Osztályozási séma szerkesztése",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": " Az osztályzási rendszer neve kötelező. Adjon hozzá egy nevet, és kattintson újra a 'Mentés' gombra.",
+        "Grading scheme title": "Az osztályozási rendszer címe",
+        "Invalid grading scheme": "Érvénytelen osztályozási rendszer",
+        "Letter Grade": "Betű alapú osztályzat",
+        "Looks great!": "Szép munka!",
+        "Percentage": "Százalék",
+        "Points": "Pont",
+        "Range": "Tartomány",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": " A tartománynak érvényes számnak kell lennie. ",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": " A tartománynak érvényes számnak kell lennie. ",
+        "edit a copy": "másolat szerkesztése"
+    },
+    "OutcomeManagement": {
+        "Course": "Kurzus",
+        "Institution": "Intézmény"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Fiókok",
+        "Close": "Bezárás",
+        "Concluded": "Befejeződött",
+        "Courses": "Kurzusok",
+        "Failed to load used locations": "Nem sikerült betölteni a használt helyeket",
+        "Loading": "Töltődik",
+        "Locations Used": "Használt helyszínek",
+        "Search": "Keresés",
+        "Search...": "Keresés..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Felhasználói szabályzat",
+        "Close": "Bezárás",
+        "Loading page": "Oldal betöltése"
+    },
+    "account_reports": {
+        "Close": "Bezárás",
+        "Next month": "Következő hónap",
+        "Previous month": "Előző hónap",
+        "Time": "Idő"
+    },
+    "admin_split": {
+        "Cancel": "Mégse",
+        "Failed to split users.": "Nem sikerült felosztani a felhasználókat.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "MEGJEGYZÉS:Ez megpróbálja a lehető legteljesebb mértékben visszacsinálni az egyesítést; azonban előfordulhat, hogy az egyesített felhasználók nem állnak vissza tökéletesen a korábbi állapotukba.",
+        "OK": "OK",
+        "Split": "Feloszt",
+        "The following users will be split into separate user accounts:": "A következő felhasználók külön felhasználói fiókokba lesznek osztva:",
+        "There are no user accounts to split from this user.": "Nincs olyan felhasználói fiók, amelyet erről a felhasználóról le lehetne választani.                        ",
+        "User split complete. Links to split user accounts follow:": " Felhasználói megosztás befejeződött. "
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Leírás"
+    },
+    "assignment_footer": {
+        "Next": "Következő",
+        "Previous": "Előző"
+    },
+    "assignment_tabs": {
+        "Assignment": "Feladat",
+        "Peer Review": "Társértékelés"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(kurzus alapértelmezett)",
+        "Account Level": "Fiókszint",
+        "Canvas Grading Scheme (course default)": "Canvas osztályozási rendszer (kurzus alapértelmezett)",
+        "Close": "Bezárás",
+        "Course Level": "Kurzus szintje",
+        "Default Canvas Grading Scheme": "Alapértelmezett Canvas osztályozási rendszer",
+        "Grading scheme was successfully removed.": "Az osztályzási rendszert sikeresen eltávolították.",
+        "Grading scheme was successfully updated.": "Az osztályzási rendszert sikeresen frissítették.",
+        "Manage All Grading Schemes": "Minden osztályozási rendszer kezelése",
+        "New Grading Scheme": "Új osztályozási rendszer",
+        "Select a grading scheme": "Válasszon ki egy osztályozási rendszert",
+        "There was an error while loading grading schemes": "Hiba történt az osztályozási sémák betöltése közben",
+        "There was an error while loading the grading scheme": "Hiba történt az osztályozási séma betöltésekor",
+        "There was an error while refreshing grading schemes": "Hiba történt az osztályozási sémák frissítése közben",
+        "There was an error while removing the grading scheme": "Hiba történt az osztályozási rendszer eltávolítása során",
+        "View": "Megtekintés"
+    },
+    "assignments_2": {
+        "Loading": "Töltődik"
+    },
+    "catalog": {
+        "Course Catalog": "Kurzuskatalógus"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Nagyszerű munka! A Canvas fejlesztőitől"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Mégse",
+        "Create course": "Kurzus létrehozása",
+        "End date must be after start date": "A végdátumnak a kezdeti dátum után kell lennie",
+        "Name": "Név",
+        "No results": "Nincsenek eredmények",
+        "Please enter the details for the new course.": "Kérjük, adja meg az új kurzus részleteit.",
+        "Start date must be before end date": "A kezdeti dátumnak a végdátum előtt kell lennie",
+        "Term": "Félév",
+        "Use arrow keys to navigate options.": "Használja a nyíl billentyűket az opció kiválasztására!"
+    },
+    "content_share_preview_overlay": {
+        "Close": "Bezárás",
+        "Content Share Preview": "Tartalommegosztás előnézete",
+        "Preview": "Előnézet"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Figyelem"
+    },
+    "course_logging_content": {
+        "No results": "Nincsenek eredmények",
+        "Type to search": "Gépeljen a keresés megkezdéséhez"
+    },
+    "create_course_modal": {
+        "Cancel": "Mégse",
+        "Course Details": "Kurzusrészletek",
+        "Course Name": "Kurzus neve",
+        "Create": "Létrehozás",
+        "Create Course": "Kurzus létrehozása",
+        "Create Subject": "Tárgy létrehozása",
+        "Creating new course...": "Új kurzus létrehozása...",
+        "Creating new subject...": "Új téma létrehozása...",
+        "Error creating new course": "Hiba az új kurzus létrehozásakor",
+        "Error creating new subject": "Hiba az új téma létrehozásakor",
+        "Loading accounts...": "Fiókok betöltése...",
+        "Name...": "Név...",
+        "No Results": "Nincsenek eredmények",
+        "Select a homeroom": "Válasszon egy osztályt",
+        "Subject Name": "Tárgy neve",
+        "Unable to get accounts": "Nem tudok számlákat szerezni",
+        "Unable to get homerooms": "Nem lehet a Osztályfőnöki kurzusba eljutni",
+        "Use arrow keys to navigate options.": "Használja a nyíl billentyűket az opció kiválasztására!",
+        "Which account will this course be associated with?": "Melyik fiókhoz fog kapcsolódni ez a kurzus?",
+        "Which account will this subject be associated with?": "Melyik fiókhoz kapcsolódik ez a téma?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Végső érdemjegy felülbírálása"
+    },
+    "feature_flags": {
+        "Accept": "Elfogad",
+        "Cancel": "Mégse"
+    },
+    "filter_bar": {
+        "All": "Összes",
+        "Clear": "Törlés",
+        "Filter by": "Szűrés",
+        "Search": "Keresés",
+        "Use arrow keys to navigate options.": "Használja a nyíl billentyűket az opció kiválasztására!"
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Csoport kiválasztása",
+        "Use arrow keys to navigate options.": "Használja a nyíl billentyűket az opció kiválasztására!"
+    },
+    "jobs": {
+        "Close": "Bezárás"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Új modul létrehozása"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Egy szorgalmas panda",
+        "Moves:": "Áthelyezések:"
+    },
+    "overview_page": {
+        "Edit home page": "Kezdőlap szerkesztése",
+        "Subject Home Page": "Téma Főoldal"
+    },
+    "pages_edit_title": {
+        "Page Title": "Oldal címe"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Mégse",
+        "Close": "Bezárás"
+    },
+    "study_assist": {
+        "Back": "Vissza",
+        "Close": "Bezárás",
+        "Page": "Oldal"
+    },
+    "submit_online_url_assignment": {
+        "Website URL": "Webcím"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Felhasználói szabályzat",
+        "Loading...": "Töltődik...",
+        "Preview": "Előnézet"
+    },
+    "todos_page": {
+        "Failed to load todos": "Nem sikerült betölteni a tennivalókat",
+        "Loading Additional Todo Details": "További teendő részletek betöltése...",
+        "Loading Todo Course Name": "Teendő Kurzus nevének betöltése",
+        "Loading Todo Title": "Teendő cím betöltése"
+    },
+    "tray": {
+        "Close": "Bezárás"
+    }
 }

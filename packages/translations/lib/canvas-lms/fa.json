@@ -1,188 +1,188 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "لغو",
-    "Confirm": "تأیید"
-  },
-  "GradingSchemeManagement": {
-    "Applied": "اعمال شد",
-    "Apply": "اعمال",
-    "Archived": "بایگانی شده",
-    "Are you sure you want to delete this grading scheme?": "مطمئنید که می خواهید این طرح نمره گذاری حذف شود؟",
-    "Cancel": "لغو",
-    "Close": "بستن",
-    "Confirm": "تأیید",
-    "Delete Grading Scheme": "حذف طرح نمره گذاری",
-    "Edit Grading Scheme": "ویرایش طرح نمره گذاری",
-    "Lower limit of range": "حد پایین تر محدوده",
-    "Next Page": "صفحه بعد",
-    "Previous Page": "صفحه قبل",
-    "Save": "ذخیره سازی",
-    "Search": "جستجو",
-    "Sort by": "مرتب کردن بر اساس",
-    "Upper limit of range": "حد بالاتر محدوده",
-    "View Grading Scheme": "مشاهده طرح نمره گذاری",
-    "View/Edit Grading Scheme": "مشاهده/ویرایش طرح نمره گذاری",
-    "to": "تا"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "مطمئنید که می خواهید این طرح نمره گذاری حذف شود؟",
-    "Cancel": "لغو",
-    "Close": "بستن",
-    "Delete": "حذف",
-    "Duplicate": "تکرار کردن",
-    "Edit Grading Scheme": "ویرایش طرح نمره گذاری",
-    "Save": "ذخیره سازی"
-  },
-  "GradingSchemes": {
-    "Edit Grading Scheme": "ویرایش طرح نمره گذاری",
-    "Letter Grade": "نمره با حروف الفبا",
-    "Looks great!": "چه عالی!",
-    "Percentage": "درصد",
-    "Points": "امتیازها",
-    "Range": "بازه"
-  },
-  "OutcomeManagement": {
-    "Course": "درس",
-    "Institution": "دانشگاه"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "حساب ها",
-    "Close": "بستن",
-    "Concluded": "خاتمه یافته",
-    "Courses": "درس ها",
-    "Loading": "در حال بارگذاری",
-    "Search": "جستجو"
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "سیاست استفاده قابل قبول ",
-    "Close": "بستن"
-  },
-  "account_reports": {
-    "Close": "بستن",
-    "Next month": "ماه بعدی",
-    "Previous month": "ماه قبلی",
-    "Time": "زمان"
-  },
-  "admin_split": {
-    "Cancel": "لغو",
-    "Failed to split users.": "تقسیم کاربران انجام نشد.",
-    "OK": "تأیید",
-    "Split": "شکاف",
-    "There are no user accounts to split from this user.": "هیچ حساب کاربری برای جدا شدن از این کاربر وجود ندارد.",
-    "User split complete. Links to split user accounts follow:": "تقسیم کاربر کامل شد. پیوندهایی برای تقسیم حساب های کاربری به شرح زیر است:"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "شرح"
-  },
-  "assignment_footer": {
-    "Next": "بعدی",
-    "Previous": "قبلی"
-  },
-  "assignment_tabs": {
-    "Assignment": "تکلیف",
-    "Peer Review": "بازبینی گروهی"
-  },
-  "assignments.grading_type_selector": {
-    "Close": "بستن",
-    "View": "مشاهده"
-  },
-  "assignments_2": {
-    "Loading": "در حال بارگذاری"
-  },
-  "catalog": {
-    "Course Catalog": "کاتالوگ درس"
-  },
-  "content_copy_redesign": {
-    "Cancel": "لغو",
-    "Create course": "ایجاد درس",
-    "Creating...": "در حال ایجاد...",
-    "Name": "نام",
-    "No results": "نتیجه موجود نیست",
-    "Please enter the details for the new course.": "لطفا اطلاعات مربوط به درس جدید را وارد نمایید.",
-    "Term": "نیمسال",
-    "Use arrow keys to navigate options.": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید."
-  },
-  "content_share_preview_overlay": {
-    "Close": "بستن",
-    "Content Share Preview": "پیش نمایش اشتراک محتوا",
-    "Preview": "پیش‌نمایش"
-  },
-  "course_logging_content": {
-    "No results": "نتیجه موجود نیست",
-    "Type to search": "نوع برای جستجو"
-  },
-  "create_course_modal": {
-    "Cancel": "لغو",
-    "Course Details": "اطلاعات درس",
-    "Course Name": "نام درس",
-    "Create": "ایجاد",
-    "Create Course": "ایجاد درس",
-    "Create Subject": "ایجاد موضوع",
-    "Creating new course...": "ایجاد درس جدید...",
-    "Creating new subject...": "ایجاد موضوع جدید...",
-    "Error creating new course": "خطا در ایجاد درس جدید",
-    "Error creating new subject": "خطا در ایجاد موضوع جدید",
-    "Name...": "اسم...",
-    "No Results": "نتیجه موجود نیست",
-    "Select a homeroom": "اتاق خانگی را انتخاب کنید",
-    "Subject Name": "نام موضوع",
-    "Unable to get accounts": "نمی توان حساب ها را دریافت کرد",
-    "Unable to get homerooms": "نمی توان تکالیف خانه را دریافت کرد",
-    "Use arrow keys to navigate options.": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید.",
-    "Which account will this course be associated with?": "این درس با کدام حساب مرتبط خواهد بود؟",
-    "Which account will this subject be associated with?": "این موضوع با کدام حساب مرتبط خواهد بود؟"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "بازنویسی نمره نهایی"
-  },
-  "feature_flags": {
-    "Accept": "قبول",
-    "Cancel": "لغو"
-  },
-  "filter_bar": {
-    "All": "همه",
-    "Clear": "پاک کردن",
-    "Filter by": "فیلتر براساس",
-    "Search": "جستجو",
-    "Use arrow keys to navigate options.": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید."
-  },
-  "groupNavigationSelector": {
-    "Use arrow keys to navigate options.": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید."
-  },
-  "jobs": {
-    "Close": "بستن"
-  },
-  "modules_home_page": {
-    "Create a new Module": "یک ماژول جدید ایجاد کنید"
-  },
-  "overview_page": {
-    "Edit home page": "ویرایش صفحه اصلی",
-    "Subject Home Page": "صفحه اصلی موضوع"
-  },
-  "pages_edit_title": {
-    "Page Title": "عنوان صفحه"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "لغو",
-    "Close": "بستن"
-  },
-  "study_assist": {
-    "Back": "بازگشت",
-    "Close": "بستن",
-    "Page": "صفحه"
-  },
-  "submit_online_url_assignment": {
-    "Website URL": "نشانی اینترنتی تارنما"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "سیاست استفاده قابل قبول ",
-    "Loading...": "در حال بارگذاری...",
-    "Preview": "پیش‌نمایش"
-  },
-  "todos_page": {
-    "Failed to load todos": "کارها بارگیری نشد"
-  },
-  "tray": {
-    "Close": "بستن"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "لغو",
+        "Confirm": "تأیید"
+    },
+    "GradingSchemeManagement": {
+        "Applied": "اعمال شد",
+        "Apply": "اعمال",
+        "Archived": "بایگانی شده",
+        "Are you sure you want to delete this grading scheme?": "مطمئنید که می خواهید این طرح نمره گذاری حذف شود؟",
+        "Cancel": "لغو",
+        "Close": "بستن",
+        "Confirm": "تأیید",
+        "Delete Grading Scheme": "حذف طرح نمره گذاری",
+        "Edit Grading Scheme": "ویرایش طرح نمره گذاری",
+        "Lower limit of range": "حد پایین تر محدوده",
+        "Next Page": "صفحه بعد",
+        "Previous Page": "صفحه قبل",
+        "Save": "ذخیره سازی",
+        "Search": "جستجو",
+        "Sort by": "مرتب کردن بر اساس",
+        "Upper limit of range": "حد بالاتر محدوده",
+        "View Grading Scheme": "مشاهده طرح نمره گذاری",
+        "View/Edit Grading Scheme": "مشاهده/ویرایش طرح نمره گذاری",
+        "to": "تا"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "مطمئنید که می خواهید این طرح نمره گذاری حذف شود؟",
+        "Cancel": "لغو",
+        "Close": "بستن",
+        "Delete": "حذف",
+        "Duplicate": "تکرار کردن",
+        "Edit Grading Scheme": "ویرایش طرح نمره گذاری",
+        "Save": "ذخیره سازی"
+    },
+    "GradingSchemes": {
+        "Edit Grading Scheme": "ویرایش طرح نمره گذاری",
+        "Letter Grade": "نمره با حروف الفبا",
+        "Looks great!": "چه عالی!",
+        "Percentage": "درصد",
+        "Points": "امتیازها",
+        "Range": "بازه"
+    },
+    "OutcomeManagement": {
+        "Course": "درس",
+        "Institution": "دانشگاه"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "حساب ها",
+        "Close": "بستن",
+        "Concluded": "خاتمه یافته",
+        "Courses": "درس ها",
+        "Loading": "در حال بارگذاری",
+        "Search": "جستجو"
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "سیاست استفاده قابل قبول ",
+        "Close": "بستن"
+    },
+    "account_reports": {
+        "Close": "بستن",
+        "Next month": "ماه بعدی",
+        "Previous month": "ماه قبلی",
+        "Time": "زمان"
+    },
+    "admin_split": {
+        "Cancel": "لغو",
+        "Failed to split users.": "تقسیم کاربران انجام نشد.",
+        "OK": "تأیید",
+        "Split": "شکاف",
+        "There are no user accounts to split from this user.": "هیچ حساب کاربری برای جدا شدن از این کاربر وجود ندارد.",
+        "User split complete. Links to split user accounts follow:": "تقسیم کاربر کامل شد. پیوندهایی برای تقسیم حساب های کاربری به شرح زیر است:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "شرح"
+    },
+    "assignment_footer": {
+        "Next": "بعدی",
+        "Previous": "قبلی"
+    },
+    "assignment_tabs": {
+        "Assignment": "تکلیف",
+        "Peer Review": "بازبینی گروهی"
+    },
+    "assignments.grading_type_selector": {
+        "Close": "بستن",
+        "View": "مشاهده"
+    },
+    "assignments_2": {
+        "Loading": "در حال بارگذاری"
+    },
+    "catalog": {
+        "Course Catalog": "کاتالوگ درس"
+    },
+    "content_copy_redesign": {
+        "Cancel": "لغو",
+        "Create course": "ایجاد درس",
+        "Creating...": "در حال ایجاد...",
+        "Name": "نام",
+        "No results": "نتیجه موجود نیست",
+        "Please enter the details for the new course.": "لطفا اطلاعات مربوط به درس جدید را وارد نمایید.",
+        "Term": "نیمسال",
+        "Use arrow keys to navigate options.": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید."
+    },
+    "content_share_preview_overlay": {
+        "Close": "بستن",
+        "Content Share Preview": "پیش نمایش اشتراک محتوا",
+        "Preview": "پیش‌نمایش"
+    },
+    "course_logging_content": {
+        "No results": "نتیجه موجود نیست",
+        "Type to search": "نوع برای جستجو"
+    },
+    "create_course_modal": {
+        "Cancel": "لغو",
+        "Course Details": "اطلاعات درس",
+        "Course Name": "نام درس",
+        "Create": "ایجاد",
+        "Create Course": "ایجاد درس",
+        "Create Subject": "ایجاد موضوع",
+        "Creating new course...": "ایجاد درس جدید...",
+        "Creating new subject...": "ایجاد موضوع جدید...",
+        "Error creating new course": "خطا در ایجاد درس جدید",
+        "Error creating new subject": "خطا در ایجاد موضوع جدید",
+        "Name...": "اسم...",
+        "No Results": "نتیجه موجود نیست",
+        "Select a homeroom": "اتاق خانگی را انتخاب کنید",
+        "Subject Name": "نام موضوع",
+        "Unable to get accounts": "نمی توان حساب ها را دریافت کرد",
+        "Unable to get homerooms": "نمی توان تکالیف خانه را دریافت کرد",
+        "Use arrow keys to navigate options.": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید.",
+        "Which account will this course be associated with?": "این درس با کدام حساب مرتبط خواهد بود؟",
+        "Which account will this subject be associated with?": "این موضوع با کدام حساب مرتبط خواهد بود؟"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "بازنویسی نمره نهایی"
+    },
+    "feature_flags": {
+        "Accept": "قبول",
+        "Cancel": "لغو"
+    },
+    "filter_bar": {
+        "All": "همه",
+        "Clear": "پاک کردن",
+        "Filter by": "فیلتر براساس",
+        "Search": "جستجو",
+        "Use arrow keys to navigate options.": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید."
+    },
+    "groupNavigationSelector": {
+        "Use arrow keys to navigate options.": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید."
+    },
+    "jobs": {
+        "Close": "بستن"
+    },
+    "modules_home_page": {
+        "Create a new Module": "یک ماژول جدید ایجاد کنید"
+    },
+    "overview_page": {
+        "Edit home page": "ویرایش صفحه اصلی",
+        "Subject Home Page": "صفحه اصلی موضوع"
+    },
+    "pages_edit_title": {
+        "Page Title": "عنوان صفحه"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "لغو",
+        "Close": "بستن"
+    },
+    "study_assist": {
+        "Back": "بازگشت",
+        "Close": "بستن",
+        "Page": "صفحه"
+    },
+    "submit_online_url_assignment": {
+        "Website URL": "نشانی اینترنتی تارنما"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "سیاست استفاده قابل قبول ",
+        "Loading...": "در حال بارگذاری...",
+        "Preview": "پیش‌نمایش"
+    },
+    "todos_page": {
+        "Failed to load todos": "کارها بارگیری نشد"
+    },
+    "tray": {
+        "Close": "بستن"
+    }
 }

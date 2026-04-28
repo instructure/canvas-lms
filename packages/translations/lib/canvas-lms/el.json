@@ -1,140 +1,140 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Ακύρωση",
-    "Confirm": "Επιβεβαιώστε"
-  },
-  "GradingSchemeManagement": {
-    "Apply": "Εφαρμογή",
-    "Archived": "Αρχειοθετήθηκε",
-    "Are you sure you want to delete this grading scheme?": "Είσαστε σίγουρος/η πως θέλετε να διαγράψετε αυτόν το κανονισμό βαθμολόγισης;",
-    "Cancel": "Ακύρωση",
-    "Close": "Κλείσιμο",
-    "Confirm": "Επιβεβαιώστε",
-    "Delete Grading Scheme": "Διαγραφή Κανονισμού Βαθμολόγησης",
-    "Edit Grading Scheme": "Τροποποίηση Κανονισμού Βαθμολόγισης",
-    "Lower limit of range": "Χαμηλότερο όριο εύρους",
-    "Save": "Αποθήκευση",
-    "Search": "Αναζήτηση",
-    "Upper limit of range": "Υψηλότερο όριο εύρους",
-    "View Grading Scheme": "Προβολή Συστήματος Βαθμολόγησης",
-    "View/Edit Grading Scheme": "Προβολή/Τροποποίηση Κανονισμού Βαθμολόγησης",
-    "to": "σε"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Είσαστε σίγουρος/η πως θέλετε να διαγράψετε αυτόν το κανονισμό βαθμολόγισης;",
-    "Cancel": "Ακύρωση",
-    "Close": "Κλείσιμο",
-    "Delete": "Αφαίρεση",
-    "Edit Grading Scheme": "Τροποποίηση Κανονισμού Βαθμολόγισης",
-    "Save": "Αποθήκευση"
-  },
-  "GradingSchemes": {
-    "Edit Grading Scheme": "Τροποποίηση Κανονισμού Βαθμολόγισης",
-    "Letter Grade": "Βαθμολόγηση με Γράμματα",
-    "Looks great!": "Φαίνεται μια χαρά!",
-    "Percentage": "Εκατοστιαία αναλογία",
-    "Points": "Μόρια",
-    "Range": "Εύρος"
-  },
-  "OutcomeManagement": {
-    "Course": "Μάθημα",
-    "Institution": "Ίδρυμα"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Λογαριασμοί",
-    "Close": "Κλείσιμο",
-    "Concluded": "Ολοκληρώθηκε",
-    "Courses": "Μαθήματα",
-    "Loading": "Φόρτωση",
-    "Search": "Αναζήτηση"
-  },
-  "acceptable_use_policy": {
-    "Close": "Κλείσιμο"
-  },
-  "account_reports": {
-    "Close": "Κλείσιμο",
-    "Next month": "Επόμενος μήνας",
-    "Time": "Χρόνος"
-  },
-  "admin_split": {
-    "Cancel": "Ακύρωση",
-    "OK": "ΟΚ"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Περιγραφή"
-  },
-  "assignment_footer": {
-    "Next": "Επόμενη",
-    "Previous": "Προηγούμενο"
-  },
-  "assignment_tabs": {
-    "Assignment": "Εργασία",
-    "Peer Review": "Αξιολόγηση Ομότιμων"
-  },
-  "assignments.grading_type_selector": {
-    "Close": "Κλείσιμο",
-    "View": "Προβολή"
-  },
-  "assignments_2": {
-    "Loading": "Φόρτωση"
-  },
-  "catalog": {
-    "Course Catalog": "Κατάλογος Μαθημάτων"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Ακύρωση",
-    "Create course": "Δημιουργία Μαθήματος",
-    "Name": "Όνομα",
-    "No results": "Κανένα αποτέλεσμα",
-    "Please enter the details for the new course.": "Παρακαλώ πληκτρολογείστε τις λεπτομέρειες του νέου μαθήματος.",
-    "Term": "Ακαδημιακό Χρονικό Διάστημα"
-  },
-  "content_share_preview_overlay": {
-    "Close": "Κλείσιμο",
-    "Preview": "Προεπισκόπηση"
-  },
-  "course_logging_content": {
-    "No results": "Κανένα αποτέλεσμα"
-  },
-  "create_course_modal": {
-    "Cancel": "Ακύρωση",
-    "Course Details": "Λεπτομέρειες Μαθήματος",
-    "Course Name": "Όνομα Μαθήματος",
-    "Create": "Δημιουργία",
-    "Create Course": "Δημιουργία Μαθήματος",
-    "No Results": "Δεν υπάρχουν Αποτελέσματα"
-  },
-  "feature_flags": {
-    "Accept": "Αποδέχομαι",
-    "Cancel": "Ακύρωση"
-  },
-  "filter_bar": {
-    "All": "Όλα",
-    "Clear": "Καθαρισμός",
-    "Search": "Αναζήτηση"
-  },
-  "jobs": {
-    "Close": "Κλείσιμο"
-  },
-  "pages_edit_title": {
-    "Page Title": "Τίτλος Σελίδας"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Ακύρωση",
-    "Close": "Κλείσιμο"
-  },
-  "study_assist": {
-    "Back": "Πίσω",
-    "Close": "Κλείσιμο"
-  },
-  "submit_online_url_assignment": {
-    "Website URL": "URL ιστοσελίδας"
-  },
-  "terms_of_service_modal": {
-    "Loading...": "Φόρτωση...",
-    "Preview": "Προεπισκόπηση"
-  },
-  "tray": {
-    "Close": "Κλείσιμο"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Ακύρωση",
+        "Confirm": "Επιβεβαιώστε"
+    },
+    "GradingSchemeManagement": {
+        "Apply": "Εφαρμογή",
+        "Archived": "Αρχειοθετήθηκε",
+        "Are you sure you want to delete this grading scheme?": "Είσαστε σίγουρος/η πως θέλετε να διαγράψετε αυτόν το κανονισμό βαθμολόγισης;",
+        "Cancel": "Ακύρωση",
+        "Close": "Κλείσιμο",
+        "Confirm": "Επιβεβαιώστε",
+        "Delete Grading Scheme": "Διαγραφή Κανονισμού Βαθμολόγησης",
+        "Edit Grading Scheme": "Τροποποίηση Κανονισμού Βαθμολόγισης",
+        "Lower limit of range": "Χαμηλότερο όριο εύρους",
+        "Save": "Αποθήκευση",
+        "Search": "Αναζήτηση",
+        "Upper limit of range": "Υψηλότερο όριο εύρους",
+        "View Grading Scheme": "Προβολή Συστήματος Βαθμολόγησης",
+        "View/Edit Grading Scheme": "Προβολή/Τροποποίηση Κανονισμού Βαθμολόγησης",
+        "to": "σε"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Είσαστε σίγουρος/η πως θέλετε να διαγράψετε αυτόν το κανονισμό βαθμολόγισης;",
+        "Cancel": "Ακύρωση",
+        "Close": "Κλείσιμο",
+        "Delete": "Αφαίρεση",
+        "Edit Grading Scheme": "Τροποποίηση Κανονισμού Βαθμολόγισης",
+        "Save": "Αποθήκευση"
+    },
+    "GradingSchemes": {
+        "Edit Grading Scheme": "Τροποποίηση Κανονισμού Βαθμολόγισης",
+        "Letter Grade": "Βαθμολόγηση με Γράμματα",
+        "Looks great!": "Φαίνεται μια χαρά!",
+        "Percentage": "Εκατοστιαία αναλογία",
+        "Points": "Μόρια",
+        "Range": "Εύρος"
+    },
+    "OutcomeManagement": {
+        "Course": "Μάθημα",
+        "Institution": "Ίδρυμα"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Λογαριασμοί",
+        "Close": "Κλείσιμο",
+        "Concluded": "Ολοκληρώθηκε",
+        "Courses": "Μαθήματα",
+        "Loading": "Φόρτωση",
+        "Search": "Αναζήτηση"
+    },
+    "acceptable_use_policy": {
+        "Close": "Κλείσιμο"
+    },
+    "account_reports": {
+        "Close": "Κλείσιμο",
+        "Next month": "Επόμενος μήνας",
+        "Time": "Χρόνος"
+    },
+    "admin_split": {
+        "Cancel": "Ακύρωση",
+        "OK": "ΟΚ"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Περιγραφή"
+    },
+    "assignment_footer": {
+        "Next": "Επόμενη",
+        "Previous": "Προηγούμενο"
+    },
+    "assignment_tabs": {
+        "Assignment": "Εργασία",
+        "Peer Review": "Αξιολόγηση Ομότιμων"
+    },
+    "assignments.grading_type_selector": {
+        "Close": "Κλείσιμο",
+        "View": "Προβολή"
+    },
+    "assignments_2": {
+        "Loading": "Φόρτωση"
+    },
+    "catalog": {
+        "Course Catalog": "Κατάλογος Μαθημάτων"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Ακύρωση",
+        "Create course": "Δημιουργία Μαθήματος",
+        "Name": "Όνομα",
+        "No results": "Κανένα αποτέλεσμα",
+        "Please enter the details for the new course.": "Παρακαλώ πληκτρολογείστε τις λεπτομέρειες του νέου μαθήματος.",
+        "Term": "Ακαδημιακό Χρονικό Διάστημα"
+    },
+    "content_share_preview_overlay": {
+        "Close": "Κλείσιμο",
+        "Preview": "Προεπισκόπηση"
+    },
+    "course_logging_content": {
+        "No results": "Κανένα αποτέλεσμα"
+    },
+    "create_course_modal": {
+        "Cancel": "Ακύρωση",
+        "Course Details": "Λεπτομέρειες Μαθήματος",
+        "Course Name": "Όνομα Μαθήματος",
+        "Create": "Δημιουργία",
+        "Create Course": "Δημιουργία Μαθήματος",
+        "No Results": "Δεν υπάρχουν Αποτελέσματα"
+    },
+    "feature_flags": {
+        "Accept": "Αποδέχομαι",
+        "Cancel": "Ακύρωση"
+    },
+    "filter_bar": {
+        "All": "Όλα",
+        "Clear": "Καθαρισμός",
+        "Search": "Αναζήτηση"
+    },
+    "jobs": {
+        "Close": "Κλείσιμο"
+    },
+    "pages_edit_title": {
+        "Page Title": "Τίτλος Σελίδας"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Ακύρωση",
+        "Close": "Κλείσιμο"
+    },
+    "study_assist": {
+        "Back": "Πίσω",
+        "Close": "Κλείσιμο"
+    },
+    "submit_online_url_assignment": {
+        "Website URL": "URL ιστοσελίδας"
+    },
+    "terms_of_service_modal": {
+        "Loading...": "Φόρτωση...",
+        "Preview": "Προεπισκόπηση"
+    },
+    "tray": {
+        "Close": "Κλείσιμο"
+    }
 }

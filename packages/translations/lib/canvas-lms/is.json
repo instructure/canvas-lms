@@ -1,306 +1,306 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Hætta við",
-    "Confirm": "Staðfesta"
-  },
-  "DueDateOverrideView": {
-    "Mark as important date and show on homeroom sidebar": "Merkja sem mikilvæga dagsetningu og sýna á hliðarvalmynd skólastofu"
-  },
-  "GradingSchemeManagement": {
-    "Account default grading scheme": "Sjálfgefinn einkunnarkvarði fyrir reikning",
-    "Account default grading scheme was successfully saved.": "Sjálfgefinn einkunnakvarði fyrir reikning var vistaður.",
-    "Active Grading Schemes": "Virkir einkunnakvarðar",
-    "Applied": "Virkjað",
-    "Apply": "Virkja",
-    "Archive Grading Scheme": "Setja einkunnakvarða í safn",
-    "Archived": "Sett í safn",
-    "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Enn er hægt að nota geymda einkunnakvarða sem eru í notkun en ekki er hægt að bæta þeim við ný námskeið eða verkefni.",
-    "Are you sure you want to delete this grading scheme?": "Viltu örugglega eyða þessum einkunnakvarða?",
-    "Cancel": "Hætta við",
-    "Canvas Default": "Canvas sjálfgilt",
-    "Close": "Loka",
-    "Confirm": "Staðfesta",
-    "Confirm Default Grading Scheme Change": "Staðfesta breytingu á sjálfgildum einkunnakvarða",
-    "Delete Grading Scheme": "Eyða einkunnakvarða",
-    "Duplicate Grading Scheme": "Gera afrit af einkunnakvarða",
-    "Edit Grading Scheme": "Breyta einkunnakvarða",
-    "Grading Scheme Name": "Nafn einkunnakvarða",
-    "Grading scheme was successfully archived.": "Einkunnakvarði var geymdur með góðum árangri.",
-    "Grading scheme was successfully created.": "Einkunnakvarði var búinn til.",
-    "Grading scheme was successfully removed.": "Einkunnakvarði var fjarlægður.",
-    "Grading scheme was successfully saved.": "Einkunnakvarði var vistaður.",
-    "Grading scheme was successfully unarchived.": "Einkunnakvarði var tekinn úr geymslu með góðum árangri.",
-    "Locations Used": "Staðsetningar notaðar",
-    "Lower limit of range": "Lægri mörk sviðs",
-    "New Grading Scheme": "Nýr einkunnakvarði",
-    "Next Page": "Næsta síða",
-    "No account default": "Ekkert sjálfgildi reiknings",
-    "Previous Page": "Fyrri síða",
-    "Save": "Vista",
-    "Search": "Leita",
-    "Search...": "Leita...",
-    "Show courses and assignments": "Sýna námskeið og verkefni",
-    "Show locations used": "Sýna staðsetningar notaðar",
-    "Sort by": "Raða eftir",
-    "There was an error while archiving the grading scheme": "Það kom upp villa við geymslu einkunnakvarðans",
-    "There was an error while creating the grading scheme": "Villa kom upp við að búa til einkunnakvarðann",
-    "There was an error while loading grading schemes": "Villa kom upp við að hlaða einkunnakvarða",
-    "There was an error while loading the default canvas grading scheme": "Villa kom upp við að hlaða sjálfgefna einkunnakvarða canvas",
-    "There was an error while loading the default grading scheme": "Villa kom upp við að hlaða sjálfgefna einkunnakvarðann",
-    "There was an error while removing the grading scheme": "Villa kom upp við að fjarlægja einkunnakvarðann",
-    "There was an error while unarchiving the grading scheme": "Það kom upp villa við að taka einkunnakvarðann úr geymslu",
-    "There was an error while updating the default grading scheme": "Villa kom upp við að uppfæra sjálfgefna einkunnakvarðann",
-    "There was an error while updating the grading scheme": "Villa kom upp við að uppfæra einkunnakvarðann",
-    "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Þessi breyting mun hafa áhrif á öll virk námskeið og verkefni sem eru að erfa sjálfgefna reikninginn. Þessari breytingu mun taka nokkurn tíma að ljúka þar sem allar einkunnir námskeiða og verkefna eru endurreiknaðar með tilliti til nýja sjálfgefna einkunnakvarðans fyrir reikning.",
-    "Unarchive Grading Scheme": "Taka einkunnakvarða úr safni",
-    "Upper limit of range": "Efri mörk sviðs",
-    "View Grading Scheme": "Skoða einkunnakvarða",
-    "View/Copy Grading Scheme": "Skoða/afrita einkunnakvarða",
-    "View/Edit Grading Scheme": "Skoða/breyta einkunnakvarða",
-    "You can't archive this grading scheme because it is set as a default for a course or account.": "Þú getur ekki safnvistað þennan einkunnakvarða vegna þess að hann er stilltur sjálfgefið fyrir námskeið eða reikning.",
-    "You can't delete this grading scheme because it is in use.": "Þú getur ekki eytt þessum einkunnakvarða vegna þess að hann er í notkun.",
-    "You have no active grading schemes.": "Þú hefur enga virka einkunnakvarða.",
-    "You have no archived grading schemes.": "Þú hefur enga geymda einkunnakvarða.",
-    "to": "til"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Viltu örugglega eyða þessum einkunnakvarða?",
-    "Are you sure you want to duplicate this grading scheme?": "Ertu viss um að þú viljir afrita þennan einkunnakvarða?",
-    "Cancel": "Hætta við",
-    "Close": "Loka",
-    "Delete": "Eyða",
-    "Delete ": "Eyða ",
-    "Duplicate": "Búa til afrit",
-    "Duplicate ": "Afrita ",
-    "Edit Grading Scheme": "Breyta einkunnakvarða",
-    "New Grading Scheme": "Nýr einkunnakvarði",
-    "Percentages and points can't be edited because it is an account level grading scheme.": "Ekki er hægt að breyta prósentutölum og punktum vegna þess að það er einkunnakvarði reikningsstigs.",
-    "Percentages and points can't be edited because it is being used as the default grading scheme.": "Ekki er hægt að breyta prósentutölum og punktum vegna þess að það er notað sem sjálfgefinn einkunnakvarði.",
-    "Percentages and points can't be edited because it is currently being used.": "Ekki er hægt að breyta prósentutölum og punktum vegna þess að það er þegar í notkun.",
-    "Save": "Vista"
-  },
-  "GradingSchemes": {
-    "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tafla sem inniheldur sjálfgefin einkunnakvarðagögn fyrir canvas.  Hver lína inniheldur heiti, hámarksprósentu og lágmarksprósentu.",
-    "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tafla sem inniheldur gögn um einkunnakvarða.  Hver lína inniheldur heiti, hámarksprósentu og lágmarksprósentu.",
-    "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Ekki er hægt að hafa tvöföld eða tóm línunöfn. Lagaðu nöfnin og reyndu að smella aftur á „Vista“.",
-    "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Ekki er hægt að hafa yfirliggjandi eða tóm svið. Lagaðu sviðin og reyndu að smella aftur á „Vista“.",
-    "Delete grading scheme": "Eyða einkunnakvarða",
-    "Edit Grading Scheme": "Breyta einkunnakvarða",
-    "Edit a copy of this grading scheme": "Breyta afriti af þessum einkunnakvarða",
-    "Edit grading scheme": "Breyta einkunnakvarða",
-    "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Þarf nafn einkunnakvarða. Bættu við nafni og reyndu að smella aftur á „Vista“.",
-    "Grading scheme title": "Titill einkunnakvarða",
-    "Invalid grading scheme": "Ógildur einkunnakvarði",
-    "Letter Grade": "Bókstafseinkunn",
-    "Looks great!": "Lítur vel út!",
-    "Percentage": "Hlutfall",
-    "Points": "Stig",
-    "Range": "Svið",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Svið verður að vera gild tala. Má ekki hafa neikvæðar tölur eða tölur sem eru stærri en 100. Lagaðu sviðin og reyndu að smella aftur á „Vista“.",
-    "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Svið verður að vera gild tala. Má ekki hafa neikvæðar tölur eða tölur sem eru stærri en efra punktasviðið. Lagaðu sviðin og reyndu að smella aftur á „Vista“.",
-    "edit a copy": "breyta afriti"
-  },
-  "OutcomeManagement": {
-    "Course": "Námskeið",
-    "Institution": "Stofnun"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Reikningar",
-    "Close": "Loka",
-    "Concluded": "Lokið",
-    "Courses": "Námskeið",
-    "Failed to load account used locations": "Ekki tókst að hlaða notaðar staðsetningar reiknings",
-    "Failed to load assignments used locations": "Ekki tókst að hlaða notaðar staðsetningar verkefna",
-    "Failed to load used locations": "Ekki tókst að hlaða notaðar staðsetningar",
-    "Load Assignments ...": "Hlaða niður verkefnum …",
-    "Load More Assignments ...": "Hlaða fleiri verkefnum ...",
-    "Loading": "Sæki",
-    "Locations Used": "Staðsetningar notaðar",
-    "Search": "Leita",
-    "Search...": "Leita..."
-  },
-  "acceptable_use_policy": {
-    "Acceptable Use Policy": "Stefna um ásættanlega notkun",
-    "Close": "Loka",
-    "Loading page": "Hleð inn síðu",
-    "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Stefnan um ásættanlega notkun er ekki tiltæk eins og er. Vinsamlegast athugaðu aftur síðar eða hafðu samband við þjónustuver ef þú þarft frekari aðstoð.",
-    "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Ekki tókst að hlaða upp stefnu um ásættanlega notkun. Reyndu aftur síðar eða hafðu samband við þjónustudeild ef vandinn er viðvarandi."
-  },
-  "account_reports": {
-    "Close": "Loka",
-    "Invalid date and time.": "Ógild dagsetning og tími.",
-    "Next month": "Næsti mánuður",
-    "Previous month": "Fyrri mánuður",
-    "Time": "Tími"
-  },
-  "admin_split": {
-    "Cancel": "Hætta við",
-    "Failed to split users.": "Ekki tókst að skipta notendum.",
-    "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "ATHUGIÐ: Þetta mun gera tilraun til þess að afturkalla sameininguna eins mikið og hægt er. Hins vegar er hugsanlegt að sameinaðir notendur muni ekki endurheimtast algjörlega í fyrra ástand sitt. ",
-    "OK": "Í lagi",
-    "Split": "Skipta",
-    "The following users will be split into separate user accounts:": "Eftirfarandi notendum verður skipt í aðskilda notendareikninga:",
-    "There are no user accounts to split from this user.": "Það eru engir notendareikningar til að skipta frá þessum notanda.",
-    "User split complete. Links to split user accounts follow:": "Notendum skipt. Tengill til að skipta notendareikningum eftirfarandi:"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Lýsing"
-  },
-  "assignment_footer": {
-    "Next": "Næsti",
-    "Previous": "Fyrri"
-  },
-  "assignment_tabs": {
-    "Assignment": "Verkefni",
-    "Peer Review": "Jafningjamat"
-  },
-  "assignments.grading_type_selector": {
-    "(course default)": "(sjálfgildur fyrir námskeið)",
-    "Account Level": "Reikningsstig",
-    "Canvas Grading Scheme (course default)": "Einkunnakvarði Canvas (sjálfgildur fyrir námskeið)",
-    "Close": "Loka",
-    "Course Level": "Námskeiðsstig",
-    "Default Canvas Grading Scheme": "Sjálfgefinn einkunnakvarði Canvas",
-    "Grading scheme was successfully removed.": "Einkunnakvarði var fjarlægður.",
-    "Grading scheme was successfully updated.": "Einkunnakvarði var uppfærður með góðum árangri.",
-    "Manage All Grading Schemes": "Stjórna öllum einkunnakvörðum",
-    "New Grading Scheme": "Nýr einkunnakvarði",
-    "Select a grading scheme": "Veldu einkunnakvarða",
-    "There was an error while loading grading schemes": "Villa kom upp við að hlaða einkunnakvarða",
-    "There was an error while loading the grading scheme": "Það kom upp villa við að hlaða einkunnakvarðann",
-    "There was an error while refreshing grading schemes": "Villa kom upp við að endurnýja einkunnakvarða",
-    "There was an error while removing the grading scheme": "Villa kom upp við að fjarlægja einkunnakvarðann",
-    "View": "Skoða"
-  },
-  "assignments_2": {
-    "Assignments 2 Teacher Error Page": "Verkefni 2 kennara villusíða",
-    "Assignments 2 Teacher initial query error": "Verkefni 2 villa við upphafsfyrirspurn kennara",
-    "Loading": "Sæki"
-  },
-  "catalog": {
-    "Course Catalog": "Catalog námskeiðs"
-  },
-  "confetti": {
-    "Great work! From the Canvas developers": "Frábært! Frá hönnuðum Canvas"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Hætta við",
-    "Copy course": "Afrita námskeið",
-    "Course code": "Námskeiðskóði",
-    "Course code must be 255 characters or less": "Kóði námskeiðs verður að vera 255 stafir eða styttri",
-    "Course name must be 255 characters or less": "Heiti námskeiðs verður að vera 255 stafir eða styttri",
-    "Create course": "Stofna námskeið",
-    "Creating...": "Bý til...",
-    "End date": "Lokadagsetning",
-    "End date must be after start date": "Lokadagsetning þarf að vera á eftir upphafsdagsetningu",
-    "Name": "Nafn",
-    "No results": "Engar niðurstöður",
-    "Please enter the details for the new course.": "Skráðu upplýsingar um nýja námskeiðið",
-    "Select a new beginning date": "Veldu nýjan upphafsdag",
-    "Select a new end date": "Veldu nýjan lokadag",
-    "Select end date": "Velja lokadag",
-    "Select start date": "Velja upphafsdag",
-    "Start date": "Upphafsdagsetning",
-    "Start date must be before end date": "Upphafsdagsetning þarf að vera á undan lokadagsetningu",
-    "Start typing to search...": "Byrjaðu að slá inn til að leita…",
-    "Term": "Önn",
-    "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Ekki er hægt að breyta upphafs- og lokadagsetningum annar hér, aðeins á síðunni Upplýsingar um önn undir Stjórnandi.",
-    "Use arrow keys to navigate options.": "Notaðu örvalyklana til að fara á milli valmöguleika."
-  },
-  "content_share_preview_overlay": {
-    "Close": "Loka",
-    "Content Share Preview": "Forskoðun efnisdeilingar",
-    "Preview": "Forskoðun"
-  },
-  "copy_warnings_modal": {
-    "Attention": "Athugið"
-  },
-  "course_logging_content": {
-    "No results": "Engar niðurstöður",
-    "Type to search": "Sláðu inn til að leita"
-  },
-  "create_course_modal": {
-    "Cancel": "Hætta við",
-    "Course Details": "Námskeiðsupplýsingar",
-    "Course Name": "Heiti námskeiðs",
-    "Create": "Stofna",
-    "Create Course": "Búa til námskeið",
-    "Create Subject": "Búa til efni",
-    "Creating new course...": "Býr til nýtt námskeið...",
-    "Creating new subject...": "Búa til nýtt efni...",
-    "Error creating new course": "Villa við að búa til nýtt námskeið",
-    "Error creating new subject": "Villa við að búa til nýtt efni",
-    "Loading accounts...": "Hleður reikningum...",
-    "Name...": "Nafn...",
-    "No Results": "Engar niðurstöður",
-    "Select a homeroom": "Veldu skólastofu",
-    "Subject Name": "Nafn efnis",
-    "Unable to get accounts": "Ekki hægt að sækja reikninga",
-    "Unable to get homerooms": "Get ekki sótt skólastofur",
-    "Use arrow keys to navigate options.": "Notaðu örvalyklana til að fara á milli valmöguleika.",
-    "Which account will this course be associated with?": "Hvaða reikning verður þetta námskeið tengt við?",
-    "Which account will this subject be associated with?": "Hvaða reikning verður þetta efni tengt við?"
-  },
-  "enhanced_individual_gradebook": {
-    "Final Grade Override": "Hnekking lokaeinkunnar"
-  },
-  "feature_flags": {
-    "Accept": "Samþykkja",
-    "Cancel": "Hætta við"
-  },
-  "filter_bar": {
-    "All": "Allt",
-    "Clear": "Hreinsa",
-    "Filter by": "Sía eftir",
-    "Search": "Leita",
-    "Use arrow keys to navigate options.": "Notaðu örvalyklana til að fara á milli valmöguleika."
-  },
-  "groupNavigationSelector": {
-    "Select Group": "Velja hóp",
-    "Use arrow keys to navigate options.": "Notaðu örvalyklana til að fara á milli valmöguleika."
-  },
-  "jobs": {
-    "Close": "Loka"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Stofna nýja einingu"
-  },
-  "not_found_page_slide_puzzle": {
-    "A studious panda": "Dugleg panda",
-    "Moves:": "Færslur:"
-  },
-  "overview_page": {
-    "Edit home page": "Breyta heimasíðu",
-    "Subject Home Page": "Heimasíða efnis"
-  },
-  "pages_edit_title": {
-    "Page Title": "Titill síðu"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Hætta við",
-    "Close": "Loka"
-  },
-  "study_assist": {
-    "Back": "Til baka",
-    "Close": "Loka",
-    "Page": "Síða"
-  },
-  "submit_online_url_assignment": {
-    "A valid URL is required": "Gild vefslóð er áskilin",
-    "Website URL": "Slóð vefsvæðis"
-  },
-  "terms_of_service_modal": {
-    "Acceptable Use Policy": "Stefna um ásættanlega notkun",
-    "Loading...": "Hleð inn...",
-    "Preview": "Forskoðun"
-  },
-  "todos_page": {
-    "Failed to load todos": "Tókst ekki að hlaða inn verkefnalista",
-    "Loading Additional Todo Details": "Hlaða inn viðbótarupplýsingum verkefnalista",
-    "Loading Todo Course Name": "Hlaða inn verkefni námskeiðsnafns",
-    "Loading Todo Title": "Hlaða inn nafni verkefnis"
-  },
-  "tray": {
-    "Close": "Loka"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Hætta við",
+        "Confirm": "Staðfesta"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Merkja sem mikilvæga dagsetningu og sýna á hliðarvalmynd skólastofu"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Sjálfgefinn einkunnarkvarði fyrir reikning",
+        "Account default grading scheme was successfully saved.": "Sjálfgefinn einkunnakvarði fyrir reikning var vistaður.",
+        "Active Grading Schemes": "Virkir einkunnakvarðar",
+        "Applied": "Virkjað",
+        "Apply": "Virkja",
+        "Archive Grading Scheme": "Setja einkunnakvarða í safn",
+        "Archived": "Sett í safn",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Enn er hægt að nota geymda einkunnakvarða sem eru í notkun en ekki er hægt að bæta þeim við ný námskeið eða verkefni.",
+        "Are you sure you want to delete this grading scheme?": "Viltu örugglega eyða þessum einkunnakvarða?",
+        "Cancel": "Hætta við",
+        "Canvas Default": "Canvas sjálfgilt",
+        "Close": "Loka",
+        "Confirm": "Staðfesta",
+        "Confirm Default Grading Scheme Change": "Staðfesta breytingu á sjálfgildum einkunnakvarða",
+        "Delete Grading Scheme": "Eyða einkunnakvarða",
+        "Duplicate Grading Scheme": "Gera afrit af einkunnakvarða",
+        "Edit Grading Scheme": "Breyta einkunnakvarða",
+        "Grading Scheme Name": "Nafn einkunnakvarða",
+        "Grading scheme was successfully archived.": "Einkunnakvarði var geymdur með góðum árangri.",
+        "Grading scheme was successfully created.": "Einkunnakvarði var búinn til.",
+        "Grading scheme was successfully removed.": "Einkunnakvarði var fjarlægður.",
+        "Grading scheme was successfully saved.": "Einkunnakvarði var vistaður.",
+        "Grading scheme was successfully unarchived.": "Einkunnakvarði var tekinn úr geymslu með góðum árangri.",
+        "Locations Used": "Staðsetningar notaðar",
+        "Lower limit of range": "Lægri mörk sviðs",
+        "New Grading Scheme": "Nýr einkunnakvarði",
+        "Next Page": "Næsta síða",
+        "No account default": "Ekkert sjálfgildi reiknings",
+        "Previous Page": "Fyrri síða",
+        "Save": "Vista",
+        "Search": "Leita",
+        "Search...": "Leita...",
+        "Show courses and assignments": "Sýna námskeið og verkefni",
+        "Show locations used": "Sýna staðsetningar notaðar",
+        "Sort by": "Raða eftir",
+        "There was an error while archiving the grading scheme": "Það kom upp villa við geymslu einkunnakvarðans",
+        "There was an error while creating the grading scheme": "Villa kom upp við að búa til einkunnakvarðann",
+        "There was an error while loading grading schemes": "Villa kom upp við að hlaða einkunnakvarða",
+        "There was an error while loading the default canvas grading scheme": "Villa kom upp við að hlaða sjálfgefna einkunnakvarða canvas",
+        "There was an error while loading the default grading scheme": "Villa kom upp við að hlaða sjálfgefna einkunnakvarðann",
+        "There was an error while removing the grading scheme": "Villa kom upp við að fjarlægja einkunnakvarðann",
+        "There was an error while unarchiving the grading scheme": "Það kom upp villa við að taka einkunnakvarðann úr geymslu",
+        "There was an error while updating the default grading scheme": "Villa kom upp við að uppfæra sjálfgefna einkunnakvarðann",
+        "There was an error while updating the grading scheme": "Villa kom upp við að uppfæra einkunnakvarðann",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Þessi breyting mun hafa áhrif á öll virk námskeið og verkefni sem eru að erfa sjálfgefna reikninginn. Þessari breytingu mun taka nokkurn tíma að ljúka þar sem allar einkunnir námskeiða og verkefna eru endurreiknaðar með tilliti til nýja sjálfgefna einkunnakvarðans fyrir reikning.",
+        "Unarchive Grading Scheme": "Taka einkunnakvarða úr safni",
+        "Upper limit of range": "Efri mörk sviðs",
+        "View Grading Scheme": "Skoða einkunnakvarða",
+        "View/Copy Grading Scheme": "Skoða/afrita einkunnakvarða",
+        "View/Edit Grading Scheme": "Skoða/breyta einkunnakvarða",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Þú getur ekki safnvistað þennan einkunnakvarða vegna þess að hann er stilltur sjálfgefið fyrir námskeið eða reikning.",
+        "You can't delete this grading scheme because it is in use.": "Þú getur ekki eytt þessum einkunnakvarða vegna þess að hann er í notkun.",
+        "You have no active grading schemes.": "Þú hefur enga virka einkunnakvarða.",
+        "You have no archived grading schemes.": "Þú hefur enga geymda einkunnakvarða.",
+        "to": "til"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Viltu örugglega eyða þessum einkunnakvarða?",
+        "Are you sure you want to duplicate this grading scheme?": "Ertu viss um að þú viljir afrita þennan einkunnakvarða?",
+        "Cancel": "Hætta við",
+        "Close": "Loka",
+        "Delete": "Eyða",
+        "Delete ": "Eyða ",
+        "Duplicate": "Búa til afrit",
+        "Duplicate ": "Afrita ",
+        "Edit Grading Scheme": "Breyta einkunnakvarða",
+        "New Grading Scheme": "Nýr einkunnakvarði",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Ekki er hægt að breyta prósentutölum og punktum vegna þess að það er einkunnakvarði reikningsstigs.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Ekki er hægt að breyta prósentutölum og punktum vegna þess að það er notað sem sjálfgefinn einkunnakvarði.",
+        "Percentages and points can't be edited because it is currently being used.": "Ekki er hægt að breyta prósentutölum og punktum vegna þess að það er þegar í notkun.",
+        "Save": "Vista"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tafla sem inniheldur sjálfgefin einkunnakvarðagögn fyrir canvas.  Hver lína inniheldur heiti, hámarksprósentu og lágmarksprósentu.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Tafla sem inniheldur gögn um einkunnakvarða.  Hver lína inniheldur heiti, hámarksprósentu og lágmarksprósentu.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Ekki er hægt að hafa tvöföld eða tóm línunöfn. Lagaðu nöfnin og reyndu að smella aftur á „Vista“.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Ekki er hægt að hafa yfirliggjandi eða tóm svið. Lagaðu sviðin og reyndu að smella aftur á „Vista“.",
+        "Delete grading scheme": "Eyða einkunnakvarða",
+        "Edit Grading Scheme": "Breyta einkunnakvarða",
+        "Edit a copy of this grading scheme": "Breyta afriti af þessum einkunnakvarða",
+        "Edit grading scheme": "Breyta einkunnakvarða",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Þarf nafn einkunnakvarða. Bættu við nafni og reyndu að smella aftur á „Vista“.",
+        "Grading scheme title": "Titill einkunnakvarða",
+        "Invalid grading scheme": "Ógildur einkunnakvarði",
+        "Letter Grade": "Bókstafseinkunn",
+        "Looks great!": "Lítur vel út!",
+        "Percentage": "Hlutfall",
+        "Points": "Stig",
+        "Range": "Svið",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Svið verður að vera gild tala. Má ekki hafa neikvæðar tölur eða tölur sem eru stærri en 100. Lagaðu sviðin og reyndu að smella aftur á „Vista“.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Svið verður að vera gild tala. Má ekki hafa neikvæðar tölur eða tölur sem eru stærri en efra punktasviðið. Lagaðu sviðin og reyndu að smella aftur á „Vista“.",
+        "edit a copy": "breyta afriti"
+    },
+    "OutcomeManagement": {
+        "Course": "Námskeið",
+        "Institution": "Stofnun"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Reikningar",
+        "Close": "Loka",
+        "Concluded": "Lokið",
+        "Courses": "Námskeið",
+        "Failed to load account used locations": "Ekki tókst að hlaða notaðar staðsetningar reiknings",
+        "Failed to load assignments used locations": "Ekki tókst að hlaða notaðar staðsetningar verkefna",
+        "Failed to load used locations": "Ekki tókst að hlaða notaðar staðsetningar",
+        "Load Assignments ...": "Hlaða niður verkefnum …",
+        "Load More Assignments ...": "Hlaða fleiri verkefnum ...",
+        "Loading": "Sæki",
+        "Locations Used": "Staðsetningar notaðar",
+        "Search": "Leita",
+        "Search...": "Leita..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Stefna um ásættanlega notkun",
+        "Close": "Loka",
+        "Loading page": "Hleð inn síðu",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Stefnan um ásættanlega notkun er ekki tiltæk eins og er. Vinsamlegast athugaðu aftur síðar eða hafðu samband við þjónustuver ef þú þarft frekari aðstoð.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Ekki tókst að hlaða upp stefnu um ásættanlega notkun. Reyndu aftur síðar eða hafðu samband við þjónustudeild ef vandinn er viðvarandi."
+    },
+    "account_reports": {
+        "Close": "Loka",
+        "Invalid date and time.": "Ógild dagsetning og tími.",
+        "Next month": "Næsti mánuður",
+        "Previous month": "Fyrri mánuður",
+        "Time": "Tími"
+    },
+    "admin_split": {
+        "Cancel": "Hætta við",
+        "Failed to split users.": "Ekki tókst að skipta notendum.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "ATHUGIÐ: Þetta mun gera tilraun til þess að afturkalla sameininguna eins mikið og hægt er. Hins vegar er hugsanlegt að sameinaðir notendur muni ekki endurheimtast algjörlega í fyrra ástand sitt. ",
+        "OK": "Í lagi",
+        "Split": "Skipta",
+        "The following users will be split into separate user accounts:": "Eftirfarandi notendum verður skipt í aðskilda notendareikninga:",
+        "There are no user accounts to split from this user.": "Það eru engir notendareikningar til að skipta frá þessum notanda.",
+        "User split complete. Links to split user accounts follow:": "Notendum skipt. Tengill til að skipta notendareikningum eftirfarandi:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Lýsing"
+    },
+    "assignment_footer": {
+        "Next": "Næsti",
+        "Previous": "Fyrri"
+    },
+    "assignment_tabs": {
+        "Assignment": "Verkefni",
+        "Peer Review": "Jafningjamat"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(sjálfgildur fyrir námskeið)",
+        "Account Level": "Reikningsstig",
+        "Canvas Grading Scheme (course default)": "Einkunnakvarði Canvas (sjálfgildur fyrir námskeið)",
+        "Close": "Loka",
+        "Course Level": "Námskeiðsstig",
+        "Default Canvas Grading Scheme": "Sjálfgefinn einkunnakvarði Canvas",
+        "Grading scheme was successfully removed.": "Einkunnakvarði var fjarlægður.",
+        "Grading scheme was successfully updated.": "Einkunnakvarði var uppfærður með góðum árangri.",
+        "Manage All Grading Schemes": "Stjórna öllum einkunnakvörðum",
+        "New Grading Scheme": "Nýr einkunnakvarði",
+        "Select a grading scheme": "Veldu einkunnakvarða",
+        "There was an error while loading grading schemes": "Villa kom upp við að hlaða einkunnakvarða",
+        "There was an error while loading the grading scheme": "Það kom upp villa við að hlaða einkunnakvarðann",
+        "There was an error while refreshing grading schemes": "Villa kom upp við að endurnýja einkunnakvarða",
+        "There was an error while removing the grading scheme": "Villa kom upp við að fjarlægja einkunnakvarðann",
+        "View": "Skoða"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Verkefni 2 kennara villusíða",
+        "Assignments 2 Teacher initial query error": "Verkefni 2 villa við upphafsfyrirspurn kennara",
+        "Loading": "Sæki"
+    },
+    "catalog": {
+        "Course Catalog": "Catalog námskeiðs"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Frábært! Frá hönnuðum Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Hætta við",
+        "Copy course": "Afrita námskeið",
+        "Course code": "Námskeiðskóði",
+        "Course code must be 255 characters or less": "Kóði námskeiðs verður að vera 255 stafir eða styttri",
+        "Course name must be 255 characters or less": "Heiti námskeiðs verður að vera 255 stafir eða styttri",
+        "Create course": "Stofna námskeið",
+        "Creating...": "Bý til...",
+        "End date": "Lokadagsetning",
+        "End date must be after start date": "Lokadagsetning þarf að vera á eftir upphafsdagsetningu",
+        "Name": "Nafn",
+        "No results": "Engar niðurstöður",
+        "Please enter the details for the new course.": "Skráðu upplýsingar um nýja námskeiðið",
+        "Select a new beginning date": "Veldu nýjan upphafsdag",
+        "Select a new end date": "Veldu nýjan lokadag",
+        "Select end date": "Velja lokadag",
+        "Select start date": "Velja upphafsdag",
+        "Start date": "Upphafsdagsetning",
+        "Start date must be before end date": "Upphafsdagsetning þarf að vera á undan lokadagsetningu",
+        "Start typing to search...": "Byrjaðu að slá inn til að leita…",
+        "Term": "Önn",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Ekki er hægt að breyta upphafs- og lokadagsetningum annar hér, aðeins á síðunni Upplýsingar um önn undir Stjórnandi.",
+        "Use arrow keys to navigate options.": "Notaðu örvalyklana til að fara á milli valmöguleika."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Loka",
+        "Content Share Preview": "Forskoðun efnisdeilingar",
+        "Preview": "Forskoðun"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Athugið"
+    },
+    "course_logging_content": {
+        "No results": "Engar niðurstöður",
+        "Type to search": "Sláðu inn til að leita"
+    },
+    "create_course_modal": {
+        "Cancel": "Hætta við",
+        "Course Details": "Námskeiðsupplýsingar",
+        "Course Name": "Heiti námskeiðs",
+        "Create": "Stofna",
+        "Create Course": "Búa til námskeið",
+        "Create Subject": "Búa til efni",
+        "Creating new course...": "Býr til nýtt námskeið...",
+        "Creating new subject...": "Búa til nýtt efni...",
+        "Error creating new course": "Villa við að búa til nýtt námskeið",
+        "Error creating new subject": "Villa við að búa til nýtt efni",
+        "Loading accounts...": "Hleður reikningum...",
+        "Name...": "Nafn...",
+        "No Results": "Engar niðurstöður",
+        "Select a homeroom": "Veldu skólastofu",
+        "Subject Name": "Nafn efnis",
+        "Unable to get accounts": "Ekki hægt að sækja reikninga",
+        "Unable to get homerooms": "Get ekki sótt skólastofur",
+        "Use arrow keys to navigate options.": "Notaðu örvalyklana til að fara á milli valmöguleika.",
+        "Which account will this course be associated with?": "Hvaða reikning verður þetta námskeið tengt við?",
+        "Which account will this subject be associated with?": "Hvaða reikning verður þetta efni tengt við?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Hnekking lokaeinkunnar"
+    },
+    "feature_flags": {
+        "Accept": "Samþykkja",
+        "Cancel": "Hætta við"
+    },
+    "filter_bar": {
+        "All": "Allt",
+        "Clear": "Hreinsa",
+        "Filter by": "Sía eftir",
+        "Search": "Leita",
+        "Use arrow keys to navigate options.": "Notaðu örvalyklana til að fara á milli valmöguleika."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Velja hóp",
+        "Use arrow keys to navigate options.": "Notaðu örvalyklana til að fara á milli valmöguleika."
+    },
+    "jobs": {
+        "Close": "Loka"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Stofna nýja einingu"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Dugleg panda",
+        "Moves:": "Færslur:"
+    },
+    "overview_page": {
+        "Edit home page": "Breyta heimasíðu",
+        "Subject Home Page": "Heimasíða efnis"
+    },
+    "pages_edit_title": {
+        "Page Title": "Titill síðu"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Hætta við",
+        "Close": "Loka"
+    },
+    "study_assist": {
+        "Back": "Til baka",
+        "Close": "Loka",
+        "Page": "Síða"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "Gild vefslóð er áskilin",
+        "Website URL": "Slóð vefsvæðis"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Stefna um ásættanlega notkun",
+        "Loading...": "Hleð inn...",
+        "Preview": "Forskoðun"
+    },
+    "todos_page": {
+        "Failed to load todos": "Tókst ekki að hlaða inn verkefnalista",
+        "Loading Additional Todo Details": "Hlaða inn viðbótarupplýsingum verkefnalista",
+        "Loading Todo Course Name": "Hlaða inn verkefni námskeiðsnafns",
+        "Loading Todo Title": "Hlaða inn nafni verkefnis"
+    },
+    "tray": {
+        "Close": "Loka"
+    }
 }

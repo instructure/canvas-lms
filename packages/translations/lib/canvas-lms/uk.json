@@ -1,151 +1,151 @@
 {
-  "ConfirmationDialog": {
-    "Cancel": "Скасувати",
-    "Confirm": "Підтвердити"
-  },
-  "GradingSchemeManagement": {
-    "Applied": "Застосовано",
-    "Apply": "Застосувати",
-    "Archived": "Архівні",
-    "Are you sure you want to delete this grading scheme?": "Ви впевнені, що хочете видалити цю схему оцінювання?",
-    "Cancel": "Скасувати",
-    "Canvas Default": "Canvas по замовчуванню",
-    "Close": "Закрити",
-    "Confirm": "Підтвердити",
-    "Delete Grading Scheme": "Видалити схему оцінювання",
-    "Edit Grading Scheme": "Редагувати схему оцінювання",
-    "Lower limit of range": "Нижня межа діапазону",
-    "Next Page": "Наступна Сторінка",
-    "Previous Page": "Попередня сторінка",
-    "Save": "Зберегти",
-    "Search": "Пошук",
-    "Sort by": "Сортувати по:",
-    "Upper limit of range": "Верхня межа діапазону",
-    "View Grading Scheme": "Переглянути схему оцінювання",
-    "View/Edit Grading Scheme": "Перегляд/Редагування Схеми оцінювання",
-    "to": "до"
-  },
-  "GradingSchemeViewModal": {
-    "Are you sure you want to delete this grading scheme?": "Ви впевнені, що хочете видалити цю схему оцінювання?",
-    "Cancel": "Скасувати",
-    "Close": "Закрити",
-    "Delete": "Видалити",
-    "Duplicate": "Дублювати",
-    "Edit Grading Scheme": "Редагувати схему оцінювання",
-    "Save": "Зберегти"
-  },
-  "GradingSchemes": {
-    "Edit Grading Scheme": "Редагувати схему оцінювання",
-    "Letter Grade": "Оцінка у вигляді літери",
-    "Looks great!": "Виглядає здорово!",
-    "Percentage": "Відсоток",
-    "Points": "Бали",
-    "Range": "Діапазон"
-  },
-  "OutcomeManagement": {
-    "Course": "Курс",
-    "Institution": "Установа"
-  },
-  "UsedLocationsModal": {
-    "Accounts": "Облікові записи",
-    "Close": "Закрити",
-    "Concluded": "Завершено",
-    "Courses": "Курси",
-    "Loading": "Завантаження",
-    "Search": "Пошук"
-  },
-  "acceptable_use_policy": {
-    "Close": "Закрити"
-  },
-  "account_reports": {
-    "Close": "Закрити",
-    "Next month": "Новий місяць",
-    "Previous month": "Попередній місяць",
-    "Time": "Час"
-  },
-  "admin_split": {
-    "Cancel": "Скасувати",
-    "OK": "OK"
-  },
-  "assignment_2_teacher_assignment_details": {
-    "Description": "Опис"
-  },
-  "assignment_footer": {
-    "Next": "Наступний",
-    "Previous": "Попередній"
-  },
-  "assignment_tabs": {
-    "Assignment": "Завдання",
-    "Peer Review": "Експертна оцінка"
-  },
-  "assignments.grading_type_selector": {
-    "Close": "Закрити",
-    "View": "Вигляд"
-  },
-  "assignments_2": {
-    "Loading": "Завантаження"
-  },
-  "catalog": {
-    "Course Catalog": "Каталог курсу"
-  },
-  "content_copy_redesign": {
-    "Cancel": "Скасувати",
-    "Create course": "Створити курс",
-    "Name": "Ім'я",
-    "No results": "Немає результатів",
-    "Please enter the details for the new course.": "Будь ласка, введіть деталі для нового курсу.",
-    "Term": "Семестр"
-  },
-  "content_share_preview_overlay": {
-    "Close": "Закрити",
-    "Preview": "Попередній перегляд"
-  },
-  "course_logging_content": {
-    "No results": "Немає результатів"
-  },
-  "create_course_modal": {
-    "Cancel": "Скасувати",
-    "Course Details": "Детальна інформація про курc",
-    "Course Name": "Назва курсу",
-    "Create": "Створити",
-    "Create Course": "Створити курс",
-    "No Results": "Результати відсутні"
-  },
-  "feature_flags": {
-    "Accept": "Прийняти",
-    "Cancel": "Скасувати"
-  },
-  "filter_bar": {
-    "All": "Всі",
-    "Clear": "Очистити",
-    "Search": "Пошук"
-  },
-  "jobs": {
-    "Close": "Закрити"
-  },
-  "modules_home_page": {
-    "Create a new Module": "Створити новий модуль"
-  },
-  "pages_edit_title": {
-    "Page Title": "Заголовок сторінки"
-  },
-  "quizzes_regrade_modal": {
-    "Cancel": "Скасувати",
-    "Close": "Закрити"
-  },
-  "study_assist": {
-    "Back": "Назад",
-    "Close": "Закрити",
-    "Page": "Сторінка"
-  },
-  "submit_online_url_assignment": {
-    "Website URL": "URL вебсайту"
-  },
-  "terms_of_service_modal": {
-    "Loading...": "Завантаження...",
-    "Preview": "Попередній перегляд"
-  },
-  "tray": {
-    "Close": "Закрити"
-  }
+    "ConfirmationDialog": {
+        "Cancel": "Скасувати",
+        "Confirm": "Підтвердити"
+    },
+    "GradingSchemeManagement": {
+        "Applied": "Застосовано",
+        "Apply": "Застосувати",
+        "Archived": "Архівні",
+        "Are you sure you want to delete this grading scheme?": "Ви впевнені, що хочете видалити цю схему оцінювання?",
+        "Cancel": "Скасувати",
+        "Canvas Default": "Canvas по замовчуванню",
+        "Close": "Закрити",
+        "Confirm": "Підтвердити",
+        "Delete Grading Scheme": "Видалити схему оцінювання",
+        "Edit Grading Scheme": "Редагувати схему оцінювання",
+        "Lower limit of range": "Нижня межа діапазону",
+        "Next Page": "Наступна Сторінка",
+        "Previous Page": "Попередня сторінка",
+        "Save": "Зберегти",
+        "Search": "Пошук",
+        "Sort by": "Сортувати по:",
+        "Upper limit of range": "Верхня межа діапазону",
+        "View Grading Scheme": "Переглянути схему оцінювання",
+        "View/Edit Grading Scheme": "Перегляд/Редагування Схеми оцінювання",
+        "to": "до"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Ви впевнені, що хочете видалити цю схему оцінювання?",
+        "Cancel": "Скасувати",
+        "Close": "Закрити",
+        "Delete": "Видалити",
+        "Duplicate": "Дублювати",
+        "Edit Grading Scheme": "Редагувати схему оцінювання",
+        "Save": "Зберегти"
+    },
+    "GradingSchemes": {
+        "Edit Grading Scheme": "Редагувати схему оцінювання",
+        "Letter Grade": "Оцінка у вигляді літери",
+        "Looks great!": "Виглядає здорово!",
+        "Percentage": "Відсоток",
+        "Points": "Бали",
+        "Range": "Діапазон"
+    },
+    "OutcomeManagement": {
+        "Course": "Курс",
+        "Institution": "Установа"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Облікові записи",
+        "Close": "Закрити",
+        "Concluded": "Завершено",
+        "Courses": "Курси",
+        "Loading": "Завантаження",
+        "Search": "Пошук"
+    },
+    "acceptable_use_policy": {
+        "Close": "Закрити"
+    },
+    "account_reports": {
+        "Close": "Закрити",
+        "Next month": "Новий місяць",
+        "Previous month": "Попередній місяць",
+        "Time": "Час"
+    },
+    "admin_split": {
+        "Cancel": "Скасувати",
+        "OK": "OK"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Опис"
+    },
+    "assignment_footer": {
+        "Next": "Наступний",
+        "Previous": "Попередній"
+    },
+    "assignment_tabs": {
+        "Assignment": "Завдання",
+        "Peer Review": "Експертна оцінка"
+    },
+    "assignments.grading_type_selector": {
+        "Close": "Закрити",
+        "View": "Вигляд"
+    },
+    "assignments_2": {
+        "Loading": "Завантаження"
+    },
+    "catalog": {
+        "Course Catalog": "Каталог курсу"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Скасувати",
+        "Create course": "Створити курс",
+        "Name": "Ім'я",
+        "No results": "Немає результатів",
+        "Please enter the details for the new course.": "Будь ласка, введіть деталі для нового курсу.",
+        "Term": "Семестр"
+    },
+    "content_share_preview_overlay": {
+        "Close": "Закрити",
+        "Preview": "Попередній перегляд"
+    },
+    "course_logging_content": {
+        "No results": "Немає результатів"
+    },
+    "create_course_modal": {
+        "Cancel": "Скасувати",
+        "Course Details": "Детальна інформація про курc",
+        "Course Name": "Назва курсу",
+        "Create": "Створити",
+        "Create Course": "Створити курс",
+        "No Results": "Результати відсутні"
+    },
+    "feature_flags": {
+        "Accept": "Прийняти",
+        "Cancel": "Скасувати"
+    },
+    "filter_bar": {
+        "All": "Всі",
+        "Clear": "Очистити",
+        "Search": "Пошук"
+    },
+    "jobs": {
+        "Close": "Закрити"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Створити новий модуль"
+    },
+    "pages_edit_title": {
+        "Page Title": "Заголовок сторінки"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Скасувати",
+        "Close": "Закрити"
+    },
+    "study_assist": {
+        "Back": "Назад",
+        "Close": "Закрити",
+        "Page": "Сторінка"
+    },
+    "submit_online_url_assignment": {
+        "Website URL": "URL вебсайту"
+    },
+    "terms_of_service_modal": {
+        "Loading...": "Завантаження...",
+        "Preview": "Попередній перегляд"
+    },
+    "tray": {
+        "Close": "Закрити"
+    }
 }
