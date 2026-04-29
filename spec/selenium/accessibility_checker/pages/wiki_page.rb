@@ -64,5 +64,9 @@ module AccessibilityChecker
     def table_header_scope
       f(".show-content table th").attribute("scope")
     end
+
+    def text_color_style
+      f(".show-content span[style]").attribute("style")
+    end
   end
 end
