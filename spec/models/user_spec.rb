@@ -4987,6 +4987,89 @@ describe User do
     end
   end
 
+  describe "#educator_dashboard_user?" do
+    let(:user) { User.create! }
+
+    it "returns false by default" do
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns true for an active teacher enrollment" do
+      course_with_teacher(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be true
+    end
+
+    it "returns true for an active designer enrollment" do
+      course_with_designer(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be true
+    end
+
+    it "returns true for an invited (pending) teacher enrollment" do
+      course_factory(active_course: true).enroll_teacher(user)
+      expect(user.educator_dashboard_user?).to be true
+    end
+
+    it "returns true when the user is a teacher in one course and a student in another" do
+      course_with_student(user:, active_all: true)
+      course_with_teacher(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be true
+    end
+
+    it "returns false when the user only has a student enrollment" do
+      course_with_student(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns false when the user only has a TA enrollment" do
+      course_with_ta(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns false when the user only has an observer enrollment" do
+      course_with_observer(user:, active_all: true)
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns false when the only teacher enrollment is concluded" do
+      course_with_teacher(user:, active_all: true)
+      user.enrollments.find_by(type: "TeacherEnrollment").complete!
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns false when the only teacher enrollment is inactive" do
+      course_with_teacher(user:, active_all: true)
+      user.enrollments.find_by(type: "TeacherEnrollment").deactivate
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    it "returns false when the only teacher enrollment is deleted" do
+      course_with_teacher(user:, active_all: true)
+      user.enrollments.find_by(type: "TeacherEnrollment").destroy
+      expect(user.educator_dashboard_user?).to be false
+    end
+
+    describe "caching" do
+      it "memoizes a true result for the lifetime of the instance" do
+        course_with_teacher(user:, active_all: true)
+        expect(Rails.cache).to receive(:fetch_with_batched_keys).once.and_call_original
+        2.times { user.educator_dashboard_user? }
+      end
+
+      it "memoizes a false result for the lifetime of the instance" do
+        expect(Rails.cache).to receive(:fetch_with_batched_keys).once.and_call_original
+        2.times { user.educator_dashboard_user? }
+      end
+
+      it "includes ApplicationController.region in the cache key" do
+        allow(ApplicationController).to receive(:region).and_return("test-region-1")
+        expect(Rails.cache).to receive(:fetch_with_batched_keys)
+          .with(a_string_including("test-region-1"), hash_including(batch_object: user, batched_keys: :enrollments))
+          .and_call_original
+        user.educator_dashboard_user?
+      end
+    end
+  end
+
   describe "#participating_student_current_and_concluded_course_ids" do
     let(:user) { User.create! }
 
