@@ -5060,6 +5060,7 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   """
   published: Boolean
   size: String
+  sizeBytes: Int
   submissionPreviewUrl(submissionId: ID): URL
   thumbnailUrl: URL
   title: String
