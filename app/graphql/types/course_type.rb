@@ -315,6 +315,7 @@ module Types
     end
     def users_connection(user_ids: nil, filter: {}, sort: {})
       user_ids = filter[:user_ids] || user_ids
+      context.scoped_merge!(course:)
       preload_course_permissions.then do
         next nil unless course.grants_any_right?(
           current_user,
@@ -323,8 +324,6 @@ module Types
           :view_all_grades,
           :manage_grades
         ) || (user_ids&.length == 1 && Shard.global_id_for(user_ids&.first) == current_user.global_id)
-
-        context.scoped_merge!(course:)
 
         options = {
           enrollment_state: filter[:enrollment_states],
@@ -387,6 +386,7 @@ module Types
     end
 
     def enrollments_connection(filter: {})
+      context.scoped_merge!(course:)
       preload_course_permissions.then do
         next nil unless course.grants_any_right?(
           current_user,
@@ -396,7 +396,6 @@ module Types
           :manage_grades
         )
 
-        context.scoped_merge!(course:)
         scope = course.apply_enrollment_visibility(course.all_enrollments, current_user)
         scope = filter[:states].present? ? scope.where(workflow_state: filter[:states]) : scope.active
         scope = scope.where(associated_user_id: filter[:associated_user_ids]) if filter[:associated_user_ids].present?

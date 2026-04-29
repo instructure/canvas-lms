@@ -2603,6 +2603,47 @@ describe Types::UserType do
         expect(type.resolve("courseProgression { requirements { total } }")).to be_truthy
       end
     end
+
+    context "via enrollments → course → usersConnection" do
+      it "returns progression for every course when enrollments returns multiple courses" do
+        second_course = course_factory(active_all: true)
+        second_course.enroll_student(@student, enrollment_state: "active")
+
+        query = <<~GQL
+          query($id: ID!) {
+            legacyNode(_id: $id, type: User) {
+              ... on User {
+                enrollments {
+                  course {
+                    _id
+                    usersConnection(filter: { userIds: [$id] }) {
+                      nodes {
+                        courseProgression { requirements { total } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        GQL
+
+        result = CanvasSchema.execute(
+          query,
+          context: { current_user: @student, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create },
+          variables: { id: @student.id.to_s }
+        )
+
+        expect(result["errors"]).to be_nil
+        enrollments = result.dig("data", "legacyNode", "enrollments")
+        expect(enrollments.length).to eq 2
+        enrollments.each do |enrollment|
+          progression = enrollment.dig("course", "usersConnection", "nodes", 0, "courseProgression")
+          expect(progression).not_to be_nil,
+                                     "expected courseProgression to be present for course #{enrollment.dig("course", "_id")}, got nil"
+        end
+      end
+    end
   end
 
   describe "submission comments" do
