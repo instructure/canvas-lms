@@ -164,6 +164,8 @@ class Attachments::Verification
 
   # TODO: Remove this method once disable_file_verifier_access flag is enabled everywhere
   def monitor_uuid_verifier_usage(request)
+    return unless Account.site_admin.feature_enabled? :log_uuid_verifier_usage
+
     referrer = request&.referer
     request_url = request&.url
 

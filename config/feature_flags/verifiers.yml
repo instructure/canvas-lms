@@ -82,3 +82,17 @@ log_cross_domain_file_access:
       state: hidden
     production:
       state: hidden
+log_uuid_verifier_usage:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Log UUID Verifier Usage
+  description: |-
+    If enabled, an event will be emitted to DataDog when a file is
+    accessed using a legacy UUID verifier
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
