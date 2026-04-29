@@ -24,7 +24,20 @@ class RollupScore
 
   attr_reader :outcome_results, :outcome, :score, :count, :title, :submitted_at, :hide_points
 
-  def initialize(outcome_results:, opts: {})
+  def initialize(outcome_results: [], opts: {})
+    # Pre-calculated mode: used for stored rollups where score is already calculated
+    if opts[:stored]
+      @outcome = opts[:outcome]
+      @score = opts[:score]
+      @count = opts[:count] || 0
+      @hide_points = opts[:hide_points] || false
+      @title = opts[:title]
+      @submitted_at = opts[:submitted_at]
+      @outcome_results = []
+      return
+    end
+
+    # Calculation mode: calculate score from individual outcome results
     @outcome_results = outcome_results
     @aggregate = opts[:aggregate_score]
     @median = opts[:aggregate_stat] == "median"

@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import React, {useCallback, useRef, useEffect, useState} from 'react'
+import React, {useCallback, useRef, useEffect, useState, type PropsWithChildren} from 'react'
 import moment, {type Moment} from 'moment-timezone'
 import {
   generateFrequencyOptions,
@@ -39,10 +39,13 @@ type FrequencyPickerErrorState = {
   errorMessage: string
 }
 
-export class FrequencyPickerErrorBoundary extends React.Component {
+export class FrequencyPickerErrorBoundary extends React.Component<
+  PropsWithChildren,
+  FrequencyPickerErrorState
+> {
   state: FrequencyPickerErrorState
 
-  constructor(props: any) {
+  constructor(props: PropsWithChildren) {
     super(props)
     this.state = {
       hasError: false,
@@ -66,7 +69,6 @@ export class FrequencyPickerErrorBoundary extends React.Component {
         </div>
       )
     }
-    // @ts-expect-error
     return this.props.children
   }
 }

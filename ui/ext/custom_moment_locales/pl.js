@@ -31,7 +31,7 @@ data._monthsShort = [
   'Lip',
   'Sie',
   'Wrz',
-  'Paz',
+  'Paź',
   'Lis',
   'Gru',
 ]

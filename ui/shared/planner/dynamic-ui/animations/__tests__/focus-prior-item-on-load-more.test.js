@@ -29,7 +29,7 @@ function createReadyAnimation() {
   return result
 }
 
-afterEach(() => jest.resetAllMocks())
+afterEach(() => vi.resetAllMocks())
 
 it('only accepts GETTING_FUTURE_ITEMS if it came from the load more button', () => {
   const {animation} = createAnimation(FocusPriorItemOnLoadMore)
@@ -51,7 +51,7 @@ it('sets focus to the last existing item before the load', () => {
 })
 
 it('logs an error if there is no previous item to set focus to', () => {
-  const consoleError = jest.spyOn(global.console, 'error')
+  const consoleError = vi.spyOn(global.console, 'error')
   consoleError.mockImplementation(() => {}) // keep it from actually logging
   const {animation, registry, animator} = createReadyAnimation()
   const mockRegistryEntries = [

@@ -28,6 +28,8 @@ import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
 import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton'
 
 type VerticalButtonDisplayProps = {
+  buttonDisplay: string
+  criterionId: string
   hidePoints: boolean
   isPreviewMode: boolean
   isSelfAssessment: boolean
@@ -40,6 +42,8 @@ type VerticalButtonDisplayProps = {
   shouldFocusFirstRating?: boolean
 }
 export const VerticalButtonDisplay = ({
+  buttonDisplay,
+  criterionId,
   hidePoints,
   isPreviewMode,
   isSelfAssessment,
@@ -60,35 +64,44 @@ export const VerticalButtonDisplay = ({
     }
   }, [shouldFocusFirstRating])
 
+  const isButtonDisplayPoints = buttonDisplay === 'points' && !hidePoints
+
   return (
     <Flex
       as="div"
       direction={ratingOrder === 'ascending' ? 'column-reverse' : 'column'}
+      data-criterion-id={criterionId}
       data-testid="rubric-assessment-vertical-display"
     >
       {ratings.map((rating, index) => {
-        const buttonDisplay = (ratings.length - (index + 1)).toString()
+        const buttonLabel =
+          isButtonDisplayPoints && rating.points != null
+            ? rating.points.toString()
+            : (ratings.length - (index + 1)).toString()
         const isSelected = rating.id != null && rating.id === selectedRatingId
         const isSelfAssessmentSelected =
           rating.id != null && rating.id === selectedSelfAssessmentRatingId
 
-        const min = criterionUseRange ? rangingFrom(ratings, index, undefined, true) : undefined
+        const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
 
         const getPossibleText = (points?: number) => {
           return min != null ? possibleStringRange(min, points) : possibleString(points)
         }
 
-        const buttonAriaLabel = `${rating.description} ${rating.longDescription} ${getPossibleText(
-          rating.points,
-        )}`
+        const buttonAriaLabel = [
+          rating.description,
+          rating.longDescription,
+          getPossibleText(rating.points),
+        ]
+          .filter(Boolean)
+          .join(' ')
 
         return (
-          <Flex.Item key={`${rating.id}-${buttonDisplay}`} padding="xx-small 0 0 0">
+          <Flex.Item key={`${rating.id}-${buttonLabel}`} padding="xx-small 0 0 0">
             <Flex>
               <Flex.Item
                 align={isSelected ? 'start' : 'center'}
                 data-testid={`rating-button-${rating.id}-${index}`}
-                aria-label={buttonAriaLabel}
                 elementRef={ref => {
                   if (index === 0) {
                     firstRatingRef.current = ref
@@ -97,14 +110,16 @@ export const VerticalButtonDisplay = ({
               >
                 {isSelfAssessment ? (
                   <SelfAssessmentRatingButton
-                    buttonDisplay={buttonDisplay}
+                    ariaLabel={buttonAriaLabel}
+                    buttonLabel={buttonLabel}
                     isPreviewMode={isPreviewMode}
                     isSelected={isSelected}
                     onClick={() => onSelectRating(rating)}
                   />
                 ) : (
                   <RatingButton
-                    buttonDisplay={buttonDisplay}
+                    ariaLabel={buttonAriaLabel}
+                    buttonLabel={buttonLabel}
                     isPreviewMode={isPreviewMode}
                     isSelected={isSelected}
                     isSelfAssessmentSelected={isSelfAssessmentSelected}

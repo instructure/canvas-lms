@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {Tray} from '@instructure/ui-tray'
-import {cloneDeep, isEmpty, isEqual} from 'lodash'
-import React, {useState} from 'react'
+import {cloneDeep, isEqual, isEmpty} from 'es-toolkit/compat'
+import React, {useState, useEffect} from 'react'
 import {confirmViewUngradedAsZero} from '../Gradebook.utils'
 import {setCoursePostPolicy as apiSetCoursePostPolicy} from '../PostPolicies/PostPolicyApi'
 import type {StatusColors} from '../constants/colors'
@@ -44,6 +44,7 @@ import AdvancedTabPanel from './AdvancedTabPanel'
 import GradePostingPolicyTabPanel from './GradePostingPolicyTabPanel'
 import LatePoliciesTabPanel from './LatePoliciesTabPanel'
 import ViewOptionsTabPanel from './ViewOptionsTabPanel'
+import {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 
 const I18n = createI18nScope('gradebook')
 
@@ -64,6 +65,7 @@ export type GradebookSettingsModalProps = {
   allowSortingByModules?: boolean
   allowViewUngradedAsZero?: boolean
   allowShowSeparateFirstLastNames?: boolean
+  allowShowSuppressedAssignments?: boolean
   anonymousAssignmentsPresent: boolean
   courseFeatures: {
     finalGradeOverrideEnabled: boolean
@@ -86,6 +88,8 @@ export type GradebookSettingsModalProps = {
     setAssignmentPostPolicies: (postManually: boolean) => void
     setCoursePostPolicy: (coursePostPolicy: {courseId?: string; postManually: boolean}) => void
   }
+  customGradeStatuses: GradeStatusUnderscore[]
+  defaultTab?: string
 }
 
 type LatePolicy = {
@@ -107,13 +111,21 @@ const GradebookSettingsModal = (props: GradebookSettingsModalProps) => {
   })
   const [latePolicy, setLatePolicy] = useState<LatePolicy>({changes: {}, validationErrors: {}})
   const [processingRequests, setProcessingRequests] = useState(false)
-  const [selectedTab, setSelectedTab] = useState<string | undefined>('tab-panel-late')
+  const [selectedTab, setSelectedTab] = useState<string | undefined>(
+    props.defaultTab || 'tab-panel-late',
+  )
   const [viewOptions, setViewOptions] = useState<GradebookViewOptions | null>(
     props.loadCurrentViewOptions?.() || null,
   )
   const [viewOptionsLastSaved, setViewOptionsLastSaved] = useState<GradebookViewOptions | null>(
     props.loadCurrentViewOptions?.() || null,
   )
+
+  useEffect(() => {
+    if (props.defaultTab) {
+      setSelectedTab(props.defaultTab)
+    }
+  }, [props.defaultTab])
 
   const includeAdvancedTab = props.courseFeatures.finalGradeOverrideEnabled
 
@@ -376,6 +388,13 @@ const GradebookSettingsModal = (props: GradebookSettingsModalProps) => {
                       setViewOptions({...viewOptions, showUnpublishedAssignments: value})
                     },
                   }}
+                  showSuppressedAssignments={{
+                    allowed: Boolean(props.allowShowSuppressedAssignments),
+                    checked: viewOptions.showSuppressedAssignments,
+                    onChange: (value: GradebookViewOptions['showSuppressedAssignments']) => {
+                      setViewOptions({...viewOptions, showSuppressedAssignments: value})
+                    },
+                  }}
                   showSeparateFirstLastNames={{
                     allowed: Boolean(props.allowShowSeparateFirstLastNames),
                     checked: viewOptions.showSeparateFirstLastNames,
@@ -407,6 +426,19 @@ const GradebookSettingsModal = (props: GradebookSettingsModalProps) => {
                       })
                     },
                   }}
+                  viewHiddenGradesIndicator={{
+                    checked: viewOptions.viewHiddenGradesIndicator,
+                    onChange: (value: GradebookViewOptions['viewHiddenGradesIndicator']) => {
+                      setViewOptions({...viewOptions, viewHiddenGradesIndicator: value})
+                    },
+                  }}
+                  viewStatusForColorblindness={{
+                    checked: viewOptions.viewStatusForColorblindness,
+                    onChange: (value: GradebookViewOptions['viewStatusForColorblindness']) => {
+                      setViewOptions({...viewOptions, viewStatusForColorblindness: value})
+                    },
+                  }}
+                  customGradeStatuses={props.customGradeStatuses}
                 />
               </Tabs.Panel>
             )}

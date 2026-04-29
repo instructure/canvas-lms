@@ -25,7 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {IconGroupLine} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
-import axios from '@canvas/axios'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import {string} from 'prop-types'
 
 const I18n = createI18nScope('generate_pairing_code')
@@ -49,12 +49,14 @@ export default class GeneratePairingCode extends Component {
 
   generatePairingCode = () => {
     this.setState({gettingPairingCode: true, pairingCodeError: false})
-    axios
-      .post(`/api/v1/users/${this.props.userId}/observer_pairing_codes`)
-      .then(({data}) => {
+    doFetchApi({
+      path: `/api/v1/users/${this.props.userId}/observer_pairing_codes`,
+      method: 'POST',
+    })
+      .then(({json}) => {
         this.setState({
           gettingPairingCode: false,
-          pairingCode: data.code,
+          pairingCode: json.code,
         })
       })
       .catch(() => {

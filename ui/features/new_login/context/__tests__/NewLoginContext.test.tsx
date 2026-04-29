@@ -16,10 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, screen} from '@testing-library/react'
+import {act, cleanup, render, screen} from '@testing-library/react'
 import React, {useEffect} from 'react'
-import '@testing-library/jest-dom'
 import {NewLoginProvider, useNewLogin} from '..'
+
+class ErrorBoundary extends React.Component<
+  {children: React.ReactNode; onError: (error: Error) => void},
+  {hasError: boolean}
+> {
+  constructor(props: {children: React.ReactNode; onError: (error: Error) => void}) {
+    super(props)
+    this.state = {hasError: false}
+  }
+
+  static getDerivedStateFromError() {
+    return {hasError: true}
+  }
+
+  componentDidCatch(error: Error) {
+    this.props.onError(error)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return null
+    }
+    return this.props.children
+  }
+}
 
 const TestComponent = () => {
   const context = useNewLogin()
@@ -35,6 +59,10 @@ const TestComponent = () => {
     </div>
   )
 }
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('NewLoginContext', () => {
   it('renders without crashing', () => {
@@ -110,12 +138,33 @@ describe('NewLoginContext', () => {
   })
 
   it('throws an error if useNewLogin is used outside NewLoginProvider', () => {
-    const OriginalConsoleError = console.error
-    console.error = jest.fn()
-    const renderOutsideProvider = () => {
-      render(<TestComponent />)
-    }
-    expect(renderOutsideProvider).toThrow('useNewLogin must be used within a NewLoginProvider')
-    console.error = OriginalConsoleError
+    // Suppress console errors during error boundary testing
+    const originalError = console.error
+    const originalWarn = console.warn
+    console.error = () => {}
+    console.warn = () => {}
+
+    // Also suppress jsdom errors
+    const originalOnError = window.onerror
+    window.onerror = () => true
+
+    let caughtError: Error | null = null
+
+    render(
+      <ErrorBoundary
+        onError={(error: Error) => {
+          caughtError = error
+        }}
+      >
+        <TestComponent />
+      </ErrorBoundary>,
+    )
+
+    expect(caughtError!.message).toBe('useNewLogin must be used within a NewLoginProvider')
+
+    // Restore original handlers
+    console.error = originalError
+    console.warn = originalWarn
+    window.onerror = originalOnError
   })
 })

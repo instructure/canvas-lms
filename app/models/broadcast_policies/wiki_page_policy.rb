@@ -32,7 +32,7 @@ module BroadcastPolicies
       end
       return false unless created_before?(1.minute.ago)
 
-      changed_while_published? || wiki_page.changed_state(:active)
+      changed_while_published?
     end
 
     def created_before?(time)

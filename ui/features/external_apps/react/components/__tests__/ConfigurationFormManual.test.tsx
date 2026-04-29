@@ -38,7 +38,7 @@ describe('ConfigurationFormManual', () => {
       const ref = createRef<ConfigurationFormManual>()
       renderComponent({ref})
       await userEvent.type(screen.getByLabelText('Name *'), 'Test App')
-      await userEvent.type(screen.getByLabelText('Launch URL *'), 'https://example.com')
+      await userEvent.type(screen.getByLabelText('Launch URL'), 'https://example.com')
       expect(ref.current!.isValid()).toEqual(true)
     })
 
@@ -54,7 +54,7 @@ describe('ConfigurationFormManual', () => {
       const ref = createRef<ConfigurationFormManual>()
       renderComponent({ref})
       await userEvent.type(screen.getByLabelText('Name *'), 'Test App')
-      await userEvent.type(screen.getByLabelText('Launch URL *'), 'https://example.com')
+      await userEvent.type(screen.getByLabelText('Launch URL'), 'https://example.com')
       expect(ref.current!.isValid()).toEqual(true)
     })
 
@@ -64,11 +64,23 @@ describe('ConfigurationFormManual', () => {
       expect(ref.current!.isValid()).toEqual(false)
     })
 
+    it('allows editing from launch url to domain only', async () => {
+      const ref = createRef<ConfigurationFormManual>()
+      renderComponent({ref})
+      await userEvent.type(screen.getByLabelText('Name *'), 'Test App')
+      await userEvent.type(screen.getByLabelText('Launch URL'), 'https://example.com')
+      expect(ref.current!.isValid()).toEqual(true)
+
+      await userEvent.clear(screen.getByLabelText('Launch URL'))
+      await userEvent.type(screen.getByLabelText('Domain'), 'example.com')
+      expect(ref.current!.isValid()).toEqual(true)
+    })
+
     it('returns false with invalid launch url', async () => {
       const ref = createRef<ConfigurationFormManual>()
       renderComponent({ref})
       await userEvent.type(screen.getByLabelText('Name *'), 'Test App')
-      await userEvent.type(screen.getByLabelText('Launch URL *'), 'example.com')
+      await userEvent.type(screen.getByLabelText('Launch URL'), 'example.com')
       expect(ref.current!.isValid()).toEqual(false)
     })
   })

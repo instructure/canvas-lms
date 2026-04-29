@@ -28,7 +28,7 @@ describe('RubricManagement', () => {
 
   beforeEach(() => {
     const err = Object.assign(new Error(), {response: {status: 404}})
-    getSpy = jest.spyOn(axios, 'get').mockImplementation(() => Promise.reject(err))
+    getSpy = vi.spyOn(axios, 'get').mockImplementation(() => Promise.reject(err))
   })
 
   afterEach(() => {

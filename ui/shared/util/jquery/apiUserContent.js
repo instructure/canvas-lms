@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {uniqueId} from 'lodash'
+import {uniqueId} from 'es-toolkit/compat'
 import htmlEscape from '@instructure/html-escape'
 import {useScope as createI18nScope} from '@canvas/i18n'
 

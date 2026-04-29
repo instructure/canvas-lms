@@ -75,7 +75,7 @@ describe('StudentContextTray', () => {
     const container = document.createElement('div')
     container.id = 'fixtures'
     document.body.appendChild(container)
-    window.ENV.FEATURES = {hide_legacy_course_analytics: false}
+    window.ENV.permissions = {can_manage_differentiation_tags: false}
   })
 
   afterEach(() => {
@@ -83,6 +83,7 @@ describe('StudentContextTray', () => {
     if (fixtures) {
       fixtures.remove()
     }
+    window.ENV.permissions = {}
   })
 
   it('sets focus back to the returnFocusTo element', () => {
@@ -110,6 +111,78 @@ describe('StudentContextTray', () => {
     expect(document.activeElement).toBe(button)
   })
 
+  describe('when tray is opened after being closed', () => {
+    it('calls data.refetch when user has manage tags permissions', () => {
+      window.ENV.permissions = {can_manage_differentiation_tags: true}
+      const mockRefetch = vi.fn()
+      const userWithAnalytics = {...user, analytics}
+
+      // Mock returnFocusTo to prevent focus errors when closing the tray
+      props.returnFocusTo = () => []
+      props.data = {loading: false, user: userWithAnalytics, course, refetch: mockRefetch}
+
+      const {getByRole, rerender} = render(<StudentContextTray {...props} />)
+
+      const closeButton = getByRole('button', {name: 'Close'})
+      fireEvent.click(closeButton)
+      mockRefetch.mockClear()
+
+      // Change props so that React calls UNSAFE_componentWillReceiveProps
+      const newProps = {
+        ...props,
+        courseId: props.courseId,
+        data: {loading: false, user: userWithAnalytics, course, refetch: mockRefetch},
+      }
+
+      rerender(<StudentContextTray {...newProps} />)
+
+      expect(mockRefetch).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not call data.refetch when user lacks manage tags permissions', () => {
+      const mockRefetch = vi.fn()
+      const userWithAnalytics = {...user, analytics}
+      props.returnFocusTo = () => []
+      props.data = {loading: false, user: userWithAnalytics, course, refetch: mockRefetch}
+
+      const {getByRole, rerender} = render(<StudentContextTray {...props} />)
+
+      const closeButton = getByRole('button', {name: 'Close'})
+      fireEvent.click(closeButton)
+      mockRefetch.mockClear()
+
+      const newProps = {
+        ...props,
+        courseId: props.courseId,
+        data: {loading: false, user: userWithAnalytics, course, refetch: mockRefetch},
+      }
+
+      rerender(<StudentContextTray {...newProps} />)
+
+      expect(mockRefetch).not.toHaveBeenCalled()
+    })
+
+    it('does not crash when data.refetch is not provided', () => {
+      window.ENV.permissions = {can_manage_differentiation_tags: true}
+      const userWithAnalytics = {...user, analytics}
+      props.returnFocusTo = () => []
+      props.data = {loading: false, user: userWithAnalytics, course}
+
+      const {getByRole, rerender} = render(<StudentContextTray {...props} />)
+
+      const closeButton = getByRole('button', {name: 'Close'})
+      fireEvent.click(closeButton)
+
+      const newProps = {
+        ...props,
+        courseId: props.courseId,
+        data: {loading: false, user: userWithAnalytics, course}, // no refetch function
+      }
+
+      expect(() => rerender(<StudentContextTray {...newProps} />)).not.toThrow()
+    })
+  })
+
   describe('Student name link', () => {
     const getAriaLabel = () => {
       return screen.getByTestId('student-name-link').getAttribute('aria-label')
@@ -135,9 +208,9 @@ describe('StudentContextTray', () => {
     it('renders with analytics data', () => {
       const userWithAnalytics = {...user, analytics}
       props.data = {loading: false, user: userWithAnalytics, course}
-      const {getByText} = render(<StudentContextTray {...props} />)
-      const analyticsButton = getByText('Analytics')
-      expect(analyticsButton).toBeTruthy()
+      const {queryByText} = render(<StudentContextTray {...props} />)
+      const analyticsButton = queryByText('Analytics')
+      expect(analyticsButton).not.toBeTruthy()
     })
 
     it('renders analytics 2 button (only) if the tool is installed', () => {
@@ -168,12 +241,143 @@ describe('StudentContextTray', () => {
       expect(analyticsLinks).toHaveLength(0)
     })
 
-    it('does not render if analytics feature is disabled', () => {
-      window.ENV.FEATURES = {hide_legacy_course_analytics: true}
+    it('does not render legacy analytics entrypoint', () => {
       props.data = {loading: false, user, course}
       const {container} = render(<StudentContextTray {...props} />)
       const analyticsLinks = container.querySelectorAll('a[href*="analytics"]')
       expect(analyticsLinks).toHaveLength(0)
+    })
+  })
+
+  describe('differentiation tags', () => {
+    const createTagEdge = (groupId, groupName, categoryName, singleTag = false) => ({
+      node: {
+        group: {
+          _id: groupId,
+          name: groupName,
+          groupCategory: {
+            name: categoryName,
+            singleTag,
+          },
+        },
+      },
+    })
+
+    beforeEach(() => {
+      window.ENV.permissions = {can_manage_differentiation_tags: true}
+    })
+
+    it('renders tags when user has permissions and tags exist', () => {
+      const userWithTags = {
+        ...user,
+        analytics,
+        differentiationTagsConnection: {
+          edges: [
+            createTagEdge('1', 'Group 1', 'Category 1'),
+            createTagEdge('2', 'Group 2', 'Category 2'),
+          ],
+        },
+      }
+      props.data = {loading: false, user: userWithTags, course}
+      render(<StudentContextTray {...props} />)
+
+      expect(screen.getByText('Category 1 | Group 1')).toBeTruthy()
+      expect(screen.getByText('Category 2 | Group 2')).toBeTruthy()
+    })
+
+    it('renders Category Name as tag name when singleTag is true', () => {
+      const userWithSingleTag = {
+        ...user,
+        analytics,
+        differentiationTagsConnection: {
+          edges: [createTagEdge('1', 'Group 1', 'Category 1', true)],
+        },
+      }
+      props.data = {loading: false, user: userWithSingleTag, course}
+      render(<StudentContextTray {...props} />)
+
+      expect(screen.getByText('Category 1')).toBeTruthy()
+      expect(screen.queryByText('Group 1')).toBeFalsy()
+    })
+
+    it('renders Category Name | Tag Name as tag name when singleTag is false', () => {
+      const userWithSingleTag = {
+        ...user,
+        analytics,
+        differentiationTagsConnection: {
+          edges: [createTagEdge('1', 'Group 1', 'Category 1')],
+        },
+      }
+      props.data = {loading: false, user: userWithSingleTag, course}
+      render(<StudentContextTray {...props} />)
+
+      expect(screen.getByText('Category 1 | Group 1')).toBeTruthy()
+    })
+
+    it('does not render tags when user lacks permissions', () => {
+      window.ENV.permissions = {can_manage_differentiation_tags: false}
+      const userWithTags = {
+        ...user,
+        analytics,
+        differentiationTagsConnection: {
+          edges: [createTagEdge('1', 'Group 1', 'Category 1')],
+        },
+      }
+      props.data = {loading: false, user: userWithTags, course}
+      render(<StudentContextTray {...props} />)
+
+      expect(screen.queryByTestId('tag-1')).toBeFalsy()
+    })
+
+    it('does not render tags when user has no tags', () => {
+      const userWithoutTags = {
+        ...user,
+        analytics,
+        differentiationTagsConnection: {edges: []},
+      }
+      props.data = {loading: false, user: userWithoutTags, course}
+      render(<StudentContextTray {...props} />)
+
+      expect(screen.queryByTestId(/tag-\d+/)).toBeFalsy()
+    })
+
+    it('renders tags container with auto scroller when there are more than 4 tags', () => {
+      const tagsEdges = Array.from({length: 5}, (_, i) =>
+        createTagEdge(`${i + 1}`, `Group ${i + 1}`, `Category ${i + 1}`),
+      )
+      const userWithManyTags = {
+        ...user,
+        analytics,
+        differentiationTagsConnection: {edges: tagsEdges},
+      }
+      props.data = {loading: false, user: userWithManyTags, course}
+      render(<StudentContextTray {...props} />)
+
+      const container = screen.getByTestId('tags-container')
+      const computedStyle = window.getComputedStyle(container)
+      expect(computedStyle.maxHeight).toBe('8rem')
+      expect(computedStyle.overflowY).toBe('auto')
+      expect(computedStyle.position).toBe('relative')
+    })
+
+    it('renders tags container without a scroller when there are 4 tags or less', () => {
+      const tagsEdges = Array.from({length: 4}, (_, i) =>
+        createTagEdge(`${i + 1}`, `Group ${i + 1}`, `Category ${i + 1}`),
+      )
+      const userWithFewTags = {
+        ...user,
+        analytics,
+        differentiationTagsConnection: {edges: tagsEdges},
+      }
+      props.data = {loading: false, user: userWithFewTags, course}
+      render(<StudentContextTray {...props} />)
+
+      const container = screen.getByTestId('tags-container')
+      const computedStyle = window.getComputedStyle(container)
+
+      // No scrolling constraints should be applied
+      expect(computedStyle.maxHeight).not.toBe('8rem')
+      expect(computedStyle.overflowY).not.toBe('auto')
     })
   })
 })

@@ -16,24 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {SerializedNodes} from '@craftjs/core'
 import {BlockContentEditorContext} from './BlockContentEditorContext'
 import {BlockContentEditorLayout} from './layout/BlockContentEditorLayout'
 import {Toolbar} from './Toolbar'
-import {PageEditorHandler} from './hooks/useBlockContentEditorIntegration'
-import {BlockContentEditorWrapper} from './BlockContentEditorWrapper'
+import {BlockContentPreview} from './Preview/BlockContentPreview'
+import {useEditorMode} from './hooks/useEditorMode'
+import {BlockContentEditorHandler} from './BlockContentEditorHandlerIntegration'
+import {BlockContentViewerProps} from './BlockContentViewer'
+import {Editor} from '@craftjs/core'
+import {components} from './block-content-editor-components'
+import {BlockContentEditorContent} from './BlockContentEditorContent'
+import {BlockContentEditorErrorBoundary} from './BlockContentEditorErrorBoundary'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@instructure/platform-query'
 
-export type BlockContentEditorProps = {
-  data: SerializedNodes | null
-  onInit: ((handler: PageEditorHandler) => void) | null
+const BlockContentEditorWrapper = (props: BlockContentEditorProps) => {
+  const {mode} = useEditorMode()
+  const editor =
+    mode === 'preview' ? <BlockContentPreview /> : <BlockContentEditorContent {...props} />
+  return (
+    <Editor enabled={mode === 'default'} resolver={components}>
+      <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} mode={mode} />
+    </Editor>
+  )
+}
+
+export type BlockContentEditorProps = BlockContentViewerProps & {
+  onInit: ((handler: BlockContentEditorHandler) => void) | null
+  aiAltTextGenerationURL: string | null
+  toolbarReorder: boolean
 }
 
 export const BlockContentEditor = (props: BlockContentEditorProps) => {
-  const editor = <BlockContentEditorWrapper isEditMode={true} {...props} />
-
   return (
-    <BlockContentEditorContext data={props.data}>
-      <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} />
-    </BlockContentEditorContext>
+    <QueryClientProvider client={queryClient}>
+      <BlockContentEditorErrorBoundary>
+        <BlockContentEditorContext
+          data={props.data}
+          aiAltTextGenerationURL={props.aiAltTextGenerationURL}
+          toolbarReorder={props.toolbarReorder}
+        >
+          <BlockContentEditorWrapper {...props} />
+        </BlockContentEditorContext>
+      </BlockContentEditorErrorBoundary>
+    </QueryClientProvider>
   )
 }

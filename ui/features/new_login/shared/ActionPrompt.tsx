@@ -52,6 +52,7 @@ const ActionPrompt = ({variant}: ActionPromptProps) => {
           {I18n.t('Log in or')}{' '}
           <Link
             data-testid="create-account-link"
+            forceButtonRole={false}
             href={ROUTES.REGISTER}
             onClick={handleNavigate(ROUTES.REGISTER)}
           >
@@ -65,6 +66,7 @@ const ActionPrompt = ({variant}: ActionPromptProps) => {
           {I18n.t('Have a pairing code?')}{' '}
           <Link
             data-testid="create-parent-account-link"
+            forceButtonRole={false}
             href={ROUTES.REGISTER_PARENT}
             onClick={handleNavigate(ROUTES.REGISTER_PARENT)}
           >

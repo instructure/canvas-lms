@@ -17,7 +17,7 @@
  */
 import React, {useState} from 'react'
 import {arrayOf, bool, func} from 'prop-types'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ProficiencyRating} from '@canvas/assignments/graphql/student/ProficiencyRating'
@@ -145,8 +145,10 @@ export default function RubricTab(props) {
     return enhancedRubricsEnabled ? (
       <TraditionalView
         criteria={rubricCriteria}
+        customRatings={props.proficiencyRatings}
         hidePoints={hidePoints}
         isPreviewMode={true}
+        isAiEvaluated={props.isAiEvaluated}
         isFreeFormCriterionComments={props.rubric.free_form_criterion_comments}
         onUpdateAssessmentData={() => {}}
         ratingOrder={props.rubric.ratingOrder}
@@ -162,13 +164,14 @@ export default function RubricTab(props) {
         onAssessmentChange={
           props.peerReviewModeEnabled && !hasSubmittedAssessment ? onAssessmentChange : null
         }
+        isAiEvaluated={props.isAiEvaluated}
       />
     )
   }
 
   return (
     <div data-testid="rubric-tab">
-      <View as="div" margin="none none medium">
+      <View as="div" margin="none none medium" maxWidth="100%" data-testid="rubric-content-wrapper">
         {props.peerReviewModeEnabled && !hasSubmittedAssessment && (
           <Alert variant="info" hasShadow={false} data-testid="peer-review-rubric-alert">
             {I18n.t(
@@ -186,13 +189,16 @@ export default function RubricTab(props) {
               {hasSubmittedAssessment ? I18n.t('View Rubric') : I18n.t('Fill Out Rubric')}
             </Button>
             <RubricAssessmentTray
+              currentUserId={ENV.current_user_id ?? ''}
               hidePoints={hidePoints}
               isOpen={rubricTrayOpen}
               isPreviewMode={hasSubmittedAssessment}
               isPeerReview={true}
+              isAiEvaluated={props.isAiEvaluated}
               onDismiss={() => setRubricTrayOpen(false)}
               rubricAssessmentData={rubricAssessmentData}
               rubric={rubricData}
+              viewModeOverride="traditional"
               onSubmit={assessment => {
                 const updatedState = {
                   score: assessment.reduce((prev, curr) => prev + (curr.points ?? 0), 0),
@@ -244,8 +250,9 @@ export default function RubricTab(props) {
                 </CanvasSelect>
               </div>
             )}
-
-            {renderRubricPreview()}
+            <View as="div" maxWidth="100%" overflowX="scroll" data-testid="rubric-preview">
+              {renderRubricPreview()}
+            </View>
           </ToggleDetails>
         )}
       </View>
@@ -261,6 +268,7 @@ RubricTab.propTypes = {
   peerReviewModeEnabled: bool,
   rubricExpanded: bool,
   toggleRubricExpanded: func,
+  isAiEvaluated: bool,
 }
 
 RubricTab.defaultProps = {

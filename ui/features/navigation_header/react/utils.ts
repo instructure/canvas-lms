@@ -26,6 +26,7 @@ export type ExternalTool = {
   imgSrc?: string | null
   label: string
   svgPath?: string | null
+  toolId: string
 }
 
 export const getExternalApps = async (): Promise<ExternalTool[]> => {
@@ -39,9 +40,11 @@ export const getExternalApps = async (): Promise<ExternalTool[]> => {
       if (!globalNavigation?.title) {
         return null
       }
+      const label = globalNavigation.title
       return {
+        toolId: `${label.replaceAll(' ', '-').toLowerCase()}-${tool.definition_id}`,
         href: globalNavigation.html_url,
-        label: globalNavigation.title,
+        label: label,
         imgSrc: globalNavigation.icon_url || null,
         svgPath: globalNavigation.icon_svg_path_64 || null,
       } as ExternalTool
@@ -55,6 +58,7 @@ export function getExternalTools(): ExternalTool[] {
     return {
       href: el.querySelector('a')?.getAttribute('href') || null,
       label: (el.querySelector('.menu-item__text') as HTMLDivElement)?.innerText || '',
+      toolId: el.getAttribute('data-tool-id') || '',
       svgPath: svg?.innerHTML || null,
       imgSrc: svg
         ? null
@@ -73,23 +77,6 @@ export type ActiveTray =
   | 'help'
   | 'history'
   | 'profile'
-
-const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
-export function setActiveClass(activeItem: string | null) {
-  const activeElement = document.querySelector(`.${ACTIVE_CLASS}`)
-  if (activeElement) {
-    activeElement.classList.remove(ACTIVE_CLASS)
-    activeElement.removeAttribute('aria-current')
-  }
-
-  if (activeItem) {
-    const listItem = document.querySelector(`#global_nav_${activeItem}_link`)?.closest('li')
-    if (listItem) {
-      listItem.classList.add(ACTIVE_CLASS)
-      listItem.setAttribute('aria-current', 'page')
-    }
-  }
-}
 
 const EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/
 const ACTIVE_ROUTE_REGEX =
@@ -180,12 +167,12 @@ export function filterAndProcessTools(tools: ExternalTool[] | null | undefined):
     return []
   }
   return tools
-    .filter(tool => tool.label?.trim())
+    .filter(tool => tool.label?.trim() && tool.toolId?.length > 0)
     .map(tool => ({
       href: tool.href || null,
       label: tool.label,
       svgPath: tool.svgPath || null,
-      toolId: tool.label.toLowerCase().replaceAll(' ', '-'),
+      toolId: tool.toolId,
       toolImg: tool.imgSrc || null,
     }))
 }

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class NotificationPolicyOverride < ActiveRecord::Base
+class NotificationPolicyOverride < ApplicationRecord
   # NotificationPolicyOverride(id: integer,
   #                            context_id: integer,
   #                            context_type: string,
@@ -75,7 +75,7 @@ class NotificationPolicyOverride < ActiveRecord::Base
   end
 
   def self.enabled_for_all_contexts(user, contexts, channel: nil)
-    !(find_all_for(user, contexts, channel:).find { |npo| npo.notification_id.nil? && npo.workflow_state == "disabled" })
+    !find_all_for(user, contexts, channel:).find { |npo| npo.notification_id.nil? && npo.workflow_state == "disabled" }
   end
 
   def self.find_all_for(user, contexts, channel: nil)

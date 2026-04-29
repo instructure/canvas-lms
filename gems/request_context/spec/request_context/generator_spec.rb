@@ -17,13 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
 require "timecop"
 
 describe "RequestContext::Generator" do
   let(:env) { {} }
-  let(:request) { double("Rack::Request", path_parameters: { controller: "users", action: "index" }, request_parameters: { "operationName" => "GetDiscussionQuery" }) }
-  let(:context) { double("Course", class: "Course", id: 15) }
+  let(:request) { instance_double(ActionDispatch::Request, path_parameters: { controller: "users", action: "index" }, request_parameters: { "operationName" => "GetDiscussionQuery" }) }
+  let(:context) { instance_double(ActiveRecord::Base, class: "Course", id: 15) }
 
   it "generates the X-Canvas-Meta response header" do
     _, headers, = RequestContext::Generator.new(lambda do |_env|
@@ -44,22 +43,22 @@ describe "RequestContext::Generator" do
     expect(headers["X-Canvas-Meta"]).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;"
   end
 
-  it "adds request and context data to X-Canvas-Meta" do
-    _, headers, = RequestContext::Generator.new(lambda do |_env|
-      RequestContext::Generator.add_meta_header("a1", "test1")
-      RequestContext::Generator.store_request_meta(request, context)
-      [200, {}, []]
-    end).call(env)
-    expect(headers["X-Canvas-Meta"]).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;t=Course;i=15;"
-  end
-
   it "adds request and sentry data to X-Canvas-Meta" do
     _, headers, = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
-      RequestContext::Generator.store_request_meta(request, nil, "c3c2790b45254b6f81541b95bf57e5d4-dd415e20c0d4b624-0")
+      RequestContext::Generator.store_request_meta(request, "c3c2790b45254b6f81541b95bf57e5d4-dd415e20c0d4b624-0")
       [200, {}, []]
     end).call(env)
     expect(headers["X-Canvas-Meta"]).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;st=c3c2790b45254b6f81541b95bf57e5d4-dd415e20c0d4b624-0;"
+  end
+
+  it "adds context data to X-Canvas-Meta" do
+    _, headers, = RequestContext::Generator.new(lambda do |_env|
+      RequestContext::Generator.add_meta_header("a1", "test1")
+      RequestContext::Generator.store_context_meta(context)
+      [200, {}, []]
+    end).call(env)
+    expect(headers["X-Canvas-Meta"]).to eq "a1=test1;t=Course;i=15;"
   end
 
   it "adds page view data to X-Canvas-Meta" do

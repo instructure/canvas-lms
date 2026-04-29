@@ -32,11 +32,11 @@ function makeEventedFn({times = 1, arg}) {
   const promise = new Promise(resolve => ee.on('done', resolve))
   let fn
   if (arg !== undefined) {
-    fn = jest.fn(p => {
+    fn = vi.fn(p => {
       if (p === arg) ee.emit('done')
     })
   } else {
-    fn = jest.fn(() => {
+    fn = vi.fn(() => {
       times -= 1
       if (times <= 0) ee.emit('done')
     })
@@ -61,7 +61,7 @@ describe('useFetchApi', () => {
         return HttpResponse.json(response)
       }),
     )
-    const loading = jest.fn()
+    const loading = vi.fn()
     renderHook(() => useFetchApi({loading, path}))
     expect(loading).toHaveBeenCalledTimes(1)
     expect(loading).toHaveBeenCalledWith(true)
@@ -80,9 +80,9 @@ describe('useFetchApi', () => {
         })
       }),
     )
-    const success = jest.fn()
-    const meta = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const meta = vi.fn()
+    const error = vi.fn()
     renderHook(() => useFetchApi({success, error, meta, path}))
     await waitFor(() => {
       expect(success).toHaveBeenCalledWith(body)
@@ -102,10 +102,10 @@ describe('useFetchApi', () => {
         return new HttpResponse(null, {status: 401})
       }),
     )
-    const success = jest.fn()
-    const meta = jest.fn()
-    const error = jest.fn()
-    const loading = jest.fn()
+    const success = vi.fn()
+    const meta = vi.fn()
+    const error = vi.fn()
+    const loading = vi.fn()
     renderHook(() => useFetchApi({success, error, meta, loading, path}))
     await waitFor(() => {
       expect(error).toHaveBeenCalled()
@@ -123,9 +123,9 @@ describe('useFetchApi', () => {
         return HttpResponse.error()
       }),
     )
-    const success = jest.fn()
-    const error = jest.fn()
-    const loading = jest.fn()
+    const success = vi.fn()
+    const error = vi.fn()
+    const loading = vi.fn()
     renderHook(() => useFetchApi({success, error, loading, path}))
     await waitFor(() => {
       expect(error).toHaveBeenCalled()
@@ -144,7 +144,7 @@ describe('useFetchApi', () => {
         return new HttpResponse(null, {status: 200})
       }),
     )
-    const success = jest.fn()
+    const success = vi.fn()
     renderHook(() => useFetchApi({path: '/api/v1/blah', params: {foo: 'bar'}, success}))
     await waitFor(() => {
       expect(capturedUrl).toMatch(/\?foo=bar/)
@@ -160,7 +160,7 @@ describe('useFetchApi', () => {
         return HttpResponse.json({key: 'value'})
       }),
     )
-    const success = jest.fn()
+    const success = vi.fn()
     renderHook(() =>
       useFetchApi({path, headers: {header: 'value'}, fetchOpts: {blah: 'frog'}, success}),
     )
@@ -178,8 +178,8 @@ describe('useFetchApi', () => {
         return HttpResponse.json({foo: 42})
       }),
     )
-    const convert = jest.fn(() => ({bar: 'baz'}))
-    const success = jest.fn()
+    const convert = vi.fn(() => ({bar: 'baz'}))
+    const success = vi.fn()
     renderHook(() => useFetchApi({success, path, convert}))
     await waitFor(() => {
       expect(success).toHaveBeenCalledWith({bar: 'baz'})
@@ -194,8 +194,8 @@ describe('useFetchApi', () => {
         return new HttpResponse(null, {status: 200})
       }),
     )
-    const convert = jest.fn()
-    const success = jest.fn()
+    const convert = vi.fn()
+    const success = vi.fn()
     renderHook(() => useFetchApi({success, path, convert}))
     await waitFor(() => {
       expect(success).toHaveBeenCalledWith(undefined)
@@ -213,9 +213,9 @@ describe('useFetchApi', () => {
         return HttpResponse.json(response)
       }),
     )
-    const success = jest.fn()
-    const meta = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const meta = vi.fn()
+    const error = vi.fn()
     const {rerender} = renderHook(({path}) => useFetchApi({success, error, meta, path}), {
       initialProps: {path: '/api/v1/blah'},
     })
@@ -238,8 +238,8 @@ describe('useFetchApi', () => {
         return HttpResponse.json(response)
       }),
     )
-    const success = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const error = vi.fn()
     const {rerender} = renderHook(({params}) => useFetchApi({success, error, path, params}), {
       initialProps: {params: {foo: 42}},
     })
@@ -261,8 +261,8 @@ describe('useFetchApi', () => {
         return HttpResponse.json(response)
       }),
     )
-    const success = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const error = vi.fn()
     const {rerender} = renderHook(({headers}) => useFetchApi({success, error, path, headers}), {
       initialProps: {headers: {foo: 42}},
     })
@@ -284,8 +284,8 @@ describe('useFetchApi', () => {
         return HttpResponse.json(response)
       }),
     )
-    const success = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const error = vi.fn()
     const {rerender} = renderHook(({fetchOpts}) => useFetchApi({success, error, path, fetchOpts}), {
       initialProps: {fetchOpts: {foo: 42}},
     })
@@ -309,8 +309,8 @@ describe('useFetchApi', () => {
         return HttpResponse.json(response)
       }),
     )
-    const success = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const error = vi.fn()
     const {rerender} = renderHook(props => useFetchApi({success, error, ...props}), {
       initialProps: {
         path,
@@ -336,15 +336,15 @@ describe('useFetchApi', () => {
   })
 
   it('reports forceResult when specified, without calling fetch', () => {
-    const success = jest.fn()
-    const meta = jest.fn()
+    const success = vi.fn()
+    const meta = vi.fn()
     renderHook(() => useFetchApi({success, meta, path: '/blah', forceResult: {fake: 'news'}}))
     expect(success).toHaveBeenCalledWith({fake: 'news'})
     expect(meta).not.toHaveBeenCalled()
   })
 
   it('only reports forceResult once if it has not changed', () => {
-    const success = jest.fn()
+    const success = vi.fn()
     const {rerender} = renderHook(props => useFetchApi(props), {
       initialProps: {success, path: '/blah', forceResult: {fake: 'news'}},
     })
@@ -354,8 +354,8 @@ describe('useFetchApi', () => {
   })
 
   it('reports new results if forceResult is changed', () => {
-    const success = jest.fn()
-    const meta = jest.fn()
+    const success = vi.fn()
+    const meta = vi.fn()
     const {rerender} = renderHook(props => useFetchApi(props), {
       initialProps: {success, meta, path: '/blah', forceResult: {fake: 'news'}},
     })
@@ -373,8 +373,8 @@ describe('useFetchApi', () => {
         return HttpResponse.json({fetch: 'result'})
       }),
     )
-    const success = jest.fn()
-    const meta = jest.fn()
+    const success = vi.fn()
+    const meta = vi.fn()
     const {rerender} = renderHook(props => useFetchApi(props), {
       initialProps: {success, meta, path, forceResult: {fake: 'news'}},
     })
@@ -394,8 +394,8 @@ describe('useFetchApi', () => {
         return HttpResponse.json({fetch: 'result'})
       }),
     )
-    const success = jest.fn()
-    const meta = jest.fn()
+    const success = vi.fn()
+    const meta = vi.fn()
     const {rerender} = renderHook(props => useFetchApi(props), {
       initialProps: {success, meta, path},
     })
@@ -420,9 +420,9 @@ describe('useFetchApi', () => {
         }
       }),
     )
-    const success = jest.fn()
-    const meta = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const meta = vi.fn()
+    const error = vi.fn()
     const {rerender} = renderHook(({params}) => useFetchApi({success, meta, error, path, params}), {
       initialProps: {params: {foo: 42}},
     })
@@ -450,8 +450,8 @@ describe('useFetchApi', () => {
         }
       }),
     )
-    const success = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const error = vi.fn()
     const {rerender} = renderHook(({params}) => useFetchApi({success, error, path, params}), {
       initialProps: {params: {foo: 42}},
     })
@@ -477,8 +477,8 @@ describe('useFetchApi', () => {
         }
       }),
     )
-    const success = jest.fn()
-    const error = jest.fn()
+    const success = vi.fn()
+    const error = vi.fn()
     const {rerender} = renderHook(({params}) => useFetchApi({success, error, path, params}), {
       initialProps: {params: {foo: 42}},
     })
@@ -500,8 +500,8 @@ describe('useFetchApi', () => {
           return HttpResponse.json(response)
         }),
       )
-      const success = jest.fn()
-      const error = jest.fn()
+      const success = vi.fn()
+      const error = vi.fn()
       const {rerender} = renderHook(({nonce}) => useFetchApi({success, error, path}, [nonce]), {
         initialProps: {nonce: 'foo'},
       })
@@ -525,8 +525,8 @@ describe('useFetchApi', () => {
           return HttpResponse.json(response)
         }),
       )
-      const success = jest.fn()
-      const error = jest.fn()
+      const success = vi.fn()
+      const error = vi.fn()
       const {rerender} = renderHook(({nonce}) => useFetchApi({success, error, path}, [nonce]), {
         initialProps: {nonce: 'foo'},
       })
@@ -563,9 +563,9 @@ describe('useFetchApi', () => {
         }),
       )
       const [loading, loadingDone] = makeEventedFn({arg: false})
-      const success = jest.fn()
-      const meta = jest.fn()
-      const error = jest.fn()
+      const success = vi.fn()
+      const meta = vi.fn()
+      const error = vi.fn()
       renderHook(() => useFetchApi({path, loading, success, meta, error, fetchAllPages: true}))
       await loadingDone
       expect(loading).toHaveBeenCalledTimes(2)
@@ -600,8 +600,8 @@ describe('useFetchApi', () => {
           }
         }),
       )
-      const success = jest.fn()
-      const error = jest.fn()
+      const success = vi.fn()
+      const error = vi.fn()
       const [loading, loadingDone] = makeEventedFn({arg: false})
       renderHook(() => useFetchApi({path, loading, success, error, fetchAllPages: true}))
       await loadingDone
@@ -623,8 +623,8 @@ describe('useFetchApi', () => {
           )
         }),
       )
-      const success = jest.fn()
-      const error = jest.fn()
+      const success = vi.fn()
+      const error = vi.fn()
       const [loading, loadingDone] = makeEventedFn({arg: false})
       const {rerender} = renderHook(
         ({fetchAllPages}) => useFetchApi({path, loading, success, error, fetchAllPages}),
@@ -657,9 +657,9 @@ describe('useFetchApi', () => {
         }),
       )
       const [loading, loadingDone] = makeEventedFn({arg: false})
-      const success = jest.fn()
-      const meta = jest.fn()
-      const error = jest.fn()
+      const success = vi.fn()
+      const meta = vi.fn()
+      const error = vi.fn()
       const convert = page => page.map(n => n + 10)
       renderHook(() =>
         useFetchApi({path, loading, success, meta, error, convert, fetchAllPages: true}),
@@ -688,9 +688,9 @@ describe('useFetchApi', () => {
         }),
       )
       const [loading, loadingDone] = makeEventedFn({arg: false})
-      const success = jest.fn()
-      const meta = jest.fn()
-      const error = jest.fn()
+      const success = vi.fn()
+      const meta = vi.fn()
+      const error = vi.fn()
       renderHook(() => useFetchApi({path, loading, success, meta, error, fetchAllPages: true}))
       await loadingDone
       expect(success).toHaveBeenCalledWith([1, 2, 3, 4, 5])
@@ -730,9 +730,9 @@ describe('useFetchApi', () => {
 
     it('fetches n pages if fetchNumPages is passed', async () => {
       const [loading, loadingDone] = makeEventedFn({arg: false})
-      const success = jest.fn()
-      const meta = jest.fn()
-      const error = jest.fn()
+      const success = vi.fn()
+      const meta = vi.fn()
+      const error = vi.fn()
 
       renderHook(() => useFetchApi({path, loading, success, meta, error, fetchNumPages: 3}))
       await loadingDone
@@ -751,9 +751,9 @@ describe('useFetchApi', () => {
 
     it('works if there are fewer pages than fetchNumPages', async () => {
       const [loading, loadingDone] = makeEventedFn({arg: false})
-      const success = jest.fn()
-      const meta = jest.fn()
-      const error = jest.fn()
+      const success = vi.fn()
+      const meta = vi.fn()
+      const error = vi.fn()
 
       renderHook(() => useFetchApi({path, loading, success, meta, error, fetchNumPages: 10}))
       await loadingDone
@@ -770,9 +770,9 @@ describe('useFetchApi', () => {
 
     it('gets overridden by fetchAllPages', async () => {
       const [loading, loadingDone] = makeEventedFn({arg: false})
-      const success = jest.fn()
-      const meta = jest.fn()
-      const error = jest.fn()
+      const success = vi.fn()
+      const meta = vi.fn()
+      const error = vi.fn()
 
       renderHook(() =>
         useFetchApi({

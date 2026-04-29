@@ -169,7 +169,7 @@ describe InfoController do
       allow(PageView).to receive(:pv4?).and_return(true)
       allow(ConfigFile).to receive(:load).and_call_original
       allow(ConfigFile).to receive(:load)
-        .with("pv4").and_return({ "uri" => "https://pv4.instructure.com/api/123/" })
+        .with("pv5").and_return({ "uri" => "https://pv5.instructure.com" })
       allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
       allow(DynamicSettings).to receive(:find)
         .with("rich-content-service")
@@ -264,6 +264,16 @@ describe InfoController do
       expect(response).to be_successful
       secondary = response.parsed_body["secondary"]
       expect(secondary).to eq []
+    end
+  end
+
+  describe "GET 'shard_info'" do
+    it "returns shard information" do
+      get "shard_info"
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json).to have_key("shard")
+      expect(json).to have_key("database")
     end
   end
 

@@ -22,13 +22,15 @@ class Mutations::SetAssignmentPostPolicy < Mutations::BaseMutation
   graphql_name "SetAssignmentPostPolicy"
 
   argument :assignment_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
+  argument :post_comments_at, String, required: false
+  argument :post_grades_at, String, required: false
   argument :post_manually, Boolean, required: true
 
   field :post_policy, Types::PostPolicyType, null: true
 
   def resolve(input:)
     begin
-      assignment = Assignment.find(input[:assignment_id])
+      assignment = AbstractAssignment.find_assignment_or_peer_review(input[:assignment_id])
       course = assignment.context
     rescue ActiveRecord::RecordNotFound
       raise GraphQL::ExecutionError, "An assignment with that id does not exist"
@@ -44,10 +46,19 @@ class Mutations::SetAssignmentPostPolicy < Mutations::BaseMutation
       end
     end
 
-    policy = PostPolicy.find_or_create_by(course:, assignment:)
-    policy.update!(post_manually: input[:post_manually])
+    assignment.ensure_post_policy(post_manually: input[:post_manually])
 
-    { post_policy: policy }
+    if Account.site_admin.feature_enabled?(:scheduled_feedback_releases) && input[:post_manually] == true
+      is_post_params_blank = input[:post_comments_at].blank? && input[:post_grades_at].blank?
+
+      if !is_post_params_blank
+        assignment.post_policy.create_or_update_scheduled_post(input[:post_comments_at], input[:post_grades_at])
+      elsif assignment.post_policy.scheduled_post && is_post_params_blank
+        assignment.post_policy.remove_scheduled_post
+      end
+    end
+
+    { post_policy: assignment.post_policy }
   end
 
   def self.post_policy_log_entry(post_policy, _context)

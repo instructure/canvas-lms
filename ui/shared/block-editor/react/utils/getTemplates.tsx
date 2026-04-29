@@ -17,7 +17,7 @@
  */
 
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getGlobalTemplates} from '@canvas/block-editor/react/assets/globalTemplates'
 import type {BlockTemplate} from '../types'

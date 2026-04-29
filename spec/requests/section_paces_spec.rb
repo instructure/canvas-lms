@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
 require_relative "../support/request_helper"
 
 describe "Section Paces API" do
@@ -171,7 +170,7 @@ describe "Section Paces API" do
             selected_days_to_skip: "foobar"
           }
         }
-        expect(response).to have_http_status :unprocessable_entity
+        expect(response).to have_http_status :unprocessable_content
       end
     end
 
@@ -203,7 +202,7 @@ describe "Section Paces API" do
             exclude_weekends: "foobar"
           }
         }
-        expect(response).to have_http_status :unprocessable_entity
+        expect(response).to have_http_status :unprocessable_content
       end
     end
 
@@ -224,7 +223,7 @@ describe "Section Paces API" do
           exclude_weekends: "foobar"
         }
       }
-      expect(response).to have_http_status :unprocessable_entity
+      expect(response).to have_http_status :unprocessable_content
     end
 
     context "when course draft feature flag is enabled" do

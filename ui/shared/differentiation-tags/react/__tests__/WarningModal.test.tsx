@@ -21,8 +21,8 @@ import {render, fireEvent} from '@testing-library/react'
 import {DeleteTagWarningModal, RemoveTagWarningModal} from '../WarningModal'
 
 describe('DeleteTagWarningModal', () => {
-  const onCloseMock = jest.fn()
-  const onContinueMock = jest.fn()
+  const onCloseMock = vi.fn()
+  const onContinueMock = vi.fn()
   const defaultProps = {
     open: true,
     onClose: onCloseMock,
@@ -34,7 +34,7 @@ describe('DeleteTagWarningModal', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the delete tag warning modal text', () => {
@@ -58,8 +58,8 @@ describe('DeleteTagWarningModal', () => {
 })
 
 describe('RemoveTagWarningModal', () => {
-  const onCloseMock = jest.fn()
-  const onContinueMock = jest.fn()
+  const onCloseMock = vi.fn()
+  const onContinueMock = vi.fn()
   const defaultProps = {
     open: true,
     onClose: onCloseMock,
@@ -71,7 +71,7 @@ describe('RemoveTagWarningModal', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the remove tag warning modal text', () => {

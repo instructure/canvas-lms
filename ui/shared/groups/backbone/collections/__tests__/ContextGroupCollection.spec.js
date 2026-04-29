@@ -27,13 +27,13 @@ describe('ContextGroupCollection', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('should add no-cache header when disableCache is true', () => {
     collection.options.disableCache = true
 
-    const fetchSpy = jest.spyOn(PaginatedCollection.prototype, 'fetch')
+    const fetchSpy = vi.spyOn(PaginatedCollection.prototype, 'fetch')
     collection.fetch()
 
     expect(fetchSpy).toHaveBeenCalled()
@@ -42,7 +42,7 @@ describe('ContextGroupCollection', () => {
   })
 
   test('should not add no-cache header when disableCache is not defined', () => {
-    const fetchSpy = jest.spyOn(PaginatedCollection.prototype, 'fetch')
+    const fetchSpy = vi.spyOn(PaginatedCollection.prototype, 'fetch')
     collection.fetch()
 
     expect(fetchSpy).toHaveBeenCalled()

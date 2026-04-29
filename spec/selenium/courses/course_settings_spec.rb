@@ -143,10 +143,32 @@ describe "course settings" do
       fj(".grading_standard_select:visible a").click
       fj("button.select_grading_standard_link:visible").click
       f(".done_button").click
-      wait_for_new_page_load(submit_form("#course_form"))
+      wait_for_new_page_load { submit_form("#course_form") }
 
       @course.reload
       expect(@course.grading_standard).to eq(@standard)
+    end
+
+    context "content security policy" do
+      it "renders content security policy options" do
+        @account.enable_feature!(:javascript_csp)
+        @account.enable_csp!
+        account_admin_user(active_all: true, account: @account)
+
+        user_session(@admin)
+        get "/courses/#{@course.id}/settings"
+        expect(f("#course_disable_csp")).to be_displayed
+      end
+
+      it "does not render when CSP is not enabled" do
+        @account.disable_feature!(:javascript_csp)
+        @account.disable_csp!
+        account_admin_user(active_all: true, account: @account)
+
+        user_session(@admin)
+        get "/courses/#{@course.id}/settings"
+        expect(f("body")).not_to contain_css("#course_disable_csp")
+      end
     end
 
     context "as a ta" do
@@ -250,16 +272,6 @@ describe "course settings" do
       end
     end
 
-    it "allows selection of existing course grading standard" do
-      skip "FOO-4220" # TODO: re-enable this test before merging EVAL-3171
-      test_select_standard_for @course
-    end
-
-    it "allows selection of existing account grading standard" do
-      skip "FOO-4220" # TODO: re-enable this test before merging EVAL-3171
-      test_select_standard_for @course.root_account
-    end
-
     it "shows the self enrollment code and url once enabled" do
       a = Account.default
       a.courses << @course
@@ -296,7 +308,7 @@ describe "course settings" do
       @course.update(self_enrollment: true)
       MasterCourses::MasterTemplate.set_as_master_course(@course)
       get "/courses/#{@course.id}/settings"
-      expect(f(".self_enrollment_message")).to_not be_displayed
+      expect(f(".self_enrollment_message")).not_to be_displayed
     end
 
     it "enables announcement limit if show announcements enabled" do
@@ -437,27 +449,27 @@ describe "course settings" do
     end
 
     it "disables from Course Navigation tab", priority: "1" do
-      get "/courses/#{@course.id}/settings#tab-navigation"
-      ff(".al-trigger")[0].click
-      ff(".icon-x")[0].click
-      wait_for_ajaximations
-      f("#nav_form button.btn.btn-primary").click
-      wait_for_ajaximations
-      enter_student_view
-      wait_for_ajaximations
+      @course.root_account.enable_feature!(:course_settings_navigation_react)
       get "/courses/#{@course.id}/settings#tab-navigation"
       wait_for_ajaximations
-      expect(f("#content")).not_to contain_link("Home")
-    end
 
-    describe "move dialog" do
-      it "returns focus to cog menu button when disabling an item" do
-        get "/courses/#{@course.id}/settings#tab-navigation"
-        cog_menu_button = ff(".al-trigger")[2]
-        cog_menu_button.click # open the menu
-        ff(".disable_nav_item_link")[2].click # click "Disable"
-        check_element_has_focus(cog_menu_button)
-      end
+      # Syllabus starts enabled
+      expect(f("#syllabus-link")).not_to have_attribute("aria-label", "Disabled. Not visible to students")
+
+      # Wait for React component to render - look for enabled tabs container
+      wait_for(method: nil, timeout: 5) { element_exists?('[data-rbd-droppable-id="enabled-tabs"]') }
+      # Find settings buttons within nav items. TAB_SYLLABUS = 1 (defined in Course model)
+      settings_buttons = ff('#nav_edit_tab_id_1 button[type="button"]')
+
+      # Click the settings button for the first movable tab
+      settings_buttons[0].click
+      # Click the "Disable" menu item - use span instead of li since InstUI uses spans
+      fj("[role='menuitem']:contains('Disable')").click
+      wait_for_ajaximations
+      fj("button:contains('Save')").click
+      wait_for_ajaximations
+
+      expect(f("#syllabus-link")).to have_attribute("aria-label", "Disabled. Not visible to students")
     end
 
     context "participation" do
@@ -624,8 +636,8 @@ describe "course settings" do
 
     get "/courses/#{@course.id}/settings"
 
-    expect(f("#course_restrict_student_past_view")).to_not be_displayed
-    expect(f("#course_restrict_student_future_view")).to_not be_displayed
+    expect(f("#course_restrict_student_past_view")).not_to be_displayed
+    expect(f("#course_restrict_student_future_view")).not_to be_displayed
   end
 
   it "disables editing settings if :manage rights are not granted" do

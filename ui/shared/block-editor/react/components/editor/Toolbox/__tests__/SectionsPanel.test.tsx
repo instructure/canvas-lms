@@ -27,16 +27,16 @@ import {testTemplates} from './testTemplates'
 
 const user = userEvent.setup()
 
-const mockAddNodeTree = jest.fn()
-const mockCreate = jest.fn((_ref, cb) => {
+const mockAddNodeTree = vi.fn()
+const mockCreate = vi.fn((_ref, cb) => {
   cb()
 })
 
-jest.mock('@craftjs/core', () => {
-  const module = jest.requireActual('@craftjs/core')
+vi.mock('@craftjs/core', async () => {
+  const module = await vi.importActual('@craftjs/core')
   return {
     ...module,
-    useEditor: jest.fn(() => {
+    useEditor: vi.fn(() => {
       return {
         actions: {
           addNodeTree: mockAddNodeTree,
@@ -45,17 +45,17 @@ jest.mock('@craftjs/core', () => {
           create: mockCreate,
         },
         query: {
-          parseSerializedNode: jest.fn(n => {
+          parseSerializedNode: vi.fn(n => {
             return {
-              toNode: jest.fn(_n => n),
+              toNode: vi.fn(_n => n),
             }
           }),
-          parseFreshNode: jest.fn(n => ({
-            toNode: jest.fn(_n => n),
+          parseFreshNode: vi.fn(n => ({
+            toNode: vi.fn(_n => n),
           })),
-          node: jest.fn(() => {
+          node: vi.fn(() => {
             return {
-              toSerializedNode: jest.fn(() => ({})),
+              toSerializedNode: vi.fn(() => ({})),
             }
           }),
         },

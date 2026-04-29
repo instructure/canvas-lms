@@ -21,9 +21,15 @@ module Factories
   def accessibility_issue_model(opts = {})
     opts[:course] ||= course_model
     opts[:accessibility_resource_scan] ||= accessibility_resource_scan_model(course: opts[:course])
-    if !opts[:wiki_page] && !opts[:assignment] && !opts[:attachment]
-      opts[:wiki_page] = wiki_page_model(course: opts[:course])
+
+    # Handle syllabus scans specially
+    if opts[:accessibility_resource_scan].is_syllabus?
+      opts[:is_syllabus] = true
+      # Don't set context for syllabus issues
+    else
+      opts[:context] ||= opts[:accessibility_resource_scan].context
     end
+
     opts[:rule_type] ||= Accessibility::Rules::ImgAltRule.id
 
     AccessibilityIssue.create!(opts)

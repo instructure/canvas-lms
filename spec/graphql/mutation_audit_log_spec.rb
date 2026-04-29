@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
 require_relative "graphql_spec_helper"
 
 describe AuditLogFieldExtension do
@@ -90,7 +89,7 @@ describe AuditLogFieldExtension do
 end
 
 describe AuditLogFieldExtension::Logger do
-  let(:mutation) { double(graphql_name: "asdf") }
+  let(:mutation) { class_double(GraphQL::Schema::Mutation, graphql_name: "asdf") }
 
   before(:once) do
     next unless AuditLogFieldExtension.enabled?
@@ -137,8 +136,14 @@ describe AuditLogFieldExtension::Logger do
     end
 
     it "allows overriding the logged object" do
-      expect(mutation).to receive(:whatever_log_entry) { @entry.context }
-      logger = AuditLogFieldExtension::Logger.new(mutation, {}, { input: {} })
+      mutation_class = Class.new(GraphQL::Schema::Mutation) do
+        graphql_name "asdf"
+
+        def self.whatever_log_entry(entry, _ctx)
+          entry.context
+        end
+      end
+      logger = AuditLogFieldExtension::Logger.new(mutation_class, {}, { input: {} })
       expect(logger.log_entry_ids(@entry, "whatever")).to eq ["#{@course.root_account.global_id}-course_#{@course.id}"]
     end
   end

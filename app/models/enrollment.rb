@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Enrollment < ActiveRecord::Base
+class Enrollment < ApplicationRecord
   SIS_TYPES = {
     "TeacherEnrollment" => "teacher",
     "TaEnrollment" => "ta",
@@ -80,12 +80,14 @@ class Enrollment < ActiveRecord::Base
   after_save :reset_notifications_cache
   after_save :dispatch_invitations_later
   after_save :add_to_favorites_later
+  after_save :delete_student_allocation_rules_if_needed
   after_commit :update_cached_due_dates
   after_save :update_assignment_overrides_if_needed
   after_create :needs_grading_count_updated, if: :active_student?
   after_update :needs_grading_count_updated, if: :active_student_changed?
 
   after_commit :sync_microsoft_group
+  after_commit :sync_to_invite_all_conferences, if: :should_sync_to_conferences?
   scope :microsoft_sync_relevant, -> { active_or_pending.accepted.not_fake }
   scope :microsoft_sync_irrelevant_but_not_fake, -> { not_fake.where("enrollments.workflow_state IN ('rejected', 'completed', 'inactive', 'invited')") }
 
@@ -98,6 +100,8 @@ class Enrollment < ActiveRecord::Base
   scope :current_and_concluded, -> { joins(:course).where(QueryBuilder.new(:current_and_concluded).conditions).readonly(false) }
   scope :horizon, -> { joins(:course).where(courses: { horizon_course: true }) }
   scope :not_horizon, -> { joins(:course).where(courses: { horizon_course: false }) }
+  scope :career_learning_library, -> { joins(:course).where(courses: { career_learning_library_only: true }) }
+  scope :not_career_learning_library, -> { joins(:course).where(courses: { career_learning_library_only: false }) }
 
   def ensure_role_id
     self.role_id ||= role.id
@@ -105,6 +109,13 @@ class Enrollment < ActiveRecord::Base
 
   def cant_observe_self
     errors.add(:associated_user_id, "Cannot observe yourself") if user_id == associated_user_id
+  end
+
+  def should_sync_to_conferences?
+    saved_change_to_workflow_state? &&
+      workflow_state == "active" &&
+      course.is_a?(Course) &&
+      workflow_state_before_last_save != "active"
   end
 
   def cant_observe_observer
@@ -167,8 +178,12 @@ class Enrollment < ActiveRecord::Base
     "(enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.workflow_state = 'active')"
   end
 
+  def self.active_or_completed_student_conditions
+    "(enrollments.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND enrollments.workflow_state IN ('active', 'completed'))"
+  end
+
   # see .active_student_conditions
-  def active_student?(was = false)
+  def active_student?(was: false)
     suffix = was ? "_before_last_save" : ""
 
     %w[StudentEnrollment StudentViewEnrollment].include?(send(:"type#{suffix}")) &&
@@ -176,7 +191,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def active_student_changed?
-    active_student? != active_student?(:was)
+    active_student? != active_student?(was: true)
   end
 
   def clear_needs_grading_count_cache
@@ -202,7 +217,16 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def delete_student_allocation_rules_if_needed
+    # Delete allocation rules for this user in the course if the enrollment was concluded, deactivated, or deleted
+    if saved_change_to_workflow_state? && %w[completed inactive deleted].include?(workflow_state)
+      user_course_rules = AllocationRule.for_user_in_course(user_id, course_id)
+      user_course_rules.update_all(workflow_state: "deleted")
+    end
+  end
+
   include StickySisFields
+
   are_sis_sticky :start_at, :end_at
 
   has_a_broadcast_policy
@@ -327,6 +351,21 @@ class Enrollment < ActiveRecord::Base
   }
 
   scope :not_fake, -> { where("enrollments.type<>'StudentViewEnrollment'") }
+
+  # SQL condition that excludes temporary enrollments that are not currently
+  # active by date. Course admin temp enrollments get 'inactive' state when
+  # future (not view_restrictable?), while student/observer ones get
+  # 'pending_active', so we check for state = 'active' to cover all types.
+  def self.pending_temporary_enrollment_exclusion_sql
+    "enrollments.temporary_enrollment_source_user_id IS NULL OR EXISTS (" \
+      "SELECT 1 FROM #{EnrollmentState.quoted_table_name} " \
+      "WHERE enrollment_states.enrollment_id = enrollments.id " \
+      "AND enrollment_states.state = 'active')"
+  end
+
+  scope :excluding_pending_temporary_enrollments, lambda {
+    where(pending_temporary_enrollment_exclusion_sql)
+  }
 
   scope :temporary_enrollment_recipients_for_provider, lambda { |user|
     active.joins(:course).where(temporary_enrollment_source_user_id: user,
@@ -454,6 +493,8 @@ class Enrollment < ActiveRecord::Base
       # Only remove differentiation tag memberships if the enrollment is being deleted/rejected
       next unless is_deleted
 
+      next if other_section_enrollment_exists?
+
       membership = tag.group_memberships.where(user_id:).first
       membership&.destroy
     end
@@ -492,7 +533,7 @@ class Enrollment < ActiveRecord::Base
       enrollment ||= observer.observer_enrollments.build
       enrollment.associated_user_id = user_id
       enrollment.shard = shard if enrollment.new_record?
-      enrollment.update_from(self, !!@skip_broadcasts)
+      enrollment.update_from(self, skip_broadcasts: !!@skip_broadcasts)
     end
   end
 
@@ -530,7 +571,7 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def update_from(other, skip_broadcasts = false)
+  def update_from(other, skip_broadcasts: false)
     self.course_id = other.course_id
     self.workflow_state = if type == "ObserverEnrollment" && other.workflow_state == "invited"
                             "active"
@@ -559,6 +600,8 @@ class Enrollment < ActiveRecord::Base
       else
         user.communication_channels.email.unretired.each { |cc| Rails.cache.delete([cc.path, "invited_enrollments2"].cache_key) }
       end
+
+      Rails.cache.delete([user, "invited_enrollments", ApplicationController.region].cache_key)
     end
   end
 
@@ -710,7 +753,7 @@ class Enrollment < ActiveRecord::Base
     res
   end
 
-  def accept(force = false)
+  def accept(force: false)
     GuardRail.activate(:primary) do
       return false unless force || invited?
 
@@ -742,12 +785,27 @@ class Enrollment < ActiveRecord::Base
   end
 
   def add_to_favorites
-    # this method was written by Alan Smithee
     user.shard.activate do
-      if user.favorites.where(context_type: "Course").exists? # only add a favorite if they've ever favorited anything even if it's no longer in effect
-        Favorite.create_or_find_by(user:, context: course)
-      end
+      # Only auto-favorite if the user still has at least one accessible favorite course,
+      # otherwise stale favorites (for concluded/deleted/inactive enrollments) would make
+      # auto-favoriting permanent with no way for the user to opt out.
+      favorite_course_ids = user.favorites.where(context_type: "Course").select(:context_id)
+      return unless user.enrollments.current_and_invited.where(course_id: favorite_course_ids).exists?
+
+      Favorite.create_or_find_by(user:, context: course)
     end
+  end
+
+  def sync_to_invite_all_conferences
+    return unless course.is_a?(Course)
+
+    course.web_conferences.active.each do |conference|
+      next unless conference.invite_all_enabled?
+
+      conference.add_new_enrollment_user(user_id)
+    end
+  rescue => e
+    Canvas::Errors.capture_exception(:web_conference_sync, e, :info)
   end
 
   workflow do
@@ -1268,6 +1326,26 @@ class Enrollment < ActiveRecord::Base
     temporary_enrollment_source_user_id.present?
   end
 
+  def temporary_enrollment_display_state
+    return nil unless temporary_enrollment?
+
+    es = enrollment_state
+    case es.state
+    when "pending_active", "pending_invited"
+      "future"
+    when "active", "invited"
+      "active"
+    when "completed"
+      "completed"
+    when "inactive"
+      # Future admin-type enrollments get "inactive" with state_valid_until
+      # set to the start date; truly inactive enrollments do not
+      es.state_valid_until.present? ? "future" : "inactive"
+    else
+      es.state
+    end
+  end
+
   def temporary_enrollment_source_user
     return nil unless temporary_enrollment?
 
@@ -1365,8 +1443,14 @@ class Enrollment < ActiveRecord::Base
                                        joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                                .where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')")
                                      }
+  scope :invited_or_pending_by_date_ignoring_access, lambda {
+                                                       joins(:enrollment_state)
+                                                         .where("enrollment_states.state IN ('invited', 'pending_invited', 'pending_active')")
+                                                     }
   scope :completed_by_date,
         -> { joins(:enrollment_state).where(enrollment_states: { restricted_access: false, state: "completed" }) }
+  scope :completed_by_date_ignoring_access,
+        -> { joins(:enrollment_state).where(enrollment_states: { state: "completed" }) }
   scope :not_inactive_by_date, lambda {
                                  joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
                                                          .where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')")
@@ -1507,7 +1591,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def touch_graders_if_needed
-    if !active_student? && active_student?(:was) && course.submissions.where(user_id:).exists?
+    if !active_student? && active_student?(was: true) && course.submissions.where(user_id:).exists?
       self.class.connection.after_transaction_commit do
         course.admins.clear_cache_keys(:todo_list)
       end

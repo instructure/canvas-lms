@@ -4,5 +4,6 @@
   "version": "1.0.0",
   "private": true,
   "main": "./index.ts",
-  "author": "Ahmad Amireh <ahmad@instructure.com>"
+  "author": "Ahmad Amireh <ahmad@instructure.com>",
+  "owner": "CFA"
 }

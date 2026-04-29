@@ -17,15 +17,16 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import ready from '@instructure/ready'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
-import ErrorBoundary from '@canvas/error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {App} from './react/App'
 
 const I18n = createI18nScope('youtube_migration')
@@ -41,12 +42,13 @@ ready(() => {
   }
 
   if (container) {
-    const root = createRoot(container)
-    root.render(
+    render(
       <ErrorBoundary
         errorComponent={
           <GenericErrorPage
             imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
             errorCategory={I18n.t('Youtube Migration Error Page')}
           />
         }
@@ -55,6 +57,7 @@ ready(() => {
           <App courseId={ENV.COURSE_ID} />
         </QueryClientProvider>
       </ErrorBoundary>,
+      container,
     )
   }
 })

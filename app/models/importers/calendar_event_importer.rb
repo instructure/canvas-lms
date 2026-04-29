@@ -35,8 +35,8 @@ module Importers
 
         begin
           import_from_migration(event, migration.context, migration)
-        rescue
-          migration.add_import_warning(t("#migration.calendar_event_type", "Calendar Event"), event[:title], $!)
+        rescue => e
+          migration.add_import_warning(t("#migration.calendar_event_type", "Calendar Event"), event[:title], e)
         end
       end
     end

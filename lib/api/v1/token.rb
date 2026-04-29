@@ -28,6 +28,7 @@ module Api::V1::Token
                     only: %w[id
                              created_at
                              permanent_expires_at
+                             last_used_at
                              purpose
                              real_user_id
                              remember_access

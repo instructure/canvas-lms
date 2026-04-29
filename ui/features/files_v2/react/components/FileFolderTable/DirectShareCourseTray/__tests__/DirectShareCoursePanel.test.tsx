@@ -27,15 +27,15 @@ import {RowsProvider} from '../../../../contexts/RowsContext'
 import DirectShareCoursePanel from '../DirectShareCoursePanel'
 import {mockRowsContext} from '../../__tests__/testUtils'
 
-jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
-jest.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
+vi.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
+vi.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
 
 const defaultProps = {
   selectedCourseId: null,
-  onSelectCourse: jest.fn(),
+  onSelectCourse: vi.fn(),
   selectedModuleId: null,
-  onSelectModule: jest.fn(),
-  onSelectPosition: jest.fn(),
+  onSelectModule: vi.fn(),
+  onSelectPosition: vi.fn(),
 }
 
 const renderComponent = (props = {}) =>
@@ -60,7 +60,7 @@ describe('DirectShareCoursePanel', () => {
   })
 
   it('shows course selector by default', async () => {
-    ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
+    ;(useManagedCourseSearchApi as any).mockImplementationOnce(({success}: {success: any}) => {
       success([
         {id: 'abc', name: 'abc', course_code: '1', term: 'default term'},
         {id: 'cde', name: 'cde', course_code: '2', term: 'default term'},
@@ -81,13 +81,13 @@ describe('DirectShareCoursePanel', () => {
   })
 
   it('shows the course and module selector when a course is given', async () => {
-    ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
+    ;(useManagedCourseSearchApi as any).mockImplementationOnce(({success}: {success: any}) => {
       success([
         {id: 'abc', name: 'abc'},
         {id: 'cde', name: 'cde'},
       ])
     })
-    ;(useModuleCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
+    ;(useModuleCourseSearchApi as any).mockImplementationOnce(({success}: {success: any}) => {
       success([
         {id: '1', name: 'Module 1'},
         {id: '2', name: 'Module 2'},
@@ -102,19 +102,19 @@ describe('DirectShareCoursePanel', () => {
   })
 
   it('shows the position selector when a module is given', async () => {
-    ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
+    ;(useManagedCourseSearchApi as any).mockImplementationOnce(({success}: {success: any}) => {
       success([
         {id: 'abc', name: 'abc'},
         {id: 'cde', name: 'cde'},
       ])
     })
-    ;(useModuleCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
+    ;(useModuleCourseSearchApi as any).mockImplementationOnce(({success}: {success: any}) => {
       success([
         {id: '1', name: 'Module 1'},
         {id: '2', name: 'Module 2'},
       ])
     })
-    ;(useCourseModuleItemApi as jest.Mock).mockImplementationOnce(({success}) => {
+    ;(useCourseModuleItemApi as any).mockImplementationOnce(({success}: {success: any}) => {
       success([
         {id: 'a', title: 'Item 1', position: '5'},
         {id: 'b', title: 'Item 2', position: '6'},
@@ -127,7 +127,7 @@ describe('DirectShareCoursePanel', () => {
   })
 
   it('hides the assignments selector when a course is given but assignments are not shown', () => {
-    ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
+    ;(useManagedCourseSearchApi as any).mockImplementationOnce(({success}: {success: any}) => {
       success([
         {id: 'abc', name: 'abc'},
         {id: 'cde', name: 'cde'},

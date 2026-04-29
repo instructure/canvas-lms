@@ -18,11 +18,12 @@
 
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import '@testing-library/jest-dom/extend-expect'
 import QuizSelect from '../QuizSelect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const mockQuizzes = [
   {id: 1, title: 'Quiz 1'},
@@ -30,32 +31,42 @@ const mockQuizzes = [
 ]
 
 describe('QuizSelect', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
+  beforeAll(() => {
+    server.listen()
+    fakeENV.setup({COURSE_ID: '1'})
   })
+  afterAll(() => {
+    server.close()
+    fakeENV.teardown()
+  })
+  afterEach(() => server.resetHandlers())
 
   it('renders loading spinner initially', () => {
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: []})
-    render(<QuizSelect onSelect={jest.fn()} />)
+    server.use(http.get('/api/quiz/v1/courses/:courseId/quizzes/', () => HttpResponse.json([])))
+    render(<QuizSelect onSelect={vi.fn()} />)
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
   it('renders quizzes after fetching', async () => {
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: mockQuizzes})
-    render(<QuizSelect onSelect={jest.fn()} />)
+    server.use(
+      http.get('/api/quiz/v1/courses/:courseId/quizzes/', () => HttpResponse.json(mockQuizzes)),
+    )
+    render(<QuizSelect onSelect={vi.fn()} />)
     await waitFor(() => expect(screen.getByText('Quiz 1')).toBeInTheDocument())
     expect(screen.getByText('Quiz 2')).toBeInTheDocument()
   })
 
   it('renders error message on fetch failure', async () => {
-    ;(doFetchApi as jest.Mock).mockRejectedValueOnce(new Error('Failed to fetch'))
-    render(<QuizSelect onSelect={jest.fn()} />)
+    server.use(http.get('/api/quiz/v1/courses/:courseId/quizzes/', () => HttpResponse.error()))
+    render(<QuizSelect onSelect={vi.fn()} />)
     await waitFor(() => expect(screen.getByText('Failed to fetch quizzes')).toBeInTheDocument())
   })
 
   it('filters quizzes based on search input', async () => {
-    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: mockQuizzes})
-    render(<QuizSelect onSelect={jest.fn()} />)
+    server.use(
+      http.get('/api/quiz/v1/courses/:courseId/quizzes/', () => HttpResponse.json(mockQuizzes)),
+    )
+    render(<QuizSelect onSelect={vi.fn()} />)
     await waitFor(() => expect(screen.getByText('Quiz 1')).toBeInTheDocument())
     fireEvent.change(screen.getByPlaceholderText('Search...'), {target: {value: 'Quiz 2'}})
     expect(screen.queryByText('Quiz 1')).not.toBeInTheDocument()

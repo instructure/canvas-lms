@@ -23,12 +23,16 @@ import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {createCourseGradesWithGradingPeriods as createGrades} from '@canvas/grading/GradeCalculatorSpecHelper'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: jest.fn(),
-  showFlashError: jest.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(),
+    showFlashError: vi.fn(),
+  }
+})
 
 describe('setupGrading', () => {
   let gradebook
@@ -39,12 +43,12 @@ describe('setupGrading', () => {
     document.body.appendChild(fixturesDiv)
     gradebook = createGradebook()
     gradebook.students = [{id: '1101'}, {id: '1102'}]
-    jest.spyOn(gradebook, 'setAssignmentVisibility').mockImplementation()
-    jest.spyOn(gradebook, 'invalidateRowsForStudentIds').mockImplementation()
+    vi.spyOn(gradebook, 'setAssignmentVisibility').mockImplementation()
+    vi.spyOn(gradebook, 'invalidateRowsForStudentIds').mockImplementation()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     document.getElementById('fixtures')?.remove()
   })
 
@@ -69,7 +73,7 @@ describe('resetGrading', () => {
     fixturesDiv.id = 'fixtures'
     document.body.appendChild(fixturesDiv)
     gradebook = createGradebook()
-    jest.spyOn(gradebook, 'setupGrading').mockImplementation()
+    vi.spyOn(gradebook, 'setupGrading').mockImplementation()
 
     // Initialize required data structures
     gradebook.gridData = {
@@ -95,18 +99,19 @@ describe('resetGrading', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     document.getElementById('fixtures')?.remove()
   })
 
-  test.skip('initializes a new submission state map', () => {
+  test('initializes a new submission state map', () => {
     gradebook.resetGrading()
     expect(gradebook.submissionStateMap).toBeInstanceOf(SubmissionStateMap)
   })
 
-  test.skip('calls setupGrading with all students', () => {
+  test('calls setupGrading with all students', () => {
     gradebook.resetGrading()
-    expect(gradebook.setupGrading).toHaveBeenCalledWith(gradebook.students)
+    const expectedStudents = gradebook.students.map(s => ({...s, initialized: true}))
+    expect(gradebook.setupGrading).toHaveBeenCalledWith(expectedStudents)
   })
 })
 
@@ -144,7 +149,7 @@ describe('Gradebook Grading Schemes', () => {
       gradebook.destroy()
     }
     document.getElementById('fixtures')?.remove()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   function createInitializedGradebook(options = {}) {
@@ -229,7 +234,7 @@ describe('Gradebook#weightedGrades', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('returns true when group_weighting_scheme is "percent"', () => {
@@ -265,7 +270,7 @@ describe('Gradebook#weightedGroups', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('returns true when group_weighting_scheme is "percent"', () => {
@@ -287,11 +292,11 @@ describe('Gradebook#calculateStudentGrade', () => {
 
   beforeEach(() => {
     calculatedGrades = createGrades()
-    jest.spyOn(CourseGradeCalculator, 'calculate').mockReturnValue(calculatedGrades)
+    vi.spyOn(CourseGradeCalculator, 'calculate').mockReturnValue(calculatedGrades)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   function createGradebookWithOptions(options = {}) {
@@ -375,8 +380,9 @@ describe('Gradebook#calculateStudentGrade', () => {
     })
   })
 
-  test.skip('calculates grades without grading period data when grading period set is null', () => {
+  test('calculates grades without grading period data when grading period set is null', () => {
     createGradebookWithOptions({grading_period_set: null})
+    gradebook.gradingPeriodSet = null
     gradebook.effectiveDueDates = {201: {}}
     gradebook.assignmentGroups = {201: {group_weight: 100}}
     const student = {
@@ -409,11 +415,13 @@ describe('Gradebook#calculateStudentGrade', () => {
     expect(student.total_grade).toEqual(calculatedGrades.current)
   })
 
-  test.skip('stores the final grade on the student if viewing ungraded as zero', () => {
+  test('stores the final grade on the student if viewing ungraded as zero', () => {
     createGradebookWithOptions({
       show_total_grade_as_points: true,
       view_ungraded_as_zero: true,
     })
+    gradebook.courseFeatures = {allowViewUngradedAsZero: true}
+    gradebook.gridDisplaySettings = {viewUngradedAsZero: true}
     gradebook.submissions = [{assignment_id: 201, score: 10}]
     gradebook.assignmentGroups = {201: {group_weight: 100}}
     const student = {
@@ -440,11 +448,13 @@ describe('Gradebook#calculateStudentGrade', () => {
     expect(student.total_grade).toEqual(calculatedGrades.gradingPeriods['701'].current)
   })
 
-  test.skip('stores the final grade from the selected grading period if viewing ungraded as zero', () => {
+  test('stores the final grade from the selected grading period if viewing ungraded as zero', () => {
     createGradebookWithOptions({
       show_total_grade_as_points: true,
       view_ungraded_as_zero: true,
     })
+    gradebook.courseFeatures = {allowViewUngradedAsZero: true}
+    gradebook.gridDisplaySettings = {viewUngradedAsZero: true, filterColumnsBy: {}}
     gradebook.gradingPeriodId = '701'
     gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
     gradebook.submissions = [{assignment_id: 201, score: 10}]
@@ -540,12 +550,12 @@ describe('Gradebook#onApplyScoreToUngradedRequested', () => {
       allow_apply_score_to_ungraded: true,
       applyScoreToUngradedModalNode: mountPoint,
     })
-    jest.spyOn(ReactDOM, 'render').mockImplementation()
-    jest.spyOn(React, 'createElement').mockImplementation()
+    vi.spyOn(ReactDOM, 'render').mockImplementation()
+    vi.spyOn(React, 'createElement').mockImplementation()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     mountPoint.remove()
   })
 
@@ -567,8 +577,9 @@ describe('Gradebook#onApplyScoreToUngradedRequested', () => {
   test('passes the supplied assignmentGroup to the render if present', () => {
     const assignmentGroup = {id: '100', name: 'group'}
     gradebook.onApplyScoreToUngradedRequested(assignmentGroup)
-    expect(React.createElement).toHaveBeenCalledTimes(1)
-    expect(React.createElement.mock.calls[0][1].assignmentGroup).toEqual({
+    expect(ReactDOM.render).toHaveBeenCalledTimes(1)
+    const renderCall = ReactDOM.render.mock.calls[0]
+    expect(renderCall[0].props.children.props.assignmentGroup).toEqual({
       id: '100',
       name: 'group',
     })
@@ -599,25 +610,25 @@ describe('Gradebook#executeApplyScoreToUngraded', () => {
     gradebook.gradebookGrid = {
       gridSupport: {
         columns: {
-          updateColumnHeaders: jest.fn(),
+          updateColumnHeaders: vi.fn(),
         },
       },
     }
 
     gradebook.scoreToUngradedManager = {
-      startProcess: jest.fn().mockResolvedValue(undefined),
+      startProcess: vi.fn().mockResolvedValue(undefined),
     }
 
-    gradebook.getAssignmentOrder = jest.fn().mockReturnValue(['1', '2'])
-    gradebook.getStudentOrder = jest.fn().mockReturnValue(['1101', '1102'])
+    gradebook.getAssignmentOrder = vi.fn().mockReturnValue(['1', '2'])
+    gradebook.getStudentOrder = vi.fn().mockReturnValue(['1101', '1102'])
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    jest.clearAllMocks()
+    vi.restoreAllMocks()
+    vi.clearAllMocks()
   })
 
-  test.skip('shows success message when starting the process', async () => {
+  test('shows success message when starting the process', async () => {
     await gradebook.executeApplyScoreToUngraded({value: 10.0})
     expect(FlashAlert.showFlashSuccess).toHaveBeenCalledWith(
       'Request successfully sent. Note that applying scores may take a while and changes will not appear until you reload the page.',
@@ -647,10 +658,22 @@ describe('Gradebook#executeApplyScoreToUngraded', () => {
     })
   })
 
+  // TODO: This test is skipped because it causes an unhandled rejection error in Vitest.
+  // The test passes but the Promise.reject creates an unhandled rejection that Vitest detects.
+  // The rejection handling in gradebook.executeApplyScoreToUngraded needs to be refactored
+  // to properly catch the error, or the test needs to use expect().rejects pattern.
   test.skip('shows error message when process fails', async () => {
     const error = new Error('Process failed')
-    gradebook.scoreToUngradedManager.startProcess.mockRejectedValue(error)
+    gradebook.scoreToUngradedManager.startProcess = vi.fn(() => {
+      const rejectedPromise = Promise.reject(error)
+      // Prevent unhandled rejection by attaching catch handler immediately
+      rejectedPromise.catch(() => {})
+      return rejectedPromise
+    })
+
     await gradebook.executeApplyScoreToUngraded({value: 10.0})
+    // Give time for all promise chains to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
     expect(FlashAlert.showFlashError).toHaveBeenCalled()
   })
 })

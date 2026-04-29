@@ -23,6 +23,8 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 
 import type {DeveloperKey} from 'features/developer_keys_v2/model/api/DeveloperKey'
 import type {NewKeyFormProps} from '../NewKeyForm'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@instructure/platform-query'
 
 const developerKey: DeveloperKey = {
   access_token_count: 77,
@@ -70,6 +72,7 @@ function defaultProps(): NewKeyFormProps {
     isRedirectUriRequired: false,
     isLtiKey: false,
     hasInvalidRedirectUris: false,
+    contextId: '1',
     developerKey: {
       access_token_count: 0,
       account_name: '',
@@ -101,13 +104,17 @@ function renderComponent(
   extraProps: Partial<NewKeyFormProps> = {},
 ) {
   const props = {...defaultProps(), developerKey: devKey, isLtiKey, ...extraProps}
-  return render(<DeveloperKeyFormFields {...props} />)
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <DeveloperKeyFormFields {...props} />
+    </QueryClientProvider>,
+  )
 }
 
 describe('DeveloperKeyFormFields', () => {
   beforeEach(() => {
     fakeENV.setup({
-      validLtiPlacements: ['course_navigation', 'account_navigation'],
+      FEATURES: {},
       validLtiScopes: {},
     })
   })
@@ -222,10 +229,10 @@ describe('DeveloperKeyFormFields', () => {
 
   describe('when isLtiKey is false', () => {
     it('renders the developer key scopes form', () => {
-      const {getByTestId, getByText} = renderComponent(developerKey, false)
+      const {getByText} = renderComponent(developerKey, false)
       const enforceScopes = document.querySelector('[data-automation="enforce_scopes"]')
       expect(enforceScopes).toBeInTheDocument()
-      expect(getByText(/when scope enforcement is disabled/i)).toBeInTheDocument()
+      expect(getByText(/allow include parameters/i)).toBeInTheDocument()
     })
   })
 
@@ -239,8 +246,27 @@ describe('DeveloperKeyFormFields', () => {
     })
 
     it('renders as required when isRedirectUriRequired is true', () => {
-      const {getByText} = renderComponent(developerKey, true, {isRedirectUriRequired: true})
-      expect(screen.getByLabelText('Redirect URIs: *')).toBeInTheDocument()
+      const {getByLabelText} = renderComponent(developerKey, true, {isRedirectUriRequired: true})
+      expect(getByLabelText('Redirect URIs: *')).toBeInTheDocument()
     })
+  })
+
+  describe('UTID Selector', () => {
+    describe('when feature flag is enabled', () => {
+      it('shows UTID selector for API keys', () => {
+        const {getByTestId} = renderComponent(developerKey, false, {
+          contextId: '1',
+        })
+        expect(getByTestId('utid-selector')).toBeInTheDocument()
+      })
+
+      it('does not show UTID selector for LTI keys', () => {
+        const {queryByTestId} = renderComponent(developerKey, true, {
+          contextId: '1',
+        })
+        expect(queryByTestId('utid-selector')).not.toBeInTheDocument()
+      })
+    })
+
   })
 })

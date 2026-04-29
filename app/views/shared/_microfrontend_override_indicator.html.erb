@@ -1,0 +1,33 @@
+<div id="microfrontend-override-indicator" style="position: fixed; bottom: 5px; right: 5px; z-index: 9999;">
+  <div id="mfe-indicator-expanded" style="background-color: #fff3cd; border: 1px solid #ffc107; padding: 8px; border-radius: 4px; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+      <strong>MFE Overrides Active:</strong>
+      <button onclick="toggleMfeIndicator()" style="background: none; border: none; cursor: pointer; font-size: 14px; padding: 0 0 0 8px; color: #666;">▼</button>
+    </div>
+    <ul style="margin: 4px 0; padding-left: 20px;">
+      <% microfrontend_overrides.each do |app, url| %>
+        <li><%= app %>: <%= url %></li>
+      <% end %>
+    </ul>
+    <%= button_to "Clear Overrides", api_v1_microfrontends_release_tag_override_path, method: :delete, style: "background-color: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px;", form: { style: "margin: 0;" } %>
+  </div>
+
+  <div id="mfe-indicator-minimized" style="display: none; background-color: #fff3cd; border: 1px solid #ffc107; padding: 8px 12px; border-radius: 4px; font-size: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer;" onclick="toggleMfeIndicator()">
+    <span style="font-weight: bold;">MFE ▲</span>
+  </div>
+</div>
+
+<script>
+  function toggleMfeIndicator() {
+    const expanded = document.getElementById('mfe-indicator-expanded');
+    const minimized = document.getElementById('mfe-indicator-minimized');
+
+    if (expanded.style.display === 'none') {
+      expanded.style.display = 'block';
+      minimized.style.display = 'none';
+    } else {
+      expanded.style.display = 'none';
+      minimized.style.display = 'block';
+    }
+  }
+</script>

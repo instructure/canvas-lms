@@ -68,7 +68,6 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to create both types of group categories by default" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -98,7 +97,6 @@ describe GroupCategoriesController do
     end
 
     it "prevents creating non-collaborative groups when manage_tags_add permission is revoked" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -236,7 +234,6 @@ describe GroupCategoriesController do
 
     context "differentiation_tags" do
       before do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
         @course.account.reload
@@ -268,7 +265,6 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to update both types of group categories by default" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -295,7 +291,6 @@ describe GroupCategoriesController do
     end
 
     it "prevents updating non-collaborative groups when manage_tags_manage permission is revoked" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -416,7 +411,6 @@ describe GroupCategoriesController do
 
   describe "POST bulk_manage_differentiation_tag" do
     before :once do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -587,7 +581,7 @@ describe GroupCategoriesController do
         expect(response).to be_successful
         body = response.parsed_body
 
-        expect(body["group_category"]["group_category"]["name"]).to eq new_name
+        expect(body["group_category"]["name"]).to eq new_name
         expect(@non_collaborative_category.reload.name).to eq new_name
       end
 
@@ -758,7 +752,6 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to delete both types of group categories by default" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -783,7 +776,6 @@ describe GroupCategoriesController do
     end
 
     it "prevents deleting non-collaborative groups when manage_tags_delete permission is revoked" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -852,7 +844,6 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to view users in both types of group categories by default" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -875,7 +866,6 @@ describe GroupCategoriesController do
     end
 
     it "prevents viewing non-collaborative group users when manage_tags_manage permission is revoked" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -940,7 +930,6 @@ describe GroupCategoriesController do
     end
 
     it "allows teachers to import to both types of group categories by default" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -964,7 +953,6 @@ describe GroupCategoriesController do
     end
 
     it "prevents importing to non-collaborative groups when manage_tags_add permission is revoked" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1051,7 +1039,6 @@ describe GroupCategoriesController do
 
   describe "POST import_tags" do
     before :once do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1131,18 +1118,6 @@ describe GroupCategoriesController do
       expect_imported_tags
     end
 
-    it "fails if the feature flag is disabled" do
-      @course.account.disable_feature! :assign_to_differentiation_tags
-      user_session(@teacher)
-
-      post "import_tags", params: {
-        course_id: @course.id,
-        attachment: fixture_file_upload("group_categories/test_tag_import.csv", "text/csv")
-      }
-
-      assert_unauthorized
-    end
-
     it "fails if the account settings is disabled" do
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
       @course.account.save!
@@ -1199,7 +1174,6 @@ describe GroupCategoriesController do
 
   context "Differentiation Tags" do
     before do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1345,61 +1319,71 @@ describe GroupCategoriesController do
           expect(response).to be_forbidden
         end
       end
+    end
+  end
 
-      context "with differentiation tags disabled with existing hidden groups" do
-        before do
-          @course.account.disable_feature! :assign_to_differentiation_tags
-          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
-          @course.account.save!
-          @course.account.reload
-        end
+  describe "GET export" do
+    before :once do
+      @student2 = student_in_course(active_all: true).user
+      @group = @collaborative_category.groups.create!(name: "Test Group", context: @course)
+      @group.add_user(@student)
+      @group.add_user(@student2)
+    end
 
-        it "prevents teachers from creating non_collaborative groups if differentiation_tags is disabled" do
-          @course.account.role_overrides.create!({
-                                                   role: teacher_role,
-                                                   permission: :manage_tags_add,
-                                                   enabled: true
-                                                 })
-          user_session(@teacher)
+    before do
+      @teacher.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
+      user_session(@teacher)
+    end
 
-          post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
+    it "respects user's semicolon field separator preference" do
+      get :export, params: { course_id: @course.id, group_category_id: @collaborative_category.id }, format: :csv
 
-          expect(response).to be_unauthorized
-        end
+      expect(response).to be_successful
+      expect(response.content_type).to eq "text/csv"
 
-        it "does not allow viewing non-collaborative group category" do
-          user_session(@teacher)
-          get "users", params: {
-            course_id: @course.id,
-            group_category_id: @non_collaborative_category.id
-          }
-          assert_unauthorized
-        end
+      csv_data = CSV.parse(response.body, col_sep: ";", headers: true)
+      expect(csv_data.length).to eq 2
+      expect(csv_data.headers).to include("name", "canvas_user_id", "login_id", "sections", "group_name")
 
-        it "does not allow adding non-collaborative group category" do
-          user_session(@teacher)
-          post "create", params: {
-            course_id: @course.id,
-            category: {
-              name: "New Non-Collaborative Group",
-              non_collaborative: "1"
-            }
-          }
-          assert_unauthorized
-        end
+      group_names = csv_data.filter_map { |row| row["group_name"] }
+      expect(group_names).to include("Test Group")
+    end
 
-        it "does not allow updating non-collaborative group category" do
-          user_session(@teacher)
-          put "update", params: { course_id: @course.id, id: @non_collaborative_category.id, category: { name: "Updated Non-Collaborative Group" } }
-          assert_unauthorized
-        end
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for when building CSV rows" do
+      allow(SisPseudonym).to receive(:for).and_call_original
+      expect(SisPseudonym).to receive(:for)
+        .with(anything, anything, hash_including(current_user: @teacher))
+        .at_least(:once)
+        .and_call_original
+      get :export, params: { course_id: @course.id, group_category_id: @collaborative_category.id }, format: :csv
+    end
+  end
 
-        it "does not allow deleting non-collaborative group category" do
-          user_session(@teacher)
-          delete "destroy", params: { course_id: @course.id, id: @non_collaborative_category.id }
-          assert_unauthorized
-        end
-      end
+  describe "GET export_tags" do
+    before :once do
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @tag_category = @course.group_categories.create!(name: "Tags", non_collaborative: true)
+      @tag = @tag_category.groups.create!(name: "Tag 1", context: @course)
+      @tag.add_user(@student)
+    end
+
+    before do
+      @teacher.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
+      user_session(@teacher)
+    end
+
+    it "respects user's semicolon field separator preference" do
+      get :export_tags, params: { course_id: @course.id }, format: :csv
+
+      expect(response).to be_successful
+      expect(response.content_type).to eq "text/csv"
+
+      csv_data = CSV.parse(response.body, col_sep: ";", headers: true)
+      expect(csv_data.length).to be >= 1
+      expect(csv_data.headers).to include("name", "canvas_user_id", "login_id", "tag_name")
     end
   end
 end

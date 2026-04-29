@@ -23,16 +23,9 @@ module Loaders
       # This loader handles fetching group memberships for multiple users efficiently
       # and supports filtering by state, group state, and group course ID.
 
-      def self.for(filter: {})
-        # Create a consistent string key by sorting the filter hash entries
-        key = filter.to_h.sort.map { |k, v| "#{k}:#{v}" }.join(";")
-
-        @loaders ||= {}
-        @loaders[key] ||= new(filter:)
-      end
-
-      def initialize(filter: {})
+      def initialize(executing_user:, filter: {})
         super()
+        @executing_user = executing_user
         @filter = filter
       end
 
@@ -48,12 +41,84 @@ module Loaders
 
         scope = scope.where(workflow_state: @filter[:state]) if @filter[:state].present?
 
+        # Preload group_memberships on the groups to avoid N+1 queries when
+        # grants_right? checks has_member? for permission evaluation
+        scope = scope.preload(group: :group_memberships).filter do |membership|
+          group = membership.group
+          # Remove any group memberships the executing user should not see
+          next group.grants_right?(@executing_user, :read)
+        end
+
         # Group results by user_id for efficient lookup
         memberships_by_user_id = scope.group_by(&:user_id)
 
         # Fulfill requests for each user_id
         user_ids.each do |user_id|
           fulfill(user_id, memberships_by_user_id[user_id] || [])
+        end
+      end
+    end
+
+    class InstitutionalTagsLoader < GraphQL::Batch::Loader
+      def initialize(current_user, session, account_id)
+        super()
+        @current_user = current_user
+        @session = session
+        @account_id = account_id
+      end
+
+      def perform(user_ids)
+        root_account = Account.find_by(id: @account_id)
+
+        unless root_account&.root_account? &&
+               root_account.feature_enabled?(:institutional_tags) &&
+               root_account.grants_right?(@current_user, @session, :manage_institutional_tags_view)
+          user_ids.each { |user_id| fulfill(user_id, nil) }
+          return
+        end
+
+        assocs = InstitutionalTagAssociation
+                 .where(user_id: user_ids, workflow_state: "active")
+                 .eager_load(:institutional_tag)
+                 .where(institutional_tags: { workflow_state: "active" })
+                 .order("institutional_tags.name")
+
+        tags_by_user_id = assocs
+                          .group_by(&:user_id)
+                          .transform_values { |a| a.map(&:institutional_tag) }
+
+        user_ids.each do |user_id|
+          fulfill(user_id, tags_by_user_id[user_id] || [])
+        end
+      end
+    end
+
+    class DifferentiationTagsLoader < GraphQL::Batch::Loader
+      def initialize(current_user, course_id)
+        super()
+        @current_user = current_user
+        @course_id = course_id
+      end
+
+      def perform(user_ids)
+        course = Course.active.find_by(id: @course_id) if @course_id.present?
+
+        if course.present? &&
+           course.account.allow_assign_to_differentiation_tags? &&
+           course.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+
+          tags_by_user_id = GroupMembership
+                            .active
+                            .where(user_id: user_ids)
+                            .joins(:group)
+                            .where.not(groups: { workflow_state: "deleted" })
+                            .where(groups: { context: course, non_collaborative: true })
+                            .group_by(&:user_id)
+        end
+
+        tags_by_user_id ||= {}
+        user_ids.each do |user_id|
+          fulfill(user_id, tags_by_user_id[user_id]) unless fulfilled?(user_id)
         end
       end
     end

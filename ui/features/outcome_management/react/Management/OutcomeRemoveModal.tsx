@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {IconCheckMarkIndeterminateLine} from '@instructure/ui-icons'
 

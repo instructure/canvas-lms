@@ -1,16 +1,22 @@
+<%
+  # For discussion checkpoints, use the parent assignment instead of the sub-assignment
+  # to ensure correct assignment IDs and URLs in notifications
+  assignment = asset.submission.assignment
+  assignment = assignment.parent_assignment if assignment.checkpoint? && assignment.parent_assignment
+%>
 <% define_content :link do %>
-  <% if asset.submission.assignment.context.feature_enabled?(:assignments_2_student) %>
-    <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment]) %>
+  <% if assignment.context.feature_enabled?(:assignments_2_student) %>
+    <%= polymorphic_url([assignment.context, assignment]) %>
   <% else %>
-    <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
+    <%= polymorphic_url([assignment.context, assignment, :submission], id: asset.submission.user) %>
   <% end %>
 <% end %>
 
 <% define_content :subject do %>
   <%= t :subject, "Submission Comment: %{user}, %{assignment}, %{context}",
         :user => submission_comment_submittor(asset, user),
-        :assignment => asset.submission.assignment.title,
-        :context => asset.submission.assignment.context.name %>
+        :assignment => assignment.title,
+        :context => assignment.context.name %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -22,7 +28,7 @@
 <p><%= t :body, "%{author} just made a new comment on the submission for %{user} for %{assignment}",
          :author => submission_comment_author(asset, user),
          :user => submission_comment_submittor(asset, user),
-         :assignment => asset.submission.assignment.title %></p>
+         :assignment => assignment.title %></p>
 
 <%= html_to_simple_html(asset.comment,
                         :base_url => dashboard_url,

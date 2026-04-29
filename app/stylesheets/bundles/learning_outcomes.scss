@@ -248,6 +248,14 @@ table.criterion {
   margin: 2em 0;
 }
 
+.has-outcome-context-tag table.criterion {
+  margin-top: .85em;
+}
+
+.has-outcome-context-tag .description.user_content p {
+  margin-bottom: 0.25em;
+}
+
 table.criterion th {
   border-top: 1px solid $borderColor;
   border-#{direction(left)}: 1px solid $borderColor;

@@ -22,6 +22,7 @@
  * From assignments_controller.rb
  */
 export type EnvAssignments = Partial<EnvAssignmentsA2StudentView> &
+  Partial<EnvAssignmentsA2TeacherView> &
   Partial<EnvAssignmentsDefaultToolInfo>
 
 /**
@@ -54,11 +55,13 @@ export interface EnvAssignmentsA2StudentView {
   LTI_TOOL_SELECTION_WIDTH?: string
   LTI_TOOL_SELECTION_HEIGHT?: string
   ASSIGNMENT_ID: string | number
+  ASSIGNMENT_POINTS?: number
   CONFETTI_ENABLED: boolean
   CURRENT_USER_CAN_GRADE_SUBMISSION: boolean
   EMOJIS_ENABLED: boolean
   EMOJI_DENY_LIST: any[]
   COURSE_ID: string | number
+  MODULE_ITEM_ID?: string | number
   ISOBSERVER: boolean
   ORIGINALITY_REPORTS_FOR_A2: boolean
   PREREQS: any
@@ -67,6 +70,12 @@ export interface EnvAssignmentsA2StudentView {
   SECTION_LIST?: EnvSection[]
   HAS_GRADING_PERIODS?: boolean
   active_grading_periods?: any[]
+}
+
+export interface EnvAssignmentsA2TeacherView {
+  PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: boolean
+  HAS_PEER_REVIEW_SUB_ASSIGNMENT: boolean
+  CAN_EDIT_ASSIGNMENTS: boolean
 }
 
 /**

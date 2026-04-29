@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe Anonymity do
   describe ".generate_id" do
     let(:short_id) { "aB123" }
@@ -53,7 +51,7 @@ describe Anonymity do
         Anonymity.generate_id(existing_ids: existing_anonymous_ids_fake)
       end
 
-      let(:existing_anonymous_ids_fake) { double("Array") }
+      let(:existing_anonymous_ids_fake) { instance_double(Array) }
 
       it "queries the passed in existing_anonymous_ids" do
         allow(Anonymity).to receive(:generate_short_id).and_return(short_id)

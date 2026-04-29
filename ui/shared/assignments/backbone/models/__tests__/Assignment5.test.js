@@ -153,7 +153,7 @@ describe('Assignment', () => {
           }),
         )
 
-        const callback = jest.fn()
+        const callback = vi.fn()
         assignment.duplicate_failed(callback)
 
         await new Promise(resolve => setTimeout(resolve, 10))
@@ -209,7 +209,7 @@ describe('Assignment', () => {
           name: 'foo',
           frozen_attributes: [],
         })
-        jest.spyOn(assignment, 'isQuizLTIAssignment').mockReturnValue(true)
+        vi.spyOn(assignment, 'isQuizLTIAssignment').mockReturnValue(true)
         expect(assignment.canFreeze()).toBe(false)
       })
     })

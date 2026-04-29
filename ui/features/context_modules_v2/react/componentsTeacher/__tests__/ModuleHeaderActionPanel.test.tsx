@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse, graphql} from 'msw'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
@@ -32,7 +33,15 @@ const server = setupServer(
       data: {
         legacyNode: {
           modulesConnection: {
-            edges: [],
+            edges: [
+              {
+                node: {
+                  _id: 'mod_1',
+                  name: 'Module 1',
+                  moduleItemsTotalCount: 15,
+                },
+              },
+            ],
             pageInfo: {
               hasNextPage: false,
               endCursor: null,
@@ -88,21 +97,56 @@ const createQueryClient = () =>
 const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentProps => ({
   id: 'mod_1',
   name: 'Module 1',
-  prerequisites: [],
   completionRequirements: [],
   requirementCount: 0,
-  itemCount: 5,
   published: true,
   expanded: true,
   hasActiveOverrides: false,
-  setModuleAction: jest.fn(),
-  setIsManageModuleContentTrayOpen: jest.fn(),
-  setSourceModule: jest.fn(),
+  setModuleAction: vi.fn(),
+  setIsManageModuleContentTrayOpen: vi.fn(),
+  setSourceModule: vi.fn(),
   ...overrides,
 })
 
-const setUp = (props: ComponentProps, courseId = 'test-course-id') => {
+const defaultPermissions = {
+  canAdd: true,
+  canEdit: true,
+  canDelete: true,
+  canView: true,
+  canViewUnpublished: true,
+  canDirectShare: true,
+  readAsAdmin: true,
+  canManageSpeedGrader: true,
+}
+
+const setUp = (
+  props: ComponentProps,
+  courseId = 'test-course-id',
+  itemCount = 15,
+  contextOverrides: Partial<typeof contextModuleDefaultProps> = {},
+) => {
   const queryClient = createQueryClient()
+
+  // Mock the modules data in the query client
+  queryClient.setQueryData(['modules', courseId], {
+    pages: [
+      {
+        modules: [
+          {
+            _id: 'mod_1',
+            id: 'mod_1',
+            name: 'Module 1',
+            moduleItemsTotalCount: itemCount,
+          },
+        ],
+        pageInfo: {
+          hasNextPage: false,
+          endCursor: null,
+        },
+      },
+    ],
+    pageParams: [undefined],
+  })
 
   const contextProps = {
     ...contextModuleDefaultProps,
@@ -111,6 +155,9 @@ const setUp = (props: ComponentProps, courseId = 'test-course-id') => {
     moduleMenuModalTools: [],
     moduleMenuTools: [],
     moduleIndexMenuModalTools: [],
+    modulesArePaginated: true,
+    pageSize: 10,
+    ...contextOverrides,
   }
 
   return render(
@@ -122,26 +169,10 @@ const setUp = (props: ComponentProps, courseId = 'test-course-id') => {
   )
 }
 
-beforeAll(() => {
-  server.listen({onUnhandledRequest: 'warn'})
-})
-
-beforeEach(() => {
-  // @ts-expect-error
-  window.ENV = {
-    TIMEZONE: 'UTC',
-  }
-})
-
-afterEach(() => {
-  server.resetHandlers()
-})
-
-afterAll(() => {
-  server.close()
-})
-
 describe('ModuleHeaderActionPanel', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
   it('renders ViewAssignTo when hasActiveOverrides is true', () => {
     const {getByText} = setUp(buildDefaultProps({hasActiveOverrides: true}))
     expect(getByText('View Assign To')).toBeInTheDocument()
@@ -152,17 +183,102 @@ describe('ModuleHeaderActionPanel', () => {
     expect(queryByText('View Assign To')).not.toBeInTheDocument()
   })
 
-  it('does not display prerequisites (moved to ModuleHeader)', () => {
-    const prerequisiteProps = buildDefaultProps({
-      prerequisites: [
-        {id: 'prereq_1', name: 'Prerequisite Module 1', type: 'context_module'},
-        {id: 'prereq_2', name: 'Prerequisite Module 2', type: 'context_module'},
-      ],
-      hasActiveOverrides: false,
+  it('does not render ViewAssignTo when canEdit is false', () => {
+    const {queryByText} = setUp(buildDefaultProps(), 'test-course-id', 15, {
+      permissions: {
+        ...defaultPermissions,
+        canEdit: false,
+      },
     })
-    const {queryByText} = setUp(prerequisiteProps)
+    expect(queryByText('View Assign To')).not.toBeInTheDocument()
+  })
 
-    expect(queryByText(/Prerequisite/)).not.toBeInTheDocument()
-    expect(queryByText('Prerequisite Module 1')).not.toBeInTheDocument()
+  it('does not render Add Module Item button when canAdd is false', () => {
+    const {queryByTestId} = setUp(buildDefaultProps(), 'test-course-id', 15, {
+      permissions: {
+        ...defaultPermissions,
+        canAdd: false,
+      },
+    })
+    expect(queryByTestId('add-item-button')).not.toBeInTheDocument()
+  })
+
+  it('does not render the publish button when canEdit is false', () => {
+    const {queryByTestId} = setUp(buildDefaultProps(), 'test-course-id', 15, {
+      permissions: {
+        ...defaultPermissions,
+        canEdit: false,
+      },
+    })
+    expect(queryByTestId('module-publish-button')).not.toBeInTheDocument()
+  })
+
+  it('does not show Show All button when module is not expanded', () => {
+    const {queryByTestId} = setUp(buildDefaultProps({expanded: false}))
+    expect(queryByTestId('show-all-toggle')).not.toBeInTheDocument()
+  })
+
+  it('shows Show All button with item count when expanded', () => {
+    setUp(buildDefaultProps({expanded: true}))
+
+    const button = screen.getByTestId('show-all-toggle')
+    expect(button).toBeInTheDocument()
+    expect(button).toHaveTextContent('Show All (15)')
+  })
+
+  it('calls onToggleShowAll when Show All button is clicked', async () => {
+    const user = userEvent.setup()
+    const mockToggleShowAll = vi.fn()
+
+    setUp(
+      buildDefaultProps({
+        expanded: true,
+        onToggleShowAll: mockToggleShowAll,
+      }),
+    )
+
+    const button = screen.getByTestId('show-all-toggle')
+    await user.click(button)
+
+    expect(mockToggleShowAll).toHaveBeenCalledWith('mod_1')
+  })
+
+  it('shows Show Less text when showAll is true', () => {
+    setUp(
+      buildDefaultProps({
+        expanded: true,
+        showAll: true,
+      }),
+    )
+
+    const button = screen.getByTestId('show-all-toggle')
+    expect(button).toHaveTextContent('Show Less')
+  })
+
+  it('does not show Show All button when pagination is disabled', () => {
+    const {queryByTestId} = setUp(buildDefaultProps({expanded: true}), 'test-course-id', 15, {
+      modulesArePaginated: false,
+    })
+    expect(queryByTestId('show-all-toggle')).not.toBeInTheDocument()
+  })
+
+  it('does not show Show All button when total count is less than page size', async () => {
+    const {queryByTestId} = setUp(buildDefaultProps({expanded: true}), 'test-course-id', 5)
+    expect(queryByTestId('show-all-toggle')).not.toBeInTheDocument()
+  })
+
+  it('shows Show All button with different page size', () => {
+    // Use itemCount of 15 which exceeds page size of 5
+    setUp(buildDefaultProps({expanded: true}), 'test-course-id', 15, {pageSize: 5})
+
+    const button = screen.getByTestId('show-all-toggle')
+    expect(button).toBeInTheDocument()
+    expect(button).toHaveTextContent('Show All (15)')
+  })
+
+  it('does not show Show All button when count equals page size', () => {
+    // Test edge case where count equals page size exactly
+    const {queryByTestId} = setUp(buildDefaultProps({expanded: true}), 'test-course-id', 10)
+    expect(queryByTestId('show-all-toggle')).not.toBeInTheDocument()
   })
 })

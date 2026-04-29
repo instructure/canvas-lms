@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {chain, debounce, find, map, groupBy, isEmpty, some, union} from 'lodash'
+import {debounce, groupBy, isEmpty, union, find, map, some, take} from 'es-toolkit/compat'
 import React from 'react'
 import PropTypes from 'prop-types'
 import OverrideStudentStore from './OverrideStudentStore'
@@ -289,10 +289,9 @@ class DueDateTokenWrapper extends React.Component {
         group: this.MAXIMUM_GROUPS_TO_SHOW,
       }[type] || 0
 
-    return chain(this.filteredTagsForType(type))
-      .take(numberToShow)
-      .map((set, index) => this.selectableOption(set, index))
-      .value()
+    return take(this.filteredTagsForType(type), numberToShow).map((set, index) =>
+      this.selectableOption(set, index),
+    )
   }
 
   selectableOption = (set, index) => {

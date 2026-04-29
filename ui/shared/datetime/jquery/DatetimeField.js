@@ -17,7 +17,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import './datepicker'
 import * as tz from '@instructure/moment-utils'
 import fallbacks from 'translations/en.json'

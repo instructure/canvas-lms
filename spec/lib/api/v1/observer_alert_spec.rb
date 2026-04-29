@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../../spec_helper"
-
 class ObserverAlertApiHarness
   include Api::V1::ObserverAlert
   include ApplicationHelper
@@ -42,7 +40,11 @@ describe "Api::V1::ObserverAlert" do
 
   describe "#observer_alert_json" do
     let(:user) { user_with_pseudonym }
-    let(:session) { user_session(user) }
+    let(:session) { {} }
+
+    before do
+      user_session(user)
+    end
 
     it "returns json" do
       alert = observer_alert_model(observer: user)
@@ -74,6 +76,14 @@ describe "Api::V1::ObserverAlert" do
         alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: "assignment_grade_high", context: asg)
         json = api.observer_alert_json(alert, user, session)
         expect(json["html_url"]).to eq api.course_assignment_url(@course.id, asg)
+      end
+
+      it "for sub assignment" do
+        assignment = assignment_model(course: @course)
+        sub_assignment = assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+        alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: "assignment_grade_high", context: sub_assignment)
+        json = api.observer_alert_json(alert, user, session)
+        expect(json["html_url"]).to eq api.course_assignment_url(@course.id, sub_assignment.parent_assignment)
       end
 
       it "for course" do

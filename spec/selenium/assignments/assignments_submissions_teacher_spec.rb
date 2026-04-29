@@ -197,28 +197,5 @@ describe "submissions" do
       expect(@course.student_view_student.submissions.count).to eq 1
       expect(f("#sidebar_content .details")).to include_text "Submitted!"
     end
-
-    it "allows a student view student to submit file upload assignments", priority: "1" do
-      skip("investigate in EVAL-2966")
-      @assignment = @course.assignments.create(
-        title: "Cool Assignment",
-        points_possible: 10,
-        submission_types: "online_upload",
-        due_at: Time.now.utc + 2.days
-      )
-
-      enter_student_view
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-
-      f(".submit_assignment_link").click
-
-      _filename, fullpath, _data = get_file("testfile1.txt")
-      f(".submission_attachment input").send_keys(fullpath)
-      scroll_to(f("#submit_file_button"))
-      expect_new_page_load { f("#submit_file_button").click }
-
-      expect(f(".details .header")).to include_text "Submitted!"
-      expect(f(".details")).to include_text "testfile1"
-    end
   end
 end

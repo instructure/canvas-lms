@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -36,10 +36,7 @@ export function showConfirmUnfavorite(props: Props) {
     if (modal) modal.show()
   }
 
-  ReactDOM.render(
-    <ConfirmUnfavoriteCourseModal {...props} ref={showConfirmUnfavoriteRef} />,
-    parent,
-  )
+  legacyRender(<ConfirmUnfavoriteCourseModal {...props} ref={showConfirmUnfavoriteRef} />, parent)
   return parent
 }
 
@@ -52,7 +49,7 @@ export function showNoFavoritesAlert() {
   parent.setAttribute('class', 'no-favorites-alert-container')
   document.querySelector('.ic-DashboardCard__box')?.appendChild(parent)
 
-  ReactDOM.render(
+  legacyRender(
     <Alert variant="info" renderCloseButtonLabel="Close" margin="small">
       {I18n.t(`You have no courses favorited. Reloading this page will show all
       your active courses. To add favorites, go to `)}{' '}

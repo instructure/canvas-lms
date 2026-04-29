@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import '@canvas/media-comments'
 import ready from '@instructure/ready'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import CanvasStudioPlayer from '@canvas/canvas-studio-player/react/CanvasStudioPlayer'
 
 type MediaPlayerAttributes = {
@@ -31,27 +31,11 @@ type MediaPlayerAttributes = {
 }
 
 ready(() => {
-  function isConsolidatedMediaPlayerEnabled() {
-    return ENV?.FEATURES?.consolidated_media_player
-  }
-
-  function renderCanvasMediaPlayer(domId: string, data: MediaPlayerAttributes) {
-    $(`#${domId}`).mediaComment(
-      'show_inline',
-      data.media_entry_id || 'maybe',
-      data.type,
-      data.download_url,
-      data.attachment_id,
-      data.bp_locked_attachment,
-    )
-  }
-
   function renderStudioMediaPlayer(domId: string, data: MediaPlayerAttributes) {
     $(`#${domId}`).css({
       color: 'unset',
     })
-    const root = createRoot(document.getElementById(domId)!)
-    root.render(
+    render(
       <CanvasStudioPlayer
         media_id={data.media_entry_id}
         type={data.type === 'audio' ? 'audio' : 'video'}
@@ -59,6 +43,7 @@ ready(() => {
         explicitSize={{width: 550, height: 400}}
         hideUploadCaptions={data.bp_locked_attachment}
       />,
+      document.getElementById(domId)!,
     )
   }
 
@@ -66,11 +51,7 @@ ready(() => {
   const $preview = $(`#${domId}`)
   const data = $preview.data() as MediaPlayerAttributes
 
-  if (isConsolidatedMediaPlayerEnabled()) {
-    renderStudioMediaPlayer(domId, data)
-  } else {
-    renderCanvasMediaPlayer(domId, data)
-  }
+  renderStudioMediaPlayer(domId, data)
 
   if ((ENV as any)?.NEW_FILES_PREVIEW) {
     $preview.css({

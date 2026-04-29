@@ -21,9 +21,9 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {InternalSettingActionButtons} from '../../table/InternalSettingActionButtons'
 
-const onSubmitChanges = jest.fn()
-const onClearChanges = jest.fn()
-const onDelete = jest.fn()
+const onSubmitChanges = vi.fn()
+const onClearChanges = vi.fn()
+const onDelete = vi.fn()
 
 describe('InternalSettingActionButtons', () => {
   it('only shows save and reset buttons with a pending change', () => {

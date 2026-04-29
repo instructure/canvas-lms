@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {reduce} from 'lodash'
+import {reduce} from 'es-toolkit/compat'
 
 /**
  * Converts an object with nested key strings into an object with nested structure.
@@ -62,7 +62,6 @@ export default function unflatten(obj) {
           key = keys[i] === '' ? cur.length : keys[i]
 
           cur = cur[key] =
-            // eslint-disable-next-line no-restricted-globals
             i < lastKey ? cur[key] || (keys[i + 1] && isNaN(keys[i + 1]) ? {} : []) : val
           i++
         }
@@ -82,6 +81,6 @@ export default function unflatten(obj) {
 
       return newObj
     },
-    Object.create(null)
+    Object.create(null),
   )
 }

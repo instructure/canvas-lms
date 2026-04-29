@@ -33,7 +33,6 @@ describe('NewKeyModal', () => {
     oldEnv = window.ENV
     window.ENV = {
       ...window.ENV,
-      validLtiPlacements: [],
       validLtiScopes: {},
     }
     userEvent.setup()
@@ -41,7 +40,7 @@ describe('NewKeyModal', () => {
 
   afterEach(() => {
     window.ENV = oldEnv
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   const selectedScopes = [
@@ -178,7 +177,7 @@ describe('NewKeyModal', () => {
   }
 
   it('clears the lti key state when modal is closed', () => {
-    const ltiStub = jest.fn()
+    const ltiStub = vi.fn()
     const actions = Object.assign(fakeActions, {
       developerKeysModalClose: () => {},
       resetLtiState: ltiStub,
@@ -196,7 +195,7 @@ describe('NewKeyModal', () => {
 
   describe('redirect_uris is too long', () => {
     let flashStub
-    const createOrEditSpy = jest.fn()
+    const createOrEditSpy = vi.fn()
     const actions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
     const devKey = {
       ...developerKey,
@@ -209,7 +208,7 @@ describe('NewKeyModal', () => {
     let ref
 
     beforeEach(() => {
-      flashStub = jest.spyOn($, 'flashError')
+      flashStub = vi.spyOn($, 'flashError')
       const {ref: reference} = renderDeveloperKeyModal({
         createLtiKeyState,
         createOrEditDeveloperKeyState: state,
@@ -251,8 +250,8 @@ describe('NewKeyModal', () => {
     afterAll(() => server.close())
 
     it('shows flash message and closes modal', async () => {
-      const handleSuccessfulSave = jest.fn()
-      const closeModal = jest.fn()
+      const handleSuccessfulSave = vi.fn()
+      const closeModal = vi.fn()
 
       const {ref} = renderDeveloperKeyModal({
         createLtiKeyState: {isLtiKey: true},
@@ -288,12 +287,12 @@ describe('NewKeyModal', () => {
 
       // Monkey patch the component's methods
       const originalCloseModal = ref.current.closeModal
-      ref.current.closeModal = jest.fn(() => {
+      ref.current.closeModal = vi.fn(() => {
         closeModal()
         originalCloseModal.call(ref.current)
       })
 
-      ref.current.saveLtiToolConfiguration = jest.fn(async () => {
+      ref.current.saveLtiToolConfiguration = vi.fn(async () => {
         // Manually trigger the success callback
         handleSuccessfulSave()
         // Close the modal using our patched method
@@ -310,8 +309,8 @@ describe('NewKeyModal', () => {
     })
 
     it('shows flash message and leaves modal open', async () => {
-      const flashStub = jest.spyOn($, 'flashError')
-      const closeModal = jest.fn()
+      const flashStub = vi.spyOn($, 'flashError')
+      const closeModal = vi.fn()
 
       const {ref} = renderDeveloperKeyModal({
         createLtiKeyState: {isLtiKey: true},
@@ -374,7 +373,7 @@ describe('NewKeyModal', () => {
   })
 
   it('renders the saved toolConfiguration if it is present in state', () => {
-    const ltiStub = jest.fn()
+    const ltiStub = vi.fn()
 
     // Mock the component's saveLtiToolConfiguration method directly
     const {ref} = renderDeveloperKeyModal({
@@ -398,7 +397,7 @@ describe('NewKeyModal', () => {
 
     // Replace the saveLtiToolConfiguration method with our mock
     const originalMethod = ref.current.saveLtiToolConfiguration
-    ref.current.saveLtiToolConfiguration = jest.fn(() => {
+    ref.current.saveLtiToolConfiguration = vi.fn(() => {
       ltiStub()
       return originalMethod.call(ref.current)
     })
@@ -415,7 +414,7 @@ describe('NewKeyModal', () => {
   })
 
   it('clears state on modal close', () => {
-    const ltiStub = jest.fn()
+    const ltiStub = vi.fn()
     const actions = {
       ...fakeActions,
       updateLtiKey: ltiStub,
@@ -519,7 +518,7 @@ describe('NewKeyModal', () => {
 
   describe('saving a LTI key in json view', () => {
     it('does not save if lti configuration is empty', () => {
-      const saveLtiToolConfigurationSpy = jest.fn()
+      const saveLtiToolConfigurationSpy = vi.fn()
       const actions = {
         ...fakeActions,
         saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy}),
@@ -538,7 +537,7 @@ describe('NewKeyModal', () => {
     })
 
     it('does not save if lti configuration json is invalid', () => {
-      const saveLtiToolConfigurationSpy = jest.fn()
+      const saveLtiToolConfigurationSpy = vi.fn()
       const actions = {
         ...fakeActions,
         saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy}),

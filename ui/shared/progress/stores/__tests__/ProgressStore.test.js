@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isEmpty} from 'lodash'
+import {isEmpty} from 'es-toolkit/compat'
 import ProgressStore from '../ProgressStore'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'

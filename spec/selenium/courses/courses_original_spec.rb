@@ -315,35 +315,6 @@ describe "courses" do
       expect(content).to include_text("group1")
     end
 
-    it "resets cached permissions when enrollment is activated by date" do
-      skip "Fails with logic around observed_users enabled in CoursesController#show"
-      enable_cache do
-        enroll_student(@student, true)
-
-        @course.start_at = 1.day.from_now
-        @course.restrict_enrollments_to_course_dates = true
-        @course.restrict_student_future_view = true
-        @course.save!
-
-        user_session(@student)
-
-        User.where(id: @student).update_all(updated_at: 5.minutes.ago) # make sure that touching the user resets the cache
-
-        get "/courses/#{@course.id}"
-
-        # cache unauthorized permission
-        expect(f("#unauthorized_message")).to be_displayed
-
-        # manually trigger a stale enrollment - should recalculate on visit if it didn't already in the background
-        Course.where(id: @course).update_all(start_at: 1.day.ago)
-        Enrollment.where(id: @student.student_enrollments).update_all(updated_at: 1.minute.from_now) # because of enrollment date caching
-        EnrollmentState.where(enrollment_id: @student.student_enrollments).update_all(state_is_current: false)
-
-        refresh_page
-        expect(f("#course_home_content")).to be_displayed
-      end
-    end
-
     it "does not display global nav on k5 subject with embed mode enabled" do
       toggle_k5_setting(@course.account)
       enroll_student(@student, true)
@@ -398,18 +369,10 @@ describe "courses" do
 
       expect(f("#announcements_on_home_page")).to be_displayed
       expect(f("#announcements_on_home_page")).to include_text(@text)
-      expect(f("#announcements_on_home_page")).to_not include_text(@html)
+      expect(f("#announcements_on_home_page")).not_to include_text(@html)
     end
 
-    ["wiki", "syllabus"].each do |view|
-      it "displays an h1 header when home page is #{view}" do
-        @course.update_column(:default_view, view)
-        get "/courses/#{@course.id}"
-        expect(f("#announcements_on_home_page h1")).to include_text("Recent Announcements")
-      end
-    end
-
-    %w[feed assignments modules].each do |view|
+    %w[wiki syllabus feed assignments modules].each do |view|
       it "displays with an h2 header when course home is #{view}" do
         @course.update_column(:default_view, view)
         get "/courses/#{@course.id}"

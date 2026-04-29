@@ -50,7 +50,7 @@ describe('gradebook_uploads#createNumberFormatter', () => {
   })
 
   it('delegates to GradeFormatHelper#formatGrade', () => {
-    const formatGradeSpy = jest.spyOn(GradeFormatHelper, 'formatGrade')
+    const formatGradeSpy = vi.spyOn(GradeFormatHelper, 'formatGrade')
     const formatter = gradebook_uploads.createNumberFormatter('foo')
     formatter(null, null, {})
     expect(formatGradeSpy).toHaveBeenCalled()

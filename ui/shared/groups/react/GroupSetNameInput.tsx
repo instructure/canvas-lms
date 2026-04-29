@@ -17,21 +17,18 @@
  */
 
 import React, {useState} from 'react'
-import {Flex} from '@instructure/ui-flex'
 import {FormMessage} from '@instructure/ui-form-field/types/FormPropTypes'
-import {IconWarningSolid} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('editGroup')
 
 export type GroupSetNameInputProps = {
-  id: string,
-  initialValue?: string,
-  getShouldShowEmptyNameError?: () => boolean,
-  setShouldShowEmptyNameError?: (shouldShow: boolean) => void,
+  id: string
+  initialValue?: string
+  getShouldShowEmptyNameError?: () => boolean
+  setShouldShowEmptyNameError?: (shouldShow: boolean) => void
 }
 
 const GroupSetNameInput = ({
@@ -48,7 +45,7 @@ const GroupSetNameInput = ({
       // reset the value
       if (setShouldShowEmptyNameError) setShouldShowEmptyNameError(false)
       const errorText = I18n.t('Name is required')
-      setErrorMessages([{ text: errorText, type: 'newError' }])
+      setErrorMessages([{text: errorText, type: 'newError'}])
     }
   }
 
@@ -58,7 +55,7 @@ const GroupSetNameInput = ({
       if (nameValue.length > 255) {
         errorText = I18n.t('Name must be 255 characters or less')
       }
-      if (errorText) setErrorMessages([{ text: errorText, type: 'newError' }])
+      if (errorText) setErrorMessages([{text: errorText, type: 'newError'}])
     }
   }
 
@@ -68,17 +65,17 @@ const GroupSetNameInput = ({
   }
 
   return (
-    <View as='div' margin='small xx-small'>
+    <View as="div" margin="small xx-small">
       <TextInput
         id={`category_${id}_name`}
         renderLabel=""
         messages={errorMessages}
-        name='name'
+        name="name"
         value={nameValue}
         onFocus={handleFocus}
         onBlur={validateInput}
         onChange={handleInputChange}
-        width='250px'
+        width="250px"
         data-testid={`category_${id}_name`}
       />
     </View>

@@ -37,6 +37,26 @@ describe LoginController do
       expect(session[:expected_user_id]).to eq @user.id
     end
 
+    it "redirects to discovery_page_url when discovery page is allowed and active" do
+      allow(Account.default).to receive_messages(discovery_page_allowed?: true,
+                                                 discovery_page_active?: true,
+                                                 discovery_page_url: "https://identity.example.com/discover")
+
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment)
+        .with("auth.new.discovery_page_redirect.v2", tags: { auth_type: nil, target_auth_type: nil, domain: "test.host" })
+      get "new"
+      expect(response).to redirect_to("https://identity.example.com/discover")
+    end
+
+    it "does not redirect to discovery_page_url when authentication_provider param is present" do
+      allow(Account.default).to receive_messages(discovery_page_allowed?: true,
+                                                 discovery_page_active?: true,
+                                                 discovery_page_url: "https://identity.example.com/discover")
+      get "new", params: { authentication_provider: "canvas" }
+      expect(response).to redirect_to(canvas_login_url)
+    end
+
     it "respects auth_discovery_url" do
       Account.default.auth_discovery_url = "https://google.com/"
       Account.default.save!
@@ -184,6 +204,41 @@ describe LoginController do
       end
     end
 
+    describe "handling mobile web view" do
+      it "sets the token with true" do
+        user_session user_with_pseudonym(active: true)
+        request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
+        allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
+
+        get "session_token", format: :json, params: { mobile_consent: "true" }
+        parsed_body = response.parsed_body
+        stoken = SessionToken.parse(parsed_body["session_url"].split("session_token=").last)
+        expect(stoken.consent_from_mobile).to be(true)
+      end
+
+      it "sets the token with false" do
+        user_session user_with_pseudonym(active: true)
+        request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
+        allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
+
+        get "session_token", format: :json, params: { mobile_consent: "false" }
+        parsed_body = response.parsed_body
+        stoken = SessionToken.parse(parsed_body["session_url"].split("session_token=").last)
+        expect(stoken.consent_from_mobile).to be(false)
+      end
+
+      it "sets the token with nil if not a mobile web view" do
+        user_session user_with_pseudonym(active: true)
+        request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
+        allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
+
+        get "session_token", format: :json
+        parsed_body = response.parsed_body
+        stoken = SessionToken.parse(parsed_body["session_url"].split("session_token=").last)
+        expect(stoken.consent_from_mobile).to be_nil
+      end
+    end
+
     it "rejects javascript scheme" do
       user_session user_with_pseudonym(active: true)
       request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
@@ -195,14 +250,9 @@ describe LoginController do
   end
 
   describe "#logout" do
-    it "doesn't logout if the authenticity token is invalid" do
-      skip("investigate cause for failures beginning 05/05/21 FOO-1950")
-      enable_forgery_protection do
-        delete "destroy"
-        # it could be a 422, or 0 if error handling isn't enabled properly in specs
-        expect(response).to_not be_successful
-        expect(response).to_not be_redirect
-      end
+    before do
+      user = user_with_pseudonym(active: true)
+      user_session(user, @pseudonym)
     end
 
     it "logs out" do

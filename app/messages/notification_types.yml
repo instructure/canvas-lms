@@ -250,6 +250,8 @@
       delay_for: 0
     - name: Pseudonym Registration Done
       delay_for: 0
+    - name: Pseudonym Suspended After Failed Login
+      delay_for: 0
     - name: Confirm Registration
       delay_for: 0
     - name: Forgot Password
@@ -266,11 +268,11 @@
       delay_for: 0
     - name: Manually Created Access Token Created
       delay_for: 0
-    - name: Account Verification
-      delay_for: 0
     - name: Access Token Created On Behalf Of User
       delay_for: 0
     - name: Access Token Deleted
+      delay_for: 0
+    - name: Access Token Expiring Soon
       delay_for: 0
 
 - category: Student Appointment Signups

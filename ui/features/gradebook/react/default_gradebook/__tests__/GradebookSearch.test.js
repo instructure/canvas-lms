@@ -76,7 +76,7 @@ describe('Gradebook', () => {
   describe('_updateEssentialDataLoaded', () => {
     const createInitializedGradebook = options => {
       gradebook = createGradebook(options)
-      jest.spyOn(gradebook, 'finishRenderingUI')
+      vi.spyOn(gradebook, 'finishRenderingUI')
 
       gradebook.setStudentIdsLoaded(true)
       gradebook.setAssignmentGroupsLoaded(true)

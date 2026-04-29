@@ -103,9 +103,11 @@ export function ExternalToolSelectionDialog(props: ExternalToolSelectionDialogPr
       <Modal.Body overflow="fit">
         <Flex as="div" direction="column">
           <Flex.Item as="div" shouldShrink={true} shouldGrow={true}>
-            {/* @ts-expect-error */}
             <Alert liveRegion={getLiveRegion} variant="info" screenReaderOnly={!filterEmpty}>
-              {filterEmpty && formatMessage('No results found for {filterTerm}', {filterTerm})}
+              {filterEmpty &&
+                formatMessage('No results found for {filterTerm}', {
+                  filterTerm,
+                })}
               {!filterEmpty &&
                 formatMessage(
                   `Found { count, plural,

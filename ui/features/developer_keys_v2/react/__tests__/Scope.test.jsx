@@ -28,7 +28,7 @@ const scope = {
 }
 
 const defaultProps = props => ({
-  onChange: jest.fn(),
+  onChange: vi.fn(),
   checked: false,
   scope,
   ...props,

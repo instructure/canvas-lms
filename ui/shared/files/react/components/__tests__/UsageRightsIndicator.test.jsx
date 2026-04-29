@@ -26,7 +26,7 @@ import File from '../../../backbone/models/File'
 describe('UsageRightsIndicator', () => {
   const defaultProps = {
     modalOptions: {
-      openModal: jest.fn(),
+      openModal: vi.fn(),
     },
     userCanEditFilesForContext: false,
     userCanRestrictFilesForContext: false,
@@ -35,7 +35,7 @@ describe('UsageRightsIndicator', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders nothing for folders', () => {
@@ -71,7 +71,7 @@ describe('UsageRightsIndicator', () => {
   })
 
   it('opens modal when button is clicked', async () => {
-    const openModal = jest.fn()
+    const openModal = vi.fn()
     render(
       <UsageRightsIndicator
         {...defaultProps}

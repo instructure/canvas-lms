@@ -23,16 +23,77 @@ module Accessibility
       self.id = "headings-sequence"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/G141.html"
 
-      def self.h_tag?(elem)
-        all_h_tags = {
-          "h1" => true,
+      # Accessibility::Rule methods
+
+      def test(elem)
+        test_tags = {
           "h2" => true,
           "h3" => true,
           "h4" => true,
           "h5" => true,
           "h6" => true
         }
-        elem && all_h_tags[elem.tag_name.downcase] == true
+
+        return nil if test_tags[elem.tag_name.downcase] != true
+
+        valid_headings = self.class.get_valid_headings(elem)
+        prior_heading = self.class.get_prior_heading(elem)
+
+        if prior_heading
+          return I18n.t("Headings are not in sequence.") unless valid_headings[prior_heading.tag_name.downcase]
+        end
+
+        nil
+      end
+
+      def form(_elem)
+        default_value = I18n.t("Fix heading level")
+        Accessibility::Forms::RadioInputGroupField.new(
+          label: I18n.t("How would you like to proceed?"),
+          undo_text: I18n.t("Heading hierarchy is now correct"),
+          value: default_value,
+          options: [
+            default_value,
+            I18n.t("Turn into a paragraph")
+          ],
+          action: I18n.t("Reformat")
+        )
+      end
+
+      def fix!(elem, value)
+        case value
+        when I18n.t("Fix heading level")
+          prior_h = self.class.get_prior_heading(elem)
+          h_idx = prior_h ? prior_h.tag_name[1..].to_i : 0
+          elem.name = "h#{h_idx + 1}"
+        when I18n.t("Turn into a paragraph")
+          elem.name = "p"
+        end
+        { changed: elem }
+      end
+
+      def display_name
+        I18n.t("Skipped heading level")
+      end
+
+      def message
+        I18n.t(
+          "This heading is more than one level below the previous heading." \
+          "Heading levels should follow a logical order, for example Heading 2, then H3, then H4."
+        )
+      end
+
+      def why
+        [I18n.t(
+          "Sighted users scan web pages quickly by looking for large or bolded headings. Similarly, screen reader users rely on properly structured headings to scan the content and jump directly to key sections. Using correct heading levels in a logical order (like H2, H3, etc.) ensures your course is clear, organized, and accessible to everyone."
+        ),
+         I18n.t("Tip: Each page already has a main title (H1), so start your content with an H2 to keep the structure clear.")]
+      end
+
+      # Helper methods
+
+      def self.h_tag?(elem)
+        elem&.tag_name&.downcase&.match?(/^h[1-6]$/)
       end
 
       def self.get_highest_order_h_for_elem(elem)
@@ -97,70 +158,6 @@ module Accessibility
         end
 
         ret
-      end
-
-      def self.test(elem)
-        test_tags = {
-          "h2" => true,
-          "h3" => true,
-          "h4" => true,
-          "h5" => true,
-          "h6" => true
-        }
-
-        return nil if test_tags[elem.tag_name.downcase] != true
-
-        valid_headings = get_valid_headings(elem)
-        prior_heading = get_prior_heading(elem)
-
-        if prior_heading
-          return I18n.t("Headings are not in sequence.") unless valid_headings[prior_heading.tag_name.downcase]
-        end
-
-        nil
-      end
-
-      def self.form(_elem)
-        Accessibility::Forms::RadioInputGroupField.new(
-          label: I18n.t("How would you like to proceed?"),
-          undo_text: I18n.t("Heading hierarchy is now correct"),
-          value: I18n.t("Fix heading hierarchy"),
-          options: [
-            I18n.t("Fix heading hierarchy"),
-            I18n.t("Remove heading style")
-          ]
-        )
-      end
-
-      def self.display_name
-        I18n.t("Skipped heading level")
-      end
-
-      def self.message
-        I18n.t(
-          "Make sure heading levels follow a logical order (for example, H2, then H3, then H4)." \
-          "This helps screen reader users understand the structure of the page."
-        )
-      end
-
-      def self.why
-        I18n.t(
-          "When heading levels are skipped (for example, from an H2 to an H4, skipping H3), " \
-          "screen reader users may have difficulty understanding the page structure. " \
-          "This creates a confusing outline of the page for assistive technology users."
-        )
-      end
-
-      def self.fix!(elem, value)
-        case value
-        when I18n.t("Fix heading hierarchy")
-          prior_h = get_prior_heading(elem)
-          h_idx = prior_h ? prior_h.tag_name[1..].to_i : 0
-          elem.name = "h#{h_idx + 1}"
-        when I18n.t("Remove heading style")
-          elem.name = "p"
-        end
-        elem
       end
     end
   end

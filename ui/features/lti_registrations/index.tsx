@@ -17,17 +17,19 @@
  */
 import ProductDetail from '@canvas/lti-apps/components/ProductDetail/ProductDetail'
 import {getBasename} from '@canvas/lti-apps/utils/basename'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {createRoot} from 'react-dom/client'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {render} from '@canvas/react'
 import {Navigate, RouterProvider, createBrowserRouter} from 'react-router-dom'
 import {DiscoverRoute} from './discover'
 import {ProductConfigureButton} from './discover/ProductConfigureButton'
-import {isLtiRegistrationsDiscoverEnabled} from './discover/utils'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
-import {LtiBreadcrumbsLayout} from './layout/LtiBreadcrumbsLayout'
 import {ManageRoutes} from './manage'
-import {updateDeveloperKeyWorkflowState} from './manage/api/developerKey'
-import {fetchRegistrationToken, getLtiRegistrationByUUID} from './manage/api/ltiImsRegistration'
+import {
+  applyLtiRegistrationUpdateRequest,
+  fetchRegistrationToken,
+  getLtiRegistrationByUUID,
+  getLtiRegistrationUpdateRequestByUUID,
+} from './manage/api/ltiImsRegistration'
 import {
   bindGlobalLtiRegistration,
   createRegistration,
@@ -40,8 +42,9 @@ import {
 import type {DynamicRegistrationWizardService} from './manage/dynamic_registration_wizard/DynamicRegistrationWizardService'
 import {InheritedKeyRegistrationWizard} from './manage/inherited_key_registration_wizard/InheritedKeyRegistrationWizard'
 import type {InheritedKeyService} from './manage/inherited_key_registration_wizard/InheritedKeyService'
+import {installInheritedRegistration} from './manage/inherited_key_registration_wizard/InheritedKeyService'
 import type {Lti1p3RegistrationWizardService} from './manage/lti_1p3_registration_form/Lti1p3RegistrationWizardService'
-import {type AccountId, ZAccountId} from './manage/model/AccountId'
+import {type AccountId} from './manage/model/AccountId'
 import {ToolDetails} from './manage/pages/tool_details/ToolDetails'
 import {ToolAvailability} from './manage/pages/tool_details/availability/ToolAvailability'
 import {ToolConfigurationView} from './manage/pages/tool_details/configuration/ToolConfigurationView'
@@ -52,23 +55,24 @@ import {RegistrationWizardModal} from './manage/registration_wizard/Registration
 import {route as MonitorRoute} from './monitor/route'
 import {isLtiRegistrationsUsageEnabled} from './monitor/utils'
 import {ToolConfigurationEdit} from './manage/pages/tool_details/configuration/ToolConfigurationEdit'
+import {ToolConfigurationJsonEditor} from './manage/pages/tool_details/configuration/ToolConfigurationJsonEditor'
 import {
   deleteContextControl,
   fetchControlsByDeployment,
   updateContextControl,
 } from './manage/api/contextControls'
 import {deleteDeployment} from './manage/api/deployments'
+import {queryClient} from '@instructure/platform-query'
+import {getAccountId} from './common/lib/getAccountId'
+import {LtiBreadcrumbsLayout} from './layout/LtiBreadcrumbsLayout'
+import {RegistrationUpdateWizardModal} from './manage/registration_update_wizard/RegistrationUpdateWizardModal'
 
-const accountId = ZAccountId.parse(window.ENV.ACCOUNT_ID)
-
-const queryClient = new QueryClient()
+const accountId = getAccountId()
 
 const getLayoutChildren = (accountId: AccountId) => {
   const layoutRoutes = [...ManageRoutes]
 
-  if (isLtiRegistrationsDiscoverEnabled()) {
-    layoutRoutes.push(DiscoverRoute)
-  }
+  layoutRoutes.push(DiscoverRoute)
 
   if (isLtiRegistrationsUsageEnabled()) {
     layoutRoutes.push(MonitorRoute(accountId))
@@ -95,12 +99,19 @@ const router = createBrowserRouter(
           path: 'product_detail/:id',
           element: (
             <ProductDetail
-              renderConfigureButton={(buttonWidth, product) => {
+              renderConfigureButton={(
+                buttonWidth,
+                product,
+                installStatus,
+                installStatusLoading,
+              ) => {
                 return (
                   <ProductConfigureButton
                     accountId={accountId}
                     buttonWidth={buttonWidth}
                     product={product}
+                    installStatus={installStatus}
+                    installStatusLoading={installStatusLoading}
                   />
                 )
               }}
@@ -129,7 +140,11 @@ const router = createBrowserRouter(
             },
             {
               path: 'configuration/edit',
-              element: <ToolConfigurationEdit updateLtiRegistration={updateRegistration} />,
+              element: <ToolConfigurationEdit />,
+            },
+            {
+              path: 'configuration/edit-json',
+              element: <ToolConfigurationJsonEditor />,
             },
             ...(isLtiRegistrationsUsageEnabled()
               ? [
@@ -141,7 +156,7 @@ const router = createBrowserRouter(
               : []),
             {
               path: 'history',
-              element: <ToolHistory />,
+              element: <ToolHistory accountId={accountId} />,
             },
           ],
         },
@@ -161,10 +176,11 @@ const router = createBrowserRouter(
 const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
   fetchRegistrationToken,
   getRegistrationByUUID: getLtiRegistrationByUUID,
-  fetchLtiRegistration: fetchLtiRegistration,
-  updateDeveloperKeyWorkflowState,
-  updateRegistration: updateRegistration,
-  deleteRegistration: deleteRegistration,
+  getLtiRegistrationUpdateRequestByUUID,
+  fetchLtiRegistration,
+  updateRegistration,
+  applyLtiRegistrationUpdateRequest,
+  deleteRegistration,
 }
 
 const jsonUrlWizardService: JsonUrlWizardService = {
@@ -180,11 +196,11 @@ const lti1p3RegistrationWizardService: Lti1p3RegistrationWizardService = {
 const inheritedKeyService: InheritedKeyService = {
   bindGlobalLtiRegistration,
   fetchRegistrationByClientId,
+  updateRegistration,
+  installInheritedRegistration,
 }
 
-const root = createRoot(document.getElementById('reactContent')!)
-
-root.render(
+render(
   <QueryClientProvider client={queryClient}>
     <RegistrationWizardModal
       accountId={accountId}
@@ -192,7 +208,9 @@ root.render(
       lti1p3RegistrationWizardService={lti1p3RegistrationWizardService}
       jsonUrlWizardService={jsonUrlWizardService}
     />
+    <RegistrationUpdateWizardModal accountId={accountId} />
     <InheritedKeyRegistrationWizard accountId={accountId} service={inheritedKeyService} />
     <RouterProvider router={router} />
   </QueryClientProvider>,
+  document.getElementById('reactContent'),
 )

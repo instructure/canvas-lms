@@ -21,13 +21,14 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
-def setupNode() {
-  sh 'rm -vrf ./tmp'
-
-  checkout scm
-
-  distribution.stashBuildScripts()
-}
+env.BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
+env.COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
+env.COVERAGE = '1'
+env.DOCKER_BUILDKIT = 1
+env.FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
+env.LOCAL_WORKDIR = pipelineHelpers.getLocalWorkDir()
+env.SELENIUM_NODE_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:145.0'
+env.SELENIUM_HUB_IMAGE = '948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:4.41.0'
 
 def getKarmaRunnerImage() {
   KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
@@ -88,100 +89,108 @@ def sendSkippedSpecsSlackReport() {
   slackSend channel: '#canvas-test-stats', color: color, message: "$jsSkippedSpecs skipped specs in $jobInfo! "
 }
 
-pipeline {
-  agent none
-  options {
-    ansiColor('xterm')
-    timeout(60)
-    timestamps()
+def collectCoverageReport() {
+  stage('Collect Coverage Report') {
+    copyArtifacts(
+      filter: 'coverage-report-js/**',
+      optional: false,
+      projectName: env.JOB_NAME,
+      selector: specific(env.BUILD_NUMBER),
+    )
+
+    sh "docker compose -f ${env.COMPOSE_FILE} cp coverage-report-js canvas:/usr/src/app/tmp/coverage-report-js"
+    sh "docker compose -f ${env.COMPOSE_FILE} exec -T canvas bash -c './build/new-jenkins/js/coverage-report.sh'"
+    pipelineHelpers.copyFromContainer('canvas', '/usr/src/app/report-html', './coverage-report-js/report-html')
+
+    publishHTML target: [
+      allowMissing: false,
+      alwaysLinkToLastBuild: false,
+      keepAll: true,
+      reportDir: './coverage-report-js/report-html',
+      reportFiles: 'index.html',
+      reportName: 'Coverage Report'
+    ]
+
+    uploadCoverage([
+      uploadSource: '/coverage-report-js/report-html',
+      uploadDest: 'canvas-lms-js/coverage'
+    ])
   }
+}
 
-  environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-js.yml'
-    FORCE_FAILURE = commitMessageFlag('force-failure-js').asBooleanInteger()
+node(nodeLabel()) {
+  timeout(time: 60, unit: 'MINUTES') {
+    ansiColor('xterm') {
+      timestamps {
+        def tests = [:]
+        env.KARMA_RUNNER_IMAGE = getKarmaRunnerImage()
+        env.PATCHSET_TAG = getPatchsetTag()
 
-    KARMA_RUNNER_IMAGE = getKarmaRunnerImage()
-    PATCHSET_TAG = getPatchsetTag()
+        try {
+          def additionalEnvVars = ["NODE_OPTIONS=--max-old-space-size=6144"]
 
-    BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
-    COMPOSE_DOCKER_CLI_BUILD = 1
-    DOCKER_BUILDKIT = 1
-    PROGRESS_NO_TRUNC = 1
-  }
+          for (int i = 0; i < jsTestsStage.VITEST_NODE_COUNT; i++) {
+            def indexPadded = String.format('%02d', i)
+            def stageName = "Vitest ${indexPadded}"
+            tests[stageName] = {
+              jsTestsStage.runVitestNode(indexPadded, additionalEnvVars)
+            }
+          }
 
-  stages {
-    stage('Environment') {
-      steps {
-        script {
-          def rspecNodeRequirements = [label: 'canvas-docker']
+          // Packages runs on the main coordinator node
+          tests['Packages'] = {
+            def stageName = 'Packages'
+            def stageStartTime = System.currentTimeMillis()
 
-          def postBuildHandler = [
-            onNodeReleasing: { stageName, stageConfig, result ->
-              buildSummaryReport.saveRunManifest()
+            stage("${stageName} - Cleanup") {
+              pipelineHelpers.cleanupWorkspace()
+            }
 
-              copyArtifacts(
-                filter: 'coverage-report-js/**',
-                optional: false,
-                projectName: env.JOB_NAME,
-                selector: specific(env.BUILD_NUMBER),
-              )
+            stage("${stageName} - Setup") {
+              distribution.unstashBuildScripts()
+              jsTestsStage.provisionDocker()
+              jsTestsStage.startServices()
+            }
 
-              withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
-                sh """
-                  docker run --interactive \
-                  --volume \$(pwd)/coverage-report-js:/usr/src/app/tmp/coverage-report-js \
-                  --name coverage-collator \
-                  $KARMA_RUNNER_IMAGE bash -c "./build/new-jenkins/js/coverage-report.sh"
-                  """
+            def envVars = [
+              "FORCE_FAILURE=${env.FORCE_FAILURE}",
+              "NODE_OPTIONS=--max-old-space-size=6144",
+              "RAILS_ENV=test",
+              "TEST_RESULT_OUTPUT_DIR=js-results/packages"
+            ]
+            def envFlags = envVars.collect { "-e ${it}" }.join(' ')
 
-                sh 'docker cp coverage-collator:/usr/src/app/report-html coverage-report-js/report-html'
+            stage("${stageName} - Run Tests") {
+              try {
+                sh("docker compose -f ${env.COMPOSE_FILE} exec -T ${envFlags} canvas bash -c 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/\$TEST_RESULT_OUTPUT_DIR yarn test:packages'")
+              } finally {
+                pipelineHelpers.copyFromContainer('canvas', '/usr/src/app/js-results/packages', './js-results/packages')
+                archiveArtifacts artifacts: "js-results/packages/**/*.xml"
+                junit "js-results/packages/**/*.xml"
 
-                publishHTML target: [
-                  allowMissing: false,
-                  alwaysLinkToLastBuild: false,
-                  keepAll: true,
-                  reportDir: './coverage-report-js/report-html',
-                  reportFiles: 'index.html',
-                  reportName: 'Coverage Report'
-                ]
-
-                uploadCoverage([
-                  uploadSource: '/coverage-report-js/report-html',
-                  uploadDest: 'canvas-lms-js/coverage'
-                ])
-              }
-              if (env.GERRIT_EVENT_TYPE != 'comment-added') {
-                generateSkippedSpecsReport()
+                if (env.COVERAGE == '1') {
+                  jsTestsStage.collectCoverage('Packages')
+                }
               }
             }
-          ]
+          }
 
-          extendedStage('Runner').obeysAllowStages(false).execute {
-            extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).nodeRequirements(rspecNodeRequirements).execute {
-              stage('Setup') {
-                setupNode()
-              }
+          stage('Checkout') {
+            jsTestsStage.checkoutCode()
+            distribution.stashBuildScripts()
+          }
 
-              extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
-                def jsStages = [:]
+          parallel(tests)
+        } finally {
+          collectCoverageReport()
 
-                for (int i = 0; i < jsStage.JEST_NODE_COUNT; i++) {
-                  String index = i
-                  extendedStage("Runner - Jest ${i}").nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(jsStages) {
-                    def tests = [:]
+          if (env.GERRIT_EVENT_TYPE != 'comment-added') {
+            generateSkippedSpecsReport()
+          }
 
-                    callableWithDelegate(jsStage.queueJestDistribution(index))(tests)
-
-                    parallel(tests)
-                  }
-                }
-
-                parallel(jsStages)
-              } //parallel tests
-            } //builder
-          } //runner
-        } //script
-      } //steps
-    } //environment
-  } //stages
-} //pipeline
+          pipelineHelpers.cleanupDocker()
+        }
+      }
+    }
+  }
+}

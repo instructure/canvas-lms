@@ -113,15 +113,15 @@ describe "BaseOutcomeReport" do
     let(:config_options) { {} }
     let(:csv) { [] }
     let(:canvas_scope) do
-      double("canvas_scope").tap do |scope|
+      instance_double(ActiveRecord::Relation).tap do |scope|
         allow(scope).to receive(:find_each) do |&block|
           (1..3).each do |i|
-            record = double(attributes: {
-                              "student id" => i,
-                              "course id" => i,
-                              "learning outcome id" => i,
-                              "submission date" => Time.now.utc + i.days
-                            })
+            record = instance_double(ActiveRecord::Base, attributes: {
+                                       "student id" => i,
+                                       "course id" => i,
+                                       "learning outcome id" => i,
+                                       "submission date" => Time.now.utc + i.days
+                                     })
             allow(record).to receive(:[]).with("student id").and_return(i)
             allow(record).to receive(:[]).with("course id").and_return(i)
             allow(record).to receive(:[]).with("learning outcome id").and_return(i)
@@ -129,13 +129,13 @@ describe "BaseOutcomeReport" do
             block.call(record)
           end
         end
-        except_scope = double("except_scope")
+        except_scope = instance_double(ActiveRecord::Relation)
         allow(scope).to receive(:except).with(:select).and_return(except_scope)
         allow(except_scope).to receive(:count).and_return(1)
       end
     end
 
-    def write_report(headers, _enable_i18n_features, _replica)
+    def write_report(headers, enable_i18n_features: false, replica: :report)
       csv_mock = []
       csv_mock << headers unless headers.nil?
       yield csv_mock if block_given?
@@ -143,8 +143,8 @@ describe "BaseOutcomeReport" do
     end
 
     before do
-      allow(report).to receive(:write_report) do |headers, enable_i18n_features, replica, &block|
-        csv_mock = write_report(headers, enable_i18n_features, replica, &block)
+      allow(report).to receive(:write_report) do |headers, enable_i18n_features: false, replica: :report, &block|
+        csv_mock = write_report(headers, enable_i18n_features:, replica:, &block)
         csv.concat(csv_mock)
       end
       allow(GuardRail).to receive(:activate).with(:primary).and_yield

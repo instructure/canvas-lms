@@ -28,7 +28,6 @@ const props = (overrides = {}) => {
     validScopes: {
       test: 'valid_scope',
     },
-    validPlacements: ['aplacement'],
     ...overrides,
   }
 }

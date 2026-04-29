@@ -25,6 +25,11 @@
   margin-inline-end: .5rem;
 }
 
+#expand_collapse_all[aria-disabled="true"] {
+  opacity: $ic-opacity-disabled;
+  pointer-events: none;
+}
+
 body.waiting_for_modules * {
   cursor: wait !important;
 }

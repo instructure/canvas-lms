@@ -23,13 +23,12 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
   let(:course) { course_model }
   let(:student) { user_model }
 
-  describe ".calculate_for_student" do
-    let(:delay_mock) { double("delay") }
+  before do
+    course.enroll_student(student, enrollment_state: "active")
+  end
 
-    before do
-      allow(Outcomes::StudentOutcomeRollupCalculationService).to receive(:delay).and_return(delay_mock)
-      allow(delay_mock).to receive(:call)
-    end
+  describe ".calculate_for_student" do
+    let(:delay_mock) { class_double(described_class) }
 
     it "enqueues a delayed job to calculate student outcome rollups" do
       Timecop.freeze do
@@ -56,15 +55,14 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     end
 
     it "calls calculate_for_student for each student in the course" do
-      # Create a list of expected parameters using map
-      expected_params = students.map do |student|
-        { course_id: course.id, student_id: student.id }
-      end
+      # Get all enrolled student IDs to account for any existing enrollments
+      enrolled_student_ids = course.students.pluck(:id)
 
-      # Expect calculate_for_student to be called exactly once for each student
-      expected_params.each do |params|
-        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
-          .with(params).once
+      # Expect calculate_for_student to be called exactly once for each enrolled student
+      expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
+        .exactly(enrolled_student_ids.count).times do |args|
+        expect(args[:course_id]).to eq(course.id)
+        expect(enrolled_student_ids).to include(args[:student_id])
       end
 
       Outcomes::StudentOutcomeRollupCalculationService.calculate_for_course(course_id: course.id)
@@ -98,6 +96,31 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       expect(subject.course).to eq(course)
       expect(subject.student).to eq(student)
     end
+
+    it "raises ArgumentError when course_id is invalid" do
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: -1, student_id: student.id)
+      end.to raise_error(ArgumentError, /Invalid course_id \(-1\) or student_id \(#{student.id}\)/)
+    end
+
+    it "raises ArgumentError when student_id is invalid" do
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: course.id, student_id: -1)
+      end.to raise_error(ArgumentError, /Invalid course_id \(#{course.id}\) or student_id \(-1\)/)
+    end
+
+    it "raises ArgumentError when both course_id and student_id are invalid" do
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: -1, student_id: -1)
+      end.to raise_error(ArgumentError, /Invalid course_id \(-1\) or student_id \(-1\)/)
+    end
+
+    it "raises ArgumentError when student is not enrolled in the course" do
+      other_student = user_model
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: course.id, student_id: other_student.id)
+      end.to raise_error(ArgumentError, /Invalid course_id \(#{course.id}\) or student_id \(#{other_student.id}\)/)
+    end
   end
 
   describe "#fetch_canvas_results" do
@@ -106,7 +129,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     let(:alignment) { outcome.align(assignment, course) }
 
     it "returns an empty relation when no results exist" do
-      results = subject.send(:fetch_canvas_results)
+      results = subject.send(:fetch_canvas_results, course:, users: [student])
       expect(results).to be_empty
     end
 
@@ -125,7 +148,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       end
 
       it "returns learning outcome results associated to the user" do
-        results = subject.send(:fetch_canvas_results)
+        results = subject.send(:fetch_canvas_results, course:, users: [student])
         expect(results.count).to eq(1)
         expect(results.first.user_id).to eq(student.id)
       end
@@ -203,7 +226,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       end
 
       it "only returns active results with active links" do
-        results = subject.send(:fetch_canvas_results)
+        results = subject.send(:fetch_canvas_results, course:, users: [student])
 
         # Verify results - should only include the active result with active link
         expect(results.count).to eq(1)
@@ -513,7 +536,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     let(:assignment) { assignment_model(context: course) }
 
     it "returns an empty array when no results are provided" do
-      rollups = subject.send(:generate_student_rollups, [])
+      rollups = subject.send(:generate_rollups, [], [student], course)
       expect(rollups).to be_an(Array)
       expect(rollups).to be_empty
     end
@@ -560,7 +583,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
 
       it "correctly groups results by outcome" do
         # Generate rollups
-        rollups = subject.send(:generate_student_rollups, [@result1, @result2])
+        rollups = subject.send(:generate_rollups, [@result1, @result2], [student], course)
 
         # We should have one rollup for the student
         expect(rollups.size).to eq(1)
@@ -592,8 +615,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
 
       before do
         # Mock only the quiz_lti scope to return our quiz assignment
-        where_scope = double("where_scope")
-        active_scope = double("active_scope")
+        where_scope = class_double(Assignment)
+        active_scope = class_double(Assignment)
 
         allow(Assignment).to receive(:active).and_return(active_scope)
         allow(active_scope).to receive(:where).and_return(where_scope)
@@ -620,6 +643,68 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
         # Service should fail when OS call fails to prevent inaccurate rollups
         expect { subject.call }.to raise_error(StandardError, "API error")
       end
+    end
+  end
+
+  describe "instrumentation metrics" do
+    subject { Outcomes::StudentOutcomeRollupCalculationService.new(course_id: course.id, student_id: student.id) }
+
+    let(:course) { course_model }
+    let(:student) { user_model }
+    let(:outcome) { outcome_model(context: course) }
+    let(:assignment) { assignment_model(context: course) }
+    let(:alignment) { outcome.align(assignment, course) }
+
+    before do
+      outcome.rubric_criterion = {
+        mastery_points: 3,
+        points_possible: 5,
+        ratings: [
+          { points: 5, description: "Exceeds" },
+          { points: 3, description: "Meets" },
+          { points: 0, description: "Does Not Meet" }
+        ]
+      }
+      outcome.calculation_method = "highest"
+      outcome.save!
+    end
+
+    it "records all metrics on successful execution" do
+      LearningOutcomeResult.create!(
+        learning_outcome: outcome,
+        user: student,
+        context: course,
+        alignment:,
+        score: 3,
+        possible: 5
+      )
+
+      expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 1, tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+
+      subject.call
+    end
+
+    it "records metrics on error" do
+      allow(subject).to receive(:fetch_canvas_results).and_raise(StandardError, "Database error")
+
+      expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.error", tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+
+      expect { subject.call }.to raise_error(StandardError, "Database error")
+    end
+
+    it "records metrics for empty results" do
+      expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { cluster: course.shard.database_server&.id }).at_least(:once)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+
+      subject.call
     end
   end
 
@@ -1179,8 +1264,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
           outcome.save!
 
           # Mock only the quiz_lti scope to return our quiz assignment
-          where_scope = double("where_scope")
-          active_scope = double("active_scope")
+          where_scope = class_double(Assignment)
+          active_scope = class_double(Assignment)
 
           allow(Assignment).to receive(:active).and_return(active_scope)
           allow(active_scope).to receive(:where).and_return(where_scope)
@@ -1239,8 +1324,8 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
         outcome.calculation_method = "highest"
         outcome.save!
 
-        where_scope = double("where_scope")
-        active_scope = double("active_scope")
+        where_scope = class_double(Assignment)
+        active_scope = class_double(Assignment)
 
         allow(Assignment).to receive(:active).and_return(active_scope)
         allow(active_scope).to receive(:where).and_return(where_scope)
@@ -1330,7 +1415,7 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     let(:outcome2) { outcome_model(context: course) }
 
     # Helper to create a RollupScore using a LearningOutcomeResult objects
-    def create_rollup_score(outcome, score_value, calculation_method = "average")
+    def create_rollup_score(outcome, score_value, calculation_method = "average", submission_time = nil, hide_points_value: false)
       # Set up the outcome with proper calculation method
       outcome.calculation_method = calculation_method
       outcome.rubric_criterion = {
@@ -1346,13 +1431,17 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
 
       assignment = assignment_model(context: course)
       alignment = outcome.align(assignment, course)
+      submitted_at = submission_time || 1.day.ago
       result = LearningOutcomeResult.create!(
         learning_outcome: outcome,
         user: student,
         context: course,
         alignment:,
         score: score_value,
-        possible: 5
+        possible: 5,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at:,
+        hide_points: hide_points_value
       )
 
       RollupScore.new(outcome_results: [result])
@@ -1545,6 +1634,279 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       expect(outcome1_rollup.calculation_method).to eq("average")
       expect(outcome2_rollup.aggregate_score).to eq(3.5)
       expect(outcome2_rollup.calculation_method).to eq("highest")
+    end
+
+    it "persists submitted_at from the rollup score" do
+      submitted_at = 3.days.ago
+      rollup_score = create_rollup_score(outcome1, 4.0, "highest", submitted_at)
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.submitted_at).to be_within(1.second).of(submitted_at)
+    end
+
+    it "updates submitted_at when updating an existing rollup" do
+      old_time = 5.days.ago
+      new_time = 1.day.ago
+
+      # Create existing rollup with old submitted_at
+      existing = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome1.id,
+        calculation_method: "highest",
+        aggregate_score: 3.0,
+        submitted_at: old_time,
+        last_calculated_at: 1.hour.ago
+      )
+
+      # Update with new result
+      rollup_score = create_rollup_score(outcome1, 4.5, "highest", new_time)
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      subject.send(:store_rollups, [rollup_collection])
+
+      # Verify submitted_at was updated
+      expect(existing.reload.submitted_at).to be_within(1.second).of(new_time)
+      expect(existing.aggregate_score).to eq(4.5)
+    end
+
+    it "persists title from the rollup score" do
+      rollup_score = create_rollup_score(outcome1, 4.0, "highest")
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.title).to be_present
+    end
+
+    it "updates title when updating an existing rollup" do
+      # Create existing rollup with old title
+      existing = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome1.id,
+        calculation_method: "highest",
+        aggregate_score: 3.0,
+        title: "Old Assignment Title",
+        last_calculated_at: 1.hour.ago
+      )
+
+      # Update with new result (which will have a new title from create_rollup_score)
+      rollup_score = create_rollup_score(outcome1, 4.5, "highest")
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      subject.send(:store_rollups, [rollup_collection])
+
+      # Verify title was updated
+      expect(existing.reload.title).not_to eq("Old Assignment Title")
+      expect(existing.title).to be_present
+      expect(existing.aggregate_score).to eq(4.5)
+    end
+
+    it "persists hide_points from the rollup score" do
+      rollup_score = create_rollup_score(outcome1, 4.0, "highest", nil, hide_points_value: true)
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.hide_points).to be true
+    end
+
+    it "defaults hide_points to false when not provided" do
+      rollup_score = create_rollup_score(outcome1, 4.0, "highest", nil, hide_points_value: false)
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.hide_points).to be false
+    end
+
+    it "updates hide_points when updating an existing rollup" do
+      # Create existing rollup with hide_points false
+      existing = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome1.id,
+        calculation_method: "highest",
+        aggregate_score: 3.0,
+        hide_points: false,
+        last_calculated_at: 1.hour.ago
+      )
+
+      # Update with new result with hide_points true
+      rollup_score = create_rollup_score(outcome1, 4.5, "highest", nil, hide_points_value: true)
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      subject.send(:store_rollups, [rollup_collection])
+
+      # Verify hide_points was updated
+      expect(existing.reload.hide_points).to be true
+      expect(existing.aggregate_score).to eq(4.5)
+    end
+
+    it "sets hide_points to true when all results have hide_points true" do
+      outcome1.calculation_method = "average"
+      outcome1.rubric_criterion = {
+        mastery_points: 3,
+        points_possible: 5,
+        ratings: [
+          { points: 5, description: "Exceeds" },
+          { points: 3, description: "Meets" },
+          { points: 0, description: "Does Not Meet" }
+        ]
+      }
+      outcome1.save!
+
+      assignment = assignment_model(context: course)
+      alignment = outcome1.align(assignment, course)
+
+      # Create two results both with hide_points: true
+      result1 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 3.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 2.days.ago,
+        hide_points: true
+      )
+      result2 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 4.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 1.day.ago,
+        hide_points: true
+      )
+
+      rollup_score = RollupScore.new(outcome_results: [result1, result2])
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.hide_points).to be true
+    end
+
+    it "sets hide_points to false when all results have hide_points false" do
+      outcome1.calculation_method = "average"
+      outcome1.rubric_criterion = {
+        mastery_points: 3,
+        points_possible: 5,
+        ratings: [
+          { points: 5, description: "Exceeds" },
+          { points: 3, description: "Meets" },
+          { points: 0, description: "Does Not Meet" }
+        ]
+      }
+      outcome1.save!
+
+      assignment = assignment_model(context: course)
+      alignment = outcome1.align(assignment, course)
+
+      # Create two results both with hide_points: false
+      result1 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 3.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 2.days.ago,
+        hide_points: false
+      )
+      result2 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 4.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 1.day.ago,
+        hide_points: false
+      )
+
+      rollup_score = RollupScore.new(outcome_results: [result1, result2])
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      expect(stored_rollup.hide_points).to be false
+    end
+
+    it "sets hide_points to false when results have mixed hide_points values" do
+      outcome1.calculation_method = "average"
+      outcome1.rubric_criterion = {
+        mastery_points: 3,
+        points_possible: 5,
+        ratings: [
+          { points: 5, description: "Exceeds" },
+          { points: 3, description: "Meets" },
+          { points: 0, description: "Does Not Meet" }
+        ]
+      }
+      outcome1.save!
+
+      assignment = assignment_model(context: course)
+      alignment = outcome1.align(assignment, course)
+
+      # Create two results: one with hide_points true, one false
+      # With average calculation, ALL results are considered, so .all?(&:hide_points) will be false
+      result1 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 3.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 2.days.ago,
+        hide_points: false
+      )
+      result2 = LearningOutcomeResult.create!(
+        learning_outcome: outcome1,
+        user: student,
+        context: course,
+        alignment:,
+        score: 4.0,
+        possible: 5.0,
+        title: "#{course.name}, #{assignment.title}",
+        submitted_at: 1.day.ago,
+        hide_points: true
+      )
+
+      rollup_score = RollupScore.new(outcome_results: [result1, result2])
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(1)
+      stored_rollup = result.first
+      # With average calculation, all results are considered, so mixed values result in false
+      expect(stored_rollup.hide_points).to be false
     end
   end
 end

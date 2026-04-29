@@ -68,6 +68,7 @@ module SendToStream
     def generate_stream_items(stream_recipients)
       @generated_stream_items ||= []
       extend TextHelper
+
       @stream_item_recipient_ids = stream_recipients.compact.filter_map { |u| User.infer_id(u) }.uniq
       @generated_stream_items = StreamItem.generate_all(self, @stream_item_recipient_ids)
     end

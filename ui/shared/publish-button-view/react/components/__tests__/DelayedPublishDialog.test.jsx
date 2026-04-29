@@ -17,11 +17,12 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import DelayedPublishDialog from '../DelayedPublishDialog'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const flushPromises = () => new Promise(setTimeout)
 
@@ -36,6 +37,9 @@ const fakePage = {
   body: '<p>Hello</p>',
 }
 
+// Track captured request for verification
+let lastCapturedRequest = null
+
 function renderDialog(props) {
   return render(
     <DelayedPublishDialog
@@ -43,21 +47,36 @@ function renderDialog(props) {
       courseId={props.courseId || 123}
       contentId={props.contentId || 'a-page'}
       publishAt={props.publishAt || '2022-02-22T22:22:22Z'}
-      onPublish={props.onPublish || jest.fn()}
-      onUpdatePublishAt={props.onUpdatePublishAt || jest.fn()}
-      onClose={props.onClose || jest.fn()}
+      onPublish={props.onPublish || vi.fn()}
+      onUpdatePublishAt={props.onUpdatePublishAt || vi.fn()}
+      onClose={props.onClose || vi.fn()}
     />,
   )
 }
 
 describe('DelayedPublishDialog', () => {
-  beforeAll(() => {
-    doFetchApi.mockResolvedValue(fakePage)
-  })
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
-    doFetchApi.mockClear()
+    lastCapturedRequest = null
+    server.use(
+      // Use wildcard path to catch all PUT requests
+      http.put('*', async ({request}) => {
+        const url = new URL(request.url)
+        // doFetchApi sends params as URL search params for PUT
+        lastCapturedRequest = {
+          path: url.pathname,
+          method: 'PUT',
+          search: url.search,
+          searchParams: Object.fromEntries(url.searchParams.entries()),
+        }
+        return HttpResponse.json(fakePage)
+      }),
+    )
   })
+
+  afterEach(() => server.resetHandlers())
 
   it('shows the publish-at date', async () => {
     const {getByLabelText} = renderDialog({publishAt: '2022-03-03T14:00:00'})
@@ -66,7 +85,7 @@ describe('DelayedPublishDialog', () => {
   })
 
   it('publishes a page outright', async () => {
-    const onPublish = jest.fn()
+    const onPublish = vi.fn()
     const {getByLabelText, getByRole} = renderDialog({onPublish})
     fireEvent.click(getByLabelText('Published'))
     fireEvent.click(getByRole('button', {name: 'OK'}))
@@ -74,38 +93,42 @@ describe('DelayedPublishDialog', () => {
   })
 
   it('cancels scheduled publication', async () => {
-    const onUpdatePublishAt = jest.fn()
+    const onUpdatePublishAt = vi.fn()
     const {getByLabelText, getByRole} = renderDialog({onUpdatePublishAt})
     fireEvent.click(getByLabelText('Unpublished'))
     fireEvent.click(getByRole('button', {name: 'OK'}))
-    await flushPromises()
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/courses/123/pages/a-page',
-      method: 'PUT',
-      params: {wiki_page: {publish_at: null}},
+    await waitFor(() => {
+      expect(lastCapturedRequest).not.toBeNull()
     })
+    expect(lastCapturedRequest.path).toBe('/api/v1/courses/123/pages/a-page')
+    expect(lastCapturedRequest.method).toBe('PUT')
+    // doFetchApi sends params in URL search string with bracket notation
+    // null value is sent as empty string
+    expect(lastCapturedRequest.search).toContain('wiki_page')
+    expect(lastCapturedRequest.searchParams['wiki_page[publish_at]']).toBe('')
     expect(onUpdatePublishAt).toHaveBeenCalledWith(null)
   })
 
   it('changes the scheduled publication date', async () => {
-    const onUpdatePublishAt = jest.fn()
+    const onUpdatePublishAt = vi.fn()
     const {getByLabelText, getByRole} = renderDialog({onUpdatePublishAt})
     fireEvent.click(getByLabelText('Scheduled for publication'))
     const input = getByLabelText('Choose a date')
     fireEvent.change(input, {target: {value: '2022-03-03T00:00:00.000Z'}})
     fireEvent.blur(input)
     fireEvent.click(getByRole('button', {name: 'OK'}))
-    await flushPromises()
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/courses/123/pages/a-page',
-      method: 'PUT',
-      params: {wiki_page: {publish_at: '2022-03-03T00:00:00.000Z'}},
+    await waitFor(() => {
+      expect(lastCapturedRequest).not.toBeNull()
     })
+    expect(lastCapturedRequest.path).toBe('/api/v1/courses/123/pages/a-page')
+    expect(lastCapturedRequest.method).toBe('PUT')
+    // doFetchApi sends params in URL search string with bracket notation
+    expect(lastCapturedRequest.search).toContain('2022-03-03')
     expect(onUpdatePublishAt).toHaveBeenCalledWith('2022-03-03T00:00:00.000Z')
   })
 
   it('closes', async () => {
-    const onClose = jest.fn()
+    const onClose = vi.fn()
     const {getByRole} = renderDialog({onClose})
     fireEvent.click(getByRole('button', {name: 'Close'}))
     expect(onClose).toHaveBeenCalled()

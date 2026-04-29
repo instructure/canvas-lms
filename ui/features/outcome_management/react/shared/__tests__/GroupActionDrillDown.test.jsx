@@ -19,15 +19,19 @@
 import React from 'react'
 import {render as rtlRender, fireEvent} from '@testing-library/react'
 import GroupActionDrillDown from '../GroupActionDrillDown'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import OutcomesContext, {
   ACCOUNT_GROUP_ID,
   ROOT_GROUP_ID,
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 describe('GroupActionDrillDown', () => {
   let onCollectionClick, setShowOutcomesView
@@ -78,12 +82,12 @@ describe('GroupActionDrillDown', () => {
   })
 
   beforeEach(() => {
-    onCollectionClick = jest.fn()
-    setShowOutcomesView = jest.fn()
+    onCollectionClick = vi.fn()
+    setShowOutcomesView = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const render = (

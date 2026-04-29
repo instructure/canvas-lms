@@ -101,69 +101,10 @@ describe "taking a quiz" do
           verify_no_access_code_reprompts_during_oqaat_quiz
         end
 
-        context "when the access code changes during an active quiz session" do
-          it "doesn't prompt for the access code again", priority: "1"
-        end
-
         it "does not prompt for access code for sidebar question navigation" do
           verify_no_access_code_reprompts_during_oqaat_quiz do
             select_question_from_column_links(@quiz.quiz_questions[0].id)
             select_question_from_column_links(@quiz.quiz_questions[1].id)
-          end
-        end
-      end
-
-      context "when the quiz has unlimited attempts" do
-        let(:quiz_with_unlimited_attempts) do
-          quiz.allowed_attempts = -1
-          quiz.save!
-          quiz.reload
-        end
-
-        def start_and_exit_quiz
-          take_and_answer_quiz(
-            submit: false,
-            access_code:,
-            quiz: quiz_with_unlimited_attempts
-          )
-
-          # exit quiz without submitting
-          expect_new_page_load do
-            fln("Quizzes").click
-            driver.switch_to.alert.accept
-          end
-
-          yield if block_given?
-        ensure
-          # This prevents selenium from freezing when the dialog appears upon leaving the quiz
-          begin
-            fln("Quizzes").click
-            driver.switch_to.alert.accept
-          rescue Selenium::WebDriver::Error::NoSuchAlertError
-            # Do nothing
-          end
-        end
-
-        def verify_access_code_prompt
-          expect(f("#quiz_access_code")).to be_truthy
-        end
-
-        it "prompts for access code upon resuming the quiz", priority: "1" do
-          skip_if_safari(:alert)
-          skip("investigate in CCI-182")
-          start_and_exit_quiz do
-            expect_new_page_load { f("a.ig-title", "#assignment-quizzes").click }
-            expect_new_page_load { fln("Resume Quiz").click }
-            verify_access_code_prompt
-          end
-        end
-
-        it "prompts for an access code upon resuming the quiz via the browser back button", priority: "1" do
-          skip("investigate in CCI-182")
-          skip_if_safari(:alert)
-          start_and_exit_quiz do
-            expect_new_page_load { driver.navigate.back }
-            verify_access_code_prompt
           end
         end
       end

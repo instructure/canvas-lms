@@ -31,7 +31,7 @@ def specs_require_sharding
     include Onceler::Sharding
   else
     before(:once) do
-      skip "Sharding specs fail without additional support from a multi-tenancy plugin"
+      skip "Sharding specs fail without additional support from a multi-tenancy plugin" # rubocop:disable Specs/NoSkipWithoutTicket,Specs/NoSkipWithoutDate
     end
   end
 end

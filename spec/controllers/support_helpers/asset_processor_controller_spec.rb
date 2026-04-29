@@ -130,4 +130,49 @@ describe SupportHelpers::AssetProcessorController do
       expect(dot_content).to include("AssetProcessor_#{@asset_processor.id} -> AssetReport_#{@asset_report.id};")
     end
   end
+
+  describe "bulk_resubmit_discussion" do
+    before do
+      site_admin_user
+      user_session(@user)
+
+      @course = course_with_student(active_all: true).course
+      @student = @course.student_enrollments.first.user
+
+      # Create a graded discussion topic
+      @assignment = assignment_model(course: @course, submission_types: "discussion_topic")
+      @discussion_topic = @assignment.discussion_topic
+
+      # Create a tool with an asset processor for discussions
+      @tool = external_tool_1_3_model(context: @course, placements: ["ActivityAssetProcessorContribution"])
+    end
+
+    it "returns 400 if neither discussion_topic_id nor course_id is provided" do
+      post :bulk_resubmit_discussion, params: {}
+      expect(response).to have_http_status :bad_request
+      json = response.parsed_body
+      expect(json["error"]).to eq "discussion_topic_id or course_id is required"
+    end
+
+    it "accepts discussion_topic_id and initiates fixer" do
+      expect_any_instance_of(SupportHelpers::AssetProcessorDiscussionNoticeResubmission).to receive(:monitor_and_fix)
+
+      post :bulk_resubmit_discussion, params: { discussion_topic_id: @discussion_topic.id }
+      expect(response).to have_http_status :ok
+    end
+
+    it "accepts course_id and initiates fixer" do
+      expect_any_instance_of(SupportHelpers::AssetProcessorDiscussionNoticeResubmission).to receive(:monitor_and_fix)
+
+      post :bulk_resubmit_discussion, params: { course_id: @course.id }
+      expect(response).to have_http_status :ok
+    end
+
+    it "accepts optional tool_id parameter" do
+      expect_any_instance_of(SupportHelpers::AssetProcessorDiscussionNoticeResubmission).to receive(:monitor_and_fix)
+
+      post :bulk_resubmit_discussion, params: { discussion_topic_id: @discussion_topic.id, tool_id: @tool.id }
+      expect(response).to have_http_status :ok
+    end
+  end
 end

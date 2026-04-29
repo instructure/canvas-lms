@@ -36,6 +36,12 @@ shared_examples "Late Policies:" do |ff_enabled|
     end
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
+  end
+
   context "when applied" do
     before(:once) do
       now = Time.zone.now

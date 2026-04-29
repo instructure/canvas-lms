@@ -22,11 +22,16 @@ import {
   fetchTitleAvailability,
   checkForTitleConflict,
 } from '../titleConflicts'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {render} from '@testing-library/react'
-import type {FormMessage} from '@instructure/ui-form-field'
+
+const server = setupServer()
 
 describe('titleConflicts', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     window.ENV.TITLE_AVAILABILITY_PATH = '/title_availability'
     window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = 'https://canvas.com'
@@ -34,12 +39,18 @@ describe('titleConflicts', () => {
     expect.hasAssertions()
   })
 
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
   describe('conflictMessage', () => {
     it('returns the correct message for courses', () => {
       const {getByTestId, getByText} = render(<>{conflictMessage().text}</>)
       expect(getByTestId('warning-icon')).toBeInTheDocument()
       expect(
-        getByText('There is already a page in this course with this title. Hitting save will create a duplicate.'),
+        getByText(
+          'There is already a page in this course with this title. Hitting save will create a duplicate.',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -48,7 +59,9 @@ describe('titleConflicts', () => {
       const {getByTestId, getByText} = render(<>{conflictMessage().text}</>)
       expect(getByTestId('warning-icon')).toBeInTheDocument()
       expect(
-        getByText('There is already a page in this group with this title. Hitting save will create a duplicate.'),
+        getByText(
+          'There is already a page in this group with this title. Hitting save will create a duplicate.',
+        ),
       ).toBeInTheDocument()
     })
   })
@@ -69,20 +82,32 @@ describe('titleConflicts', () => {
   })
 
   describe('fetchTitleAvailability', () => {
-    beforeEach(() => {
-      fetchMock.reset()
-    })
-
     it('returns true if the title is already used', async () => {
       const title = 'anything'
-      fetchMock.get(generateUrl(title), JSON.stringify({conflict: true}))
+      server.use(
+        http.get('https://canvas.com/title_availability', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('title') === title) {
+            return HttpResponse.json({conflict: true})
+          }
+          return new HttpResponse(null, {status: 404})
+        }),
+      )
       const result = await fetchTitleAvailability(title)
       expect(result).toEqual(true)
     })
 
     it('returns false if the title is unused', async () => {
       const title = 'something else'
-      fetchMock.get(generateUrl(title), JSON.stringify({conflict: false}))
+      server.use(
+        http.get('https://canvas.com/title_availability', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('title') === title) {
+            return HttpResponse.json({conflict: false})
+          }
+          return new HttpResponse(null, {status: 404})
+        }),
+      )
       const result = await fetchTitleAvailability(title)
       expect(result).toEqual(false)
     })
@@ -90,47 +115,78 @@ describe('titleConflicts', () => {
     it('throws an error if the response is not ok', async () => {
       const title = 'uh oh'
       const message = 'not found'
-      const body = JSON.stringify({errors: [{message}]})
-      fetchMock.get(generateUrl(title), {status: 404, body})
+      server.use(
+        http.get('https://canvas.com/title_availability', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('title') === title) {
+            return HttpResponse.json({errors: [{message}]}, {status: 404})
+          }
+          return new HttpResponse(null, {status: 404})
+        }),
+      )
       await expect(fetchTitleAvailability(title)).rejects.toThrow(message)
     })
   })
 
   describe('checkForTitleConflict', () => {
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
 
     beforeEach(() => {
-      fetchMock.reset()
       mockCallback.mockReset()
     })
 
     it('calls the callback with the conflict message if the title is already used', async () => {
       const title = 'anything'
-      fetchMock.get(generateUrl(title), JSON.stringify({conflict: true}))
+      server.use(
+        http.get('https://canvas.com/title_availability', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('title') === title) {
+            return HttpResponse.json({conflict: true})
+          }
+          return new HttpResponse(null, {status: 404})
+        }),
+      )
       await checkForTitleConflict(title, mockCallback)
       expect(mockCallback).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({
             text: expect.anything(),
-            type: 'hint'
-          })
-        ])
+            type: 'hint',
+          }),
+        ]),
       )
     })
 
     it('calls the callback with [] if the title is unused', async () => {
       const title = 'something else'
-      fetchMock.get(generateUrl(title), JSON.stringify({conflict: false}))
+      server.use(
+        http.get('https://canvas.com/title_availability', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('title') === title) {
+            return HttpResponse.json({conflict: false})
+          }
+          return new HttpResponse(null, {status: 404})
+        }),
+      )
       await checkForTitleConflict(title, mockCallback)
       expect(mockCallback).toHaveBeenCalledWith([])
     })
 
     it('calls the callback with [] if the response is not ok', async () => {
+      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
       const title = 'uh oh'
-      const body = JSON.stringify({errors: [{message: 'not found'}]})
-      fetchMock.get(generateUrl(title), {status: 404, body})
+      server.use(
+        http.get('https://canvas.com/title_availability', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('title') === title) {
+            return HttpResponse.json({errors: [{message: 'not found'}]}, {status: 404})
+          }
+          return new HttpResponse(null, {status: 404})
+        }),
+      )
       await checkForTitleConflict(title, mockCallback)
       expect(mockCallback).toHaveBeenCalledWith([])
+      consoleLogSpy.mockRestore()
     })
   })
 })

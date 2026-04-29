@@ -18,7 +18,7 @@
 
 import type JQuery from 'jquery'
 import $ from 'jquery'
-import {each} from 'lodash'
+import {each} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import {datetimeString} from '@canvas/datetime/date-functions'

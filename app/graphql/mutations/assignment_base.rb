@@ -45,12 +45,14 @@ class Mutations::AssignmentBase::AssignmentModeratedGradingUpdate < GraphQL::Sch
 end
 
 class Mutations::AssignmentBase::AssignmentPeerReviewsUpdate < GraphQL::Schema::InputObject
+  argument :across_sections, Boolean, required: false
   argument :anonymous_reviews, Boolean, required: false
   argument :automatic_reviews, Boolean, required: false
   argument :count, Int, required: false
   argument :due_at, Types::DateTimeType, required: false
   argument :enabled, Boolean, required: false
   argument :intra_reviews, Boolean, required: false
+  argument :submission_required, Boolean, required: false
 end
 
 class Mutations::AssignmentBase::LtiAssetProcessorCreateOrUpdate < GraphQL::Schema::InputObject
@@ -80,6 +82,7 @@ class Mutations::AssignmentBase::AssignmentInputBase < GraphQL::Schema::InputObj
   argument :peer_reviews, Mutations::AssignmentBase::AssignmentPeerReviewsUpdate, required: false
   argument :points_possible, Float, required: false
   argument :post_to_sis, Boolean, required: false
+  argument :secure_params, String, required: false
   argument :suppress_assignment, Boolean, required: false
   argument :unlock_at, Types::DateTimeType, required: false
 end
@@ -105,12 +108,13 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
     include Api
     include Api::V1::Assignment
 
-    def initialize(request, working_assignment, session, current_user)
+    def initialize(request, working_assignment, session, current_user, in_app: true)
       @request = request
       @working_assignment = working_assignment
       @session = session
       @current_user = current_user
       @context = working_assignment.context
+      @in_app = in_app
     end
 
     attr_reader :session
@@ -133,6 +137,10 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
 
     def load_root_account
       @domain_root_account = @request.env["canvas.domain_root_account"] || LoadAccount.default_domain_root_account
+    end
+
+    def in_app?
+      @in_app
     end
   end
 
@@ -242,6 +250,8 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
       # checking peer_reviews[:intra_reviews].present? does not apply since it's a bool, fails in the false case.
       # peer_reviews.key?(:intra_reviews) should be sufficient.
       input_hash[:intra_group_peer_reviews] = peer_reviews[:intra_reviews] if peer_reviews.key?(:intra_reviews)
+      input_hash[:peer_review_submission_required] = peer_reviews[:submission_required] if peer_reviews.key?(:submission_required)
+      input_hash[:peer_review_across_sections] = peer_reviews[:across_sections] if peer_reviews.key?(:across_sections)
 
       # this should be peer_reviews_due_at, but its not permitted in the backend and peer_reviews_assign_at
       # is transformed into peer_reviews_due_at. that's probably a bug, but just to keep this update resilient

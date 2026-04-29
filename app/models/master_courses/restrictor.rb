@@ -86,6 +86,7 @@ module MasterCourses::Restrictor
     end
 
     def mark_as_importing!(cm)
+      self.importing = true if respond_to?(:importing=)
       @importing_migration = cm if cm&.master_course_subscription
       # if we are doing a course copy and the source course has up-to-date search embeddings,
       # we will copy those embeddings in batches instead of regenerating them

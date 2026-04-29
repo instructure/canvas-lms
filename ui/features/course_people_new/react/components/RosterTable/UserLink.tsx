@@ -37,14 +37,7 @@ export type UserLinkProps = {
   enrollments: Enrollment[]
 }
 
-const UserLink: FC<UserLinkProps> = ({
-  uid,
-  avatarUrl,
-  name,
-  htmlUrl,
-  pronouns,
-  enrollments
-}) => {
+const UserLink: FC<UserLinkProps> = ({uid, avatarUrl, name, htmlUrl, pronouns, enrollments}) => {
   const renderPronouns = () => {
     if (!pronouns) return null
     return (

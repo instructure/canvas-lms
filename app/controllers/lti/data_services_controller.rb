@@ -28,56 +28,43 @@ module Lti
   #       "id": "DataServiceSubscription",
   #       "description": "A subscription to a data service live event.",
   #       "properties": {
-  #          "ContextId": {
-  #            "description": "The id of the context for the subscription.",
-  #            "example": "8ADadf-asdfas-asdfas-asdfaew",
-  #            "type": "string"
-  #          },
-  #          "ContextType": {
-  #            "description": "The type of context for the subscription. Must be 'assignment', or 'root_account'",
-  #            "example": "root_account",
-  #            "type": "string"
-  #          },
-  #          "EventTypes": {
-  #            "description": "Array of strings representing the event types for the subscription.",
-  #            "example": ["asset_accessed"],
-  #            "type": "array",
-  #            "items": {"type": "string"}
-  #          },
-  #          "Format": {
-  #            "description": "Format to deliver the live events. Must be 'live-event' or 'caliper'.",
-  #            "example": "caliper",
-  #            "type": "string"
-  #          },
-  #          "TransportMetadata": {
-  #            "description": "An object with a single key: 'Url'.",
-  #            "example": "{\n\t\"Url\":\"sqs.example\"}",
-  #            "type": "string"
-  #          },
-  #          "TransportType": {
-  #            "description": "The type of transport for the event. Must be either 'sqs' or 'https'.",
-  #            "example": "sqs",
-  #            "type": "string"
-  #          }
+  #         "ContextId": {
+  #           "description": "The id of the context for the subscription.",
+  #           "example": "8ADadf-asdfas-asdfas-asdfaew",
+  #           "type": "string"
+  #         },
+  #         "ContextType": {
+  #           "description": "The type of context for the subscription. Must be 'assignment', or 'root_account'",
+  #           "example": "root_account",
+  #           "type": "string"
+  #         },
+  #         "EventTypes": {
+  #           "description": "Array of strings representing the event types for the subscription.",
+  #           "example": ["asset_accessed"],
+  #           "type": "array",
+  #           "items": {"type": "string"}
+  #         },
+  #         "Format": {
+  #           "description": "Format to deliver the live events. Must be 'live-event' or 'caliper'.",
+  #           "example": "caliper",
+  #           "type": "string"
+  #         },
+  #         "TransportMetadata": {
+  #           "description": "An object with a single key: 'Url'.",
+  #           "example": "{\n\t\"Url\":\"sqs.example\"}",
+  #           "type": "string"
+  #         },
+  #         "TransportType": {
+  #           "description": "The type of transport for the event. Must be either 'sqs' or 'https'.",
+  #           "example": "sqs",
+  #           "type": "string"
+  #         }
   #       }
   #     }
   #
-  #     @model DataServiceEventTypes
-  #         {
-  #            "id": "DataServiceEventTypes",
-  #            "description": "A categorized list of all possible event types",
-  #            "properties": {
-  #               "EventCategory": {
-  #                 "description": "An array of strings representing the event types in the category.",
-  #                 "example": ["assignment_created"],
-  #                 "type": "array",
-  #                 "items": {"type": "string"}
-  #               }
-  #             }
-  #         }
-  #
   class DataServicesController < ApplicationController
     include ::Lti::IMS::Concerns::AdvantageServices
+
     MIME_TYPE = "application/vnd.canvas.dataservices+json"
 
     ACTION_SCOPE_MATCHERS = {
@@ -86,7 +73,6 @@ module Lti
       update: all_of(TokenScopes::LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE),
       index: all_of(TokenScopes::LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE),
       destroy: all_of(TokenScopes::LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE),
-      event_types_index: all_of(TokenScopes::LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE)
     }.freeze.with_indifferent_access
 
     rescue_from Lti::SubscriptionsValidator::InvalidContextType do
@@ -215,14 +201,6 @@ module Lti
     # @returns DataServiceSubscription
     def destroy
       response = Services::LiveEventsSubscriptionService.destroy(jwt_body, params.require(:id))
-      forward_service_response(response)
-    end
-
-    # @API List all event types in categories
-    #
-    # @returns DataServiceEventTypes
-    def event_types_index
-      response = Services::LiveEventsSubscriptionService.event_types_index(jwt_body, message_type)
       forward_service_response(response)
     end
 

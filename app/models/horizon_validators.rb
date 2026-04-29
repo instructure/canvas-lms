@@ -61,7 +61,9 @@ module HorizonValidators
 
   class QuizzesValidator < ActiveModel::Validator
     def validate(record)
-      record.errors.add(:quiz_type, "Classic Quizzes are not supported")
+      if record.published
+        record.errors.add(:quiz_type, "Published classic quizzes are not supported in Canvas Career courses.")
+      end
     end
   end
 

@@ -20,6 +20,7 @@
 module ModuleVisibility
   class ModuleVisibilityService
     extend VisibilityHelpers::Common
+
     class << self
       def modules_visible_to_students(course_ids: nil, user_ids: nil, context_module_ids: nil)
         unless course_ids || user_ids || context_module_ids
@@ -43,12 +44,10 @@ module ModuleVisibility
                                         .find_modules_visible_to_sections(course_ids:, user_ids:, context_module_ids:)
           visible_modules |= modules_visible_to_sections
 
-          if assign_to_differentiation_tags_enabled?(course_ids)
-            # add modules visible to groups (and related module group overrides)
-            modules_visible_to_groups = ModuleVisibility::Repositories::ModuleVisibleToStudentRepository
-                                        .find_modules_visible_to_groups(course_ids:, user_ids:, context_module_ids:)
-            visible_modules |= modules_visible_to_groups
-          end
+          # add modules visible to groups (and related module group overrides)
+          modules_visible_to_groups = ModuleVisibility::Repositories::ModuleVisibleToStudentRepository
+                                      .find_modules_visible_to_groups(course_ids:, user_ids:, context_module_ids:)
+          visible_modules |= modules_visible_to_groups
 
           # add modules visible due to ADHOC overrides (and related module ADHOC overrides)
           modules_visible_to_adhoc_overrides = ModuleVisibility::Repositories::ModuleVisibleToStudentRepository
@@ -57,13 +56,18 @@ module ModuleVisibility
         end
       end
 
-      def assign_to_differentiation_tags_enabled?(course_ids)
-        return false if course_ids.blank?
+      def invalidate_cache(course_ids: nil, user_ids: nil, context_module_ids: nil, include_concluded: true)
+        unless course_ids || context_module_ids
+          raise ArgumentError, "at least one non nil course_id or context_module_id is required (for query performance reasons)"
+        end
 
-        account_ids = Course.where(id: course_ids).distinct.pluck(:account_id).uniq
-        accounts = Account.where(id: account_ids).to_a
+        course_ids = Array(course_ids) if course_ids
+        user_ids = Array(user_ids) if user_ids
+        context_module_ids = Array(context_module_ids) if context_module_ids
 
-        accounts.any? { |account| account.feature_enabled?(:assign_to_differentiation_tags) }
+        key = service_cache_key(service: name, course_ids:, user_ids:, additional_ids: context_module_ids, include_concluded:)
+
+        Rails.cache.delete(key)
       end
     end
   end

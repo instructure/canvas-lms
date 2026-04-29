@@ -65,6 +65,9 @@ development:
         app-host: "rce.canvas.docker"
         # if you're running canvas-rce-api with docker-compose/rce-api.override.yml in .env
         app-host: "http://rce.canvas.docker:3000"
+      onetrust-cookie-consent:
+        domain_id: "stub-key-please-see-MRA-plugin"
+        vanity_domain_id: "stub-key-please-see-MRA-plugin"
       common_cartridge_viewer:
         base_url: "http://localhost:3300"
       csp-logging:
@@ -78,6 +81,12 @@ development:
 
   private:
     canvas:
+      pendo_app_id: "stub-key-please-see-MRA-plugin"
+      pendo_regional_app_id: "stub-key-please-see-MRA-plugin"
+      pendo_regional_app_env: "io"
+      pendo_mobile_api_key_teacher: "stub-teacher-key-see-MRA-plugin"
+      pendo_mobile_api_key_parent: "stub-parent-key-see-MRA-plugin"
+      pendo_mobile_api_key_student: "stub-student-key-see-MRA-plugin"
       auditors.yml: |
         write_paths:
           - active_record
@@ -88,6 +97,9 @@ development:
         aws_access_key_id: key
         aws_secret_access_key_dec: secret
         # stub_credentials: true # can be used in dev to print creds to stdout
+      kafka_events.yml: |-
+        topics:
+          course_events: course.events
       # bedrock configuration for smart search and discussion summaries
       bedrock.yml: |-
         bedrock_region: us-west-2
@@ -96,6 +108,15 @@ development:
       translation.yml: |
         translation_region: us-west-2
         vault_credential_path: sts/testaccount/sts/translation-dev
+      ignite_agent.yml: |
+        launch_url: http://localhost:9003/remoteEntry.js
+        backend_url: http://localhost:9002
+      inst_access_service_keys.yml: |
+        service/purpose:
+          issuer: service.instructure.invalid
+          key_type: RSA
+          e: AQAB
+          n: totally_definitely_342_base64_characters_long
       # datadog_apm.yml: |
       #   sample_rate: 0.0
       #   host_sample_rate: 0.0
@@ -140,6 +161,12 @@ development:
       #   ddb_endpoint: 'http://dynamo:8000/'
       #   ddb_table_name: 'canvas-release-notes'
       #   vault_credential_path: 'sts/testaccount/sts/canvas-release-notes'
+      # To work with global lookups, ensure you have vault_contents.yml
+      # with the example contents. Also see docker-compose/dynamodb.override.yml
+      # global_lookups.yml: |
+      #   ddb_endpoint: 'http://dynamo:8000/'
+      #   ddb_table_name: 'canvas-global-lookups'
+      #   vault_credential_path: 'sts/testaccount/sts/canvas-global-lookups'
       # feature_analytics:
       #   cache_expiry: '86400'
       #   sampling_rate: '0.0'
@@ -147,31 +174,31 @@ development:
       #   region: 'us-west-2'
       # ams.yml: |
       #   launch_url: http://ams-ux.inseng.test:5173/src/remote-adapter.js
+      #   api_url: http://ams-ux-api.inseng.test:3000
+      #   item_management_launch_url: http://ams-ux-item-management.inseng.test/src/remote-adapter.js
       # canvas_career.yml: |
+      #   learner_launch_url: "http://localhost:3002/remoteEntry.js"
+      #   learning_provider_launch_url: "http://localhost:3003/remoteEntry.js"
+      #   theme_url: "http://localhost:3002/themes/horizon.json"
+      #   dark_theme_url: "http://localhost:3002/themes/horizon_dark.json"
       #   public_app_config:
       #     hosts:
-      #       api_proxy: "https://dev.cd.canvashorizon.com"
-      #       cedar: "https://cedar-api-dev.domain-svcs.nonprod.inseng.io"
       #       common_cartridge_viewer: "https://common-cartridge-viewer.netlify.app"
       #       ignite: "https://career-agent-dev.journey.nonprod.inseng.io"
       #       journey: "https://journey-server-dev.journey.nonprod.inseng.io"
-      #       pine: "https://pine-api-dev.domain-svcs.nonprod.inseng.io"
       #       rcs: "https://rich-content-pdx-cd.inseng.net"
-      #       redwood: "https://redwood-api-dev.domain-svcs.nonprod.inseng.io"
-      #       upload: "https://instructure-uploads-pdx-cd.s3.us-west-2.amazonaws.com"
       #     hotglue:
       #       api_key: "gFd34vgi2D5OY8RrNInl55wDY1ixqSvxZsSHf965"
       #       env_id: "demo.hg.instructure.com"
       #       flow_id: "NsN76D10s"
-      #     pendo:
-      #       api_key: "f5faad90-a2af-4bf9-6f7b-862e00100be4"
-      #     sentry:
-      #       learner_dsn: "https://4c2589d43fafee7da8e0896a8667cfcb@relay-pdx.sentry.insops.net/486"
-      #       learning_provider_dsn: "https://feb64e6e836b324f39dd9c499a9d3a47@relay-pdx.sentry.insops.net/530"
-      #       replays_sample_rate: 1.0
-      #       traces_sample_rate: 0.1
       #     environment: "dev"
-      #     feedback_url: "https://docs.google.com/forms/d/e/1FAIpQLScj-OKZVmsva-OE6T5rcvvm9fI6_eLtt2tk8pkgQ24DjSAPDQ/viewform"
+      #     experience_mode: "career"
+      # new_quizzes.yml: |
+      #   new_quizzes_cloudfront_host_production: http://quizzes-ui-app.inseng.test:8082
+      #   new_quizzes_cloudfront_host_beta: http://quizzes-ui-app.inseng.test:8082
+      #   new_quizzes_cloudfront_host_edge: http://quizzes-ui-app.inseng.test:8082
+      #   new_quizzes_importing_timeout_in_minutes: 360
+      #   new_quizzes_api_gateway_host: http://quiz-lti-web.inseng.test
 
   store:
     canvas:

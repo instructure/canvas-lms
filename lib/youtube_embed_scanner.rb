@@ -32,7 +32,9 @@ class YoutubeEmbedScanner
       if src && (src.include?(YOUTUBE_NOCOOKIE_EMBED) || src.include?(YOUTUBE_EMBED))
         {
           path: iframe_node.path,
-          src:
+          src:,
+          width: iframe_node["width"],
+          height: iframe_node["height"]
         }
       end
     end

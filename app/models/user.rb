@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class User < ActiveRecord::Base
-  self.ignored_columns += ["page_views_count"]
-
+class User < ApplicationRecord
   GRAVATAR_PATTERN = %r{^https?://[a-zA-Z0-9.-]+\.gravatar\.com/}
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
   MINIMAL_COLUMNS_TO_SAVE = %i[avatar_image_source
@@ -59,16 +57,16 @@ class User < ActiveRecord::Base
   include UserLearningObjectScopes
   include PermissionsHelper
 
-  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock, :trusted_account
+  attr_accessor :default_name, :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock, :trusted_account, :impersonated
 
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
-  after_create :set_default_feature_flags
   after_update :clear_cached_short_name, if: ->(user) { user.saved_change_to_short_name? || (user["short_name"].nil? && user.saved_change_to_name?) }
   validate :preserve_lti_id, on: :update
 
   serialize :preferences
   include TimeZoneHelper
+
   time_zone_attribute :time_zone
   include Workflow
   include UserPreferenceValue::UserMethods # include after other callbacks are defined
@@ -157,15 +155,17 @@ class User < ActiveRecord::Base
   has_many :developer_keys
   has_many :access_tokens, -> { where(workflow_state: ["active", "pending"]) }, inverse_of: :user, multishard: true
   has_many :masquerade_tokens, -> { where(workflow_state: "active") }, class_name: "AccessToken", inverse_of: :real_user
-  has_many :notification_endpoints, -> { merge(AccessToken.active) }, through: :access_tokens, multishard: true
+  has_many :notification_endpoints, through: :access_tokens, multishard: true
   has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :lti_results, inverse_of: :user, class_name: "Lti::Result", dependent: :destroy
+  has_many :lti_registration_history_entries, inverse_of: :created_by, class_name: "Lti::RegistrationHistoryEntry", foreign_key: "created_by_id"
 
   has_many :student_enrollments
   has_many :ta_enrollments
   has_many :teacher_enrollments, -> { where(enrollments: { type: "TeacherEnrollment" }) }, class_name: "TeacherEnrollment"
   has_many :all_submissions, -> { preload(:assignment, :submission_comments).order(updated_at: :desc) }, class_name: "Submission", dependent: :destroy
   has_many :submissions, -> { active.preload(:assignment, :submission_comments, :grading_period).order(updated_at: :desc) }
+  has_many :group_submissions, inverse_of: :real_submitter, class_name: "Submission", foreign_key: :real_submitter_id, dependent: :nullify
   has_many :pseudonyms, -> { ordered }, dependent: :destroy
   has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: "Pseudonym"
   has_many :pseudonym_accounts, source: :account, through: :pseudonyms
@@ -175,8 +175,8 @@ class User < ActiveRecord::Base
   has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Assignment"
   has_many :mentions, inverse_of: :user
   has_many :discussion_entries
-  has_many :discussion_entry_drafts, inverse_of: :user
   has_many :discussion_entry_versions, inverse_of: :user
+  has_many :discussion_topic_participants, dependent: :destroy
   has_many :all_attachments, as: "context", class_name: "Attachment"
   has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context
   has_many :submissions_folders, -> { where.not(folders: { submission_context_code: nil }) }, as: :context, inverse_of: :context, class_name: "Folder"
@@ -184,8 +184,8 @@ class User < ActiveRecord::Base
   has_many :calendar_events, -> { preload(:parent_event) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :eportfolios, dependent: :destroy
   has_many :quiz_submissions, dependent: :destroy, class_name: "Quizzes::QuizSubmission"
-  has_many :dashboard_messages, -> { where(to: "dashboard", workflow_state: "dashboard").order("created_at DESC") }, class_name: "Message", dependent: :destroy
-  has_many :user_services, -> { order("created_at") }, dependent: :destroy
+  has_many :dashboard_messages, -> { where(to: "dashboard", workflow_state: "dashboard").order(created_at: :desc) }, class_name: "Message", dependent: :destroy
+  has_many :user_services, -> { order(:created_at) }, dependent: :destroy
   has_many :rubric_associations, -> { preload(:rubric).order(created_at: :desc) }, as: :context, inverse_of: :context
   has_many :rubrics
   has_many :context_rubrics, as: :context, inverse_of: :context, class_name: "Rubric"
@@ -210,6 +210,7 @@ class User < ActiveRecord::Base
   has_many :stream_item_instances, dependent: :delete_all
   has_many :all_conversations, -> { preload(:conversation) }, class_name: "ConversationParticipant"
   has_many :conversation_batches, -> { preload(:root_conversation_message) }
+  has_many :authored_conversation_messages, foreign_key: :author_id, class_name: "ConversationMessage", inverse_of: :author
   has_many :favorites
   has_many :messages
   has_many :sis_batches
@@ -223,9 +224,19 @@ class User < ActiveRecord::Base
            dependent: :destroy
   has_many :gradebook_csvs, dependent: :destroy, class_name: "GradebookCSV"
   has_many :block_editor_templates, class_name: "BlockEditorTemplate", as: :context, inverse_of: :context
+
+  # added for dsr
   has_many :asset_user_accesses
+  has_many :wiki_pages
+  has_many :announcements
+  has_many :discussion_topics, -> { where(type: nil) }
+  has_many :submission_comments, foreign_key: "author_id", inverse_of: :author
+  has_many :all_comment_bank_items, class_name: "CommentBankItem"
+  has_many :bookmarks, class_name: "Bookmarks::Bookmark"
+  has_many :all_group_memberships, class_name: "GroupMembership"
 
   has_one :profile, class_name: "UserProfile"
+  has_many :profile_links, through: :profile, source: :links
 
   has_many :progresses, as: :context, inverse_of: :context
   has_many :one_time_passwords, -> { order(:id) }, inverse_of: :user
@@ -254,6 +265,11 @@ class User < ActiveRecord::Base
            class_name: "Auditors::ActiveRecord::FeatureFlagRecord",
            dependent: :destroy,
            inverse_of: :user
+  has_many :auditor_performing_user_account_user_records,
+           foreign_key: "performing_user_id",
+           class_name: "Auditors::ActiveRecord::AccountUserRecord",
+           dependent: :nullify,
+           inverse_of: :performing_user
   has_many :created_lti_registrations, class_name: "Lti::Registration", foreign_key: "created_by_id", inverse_of: :created_by
   has_many :updated_lti_registrations, class_name: "Lti::Registration", foreign_key: "updated_by_id", inverse_of: :updated_by
   has_many :created_lti_registration_account_bindings,
@@ -268,29 +284,44 @@ class User < ActiveRecord::Base
   has_many :lti_overlay_versions, class_name: "Lti::OverlayVersion", inverse_of: :created_by, dependent: :destroy
   has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :user, dependent: :destroy
 
-  has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
+  has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }, multishard: true
   has_many :microsoft_sync_partial_sync_changes, class_name: "MicrosoftSync::PartialSyncChange", dependent: :destroy, inverse_of: :user
 
   has_many :gradebook_filters, inverse_of: :user, dependent: :destroy
   has_many :quiz_migration_alerts, dependent: :destroy
   has_many :custom_data, class_name: "CustomData"
+  has_many :institutional_tag_associations
+  has_many :institutional_tags, through: :institutional_tag_associations
+
+  has_many :assessor_allocation_rules,
+           class_name: "AllocationRule",
+           foreign_key: "assessor_id",
+           dependent: :destroy,
+           inverse_of: :assessor
+
+  has_many :assessee_allocation_rules,
+           class_name: "AllocationRule",
+           foreign_key: "assessee_id",
+           dependent: :destroy,
+           inverse_of: :assessee
 
   belongs_to :otp_communication_channel, class_name: "CommunicationChannel"
 
   belongs_to :merged_into_user, class_name: "User"
 
   include StickySisFields
+
   are_sis_sticky :name, :sortable_name, :short_name, :pronouns
 
   include FeatureFlags
 
   def conversations
     # i.e. exclude any where the user has deleted all the messages
-    all_conversations.visible.order("last_message_at DESC, conversation_id DESC")
+    all_conversations.visible.order(last_message_at: :desc, conversation_id: :desc)
   end
 
   def starred_conversations
-    all_conversations.order("updated_at DESC, conversation_id DESC").starred
+    all_conversations.order(updated_at: :desc, conversation_id: :desc).starred
   end
 
   def page_views(options = {})
@@ -351,8 +382,8 @@ class User < ActiveRecord::Base
   scope :not_fake_student, -> { where("enrollments.type <> 'StudentViewEnrollment'") }
 
   # NOTE: only use for courses with differentiated assignments on
-  scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id, user_ids = nil|
-    visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids: assignment_id, course_ids: course_id, user_ids:).map(&:user_id)
+  scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id, user_ids = nil, include_concluded: true|
+    visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids: assignment_id, course_ids: course_id, user_ids:, include_concluded:).map(&:user_id)
     if visible_user_id.any?
       where(id: visible_user_id)
     else
@@ -374,14 +405,13 @@ class User < ActiveRecord::Base
   # a student, this first enrollment stays the same, but a new one with an associated_user_id is added. thusly to find
   # course observers, you take the difference between all active observers and active observers with associated users
   scope :observing_full_course, lambda { |course_ids|
-    active_observer_scope = joins(:enrollments).where(enrollments: { type: "ObserverEnrollment", course_id: course_ids, workflow_state: ["active", "invited"] })
-    users_observing_students = active_observer_scope.where.not(enrollments: { associated_user_id: nil }).pluck(:id)
-
-    if users_observing_students == [] || users_observing_students.nil?
-      active_observer_scope
-    else
-      active_observer_scope.where.not(users: { id: users_observing_students })
-    end
+    joins(:observer_enrollments)
+      .where(observer_enrollments: { course_id: course_ids, workflow_state: ["active", "invited"] })
+      .where.not(
+        ObserverEnrollment.where("enrollments.user_id=users.id and observer_enrollments.course_id=enrollments.course_id")
+                          .where(workflow_state: ["active", "invited"])
+                          .where.not(associated_user_id: nil).arel.exists
+      )
   }
 
   scope :linked_through_root_account, lambda { |root_account|
@@ -450,7 +480,7 @@ class User < ActiveRecord::Base
     end
     scope.select("MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank")
          .group(User.connection.group_by(User))
-         .order("enrollment_rank")
+         .order(:enrollment_rank)
          .order_by_sortable_name
   end
 
@@ -493,6 +523,7 @@ class User < ActiveRecord::Base
                 :require_self_enrollment_code,
                 :self_enrollment_code,
                 :self_enrollment_course,
+                :self_enrollment_section,
                 :validation_root_account,
                 :sortable_name_explicitly_set
   attr_reader :self_enrollment
@@ -529,7 +560,7 @@ class User < ActiveRecord::Base
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
-  def courses_for_enrollments(enrollment_scope, associated_user = nil, include_completed_courses = true)
+  def courses_for_enrollments(enrollment_scope, associated_user = nil, include_completed_courses: true)
     if associated_user && associated_user != self
       join = :observer_enrollments
       scope = Course.active.joins(join)
@@ -562,6 +593,73 @@ class User < ActiveRecord::Base
 
   def current_and_concluded_courses
     courses_for_enrollments(enrollments.current_and_concluded)
+  end
+
+  # Returns course IDs for truly current enrollments, filtered the same way as the dashboard
+  # Excludes past courses, completed/rejected/inactive enrollments, and homeroom/horizon courses for students
+  #
+  # This is the non-cached version - prefer using cached_current_course_ids_for_dashboard for better performance
+  def current_course_ids_for_dashboard(domain_root_account: nil)
+    all_enrollments = enrollments
+                      .not_deleted
+                      .shard(in_region_associated_shards)
+                      .preload(:enrollment_state, :course, :course_section)
+                      .to_a
+
+    # Filter out homeroom and horizon courses for students
+    if domain_root_account && roles(domain_root_account).all? { |role| ["student", "user"].include?(role) }
+      all_enrollments = all_enrollments.reject { |e| e.course.elementary_homeroom_course? || e.course.horizon_course? }
+    end
+
+    # Filter to only current enrollments (matching courses_controller logic)
+    completed_states = %i[completed rejected]
+    active_states = %i[active]
+
+    current_enrollments = all_enrollments.select do |enrollment|
+      state = enrollment.state_based_on_date
+      course = enrollment.course
+
+      # Skip if course is not published
+      next false unless course.workflow_state == "available"
+
+      # Skip if course is concluded (term ended, course dates passed, etc.)
+      next false if course.concluded?
+
+      # Skip completed or rejected
+      next false if completed_states.include?(state)
+
+      # Skip invited/pending enrollments (these are future enrollments)
+      next false if enrollment.workflow_state == "invited" || enrollment.enrollment_state.pending? || state == :creation_pending
+
+      # Skip if active but dates are in the past
+      next false if active_states.include?(state) && enrollment.section_or_course_date_in_past?
+
+      # Skip hard inactive
+      next false if enrollment.hard_inactive?
+
+      # Skip inactive state
+      next false if state == :inactive
+
+      true
+    end
+
+    current_enrollments.map(&:course_id).uniq
+  end
+
+  # Cached version of current_course_ids_for_dashboard
+  # Uses Rails.cache with batched keys to automatically invalidate when enrollments change
+  def cached_current_course_ids_for_dashboard(domain_root_account: nil)
+    # Include domain_root_account in cache key since it affects filtering
+    cache_key = ["current_course_ids_for_dashboard", domain_root_account&.global_id, ApplicationController.region].cache_key
+
+    Rails.cache.fetch_with_batched_keys(
+      cache_key,
+      batch_object: self,
+      batched_keys: :enrollments,
+      expires_in: 1.day
+    ) do
+      current_course_ids_for_dashboard(domain_root_account:)
+    end
   end
 
   def self.skip_updating_account_associations
@@ -774,7 +872,13 @@ class User < ActiveRecord::Base
         current_associations[key] = [aa.id, aa.depth]
       end
 
-      account_id_to_root_account_id = Account.where(id: precalculated_associations&.keys).pluck(:id, Arel.sql(Account.resolved_root_account_id_sql)).to_h
+      account_id_to_root_account_id = if precalculated_associations.present?
+                                        Account.where(id: precalculated_associations&.keys)
+                                               .pluck(:id, Arel.sql(Account.resolved_root_account_id_sql))
+                                               .to_h
+                                      else
+                                        {}
+                                      end
 
       users_or_user_ids.uniq.sort_by { |u| u.try(:id) || u }.each do |user_id|
         if user_id.is_a? User
@@ -967,7 +1071,7 @@ class User < ActiveRecord::Base
 
   def infer_defaults
     self.name = nil if name == "User"
-    self.name ||= email || t("#user.default_user_name", "User")
+    self.name ||= short_name || email || default_name || t("#user.default_user_name", "User")
     self.short_name = nil if short_name == ""
     self.short_name ||= self.name
     self.sortable_name = nil if sortable_name == ""
@@ -1001,10 +1105,6 @@ class User < ActiveRecord::Base
 
   def ensure_lti_id
     self.lti_id ||= SecureRandom.uuid
-  end
-
-  def set_default_feature_flags
-    enable_feature!(:new_user_tutorial_on_off) unless Rails.env.test?
   end
 
   def sortable_name
@@ -1212,7 +1312,10 @@ class User < ActiveRecord::Base
       user_observee_scope.destroy_all
       eportfolio_scope&.in_batches&.destroy_all
       pseudonym_scope.each(&:destroy)
-      account_users.each(&:destroy)
+      account_users.each do |account_user|
+        account_user.current_user = updating_user
+        account_user.destroy
+      end
 
       # only delete the user's communication channels when the last account is
       # removed (they don't belong to any particular account). they will always
@@ -1300,15 +1403,26 @@ class User < ActiveRecord::Base
   end
 
   def check_accounts_right?(user, sought_right)
-    # check if the user we are given is an admin in one of this user's accounts
     return false unless user && sought_right
-    return account.grants_right?(user, sought_right) if fake_student? # doesn't have account association
+
+    check_accounts(user) { |account| account.grants_right?(user, sought_right) }
+  end
+
+  def check_accounts_any_right?(user, *sought_rights)
+    return false unless user && sought_rights.any?
+
+    check_accounts(user) { |account| account.grants_any_right?(user, *sought_rights) }
+  end
+
+  def check_accounts(user, &)
+    # check if the user we are given is an admin in one of this user's accounts
+    return yield(account) if fake_student? # doesn't have account association
 
     # Intentionally include deleted pseudonyms when checking deleted users (important for diagnosing deleted users)
     accounts_to_search =
       if associated_accounts.empty?
         if merged_into_user && active_merged_into_user
-          return active_merged_into_user.check_accounts_right?(user, sought_right)
+          return active_merged_into_user.check_accounts(user, &)
         elsif Account.joins(:pseudonyms).where(pseudonyms: { user_id: id }).exists?
           Account.joins(:pseudonyms).where(pseudonyms: { user_id: id })
         else
@@ -1322,9 +1436,9 @@ class User < ActiveRecord::Base
     search_method = lambda do |shard|
       # new users with creation pending enrollments don't have account associations
       if accounts_to_search.shard(shard).empty? && common_shards.length == 1 && !unavailable?
-        account.grants_right?(user, sought_right)
+        yield(account)
       else
-        accounts_to_search.shard(shard).any? { |a| a.grants_right?(user, sought_right) }
+        accounts_to_search.shard(shard).any?(&)
       end
     end
     # search shards the two users have in common first, since they're most likely
@@ -1376,8 +1490,10 @@ class User < ActiveRecord::Base
       api_show_user
       read_email_addresses
       view_user_logins
+      view_user_generated_access_tokens
       generate_observer_pairing_code
       update_speed_grader_settings
+      read_observer_alerts
     ]
 
     given { |user| user == self && user.user_can_edit_name? }
@@ -1420,6 +1536,9 @@ class User < ActiveRecord::Base
 
     given { |user| check_accounts_right?(user, :view_user_logins) }
     can :view_user_logins
+
+    given { |user| check_accounts_right?(user, :view_user_generated_access_tokens) }
+    can :view_user_generated_access_tokens
 
     given { |user| check_accounts_right?(user, :read_email_addresses) }
     can :read_email_addresses
@@ -1489,7 +1608,7 @@ class User < ActiveRecord::Base
       return false unless includes_subset_of_course_admin_permissions?(masquerader, account)
     end
 
-    has_subset_of_account_permissions?(masquerader, account)
+    has_subset_of_account_permissions?(masquerader, account, exclude_non_masquerading_permissions: true)
   end
 
   def self.all_course_admin_type_permissions_for(user)
@@ -1522,14 +1641,19 @@ class User < ActiveRecord::Base
     end
   end
 
-  def has_subset_of_account_permissions?(user, account)
+  def has_subset_of_account_permissions?(user, account, exclude_non_masquerading_permissions: false)
     return true if user == self
     return false unless account.root_account?
 
-    Rails.cache.fetch(["has_subset_of_account_permissions", self, user, account].cache_key, expires_in: 60.minutes) do
+    Rails.cache.fetch(["has_subset_of_account_permissions",
+                       self,
+                       user,
+                       account,
+                       !!exclude_non_masquerading_permissions].cache_key,
+                      expires_in: 60.minutes) do
       account_users = account.cached_all_account_users_for(self)
       account_users.all? do |account_user|
-        account_user.is_subset_of?(user)
+        account_user.is_subset_of?(user, exclude_non_masquerading_permissions:)
       end
     end
   end
@@ -1691,20 +1815,66 @@ class User < ActiveRecord::Base
   end
 
   AVATAR_SETTINGS = %w[enabled enabled_pending sis_only disabled].freeze
-  def avatar_url(size = nil, avatar_setting = nil, fallback = nil, request = nil, use_fallback = true)
+  def avatar_url(size = nil, avatar_setting = nil, fallback = nil, request = nil, use_fallback: true)
     return fallback if avatar_setting == "disabled"
 
     size ||= 50
     avatar_setting ||= "enabled"
     fallback = use_fallback ? self.class.avatar_fallback_url(fallback, request) : nil
     if avatar_setting == "enabled" || (avatar_setting == "enabled_pending" && avatar_approved?) || (avatar_setting == "sis_only")
-      @avatar_url ||= avatar_image_url
+      @avatar_url ||= avatar_location(avatar_image_url)
     end
     @avatar_url ||= fallback if avatar_image_source == "no_pic"
     if (avatar_setting == "enabled") && (avatar_image_source == "gravatar")
       @avatar_url ||= gravatar_url(size, fallback, request)
     end
     @avatar_url ||= fallback
+  end
+
+  def avatar_location(image_url)
+    url = image_url
+    return url unless image_url &&
+                      %w[attachment external].include?(avatar_image_source) &&
+                      associated_root_accounts.any? { |a| a.feature_enabled?(:file_association_access) }
+
+    uri = URI.parse(image_url)
+    attachment_id = get_attachment_id_from_known_avatar_paths(uri.path)
+    if attachment_id
+      params = URI.decode_www_form(uri.query || "")
+      params << ["location", "avatar_#{id}"]
+      uri.query = URI.encode_www_form(params)
+      url = uri.to_s
+    end
+    url
+  rescue URI::InvalidURIError
+    image_url
+  end
+
+  # returns the attachment id specified in the path, or nil if there is no match
+  def get_attachment_id_from_known_avatar_paths(uri_path)
+    md = %r{/images/thumbnails/(\d+(?:~\d+)?)$}.match(uri_path)
+    md ||= %r{/files/(\d+(?:~\d+)?)/download$}.match(uri_path)
+    Shard.integral_id_for(md[1]) if md
+  end
+  private :get_attachment_id_from_known_avatar_paths
+
+  def allow_avatar_access?(attachment)
+    return false unless attachment
+    return false unless %w[attachment external].include?(avatar_image_source)
+
+    avatar_attachment == attachment && avatar_attachment.grants_any_right?(self, :read, :download)
+  end
+
+  # Returns the Attachment record for the file in user's avatar, or nil if the user does not have an avatar. It does no
+  # permission checking, it just goes and finds the attachment.
+  def avatar_attachment
+    return nil unless %w[attachment external].include?(avatar_image_source) && avatar_image_url
+
+    uri = URI.parse(avatar_image_url)
+    attachment_id = get_attachment_id_from_known_avatar_paths(uri.path)
+    return nil unless attachment_id
+
+    Attachment.find_by(id: attachment_id)
   end
 
   def avatar_path
@@ -1757,7 +1927,7 @@ class User < ActiveRecord::Base
   end
 
   scope :with_avatar_state, lambda { |state|
-    scope = where.not(avatar_image_url: nil).order("avatar_image_updated_at DESC")
+    scope = where.not(avatar_image_url: nil).order(avatar_image_updated_at: :desc)
     if state == "any"
       scope.where("avatar_state IS NOT NULL AND avatar_state<>'none'")
     else
@@ -1789,6 +1959,18 @@ class User < ActiveRecord::Base
 
   def new_user_tutorial_statuses
     get_preference(:new_user_tutorial_statuses) || {}
+  end
+
+  # on this date we started creating an enabled :new_user_tutorial_on_off FF for every new user.
+  # changing the default to `allowed_on` let us avoid doing that (tbf this wasn't an option then)
+  TUTORIAL_FF_INTRO_DATE = Date.new(2017, 4, 22)
+  def show_new_user_tutorial?
+    if created_at < TUTORIAL_FF_INTRO_DATE
+      # avoid implicitly enabling the feature for old users (they need to explicitly toggle it on)
+      lookup_feature_flag(:new_user_tutorial_on_off)&.state == "on"
+    else
+      feature_enabled?(:new_user_tutorial_on_off)
+    end
   end
 
   def apply_contrast(colors)
@@ -1834,6 +2016,14 @@ class User < ActiveRecord::Base
   def set_dashboard_positions(new_positions)
     @dashboard_positions = nil
     set_preference(:dashboard_positions, new_positions)
+  end
+
+  def educator_dashboard_config
+    config = get_preference(:educator_dashboard_config) || {}
+    unless config["layout"].is_a?(Hash)
+      config = config.merge("layout" => WidgetDashboardLayoutValidator.default_educator_layout)
+    end
+    WidgetDashboardLayoutValidator.sanitize_educator_layout(config)
   end
 
   # Use the user's preferences for the default view
@@ -1944,17 +2134,30 @@ class User < ActiveRecord::Base
 
   # the logic here is copied from feature_flags_controller#index
   # we don't want to add use_dyslexic_font to ENV if
-  # (a) the flag is shadowed or (b) the flag is off/locked at site admin
+  # the flag is off/locked at site admin
   def can_see_dyslexic_font_feature_flag?(session)
     can_read_site_admin = Account.site_admin.grants_right?(@current_user, session, :read)
 
-    !!lookup_feature_flag(
+    ff = lookup_feature_flag(
       "use_dyslexic_font",
       override_hidden: can_read_site_admin,
       include_shadowed: can_read_site_admin,
-      skip_cache: false,
-      hide_inherited_enabled: true
+      skip_cache: false
     )
+
+    return false unless ff
+    return false if ff.enabled? && ff.locked?(self)
+
+    true
+  end
+
+  def prefers_widget_dashboard?(_domain_root_account, _flag = nil)
+    # Explicit preference takes priority
+    return preferences[:widget_dashboard_user_preference] unless preferences[:widget_dashboard_user_preference].nil?
+
+    # Require explicit opt-in for both "allowed" and "allowed_on" states
+    # When preference is nil, return false
+    false
   end
 
   def auto_show_cc?
@@ -2071,7 +2274,9 @@ class User < ActiveRecord::Base
     return if @self_enrolling # avoid infinite recursion when enrolling across shards (pseudonym creation + shard association stuff)
 
     @self_enrolling = true
-    @self_enrollment = @self_enrollment_course.self_enroll_student(self, skip_pseudonym: @just_created, skip_touch_user: true)
+    enrollment_options = { skip_pseudonym: @just_created, skip_touch_user: true }
+    enrollment_options[:section] = @self_enrollment_section if @self_enrollment_section
+    @self_enrollment = @self_enrollment_course.self_enroll_student(self, enrollment_options)
     @self_enrolling = false
   end
 
@@ -2097,11 +2302,11 @@ class User < ActiveRecord::Base
     Rails.cache.fetch_with_batched_keys("course_creating_teacher_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
       Shard.with_each_shard(in_region_associated_shards) do
         Account.where(id: Course.where(id: enrollments.active.shard(Shard.current)
-                                .select(:course_id)
-                                .where(type: %w[TeacherEnrollment DesignerEnrollment])
-                                .joins(:root_account)
-                                .where("accounts.settings LIKE ?", "%teachers_can_create_courses: true%"))
-               .select(:account_id))
+                                           .select(:course_id)
+                                           .where(type: %w[TeacherEnrollment DesignerEnrollment])
+                                           .joins(:root_account)
+                                           .where("accounts.settings LIKE ?", "%teachers_can_create_courses: true%"))
+                          .select(:account_id))
       end
     end
   end
@@ -2110,11 +2315,11 @@ class User < ActiveRecord::Base
     Rails.cache.fetch_with_batched_keys("course_creating_student_enrollment_accounts", batch_object: self, batched_keys: :enrollments) do
       Shard.with_each_shard(in_region_associated_shards) do
         Account.where(id: Course.where(id: enrollments.active.shard(Shard.current)
-                                .select(:course_id)
-                                .where(type: %w[StudentEnrollment ObserverEnrollment])
-                                .joins(:root_account)
-                                .where("accounts.settings LIKE ?", "%students_can_create_courses: true%"))
-               .select(:account_id))
+                                           .select(:course_id)
+                                           .where(type: %w[StudentEnrollment ObserverEnrollment])
+                                           .joins(:root_account)
+                                           .where("accounts.settings LIKE ?", "%students_can_create_courses: true%"))
+                          .select(:account_id))
       end
     end
   end
@@ -2125,7 +2330,7 @@ class User < ActiveRecord::Base
     @courses_with_primary_enrollment.fetch(cache_key) do
       res = shard.activate do
         result = Rails.cache.fetch([self, "courses_with_primary_enrollment2", association, options, ApplicationController.region].cache_key, expires_in: 15.minutes) do
-          scope = courses_for_enrollments(enrollments.current_and_invited, options[:observee_user], !!options[:include_completed_courses])
+          scope = courses_for_enrollments(enrollments.current_and_invited, options[:observee_user], include_completed_courses: !!options[:include_completed_courses])
           shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
@@ -2321,6 +2526,15 @@ class User < ActiveRecord::Base
     end
   end
 
+  def teacher_enrollment?
+    return @_teacher_enrollment if defined?(@_teacher_enrollment)
+
+    @_teacher_enrollment = Rails.cache.fetch_with_batched_keys(["has_teacher_enrollment", ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
+      enrollments.shard(in_region_associated_shards).where(type: %w[TeacherEnrollment])
+                 .where.not(workflow_state: %w[rejected inactive deleted]).exists?
+    end
+  end
+
   def non_student_enrollment?
     # We should be able to remove this method when the planner works for teachers/other course roles
     return @_non_student_enrollment if defined?(@_non_student_enrollment)
@@ -2328,6 +2542,31 @@ class User < ActiveRecord::Base
     @_non_student_enrollment = Rails.cache.fetch_with_batched_keys(["has_non_student_enrollment", ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
       enrollments.shard(in_region_associated_shards).where.not(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
                  .where.not(workflow_state: %w[rejected inactive deleted]).exists?
+    end
+  end
+
+  # TODO: Optimize caching strategies (EGG-2540)
+  def educator_dashboard_user?
+    Rails.cache.fetch_with_batched_keys(
+      "should_show_educator_dashboard",
+      batch_object: self,
+      batched_keys: :enrollments,
+      expires_in: 1.hour
+    ) do
+      enrollments
+        .shard(in_region_associated_shards)
+        .of_content_admins
+        .active_or_pending
+        .exists?
+    end
+  end
+
+  def active_non_student_enrollment?
+    return @_active_non_student_enrollment if defined?(@_active_non_student_enrollment)
+
+    @_active_non_student_enrollment = Rails.cache.fetch_with_batched_keys(["has_active_non_student_enrollment", ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
+      enrollments.shard(in_region_associated_shards).where.not(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
+                 .where.not(workflow_state: %w[rejected inactive deleted completed]).exists?
     end
   end
 
@@ -2402,6 +2641,59 @@ class User < ActiveRecord::Base
   end
   private :cached_course_ids
 
+  # Returns courses the user can read via Canvas permissions:
+  # public courses, institution-public courses, enrolled courses, or admin access.
+  # All courses must be published to be accessible.
+  def accessible_courses_by_ids(course_ids, opts = {})
+    return [] if course_ids.blank?
+
+    @accessible_courses_by_ids ||= {}
+    cache_key = course_ids.sort.join(",")
+
+    courses = @accessible_courses_by_ids[cache_key] ||= shard.activate do
+      Rails.cache.fetch_with_batched_keys(
+        ["accessible_courses", cache_key].cache_key,
+        batch_object: self,
+        batched_keys: [:enrollments, :account_users],
+        expires_in: 1.hour
+      ) do
+        courses = Course.where(id: course_ids)
+        courses.select { |course| course.grants_right?(self, :read) }
+      end
+    end
+
+    if opts[:preload_courses]
+      ActiveRecord::Associations.preload(courses, :enrollment_term)
+    end
+
+    courses
+  end
+
+  def accessible_courses_by_sis_ids(sis_ids, opts = {})
+    return [] if sis_ids.blank?
+
+    @accessible_courses_by_sis_ids ||= {}
+    cache_key = sis_ids.sort.join(",")
+
+    courses = @accessible_courses_by_sis_ids[cache_key] ||= shard.activate do
+      Rails.cache.fetch_with_batched_keys(
+        ["accessible_courses_by_sis", cache_key].cache_key,
+        batch_object: self,
+        batched_keys: [:enrollments, :account_users],
+        expires_in: 1.hour
+      ) do
+        courses = Course.where(sis_source_id: sis_ids).to_a
+        courses.select { |course| course.grants_right?(self, :read) }
+      end
+    end
+
+    if opts[:preload_courses]
+      ActiveRecord::Associations.preload(courses, :enrollment_term)
+    end
+
+    courses
+  end
+
   def participating_enrollments
     @participating_enrollments ||= shard.activate do
       Rails.cache.fetch_with_batched_keys([self, "participating_enrollments2", ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
@@ -2432,7 +2724,7 @@ class User < ActiveRecord::Base
                                    .joins(:assignment, assignment: [:post_policy])
                                    .where(assignments: { workflow_state: "published" })
                                    .where("last_comment_at > ?", start_at)
-                                   .limit(limit).order("last_comment_at").to_a
+                                   .limit(limit).order(:last_comment_at).to_a
 
           submissions = submissions.sort_by { |t| t.last_comment_at || t.created_at }.reverse
           submissions = submissions.uniq
@@ -2442,7 +2734,15 @@ class User < ActiveRecord::Base
 
           # when discussion_checkpoints FF is enabled, we filter out parent assignment submissions
           # when that FF is disabled, we filter out sub_assignment submissions
-          course_ids_with_active_checkpoints = Course.where(id: course_ids).select(&:discussion_checkpoints_enabled?).map(&:id)
+          course_ids_by_account_id = Course.where(id: course_ids)
+                                           .group(:account_id).pluck(Arel.sql("account_id, ARRAY_AGG(id)")).to_h
+          course_ids_with_active_checkpoints = if course_ids_by_account_id.any?
+                                                 Account.where(id: course_ids_by_account_id.keys)
+                                                        .select(&:discussion_checkpoints_enabled?)
+                                                        .flat_map { |a| course_ids_by_account_id[a.id] }
+                                               else
+                                                 []
+                                               end
           submissions.delete_if do |sub|
             (sub.assignment.has_sub_assignments? && course_ids_with_active_checkpoints.include?(sub.course_id)) ||
               (sub.assignment.is_a?(SubAssignment) && !course_ids_with_active_checkpoints.include?(sub.course_id))
@@ -2459,7 +2759,7 @@ class User < ActiveRecord::Base
     ** # forwarded to submissions_for_course_ids
   )
     course_ids ||= if contexts
-                     contexts.select { |c| c.is_a?(Course) }.map(&:id)
+                     contexts.grep(Course).map(&:id)
                    else
                      participating_student_course_ids
                    end
@@ -2569,7 +2869,7 @@ class User < ActiveRecord::Base
     filter_after_db = !opts[:use_db_filter] &&
                       (context_codes.grep(/\Acourse_\d+\z/).count > Setting.get("filter_events_by_section_code_threshold", "25").to_i)
 
-    section_codes = section_context_codes(context_codes, filter_after_db)
+    section_codes = section_context_codes(context_codes, skip_visibility_filter: filter_after_db, include_concluded: false)
     limit = filter_after_db ? opts[:limit] * 2 : opts[:limit] # pull extra events just in case
     events = CalendarEvent.active.for_user_and_context_codes(self, context_codes, section_codes)
                           .between(now, opts[:end_at]).limit(limit).order(:start_at).to_a.reject(&:hidden?)
@@ -2580,7 +2880,7 @@ class User < ActiveRecord::Base
         section_ids = events.map(&:context_code).grep(/\Acourse_section_\d+\z/).map { |s| s.delete_prefix("course_section_").to_i }
         section_course_codes = Course.joins(:course_sections).where(course_sections: { id: section_ids })
                                      .pluck(:id).map { |id| "course_#{id}" }
-        visible_section_codes = section_context_codes(section_course_codes)
+        visible_section_codes = section_context_codes(section_course_codes, skip_visibility_filter: false, include_concluded: false)
         events.reject! { |e| e.context_code.start_with?("course_section_") && !visible_section_codes.include?(e.context_code) }
         events = events.first(opts[:limit]) # strip down to the original limit
       end
@@ -2606,9 +2906,15 @@ class User < ActiveRecord::Base
       )
     end
 
-    if course_ids_with_checkpoints_enabled.any?
+    # Filter context_codes to only checkpoint-enabled courses (consistent with regular assignment filtering)
+    checkpoint_context_codes = context_codes.select do |code|
+      type, id = ActiveRecord::Base.parse_asset_string(code)
+      type == "Course" && course_ids_with_checkpoints_enabled.include?(id)
+    end
+
+    if checkpoint_context_codes.any?
       sub_assignments = SubAssignment.published
-                                     .for_course(course_ids_with_checkpoints_enabled)
+                                     .for_context_codes(checkpoint_context_codes)
                                      .due_between_with_overrides(now, opts[:end_at])
                                      .include_submitted_count.to_a
 
@@ -2619,6 +2925,30 @@ class User < ActiveRecord::Base
 
         events += select_available_assignments(
           select_upcoming_assignments(sub_assignments.map { |a| a.overridden_for(self) }, opts.merge(time: now))
+        )
+      end
+    end
+
+    course_code_by_id = context_codes.each_with_object({}) do |code, map|
+      type, id = ActiveRecord::Base.parse_asset_string(code)
+      map[id] = code if type == "Course"
+    end
+    enabled_peer_review_ids = course_ids_with_peer_review_enabled(course_ids: course_code_by_id.keys)
+    peer_review_context_codes = course_code_by_id.values_at(*enabled_peer_review_ids).compact
+
+    if peer_review_context_codes.any?
+      peer_review_sub_assignments = PeerReviewSubAssignment.published
+                                                           .for_context_codes(peer_review_context_codes)
+                                                           .due_between_with_overrides(now, opts[:end_at])
+                                                           .include_submitted_count.to_a
+
+      if peer_review_sub_assignments.any?
+        if AssignmentOverrideApplicator.should_preload_override_students?(peer_review_sub_assignments, self, "upcoming_events")
+          AssignmentOverrideApplicator.preload_assignment_override_students(peer_review_sub_assignments, self)
+        end
+
+        events += select_available_assignments(
+          select_upcoming_assignments(peer_review_sub_assignments.map { |a| a.overridden_for(self) }, opts.merge(time: now))
         )
       end
     end
@@ -2637,7 +2967,18 @@ class User < ActiveRecord::Base
   end
 
   def course_ids_with_checkpoints_enabled
-    courses.select(&:discussion_checkpoints_enabled?).map(&:id)
+    course_ids_by_account_id = courses.group("courses.account_id")
+                                      .pluck(Arel.sql("courses.account_id, ARRAY_AGG(courses.id)")).to_h
+    return [] if course_ids_by_account_id.empty?
+
+    Account.where(id: course_ids_by_account_id.keys)
+           .select(&:discussion_checkpoints_enabled?)
+           .flat_map { |a| course_ids_by_account_id[a.id] }
+  end
+
+  def course_ids_with_peer_review_enabled(course_ids: nil)
+    courses_to_check = course_ids ? courses.where(id: course_ids) : courses
+    courses_to_check.select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
   end
 
   def select_available_assignments(assignments, include_concluded: false)
@@ -2712,25 +3053,28 @@ class User < ActiveRecord::Base
   # given user, i.e. courses and sections
   def appointment_context_codes(include_observers: false)
     @appointment_context_codes ||= {}
-    @appointment_context_codes[include_observers] ||= Rails.cache.fetch([self, "cached_appointment_codes", ApplicationController.region, include_observers].cache_key, expires_in: 1.day) do
+    @appointment_context_codes[[Shard.current, include_observers]] ||= Rails.cache.fetch([self, "cached_appointment_codes", ApplicationController.region, Shard.current, include_observers].cache_key, expires_in: 1.day) do
       ret = { primary: [], secondary: [] }
       cached_currentish_enrollments(preload_dates: true).each do |e|
         next unless (e.student? || (include_observers && e.observer?)) && e.active?
+        next unless e.shard == Shard.current
 
         ret[:primary] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"
       end
-      ret[:secondary].concat(groups.map { |g| "group_category_#{g.group_category_id}" })
+      ret[:secondary].concat(groups.shard(Shard.current).map { |g| "group_category_#{g.group_category_id}" })
       ret
     end
   end
 
   def manageable_appointment_context_codes
-    cache_key = [self, "cached_manageable_appointment_codes", ApplicationController.region].cache_key
-    @manageable_appointment_context_codes ||= Rails.cache.fetch(cache_key, expires_in: 1.day) do
+    @manageable_appointment_context_codes ||= {}
+    cache_key = [self, "cached_manageable_appointment_codes", ApplicationController.region, Shard.current].cache_key
+    @manageable_appointment_context_codes[Shard.current] ||= Rails.cache.fetch(cache_key, expires_in: 1.day) do
       ret = { full: [], limited: [], secondary: [] }
       limited_sections = {}
       manageable_enrollments_by_permission(:manage_calendar, cached_currentish_enrollments).each do |e|
+        next unless e.shard == Shard.current
         next if ret[:full].include?("course_#{e.course_id}")
 
         if e.limit_privileges_to_course_section
@@ -2753,7 +3097,7 @@ class User < ActiveRecord::Base
   # include_concluded_codes - If true, include concluded courses (default: true).
   #
   # Returns an array of context code strings.
-  def conversation_context_codes(include_concluded_codes = true)
+  def conversation_context_codes(include_concluded_codes: true)
     return @conversation_context_codes[include_concluded_codes] if @conversation_context_codes
 
     Rails.cache.fetch([self, include_concluded_codes, "conversation_context_codes4"].cache_key, expires_in: 1.day) do
@@ -2836,7 +3180,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def section_context_codes(context_codes, skip_visibility_filter = false)
+  def section_context_codes(context_codes, skip_visibility_filter: false, include_concluded: true)
     course_ids = context_codes.grep(/\Acourse_\d+\z/).map { |s| s.delete_prefix("course_").to_i }
     return [] unless course_ids.present?
 
@@ -2846,7 +3190,7 @@ class User < ActiveRecord::Base
     else
       full_course_ids = []
       Course.where(id: course_ids).each do |course|
-        result = course.course_section_visibility(self)
+        result = course.course_section_visibility(self, include_concluded:)
         case result
         when Array
           section_ids.concat(result)
@@ -2866,12 +3210,12 @@ class User < ActiveRecord::Base
     section_ids.map { |id| "course_section_#{id}" }
   end
 
-  def manageable_courses(include_concluded = false)
+  def manageable_courses(include_concluded: false)
     Course.manageable_by_user(id, include_concluded).not_deleted
   end
 
-  def manageable_courses_by_query(query = "", include_concluded = false)
-    manageable_courses(include_concluded).not_deleted.name_like(query).limit(50)
+  def manageable_courses_by_query(query = "", include_concluded: false)
+    manageable_courses(include_concluded:).not_deleted.name_like(query).limit(50)
   end
 
   def last_completed_module
@@ -2896,6 +3240,10 @@ class User < ActiveRecord::Base
 
   def flamegraphs_folder
     initialize_default_folder(Folder::FLAMEGRAPHS_FOLDER_NAME)
+  end
+
+  def n_plus_one_detection_folder
+    initialize_default_folder(Folder::N_PLUS_ONE_DETECTION_FOLDER_NAME)
   end
 
   def initialize_default_folder(name)
@@ -3033,47 +3381,81 @@ class User < ActiveRecord::Base
   end
 
   def menu_courses(enrollment_uuid = nil, opts = {})
-    return @menu_courses if @menu_courses
+    # Only use cached @menu_courses if no limit override is specified
+    return @menu_courses if @menu_courses && opts[:limit].nil?
 
     can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) || roles(c.root_account).include?("teacher") }
     # this terribleness is so we try to make sure that the newest courses show up in the menu
+    limit = opts[:limit] || Setting.get("menu_course_limit", "20").to_i
     courses = courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid, opts)
               .sort_by { |c| [c.primary_enrollment_rank, Time.zone.now - (c.primary_enrollment_date || Time.zone.now)] }
-              .first(Setting.get("menu_course_limit", "20").to_i)
+              .first(limit)
               .sort_by { |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
     favorites = courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
                 .select { |c| can_favorite.call(c) }
     # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
-    @menu_courses = if favorites.empty?
-                      courses
-                    else
-                      favorites + courses.reject { |c| can_favorite.call(c) }
-                    end
-    ActiveRecord::Associations.preload(@menu_courses, :enrollment_term)
-    @menu_courses.reject do |c|
+    menu_courses = if favorites.empty?
+                     courses
+                   else
+                     favorites + courses.reject { |c| can_favorite.call(c) }
+                   end
+    # Only cache if using default limit
+    @menu_courses = menu_courses if opts[:limit].nil?
+    ActiveRecord::Associations.preload(menu_courses, :enrollment_term)
+    menu_courses.reject do |c|
       c.horizon_course? && !c.grants_right?(self, :read_as_admin)
     end
   end
 
-  def user_can_edit_name?
+  # creates a hash of booleans determining what profile fields the user can edit
+  def details_editable_by_user
     accounts = pseudonyms.shard(self).active.map(&:account)
-    return true if accounts.empty?
 
-    accounts.any?(&:users_can_edit_name?)
+    {
+      can_edit_name: user_can_edit_name?(accounts),
+      can_edit_bio: user_can_edit_bio?(accounts),
+      can_edit_title: user_can_edit_title?(accounts),
+      can_edit_profile_links: user_can_edit_profile_links?(accounts),
+      can_edit: user_can_edit_profile?(accounts),
+      can_edit_channels: user_can_edit_comm_channels?(accounts)
+    }
   end
 
-  def user_can_edit_profile?
-    accounts = pseudonyms.shard(self).active.map(&:account)
+  def check_account_user_can_edit_permissions?(accounts = nil, &)
+    accounts ||= pseudonyms.shard(self).active.map(&:account)
     return true if accounts.empty?
 
-    accounts.any?(&:users_can_edit_profile?)
+    accounts.any?(&)
   end
 
-  def user_can_edit_comm_channels?
-    accounts = pseudonyms.shard(self).active.map(&:account)
-    return true if accounts.empty?
+  def user_can_edit_name?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts, &:users_can_edit_name?)
+  end
 
-    accounts.any?(&:users_can_edit_comm_channels?)
+  def user_can_edit_bio?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts) do |account|
+      account.users_can_edit_bio? && account.users_can_edit_profile?
+    end
+  end
+
+  def user_can_edit_title?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts) do |account|
+      account.users_can_edit_title? && account.users_can_edit_profile?
+    end
+  end
+
+  def user_can_edit_profile_links?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts) do |account|
+      account.users_can_edit_profile_links? && account.users_can_edit_profile?
+    end
+  end
+
+  def user_can_edit_profile?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts, &:users_can_edit_profile?)
+  end
+
+  def user_can_edit_comm_channels?(accounts = nil)
+    check_account_user_can_edit_permissions?(accounts, &:users_can_edit_comm_channels?)
   end
 
   def suspended?
@@ -3125,7 +3507,7 @@ class User < ActiveRecord::Base
     pseudonym = SisPseudonym.for(self, account, type: :trusted, require_sis: false)
     unless pseudonym
       # list of copyable pseudonyms
-      active_pseudonyms = all_active_pseudonyms(:reload).select { |p| !p.password_auto_generated? && !p.account.delegated_authentication? }
+      active_pseudonyms = all_active_pseudonyms(reload: true).select { |p| !p.password_auto_generated? && !p.account.delegated_authentication? }
       templates = []
       # re-arrange in the order we prefer
       templates.concat(active_pseudonyms.select { |p| p.account_id == preferred_template_account.id }) if preferred_template_account
@@ -3149,6 +3531,10 @@ class User < ActiveRecord::Base
 
   def fake_student?
     !!preferences[:fake_student] && enrollments.where(type: "StudentViewEnrollment").exists?
+  end
+
+  def underage?
+    !!preferences[:underage]
   end
 
   def private?
@@ -3197,6 +3583,8 @@ class User < ActiveRecord::Base
     end
   end
 
+  # despite the name being crocodoc_id, this is still used for DocViewer. It's also sometimes used for moderated grading
+  # ids as well. Renaming it would be too much work for now.
   def crocodoc_id!
     cid = crocodoc_id
     return cid if cid
@@ -3215,7 +3603,7 @@ class User < ActiveRecord::Base
     "#{crocodoc_id!},#{short_name.delete(",")}"
   end
 
-  def moderated_grading_ids(create_crocodoc_id = false)
+  def moderated_grading_ids(create_crocodoc_id: false)
     {
       crocodoc_id: create_crocodoc_id ? crocodoc_id! : crocodoc_id,
       global_id: global_id.to_s
@@ -3349,10 +3737,53 @@ class User < ActiveRecord::Base
     Rails.cache.delete(adminable_accounts_cache_key)
   end
 
+  def adminable_horizon_accounts_cache_key
+    ["adminable_horizon_accounts_1", self, ApplicationController.region].cache_key
+  end
+
+  def clear_adminable_horizon_accounts_cache!
+    Rails.cache.delete(adminable_horizon_accounts_cache_key)
+  end
+
   def adminable_accounts_scope(shard_scope: in_region_associated_shards)
     # i couldn't get EXISTS (?) to work multi-shard, so this is happening instead
     account_ids = account_users.active.shard(shard_scope).distinct.pluck(:account_id)
     Account.active.where(id: account_ids)
+  end
+
+  def adminable_horizon_accounts_scope(shard_scope: in_region_associated_shards)
+    adminable_accounts_ids = account_users.active.shard(shard_scope).distinct.pluck(:account_id)
+    root_accounts = Account.active.where(
+      id: Account.active
+          .where(id: adminable_accounts_ids)
+          .select(Arel.sql("DISTINCT COALESCE(NULLIF(root_account_id, 0), id)"))
+    )
+
+    horizon_account_ids = Set.new
+    adminable_accounts_set = Set.new(adminable_accounts_ids)
+
+    root_accounts.each do |root_account|
+      root_account.shard.activate do
+        horizon_parent_ids = root_account.settings[:horizon_account_ids] || []
+
+        next if horizon_parent_ids.empty?
+
+        all_horizon_accounts = Account.multi_parent_sub_accounts_recursive(horizon_parent_ids)
+        all_horizon_ids = all_horizon_accounts.pluck(:id)
+
+        matching_ids = Set.new(all_horizon_ids) & adminable_accounts_set
+
+        matching_ids.each do |local_id|
+          horizon_account_ids.add(Shard.global_id_for(local_id, root_account.shard))
+        end
+      end
+    end
+
+    if horizon_account_ids.any? && account_users.active.where(account: Account.site_admin).exists?
+      horizon_account_ids.add(Account.site_admin.global_id)
+    end
+
+    Account.active.where(id: horizon_account_ids.to_a)
   end
 
   def adminable_accounts
@@ -3363,8 +3794,20 @@ class User < ActiveRecord::Base
     end
   end
 
+  def adminable_horizon_accounts
+    @adminable_horizon_accounts ||= shard.activate do
+      Rails.cache.fetch(adminable_horizon_accounts_cache_key) do
+        adminable_horizon_accounts_scope.order(:id).to_a
+      end
+    end
+  end
+
   def all_paginatable_accounts
     ShardedBookmarkedCollection.build(Account::Bookmarker, adminable_accounts_scope.order(:name, :id))
+  end
+
+  def all_paginatable_horizon_accounts
+    ShardedBookmarkedCollection.build(Account::Bookmarker, adminable_horizon_accounts_scope.order(:name, :id))
   end
 
   def all_pseudonyms_loaded?
@@ -3392,7 +3835,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def all_active_pseudonyms(reload = false)
+  def all_active_pseudonyms(reload: false)
     @all_active_pseudonyms = nil if reload
     @all_active_pseudonyms ||= pseudonyms.shard(self).active.to_a
   end
@@ -3503,7 +3946,7 @@ class User < ActiveRecord::Base
     end
     roles << "student" if enrollment_types.intersect?(%w[StudentEnrollment StudentViewEnrollment])
     roles << "fake_student" if fake_student?
-    roles << "observer" if enrollment_types.intersect?(%w[ObserverEnrollment])
+    roles << "observer" if enrollment_types.include?("ObserverEnrollment")
     roles << "teacher" if enrollment_types.intersect?(%w[TeacherEnrollment TaEnrollment DesignerEnrollment])
     account_users = GuardRail.activate(:secondary) do
       root_account.cached_all_account_users_for(self)
@@ -3603,7 +4046,19 @@ class User < ActiveRecord::Base
                  !(create_permission_root_account && root_account.feature_enabled?(:create_course_subaccount_picker))
                end
     can_create = create_permission_root_account || create_permission_alternate_account || create_permission_mcc_account
-    { can_create:, restrict_to_mcc: mcc_only }
+    # nil = non-admin (teacher/student) who uses /users/self/courses, no read_course_list needed.
+    # array = IDs of accounts where this admin has read_course_list; may be empty.
+    # This lets the frontend skip the homerooms fetch only for the specific selected account
+    # that lacks the permission, rather than blocking all accounts globally.
+    active_account_users = account_users.active.shard(in_region_associated_shards).preload(:account)
+    viewable_account_ids = if active_account_users.none?
+                             nil
+                           else
+                             active_account_users
+                               .select { |au| au.account.grants_right?(self, :read_course_list) }
+                               .map { |au| au.account_id.to_s }
+                           end
+    { can_create:, restrict_to_mcc: mcc_only, viewable_account_ids: }
   end
 
   def all_account_calendars
@@ -3681,5 +4136,13 @@ class User < ActiveRecord::Base
 
   def pseudonym_for_restoration_in(account)
     account.pseudonyms.where(user_id: self).order(deleted_at: :desc).first!
+  end
+
+  def all_attachments_frd
+    Attachment.where(user: self).or(Attachment.where(context: self))
+  end
+
+  def all_calendar_events
+    CalendarEvent.where(user: self).or(CalendarEvent.where(context: self))
   end
 end

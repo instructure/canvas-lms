@@ -19,7 +19,7 @@
 #
 
 describe Account do
-  include_examples "outcome import context examples"
+  it_behaves_like "outcome import context examples"
 
   context "domain_method" do
     it "retrieves correct account domain" do
@@ -38,12 +38,8 @@ describe Account do
       AccountDomain.create!(host: "canvas.instructure.com", account: root_account)
     end
 
-    it "retrieves correct beta domain" do
-      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
-      expect(root_account.environment_specific_domain).to eq "canvas.beta.instructure.com"
-    end
-
     it "retrieves correct prod domain" do
+      # beta domains are handled in MRA
       allow(ApplicationController).to receive(:test_cluster_name).and_return(nil)
       expect(root_account.environment_specific_domain).to eq "canvas.instructure.com"
     end
@@ -247,21 +243,6 @@ describe Account do
 
   it "provides a list of courses" do
     expect { Account.new.courses }.not_to raise_error
-  end
-
-  context "equella_settings" do
-    it "responds to :equella_settings" do
-      expect(Account.new).to respond_to(:equella_settings)
-      expect(Account.new.equella_settings).to be_nil
-    end
-
-    it "returns the equella_settings data if defined" do
-      a = Account.new
-      a.equella_endpoint = "http://oer.equella.com/signon.do"
-      expect(a.equella_settings).not_to be_nil
-      expect(a.equella_settings[:endpoint]).to eql("http://oer.equella.com/signon.do")
-      expect(a.equella_settings[:default_action]).not_to be_nil
-    end
   end
 
   # it "should have an atom feed" do
@@ -538,8 +519,8 @@ describe Account do
   end
 
   def account_with_admin_and_restricted_user(account, restricted_role)
-    admin = User.create
-    user = User.create
+    admin = User.create(impersonated: false)
+    user = User.create(impersonated: false)
     account.account_users.create!(user: admin, role: admin_role)
     account.account_users.create!(user:, role: restricted_role)
     [admin, user]
@@ -586,7 +567,7 @@ describe Account do
     disabled_by_default = RoleOverride.permissions.select { |_, v| v[:true_for].empty? }.map(&:first)
     full_access = RoleOverride.permissions.keys +
                   limited_access - disabled_by_default - conditional_access +
-                  [:create_courses]
+                  [:create_courses, :manage_grading_schemes]
 
     full_root_access = full_access - RoleOverride.permissions.select { |_k, v| v[:account_only] == :site_admin }.map(&:first)
     full_sub_access = full_root_access - RoleOverride.permissions.select { |_k, v| v[:account_only] == :root }.map(&:first)
@@ -600,6 +581,7 @@ describe Account do
       admin_privileges = full_access + common_siteadmin_privileges
 
       user_privileges = limited_access + common_siteadmin_privileges
+      user_privileges += [:site_admin_self_token_create]
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
       expect(account.check_policy(hash[:site_admin][:user]) - conditional_access).to match_array user_privileges
     end
@@ -650,7 +632,7 @@ describe Account do
       account = v[:account]
       admin_privileges = full_access.clone
       admin_privileges += [:read_global_outcomes] if k == :site_admin
-      user_array = some_access + [:reset_any_mfa] +
+      user_array = some_access + [:reset_any_mfa, :site_admin_self_token_create] +
                    ((k == :site_admin) ? [:read_global_outcomes] : [])
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
       expect(account.check_policy(hash[:site_admin][:user])).to match_array user_array
@@ -712,7 +694,7 @@ describe Account do
       subs << great_grand_sub = Account.create!(name: "great_grand_sub", parent_account: grand_sub)
       subs << Account.create!(name: "great_great_grand_sub", parent_account: great_grand_sub)
       @shard1.activate do
-        expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
+        expect(Account.select(:id).sub_accounts_recursive(sub.id, pluck: true).sort).to eq(subs.map(&:id).sort)
         expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
       end
     end
@@ -784,7 +766,7 @@ describe Account do
     subs << grand_sub = Account.create!(name: "grand_sub", parent_account: sub)
     subs << great_grand_sub = Account.create!(name: "great_grand_sub", parent_account: grand_sub)
     subs << Account.create!(name: "great_great_grand_sub", parent_account: great_grand_sub)
-    expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
+    expect(Account.select(:id).sub_accounts_recursive(sub.id, pluck: true).sort).to eq(subs.map(&:id).sort)
     expect(Account.limit(10).sub_accounts_recursive(sub.id).sort).to eq(subs.sort_by(&:id))
   end
 
@@ -1123,7 +1105,7 @@ describe Account do
       tool.account_navigation = { url: "http://www.example.com", text: "Example URL", root_account_only: true }
       tool.save!
       expect(@account.root_account.tabs_available(@teacher).pluck(:id)).to include(tool.asset_string)
-      expect(@account.tabs_available(@teacher).pluck(:id)).to_not include(tool.asset_string)
+      expect(@account.tabs_available(@teacher).pluck(:id)).not_to include(tool.asset_string)
     end
 
     it "does not include external tools for non-admins if visibility is set" do
@@ -1133,7 +1115,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to_not include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to include(tool.asset_string)
 
       admin = account_admin_user(account: @account)
       tabs = @account.tabs_available(admin)
@@ -1388,7 +1370,7 @@ describe Account do
 
     it "ignores deleted AACs" do
       aac.destroy
-      expect(account.authentication_providers.active).to_not include(aac)
+      expect(account.authentication_providers.active).not_to include(aac)
     end
   end
 
@@ -1829,12 +1811,15 @@ describe Account do
 
       account.default_storage_quota = 10.decimal_megabytes
       account.save! # clear here
+      run_jobs
 
       account.reload
       account.save!
+      run_jobs
 
       account.default_storage_quota = 10.decimal_megabytes
       account.save!
+      run_jobs
     end
 
     it "inherits from a parent account's default_storage_quota" do
@@ -1849,6 +1834,7 @@ describe Account do
 
         account.default_storage_quota = 20.decimal_megabytes
         account.save!
+        run_jobs
 
         # should clear caches
         account = Account.find(account.id)
@@ -1990,6 +1976,7 @@ describe Account do
 
           @sub1.settings = @sub1.settings.merge(restrict_student_future_view: { locked: true, value: true }, lock_all_announcements: { locked: true, value: true })
           @sub1.save!
+          run_jobs
 
           # hard reload
           @account = Account.find(@account.id)
@@ -2087,22 +2074,6 @@ describe Account do
         end
         expect(@account.users_name_like("silly").first).to eq @user
       end
-    end
-  end
-
-  describe "#migrate_to_canvadocs?" do
-    before(:once) do
-      @account = Account.create!
-    end
-
-    it "is true if hijack_crocodoc_sessions is true" do
-      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return(true)
-      expect(@account).to be_migrate_to_canvadocs
-    end
-
-    it "is false if hijack_crocodoc_sessions is false" do
-      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return(false)
-      expect(@account).not_to be_migrate_to_canvadocs
     end
   end
 
@@ -2328,8 +2299,8 @@ describe Account do
       it "can handle lots of accounts" do
         accounts = Array.new(100) { Account.default.sub_accounts.create! }
         expect(Account.account_chain_ids_for_multiple_accounts(accounts.map(&:id))).to eq(
-          accounts.each_with_object({}) do |account, hash|
-            hash[account.id] = [account.id, Account.default.id]
+          accounts.to_h do |account|
+            [account.id, [account.id, Account.default.id]]
           end
         )
       end
@@ -2358,6 +2329,49 @@ describe Account do
       @sub_account.destroy!
       expect(account_user1.reload.workflow_state).to eq "deleted"
       expect(account_user2.reload.workflow_state).to eq "deleted"
+    end
+
+    it "soft-deletes associated LTI context controls" do
+      user = user_model
+
+      registration = lti_registration_with_tool(account: @root_account)
+      deployment = registration.deployments.first
+
+      # But context controls can be on sub-accounts
+      control = Lti::ContextControl.create!(
+        context: @sub_account,
+        registration:,
+        deployment:
+      )
+
+      expect(control.workflow_state).to eq("active")
+
+      @sub_account.destroy(user:)
+
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+    end
+
+    it "restores LTI context controls when account is undeleted" do
+      user = user_model
+
+      registration = lti_registration_with_tool(account: @root_account)
+      deployment = registration.deployments.first
+
+      control = Lti::ContextControl.create!(
+        context: @sub_account,
+        registration:,
+        deployment:
+      )
+
+      # Delete the account
+      @sub_account.destroy(user:)
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+
+      # Undelete the account
+      @sub_account.process_event(:restore)
+      @sub_account.save!
+
+      expect(control.reload.workflow_state).to eq("active")
     end
   end
 
@@ -2457,7 +2471,7 @@ describe Account do
   end
 
   describe "#roles_with_enabled_permission" do
-    def create_role_override(permission, role, context, enabled = true)
+    def create_role_override(permission, role, context, enabled: true)
       RoleOverride.create!(
         context:,
         permission:,
@@ -2530,6 +2544,28 @@ describe Account do
     end
   end
 
+  describe "default_allow_observer_signup?" do
+    it "returns false by default" do
+      account = Account.create!
+      expect(account.default_allow_observer_signup?).to be false
+    end
+
+    it "returns true if the setting is enabled" do
+      account = Account.create!
+      account.settings[:default_allow_observer_signup] = { value: true }
+      account.save!
+      expect(account.default_allow_observer_signup?).to be true
+    end
+
+    it "inherits the setting from parent account" do
+      parent = Account.create!
+      parent.settings[:default_allow_observer_signup] = { value: true }
+      parent.save!
+      sub_account = Account.create!(parent_account: parent, root_account: parent)
+      expect(sub_account.default_allow_observer_signup?).to be true
+    end
+  end
+
   describe "enable_as_k5_account setting" do
     it "enable_as_k5_account? helper returns false by default" do
       account = Account.create!
@@ -2545,6 +2581,193 @@ describe Account do
       expect(account).to be_enable_as_k5_account
       expect(account.enable_as_k5_account[:value]).to be_truthy
       expect(account.enable_as_k5_account[:locked]).to be_truthy
+    end
+  end
+
+  describe "discovery_page_active setting" do
+    let(:account) { Account.create!(name: "Test", workflow_state: "active") }
+
+    it "defaults discovery_page_active to false" do
+      expect(account.discovery_page_active?).to be(false)
+    end
+
+    it "returns false when active is nil" do
+      account.settings[:discovery_page] = { active: nil }
+      expect(account.discovery_page_active?).to be(false)
+    end
+
+    it "returns false when discovery_page is not set" do
+      account.settings.delete(:discovery_page)
+      expect(account.discovery_page_active?).to be(false)
+    end
+
+    it "returns true when active is true" do
+      account.settings[:discovery_page] = { active: true }
+      expect(account.discovery_page_active?).to be(true)
+    end
+
+    it "returns false when active is explicitly false" do
+      account.settings[:discovery_page] = { active: false }
+      expect(account.discovery_page_active?).to be(false)
+    end
+
+    it "can enable discovery_page_active" do
+      account.discovery_page_active = true
+      expect(account.discovery_page_active?).to be(true)
+    end
+
+    it "can disable discovery_page_active" do
+      account.discovery_page_active = true
+      account.discovery_page_active = false
+      expect(account.discovery_page_active?).to be(false)
+    end
+
+    it "coerces string values to boolean" do
+      account.discovery_page_active = "true"
+      expect(account.discovery_page_active?).to be(true)
+      account.discovery_page_active = "false"
+      expect(account.discovery_page_active?).to be(false)
+    end
+  end
+
+  describe "#discovery_page_allowed?" do
+    it "always returns false" do
+      expect(Account.new.discovery_page_allowed?).to be(false)
+    end
+  end
+
+  describe "#discovery_page_url" do
+    it "returns nil" do
+      expect(Account.new.discovery_page_url).to be_nil
+    end
+  end
+
+  describe "#discovery_page_claims_for" do
+    let(:account) { Account.default }
+    let(:user) { user_model }
+    let(:provider) { account.authentication_providers.create!(auth_type: "cas") }
+
+    it "sets sub to the user global_id as a string" do
+      claims = account.discovery_page_claims_for(user, { primary: [], secondary: [] })
+      expect(claims[:sub]).to eq(user.global_id.to_s)
+    end
+
+    it "sets org to the account uuid" do
+      claims = account.discovery_page_claims_for(user, { primary: [], secondary: [] })
+      expect(claims[:org]).to eq(account.uuid)
+    end
+
+    it "builds primary links for matching providers" do
+      entry = { authentication_provider_id: provider.id, label: "CAS Login", icon: nil }
+      claims = account.discovery_page_claims_for(user, { primary: [entry], secondary: [] })
+      expect(claims[:primary].length).to eq(1)
+      expect(claims[:primary].first[:label]).to eq("CAS Login")
+    end
+
+    it "skips entries with no matching provider" do
+      entry = { authentication_provider_id: 0, label: "Ghost", icon: nil }
+      claims = account.discovery_page_claims_for(user, { primary: [entry], secondary: [] })
+      expect(claims[:primary]).to be_empty
+    end
+
+    it "treats nil config sections as empty" do
+      claims = account.discovery_page_claims_for(user, { primary: nil, secondary: nil })
+      expect(claims[:primary]).to eq([])
+      expect(claims[:secondary]).to eq([])
+    end
+
+    it "includes customMessageDiscovery delegated from discovery_page_custom_message" do
+      Account.site_admin.enable_feature!(:new_login_ui_custom_labels)
+      allow(account).to receive(:discovery_page_allowed?).and_return(true)
+      bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "Hello world" })
+      account.update!(brand_config: bc)
+      claims = account.discovery_page_claims_for(user, { primary: [], secondary: [] })
+      expect(claims[:customMessageDiscovery]).to eq("Hello world")
+    end
+  end
+
+  describe "#discovery_page_custom_message" do
+    let(:account) { Account.default }
+
+    context "when new_login_ui_custom_labels is disabled" do
+      it "returns nil even when a custom message is set" do
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "Hello" })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to be_nil
+      end
+    end
+
+    context "when new_login_ui_custom_labels is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:new_login_ui_custom_labels)
+        allow(account).to receive(:discovery_page_allowed?).and_return(true)
+      end
+
+      it "returns nil when there is no brand config" do
+        expect(account.discovery_page_custom_message).to be_nil
+      end
+
+      it "returns nil when the variable is not set" do
+        bc = BrandConfig.create!(variables: { "ic-brand-primary" => "#fff" })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to be_nil
+      end
+
+      it "returns the value with newlines collapsed" do
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "line one\nline two" })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to eq("line one line two")
+      end
+
+      it "strips leading and trailing whitespace" do
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "  hello  " })
+        account.update!(brand_config: bc)
+        expect(account.discovery_page_custom_message).to eq("hello")
+      end
+    end
+
+    context "when discovery_page_allowed? is false" do
+      before do
+        Account.site_admin.enable_feature!(:new_login_ui_custom_labels)
+        bc = BrandConfig.create!(variables: { "ic-brand-Discovery-custom-message" => "Hello" })
+        account.update!(brand_config: bc)
+      end
+
+      it "returns nil" do
+        allow(account).to receive(:discovery_page_allowed?).and_return(false)
+        expect(account.discovery_page_custom_message).to be_nil
+      end
+    end
+  end
+
+  describe "#discovery_page_link_for" do
+    let(:account) { Account.default }
+    let(:provider) { account.authentication_providers.create!(auth_type: "cas") }
+
+    it "includes label, icon, and path" do
+      entry = { label: "CAS Login", icon: "cas-icon" }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link[:label]).to eq("CAS Login")
+      expect(link[:icon]).to eq("cas-icon")
+      expect(link[:path]).to be_present
+    end
+
+    it "omits nil values via compact" do
+      entry = { label: "CAS Login", icon: nil }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link).not_to have_key(:icon)
+    end
+
+    it "sanitizes HTML from the label" do
+      entry = { label: "<script>alert('xss')</script>CAS Login" }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link[:label]).to eq("CAS Login")
+    end
+
+    it "HTML-encodes & in the label" do
+      entry = { label: "Arts & Sciences" }
+      link = account.discovery_page_link_for(provider, entry)
+      expect(link[:label]).to eq("Arts &amp; Sciences")
     end
   end
 
@@ -3024,7 +3247,7 @@ describe Account do
     end
 
     it "updates submission grades in account inheriting courses/assignments and all sub account courses/assignments" do
-      @root_account.recompute_assignments_using_account_default(@new_grading_standard)
+      @root_account.recompute_assignments_using_account_default(@new_grading_standard.id)
 
       expect(@submission_root.reload.grade).to eq "A"
       expect(@submission_not_inheriting.reload.grade).to eq "F"
@@ -3033,12 +3256,21 @@ describe Account do
     end
 
     it "updates the most recent submission version in all inheriting account and sub account courses" do
-      @root_account.recompute_assignments_using_account_default(@new_grading_standard)
+      @root_account.recompute_assignments_using_account_default(@new_grading_standard.id)
 
       expect(@submission_root.reload.versions.first.model.grade).to eq "A"
       expect(@submission_not_inheriting.reload.versions.first.model.grade).to eq "F"
       expect(@submission_sub.reload.versions.first.model.grade).to eq "A"
       expect(@submission_sub_sub.reload.versions.first.model.grade).to eq "A"
+    end
+
+    it "handles nil grading_standard_id by using default instance" do
+      @root_account.recompute_assignments_using_account_default(nil)
+
+      # Should use GradingStandard.default_instance for grading
+      expect(@submission_root.reload.grade).not_to be_nil
+      expect(@submission_sub.reload.grade).not_to be_nil
+      expect(@submission_sub_sub.reload.grade).not_to be_nil
     end
   end
 
@@ -3050,9 +3282,8 @@ describe Account do
     end
 
     it "returns the recaptcha_client_key when root_account? and self_registration_captcha? are true" do
-      allow(DynamicSettings).to receive(:find).with(tree: "private").and_return(
-        instance_double(DynamicSettings::PrefixProxy, :[] => "test_key")
-      )
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return({ server_key: "test_key" })
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :client_key).and_return("test_key")
       expect(root_account.recaptcha_key).to eq("test_key")
     end
 
@@ -3067,9 +3298,8 @@ describe Account do
     end
 
     it "returns nil if recaptcha_client_key is not present in DynamicSettings" do
-      allow(DynamicSettings).to receive(:find).with(tree: "private").and_return(
-        instance_double(DynamicSettings::PrefixProxy, :[] => nil)
-      )
+      allow(Rails.application.credentials).to receive(:recaptcha_keys).and_return(nil)
+      allow(Rails.application.credentials).to receive(:dig).with(:recaptcha_keys, :client_key).and_return(nil)
       expect(root_account.recaptcha_key).to be_nil
     end
 
@@ -3111,6 +3341,14 @@ describe Account do
       result = account.get_role_by_name(role_name)
       expect(result).to be_nil
     end
+
+    it "returns the most specific role if multiple roles exist in the account chain" do
+      sub_account = account.sub_accounts.create!
+      sub_account.roles.create(name: role_name, base_role_type: "TeacherEnrollment", workflow_state: "active")
+
+      result = sub_account.get_role_by_name(role_name)
+      expect(result.account_id).to eq(sub_account.id)
+    end
   end
 
   describe "horizon account" do
@@ -3141,78 +3379,69 @@ describe Account do
         expect(subaccount.horizon_account[:inherited]).to be true
       end
     end
-  end
 
-  describe "horizon_url" do
-    before :once do
-      @account = Account.default
-      @account.settings[:horizon_domain] = "test.canvasforcareer.com"
-      @account.save!
-    end
+    describe "#horizon_block_content_editor?" do
+      before do
+        @account.enable_feature!(:horizon_course_setting)
+        @account.horizon_account = true
+        @account.save!
+        @account.enable_feature!(:horizon_block_content_editor)
+        allow(ContentServiceClient).to receive(:enabled?).and_return(true)
+      end
 
-    it "returns the url with the specified path" do
-      expect(@account.horizon_url("api/v1/test").to_s).to eq("https://test.canvasforcareer.com/api/v1/test")
-    end
+      context "when all conditions are met" do
+        it "returns true" do
+          expect(@account.horizon_block_content_editor?).to be true
+        end
+      end
 
-    it "returns nil if horizon_domain is not set" do
-      @account.settings[:horizon_domain] = nil
-      @account.save!
-      expect(@account.horizon_url("api/v1/test")).to be_nil
-    end
+      context "when it is not a horizon account" do
+        before do
+          @account.horizon_account = false
+          @account.save!
+        end
 
-    it "uses http protocol for localhost domains" do
-      @account.settings[:horizon_domain] = "localhost:3002"
-      @account.save!
-      expect(@account.horizon_url("api/v1/test").to_s).to eq("http://localhost:3002/api/v1/test")
-    end
-  end
+        it "returns false" do
+          expect(@account.horizon_block_content_editor?).to be false
+        end
+      end
 
-  describe "horizon_redirect_url" do
-    before :once do
-      @account = Account.default
-      @account.settings[:horizon_domain] = "test.canvasforcareer.com"
-      @account.save!
-    end
+      context "when the horizon_block_content_editor flag is disabled" do
+        before do
+          @account.disable_feature!(:horizon_block_content_editor)
+        end
 
-    it "returns the redirect url with canvas path" do
-      expect(@account.horizon_redirect_url("/courses")).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2Fcourses&preview=false&reauthenticate=false")
-    end
+        it "returns false" do
+          expect(@account.horizon_block_content_editor?).to be false
+        end
+      end
 
-    it "returns the redirect url with reauthenticate param" do
-      expect(@account.horizon_redirect_url("/", reauthenticate: true)).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2F&preview=false&reauthenticate=true")
-    end
+      context "when ContentServiceClient is not enabled" do
+        before do
+          allow(ContentServiceClient).to receive(:enabled?).and_return(false)
+        end
 
-    it "returns the redirect url with preview param" do
-      expect(@account.horizon_redirect_url("/", preview: true)).to eq("https://test.canvasforcareer.com/redirect?canvas_url=%2F&preview=true&reauthenticate=false")
-    end
-
-    it "returns nil if horizon_domain is not set" do
-      @account.settings[:horizon_domain] = nil
-      @account.save!
-      expect(@account.horizon_redirect_url("/courses")).to be_nil
-    end
-
-    it "returns redirect url on localhost with port" do
-      @account.settings[:horizon_domain] = "localhost:3002"
-      @account.save!
-      expect(@account.horizon_redirect_url("/courses")).to eq("http://localhost:3002/redirect?canvas_url=%2Fcourses&preview=false&reauthenticate=false")
+        it "returns false" do
+          expect(@account.horizon_block_content_editor?).to be false
+        end
+      end
     end
   end
 
   describe "allow_assign_to_differentiation_tags?" do
     before :once do
       @account = Account.default
-      Account.site_admin.enable_feature!(:assign_to_differentiation_tags)
       @account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @account.save!
     end
 
-    it "returns true if the setting is enabled and the observer_appointment_groups flag is enabled" do
+    it "returns true if the setting is enabled" do
       expect(@account.allow_assign_to_differentiation_tags?).to be true
     end
 
-    it "returns false if the observer_appointment_groups flag is disabled" do
-      Account.site_admin.disable_feature!(:assign_to_differentiation_tags)
+    it "returns false if the setting is disabled" do
+      @account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+      @account.save!
       expect(@account.allow_assign_to_differentiation_tags?).to be false
     end
   end
@@ -3246,6 +3475,785 @@ describe Account do
       account.settings[:thousand_separator] = { value: "," }
       account.settings[:decimal_separator] = { value: "" }
       expect(account).not_to be_valid
+    end
+  end
+
+  context "login_help_url validation" do
+    let(:account) { Account.default }
+
+    it "is valid with a proper https URL" do
+      account.login_help_url = "https://example.com/faq"
+      expect(account).to be_valid
+    end
+
+    it "is valid when the URL is blank" do
+      account.login_help_url = ""
+      expect(account).to be_valid
+    end
+
+    it "is valid when the URL is nil" do
+      account.login_help_url = nil
+      expect(account).to be_valid
+    end
+
+    it "normalizes a URL without a scheme" do
+      account.login_help_url = "example.com/faq"
+      account.validate
+      expect(account.login_help_url).to eq("http://example.com/faq")
+    end
+
+    it "is invalid with a non-URL string" do
+      account.login_help_url = "not a url at all"
+      expect(account).not_to be_valid
+      expect(account.errors[:login_help_url]).to include("The login help URL is not valid")
+    end
+
+    it "is invalid with a javascript: scheme" do
+      account.login_help_url = "javascript:alert(1)"
+      expect(account).not_to be_valid
+    end
+  end
+
+  describe "#restricted_file_access_for_user?" do
+    let(:root_account) { Account.create!(root_account: nil) }
+    let(:sub_account) { Account.create!(root_account:) }
+    let!(:user)         { User.create! }
+
+    context "when the feature flag is disabled" do
+      before do
+        root_account.disable_feature!(:restrict_student_access)
+      end
+
+      it "always returns false, even if the user has enrollments" do
+        course = course_factory(account: sub_account)
+        Enrollment.create!(user:, course:, type: "StudentEnrollment")
+        expect(sub_account.restricted_file_access_for_user?(user)).to be_falsey
+      end
+    end
+
+    context "when the feature flag is enabled" do
+      before do
+        root_account.enable_feature!(:restrict_student_access)
+      end
+
+      context "and the user has a student enrollment in that account" do
+        before do
+          course = course_factory(account: sub_account)
+          Enrollment.create!(user:, course:, type: "StudentEnrollment")
+        end
+
+        it "returns true" do
+          expect(sub_account.restricted_file_access_for_user?(user)).to be_truthy
+        end
+      end
+
+      context "and the user does NOT have a student enrollment in that account" do
+        it "returns false" do
+          expect(sub_account.restricted_file_access_for_user?(user)).to be_falsey
+        end
+      end
+    end
+  end
+
+  describe "denormalize_horizon_account_if_changed" do
+    let(:root_account) { Account.create! }
+    let(:sub_account) { Account.create!(parent_account: root_account) }
+
+    it "does nothing when settings haven't changed" do
+      expect(root_account).not_to receive(:save!)
+      sub_account.denormalize_horizon_account_if_changed
+    end
+
+    it "does nothing when horizon_account settings haven't changed" do
+      sub_account.settings = { horizon_account: { value: true, locked: true } }
+      sub_account.save!
+
+      sub_account.settings[:unrelated_setting] = "updated"
+
+      expect(root_account).not_to receive(:save!)
+      sub_account.denormalize_horizon_account_if_changed
+    end
+
+    it "adds account id to horizon_account_ids when enabled" do
+      sub_account.horizon_account = true
+      sub_account.save!
+
+      expect(root_account.reload.settings[:horizon_account_ids]).to include(sub_account.id)
+      expect(sub_account.reload.settings[:horizon_account][:locked]).to be true
+    end
+
+    it "removes account id from horizon_account_ids when disabled" do
+      sub_account.horizon_account = true
+      sub_account.save!
+
+      expect(root_account.reload.settings[:horizon_account_ids]).to include(sub_account.id)
+
+      sub_account.horizon_account = false
+      sub_account.save!
+
+      expect(root_account.reload.settings[:horizon_account_ids]).not_to include(sub_account.id)
+      expect(sub_account.reload.settings[:horizon_account][:locked]).to be false
+    end
+
+    it "sets horizon_course to false on associated courses when disabled" do
+      sub_account.horizon_account = true
+      sub_account.save!
+
+      course = Course.create!(account: sub_account)
+      course.update!(horizon_course: true)
+
+      sub_account.horizon_account = false
+      sub_account.save!
+
+      expect(course.reload.horizon_course).to be false
+    end
+
+    it "doesn't save root_account if this is the root account" do
+      root_account.horizon_account = true
+
+      expect(root_account).not_to receive(:save!)
+      root_account.denormalize_horizon_account_if_changed
+    end
+  end
+
+  describe "cache staleness and conditional reload" do
+    let(:account) { Account.create!(name: "Original") }
+
+    describe "#cache_stale?" do
+      it "returns false on a freshly loaded record" do
+        expect(account.cache_stale?).to be false
+      end
+
+      it "returns true when the DB updated_at is newer than the in-memory record" do
+        # Force an update directly in SQL so the in-memory object does not see the updated timestamp
+        future_time = 2.minutes.from_now
+        Account.where(id: account).update_all(updated_at: future_time)
+        expect(account.cache_stale?).to be true
+      end
+    end
+
+    describe "#reload_if_cache_stale" do
+      it "reloads the record when stale" do
+        Account.where(id: account).update_all(name: "Changed", updated_at: 1.minute.from_now)
+        expect(account.name).to eq "Original" # still old in-memory value
+        account.reload_if_cache_stale
+        expect(account.name).to eq "Changed"
+      end
+
+      it "does not reload when not stale" do
+        expect(account.cache_stale?).to be false
+        expect(account).not_to receive(:reload)
+        account.reload_if_cache_stale
+        expect(account.name).to eq "Original"
+      end
+    end
+
+    describe "callback invocation in invalidate_caches_if_changed" do
+      it "invokes reload_if_cache_stale after invalidations are committed" do
+        allow(account).to receive(:reload_if_cache_stale).and_call_original
+        # Change an inheritable setting to populate @invalidations
+        account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        account.save!
+        expect(account).to have_received(:reload_if_cache_stale)
+      end
+    end
+  end
+
+  describe "#marked_for_deletion?" do
+    let(:account) { Account.create! }
+
+    it "returns true when account is deleted and external_status is delete_me_frd" do
+      account.workflow_state = "deleted"
+      account.external_status = "delete_me_frd"
+      account.save!
+      expect(account.marked_for_deletion?).to be true
+    end
+
+    it "returns false when account is deleted but external_status is not delete_me_frd" do
+      account.workflow_state = "deleted"
+      account.external_status = "employee_sandbox"
+      account.save!
+      expect(account.marked_for_deletion?).to be false
+    end
+
+    it "returns false when external_status is delete_me_frd but account is not deleted" do
+      account.workflow_state = "active"
+      account.external_status = "delete_me_frd"
+      account.save!
+      expect(account.marked_for_deletion?).to be false
+    end
+
+    it "returns false when account is not deleted and external_status is nil" do
+      account.workflow_state = "active"
+      account.external_status = nil
+      account.save!
+      expect(account.marked_for_deletion?).to be false
+    end
+
+    it "returns false when account is deleted but external_status is nil" do
+      account.workflow_state = "deleted"
+      account.external_status = nil
+      account.save!
+      expect(account.marked_for_deletion?).to be false
+    end
+  end
+
+  describe "#setting_changed?" do
+    let(:account) { Account.create! }
+
+    context "when the setting has changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.save!
+        account.settings[:restrict_student_future_view] = { value: true }
+      end
+
+      it "returns true" do
+        expect(account.setting_changed?(:restrict_student_future_view)).to be true
+      end
+    end
+
+    context "when settings have not changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.save!
+      end
+
+      it "returns false" do
+        expect(account.setting_changed?(:restrict_student_future_view)).to be false
+      end
+    end
+
+    context "when a different setting has changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.settings[:restrict_student_past_view] = { value: false }
+        account.save!
+        account.settings[:restrict_student_past_view] = { value: true }
+      end
+
+      it "returns false for the unchanged setting" do
+        expect(account.setting_changed?(:restrict_student_future_view)).to be false
+      end
+    end
+
+    context "with an unknown setting" do
+      it "raises ArgumentError" do
+        expect { account.setting_changed?(:nonexistent_setting) }.to raise_error(
+          ArgumentError, "Unknown setting nonexistent_setting"
+        )
+      end
+    end
+
+    context "with argument type variations" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.save!
+        account.settings[:restrict_student_future_view] = { value: true }
+      end
+
+      it "accepts string arguments" do
+        expect(account.setting_changed?("restrict_student_future_view")).to be true
+      end
+
+      it "accepts symbol arguments" do
+        expect(account.setting_changed?(:restrict_student_future_view)).to be true
+      end
+    end
+  end
+
+  describe "dynamically generated <setting>_changed? methods" do
+    let(:account) { Account.create! }
+
+    it "defines a _changed? method for each account setting" do
+      expect(account).to respond_to(:restrict_student_future_view_changed?)
+      expect(account).to respond_to(:restrict_student_past_view_changed?)
+    end
+
+    context "when the setting has changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.save!
+        account.settings[:restrict_student_future_view] = { value: true }
+      end
+
+      it "returns true" do
+        expect(account.restrict_student_future_view_changed?).to be true
+      end
+    end
+
+    context "when settings have not changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.save!
+      end
+
+      it "returns false" do
+        expect(account.restrict_student_future_view_changed?).to be false
+      end
+    end
+
+    context "when a different setting has changed" do
+      before do
+        account.settings[:restrict_student_future_view] = { value: false }
+        account.settings[:restrict_student_past_view] = { value: false }
+        account.save!
+        account.settings[:restrict_student_past_view] = { value: true }
+      end
+
+      it "returns false for the unchanged setting" do
+        expect(account.restrict_student_future_view_changed?).to be false
+      end
+
+      it "returns true for the changed setting" do
+        expect(account.restrict_student_past_view_changed?).to be true
+      end
+    end
+  end
+
+  describe "#sanitize_discovery_page" do
+    let(:account) { Account.default }
+    let!(:auth_provider) { account.authentication_providers.create!(auth_type: "saml") }
+
+    def valid_discovery_page_entry(auth_provider_id, overrides = {})
+      {
+        authentication_provider_id: auth_provider_id,
+        label: "Test Provider",
+        path: "/login/saml"
+      }.merge(overrides)
+    end
+
+    context "when discovery_page setting changes" do
+      it "sanitizes HTML from labels in primary entries" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "<script>alert('xss')</script>Safe Label")],
+          secondary: []
+        }
+        account.save!
+
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Safe Label")
+      end
+
+      it "sanitizes HTML from labels in secondary entries" do
+        account.settings[:discovery_page] = {
+          primary: [],
+          secondary: [valid_discovery_page_entry(auth_provider.id, label: "<b>Bold</b> Text")]
+        }
+        account.save!
+
+        expect(account.settings[:discovery_page][:secondary][0][:label]).to eq("Bold Text")
+      end
+
+      it "sanitizes multiple entries in both positions" do
+        account.settings[:discovery_page] = {
+          primary: [
+            valid_discovery_page_entry(auth_provider.id, label: "<em>First</em>"),
+            valid_discovery_page_entry(auth_provider.id, label: "<strong>Second</strong>")
+          ],
+          secondary: [
+            valid_discovery_page_entry(auth_provider.id, label: "<span>Third</span>")
+          ]
+        }
+        account.save!
+
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("First")
+        expect(account.settings[:discovery_page][:primary][1][:label]).to eq("Second")
+        expect(account.settings[:discovery_page][:secondary][0][:label]).to eq("Third")
+      end
+
+      it "preserves labels without HTML" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "Plain Text Label")],
+          secondary: []
+        }
+        account.save!
+
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Plain Text Label")
+      end
+
+      it "HTML-encodes & in labels for safe storage" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "Arts & Sciences")],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Arts &amp; Sciences")
+      end
+
+      it "HTML-encodes angle brackets in non-tag context" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "Student <-> Teacher")],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Student &lt;-&gt; Teacher")
+      end
+
+      it "strips script elements and their content, failing validation when label becomes blank" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: '<script>alert("foo");</script>')],
+          secondary: []
+        }
+        expect(account).not_to be_valid
+        expect(account.errors[:settings]).to include("discovery_page.primary[0].label is required")
+      end
+
+      it "strips script elements while preserving surrounding text" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: 'Foo <script>alert("foo");</script>')],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("Foo ")
+      end
+
+      it "preserves pre-encoded HTML entities as safe text" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "&lt;script&gt;alert(1)&lt;/script&gt;")],
+          secondary: []
+        }
+        account.save!
+        expect(account.settings[:discovery_page][:primary][0][:label]).to eq("&lt;script&gt;alert(1)&lt;/script&gt;")
+      end
+    end
+
+    context "when discovery_page setting has not changed" do
+      it "does not run sanitization" do
+        account.settings[:discovery_page] = {
+          primary: [valid_discovery_page_entry(auth_provider.id, label: "Original")],
+          secondary: []
+        }
+        account.save!
+
+        account.settings[:restrict_student_future_view] = { value: true }
+        expect(account).not_to receive(:sanitize_discovery_page)
+        account.valid?
+      end
+    end
+
+    context "when discovery_page is not present" do
+      it "does not raise an error" do
+        account.settings.delete(:discovery_page)
+
+        expect { account.save! }.not_to raise_error
+      end
+    end
+  end
+
+  describe "#a11y_checker_account_statistics?" do
+    let(:account) { Account.create! }
+
+    context "when site_admin a11y_checker_account_statistics is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:a11y_checker_account_statistics)
+      end
+
+      it "returns false even if account has a11y_checker enabled" do
+        account.enable_feature!(:a11y_checker)
+        expect(account.a11y_checker_account_statistics?).to be false
+      end
+
+      it "returns false even if site_admin has a11y_checker_ga2_features enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_account_statistics?).to be false
+      end
+    end
+
+    context "when site_admin a11y_checker_account_statistics is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+      end
+
+      it "returns true when account has a11y_checker enabled" do
+        account.enable_feature!(:a11y_checker)
+        expect(account.a11y_checker_account_statistics?).to be true
+      end
+
+      it "returns true when site_admin has a11y_checker_ga2_features enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_account_statistics?).to be true
+      end
+
+      it "returns true when both a11y_checker and a11y_checker_ga2_features are enabled" do
+        account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_account_statistics?).to be true
+      end
+
+      it "returns false when neither a11y_checker nor a11y_checker_ga2_features are enabled" do
+        expect(account.a11y_checker_account_statistics?).to be false
+      end
+    end
+  end
+
+  describe "a11y_checker_ai feature methods" do
+    let(:account) { Account.create! }
+    let(:root_account) { account.root_account }
+
+    describe "#a11y_checker_ai_table_caption_generation?" do
+      context "when all three conditions are met" do
+        before do
+          Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
+          root_account.enable_feature!(:a11y_checker_ignite_ai)
+        end
+
+        it "returns true when account has a11y_checker enabled" do
+          account.enable_feature!(:a11y_checker)
+          expect(account.a11y_checker_ai_table_caption_generation?).to be true
+        end
+
+        it "returns true when site_admin has a11y_checker_ai_features enabled" do
+          Account.site_admin.enable_feature!(:a11y_checker_ai_features)
+          expect(account.a11y_checker_ai_table_caption_generation?).to be true
+        end
+
+        it "returns true when both a11y_checker and a11y_checker_ai_features are enabled" do
+          account.enable_feature!(:a11y_checker)
+          Account.site_admin.enable_feature!(:a11y_checker_ai_features)
+          expect(account.a11y_checker_ai_table_caption_generation?).to be true
+        end
+      end
+
+      it "returns false when site_admin feature is disabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_ai_table_caption_generation)
+        root_account.enable_feature!(:a11y_checker_ignite_ai)
+        account.enable_feature!(:a11y_checker)
+
+        expect(account.a11y_checker_ai_table_caption_generation?).to be false
+      end
+
+      it "returns false when root_account ignite_ai feature is disabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
+        root_account.disable_feature!(:a11y_checker_ignite_ai)
+        account.enable_feature!(:a11y_checker)
+
+        expect(account.a11y_checker_ai_table_caption_generation?).to be false
+      end
+
+      it "returns false when neither a11y_checker nor a11y_checker_ai_features are enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ai_table_caption_generation)
+        root_account.enable_feature!(:a11y_checker_ignite_ai)
+
+        expect(account.a11y_checker_ai_table_caption_generation?).to be false
+      end
+
+      it "returns false when all features are disabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_ai_table_caption_generation)
+        root_account.disable_feature!(:a11y_checker_ignite_ai)
+
+        expect(account.a11y_checker_ai_table_caption_generation?).to be false
+      end
+    end
+
+    describe "#a11y_checker_ai_alt_text_generation?" do
+      context "when all three conditions are met" do
+        before do
+          Account.site_admin.enable_feature!(:a11y_checker_ai_alt_text_generation)
+          root_account.enable_feature!(:a11y_checker_ignite_ai)
+        end
+
+        it "returns true when account has a11y_checker enabled" do
+          account.enable_feature!(:a11y_checker)
+          expect(account.a11y_checker_ai_alt_text_generation?).to be true
+        end
+
+        it "returns true when site_admin has a11y_checker_ai_features enabled" do
+          Account.site_admin.enable_feature!(:a11y_checker_ai_features)
+          expect(account.a11y_checker_ai_alt_text_generation?).to be true
+        end
+
+        it "returns true when both a11y_checker and a11y_checker_ai_features are enabled" do
+          account.enable_feature!(:a11y_checker)
+          Account.site_admin.enable_feature!(:a11y_checker_ai_features)
+          expect(account.a11y_checker_ai_alt_text_generation?).to be true
+        end
+      end
+
+      it "returns false when site_admin feature is disabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_ai_alt_text_generation)
+        root_account.enable_feature!(:a11y_checker_ignite_ai)
+        account.enable_feature!(:a11y_checker)
+
+        expect(account.a11y_checker_ai_alt_text_generation?).to be false
+      end
+
+      it "returns false when root_account ignite_ai feature is disabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ai_alt_text_generation)
+        root_account.disable_feature!(:a11y_checker_ignite_ai)
+        account.enable_feature!(:a11y_checker)
+
+        expect(account.a11y_checker_ai_alt_text_generation?).to be false
+      end
+
+      it "returns false when neither a11y_checker nor a11y_checker_ai_features are enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ai_alt_text_generation)
+        root_account.enable_feature!(:a11y_checker_ignite_ai)
+
+        expect(account.a11y_checker_ai_alt_text_generation?).to be false
+      end
+
+      it "returns false when all features are disabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_ai_alt_text_generation)
+        root_account.disable_feature!(:a11y_checker_ignite_ai)
+
+        expect(account.a11y_checker_ai_alt_text_generation?).to be false
+      end
+    end
+  end
+
+  describe "#a11y_checker_close_issues?" do
+    let(:account) { Account.create! }
+
+    context "when site_admin a11y_checker_close_issues is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:a11y_checker_close_issues)
+      end
+
+      it "returns false even if account has a11y_checker enabled" do
+        account.enable_feature!(:a11y_checker)
+        expect(account.a11y_checker_close_issues?).to be false
+      end
+
+      it "returns false even if site_admin has a11y_checker_ga2_features enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_close_issues?).to be false
+      end
+    end
+
+    context "when site_admin a11y_checker_close_issues is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_close_issues)
+      end
+
+      it "returns true when account has a11y_checker enabled" do
+        account.enable_feature!(:a11y_checker)
+        expect(account.a11y_checker_close_issues?).to be true
+      end
+
+      it "returns true when site_admin has a11y_checker_ga2_features enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_close_issues?).to be true
+      end
+
+      it "returns true when both a11y_checker and a11y_checker_ga2_features are enabled" do
+        account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_close_issues?).to be true
+      end
+
+      it "returns false when neither a11y_checker nor a11y_checker_ga2_features are enabled" do
+        expect(account.a11y_checker_close_issues?).to be false
+      end
+    end
+  end
+
+  describe "#a11y_checker_additional_resources?" do
+    let(:account) { Account.create! }
+
+    context "when site_admin a11y_checker_additional_resources is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:a11y_checker_additional_resources)
+      end
+
+      it "returns false even if account has a11y_checker enabled" do
+        account.enable_feature!(:a11y_checker)
+        expect(account.a11y_checker_additional_resources?).to be false
+      end
+
+      it "returns false even if site_admin has a11y_checker_ga2_features enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_additional_resources?).to be false
+      end
+    end
+
+    context "when site_admin a11y_checker_additional_resources is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+      end
+
+      it "returns true when account has a11y_checker enabled" do
+        account.enable_feature!(:a11y_checker)
+        expect(account.a11y_checker_additional_resources?).to be true
+      end
+
+      it "returns true when site_admin has a11y_checker_ga2_features enabled" do
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_additional_resources?).to be true
+      end
+
+      it "returns true when both a11y_checker and a11y_checker_ga2_features are enabled" do
+        account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_ga2_features)
+        expect(account.a11y_checker_additional_resources?).to be true
+      end
+
+      it "returns false when neither a11y_checker nor a11y_checker_ga2_features are enabled" do
+        expect(account.a11y_checker_additional_resources?).to be false
+      end
+    end
+  end
+
+  describe "#suppress_notifications?" do
+    let(:account) { Account.default }
+
+    it "returns true when setting is true" do
+      account.settings[:suppress_notifications] = true
+      expect(account.suppress_notifications?).to be true
+    end
+
+    it "returns false when setting is false" do
+      account.settings[:suppress_notifications] = false
+      expect(account.suppress_notifications?).to be false
+    end
+
+    it "returns false when setting is nil" do
+      account.settings.delete(:suppress_notifications)
+      expect(account.suppress_notifications?).to be false
+    end
+
+    it "returns false when setting is an array of categories" do
+      account.settings[:suppress_notifications] = %w[grading announcement]
+      expect(account.suppress_notifications?).to be false
+    end
+  end
+
+  describe "#suppress_notification?" do
+    let(:account) { Account.default }
+
+    let(:grading_notification) do
+      Notification.create!(name: "Test Grading Notification", category: "Grading")
+    end
+
+    let(:announcement_notification) do
+      Notification.create!(name: "Test Announcement Notification", category: "Announcement")
+    end
+
+    it "returns false when setting is nil" do
+      account.settings.delete(:suppress_notifications)
+      expect(account.suppress_notification?(grading_notification)).to be false
+    end
+
+    it "returns false when setting is false" do
+      account.settings[:suppress_notifications] = false
+      expect(account.suppress_notification?(grading_notification)).to be false
+    end
+
+    it "returns true for any notification when setting is true" do
+      account.settings[:suppress_notifications] = true
+      expect(account.suppress_notification?(grading_notification)).to be true
+      expect(account.suppress_notification?(announcement_notification)).to be true
+    end
+
+    it "suppresses only notifications whose category_slug is in the array" do
+      account.settings[:suppress_notifications] = %w[grading]
+      expect(account.suppress_notification?(grading_notification)).to be true
+      expect(account.suppress_notification?(announcement_notification)).to be false
+    end
+
+    it "suppresses multiple categories when all are in the array" do
+      account.settings[:suppress_notifications] = %w[grading announcement]
+      expect(account.suppress_notification?(grading_notification)).to be true
+      expect(account.suppress_notification?(announcement_notification)).to be true
     end
   end
 end

@@ -52,6 +52,7 @@ describe('AssignmenGroupUI', () => {
     expect(getByText(groupList[1].name)).toBeInTheDocument()
   })
 
+  // Skipped: InstUI Select component API changed in v7, component needs update
   it.skip('renders the given assignment group in edit mode', () => {
     const groupList = makeGroupList()
     const {getByTestId} = render(
@@ -75,9 +76,10 @@ describe('AssignmenGroupUI', () => {
     expect(getByText('No Assignment Group Assigned')).toBeInTheDocument()
   })
 
+  // Skipped: InstUI Select component API changed in v7, component needs update
   it.skip('calls onChange when the selection changes', () => {
-    const onchange = jest.fn()
-    const onchangemode = jest.fn()
+    const onchange = vi.fn()
+    const onchangemode = vi.fn()
     const groupList = makeGroupList()
 
     const {container} = render(

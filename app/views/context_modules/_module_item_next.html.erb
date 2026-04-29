@@ -25,7 +25,6 @@
   criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
   show_checkpoints = @context.discussion_checkpoints_enabled? && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints?
   item_restrictions ||= nil
-
   @module_item_image_tags ||= {
     'indent' => "<i class='icon-arrow-right'></i>".html_safe,
     'outdent' => "<i class='icon-arrow-left'></i>".html_safe,
@@ -63,7 +62,7 @@
         <%= 'show_assignment_menu' %>
       <% end %>
     <% end %>
-    <%= module_item.content_type_class(@is_student) if module_item %>
+    <%= module_item.content_type_class(is_student: @is_student) if module_item %>
     <%= 'also_assignment' if module_item && module_item.graded? %>
     indent_<%= @context.horizon_course? ? '0' : (module_item.try_rescue(:indent) || '0') %>
     <%= 'progression_requirement' if criterion %>
@@ -94,7 +93,7 @@
         <i class="icon-quiz"></i>
         <i class="icon-quiz icon-Solid"></i>
         <i class="icon-link"></i>
-        <img id="mc_icon" src="/images/icons/<%= module_item && module_item.published? ? 'mc-assignment-pub.svg' : 'mc-assignment-unpub.svg' %>"
+        <img id="mc_icon" src="/images/icons/<%= module_item && module_item.published? ? 'mc-assignment-pub-v2.svg' : 'mc-assignment-unpub-v2.svg' %>"
             alt="<%= t('Mastery Connect') %>" style="display: none; width: 1rem; height: 1rem;"/>
       </span>
     </span>
@@ -124,6 +123,7 @@
               title="<%= title %>"
               class="ig-title title item_link"
               href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>"
+              aria-describedby="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-details"
               <% if item_data[:mastery_paths] && item_data[:mastery_paths][:locked] %>
               aria-describedby="module-item-locked-<%= module_item && module_item.id %>"
               <% end %>
@@ -160,16 +160,23 @@
         <span class="graded" style="display: none;"><%= module_item && module_item.graded? ? '1' : '0' %></span>
       </div>
 
-      <div class="ig-details">
+      <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-details" class="ig-details">
         <% if !@is_student && show_checkpoints %>
             <div class="ig-details__item reply_to_topic_display"></div>
             <div class="ig-details__item reply_to_entry_display"></div>
         <%end%>
-        <div class="due_date_display ig-details__item"></div>
-        <% if module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true))%>
-          <div class="points_possible_display ig-details__item"></div>
-        <%end%>
-        <div class="requirement-description ig-details__item">
+        <% show_peer_review_info = !@is_student && module_item && module_item.content_type == 'Assignment' && module_item.content&.peer_reviews? && module_item.content&.peer_review_sub_assignment && @context.feature_enabled?(:peer_review_allocation_and_grading) %>
+        <% render_peer_review_container = !@is_student && @context.feature_enabled?(:peer_review_allocation_and_grading) && (!module_item || (module_item.content_type == 'Assignment' && module_item.content&.peer_review_sub_assignment)) %>
+        <% if !show_peer_review_info %>
+          <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-due-date" class="due_date_display ig-details__item"></div>
+          <% if (!module_item && !@is_student) || (module_item&.graded? && (!module_item.try_rescue(:assignment).restrict_quantitative_data?(@current_user, check_extra_permissions: true)))%>
+            <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-points" class="points_possible_display ig-details__item"></div>
+          <%end%>
+        <% end %>
+        <% if render_peer_review_container %>
+          <div class="peer-review-info-container" id="module_teacher_peer_review_info_<%= module_item ? module_item.content_id : "{{ content_id }}" %>_<%= module_item ? module_item.context_module_id : "{{ context_module_id }}" %>" style="<%= 'display: none;' unless show_peer_review_info %>"></div>
+        <% end %>
+        <div id="module-item-<%= module_item ? module_item.id : "{{ id }}" %>-requirement" class="requirement-description ig-details__item">
           <span class="completion_requirement">
             <span class="requirement_type min_score_requirement">
               <% score_display = content_tag(:span, criterion && criterion[:min_score] || nbsp, class: 'min_score') %>
@@ -267,7 +274,7 @@
             data-assignment-id="<%= module_item && module_item.assignment.try(:id) %>"
             data-is-cyoeable="<%= module_item && cyoe_able?(module_item) %>"
             data-published="<%= module_item && item_data[:published_status] == 'published' %>"
-            data-publishable="<%= module_item_publishable?(module_item) %>"
+            data-publishable="<%= module_item_publishable?(module_item) && !(@context.horizon_course? && module_item&.content_type == 'Quizzes::Quiz') %>"
             data-unpublishable="<%= module_item_unpublishable?(module_item) %>"
             data-publish-at="<%= module_item_publish_at(module_item) %>"
             data-publish-title="<%= module_item && module_item.title ? module_item.title : '' %>"
@@ -280,7 +287,7 @@
         <% end %>
 
         <div class="inline-block cog-menu-container">
-          <a class="al-trigger al-trigger-gray" role="button" tabindex="0" href="#">
+          <a class="al-trigger al-trigger-gray" role="button" tabindex="0">
             <i class="icon-more" aria-hidden="true"></i>
             <span class="screenreader-only"><%= t('Manage %{item_name}', {item_name: module_item && module_item.title ? module_item.title : 'item'})  %></span>
           </a>
@@ -297,22 +304,24 @@
               <% if @context.allows_speed_grader? && @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)%>
                 <% speed_grader_id = module_item ? "#{module_item.content_type_class}-#{module_item.content_id}" : "blank" %>
                 <li id="<%="speed-grader-container-#{speed_grader_id}"%>" role='presentation' class="speed-grader-link-container <%= module_item&.assignment&.id && ['assignment', 'quiz','lti-quiz', 'discussion_topic'].include?(module_item.content_type_class) && item_data[:published_status] == 'published' ? '' : 'hidden' %>">
-                  <a href="<%= context_url(@context, :context_url) %>/gradebook/speed_grader?assignment_id=<%= module_item&.assignment&.present? ? module_item.assignment.id : "{{ assignment_id }}" %>" title="<%= t('SpeedGrader')%>"><%= @module_item_image_tags['speed_grader'] %> <%= t('SpeedGrader') %></a>
+                  <a href="<%= context_url(@context, :context_url) %>/gradebook/speed_grader?assignment_id=<%= module_item&.assignment&.present? ? module_item.assignment.id : "{{ assignment_id }}" %>" target="_blank" rel="noopener" title="<%= t('SpeedGrader')%>"><%= @module_item_image_tags['speed_grader'] %> <%= t('SpeedGrader') %></a>
                 </li>
               <% end %>
                 <li class="assign-to-option <%= (module_item.present? && (module_item.show_assign_to?) && module_item.content&.grants_right?(@current_user, :manage_assign_to) ) ? "" : "hidden" %>" role="presentation">
                   <a
                     class="module-item-assign-to-link"
                     href="#<%= module_item ? module_item.id : "{{ id }}" %>"
+                    title="<%= t('Assign this module') %>"
+                  >
+                  <span class="assign-to-link-resources"
+                    translate="no"
                     data-item-id="<%= module_item ? module_item.id : '' %>"
                     data-item-name="<%= module_item ? module_item.title : '' %>"
                     data-item-type="<%= module_item ? module_item.content_type_class : '' %>"
                     data-item-context-id="<%= module_item ? module_item.context_id : '' %>"
                     data-item-content-id="<%= module_item ? module_item.content_id : '' %>"
                     data-item-has-assignment="<%= module_item ? module_item&.assignment&.present? : '' %>"
-                    data-item-has-assignment-checkpoint="<%= module_item ? module_item&.assignment&.has_sub_assignments : '' %>"
-                    title="<%= t('Assign this module') %>"
-                  >
+                    data-item-has-assignment-checkpoint="<%= module_item ? module_item&.assignment&.has_sub_assignments : '' %>"></span>
                     <%= @module_item_image_tags['assign_to'] %> <%= t('Assign To...') %>
                   </a>
                 </li>
@@ -447,7 +456,7 @@
   </div>
   <% if @is_student && @context.discussion_checkpoints_enabled? && module_item && module_item.content_type == 'DiscussionTopic' && module_item.content.checkpoints? %>
     <div class="context_module_item indent_<%= module_item.try_rescue(:indent) || '0' %>">
-      <% checkpoints = [module_item.content.reply_to_topic_checkpoint, module_item.content.reply_to_entry_checkpoint] %>
+      <% checkpoints = [module_item.content.reply_to_topic_checkpoint, module_item.content.reply_to_entry_checkpoint].compact %>
       <% checkpoints.each do |checkpoint| %>
         <div class="ig-row" data-testid="checkpoint" style="display: flex; align-items: center;">
           <% left_padding = case module_item.try_rescue(:indent)
@@ -461,7 +470,7 @@
           <span class="ig-type-icon" aria-hidden="true" style="display: inline-block; max-width: 1.75rem; font-size: 1.125rem; padding-left: <%= left_padding %>">
             <i class='icon-arrow-nest'></i>
           </span>
-          <% status = checkpoint.submission_for_student(@current_user)&.submission_status %>
+          <% status = checkpoint.try(:submission_for_student, @current_user).try(:submission_status) %>
           <% if status && [:submitted, :resubmitted].include?(status) %>
             <span class="ig-type-icon" aria-hidden="true" style="display: inline-block; max-width: 1rem; font-size: 1.125rem;">
               <i class='icon-complete'></i>
@@ -490,6 +499,6 @@
   <% end %>
 </li>
 
-<% if @is_student && @context.feature_enabled?(:peer_reviews_for_a2) && module_item && module_item.content_type == 'Assignment' %>
+<% if @is_student && @context.feature_enabled?(:assignments_2_student) && module_item && module_item.content_type == 'Assignment' %>
   <div id="module_student_view_peer_reviews_<%= module_item.content_id %>_<%= module_item.context_module_id %>"></div>
 <% end %>

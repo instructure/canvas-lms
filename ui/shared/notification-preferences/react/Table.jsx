@@ -171,7 +171,6 @@ const renderNotificationCategory = (
               <Table.Row key={category} data-testid={formatCategoryKey(category)}>
                 <Table.RowHeader>
                   <Text
-                    tabIndex="0"
                     variant="contentImportant"
                     data-testid={`${formatCategoryKey(category)}_header`}
                   >

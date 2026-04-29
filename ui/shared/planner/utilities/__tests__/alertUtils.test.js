@@ -18,8 +18,8 @@
 import * as AlertUtils from '../alertUtils'
 
 describe('alert', () => {
-  const fakeVisualSuccess = jest.fn()
-  const fakeVisualError = jest.fn()
+  const fakeVisualSuccess = vi.fn()
+  const fakeVisualError = vi.fn()
 
   beforeAll(() => {
     AlertUtils.initialize({
@@ -41,7 +41,7 @@ describe('alert', () => {
 
 describe('srAlert', () => {
   it('calls srAlertCallback', () => {
-    const fakeSRAlert = jest.fn()
+    const fakeSRAlert = vi.fn()
     AlertUtils.initialize({
       srAlertCallback: fakeSRAlert,
     })

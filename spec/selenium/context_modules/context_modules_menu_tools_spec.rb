@@ -67,7 +67,7 @@ describe "context modules" do
           Account.site_admin.disable_feature!(:new_quizzes_media_type)
         end
 
-        include_examples "launches the index menu tool via the tray", %w[assignment audio discussion_topic document image module quiz page video]
+        it_behaves_like "launches the index menu tool via the tray", %w[assignment audio discussion_topic document image module quiz page video]
       end
 
       context "new_quizzes_media_type feature flag is enabled" do
@@ -75,7 +75,7 @@ describe "context modules" do
           Account.site_admin.enable_feature!(:new_quizzes_media_type)
         end
 
-        include_examples "launches the index menu tool via the tray", %w[assignment audio discussion_topic document image module quiz page video quizzesnext]
+        it_behaves_like "launches the index menu tool via the tray", %w[assignment audio discussion_topic document image module quiz page video quizzesnext]
       end
     end
 
@@ -103,19 +103,19 @@ describe "context modules" do
       end
 
       context "new_quizzes_media_type feature flag is disabled" do
-        before do
-          Account.site_admin.disable_feature!(:new_quizzes_media_type)
+        it_behaves_like "opens the external apps modal successfully" do
+          before do
+            Account.site_admin.disable_feature!(:new_quizzes_media_type)
+          end
         end
-
-        include_examples "opens the external apps modal successfully"
       end
 
       context "new_quizzes_media_type feature flag is enabled" do
-        before do
-          Account.site_admin.enable_feature!(:new_quizzes_media_type)
+        it_behaves_like "opens the external apps modal successfully" do
+          before do
+            Account.site_admin.enable_feature!(:new_quizzes_media_type)
+          end
         end
-
-        include_examples "opens the external apps modal successfully"
       end
     end
 
@@ -152,7 +152,7 @@ describe "context modules" do
           Account.site_admin.disable_feature!(:new_quizzes_media_type)
         end
 
-        include_examples "launches the individual module menu tool via the tray", %w[assignment audio discussion_topic document image module quiz page video]
+        it_behaves_like "launches the individual module menu tool via the tray", %w[assignment audio discussion_topic document image module quiz page video]
       end
 
       context "new_quizzes_media_type feature flag is enabled" do
@@ -160,7 +160,7 @@ describe "context modules" do
           Account.site_admin.enable_feature!(:new_quizzes_media_type)
         end
 
-        include_examples "launches the individual module menu tool via the tray", %w[assignment audio discussion_topic document image module quiz page video quizzesnext]
+        it_behaves_like "launches the individual module menu tool via the tray", %w[assignment audio discussion_topic document image module quiz page video quizzesnext]
       end
     end
   end

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import ready from '@instructure/ready'
@@ -32,7 +32,7 @@ ready(() => {
 
   const block_editor_attributes: BlockEditorDataTypes = JSON.parse(ENV.block_editor_attributes)
 
-  ReactDOM.render(
+  legacyRender(
     <BlockEditorView content={block_editor_attributes} />,
     document.getElementById('block_editor_viewer_container') as HTMLElement,
   )

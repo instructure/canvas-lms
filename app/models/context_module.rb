@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ContextModule < ActiveRecord::Base
+class ContextModule < ApplicationRecord
   include Workflow
   include SearchTermHelper
   include DuplicatingObjects
@@ -26,6 +26,7 @@ class ContextModule < ActiveRecord::Base
   include DifferentiableAssignment
 
   include MasterCourses::Restrictor
+
   restrict_columns :state, [:workflow_state]
   restrict_columns :settings, %i[prerequisites completion_requirements requirement_count require_sequential_progress]
 
@@ -130,7 +131,14 @@ class ContextModule < ActiveRecord::Base
     current_scope.find_in_batches(batch_size: 100) do |progressions|
       context.cache_item_visibilities_for_user_ids(progressions.map(&:user_id))
 
+      concluded_user_ids = concluded_enrollment_user_ids(progressions.map(&:user_id))
+
       progressions.each do |progression|
+        if concluded_user_ids.include?(progression.user_id)
+          progression.update_column(:current, true) unless progression.current
+          next
+        end
+
         progression.context_module = self
         progression.evaluate!
       end
@@ -206,21 +214,30 @@ class ContextModule < ActiveRecord::Base
   end
 
   def send_items_to_stream
-    if saved_change_to_workflow_state? && workflow_state == "active"
-      content_tags.where(content_type: "DiscussionTopic", workflow_state: "active").preload(:content).each do |ct|
-        ct.content.send_items_to_stream
-      end
+    return unless saved_change_to_workflow_state? && workflow_state == "active"
+
+    topics = DiscussionTopic
+             .where(id: content_tags.where(content_type: "DiscussionTopic", workflow_state: "active").select(:content_id))
+             .preload(:stream_item, :assignment_overrides, :discussion_topic_participants, :root_discussion_entries, context_module_tags: { context_module: :context }, context: { enrollments: [:user, :enrollment_state] })
+             .load
+
+    topic_ids_in_unpublished_modules = batch_load_unpublished_topic_ids(topics.map(&:id))
+
+    topics.each do |topic|
+      topic.send_items_to_stream(topic_ids_in_unpublished_modules:)
     end
   end
 
   def clear_discussion_stream_items
-    if saved_change_to_workflow_state? &&
-       ["active", nil].include?(workflow_state_before_last_save) &&
-       workflow_state == "unpublished"
-      content_tags.where(content_type: "DiscussionTopic", workflow_state: "active").preload(:content).each do |ct|
-        ct.content.clear_stream_items
-      end
-    end
+    return unless saved_change_to_workflow_state? &&
+                  ["active", nil].include?(workflow_state_before_last_save) &&
+                  workflow_state == "unpublished"
+
+    topics = content_tags.where(content_type: "DiscussionTopic", workflow_state: "active")
+                         .preload(content: { stream_item: [:context, :stream_item_instances] })
+                         .filter_map(&:content)
+
+    topics.each(&:clear_stream_items)
   end
 
   # This is intended for duplicating a content tag when we are duplicating a module
@@ -248,10 +265,10 @@ class ContextModule < ActiveRecord::Base
   # Intended for taking a content_tag in this module and duplicating it
   # into a new module.  Not intended for duplicating a content tag to be
   # kept in the same module.
-  def duplicate_content_tag(original_content_tag)
+  def duplicate_content_tag(original_content_tag, opts = {})
     new_tag = duplicate_content_tag_base_model(original_content_tag)
     if original_content_tag.content.respond_to?(:duplicate)
-      new_tag.content = original_content_tag.content.duplicate
+      new_tag.content = original_content_tag.content.duplicate(opts)
       # If we have multiple assignments (e.g.) make sure they each get unused titles.
       # A title isn't marked used if the assignment hasn't been saved yet.
       new_tag.content.save!
@@ -273,12 +290,12 @@ class ContextModule < ActiveRecord::Base
     !only_visible_to_overrides
   end
 
-  def duplicate
+  def duplicate(opts = {})
     copy_title = get_copy_title(self, t("Copy"), name)
     new_module = duplicate_base_model(copy_title)
     living_tags = content_tags.reject(&:deleted?)
     new_module.content_tags = living_tags.map do |content_tag|
-      duplicate_content_tag(content_tag)
+      duplicate_content_tag(content_tag, opts)
     end
     new_module
   end
@@ -373,19 +390,21 @@ class ContextModule < ActiveRecord::Base
 
   alias_method :published?, :active?
 
-  def publish_items!(progress: nil)
-    content_tags.each do |content_tag|
+  def publish_items!(progress: nil, user: nil)
+    user ||= progress&.user
+    content_tags.preload(content: %i[assignment_overrides discussion_topic_section_visibilities sub_assignments context_module_tags]).load.each do |content_tag|
       break if progress&.reload&.failed?
 
-      content_tag.trigger_publish!
+      content_tag.trigger_publish!(user:)
     end
   end
 
-  def unpublish_items!(progress: nil)
-    content_tags.each do |content_tag|
+  def unpublish_items!(progress: nil, user: nil)
+    user ||= progress&.user
+    content_tags.preload(:content).load.each do |content_tag|
       break if progress&.reload&.failed?
 
-      content_tag.trigger_unpublish!
+      content_tag.trigger_unpublish!(user:)
     end
   end
 
@@ -621,7 +640,7 @@ class ContextModule < ActiveRecord::Base
                                             .active
                                             .joins(assignment_sets: :assignment_set_associations)
                                             .group("conditional_release_rules.trigger_assignment_id")
-                                            .having("count(conditional_release_assignment_set_associations.id) >= 3")
+                                            .having("count(conditional_release_assignment_set_associations.id) >= 1")
                                             .pluck(:trigger_assignment_id)
                                             .uniq
 
@@ -718,14 +737,49 @@ class ContextModule < ActiveRecord::Base
                                  end
   end
 
+  # Find next available position starting from requested position
+  def find_next_available_position(requested_position)
+    used_positions = content_tags.not_deleted.pluck(:position).compact.to_set
+    target_position = requested_position
+    target_position += 1 while used_positions.include?(target_position)
+    target_position
+  end
+
+  # Shift existing items to make room at requested position
+  def resolve_position_conflicts(requested_position)
+    if content_tags.not_deleted.where(position: requested_position).exists?
+      content_tags.not_deleted
+                  .where(position: requested_position..)
+                  .update_all("position = position + 1")
+    end
+  end
+
+  # Decide what position a new module item should get
+  def determine_position(params, opts)
+    raw_position = opts[:position] || params[:position]
+    position_int = raw_position.to_i if raw_position.present? && raw_position.to_i > 0
+
+    if opts[:defer_position]
+      nil
+    elsif position_int
+      position_int
+    else
+      (content_tags.not_deleted.maximum(:position) || 0) + 1
+    end
+  end
+
   def add_item(params, added_item = nil, opts = {})
     params[:type] = params[:type].underscore if params[:type]
-    top_position = (content_tags.not_deleted.maximum(:position) || 0) + 1
-    position = opts[:position] || top_position
-    position = [position, params[:position].to_i].max if params[:position]
-    if content_tags.not_deleted.where(position:).count != 0
-      position = top_position
+
+    # Determine initial position
+    position = determine_position(params, opts)
+
+    # If resolve_conflicts is enabled, handle position conflicts before saving
+    if opts[:resolve_conflicts] && position
+      resolve_position_conflicts(position)
     end
+
+    params[:position] = position if position
     case params[:type]
     when "wiki_page", "page"
       item = opts[:wiki_page] || context.wiki_pages.where(id: params[:id]).first
@@ -745,14 +799,15 @@ class ContextModule < ActiveRecord::Base
     when "external_url"
       title = params[:title]
       added_item ||= content_tags.build(context:)
-      added_item.attributes = {
+      attributes_hash = {
         url: params[:url],
         new_tab: params[:new_tab],
         tag_type: "context_module",
         title:,
-        indent: params[:indent],
-        position:
+        indent: params[:indent]
       }
+      attributes_hash[:position] = position unless position.nil?
+      added_item.attributes = attributes_hash
       added_item.content_id = 0
       added_item.content_type = "ExternalUrl"
       added_item.context_module_id = id
@@ -767,15 +822,16 @@ class ContextModule < ActiveRecord::Base
                 else
                   Lti::ToolFinder.from_url(params[:url], context, preferred_tool_id: params[:id].to_i) || ContextExternalTool.new.tap { |tool| tool.id = 0 }
                 end
-      added_item.attributes = {
+      attributes_hash = {
         content:,
         url: params[:url],
         new_tab: params[:new_tab],
         tag_type: "context_module",
         title:,
-        indent: params[:indent],
-        position:
+        indent: params[:indent]
       }
+      attributes_hash[:position] = position unless position.nil?
+      added_item.attributes = attributes_hash
       added_item.context_module_id = id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = "unpublished" if added_item.new_record?
@@ -799,12 +855,13 @@ class ContextModule < ActiveRecord::Base
     when "context_module_sub_header", "sub_header"
       title = params[:title]
       added_item ||= content_tags.build(context:)
-      added_item.attributes = {
+      attributes_hash = {
         tag_type: "context_module",
         title:,
-        indent: params[:indent],
-        position:
+        indent: params[:indent]
       }
+      attributes_hash[:position] = position unless position.nil?
+      added_item.attributes = attributes_hash
       added_item.content_id = 0
       added_item.content_type = "ContextModuleSubHeader"
       added_item.context_module_id = id
@@ -815,13 +872,14 @@ class ContextModule < ActiveRecord::Base
 
       title = params[:title] || item.try(:title) || item.name
       added_item ||= content_tags.build(context:)
-      added_item.attributes = {
+      attributes_hash = {
         content: item,
         tag_type: "context_module",
         title:,
-        indent: params[:indent],
-        position:
+        indent: params[:indent]
       }
+      attributes_hash[:position] = position unless position.nil?
+      added_item.attributes = attributes_hash
       added_item.context_module_id = id
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = workflow_state if added_item.new_record?
@@ -926,13 +984,12 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def confirm_valid_requirements(do_save = false)
+  def confirm_valid_requirements
     return if @already_confirmed_valid_requirements
 
     @already_confirmed_valid_requirements = true
     # the write accessor validates for us
     self.completion_requirements = completion_requirements || []
-    save if do_save && completion_requirements_changed?
     completion_requirements
   end
 
@@ -949,16 +1006,25 @@ class ContextModule < ActiveRecord::Base
     progressions.uniq
   end
 
+  def self.preload_progressions_for_user(modules, user)
+    return {} unless user && modules.any?
+
+    module_ids = modules.map(&:id)
+    ContextModuleProgression
+      .where(user_id: user.id, context_module_id: module_ids)
+      .index_by(&:context_module_id)
+  end
+
   def find_or_create_progression(user)
     return nil unless user
 
     shard.activate do
       GuardRail.activate(:primary) do
-        # Check if progression already exists to avoid redundant enrollment check
         existing_progression = ContextModuleProgression.find_by(user:, context_module: self)
         return existing_progression if existing_progression
 
-        if context.enrollments.except(:preload).where(user_id: user).exists?
+        if context.enrollments.except(:preload).where(user_id: user).exists? ||
+           (grants_right?(user, :read_as_admin) && User.where(id: user).shard(Shard.current).exists?)
           ContextModuleProgression.create_and_ignore_on_duplicate(user:, context_module: self)
         end
       end
@@ -972,6 +1038,18 @@ class ContextModule < ActiveRecord::Base
       progression, user = [find_or_create_progression(user_or_progression), user_or_progression]
     end
     return nil unless progression && user
+
+    # Check enrollment state before evaluating
+    # For concluded enrollments, return existing progression without re-evaluating
+    # This prevents completed_at timestamps from being updated after enrollment ends
+    if context.is_a?(Course)
+      enrollments = context.enrollments.for_user(user)
+      if enrollments.any? && enrollments.all? { |e| e.state_based_on_date == :completed }
+        return progression if progression.persisted?
+
+        return nil
+      end
+    end
 
     progression.context_module = self if progression.context_module_id == id
     progression.user = user if progression.user_id == user.id
@@ -1057,5 +1135,33 @@ class ContextModule < ActiveRecord::Base
 
     assignments_quizzes = module_assignments + module_quizzes_and_discussions
     Assignment.where(id: assignments_quizzes)
+  end
+
+  private
+
+  def concluded_enrollment_user_ids(user_ids)
+    return Set.new unless context.is_a?(Course)
+
+    context.enrollments
+           .joins(:enrollment_state)
+           .where(user_id: user_ids)
+           .group(:user_id)
+           .having("COUNT(CASE WHEN enrollment_states.state != 'completed' THEN 1 END) = 0")
+           .pluck(:user_id)
+           .to_set
+  end
+
+  def batch_load_unpublished_topic_ids(topic_ids)
+    unpublished_from_tags = ContentTag.where(content_type: "DiscussionTopic",
+                                             content_id: topic_ids,
+                                             workflow_state: "unpublished")
+                                      .pluck(:content_id)
+    unpublished_from_modules = ContextModule.joins(:content_tags)
+                                            .where(content_tags: { content_type: "DiscussionTopic", content_id: topic_ids })
+                                            .where(workflow_state: "unpublished")
+                                            .where.not(id:)
+                                            .pluck("content_tags.content_id")
+
+    (unpublished_from_tags + unpublished_from_modules).uniq
   end
 end

@@ -38,7 +38,7 @@ module Login::Shared
             session[:return_to] = url
           elsif (target_account == domain_root_account) ||
                 (target_account && target_account != domain_root_account &&
-                pseudonym&.works_for_account?(target_account, true))
+                pseudonym&.works_for_account?(target_account, allow_implicit: true))
             token = SessionToken.new(pseudonym.global_id,
                                      current_user_id: pseudonym.global_user_id).to_s
             uri.query&.concat("&")
@@ -76,7 +76,9 @@ module Login::Shared
     redirect_to unknown_user_url || login_url
   end
 
-  def successful_login(user, pseudonym, otp_passed = false)
+  def finalize_login(_user, _pseudonym); end
+
+  def successful_login(user, pseudonym, otp_passed: false)
     reset_authenticity_token!
     Auditors::Authentication.record(pseudonym, "login")
 
@@ -87,6 +89,7 @@ module Login::Shared
     setup_live_events_context
     # TODO: Only send this if the current_pseudonym's root account matches the current root
     # account?
+    AuthenticationMethods::FederatedPseudonymAttributes.load_from(session)
     Canvas::LiveEvents.logged_in(session, user, pseudonym)
 
     otp_passed ||= user.validate_otp_secret_key_remember_me_cookie(cookies["canvas_otp_remember_me"], request.remote_ip)
@@ -122,6 +125,8 @@ module Login::Shared
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(user)
     @current_user = user
     @current_pseudonym = pseudonym
+
+    finalize_login(user, pseudonym)
 
     respond_to do |format|
       if (oauth = session[:oauth2])
@@ -200,29 +205,13 @@ module Login::Shared
   end
 
   include PseudonymSessionsController
+
   def remember_me_cookie_domain
     otp_remember_me_cookie_domain
   end
 
   def delegated_auth_redirect_uri(uri)
     uri
-  end
-
-  def need_email_verification?(unique_ids, auth_provider)
-    old_login_attribute = auth_provider.settings["old_login_attribute"]
-    if old_login_attribute.present? &&
-       auth_provider.login_attribute != old_login_attribute &&
-       unique_ids.is_a?(Hash) &&
-       unique_ids.key?(old_login_attribute) &&
-       unique_ids.key?(auth_provider.login_attribute)
-      pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_ids[old_login_attribute], auth_provider)
-      if pseudonym
-        pseudonym.begin_login_attribute_migration!(unique_ids)
-        redirect_to login_email_verify_show_url(d: CanvasSecurity.create_jwt({ i: pseudonym.id, e: pseudonym.email }, 15.minutes.from_now))
-        return true
-      end
-    end
-    false
   end
 
   private

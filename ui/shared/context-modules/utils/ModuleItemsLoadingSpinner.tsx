@@ -30,6 +30,9 @@ type ModuleItemsLoadingProps = {
 
 export const ModuleItemsLoadingSpinner = ({isLoading}: ModuleItemsLoadingProps) => {
   if (!isLoading) return null
+
+  const liveRegionElement = document.querySelector('#flash_screenreader_holder') as HTMLElement
+
   return (
     <View
       as="div"
@@ -40,8 +43,8 @@ export const ModuleItemsLoadingSpinner = ({isLoading}: ModuleItemsLoadingProps) 
     >
       <Alert
         variant="info"
-        screenReaderOnly={true}
-        liveRegion={() => document.querySelector('#flash_screenreader_holder') as HTMLElement}
+        screenReaderOnly={!!liveRegionElement}
+        liveRegion={liveRegionElement ? () => liveRegionElement : undefined}
       >
         {I18n.t('Loading items')}
       </Alert>

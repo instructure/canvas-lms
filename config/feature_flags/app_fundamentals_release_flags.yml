@@ -67,3 +67,14 @@ new_account_reports_ui:
       state: allowed_on
     development:
       state: allowed_on
+eportfolio_deprecation_notice:
+  state: hidden
+  applies_to: RootAccount
+  display_name: ePortfolio Deprecation Notice
+  description: Show a deprecation notice on ePortfolio pages to users in accounts where ePortfolios are enabled
+user_session_termination:
+  state: hidden
+  display_name: Terminate User Sessions
+  description: Allows administrators to terminate all sessions for a specific user through the UI
+  applies_to: RootAccount
+  shadow: true

@@ -22,11 +22,11 @@ import {
   LoadingIndicator,
   sizeMediaPlayer,
 } from '@instructure/canvas-media'
-import {CaptionMetaData, StudioPlayer} from '@instructure/studio-player'
+import {CaptionMetaData, StudioPlayer, type StudioPlayerProps} from '@instructure/studio-player'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {type MediaSource} from 'api'
@@ -65,18 +65,20 @@ const convertAndSortMediaSources = (sources: CanvasMediaSource[] | string) => {
   return sources.map(convertMediaSource).sort(byBitrate)
 }
 
+const isCaptionMetaData = (track: MediaTrack | CaptionMetaData): track is CaptionMetaData => {
+  return 'src' in track
+}
+
 const convertMediaTracksIfNeeded = (
   tracks: MediaTrack[] | CaptionMetaData[],
 ): CaptionMetaData[] => {
-  // @ts-expect-error
-  return tracks.map(track => {
-    if ('src' in track) return track
+  return tracks.map((track): CaptionMetaData => {
+    if (isCaptionMetaData(track)) return track
     return {
-      locale: track.locale,
       language: captionLanguageForLocale(track.locale),
-      inherited: track.inherited,
       label: captionLanguageForLocale(track.locale),
       src: track.url,
+      type: 'vtt',
     }
   })
 }
@@ -102,6 +104,15 @@ interface BaseCanvasStudioPlayerProps {
   explicitSize?: {width: number | string; height: number | string}
   hideUploadCaptions?: boolean
   isInverseVariant?: boolean
+  kebabMenuElements?: StudioPlayerProps['kebabMenuElements']
+  enableSidebar?: StudioPlayerProps['enableSidebar']
+  openSidebar?: StudioPlayerProps['openSidebar']
+  tabs?: StudioPlayerProps['tabs']
+  emptyTranscriptsComponent?: StudioPlayerProps['emptyTranscriptsComponent']
+  rollingTranscriptElement?: StudioPlayerProps['rollingTranscriptElement']
+  onTranscriptEdit?: StudioPlayerProps['onTranscriptEdit']
+  onConfirmEditChanges?: StudioPlayerProps['onConfirmEditChanges']
+  onTrackEvent?: StudioPlayerProps['onTrackEvent']
 }
 
 type CanvasStudioPropsWithMediaIdOrAttachmentId =
@@ -126,6 +137,15 @@ export default function CanvasStudioPlayer({
   explicitSize,
   hideUploadCaptions = false,
   isInverseVariant = false,
+  kebabMenuElements = [],
+  enableSidebar = false,
+  openSidebar = false,
+  tabs,
+  emptyTranscriptsComponent,
+  rollingTranscriptElement,
+  onTranscriptEdit,
+  onConfirmEditChanges,
+  onTrackEvent,
 }: CanvasStudioPropsWithMediaIdOrAttachmentId) {
   const [mediaId, setMediaId] = useState(media_id)
   const captions: CaptionMetaData[] | undefined = Array.isArray(media_captions)
@@ -135,10 +155,20 @@ export default function CanvasStudioPlayer({
   const [mediaCaptions, setMediaCaptions] = useState<CaptionMetaData[] | undefined>(captions)
   const [retryAttempt, setRetryAttempt] = useState(0)
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
+  const [mediaObjFailed, setMediaObjFailed] = useState(false)
   const [containerWidth, setContainerWidth] = useState(explicitSize?.width || 0)
   const [containerHeight, setContainerHeight] = useState(explicitSize?.height || 0)
   const [isLoading, setIsLoading] = useState(true)
   const [canAddCaptions, setCanAddCaptions] = useState(false)
+
+  useEffect(() => {
+    if (media_id && media_id !== mediaId) {
+      setMediaId(media_id)
+      setMediaSources([])
+      setRetryAttempt(0)
+    }
+  }, [media_id, mediaId])
+
   // the ability to set these makes testing easier
   // hint: set these values in a conditional breakpoint in
   // media_player_iframe_content.js where the CanvasStudioPlayer is rendered
@@ -208,6 +238,7 @@ export default function CanvasStudioPlayer({
       try {
         setIsLoading(true)
         setMediaObjNetworkErr(null)
+        setMediaObjFailed(false)
         resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e: any) {
         console.warn(`Error getting ${url}`, e.message)
@@ -220,6 +251,11 @@ export default function CanvasStudioPlayer({
       }
       if (typeof resp?.can_add_captions === 'boolean') {
         setCanAddCaptions(resp.can_add_captions)
+      }
+      if (resp?.status === 'ERROR_IMPORTING' || resp?.status === 'ERROR_CONVERTING') {
+        setMediaObjFailed(true)
+        setIsLoading(false)
+        return
       }
       if (resp?.media_sources?.length) {
         setMediaSources(convertAndSortMediaSources(resp.media_sources))
@@ -240,12 +276,14 @@ export default function CanvasStudioPlayer({
       return
     }
 
-    await fetch(caption.src, {
-      method: 'DELETE',
-      headers: {
-        'X-CSRF-Token': getCookie('_csrf_token'),
-      },
-    })
+    if (caption.src) {
+      await fetch(caption.src, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-Token': getCookie('_csrf_token') ?? '',
+        },
+      })
+    }
     setMediaCaptions(prev => prev?.filter(c => c.src !== caption.src))
   }, [])
 
@@ -281,17 +319,24 @@ export default function CanvasStudioPlayer({
     (document.fullscreenEnabled || document.webkitFullscreenEnabled) && type === 'video'
 
   function renderNoPlayer() {
+    if (mediaObjFailed) {
+      return (
+        <Alert key="failedalert" variant="error" margin="small" liveRegion={liveRegion}>
+          {I18n.t(
+            "This file couldn't be processed. It may be corrupted or in an unsupported format. Please upload a different file.",
+          )}
+        </Alert>
+      )
+    }
     if (mediaObjNetworkErr) {
       if (is_attachment) {
         return (
-          // @ts-expect-error
           <Alert key="bepatientalert" variant="info" margin="x-small" liveRegion={liveRegion}>
             {I18n.t('Your media has been uploaded and will appear here after processing.')}
           </Alert>
         )
       } else {
         return (
-          // @ts-expect-error
           <Alert key="erralert" variant="error" margin="small" liveRegion={liveRegion}>
             {I18n.t('Failed retrieving media sources.')}
           </Alert>
@@ -301,7 +346,6 @@ export default function CanvasStudioPlayer({
     if (retryAttempt >= retryAttempts) {
       // this should be very rare
       return (
-        // @ts-expect-error
         <Alert key="giveupalert" variant="info" margin="x-small" liveRegion={liveRegion}>
           {I18n.t(
             'Giving up on retrieving media sources. This issue will probably resolve itself eventually.',
@@ -313,7 +357,6 @@ export default function CanvasStudioPlayer({
       return (
         <Flex margin="xx-small" justifyItems="space-between">
           <Flex.Item margin="0 0 x-small 0" shouldGrow={true} shouldShrink={true}>
-            {/* @ts-expect-error */}
             <Alert key="bepatientalert" variant="info" margin="x-small" liveRegion={liveRegion}>
               {I18n.t('Your media has been uploaded and will appear here after processing.')}
             </Alert>
@@ -360,6 +403,65 @@ export default function CanvasStudioPlayer({
     handlePlayerSize({})
   }, [mediaSources, type, boundingBox, handlePlayerSize])
 
+  useEffect(() => {
+    if (explicitSize) {
+      if (explicitSize.width !== containerWidth) {
+        setContainerWidth(explicitSize.width)
+      }
+      if (explicitSize.height !== containerHeight) {
+        setContainerHeight(explicitSize.height)
+      }
+    }
+  }, [explicitSize, containerWidth, containerHeight])
+
+  /**
+   * When escape is pressed, if focus is inside the player:
+   * - If in fullscreen: manually exit and restore focus to fullscreen button
+   * - If menu is open: restore focus to the menu button
+   * Why: Chrome loses focus after fullscreen exit, Firefox doesn't
+   */
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const handleEscapeCapture = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+
+      const target = event.target as HTMLElement
+      if (!container.contains(target)) return
+
+      if (document.fullscreenElement) {
+        event.preventDefault()
+        event.stopPropagation()
+
+        document.exitFullscreen().then(() => {
+          const fullscreenButton = container.querySelector(
+            '[class*="_full-screen-button"]',
+          ) as HTMLElement | null
+          fullscreenButton?.focus()
+        })
+
+        return
+      }
+
+      // Handle menu escape - restore focus to menu button
+      const openMenuButton = container.querySelector(
+        '.controls-button[aria-expanded="true"], #kebab-menu-button[aria-expanded="true"]',
+      ) as HTMLElement | null
+      if (openMenuButton) {
+        setTimeout(() => {
+          openMenuButton.focus()
+        }, 0)
+      }
+    }
+
+    document.addEventListener('keydown', handleEscapeCapture, true)
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeCapture, true)
+    }
+  }, [])
+
   function renderLoader() {
     if (retryAttempt >= showBePatientMsgAfterAttempts) {
       setIsLoading(false)
@@ -394,11 +496,19 @@ export default function CanvasStudioPlayer({
               src={mediaSources}
               captions={mediaCaptions}
               hideFullScreen={!includeFullscreen}
-              title={getAriaLabel()}
+              title={getAriaLabel() ?? ''}
               onCaptionsDelete={hideCaptionButtons ? undefined : deleteCaption}
+              enableSidebar={enableSidebar}
+              openSidebar={openSidebar}
+              tabs={tabs}
+              onTranscriptEdit={onTranscriptEdit}
+              onConfirmEditChanges={onConfirmEditChanges}
+              onTrackEvent={onTrackEvent}
+              emptyTranscriptsComponent={emptyTranscriptsComponent}
+              rollingTranscriptElement={rollingTranscriptElement}
               kebabMenuElements={
                 hideCaptionButtons
-                  ? undefined
+                  ? [...kebabMenuElements]
                   : [
                       {
                         id: 'upload-cc',

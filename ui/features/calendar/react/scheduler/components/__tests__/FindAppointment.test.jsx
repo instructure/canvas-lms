@@ -34,8 +34,8 @@ describe('FindAppointmentApp', () => {
       },
     }
 
-    const {getByRole} = render(<FindAppointmentApp courses={courses} store={store} />)
-    expect(getByRole('button', {name: 'Find Appointment'})).toBeInTheDocument()
+    const {getByTestId} = render(<FindAppointmentApp courses={courses} store={store} />)
+    expect(getByTestId('find-appointment-button')).toBeInTheDocument()
   })
 
   test('correct button renders', () => {
@@ -47,8 +47,8 @@ describe('FindAppointmentApp', () => {
       },
     }
 
-    const {getByRole} = render(<FindAppointmentApp courses={courses} store={store} />)
-    expect(getByRole('button', {name: 'Close'})).toBeInTheDocument()
+    const {getByTestId} = render(<FindAppointmentApp courses={courses} store={store} />)
+    expect(getByTestId('find-appointment-close-button')).toBeInTheDocument()
   })
 
   test('selectCourse sets the proper selected course', () => {

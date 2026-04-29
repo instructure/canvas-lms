@@ -45,7 +45,7 @@
 #         },
 #         "zip_attachment": {
 #           "description": "attachment api object for the export web zip (not present until the export completes)",
-#           "example": {"url": "https://example.com/api/v1/attachments/789?download_frd=1&verifier=bG9sY2F0cyEh"},
+#           "example": {"url": "https://example.com/api/v1/attachments/789?download_frd=1"},
 #           "$ref": "File"
 #         },
 #         "progress_id": {
@@ -95,7 +95,6 @@ class WebZipExportsController < ApplicationController
   include Api::V1::WebZipExport
   include WebZipExportHelper
 
-  before_action :require_user
   before_action :require_context
   before_action :check_feature_enabled
 
@@ -120,7 +119,7 @@ class WebZipExportsController < ApplicationController
   def index
     return render_unauthorized_action unless allow_web_export_for_course_user?
 
-    user_web_zips = @context.web_zip_exports.visible_to(@current_user).order("created_at DESC")
+    user_web_zips = @context.web_zip_exports.visible_to(@current_user).order(created_at: :desc)
     web_zips_json = Api.paginate(user_web_zips, self, api_v1_web_zip_exports_url).map do |web_zip|
       web_zip_export_json(web_zip)
     end

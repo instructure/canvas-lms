@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getRegistry} from '@instructure/theme-registry'
-import {merge, cloneDeep} from 'lodash'
+import {canvas, canvasHighContrast} from '@instructure/ui-themes'
+import {cloneDeep} from 'es-toolkit/compat'
+import {getTypography} from '@instructure/platform-instui-bindings'
 
 // In case we are running a test and there is absolutely no theme data available
 // (happens often)
@@ -35,16 +36,24 @@ let memoizedVariables
 function getThemeVars() {
   if (memoizedVariables) return memoizedVariables
 
-  const {defaultThemeKey, overrides, themes} = getRegistry()
-  // Just assume the "canvas" theme if the default key is null. This will
-  // never happen in the live app because one way or another a theme gets
-  // used, but unit tests don't always do that.
-  // Also we have to cloneDeep this because the merge below is about to
-  // mutate the whole thing.
-  const variables = cloneDeep(themes[defaultThemeKey ?? 'canvas'] || fallback)
-  merge(variables, overrides)
+  const useHighContrast = typeof window !== 'undefined' && window.ENV?.use_high_contrast
+  const themeKey = useHighContrast ? 'canvas-high-contrast' : 'canvas'
+  const theme = useHighContrast ? canvasHighContrast : canvas
+  const brandVars =
+    !useHighContrast && typeof window !== 'undefined'
+      ? window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
+      : {}
+  const variables = {...cloneDeep(theme || fallback), ...brandVars}
+  variables.typography = {
+    ...variables.typography,
+    ...getTypography(
+      Boolean(ENV.K5_USER),
+      Boolean(ENV.USE_CLASSIC_FONT),
+      Boolean(ENV.use_dyslexic_font),
+    ),
+  }
 
-  memoizedVariables = {variables, key: defaultThemeKey}
+  memoizedVariables = {variables, key: themeKey}
   return memoizedVariables
 }
 

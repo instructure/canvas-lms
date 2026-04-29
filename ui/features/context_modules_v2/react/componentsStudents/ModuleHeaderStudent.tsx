@@ -20,7 +20,7 @@ import React, {useCallback} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconButton} from '@instructure/ui-buttons'
+import {IconButton, Button} from '@instructure/ui-buttons'
 import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -38,6 +38,8 @@ import {ModuleHeaderMissingCount} from './ModuleHeaderMissingCount'
 import {Pill} from '@instructure/ui-pill'
 import ModuleHeaderUnlockAt from '../components/ModuleHeaderUnlockAt'
 import {isModuleUnlockAtDateInTheFuture} from '../utils/utils'
+import {useContextModule} from '../hooks/useModuleContext'
+import {useModules} from '../hooks/queries/useModules'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -53,6 +55,8 @@ export interface ModuleHeaderStudentProps {
   unlockAt: string | null
   submissionStatistics?: ModuleStatistics
   smallScreen?: boolean
+  showAll?: boolean
+  onToggleShowAll?: () => void
 }
 
 const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
@@ -67,11 +71,27 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   unlockAt,
   submissionStatistics,
   smallScreen = false,
+  showAll = false,
+  onToggleShowAll,
 }) => {
   const onToggleExpandRef = useCallback(() => {
     onToggleExpand(id)
   }, [onToggleExpand, id])
 
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        event.stopPropagation()
+        onToggleExpandRef()
+      }
+    },
+    [onToggleExpandRef],
+  )
+
+  const {courseId, modulesArePaginated, pageSize} = useContextModule()
+  const {getModuleItemsTotalCount} = useModules(courseId, 'student')
+  const totalCount = getModuleItemsTotalCount(id) || 0
   const missingCount = submissionStatistics?.missingAssignmentCount || 0
 
   const hasCompletionRequirements = completionRequirements && completionRequirements.length > 0
@@ -83,12 +103,27 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
     ? I18n.t('Collapse "%{name}"', {name})
     : I18n.t('Expand "%{name}"', {name})
 
+  const shouldShowToggle = (totalCount || 0) > pageSize
+
   return (
-    <View as="div" background="transparent">
+    <View
+      data-testid="module-header-expand-toggle"
+      id={`module-header-expand-toggle-${id}`}
+      as="div"
+      background="transparent"
+      cursor="pointer"
+      onClick={onToggleExpandRef}
+      onKeyDown={handleKeyDown}
+      focusPosition="inset"
+      tabIndex={0}
+      aria-label={screenReaderLabel}
+      aria-expanded={expanded}
+      focusWithin
+    >
       <Flex padding="small" justifyItems="space-between" direction="row">
         <Flex.Item shouldGrow shouldShrink margin="0 0 0 small">
           <Flex justifyItems="space-between" direction="column">
-            <Flex.Item>
+            <Flex.Item padding="xxx-small 0 xxx-small 0">
               <Flex
                 gap="small"
                 alignItems={smallScreen ? 'start' : 'center'}
@@ -124,6 +159,24 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
                           completed={progression?.completed}
                           requirementCount={requirementCount}
                         />
+                      </Flex.Item>
+                    )}
+                    {expanded && modulesArePaginated && shouldShowToggle && onToggleShowAll && (
+                      <Flex.Item>
+                        <Button
+                          size="small"
+                          display="inline-block"
+                          onClick={onToggleShowAll}
+                          data-testid="show-all-toggle"
+                          color="secondary"
+                          themeOverride={{
+                            borderWidth: '0',
+                          }}
+                        >
+                          {showAll
+                            ? I18n.t('Show Less')
+                            : I18n.t('Show All (%{count})', {count: totalCount || 0})}
+                        </Button>
                       </Flex.Item>
                     )}
                   </Flex>
@@ -182,16 +235,9 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
           </Flex>
         </Flex.Item>
         <Flex.Item>
-          <IconButton
-            data-testid="module-header-expand-toggle"
-            size="small"
-            withBorder={false}
-            screenReaderLabel={screenReaderLabel}
-            renderIcon={expanded ? IconArrowOpenDownLine : IconArrowOpenUpLine}
-            withBackground={false}
-            onClick={onToggleExpandRef}
-            aria-expanded={expanded}
-          />
+          <View margin="0 small 0 0">
+            {expanded ? <IconArrowOpenDownLine /> : <IconArrowOpenUpLine />}
+          </View>
         </Flex.Item>
       </Flex>
     </View>

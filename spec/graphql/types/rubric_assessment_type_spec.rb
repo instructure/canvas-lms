@@ -62,6 +62,123 @@ describe Types::RubricAssessmentType do
     ).to eq [nil]
   end
 
+  context "with moderated grading" do
+    let(:final_grader) { teacher_in_course(active_all: true, course:, name: "Final Grader").user }
+    let(:other_grader) { teacher_in_course(active_all: true, course:, name: "Other Grader").user }
+
+    before do
+      @moderated_assignment = @course.assignments.create!(
+        due_at: 2.years.from_now,
+        final_grader:,
+        grader_count: 2,
+        moderated_grading: true,
+        points_possible: 10,
+        submission_types: :online_text_entry,
+        title: "Moderated Assignment"
+      )
+      rubric = rubric_for_course
+      rubric_association = rubric_association_model(
+        context: @course,
+        rubric:,
+        association_object: @moderated_assignment,
+        purpose: "grading"
+      )
+      @submission = @moderated_assignment.submit_homework(@student, body: "foo", submitted_at: 2.hours.ago)
+
+      @moderated_assignment.ensure_grader_can_adjudicate(grader: final_grader, provisional: true, occupy_slot: true)
+      @moderated_assignment.ensure_grader_can_adjudicate(grader: other_grader, provisional: true, occupy_slot: true)
+      # ensuring the anonymous grader identities used for testing sake
+      ModerationGrader.find_by(user_id: final_grader.id).update!(anonymous_id: "anon1")
+      ModerationGrader.find_by(user_id: other_grader.id).update!(anonymous_id: "anon2")
+
+      moderator_provisional_grade = @submission.find_or_create_provisional_grade!(final_grader)
+      rubric_association.assess(
+        user: @student,
+        assessor: final_grader,
+        artifact: moderator_provisional_grade,
+        assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+      )
+
+      provisional_grade = @submission.find_or_create_provisional_grade!(other_grader)
+      rubric_association.assess(
+        user: @student,
+        assessor: other_grader,
+        artifact: provisional_grade,
+        assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+      )
+    end
+
+    it "returns anonymous grader identity to final grader when grader_names_visible_to_final_grader is false" do
+      @moderated_assignment.update!(grader_names_visible_to_final_grader: false)
+      final_grader_submission_type = GraphQLTypeTester.new(@submission, current_user: final_grader)
+      result = final_grader_submission_type.resolve(
+        "rubricAssessmentsConnection(filter: { includeProvisionalAssessments: true }) { nodes { assessor { name } } }"
+      )
+
+      assessor_names = result.compact
+      expect(assessor_names).not_to be_empty
+      expect(assessor_names).to include("Grader 2")
+      expect(assessor_names).to include("Final Grader")
+    end
+
+    it "returns actual assessor to final grader when grader_names_visible_to_final_grader is true" do
+      @moderated_assignment.update!(grader_names_visible_to_final_grader: true)
+      final_grader_submission_type = GraphQLTypeTester.new(@submission, current_user: final_grader)
+      result = final_grader_submission_type.resolve(
+        "rubricAssessmentsConnection(filter: { includeProvisionalAssessments: true }) { nodes { assessor { name } } }"
+      )
+
+      expect(result).to include("Other Grader")
+      expect(result).to include("Final Grader")
+    end
+
+    it "returns only accessor's own assessment when not the final grader" do
+      @moderated_assignment.update!(grader_names_visible_to_final_grader: true)
+      final_grader_submission_type = GraphQLTypeTester.new(@submission, current_user: other_grader)
+      result = final_grader_submission_type.resolve(
+        "rubricAssessmentsConnection(filter: { includeProvisionalAssessments: true }) { nodes { assessor { name } } }"
+      )
+
+      expect(result).to include("Other Grader")
+      expect(result).not_to include("Final Grader")
+    end
+
+    it "returns isCurrentUser correctly for moderator and provisional graders" do
+      @moderated_assignment.update!(grader_names_visible_to_final_grader: false)
+
+      # Final grader should see their own assessment as isCurrentUser: true
+      final_grader_submission_type = GraphQLTypeTester.new(@submission, current_user: final_grader)
+
+      # Query isCurrentUser flags
+      is_current_user_result = final_grader_submission_type.resolve(
+        "rubricAssessmentsConnection(filter: { includeProvisionalAssessments: true }) { nodes { isCurrentUser } }"
+      )
+      expect(is_current_user_result.count).to eq(2)
+      expect(is_current_user_result).to include(true)
+      expect(is_current_user_result).to include(false)
+
+      # Query assessor names
+      assessor_names_result = final_grader_submission_type.resolve(
+        "rubricAssessmentsConnection(filter: { includeProvisionalAssessments: true }) { nodes { assessor { name } } }"
+      )
+      expect(assessor_names_result).to include("Final Grader")
+      expect(assessor_names_result).to include("Grader 2")
+
+      # Other grader should only see their own assessment
+      other_grader_submission_type = GraphQLTypeTester.new(@submission, current_user: other_grader)
+      is_current_user_result = other_grader_submission_type.resolve(
+        "rubricAssessmentsConnection(filter: { includeProvisionalAssessments: true }) { nodes { isCurrentUser } }"
+      )
+      expect(is_current_user_result.count).to eq(1)
+      expect(is_current_user_result[0]).to be(true)
+
+      assessor_name_result = other_grader_submission_type.resolve(
+        "rubricAssessmentsConnection(filter: { includeProvisionalAssessments: true }) { nodes { assessor { name } } }"
+      )
+      expect(assessor_name_result[0]).to eq("Other Grader")
+    end
+  end
+
   describe "works for the field" do
     it "assessment_type" do
       expect(
@@ -108,6 +225,19 @@ describe Types::RubricAssessmentType do
       expect(
         submission_type.resolve("rubricAssessmentsConnection { nodes { updatedAt } }")
       ).to eq [rubric_assessment.updated_at.iso8601]
+    end
+
+    it "is_current_user" do
+      # teacher is the assessor, so isCurrentUser should be true when teacher is current_user
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { isCurrentUser } }")
+      ).to eq [true]
+
+      # student is not the assessor, so isCurrentUser should be false when student is current_user
+      student_submission_type = GraphQLTypeTester.new(submission, current_user: student)
+      expect(
+        student_submission_type.resolve("rubricAssessmentsConnection { nodes { isCurrentUser } }")
+      ).to eq [false]
     end
   end
 

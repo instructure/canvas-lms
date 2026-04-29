@@ -42,62 +42,6 @@ describe "SpeedGrader" do
     @course.enroll_student(@student2, enrollment_state: "active")
   end
 
-  context "with an anonymous assignment" do
-    before do
-      # an anonymous assignment
-      @assignment = @course.assignments.create!(
-        name: "anonymous assignment",
-        points_possible: 10,
-        submission_types: "online_text_entry,online_upload",
-        anonymous_grading: true
-      )
-
-      # Student1 & Student2 submit homework and a comment
-      file_attachment = attachment_model(content_type: "application/pdf", context: @student1)
-      @submission1 = @assignment.submit_homework(@student1,
-                                                 submission_type: "online_upload",
-                                                 attachments: [file_attachment],
-                                                 comment: "This is Student One's comment")
-
-      file_attachment = attachment_model(content_type: "application/pdf", context: @student2)
-      @submission1 = @assignment.submit_homework(@student2,
-                                                 submission_type: "online_upload",
-                                                 attachments: [file_attachment],
-                                                 comment: "This is Student Two's comment")
-      user_session(@teacher)
-      Speedgrader.visit(@course.id, @assignment.id)
-    end
-
-    it "student names are anonymous", priority: "1" do
-      skip "11/13/23 unskip in EVAL-3713"
-      Speedgrader.students_dropdown_button.click
-      student_names = Speedgrader.students_select_menu_list.map(&:text)
-      expect(student_names).to match_array ["Student 1", "Student 2"]
-    end
-
-    context "given a specific student" do
-      before do
-        Speedgrader.click_next_or_prev_student(:next)
-        Speedgrader.students_dropdown_button.click
-        @current_student = Speedgrader.selected_student
-      end
-
-      it "when their submission is selected and page reloaded", priority: "1" do
-        skip "EVAL-2497 (6/10/22)"
-
-        expect { refresh_page }.not_to change { Speedgrader.selected_student.text }.from("Student 2")
-      end
-    end
-
-    context "given student comment and file submission" do
-      it "author of comment is anonymous", priority: 2 do
-        skip "11/13/23 unskip in EVAL-3713"
-        expect(Speedgrader.comment_citation.first.text).not_to match(/(First|Second) Student/)
-        expect(Speedgrader.comment_citation.first.text).to match(/Student (1|2)/)
-      end
-    end
-  end
-
   context "with a moderated assignment" do
     before do
       @moderated_assignment = @course.assignments.create!(

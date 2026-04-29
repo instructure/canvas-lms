@@ -52,8 +52,11 @@ describe('SelectableText, single', () => {
     expect(getByText('Mongo Santamaria')).toBeInTheDocument()
   })
 
+  // Skipped: InstUI Select v7+ changed how selected values are displayed.
+  // The input value is no longer set to the selected option's label.
+  // This can be fixed when work resumes on A2.
   it.skip('renders the value in edit mode', () => {
-    const renderView = jest.fn()
+    const renderView = vi.fn()
     const {getByDisplayValue} = render(
       <SelectableText
         mode="edit"
@@ -108,6 +111,9 @@ describe('SelectableText, multiple', () => {
     expect(getByText('Mongo Santamaria|Pancho Sanchez')).toBeInTheDocument()
   })
 
+  // Skipped: InstUI Select v7+ changed how multi-select values are rendered.
+  // The component no longer renders selected values as <button><span>label</span></button>.
+  // This can be fixed when work resumes on A2.
   it.skip('renders the value in edit mode', async () => {
     function findCongero(name) {
       return (content, element) =>

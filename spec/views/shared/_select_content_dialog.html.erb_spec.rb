@@ -48,7 +48,7 @@ describe "shared/_select_content_dialog" do
       render partial: "shared/select_content_dialog"
       page = Nokogiri(response.body)
       options = page.css("#quizs_select .module_item_select option").map(&:text)
-      expect(options).to eq(["[ Create Quiz ]", "A (classic)", "B (classic)", "C "])
+      expect(options).to eq(["[ Create Quiz ]", "A (classic)", "B (classic)", "C"])
     end
 
     it "does not render the (classic) identifier when there are only classic quizzes listed" do
@@ -60,7 +60,7 @@ describe "shared/_select_content_dialog" do
       render partial: "shared/select_content_dialog"
       page = Nokogiri(response.body)
       options = page.css("#quizs_select .module_item_select option").map(&:text)
-      expect(options).to eq(["[ Create Quiz ]", "A ", "B "])
+      expect(options).to eq(["[ Create Quiz ]", "A", "B"])
     end
 
     it "does not render New Quizzes as Assignments" do
@@ -242,7 +242,7 @@ describe "shared/_select_content_dialog" do
       render partial: "shared/select_content_dialog"
       page = Nokogiri(response.body)
       options = page.css("#quizs_select .module_item_select option").map { |option| [option.text, option.attribute("value").to_s] }
-      expect(options).to eq([["[ Create Quiz ]", "new"], ["A ", "quiz_#{a.id}"], ["B ", "quiz_#{b.id}"], ["C ", "quiz_#{c.id}"]])
+      expect(options).to eq([["[ Create Quiz ]", "new"], ["A", "quiz_#{a.id}"], ["B", "quiz_#{b.id}"], ["C", "quiz_#{c.id}"]])
       groups = page.css('select[name="quiz[assignment_group_id]"] option').map { |option| [option.text, option.attribute("value").to_s] }
       expect(groups).to eq([["group A", @groupA.id.to_s], ["group B", @groupB.id.to_s]])
     end

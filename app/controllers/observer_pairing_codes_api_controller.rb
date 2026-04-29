@@ -50,8 +50,6 @@
 #       }
 #     }
 class ObserverPairingCodesApiController < ApplicationController
-  before_action :require_user
-
   # @API Create observer pairing code
   #
   # If the user is a student, will generate a code to be used with self registration

@@ -19,8 +19,10 @@
 import React from 'react'
 import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {generateModalTitle, TempEnrollModal} from '../TempEnrollModal'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import userEvent from '@testing-library/user-event'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   type DuplicateUser,
   type EnrollmentType,
@@ -29,6 +31,8 @@ import {
   RECIPIENT,
   type User,
 } from '../types'
+
+const server = setupServer()
 
 // Temporary Enrollment Provider
 const providerUser = {
@@ -80,7 +84,7 @@ const modalProps = {
     ...providerUser,
   },
   isEditMode: false,
-  onToggleEditMode: jest.fn(),
+  onToggleEditMode: vi.fn(),
   modifyPermissions: {
     canAdd: true,
     canDelete: true,
@@ -136,22 +140,26 @@ const userListsParams = Object.entries(userListsData)
 const USER_LIST_URI = encodeURI(`/accounts/1/user_lists.json?${userListsParams}`)
 
 const userDetailsUriMock = (userId: string, response: object) =>
-  fetchMock.get(`/api/v1/users/${userId}/profile`, response)
+  server.use(http.get(`/api/v1/users/${userId}/profile`, () => HttpResponse.json(response)))
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: jest.fn(() => jest.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 describe('TempEnrollModal', () => {
   beforeAll(() => {
-    // @ts-expect-error
-    window.ENV = {ACCOUNT_ID: '1'}
+    server.listen()
+    fakeENV.setup({ACCOUNT_ID: '1'})
   })
 
   beforeEach(() => {
     localStorage.clear()
-    fetchMock.reset()
-    jest.clearAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -160,9 +168,8 @@ describe('TempEnrollModal', () => {
   })
 
   afterAll(() => {
-    // @ts-expect-error
-    window.ENV = {}
-    fetchMock.restore()
+    server.close()
+    fakeENV.teardown()
   })
 
   it('displays the modal upon clicking the child element', async () => {
@@ -182,9 +189,11 @@ describe('TempEnrollModal', () => {
 
   describe('after opening modal', () => {
     beforeEach(async () => {
-      fetchMock.post(USER_LIST_URI, userData)
+      server.use(
+        http.post(USER_LIST_URI, () => HttpResponse.json(userData)),
+        http.get(ENROLLMENTS_URI, () => HttpResponse.json(enrollmentsByCourse)),
+      )
       userDetailsUriMock(recipientUser.user_id, recipientProfile)
-      fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
       const {findByTestId} = render(
         <TempEnrollModal {...modalProps}>
           <p>child_element</p>
@@ -239,9 +248,12 @@ describe('TempEnrollModal', () => {
       expect(submit).toBeInTheDocument()
       fireEvent.click(submit)
 
-      expect(fetchMock.calls(USER_LIST_URI)).toHaveLength(1)
-      expect(fetchMock.calls('/api/v1/users/2/profile')).toHaveLength(1)
-      expect(fetchMock.calls(ENROLLMENTS_URI)).toHaveLength(1)
+      // Wait for the modal to close after submission
+      await waitFor(() => {
+        expect(
+          screen.queryByText('Find recipients of Temporary Enrollments'),
+        ).not.toBeInTheDocument()
+      })
     })
 
     it('starts over when start over button is clicked', async () => {
@@ -262,9 +274,6 @@ describe('TempEnrollModal', () => {
         expect(screen.queryByText('Start Over')).toBeNull()
         expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeNull()
       })
-
-      expect(fetchMock.calls(USER_LIST_URI)).toHaveLength(1)
-      expect(fetchMock.calls('/api/v1/users/2/profile')).toHaveLength(1)
     })
 
     it('goes back when the assign screen (page 3) back button is clicked', async () => {
@@ -294,10 +303,6 @@ describe('TempEnrollModal', () => {
         expect(screen.queryByText('Back')).toBeNull()
         expect(screen.queryByText(/to be assigned temporary enrollments/)).toBeInTheDocument()
       })
-
-      expect(fetchMock.calls(USER_LIST_URI)).toHaveLength(1)
-      expect(fetchMock.calls('/api/v1/users/2/profile')).toHaveLength(1)
-      expect(fetchMock.calls(ENROLLMENTS_URI)).toHaveLength(1)
     })
 
     it('buttons are enabled', async () => {

@@ -23,7 +23,6 @@ import {isLockedBlueprintItem} from '../../../utils/fileFolderUtils'
 import NoFilePreviewAvailable from './NoFilePreviewAvailable'
 import FilePreviewIframe from './FilePreviewIframe'
 
-const previewableTypes = ['image', 'pdf', 'html', 'doc', 'text']
 const mediaTypes = ['video', 'audio']
 
 export interface FilePreviewProps {
@@ -31,12 +30,10 @@ export interface FilePreviewProps {
 }
 
 export const FilePreview = ({item}: FilePreviewProps) => {
-  const isFilePreview = !!(item.preview_url && previewableTypes.includes(item.mime_class))
-  const isMediaPreview = !isFilePreview && mediaTypes.includes(item.mime_class)
+  const isMediaPreview = mediaTypes.includes(item.mime_class)
+  const isFilePreview = Boolean(item.preview_url)
 
-  if (isFilePreview) {
-    return <FilePreviewIframe item={item} />
-  } else if (isMediaPreview) {
+  if (isMediaPreview) {
     return (
       <Flex as="div" alignItems="center" height="100%" justifyItems="center">
         <StudioMediaPlayer
@@ -52,7 +49,11 @@ export const FilePreview = ({item}: FilePreviewProps) => {
         />
       </Flex>
     )
-  } else {
-    return <NoFilePreviewAvailable item={item} />
   }
+
+  if (isFilePreview) {
+    return <FilePreviewIframe item={item} />
+  }
+
+  return <NoFilePreviewAvailable item={item} />
 }

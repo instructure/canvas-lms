@@ -92,11 +92,6 @@ module Services
         request(:get, "/api/root_account_subscriptions", options)
       end
 
-      def event_types_index(jwt_body, message_type, opts = {})
-        options = { headers: headers(jwt_body, opts) }
-        request(:get, "/api/event_types?message_type=#{message_type}", options)
-      end
-
       private
 
       def request(method, endpoint, options = {})
@@ -106,7 +101,7 @@ module Services
       end
 
       def headers(jwt_body, headers = {})
-        token = CanvasSecurity::ServicesJwt.generate(jwt_body, symmetric: true)
+        token = CanvasSecurity::ServicesJwt.generate(jwt_body, base64: false, encrypt: false)
         headers["Authorization"] = "Bearer #{token}"
         headers
       end

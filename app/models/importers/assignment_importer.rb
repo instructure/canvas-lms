@@ -234,7 +234,7 @@ module Importers
         rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
         rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
         if rubric
-          assoc = rubric.associate_with(item, context, purpose: "grading", skip_updating_points_possible: true)
+          assoc = rubric.associate_with(item, context, purpose: "grading", skip_updating_points_possible: true, skip_updating_rubric_association_count: true)
           assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.key?(:rubric_use_for_grading)
           assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.key?(:rubric_hide_score_total)
           assoc.hide_points = !!hash[:rubric_hide_points] if hash.key?(:rubric_hide_points)
@@ -245,6 +245,7 @@ module Importers
             assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
           end
           assoc.skip_updating_points_possible = true
+          assoc.skip_updating_rubric_association_count = true
           assoc.save
 
           item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"
@@ -309,6 +310,12 @@ module Importers
       end
 
       hash[:due_at] ||= hash[:due_date] if hash.key?(:due_date)
+
+      # Clear due_at for assignments with checkpoints
+      if hash[:sub_assignments].present? && context.discussion_checkpoints_enabled?
+        hash[:due_at] = nil
+      end
+
       %i[due_at lock_at unlock_at peer_reviews_due_at].each do |key|
         if hash.key?(key) && (master_migration || hash[key].present?)
           item.send :"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
@@ -386,6 +393,17 @@ module Importers
         item.turnitin_settings = settings
       end
 
+      import_new_quizzes_settings(hash, item)
+
+      if item.context.root_account.feature_enabled?(:lti_asset_processor)
+        if hash[:lti_context_id].present?
+          Lti::ImportHistory.register(source_lti_id: hash[:lti_context_id], target_lti_id: item.lti_context_id, root_account: item.root_account)
+        end
+        if hash[:asset_processors].present?
+          import_asset_processors(item, hash[:asset_processors], migration)
+        end
+      end
+
       set_annotatable_attachment(item, hash, context)
 
       migration.add_imported_item(item)
@@ -422,6 +440,19 @@ module Importers
       item
     end
 
+    def self.import_new_quizzes_settings(hash, item)
+      updates = {
+        "type" => hash[:new_quizzes_type],
+        "anonymous_participants" => ActiveModel::Type::Boolean.new.cast(hash[:new_quizzes_anonymous_participants])
+      }.compact
+
+      return if updates.empty?
+
+      item.settings ||= {}
+      item.settings["new_quizzes"] ||= {}
+      item.settings["new_quizzes"].merge!(updates)
+    end
+
     def self.handle_sub_assignments(assignment_hash, parent_item, migration)
       return unless assignment_hash[:sub_assignments].present?
       return unless parent_item.context.discussion_checkpoints_enabled?
@@ -437,13 +468,90 @@ module Importers
 
         parent_item.sub_assignments << sub_assignment
       end
+
+      # Fix inconsistent state: if has_sub_assignments=true but checkpoints are deleted, restore them
+      fix_checkpoint_consistency(parent_item, migration)
+
+      create_missing_sub_assignment_submissions(parent_item)
+    end
+
+    def self.fix_checkpoint_consistency(parent_item, migration)
+      # Consistency rule: if has_sub_assignments is true, each checkpoint tag
+      # should have exactly one active record. Restore only the most recently
+      # updated deleted checkpoint per tag, and only when none is active for
+      # that tag. This prevents stale duplicates from previous toggle cycles
+      # being resurrected alongside current active ones.
+      return unless parent_item.has_sub_assignments
+
+      all_checkpoints = SubAssignment.where(parent_assignment_id: parent_item.id)
+      restore_state = parent_item.workflow_state
+      restored_count = 0
+
+      [CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY].each do |tag|
+        # Skip if an active checkpoint already exists for this tag
+        next if all_checkpoints.where(sub_assignment_tag: tag).where.not(workflow_state: "deleted").exists?
+
+        latest_deleted = all_checkpoints
+                         .where(sub_assignment_tag: tag, workflow_state: "deleted")
+                         .order(updated_at: :desc)
+                         .first
+
+        next unless latest_deleted
+
+        latest_deleted.update_columns(workflow_state: restore_state, updated_at: Time.now.utc)
+        restored_count += 1
+      end
+
+      return if restored_count.zero?
+
+      Rails.logger.info(
+        "[Import Consistency Fix] Assignment #{parent_item.id} (#{parent_item.title}) " \
+        "restored #{restored_count} checkpoint(s) to #{restore_state} state. " \
+        "Migration: #{migration&.id}"
+      )
+
+      parent_item.sub_assignments.reload
     end
 
     def self.find_or_create_sub_assignment(sub_assignment_hash, parent_item)
       sub_item ||= SubAssignment.where(context_type: parent_item.context.class.to_s, context_id: parent_item.context, id: sub_assignment_hash[:id]).first
       sub_item ||= SubAssignment.where(context_type: parent_item.context.class.to_s, context_id: parent_item.context, migration_id: sub_assignment_hash[:migration_id]).first if sub_assignment_hash[:migration_id]
+      # If we still haven't found it, check by parent_assignment_id and sub_assignment_tag
+      # This handles re-imports where a sub_assignment was created without a migration_id
+      sub_item ||= parent_item.sub_assignments.active.find_by(sub_assignment_tag: sub_assignment_hash[:tag]) if sub_assignment_hash[:tag]
 
       sub_item || parent_item.sub_assignments.temp_record
+    end
+
+    def self.create_missing_sub_assignment_submissions(parent_item)
+      parent_item.sub_assignments.reload
+
+      students = parent_item.students_with_visibility
+
+      parent_item.sub_assignments.active.each do |sub_assignment|
+        # Load all existing submissions for this sub_assignment into a set for fast lookup
+        existing_submission_user_ids = sub_assignment.all_submissions
+                                                     .where(user: students)
+                                                     .pluck(:user_id)
+                                                     .to_set
+
+        students.find_each do |student|
+          next if existing_submission_user_ids.include?(student.id)
+
+          begin
+            sub_assignment.find_or_create_submission(student)
+          rescue ActiveRecord::RecordNotUnique
+            # Submission already exists, continue
+            next
+          rescue => e
+            Rails.logger.error(
+              "AssignmentImporter - Error creating submission for SubAssignment #{sub_assignment.id}, " \
+              "User #{student.id}: #{e.message}"
+            )
+            next
+          end
+        end
+      end
     end
 
     def self.import_similarity_detection_tool(hash, context, migration, item)
@@ -451,6 +559,7 @@ module Importers
 
       if tool_hash
         active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(context:, vendor_code: tool_hash["vendor_code"], product_code: tool_hash["product_code"])
+        return migration.add_warning(I18n.t("The export had an improperly attached similarity detection tool, so the import won't include it")) if active_proxies.blank? && tool_hash["vendor_code"].blank? && tool_hash["product_code"].blank? && Account.site_admin.feature_enabled?(:exclude_deleted_lti2_tools_on_assignment_export)
         return migration.add_warning(I18n.t("We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".", vendor_code: tool_hash["vendor_code"], product_code: tool_hash["product_code"])) if active_proxies.blank?
       else
         item.assignment_configuration_tool_lookups.destroy_all if migration.for_master_course_import?
@@ -678,6 +787,65 @@ module Importers
         item.assignment_group = context.assignment_groups.active.where(migration_id: hash[:assignment_group_migration_id]).first
       end
       item.assignment_group ||= context.assignment_groups.active.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
+    end
+
+    def self.import_asset_processors(assignment, asset_processors_data, migration)
+      # for blueprint sync don't import if assignment has downstream changes and the assignment is not locked
+      if migration&.for_master_course_import?
+        content = assignment.discussion_topic? ? assignment.discussion_topic : assignment
+        content_tag = migration.master_course_subscription.content_tag_for(content)
+        return if content_tag&.downstream_changes&.any? && !content.editing_restricted?(:any)
+      end
+
+      asset_processors_data.each do |ap_data|
+        # Skip already existing APs: asset processors are immutable, so there's no need to update existing ones
+        next if assignment.lti_asset_processors.where(migration_id: ap_data[:migration_id]).exists?
+
+        tool_id = ap_data[:context_external_tool_global_id]
+        tool_url = ap_data[:context_external_tool_url]
+        tool = Lti::ToolFinder.from_url(tool_url, migration.context, preferred_tool_id: tool_id, only_1_3: true)
+        unless tool
+          migration.add_warning(t("Document Processor settings won't be copied for assignment '%{assignment_name}' because the specified tool is not configured.", assignment_name: assignment.title))
+          next
+        end
+
+        # Check if tool is Asset Processor compatible
+        unless tool.use_1_3? && (tool.has_placement?(Lti::ResourcePlacement::ASSET_PROCESSOR) || tool.has_placement?(Lti::ResourcePlacement::ASSET_PROCESSOR_CONTRIBUTION))
+          migration.add_warning(t("Document Processor settings won't be copied for assignment '%{assignment_name}' because the selected tool is not Document Processor compatible.", assignment_name: assignment.title))
+          next
+        end
+
+        begin
+          wrap = ->(val) { val.is_a?(Hash) ? ActionController::Parameters.new(val) : nil }
+
+          raw_content_item = {
+            "context_external_tool_id" => tool.id,
+            "url" => ap_data[:url],
+            "title" => ap_data[:title],
+            "text" => ap_data[:text],
+            "custom" => wrap.call(parse_json_field(ap_data[:custom])),
+            "icon" => wrap.call(parse_json_field(ap_data[:icon])),
+            "window" => wrap.call(parse_json_field(ap_data[:window])),
+            "iframe" => wrap.call(parse_json_field(ap_data[:iframe])),
+            "report" => wrap.call(parse_json_field(ap_data[:report]))
+          }
+          content_item = ActionController::Parameters.new(raw_content_item)
+
+          asset_processor = Lti::AssetProcessor.build_for_assignment_and_tool(content_item:, tool:)
+          asset_processor.assignment = assignment
+          asset_processor.migration_id = ap_data[:migration_id]
+          asset_processor.save!
+        rescue JSON::ParserError, ActiveRecord::RecordInvalid => e
+          migration.add_warning(t("Document Processor won't be copied for assignment '%{assignment_name}': %{error}", assignment_name: assignment.title, error: e.message), e)
+        end
+      end
+    end
+
+    def self.parse_json_field(field_value)
+      return nil if field_value.blank?
+      return field_value if field_value.is_a?(Hash)
+
+      JSON.parse(field_value)
     end
   end
 end

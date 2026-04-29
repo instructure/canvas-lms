@@ -74,7 +74,7 @@ describe CC::CCHelper do
     end
 
     before do
-      @kaltura = double("CanvasKaltura::ClientV3")
+      @kaltura = instance_double(CanvasKaltura::ClientV3)
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(@kaltura)
       allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("m-noattachment").and_return(flavor_asset)
       allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("abcde").and_return(flavor_asset)
@@ -100,21 +100,23 @@ describe CC::CCHelper do
         expect(exported_html[2]).to eq(%(<a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media_comment_type="video" data-alt=""></a>))
       end
 
-      it "are not translated on export when pointing at user media" do
-        att = attachment_model(display_name: "lolcats.mp4", context: @user, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      it "are translated to Uploaded Media in new course files on export when pointing at user media" do
+        folder = folder_model({ context: @user, parent_folder: Folder.root_folders(@user).first })
+        att = attachment_model(display_name: "lolcats.mp4", context: @user, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
         att.save!
         @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
         orig = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="zzzz"></iframe>)
         translated = @exporter.html_content(orig)
-        expect(translated).to include %(<source src="/media_attachments_iframe/#{att.id}?type=video" data-media-id="zzzz" data-media-type="video">)
+        expect(translated).to include %(<source src="$IMS-CC-FILEBASE$/Uploaded%20Media/lolcats.mp4?canvas_=1&amp;canvas_qs_type=video" data-media-id="zzzz" data-media-type="video">)
         expect(@exporter.media_object_infos.count).to eq 0
       end
 
       it "are not translated on export when pointing at media in another course" do
-        other_course = course_with_teacher
+        original_course = @course
+        other_course = course_with_teacher.course
         att = attachment_model(display_name: "lolcats.mp4", context: other_course, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
         att.save!
-        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+        @exporter = CC::CCHelper::HtmlContentExporter.new(original_course, @user)
         orig = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{att.id}?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="zzzz"></iframe>)
         translated = @exporter.html_content(orig)
         expect(translated).to include %(<source src="/media_attachments_iframe/#{att.id}?type=video" data-media-id="zzzz" data-media-type="video">)
@@ -136,13 +138,13 @@ describe CC::CCHelper do
       context "with precise_link_replacements FF OFF" do
         before { Account.site_admin.disable_feature! :precise_link_replacements }
 
-        include_examples "media_attachments_iframes examples"
+        it_behaves_like "media_attachments_iframes examples"
       end
 
       context "with precise_link_replacements FF ON" do
         before { Account.site_admin.enable_feature! :precise_link_replacements }
 
-        include_examples "media_attachments_iframes examples"
+        it_behaves_like "media_attachments_iframes examples"
       end
     end
 
@@ -322,6 +324,13 @@ describe CC::CCHelper do
       expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/}
     end
 
+    it "interprets urls to the home page as normal course page" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
+      url = "/courses/#{@course.id}"
+      translated = @exporter.translate_url(url)
+      expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/}
+    end
+
     it "prepends the domain to links outside the course" do
       allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
@@ -366,10 +375,10 @@ describe CC::CCHelper do
           "points_possible" => 10,
           "answers" => [{ "id" => 1 }, { "id" => 2 }],
         }
-        @question = @bank.assessment_questions.create!(question_data:)
+        @question = @bank.assessment_questions.create!(question_data:, updating_user: @teacher)
         @question.question_data = question_data.merge("question_text" => %(<p><img src="/courses/#{@course.id}/files/#{@attachment.id}/download"></p>))
         @question.save!
-        quiz_model(course: @course)
+        quiz_model(course: @course, updating_user: @teacher)
         @quiz.add_assessment_questions([@question])
       end
 
@@ -388,6 +397,7 @@ describe CC::CCHelper do
         qb_attachment = @question.attachments.take
         question_text = %(<p><img src="/assessment_questions/#{@question.id}/files/#{qb_attachment.id}/download?verifier=#{qb_attachment.uuid}&amp;verifier=random_other_att_verifier" alt="5e9toe-2.jpeg" /></p>)
         @question.question_data = @question.question_data = question_data.merge("question_text" => question_text)
+        @question.updating_user = @teacher
         @question.save!
         translated = @exporter.html_content(question_text)
         expect(translated).to match %r{\$IMS-CC-FILEBASE\$/assessment_questions/test%20my%20file\?%20hai!&amp;.png}
@@ -404,6 +414,58 @@ describe CC::CCHelper do
       doc = Nokogiri::HTML5(@exporter.html_content(html))
       urls = doc.css("a").pluck(:href)
       expect(urls[0]).to eq "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(page)}"
+    end
+
+    context "wiki page URL resolution" do
+      let(:exporter) { CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false) }
+
+      before do
+        Account.site_admin.enable_feature! :permanent_page_links
+        allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
+      end
+
+      def expect_wiki_link(html, expected_page)
+        doc = Nokogiri::HTML5(exporter.html_content(html))
+        urls = doc.css("a").pluck(:href)
+        expect(urls[0]).to eq "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(expected_page)}"
+      end
+
+      it "resolves normal links without encoding" do
+        page = @course.wiki_pages.create!(title: "normal page")
+        html = %(<a href="/courses/#{@course.id}/pages/normal-page">Link</a>)
+        expect_wiki_link(html, page)
+      end
+
+      it "decodes pipe character" do
+        page = @course.wiki_pages.create!(title: "source | page")
+        html = %(<a href="/courses/#{@course.id}/pages/source-%7C-page">Link</a>)
+        expect_wiki_link(html, page)
+      end
+
+      it "decodes special characters including plus sign" do
+        page = @course.wiki_pages.create!(title: "test {+<=>} page")
+        html = %(<a href="/courses/#{@course.id}/pages/test-%7B+%3C=%3E%7D-page">Link</a>)
+        expect_wiki_link(html, page)
+      end
+
+      it "prioritizes exact slug match before decoded match" do
+        page1 = @course.wiki_pages.create!(title: "test+page")
+        @course.wiki_pages.create!(title: "test page")
+        html = %(<a href="/courses/#{@course.id}/pages/test+page">Link</a>)
+        expect_wiki_link(html, page1)
+      end
+
+      it "preserves plus sign in URL (not decoded as space)" do
+        page = @course.wiki_pages.create!(title: "test+page")
+        html = %(<a href="/courses/#{@course.id}/pages/test+page">Link</a>)
+        expect_wiki_link(html, page)
+      end
+
+      it "falls back to decoded match when exact slug not found" do
+        page = @course.wiki_pages.create!(title: "test page")
+        html = %(<a href="/courses/#{@course.id}/pages/test%20page">Link</a>)
+        expect_wiki_link(html, page)
+      end
     end
 
     it "creates a page url with a migration id" do

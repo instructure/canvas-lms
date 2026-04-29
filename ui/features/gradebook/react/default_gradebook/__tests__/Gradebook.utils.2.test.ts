@@ -88,7 +88,7 @@ describe('confirmViewUngradedAsZero', () => {
   }
 
   beforeEach(() => {
-    onAccepted = jest.fn()
+    onAccepted = vi.fn()
   })
 
   describe('when initialValue is false', () => {

@@ -48,6 +48,15 @@ describe Types::UserType do
     )
   end
 
+  let(:student_user_type) do
+    GraphQLTypeTester.new(
+      @student,
+      current_user: @student,
+      domain_root_account: @course.account.root_account,
+      request: ActionDispatch::TestRequest.create
+    )
+  end
+
   context "node" do
     it "works" do
       expect(user_type.resolve("_id")).to eq @student.id.to_s
@@ -115,26 +124,19 @@ describe Types::UserType do
         expect(user_type_as_admin.resolve("loginId", current_user: @other_student)).to be_nil
       end
     end
-  end
 
-  context "name" do
-    it "encodes html entities" do
-      @student.update! name: "<script>alert(1)</script>"
-      expect(user_type.resolve("name")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
-    end
-  end
-
-  context "firstName" do
-    it "encodes html entities" do
-      @student.update! sortable_name: "<script>alert(1)</script>"
-      expect(user_type.resolve("firstName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
-    end
-  end
-
-  context "lastName" do
-    it "encodes html entities" do
-      @student.update! sortable_name: "<script>alert(1)</script>,<script>alert(1)</script>"
-      expect(user_type.resolve("lastName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      tester = GraphQLTypeTester.new(
+        @student,
+        current_user: admin,
+        domain_root_account: @course.account.root_account,
+        course: @course,
+        request: ActionDispatch::TestRequest.create
+      )
+      expect(SisPseudonym).to receive(:for).with(@student, anything, hash_including(current_user: admin)).and_call_original
+      tester.resolve("loginId")
     end
   end
 
@@ -150,18 +152,6 @@ describe Types::UserType do
     it "returns full name if shortname is not set" do
       @student.update! short_name: nil
       expect(user_type.resolve("shortName")).to eq @student.name
-    end
-
-    it "encodes html entities" do
-      @student.update! short_name: "<script>alert(1)</script>"
-      expect(user_type.resolve("shortName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
-    end
-  end
-
-  context "sortableName" do
-    it "encodes html entities" do
-      @student.update! sortable_name: "<script>alert(1)</script>"
-      expect(user_type.resolve("sortableName")).to eq "&lt;script&gt;alert(1)&lt;/script&gt;"
     end
   end
 
@@ -181,12 +171,12 @@ describe Types::UserType do
     end
 
     it "returns an avatar url when avatars are enabled" do
-      @student.account.enable_service(:avatars)
+      @course.account.root_account.tap { |a| a.enable_service(:avatars) }.save!
       expect(user_type.resolve("avatarUrl")).to match(/avatar.*png/)
     end
 
     it "returns nil when a user has no avatar" do
-      @student.account.enable_service(:avatars)
+      @course.account.root_account.tap { |a| a.enable_service(:avatars) }.save!
       @student.update! avatar_image_url: nil
       expect(user_type.resolve("avatarUrl")).to be_nil
     end
@@ -217,41 +207,131 @@ describe Types::UserType do
         workflow_state: "active",
         sis_user_id: "a.ham"
       )
+      @admin = account_admin_user
+    end
+
+    before do
+      @resolver = GraphQLTypeTester.new(@student,
+                                        domain_root_account: @course.account.root_account,
+                                        request: ActionDispatch::TestRequest.create)
     end
 
     context "as admin" do
-      let(:admin) { account_admin_user }
-      let(:user_type_as_admin) do
-        GraphQLTypeTester.new(@student,
-                              current_user: admin,
-                              domain_root_account: @course.account.root_account,
-                              request: ActionDispatch::TestRequest.create)
-      end
-
       it "returns the sis user id if the user has permissions to read it" do
-        expect(user_type_as_admin.resolve("sisId")).to eq "a.ham"
+        expect(@resolver.resolve("sisId", current_user: @admin)).to eq @student.pseudonyms.first.sis_user_id
       end
 
       it "returns nil if the user does not have permission to read the sis user id" do
         account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
-        admin_type = GraphQLTypeTester.new(@student,
-                                           current_user: @admin,
-                                           domain_root_account: @course.account.root_account,
-                                           request: ActionDispatch::TestRequest.create)
-        expect(admin_type.resolve("sisId")).to be_nil
+        expect(@resolver.resolve("sisId", current_user: @admin)).to be_nil
       end
     end
 
     context "as teacher" do
       it "returns the sis user id if the user has permissions to read it" do
-        expect(user_type.resolve("sisId")).to eq "a.ham"
+        expect(@resolver.resolve("sisId", current_user: @teacher)).to eq @student.pseudonyms.first.sis_user_id
       end
 
       it "returns null if the user does not have permission to read the sis user id" do
         @teacher.enrollments.find_by(course: @course).role
                 .role_overrides.create!(permission: "read_sis", enabled: false, account: @course.account)
-        expect(user_type.resolve("sisId")).to be_nil
+        expect(@resolver.resolve("sisId", current_user: @teacher)).to be_nil
       end
+    end
+
+    context "permission check priority" do
+      context "with course context" do
+        before do
+          # Object level permissions should be never called if course is in context
+          expect(@student).not_to receive(:grants_any_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@admin, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).not_to receive(:grants_any_right?)
+
+          expect(@resolver.resolve("sisId", current_user: @admin)).to eq @student.pseudonyms.first.sis_user_id
+        end
+
+        it "checks course-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("sisId", current_user: @teacher, course: @course)).to eq @student.pseudonyms.first.sis_user_id
+        end
+
+        it "returns nil account-level and course-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("sisId", current_user: @other_student, course: @course)).to be_nil
+        end
+      end
+
+      context "without course context" do
+        before do
+          # Course-level permissions should be never called if course is not in context
+          expect(@course).not_to receive(:grants_any_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@admin, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@student).not_to receive(:grants_any_right?)
+
+          expect(@resolver.resolve("sisId", current_user: @admin)).to eq @student.pseudonyms.first.sis_user_id
+        end
+
+        it "checks object-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_any_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_sis, :manage_sis call happens
+          allow_any_instance_of(User).to receive(:grants_any_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("sisId", current_user: @teacher)).to eq @student.pseudonyms.first.sis_user_id
+        end
+
+        it "returns nil account-level and object-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_any_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_sis, :manage_sis call happens
+          allow_any_instance_of(User).to receive(:grants_any_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("sisId", current_user: @other_student)).to be_nil
+        end
+      end
+    end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      expect(SisPseudonym).to receive(:for).with(@student, anything, hash_including(current_user: @admin)).and_call_original
+      @resolver.resolve("sisId", current_user: @admin)
     end
   end
 
@@ -263,41 +343,131 @@ describe Types::UserType do
         workflow_state: "active",
         integration_id: "Rachel.Lands"
       )
+      @admin = account_admin_user
+    end
+
+    before do
+      @resolver = GraphQLTypeTester.new(@student,
+                                        domain_root_account: @course.account.root_account,
+                                        request: ActionDispatch::TestRequest.create)
     end
 
     context "as admin" do
-      let(:admin) { account_admin_user }
-      let(:user_type_as_admin) do
-        GraphQLTypeTester.new(@student,
-                              current_user: admin,
-                              domain_root_account: @course.account.root_account,
-                              request: ActionDispatch::TestRequest.create)
-      end
-
       it "returns the integration id if admin user has permissions to read SIS info" do
-        expect(user_type_as_admin.resolve("integrationId")).to eq "Rachel.Lands"
+        expect(@resolver.resolve("integrationId", current_user: @admin)).to eq @student.pseudonyms.first.integration_id
       end
 
       it "returns null for integration id if admin user does not have permission to read SIS info" do
         account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
-        admin_type = GraphQLTypeTester.new(@student,
-                                           current_user: @admin,
-                                           domain_root_account: @course.account.root_account,
-                                           request: ActionDispatch::TestRequest.create)
-        expect(admin_type.resolve("integrationId")).to be_nil
+        expect(@resolver.resolve("integrationId", current_user: @admin)).to be_nil
       end
     end
 
     context "as teacher" do
       it "returns the integration id if teacher user has permissions to read SIS info" do
-        expect(user_type.resolve("integrationId")).to eq "Rachel.Lands"
+        expect(@resolver.resolve("integrationId", current_user: @teacher)).to eq @student.pseudonyms.first.integration_id
       end
 
       it "returns null if teacher user does not have permission to read SIS info" do
         @teacher.enrollments.find_by(course: @course).role
                 .role_overrides.create!(permission: "read_sis", enabled: false, account: @course.account)
-        expect(user_type.resolve("integrationId")).to be_nil
+        expect(@resolver.resolve("integrationId", current_user: @teacher)).to be_nil
       end
+    end
+
+    context "permission check priority" do
+      context "with course context" do
+        before do
+          # Object level permissions should be never called if course is in context
+          expect(@student).not_to receive(:grants_any_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@admin, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).not_to receive(:grants_any_right?)
+
+          expect(@resolver.resolve("integrationId", current_user: @admin)).to eq @student.pseudonyms.first.integration_id
+        end
+
+        it "checks course-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("integrationId", current_user: @teacher, course: @course)).to eq @student.pseudonyms.first.integration_id
+        end
+
+        it "returns nil account-level and course-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@course).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("integrationId", current_user: @other_student, course: @course)).to be_nil
+        end
+      end
+
+      context "without course context" do
+        before do
+          # Course-level permissions should be never called if course is not in context
+          expect(@course).not_to receive(:grants_any_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@admin, :read_sis, :manage_sis)
+            .and_call_original
+          expect(@student).not_to receive(:grants_any_right?)
+
+          expect(@resolver.resolve("integrationId", current_user: @admin)).to eq @student.pseudonyms.first.integration_id
+        end
+
+        it "checks object-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_any_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_sis, :manage_sis call happens
+          allow_any_instance_of(User).to receive(:grants_any_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_any_right?)
+            .with(@teacher, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("integrationId", current_user: @teacher)).to eq @student.pseudonyms.first.integration_id
+        end
+
+        it "returns nil account-level and object-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_any_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_sis, :manage_sis call happens
+          allow_any_instance_of(User).to receive(:grants_any_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_any_right?)
+            .with(@other_student, :read_sis, :manage_sis)
+            .and_call_original
+
+          expect(@resolver.resolve("integrationId", current_user: @other_student)).to be_nil
+        end
+      end
+    end
+
+    # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+    # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+    it "passes current_user to SisPseudonym.for" do
+      expect(SisPseudonym).to receive(:for).with(@student, anything, hash_including(current_user: @admin)).and_call_original
+      @resolver.resolve("integrationId", current_user: @admin)
     end
   end
 
@@ -604,6 +774,511 @@ describe Types::UserType do
         expect(user_type.resolve("enrollments(horizonCourses: false) { _id }", current_user: @student).length).to eq @student.enrollments.length - 1
       end
     end
+
+    context "Career Learning Library courses" do
+      before :once do
+        @horizon_account = Account.create!
+        @horizon_account.enable_feature!(:horizon_course_setting)
+        @horizon_account.enable_feature!(:horizon_learning_library_ms2)
+        @horizon_account.horizon_account = true
+        @horizon_account.save!
+
+        @cll_course = @horizon_account.courses.create!(name: "CLL Course", career_learning_library_only: true)
+        @regular_course = @horizon_account.courses.create!(name: "Regular Course", career_learning_library_only: false)
+      end
+
+      it "returns only career learning library courses if true" do
+        @cll_course.enroll_student(@student, enrollment_state: "active")
+        @regular_course.enroll_student(@student, enrollment_state: "active")
+        expect(user_type.resolve("enrollments(careerLearningLibraryOnly: true) { _id }", current_user: @student).length).to eq 1
+      end
+
+      it "returns only non-career learning library courses if false" do
+        @cll_course.enroll_student(@student, enrollment_state: "active")
+        @regular_course.enroll_student(@student, enrollment_state: "active")
+        # Student has enrollments in @course, @course2, @cll_course, and @regular_course = 4 total
+        # With careerLearningLibraryOnly: false, should exclude @cll_course = 3 enrollments
+        expect(user_type.resolve("enrollments(careerLearningLibraryOnly: false) { _id }", current_user: @student).length).to eq @student.enrollments.length - 1
+      end
+    end
+
+    context "cross-shard" do
+      specs_require_sharding
+
+      before :once do
+        @shard1.activate do
+          @cross_shard_user = user_with_pseudonym(active_all: true)
+        end
+
+        @shard2.activate do
+          @cross_shard_account = Account.create!
+          @cross_shard_course = @cross_shard_account.courses.create!
+          @cross_shard_course.offer!
+          @cross_shard_enrollment = @cross_shard_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+        end
+      end
+
+      let(:cross_shard_user_type) { GraphQLTypeTester.new(@cross_shard_user, current_user: @cross_shard_user) }
+
+      it "returns enrollments from other shards" do
+        @shard1.activate do
+          enrollments = cross_shard_user_type.resolve("enrollments { _id }")
+          expect(enrollments.length).to eq(1)
+          expect(enrollments).to include(@cross_shard_enrollment.global_id.to_s)
+        end
+      end
+
+      it "returns enrollments from multiple shards" do
+        @shard1.activate do
+          @account1 = Account.create!
+          @course1 = @account1.courses.create!
+          @course1.offer!
+          @enrollment1 = @course1.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+          enrollments = cross_shard_user_type.resolve("enrollments { _id }")
+          expect(enrollments.length).to eq(2)
+        end
+      end
+
+      it "filters by course_id across shards" do
+        @shard1.activate do
+          @account1 = Account.create!
+          @course1 = @account1.courses.create!
+          @course1.offer!
+          @enrollment1 = @course1.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+          enrollments = cross_shard_user_type.resolve(%|enrollments(courseId: "#{@cross_shard_course.id}") { _id }|)
+          expect(enrollments.length).to eq(1)
+          expect(enrollments.first).to eq(@cross_shard_enrollment.global_id.to_s)
+        end
+      end
+
+      it "excludes concluded enrollments across shards with currentOnly" do
+        @cross_shard_enrollment.complete!
+
+        @shard1.activate do
+          @account1 = Account.create!
+          @course1 = @account1.courses.create!
+          @course1.offer!
+          @enrollment1 = @course1.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+          enrollments = cross_shard_user_type.resolve("enrollments(currentOnly: true) { _id }")
+          expect(enrollments.length).to eq(1)
+        end
+      end
+
+      it "includes enrollments from multiple shards with currentOnly" do
+        @shard1.activate do
+          @account1 = Account.create!
+          @course1 = @account1.courses.create!
+          @course1.offer!
+          @enrollment1 = @course1.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+          enrollments = cross_shard_user_type.resolve("enrollments(currentOnly: true) { _id }")
+          expect(enrollments.length).to eq(2)
+        end
+      end
+    end
+  end
+
+  context "enrollments_connection" do
+    before(:once) do
+      @course1 = @course
+      @course2 = course_factory
+      @course2.enroll_student(@student, enrollment_state: "active")
+      @course3 = course_factory
+      @course3.enroll_student(@student, enrollment_state: "active")
+      @course4 = course_factory
+      @course4.enroll_student(@student, enrollment_state: "active")
+    end
+
+    it "returns paginated enrollments with default limit" do
+      user_type.extract_result = false
+      result = user_type.resolve("enrollmentsConnection { nodes { _id } pageInfo { hasNextPage hasPreviousPage } }")
+      enrollments_result = result["enrollmentsConnection"]
+
+      expect(enrollments_result["nodes"]).to be_an(Array)
+      expect(enrollments_result["pageInfo"]).to include("hasNextPage", "hasPreviousPage")
+    end
+
+    it "returns enrollments with specified limit" do
+      user_type.extract_result = false
+      result = user_type.resolve("enrollmentsConnection(first: 2) { nodes { _id } pageInfo { hasNextPage hasPreviousPage endCursor startCursor } }")
+      enrollments_result = result["enrollmentsConnection"]
+      expect(enrollments_result["nodes"].length).to be <= 2
+      expect(enrollments_result["pageInfo"]).to include("hasNextPage", "hasPreviousPage", "endCursor", "startCursor")
+    end
+
+    it "supports cursor-based pagination" do
+      user_type.extract_result = false
+      # Get first page
+      first_page_result = user_type.resolve("enrollmentsConnection(first: 2) { nodes { _id } pageInfo { endCursor hasNextPage } }")
+      first_page = first_page_result["enrollmentsConnection"]
+
+      if first_page["pageInfo"]["hasNextPage"]
+        cursor = first_page["pageInfo"]["endCursor"]
+        # Get second page
+        second_page_result = user_type.resolve(%|enrollmentsConnection(first: 2, after: "#{cursor}") { nodes { _id } pageInfo { hasPreviousPage } }|)
+        second_page = second_page_result["enrollmentsConnection"]
+        expect(second_page["pageInfo"]["hasPreviousPage"]).to be true
+
+        # Ensure different results
+        first_ids = first_page["nodes"].pluck("_id")
+        second_ids = second_page["nodes"].pluck("_id")
+        expect(first_ids & second_ids).to be_empty
+      end
+    end
+
+    it "returns enrollments for a given course with pagination" do
+      user_type.extract_result = false
+      result = user_type.resolve(%|enrollmentsConnection(courseId: "#{@course1.id}", first: 1) { nodes { _id } }|)
+      enrollments_result = result["enrollmentsConnection"]
+      expect(enrollments_result["nodes"].length).to eq 1
+      expect(enrollments_result["nodes"].first["_id"]).to eq @student.enrollments.where(course: @course1).first.to_param
+    end
+
+    it "excludes unavailable courses when currentOnly is true" do
+      @course1.complete
+      user_type.extract_result = false
+      result = user_type.resolve("enrollmentsConnection(currentOnly: true) { nodes { _id } }")
+      enrollments_result = result["enrollmentsConnection"]
+      course1_enrollment_id = @student.enrollments.where(course: @course1).first.to_param
+      node_ids = enrollments_result["nodes"].pluck("_id")
+      expect(node_ids).not_to include(course1_enrollment_id)
+    end
+
+    it "excludes concluded enrollments when excludeConcluded is true" do
+      @student.enrollments.where(course: @course1).update_all(workflow_state: "completed")
+      user_type.extract_result = false
+      result = user_type.resolve("enrollmentsConnection(excludeConcluded: true) { nodes { _id } }")
+      enrollments_result = result["enrollmentsConnection"]
+      course1_enrollment_id = @student.enrollments.where(course: @course1).first.to_param
+      node_ids = enrollments_result["nodes"].pluck("_id")
+      expect(node_ids).not_to include(course1_enrollment_id)
+    end
+
+    it "applies same permission checks as regular enrollments field" do
+      # Test that user can't see enrollments for courses they don't have permission for
+      user_type.extract_result = false
+      result = user_type.resolve(%|enrollmentsConnection(courseId: "#{@course2.id}") { nodes { _id } }|)
+      enrollments_result = result["enrollmentsConnection"]
+      expect(enrollments_result["nodes"]).to eq []
+    end
+
+    it "supports sorting with orderBy parameter" do
+      @course2.start_at = 1.week.ago
+      @course2.save!
+
+      user_type.extract_result = false
+      result = user_type.resolve('enrollmentsConnection(orderBy: ["courses.start_at"]) {
+                                   nodes {
+                                     _id
+                                     course { _id }
+                                   }
+                                 }',
+                                 current_user: @student)
+      enrollments_result = result["enrollmentsConnection"]
+
+      course_ids = enrollments_result["nodes"].map { |n| n["course"]["_id"].to_i }
+      expect(course_ids).to include(@course2.id, @course1.id)
+    end
+
+    context "with many enrollments" do
+      before(:once) do
+        # Create additional courses to test pagination behavior
+        5.times do |i|
+          course = course_factory(course_name: "Test Course #{i + 5}")
+          course.enroll_student(@student, enrollment_state: "active")
+        end
+      end
+
+      it "properly paginates through all enrollments" do
+        user_type.extract_result = false
+        all_enrollment_ids = []
+        has_next = true
+        cursor = nil
+
+        while has_next
+          query = if cursor
+                    %|enrollmentsConnection(first: 3, after: "#{cursor}") { nodes { _id } pageInfo { hasNextPage endCursor } }|
+                  else
+                    "enrollmentsConnection(first: 3) { nodes { _id } pageInfo { hasNextPage endCursor } }"
+                  end
+
+          result = user_type.resolve(query, current_user: @student)
+          enrollments_result = result["enrollmentsConnection"]
+          page_ids = enrollments_result["nodes"].pluck("_id")
+          all_enrollment_ids.concat(page_ids)
+
+          has_next = enrollments_result["pageInfo"]["hasNextPage"]
+          cursor = enrollments_result["pageInfo"]["endCursor"]
+
+          # Safety break to prevent infinite loops in tests
+          break if all_enrollment_ids.length > 20
+        end
+
+        # Verify we got all enrollments and no duplicates
+        expect(all_enrollment_ids.uniq.length).to eq all_enrollment_ids.length
+        expect(all_enrollment_ids.length).to eq @student.enrollments.count
+      end
+    end
+
+    context "permission handling" do
+      before(:once) do
+        @admin = account_admin_user
+        @observer = user_factory(name: "Observer")
+        @other_course = course_factory
+        @other_student = user_factory(name: "Other Student")
+
+        @other_course.enroll_student(@other_student, enrollment_state: "active")
+        @other_course.enroll_teacher(@teacher, enrollment_state: "active")
+
+        student_course = @student.enrollments.first.course
+        observer_enrollment = student_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active")
+        observer_enrollment.update!(associated_user_id: @student.id)
+        UserObservationLink.create!(
+          student: @student,
+          observer: @observer,
+          root_account: @course.account.root_account
+        )
+      end
+
+      let(:admin_type) do
+        GraphQLTypeTester.new(
+          @student,
+          current_user: @admin,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+      end
+
+      it "allows admin with manage_students permission to view all user enrollments" do
+        admin_type.extract_result = false
+        result = admin_type.resolve("enrollmentsConnection { nodes { _id } }")
+        enrollments_result = result["enrollmentsConnection"]
+
+        expected_ids = @student.enrollments.pluck(:id).map(&:to_param)
+        actual_ids = enrollments_result["nodes"].pluck("_id")
+        expect(actual_ids).to match_array(expected_ids)
+      end
+
+      it "allows observer to view their observee's enrollments" do
+        observer_viewing_student = GraphQLTypeTester.new(
+          @student,
+          current_user: @observer,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+
+        observer_viewing_student.extract_result = false
+        result = observer_viewing_student.resolve("enrollmentsConnection { nodes { _id } }")
+        enrollments_result = result["enrollmentsConnection"]
+
+        student_course = @student.enrollments.first.course
+        expected_enrollment = @student.enrollments.find_by(course: student_course)
+        expected_ids = [expected_enrollment.id.to_param]
+        actual_ids = enrollments_result["nodes"].pluck("_id")
+        expect(actual_ids).to match_array(expected_ids)
+      end
+
+      it "allows teacher to view enrollments for students in their course" do
+        teacher_viewing_student = GraphQLTypeTester.new(
+          @student,
+          current_user: @teacher,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+
+        teacher_viewing_student.extract_result = false
+        result = teacher_viewing_student.resolve("enrollmentsConnection { nodes { _id } }")
+        enrollments_result = result["enrollmentsConnection"]
+
+        actual_ids = enrollments_result["nodes"].pluck("_id")
+        expect(actual_ids.length).to eq(1)
+        expect(@student.enrollments.pluck(:id).map(&:to_s)).to include(actual_ids.first)
+      end
+
+      it "returns empty result when user has no shared courses" do
+        separate_course = course_factory
+        separate_course.enroll_student(@student, enrollment_state: "active")
+        separate_teacher = user_factory
+        separate_course.enroll_teacher(separate_teacher, enrollment_state: "active")
+
+        teacher_no_access = GraphQLTypeTester.new(
+          @student,
+          current_user: separate_teacher,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+
+        teacher_no_access.extract_result = false
+        result = teacher_no_access.resolve(%|enrollmentsConnection(courseId: "#{@course.id}") { nodes { _id } }|)
+        enrollments_result = result["enrollmentsConnection"]
+
+        expect(enrollments_result["nodes"]).to be_empty
+      end
+
+      it "allows users to view their own enrollments" do
+        user_type.extract_result = false
+        result = user_type.resolve("enrollmentsConnection { nodes { _id } }", current_user: @student)
+        enrollments_result = result["enrollmentsConnection"]
+
+        expected_ids = @student.enrollments.pluck(:id).map(&:to_param)
+        actual_ids = enrollments_result["nodes"].pluck("_id")
+        expect(actual_ids).to match_array(expected_ids)
+      end
+
+      it "respects course_id filtering with proper permissions" do
+        admin_type.extract_result = false
+        result = admin_type.resolve(%|enrollmentsConnection(courseId: "#{@course.id}") { nodes { _id } }|)
+        enrollments_result = result["enrollmentsConnection"]
+
+        expected_ids = @student.enrollments.where(course: @course).pluck(:id).map(&:to_param)
+        actual_ids = enrollments_result["nodes"].pluck("_id")
+        expect(actual_ids).to match_array(expected_ids)
+      end
+
+      it "returns empty result when requesting course without permissions" do
+        user_type.extract_result = false
+        result = user_type.resolve(%|enrollmentsConnection(courseId: "#{@other_course.id}") { nodes { _id } }|, current_user: @student)
+        enrollments_result = result["enrollmentsConnection"]
+
+        expect(enrollments_result["nodes"]).to be_empty
+      end
+    end
+
+    context "cross-shard" do
+      specs_require_sharding
+
+      before :once do
+        @shard1.activate do
+          @cross_shard_user = user_with_pseudonym(active_all: true)
+        end
+
+        @shard2.activate do
+          @cross_shard_account = Account.create!
+          @cross_shard_course = @cross_shard_account.courses.create!
+          @cross_shard_course.offer!
+          @cross_shard_enrollment = @cross_shard_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+        end
+      end
+
+      let(:cross_shard_user_type) { GraphQLTypeTester.new(@cross_shard_user, current_user: @cross_shard_user) }
+
+      def resolve_enrollment_ids(tester, query_args = nil)
+        tester.extract_result = false
+        args_str = query_args ? "(#{query_args})" : ""
+        result = tester.resolve("enrollmentsConnection#{args_str} { nodes { _id } }")
+        result["enrollmentsConnection"]["nodes"].pluck("_id")
+      end
+
+      it "returns enrollments from other shards" do
+        @shard1.activate do
+          node_ids = resolve_enrollment_ids(cross_shard_user_type)
+          expect(node_ids).to eq([@cross_shard_enrollment.id.to_s])
+        end
+      end
+
+      context "with enrollment on both shards" do
+        before :once do
+          @shard1.activate do
+            @shard1_account = Account.create!
+            @shard1_course = @shard1_account.courses.create!
+            @shard1_course.offer!
+            @shard1_enrollment = @shard1_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+          end
+        end
+
+        it "returns enrollments from multiple shards" do
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type)
+            expect(node_ids.length).to eq(2)
+          end
+        end
+
+        it "filters by course_id across shards" do
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type, %(courseId: "#{@cross_shard_course.id}"))
+            expect(node_ids).to eq([@cross_shard_enrollment.id.to_s])
+          end
+        end
+
+        it "excludes concluded enrollments across shards with currentOnly" do
+          @cross_shard_enrollment.complete!
+
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type, "currentOnly: true")
+            expect(node_ids.length).to eq(1)
+          end
+        end
+
+        it "includes active enrollments from all shards with currentOnly" do
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(cross_shard_user_type, "currentOnly: true")
+            expect(node_ids.length).to eq(2)
+          end
+        end
+      end
+
+      context "permission handling" do
+        before :once do
+          @shard1.activate do
+            @cs_teacher = user_with_pseudonym(active_all: true)
+          end
+
+          @shard2.activate do
+            @cross_shard_course.enroll_teacher(@cs_teacher, enrollment_state: "active")
+          end
+        end
+
+        it "only shows enrollments in courses shared with the viewing teacher" do
+          @shard1.activate do
+            shard1_account = Account.create!
+            shard1_course = shard1_account.courses.create!
+            shard1_course.offer!
+            unshared_enrollment = shard1_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+
+            teacher_viewing = GraphQLTypeTester.new(
+              @cross_shard_user,
+              current_user: @cs_teacher,
+              domain_root_account: shard1_account,
+              request: ActionDispatch::TestRequest.create
+            )
+
+            node_ids = resolve_enrollment_ids(teacher_viewing)
+            expect(node_ids).to include(@cross_shard_enrollment.id.to_s)
+            expect(node_ids).not_to include(unshared_enrollment.id.to_s)
+          end
+        end
+
+        it "scopes admin with manage_students to their own root account" do
+          shard1_account = nil
+          shard1_admin = nil
+          shard1_enrollment = nil
+
+          @shard1.activate do
+            shard1_account = Account.create!
+            shard1_course = shard1_account.courses.create!
+            shard1_course.offer!
+            shard1_enrollment = shard1_course.enroll_student(@cross_shard_user, enrollment_state: "active")
+            shard1_admin = account_admin_user(account: shard1_account)
+          end
+
+          admin_viewing = GraphQLTypeTester.new(
+            @cross_shard_user,
+            current_user: shard1_admin,
+            domain_root_account: shard1_account,
+            request: ActionDispatch::TestRequest.create
+          )
+
+          @shard1.activate do
+            node_ids = resolve_enrollment_ids(admin_viewing)
+            expect(node_ids).to include(shard1_enrollment.id.to_s)
+            expect(node_ids).not_to include(@cross_shard_enrollment.id.to_s)
+          end
+        end
+      end
+    end
   end
 
   context "email" do
@@ -655,6 +1330,103 @@ describe Types::UserType do
       read_email_override.update!(enabled: false)
 
       expect(user_type.resolve("email")).to be_nil
+    end
+
+    context "permission check priority" do
+      before do
+        @resolver = GraphQLTypeTester.new(
+          @student,
+          current_user: @other_student,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+      end
+
+      context "with course context" do
+        before do
+          # Object level permissions should be never called if course is in context
+          expect(@student).not_to receive(:grants_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@admin, :read_email_addresses)
+            .and_call_original
+          expect(@course).not_to receive(:grants_right?)
+
+          expect(@resolver.resolve("email", current_user: @admin, course: @course)).to eq @student.email
+        end
+
+        it "checks course-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@teacher, :read_email_addresses)
+            .and_call_original
+          expect(@course).to receive(:grants_right?)
+            .with(@teacher, :read_email_addresses)
+            .and_call_original
+
+          expect(@resolver.resolve("email", current_user: @teacher, course: @course)).to eq @student.email
+        end
+
+        it "returns nil account-level and course-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@other_student, :read_email_addresses)
+            .and_call_original
+          expect(@course).to receive(:grants_right?)
+            .with(@other_student, :read_email_addresses)
+            .and_call_original
+
+          expect(@resolver.resolve("email", course: @course)).to be_nil
+        end
+      end
+
+      context "without course context" do
+        before do
+          # Course-level permissions should be never called if course is not in context
+          expect(@course).not_to receive(:grants_right?)
+        end
+
+        it "checks account-level permission first" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@admin, :read_email_addresses)
+            .and_call_original
+          expect(@student).not_to receive(:grants_right?)
+
+          expect(@resolver.resolve("email", current_user: @admin)).to eq @student.email
+        end
+
+        it "checks object-level permission if account-level fails" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@teacher, :read_email_addresses)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_email_addresses call happens
+          allow_any_instance_of(User).to receive(:grants_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_right?)
+            .with(@teacher, :read_email_addresses)
+            .and_call_original
+
+          expect(@resolver.resolve("email", current_user: @teacher)).to eq @student.email
+        end
+
+        it "returns nil account-level and object-level permission checks fail" do
+          expect(@course.account.root_account).to receive(:grants_right?)
+            .with(@other_student, :read_email_addresses)
+            .and_call_original
+
+          # Must use any_instance_of because GraphQL's IDLoader reloads User from DB (new instance)
+          # allow_any_instance_of: lets ALL grants_right? calls proceed (e.g., :read_full_profile checks)
+          # expect_any_instance_of: verifies our specific :read_email_addresses call happens
+          allow_any_instance_of(User).to receive(:grants_right?).and_call_original
+          expect_any_instance_of(User).to receive(:grants_right?)
+            .with(@other_student, :read_email_addresses)
+            .and_call_original
+
+          expect(@resolver.resolve("email")).to be_nil
+        end
+      end
     end
   end
 
@@ -744,6 +1516,91 @@ describe Types::UserType do
           user_type.resolve("notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }")
         ).to be_nil
       end
+    end
+  end
+
+  context "differentiation_tags_connection" do
+    def resolve_user_type(course_id = @course.id)
+      user_type.resolve(%|differentiationTagsConnection(courseId: "#{course_id}") { edges { node { group { _id name } } } }|)
+    end
+
+    it "calls the DifferentiationTagsLoader" do
+      loader_instance = instance_double(GraphQL::Schema::Loader)
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::DifferentiationTagsLoader)
+        .to receive(:for)
+        .and_return(loader_instance)
+
+      resolve_user_type
+    end
+
+    it "passes correct parameters to the the DifferentiationTagsLoader" do
+      loader_instance = instance_double(GraphQL::Schema::Loader)
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::DifferentiationTagsLoader)
+        .to receive(:for)
+        .with(@teacher, @course.id.to_s)
+        .and_return(loader_instance)
+
+      resolve_user_type
+    end
+  end
+
+  context "institutional_tags_connection" do
+    def resolve_institutional_tags(account_id = @root_account.id, tester: nil)
+      tester ||= user_type
+      tester.resolve(%|institutionalTagsConnection(accountId: "#{account_id}") { nodes { _id } }|)
+    end
+
+    before(:once) do
+      @root_account = Account.default
+      @root_account.enable_feature!(:institutional_tags)
+      @admin = account_admin_user(account: @root_account)
+      @category = institutional_tag_category_model(account: @root_account)
+      @tag1 = institutional_tag_model(account: @root_account, category: @category, name: "Alumni")
+      @tag2 = institutional_tag_model(account: @root_account, category: @category, name: "Staff")
+      institutional_tag_association_model(account: @root_account, institutional_tag: @tag1, user: @student)
+      institutional_tag_association_model(account: @root_account, institutional_tag: @tag2, user: @student)
+    end
+
+    let(:admin_tester) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @admin,
+        domain_root_account: @root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it "calls InstitutionalTagsLoader" do
+      loader_instance = instance_double(GraphQL::Schema::Loader)
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::InstitutionalTagsLoader)
+        .to receive(:for)
+        .and_return(loader_instance)
+
+      resolve_institutional_tags(tester: admin_tester)
+    end
+
+    it "passes correct arguments to InstitutionalTagsLoader" do
+      loader_instance = instance_double(GraphQL::Schema::Loader)
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::InstitutionalTagsLoader)
+        .to receive(:for)
+        .with(@admin, anything, @root_account.id.to_s)
+        .and_return(loader_instance)
+
+      resolve_institutional_tags(tester: admin_tester)
+    end
+
+    it "returns institutional tags for the user" do
+      result = resolve_institutional_tags(tester: admin_tester)
+      expect(result).to match_array([@tag1.id.to_s, @tag2.id.to_s])
+    end
+
+    it "returns nil when the current_user lacks permission" do
+      # @teacher is not an account admin so lacks manage_institutional_tags_view
+      expect(resolve_institutional_tags).to be_nil
     end
   end
 
@@ -1046,10 +1903,21 @@ describe Types::UserType do
       expect(result).to be_nil
     end
 
-    it "returns known users" do
-      known_users = @student.address_book.search_users.paginate(per_page: 4)
-      result = type.resolve("recipients { usersConnection { nodes { _id } } }")
-      expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
+    context "when feature is disabled" do
+      it "returns known users including students" do
+        known_users = @student.address_book.search_users.paginate(per_page: 4)
+        result = type.resolve("recipients { usersConnection { nodes { _id } } }")
+        expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
+      end
+    end
+
+    context "when feature is enabled" do
+      before { @student.account.root_account.enable_feature!(:restrict_student_access) }
+
+      it "returns known users without students" do
+        result = type.resolve("recipients { usersConnection { nodes { _id } } }")
+        expect(result).to match_array([@teacher.id.to_s])
+      end
     end
 
     it "returns contexts" do
@@ -1101,7 +1969,6 @@ describe Types::UserType do
 
     context "differentiation tags" do
       before do
-        Account.default.enable_feature! :assign_to_differentiation_tags
         Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
         Account.default.save!
         Account.default.reload
@@ -1136,7 +2003,6 @@ describe Types::UserType do
         end
 
         it "does not return differentiation tags when flag is off" do
-          Account.default.disable_feature! :assign_to_differentiation_tags
           Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
           Account.default.save!
           Account.default.reload
@@ -1565,15 +2431,6 @@ describe Types::UserType do
       end
     end
 
-    describe "with the limit argument" do
-      it "returns a limited number of results" do
-        comment_bank_item_model(user: @teacher, context: @course, comment: "2nd great comment!")
-        expect(
-          type.resolve("commentBankItemsConnection(limit: 1) { nodes { comment } }").length
-        ).to eq 1
-      end
-    end
-
     describe "with a search query" do
       before do
         @comment_bank_item2 = comment_bank_item_model(user: @teacher, context: @course, comment: "new comment!")
@@ -1596,31 +2453,6 @@ describe Types::UserType do
           type.resolve("commentBankItemsConnection(query: \"  \") { nodes { _id } }").length
         ).to eq 2
       end
-    end
-  end
-
-  context "commentBankItemsCount" do
-    before do
-      @comment_bank_item_one = comment_bank_item_model(user: @teacher, context: @course, comment: "great comment!")
-      @comment_bank_item_two = comment_bank_item_model(user: @teacher, context: @course, comment: "another comment!")
-    end
-
-    let(:type) do
-      GraphQLTypeTester.new(
-        @teacher,
-        current_user: @teacher,
-        domain_root_account: @course.account.root_account,
-        request: ActionDispatch::TestRequest.create
-      )
-    end
-
-    it "returns the count of comment bank items" do
-      expect(type.resolve("commentBankItemsCount")).to eq 2
-    end
-
-    it "ignores deleted comment bank items" do
-      @comment_bank_item_one.destroy
-      expect(type.resolve("commentBankItemsCount")).to eq 1
     end
   end
 
@@ -1728,7 +2560,7 @@ describe Types::UserType do
 
   describe "course_progression" do
     let(:progress_helper) do
-      progress_helper = double(CourseProgress.name)
+      progress_helper = instance_double(CourseProgress)
       allow(progress_helper).to receive_messages(can_evaluate_progression?: true, normalized_requirement_count: 1)
       progress_helper
     end
@@ -2015,6 +2847,1524 @@ describe Types::UserType do
       expect(cur_resolver.resolve("activityStream(onlyActiveCourses: true) { summary { count } } ")).to match_array [1]
       expect(cur_resolver.resolve("activityStream(onlyActiveCourses: true) { summary { unreadCount } } ")).to match_array [1]
       expect(cur_resolver.resolve("activityStream(onlyActiveCourses: true) { summary { notificationCategory } } ")).to match_array [nil]
+    end
+  end
+
+  context "discussion_participants_connection" do
+    before do
+      @course1 = course_factory(active_all: true)
+      @course2 = course_factory(active_all: true)
+      @student_user = user_factory(active_all: true)
+
+      # Enroll user in both courses
+      @course1.enroll_user(@student_user, "StudentEnrollment", enrollment_state: "active")
+      @course2.enroll_user(@student_user, "StudentEnrollment", enrollment_state: "active")
+
+      # Create announcements and discussions
+      @announcement1 = @course1.announcements.create!(title: "Course 1 Announcement", message: "Test announcement 1")
+      @announcement2 = @course2.announcements.create!(title: "Course 2 Announcement", message: "Test announcement 2")
+      @discussion1 = @course1.discussion_topics.create!(title: "Course 1 Discussion", message: "Test discussion 1")
+      @discussion2 = @course2.discussion_topics.create!(title: "Course 2 Discussion", message: "Test discussion 2")
+
+      # Get participant records (announcements auto-create them, discussions need manual creation)
+      @participant1 = @student_user.discussion_topic_participants.find_by(discussion_topic: @announcement1)
+      @participant1.update!(workflow_state: "read") # Update to desired test state
+
+      @participant2 = @student_user.discussion_topic_participants.find_by(discussion_topic: @announcement2)
+      # @participant2 is already "unread" from auto-creation
+
+      @participant3 = @student_user.discussion_topic_participants.create!(
+        discussion_topic: @discussion1,
+        workflow_state: "read"
+      )
+      @participant4 = @student_user.discussion_topic_participants.create!(
+        discussion_topic: @discussion2,
+        workflow_state: "unread"
+      )
+
+      @user_type_tester = GraphQLTypeTester.new(
+        @student_user,
+        current_user: @student_user,
+        domain_root_account: @course1.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    def resolve_participants_connection(filter: nil, first: nil)
+      filter_str = filter ? build_filter_string(filter) : ""
+      first_str = first ? %(first: #{first}) : ""
+      args = [filter_str, first_str].reject(&:empty?).join(", ")
+      query = %(discussionParticipantsConnection#{"(#{args})" unless args.empty?} { nodes { id } })
+      @user_type_tester.resolve(query)
+    end
+
+    def resolve_participants_with_topics(filter: nil)
+      filter_str = filter ? build_filter_string(filter) : ""
+      query = %(discussionParticipantsConnection#{"(#{filter_str})" unless filter_str.empty?} {
+        nodes {
+          discussionTopic {
+            title
+          }
+        }
+      })
+      @user_type_tester.resolve(query)
+    end
+
+    def build_filter_string(filter)
+      filter_parts = []
+      filter_parts << "isAnnouncement: #{filter[:isAnnouncement]}" if filter.key?(:isAnnouncement)
+      filter_parts << "courseId: \"#{filter[:courseId]}\"" if filter.key?(:courseId)
+      filter_parts << "readState: \"#{filter[:readState]}\"" if filter.key?(:readState)
+      "filter: { #{filter_parts.join(", ")} }"
+    end
+
+    it "returns all discussion participants for the user" do
+      result = resolve_participants_connection
+
+      expect(result.length).to eq(4)
+      # GraphQL returns Global IDs (Base64 encoded), so we just check we get 4 unique IDs
+      expect(result.flatten.uniq.length).to eq(4)
+    end
+
+    it "filters by announcements only when isAnnouncement is true" do
+      result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+
+      expect(result.length).to eq(2)
+      titles = result.flatten
+      expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+    end
+
+    it "filters by discussions only when isAnnouncement is false" do
+      result = resolve_participants_with_topics(filter: { isAnnouncement: false })
+
+      expect(result.length).to eq(2)
+      titles = result.flatten
+      expect(titles).to match_array(["Course 1 Discussion", "Course 2 Discussion"])
+    end
+
+    it "filters by course when courseId is provided" do
+      result = resolve_participants_with_topics(filter: { courseId: @course1.id })
+
+      expect(result.length).to eq(2)
+      titles = result.flatten
+      expect(titles).to match_array(["Course 1 Announcement", "Course 1 Discussion"])
+    end
+
+    it "respects pagination with first parameter" do
+      result = resolve_participants_connection(first: 2)
+
+      expect(result.length).to eq(2)
+    end
+
+    it "returns null for non-current user" do
+      other_user = user_factory
+      other_user_tester = GraphQLTypeTester.new(
+        other_user,
+        current_user: @student_user,
+        domain_root_account: @course1.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+
+      result = other_user_tester.resolve("discussionParticipantsConnection { nodes { id } }")
+      expect(result).to be_nil
+    end
+
+    context "with read state filtering" do
+      it "filters by read status when readState is 'read'" do
+        result = resolve_participants_with_topics(filter: { readState: "read" })
+
+        expect(result.length).to eq(2)
+        titles = result.flatten
+        expect(titles).to match_array(["Course 1 Announcement", "Course 1 Discussion"])
+      end
+
+      it "filters by unread status when readState is 'unread'" do
+        result = resolve_participants_with_topics(filter: { readState: "unread" })
+
+        expect(result.length).to eq(2)
+        titles = result.flatten
+        expect(titles).to match_array(["Course 2 Announcement", "Course 2 Discussion"])
+      end
+
+      it "returns all participants when readState is 'all'" do
+        result = resolve_participants_with_topics(filter: { readState: "all" })
+
+        expect(result.length).to eq(4)
+        titles = result.flatten
+        expect(titles).to match_array([
+                                        "Course 1 Announcement",
+                                        "Course 2 Announcement",
+                                        "Course 1 Discussion",
+                                        "Course 2 Discussion"
+                                      ])
+      end
+
+      it "combines readState with isAnnouncement filter" do
+        result = resolve_participants_with_topics(filter: { readState: "read", isAnnouncement: true })
+
+        expect(result.length).to eq(1)
+        titles = result.flatten
+        expect(titles).to eq(["Course 1 Announcement"])
+      end
+    end
+
+    context "with time-based filtering for announcements" do
+      it "excludes locked announcements" do
+        @announcement1.update!(lock_at: 1.day.ago)
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(result.length).to eq(1)
+        expect(titles).to eq(["Course 2 Announcement"])
+      end
+    end
+
+    context "with enrollment filtering" do
+      it "excludes participants from courses where user has no active enrollment" do
+        # Deactivate enrollment in course2
+        @course2.enrollments.where(user: @student_user).first.deactivate
+
+        result = resolve_participants_connection
+
+        # Should only return participants from course1
+        expect(result.length).to eq(2)
+      end
+
+      it "excludes announcements from past courses (section end date in past)" do
+        # Create a course with section that ended
+        past_course = course_factory(active_all: true)
+        past_section = past_course.course_sections.create!(name: "Past Section", end_at: 1.week.ago)
+        past_course.enroll_student(@student_user, section: past_section, enrollment_state: "active")
+
+        # Create an announcement in the past course
+        past_course.announcements.create!(
+          title: "Past Course Announcement",
+          message: "This should not appear"
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        # Should only include announcements from current courses
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Past Course Announcement")
+      end
+
+      it "excludes announcements from courses with conclude_at in past" do
+        # Create a course that concluded
+        concluded_course = course_factory(active_all: true)
+        concluded_course.update!(conclude_at: 1.week.ago)
+        concluded_course.enroll_student(@student_user, enrollment_state: "active")
+
+        # Create an announcement in the concluded course
+        concluded_course.announcements.create!(
+          title: "Concluded Course Announcement",
+          message: "This should not appear"
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        # Should only include announcements from current courses
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Concluded Course Announcement")
+      end
+
+      it "excludes announcements from unpublished courses" do
+        # Create an unpublished course
+        unpublished_course = course_factory
+        unpublished_course.workflow_state = "claimed"
+        unpublished_course.save!
+        unpublished_course.enroll_student(@student_user, enrollment_state: "active")
+
+        # Create an announcement in the unpublished course
+        unpublished_course.announcements.create!(
+          title: "Unpublished Course Announcement",
+          message: "This should not appear"
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        # Should only include announcements from current courses
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Unpublished Course Announcement")
+      end
+
+      it "excludes announcements from courses with past enrollment term" do
+        past_term = @course1.account.enrollment_terms.create!(
+          name: "Past Term",
+          start_at: 6.months.ago,
+          end_at: 1.month.ago
+        )
+        past_term_course = course_factory(active_all: true, account: @course1.account)
+        past_term_course.update!(enrollment_term: past_term)
+        past_term_course.enroll_student(@student_user, enrollment_state: "active")
+
+        past_term_course.announcements.create!(
+          title: "Past Term Announcement",
+          message: "This should not appear"
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Past Term Announcement")
+      end
+
+      it "excludes announcements from formally concluded courses" do
+        concluded_course = course_factory(active_all: true)
+        concluded_course.enroll_student(@student_user, enrollment_state: "active")
+        concluded_course.announcements.create!(
+          title: "Concluded Course Announcement",
+          message: "This should not appear"
+        )
+
+        concluded_course.complete!
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Concluded Course Announcement")
+      end
+
+      it "excludes announcements from courses where student has only an invited enrollment" do
+        invited_course = course_factory(active_all: true)
+        invited_course.enroll_student(@student_user, enrollment_state: "invited")
+        invited_announcement = invited_course.announcements.create!(
+          title: "Invited Course Announcement",
+          message: "Should not appear"
+        )
+        @student_user.discussion_topic_participants.find_or_create_by!(discussion_topic: invited_announcement)
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+        expect(titles).not_to include("Invited Course Announcement")
+      end
+
+      it "returns each announcement exactly once when student has multiple enrollments in same course" do
+        section_b = @course1.course_sections.create!(name: "Section B")
+        @course1.enroll_student(
+          @student_user,
+          section: section_b,
+          enrollment_state: "active",
+          allow_multiple_enrollments: true
+        )
+
+        result = resolve_participants_with_topics(filter: { isAnnouncement: true })
+        titles = result.flatten
+
+        expect(titles.count("Course 1 Announcement")).to eq(1)
+        expect(titles).to match_array(["Course 1 Announcement", "Course 2 Announcement"])
+      end
+    end
+  end
+
+  context "discussionParticipantsConnection with observed user" do
+    before(:once) do
+      @course1 = course_factory(active_all: true, course_name: "Course 1")
+      @course2 = course_factory(active_all: true, course_name: "Course 2")
+
+      @observer = user_factory(name: "Observer")
+      @observed_student = user_factory(name: "Observed Student")
+
+      @course1.enroll_student(@observed_student, enrollment_state: "active")
+      @course2.enroll_student(@observed_student, enrollment_state: "active")
+      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, enrollment_state: "active")
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, enrollment_state: "active")
+
+      # Create discussions and announcements
+      @discussion1 = @course1.discussion_topics.create!(title: "Discussion 1", message: "Test discussion", workflow_state: "active")
+      @announcement1 = @course1.announcements.create!(title: "Announcement 1", message: "Test announcement", workflow_state: "active")
+      @discussion2 = @course2.discussion_topics.create!(title: "Discussion 2", message: "Another discussion", workflow_state: "active")
+
+      # Create participation records for observed student (announcements auto-create, so use find_or_create)
+      @discussion1.discussion_topic_participants.find_or_create_by!(user: @observed_student)
+      @announcement1.discussion_topic_participants.find_or_create_by!(user: @observed_student)
+      @discussion2.discussion_topic_participants.find_or_create_by!(user: @observed_student)
+    end
+
+    let(:observer_user_type) do
+      GraphQLTypeTester.new(
+        @observer,
+        current_user: @observer,
+        domain_root_account: @course1.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it "returns discussion participants for observed student" do
+      result = observer_user_type.resolve(
+        "discussionParticipantsConnection(observedUserId: \"#{@observed_student.id}\") {
+          nodes {
+            discussionTopic {
+              title
+            }
+          }
+        }"
+      )
+
+      expect(result.length).to eq(3)
+      topic_titles = result.flatten.sort
+      expect(topic_titles).to eq(["Announcement 1", "Discussion 1", "Discussion 2"])
+    end
+
+    it "returns empty result for invalid observed user id" do
+      result = observer_user_type.resolve(
+        "discussionParticipantsConnection(observedUserId: \"999999\") {
+          nodes {
+            discussionTopic { title }
+          }
+        }"
+      )
+
+      expect(result).to be_empty
+    end
+
+    it "filters by announcement status" do
+      result = observer_user_type.resolve(
+        "discussionParticipantsConnection(
+          observedUserId: \"#{@observed_student.id}\",
+          filter: { isAnnouncement: true }
+        ) {
+          nodes {
+            discussionTopic { title }
+          }
+        }"
+      )
+
+      expect(result.length).to eq(1)
+      expect(result.flatten.first).to eq("Announcement 1")
+    end
+
+    it "only returns participants from courses observer can access" do
+      # Create a course the observer can't see
+      other_course = Course.create!(name: "Other Course")
+      other_discussion = other_course.discussion_topics.create!(title: "Other Discussion", message: "Hidden")
+      other_course.enroll_student(@observed_student, active_all: true)
+      other_discussion.discussion_topic_participants.create!(user: @observed_student)
+
+      result = observer_user_type.resolve(
+        "discussionParticipantsConnection(observedUserId: \"#{@observed_student.id}\") {
+          nodes {
+            discussionTopic { title }
+          }
+        }"
+      )
+
+      topic_titles = result.flatten.sort
+      expect(topic_titles).to eq(["Announcement 1", "Discussion 1", "Discussion 2"])
+      expect(topic_titles).not_to include("Other Discussion")
+    end
+  end
+
+  context "course_work_submissions_connection" do
+    before(:once) do
+      @frozen_time = Time.zone.parse("2024-01-15 12:00:00")
+
+      Timecop.freeze(@frozen_time) do
+        @assignment = @course.assignments.create!(
+          title: "Test Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day, # Due tomorrow
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        # Create unsubmitted submission (actionable) - use find_or_create pattern
+        @submission = @assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+      end
+    end
+
+    it "returns the connection field" do
+      Timecop.freeze(@frozen_time) do
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { _id } } }")
+        expect(result).to be_an(Array)
+      end
+    end
+
+    it "returns actual submissions data" do
+      Timecop.freeze(@frozen_time) do
+        expect(@submission).not_to be_nil
+        expect(@submission.submitted_at).to be_nil # Should be unsubmitted
+        expect(@submission.excused).to be_falsey # Should not be excused
+        expect(@assignment.workflow_state).to eq("published")
+        expect(@course.workflow_state).to eq("available")
+
+        enrollment = @student.enrollments.where(course: @course).first
+        expect(enrollment).not_to be_nil
+        expect(enrollment.workflow_state).to eq("active")
+
+        # Test with date range parameters (next 7 days from frozen time)
+        start_date = @frozen_time.beginning_of_day
+        end_date = (@frozen_time + 7.days).end_of_day
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") { edges { node { assignment { title } } } }")
+        expect(result).not_to be_empty, "Expected to find submissions with date range filter"
+        expect(result.first).to eq("Test Assignment")
+      end
+    end
+
+    it "does not return deleted submissions" do
+      Timecop.freeze(@frozen_time) do
+        @submission.update!(workflow_state: "deleted")
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { _id } } }")
+        expect(result).to eq([])
+      end
+    end
+
+    it "does not return submissions for pending enrollments" do
+      Timecop.freeze(@frozen_time) do
+        enrollment = @student.enrollments.where(course: @course).first
+        enrollment.update!(workflow_state: "invited")
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { _id } } }")
+        expect(result).to eq([])
+      end
+    end
+
+    it "only returns data for current user" do
+      Timecop.freeze(@frozen_time) do
+        result = user_type.resolve("courseWorkSubmissionsConnection { edges { node { _id } } }")
+        expect(result).to eq([])
+      end
+    end
+
+    it "filters by includeOverdue parameter" do
+      Timecop.freeze(@frozen_time) do
+        # Create an overdue assignment (due 2 days ago from frozen time)
+        overdue_assignment = @course.assignments.create!(
+          title: "Overdue Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        overdue_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(result).to include("Overdue Assignment")
+      end
+    end
+
+    it "filters by onlySubmitted parameter" do
+      Timecop.freeze(@frozen_time) do
+        # Create a submitted assignment (due tomorrow from frozen time)
+        submitted_assignment = @course.assignments.create!(
+          title: "Submitted Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        submitted_submission = submitted_assignment.submissions.find_or_create_by(user: @student)
+        submitted_submission.update!(
+          submitted_at: @frozen_time - 1.hour,
+          workflow_state: "submitted",
+          submission_type: "online_text_entry"
+        )
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
+        expect(result).to include("Submitted Assignment")
+        expect(result).not_to include("Test Assignment") # Should not include unsubmitted
+      end
+    end
+
+    it "includes graded submissions in onlySubmitted filter even without submitted_at" do
+      Timecop.freeze(@frozen_time) do
+        # Create assignment with no submission required (e.g., "on_paper")
+        no_submission_assignment = @course.assignments.create!(
+          title: "Graded No Submission Assignment",
+          due_at: (@frozen_time - 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "none"
+        )
+        graded_submission = no_submission_assignment.submissions.find_or_create_by(user: @student)
+        graded_submission.update!(
+          submitted_at: nil, # Never submitted
+          workflow_state: "graded",
+          grader_id: @teacher.id,
+          score: 90
+        )
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
+        expect(result).to include("Graded No Submission Assignment")
+      end
+    end
+
+    it "includes excused submissions in onlySubmitted filter" do
+      Timecop.freeze(@frozen_time) do
+        excused_assignment = @course.assignments.create!(
+          title: "Excused Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        excused_submission = excused_assignment.submissions.find_or_create_by(user: @student)
+        excused_submission.update!(
+          submitted_at: nil,
+          workflow_state: "unsubmitted",
+          excused: true
+        )
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
+        expect(result).to include("Excused Assignment")
+      end
+    end
+
+    context "onlyGradedOrWithFeedback filter" do
+      before(:once) do
+        Timecop.freeze(@frozen_time) do
+          @graded_assignment = @course.assignments.create!(
+            title: "Graded Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @graded_submission = @graded_assignment.submissions.find_or_create_by(user: @student)
+          @graded_submission.update!(
+            workflow_state: "graded",
+            score: 85,
+            grade: "B",
+            submitted_at: @frozen_time - 1.week,
+            posted_at: @frozen_time - 1.week,
+            grader_id: @teacher.id
+          )
+
+          @feedback_only_assignment = @course.assignments.create!(
+            title: "Feedback Only Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @feedback_only_submission = @feedback_only_assignment.submissions.find_or_create_by(user: @student)
+          @feedback_only_submission.update!(
+            workflow_state: "submitted",
+            submitted_at: @frozen_time - 2.weeks,
+            posted_at: @frozen_time - 2.weeks
+          )
+          @feedback_only_submission.update_column(:last_comment_at, @frozen_time - 2.weeks)
+
+          @no_feedback_assignment = @course.assignments.create!(
+            title: "Submitted No Feedback Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          @no_feedback_submission = @no_feedback_assignment.submissions.find_or_create_by(user: @student)
+          @no_feedback_submission.update!(
+            workflow_state: "submitted",
+            submitted_at: @frozen_time - 1.week
+          )
+        end
+      end
+
+      it "returns graded submissions" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).to include("Graded Assignment")
+        end
+      end
+
+      it "returns submissions with recent instructor feedback" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).to include("Feedback Only Assignment")
+        end
+      end
+
+      it "does not return submitted submissions without a grade or feedback" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Submitted No Feedback Assignment")
+        end
+      end
+
+      it "does not return unsubmitted assignments" do
+        Timecop.freeze(@frozen_time) do
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Test Assignment")
+        end
+      end
+
+      it "does not return graded submissions older than 4 weeks" do
+        Timecop.freeze(@frozen_time) do
+          old_assignment = @course.assignments.create!(
+            title: "Old Graded Assignment",
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          old_submission = old_assignment.submissions.find_or_create_by(user: @student)
+          old_submission.update!(
+            workflow_state: "graded",
+            score: 90,
+            submitted_at: @frozen_time - 5.weeks,
+            posted_at: @frozen_time - 5.weeks,
+            grader_id: @teacher.id
+          )
+          old_submission.update_column(:created_at, @frozen_time - 5.weeks)
+
+          result = student_user_type.resolve("courseWorkSubmissionsConnection(onlyGradedOrWithFeedback: true) { edges { node { assignment { title } } } }")
+          expect(result).not_to include("Old Graded Assignment")
+        end
+      end
+    end
+
+    it "handles NULL excused values correctly" do
+      Timecop.freeze(@frozen_time) do
+        # Explicitly set excused to nil to test our NULL handling
+        @submission.update_column(:excused, nil)
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { title } } } }")
+        expect(result).not_to be_empty, "Should include submissions with NULL excused values"
+        expect(result.first).to eq("Test Assignment")
+      end
+    end
+
+    it "excludes assignments with no submission requirements from includeOverdue filter" do
+      Timecop.freeze(@frozen_time) do
+        no_submission_assignment = @course.assignments.create!(
+          title: "No Submission Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "none"
+        )
+        no_submission_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        regular_overdue_assignment = @course.assignments.create!(
+          title: "Regular Overdue Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        regular_overdue_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+
+        expect(result).to include("Regular Overdue Assignment")
+        expect(result).not_to include("No Submission Assignment")
+
+        no_sub_submission = no_submission_assignment.submissions.find_by(user: @student)
+        regular_sub_submission = regular_overdue_assignment.submissions.find_by(user: @student)
+
+        expect(no_sub_submission.missing?).to be false
+        expect(regular_sub_submission.missing?).to be true
+      end
+    end
+
+    it "excludes assignments with not_graded submission types from includeOverdue filter" do
+      Timecop.freeze(@frozen_time) do
+        not_graded_assignment = @course.assignments.create!(
+          title: "Not Graded Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "not_graded"
+        )
+        not_graded_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Not Graded Assignment")
+
+        submission = not_graded_assignment.submissions.find_by(user: @student)
+        expect(submission.missing?).to be false
+      end
+    end
+
+    it "excludes assignments with wiki_page submission types from includeOverdue filter" do
+      Timecop.freeze(@frozen_time) do
+        wiki_assignment = @course.assignments.create!(
+          title: "Wiki Page Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "wiki_page"
+        )
+        wiki_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Wiki Page Assignment")
+
+        submission = wiki_assignment.submissions.find_by(user: @student)
+        expect(submission.missing?).to be false
+      end
+    end
+
+    it "excludes submitted assignments from includeOverdue filter" do
+      Timecop.freeze(@frozen_time) do
+        submitted_overdue_assignment = @course.assignments.create!(
+          title: "Submitted Overdue Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        submitted_submission = submitted_overdue_assignment.submissions.find_or_create_by(user: @student)
+        submitted_submission.update!(
+          submitted_at: @frozen_time - 1.day,
+          workflow_state: "submitted",
+          submission_type: "online_text_entry",
+          body: "My submission content"
+        )
+
+        unsubmitted_overdue_assignment = @course.assignments.create!(
+          title: "Unsubmitted Overdue Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        unsubmitted_overdue_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+
+        expect(result).to include("Unsubmitted Overdue Assignment")
+        expect(result).not_to include("Submitted Overdue Assignment")
+
+        submitted_sub = submitted_overdue_assignment.submissions.find_by(user: @student)
+        unsubmitted_sub = unsubmitted_overdue_assignment.submissions.find_by(user: @student)
+
+        expect(submitted_sub.missing?).to be false
+        expect(unsubmitted_sub.missing?).to be true
+      end
+    end
+
+    it "excludes graded assignments from includeOverdue filter" do
+      Timecop.freeze(@frozen_time) do
+        graded_overdue_assignment = @course.assignments.create!(
+          title: "Graded Overdue Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        graded_submission = graded_overdue_assignment.submissions.find_or_create_by(user: @student)
+        graded_submission.update!(
+          submitted_at: nil,
+          workflow_state: "graded",
+          grader_id: @teacher.id,
+          score: 85
+        )
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Graded Overdue Assignment")
+
+        submission = graded_overdue_assignment.submissions.find_by(user: @student)
+        expect(submission.missing?).to be false
+      end
+    end
+
+    it "excludes assignments from past courses (section end date in past)" do
+      Timecop.freeze(@frozen_time) do
+        # Create a course with section that ended
+        past_course = course_factory(active_all: true)
+        past_section = past_course.course_sections.create!(name: "Past Section", end_at: @frozen_time - 1.week)
+        past_course.enroll_student(@student, section: past_section, enrollment_state: "active")
+
+        # Create an assignment in the past course
+        past_assignment = past_course.assignments.create!(
+          title: "Past Course Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        past_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Past Course Assignment")
+        expect(result).to include("Test Assignment") # Should still show current course
+      end
+    end
+
+    it "excludes assignments from courses with conclude_at in past" do
+      Timecop.freeze(@frozen_time) do
+        # Create a course that concluded
+        concluded_course = course_factory(active_all: true)
+        concluded_course.update!(conclude_at: @frozen_time - 1.week)
+        concluded_course.enroll_student(@student, enrollment_state: "active")
+
+        # Create an assignment in the concluded course
+        concluded_assignment = concluded_course.assignments.create!(
+          title: "Concluded Course Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        concluded_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Concluded Course Assignment")
+        expect(result).to include("Test Assignment") # Should still show current course
+      end
+    end
+
+    it "excludes assignments from unpublished courses" do
+      Timecop.freeze(@frozen_time) do
+        # Create an unpublished course
+        unpublished_course = course_factory
+        unpublished_course.workflow_state = "claimed"
+        unpublished_course.save!
+        unpublished_course.enroll_student(@student, enrollment_state: "active")
+
+        # Create an assignment in the unpublished course
+        unpublished_assignment = unpublished_course.assignments.create!(
+          title: "Unpublished Course Assignment",
+          due_at: (@frozen_time + 1.day).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+        unpublished_assignment.submissions.find_or_create_by(user: @student) do |s|
+          s.submitted_at = nil
+          s.workflow_state = "unsubmitted"
+        end
+
+        result = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { title } } } }")
+        expect(result).not_to include("Unpublished Course Assignment")
+        expect(result).to include("Test Assignment") # Should still show current course
+      end
+    end
+
+    context "graded unsubmitted work filtering" do
+      before(:once) do
+        @frozen_time = Time.zone.parse("2024-01-15 12:00:00")
+      end
+
+      it "excludes graded-unsubmitted work from default filter (onlySubmitted: false)" do
+        Timecop.freeze(@frozen_time) do
+          graded_unsubmitted_assignment = @course.assignments.create!(
+            title: "Graded but Never Submitted",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          graded_submission = graded_unsubmitted_assignment.submissions.find_or_create_by(user: @student)
+          graded_submission.update!(
+            submitted_at: nil,           # NOT submitted
+            workflow_state: "graded",    # But graded
+            grader_id: @teacher.id,
+            score: 85
+          )
+
+          # Query without onlySubmitted (default filter for "due" items)
+          start_date = @frozen_time.beginning_of_day
+          end_date = (@frozen_time + 7.days).end_of_day
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).not_to include("Graded but Never Submitted")
+        end
+      end
+
+      it "includes graded-unsubmitted work in onlySubmitted filter" do
+        Timecop.freeze(@frozen_time) do
+          graded_unsubmitted_assignment = @course.assignments.create!(
+            title: "Graded but Never Submitted",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          graded_submission = graded_unsubmitted_assignment.submissions.find_or_create_by(user: @student)
+          graded_submission.update!(
+            submitted_at: nil,
+            workflow_state: "graded",
+            grader_id: @teacher.id,
+            score: 85
+          )
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(onlySubmitted: true) {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).to include("Graded but Never Submitted")
+        end
+      end
+
+      it "handles edge case: graded workflow_state without score (grade cleared)" do
+        Timecop.freeze(@frozen_time) do
+          # Edge case: assignment has graded workflow_state but no score (score was cleared)
+          graded_no_score_assignment = @course.assignments.create!(
+            title: "Graded State Without Score",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          graded_no_score_submission = graded_no_score_assignment.submissions.find_or_create_by(user: @student)
+          graded_no_score_submission.update!(
+            submitted_at: nil,
+            workflow_state: "graded",  # Has graded state
+            grader_id: @teacher.id,
+            score: nil                 # But no score
+          )
+
+          start_date = @frozen_time.beginning_of_day
+          end_date = (@frozen_time + 7.days).end_of_day
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).to include("Graded State Without Score")
+        end
+      end
+
+      it "handles edge case: score without graded workflow_state (race condition)" do
+        Timecop.freeze(@frozen_time) do
+          # Edge case: submission has score but workflow_state is not 'graded' (race condition)
+          score_no_graded_state_assignment = @course.assignments.create!(
+            title: "Score Without Graded State",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          score_no_graded_submission = score_no_graded_state_assignment.submissions.find_or_create_by(user: @student)
+          score_no_graded_submission.update!(
+            submitted_at: nil,
+            workflow_state: "unsubmitted",  # NOT graded state
+            score: 75                       # But has score
+          )
+
+          start_date = @frozen_time.beginning_of_day
+          end_date = (@frozen_time + 7.days).end_of_day
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).to include("Score Without Graded State")
+        end
+      end
+
+      it "excludes normal graded work with both score and graded state from default filter" do
+        Timecop.freeze(@frozen_time) do
+          normal_graded_assignment = @course.assignments.create!(
+            title: "Normal Graded Assignment",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          normal_graded_submission = normal_graded_assignment.submissions.find_or_create_by(user: @student)
+          normal_graded_submission.update!(
+            submitted_at: nil,
+            workflow_state: "graded",  # Has graded state
+            grader_id: @teacher.id,
+            score: 90                  # And has score
+          )
+
+          start_date = @frozen_time.beginning_of_day
+          end_date = (@frozen_time + 7.days).end_of_day
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).not_to include("Normal Graded Assignment")
+        end
+      end
+
+      it "includes truly ungraded work in default filter" do
+        Timecop.freeze(@frozen_time) do
+          ungraded_assignment = @course.assignments.create!(
+            title: "Truly Ungraded Assignment",
+            due_at: (@frozen_time + 2.days).end_of_day,
+            workflow_state: "published",
+            submission_types: "online_text_entry"
+          )
+          ungraded_submission = ungraded_assignment.submissions.find_or_create_by(user: @student)
+          ungraded_submission.update!(
+            submitted_at: nil,
+            workflow_state: "unsubmitted",
+            score: nil
+          )
+
+          start_date = @frozen_time.beginning_of_day
+          end_date = (@frozen_time + 7.days).end_of_day
+
+          result = student_user_type.resolve(
+            "courseWorkSubmissionsConnection(startDate: \"#{start_date.iso8601}\", endDate: \"#{end_date.iso8601}\") {
+              edges { node { assignment { title } } }
+            }"
+          )
+
+          expect(result).to include("Truly Ungraded Assignment")
+        end
+      end
+    end
+
+    it "includes submissions marked as missing by teacher in includeOverdue filter even if graded" do
+      Timecop.freeze(@frozen_time) do
+        missing_assignment = @course.assignments.create!(
+          title: "Teacher Marked Missing Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+
+        # Create a submission where:
+        # - Student never submitted (submitted_at: nil)
+        # - Teacher graded it anyway (score, workflow_state = graded)
+        # - Teacher manually marked it as missing via late policy
+        submission = missing_assignment.submissions.find_or_create_by(user: @student)
+        submission.update!(
+          submitted_at: nil,
+          workflow_state: "graded",
+          submission_type: nil,
+          grader_id: @teacher.id,
+          score: 0,
+          late_policy_status: "missing"
+        )
+
+        expect(submission.missing?).to be true
+        missing_result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(missing_result).to include("Teacher Marked Missing Assignment")
+
+        submitted_result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
+        expect(submitted_result).not_to include("Teacher Marked Missing Assignment")
+      end
+    end
+
+    it "excludes submissions that are calculated as missing (not explicitly marked) from submitted filter" do
+      Timecop.freeze(@frozen_time) do
+        calculated_missing_assignment = @course.assignments.create!(
+          title: "Calculated Missing Assignment",
+          due_at: (@frozen_time - 2.days).end_of_day,
+          workflow_state: "published",
+          submission_types: "online_text_entry"
+        )
+
+        # Create a submission that is missing by calculation, not by explicit late_policy_status
+        submission = calculated_missing_assignment.submissions.find_or_create_by(user: @student)
+        submission.update!(
+          submitted_at: nil,
+          workflow_state: "unsubmitted",
+          submission_type: nil,
+          grader_id: nil,
+          score: nil,
+          late_policy_status: nil
+        )
+
+        expect(submission.missing?).to be true
+
+        submitted_result = student_user_type.resolve("courseWorkSubmissionsConnection(onlySubmitted: true) { edges { node { assignment { title } } } }")
+        expect(submitted_result).not_to include("Calculated Missing Assignment")
+
+        missing_result = student_user_type.resolve("courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }")
+        expect(missing_result).to include("Calculated Missing Assignment")
+      end
+    end
+
+    context "with grading periods" do
+      before(:once) do
+        @frozen_time = Time.zone.parse("2024-06-15 12:00:00")
+
+        Timecop.freeze(@frozen_time) do
+          term = Account.default.enrollment_terms.create!(start_at: 10.years.ago)
+          @gp_course = course_factory(active_all: true, enrollment_term_id: term.id)
+          @gp_course.enroll_student(@student, enrollment_state: :active)
+
+          period_group = Account.default.grading_period_groups.create!
+          period_group.enrollment_terms << @gp_course.enrollment_term
+          @closed_period = period_group.grading_periods.create!(
+            title: "Closed Period",
+            start_date: 5.months.ago(@frozen_time),
+            end_date: 2.months.ago(@frozen_time),
+            close_date: 2.months.ago(@frozen_time)
+          )
+          @current_period = period_group.grading_periods.create!(
+            title: "Current Period",
+            start_date: 2.months.ago(@frozen_time),
+            end_date: 2.months.from_now(@frozen_time),
+            close_date: 2.months.from_now(@frozen_time)
+          )
+
+          @closed_period_assignment = @gp_course.assignments.create!(
+            title: "Assignment in Closed Period",
+            workflow_state: "published",
+            submission_types: "online_text_entry",
+            due_at: 4.months.ago(@frozen_time)
+          )
+          @current_period_assignment = @gp_course.assignments.create!(
+            title: "Assignment in Current Period",
+            workflow_state: "published",
+            submission_types: "online_text_entry",
+            due_at: 1.month.ago(@frozen_time)
+          )
+
+          @closed_period_assignment.submissions.find_or_create_by(user: @student) do |s|
+            s.submitted_at = nil
+            s.workflow_state = "unsubmitted"
+          end
+          @current_period_assignment.submissions.find_or_create_by(user: @student) do |s|
+            s.submitted_at = nil
+            s.workflow_state = "unsubmitted"
+          end
+        end
+      end
+
+      let(:gp_student_user_type) do
+        GraphQLTypeTester.new(
+          @student,
+          current_user: @student,
+          domain_root_account: @gp_course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+      end
+
+      it "filters missing submissions by current grading period by default" do
+        Timecop.freeze(@frozen_time) do
+          result = gp_student_user_type.resolve(
+            "courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }"
+          )
+
+          expect(result).to include("Assignment in Current Period")
+          expect(result).not_to include("Assignment in Closed Period")
+        end
+      end
+
+      it "returns all missing submissions when onlyCurrentGradingPeriod is false" do
+        Timecop.freeze(@frozen_time) do
+          result = gp_student_user_type.resolve(
+            "courseWorkSubmissionsConnection(includeOverdue: true, onlyCurrentGradingPeriod: false) { edges { node { assignment { title } } } }"
+          )
+
+          expect(result).to include("Assignment in Current Period")
+          expect(result).to include("Assignment in Closed Period")
+        end
+      end
+
+      it "includes missing assignments from courses without grading periods" do
+        Timecop.freeze(@frozen_time) do
+          no_gp_course = course_factory(active_all: true)
+          no_gp_course.enroll_student(@student, enrollment_state: :active)
+          no_gp_assignment = no_gp_course.assignments.create!(
+            title: "Assignment Without Grading Period",
+            workflow_state: "published",
+            submission_types: "online_text_entry",
+            due_at: 1.month.ago(@frozen_time)
+          )
+          no_gp_assignment.submissions.find_or_create_by(user: @student) do |s|
+            s.submitted_at = nil
+            s.workflow_state = "unsubmitted"
+          end
+
+          result = gp_student_user_type.resolve(
+            "courseWorkSubmissionsConnection(includeOverdue: true) { edges { node { assignment { title } } } }"
+          )
+
+          expect(result).to include("Assignment Without Grading Period")
+          expect(result).to include("Assignment in Current Period")
+          expect(result).not_to include("Assignment in Closed Period")
+        end
+      end
+    end
+
+    it "excludes parent assignments with checkpoints, shows only SubAssignments" do
+      Timecop.freeze(@frozen_time) do
+        @course.account.enable_feature!(:discussion_checkpoints)
+
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+        parent_assignment = topic.assignment
+        parent_assignment.update!(has_sub_assignments: true)
+
+        checkpoint1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: @frozen_time + 1.day }],
+          points_possible: 5
+        )
+        checkpoint2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: @frozen_time + 2.days }],
+          points_possible: 10
+        )
+
+        # Create submissions for all (parent + checkpoints)
+        parent_assignment.submissions.find_or_create_by(user: @student)
+        checkpoint1.submissions.find_or_create_by(user: @student)
+        checkpoint2.submissions.find_or_create_by(user: @student)
+
+        ids = student_user_type.resolve("courseWorkSubmissionsConnection { edges { node { assignment { _id } } } }")
+
+        expect(ids).not_to include(parent_assignment.id.to_s)
+        expect(ids).to include(checkpoint1.id.to_s, checkpoint2.id.to_s)
+      end
+    end
+  end
+
+  context "courseWorkSubmissionsConnection with observed user" do
+    before(:once) do
+      @course1 = course_factory(active_all: true, course_name: "Course 1")
+      @course2 = course_factory(active_all: true, course_name: "Course 2")
+
+      @assignment1 = @course1.assignments.create!(title: "Assignment 1", due_at: 1.day.from_now, workflow_state: "published")
+      @assignment2 = @course2.assignments.create!(title: "Assignment 2", due_at: 2.days.from_now, workflow_state: "published")
+
+      @observer = user_factory(name: "Observer")
+      @observed_student = user_factory(name: "Observed Student")
+
+      @course1.enroll_student(@observed_student, enrollment_state: "active")
+      @course2.enroll_student(@observed_student, enrollment_state: "active")
+      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, enrollment_state: "active")
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, enrollment_state: "active")
+
+      @submission1 = @assignment1.submissions.find_by(user: @observed_student)
+      @submission2 = @assignment2.submissions.find_by(user: @observed_student)
+    end
+
+    let(:observer_user_type) do
+      GraphQLTypeTester.new(
+        @observer,
+        current_user: @observer,
+        domain_root_account: @course1.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it "returns course work for observed student" do
+      result = observer_user_type.resolve(
+        "courseWorkSubmissionsConnection(observedUserId: \"#{@observed_student.id}\") {
+          edges {
+            node {
+              assignment {
+                name
+              }
+            }
+          }
+        }"
+      )
+
+      expect(result.length).to eq(2)
+      assignment_names = result.sort
+      expect(assignment_names).to eq(["Assignment 1", "Assignment 2"])
+    end
+
+    it "returns empty result for invalid observed user id" do
+      result = observer_user_type.resolve(
+        "courseWorkSubmissionsConnection(observedUserId: \"999999\") {
+          edges {
+            node {
+              assignment { name }
+            }
+          }
+        }"
+      )
+
+      expect(result).to be_empty
+    end
+
+    it "filters by course when specified" do
+      result = observer_user_type.resolve(
+        "courseWorkSubmissionsConnection(observedUserId: \"#{@observed_student.id}\", courseFilter: \"#{@course1.id}\") {
+          edges {
+            node {
+              assignment {
+                name
+              }
+            }
+          }
+        }"
+      )
+
+      expect(result.length).to eq(1)
+      expect(result.first).to eq("Assignment 1")
+    end
+
+    it "only returns submissions from courses observer can access" do
+      # Create a course the observer can't see
+      other_course = course_factory(active_all: true, course_name: "Other Course")
+      other_course.assignments.create!(title: "Other Assignment")
+      other_course.enroll_student(@observed_student, enrollment_state: "active")
+
+      result = observer_user_type.resolve(
+        "courseWorkSubmissionsConnection(observedUserId: \"#{@observed_student.id}\") {
+          edges {
+            node {
+              assignment { name }
+            }
+          }
+        }"
+      )
+
+      assignment_names = result.sort
+      expect(assignment_names).to eq(["Assignment 1", "Assignment 2"])
+      expect(assignment_names).not_to include("Other Assignment")
+    end
+  end
+
+  describe "peer_review_status field" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        points_possible: 10,
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+      @student1 = user_factory(name: "Student One")
+      @student2 = user_factory(name: "Student Two")
+
+      @course.enroll_student(@student1, enrollment_state: "active")
+      @course.enroll_student(@student2, enrollment_state: "active")
+
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      AllocationRule.create!(
+        assignment: @assignment,
+        course: @course,
+        assessor: @student1,
+        assessee: @student2,
+        must_review: true
+      )
+
+      submission1 = @assignment.submit_homework(@student1, {
+                                                  submission_type: "online_text_entry",
+                                                  body: "Student 1 submission"
+                                                })
+      submission2 = @assignment.submit_homework(@student2, {
+                                                  submission_type: "online_text_entry",
+                                                  body: "Student 2 submission"
+                                                })
+      AssessmentRequest.create!(
+        asset: submission2,
+        assessor_asset: submission1,
+        user: @student2,
+        assessor: @student1,
+        workflow_state: "completed"
+      )
+    end
+
+    it "loads peer review status using the loader" do
+      user_type_tester = GraphQLTypeTester.new(
+        @student1,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create,
+        assignment_id: @assignment.id
+      )
+
+      must_review_count = user_type_tester.resolve("peerReviewStatus { mustReviewCount }")
+      completed_reviews_count = user_type_tester.resolve("peerReviewStatus { completedReviewsCount }")
+      expect(must_review_count).to eq(1)
+      expect(completed_reviews_count).to eq(1)
+    end
+
+    it "returns nil when assignment_id is not in context" do
+      user_type_tester = GraphQLTypeTester.new(
+        @student1,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+
+      result = user_type_tester.resolve("peerReviewStatus { mustReviewCount }")
+      expect(result).to be_nil
+    end
+
+    context "with permission and feature checks" do
+      it "returns nil when user lacks grade permission" do
+        student_type_tester = GraphQLTypeTester.new(
+          @student1,
+          current_user: @student2,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create,
+          assignment_id: @assignment.id
+        )
+
+        result = student_type_tester.resolve("peerReviewStatus { mustReviewCount }")
+        expect(result).to be_nil
+      end
+
+      it "returns nil when feature is not enabled" do
+        @assignment.context.disable_feature!(:peer_review_allocation_and_grading)
+
+        user_type_tester = GraphQLTypeTester.new(
+          @student1,
+          current_user: @teacher,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create,
+          assignment_id: @assignment.id
+        )
+
+        result = user_type_tester.resolve("peerReviewStatus { mustReviewCount }")
+        expect(result).to be_nil
+      end
+
+      it "returns nil when peer reviews are not enabled on assignment" do
+        # Skip validation: testing GraphQL response format when peer reviews disabled,
+        # not the business logic that prevents this state from occurring normally
+        @assignment.update_attribute(:peer_reviews, false)
+
+        user_type_tester = GraphQLTypeTester.new(
+          @student1,
+          current_user: @teacher,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create,
+          assignment_id: @assignment.id
+        )
+        result = user_type_tester.resolve("peerReviewStatus { mustReviewCount }")
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  context "widgetDashboardConfig" do
+    it "returns null when no preference is set" do
+      expect(student_user_type.resolve("widgetDashboardConfig")).to be_nil
+    end
+
+    it "returns the stored configuration as JSON" do
+      config = { "columns" => 2, "widgets" => [] }
+      @student.set_preference(:widget_dashboard_config, config)
+      result = student_user_type.resolve("widgetDashboardConfig")
+      expect(JSON.parse(result)).to eq(config)
+    end
+
+    it "returns a complete widget configuration" do
+      config = {
+        "columns" => 2,
+        "widgets" => [
+          {
+            "id" => "course-work-widget",
+            "type" => "course_work",
+            "position" => { "col" => 1, "row" => 1, "relative" => 1 },
+            "title" => "Course work"
+          }
+        ]
+      }
+      @student.set_preference(:widget_dashboard_config, config)
+      result = student_user_type.resolve("widgetDashboardConfig")
+      expect(JSON.parse(result)).to eq(config)
     end
   end
 end

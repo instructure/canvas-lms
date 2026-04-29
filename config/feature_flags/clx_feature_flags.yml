@@ -7,101 +7,86 @@ horizon_course_setting:
   description: |-
     Enables the Canvas Career tab in account settings.
   beta: true
-
-# Module Federation flags
-horizon_learning_provider_app_for_accounts:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Learning Provider App (Account Contexts)"
-  description: |-
-    Enables the Canvas Career Learning Provider App in account contexts.
-horizon_learning_provider_app_for_courses:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Learning Provider App (Course Contexts)"
-  description: |-
-    Enables the Canvas Career Learning Provider App in course contexts.
-horizon_learning_provider_app_on_contextless_routes:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Learning Provider App (Contextless Routes)"
-  description: |-
-    Enables the Canvas Career Learning Provider App on contextless routes.
-horizon_learner_app:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Learner App"
-  description: |-
-    Enables the Learner app in Canvas Career on all routes.
-horizon_injected_config:
-  applies_to: RootAccount
-  state: hidden
-  shadow: true
-  display_name: "Canvas Career: Injected Config"
-  description: |-
-    Injects config into the microfrontend at load time instead of fetching from the server.
+  after_state_change_proc: sync_with_salesforce
 
 # Feature flags read by Horizon app
-horizon_crm_integration:
+horizon_hris_integrations:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: CRM Integration"
+  display_name: "Canvas Career: HRIS Integrations"
   description: |-
-    Enables the CRM integration settings in Canvas Career.
-horizon_leader_dashboards:
+    Enables HRIS integrations in Canvas Career.
+horizon_user_profile_page:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Leader Dashboards"
+  display_name: "Canvas Career: User Profile Page"
   description: |-
-    Enables dashboards for leaders in Canvas Career.
-horizon_admin_dashboards:
+    Enables the refreshed user profile page in Canvas Career.
+horizon_block_content_editor:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Admin Dashboards"
+  display_name: "Canvas Career: Block Content Editor"
   description: |-
-    Enables dashboards for admins in Canvas Career.
-horizon_roles_and_permissions:
+    Enables the block content editor in Canvas Career.
+horizon_manual_dashboard_builder:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Roles & Permissions"
+  display_name: "Canvas Career: Manual Dashboard Builder"
   description: |-
-    Enables updated Roles & Permissions UI in Canvas Career.
-horizon_agent:
+    Enables manual dashboard builder in Canvas Career.
+horizon_learning_library:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Agent"
+  display_name: "Canvas Career: Learning Library"
   description: |-
-    Enables the Career agent.
-horizon_content_library:
+    Enables the Learning Library in Canvas Career.
+horizon_learning_library_ms2:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Content Library"
+  display_name: "Canvas Career: Learning Library Milestone 2"
   description: |-
-    Enables the Content Library in Canvas Career.
-horizon_program_management:
+    Enables Learning Library microlearning features in Canvas Career.
+horizon_learning_library_ms3:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Program Management"
+  display_name: "Canvas Career: Learning Library Milestone 3"
   description: |-
-    Enables Program Management in Canvas Career.
-horizon_skill_management:
+    Enables Learning Library recommendation features in Canvas Career.
+horizon_chart_view:
   applies_to: RootAccount
   state: hidden
   shadow: true
-  display_name: "Canvas Career: Skill Management"
+  display_name: "Canvas Career: Chart View"
   description: |-
-    Enables Skill Management in Canvas Career.
+    Enables chart view in Canvas Career.
+horizon_native_permissions_page:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Permissions Page"
+  description: |-
+    Enables native permissions page instead of the Academic iframe in Canvas Career.
+horizon_native_inbox:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Native Inbox"
+  description: |-
+    Enables the native inbox in Canvas Career.
+horizon_study_tools:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Study Tools"
+  description: |-
+    Restricts AI study tools to Page and File learning object routes in Canvas Career.
 
 # Feature flags read by Canvas
 horizon_bulk_api_permission:
@@ -111,3 +96,10 @@ horizon_bulk_api_permission:
   display_name: "Canvas Career: Manage Bulk API & Permission"
   description: |-
     Enables the ability to manage bulk API and permission settings in Canvas Career.
+horizon_autopilot:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Rule-Based Automations"
+  description: |-
+    Enables creating & running rule-based automations in Canvas Career.

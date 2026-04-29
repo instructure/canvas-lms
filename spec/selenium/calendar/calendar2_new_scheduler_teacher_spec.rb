@@ -24,6 +24,7 @@ require_relative "pages/scheduler_page"
 describe "scheduler" do
   include Calendar2Common
   include SchedulerPage
+
   include_context "in-process server selenium tests"
 
   context "as a teacher" do

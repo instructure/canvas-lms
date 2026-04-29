@@ -83,6 +83,11 @@ const server = setupServer(
   // Default handlers for folder contents
   http.get('/api/v1/folders/:folderId/folders', () => HttpResponse.json([])),
   http.get('/api/v1/folders/:folderId/files', () => HttpResponse.json([])),
+  // Default handlers for upload endpoints to prevent MSW warnings
+  http.options('http://example.com/upload', () => new HttpResponse(null, {status: 200})),
+  http.post('http://example.com/upload', () =>
+    HttpResponse.json({id: '123', display_name: 'test.png'}),
+  ),
 )
 
 // rewrite using testing-library
@@ -108,8 +113,7 @@ describe('FileBrowser', () => {
     expect(wrapper.container).toBeInTheDocument()
   })
 
-  // TODO: fix fickle test (cf. RCX-2728)
-  it.skip('only shows images in the tree', async () => {
+  it('only shows images in the tree', async () => {
     const files = [
       testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'}),
       testFile({
@@ -131,7 +135,7 @@ describe('FileBrowser', () => {
       }),
     )
 
-    const {wrapper, ref} = renderFileBrowser()
+    const {wrapper, ref} = renderFileBrowser({contentTypes: ['image/*']})
     const folder1 = 'folder 1'
     const folder4 = 'folder 4'
     const collections = {
@@ -144,11 +148,15 @@ describe('FileBrowser', () => {
     await userEvent.click(getClosestElementByType(wrapper, folder1, 'button'))
     await userEvent.click(getClosestElementByType(wrapper, folder4, 'button'))
 
-    expect(wrapper.container.querySelectorAll('button')).toHaveLength(3)
+    // Wait for files to be loaded and filtered
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    // Check that only the image file is shown (not the HTML file)
+    expect(wrapper.queryByText('file 1')).toBeInTheDocument()
+    expect(wrapper.queryByText('file 2')).not.toBeInTheDocument()
   })
 
-  // TODO: fix fickle test (cf. RCX-2728)
-  it.skip('shows thumbnails if provided', async () => {
+  it('shows thumbnails if provided', async () => {
     const files = [testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'})]
     server.use(
       http.get('/api/v1/folders/4/files', () => {
@@ -228,8 +236,7 @@ describe('FileBrowser', () => {
   })
 
   describe('on folder click', () => {
-    // TODO: fix fickle test (cf. RCX-2728)
-    it.skip("gets sub-folders and files for folder's sub-folders on folder expand", async () => {
+    it("gets sub-folders and files for folder's sub-folders on folder expand", async () => {
       const subFolders1 = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
       const subFolders2 = [courseFolder({id: 7, name: 'sub folder 2', parent_folder_id: 5})]
       const files1 = [testFile({folder_id: 4})]
@@ -268,7 +275,7 @@ describe('FileBrowser', () => {
       }
 
       ref.current.setState({collections})
-      jest.spyOn(ref.current, 'getFolderData')
+      vi.spyOn(ref.current, 'getFolderData')
 
       await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
 
@@ -296,7 +303,7 @@ describe('FileBrowser', () => {
       // Wait for state to settle
       await new Promise(resolve => setTimeout(resolve, 50))
 
-      jest.spyOn(ref.current, 'getFolderData')
+      vi.spyOn(ref.current, 'getFolderData')
 
       await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
 
@@ -475,7 +482,7 @@ describe('FileBrowser', () => {
 
   describe('on file click', () => {
     it('sets a selected file on file click', async () => {
-      const spy = jest.fn()
+      const spy = vi.fn()
       const {wrapper, ref} = renderFileBrowser({selectFile: spy})
       const collections = {
         0: {id: 0, collections: [1]},
@@ -656,7 +663,7 @@ describe('FileBrowser', () => {
           context: '/courses/1',
         },
       }
-      const spy = jest.spyOn(ref.current, 'submitFile')
+      const spy = vi.spyOn(ref.current, 'submitFile')
 
       ref.current.setState({collections})
 
@@ -752,7 +759,7 @@ describe('FileBrowser', () => {
       }
 
       ref.current.setState({collections})
-      jest.spyOn(ref.current, 'setSuccessMessage')
+      vi.spyOn(ref.current, 'setSuccessMessage')
 
       server.use(
         http.post(`/api/v1/folders/${id}/files`, ({request}) => {
@@ -810,7 +817,7 @@ describe('FileBrowser', () => {
       }
 
       ref.current.setState({collections})
-      jest.spyOn(ref.current, 'setFailureMessage')
+      vi.spyOn(ref.current, 'setFailureMessage')
 
       server.use(
         http.post(`/api/v1/folders/${id}/files`, () => new HttpResponse(null, {status: 500})),

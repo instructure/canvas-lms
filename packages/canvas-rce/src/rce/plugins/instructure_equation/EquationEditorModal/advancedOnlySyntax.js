@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {memoize} from 'lodash'
+import {memoize} from 'es-toolkit/compat'
 
 // These commands all work fine with MathJax but either don't work, don't work well
 // (bad UX for editing), or look strange when rendered by Mathlive. Add new ones
@@ -104,6 +104,7 @@ const advancedOnlyCommands = [
 
 const advancedOnlyRegex = new RegExp(advancedOnlyCommands.join('|'), 'm')
 
+/** @type {(latex: string) => boolean} */
 const containsAdvancedSyntax = memoize(latex => advancedOnlyRegex.test(latex))
 
 export {advancedOnlyCommands, containsAdvancedSyntax}

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AbstractCourse < ActiveRecord::Base
+class AbstractCourse < ApplicationRecord
   include Workflow
 
   belongs_to :root_account, class_name: "Account"
@@ -42,5 +42,6 @@ class AbstractCourse < ActiveRecord::Base
   scope :active, -> { where("abstract_courses.workflow_state<>'deleted'") }
 
   include StickySisFields
+
   are_sis_sticky :name, :short_name, :enrollment_term_id
 end

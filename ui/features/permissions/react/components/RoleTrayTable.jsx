@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types'
 import React from 'react'
-import sortBy from 'lodash/sortBy'
+import {sortBy} from 'es-toolkit/compat'
 
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'

@@ -43,7 +43,7 @@ if CanvasRails::Application.routes_reloader.paths.empty?
 else
   # we're probably running in spring, and Rails has already loaded them; make
   # sure they're up to date
-  CanvasRails::Application.routes_reloader.reload!
+  CanvasRails::Application.reload_routes!
 end
 
 # Extend YARD to generate our API documentation
@@ -70,6 +70,10 @@ YARD::Tags::Library.define_tag("API resource is Beta", :beta)
 YARD::Tags::Library.define_tag("API Object Definition", :object)
 YARD::Tags::Library.define_tag("API Return Type", :returns)
 YARD::Tags::Library.define_tag("API resource is internal", :internal)
+# Expected Format:
+# @hint style_name
+#   The hint text content. Supported styles: info, warning, danger, success
+YARD::Tags::Library.define_tag("API hint block", :hint)
 
 module YARD::Templates::Helpers
   module BaseHelper
@@ -82,7 +86,7 @@ module YARD::Templates::Helpers
       when :root, :module, :constant
         false
       when :method, :class
-        !object.tags("API").empty? && (ENV["INCLUDE_INTERNAL"] || object.tags("internal").empty?)
+        !object.tags("API").empty? && (show_internal? || object.tags("internal").empty?)
       else
         if object.parent.nil?
           false
@@ -90,6 +94,10 @@ module YARD::Templates::Helpers
           relevant_object?(object.parent)
         end
       end
+    end
+
+    def show_internal?
+      ["true", true].include?(ENV["INCLUDE_INTERNAL_API_DOCS"])
     end
   end
 end

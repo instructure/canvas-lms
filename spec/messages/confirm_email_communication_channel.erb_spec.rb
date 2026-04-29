@@ -32,5 +32,5 @@ describe "confirm_email_communication_channel" do
   let(:asset) { @object }
   let(:notification_name) { :confirm_email_communication_channel }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

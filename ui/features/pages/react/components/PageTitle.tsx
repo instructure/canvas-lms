@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {TextInput} from '@instructure/ui-text-input'
 
-const I18n = createI18nScope('pages')
-
 export const PageTitle = () => {
-  return <TextInput renderLabel={I18n.t('Page title')} />
+  const {t} = useTranslation('pages')
+  return <TextInput renderLabel={t('Page title')} />
 }

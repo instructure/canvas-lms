@@ -25,18 +25,52 @@ import {
 } from '@instructure/ui-icons'
 import {canvas} from '@instructure/ui-themes'
 import {IconButton} from '@instructure/ui-buttons'
+import {Pill} from '@instructure/ui-pill'
+import {Text} from '@instructure/ui-text'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Flex} from '@instructure/ui-flex'
 
+const I18n = createI18nScope('discussion_insights')
 const honeyInstUI10 = '#B07E00'
 
 export const getStatusByRelevance = (relevance: string) => {
-  if (relevance === 'needs_review') {
-    return <IconWarningSolid style={{fill: honeyInstUI10}} />
-  } else {
-    if (relevance === 'relevant') {
-      return <IconCompleteSolid style={{fill: canvas.colors.contrasts.green5782}} />
-    } else {
-      return <IconTroubleSolid style={{fill: canvas.colors.contrasts.red5782}} />
-    }
+  switch (relevance) {
+    case 'needs_review':
+      return (
+        <Pill
+          color="warning"
+          themeOverride={{background: honeyInstUI10, warningColor: honeyInstUI10}}
+        >
+          <Flex alignItems="center" gap="xx-small">
+            <Text color="primary-inverse" size="small">
+              {I18n.t('Needs review')}
+            </Text>
+            <IconWarningSolid style={{fill: 'white'}} />
+          </Flex>
+        </Pill>
+      )
+    case 'relevant':
+      return (
+        <Pill color="success" themeOverride={{background: canvas.colors.contrasts.green5782}}>
+          <Flex alignItems="center" gap="xx-small">
+            <Text color="primary-inverse" size="small">
+              {I18n.t('Relevant')}
+            </Text>
+            <IconCompleteSolid style={{fill: 'white'}} />
+          </Flex>
+        </Pill>
+      )
+    default:
+      return (
+        <Pill color="danger" themeOverride={{background: canvas.colors.contrasts.red5782}}>
+          <Flex alignItems="center" gap="xx-small">
+            <Text color="primary-inverse" size="small">
+              {I18n.t('Irrelevant')}
+            </Text>
+            <IconTroubleSolid style={{fill: 'white'}} />
+          </Flex>
+        </Pill>
+      )
   }
 }
 

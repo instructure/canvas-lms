@@ -27,7 +27,7 @@ function makeProps() {
     applicationElement: () => document.getElementById('fixtures'),
     contextId: '1',
     contextType: 'course',
-    deleteSelectedAnnouncements: jest.fn(),
+    deleteSelectedAnnouncements: vi.fn(),
     isBusy: false,
     permissions: {
       create: true,
@@ -35,48 +35,40 @@ function makeProps() {
       manage_course_content_delete: true,
       moderate: true,
     },
-    searchAnnouncements: jest.fn(),
+    searchAnnouncements: vi.fn(),
     selectedCount: 0,
-    toggleSelectedAnnouncementsLock: jest.fn(),
+    toggleSelectedAnnouncementsLock: vi.fn(),
     announcementsLocked: false,
     isToggleLocking: false,
-    markAllAnnouncementRead: jest.fn(),
+    markAllAnnouncementRead: vi.fn(),
   }
 }
 
 // Making sure debounce is not making tests slow in CI, passed fn should fire instantly instead
-jest.mock('lodash/debounce', () => jest.fn(fn => fn))
+vi.mock('lodash/debounce', () => vi.fn(fn => fn))
 
 describe('"Add Announcement" button', () => {
   test('is present when the user has permission to create an announcement', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
-    expect(
-      screen.getByRole('link', {
-        name: /add announcement/i,
-      }),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('add-announcement-button')).toBeInTheDocument()
   })
 
   test('is absent when the user does not have permission to create an announcement', () => {
     const props = makeProps()
     props.permissions.create = false
     render(<IndexHeader {...props} />)
-    expect(
-      screen.queryByRole('link', {
-        name: /add announcement/i,
-      }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('add-announcement-button')).not.toBeInTheDocument()
   })
 })
 
 describe('searching announcements', () => {
   test('calls the searchAnnouncements prop with searchInput value after debounce timeout', async () => {
-    const spy = jest.fn()
+    const spy = vi.fn()
     const props = makeProps()
     props.searchAnnouncements = spy
     render(<IndexHeader {...props} />)
-    const input = screen.getByRole('textbox')
+    const input = screen.getByTestId('announcements-search')
     await userEvent.type(input, 'foo')
 
     await waitFor(() => {
@@ -106,7 +98,7 @@ describe('"Announcement Filter" select', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
 
-    const filterDDown = screen.getByRole('combobox', {name: 'Announcement Filter'})
+    const filterDDown = screen.getByTestId('announcement-filter')
 
     await userEvent.click(filterDDown)
 
@@ -126,7 +118,7 @@ describe('"Announcement Filter" select', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
 
-    const filterButton = screen.getByRole('button', {name: 'Announcement Filter'})
+    const filterButton = screen.getByTestId('toggle-filter-menu')
 
     await userEvent.click(filterButton)
 
@@ -137,12 +129,12 @@ describe('"Announcement Filter" select', () => {
   })
 
   test('calls the searchAnnouncements prop when selecting a filter option with the selected value', async () => {
-    const spy = jest.fn()
+    const spy = vi.fn()
     const props = makeProps()
     props.searchAnnouncements = spy
     render(<IndexHeader {...props} />)
 
-    const filterDDown = screen.getByRole('combobox', {name: 'Announcement Filter'})
+    const filterDDown = screen.getByTestId('announcement-filter')
 
     await userEvent.click(filterDDown)
 
@@ -200,7 +192,7 @@ describe('"Lock Selected Announcements" button', () => {
     render(<IndexHeader {...props} />)
     await userEvent.click(screen.getByTestId('lock_announcements'))
 
-    waitFor(() => {
+    await waitFor(() => {
       expect(props.toggleSelectedAnnouncementsLock).toHaveBeenCalledTimes(1)
     })
   })
@@ -243,11 +235,7 @@ describe('"Delete Selected Announcements" button', () => {
     const delButton = screen.getByTestId('delete-announcements-button')
     await userEvent.click(delButton)
 
-    expect(
-      screen.getByRole('heading', {
-        name: /confirm delete/i,
-      }),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/confirm delete/i)).toBeInTheDocument()
   })
 })
 

@@ -20,7 +20,7 @@
 
 require_relative "api_spec_helper"
 
-shared_examples_for "file uploads api" do
+shared_examples "file uploads api" do
   include ApplicationHelper
 
   # send a multipart post request in an integration spec post_params is
@@ -75,7 +75,6 @@ shared_examples_for "file uploads api" do
 
     unless options[:no_doc_preview]
       json["canvadoc_session_url"] = nil
-      json["crocodoc_session_url"] = nil
     end
 
     json
@@ -139,9 +138,10 @@ shared_examples_for "file uploads api" do
           "mime_class" => attachment.mime_class,
           "media_entry_id" => attachment.media_entry_id,
           "canvadoc_session_url" => nil,
-          "crocodoc_session_url" => nil,
           "category" => "uncategorized"
         }
+
+        expected_json["uuid"] = attachment.uuid if (attachment.context_type == "User" && attachment.context_id == @user.id) || !attachment.root_account.feature_enabled?(:deprecate_uuid_in_files_api)
 
         if attachment.context.is_a?(User) || attachment.context.is_a?(Course) || attachment.context.is_a?(Group)
           expected_json["preview_url"] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0)
@@ -192,7 +192,9 @@ shared_examples_for "file uploads api" do
           expect(response).to be_successful
           attachment.reload
           json = json_parse(response.body)
-          expect(json).to eq attachment_json(attachment, { include: %w[enhanced_preview_url] })
+          expected_json = attachment_json(attachment, { include: %w[enhanced_preview_url] })
+          expected_json["uuid"] = attachment.uuid if (attachment.context_type == "User" && attachment.context_id == @user.id) || !attachment.root_account.feature_enabled?(:deprecate_uuid_in_files_api)
+          expect(json).to eq expected_json
 
           expect(attachment.file_state).to eq "available"
           expect(attachment.content_type).to eq "application/msword"
@@ -344,7 +346,7 @@ shared_examples_for "file uploads api" do
 end
 
 shared_examples_for "file uploads api with folders" do
-  include_examples "file uploads api"
+  include_context "file uploads api"
 
   it "allows specifying a folder with deprecated argument name" do
     preflight({ name: "with_path.txt", folder: "files/a/b/c/mypath" })

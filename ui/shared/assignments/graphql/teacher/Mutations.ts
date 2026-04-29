@@ -29,3 +29,62 @@ export const SET_WORKFLOW = gql`
     }
   }
 `
+
+export const CREATE_ALLOCATION_RULE_MUTATION = gql`
+  mutation CreateAllocationRule($input: CreateAllocationRuleInput!) {
+    createAllocationRule(input: $input) {
+      allocationRules {
+        _id
+        assessor {
+          _id
+          name
+        }
+        assessee {
+          _id
+          name
+        }
+        mustReview
+        reviewPermitted
+        appliesToAssessor
+      }
+      allocationErrors {
+        message
+        attribute
+        attributeId
+      }
+    }
+  }
+`
+
+export const UPDATE_ALLOCATION_RULE_MUTATION = gql`
+  mutation UpdateAllocationRule($input: UpdateAllocationRuleInput!) {
+    updateAllocationRule(input: $input) {
+      allocationRules {
+        _id
+        mustReview
+        reviewPermitted
+        appliesToAssessor
+        assessor {
+          _id
+          name
+        }
+        assessee {
+          _id
+          name
+        }
+      }
+      allocationErrors {
+        attributeId
+        message
+      }
+    }
+  }
+`
+
+export const DELETE_ALLOCATION_RULE_MUTATION = gql`
+  mutation DeleteAllocationRule($input: DeleteAllocationRuleInput!) {
+    deleteAllocationRule(input: $input) {
+      allocationRuleId
+    }
+  }
+`

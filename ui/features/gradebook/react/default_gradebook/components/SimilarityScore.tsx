@@ -48,7 +48,8 @@ export default class SimilarityScore extends PureComponent<Props> {
     }
     const statusIcon = <SimilarityIcon similarityScore={similarityScore} status={status} />
 
-    const displayScore = I18n.n(similarityScore, {precision: 1})
+    const displayScore =
+      similarityScore !== undefined ? I18n.n(similarityScore, {precision: 1}) : ''
     return (
       <Grid rowSpacing="none">
         {statusMessage ? (

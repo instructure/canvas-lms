@@ -185,7 +185,7 @@ it('renders the results by most recent', () => {
 describe('handleToggle()', () => {
   it('calls onExpansionChange with the correct data', () => {
     const props = defaultProps()
-    props.onExpansionChange = jest.fn()
+    props.onExpansionChange = vi.fn()
 
     const {getByText} = render(<Outcome {...props} />)
     fireEvent.click(getByText(/Toggle alignment details/)) // expand

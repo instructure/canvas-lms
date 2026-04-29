@@ -31,15 +31,15 @@ const createProps = overrides => {
     settingsDisabled: false,
     shouldRenderMarkAsRead: true,
     shouldRenderMarkAsUnread: true,
-    compose: jest.fn(),
-    reply: jest.fn(),
-    replyAll: jest.fn(),
-    archive: jest.fn(),
-    delete: jest.fn(),
-    markAsUnread: jest.fn(),
-    markAsRead: jest.fn(),
-    forward: jest.fn(),
-    star: jest.fn(),
+    compose: vi.fn(),
+    reply: vi.fn(),
+    replyAll: vi.fn(),
+    archive: vi.fn(),
+    delete: vi.fn(),
+    markAsUnread: vi.fn(),
+    markAsRead: vi.fn(),
+    forward: vi.fn(),
+    star: vi.fn(),
     ...overrides,
   }
 }
@@ -132,7 +132,7 @@ describe('MessageActionButtons', () => {
 
   it('calls unarchive when unarchive prop exists', async () => {
     const props = createProps({
-      unarchive: jest.fn(),
+      unarchive: vi.fn(),
     })
 
     const {queryByTestId} = render(<MessageActionButtons {...props} />)
@@ -145,5 +145,34 @@ describe('MessageActionButtons', () => {
     const {queryByTestId} = render(<MessageActionButtons {...props} />)
     fireEvent.click(queryByTestId('archive'))
     expect(props.archive).toHaveBeenCalled()
+  })
+
+  describe('when restrict_student_access feature is enabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.restrict_student_access = true
+    })
+
+    afterAll(() => {
+      delete window.ENV.FEATURES.restrict_student_access
+    })
+
+    it('does not render the reply all & delete button', async () => {
+      const props = createProps()
+      const {queryByTestId} = render(<MessageActionButtons {...props} />)
+
+      expect(queryByTestId('reply-all')).not.toBeInTheDocument()
+      expect(queryByTestId('delete')).not.toBeInTheDocument()
+    })
+
+    it('renders all other expected buttons', () => {
+      const props = createProps()
+      const {getByTestId} = render(<MessageActionButtons {...props} />)
+
+      expect(getByTestId('compose')).toBeInTheDocument()
+      expect(getByTestId('reply')).toBeInTheDocument()
+      expect(getByTestId('archive')).toBeInTheDocument()
+      expect(getByTestId('settings')).toBeInTheDocument()
+    })
   })
 })

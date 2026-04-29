@@ -18,35 +18,36 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Product} from '@canvas/lti-apps/models/Product'
-import {
-  pickPreferredIntegration,
-  type PreferredLtiIntegration,
-} from '@canvas/lti-apps/utils/pickPreferredIntegration'
+import {pickPreferredIntegration} from '@canvas/lti-apps/utils/pickPreferredIntegration'
 import {Button} from '@instructure/ui-buttons'
 import * as React from 'react'
-import {useNavigate} from 'react-router-dom'
+import {Link as RouterLink, useNavigate} from 'react-router-dom'
 import {isSuccessful} from '../common/lib/apiResult/ApiResult'
-import {fetchThirdPartyToolConfiguration} from '../manage/api/registrations'
+import {fetchThirdPartyToolConfiguration, refreshRegistrations} from '../manage/api/registrations'
 import {openInheritedKeyWizard} from '../manage/inherited_key_registration_wizard/InheritedKeyRegistrationWizardState'
 import type {AccountId} from '../manage/model/AccountId'
 import {ZDeveloperKeyId} from '../manage/model/developer_key/DeveloperKeyId'
+import {LtiRegistrationId} from '../manage/model/LtiRegistrationId'
 import {ZUnifiedToolId} from '../manage/model/UnifiedToolId'
 import {
-  openRegistrationWizard,
   openDynamicRegistrationWizard,
   openJsonRegistrationWizard,
   openJsonUrlRegistrationWizard,
+  openRegistrationWizard,
   type JsonFetchStatus,
-  openEditManualRegistrationWizard,
 } from '../manage/registration_wizard/RegistrationWizardModalState'
-import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingState'
-import type {LtiRegistrationWithConfiguration} from '../manage/model/LtiRegistration'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 export type ConfigureButtonProps = {
   buttonWidth: 'block' | 'inline-block'
   product: Product
   accountId: AccountId
+  /**
+   * This represents the id of the existing LtiRegistration of the tool, if it exists.
+   * It's not using the LtiRegistration type because that's not available
+   * in ui/shared/lti-apps/
+   */
+  installStatus?: {id: string} | null
+  installStatusLoading?: boolean
 }
 
 const I18n = createI18nScope('lti_registrations')
@@ -73,16 +74,33 @@ export const findLtiVersion = (
   return '1p3'
 }
 
-export const ProductConfigureButton = ({buttonWidth, product, accountId}: ConfigureButtonProps) => {
+export const ProductConfigureButton = ({
+  buttonWidth,
+  product,
+  accountId,
+  installStatus,
+  installStatusLoading,
+}: ConfigureButtonProps) => {
   const navigate = useNavigate()
 
-  const onSuccessfulInstall = React.useCallback(() => {
-    navigate('/manage')
-  }, [navigate])
+  const onSuccessfulInstall = React.useCallback(
+    (registrationId: LtiRegistrationId) => {
+      if (window.ENV.FEATURES.lti_registrations_next) {
+        navigate(`/manage/${registrationId}`)
+      } else {
+        navigate('/manage')
+      }
+    },
+    [navigate],
+  )
 
   const onSuccessfulInstallForInheritedKey = React.useCallback(
-    (config: LtiRegistrationWithConfiguration) => {
-      navigate(`/manage?q=${config.admin_nickname || config.name}`)
+    (id: LtiRegistrationId, name?: string) => {
+      if (window.ENV.FEATURES.lti_registrations_next) {
+        navigate(`/manage/${id}`)
+      } else {
+        navigate(`/manage?q=${name}`)
+      }
     },
     [navigate],
   )
@@ -130,84 +148,89 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
       showBlankConfigurationMessage: (product?.canvas_lti_configurations?.length || 0) === 0,
       method: 'manual',
       registering: false,
-      exitOnCancel: false,
       onSuccessfulInstallation: () => {
         refreshRegistrations()
       },
       jsonFetch: {_tag: 'initial'},
     })
 
-  return (
-    <Button
-      display={buttonWidth}
-      color="primary"
-      interaction={buttonIsEnabled(integration, jsonFetchStatus) ? 'enabled' : 'disabled'}
-      onClick={() => {
-        switch (integration?.integration_type) {
-          case 'lti_13_dynamic_registration':
-            openDynamicRegistrationWizard(
-              integration.url,
-              ZUnifiedToolId.parse(integration.unified_tool_id),
-              onSuccessfulInstall,
-            )
-            break
-          case 'lti_13_global_inherited_key':
-            openInheritedKeyWizard(
-              ZDeveloperKeyId.parse(integration.global_inherited_key),
-              onSuccessfulInstallForInheritedKey,
-            )
-            break
-          case 'lti_13_url':
-            if (jsonFetchStatus._tag === 'loaded' && isSuccessful(jsonFetchStatus.result)) {
-              openJsonUrlRegistrationWizard(
-                integration.url,
-                jsonFetchStatus.result.data,
-                ZUnifiedToolId.parse(integration.unified_tool_id),
-                onSuccessfulInstall,
-              )
-            } else if (jsonFetchStatus._tag === 'loaded') {
-              openBlankRegistrationWizard()
-            }
-            break
-          case 'lti_13_configuration':
-            if (jsonFetchStatus._tag === 'loaded' && isSuccessful(jsonFetchStatus.result)) {
-              openJsonRegistrationWizard(
-                integration.configuration,
-                jsonFetchStatus.result.data,
-                ZUnifiedToolId.parse(integration.unified_tool_id),
-                onSuccessfulInstall,
-              )
-            } else if (jsonFetchStatus._tag === 'loaded') {
-              openBlankRegistrationWizard()
-            }
-            break
-          case undefined:
-            openBlankRegistrationWizard()
-            break
-        }
-      }}
-    >
-      {I18n.t('Configure')}
-    </Button>
-  )
-}
-
-const buttonIsEnabled = (
-  integration: PreferredLtiIntegration | undefined,
-  jsonFetchStatus: JsonFetchStatus,
-) => {
-  if (integration === undefined) {
-    return true
-  } else if (jsonFetchStatus._tag === 'loading') {
-    return false
-  } else if (integration?.integration_type === 'lti_13_dynamic_registration') {
-    return true
-  } else if (
-    (jsonFetchStatus._tag === 'loaded' && isSuccessful(jsonFetchStatus.result)) ||
-    integration?.integration_type === 'lti_13_global_inherited_key'
-  ) {
-    return window.ENV.FEATURES.lti_registrations_page
+  // Don't render the button at all until we know whether or not the tool is already installed,
+  // This is to avoid jank while loading
+  if (installStatusLoading) {
+    return null
+  } else if (window.ENV.FEATURES.lti_registrations_templates && installStatus) {
+    // If the tool is already installed, we want to direct the user to the registration details page instead of showing the configure button
+    // the link should look like the configure button, but it should take the user to the registration details page instead of opening the registration wizard
+    // it sohuld also render as an 'a' tag, but still look like a button
+    return (
+      <Button
+        id="configure-existing-lti-app"
+        display={buttonWidth}
+        color="primary"
+        as={RouterLink}
+        to={`/manage/${installStatus.id}`}
+      >
+        {I18n.t('View Installation')}
+      </Button>
+    )
   } else {
-    return true
+    return (
+      <Button
+        id="install-new-lti-app"
+        display={buttonWidth}
+        color="primary"
+        interaction={
+          buttonIsEnabled(jsonFetchStatus) && !installStatusLoading ? 'enabled' : 'disabled'
+        }
+        onClick={() => {
+          switch (integration?.integration_type) {
+            case 'lti_13_dynamic_registration':
+              openDynamicRegistrationWizard(
+                integration.url,
+                ZUnifiedToolId.parse(integration.unified_tool_id),
+                onSuccessfulInstall,
+              )
+              break
+            case 'lti_13_global_inherited_key':
+              openInheritedKeyWizard(
+                ZDeveloperKeyId.parse(integration.global_inherited_key),
+                onSuccessfulInstallForInheritedKey,
+              )
+              break
+            case 'lti_13_url':
+              if (jsonFetchStatus._tag === 'loaded' && isSuccessful(jsonFetchStatus.result)) {
+                openJsonUrlRegistrationWizard(
+                  integration.url,
+                  jsonFetchStatus.result.data,
+                  ZUnifiedToolId.parse(integration.unified_tool_id),
+                  onSuccessfulInstall,
+                )
+              } else if (jsonFetchStatus._tag === 'loaded') {
+                openBlankRegistrationWizard()
+              }
+              break
+            case 'lti_13_configuration':
+              if (jsonFetchStatus._tag === 'loaded' && isSuccessful(jsonFetchStatus.result)) {
+                openJsonRegistrationWizard(
+                  integration.configuration,
+                  jsonFetchStatus.result.data,
+                  ZUnifiedToolId.parse(integration.unified_tool_id),
+                  onSuccessfulInstall,
+                )
+              } else if (jsonFetchStatus._tag === 'loaded') {
+                openBlankRegistrationWizard()
+              }
+              break
+            case undefined:
+              openBlankRegistrationWizard()
+              break
+          }
+        }}
+      >
+        {I18n.t('Install')}
+      </Button>
+    )
   }
 }
+
+const buttonIsEnabled = (jsonFetchStatus: JsonFetchStatus) => jsonFetchStatus._tag !== 'loading'

@@ -26,6 +26,7 @@ describe "dashboard" do
   include NotificationsCommon
   include K5DashboardPageObject
   include DashboardPage
+
   include_context "in-process server selenium tests"
 
   shared_examples_for "load events list" do
@@ -106,9 +107,6 @@ describe "dashboard" do
       assert_recent_activity_category_closed
     end
 
-    it "should update the item count on stream item hide"
-    it "should remove the stream item category if all items are removed"
-
     it "shows conversation stream items on the dashboard", priority: "1" do
       c = User.create.initiate_conversation([@user, User.create])
       c.add_message("test")
@@ -176,31 +174,6 @@ describe "dashboard" do
       expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
     end
 
-    it "shows appointment stream items on the dashboard", priority: "2" do
-      skip "we need to add this stuff back in"
-      Notification.create(name: "Appointment Group Published", category: "Appointment Availability")
-      Notification.create(name: "Appointment Group Updated", category: "Appointment Availability")
-      Notification.create(name: "Appointment Reserved For User", category: "Appointment Signups")
-      @me = @user
-      student_in_course(active_all: true, course: @course)
-      @other_student = @user
-      @user = @me
-
-      @group = group_category.groups.create(context: @course)
-      @group.users << @other_student << @user
-      # appointment group publish notification and signup notification
-      appointment_participant_model(course: @course, participant: @group, updating_user: @other_student)
-      # appointment group update notification
-      @appointment_group.update(new_appointments: [[Time.now.utc + 2.hours, Time.now.utc + 3.hours]])
-
-      get "/"
-      expect(ffj(".topic_message .communication_message.dashboard_notification").size).to eq 3
-      # appointment group publish and update notifications
-      expect(ffj(".communication_message.message_appointment_group_#{@appointment_group.id}").size).to eq 2
-      # signup notification
-      expect(ffj(".communication_message.message_group_#{@group.id}").size).to eq 1
-    end
-
     describe "course menu" do
       before do
         @course.update(start_at: 2.days.from_now, conclude_at: 4.days.from_now, restrict_enrollments_to_course_dates: false)
@@ -232,7 +205,7 @@ describe "dashboard" do
 
         list = fj("[aria-label='Groups tray']")
         expect(list).to include_text(group.name)
-        expect(list).to_not include_text(other_group.name)
+        expect(list).not_to include_text(other_group.name)
       end
 
       it "goes to a course when clicking a course link from the menu", priority: "1" do
@@ -280,7 +253,7 @@ describe "dashboard" do
       expect(alert_present?).to be_truthy
       accept_alert
       wait_for_ajaximations
-      expect(f(".conference")).to_not be_displayed
+      expect(f(".conference")).not_to be_displayed
       @conference.reload
       expect(@conference).to be_finished
     end
@@ -404,7 +377,7 @@ describe "dashboard" do
         a.save!
         get "/courses"
         expect(fj("#future_enrollments_table a[href='/courses/#{@c1.id}']")).to include_text(@c1.name)
-        expect(f("#future_enrollments_table")).to_not include_text(@c2.name) # shouldn't be included at all
+        expect(f("#future_enrollments_table")).not_to include_text(@c2.name) # shouldn't be included at all
       end
     end
 

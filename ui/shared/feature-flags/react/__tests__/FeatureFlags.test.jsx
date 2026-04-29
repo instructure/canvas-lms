@@ -19,7 +19,8 @@
 
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 import FeatureFlags from '../FeatureFlags'
 import sampleData from './sampleData.json'
@@ -32,15 +33,20 @@ const rows = [
   sampleData.betaFeature,
 ]
 
-describe('feature_flags::FeatureFlags', () => {
-  afterEach(() => {
-    fetchMock.restore()
-  })
+const server = setupServer()
 
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
+describe('feature_flags::FeatureFlags', () => {
   beforeEach(() => {
     ENV.CONTEXT_BASE_URL = '/accounts/1'
-    const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features?hide_inherited_enabled=true&per_page=50`
-    fetchMock.getOnce(route, rows)
+    server.use(
+      http.get('/api/v1/accounts/1/features', () => {
+        return HttpResponse.json(rows)
+      }),
+    )
   })
 
   it('Renders all the appropriate sections', async () => {

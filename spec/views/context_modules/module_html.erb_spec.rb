@@ -67,7 +67,7 @@ describe "context_modules/module_html" do
 
         it "should not call module item rendering" do
           expect(view)
-            .to_not receive(:render)
+            .not_to receive(:render)
             .with(partial: "context_modules/context_module_next", **non_call_render_params)
 
           subject
@@ -83,7 +83,7 @@ describe "context_modules/module_html" do
 
     it "should not call module item rendering" do
       expect(view)
-        .to_not receive(:render)
+        .not_to receive(:render)
         .with(partial: "context_modules/context_module_next", **non_call_render_params)
 
       subject
@@ -97,7 +97,7 @@ describe "context_modules/module_html" do
 
     it "should not call module item rendering" do
       expect(view)
-        .to_not receive(:render)
+        .not_to receive(:render)
         .with(partial: "context_modules/context_module_next", **non_call_render_params)
 
       subject

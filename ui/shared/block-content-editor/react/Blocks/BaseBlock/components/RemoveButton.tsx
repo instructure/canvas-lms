@@ -20,22 +20,15 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
-export const RemoveButton = (props: {
-  onClicked: () => void
-}) => {
+export const RemoveButton = (props: {onClicked: () => void; title: string}) => {
   return (
     <IconButton
       data-testid="remove-block-button"
-      data-removebutton
-      withBackground={false}
-      withBorder={false}
-      screenReaderLabel={I18n.t('Remove block')}
-      onClick={e => {
-        e.stopPropagation()
-        props.onClicked()
-      }}
+      data-action-button
+      screenReaderLabel={I18n.t('Remove block: %{title}', {title: props.title})}
+      onClick={props.onClicked}
     >
       <IconTrashLine />
     </IconButton>

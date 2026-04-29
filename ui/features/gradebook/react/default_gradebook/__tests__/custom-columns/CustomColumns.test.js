@@ -54,7 +54,7 @@ describe('Gradebook > Custom Columns', () => {
     })
 
     test('updates essential data load status', () => {
-      const spy = jest.spyOn(gradebook, '_updateEssentialDataLoaded')
+      const spy = vi.spyOn(gradebook, '_updateEssentialDataLoaded')
       gradebook.gotCustomColumns(customColumns)
       expect(spy).toHaveBeenCalledTimes(1)
     })

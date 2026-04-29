@@ -38,5 +38,5 @@ export default combineReducers<StoreState>({
   blackoutDates: blackoutDatesReducer,
   original: originalReducer,
   paceContexts: paceContextsReducer,
-  bulkEditStudents: bulkEditStudentsReducer
+  bulkEditStudents: bulkEditStudentsReducer,
 })

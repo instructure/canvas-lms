@@ -21,6 +21,7 @@
 # @API Discussion Topics
 class DiscussionEntriesController < ApplicationController
   before_action :require_context_and_read_access, except: :public_feed
+  skip_before_action :require_user, only: :public_feed
 
   def show
     @entry = @context.discussion_entries.find(params[:id]).tap { |e| e.current_user = @current_user }
@@ -48,6 +49,7 @@ class DiscussionEntriesController < ApplicationController
     @entry = @topic.discussion_entries.temp_record(entry_params)
     @entry.current_user = @current_user
     @entry.user_id = @current_user&.id
+    @entry.saving_user = @current_user
     @entry.parent_id = parent_id
     if authorized_action(@entry, @current_user, :create)
 
@@ -106,6 +108,7 @@ class DiscussionEntriesController < ApplicationController
 
     @topic ||= @entry.discussion_topic
     @entry.current_user = @current_user
+    @entry.saving_user = @current_user
     @entry.attachment_id = nil if @remove_attachment == "1" || params[:attachment].nil?
 
     if authorized_action(@entry, @current_user, :update)
@@ -163,7 +166,7 @@ class DiscussionEntriesController < ApplicationController
       return
     end
     if authorized_action(@context, @current_user, :read) && authorized_action(@topic, @current_user, :read)
-      @discussion_entries = @topic.entries_for_feed(@current_user, request.format == :rss)
+      @discussion_entries = @topic.entries_for_feed(@current_user, podcast_feed: request.format == :rss)
       respond_to do |format|
         format.atom do
           title = t :posts_feed_title, "%{title} Posts Feed", title: @topic.title
@@ -215,6 +218,7 @@ class DiscussionEntriesController < ApplicationController
                               .permit(Attachment.permitted_attributes)
     @attachment = @context.attachments.create(attachment_params)
     @entry.attachment = @attachment
+    @entry.saving_user = @current_user
     @entry.save
   end
 

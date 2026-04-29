@@ -17,16 +17,14 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 import {App} from './App'
 
 const rootElement = document.getElementById('content')
 
 if (rootElement) {
-  const root = createRoot(rootElement)
-
   // React.strictMode is not used here because <CanvasRce /> component's
   // hooks malfunction in strict mode.
-  root.render(<App />)
+  render(<App />, rootElement)
 }

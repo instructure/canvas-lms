@@ -22,6 +22,8 @@ module Types
   class CheckpointType < ApplicationObjectType
     alias_method :checkpoint, :object
 
+    implements Interfaces::AssignedDatesInterface
+
     field :name, String, null: true
 
     field :tag,

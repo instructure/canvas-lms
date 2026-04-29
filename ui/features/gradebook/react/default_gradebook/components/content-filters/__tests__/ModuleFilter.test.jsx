@@ -29,7 +29,7 @@ describe('ModuleFilter', () => {
       {id: '2002', name: 'Module 2'},
       {id: '2001', name: 'Module 1'},
     ],
-    onSelect: jest.fn(),
+    onSelect: vi.fn(),
     selectedModuleId: '0',
   }
 
@@ -38,7 +38,7 @@ describe('ModuleFilter', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('labels the filter with "Module Filter"', () => {

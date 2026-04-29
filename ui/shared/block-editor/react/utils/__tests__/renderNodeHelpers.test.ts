@@ -24,13 +24,13 @@ const createDOM = () => {
   mountPoint.style.height = '150px'
   document.body.appendChild(mountPoint)
   // @ts-expect-error
-  mountPoint.getBoundingClientRect = jest.fn(() => ({top: 0, left: 0, width: 300, height: 300}))
+  mountPoint.getBoundingClientRect = vi.fn(() => ({top: 0, left: 0, width: 300, height: 300}))
 
   const topbar = document.createElement('div')
   topbar.className = 'topbar'
   document.body.appendChild(topbar)
   // @ts-expect-error
-  topbar.getBoundingClientRect = jest.fn(() => ({bottom: 100}))
+  topbar.getBoundingClientRect = vi.fn(() => ({bottom: 100}))
 
   const domNode = document.createElement('div')
   domNode.style.position = 'relative'
@@ -40,7 +40,7 @@ const createDOM = () => {
   domNode.style.height = '100px'
   mountPoint.appendChild(domNode)
   // @ts-expect-error
-  domNode.getBoundingClientRect = jest.fn(() => ({top: 200, left: 50, width: 100, height: 100}))
+  domNode.getBoundingClientRect = vi.fn(() => ({top: 200, left: 50, width: 100, height: 100}))
 
   return {mountPoint, domNode, topbar}
 }
@@ -52,7 +52,7 @@ const createToolbar = (mountPoint: HTMLElement) => {
   theToolbar.style.height = '25px'
   mountPoint.appendChild(theToolbar)
   // @ts-expect-error
-  theToolbar.getBoundingClientRect = jest.fn(() => ({top: 0, left: 0, width: 75, height: 25}))
+  theToolbar.getBoundingClientRect = vi.fn(() => ({top: 0, left: 0, width: 75, height: 25}))
   return theToolbar
 }
 
@@ -94,7 +94,7 @@ describe('renderNodeHelpers', () => {
       const theToolbar = createToolbar(mountPoint)
 
       // @ts-expect-error
-      domNode.getBoundingClientRect = jest.fn(() => ({top: 75, left: 50, width: 100, height: 100}))
+      domNode.getBoundingClientRect = vi.fn(() => ({top: 75, left: 50, width: 100, height: 100}))
 
       const result = getToolbarPos(domNode, mountPoint, theToolbar)
       expect(result).toEqual({top: 175, left: 45})

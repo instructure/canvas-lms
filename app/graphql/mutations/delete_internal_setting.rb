@@ -30,7 +30,7 @@ class Mutations::DeleteInternalSetting < Mutations::BaseMutation
     end
 
     context[:deleted_models] = { internal_setting: }
-    internal_setting.destroy
+    Setting.remove(internal_setting.name)
 
     { internal_setting_id: CanvasSchema.id_from_object(internal_setting, Types::InternalSettingType, nil) }
   rescue ActiveRecord::RecordNotFound

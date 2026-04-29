@@ -22,18 +22,21 @@ import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/contentShare'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/react'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('direct_share_user_modal')
 
 const DirectShareUserPanel = lazy(() => import('./DirectShareUserPanel'))
 
 DirectShareUserModal.propTypes = {
+  id: string,
   contentShare: shape({
     content_id: oneOfType([string, number]),
     content_type: oneOf(CONTENT_SHARE_TYPES),
@@ -41,7 +44,7 @@ DirectShareUserModal.propTypes = {
   courseId: string,
 }
 
-export default function DirectShareUserModal({contentShare, courseId, ...modalProps}) {
+export default function DirectShareUserModal({id, contentShare, courseId, ...modalProps}) {
   const [selectedUsers, setSelectedUsers] = useState([])
   const [postStatus, setPostStatus] = useState(null)
   const [selectedUsersError, setSelectedUsersError] = useState(false)
@@ -96,6 +99,8 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
 
   function sendSuccessful() {
     showFlashSuccess(I18n.t('Content share started successfully'))()
+    queryClient.invalidateQueries({queryKey: ['moduleItems', id || '']})
+    queryClient.invalidateQueries({queryKey: ['modules', courseId]})
     modalProps.onDismiss()
   }
 
@@ -149,6 +154,8 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
       size="medium"
       footer={<Footer />}
       data-testid="send-to-item-modal"
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
       {...modalProps}
     >
       <Suspense fallback={suspenseFallback}>

@@ -185,7 +185,7 @@ describe ErrorsController do
       end
 
       it "validates captcha for unauthenticated users" do
-        response_double = double(code: "200", body: { success: true, hostname: "test.host" }.to_json)
+        response_double = instance_double(Net::HTTPResponse, code: "200", body: { success: true, hostname: "test.host" }.to_json)
         allow(CanvasHttp).to receive(:post).and_return(response_double)
 
         post "create", params: { :error => { message: "test" }, "g-recaptcha-response" => "valid_response" }
@@ -193,7 +193,7 @@ describe ErrorsController do
       end
 
       it "returns error on captcha validation failure" do
-        response_double = double(code: "200", body: { success: false, "error-codes": ["invalid-input"] }.to_json)
+        response_double = instance_double(Net::HTTPResponse, code: "200", body: { success: false, "error-codes": ["invalid-input"] }.to_json)
         allow(CanvasHttp).to receive(:post).and_return(response_double)
 
         post "create", params: { :error => { message: "test" }, "g-recaptcha-response" => "invalid_response" }, format: :json
@@ -202,7 +202,7 @@ describe ErrorsController do
       end
 
       it "returns error on hostname mismatch" do
-        response_double = double(code: "200", body: { success: true, hostname: "wrong.host" }.to_json)
+        response_double = instance_double(Net::HTTPResponse, code: "200", body: { success: true, hostname: "wrong.host" }.to_json)
         allow(CanvasHttp).to receive(:post).and_return(response_double)
 
         post "create", params: { :error => { message: "test" }, "g-recaptcha-response" => "valid_response" }, format: :json
@@ -211,7 +211,7 @@ describe ErrorsController do
       end
 
       it "raises error if captcha service is unavailable" do
-        response_double = double(code: "500")
+        response_double = instance_double(Net::HTTPResponse, code: "500")
         allow(CanvasHttp).to receive(:post).and_return(response_double)
         post "create", params: { :error => { message: "test" }, "g-recaptcha-response" => "valid_response" }
         expect(response).to have_http_status(:internal_server_error)

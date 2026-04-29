@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + "/../spec_helper")
 require File.expand_path(File.dirname(__FILE__) + "/messages_helper")
 
 describe "manually_created_access_token_created" do
@@ -34,7 +33,7 @@ describe "manually_created_access_token_created" do
   end
   let(:notification_name) { :manually_created_access_token_created }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   it "removes notification settings url link" do
     msg = generate_message(notification_name, :email, asset, message_data)

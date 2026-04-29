@@ -18,10 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "crocodoc"
-
 # See the uploads controller and views for examples on how to use this model.
-class Attachment < ActiveRecord::Base
+class Attachment < ApplicationRecord
   class UniqueRenameFailure < StandardError; end
 
   def self.display_name_order_by_clause(table = nil)
@@ -70,6 +68,7 @@ class Attachment < ActiveRecord::Base
   include SearchTermHelper
   include MasterCourses::Restrictor
   include DatesOverridable
+
   restrict_columns :content, %i[display_name uploaded_data media_track_content]
   restrict_columns :settings, %i[folder_id locked lock_at unlock_at usage_rights_id]
   restrict_columns :state, [:locked, :file_state]
@@ -124,11 +123,10 @@ class Attachment < ActiveRecord::Base
   has_many :thumbnails, foreign_key: "parent_id", inverse_of: :attachment
   has_many :children, foreign_key: :root_attachment_id, class_name: "Attachment", inverse_of: :root_attachment
   has_many :attachment_upload_statuses
-  has_one :crocodoc_document
+  has_one :last_attachment_upload_status, -> { order(created_at: :desc) }, class_name: "AttachmentUploadStatus"
   has_one :canvadoc
   belongs_to :usage_rights
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
-  has_many :discussion_entry_drafts, inverse_of: :attachment
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :attachment
   has_one :estimated_duration, dependent: :destroy, inverse_of: :attachment
   has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :attachment, dependent: :destroy
@@ -146,7 +144,7 @@ class Attachment < ActiveRecord::Base
 
   def self.file_store_config
     # Return existing value, even if nil, as long as it's defined
-    @file_store_config ||= ConfigFile.load("file_store").dup
+    @file_store_config ||= Canvas.load_config_file_or_consul("file_store")&.dup
     @file_store_config ||= { "storage" => "local" }
     @file_store_config["path_prefix"] ||= @file_store_config["path"] || "tmp/files"
     @file_store_config["path_prefix"] = nil if @file_store_config["path_prefix"] == "tmp/files" && @file_store_config["storage"] == "s3"
@@ -157,7 +155,7 @@ class Attachment < ActiveRecord::Base
     # Return existing value, even if nil, as long as it's defined
     return @s3_config if defined?(@s3_config)
 
-    @s3_config ||= ConfigFile.load("amazon_s3")
+    @s3_config ||= Canvas.load_config_file_or_consul("amazon_s3")
   end
 
   def self.s3_storage?
@@ -200,6 +198,7 @@ class Attachment < ActiveRecord::Base
   # That means you can't rely on these happening in the same transaction as the save.
   after_save_and_attachment_processing :touch_context_if_appropriate
   after_save_and_attachment_processing :ensure_media_object
+  after_save_and_attachment_processing :index_in_pine, if: :should_index_in_pine?
 
   # this mixin can be added to a has_many :attachments association, and it'll
   # handle finding replaced attachments. In other words, if an attachment found
@@ -240,10 +239,7 @@ class Attachment < ActiveRecord::Base
 
       return att unless att.deleted? && owner
 
-      include_hidden_files = Account.site_admin.feature_enabled?(:hidden_attachments_replacement_chain)
-      file_states = include_hidden_files ? %w[available hidden] : "available"
-
-      new_att = owner.attachments.where(id: att.replacement_attachment_id, file_state: file_states).first if att.replacement_attachment_id
+      new_att = owner.attachments.where(id: att.replacement_attachment_id, file_state: %w[available hidden]).first if att.replacement_attachment_id
       new_att ||= Folder.find_attachment_in_context_with_path(owner, att.full_display_path)
       new_att || att
     end
@@ -607,18 +603,8 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def set_word_count
-    if word_count.nil? && !deleted? && file_state != "broken" && word_count_supported?
-      delay(singleton: "attachment_set_word_count_#{global_id}").update_word_count
-    end
-  end
-
   def remove_attachments_from_drafts
     submission_draft_attachments.destroy_all
-  end
-
-  def update_word_count
-    update_column(:word_count, calculate_words)
   end
 
   def namespace
@@ -894,6 +880,10 @@ class Attachment < ActiveRecord::Base
       shard.activate do
         Attachment.where(id: atts).update_all(replacement_attachment_id: id) # so we can find the new file in content links
         copy_access_attributes!(atts)
+        # move attachment_associations to the new replaced attachment (this is needed to be able to verify access to theses attachments)
+        AttachmentAssociation.where(attachment_id: atts).find_in_batches do |batch|
+          AttachmentAssociation.where(id: batch.map(&:id)).update_all(attachment_id: id)
+        end
         atts.each do |a|
           # update content tags to refer to the new file
           if ContentTag.where(content_id: a, content_type: "Attachment").update_all(content_id: id, updated_at: Time.now.utc) > 0
@@ -956,6 +946,24 @@ class Attachment < ActiveRecord::Base
     !!instfs_uuid
   end
 
+  def kaltura_media?
+    return false unless CanvasKaltura::ClientV3.config
+    return false if media_entry_id.blank? || media_entry_id == "maybe"
+    return false unless media_object_by_media_id
+
+    true
+  end
+
+  def kaltura_manifest_file?
+    return false unless kaltura_media?
+
+    if stored_locally?
+      File.read(full_filename, 5) == "<?xml"
+    else # either instfs or s3
+      CanvasHttp.get(public_url(internal: true), { "Range" => "bytes=0-4" }).read_body == "<?xml"
+    end
+  end
+
   def downloadable?
     instfs_hosted? || !!authenticated_s3_url
   rescue
@@ -968,6 +976,7 @@ class Attachment < ActiveRecord::Base
     else
       # s3 can't handle unknown options :sigh:
       options.delete(:internal)
+      options.delete(:no_jti)
       should_download = options.delete(:download)
       disposition = should_download ? "attachment" : "inline"
       options[:response_content_disposition] = "#{disposition}; #{disposition_filename}"
@@ -975,12 +984,22 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def public_inline_url(ttl = url_ttl)
-    public_url(expires_in: ttl, download: false)
+  def public_inline_url(expires_in: url_ttl, no_jti: false)
+    public_url(expires_in:, no_jti:, download: false)
   end
 
-  def public_download_url(ttl = url_ttl)
-    public_url(expires_in: ttl, download: true)
+  def public_download_url(expires_in: url_ttl, no_jti: false)
+    public_url(expires_in:, no_jti:, download: true)
+  end
+
+  def kaltura_media_download_url
+    return nil unless kaltura_media?
+
+    kaltura_client = CanvasKaltura::ClientV3.new
+    download_url = kaltura_client.media_download_url(media_object_by_media_id.media_id)
+    return nil if download_url.nil?
+
+    UrlHelper.add_query_params(download_url, filename: display_name)
   end
 
   def url_ttl
@@ -997,17 +1016,15 @@ class Attachment < ActiveRecord::Base
     Attachment.local_storage?
   end
 
-  HTML_MAX_PROXY_SIZE = 128.kilobytes
-  FLASH_MAX_PROXY_SIZE = 1.megabyte
-  CSS_MAX_PROXY_SIZE = 64.kilobytes
+  HTML_MAX_PROXY_SIZE = 510.kilobytes
+  CSS_MAX_PROXY_SIZE = 255.kilobytes
 
   def can_be_proxied?
     (mime_class == "html" && size < HTML_MAX_PROXY_SIZE) ||
-      (mime_class == "flash" && size < FLASH_MAX_PROXY_SIZE) ||
       (content_type == "text/css" && size < CSS_MAX_PROXY_SIZE)
   end
 
-  def local_storage_path(user: nil, ttl: nil)
+  def local_storage_path(user: nil, ttl: nil, location: nil)
     verifier_string = if root_account.feature_enabled?(:file_association_access)
                         Attachments::Verification.new(self).verifier_for_user(user, expires: ttl || 1.hour.from_now)
                       else
@@ -1055,7 +1072,7 @@ class Attachment < ActiveRecord::Base
   # computed (during the download if possible) and a CorruptedDownload error
   # will be raised if it doesn't match the stored value.
   def open(temp_folder: nil, integrity_check: false, &block)
-    if instfs_hosted?
+    if instfs_hosted? || kaltura_media?
       if block
         streaming_download(integrity_check:, &block)
       else
@@ -1121,7 +1138,7 @@ class Attachment < ActiveRecord::Base
     geometry = options[:size]
     if thumbnail || geometry.present?
       to_use = thumbnail_for_size(geometry) || thumbnail
-      to_use.cached_s3_url
+      to_use.cached_s3_url(options: { location: options[:location] })
     elsif media_object&.media_id
       CanvasKaltura::ClientV3.new.thumbnail_url(media_object.media_id,
                                                 width: options[:width] || 140,
@@ -1134,8 +1151,12 @@ class Attachment < ActiveRecord::Base
 
   def thumbnail_for_size(geometry)
     if self.class.allows_thumbnails_of_size?(geometry)
-      to_use = thumbnails.loaded? ? thumbnails.detect { |t| t.thumbnail == geometry } : thumbnails.where(thumbnail: geometry).first
-      to_use || create_dynamic_thumbnail(geometry)
+      if association(:thumbnails).loaded?
+        thumbnails.detect { |t| t.thumbnail == geometry }
+      else
+        to_use = thumbnails.where(thumbnail: geometry).first
+        to_use || create_dynamic_thumbnail(geometry)
+      end
     end
   end
 
@@ -1280,7 +1301,15 @@ class Attachment < ActiveRecord::Base
   end
 
   def thumbnail
-    super || root_attachment.try(:thumbnail)
+    # Use preloaded thumbnails when available to avoid N+1 queries in GraphQL
+    if association(:thumbnails).loaded?
+      # Find the thumb in the preloaded association
+      # If thumbnails are preloaded, trust that data completely and avoid calling
+      # super or root_attachment.thumbnail as both can trigger N+1 queries
+      thumbnails.detect { |t| t.thumbnail == "thumb" }
+    else
+      super || root_attachment.try(:thumbnail)
+    end
   end
 
   def content_directory
@@ -1387,7 +1416,10 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.mime_class(content_type)
-    valid_content_types_hash[content_type] || "file"
+    # Strip MIME parameters (charset, boundary, etc.) before lookup
+    # Similar to what File.mime_type does in canvas_mimetype_fu gem
+    base_type = content_type&.split(";")&.first&.strip
+    valid_content_types_hash[base_type] || "file"
   end
 
   def mime_class
@@ -1416,6 +1448,15 @@ class Attachment < ActiveRecord::Base
 
     # grader
     return true if assignment.grants_right?(user, session, :grade)
+
+    # peer reviewer
+    if user && assignment.peer_reviews
+      # Find submissions associated with this attachment through AttachmentAssociation
+      assignment_submissions = assignment.all_submissions.referencing_linked_attachment(id)
+      if assignment_submissions.any? { |sub| sub.peer_reviewer_for?(user) }
+        return true
+      end
+    end
 
     # submitter (or observer of submitter)
     assignment.shard.activate do
@@ -1710,7 +1751,7 @@ class Attachment < ActiveRecord::Base
   def self.create_data_attachment(context, data, display_name = nil)
     context.shard.activate do
       Attachment.new.tap do |att|
-        Attachment.skip_3rd_party_submits(true)
+        Attachment.skip_3rd_party_submits(skip: true)
         att.context = context
         att.display_name = display_name if display_name
         Attachments::Storage.store_for_attachment(att, data)
@@ -1718,7 +1759,7 @@ class Attachment < ActiveRecord::Base
       end
     end
   ensure
-    Attachment.skip_3rd_party_submits(false)
+    Attachment.skip_3rd_party_submits(skip: false)
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -1765,9 +1806,17 @@ class Attachment < ActiveRecord::Base
         batch = Attachment.where(id: attachments)
         array_batch = attachments
       end
+      # Check which attachments were available before deletion (for Pine cleanup)
+      attachments_to_delete_from_pine = array_batch.select do |attach|
+        attach.file_state == "available" && attach.eligible_for_pine_indexing?
+      end
+
       batch.update_all(file_state: "deleted", deleted_at: delete_time, updated_at: delete_time, modified_at: delete_time)
       array_batch.each { |attach| attach.mark_downstream_changes(%w[manually_deleted deleted_at updated_at modified_at]) }
       Canvas::LiveEvents.delay_if_production.attachments_bulk_deleted(array_batch.map(&:id))
+
+      # Delete from Pine for attachments that were available before deletion
+      attachments_to_delete_from_pine.each(&:delete_from_pine)
       break if array_batch.length < 1000
     end
     attachments
@@ -1794,7 +1843,6 @@ class Attachment < ActiveRecord::Base
         Attachments::Storage.store_for_attachment(att, File.open(file_removed_path))
       end
       attachment_ids = att.children_and_self.select(:id)
-      CrocodocDocument.where(attachment_id: attachment_ids).delete_all
       canvadoc_scope = Canvadoc.where(attachment_id: attachment_ids)
       CanvadocsSubmission.where(canvadoc_id: canvadoc_scope.select(:id)).delete_all
       AnonymousOrModerationEvent.where(canvadoc_id: canvadoc_scope.select(:id)).delete_all
@@ -1991,6 +2039,14 @@ class Attachment < ActiveRecord::Base
     return unless child
     raise "must be a child" unless child.root_attachment_id == id
 
+    if !instfs_hosted? && %w[ContentMigration ContentExport].include?(context_type) && Attachment.s3_storage? && !s3object.exists?
+      child.workflow_state = child.file_state = "deleted"
+      child.root_attachment_id = nil
+      child.deleted_at ||= Time.now.utc
+      child.save!
+      return make_childless
+    end
+
     child.root_attachment_id = nil
     copy_attachment_content(child, split_root_attachment: true)
     child.save!
@@ -2011,7 +2067,14 @@ class Attachment < ActiveRecord::Base
       destination.workflow_state = "processed"
     else
       destination.avoid_linking_to_root_attachment = true if split_root_attachment
-      Attachments::Storage.store_for_attachment(destination, open)
+      # If open returns nil (e.g., underlying S3 object missing and marked broken),
+      # skip attempting to store, and mark destination broken as well to prevent
+      # downstream service errors like InstFS::BadRequestError ("No file uploaded").
+      if (source_file = open)
+        Attachments::Storage.store_for_attachment(destination, source_file)
+      elsif destination.md5.nil?
+        Attachment.where(id: destination).update_all(file_state: "broken")
+      end
     end
   end
 
@@ -2048,11 +2111,6 @@ class Attachment < ActiveRecord::Base
     self.file_state == "available"
   end
 
-  def crocodocable?
-    Canvas::Crocodoc.enabled? &&
-      CrocodocDocument::MIME_TYPES.include?(content_type)
-  end
-
   def canvadocable?
     for_assignment_or_submissions = folder&.for_submissions? || folder&.for_student_annotation_documents?
     canvadocable_mime_types = for_assignment_or_submissions ? Canvadoc.submission_mime_types : Canvadoc.mime_types
@@ -2063,7 +2121,7 @@ class Attachment < ActiveRecord::Base
     Attachment.where(id: ids).find_each(&:submit_to_canvadocs)
   end
 
-  def self.skip_3rd_party_submits(skip = true)
+  def self.skip_3rd_party_submits(skip: true)
     @skip_3rd_party_submits = skip
   end
 
@@ -2085,24 +2143,24 @@ class Attachment < ActiveRecord::Base
   MAX_CANVADOCS_ATTEMPTS = 5
 
   def submit_to_canvadocs(attempt = 1, **opts)
-    # ... or crocodoc (this will go away soon)
     return if Attachment.skip_3rd_party_submits?
 
-    submit_to_crocodoc_instead = opts[:wants_annotation] &&
-                                 crocodocable? &&
-                                 !Canvadocs.annotations_supported?
-    if submit_to_crocodoc_instead
-      # get crocodoc off the canvadocs strand
-      # (maybe :wants_annotation was a dumb idea)
-      delay(n_strand: "crocodoc",
-            priority: Delayed::LOW_PRIORITY)
-        .submit_to_crocodoc(attempt)
-    elsif canvadocable?
+    if canvadocable?
       doc = canvadoc || create_canvadoc
-      doc.upload({
-                   annotatable: opts[:wants_annotation],
-                   preferred_plugins: opts[:preferred_plugins]
-                 })
+      upload_opts = {
+        annotatable: opts[:wants_annotation],
+        preferred_plugins: opts[:preferred_plugins]
+      }
+
+      # Add canvas_metadata for submission attachments to enable word count updates
+      if assignment_submissions.present?
+        upload_opts[:canvas_metadata] = {
+          base_url: "#{HostUrl.protocol}://#{root_account.environment_specific_domain}",
+          attachment_jwt: CanvasSecurity.create_jwt({ id: }, 1.hour.from_now)
+        }
+      end
+
+      doc.upload(upload_opts)
       update_attribute(:workflow_state, "processing")
     end
   rescue => e
@@ -2121,26 +2179,6 @@ class Attachment < ActiveRecord::Base
       delay(n_strand: "canvadocs_retries",
             run_at: (5 * attempt).minutes.from_now,
             priority: Delayed::LOW_PRIORITY).submit_to_canvadocs(attempt + 1, **opts)
-    end
-  end
-
-  MAX_CROCODOC_ATTEMPTS = 5
-
-  def submit_to_crocodoc(attempt = 1)
-    if crocodocable? && !Attachment.skip_3rd_party_submits?
-      crocodoc = crocodoc_document || create_crocodoc_document
-      crocodoc.upload
-      update_attribute(:workflow_state, "processing")
-    end
-  rescue => e
-    update_attribute(:workflow_state, "errored")
-    Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id)
-
-    if attempt <= MAX_CROCODOC_ATTEMPTS
-      delay(n_strand: "crocodoc_retries",
-            run_at: (5 * attempt).minutes.from_now,
-            priority: Delayed::LOW_PRIORITY)
-        .submit_to_crocodoc(attempt + 1)
     end
   end
 
@@ -2257,7 +2295,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.serialization_methods
-    %i[mime_class currently_locked crocodoc_available?]
+    %i[mime_class currently_locked]
   end
   cattr_accessor :skip_thumbnails
 
@@ -2422,10 +2460,6 @@ class Attachment < ActiveRecord::Base
     failed_retryable
   end
 
-  def crocodoc_available?
-    crocodoc_document.try(:available?)
-  end
-
   def canvadoc_available?
     canvadoc.try(:available?)
   end
@@ -2434,12 +2468,6 @@ class Attachment < ActiveRecord::Base
     return unless canvadocable?
 
     "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc", opts, access_token:)}"
-  end
-
-  def crocodoc_url(user, opts = {})
-    return unless crocodoc_available?
-
-    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc", opts.merge(enable_annotations: true))}"
   end
 
   def previewable_media?
@@ -2461,7 +2489,15 @@ class Attachment < ActiveRecord::Base
   private :preview_params
 
   def can_unpublish?
-    false
+    # Only allow if file is in a simple "published" state with no special restrictions
+    return false if locked?
+
+    has_complex_state = file_state != "available" ||
+                        lock_at.present? ||
+                        unlock_at.present? ||
+                        (visibility_level.present? && visibility_level != "inherit")
+
+    !has_complex_state
   end
 
   def self.copy_attachments_to_submissions_folder(assignment_context, attachments)
@@ -2506,47 +2542,79 @@ class Attachment < ActiveRecord::Base
   def self.clone_url_as_attachment(url, opts = {})
     _, uri = CanvasHttp.validate_url(url, check_host: true)
 
-    CanvasHttp.get(url) do |http_response|
-      if http_response.code.to_i == 200
-        tmpfile = CanvasHttp.tempfile_for_uri(uri)
-        # net/http doesn't make this very obvious, but read_body can take any
-        # object that responds to << as the destination of the body, and it'll
-        # stream in chunks rather than reading the whole body into memory (as
-        # long as you use the block form of http.request, which
-        # CanvasHttp.get does)
-        http_response.read_body(tmpfile)
-        tmpfile.rewind
-        attachment = opts[:attachment] || Attachment.new(filename: File.basename(uri.path))
-        attachment.filename ||= File.basename(uri.path)
-        Attachments::Storage.store_for_attachment(attachment, tmpfile)
-        if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
-          # uploaded_data= clobbers the content_type set in preflight; if it was given, prefer it to the HTTP response
-          attachment.content_type = if attachment.content_type_was.present? && attachment.content_type_was != "unknown/unknown"
-                                      attachment.content_type_was
-                                    else
-                                      http_response.content_type
-                                    end
-        end
-        return attachment
-      else
-        # Grab the first part of the body for error reporting
-        # Just read the first chunk of the body in case it's huge
-        body_head = nil
-
-        begin
-          http_response.read_body do |chunk|
-            body_head = "#{chunk}..." if chunk.present?
-            break
+    InstrumentTLSCiphers.without_tls_metrics do
+      CanvasHttp.get(url) do |http_response|
+        if http_response.code.to_i == 200
+          tmpfile = CanvasHttp.tempfile_for_uri(uri)
+          # net/http doesn't make this very obvious, but read_body can take any
+          # object that responds to << as the destination of the body, and it'll
+          # stream in chunks rather than reading the whole body into memory (as
+          # long as you use the block form of http.request, which
+          # CanvasHttp.get does)
+          http_response.read_body(tmpfile)
+          tmpfile.rewind
+          attachment = opts[:attachment] || Attachment.new(filename: File.basename(uri.path))
+          attachment.filename ||= File.basename(uri.path)
+          Attachments::Storage.store_for_attachment(attachment, tmpfile)
+          if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
+            # uploaded_data= clobbers the content_type set in preflight; if it was given, prefer it to the HTTP response
+            attachment.content_type = if attachment.content_type_was.present? && attachment.content_type_was != "unknown/unknown"
+                                        attachment.content_type_was
+                                      else
+                                        http_response.content_type
+                                      end
           end
-        rescue
-          # If an error occured reading the body, don't worry
-          # about attempting to report it
+          return attachment
+        else
+          # Grab the first part of the body for error reporting
+          # Just read the first chunk of the body in case it's huge
           body_head = nil
-        end
 
-        raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i, body_head)
+          begin
+            http_response.read_body do |chunk|
+              body_head = "#{chunk}..." if chunk.present?
+              break
+            end
+          rescue
+            # If an error occured reading the body, don't worry
+            # about attempting to report it
+            body_head = nil
+          end
+
+          raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i, body_head)
+        end
       end
     end
+  end
+
+  def ingest_to_pine
+    return unless context.is_a?(Course) && context.root_account.present?
+
+    url = public_download_url
+
+    metadata = {
+      course_id: context.id.to_s,
+      filename:,
+      content_type:
+    }
+
+    # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
+    # and the action is more of a system-initiated action than a user-initiated action
+    null_user = Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil)
+
+    PineClient.ingest_url(
+      url:,
+      metadata:,
+      source: "canvas",
+      source_id: id.to_s,
+      source_type: "attachment",
+      feature_slug: "horizon-content-ingestion",
+      root_account_uuid: context.root_account.uuid,
+      current_user: null_user
+    )
+  rescue => e
+    Rails.logger.error("Failed to ingest attachment #{id} for context #{context.class.name}:#{context.id}: #{e.message}")
+    raise
   end
 
   def self.migrate_attachments(from_context, to_context, scope = nil)
@@ -2580,7 +2648,7 @@ class Attachment < ActiveRecord::Base
                               else
                                 begin
                                   attachment.copy_attachment_content(new_attachment)
-                                rescue Aws::S3::Errors::NoSuchKey => e
+                                rescue Aws::S3::Errors::NoSuchKey, CanvasHttp::InvalidResponseCodeError => e
                                   Canvas::Errors.capture_exception(:attachment, e, :warn)
                                   next
                                 end
@@ -2610,51 +2678,6 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  def calculate_words
-    MemoryLimit.apply(Setting.get("attachment_calculate_words_memory_limit", 4.gigabytes.to_s).to_i) do
-      Timeout.timeout(Setting.get("attachment_calculate_words_time_limit", 3.minutes.to_s).to_f) do
-        word_count_regex = /\S+/
-        @word_count ||= if mime_class == "pdf"
-                          reader = PDF::Reader.new(self.open)
-                          reader.pages.sum do |page|
-                            page.text.scan(word_count_regex).count
-                          end
-                        elsif [
-                          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                          "application/x-docx"
-                        ].include?(mimetype)
-                          doc = Docx::Document.open(self.open)
-                          doc.paragraphs.sum do |paragraph|
-                            paragraph.text.scan(word_count_regex).count
-                          end
-                        elsif [
-                          "application/rtf",
-                          "text/rtf"
-                        ].include?(mimetype)
-                          parser = RubyRTF::Parser.new(unknown_control_warning_enabled: false)
-                          parser.parse(self.open.read).sections.sum do |section|
-                            section[:text].scan(word_count_regex).count
-                          end
-                        elsif mime_class == "text"
-                          open.read.scan(word_count_regex).count
-                        else
-                          0
-                        end
-      end
-    end
-  rescue => e
-    # If there is an error processing the file just log the error and return 0
-    Canvas::Errors.capture_exception(:word_count, e, :info)
-    0
-  end
-
-  def word_count_supported?
-    ["application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-     "application/x-docx",
-     "application/rtf",
-     "text/rtf"].include?(mimetype) || ["pdf", "text"].include?(mime_class)
-  end
-
   def self.context_supports_visibility?(context)
     context.respond_to?(:files_visibility_option)
   end
@@ -2671,6 +2694,58 @@ class Attachment < ActiveRecord::Base
     vl = context.files_visibility_option if vl == "inherit"
     vl = "context" if vl == context.class.name.downcase
     vl
+  end
+
+  def should_index_in_pine?
+    eligible_for_pine_indexing? && file_state == "available"
+  end
+
+  def index_in_pine
+    delay(
+      n_strand: ["horizon_file_ingestion", context.global_root_account_id],
+      singleton: "horizon_file_ingestion:#{context.global_id}:#{id}",
+      max_attempts: 3
+    ).ingest_to_pine
+  end
+
+  def eligible_for_pine_indexing?
+    return false unless context.is_a?(Course)
+    return false unless context.horizon_course?
+    return false unless PineClient.enabled?
+    return false unless PineClient.allowed_attachment_content_types.include?(content_type)
+
+    true
+  end
+
+  def delete_from_pine
+    return unless context.is_a?(Course) && context.root_account.present?
+
+    # PineClient requires a user object with uuid and global_id, but we don't have a user in this context
+    # and the action is more of a system-initiated action than a user-initiated action
+    null_user = Struct.new(:uuid, :global_id).new(uuid: nil, global_id: nil)
+
+    delay(
+      n_strand: ["horizon_file_deletion", context.global_root_account_id],
+      singleton: "horizon_file_deletion:#{context.global_id}:#{id}",
+      max_attempts: 3
+    ).delete_from_pine_job(null_user)
+  rescue => e
+    Rails.logger.error("Failed to queue Pine deletion for attachment #{id} for context #{context.class.name}:#{context.id}: #{e.message}")
+    # Don't raise - we don't want to block the deletion if Pine is down
+  end
+
+  def delete_from_pine_job(null_user)
+    PineClient.delete_document(
+      source: "canvas",
+      source_id: id.to_s,
+      source_type: "attachment",
+      feature_slug: "horizon-content-ingestion",
+      root_account_uuid: context.root_account.uuid,
+      current_user: null_user
+    )
+  rescue => e
+    Rails.logger.error("Failed to delete attachment #{id} from Pine for context #{context.class.name}:#{context.id}: #{e.message}")
+    raise
   end
 
   private
@@ -2694,7 +2769,9 @@ class Attachment < ActiveRecord::Base
     end
 
     validate_hash(enable: integrity_check) do |hash_context|
-      CanvasHttp.get(public_url(internal: true)) do |response|
+      download_url = kaltura_media_download_url || public_url(internal: true)
+
+      CanvasHttp.get(download_url) do |response|
         raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
 
         response.read_body do |data|

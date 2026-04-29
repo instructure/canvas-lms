@@ -22,9 +22,10 @@ module Lti
     class NoticeTypes
       HELLO_WORLD = "LtiHelloWorldNotice"
       ASSET_PROCESSOR_SUBMISSION = "LtiAssetProcessorSubmissionNotice"
+      ASSET_PROCESSOR_CONTRIBUTION = "LtiAssetProcessorContributionNotice"
       CONTEXT_COPY = "LtiContextCopyNotice"
 
-      ALL = [HELLO_WORLD, ASSET_PROCESSOR_SUBMISSION, CONTEXT_COPY].freeze
+      ALL = [HELLO_WORLD, ASSET_PROCESSOR_SUBMISSION, CONTEXT_COPY, ASSET_PROCESSOR_CONTRIBUTION].freeze
     end
   end
 end

@@ -74,8 +74,13 @@ class RailsFlashNotificationsHelper {
     return this.holder != null
   }
 
-  // @ts-expect-error
-  createNode(type, content, timeout, cssOptions = {}, classes = '') {
+  createNode(
+    type: string,
+    content: string | {html: string},
+    timeout?: number | false,
+    cssOptions: Record<string, string | number> = {},
+    classes = '',
+  ) {
     if (this.holderReady()) {
       const node = this.generateNodeHTML(type, content)
 
@@ -91,8 +96,7 @@ class RailsFlashNotificationsHelper {
     }
   }
 
-  // @ts-expect-error
-  generateNodeHTML(type, content) {
+  generateNodeHTML(type: string, content: string | {html: string}) {
     const icon = this.getIconType(type)
     const escapedType = htmlEscape(type)
     const escapedIcon = htmlEscape(icon)
@@ -113,8 +117,7 @@ class RailsFlashNotificationsHelper {
     `.trim()
   }
 
-  // @ts-expect-error
-  getIconType(type) {
+  getIconType(type: string) {
     if (type === 'success') {
       return 'check'
     } else if (type === 'warning' || type === 'error') {
@@ -139,8 +142,7 @@ class RailsFlashNotificationsHelper {
     return this.screenreader_holder != null
   }
 
-  // @ts-expect-error
-  createScreenreaderNode(content, closable = true) {
+  createScreenreaderNode(content: string | {html: string}, closable = true) {
     if (this.screenreaderHolderReady()) {
       updateAriaLive.call(this, {polite: false})
       const node = $(this.generateScreenreaderNodeHTML(content, closable))
@@ -181,8 +183,7 @@ class RailsFlashNotificationsHelper {
     }
   }
 
-  // @ts-expect-error
-  createScreenreaderNodeExclusive(content, polite = false) {
+  createScreenreaderNodeExclusive(content: string | {html: string}, polite = false) {
     if (this.screenreaderHolderReady()) {
       updateAriaLive.call(this, {polite})
       this.screenreader_holder.innerHTML = ''
@@ -191,8 +192,7 @@ class RailsFlashNotificationsHelper {
     }
   }
 
-  // @ts-expect-error
-  generateScreenreaderNodeHTML(content, closable) {
+  generateScreenreaderNodeHTML(content: string | {html: string}, closable: boolean) {
     let closeContent
     if (closable) {
       closeContent = I18n.t('Close')
@@ -203,10 +203,9 @@ class RailsFlashNotificationsHelper {
     return `<span>${this.escapeContent(content)}${htmlEscape(closeContent)}</span>`
   }
 
-  // @ts-expect-error
   // xsslint safeString.method escapeContent
-  escapeContent(content) {
-    if (content.hasOwnProperty('html')) {
+  escapeContent(content: string | {html: string}) {
+    if (typeof content === 'object' && 'html' in content) {
       return content.html
     } else {
       return htmlEscape(content)

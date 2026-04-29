@@ -99,7 +99,9 @@ const serializedTerms: SerializedTermGroup = {
   ],
 }
 
-jest.mock('@canvas/network/NaiveRequestDispatch/index')
+vi.mock('@canvas/network/NaiveRequestDispatch/index', () => ({
+  default: vi.fn(),
+}))
 
 describe('enrollmentTermsApi', () => {
   let mockDeferred: JQuery.Deferred<SerializedTermGroup[]>
@@ -110,16 +112,16 @@ describe('enrollmentTermsApi', () => {
     })
     mockDeferred = $.Deferred<SerializedTermGroup[]>()
     const mockDispatch = {
-      getDepaginated: jest.fn().mockReturnValue(mockDeferred),
+      getDepaginated: vi.fn().mockReturnValue(mockDeferred),
     }
-    ;(NaiveRequestDispatch as jest.MockedClass<typeof NaiveRequestDispatch>).mockImplementation(
+    ;(NaiveRequestDispatch as any).mockImplementation(
       () => mockDispatch as unknown as NaiveRequestDispatch,
     )
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('list', () => {

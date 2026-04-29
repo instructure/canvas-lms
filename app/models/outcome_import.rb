@@ -20,6 +20,7 @@
 
 class OutcomeImport < ApplicationRecord
   include Workflow
+
   belongs_to :context, polymorphic: %i[account course], optional: false
   belongs_to :attachment
   belongs_to :user
@@ -116,12 +117,12 @@ class OutcomeImport < ApplicationRecord
 
       job_completed!
     rescue Outcomes::Import::DataFormatError => e
-      add_error(1, e.message, true)
+      add_error(1, e.message, failure: true)
       job_failed!
     rescue => e
       report = ErrorReport.log_exception("outcomes_import", e)
       # no I18n on error report id
-      add_error(1, I18n.t("An unexpected error has occurred: see error report %{id}", id: report.id.to_s), true)
+      add_error(1, I18n.t("An unexpected error has occurred: see error report %{id}", id: report.id.to_s), failure: true)
       job_failed!
     ensure
       file.close
@@ -129,7 +130,7 @@ class OutcomeImport < ApplicationRecord
     end
   end
 
-  def add_error(row, error, failure = false)
+  def add_error(row, error, failure: false)
     outcome_import_errors.create!(
       row:,
       message: error,

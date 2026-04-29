@@ -31,7 +31,7 @@ function makeModel(type: string, id: number, module_item_id: number) {
       module_item_id,
     },
     view: {
-      render: jest.fn(),
+      render: vi.fn(),
     },
   }
 }
@@ -105,5 +105,8 @@ export function makeModuleWithItems(moduleId: number, itemIds: number[], publish
 }
 
 export function initBody() {
-  document.body.innerHTML = '<div id="context_modules"></div>'
+  document.body.innerHTML =
+    '<div id="context_modules"></div>' +
+    '<div id="flashalert_message_holder" role="alert"></div>' +
+    '<div id="flash_screenreader_holder" role="alert"></div>'
 }

@@ -19,7 +19,7 @@
 import Handlebars from '..'
 import $ from 'jquery'
 import 'jquery-migrate'
-import _ from 'lodash'
+import {defaults} from 'es-toolkit/compat'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
@@ -45,7 +45,7 @@ describe('handlebars_helpers', () => {
         .find('input')
         .eq(1)
 
-      const checks = _.defaults(hash, {
+      const checks = defaults(hash, {
         value: 1,
         tagName: 'INPUT',
         type: 'checkbox',

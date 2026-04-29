@@ -38,6 +38,12 @@ shared_examples "outcome gradebook" do |ff_enabled|
     end
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
+  end
+
   context "as a teacher" do
     before(:once) do
       gradebook_data_setup
@@ -306,7 +312,10 @@ shared_examples "outcome gradebook" do |ff_enabled|
           expect(averages).to contain_exactly("2.33", "2.67")
         end
 
-        it "outcome ordering persists accross page refresh" do
+        it "outcome ordering persists across page refresh" do
+          # Set arrangement to custom so backend uses the drag & drop positions
+          @teacher.set_preference(:learning_mastery_gradebook_settings, @course.global_id, { "outcome_arrangement" => "custom" })
+
           get "/courses/#{@course.id}/gradebook"
           select_learning_mastery
           wait_for_ajax_requests

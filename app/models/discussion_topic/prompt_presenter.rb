@@ -113,18 +113,23 @@ class DiscussionTopic
       xml.target!
     end
 
+    def enrollments_by_user
+      @enrollments_by_user ||= begin
+        hash = {}
+        @topic.course.enrollments.active.select(:user_id, :type).each do |enrollment|
+          hash[enrollment.user_id] ||= []
+          hash[enrollment.user_id] << enrollment.type
+        end
+        hash
+      end
+    end
+
     def get_anonymized_user_ids(with_index:)
       anonymized_user_ids = {}
       instructor_count = 0
       student_count = 0
 
-      enrollments_by_user = {}
-      instructor_types = ["TeacherEnrollment", "TaEnrollment"]
-
-      @topic.course.enrollments.active.select(:user_id, :type).each do |enrollment|
-        enrollments_by_user[enrollment.user_id] ||= []
-        enrollments_by_user[enrollment.user_id] << enrollment.type
-      end
+      instructor_types = %w[TeacherEnrollment TaEnrollment]
 
       enrollments_by_user.each do |user_id, types|
         is_instructor = types.any? { |type| instructor_types.include?(type) }

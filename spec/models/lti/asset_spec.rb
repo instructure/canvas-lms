@@ -22,6 +22,47 @@ RSpec.describe Lti::Asset do
     subject { lti_asset_model }
 
     it { is_expected.to be_valid }
+
+    context "exactly one locator field present" do
+      it "is valid with only attachment_id" do
+        expect(lti_asset_model(attachment: attachment_model).save).to be_truthy
+      end
+
+      it "is valid with only submission_attempt (RCE)" do
+        submission = submission_model(submission_type: "online_text_entry", body: "hi")
+        asset = lti_asset_model(submission:, submission_attempt: submission.attempt)
+        expect(asset.save).to be_truthy
+      end
+
+      it "is valid with only discussion_entry_version_id" do
+        topic = course_model.discussion_topics.create!
+        entry = topic.discussion_entries.create!(message: "msg", user: user_model)
+        dev = entry.discussion_entry_versions.first
+        submission = submission_model
+        asset = Lti::Asset.new(submission:, discussion_entry_version: dev)
+        expect(asset.save).to be_truthy
+      end
+
+      it "is valid with none present (referenced entity (discussion_entry_version_id) has been deleted)" do
+        submission = submission_model
+        asset = Lti::Asset.new(submission:, attachment: nil, submission_attempt: nil, discussion_entry_version_id: nil)
+        expect(asset).not_to be_valid
+        expect(asset.errors.full_messages.join).to match(/Exactly one of/)
+        expect(asset.save(validate: false)).to be_truthy
+      end
+
+      it "is invalid with multiple present" do
+        submission = submission_model(submission_type: "online_text_entry", body: "hi")
+        topic = submission.assignment.context.discussion_topics.create!
+        entry = topic.discussion_entries.create!(message: "msg", user: user_model)
+        dev = entry.discussion_entry_versions.first
+        # use raw model to control fields
+        asset = Lti::Asset.new(submission:, attachment: attachment_model, submission_attempt: submission.attempt, discussion_entry_version_id: dev.id)
+        expect(asset).not_to be_valid
+        expect(asset.errors.full_messages.join).to match(/Exactly one of/)
+        expect { asset.save!(validate: false) }.to raise_error(ActiveRecord::StatementInvalid, /CheckViolation|chk_one_asset_locator_present/)
+      end
+    end
   end
 
   it "generates a uuid" do
@@ -38,6 +79,7 @@ RSpec.describe Lti::Asset do
     asset1.submission.destroy
 
     expect(asset1.reload.submission_id).to be_nil
+    expect(asset1.asset_type).to eq "deleted"
   end
 
   it "allows multiple rows with the same attachment_id and empty submission id" do
@@ -53,12 +95,69 @@ RSpec.describe Lti::Asset do
     expect(asset2.reload.submission_id).to be_nil
   end
 
+  it "allows multiple rows with the same submission_attempt and empty submission id" do
+    submission = submission_model(submission_type: "online_text_entry", body: "hello body")
+    attempt_number = submission.attempt
+    asset1 = lti_asset_model(submission:, submission_attempt: attempt_number)
+    submission.destroy
+    asset1.reload
+    expect(asset1.submission_id).to be_nil
+
+    asset2 = Lti::Asset.new(submission_attempt: attempt_number)
+    asset2.uuid = SecureRandom.uuid
+    asset2.root_account_id = asset1.root_account_id
+    expect { asset2.save!(validate: false) }.not_to raise_error
+  end
+
   it "soft deleted when attachment is deleted" do
     asset1 = lti_asset_model
 
     asset1.attachment.destroy
 
     expect(asset1.reload.workflow_state).to eq("deleted")
+  end
+
+  describe "discussion_entry_version_id" do
+    it "prevents duplicates at the DB level" do
+      submission = submission_model
+      topic = submission.assignment.context.discussion_topics.create!
+      entry = topic.discussion_entries.create!(message: "msg", user: user_model)
+      dev = entry.discussion_entry_versions.first
+      first = Lti::Asset.create!(submission:, attachment: nil, submission_attempt: nil, discussion_entry_version_id: dev.id)
+      expect(first).to be_persisted
+
+      dup = Lti::Asset.new(submission:, discussion_entry_version_id: dev.id)
+      expect { dup.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+
+    it "when deleting a discussion_entry_version referenced by an asset the asset is soft-deleted" do
+      submission = submission_model
+      topic = submission.assignment.context.discussion_topics.create!
+      entry = topic.discussion_entries.create!(message: "msg", user: user_model)
+      dev = entry.discussion_entry_versions.first
+      asset = Lti::Asset.create!(submission:, discussion_entry_version: dev)
+
+      dev.destroy!
+      expect(asset.reload.workflow_state).to eq("active")
+      expect(asset.discussion_entry_version_id).to be_nil
+    end
+
+    it "nullifies discussion_entry_version_id at the DB level via FK ON DELETE SET NULL" do
+      submission = submission_model
+      topic = submission.assignment.context.discussion_topics.create!
+      entry = topic.discussion_entries.create!(message: "msg", user: user_model)
+      dev = entry.discussion_entry_versions.first
+      asset = Lti::Asset.create!(submission:, discussion_entry_version: dev)
+
+      # Direct SQL delete to bypass AR callbacks and ensure database FK handles nullification
+      DiscussionEntryVersion.connection.execute("DELETE FROM #{DiscussionEntryVersion.quoted_table_name} WHERE id = #{dev.id}")
+
+      asset.reload
+      expect(asset.discussion_entry_version_id).to be_nil
+      # Asset should remain active and still have its submission id set
+      expect(asset.workflow_state).to eq("active")
+      expect(asset.submission_id).not_to be_nil
+    end
   end
 
   describe "#compatible_with_processor?" do
@@ -70,6 +169,55 @@ RSpec.describe Lti::Asset do
 
         expect(asset.compatible_with_processor?(lti_asset_processor_model)).to be(false)
       end
+    end
+
+    it "is false when submission has been hard-deleted (submission_id is nil)" do
+      asset = lti_asset_model
+      asset.submission.destroy
+      asset.reload
+      expect(asset.submission_id).to be_nil
+      expect(asset.compatible_with_processor?(lti_asset_processor_model)).to be(false)
+    end
+  end
+
+  describe "destruction when submission has been hard-deleted" do
+    it "can be destroyed when submission_id is nil" do
+      asset = lti_asset_model
+      asset.submission.destroy
+      asset.reload
+      expect(asset.submission_id).to be_nil
+      expect { asset.destroy! }.not_to raise_error
+      expect(asset.workflow_state).to eq("deleted")
+    end
+
+    it "cascades destroy to asset reports when submission_id is nil" do
+      asset = lti_asset_model
+      processor = lti_asset_processor_model(assignment: asset.submission.assignment)
+      report = lti_asset_report_model(asset:, asset_processor: processor)
+
+      asset.submission.destroy
+      asset.reload
+
+      expect { asset.destroy! }.not_to raise_error
+      expect(report.reload.workflow_state).to eq("deleted")
+    end
+  end
+
+  describe "validates submission presence on create only" do
+    it "requires submission on create" do
+      asset = Lti::Asset.new(attachment: attachment_model)
+      asset.uuid = SecureRandom.uuid
+      asset.root_account_id = Account.default.id
+      expect(asset).not_to be_valid
+      expect(asset.errors[:submission]).to be_present
+    end
+
+    it "does not require submission on update" do
+      asset = lti_asset_model
+      asset.submission.destroy
+      asset.reload
+      expect(asset.submission_id).to be_nil
+      expect(asset).to be_valid
     end
   end
 
@@ -116,6 +264,129 @@ RSpec.describe Lti::Asset do
 
       it "returns the size of the text entry content" do
         expect(asset.content_size).to eq(11)
+      end
+    end
+  end
+
+  describe "#attempt_number" do
+    context "with a text entry asset (submission_attempt set)" do
+      let(:submission) { submission_model(submission_type: "online_text_entry", body: "hi") }
+      let(:asset) { lti_asset_model(submission:, submission_attempt: submission.attempt) }
+
+      it "returns the submission_attempt" do
+        expect(asset.send(:attempt_number)).to eq(submission.attempt)
+      end
+    end
+
+    context "with an attachment asset" do
+      let(:course) { course_model }
+      let(:assignment) { assignment_model(course:, submission_types: "online_upload") }
+      let(:student) { student_in_course(course:, active_all: true).user }
+
+      it "returns the attempt for the version that contains the attachment" do
+        attachment1 = attachment_model(context: student)
+        attachment2 = attachment_model(context: student)
+
+        sub = assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment1])
+        asset1 = Lti::Asset.create!(submission: sub, attachment: attachment1)
+
+        sub = assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment2])
+        asset2 = Lti::Asset.create!(submission: sub, attachment: attachment2)
+
+        expect(asset1.send(:attempt_number)).to eq(1)
+        expect(asset2.send(:attempt_number)).to eq(2)
+      end
+
+      it "falls back to the current submission attempt if attachment is not found in history" do
+        sub = submission_model
+        attachment = attachment_model
+        asset = Lti::Asset.create!(submission: sub, attachment:)
+
+        expect(asset.send(:attempt_number)).to eq(sub.attempt)
+      end
+    end
+
+    context "with no submission (deleted)" do
+      it "returns nil" do
+        asset = lti_asset_model
+        asset.submission.destroy
+        asset.reload
+        expect(asset.send(:attempt_number)).to be_nil
+      end
+    end
+  end
+
+  describe "#submission_lti_claim_id" do
+    context "with a text entry asset" do
+      let(:submission) { submission_model(submission_type: "online_text_entry", body: "hi") }
+      let(:asset) { lti_asset_model(submission:, submission_attempt: submission.attempt) }
+
+      it "delegates to submission#lti_attempt_id" do
+        expect(asset.submission_lti_claim_id).to eq(submission.lti_attempt_id(submission.attempt))
+      end
+    end
+
+    context "with a regular attachment asset" do
+      let(:asset) { lti_asset_model }
+
+      it "delegates to submission#lti_attempt_id" do
+        expect(asset.submission_lti_claim_id).to eq(asset.submission.lti_attempt_id(asset.send(:attempt_number)))
+      end
+    end
+
+    context "with a discussion entry asset" do
+      let(:submission) { submission_model }
+      let(:topic) { submission.assignment.context.discussion_topics.create! }
+      let(:entry) { topic.discussion_entries.create!(message: "hello", user: submission.user) }
+      let(:dev) { entry.discussion_entry_versions.first }
+      let(:asset) { lti_asset_model(submission:, discussion_entry_version: dev) }
+
+      it "uses the discussion claim format" do
+        expected = "#{submission.lti_id}:#{dev.id}:#{entry.attachment_id}"
+        expect(asset.submission_lti_claim_id).to eq(expected)
+      end
+    end
+
+    context "with a discussion attachment asset" do
+      let(:course) { course_model }
+      let(:student) { student_in_course(course:, active_all: true).user }
+      let(:attachment) { attachment_model(context: student) }
+      let(:assignment) { assignment_model(course:, submission_types: "discussion_topic") }
+      let(:topic) do
+        t = course.discussion_topics.create!(title: "t", user: course.teachers.first)
+        t.update!(assignment:)
+        t
+      end
+      let(:submission) do
+        sub = assignment.find_or_create_submission(student)
+        sub.update!(submission_type: "discussion_topic")
+        sub
+      end
+
+      it "uses the entry's latest version for the claim id" do
+        entry = topic.discussion_entries.create!(message: "first", user: student, attachment:)
+        asset = Lti::Asset.create!(submission:, attachment:)
+        dev = entry.discussion_entry_versions.order(version: :desc).first
+
+        expect(asset.submission_lti_claim_id).to eq(dev.lti_submission_claim_id(submission))
+      end
+
+      it "picks the latest entry when multiple share the same attachment" do
+        topic.discussion_entries.create!(message: "first", user: student, attachment:)
+        entry2 = topic.discussion_entries.create!(message: "second", user: student, attachment:)
+        asset = Lti::Asset.create!(submission:, attachment:)
+        dev2 = entry2.discussion_entry_versions.order(version: :desc).first
+
+        expect(asset.submission_lti_claim_id).to eq(dev2.lti_submission_claim_id(submission))
+      end
+    end
+
+    context "when submission is nil (deleted)" do
+      it "returns nil" do
+        asset = lti_asset_model
+        asset.submission.destroy
+        asset.reload
+        expect(asset.submission_lti_claim_id).to be_nil
       end
     end
   end

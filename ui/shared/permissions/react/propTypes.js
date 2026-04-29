@@ -73,4 +73,11 @@ propTypes.filteredRole = shape({
   value: string.isRequired,
 })
 
+propTypes.permissionGroups = shape({
+  [string]: shape({
+    label: string.isRequired,
+    subtitle: string,
+    course_subtitle: string,
+  }),
+})
 export default propTypes

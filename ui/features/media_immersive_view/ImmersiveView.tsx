@@ -1,0 +1,79 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import CanvasStudioPlayer from '@canvas/canvas-studio-player'
+import {NoTranscript} from './components/NoTranscript'
+import styles from './ImmersiveView.module.css'
+import {ImmersiveViewBackButton} from './components/ImmersiveViewBackButton'
+import {useMedia} from 'react-use'
+import {useTranslation} from '@canvas/i18next'
+import {Heading} from '@instructure/ui-heading'
+
+export type ImmersiveViewProps = {
+  id: string
+  title: string
+  attachmentId?: string
+  isAttachment?: boolean
+}
+
+export function ImmersiveView({id, title, attachmentId, isAttachment}: ImmersiveViewProps) {
+  const {t} = useTranslation('media_immersive_view')
+  const rollingTranscriptElementId = 'immersive-view-transcript-root'
+  const isTablet = !useMedia('(min-width: 769px)')
+  const playerHeight = isTablet ? 'calc(100vw / (16 / 9) + 40px)' : '490px'
+
+  // Check for custom_embed_hide_header URL parameter
+  const searchParams = new URLSearchParams(window.location.search)
+  const hideHeader = searchParams.get('custom_embed_hide_header') === 'true'
+
+  return (
+    <div className={styles.immersiveView}>
+      {!hideHeader && (
+        <div className={styles.immersiveViewHeader}>
+          <h1 className={styles.immersiveViewTitle}>{title}</h1>
+          <ImmersiveViewBackButton />
+        </div>
+      )}
+
+      <div className={styles.immersiveViewContent}>
+        <CanvasStudioPlayer
+          explicitSize={{height: playerHeight, width: '100%'}}
+          media_id={id}
+          attachment_id={attachmentId}
+          is_attachment={isAttachment}
+          aria_label={title}
+          type="video"
+          enableSidebar={!isTablet}
+          openSidebar={!isTablet}
+          emptyTranscriptsComponent={<NoTranscript />}
+          hideUploadCaptions
+          show_loader={true}
+          rollingTranscriptElement={isTablet ? rollingTranscriptElementId : undefined}
+        />
+
+        {isTablet && (
+          <Heading variant="titleCardRegular" level="h2" margin="small">
+            {t('Transcript')}
+          </Heading>
+        )}
+
+        <div className={styles.immersivViewTranscript} id={rollingTranscriptElementId} />
+      </div>
+    </div>
+  )
+}

@@ -145,14 +145,17 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
     pointsBasedGradingScheme: bool.isRequired,
     viewUngradedAsZero: bool.isRequired,
     weightedGroups: bool.isRequired,
-    // @ts-expect-error
-    onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
+    onMenuDismiss: func.isRequired,
     isRunningScoreToUngraded: bool,
-    ...ColumnHeader.propTypes,
+    addGradebookElement: func,
+    removeGradebookElement: func,
+    onHeaderKeyDown: func,
   }
 
   static defaultProps = {
-    ...ColumnHeader.defaultProps,
+    addGradebookElement() {},
+    removeGradebookElement() {},
+    onHeaderKeyDown() {},
   }
 
   handleSendMessageStudentsWho = (args: {

@@ -21,6 +21,8 @@ const isEmpty = obj => Object.keys(obj).length === 0
 /**
  * @typedef {Object} Features
  * @property {boolean} file_verifiers_for_quiz_links
+ * @property {boolean} rce_studio_embed_improvements
+ * @property {boolean} rce_asr_captioning_improvements
  */
 
 class RCEGlobals {

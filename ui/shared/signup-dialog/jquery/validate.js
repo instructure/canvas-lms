@@ -29,7 +29,7 @@
 //   else
 //     errors = $form.data 'errors'
 import $ from 'jquery'
-import {size} from 'lodash'
+import {size} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('validate')

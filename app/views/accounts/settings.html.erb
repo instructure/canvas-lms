@@ -19,8 +19,8 @@
   css_bundle :account_settings, :reports, :tinymce
   provide :page_title, t(:page_title, "Account Settings")
 
-  js_env(
-    :ACCOUNT => {
+  js_env({
+    ACCOUNT: {
       'id' => @context.id,
       'site_admin' => @account.site_admin?,
       'root_account' => @account.root_account?
@@ -33,7 +33,7 @@
         )
       end
     end
-  )
+  })
 %>
 
 <% provide :right_side do %>
@@ -238,6 +238,11 @@
                     </td>
                   </tr>
                   <tr>
+                    <td colspan="2"><%= settings.check_box :restrict_grading_scheme_editing_to_admins, :checked => @account.settings[:restrict_grading_scheme_editing_to_admins] %>
+                    <%= settings.label :restrict_grading_scheme_editing_to_admins, :en => "Don't let teachers modify grading schemes" %>
+                    </td>
+                  </tr>
+                  <tr>
                     <td colspan="2"><%= settings.check_box :allow_sending_scores_in_emails, :checked => @account.settings[:allow_sending_scores_in_emails] != false %>
                     <%= settings.label :allow_sending_scores_in_emails, :en => "Students can opt-in to receiving scores in email notifications" %>
                     </td>
@@ -372,6 +377,26 @@
                   <% end %>
                 <% end %>
 
+                <% if @account.root_account.feature_enabled?(:course_pace_enable_from_account_setting) %>
+                  <%= settings.fields_for :enable_course_paces do |r| %>
+                    <% hash = @account.enable_course_paces %>
+                    <% disabled = hash[:locked] && hash[:inherited] %>
+                    <tr>
+                      <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                        <%= r.label :value, t("Course pacing allowed") %>
+                      </td>
+                    </tr>
+                    <% unless disabled %>
+                      <tr>
+                        <td colspan="2" class="sub_checkbox">
+                          <%= r.check_box :locked, :checked => hash[:locked] %>
+                          <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                <% end %>
+
                 <%= settings.fields_for :enable_offline_web_export do |r| %>
                   <% hash = @account.enable_offline_web_export %>
                   <% disabled = hash[:locked] && hash[:inherited] %>
@@ -422,6 +447,15 @@
                       </td>
                     </tr>
                   <% end %>
+                  <%= settings.fields_for :default_allow_observer_signup do |r| %>
+                    <% hash = @account.default_allow_observer_signup %>
+                    <tr>
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :value, checked: hash[:value] %>
+                        <%= r.label :value, t("Check 'Allow observers to sign-up' by default when creating new appointment groups") %>
+                      </td>
+                    </tr>
+                  <% end %>
                 <% end %>
 
                 <% if Account.site_admin.feature_enabled?(:gradebook_show_first_last_names) %>
@@ -454,11 +488,17 @@
                   </tr>
                 <% end %>
 
-                <% if !@account.site_admin? && @account.primary_settings_root_account? && @account.feature_enabled?(:admin_manage_access_tokens)%>
+                <% if !@account.site_admin? && @account.primary_settings_root_account? %>
                   <tr>
                     <td colspan="2">
                       <%= settings.check_box :limit_personal_access_tokens, checked: @account.limit_personal_access_tokens? %>
                       <%= settings.label :limit_personal_access_tokens, t("Limit personal access token creation to Admins.") %>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2">
+                      <%= settings.check_box :restrict_personal_access_tokens_from_students, checked: @account.restrict_personal_access_tokens_from_students? %>
+                      <%= settings.label :restrict_personal_access_tokens_from_students, t("Restrict students and observers from creating personal access tokens.") %>
                     </td>
                   </tr>
                 <% end%>
@@ -473,7 +513,7 @@
           <% slack_api_key = @account.root_account.settings[:encrypted_slack_key] ? Canvas::Security.decrypt_password(@account.root_account.settings[:encrypted_slack_key], @account.root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key') : '' %>
           <fieldset>
             <legend><%= t("Slack Api Key") %></legend>
-            <div class="dim-till-hover">
+            <div>
               <span><%= t("Current Slack Api Key:") %></span>
               <span id="current_slack_api_key"><%= slack_api_key.length > 4 ? "#{slack_api_key[0..3]}#{'*' * (slack_api_key.length - 4)}" : '****' %></span>
             </div>
@@ -522,7 +562,7 @@
                     <%= settings.check_box :can_change_pronouns, :checked => @account.can_change_pronouns? %>
                     <%= settings.label :can_change_pronouns, en: "Allow users to change their pronouns in Canvas" %>
                   </div>
-                    <% js_env(PRONOUNS_LIST: ((@account.pronouns.presence || Pronouns.default_pronouns)))
+                    <% js_env({ PRONOUNS_LIST: ((@account.pronouns.presence || Pronouns.default_pronouns)) })
                     js_bundle :available_pronouns_list %>
                 </div>
               <% end %>
@@ -531,9 +571,31 @@
                 <%= settings.label :users_can_edit_name, :en => "Users can edit their name" %>
               </div>
               <div>
-                <%= settings.check_box :users_can_edit_profile, :checked => @account.users_can_edit_profile? %>
+                <%= settings.check_box :users_can_edit_profile, :checked => @account.users_can_edit_profile?, class: "element_toggler", "aria-controls": "edit_profile_options" %>
                 <%= settings.label :users_can_edit_profile, :en => "Users can edit their profile" %>
+                <div id="edit_profile_options" <%= hidden(include_style: true) unless @account.users_can_edit_profile? %>>
+                  <div>
+                    <%= settings.check_box :users_can_edit_title, :checked => @account.users_can_edit_title? %>
+                    <%= settings.label :users_can_edit_title, :en => "Users can edit their title" %>
+                  </div>
+                  <div>
+                    <%= settings.check_box :users_can_edit_bio, :checked => @account.users_can_edit_bio? %>
+                    <%= settings.label :users_can_edit_bio, :en => "Users can edit their bio" %>
+                  </div>
+                  <div>
+                    <%= settings.check_box :users_can_edit_profile_links, :checked => @account.users_can_edit_profile_links? %>
+                    <%= settings.label :users_can_edit_profile_links, :en => "Users can edit their profile links" %>
+                  </div>
               </div>
+            <% end %>
+          </fieldset>
+        <% end %>
+        <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) %>
+          <fieldset>
+            <legend><%= t("Content Privacy Settings") %></legend>
+            <%= f.fields_for :settings do |settings| %>
+              <%= settings.check_box :has_underage_users, :checked => @account.settings[:has_underage_users] %>
+              <%= settings.label :has_underage_users, t("This account has underage users")%>
             <% end %>
           </fieldset>
         <% end %>
@@ -557,6 +619,35 @@
             <textarea name="account[terms_of_service][content]"></textarea>
           </div>
           <div id="terms_of_service_preview_link"></div>
+        <% end %>
+        <% if Account.site_admin.grants_right?(@current_user, :manage) %>
+          <fieldset>
+            <legend><%= t("Impact settings") %></legend>
+            <%= f.fields_for :settings do |settings| %>
+              <table class="formtable narrow">
+                <tr>
+                  <td><%= settings.blabel :impact_account_type, t("Impact Account Type") %></td>
+                  <td>
+                    <% if @account.root_account? %>
+                      <%= settings.select :impact_account_type,
+                        options_for_select([
+                          [t("Account (default)"), "account"],
+                          [t("Consortium"), "consortium"]
+                        ], @account.settings[:impact_account_type] || "account") %>
+                      <p class="aside"><%= t("Send the Salesforce ID as a partner account ID (oemAccountId). Use this for special cases like Impact purchased for a consortium.") %></p>
+                    <% else %>
+                      <%= settings.select :impact_account_type,
+                        options_for_select([
+                          [t("Account (default)"), "account"],
+                          [t("Sub-account"), "subaccount"]
+                        ], @account.settings[:impact_account_type] || "account") %>
+                      <p class="aside"><%= t("Send a unique ID as a partner account ID (oemAccountId). Use this for special cases like Impact purchased for a single sub-account.") %></p>
+                    <% end %>
+                  </td>
+                </tr>
+              </table>
+            <% end %>
+          </fieldset>
         <% end %>
         <% if !@account.site_admin? &&
                @account.primary_settings_root_account? &&
@@ -618,7 +709,7 @@
               </div>
             </div>
 
-            <% if !@account.site_admin? && @account.feature_enabled?(:assign_to_differentiation_tags) %>
+            <% if !@account.site_admin? %>
               <div>
                 <% diff_tags = @account.allow_assign_to_differentiation_tags %>
                 <% disabled = diff_tags[:locked] && diff_tags[:inherited] %>
@@ -725,6 +816,10 @@
                   <%= settings.check_box :limit_parent_app_web_access, :checked => @account.settings[:limit_parent_app_web_access] %>
                   <%= settings.label :limit_parent_app_web_access, :en => "Limit access to Canvas web from the Canvas Parent app" %>
                 </div>
+                <div>
+                  <%= settings.check_box :suppress_assignments, :checked => @account.suppress_assignments? %>
+                  <%= settings.label :suppress_assignments, :en => "Allow assignments to be suppressed" %>
+                </div>
               <% end %>
               <%# end of :manage_site_settings %>
               <div>
@@ -793,39 +888,21 @@
                 <%= settings.check_box :enable_course_catalog, :checked => @account.settings[:enable_course_catalog] %>
                 <%= settings.label     :enable_course_catalog, :en => "Show a searchable list of courses in this root account with the \"Include this course in the public course index\" flag enabled." %>
               </div>
-              <% if Account.site_admin.feature_enabled?(:show_push_notification_account_setting) %>
-                <div>
-                  <%= settings.check_box :enable_push_notifications, :checked => @account.enable_push_notifications? %>
-                  <%= settings.label     :enable_push_notifications, :en => "Enable push notifications to mobile devices" %>
-                </div>
-              <% end %>
+              <div>
+                <%= settings.check_box :enable_push_notifications, :checked => @account.enable_push_notifications? %>
+                <%= settings.label     :enable_push_notifications, :en => "Enable push notifications to mobile devices" %>
+              </div>
               <% unless @account.site_admin? %>
                 <div>
                   <%= settings.check_box :kill_joy, :checked => @account.kill_joy? %>
                   <%= settings.label     :kill_joy, :en => "Remove hidden game from 404 page" %>
                 </div>
               <% end %>
-              <% unless @account.site_admin? %>
-                <div>
-                  <%= settings.check_box :suppress_notifications, :checked => @account.suppress_notifications? %>
-                  <%= settings.label     :suppress_notifications, :en => "Suppress notifications from being created and sent out" %>
-                </div>
-              <% end %>
-            <% end %>
-            <% unless @account.site_admin? %>
-              <div>
-                <input type="checkbox" id="enable_equella" <%= 'checked' if !@account.settings[:equella_endpoint].blank? %> />
-                <label for="enable_equella"><%= t 'labels.equella', 'Equella' %></label>
-              </div>
             <% end %>
             <% if @account.grants_right?(@current_user, :manage_site_settings) %>
               <div>
                 <%= settings.check_box :enable_turnitin, :checked => @account.settings[:enable_turnitin] %>
                 <%= settings.label :enable_turnitin, :en => "Turnitin" %>
-              </div>
-              <div>
-                <%= settings.check_box :suppress_assignments, :checked => @account.settings[:suppress_assignments] %>
-                <%= settings.label :suppress_assignments, :en => "Allow assignments to be suppressed" %>
               </div>
             <% end %>
           <% end %>
@@ -847,6 +924,22 @@
           <% end %>
         </fieldset>
 
+        <% if !@account.site_admin? && @account.primary_settings_root_account? %>
+          <fieldset id="suppress_notifications_settings">
+            <h2 class="screenreader-only"><%= t('Suppress Notifications') %></h2>
+            <legend><%= t('Suppress Notifications') %></legend>
+            <div id="suppress-notifications-mount" data-values="<%=
+              {
+                suppressNotifications: @account.settings[:suppress_notifications].presence || false,
+                notificationCategories: Notification.all_cached
+                  .map { |n| { slug: n.category_slug, displayName: n.category_display_name } }
+                  .uniq { |c| c[:slug] }
+                  .sort_by { |c| c[:displayName] }
+              }.to_json
+            %>"></div>
+          </fieldset>
+        <% end %>
+
         <% unless @account.site_admin? %>
             <% if @account.feature_enabled?(:new_sis_integrations) %>
                 <%= render partial: 'sis_integration_settings', locals: { f: f } %>
@@ -859,26 +952,11 @@
           <div id="custom_help_link_settings"></div>
         <% end %>
 
-        <% unless @account.site_admin? %>
-          <fieldset id="enable_equella_settings" style="display: none;">
-            <legend><%= t(:equella_settings_title, "Equella Settings") %></legend>
-            <%= f.fields_for :settings do |settings| %>
-              <table class="formtable">
-                <tr>
-                  <td style="vertical-align: top;"><%= settings.label :equella_endpoint, :en => "Equella Endpoint" %></td>
-                  <td>
-                    <%= settings.text_field :equella_endpoint, :value => @account.settings[:equella_endpoint] %>
-                    <div style="font-size: 0.9em;"><%= t(:equall_endpoint_help, "This is the URL to your equella service.  It will probably look something like \"%{sample_url}\".", :sample_url => "http://oer.equella.com/signon.do") %></div>
-                  </td>
-                </tr>
-                <tr>
-                  <td><%= settings.blabel :equella_teaser, :en => "Equella Comments" %></td>
-                  <td><%= settings.text_area :equella_teaser, :style => "width: 90%; height: 75px;", :value => @account.settings[:equella_teaser] %></td>
-                </tr>
-              </table>
-            <% end %>
-          </fieldset>
+        <% if @account.root_account&.feature_enabled?(:nav_menu_links) %>
+          <div id="nav_menu_links_settings"></div>
+        <% end %>
 
+        <% unless @account.site_admin? %>
           <fieldset id="turnitin_settings">
             <legend><%= t("Similarity Detection Platform") %></legend>
             <table class="formtable narrow">
@@ -1153,7 +1231,7 @@ acknowledge that you have read and agreed to the
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
     <ul class="admins_list user_list list admins">
       <%= render :partial => 'account_user', :collection => @account_users %>
-      <% available_roles = @context.available_account_roles(false, @current_user).sort_by(&:display_sort_index) %>
+      <% available_roles = @context.available_account_roles(user: @current_user).sort_by(&:display_sort_index) %>
       <% unless available_roles.empty? %>
         <%= render :partial => 'account_user', :object => nil %>
       <% end %>
@@ -1367,7 +1445,7 @@ acknowledge that you have read and agreed to the
       <% end %>
     <% end %>
     <ul class="announcements_list unstyled_list">
-      <%= will_paginate(@announcements, params: {anchor: "tab-announcements-mount"}) %>
+      <%= will_paginate(@announcements, params: {anchor: "tab-announcements"}) %>
       <% @announcements.each do |announcement| %>
         <li class="announcements_list_item">
           <div class="ic-notification ic-notification--admin-created ic-notification--<%= notification_container_classname(announcement) %>">
@@ -1424,9 +1502,9 @@ acknowledge that you have read and agreed to the
               </div>
               <span class="notification_account_content_text">
                 <% if @account.site_admin? %>
-                  <%= t("This is a message from *Canvas Administration*", wrapper: '<b>\1</b>') %>
+                  <%= t("This is an announcement from *Canvas Administration*", wrapper: '<b>\1</b>') %>
                 <% else %>
-                  <%= t("This is a message from *%{name}*", name: announcement.account.name, wrapper: '<b>\1</b>') %>
+                  <%= t("This is an announcement from *%{name}*", name: announcement.account.name, wrapper: '<b>\1</b>') %>
                 <% end %>
               </span>
             </div>
@@ -1514,4 +1592,3 @@ acknowledge that you have read and agreed to the
 <% end %>
 
 <div id="rqd_mount"></div>
-

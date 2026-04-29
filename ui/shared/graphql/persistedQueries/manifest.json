@@ -5,10 +5,16 @@
   "GetModulesStudentQuery": {
     "anonymous_access_allowed": true
   },
-  "GetModuleItemsStudentQuery": {
+  "GetModulesQuery": {
     "anonymous_access_allowed": true
   },
   "GetModuleItemsQuery": {
+    "anonymous_access_allowed": true
+  },
+  "GetModuleItemsStudentQuery": {
+    "anonymous_access_allowed": true
+  },
+  "GetModuleItemTitlesQuery": {
     "anonymous_access_allowed": true
   }
 }

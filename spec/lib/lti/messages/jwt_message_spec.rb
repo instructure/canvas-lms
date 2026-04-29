@@ -19,6 +19,7 @@
 
 describe Lti::Messages::JwtMessage do
   include_context "key_storage_helper"
+  include AccountDomainSpecHelper
 
   let(:return_url) { "http://www.platform.com/return_url" }
   let(:user) { @student }
@@ -433,8 +434,8 @@ describe Lti::Messages::JwtMessage do
       end
 
       let(:controller) do
-        controller = double("controller")
-        allow(controller).to receive(:request).and_return(double("request"))
+        controller = instance_double(ApplicationController)
+        allow(controller).to receive(:request).and_return(instance_double(ActionDispatch::Request))
         controller
       end
 
@@ -561,13 +562,13 @@ describe Lti::Messages::JwtMessage do
       )
     end
     let(:controller) do
-      controller = double("controller")
+      controller = instance_double(ApplicationController)
       allow(controller).to receive_messages(polymorphic_url: "polymorphic_url", request:)
       controller
     end
     # All this setup just so we can stub out controller.polymorphic_url
     let(:request) do
-      request = double("request")
+      request = instance_double(ActionDispatch::Request)
       allow(request).to receive_messages(url: "https://localhost", host: "/my/url", scheme: "https")
       request
     end
@@ -621,7 +622,7 @@ describe Lti::Messages::JwtMessage do
 
     shared_examples "names and roles claim check" do
       it "sets the NRPS url using the Account#domain" do
-        allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("account_host")
+        stub_host_for_environment_specific_domain("account_host")
         expect(lti_advantage_service_claim["context_memberships_url"]).to eq "polymorphic_url"
         expect(controller).to have_received(:polymorphic_url).with(
           [anything, :names_and_roles], host: "account_host"
@@ -661,7 +662,7 @@ describe Lti::Messages::JwtMessage do
     let(:lti_advantage_service_claim_group) { :assignment_and_grade_service }
 
     before do
-      allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical_domain")
+      stub_host_for_environment_specific_domain("canonical_domain")
     end
 
     shared_examples "assignment and grade service claim check" do
@@ -704,7 +705,7 @@ describe Lti::Messages::JwtMessage do
     let(:lti_advantage_service_claim_group) { :platform_notification_service }
 
     before do
-      allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical_domain")
+      stub_host_for_environment_specific_domain("canonical_domain")
       allow(controller).to receive(:lti_notice_handlers_url)
         .with({ host: "canonical_domain", context_external_tool_id: lti_advantage_tool.id })
         .and_return("lti_notice_handlers_url")
@@ -856,8 +857,26 @@ describe Lti::Messages::JwtMessage do
       expect(decoded_jwt["family_name"]).to eq user.last_name
     end
 
-    it "adds the person sourcedid" do
-      expect(decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/lis", "person_sourcedid")).to eq "$Person.sourcedId"
+    context "when lti_suppress_unresolved_variable_names_in_claims is disabled" do
+      before { course.root_account.disable_feature!(:lti_suppress_unresolved_variable_names_in_claims) }
+
+      it "adds the literal variable name as person_sourcedid" do
+        expect(decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/lis", "person_sourcedid")).to eq "$Person.sourcedId"
+      end
+    end
+
+    context "when the user has no SIS pseudonym" do
+      it "sets person_sourcedid to nil" do
+        expect(decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/lis", "person_sourcedid")).to be_nil
+      end
+    end
+
+    context "when the user has a SIS pseudonym with a sis_user_id" do
+      before { managed_pseudonym(user, account: course.root_account, sis_user_id: "sis_abc123") }
+
+      it "sets person_sourcedid to the SIS user ID" do
+        expect(decoded_jwt.dig("https://purl.imsglobal.org/spec/lti/claim/lis", "person_sourcedid")).to eq "sis_abc123"
+      end
     end
 
     it "adds the courses offering sourcedid" do

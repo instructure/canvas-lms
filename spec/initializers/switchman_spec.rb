@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe Switchman::Shard do
   describe "#activate!" do
     shared_examples_for "#activate!" do
@@ -29,10 +27,10 @@ describe Switchman::Shard do
     context "with sharding" do
       specs_require_sharding
 
-      include_examples "#activate!"
+      it_behaves_like "#activate!"
     end
 
-    include_examples "#activate!"
+    it_behaves_like "#activate!"
   end
 
   describe "maintenance_windows" do

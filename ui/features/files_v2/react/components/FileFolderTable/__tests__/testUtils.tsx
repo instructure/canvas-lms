@@ -35,7 +35,7 @@ export const defaultProps: FileFolderTableProps = {
   userCanDeleteFilesForContext: true,
   userCanRestrictFilesForContext: true,
   usageRightsRequiredForContext: false,
-  onSortChange: jest.fn(),
+  onSortChange: vi.fn(),
   sort: {
     by: 'name',
     direction: 'asc',
@@ -43,23 +43,23 @@ export const defaultProps: FileFolderTableProps = {
   searchString: '',
   selectedRows: new Set<string>(),
   selectionHandler: {
-    selectAll: jest.fn(),
-    deselectAll: jest.fn(),
-    toggleSelectAll: jest.fn(),
-    toggleSelection: jest.fn(),
-    selectRange: jest.fn(),
+    selectAll: vi.fn(),
+    deselectAll: vi.fn(),
+    toggleSelectAll: vi.fn(),
+    toggleSelection: vi.fn(),
+    selectRange: vi.fn(),
   },
 }
 
 export const mockRowFocusContext = {
-  setRowToFocus: jest.fn(),
-  handleActionButtonRef: jest.fn(),
+  setRowToFocus: vi.fn(),
+  handleActionButtonRef: vi.fn(),
 }
 
 export const mockRowsContext = {
   currentRows: [],
-  setCurrentRows: jest.fn(),
-  setSessionExpired: jest.fn(),
+  setCurrentRows: vi.fn(),
+  setSessionExpired: vi.fn(),
 }
 
 export const renderComponent = (props?: Partial<FileFolderTableProps>) => {

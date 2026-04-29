@@ -24,7 +24,7 @@ import {
 } from '../components/OutcomeCriterionModal'
 
 describe('OutcomeCriterionModal', () => {
-  const onDismissMock = jest.fn()
+  const onDismissMock = vi.fn()
 
   const criterion = {
     id: '1',

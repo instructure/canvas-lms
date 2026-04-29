@@ -29,10 +29,10 @@ describe "collaborations" do
   include GoogleDriveCommon
 
   context "a teacher's" do
-    title = "Google Docs"
-    type = "google_docs"
+    let(:title) { "Google Docs" }
+    let(:type) { "google_docs" }
 
-    context "#{title} collaboration" do
+    context "Google Docs collaboration" do
       before do
         course_with_teacher_logged_in
         setup_google_drive
@@ -79,7 +79,7 @@ describe "collaborations" do
     context "Google Docs collaborations with google docs not having access" do
       before do
         course_with_teacher_logged_in
-        setup_google_drive(false, false)
+        setup_google_drive(add_user_service: false, authorized: false)
       end
 
       it "is not editable if google drive does not have access to your account", priority: "1" do
@@ -124,10 +124,13 @@ describe "collaborations" do
         f("input#collaboration_title").send_keys "created by admin while masquerading"
         force_click("button:contains('Start Collaborating')")
         wait_for_ajaximations
-        collab = Collaboration.last
-        expect(collab.user_id).to eq @user.id
-        expect(collab.user_id).not_to eq @teacher.id
-        expect(collab.users.count { |u| u.id == @teacher.id }).to eq 1
+
+        keep_trying_until do
+          collab = Collaboration.last
+          expect(collab.user_id).to eq @user.id
+          expect(collab.user_id).not_to eq @teacher.id
+          expect(collab.users.count { |u| u.id == @teacher.id }).to eq 1
+        end
       end
     end
   end
@@ -146,14 +149,14 @@ describe "collaborations" do
       all_icons.last.click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      expect(check_element_has_focus(all_icons.first)).to be
+      expect(check_element_has_focus(all_icons.first)).to be true
     end
 
     it "sets focus to the add collaboration button if there are no previous collaborations" do
       f(".delete_collaboration_link").click
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      expect(check_element_has_focus(f(".add_collaboration_link"))).to be
+      expect(check_element_has_focus(f(".add_collaboration_link"))).to be true
     end
   end
 end

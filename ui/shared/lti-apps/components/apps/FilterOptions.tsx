@@ -23,7 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
-import {capitalize} from 'lodash'
+import {capitalize} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('lti_registrations')
 

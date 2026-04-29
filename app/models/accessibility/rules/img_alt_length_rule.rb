@@ -21,11 +21,9 @@ module Accessibility
   module Rules
     class ImgAltLengthRule < Accessibility::Rule
       self.id = "img-alt-length"
-      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
+      self.link = nil
 
-      MAX_LENGTH = 120
-
-      def self.test(elem)
+      def test(elem)
         return nil if elem.tag_name != "img"
         return nil unless elem.attribute?("alt")
 
@@ -35,56 +33,44 @@ module Accessibility
         return nil if alt == "" && role == "presentation"
         return nil if alt.blank?
 
-        I18n.t("Alt text is longer than 120.") if alt.length > MAX_LENGTH
+        ImgAltRuleHelper.validation_error_too_long if alt.length > ImgAltRuleHelper::MAX_LENGTH
       end
 
-      def self.message
-        I18n.t("The alt text is too long. Alt text should ideally be under 120 characters,
-        so people using screen readers can quickly understand the important content of the image.")
-      end
-
-      def self.why
-        I18n.t("Alt text should be concise. When it's unnecessarily long, it can break the flow of screen reader users.
-        Unless the image conveys complex information, aim for 120 characters or fewer.")
-      end
-
-      def self.display_name
-        I18n.t("Alt text is too long")
-      end
-
-      def self.form(elem)
+      def form(elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
           checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
           input_label: I18n.t("Alt text"),
-          undo_text: I18n.t("Alt text fixed"),
-          input_description: I18n.t("Describe what's on the picture."),
-          input_max_length: MAX_LENGTH,
+          undo_text: I18n.t("Alt text updated"),
+          input_description: I18n.t("Describe what this image is meant to convey."),
+          input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
+          is_canvas_image: Accessibility::AiGenerationService.extract_attachment_id_from_element(elem).present?,
           generate_button_label: I18n.t("Generate alt text"),
           value: elem.get_attribute("alt") || ""
         )
       end
 
-      def self.generate_fix(elem)
-        return nil if elem.tag_name != "img"
-        return nil unless elem.attribute?("src")
-
-        src = elem.get_attribute("src")
-        ImgAltRuleHelper.generate_alt_text(src)
+      def fix!(elem, value)
+        ImgAltRuleHelper.fix_alt_text!(elem, value)
       end
 
-      def self.fix!(elem, value)
-        if value == "" || value.nil?
-          elem["role"] = "presentation"
-        elsif value.length > MAX_LENGTH
-          raise StandardError, I18n.t("Too long alt text. It should be less than 120 characters.")
-        end
+      def display_name
+        I18n.t("Alt text is too long")
+      end
 
-        return nil if elem["alt"] == value
+      def message
+        I18n.t("Recommended alt text length is under %{max_length} characters. Concise descriptions help screen reader users scan pages efficiently. If this image conveys complex information, consider placing it in the image caption or the following paragraph.", max_length: ImgAltRuleHelper::MAX_LENGTH)
+      end
 
-        elem["alt"] = value
-        elem
+      def issue_preview(elem)
+        return nil unless elem.tag_name == "img"
+
+        ImgAltRuleHelper.adjust_img_style(elem)
+      end
+
+      def why
+        I18n.t("This description is over %{max_length} characters. Long alt text can cause \"audio fatigue\" because screen readers cannot pause or navigate through it. Recommendation: Consider summarising the image here. If the image needs a detailed description (like a chart), place that text in the document body or a caption instead.", max_length: ImgAltRuleHelper::MAX_LENGTH)
       end
     end
   end

@@ -56,9 +56,28 @@ class LoadAccount
     Account.default
   end
 
+  def self.infer_shard(_hostname)
+    Shard.current
+  end
+
+  # This is used for URL filtering to determine if a URL points to a Canvas instance
+  def self.from_host(hostname)
+    return nil if hostname.blank?
+
+    default_host = HostUrl.default_host
+    return nil if default_host.blank?
+
+    default_uri = URI.parse("http://#{default_host}")
+    return Account.default if default_uri.host == hostname
+
+    nil
+  rescue URI::InvalidURIError
+    nil
+  end
+
   def clear_caches
     Canvas::Reloader.reload
-    ::Account.clear_special_account_cache!(::LoadAccount.force_special_account_reload)
+    ::Account.clear_special_account_cache!(force: ::LoadAccount.force_special_account_reload)
     ::LoadAccount.clear_shard_cache
     Account.current_domain_root_account = nil
   end

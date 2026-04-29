@@ -17,9 +17,9 @@
  */
 
 import {useMemo} from 'react'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import {fetchAssignments, getNextAssignmentsPage} from '../../queries/Queries'
-import _ from 'lodash'
+import {groupBy} from 'es-toolkit/compat'
 import type {InfiniteData} from '@tanstack/react-query'
 import type {FetchAssignmentsResponse} from '../../queries/Queries'
 
@@ -43,7 +43,7 @@ export const useAssignmentsQuery = (courseId: string) => {
     [data],
   )
   const assignments = useMemo(
-    () => _.groupBy(flatAssignments, 'assignmentGroupId'),
+    () => groupBy(flatAssignments, 'assignmentGroupId'),
     [flatAssignments],
   )
 

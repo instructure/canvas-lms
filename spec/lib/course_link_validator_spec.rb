@@ -354,6 +354,7 @@ describe CourseLinkValidator do
       <a href='#{link}'>link</a>
     HTML
     @course.syllabus_body = message
+    @course.saving_user = User.create!
     @course.save!
 
     CourseLinkValidator.queue_course(@course)

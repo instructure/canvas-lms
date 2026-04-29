@@ -140,6 +140,71 @@ describe AssignmentUtil do
       allow(described_class).to receive(:due_date_required?).with(assignment).and_return(false)
       expect(described_class.due_date_ok?(assignment)).to be(true)
     end
+
+    context "with discussion checkpoints" do
+      before do
+        # Enable checkpoints for the course
+        course_with_teacher(active_all: true)
+        student_in_course(active_all: true, user_name: "a student")
+        @course.account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:new_sis_integrations)
+        @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
+        @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 10.days.from_now }, { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 10.days.from_now }],
+          points_possible: 5
+        )
+        @c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 15.days.from_now }, { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 10.days.from_now }],
+          points_possible: 5,
+          replies_required: 2
+        )
+        @assignment = @topic.assignment
+        @assignment.post_to_sis = true
+        @assignment.save!
+
+        allow(@assignment.context.account).to receive_messages(
+          sis_require_assignment_due_date: { value: true },
+          sis_syncing: { value: true }
+        )
+      end
+
+      context "when reply_to_entry checkpoint has a due date" do
+        before do
+          reply_to_entry_checkpoint = @topic.reply_to_entry_checkpoint
+          reply_to_entry_checkpoint.update!(due_at: 1.week.from_now)
+        end
+
+        it "returns true even if parent assignment has no due date" do
+          expect(described_class.due_date_ok?(@assignment)).to be(true)
+        end
+      end
+
+      context "when reply_to_entry checkpoint has no due date" do
+        before do
+          reply_to_entry_checkpoint = @topic.reply_to_entry_checkpoint
+          reply_to_entry_checkpoint.update!(due_at: nil)
+        end
+
+        it "returns false" do
+          expect(described_class.due_date_ok?(@assignment)).to be(false)
+        end
+      end
+
+      context "when there is no reply_to_entry checkpoint" do
+        before do
+          # Remove the reply_to_entry checkpoint
+          @topic.reply_to_entry_checkpoint&.destroy
+        end
+
+        it "falls back to parent assignment due date check" do
+          expect(described_class.due_date_ok?(@assignment)).to be(false)
+        end
+      end
+    end
   end
 
   describe "sis_integration_settings_enabled?" do

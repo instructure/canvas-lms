@@ -48,6 +48,7 @@ it('renders an OverrideSubmissionType summary', () => {
  *  resumes on A2.
  */
 
+// Skipped: InstUI Select v7 changed how selectedOption values are displayed
 it.skip('renders details of a file submission type', () => {
   const override = mockOverride({
     submissionTypes: ['online_upload'],
@@ -60,6 +61,7 @@ it.skip('renders details of a file submission type', () => {
   expect(getByText('All Types Allowed')).toBeInTheDocument()
 })
 
+// Skipped: InstUI Select v7 changed how selectedOption values are displayed
 it.skip('renders details of a restricted-type file submission type', () => {
   const override = mockOverride({
     submissionTypes: ['online_upload'],
@@ -107,6 +109,7 @@ it('renders details of a url submission type', () => {
   expect(getByText('URL')).toBeInTheDocument()
 })
 
+// Skipped: InstUI Select v7 changed how selectedOption values are displayed
 it.skip('renders details of multiple submission types', () => {
   const override = mockOverride({
     submissionTypes: ['online_text_entry', 'online_url', 'online_upload'],

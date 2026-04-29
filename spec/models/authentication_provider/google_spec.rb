@@ -47,8 +47,8 @@ describe AuthenticationProvider::Google do
   it "rejects non-matching hd" do
     ap.hosted_domain = "instructure.com"
     expect(CanvasSecurity).to receive(:decode_jwt).and_return(id_token("hd" => "school.edu", "sub" => "123"))
-    userinfo = double("userinfo", parsed: {})
-    token = double("token", params: { "id_token" => "dummy" }, options: {}, get: userinfo)
+    userinfo = instance_double(OAuth2::Response, parsed: {})
+    token = instance_double(OAuth2::AccessToken, params: { "id_token" => "dummy" }, options: {}, get: userinfo)
 
     expect { ap.unique_id(token) }.to raise_error('User is from unacceptable domain "school.edu".')
   end
@@ -56,8 +56,8 @@ describe AuthenticationProvider::Google do
   it "allows hd from list" do
     ap.hosted_domain = "canvaslms.com, instructure.com"
     expect(CanvasSecurity).to receive(:decode_jwt).and_return(id_token("hd" => "instructure.com", "sub" => "123"))
-    userinfo = double("userinfo", parsed: {})
-    token = double("token", params: { "id_token" => "dummy" }, options: {}, get: userinfo)
+    userinfo = instance_double(OAuth2::Response, parsed: {})
+    token = instance_double(OAuth2::AccessToken, params: { "id_token" => "dummy" }, options: {}, get: userinfo)
 
     expect(ap.unique_id(token)).to eq "123"
   end
@@ -65,8 +65,8 @@ describe AuthenticationProvider::Google do
   it "rejects missing hd" do
     ap.hosted_domain = "instructure.com"
     expect(CanvasSecurity).to receive(:decode_jwt).and_return(id_token("sub" => "123"))
-    userinfo = double("userinfo", parsed: {})
-    token = double("token", params: { "id_token" => "dummy" }, options: {}, get: userinfo)
+    userinfo = instance_double(OAuth2::Response, parsed: {})
+    token = instance_double(OAuth2::AccessToken, params: { "id_token" => "dummy" }, options: {}, get: userinfo)
 
     expect { ap.unique_id(token) }.to raise_error("Google Apps user not received, but required")
   end
@@ -74,8 +74,8 @@ describe AuthenticationProvider::Google do
   it "rejects missing hd for *" do
     ap.hosted_domain = "*"
     expect(CanvasSecurity).to receive(:decode_jwt).and_return(id_token("sub" => "123"))
-    userinfo = double("userinfo", parsed: {})
-    token = double("token", params: { "id_token" => "dummy" }, options: {}, get: userinfo)
+    userinfo = instance_double(OAuth2::Response, parsed: {})
+    token = instance_double(OAuth2::AccessToken, params: { "id_token" => "dummy" }, options: {}, get: userinfo)
 
     expect { ap.unique_id(token) }.to raise_error("Google Apps user not received, but required")
   end
@@ -83,15 +83,15 @@ describe AuthenticationProvider::Google do
   it "accepts any hd for '*'" do
     ap.hosted_domain = "*"
     expect(CanvasSecurity).to receive(:decode_jwt).once.and_return(id_token("hd" => "instructure.com", "sub" => "123"))
-    token = double("token", params: { "id_token" => "dummy" }, options: {})
+    token = instance_double(OAuth2::AccessToken, params: { "id_token" => "dummy" }, options: {})
 
     expect(ap.unique_id(token)).to eq "123"
   end
 
   it "accepts when hosted domain isn't required" do
     expect(CanvasSecurity).to receive(:decode_jwt).once.and_return(id_token("sub" => "123"))
-    userinfo = double("userinfo", parsed: {})
-    token = double("token", params: { "id_token" => "dummy" }, options: {}, get: userinfo)
+    userinfo = instance_double(OAuth2::Response, parsed: {})
+    token = instance_double(OAuth2::AccessToken, params: { "id_token" => "dummy" }, options: {}, get: userinfo)
 
     expect(ap.unique_id(token)).to eq "123"
   end

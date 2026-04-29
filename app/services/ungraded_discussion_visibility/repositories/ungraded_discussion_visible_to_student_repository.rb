@@ -69,8 +69,7 @@ module UngradedDiscussionVisibility
             #{VisibilitySqlHelper.assignment_override_unassign_filter_sql(filter_condition_sql:)}
 
             /* non collaborative groups */
-            /* incorporate non_collaborative groups if account feature flag is enabled */
-            #{non_collaborative_group_union_sql(filter_condition_sql) if VisibilitySqlHelper.assign_to_differentiation_tags_enabled?(course_ids)}
+            #{non_collaborative_group_union_sql(filter_condition_sql)}
 
             UNION
 

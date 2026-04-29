@@ -30,7 +30,7 @@ describe('ExternalToolOptions', () => {
   let updateActiveSubmissionType
 
   beforeEach(() => {
-    updateActiveSubmissionType = jest.fn()
+    updateActiveSubmissionType = vi.fn()
   })
 
   it('renders a tool with the name Studio as its own button', () => {

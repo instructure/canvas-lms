@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {extend} from 'lodash'
+import {extend} from 'es-toolkit/compat'
 import OutcomeContentBase from './OutcomeContentBase'
 import outcomeGroupTemplate from '../../jst/outcomeGroup.handlebars'
 import outcomeGroupFormTemplate from '../../jst/outcomeGroupForm.handlebars'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {createElement} from 'react'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
@@ -53,31 +53,38 @@ export default class OutcomeGroupView extends OutcomeContentBase {
         root: (() => {
           const el = this.$('#outcome_group_title_container')[0]
           if (!el) return null
-          return {rootElement: createRoot(el), initialValue: el.dataset.initialValue}
+          return {rootElement: el, initialValue: el.dataset.initialValue}
         })(),
         render: errorMessages => {
-          this.instUIInputs.title.root?.rootElement.render(
-            createElement(
-              View,
-              {as: 'div', margin: 'none none small none'},
-              createElement(TextInput, {
-                name: 'title',
-                id: 'outcome_group_title',
-                isRequired: true,
-                defaultValue: this.instUIInputs.title.root?.initialValue,
-                width: '30ch',
-                placeholder: I18n.t('New Outcome Group'),
-                renderLabel: () =>
-                  createElement(
-                    Text,
-                    {weight: 'normal', size: 'small'},
-                    I18n.t('title', 'Name this group'),
-                  ),
-                messages: errorMessages?.map(m => ({text: m.message, type: 'newError'})),
-                'data-testid': 'outcome-group-title-input',
-              }),
-            ),
+          if (!this.instUIInputs.title.root) return
+          const element = createElement(
+            View,
+            {as: 'div', margin: 'none none small none'},
+            createElement(TextInput, {
+              name: 'title',
+              id: 'outcome_group_title',
+              isRequired: true,
+              defaultValue: this.instUIInputs.title.root.initialValue,
+              width: '30ch',
+              placeholder: I18n.t('New Outcome Group'),
+              renderLabel: () =>
+                createElement(
+                  Text,
+                  {weight: 'normal', size: 'small'},
+                  I18n.t('title', 'Name this group'),
+                ),
+              messages: errorMessages?.map(m => ({text: m.message, type: 'newError'})),
+              'data-testid': 'outcome-group-title-input',
+            }),
           )
+          if (this.instUIInputs.title.root.reactRoot) {
+            rerender(this.instUIInputs.title.root.reactRoot, element)
+          } else {
+            this.instUIInputs.title.root.reactRoot = render(
+              element,
+              this.instUIInputs.title.root.rootElement,
+            )
+          }
         },
         inputElement: () => this.$('#outcome_group_title')[0],
       },

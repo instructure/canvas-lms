@@ -20,6 +20,7 @@
 class GradeSummaryAssignmentPresenter
   include TextHelper
   include GradeDisplay
+
   attr_reader :assignment, :submission, :originality_reports
 
   def initialize(summary, current_user, assignment, submission)
@@ -30,15 +31,23 @@ class GradeSummaryAssignmentPresenter
     @originality_reports = @submission.originality_reports_for_display if @submission
   end
 
+  def attachments
+    @attachments ||= if submission
+                       (submission.preloaded_attachments || submission.attachments).to_a
+                     else
+                       []
+                     end
+  end
+
   def upload_status
     return unless submission
 
     # The sort here ensures that statuses received are in the failed,
     # pending and success order. With that security we can just pluck
     # first one.
-    submission.attachments
-              .map { |a| AttachmentUploadStatus.upload_status(a) }
-              .min
+    attachments
+      .map { |a| AttachmentUploadStatus.upload_status(a) }
+      .min
   end
 
   def originality_report?
@@ -46,7 +55,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def show_distribution_graph?
-    @assignment.score_statistic = @summary.assignment_stats[assignment.id] # Avoid another query
+    @assignment.association(:score_statistic).target = @summary.assignment_stats[assignment.id] # Avoid another query
     @assignment.can_view_score_statistics?(@current_user)
   end
 
@@ -85,7 +94,26 @@ class GradeSummaryAssignmentPresenter
   end
 
   def is_assignment?
-    assignment.instance_of?(Assignment)
+    assignment.instance_of?(Assignment) || assignment.is_a?(PeerReviewSubAssignment)
+  end
+
+  def assignment_for_submission_link
+    if assignment.is_a?(PeerReviewSubAssignment)
+      assignment.parent_assignment
+    else
+      assignment
+    end
+  end
+
+  def should_link_to_peer_reviews_page?
+    assignment.context.feature_enabled?(:peer_review_allocation_and_grading) && assignment.is_a?(PeerReviewSubAssignment) && (@summary.student_is_user? || @summary.user_an_observer_of_student?)
+  end
+
+  def peer_reviews_url
+    return nil unless should_link_to_peer_reviews_page?
+
+    parent = assignment.parent_assignment
+    "/courses/#{parent.context_id}/assignments/#{parent.id}/peer_reviews"
   end
 
   def has_no_group_weight?
@@ -238,7 +266,7 @@ class GradeSummaryAssignmentPresenter
 
   def plagiarism(type)
     plag_data = if type == "vericite"
-                  submission.vericite_data(true)
+                  submission.vericite_data(lookup_data: true)
                 else
                   submission.originality_data
                 end
@@ -282,13 +310,13 @@ class GradeSummaryAssignmentPresenter
   end
 
   def file
-    @file ||= submission.attachments.detect { |a| plagiarism_attachment?(a) }
+    @file ||= attachments.detect { |a| plagiarism_attachment?(a) }
   end
 
   def plagiarism_attachment?(a)
     @originality_reports.any? { |o| o.attachment == a } ||
       (submission.turnitin_data && submission.turnitin_data[a.asset_string]).present? ||
-      (submission.vericite_data(true) && submission.vericite_data(true)[a.asset_string]).present?
+      (submission.vericite_data(lookup_data: true) && submission.vericite_data(lookup_data: true)[a.asset_string]).present?
   end
 
   def comments
@@ -310,7 +338,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   FULLWIDTH = 150.0
-  GradeSummaryGraph = Struct.new(:high, :low, :lower_q, :upper_q, :median, :mean, :points_possible, :score, :legacy, keyword_init: true) do
+  GradeSummaryGraph = Struct.new(:high, :low, :lower_q, :upper_q, :median, :mean, :points_possible, :score, :legacy) do
     def low_pos
       pixels_for(legacy ? 0 : low)
     end

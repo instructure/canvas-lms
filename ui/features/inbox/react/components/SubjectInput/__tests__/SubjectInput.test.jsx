@@ -32,7 +32,7 @@ describe('Button', () => {
   })
 
   it('should call onChange when typing occurs', () => {
-    const onChangeMock = jest.fn()
+    const onChangeMock = vi.fn()
     const {subjectInput} = setup({
       onChange: onChangeMock,
     })
@@ -41,7 +41,7 @@ describe('Button', () => {
   })
 
   it('should call onBlur when blur event triggered', () => {
-    const onBlurMock = jest.fn()
+    const onBlurMock = vi.fn()
     const {subjectInput} = setup({
       onBlur: onBlurMock,
     })
@@ -51,7 +51,7 @@ describe('Button', () => {
   })
 
   it('should call onFocus when focus event triggered', () => {
-    const onFocusMock = jest.fn()
+    const onFocusMock = vi.fn()
     const {subjectInput} = setup({
       onFocus: onFocusMock,
     })

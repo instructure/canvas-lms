@@ -51,6 +51,7 @@ describe "discussion assignments" do
   context "create group discussion" do
     context "when discussion_create feature flag is OFF" do
       it "creates a group discussion ungraded", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         get "/courses/#{@course.id}/discussion_topics/new"
         f("#discussion-title").send_keys("New Discussion Title")
         type_in_tiny("textarea[name=message]", "Discussion topic message body")
@@ -70,7 +71,7 @@ describe "discussion assignments" do
       it "creates an ungraded group discussion in a course context" do
         get "/courses/#{@course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "Ungraded Group Discussion"
-        force_click_native("input[data-testid='group-discussion-checkbox']")
+        force_click_native("span[data-testid='group-discussion-checkbox'] input")
         force_click_native("input[placeholder='Select a group category']")
         fj("li:contains('category 1')").click
         f("button[data-testid='save-button']").click
@@ -83,7 +84,7 @@ describe "discussion assignments" do
       it "creates a graded group discussion in a course context" do
         get "/courses/#{@course.id}/discussion_topics/new"
         f("input[placeholder='Topic Title']").send_keys "Graded Group Discussion"
-        force_click_native("input[data-testid='group-discussion-checkbox']")
+        force_click_native("span[data-testid='group-discussion-checkbox'] input")
         force_click_native("input[placeholder='Select a group category']")
         fj("li:contains('category 1')").click
         force_click("label:contains('Graded')")

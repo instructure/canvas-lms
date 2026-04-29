@@ -29,11 +29,11 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Mask} from '@instructure/ui-overlays'
 import {InstUISettingsProvider} from '@instructure/emotion'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
 import TargetGroupSelector from './shared/TargetGroupSelector'
 import {titleValidator, displayNameValidator} from '../validators/outcomeValidators'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {
   CREATE_LEARNING_OUTCOME,
   SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
@@ -155,9 +155,9 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
     }) && selectedGroup
       ? onCreateOutcomeHandler()
       : (() => {
-        focusOnError()
-        invalidTitle && setShowTitleError(true)
-      })()
+          focusOnError()
+          invalidTitle && setShowTitleError(true)
+        })()
 
   const updateProficiencyCalculation = (calculationMethodKey, calculationInt) =>
     setProficiencyCalculation({calculationMethod: calculationMethodKey, calculationInt})

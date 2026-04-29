@@ -28,7 +28,7 @@ describe('PostTypes', () => {
       anonymousGrading: false,
       defaultValue: EVERYONE,
       disabled: false,
-      postTypeChanged: jest.fn(),
+      postTypeChanged: vi.fn(),
     }
   })
 

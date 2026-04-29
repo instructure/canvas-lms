@@ -28,8 +28,8 @@ function renderInput(overrides = {}) {
     renderLabel: () => 'label',
     messages: [],
     timezone: 'UTC',
-    formatDate: jest.fn(date => date.toISOString()),
-    onSelectedDateChange: jest.fn(),
+    formatDate: vi.fn(date => date.toISOString()),
+    onSelectedDateChange: vi.fn(),
     ...overrides,
   }
   const result = render(<CanvasDateInput {...props} />)
@@ -92,7 +92,7 @@ describe('clean input state', () => {
 
   it('displays the formatted date when the initial date is not null', () => {
     const now = new Date()
-    const formatter = jest.fn(() => 'formatted date')
+    const formatter = vi.fn(() => 'formatted date')
     const {getInput} = renderInput({selectedDate: now, formatDate: formatter})
     expect(formatter).toHaveBeenCalledWith(now)
     expect(getInput().value).toBe('formatted date')
@@ -217,7 +217,7 @@ describe('dirty input state', () => {
 
   it('handles the date in the given timezone', () => {
     const tz = 'Pacific/Tarawa' // +12
-    const handleDateChange = jest.fn()
+    const handleDateChange = vi.fn()
     const {getInput} = renderAndDirtyInput('May 20, 2020', {
       selectedDate: new Date(),
       timezone: tz,

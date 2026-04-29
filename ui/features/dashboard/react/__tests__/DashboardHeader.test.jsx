@@ -18,21 +18,25 @@
 
 import React from 'react'
 import {render, act, fireEvent, waitFor} from '@testing-library/react'
-
+import userEvent from '@testing-library/user-event'
 import {DashboardHeader} from '../DashboardHeader'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {resetPlanner} from '@canvas/planner'
+import fetchMock from 'fetch-mock'
 
-jest.mock('@canvas/planner', () => ({
-  ...jest.requireActual('@canvas/planner'),
-  resetPlanner: jest.fn(),
-  initializePlanner: jest.fn().mockResolvedValue(),
-  loadPlannerDashboard: jest.fn(),
-}))
+vi.mock('@canvas/planner', async () => {
+  const actual = await vi.importActual('@canvas/planner')
+  return {
+    ...actual,
+    resetPlanner: vi.fn(),
+    initializePlanner: vi.fn().mockResolvedValue(),
+    loadPlannerDashboard: vi.fn(),
+  }
+})
 
 injectGlobalAlertContainers()
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 const defaultEnv = {
   current_user: {id: '1'},
@@ -78,11 +82,11 @@ describe('DashboardHeader', () => {
       STUDENT_PLANNER_COURSES: [],
     }
     resetPlanner()
-    plannerSpy = jest.spyOn(DashboardHeader.prototype, 'loadPlannerComponent')
-    saveDashboardViewSpy = jest
+    plannerSpy = vi.spyOn(DashboardHeader.prototype, 'loadPlannerComponent')
+    saveDashboardViewSpy = vi
       .spyOn(DashboardHeader.prototype, 'saveDashboardView')
       .mockImplementation(() => {})
-    cardLoadSpy = jest.spyOn(DashboardHeader.prototype, 'loadCardDashboard')
+    cardLoadSpy = vi.spyOn(DashboardHeader.prototype, 'loadCardDashboard')
     document.body.innerHTML = ''
     document.body.innerHTML = `
       <div id="dashboard-planner" style="display: none;"></div>
@@ -228,6 +232,35 @@ describe('DashboardHeader', () => {
       expect(dashboardActivity.style.display).toBe('none')
     })
 
+    it('does not trigger page reload on mount when widget_dashboard feature flag is on but user is on classic dashboard', async () => {
+      delete window.location
+      window.location = {reload: vi.fn()}
+
+      window.ENV = {
+        current_user_roles: ['observer'],
+        current_user: {id: '1'},
+        current_user_id: '1',
+        OBSERVED_USERS_LIST: [
+          {id: '2', name: 'Student 2', avatar_url: ''},
+          {id: '3', name: 'Student 3', avatar_url: ''},
+        ],
+        CAN_ADD_OBSERVEE: false,
+        FEATURES: {
+          widget_dashboard: true,
+        },
+      }
+
+      render(
+        <FakeDashboardHeader planner_enabled={false} dashboard_view="activity" env={window.ENV} />,
+      )
+
+      await act(async () => {
+        vi.advanceTimersByTime(100)
+      })
+
+      expect(window.location.reload).not.toHaveBeenCalled()
+    })
+
     it('does not call loadCardDashboard if preloaded cards passed in', async () => {
       window.ENV = {
         ...defaultEnv,
@@ -235,9 +268,135 @@ describe('DashboardHeader', () => {
           dashboard_graphql_integration: true,
         },
       }
-      const loadCardDashboardSpy = jest.spyOn(DashboardHeader.prototype, 'loadCardDashboard')
+      const loadCardDashboardSpy = vi.spyOn(DashboardHeader.prototype, 'loadCardDashboard')
       render(<FakeDashboardHeader {...defaultProps} preloadedCards={[]} />)
       expect(loadCardDashboardSpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Dashboard Toggle Button', () => {
+    let reloadSpy
+
+    beforeEach(() => {
+      delete window.location
+      window.location = {reload: vi.fn()}
+      reloadSpy = window.location.reload
+      fetchMock.restore()
+    })
+
+    afterEach(() => {
+      fetchMock.restore()
+    })
+
+    it('renders switch button when widget_dashboard_overridable is false', () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: false,
+        current_user_id: '1',
+        current_user_roles: ['user', 'student'],
+      }
+
+      const {getByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+      expect(getByTestId('switch-to-new-dashboard-button')).toBeInTheDocument()
+      expect(getByTestId('switch-to-new-dashboard-button')).toHaveTextContent(
+        'Switch to new dashboard view',
+      )
+    })
+
+    it('does not render switch button when widget_dashboard_overridable is undefined', () => {
+      window.ENV = {
+        ...defaultEnv,
+        current_user_id: '1',
+      }
+
+      const {queryByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+      expect(queryByTestId('switch-to-new-dashboard-button')).not.toBeInTheDocument()
+    })
+
+    it('does not render switch button when widget_dashboard_overridable is true', () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: true,
+        current_user_id: '1',
+      }
+
+      const {queryByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+      expect(queryByTestId('switch-to-new-dashboard-button')).not.toBeInTheDocument()
+    })
+
+    it('calls API and reloads page when switch button is clicked', async () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: false,
+        current_user_id: '1',
+        current_user_roles: ['user', 'student'],
+      }
+
+      fetchMock.put('/api/v1/users/1/settings', {
+        widget_dashboard_user_preference: true,
+      })
+
+      const {getByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+      const switchButton = getByTestId('switch-to-new-dashboard-button')
+
+      await act(async () => {
+        fireEvent.click(switchButton)
+      })
+
+      await waitFor(() => {
+        expect(fetchMock.called('/api/v1/users/1/settings')).toBe(true)
+      })
+
+      await waitFor(() => {
+        expect(reloadSpy).toHaveBeenCalled()
+      })
+    })
+
+    it('renders switch button when observer is observing a student', async () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: false,
+        current_user_id: '1',
+        current_user_roles: ['user', 'observer'],
+      }
+
+      fetchMock.get('/api/v1/show_k5_dashboard', {show_k5_dashboard: false})
+
+      const {findByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+      expect(await findByTestId('switch-to-new-dashboard-button')).toBeInTheDocument()
+    })
+
+    it('does not render switch button when observer is observing themselves', async () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: false,
+        current_user_id: '1',
+        current_user_roles: ['user', 'observer'],
+        OBSERVED_USERS_LIST: [{id: '1', name: 'Self', avatar_url: undefined}],
+      }
+
+      fetchMock.get('/api/v1/show_k5_dashboard', {show_k5_dashboard: false})
+
+      const {queryByTestId} = render(<FakeDashboardHeader {...defaultProps} />)
+
+      await waitFor(() => {
+        expect(queryByTestId('switch-to-new-dashboard-button')).not.toBeInTheDocument()
+      })
+    })
+
+    it('renders switch button in responsive view', () => {
+      window.ENV = {
+        ...defaultEnv,
+        widget_dashboard_overridable: false,
+        current_user_id: '1',
+        current_user_roles: ['user', 'student'],
+        FEATURES: {
+          instui_header: true,
+        },
+      }
+
+      const {getByTestId} = render(<FakeDashboardHeader {...defaultProps} responsiveSize="small" />)
+      expect(getByTestId('switch-to-new-dashboard-button')).toBeInTheDocument()
     })
   })
 })

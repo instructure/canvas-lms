@@ -298,25 +298,6 @@ describe CalendarEventsApiController do
       expect(assigns[:events][0]).to eql(@event)
     end
 
-    it "uses the relevant event for that section, in the course feed" do
-      skip "requires changing the format of the course feed url to include user information"
-      s2 = @course.course_sections.create!(name: "s2")
-      c1 = @event.child_events.create!(description: @event.description,
-                                       title: @event.title,
-                                       context: @course.default_section,
-                                       start_at: 2.hours.ago,
-                                       end_at: 1.hour.ago)
-      @event.child_events.create!(description: @event.description,
-                                  title: @event.title,
-                                  context: s2,
-                                  start_at: 3.hours.ago,
-                                  end_at: 2.hours.ago)
-      get "public_feed", params: { feed_code: "course_#{@course.uuid}", format: "ics" }
-      expect(response).to be_successful
-      expect(assigns[:events]).to be_present
-      expect(assigns[:events]).to eq [c1]
-    end
-
     context "for a user context" do
       it "uses the relevant event for that section" do
         s2 = @course.course_sections.create!(name: "s2")
@@ -376,6 +357,30 @@ describe CalendarEventsApiController do
         get "public_feed", params: { feed_code: @user.feed_code }, format: "ics"
         expect(response.body).not_to include("DESCRIPTION:#{assignment.description}")
       end
+    end
+  end
+
+  describe "#preload_peer_review_sub_assignments" do
+    subject(:controller_instance) { described_class.new }
+
+    let(:assignment) { Assignment.new }
+    let(:non_assignment) { SubAssignment.new }
+
+    it "preloads :peer_review_sub_assignment only on Assignment instances from a mixed collection" do
+      collection = [assignment, non_assignment]
+
+      expect(ActiveRecord::Associations).to receive(:preload).with([assignment], :peer_review_sub_assignment)
+      controller_instance.send(:preload_peer_review_sub_assignments, collection)
+    end
+
+    it "does not call preload when the collection contains no Assignment instances" do
+      expect(ActiveRecord::Associations).not_to receive(:preload)
+      controller_instance.send(:preload_peer_review_sub_assignments, [non_assignment])
+    end
+
+    it "does not call preload for an empty collection" do
+      expect(ActiveRecord::Associations).not_to receive(:preload)
+      controller_instance.send(:preload_peer_review_sub_assignments, [])
     end
   end
 end

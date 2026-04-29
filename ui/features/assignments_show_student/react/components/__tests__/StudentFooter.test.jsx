@@ -18,12 +18,12 @@
 
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import StudentFooter from '../StudentFooter'
 
 import api from '../../apis/ContextModuleApi'
 
-jest.mock('../../apis/ContextModuleApi')
+vi.mock('../../apis/ContextModuleApi')
 
 describe('StudentFooter', () => {
   let nextModule
@@ -34,7 +34,7 @@ describe('StudentFooter', () => {
   let defaultProps
 
   const renderComponent = (customProps = {}) => {
-    setOnFailure = jest.fn()
+    setOnFailure = vi.fn()
 
     return render(
       <AlertManagerContext.Provider value={{setOnFailure}}>

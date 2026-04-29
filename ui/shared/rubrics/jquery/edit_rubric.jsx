@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import RubricAddCriterionPopover from '../react/components/RubricAddCriterionPopover'
 import RubricManagement from '../react/components/RubricManagement'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import changePointsPossibleToMatchRubricDialog from '../jst/changePointsPossibleToMatchRubricDialog.handlebars'
 import $ from 'jquery'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import htmlEscape from '@instructure/html-escape'
 import numberHelper from '@canvas/i18n/numberHelper'
 import '@canvas/outcomes/find_outcome'
@@ -37,8 +37,7 @@ import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import '@canvas/rails-flash-notifications'
 import 'jquery-tinypubsub'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
-import '@canvas/util/jquery/fixDialogButtons'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import replaceTags from '@canvas/util/replaceTags'
 import useStore from '../stores'
 import {FocusRegionManager} from '@instructure/ui-a11y-utils'
@@ -72,12 +71,12 @@ const rubricEditing = {
     $('#add_criterion_container').remove()
     $rubric.find('#add_criterion_holder').append($('<span/>').attr('id', 'add_criterion_container'))
     setTimeout(() => {
-      const root = createRoot(document.getElementById('add_criterion_container'))
-      root.render(
+      render(
         <RubricAddCriterionPopover
           rubric={$rubric}
           duplicateFunction={rubricEditing.copyCriterion}
         />,
+        document.getElementById('add_criterion_container'),
       )
       if (focusTarget) {
         $rubric.find(`#add_criterion_container ${focusTarget}:visible`).focus()
@@ -1770,8 +1769,7 @@ if (
   $('h1').hide()
   const contextId = ENV.context_asset_string.split('_')[1]
 
-  const root = createRoot(document.getElementById('rubric_management'))
-  root.render(<RubricManagement accountId={contextId} />)
+  render(<RubricManagement accountId={contextId} />, document.getElementById('rubric_management'))
 }
 
 const getEditRubricPrompt = useMasteryScale => {

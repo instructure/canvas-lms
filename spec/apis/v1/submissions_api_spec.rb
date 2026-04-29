@@ -192,7 +192,7 @@ describe "Submissions API", type: :request do
     end
 
     context "active enrollment_state with active and concluded enrollments" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         e = @course.enroll_user(@student1, "StudentEnrollment", section: @default_section)
         e.conclude
@@ -203,7 +203,7 @@ describe "Submissions API", type: :request do
     end
 
     context "active enrollment_state" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         @enrollment_state = "active"
         @active_count = 1
@@ -212,7 +212,7 @@ describe "Submissions API", type: :request do
     end
 
     context "active enrollment_state state_based_on_date=false" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         @course.start_at = 10.days.ago
         @course.conclude_at = 2.days.ago
@@ -227,7 +227,7 @@ describe "Submissions API", type: :request do
     end
 
     context "conclude enrollment_state" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         @state_based_on_date = true
         @enrollment_state = "concluded"
@@ -237,7 +237,7 @@ describe "Submissions API", type: :request do
     end
 
     context "conclude enrollment_state state_based_on_date=false" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         @course.start_at = 10.days.ago
         @course.conclude_at = 2.days.ago
@@ -252,7 +252,7 @@ describe "Submissions API", type: :request do
     end
 
     context "empty enrollment_state" do
-      include_examples "enrollment_state"
+      it_behaves_like "enrollment_state"
       before do
         @enrollment_state = ""
         @active_count = 1
@@ -852,14 +852,17 @@ describe "Submissions API", type: :request do
       @student1 = student_in_course(course: @course, active_enrollment: true).user
       @course.root_account.enable_feature!(:discussion_checkpoints)
       @assignment = @course.assignments.create!(has_sub_assignments: true)
-      @assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
-      @assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
+      @checkpoint1 = @assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
+      @checkpoint2 = @assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
       @topic = @course.discussion_topics.create!(assignment: @assignment, reply_to_entry_required_count: 4)
+      @sub1 = @checkpoint1.submissions.find_or_create_by!(user: @student1)
+      @sub2 = @checkpoint2.submissions.find_or_create_by!(user: @student1)
+      @parent_submission = @topic.assignment.submissions.find_or_create_by!(user: @student1)
     end
 
     it "returns sub_assignment_submissions for checkpointed discussions submissions" do
       json = api_call(:get,
-                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
                       { controller: "submissions_api",
                         action: "show",
                         format: "json",
@@ -869,6 +872,222 @@ describe "Submissions API", type: :request do
                       include: %w[sub_assignment_submissions])
 
       expect(json["sub_assignment_submissions"].size).to eq 2
+    end
+
+    it "does not return deleted sub assignment submissions" do
+      @sub1.update(workflow_state: "deleted")
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[sub_assignment_submissions])
+
+      expect(json["sub_assignment_submissions"].count).to eq 1
+    end
+
+    it "returns empty array for sub_assignment_submissions when there are none" do
+      @sub1.update(workflow_state: "deleted")
+      @sub2.update(workflow_state: "deleted")
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[sub_assignment_submissions])
+
+      expect(json["sub_assignment_submissions"]).to eq []
+    end
+  end
+
+  describe "peer_review_submissions include" do
+    before do
+      course_with_teacher(active_all: true)
+      @student1 = student_in_course(course: @course, active_enrollment: true).user
+      @student2 = student_in_course(course: @course, active_enrollment: true).user
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+
+      @peer_review_sub_assignment = @assignment.create_peer_review_sub_assignment!(
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+
+      # Student1 submits to the main assignment
+      @parent_submission = @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "My work")
+
+      # Student2 reviews student1's work
+      @assessment_request = @assignment.assign_peer_review(@student1, @student2)
+      @assessment_request.complete!
+
+      # Create a second assessment request for student1
+      @assessment_request2 = @assignment.assign_peer_review(@student2, @student1)
+      @assessment_request2.complete!
+
+      # This triggers creation of peer review submission for student1
+      @peer_review_submission = @peer_review_sub_assignment.submit_homework(
+        @student1,
+        submission_type: "online_text_entry",
+        body: "peer_review"
+      )
+    end
+
+    it "returns peer_review_submission when it exists" do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      expect(json["has_peer_review_submission"]).to be true
+      expect(json["peer_review_submission"]).not_to be_nil
+      expect(json["peer_review_submission"]["assignment_id"]).to eq @peer_review_sub_assignment.id
+      expect(json["peer_review_submission"]["user_id"]).to eq @student1.id
+    end
+
+    it "returns nil for peer_review_submission when it does not exist" do
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student2.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      expect(json["has_peer_review_submission"]).to be false
+      expect(json["peer_review_submission"]).to be_nil
+    end
+
+    it "returns nil for peer_review_submission when it is deleted" do
+      @peer_review_submission.update!(workflow_state: "deleted")
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      expect(json["has_peer_review_submission"]).to be false
+      expect(json["peer_review_submission"]).to be_nil
+    end
+
+    it "does not include peer_review_submission when feature is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      expect(json).not_to have_key("has_peer_review_submission")
+      expect(json).not_to have_key("peer_review_submission")
+    end
+
+    it "does not include peer_review_submission when peer reviews are disabled" do
+      # Skip validation: testing API response format when peer reviews disabled,
+      # not the business logic that prevents this state from occurring normally
+      @assignment.update_attribute(:peer_reviews, false)
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      # When peer reviews are disabled, the parameter is ignored per Jira requirements
+      expect(json).not_to have_key("has_peer_review_submission")
+      expect(json).not_to have_key("peer_review_submission")
+    end
+
+    it "returns false when peer_reviews is enabled but no peer_review_sub_assignment exists" do
+      # Simulate old peer review (before feature) by destroying the sub assignment
+      @peer_review_sub_assignment.destroy
+      @assignment.reload
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}.json",
+                      { controller: "submissions_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        assignment_id: @assignment.id.to_s,
+                        user_id: @student1.id.to_s },
+                      include: %w[peer_review_submissions])
+
+      expect(json["has_peer_review_submission"]).to be false
+      expect(json["peer_review_submission"]).to be_nil
+    end
+
+    context "for_students endpoint" do
+      before do
+        # Switch to teacher user for for_students endpoint
+        @user = @teacher
+      end
+
+      it "works with for_students endpoint when peer review submission exists" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/students/submissions.json",
+                        { controller: "submissions_api",
+                          action: "for_students",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          student_ids: [@student1.id.to_s],
+                          assignment_ids: [@assignment.id.to_s] },
+                        include: %w[peer_review_submissions])
+
+        expect(json).to be_an(Array)
+        submission = json.find { |s| s["user_id"] == @student1.id }
+        expect(submission["has_peer_review_submission"]).to be true
+        expect(submission["peer_review_submission"]).not_to be_nil
+        expect(submission["peer_review_submission"]["assignment_id"]).to eq @peer_review_sub_assignment.id
+      end
+
+      it "works with for_students endpoint when peer review submission does not exist" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/students/submissions.json",
+                        { controller: "submissions_api",
+                          action: "for_students",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          student_ids: [@student2.id.to_s],
+                          assignment_ids: [@assignment.id.to_s] },
+                        include: %w[peer_review_submissions])
+
+        expect(json).to be_an(Array)
+        submission = json.find { |s| s["user_id"] == @student2.id }
+        expect(submission["has_peer_review_submission"]).to be false
+        expect(submission["peer_review_submission"]).to be_nil
+      end
     end
   end
 
@@ -1132,7 +1351,7 @@ describe "Submissions API", type: :request do
     Quizzes::SubmissionGrader.new(qs).grade_submission
     qs.reload
     qs.attempt = 2
-    qs.with_versioning(true, &:save)
+    qs.with_versioning(&:save)
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{quiz.assignment.id}/submissions.json",
@@ -1310,7 +1529,7 @@ describe "Submissions API", type: :request do
     course_with_teacher(active_all: true)
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
-    should_translate_user_content(@course, false) do |content|
+    should_translate_user_content(@course, include_verifiers: false) do |content|
       submit_homework(a1, student1, body: content)
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
@@ -1357,7 +1576,7 @@ describe "Submissions API", type: :request do
     @course.enroll_student(student1).accept!
     a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
     media_object(media_id: "54321", context: student1, user: student1)
-    mock_kaltura = double("CanvasKaltura::ClientV3")
+    mock_kaltura = instance_double(CanvasKaltura::ClientV3)
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
     expect(mock_kaltura).to receive(:media_sources).and_return([{ height: "240",
                                                                   bitrate: "382",
@@ -1883,6 +2102,28 @@ describe "Submissions API", type: :request do
     expect(json.first["integration_id"]).to eq "xyz"
   end
 
+  # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+  # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+  it "passes current_user to SisPseudonym.for when fetching student submissions" do
+    student = user_with_pseudonym(active_all: true)
+    course_with_teacher(active_all: true)
+    @course.enroll_student(student).accept!
+    allow(SisPseudonym).to receive(:for).and_call_original
+    expect(SisPseudonym).to receive(:for)
+      .with(student, anything, hash_including(current_user: @teacher))
+      .and_call_original
+    api_call_as_user(
+      @teacher,
+      :get,
+      "/api/v1/courses/#{@course.id}/students/submissions.json",
+      { controller: "submissions_api",
+        action: "for_students",
+        format: "json",
+        course_id: @course.to_param },
+      { student_ids: [student.to_param], grouped: "true" }
+    )
+  end
+
   context "with plagiarism data" do
     before :once do
       @student = user_factory(active_all: true)
@@ -1934,7 +2175,8 @@ describe "Submissions API", type: :request do
           student_overlap: 100,
           state: "failure",
           similarity_score: 100,
-          object_id: "123345"
+          object_id: "123345",
+          view_report_url: "/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}/turnitin/attachment_504177?attempt=#{@submission.attempt}"
         }
       }
       @submission.update(turnitin_data: sample_turnitin_data)
@@ -2278,7 +2520,7 @@ describe "Submissions API", type: :request do
                           include: ["provisional_grades"]
                         })
 
-        expect(json.first["provisional_grades"]).to_not be_empty
+        expect(json.first["provisional_grades"]).not_to be_empty
         speedgrader_url = URI.parse(json.first["provisional_grades"].first["speedgrader_url"])
         expect(speedgrader_url).to match_path("/courses/#{@course.id}/gradebook/speed_grader")
           .and_query({ assignment_id: @assignment.id, student_id: @student.id })
@@ -2747,6 +2989,93 @@ describe "Submissions API", type: :request do
                            {},
                            expected_status: 403)
         end
+      end
+    end
+
+    context "group assignment submissions with group fallback" do
+      before do
+        @group_category = @course.group_categories.create!(name: "Project Groups")
+        @group = @course.groups.create!(name: "Test Group", group_category: @group_category)
+        @student2 = user_factory(active_all: true, name: "Student 2")
+        @course.enroll_student(@student2, enrollment_state: "active")
+        @group.add_user(@student)
+        @group.add_user(@student2)
+
+        @group_assignment = @course.assignments.create!(
+          title: "Group Assignment",
+          group_category: @group_category,
+          grade_group_students_individually: false,
+          points_possible: 10
+        )
+
+        # Submit homework as student
+        submit_homework(@group_assignment, @student, body: "Group submission")
+
+        @user = @teacher
+      end
+
+      it "returns group data when requested via include parameter" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student.id}.json",
+                        { controller: "submissions_api",
+                          action: "show",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          assignment_id: @group_assignment.id.to_s,
+                          user_id: @student.id.to_s },
+                        { include: ["group"] })
+
+        expect(json["group"]).to be_present
+        expect(json["group"]["id"]).to eq @group.id
+        expect(json["group"]["name"]).to eq "Test Group"
+      end
+
+      it "returns group data even when submission.group_id is nil" do
+        submission = @group_assignment.submissions.find_by(user_id: @student.id)
+        submission.update_column(:group_id, nil)
+
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student.id}.json",
+                        { controller: "submissions_api",
+                          action: "show",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          assignment_id: @group_assignment.id.to_s,
+                          user_id: @student.id.to_s },
+                        { include: ["group"] })
+
+        expect(json["group"]).to be_present
+        expect(json["group"]["id"]).to eq @group.id
+        expect(json["group"]["name"]).to eq "Test Group"
+      end
+
+      it "does not include group data when not requested" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student.id}.json",
+                        { controller: "submissions_api",
+                          action: "show",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          assignment_id: @group_assignment.id.to_s,
+                          user_id: @student.id.to_s })
+
+        expect(json["group"]).to be_nil
+      end
+
+      it "returns correct group for different user in same group" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student2.id}.json",
+                        { controller: "submissions_api",
+                          action: "show",
+                          format: "json",
+                          course_id: @course.id.to_s,
+                          assignment_id: @group_assignment.id.to_s,
+                          user_id: @student2.id.to_s },
+                        { include: ["group"] })
+
+        expect(json["group"]).to be_present
+        expect(json["group"]["id"]).to eq @group.id
+        expect(json["group"]["name"]).to eq "Test Group"
       end
     end
   end
@@ -3507,6 +3836,98 @@ describe "Submissions API", type: :request do
       end.to change {
         submission.reload.sticker
       }.from(nil).to("trophy")
+    end
+
+    context "with peer review sub assignment" do
+      before(:once) do
+        @course = course_factory(active_all: true)
+        @teacher = teacher_in_course(course: @course, active_all: true).user
+        @student = student_in_course(course: @course, active_all: true).user
+        @parent_assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          points_possible: 10,
+          peer_reviews: true
+        )
+        @peer_review = peer_review_model(parent_assignment: @parent_assignment)
+        @reviewer = student_in_course(course: @course, active_all: true).user
+        @assessment_request = AssessmentRequest.create!(
+          user: @student,
+          asset: @parent_assignment.find_or_create_submission(@student),
+          assessor: @reviewer,
+          assessor_asset: @peer_review.find_or_create_submission(@reviewer),
+          peer_review_sub_assignment: @peer_review
+        )
+        @peer_review_submission = @peer_review.grade_student(@reviewer, grade: "3", grader: @teacher).first
+      end
+
+      it "allows posting a comment via peer review sub assignment" do
+        expect do
+          api_call_as_user(
+            @reviewer,
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@peer_review.id}/anonymous_submissions/#{@peer_review_submission.anonymous_id}.json",
+            {
+              controller: "submissions_api",
+              action: "update_anonymous",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: @peer_review.id.to_s,
+              anonymous_id: @peer_review_submission.anonymous_id.to_s
+            },
+            {
+              comment: { text_comment: "peer review comment via API" }
+            }
+          )
+        end.to change {
+          @peer_review_submission.reload.submission_comments.count
+        }.by(1)
+
+        expect(@peer_review_submission.submission_comments.last.comment).to eq("peer review comment via API")
+      end
+
+      it "does not allow updating deleted peer review assignments" do
+        @peer_review.destroy
+        api_call_as_user(
+          @reviewer,
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@peer_review.id}/anonymous_submissions/#{@peer_review_submission.anonymous_id}.json",
+          {
+            controller: "submissions_api",
+            action: "update_anonymous",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @peer_review.id.to_s,
+            anonymous_id: @peer_review_submission.anonymous_id.to_s
+          },
+          {
+            comment: { text_comment: "should not work" }
+          },
+          {},
+          { expected_status: 404 }
+        )
+      end
+
+      it "does not find peer review sub assignment when feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        api_call_as_user(
+          @reviewer,
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@peer_review.id}/anonymous_submissions/#{@peer_review_submission.anonymous_id}.json",
+          {
+            controller: "submissions_api",
+            action: "update_anonymous",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @peer_review.id.to_s,
+            anonymous_id: @peer_review_submission.anonymous_id.to_s
+          },
+          {
+            comment: { text_comment: "should not work" }
+          },
+          {},
+          { expected_status: 404 }
+        )
+      end
     end
   end
 
@@ -4474,6 +4895,193 @@ describe "Submissions API", type: :request do
       expect(json["submission_type"]).to eql "online_text_entry"
       expect(json["url"]).to be_nil
     end
+
+    context "group assignment submissions" do
+      before :once do
+        @group_category = @course.group_categories.create!(name: "Project Groups")
+        @group = @course.groups.create!(name: "Group 1", group_category: @group_category)
+
+        @student2 = user_factory(active_all: true, name: "Student 2")
+        @student3 = user_factory(active_all: true, name: "Student 3")
+
+        @course.enroll_student(@student2, enrollment_state: "active")
+        @course.enroll_student(@student3, enrollment_state: "active")
+
+        @group.add_user(@student)
+        @group.add_user(@student2)
+        @group.add_user(@student3)
+
+        @group_assignment = @course.assignments.create!(
+          title: "Group Assignment",
+          group_category: @group_category,
+          grade_group_students_individually: false,
+          points_possible: 10
+        )
+      end
+
+      before do
+        @user = @teacher
+      end
+
+      it "returns the correct user's submission when grading" do
+        json = api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student2.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @group_assignment.id.to_s,
+            user_id: @student2.id.to_s
+          },
+          {
+            submission: { posted_grade: "8" }
+          }
+        )
+
+        expect(json["user_id"]).to eq @student2.id
+        expect(json["score"]).to eq 8.0
+        expect(json["grade"]).to eq "8"
+      end
+
+      it "includes group data when explicitly requested via include parameter" do
+        json = api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @group_assignment.id.to_s,
+            user_id: @student.id.to_s
+          },
+          {
+            submission: { posted_grade: "9" },
+            include: ["group"]
+          }
+        )
+
+        expect(json["group"]).to be_present
+        expect(json["group"]["id"]).to eq @group.id
+        expect(json["group"]["name"]).to eq "Group 1"
+      end
+
+      it "includes group data in all_submissions array when requested" do
+        json = api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student3.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @group_assignment.id.to_s,
+            user_id: @student3.id.to_s
+          },
+          {
+            submission: { posted_grade: "7.5" },
+            include: ["group"]
+          }
+        )
+
+        expect(json["all_submissions"]).to be_present
+        expect(json["all_submissions"].length).to eq 3
+
+        json["all_submissions"].each do |sub|
+          expect(sub["group"]).to be_present
+          expect(sub["group"]["id"]).to eq @group.id
+          expect(sub["score"]).to eq 7.5
+        end
+      end
+
+      it "returns the requested user's submission not just the first one" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @group_assignment.id.to_s,
+            user_id: @student.id.to_s
+          },
+          {
+            submission: { posted_grade: "10" }
+          }
+        )
+
+        json = api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student2.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @group_assignment.id.to_s,
+            user_id: @student2.id.to_s
+          },
+          {
+            submission: { posted_grade: "9" }
+          }
+        )
+
+        expect(json["user_id"]).to eq @student2.id
+        expect(json["score"]).to eq 9.0
+      end
+
+      context "when grade_group_students_individually is true" do
+        before do
+          @group_assignment.update!(grade_group_students_individually: true)
+        end
+
+        it "returns the correct user's submission" do
+          json = api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student2.id}.json",
+            {
+              controller: "submissions_api",
+              action: "update",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: @group_assignment.id.to_s,
+              user_id: @student2.id.to_s
+            },
+            {
+              submission: { posted_grade: "8" }
+            }
+          )
+
+          expect(json["user_id"]).to eq @student2.id
+          expect(json["all_submissions"].length).to eq 1
+        end
+
+        it "still includes group data when requested" do
+          json = api_call(
+            :put,
+            "/api/v1/courses/#{@course.id}/assignments/#{@group_assignment.id}/submissions/#{@student.id}.json",
+            {
+              controller: "submissions_api",
+              action: "update",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: @group_assignment.id.to_s,
+              user_id: @student.id.to_s
+            },
+            {
+              submission: { posted_grade: "7" },
+              include: ["group"]
+            }
+          )
+
+          expect(json["group"]).to be_present
+          expect(json["group"]["id"]).to eq @group.id
+        end
+      end
+    end
   end
 
   it "allows posting grade by sis id" do
@@ -4589,6 +5197,271 @@ describe "Submissions API", type: :request do
                  { comment: { text_comment: "witty remark" },
                    rubric_assessment: { criteria: { points: 5 } } })
     assert_forbidden
+  end
+
+  describe "direct peer review sub-assignment update" do
+    before :once do
+      @peer_review_course = course_factory(active_all: true)
+      @peer_review_teacher = teacher_in_course(course: @peer_review_course, active_all: true).user
+      @peer_review_student = student_in_course(course: @peer_review_course, active_all: true).user
+      @peer_review_course.enable_feature!(:peer_review_allocation_and_grading)
+      @peer_review_sub_assignment = peer_review_model(course: @peer_review_course)
+      @parent_assignment = @peer_review_sub_assignment.parent_assignment
+      @direct_api_params = {
+        controller: "submissions_api",
+        action: "update",
+        format: "json",
+        course_id: @peer_review_course.id.to_s,
+        assignment_id: @peer_review_sub_assignment.id.to_s,
+        user_id: @peer_review_student.id.to_s
+      }
+      @direct_api_url = "/api/v1/courses/#{@peer_review_course.id}/assignments/#{@peer_review_sub_assignment.id}/submissions/#{@peer_review_student.id}.json"
+      @user = @peer_review_teacher
+    end
+
+    def update_submission_directly(body = {})
+      api_call(
+        :put,
+        @direct_api_url,
+        @direct_api_params,
+        body
+      )
+    end
+
+    context "when all conditions are met" do
+      it "updates peer review sub assignment submission using direct ID" do
+        json = update_submission_directly(
+          {
+            submission: {
+              posted_grade: "9"
+            }
+          }
+        )
+
+        expect(json["score"]).to eq 9.0
+        expect(json["assignment_id"]).to eq @peer_review_sub_assignment.id
+
+        parent_submission = @parent_assignment.submissions.find_by(user: @peer_review_student)
+        expect(parent_submission.score).to be_nil
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.score).to eq 9.0
+      end
+
+      it "handles excuse correctly with direct approach" do
+        json = update_submission_directly(
+          {
+            submission: {
+              excuse: true
+            }
+          }
+        )
+
+        expect(json["excused"]).to be true
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.excused?).to be true
+      end
+
+      it "handles comments correctly with direct approach" do
+        update_submission_directly(
+          {
+            comment: {
+              text_comment: "Excellent peer review!"
+            }
+          }
+        )
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.submission_comments.last.comment).to eq "Excellent peer review!"
+      end
+
+      it "handles late_policy_status correctly with direct approach" do
+        update_submission_directly(
+          {
+            submission: {
+              late_policy_status: "late"
+            }
+          }
+        )
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.late_policy_status).to eq "late"
+      end
+
+      it "handles missing grade status correctly with direct approach" do
+        update_submission_directly(
+          {
+            submission: {
+              late_policy_status: "missing"
+            }
+          }
+        )
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.late_policy_status).to eq "missing"
+        expect(peer_review_submission.missing?).to be true
+      end
+
+      it "handles extended grade status correctly with direct approach" do
+        update_submission_directly(
+          {
+            submission: {
+              late_policy_status: "extended"
+            }
+          }
+        )
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.late_policy_status).to eq "extended"
+        expect(peer_review_submission.extended?).to be true
+      end
+
+      it "handles late status with seconds_late_override correctly with direct approach" do
+        seconds_late_override = 3.days
+        json = update_submission_directly(
+          {
+            submission: {
+              late_policy_status: "late",
+              seconds_late_override:
+            }
+          }
+        )
+
+        expect(json["late_policy_status"]).to eq "late"
+        expect(json["seconds_late"]).to eq seconds_late_override.to_i
+
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        expect(peer_review_submission.late_policy_status).to eq "late"
+        expect(peer_review_submission.seconds_late).to eq seconds_late_override.to_i
+      end
+
+      it "updates seconds_late_override on existing late peer review submission with direct approach" do
+        peer_review_submission = @peer_review_sub_assignment.submissions.find_by(user: @peer_review_student)
+        peer_review_submission.update!(late_policy_status: "late", seconds_late_override: 1.day.to_i)
+
+        new_seconds_late_override = 5.days
+        json = update_submission_directly(
+          {
+            submission: {
+              seconds_late_override: new_seconds_late_override
+            }
+          }
+        )
+
+        expect(json["seconds_late"]).to eq new_seconds_late_override.to_i
+
+        peer_review_submission.reload
+        expect(peer_review_submission.seconds_late).to eq new_seconds_late_override.to_i
+        expect(peer_review_submission.late_policy_status).to eq "late"
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        @peer_review_course.disable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns error when using direct peer review sub-assignment ID" do
+        json = api_call(
+          :put,
+          @direct_api_url,
+          @direct_api_params,
+          {
+            submission: {
+              posted_grade: "8"
+            }
+          },
+          {},
+          { expected_status: 422 }
+        )
+
+        expect(json["errors"]).to be_present
+        expect(json["errors"].first["message"]).to eq("Peer review allocation and grading feature is not enabled for this course")
+      end
+    end
+
+    context "when parent doesn't have peer reviews enabled" do
+      before do
+        @parent_assignment.update!(peer_reviews: false)
+      end
+
+      it "returns error when using direct peer review sub-assignment ID" do
+        json = api_call(
+          :put,
+          @direct_api_url,
+          @direct_api_params,
+          {
+            submission: {
+              posted_grade: "8"
+            }
+          },
+          {},
+          { expected_status: 422 }
+        )
+
+        expect(json["errors"]).to be_present
+        expect(json["errors"].first["message"]).to eq("This assignment does not have peer reviews enabled")
+      end
+    end
+
+    context "when parent assignment is missing" do
+      before do
+        # Simulate orphaned sub-assignment by nullifying parent reference
+        @peer_review_sub_assignment.update_column(:parent_assignment_id, nil)
+      end
+
+      it "returns error when sub assignment has no parent" do
+        json = api_call(
+          :put,
+          @direct_api_url,
+          @direct_api_params,
+          {
+            submission: {
+              posted_grade: "8"
+            }
+          },
+          {},
+          { expected_status: 422 }
+        )
+
+        expect(json["errors"]).to be_present
+        expect(json["errors"].first["message"]).to eq("This peer review sub assignment does not have a parent assignment")
+      end
+    end
+
+    context "authorization" do
+      it "allows teacher to grade peer review submission directly" do
+        @user = @peer_review_teacher
+        json = update_submission_directly(
+          {
+            submission: {
+              posted_grade: "10"
+            }
+          }
+        )
+
+        expect(json["score"]).to eq 10.0
+      end
+
+      it "prevents student from grading peer review submission directly" do
+        @user = @peer_review_student
+        json = api_call(
+          :put,
+          @direct_api_url,
+          @direct_api_params,
+          {
+            submission: {
+              posted_grade: "10"
+            }
+          },
+          {},
+          { expected_status: 403 }
+        )
+
+        expect(json["status"]).to eq "unauthorized"
+      end
+    end
   end
 
   context "moderated grading" do
@@ -4772,7 +5645,7 @@ describe "Submissions API", type: :request do
       },
       { comment: { text_comment: "a comment!" } }
     )
-    expect(submission.submission_comments.order("id DESC").first).to be_hidden
+    expect(submission.submission_comments.order(id: :desc).first).to be_hidden
   end
 
   it "does not hide comments when the submission is already posted" do
@@ -4797,7 +5670,7 @@ describe "Submissions API", type: :request do
       },
       { comment: { text_comment: "a comment!" } }
     )
-    expect(submission.submission_comments.order("id DESC").first).not_to be_hidden
+    expect(submission.submission_comments.order(id: :desc).first).not_to be_hidden
   end
 
   it "does not hide student comments on muted assignments" do
@@ -4817,7 +5690,7 @@ describe "Submissions API", type: :request do
                assignment_id: assignment.to_param,
                user_id: student.to_param },
              { comment: { text_comment: "hidden comment" } })
-    expect(submission.submission_comments.order("id DESC").first).not_to be_hidden
+    expect(submission.submission_comments.order(id: :desc).first).not_to be_hidden
   end
 
   it "allows submitting points" do
@@ -5433,6 +6306,11 @@ describe "Submissions API", type: :request do
         expect(json["message"]).to eq "Invalid submission[submission_type] given"
       end
 
+      it "rejects peer_review submission_type (system-only)" do
+        json = api_call(:post, @url, @args, { submission: { submission_type: PeerReviewSubAssignment::PEER_REVIEW_SUBMISSION_TYPE } }, {}, expected_status: 400)
+        expect(json["message"]).to eq "Invalid submission[submission_type] given"
+      end
+
       it "rejects mismatched submission_type and params" do
         json = api_call(:post, @url, @args, { submission: { submission_type: "online_url", body: "some html text" } }, {}, expected_status: 400)
         expect(json["message"]).to eq "Invalid parameters for submission_type online_url. Required: submission[url]"
@@ -5559,8 +6437,8 @@ describe "Submissions API", type: :request do
           @user = @student1
         end
 
-        include_examples "file uploads api"
-        include_examples "file uploads api without quotas"
+        it_behaves_like "file uploads api"
+        it_behaves_like "file uploads api without quotas"
 
         # preflight_params has to be first and nameless to keep backwards compat with the include_examples
         def preflight(preflight_params, request_params: {}, api_url: nil)
@@ -5938,7 +6816,7 @@ describe "Submissions API", type: :request do
     a = @course.assignments.create!
     a.submit_homework(@student,
                       submission_type: "online_upload",
-                      attachments: [crocodocable_attachment_model(context: @student)])
+                      attachments: [canvadocable_attachment_model(context: @student)])
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=submission_history",
                     { course_id: @course.id.to_s,
@@ -5962,7 +6840,7 @@ describe "Submissions API", type: :request do
     a = @course.assignments.create!
     a.submit_homework(@student,
                       submission_type: "online_upload",
-                      attachments: [crocodocable_attachment_model(context: @student)])
+                      attachments: [canvadocable_attachment_model(context: @student)])
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=submission_history",
                     { course_id: @course.id.to_s,
@@ -6003,49 +6881,6 @@ describe "Submissions API", type: :request do
                       include: %w[canvadoc_document_id] })
     canvadoc_document_id = a.submissions[0].attachments[0].canvadoc.document_id
     expect(json[0]["attachments"][0]["canvadoc_document_id"]).to eq canvadoc_document_id
-  end
-
-  it "includes crocodoc allowed ids in the preview url for attachments" do
-    allow(Canvas::Crocodoc).to receive(:config).and_return({ a: 1 })
-
-    course_with_teacher_logged_in active_all: true
-    student_in_course active_all: true
-    @user = @teacher
-    assignment = @course.assignments.create!(moderated_grading: true, grader_count: 1)
-    submission = assignment.submit_homework(@student,
-                                            submission_type: "online_upload",
-                                            attachments: [crocodocable_attachment_model(context: @student)])
-    provisional_grade = submission.find_or_create_provisional_grade!(@teacher, score: 1)
-    assignment.moderated_grading_selections
-              .where(student_id: @student.id).first
-              .update_attribute(:provisional_grade, provisional_grade)
-    provisional_grade.publish!
-    assignment.update(grades_published_at: 1.hour.ago)
-    submission.reload
-    submission.attachments.first.create_crocodoc_document(uuid: "1234",
-                                                          process_state: "PROCESSED")
-
-    url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions?include[]=submission_history"
-    json = api_call(:get, url, { course_id: @course.id.to_s,
-                                 assignment_id: assignment.id.to_s,
-                                 action: "index",
-                                 controller: "submissions_api",
-                                 format: "json",
-                                 include: %w[submission_history] })
-
-    result_url = json.first.fetch("submission_history").first.fetch("attachments").first
-                     .fetch("preview_url")
-
-    @teacher.reload
-    @student.reload
-
-    parsed = URI.parse result_url
-    parsed_params = CGI.parse parsed.query
-    parsed_blob = JSON.parse parsed_params["blob"].first
-    expect(parsed.path).to eq "/api/v1/crocodoc_session"
-
-    expect(parsed_blob["moderated_grading_allow_list"]).to include(@student.moderated_grading_ids.as_json)
-    expect(parsed_blob["moderated_grading_allow_list"]).to include(@teacher.moderated_grading_ids.as_json)
   end
 
   def course_with_student_and_submitted_homework
@@ -6634,7 +7469,7 @@ describe "Submissions API", type: :request do
                grade_data)
       run_jobs
 
-      expect(@a1.submission_for_student(@student1)).to_not be_excused
+      expect(@a1.submission_for_student(@student1)).not_to be_excused
     end
 
     it "posts do not set grader_id for unchanged scores" do
@@ -6817,6 +7652,39 @@ describe "Submissions API", type: :request do
       expect(response.headers["Link"]).to match(/rel="next"/)
     end
 
+    it "sorts students alphabetically when sort=name" do
+      student_in_course(active_all: true, name: "Alice Anderson").user
+      student_in_course(active_all: true, name: "Bob Brown").user
+      student_in_course(active_all: true, name: "Charlie Clark").user
+
+      json = api_call_as_user(@teacher, :get, @path + "?sort=name&order=asc", @params.merge(sort: "name", order: "asc"))
+
+      display_names = json.pluck("display_name")
+
+      expect(display_names).to start_with("Alice Anderson", "Bob Brown", "Charlie Clark")
+    end
+
+    it "sorts students in descending order when order=desc" do
+      student_in_course(active_all: true, name: "Alice Anderson").user
+      student_in_course(active_all: true, name: "Bob Brown").user
+
+      json = api_call_as_user(@teacher, :get, @path + "?sort=name&order=desc", @params.merge(sort: "name", order: "desc"))
+
+      display_names = json.pluck("display_name")
+
+      expect(display_names.last(2)).to eq(["Bob Brown", "Alice Anderson"])
+    end
+
+    it "uses default sorting when no sort parameter is provided" do
+      student_in_course(active_all: true, name: "Alice Anderson").user
+      student_in_course(active_all: true, name: "Bob Brown").user
+
+      json_default = api_call_as_user(@teacher, :get, @path, @params)
+
+      student_ids = json_default.pluck("id")
+      expect(student_ids).to eq(student_ids.sort)
+    end
+
     describe "include[]=provisional_grades" do
       before(:once) do
         @course.root_account.enable_service(:avatars)
@@ -6992,6 +7860,54 @@ describe "Submissions API", type: :request do
       expect(json.size).to eq 1
       expect(json[0]["id"]).to eq section_student.id
     end
+
+    it "only returns assignment_ids for requested assignments even when students have access to more" do
+      @assignment3 = @course.assignments.create!(title: "Third Assignment", points_possible: 10)
+      @assignment4 = @course.assignments.create!(title: "Fourth Assignment", points_possible: 10)
+
+      requested_params = { controller: "submissions_api",
+                           action: "multiple_gradeable_students",
+                           format: "json",
+                           course_id: @course.to_param,
+                           assignment_ids: [@assignment1.to_param, @assignment2.to_param] }
+
+      json = api_call_as_user(@teacher, :get, @path, requested_params)
+
+      expect(json.pluck("id")).to match_array([@student1.id, @student2.id])
+
+      json.each do |student_json|
+        expect(student_json["assignment_ids"]).to match_array([@assignment1.id, @assignment2.id])
+        expect(student_json["assignment_ids"]).not_to include(@assignment3.id)
+        expect(student_json["assignment_ids"]).not_to include(@assignment4.id)
+      end
+    end
+
+    it "filters assignment_ids based on differentiated access for requested assignments" do
+      section = add_section("Restricted Section")
+      section_student = student_in_section(section, active_all: true)
+
+      @assignment3 = @course.assignments.create!(title: "Section Only Assignment", only_visible_to_overrides: true)
+      @assignment3.assignment_overrides.create!(set: section)
+
+      requested_params = { controller: "submissions_api",
+                           action: "multiple_gradeable_students",
+                           format: "json",
+                           course_id: @course.to_param,
+                           assignment_ids: [@assignment1.to_param, @assignment2.to_param, @assignment3.to_param] }
+
+      json = api_call_as_user(@teacher, :get, @path, requested_params)
+
+      student1_data = json.find { |s| s["id"] == @student1.id }
+      student2_data = json.find { |s| s["id"] == @student2.id }
+      section_student_data = json.find { |s| s["id"] == section_student.id }
+
+      expect(student1_data["assignment_ids"]).to match_array([@assignment1.id, @assignment2.id])
+      expect(student2_data["assignment_ids"]).to match_array([@assignment1.id, @assignment2.id])
+      expect(section_student_data["assignment_ids"]).to match_array([@assignment1.id, @assignment2.id, @assignment3.id])
+
+      expect(student1_data["assignment_ids"]).not_to include(@assignment3.id)
+      expect(student2_data["assignment_ids"]).not_to include(@assignment3.id)
+    end
   end
 
   describe "#index" do
@@ -7150,6 +8066,105 @@ describe "Submissions API", type: :request do
           json = api_call_as_user(teacher, :get, path, params.merge(include: field))
           expect(json).to all include field
         end
+      end
+    end
+
+    context "group fallback logic" do
+      let(:course) { course_factory }
+      let(:teacher) { user_factory(active_all: true) }
+      let(:student1) { user_factory(active_all: true) }
+      let(:student2) { user_factory(active_all: true) }
+      let(:group) do
+        group_category = course.group_categories.create(name: "Engineering")
+        course.groups.create(name: "Group1", group_category:)
+      end
+      let(:assignment) do
+        course.assignments.create!(
+          title: "group assignment",
+          grading_type: "points",
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          group_category: group.group_category
+        )
+      end
+      let(:path) { "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/submissions" }
+      let(:params) do
+        {
+          controller: "submissions_api",
+          action: "index",
+          format: "json",
+          course_id: course.id.to_s,
+          assignment_id: assignment.id.to_s
+        }
+      end
+
+      before do
+        course.enroll_teacher(teacher).accept!
+        course.enroll_student(student1, enrollment_state: "active")
+        course.enroll_student(student2, enrollment_state: "active")
+        group.add_user(student1)
+        group.add_user(student2)
+        assignment.submit_homework(student1, submission_type: "online_text_entry")
+      end
+
+      it "returns group data for all submissions when include[]=group is passed" do
+        params[:include] = %w[group]
+        json = api_call_as_user(teacher, :get, path, params)
+
+        expect(json.size).to eq 2
+        json.each do |submission|
+          expect(submission["group"]).to be_present
+          expect(submission["group"]["id"]).to eq group.id
+          expect(submission["group"]["name"]).to eq group.name
+        end
+      end
+
+      it "returns group data even when submission.group_id is nil" do
+        # Simulate submissions without group_id set (edge case)
+        assignment.submissions.update_all(group_id: nil)
+
+        params[:include] = %w[group]
+        json = api_call_as_user(teacher, :get, path, params)
+
+        expect(json.size).to eq 2
+        json.each do |submission|
+          expect(submission["group"]).to be_present
+          expect(submission["group"]["id"]).to eq group.id
+          expect(submission["group"]["name"]).to eq group.name
+        end
+      end
+
+      it "returns group with nil values when user has no group" do
+        # Create a student not in any group
+        student3 = user_factory(active_all: true, name: "Student 3")
+        course.enroll_student(student3, enrollment_state: "active")
+
+        params[:include] = %w[group]
+        json = api_call_as_user(teacher, :get, path, params)
+
+        student3_submission = json.find { |s| s["user_id"] == student3.id }
+        expect(student3_submission["group"]).to be_present
+        expect(student3_submission["group"]["id"]).to be_nil
+        expect(student3_submission["group"]["name"]).to be_nil
+      end
+
+      it "does not include group data when not requested" do
+        json = api_call_as_user(teacher, :get, path, params)
+
+        json.each do |submission|
+          expect(submission["group"]).to be_nil
+        end
+      end
+
+      it "returns correct group data for each user in grouped mode" do
+        params[:grouped] = true
+        params[:include] = %w[group]
+        json = api_call_as_user(teacher, :get, path, params)
+
+        expect(json.size).to eq 1
+        expect(json.first["group"]).to be_present
+        expect(json.first["group"]["id"]).to eq group.id
+        expect(json.first["group"]["name"]).to eq group.name
       end
     end
   end

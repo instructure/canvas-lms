@@ -58,17 +58,14 @@ describe Importers::LtiResourceLinkImporter do
         destination_course.assignments.create!(
           submission_types: "external_tool",
           external_tool_tag_attributes: { content: tool },
-          points_possible: 10
+          points_possible: 10,
+          migration_id: "asdfasdf"
         )
       end
       let!(:resource_link) do
-        Lti::ResourceLink.create!(
-          context_external_tool: tool,
-          context: assignment,
-          lookup_uuid:,
-          custom: nil,
-          url: "http://www.example.com/launch"
-        )
+        assignment.lti_resource_links.first.tap do |rl|
+          rl.update! lookup_uuid:
+        end
       end
 
       context "when the associated assignment is selected for import" do
@@ -81,6 +78,53 @@ describe Importers::LtiResourceLinkImporter do
 
           expect(resource_link.custom).to eq custom_params
         end
+
+        context "with an existing assignment with the same lookup_uuid" do
+          let!(:other_assignment) do
+            destination_course.assignments.create!(
+              submission_types: "external_tool",
+              external_tool_tag_attributes: { content: tool },
+              points_possible: 10,
+              migration_id: "asdf"
+            )
+          end
+          let!(:other_resource_link) do
+            other_assignment.lti_resource_links.first.tap do |rl|
+              rl.update! lookup_uuid:
+            end
+          end
+          let(:other_custom_params) do
+            { "param2" => "value2" }
+          end
+          let(:hash) do
+            {
+              "lti_resource_links" => [
+                {
+                  "custom" => custom_params,
+                  "lookup_uuid" => lookup_uuid,
+                  "launch_url" => tool.url,
+                  "assignment_migration_id" => assignment.migration_id
+                },
+                {
+                  "custom" => other_custom_params,
+                  "lookup_uuid" => lookup_uuid,
+                  "launch_url" => tool.url,
+                  "assignment_migration_id" => other_assignment.migration_id
+                }
+              ]
+            }
+          end
+
+          it "sets the right custom params for both resource links" do
+            expect(subject).to be true
+
+            resource_link.reload
+            other_resource_link.reload
+
+            expect(other_resource_link.custom).to eq other_custom_params
+            expect(resource_link.custom).to eq custom_params
+          end
+        end
       end
 
       context "when the associated assignment is not selected for import" do
@@ -90,6 +134,25 @@ describe Importers::LtiResourceLinkImporter do
 
         it "does not import lti resource links" do
           expect(subject).to be false
+        end
+      end
+
+      context "when the resource link has an assignment_migration_id but the assignment is not in the destination" do
+        let(:hash) do
+          {
+            "lti_resource_links" => [
+              {
+                "custom" => custom_params,
+                "lookup_uuid" => lookup_uuid,
+                "launch_url" => tool.url,
+                "assignment_migration_id" => "nonexistent_migration_id"
+              }
+            ]
+          }
+        end
+
+        it "does not create a course-level resource link" do
+          expect { subject }.not_to change { destination_course.lti_resource_links.count }
         end
       end
     end
@@ -138,7 +201,7 @@ describe Importers::LtiResourceLinkImporter do
       ]
     end
 
-    context "when lti_resource_link has an associated assignemnt context" do
+    context "when lti_resource_link has an associated assignment context" do
       let!(:lti_resource_links) do
         [
           {
@@ -161,7 +224,7 @@ describe Importers::LtiResourceLinkImporter do
         end
       end
 
-      context "when assignment does not selected for import" do
+      context "when assignment is not selected for import" do
         before do
           allow(migration).to receive_messages(
             import_everything?: false,
@@ -176,11 +239,11 @@ describe Importers::LtiResourceLinkImporter do
       end
     end
 
-    context "when lti_resource_link does not have an associated assignemnt context" do
+    context "when lti_resource_link's context_type is not Assignment (no assignment_migration_id)" do
       let!(:lti_resource_links) do
         [
           {
-            "lookup_uuid" => "11111111-2222-1111-2222-111111111111",
+            "lookup_uuid" => "11111111-2222-1111-2222-111111111111"
           }
         ]
       end
@@ -210,6 +273,105 @@ describe Importers::LtiResourceLinkImporter do
         it "keeps the associated lti_resource_link" do
           filtered_lti_resource_links = subject.filter_by_assignment_context(lti_resource_links.dup, assignments, migration)
           expect(filtered_lti_resource_links).to include(lti_resource_links.first)
+        end
+      end
+    end
+
+    context "when multiple assignments have resource links with the same lookup_uuid" do
+      let!(:assignment1_migration_id) { "assignment_1" }
+      let!(:assignment2_migration_id) { "assignment_2" }
+      let!(:assignments) do
+        [
+          {
+            "migration_id" => assignment1_migration_id,
+            "resource_link_lookup_uuid" => lookup_uuid
+          },
+          {
+            "migration_id" => assignment2_migration_id,
+            "resource_link_lookup_uuid" => lookup_uuid
+          }
+        ]
+      end
+      let!(:lti_resource_links) do
+        [
+          {
+            "lookup_uuid" => lookup_uuid,
+            "assignment_migration_id" => assignment1_migration_id
+          },
+          {
+            "lookup_uuid" => lookup_uuid,
+            "assignment_migration_id" => assignment2_migration_id
+          }
+        ]
+      end
+
+      context "when only one assignment is selected for import" do
+        before do
+          allow(migration).to receive(:import_everything?).and_return(false)
+          allow(migration).to receive(:import_object?) do |_type, migration_id|
+            migration_id == assignment1_migration_id
+          end
+        end
+
+        it "includes only the resource link associated with the imported assignment" do
+          filtered_lti_resource_links = subject.filter_by_assignment_context(lti_resource_links.dup, assignments, migration)
+
+          expect(filtered_lti_resource_links.size).to eq 1
+          expect(filtered_lti_resource_links.first["assignment_migration_id"]).to eq assignment1_migration_id
+          expect(filtered_lti_resource_links).not_to include(
+            hash_including("assignment_migration_id" => assignment2_migration_id)
+          )
+        end
+      end
+    end
+
+    context "when lti_resource_link has no assignment association and no matching assignment" do
+      let!(:lookup_uuid_without_assignment) { "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee" }
+      let!(:assignments) { [] }
+
+      context "when resource link has no assignment_migration_id (course-level resource link)" do
+        let!(:lti_resource_links) do
+          [
+            {
+              "lookup_uuid" => lookup_uuid_without_assignment,
+              "assignment_migration_id" => nil
+            }
+          ]
+        end
+
+        before do
+          allow(migration).to receive_messages(
+            import_everything?: false,
+            import_object?: false
+          )
+        end
+
+        it "includes the course-level resource link" do
+          filtered_lti_resource_links = subject.filter_by_assignment_context(lti_resource_links.dup, assignments, migration)
+          expect(filtered_lti_resource_links).to include(lti_resource_links.first)
+        end
+      end
+
+      context "when resource link has an assignment_migration_id but assignment not selected" do
+        let!(:lti_resource_links) do
+          [
+            {
+              "lookup_uuid" => lookup_uuid_without_assignment,
+              "assignment_migration_id" => "some_assignment_id"
+            }
+          ]
+        end
+
+        before do
+          allow(migration).to receive_messages(
+            import_everything?: false,
+            import_object?: false
+          )
+        end
+
+        it "filters out the assignment-level resource link" do
+          filtered_lti_resource_links = subject.filter_by_assignment_context(lti_resource_links.dup, assignments, migration)
+          expect(filtered_lti_resource_links).not_to include(lti_resource_links.first)
         end
       end
     end

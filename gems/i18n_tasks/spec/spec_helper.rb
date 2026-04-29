@@ -21,7 +21,7 @@ begin
   require "../../spec/coverage_tool"
   CoverageTool.start("i18n-tasks-gem")
 rescue LoadError => e
-  puts "Error: #{e} "
+  warn "Error: #{e}"
 end
 
 require "i18n_tasks"

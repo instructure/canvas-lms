@@ -28,5 +28,5 @@ describe('TeacherQuery', () => {
     expect(await waitFor(() => getAllByText(assignment.name)[0])).toBeInTheDocument()
   })
 
-  it.skip('renders a problem screen on a bad graphql query', () => {})
+  it('renders a problem screen on a bad graphql query', () => {})
 })

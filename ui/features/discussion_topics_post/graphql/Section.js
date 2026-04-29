@@ -21,7 +21,7 @@ import {number, shape, string} from 'prop-types'
 
 export const Section = {
   fragment: gql`
-    fragment Section on Section {
+    fragment DiscussionPostSection on Section {
       _id
       createdAt
       id

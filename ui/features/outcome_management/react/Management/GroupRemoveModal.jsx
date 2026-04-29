@@ -23,9 +23,9 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {removeOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
 const I18n = createI18nScope('OutcomeManagement')

@@ -40,6 +40,11 @@ module Types
 
     field :assessment_type, AssessmentType, null: false
 
+    field :is_current_user, Boolean, null: false
+    def is_current_user
+      object.assessor_id == current_user&.id
+    end
+
     field :score, Float, null: true
 
     field :updated_at, Types::DateTimeType, null: true
@@ -51,9 +56,30 @@ module Types
 
     field :assessor, UserType, null: true
     def assessor
-      return nil unless object.grants_right?(current_user, session, :read_assessor)
+      if object.grants_right?(current_user, session, :read_assessor)
+        return load_association(:assessor)
+      end
 
-      load_association(:assessor)
+      assignment = nil
+      if object.rubric_association&.association_object.is_a?(Assignment)
+        assignment = object.rubric_association.association_object
+      elsif object.artifact.is_a?(Submission)
+        assignment = object.artifact.assignment
+      elsif object.artifact.is_a?(ModeratedGrading::ProvisionalGrade)
+        assignment = object.artifact.submission.assignment
+      end
+
+      if assignment&.moderated_grading? && object.assessor_id
+        grader_identities = assignment.grader_identities
+        grader_identity = grader_identities.find { |grader| grader[:user_id] == object.assessor_id }
+        anonymous_identity = Assignments::GraderIdentities.anonymize_grader_identity(grader_identity)
+
+        if anonymous_identity
+          return User.new(name: anonymous_identity[:name], short_name: anonymous_identity[:name])
+        end
+      end
+
+      nil
     end
 
     field :assessment_ratings, [RubricAssessmentRatingType], <<~MD, null: true
@@ -65,11 +91,17 @@ module Types
       # sorts of terrible.
       return if object.data.nil?
 
-      object.data.map do |assessment_rating|
-        assessment_rating[:rubric_assessment_id] = object.id
-        assessment_rating[:rubric_id] = object.rubric_id
-        assessment_rating[:artifact_attempt] = object.artifact_attempt
-        assessment_rating
+      # Use the rubric from the rubric_association if available,
+      # otherwise fall back to the rubric_id stored on the assessment.
+      load_association(:rubric_association).then do |rubric_association|
+        rubric_id = rubric_association&.rubric_id || object.rubric_id
+
+        object.data.map do |assessment_rating|
+          assessment_rating[:rubric_assessment_id] = object.id
+          assessment_rating[:rubric_id] = rubric_id
+          assessment_rating[:artifact_attempt] = object.artifact_attempt
+          assessment_rating
+        end
       end
     end
 

@@ -61,7 +61,6 @@ describe('toHtmlString', () => {
   })
 
   describe('when the link needs to be sanitized', () => {
-     
     const overrides = {url: 'javascript:alert("hello world!");'}
     it('sanitizes the url', () => {
       expect(linkContentItemToHtmlString(overrideLinkContentItem(overrides))).toEqual(

@@ -18,17 +18,18 @@
 
 import React from 'react'
 import {render, act} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import ReviewModal from '../ReviewModal'
 import useInsightStore from '../../../hooks/useInsightStore'
 import {useInsight, InsightEntry} from '../../../hooks/useFetchInsights'
 import EvaluationFeedback from '../EvaluationFeedback'
 
-jest.mock('../EvaluationFeedback', () => jest.fn(() => null))
-const MockedEvaluationFeedback = EvaluationFeedback as jest.Mock
+vi.mock('../EvaluationFeedback', () => ({
+  default: vi.fn(() => null),
+}))
+const MockedEvaluationFeedback = EvaluationFeedback as unknown as ReturnType<typeof vi.fn>
 
-jest.mock('../../../hooks/useFetchInsights')
-const mockedUseInsight = useInsight as jest.MockedFunction<typeof useInsight>
+vi.mock('../../../hooks/useFetchInsights')
+const mockedUseInsight = vi.mocked(useInsight)
 
 const entry1: InsightEntry = {
   id: 123,

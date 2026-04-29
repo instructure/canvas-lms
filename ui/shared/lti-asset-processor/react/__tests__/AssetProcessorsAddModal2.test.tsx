@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {AssetProcessorsAddModal} from '../AssetProcessorsAddModal'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
@@ -26,110 +28,170 @@ import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 import {
   mockDeepLinkResponse,
   mockInvalidDeepLinkResponse,
-  mockDoFetchApi,
-  mockTools as tools,
+  mockToolsForAssignment as assignmentTools,
+  mockToolsForDiscussions as discussionTools,
+  mockContributionDeepLinkResponse,
 } from './assetProcessorsTestHelpers'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-jest.mock('@canvas/do-fetch-api-effect')
-jest.mock('@canvas/external-tools/messages')
+vi.mock('@canvas/external-tools/messages')
+vi.mock('@instructure/platform-alerts')
+
+const server = setupServer(
+  http.get('/api/v1/courses/:courseId/lti_apps/launch_definitions', ({request}) => {
+    const url = new URL(request.url)
+    const placements = url.searchParams.get('placements[]')
+    return HttpResponse.json(
+      placements === 'ActivityAssetProcessor' ? assignmentTools : discussionTools,
+    )
+  }),
+)
 
 describe('AssetProcessorsAddModal', () => {
-  let mockOnProcessorResponse: jest.Mock
+  let mockOnProcessorResponse: any
   const queryClient = new QueryClient()
+  let originalPostMessage: typeof window.postMessage
+
+  beforeAll(() => {
+    server.listen()
+    // Save original postMessage for restoration
+    originalPostMessage = window.postMessage.bind(window)
+  })
+  afterAll(() => {
+    server.close()
+    // Restore original postMessage
+    window.postMessage = originalPostMessage
+  })
 
   beforeEach(() => {
-    mockOnProcessorResponse = jest.fn()
-
-    queryClient.setQueryData(['assetProcessors', 123], tools)
-    const launchDefsUrl = '/api/v1/courses/123/lti_apps/launch_definitions'
-    mockDoFetchApi(launchDefsUrl, doFetchApi as jest.Mock)
+    fakeENV.setup()
+    mockOnProcessorResponse = vi.fn()
+    // Mock postMessage globally to prevent jsdom errors with _origin being null.
+    // This is needed because monitorLtiMessages() adds a persistent listener that
+    // tries to respond to LTI messages via postMessage, which fails in jsdom.
+    window.postMessage = vi.fn()
   })
 
   afterEach(() => {
+    server.resetHandlers()
     queryClient.clear()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+    // Reset Zustand store state to prevent test pollution
+    useAssetProcessorsAddModalState.getState().actions.close()
+    fakeENV.teardown()
   })
 
-  function renderModal() {
+  function renderModal(type: AssetProcessorType) {
     return render(
       <MockedQueryClientProvider client={queryClient}>
         <AssetProcessorsAddModal
           courseId={123}
           secureParams={'my-secure-params'}
           onProcessorResponse={mockOnProcessorResponse}
+          type={type}
         />
       </MockedQueryClientProvider>,
     )
   }
 
-  it('is opened by calling the showToolList function in the useAssetProcessorsAddModalState hook', async () => {
-    const {result} = renderHook(() => useAssetProcessorsAddModalState())
+  function toolsForType(type: AssetProcessorType) {
+    return type === 'ActivityAssetProcessor' ? assignmentTools : discussionTools
+  }
 
-    act(() => {
-      result.current.actions.close()
-    })
+  describe('Modal state management', () => {
+    it('opens and closes the modal correctly', async () => {
+      const {result} = renderHook(() => useAssetProcessorsAddModalState())
 
-    expect(result.current.state.tag).toBe('closed')
-
-    act(() => {
-      result.current.actions.showToolList()
-    })
-
-    expect(result.current.state.tag).toBe('toolList')
-  })
-
-  it('launches the tool when the AssetProcessorsCard is clicked', async () => {
-    const toolWithId22 = tools.find(tool => tool.definition_id === '22')
-    expect(toolWithId22).not.toBeUndefined()
-
-    const {getByText, getByTitle, queryAllByTestId} = renderModal()
-    const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
-      .showToolList
-    act(() => open())
-
-    await waitFor(
-      () => {
-        expect(getByText('Add a document processing app')).toBeInTheDocument()
-
-        const cards = queryAllByTestId('asset-processor-card')
-        expect(cards.length).toBeGreaterThan(0)
-
-        const foundCard = cards.find(card => card.textContent?.includes(toolWithId22!.name))
-        expect(foundCard).toBeDefined()
-        return foundCard
-      },
-      {timeout: 3000},
-    ).then(toolCard => {
-      act(() => toolCard!.click())
-    })
-
-    const iframe = await waitFor(() => getByTitle('Configure new document processing app'))
-    expect(iframe).toHaveAttribute(
-      'src',
-      '/courses/123/external_tools/22/resource_selection?display=borderless&launch_type=ActivityAssetProcessor&secure_params=my-secure-params',
-    )
-    expect(iframe.style.width).toBe('600px')
-    expect(iframe.style.height).toBe('500px')
-  })
-
-  describe('when valid deep linking response is received from the launch', () => {
-    it('closes the modal and send calls the onProcessorResponse callback with the content items', async () => {
-      const mockOnProcessorResponse = jest.fn()
-
-      const validToolId = '22'
-      const validTool = tools.find(tool => tool.definition_id === validToolId)
-      expect(validTool).not.toBeUndefined()
-
-      const validResponse = {...mockDeepLinkResponse}
-      expect(validResponse.tool_id).toBe(validToolId)
-
-      const mockHECM = handleExternalContentMessages as jest.Mock
-      mockHECM.mockImplementation(({onDeepLinkingResponse}) => {
-        setTimeout(() => onDeepLinkingResponse(validResponse), 0)
-        return () => {}
+      act(() => {
+        result.current.actions.close()
       })
+      expect(result.current.state.tag).toBe('closed')
+
+      act(() => {
+        result.current.actions.showToolList()
+      })
+      expect(result.current.state.tag).toBe('toolList')
+    })
+  })
+
+  describe.each([
+    {
+      type: 'ActivityAssetProcessor' as AssetProcessorType,
+      tool_id: '22',
+      mockResponse: mockDeepLinkResponse,
+    },
+    {
+      type: 'ActivityAssetProcessorContribution' as AssetProcessorType,
+      tool_id: '22',
+      mockResponse: mockContributionDeepLinkResponse,
+    },
+  ])('with type $type', ({type, tool_id, mockResponse}) => {
+    const tool = toolsForType(type).find(tool => tool.definition_id === tool_id)
+
+    it(`launches the tool with correct launch_type with correct dimensions`, async () => {
+      const {getByText, getByTitle, queryAllByTestId} = renderModal(type)
+      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+        .showToolList
+      act(() => open())
+
+      await waitFor(
+        () => {
+          expect(getByText('Add A Document Processing App')).toBeInTheDocument()
+
+          const cards = queryAllByTestId('asset-processor-card')
+          expect(cards).toHaveLength(4)
+          const foundCard = cards.find(card => card.textContent?.includes(tool!.name))
+          expect(foundCard).toBeDefined()
+
+          toolsForType(type).forEach(t => {
+            if (t.context_name) {
+              expect(getByText(`Installed in: ${t.context_name}`)).toBeInTheDocument()
+            }
+          })
+
+          return foundCard
+        },
+        {timeout: 3000},
+      ).then(toolCard => {
+        act(() => toolCard!.click())
+      })
+
+      const iframe = await waitFor(() => getByTitle('Configure new document processing app'))
+      expect(iframe).toHaveAttribute(
+        'src',
+        `/courses/123/external_tools/22/resource_selection?display=borderless&launch_type=${type}&secure_params=my-secure-params`,
+      )
+      const {selection_width, selection_height} = tool!.placements[type]!
+      expect(iframe.style.width).toBe(selection_width + 'px')
+      expect(iframe.style.height).toBe(selection_height + 'px')
+
+      await waitFor(() => {
+        const closeButton = document.querySelector(
+          '[data-pendo="asset-processors-add-modal-close-button"]',
+        )
+        if (closeButton) {
+          expect(document.activeElement).toBe(closeButton)
+        }
+      })
+    })
+
+    it(`handles valid deep linking response for ${type}`, async () => {
+      const mockOnProcessorResponse = vi.fn()
+
+      const validResponse = {...mockResponse}
+      expect(validResponse.tool_id).toBe(tool_id)
+
+      const mockHECM = handleExternalContentMessages as any
+      mockHECM.mockImplementation(
+        ({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
+          setTimeout(() => onDeepLinkingResponse(validResponse), 0)
+          return () => {}
+        },
+      )
 
       render(
         <MockedQueryClientProvider client={queryClient}>
@@ -137,6 +199,7 @@ describe('AssetProcessorsAddModal', () => {
             courseId={123}
             secureParams={'my-secure-params'}
             onProcessorResponse={mockOnProcessorResponse}
+            type={type}
           />
         </MockedQueryClientProvider>,
       )
@@ -144,21 +207,36 @@ describe('AssetProcessorsAddModal', () => {
       const {result} = renderHook(() => useAssetProcessorsAddModalState())
 
       act(() => {
-        result.current.actions.launchTool(validTool!)
+        result.current.actions.launchTool(tool!)
       })
 
       await waitFor(() => {
         expect(mockOnProcessorResponse).toHaveBeenCalledWith({
-          tool: validTool,
+          tool: tool,
           data: validResponse,
+        })
+        expect(showFlashAlert).toHaveBeenCalledWith({
+          message: `${tool!.name} successfully added`,
+          type: 'success',
+          srOnly: true,
         })
       })
     })
-  })
 
-  describe('when invalid deep linking response is received from the launch', () => {
-    it('renders error message', async () => {
-      const mockOnProcessorResponse = jest.fn()
+    it(`handles invalid deep linking response for ${type}`, async () => {
+      const mockOnProcessorResponse = vi.fn()
+      const matchingTool = toolsForType(type).find(
+        tool => tool.definition_id === mockInvalidDeepLinkResponse.tool_id,
+      )
+      expect(matchingTool).not.toBeUndefined()
+
+      const mockHECM = handleExternalContentMessages as any
+      mockHECM.mockImplementation(
+        ({onDeepLinkingResponse}: {onDeepLinkingResponse: (response: any) => void}) => {
+          setTimeout(() => onDeepLinkingResponse(mockInvalidDeepLinkResponse), 0)
+          return () => {}
+        },
+      )
 
       render(
         <MockedQueryClientProvider client={queryClient}>
@@ -166,20 +244,10 @@ describe('AssetProcessorsAddModal', () => {
             courseId={123}
             secureParams={'my-secure-params'}
             onProcessorResponse={mockOnProcessorResponse}
+            type={type}
           />
         </MockedQueryClientProvider>,
       )
-
-      const matchingTool = tools.find(
-        tool => tool.definition_id === mockInvalidDeepLinkResponse.tool_id,
-      )
-      expect(matchingTool).not.toBeUndefined()
-
-      const mockHECM = handleExternalContentMessages as jest.Mock
-      mockHECM.mockImplementation(({onDeepLinkingResponse}) => {
-        setTimeout(() => onDeepLinkingResponse(mockInvalidDeepLinkResponse), 0)
-        return () => {}
-      })
 
       const {result} = renderHook(() => useAssetProcessorsAddModalState())
 
@@ -202,29 +270,28 @@ describe('AssetProcessorsAddModal', () => {
     act(() => {
       result.current.actions.close()
     })
-
     expect(result.current.state.tag).toBe('closed')
 
     act(() => {
       result.current.actions.showToolList()
     })
-
     expect(result.current.state.tag).toBe('toolList')
 
     act(() => {
-      result.current.actions.launchTool(tools[0])
+      result.current.actions.launchTool(assignmentTools[0])
     })
 
     expect(result.current.state.tag).toBe('toolLaunch')
-    expect('tool' in result.current.state && result.current.state.tool).toBe(tools[0])
+    expect('tool' in result.current.state && result.current.state.tool).toBe(assignmentTools[0])
 
-    const {getByTitle, queryAllByTestId} = renderModal()
+    const {getByTitle} = renderModal('ActivityAssetProcessor')
     const iframe = (await waitFor(() =>
       getByTitle('Configure new document processing app'),
     )) as HTMLIFrameElement
-    const source = iframe.contentWindow as Window
-    // If we don't overwrite postMessage we get some strange internal error in jsdom's postMessage
-    jest.spyOn(source, 'postMessage').mockImplementation(() => {})
+    // Also mock postMessage on the iframe's contentWindow since jsdom may route through it
+    if (iframe.contentWindow) {
+      iframe.contentWindow.postMessage = vi.fn()
+    }
 
     monitorLtiMessages()
 
@@ -241,6 +308,119 @@ describe('AssetProcessorsAddModal', () => {
 
     await waitFor(() => {
       expect(result.current.state.tag).toBe('closed')
+    })
+  })
+
+  describe('Keyboard accessibility', () => {
+    it('launches the tool when Enter key is pressed on a card', async () => {
+      const {getByText, getByTitle, queryAllByTestId} = renderModal('ActivityAssetProcessor')
+      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+        .showToolList
+      act(() => open())
+
+      const toolCard = await waitFor(
+        () => {
+          expect(getByText('Add A Document Processing App')).toBeInTheDocument()
+
+          const cards = queryAllByTestId('asset-processor-card')
+          expect(cards).toHaveLength(4)
+          const foundCard = cards.find(card => card.textContent?.includes(assignmentTools[0].name))
+          expect(foundCard).toBeDefined()
+          return foundCard!
+        },
+        {timeout: 3000},
+      )
+
+      act(() => {
+        fireEvent.keyDown(toolCard, {key: 'Enter', code: 'Enter', bubbles: true})
+      })
+
+      await waitFor(
+        () => {
+          expect(getByTitle('Configure new document processing app')).toBeInTheDocument()
+        },
+        {timeout: 5000},
+      )
+
+      await waitFor(
+        () => {
+          const closeButton = document.querySelector(
+            '[data-pendo="asset-processors-add-modal-close-button"]',
+          )
+          if (closeButton) {
+            expect(document.activeElement).toBe(closeButton)
+          }
+        },
+        {timeout: 3000},
+      )
+    })
+
+    it('launches the tool when Space key is pressed on a card', async () => {
+      const {getByText, getByTitle, queryAllByTestId} = renderModal('ActivityAssetProcessor')
+      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+        .showToolList
+      act(() => open())
+
+      const toolCard = await waitFor(
+        () => {
+          expect(getByText('Add A Document Processing App')).toBeInTheDocument()
+
+          const cards = queryAllByTestId('asset-processor-card')
+          expect(cards).toHaveLength(4)
+          const foundCard = cards.find(card => card.textContent?.includes(assignmentTools[0].name))
+          expect(foundCard).toBeDefined()
+          return foundCard!
+        },
+        {timeout: 3000},
+      )
+
+      act(() => {
+        fireEvent.keyDown(toolCard, {key: ' ', code: 'Space', bubbles: true})
+      })
+
+      await waitFor(
+        () => {
+          expect(getByTitle('Configure new document processing app')).toBeInTheDocument()
+        },
+        {timeout: 5000},
+      )
+
+      await waitFor(() => {
+        const closeButton = document.querySelector(
+          '[data-pendo="asset-processors-add-modal-close-button"]',
+        )
+        if (closeButton) {
+          expect(document.activeElement).toBe(closeButton)
+        }
+      })
+    })
+
+    it('does not launch the tool when other keys are pressed on a card', async () => {
+      const {getByText, queryByTitle, queryAllByTestId} = renderModal('ActivityAssetProcessor')
+      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+        .showToolList
+      act(() => open())
+
+      const toolCard = await waitFor(
+        () => {
+          expect(getByText('Add A Document Processing App')).toBeInTheDocument()
+
+          const cards = queryAllByTestId('asset-processor-card')
+          expect(cards).toHaveLength(4)
+          const foundCard = cards.find(card => card.textContent?.includes(assignmentTools[0].name))
+          expect(foundCard).toBeDefined()
+          return foundCard!
+        },
+        {timeout: 3000},
+      )
+
+      act(() => {
+        fireEvent.keyDown(toolCard, {key: 'a', code: 'KeyA'})
+        fireEvent.keyDown(toolCard, {key: 'Escape', code: 'Escape'})
+        fireEvent.keyDown(toolCard, {key: 'Tab', code: 'Tab'})
+      })
+
+      expect(queryByTitle('Configure new document processing app')).not.toBeInTheDocument()
     })
   })
 })

@@ -24,8 +24,20 @@ module Services
       config["launch_url"]
     end
 
+    def self.api_url
+      config["api_url"]
+    end
+
+    def self.item_management_launch_url
+      config["item_management_launch_url"]
+    end
+
     class << self
       private
+
+      Canvas::Reloader.on_reload do
+        @config = nil
+      end
 
       def config
         @config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["ams.yml", failsafe: nil] || "{}")

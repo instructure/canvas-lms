@@ -20,22 +20,74 @@
 module Lti
   class AssetProcessorController < ApplicationController
     before_action { require_feature_enabled :lti_asset_processor }
-    before_action :require_user
-    before_action :require_asset_processor
+    before_action :require_asset_processor, except: [:resubmit_discussion_notices_all]
     before_action :require_context
     before_action :require_access_to_context
     before_action :require_submission
 
     def resubmit_notice
+      submission_to_notify = if submission.group_id.present?
+                               Lti::AssetProcessorNotifier.get_original_submission_for_group(submission)
+                             else
+                               submission
+                             end
       Lti::AssetProcessorNotifier.notify_asset_processors(
-        submission,
+        submission_to_notify,
         asset_processor
       )
       head :no_content
+    rescue Lti::AssetProcessorNotifier::MissingGroupmateSubmissionError
+      render json: {
+               errors: {
+                 error_code: "groupmate_submission_not_found",
+                 message: "Groupmate submission could not be found"
+               }
+             },
+             status: :not_found
+    end
+
+    def resubmit_discussion_notices_all
+      topic = assignment.discussion_topic
+      return render json: { error: "Not a discussion assignment" }, status: :unprocessable_content unless topic
+      return render status: :forbidden, plain: "invalid_request" unless context.grants_any_right?(@current_user, session, :manage_grades)
+
+      entry_ids = topic.discussion_entries.active.where(user_id: student.id).pluck(:id)
+      return head :no_content if entry_ids.empty?
+
+      submission = assignment.submission_for_student(student)
+
+      GuardRail.activate(:secondary) do
+        DiscussionEntryVersion
+          .where(discussion_entry_id: entry_ids)
+          .select("DISTINCT ON (discussion_entry_id) discussion_entry_versions.*")
+          .order(:discussion_entry_id, version: :desc)
+          .preload(:discussion_entry, :user, :root_account)
+          .find_in_batches(batch_size: 100) do |versions|
+          Lti::AssetProcessorDiscussionNotifier.delay_if_production.notify_asset_processors_of_discussion(
+            assignment:,
+            submission:,
+            discussion_entry_versions: versions,
+            contribution_status: Lti::Pns::LtiAssetProcessorContributionNoticeBuilder::SUBMITTED,
+            current_user: student,
+            asset_processor: nil,
+            tool_id: nil
+          )
+        end
+      end
+
+      head :no_content
+    end
+
+    def assignment_id
+      params[:assignment_id] || asset_processor&.assignment_id
     end
 
     def assignment
-      asset_processor.assignment
+      @assignment ||= if params[:assignment_id]
+                        Assignment.find(params[:assignment_id])
+                      else
+                        asset_processor.assignment
+                      end
     end
 
     def asset_processor_id
@@ -64,28 +116,43 @@ module Lti
       render status: :forbidden, plain: "invalid_request"
     end
 
+    # Format: <student_id> or "anonymous:<anonymous_id>"
     def student_id
       params.require(:student_id)
     end
 
+    def anonymous_student_id?
+      student_id.to_s.start_with?("anonymous:")
+    end
+
+    def extract_anonymous_id
+      student_id.to_s.sub("anonymous:", "")
+    end
+
     def student
-      @student ||= User.find_by(id: student_id)
+      @student ||= if anonymous_student_id?
+                     @current_submission ||= assignment.submissions.find_by(anonymous_id: extract_anonymous_id)
+                     @current_submission&.user
+                   else
+                     User.find_by(id: student_id)
+                   end
     end
 
     # "latest", 0, or any invalid value will be treated as latest
     def attempt
-      @params ||= params[:attempt].to_i
+      @attempt ||= params[:attempt].to_i
     end
 
     def submission
       @submission ||=
         begin
-          sub = assignment.submission_for_student(student)
-          if attempt.positive?
-            version = sub.versions.find { |s| s.model.attempt == attempt }&.model
+          @current_submission ||= assignment.submission_for_student(student)
+
+          if @current_submission && attempt.positive?
+            version = @current_submission.versions.find { |s| s.model.attempt == attempt }&.model
           end
 
-          version || sub
+          version || @current_submission
         end
     end
 

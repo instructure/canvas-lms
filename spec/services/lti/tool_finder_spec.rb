@@ -110,7 +110,7 @@ describe Lti::ToolFinder do
     subject { Lti::ToolFinder.from_context(@course, scope:) }
 
     let(:scope) { ContextExternalTool.where(consumer_key:) }
-    let(:tool) { external_tool_1_3_model(context: @course) }
+    let(:tool) { external_tool_model(context: @course) }
     let(:consumer_key) { "test" }
 
     before do
@@ -132,10 +132,51 @@ describe Lti::ToolFinder do
     end
 
     context "when tool is installed up the context chain" do
-      let(:tool) { external_tool_1_3_model(context: @course.account) }
+      let(:tool) { external_tool_model(context: @course.account) }
 
       it "returns the tool" do
         expect(subject).to eq tool
+      end
+    end
+
+    context "for 1.3 tools with context controls" do
+      subject { Lti::ToolFinder.from_context(@course, scope: ContextExternalTool.active.where(developer_key_id: registration.developer_key.id)) }
+
+      let!(:registration) { lti_registration_with_tool(account: @root_account) }
+      let(:deployment) { registration.deployments.first }
+
+      it "returns the tool when available" do
+        expect(subject).to eq deployment
+      end
+
+      it "returns nil when the tool is unavailable in the course context" do
+        deployment.primary_context_control.update!(available: false)
+        expect(subject).to be_nil
+      end
+
+      it "returns nil when the tool is unavailable due to a parent account context control" do
+        deployment.context_controls.update_all(available: false)
+        expect(subject).to be_nil
+      end
+
+      context "when an LTI 1.1 tool matches the scope" do
+        subject do
+          Lti::ToolFinder.from_context(
+            @course,
+            scope: ContextExternalTool.active.where(id: [deployment.id, lti_1_1_tool.id])
+          )
+        end
+
+        let(:lti_1_1_tool) { external_tool_model(context: @course) }
+
+        before do
+          deployment.primary_context_control.update!(available: false)
+        end
+
+        it "still returns the LTI 1.1 tool even when the 1.3 tool is unavailable" do
+          lti_1_1_tool
+          expect(subject).to eq lti_1_1_tool
+        end
       end
     end
   end
@@ -225,7 +266,7 @@ describe Lti::ToolFinder do
       end
 
       it "raises RecordNotFound if there is an unavailable context control for the account" do
-        deployment.context_controls.first.update(available: false)
+        deployment.primary_context_control.update(available: false)
 
         expect { Lti::ToolFinder.from_id!(deployment.id, @root_account) }.to raise_error(ActiveRecord::RecordNotFound)
       end
@@ -266,7 +307,7 @@ describe Lti::ToolFinder do
       it "is unaffected by context controls if the lti_registrations_next flag is off" do
         @root_account.disable_feature!(:lti_registrations_next)
 
-        deployment.context_controls.first.update(available: false)
+        deployment.primary_context_control.update(available: false)
 
         expect(Lti::ToolFinder.from_id!(deployment.id, @root_account)).to eq(deployment)
         expect(Lti::ToolFinder.from_id!(deployment.id, @account)).to eq(deployment)
@@ -356,7 +397,7 @@ describe Lti::ToolFinder do
       end
 
       it "returns nil if there is an unavailable context control for the account" do
-        deployment.context_controls.first.update(available: false)
+        deployment.primary_context_control.update(available: false)
 
         expect(Lti::ToolFinder.from_id(deployment.id, @root_account)).to be_nil
       end
@@ -490,7 +531,7 @@ describe Lti::ToolFinder do
         end
 
         it "finds the tool with an unavailable CC" do
-          lti_1_3_tool.context_controls.first.update!(available: false)
+          lti_1_3_tool.primary_context_control.update!(available: false)
           expect(subject).to eq(lti_1_3_tool)
         end
       end
@@ -502,7 +543,7 @@ describe Lti::ToolFinder do
 
         context "and the LTI 1.3 tool is unavailable" do
           before do
-            lti_1_3_tool.context_controls.first.update!(available: false)
+            lti_1_3_tool.primary_context_control.update!(available: false)
           end
 
           it { is_expected.to eq tool }
@@ -518,7 +559,7 @@ describe Lti::ToolFinder do
 
           context "and the original LTI 1.3 tool is unavailable" do
             before do
-              lti_1_3_tool.context_controls.first.update!(available: false)
+              lti_1_3_tool.primary_context_control.update!(available: false)
             end
 
             it "returns the duplicate tool instead" do
@@ -1168,24 +1209,8 @@ describe Lti::ToolFinder do
         closest_tool
       end
 
-      context "and the flag is disabled" do
-        before do
-          @course.root_account.disable_feature!(:lti_find_external_tool_prefer_original_client_id)
-        end
-
-        it "returns the closest matching tool" do
-          expect(Lti::ToolFinder.from_url(url, @course, preferred_tool_id: original_tool.id)).to eq closest_tool
-        end
-      end
-
-      context "and the flag is enabled" do
-        before do
-          @course.root_account.enable_feature!(:lti_find_external_tool_prefer_original_client_id)
-        end
-
-        it "prefers tool from the same developer key" do
-          expect(Lti::ToolFinder.from_url(url, @course, preferred_tool_id: original_tool.id)).to eq matching_tool
-        end
+      it "prefers tool from the same developer key" do
+        expect(Lti::ToolFinder.from_url(url, @course, preferred_tool_id: original_tool.id)).to eq matching_tool
       end
     end
   end
@@ -1339,24 +1364,8 @@ describe Lti::ToolFinder do
         tool2.save!
       end
 
-      context "and flag is enabled" do
-        before do
-          @course.root_account.enable_feature!(:lti_find_external_tool_prefer_original_client_id)
-        end
-
-        it "prefers tool from the same developer key" do
-          expect(subject.first).to eq tool1
-        end
-      end
-
-      context "and flag is disabled" do
-        before do
-          @course.root_account.disable_feature!(:lti_find_external_tool_prefer_original_client_id)
-        end
-
-        it "prefers tool from closer context" do
-          expect(subject.first).to eq tool2
-        end
+      it "prefers tool from the same developer key" do
+        expect(subject.first).to eq tool1
       end
     end
 
@@ -1504,54 +1513,6 @@ describe Lti::ToolFinder do
         let!(:specific_1_1_tool) { external_tool_model(context:, opts: specific_opts) }
 
         it { is_expected.to eq(specific_1_1_tool) }
-      end
-    end
-  end
-
-  describe "filter_by_unavailable_context_controls" do
-    subject { Lti::ToolFinder.send(:filter_by_unavailable_context_controls, scope, root_account) }
-
-    let_once(:root_account) { account_model }
-    let_once(:dev_key) do
-      lti_developer_key_model(account: root_account).tap do |k|
-        lti_tool_configuration_model(account: k.account, developer_key: k, lti_registration: k.lti_registration)
-      end
-    end
-    let_once(:registration) { dev_key.lti_registration }
-    let_once(:tool) { registration.new_external_tool(root_account) }
-    let_once(:old_tool) { external_tool_model(context: root_account) }
-
-    let(:scope) { ContextExternalTool.all }
-
-    it "allows 1.3 and 1.1 tools if they are available" do
-      expect(subject).to include(tool, old_tool)
-    end
-
-    context "with multiple 1.3 tools associated with the same registration" do
-      let_once(:other_tool) { registration.new_external_tool(root_account) }
-
-      context "one of the tools is unavailable" do
-        before(:once) do
-          tool.context_controls.first.update!(available: false)
-        end
-
-        it "only returns the other tool in the root account" do
-          expect(subject).not_to include(tool)
-          expect(subject).to include(other_tool)
-        end
-
-        it "only returns the other tool in a subaccount" do
-          subaccount = account_model(parent_account: root_account)
-          expect(Lti::ToolFinder.send(:filter_by_unavailable_context_controls, scope, subaccount)).not_to include(tool)
-          expect(Lti::ToolFinder.send(:filter_by_unavailable_context_controls, scope, subaccount)).to include(other_tool)
-        end
-
-        it "only returns the other tool in a course" do
-          subaccount = account_model(parent_account: root_account)
-          course = course_model(account: subaccount)
-          expect(Lti::ToolFinder.send(:filter_by_unavailable_context_controls, scope, course)).not_to include(tool)
-          expect(Lti::ToolFinder.send(:filter_by_unavailable_context_controls, scope, course)).to include(other_tool)
-        end
       end
     end
   end

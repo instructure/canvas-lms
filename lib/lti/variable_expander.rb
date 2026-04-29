@@ -156,12 +156,10 @@ module Lti
                    v
                  end
 
-        if @tool.is_a?(ContextExternalTool) && @tool.use_1_3? && (output.is_a?(Numeric) || (@root_account.feature_enabled?(:custom_variables_booleans_as_strings) && [true, false].include?(output)))
+        if @tool.is_a?(ContextExternalTool) && @tool.use_1_3? && (output.is_a?(Numeric) || [true, false].include?(output))
           output&.to_s
-        elsif Account.site_admin.feature_enabled?(:disallow_null_custom_variables)
-          output.nil? ? v : output
         else
-          output
+          output.nil? ? v : output
         end
       end
     end
@@ -607,7 +605,7 @@ module Lti
                        -> { @context.is_a?(Course) || (@placement == :user_navigation && @context.is_a?(User) && sis_pseudonym) }
 
     # With respect to the current course, recursively returns the context ids of the courses from which content has been copied (excludes cartridge imports).
-    # Will show a limit of 1000 context ids.  When the number passes 1000, 'truncated' will show at the end of the list.
+    # Will show a limit of 1000 context ids. When the number passes 1000, 'truncated' will show at the end of the list.
     #
     # This is an alias of `Canvas.course.previousContextIds.recursive`.
     #
@@ -619,6 +617,21 @@ module Lti
                        [],
                        -> { lti_helper.recursively_fetch_previous_lti_context_ids },
                        COURSE_GUARD
+
+    # With respect to the current assignment, recursively returns the activity (assignment)
+    # LTI ids of the assignments from which the current assignment was copied or imported.
+    # The value of this variable is updated only if the source assignment has at least one asset processor attached.
+    # Tools can use this to detect copies and automatically import related resources.
+    # The result is limited to 1000 ids. When the number passes 1000, 'truncated' will show at the end of the list.
+    #
+    # @example
+    #   ```
+    #   "25de3090-de71-4419-9a7c-53b509945710,057361e2-87f9-4597-b072-4b7464bdefde"
+    #   ```
+    register_expansion "Activity.id.history",
+                       [],
+                       -> { activity_id_history },
+                       ASSIGNMENT_GUARD
 
     # communicates the kind of browser window/frame where the Canvas has launched a tool
     # @launch_parameter launch_presentation_document_target
@@ -729,6 +742,12 @@ module Lti
     register_expansion "Canvas.account.sisSourceId",
                        [],
                        -> { lti_helper.account.sis_source_id }
+
+    # returns true if the current account is a Horizon account
+    # @internal
+    register_expansion "Canvas.account.horizonMode",
+                       [],
+                       -> { lti_helper.account.horizon_account? }
 
     # returns the Root Account ID for the current context.
     # @example
@@ -991,6 +1010,13 @@ module Lti
                        -> { lti_helper.course.grade_passback_setting },
                        COURSE_GUARD
 
+    # returns true if the current course is a Horizon course
+    # @internal
+    register_expansion "Canvas.course.horizonMode",
+                       [],
+                       -> { lti_helper.course.horizon_course? },
+                       COURSE_GUARD
+
     # returns the current course's term start date.
     # @example
     #   ```
@@ -1060,7 +1086,7 @@ module Lti
     # enabled.
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "com.instructure.Assignment.anonymous_grading",
                        [],
@@ -1072,7 +1098,7 @@ module Lti
     # Assignment types: points, percentage, gpa_scale are all considered quantitative.
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "com.instructure.Assignment.restrict_quantitative_data",
                        [],
@@ -1176,6 +1202,17 @@ module Lti
                        [],
                        -> { lti_helper.previous_course_ids },
                        COURSE_GUARD
+
+    # Returns "true" if the RCE Studio embed improvements feature is enabled
+    # for the current course, or account context "false" otherwise.
+    # This allows LTI tools to adapt their UI based on Canvas feature flags.
+    # @example
+    #   ```
+    #   "true"
+    #   ```
+    register_expansion "com.instructure.Course.rce_studio_embed_improvements",
+                       [],
+                       -> { @context.feature_enabled?(:rce_studio_embed_improvements).to_s }
 
     # Returns the full name of the launching user.
     # @launch_parameter lis_person_name_full
@@ -1375,6 +1412,16 @@ module Lti
                        -> { @current_user.prefers_high_contrast? ? "true" : "false" },
                        USER_GUARD
 
+    # Returns the users preference for using a dyslexia friendly font (an accessibility feature).
+    # @example
+    #   ```
+    #   false
+    #   ```
+    register_expansion "Canvas.user.prefersDyslexicFont",
+                       [],
+                       -> { @current_user.prefers_dyslexic_font? ? "true" : "false" },
+                       USER_GUARD
+
     # returns the Canvas ids of all active groups in the current course.
     # @example
     #   ```
@@ -1454,7 +1501,7 @@ module Lti
     # Returns true for root account admins and false for all other roles.
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.user.isRootAccountAdmin",
                        [],
@@ -1652,7 +1699,7 @@ module Lti
     #
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.course.sectionRestricted",
                        [],
@@ -1719,6 +1766,28 @@ module Lti
                        -> { @assignment.id },
                        ASSIGNMENT_GUARD
 
+    # Returns the new_quizzes type of the assignment that was launched
+    #
+    # @example
+    #   ```
+    #   "graded_quiz"
+    #   ```
+    register_expansion "Canvas.assignment.new_quizzes_type",
+                       [],
+                       -> { @assignment.new_quizzes_type },
+                       ASSIGNMENT_GUARD
+
+    # Returns whether the assignment that was launched anonymizes the participants
+    #
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion "Canvas.assignment.anonymous_participants",
+                       [],
+                       -> { @assignment.anonymous_participants? },
+                       ASSIGNMENT_GUARD
+
     # Returns the assignment_description of the assignment that was launched.
     #
     # @example
@@ -1731,7 +1800,23 @@ module Lti
                        ASSIGNMENT_GUARD
 
     # Returns the Canvas id of the group the current user is in if launching
+    # from a group assignment otherwise empty string
+    #
+    # @example
+    #   ```
+    #   481
+    #   ```
+    register_expansion "CourseGroup.id",
+                       [],
+                       -> { (@assignment.group_category && (@assignment.group_category.groups & @current_user.groups).first&.id) || "" },
+                       USER_GUARD,
+                       ASSIGNMENT_GUARD
+
+    # Returns the Canvas id of the group the current user is in if launching
     # from a group assignment.
+    #
+    # This is similar to `CourseGroup.id` but unlike that this returns
+    # `$com.instructure.Group.id` for non group assignments and not an empty string
     #
     # @example
     #   ```
@@ -1822,7 +1907,7 @@ module Lti
     #
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.assignment.hideInGradebook",
                        [],
@@ -1833,7 +1918,7 @@ module Lti
     #
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.assignment.omitFromFinalGrade",
                        [],
@@ -1939,7 +2024,7 @@ module Lti
     # Only available when launched as an assignment.
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.assignment.published",
                        [],
@@ -1950,7 +2035,7 @@ module Lti
     # Only available when launched as an assignment.
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.assignment.lockdownEnabled",
                        [],
@@ -2173,7 +2258,7 @@ module Lti
     #
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "com.instructure.Course.allow_canvas_resource_selection",
                        [],
@@ -2288,7 +2373,7 @@ module Lti
     #
     # @example
     #   ```
-    #   true
+    #   "true"
     #   ```
     register_expansion "Canvas.course.aiQuizGeneration",
                        [],
@@ -2367,6 +2452,15 @@ module Lti
       AssignmentOverride.where(assignment_id: @assignment.id, set_type: "Group")
                         .where(set_id: user_differentiation_tags.pluck(:id))
                         .first
+    end
+
+    def activity_id_history
+      Rails.cache.fetch(Lti::ImportHistory.import_history_cache_key(@assignment.lti_context_id)) do
+        limit = 1000
+        results = Lti::ImportHistory.recursive_import_history(@assignment.lti_context_id, limit: limit + 1)
+        results = results.first(limit) << "truncated" if results.length > limit
+        results.join(",")
+      end
     end
   end
 end

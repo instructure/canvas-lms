@@ -25,7 +25,7 @@
 # from their use, making things harder to find
 
 begin
-  require "debug"
+  require "debug/prelude"
 rescue LoadError
   nil
 end
@@ -40,7 +40,7 @@ ENV["RAILS_ENV"] = "test"
 if ENV["COVERAGE"] == "1" && (ENV["SUPPRESS_OUTPUT"] != "1")
   require_relative("canvas_simplecov")
   require_relative("coverage_tool")
-  puts "Code Coverage enabled" unless ENV["SUPPRESS_OUTPUT"] == "1"
+  puts "Code Coverage enabled" unless ENV["SUPPRESS_OUTPUT"] == "1" # rubocop:disable RSpec/Output
   CoverageTool.start("RSpec")
 end
 
@@ -62,7 +62,7 @@ if ENV["CRYSTALBALL_MAP"] == "1"
         end
 
         def call(example_map, example)
-          puts "Calling Coverage Strategy for #{example.inspect}"
+          puts "Calling Coverage Strategy for #{example.inspect}" # rubocop:disable RSpec/Output
           before = Coverage.peek_result
           yield example_map, example
           after = Coverage.peek_result
@@ -91,6 +91,7 @@ WebMock.enable!
 # unlike webmock/rspec, only reset in groups that actually do stubbing
 module WebMock::API
   include WebMock::Matchers
+
   def self.included(other)
     other.before { allow(CanvasHttp).to receive(:insecure_host?).and_return(false) }
     other.after { WebMock.reset! }
@@ -109,7 +110,6 @@ TestDatabaseUtils.reset_database! unless ENV["DB_VALIDITY_ENSURED"] == "1"
 TestDatabaseUtils.check_migrations! unless ENV["DB_VALIDITY_ENSURED"] == "1"
 Setting.reset_cache!
 BlankSlateProtection.install!
-GreatExpectations.install!
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 ActionView::Base.streaming_completion_on_exception = "</html>"
@@ -263,10 +263,12 @@ module ReadOnlySecondaryStub
     if readonly_user_exists? && readonly_user_can_read?
       ActiveRecord::Base.connection.execute((env == :secondary) ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
     else
-      puts "The database #{test_db_name} is not setup with a secondary/readonly_user to fix run the following."
-      puts "psql -c 'ALTER USER #{datbase_username} CREATEDB CREATEROLE' -d #{test_db_name}"
-      puts "psql -c 'GRANT canvas_readonly_user TO #{datbase_username}' -d #{test_db_name}"
-      puts "RAILS_ENV=#{Rails.env} bundle exec rake db:migrate:redo VERSION=20211101220306"
+      warn <<~TEXT
+        The database #{test_db_name} is not setup with a secondary/readonly_user to fix run the following.
+        psql -c 'ALTER USER #{datbase_username} CREATEDB CREATEROLE' -d #{test_db_name}
+        psql -c 'GRANT canvas_readonly_user TO #{datbase_username}' -d #{test_db_name}
+        RAILS_ENV=#{Rails.env} bundle exec rake db:migrate:redo VERSION=20211101220306
+      TEXT
     end
   end
 
@@ -321,7 +323,7 @@ module RenderWithHelpers
     # this extends the controller's helper methods to the view
     # however, these methods are delegated to the test controller
     view.singleton_class.class_eval do
-      include controller_class._helpers unless included_modules.include?(controller_class._helpers)
+      include controller_class._helpers unless include?(controller_class._helpers)
     end
 
     # so create a "real_controller"
@@ -331,8 +333,8 @@ module RenderWithHelpers
 
       controller_class._helper_methods.each do |helper|
         class_eval <<~RUBY, __FILE__, __LINE__ + 1
-          def #{helper}(*args, **kwargs, &block)
-            real_controller.send(:#{helper}, *args, **kwargs, &block)
+          def #{helper}(...)
+            real_controller.send(:#{helper}, ...)
           end
         RUBY
       end
@@ -435,18 +437,6 @@ RSpec.configure do |config|
   config.order = :random
   config.filter_run_when_matching :focus
 
-  # The Pact specs have prerequisite setup steps so we exclude them by default
-  config.filter_run_excluding :pact_live_events if ENV.fetch("RUN_LIVE_EVENTS_CONTRACT_TESTS", "0") == "0"
-
-  if ENV["CRYSTALBALL_MAP"] == "1"
-    config.filter_run_excluding :pact_live_events
-    config.filter_run_excluding :pact
-  end
-
-  # The Pact build needs RspecJunitFormatter and does not run RSpecQ
-  file = "log/results/results-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.xml"
-  config.add_formatter "RspecJunitFormatter", file if (ENV["PACT_BROKER"] && ENV["JENKINS_HOME"]) || ENV["CRYSTALBALL_MAP"] == "1"
-
   config.include Helpers
   config.include Factories
   config.include RequestHelper, type: :request
@@ -484,8 +474,21 @@ RSpec.configure do |config|
     end
   end
 
+  if ENV["PRE_EXAMPLE_CHECKS"] == "1"
+    config.after(:suite) do
+      next if PreExampleChecks.log_entries.empty?
+
+      RSpec.configuration.reporter.message("\nPreExampleChecks findings:\n#{PreExampleChecks.log_entries.join("\n")}")
+    end
+  end
+
   config.around do |example|
     Rails.logger.info "STARTING SPEC #{example.full_description}"
+    if ENV["PRE_EXAMPLE_CHECKS"] == "1"
+      PreExampleChecks::Base.descendants.select { |c| c.run_types.include?(:pre_before_each) }.each(&:check_and_log)
+      PreExampleChecks.append_before_example_hooks(example)
+      PreExampleChecks.append_after_example_hooks(example)
+    end
     SpecTimeLimit.enforce(example, &example)
   end
 
@@ -494,7 +497,7 @@ RSpec.configure do |config|
     ReadOnlySecondaryStub.reset
     Time.zone = "UTC"
     LoadAccount.force_special_account_reload = true
-    Account.clear_special_account_cache!(true)
+    Account.clear_special_account_cache!(force: true)
     PluginSetting.current_account = nil
     AdheresToPolicy::Cache.clear
     Setting.reset_cache!
@@ -505,6 +508,7 @@ RSpec.configure do |config|
     Rails.logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.current_root_account = nil
     DynamicSettings.reset_cache!
+    SentryExtensions::Settings.reset_settings
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
     MultiCache.reset
@@ -548,10 +552,21 @@ RSpec.configure do |config|
     use_transactional_tests
   end
 
+  config.after(:context) do
+    non_empty_tables = ActiveRecord::Base.connection.non_empty_tables
+    next if non_empty_tables.empty?
+
+    # If you're seeing this error, your spec has left extra data around.
+    # The test database should be completely empty after migrations run
+    # with the exception of the core tables mentioned in the method above,
+    # and a single row in the accounts table for the dummy root account.
+    raise ActiveRecord::Base.connection.non_empty_tables_message(non_empty_tables)
+  end
+
   config.before :suite do
     if ENV["COVERAGE"] == "1"
       simple_cov_cmd = "rspec:#{Process.pid}"
-      puts "Starting SimpleCov command: #{simple_cov_cmd}"
+      puts "Starting SimpleCov command: #{simple_cov_cmd}" # rubocop:disable RSpec/Output
       SimpleCov.command_name(simple_cov_cmd)
       SimpleCov.pid = Process.pid # because https://github.com/colszowka/simplecov/pull/377
     end
@@ -644,7 +659,7 @@ RSpec.configure do |config|
          params: { "pseudonym_session[unique_id]" => username,
                    "pseudonym_session[password]" => password }
     follow_redirect! while response.redirect?
-    assert_response :success
+    expect(response).to have_http_status(:success)
     expect(request.fullpath).to eq "/?login_success=1"
   end
 
@@ -672,12 +687,12 @@ RSpec.configure do |config|
     end
   end
 
-  def fixture_file_upload(path, mime_type = nil, binary = false)
+  def fixture_file_upload(path, mime_type = nil, binary: false)
     Rack::Test::UploadedFile.new(file_fixture(path), mime_type, binary)
   end
 
   def default_uploaded_data
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def create_temp_dir!
@@ -765,10 +780,10 @@ RSpec.configure do |config|
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
-  def enable_forgery_protection(enable = true)
+  def enable_forgery_protection
     old_value = ActionController::Base.allow_forgery_protection
-    allow(ActionController::Base).to receive(:allow_forgery_protection).and_return(enable)
-    allow_any_instance_of(ActionController::Base).to receive(:allow_forgery_protection).and_return(enable)
+    allow(ActionController::Base).to receive(:allow_forgery_protection).and_return(true)
+    allow_any_instance_of(ActionController::Base).to receive(:allow_forgery_protection).and_return(true)
 
     yield if block_given?
   ensure
@@ -812,7 +827,7 @@ RSpec.configure do |config|
     BACKENDS = %w[FileSystem S3].map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As # :nodoc:
-      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$|^object_id$)/)) # rubocop:disable Style/AccessModifierDeclarations
+      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$|^object_id$)/))
 
       def initialize(subject, ancestor)
         @subject = subject
@@ -905,7 +920,7 @@ RSpec.configure do |config|
       ConfigFile.singleton_class.prepend(StubS3)
       allow(StubS3).to receive(:stubbed?).and_return(true)
     elsif Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == "access_key"
-      skip "Please put valid S3 credentials in config/amazon_s3.yml"
+      raise "Please put valid S3 credentials in config/amazon_s3.yml"
     end
   end
 
@@ -997,7 +1012,7 @@ RSpec.configure do |config|
   end
 
   def dummy_io
-    fixture_file_upload("docs/doc.doc", "application/msword", true)
+    fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
   end
 
   def consider_all_requests_local(value)
@@ -1006,10 +1021,6 @@ RSpec.configure do |config|
     yield
   ensure
     Rails.application.config.consider_all_requests_local = old_value
-  end
-
-  def skip_if_prepended_class_method_stubs_broken
-    skip("stubbing prepended class methods is broken in new versions of ruby")
   end
 end
 
@@ -1074,12 +1085,18 @@ def enable_developer_key_account_binding!(developer_key)
   developer_key.developer_key_account_bindings.first.update!(
     workflow_state: "on"
   )
+  if developer_key.is_lti_key
+    developer_key.lti_registration&.activate
+  end
 end
 
 def disable_developer_key_account_binding!(developer_key)
   developer_key.developer_key_account_bindings.first.update!(
     workflow_state: "off"
   )
+  if developer_key.is_lti_key
+    developer_key.lti_registration&.deactivate
+  end
 end
 
 def enable_default_developer_key!

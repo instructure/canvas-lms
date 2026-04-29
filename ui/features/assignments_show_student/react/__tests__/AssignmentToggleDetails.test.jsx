@@ -19,7 +19,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
-import $ from 'jquery'
 
 describe('AssignmentToggleDetails', () => {
   it('renders normally', async () => {
@@ -31,7 +30,7 @@ describe('AssignmentToggleDetails', () => {
     }
 
     const container = render(<AssignmentToggleDetails description={assignment.description} />)
-    const element = container.getByTestId('assignments-2-assignment-toggle-details-text')
+    const element = container.getByTestId('assignments-2-assignment-description')
     expect(element).toHaveTextContent(assignment.description)
   })
 
@@ -43,7 +42,7 @@ describe('AssignmentToggleDetails', () => {
     }
 
     const container = render(<AssignmentToggleDetails description={assignment.description} />)
-    const element = container.getByTestId('assignments-2-assignment-toggle-details-text')
+    const element = container.getByTestId('assignments-2-assignment-description')
     expect(element).toHaveTextContent('No additional details were added for this assignment.')
   })
 })

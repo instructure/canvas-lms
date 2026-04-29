@@ -40,6 +40,11 @@ Rails.application.config.after_initialize do
         end
       end
 
+      def initialize(...)
+        super
+        @checked_db_change = false
+      end
+
       def settings
         return {} unless self.class.columns_hash.key?("settings")
 
@@ -75,6 +80,17 @@ Rails.application.config.after_initialize do
           self.settings = s
         end
         s
+      end
+
+      def database_server
+        result = super
+        # automatically check if a new database server was added to the config
+        # that's referenced from a shard, and we don't know about it
+        if result.nil? && !@checked_db_change
+          @checked_db_change = true
+          result = super if Extensions::ActiveRecord::ConnectionHandling.check_database_configuration_change
+        end
+        result
       end
     end
 

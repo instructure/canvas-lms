@@ -92,7 +92,7 @@ describe('content shares table', () => {
   })
 
   it('uses onUpdate to mark as read if the unread dot is clicked on', () => {
-    const onUpdate = jest.fn()
+    const onUpdate = vi.fn()
 
     const {getByTestId} = render(
       <ReceivedTable shares={[unreadDiscussionShare]} onUpdate={onUpdate} />,
@@ -102,7 +102,7 @@ describe('content shares table', () => {
   })
 
   it('calls onUpdate to mark as unread if read space is clicked on', () => {
-    const onUpdate = jest.fn()
+    const onUpdate = vi.fn()
 
     const {getByTestId} = render(
       <ReceivedTable shares={[readDiscussionShare]} onUpdate={onUpdate} />,
@@ -112,8 +112,8 @@ describe('content shares table', () => {
   })
 
   it('triggers handler for preview menu action', () => {
-    const onPreview = jest.fn()
-    const onImport = jest.fn()
+    const onPreview = vi.fn()
+    const onImport = vi.fn()
 
     const {getByText, getByTestId} = render(
       <ReceivedTable shares={[assignmentShare]} onPreview={onPreview} onImport={onImport} />,
@@ -127,8 +127,8 @@ describe('content shares table', () => {
   })
 
   it('triggers handler for import menu action', () => {
-    const onPreview = jest.fn()
-    const onImport = jest.fn()
+    const onPreview = vi.fn()
+    const onImport = vi.fn()
 
     const {getByText, getByTestId} = render(
       <ReceivedTable shares={[assignmentShare]} onPreview={onPreview} onImport={onImport} />,
@@ -142,7 +142,7 @@ describe('content shares table', () => {
   })
 
   it('triggers handler for remove menu action', () => {
-    const onRemove = jest.fn()
+    const onRemove = vi.fn()
     const {getByText} = render(<ReceivedTable shares={[assignmentShare]} onRemove={onRemove} />)
     fireEvent.click(getByText(/manage options/i))
     fireEvent.click(getByText('Remove'))

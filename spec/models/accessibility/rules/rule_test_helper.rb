@@ -143,8 +143,8 @@ module RuleTestHelper
   end
 
   def find_issues(rule_name, html, resource_prefix)
-    rule_class = RULE_MAP[rule_name.to_sym]
-    raise ArgumentError, "Unknown rule: #{rule_name}" unless rule_class
+    rule = RULE_MAP[rule_name.to_sym].new
+    raise ArgumentError, "Unknown rule: #{rule_name}" unless rule
 
     document = Nokogiri::HTML::DocumentFragment.parse(html)
     extend_nokogiri_with_dom_adapter(document)
@@ -154,15 +154,15 @@ module RuleTestHelper
     document.traverse do |elem|
       next unless elem.respond_to?(:tag_name) && elem.tag_name # skip text nodes, comments, etc.
 
-      result = rule_class.test(elem)
+      result = rule.test(elem)
       if result
         # Compose a similar issue hash as before
         issues << {
           element_type: elem.tag_name,
-          rule_id: rule_class.name.demodulize.underscore,
-          data: { id: "#{resource_prefix}-#{rule_class.id}-1" },
+          rule_id: rule.class.name.demodulize.underscore,
+          data: { id: "#{resource_prefix}-#{rule.class.id}-1" },
           resource_prefix:,
-          message: result.is_a?(String) ? result : rule_class.message
+          message: result.is_a?(String) ? result : rule.message
         }
       end
     end
@@ -170,15 +170,15 @@ module RuleTestHelper
   end
 
   def fix_issue(rule_name, html, selector, value)
-    rule_class = RULE_MAP[rule_name.to_sym]
-    raise ArgumentError, "Unknown rule: #{rule_name}" unless rule_class
+    rule = RULE_MAP[rule_name.to_sym].new
+    raise ArgumentError, "Unknown rule: #{rule_name}" unless rule
 
     document = Nokogiri::HTML::DocumentFragment.parse(html)
     extend_nokogiri_with_dom_adapter(document)
     element = document.at_xpath(selector)
 
     if element
-      rule_class.fix!(element, value)
+      rule.fix!(element, value)
     else
       raise ArgumentError, "Element not found for selector: '" + selector + "', please fix test case. HTML was '" + html + "'"
     end

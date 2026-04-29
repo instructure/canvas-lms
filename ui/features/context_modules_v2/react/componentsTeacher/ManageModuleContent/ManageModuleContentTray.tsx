@@ -22,27 +22,41 @@ import {Tray} from '@instructure/ui-tray'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {CloseButton} from '@instructure/ui-buttons'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {ModuleAction} from '../../utils/types'
-import {queryClient} from '@canvas/query'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
+import {ModuleAction, ModuleItem} from '../../utils/types'
+import {queryClient} from '@instructure/platform-query'
 import {useModules} from '../../hooks/queries/useModules'
-import {useModuleItems} from '../../hooks/queries/useModuleItems'
+import {getModuleItems, useModuleItems} from '../../hooks/queries/useModuleItems'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useContextModule} from '../../hooks/useModuleContext'
 import {
-  createModuleItemOrder,
   createModuleContentsOrder,
   createModuleOrder,
   getTrayTitle,
   getErrorMessage,
 } from '../../handlers/manageModuleContentsHandlers'
-
+import {
+  MODULE_ITEMS,
+  MODULE_ITEMS_ALL,
+  MODULES,
+  MOVE_MODULE_ITEM,
+  MOVE_MODULE_CONTENTS,
+  MOVE_MODULE,
+} from '../../utils/constants'
 import ModuleSelect from './ModuleSelect'
 import PositionSelect from './PositionSelect'
 import ReferenceSelect from './ReferenceSelect'
 import TrayFooter from './TrayFooter'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {useReorderModuleItemsGQL} from '../../hooks/mutations/useReorderModuleItemsGQL'
 
 const I18n = createI18nScope('context_modules_v2')
+
+const MODULE_TARGET_ACTIONS = [MOVE_MODULE_ITEM, MOVE_MODULE_CONTENTS, MOVE_MODULE] as const
+const SOURCE_MOVE_ACTIONS = [MOVE_MODULE_CONTENTS, MOVE_MODULE_ITEM] as const
+
+type ModuleTargetAction = (typeof MODULE_TARGET_ACTIONS)[number]
+type SourceMoveAction = (typeof SOURCE_MOVE_ACTIONS)[number]
 
 interface ManageModuleContentTrayProps {
   sourceModuleId: string
@@ -65,29 +79,69 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
   moduleItemTitle = '',
   sourceModuleItemId = '',
 }) => {
+  const reorderItemsMutation = useReorderModuleItemsGQL()
+  const [allSourceModuleItems, setAllSourceModuleItems] = useState<ModuleItem[]>([])
   const [selectedModule, setSelectedModule] = useState<string>('')
   const [selectedPosition, setSelectedPosition] = useState<string>('top')
   const [selectedItem, setSelectedItem] = useState<string>('')
   const [itemTitle, setItemTitle] = useState<string>('')
+  const {courseId, pageSize, moduleCursorState} = useContextModule()
+  const {data: modulesData, getModuleItemsTotalCount} = useModules(courseId || '')
+  const getTitle = useMemo(() => getTrayTitle(moduleAction || null), [moduleAction])
 
-  const {courseId} = useContextModule()
+  const [destinationPages, setDestinationPages] = useState<number[]>([])
+  const [selectedPage, setSelectedPage] = useState<number>(1)
+  const destinationModuleHasItems = (getModuleItemsTotalCount(selectedModule) || 0) > 0
+  const totalCount = getModuleItemsTotalCount(selectedModule) || 0
+  const totalPages = Number.isFinite(totalCount) ? Math.ceil(totalCount / pageSize) : 0
 
-  const {data: modulesData} = useModules(courseId || '')
-
-  const {data: moduleItemsData} = useModuleItems(
-    selectedModule,
-    !!selectedModule &&
-      (moduleAction === 'move_module_item' ||
-        moduleAction === 'move_module_contents' ||
-        moduleAction === 'move_module'),
+  const getCursor = useCallback(
+    (page: number): string | null => {
+      return page > 1 ? btoa(String((page - 1) * pageSize)) : null
+    },
+    [pageSize],
   )
+
+  const canTargetModule =
+    !!selectedModule &&
+    MODULE_TARGET_ACTIONS.includes(moduleAction as ModuleTargetAction) &&
+    totalPages > 0
+
+  const canFetchSourceItems =
+    !!sourceModuleId && SOURCE_MOVE_ACTIONS.includes(moduleAction as SourceMoveAction)
+
+  const {data: moduleItemsData, isLoading} = useModuleItems(
+    selectedModule,
+    getCursor(selectedPage),
+    canTargetModule,
+  )
+
   // Also fetch module items for the source module when moving module contents
   // or when moving an individual module item (to get its source module)
-  const {data: sourceModuleItemsData} = useModuleItems(
-    sourceModuleId,
-    !!sourceModuleId &&
-      (moduleAction === 'move_module_contents' || moduleAction === 'move_module_item'),
-  )
+  const {data: sourceModuleItemsData} = useModuleItems(sourceModuleId, null, canFetchSourceItems)
+
+  useEffect(() => {
+    if (!sourceModuleId || MOVE_MODULE_CONTENTS !== moduleAction) return
+
+    let cancelled = false
+    ;(async () => {
+      let cursor: string | null = null
+      const acc: ModuleItem[] = []
+
+      while (!cancelled) {
+        const {moduleItems, pageInfo} = await getModuleItems(sourceModuleId, cursor)
+        acc.push(...moduleItems)
+
+        if (!pageInfo.hasNextPage) break
+        cursor = pageInfo.endCursor
+      }
+
+      if (!cancelled) setAllSourceModuleItems(acc)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [sourceModuleId, moduleAction])
 
   // Reset selections when tray opens
   useEffect(() => {
@@ -96,9 +150,9 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
       setSelectedPosition('top')
       setSelectedItem('')
 
-      if (moduleAction === 'move_module_item') {
+      if (moduleAction === MOVE_MODULE_ITEM) {
         setItemTitle(moduleItemTitle || '')
-      } else if (moduleAction === 'move_module') {
+      } else if (moduleAction === MOVE_MODULE) {
         setItemTitle(sourceModuleTitle || '')
       }
     }
@@ -112,7 +166,7 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
       !selectedModule
     ) {
       if (
-        moduleAction === 'move_module_item' ||
+        moduleAction === MOVE_MODULE_ITEM ||
         (modulesData.pages[0].modules.length > 0 &&
           modulesData.pages[0].modules[0]._id !== sourceModuleId)
       ) {
@@ -134,7 +188,7 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
 
         // If the selected module has no items, set position to 'top'
         if (
-          (moduleAction === 'move_module_item' || moduleAction === 'move_module_contents') &&
+          (moduleAction === MOVE_MODULE_ITEM || moduleAction === MOVE_MODULE_CONTENTS) &&
           (!moduleItemsData?.moduleItems || moduleItemsData.moduleItems.length === 0)
         ) {
           setSelectedPosition('top')
@@ -143,7 +197,7 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
         // If we're moving a module and the position is 'before' or 'after',
         // we need to set the selected module as the target module
         if (
-          moduleAction === 'move_module' &&
+          moduleAction === MOVE_MODULE &&
           (selectedPosition === 'before' || selectedPosition === 'after')
         ) {
           setSelectedItem(moduleId)
@@ -153,15 +207,26 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
     [moduleAction, selectedPosition, moduleItemsData],
   )
 
+  useEffect(() => {
+    const newPages = Array.from({length: totalPages}, (_, i) => i + 1)
+    setDestinationPages(newPages)
+  }, [selectedPosition, selectedModule])
+
+  useEffect(() => {
+    if (destinationPages.length > 0) {
+      if (selectedPosition === 'bottom') {
+        setSelectedPage(destinationPages[destinationPages.length - 1])
+      } else {
+        setSelectedPage(destinationPages[0])
+      }
+    }
+  }, [destinationPages, selectedPosition])
+
   const handlePositionChange = useCallback(
     (_event: React.SyntheticEvent<Element, Event>, data: {value?: string | number}) => {
       if (data.value) {
         const position = String(data.value)
         setSelectedPosition(position)
-
-        if (position === 'top' || position === 'bottom') {
-          setSelectedItem('')
-        }
       }
     },
     [],
@@ -179,33 +244,20 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
     () => modulesData?.pages?.flatMap(page => page.modules) || [],
     [modulesData],
   )
-  const moduleItemOrder = useMemo(() => {
-    return moduleItemsData?.moduleItems
-      ? createModuleItemOrder(
-          moduleItemId,
-          moduleItemsData.moduleItems,
-          selectedPosition,
-          selectedItem,
-        )
-      : []
-  }, [moduleItemId, moduleItemsData?.moduleItems, selectedPosition, selectedItem])
+
   const moduleContentsOrder = useMemo(() => {
     if (!moduleItemsData?.moduleItems) return []
-    const sourceItems: string[] = sourceModuleItemsData?.moduleItems
-      ? sourceModuleItemsData.moduleItems.map(item => item._id)
-      : []
-    return createModuleContentsOrder(
+    const sourceItems: string[] = allSourceModuleItems.map(item => item._id)
+
+    const order = createModuleContentsOrder(
       sourceItems,
-      moduleItemsData.moduleItems,
+      moduleItemsData?.moduleItems,
       selectedPosition,
       selectedItem,
     )
-  }, [
-    moduleItemsData?.moduleItems,
-    sourceModuleItemsData?.moduleItems,
-    selectedPosition,
-    selectedItem,
-  ])
+    return order
+  }, [moduleItemsData?.moduleItems, selectedPosition, selectedItem, allSourceModuleItems])
+
   const moduleOrder = useMemo(() => {
     return createModuleOrder(sourceModuleId, modules, selectedPosition, selectedItem)
   }, [sourceModuleId, modules, selectedPosition, selectedItem])
@@ -220,49 +272,79 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
     })
   }
 
-  const invalidateApplicableQueries = () => {
-    if (!courseId) return
+  const getTargetPosition = (selectedPosition: string, selectedItem: string): number => {
+    const moduleItems = moduleItemsData?.moduleItems || []
+    const pageOffset = (selectedPage - 1) * pageSize
 
-    if (moduleAction === 'move_module_item' || moduleAction === 'move_module_contents') {
-      queryClient.invalidateQueries({queryKey: ['moduleItems', selectedModule]})
-      if (sourceModuleId !== selectedModule) {
-        queryClient.invalidateQueries({queryKey: ['moduleItems', sourceModuleId]})
-      }
-    } else if (moduleAction === 'move_module') {
-      queryClient.invalidateQueries({queryKey: ['modules', courseId]})
+    if (selectedPosition === 'top') {
+      return 1
     }
+
+    if (selectedPosition === 'bottom') {
+      return totalCount + 1
+    }
+
+    const idxInPage = moduleItems.findIndex(item => item._id === selectedItem)
+    if (idxInPage === -1) {
+      return 1
+    }
+
+    const globalIndex = pageOffset + idxInPage + 1
+
+    return selectedPosition === 'before' ? globalIndex : globalIndex + 1
   }
 
   const handleMove = async () => {
     try {
-      if (moduleAction === 'move_module_item') {
-        await submitReorderRequest(
-          `${ENV.CONTEXT_URL_ROOT}/modules/${selectedModule}/reorder`,
-          moduleItemOrder,
-        )
+      if (moduleAction === MOVE_MODULE_ITEM) {
+        const movedItemIds = [sourceModuleItemId].filter(Boolean)
+        const targetPosition = getTargetPosition(selectedPosition, selectedItem)
+        reorderItemsMutation.mutate({
+          courseId,
+          moduleId: selectedModule,
+          itemIds: movedItemIds,
+          oldModuleId: sourceModuleId,
+          targetPosition,
+        })
         showFlashSuccess(I18n.t('Item moved successfully'))
-      } else if (moduleAction === 'move_module_contents') {
+      }
+
+      if (moduleAction === MOVE_MODULE_CONTENTS) {
         await submitReorderRequest(
           `${ENV.CONTEXT_URL_ROOT}/modules/${selectedModule}/reorder`,
           moduleContentsOrder,
         )
         showFlashSuccess(I18n.t('Module contents moved successfully'))
-      } else if (moduleAction === 'move_module') {
-        await submitReorderRequest(`${ENV.CONTEXT_URL_ROOT}/modules/reorder`, moduleOrder)
-        showFlashSuccess(I18n.t('Module moved successfully'))
+        await queryClient.invalidateQueries({
+          queryKey: [MODULE_ITEMS, sourceModuleId, moduleCursorState[sourceModuleId]],
+        })
+        await queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, sourceModuleId]})
+        await queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, selectedModule]})
+        await queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, selectedModule]})
+        await queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
       }
 
-      invalidateApplicableQueries()
+      if (moduleAction === MOVE_MODULE) {
+        await submitReorderRequest(`${ENV.CONTEXT_URL_ROOT}/modules/reorder`, moduleOrder)
+        showFlashSuccess(I18n.t('Module moved successfully'))
+        queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
+      }
+
       onClose()
     } catch {
       showFlashError(getErrorMessage(moduleAction))
     }
   }
 
-  const getTitle = useMemo(() => getTrayTitle(moduleAction || null), [moduleAction])
-
   return (
-    <Tray label={getTitle} open={isOpen} onDismiss={onClose} placement="end" size="small">
+    <Tray
+      label={getTitle}
+      open={isOpen}
+      onDismiss={onClose}
+      placement="end"
+      size="small"
+      data-testid="manage-module-content-tray"
+    >
       <View as="div" padding="medium">
         <View as="div" textAlign="end">
           <CloseButton
@@ -278,7 +360,7 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
         </Heading>
 
         {/* Module Selection - only show for non-module moves */}
-        {moduleAction !== 'move_module' && (
+        {moduleAction !== MOVE_MODULE && (
           <ModuleSelect
             modules={modules}
             selectedModule={selectedModule}
@@ -287,32 +369,52 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
             moduleAction={moduleAction || ''}
           />
         )}
-
         {/* Position Selection */}
         {selectedModule && (
           <PositionSelect
             selectedPosition={selectedPosition}
             onPositionChange={handlePositionChange}
-            hasItems={!!(moduleItemsData?.moduleItems && moduleItemsData.moduleItems.length > 0)}
+            hasItems={destinationModuleHasItems}
             moduleAction={moduleAction || null}
             itemTitle={itemTitle || ''}
           />
         )}
-
+        {['before', 'after'].includes(selectedPosition) &&
+          destinationModuleHasItems &&
+          moduleAction !== MOVE_MODULE && (
+            <View as="div" margin="medium 0 0 0">
+              <SimpleSelect
+                renderLabel={I18n.t('Select a Destination Page')}
+                assistiveText={I18n.t('Select a destination page')}
+                value={selectedPage}
+                onChange={(_, data) => setSelectedPage(Number(data.value))}
+                data-testid="select_module_listbox"
+              >
+                {destinationPages.map(page => (
+                  <SimpleSelect.Option key={page} id={String(page)} value={page}>
+                    {I18n.t('Page %{page}', {page})}
+                  </SimpleSelect.Option>
+                ))}
+              </SimpleSelect>
+            </View>
+          )}
         {/* Reference Selection - only show for before/after positions */}
         {/* Reference Selection - this is used for both modules and items */}
-        {selectedModule && (selectedPosition === 'before' || selectedPosition === 'after') && (
-          <ReferenceSelect
-            moduleAction={moduleAction || null}
-            selectedItem={selectedItem}
-            onItemChange={handleItemChange}
-            modules={modules}
-            moduleItems={moduleItemsData?.moduleItems}
-            sourceModuleId={sourceModuleId}
-            selectedModule={selectedModule}
-            sourceModuleItemId={sourceModuleItemId}
-          />
-        )}
+        {selectedModule &&
+          ['before', 'after'].includes(selectedPosition) &&
+          destinationModuleHasItems && (
+            <ReferenceSelect
+              moduleAction={moduleAction || null}
+              selectedItem={selectedItem}
+              onItemChange={handleItemChange}
+              modules={modules}
+              moduleItems={moduleItemsData?.moduleItems ?? []}
+              sourceModuleId={sourceModuleId}
+              selectedModule={selectedModule}
+              sourceModuleItemId={sourceModuleItemId}
+              isLoading={isLoading}
+            />
+          )}
 
         {/* Footer with Action Buttons */}
         <TrayFooter onClose={onClose} onMove={handleMove} />

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useMutation} from '@apollo/client'
 import React, {useContext, useEffect, useState} from 'react'
@@ -176,7 +176,6 @@ export const InternalSettingsManager = (props: {internalSettings: InternalSettin
           <Dialog
             open={!!pendingDeleteId}
             shouldContainFocus={true}
-            // @ts-expect-error
             defaultFocusElement={() => {}}
             shouldReturnFocus={true}
             onDismiss={cancelDeleteInternalSetting}

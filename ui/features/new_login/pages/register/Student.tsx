@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -30,6 +30,7 @@ import {createStudentAccount} from '../../services'
 import {SignInPrompt, TermsAndPolicyCheckbox} from '../../shared'
 import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
 import {ReCaptchaSection, ReCaptchaSectionRef} from '../../shared/recaptcha'
+import {ROUTES} from '../../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
@@ -306,7 +307,7 @@ const Student = () => {
   }
 
   const handleUsernameChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setUsername(value.trim())
+    setUsername(value)
   }
 
   const handlePasswordChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
@@ -318,18 +319,18 @@ const Student = () => {
   }
 
   const handleJoinCodeChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setJoinCode(value.trim())
+    setJoinCode(value)
   }
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setEmail(value.trim())
+    setEmail(value)
   }
 
   const handleTermsChange = (checked: boolean) => {
     setTermsAccepted(checked)
   }
 
-  const handleCancel = useSafeBackNavigation()
+  const handleCancel = useSafeBackNavigation(ROUTES.SIGN_IN)
 
   const handleReCaptchaVerify = (token: string | null) => {
     if (!token) console.error('Failed to get a valid reCAPTCHA token')

@@ -33,7 +33,7 @@ describe('SaveThemeButton', () => {
       account_id: '123',
       brand_config_md5: '00112233445566778899aabbccddeeff',
     },
-    onSave: jest.fn(),
+    onSave: vi.fn(),
     isDefaultConfig: false,
     userNeedsToPreviewFirst: false,
   }
@@ -49,7 +49,7 @@ describe('SaveThemeButton', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     server.resetHandlers()
   })
 

@@ -96,26 +96,6 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(new_page).to be_published
     end
 
-    it "does not allow students to add links to new pages" do
-      skip("With new RCE you CAN select pages in this scenario")
-      create_wiki_page("test_page", false, "public")
-      title = "test_page"
-      unpublished = false
-      edit_roles = "public"
-
-      create_wiki_page(title, unpublished, edit_roles)
-
-      get "/courses/#{@course.id}/pages/test_page/edit"
-      wait_for_tiny(edit_wiki_css)
-
-      click_course_links_toolbar_menuitem
-
-      click_pages_accordion
-      click_course_item_link(title)
-
-      expect(f("#content")).not_to contain_css("#rcs-LinkToNewPage-btn-link")
-    end
-
     it "allows students to add links to pages if they can create them" do
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!

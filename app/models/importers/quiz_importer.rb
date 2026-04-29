@@ -159,7 +159,7 @@ module Importers
           assignment["quiz_migration_id"] = migration_id
         end
         begin
-          Importers::QuizImporter.import_from_migration(assessment, migration.context, migration, question_data, nil, allow_update)
+          Importers::QuizImporter.import_from_migration(assessment, migration.context, migration, question_data, nil, allow_update:)
         rescue
           migration.add_import_warning(t("#migration.quiz_type", "Quiz"), assessment[:title], $!)
         end
@@ -168,7 +168,7 @@ module Importers
 
     # Import a quiz from a hash.
     # It assumes that all the referenced questions are already in the database
-    def self.import_from_migration(hash, context, migration, question_data = nil, item = nil, allow_update = false)
+    def self.import_from_migration(hash, context, migration, question_data = nil, item = nil, allow_update: false)
       hash = hash.with_indifferent_access
       # there might not be an import id if it's just a text-only type...
       item ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first if hash[:id]
@@ -252,7 +252,14 @@ module Importers
         end
         item.assignment = nil if item.assignment&.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.temp_record
-        item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
+
+        # For Quizzes.next, use the quiz's migration_id instead of the assignment's
+        assignment_hash = hash[:assignment].dup
+        if hash[:qti_new_quiz]
+          assignment_hash[:migration_id] = hash[:migration_id]
+        end
+
+        item.assignment = ::Importers::AssignmentImporter.import_from_migration(assignment_hash, context, migration, item.assignment, item)
         if migration.cc_qti_migration? && (migration.import_quizzes_next? || !!hash[:qti_new_quiz])
           migration.migration_settings[:quiz_next_imported] = true
           migration.save if migration.changed?
@@ -326,7 +333,7 @@ module Importers
         item.assignment.points_possible = item.points_possible
       end
 
-      item.root_entries(true) if !item.available? && !item.survey? # reload items so we get accurate points
+      item.root_entries(force_check: true) if !item.available? && !item.survey? # reload items so we get accurate points
       item.notify_of_update = false
       item.save
       item.assignment.save_without_broadcasting if item.assignment&.changed?

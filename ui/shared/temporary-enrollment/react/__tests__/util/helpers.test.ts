@@ -35,7 +35,7 @@ describe('helpers.ts', () => {
   describe('local storage', () => {
     beforeEach(() => {
       localStorage.clear()
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     describe('getFromLocalStorage', () => {
@@ -46,7 +46,7 @@ describe('helpers.ts', () => {
 
       it('logs an error when retrieving unparsable data', () => {
         localStorage.setItem('invalidJSON', 'This is not valid JSON.')
-        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
         getFromLocalStorage('invalidJSON')
         expect(errorSpy).toHaveBeenCalled()
         errorSpy.mockRestore()
@@ -55,7 +55,7 @@ describe('helpers.ts', () => {
       it('returns undefined when the stored value is null', () => {
         localStorage.setItem('nullKey', 'null')
 
-        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
         const retrievedData = getFromLocalStorage('nullKey')
         expect(retrievedData).toBeUndefined()
@@ -66,7 +66,7 @@ describe('helpers.ts', () => {
       it('returns undefined for non-object values', () => {
         localStorage.setItem('stringKey', '"stringValue"')
 
-        const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+        const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
         const retrievedData = getFromLocalStorage('stringKey')
         expect(retrievedData).toBeUndefined()
@@ -94,14 +94,15 @@ describe('helpers.ts', () => {
 
       it('does not modify localStorage when there is a serialization error', () => {
         const circularRef: any = {}
-        const initialLocalStorage = {...localStorage}
-        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const initialKeys = Object.keys(localStorage)
+        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
         circularRef.ref = circularRef
         setToLocalStorage('circularKey', circularRef)
 
         expect(errorSpy).toHaveBeenCalled()
-        expect(localStorage).toEqual(initialLocalStorage)
+        expect(Object.keys(localStorage)).toEqual(initialKeys)
+        expect(localStorage.getItem('circularKey')).toBeNull()
 
         errorSpy.mockRestore()
       })
@@ -110,7 +111,7 @@ describe('helpers.ts', () => {
         const circularRef: CircularReference = {}
         circularRef.ref = circularRef
 
-        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
         setToLocalStorage('circularKey', circularRef)
         expect(errorSpy).toHaveBeenCalled()
         errorSpy.mockRestore()
@@ -213,12 +214,11 @@ describe('helpers.ts', () => {
       })
 
       it('returns error message if wrongOrder', () => {
-        // @ts-expect-error
-        window.ENV = {
+        fakeENV.setup({
           CONTEXT_TIMEZONE: 'Asia/Brunei',
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',
-        }
+        })
         const dateTime = {value: date, isInvalid: false, wrongOrder: true}
         const messages = generateDateTimeMessage(dateTime)
         const messageText = messages.map(function (msg) {

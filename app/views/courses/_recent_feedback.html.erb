@@ -85,7 +85,7 @@
       <% end %>
       <% if grade %>
         <% if recent_feedback.assignment.restrict_quantitative_data?(@current_user) && !preserve_grade %>
-          <p><strong><%= recent_feedback.assignment.score_to_grade(score, grade, true) %></strong></p>
+          <p><strong><%= recent_feedback.assignment.score_to_grade(score, grade, force_letter_grade: true) %></strong></p>
         <% else %>
           <p><strong><%= grade %></strong></p>
         <% end %>

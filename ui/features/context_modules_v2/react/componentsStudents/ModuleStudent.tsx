@@ -20,22 +20,24 @@ import React, {useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleHeaderStudent from './ModuleHeaderStudent'
 import ModuleItemListStudent from './ModuleItemListStudent'
-import {useModuleItemsStudent} from '../hooks/queriesStudent/useModuleItemsStudent'
 import {
   CompletionRequirement,
   ModuleProgression,
   ModuleStatistics,
   Prerequisite,
 } from '../utils/types'
+import ModuleItemListSmart from '../components/ModuleItemListSmart'
+import {STUDENT} from '../utils/constants'
+import {useShowAllState} from '../hooks/useShowAllState'
+import {useContextModule} from '../hooks/useModuleContext'
 
-const I18n = createI18nScope('context_modules_v2')
 export interface ModuleStudentProps {
   id: string
   name: string
   completionRequirements?: CompletionRequirement[]
+  position?: number
   prerequisites?: Prerequisite[]
   expanded?: boolean
   onToggleExpand?: (id: string) => void
@@ -49,6 +51,7 @@ export interface ModuleStudentProps {
 const ModuleStudent: React.FC<ModuleStudentProps> = ({
   id,
   completionRequirements,
+  position,
   prerequisites,
   expanded: propExpanded,
   onToggleExpand,
@@ -60,7 +63,8 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   submissionStatistics,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
-  const {data, isLoading, error} = useModuleItemsStudent(id, !!isExpanded)
+  const [showAll, setShowAll] = useShowAllState(id)
+  const {modulesArePaginated} = useContextModule()
 
   const toggleExpanded = (moduleId: string) => {
     const newExpandedState = !isExpanded
@@ -68,6 +72,10 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
     if (onToggleExpand) {
       onToggleExpand(moduleId)
     }
+  }
+
+  const handleToggleShowAll = () => {
+    setShowAll(prev => !prev)
   }
 
   useEffect(() => {
@@ -94,7 +102,8 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
             shadow="resting"
             overflowX="hidden"
             data-module-id={id}
-            className={`context_module module_${id}`}
+            data-position={position}
+            className={`context_module module_${id} ${isExpanded ? 'expanded' : 'collapsed'}`}
             id={`context_module_${id}`}
           >
             <Flex direction="column">
@@ -111,18 +120,28 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
                   unlockAt={unlockAt}
                   submissionStatistics={submissionStatistics}
                   smallScreen={smallScreen}
+                  showAll={showAll}
+                  onToggleShowAll={handleToggleShowAll}
                 />
               </Flex.Item>
               {isExpanded && (
                 <Flex.Item>
-                  <ModuleItemListStudent
-                    moduleItems={data?.moduleItems || []}
-                    requireSequentialProgress={requireSequentialProgress}
-                    completionRequirements={completionRequirements}
-                    progression={progression}
-                    isLoading={isLoading}
-                    error={error}
-                    smallScreen={smallScreen}
+                  <ModuleItemListSmart
+                    moduleId={id}
+                    view={STUDENT}
+                    isExpanded={isExpanded}
+                    isPaginated={modulesArePaginated && !showAll}
+                    renderList={({moduleItems, isEmpty, error}) => (
+                      <ModuleItemListStudent
+                        moduleItems={moduleItems}
+                        requireSequentialProgress={requireSequentialProgress}
+                        completionRequirements={completionRequirements}
+                        progression={progression}
+                        error={error}
+                        smallScreen={smallScreen}
+                        isEmpty={isEmpty}
+                      />
+                    )}
                   />
                 </Flex.Item>
               )}

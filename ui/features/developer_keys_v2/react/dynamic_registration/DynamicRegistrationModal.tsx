@@ -32,8 +32,9 @@ import type {AnyAction} from 'redux'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('react_developer_keys')
 type DynamicRegistrationModalProps = {
@@ -163,7 +164,9 @@ const DynamicRegistrationModalBody = ({contextId}: DynamicRegistrationModalBodyP
         <Modal.Body>
           <GenericErrorPage
             imageUrl={errorShipUrl}
-            error={state.error}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
+            errorMessage={state.error?.message}
             errorCategory="Dynamic Registration"
           />
         </Modal.Body>
@@ -204,7 +207,15 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             margin="small"
             disabled={
               !isValidUrl(state.dynamicRegistrationUrl) ||
-              state.tag === 'loading_registration_token'
+              state.tag === 'loading_registration_token' ||
+              ENV.devKeysReadOnly
+            }
+            title={
+              ENV.devKeysReadOnly
+                ? I18n.t(
+                    'You do not have permission to create or modify developer keys / LTI registrations in this account',
+                  )
+                : undefined
             }
             onClick={() => {
               loadingRegistrationToken()

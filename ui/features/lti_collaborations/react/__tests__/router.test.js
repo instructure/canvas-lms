@@ -28,8 +28,8 @@ import * as DeepLinking from '@canvas/deep-linking/DeepLinking'
 import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
 
 // Mock the modules - we'll control their behavior in individual tests
-jest.mock('@canvas/deep-linking/DeepLinking')
-jest.mock('@canvas/deep-linking/processors/processSingleContentItem')
+vi.mock('@canvas/deep-linking/DeepLinking')
+vi.mock('@canvas/deep-linking/processors/processSingleContentItem')
 
 const sleep = async ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -73,15 +73,15 @@ describe('router', () => {
 
     beforeEach(() => {
       // Reset all mocks before each test
-      jest.resetAllMocks()
+      vi.resetAllMocks()
 
       // Mock the action creators to return action objects
-      jest.spyOn(actions, 'externalContentReady').mockImplementation(data => ({
+      vi.spyOn(actions, 'externalContentReady').mockImplementation(data => ({
         type: 'EXTERNAL_CONTENT_READY',
         payload: data,
       }))
 
-      jest.spyOn(actions, 'externalContentRetrievalFailed').mockImplementation(() => ({
+      vi.spyOn(actions, 'externalContentRetrievalFailed').mockImplementation(() => ({
         type: 'EXTERNAL_CONTENT_RETRIEVAL_FAILED',
       }))
 
@@ -98,7 +98,7 @@ describe('router', () => {
 
     afterEach(() => {
       // Restore the original implementations
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     describe('when LTI 1.3 message is received', () => {
@@ -162,15 +162,15 @@ describe('router', () => {
         })
 
         // Reset the mocks for this test group
-        jest.resetAllMocks()
+        vi.resetAllMocks()
 
         // Mock the action creators again after reset
-        jest.spyOn(actions, 'externalContentReady').mockImplementation(data => ({
+        vi.spyOn(actions, 'externalContentReady').mockImplementation(data => ({
           type: 'EXTERNAL_CONTENT_READY',
           payload: data,
         }))
 
-        jest.spyOn(actions, 'externalContentRetrievalFailed').mockImplementation(() => ({
+        vi.spyOn(actions, 'externalContentRetrievalFailed').mockImplementation(() => ({
           type: 'EXTERNAL_CONTENT_RETRIEVAL_FAILED',
         }))
 

@@ -23,7 +23,7 @@ import {TagSelect, AvailableTags} from '../TagSelect'
 const renderComponent = (props = {}) => {
   return render(
     <TagSelect
-      onChange={jest.fn()}
+      onChange={vi.fn()}
       selectedTags={Object.keys(AvailableTags)}
       interaction="enabled"
       {...props}
@@ -44,7 +44,7 @@ describe('TagSelect', () => {
   it('shows the menu', () => {
     const {getByText} = renderComponent()
     const trigger = getByText('Apply Filters').closest('button')
-    
+
     trigger?.click()
     expect(getByText('Home')).toBeInTheDocument()
     expect(getByText('Resource')).toBeInTheDocument()
@@ -67,7 +67,7 @@ describe('TagSelect', () => {
   })
 
   it('calls onChange when a tag is selected', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const selectedTags = ['resource']
     const {getByText} = renderComponent({selectedTags, onChange})
     const trigger = getByText('Apply Filters').closest('button')

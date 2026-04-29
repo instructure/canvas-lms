@@ -48,7 +48,7 @@ class Mutations::UpdateGradebookGroupFilter < Mutations::BaseMutation
       current_user.set_preference(:gradebook_settings, course.global_id, context_settings)
     end
     {
-      group_name: updated_group_info[:group].present? ? updated_group_info[:group].name : nil,
+      group_name: updated_group_info[:group]&.name,
       reason_for_change: updated_group_info[:reason_for_change],
     }
   rescue ActiveRecord::RecordNotFound

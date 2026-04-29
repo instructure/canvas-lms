@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type { AnyAction } from 'redux'
-import type { BulkEditStudentsState, OrderType, SortableColumn } from '../types'
+import type {AnyAction} from 'redux'
+import type {BulkEditStudentsState, OrderType, SortableColumn} from '../types'
 import {
   SET_SEARCH_TERM,
   SET_FILTER_SECTION,
@@ -29,7 +29,7 @@ import {
   SET_STUDENTS,
   SET_SECTIONS,
   SET_PAGE_COUNT,
-  RESET_BULK_EDIT_STATE
+  RESET_BULK_EDIT_STATE,
 } from '../actions/bulk_edit_students_actions'
 
 const initialState: BulkEditStudentsState = {
@@ -48,36 +48,36 @@ const initialState: BulkEditStudentsState = {
 
 export function bulkEditStudentsReducer(
   state = initialState,
-  action: AnyAction
+  action: AnyAction,
 ): BulkEditStudentsState {
   switch (action.type) {
     case SET_SEARCH_TERM:
-      return { ...state, searchTerm: action.payload }
+      return {...state, searchTerm: action.payload}
     case SET_FILTER_SECTION:
-      return { ...state, filterSection: action.payload }
+      return {...state, filterSection: action.payload}
     case SET_FILTER_PACE_STATUS:
-      return { ...state, filterPaceStatus: action.payload }
+      return {...state, filterPaceStatus: action.payload}
     case SET_SORT: {
-      const { sortBy, orderType } = action.payload as {
+      const {sortBy, orderType} = action.payload as {
         sortBy: SortableColumn
         orderType: OrderType
       }
-      return { ...state, sortBy, orderType }
+      return {...state, sortBy, orderType}
     }
     case SET_PAGE:
-      return { ...state, page: action.payload }
+      return {...state, page: action.payload}
     case SET_LOADING:
-      return { ...state, isLoading: action.payload }
+      return {...state, isLoading: action.payload}
     case SET_ERROR:
-      return { ...state, error: action.payload }
+      return {...state, error: action.payload}
     case SET_STUDENTS:
-      return { ...state, students: action.payload }
+      return {...state, students: action.payload}
     case SET_SECTIONS:
-      return { ...state, sections: action.payload }
+      return {...state, sections: action.payload}
     case SET_PAGE_COUNT:
-      return { ...state, pageCount: action.payload }
+      return {...state, pageCount: action.payload}
     case RESET_BULK_EDIT_STATE:
-        return { ...initialState }
+      return {...initialState}
     default:
       return state
   }

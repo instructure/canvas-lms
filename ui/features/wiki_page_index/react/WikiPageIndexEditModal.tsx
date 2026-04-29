@@ -22,9 +22,10 @@ import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {TextInput} from '@instructure/ui-text-input'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import type {FormMessage} from '@instructure/ui-form-field'
 import type {Root} from 'react-dom/client'
+import {rerender} from '@canvas/react'
 import {TITLE_MAX_LENGTH} from '@canvas/wiki/utils/constants'
 import {checkForTitleConflict} from '@canvas/wiki/utils/titleConflicts'
 import {debounce} from '@instructure/debounce'
@@ -46,7 +47,7 @@ export interface WikiPageIndexEditModalProps {
 }
 
 const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEditModalProps) => {
-  const [name, setName] = useState(model?.get('title'))
+  const [name, setName] = useState(model?.get('title') || '')
   const [messages, setMessages] = useState<FormMessage[]>([])
   const [open, setOpen] = useState(modalOpen)
   const [saving, setSaving] = useState(false)
@@ -54,7 +55,7 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
   useEffect(() => {
     setOpen(modalOpen)
     if (modalOpen) {
-      setName(model?.get('title'))
+      setName(model?.get('title') || '')
       setMessages([])
       setSaving(false)
     }
@@ -147,7 +148,7 @@ const WikiPageIndexEditModal = ({model, modalOpen, closeModal}: WikiPageIndexEdi
         <TextInput
           id="page-title-input"
           data-testid="page-title-input"
-          value={name || undefined}
+          value={name}
           isRequired={true}
           disabled={saving}
           messages={messages}
@@ -179,6 +180,6 @@ export default function renderWikiPageIndexEditModal(
   props: WikiPageIndexEditModalProps,
 ) {
   const titleComponent = <WikiPageIndexEditModal {...props} />
-  root.render(titleComponent)
+  rerender(root, titleComponent)
   return titleComponent
 }

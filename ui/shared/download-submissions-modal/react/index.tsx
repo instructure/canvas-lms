@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints'
+import {WithBreakpoints, type Breakpoints} from '@instructure/platform-with-breakpoints'
 
 const I18n = createI18nScope('download_submissions_modal')
 
@@ -40,7 +40,7 @@ const DownloadSubmissionsModal = ({
   breakpoints,
 }: {
   open: boolean
-  handleCloseModal: void
+  handleCloseModal: () => void
   assignmentId: string
   courseId: string
   breakpoints: Breakpoints
@@ -131,7 +131,6 @@ const DownloadSubmissionsModal = ({
         <CloseButton
           placement="end"
           offset="small"
-          // @ts-expect-error
           onClick={handleCloseModal}
           screenReaderLabel={I18n.t('Close')}
         />
@@ -159,7 +158,6 @@ const DownloadSubmissionsModal = ({
         {renderProgressText()}
       </Modal.Body>
       <Modal.Footer>
-        {/* @ts-expect-error */}
         <Button onClick={handleCloseModal} margin="0 x-small 0 0">
           {I18n.t('Cancel')}
         </Button>

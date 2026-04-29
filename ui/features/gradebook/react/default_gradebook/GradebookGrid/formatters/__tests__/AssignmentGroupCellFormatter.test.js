@@ -31,7 +31,7 @@ describe('GradebookGrid AssignmentGroupCellFormatter', () => {
     setFixtureHtml(container)
 
     gradebook = createGradebook()
-    jest.spyOn(gradebook, 'saveSettings')
+    vi.spyOn(gradebook, 'saveSettings')
     formatter = new AssignmentGroupCellFormatter(gradebook)
 
     grade = {score: 8, possible: 10}

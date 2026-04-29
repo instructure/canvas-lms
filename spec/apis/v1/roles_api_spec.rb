@@ -64,6 +64,25 @@ describe "Roles API", type: :request do
         @account.reload
         expect(@account.available_account_roles).to include(@role)
       end
+
+      it "checks for name collision on inherited roles" do
+        role = @account.roles.new(name: "NewRole")
+        role.base_role_type = "StudentEnrollment"
+        role.save!
+
+        sub_account = @account.sub_accounts.create!
+        account_admin_user(account: sub_account, active_user: true)
+
+        api_call(
+          :post,
+          "/api/v1/accounts/#{sub_account.id}/roles",
+          { controller: "role_overrides", action: "add_role", format: "json", account_id: sub_account.id },
+          { role: "NewRole" }
+        )
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.body).to eq('{"message":"role name NewRole already in use"}')
+      end
     end
 
     describe "index" do
@@ -199,7 +218,7 @@ describe "Roles API", type: :request do
       json = api_call_with_settings(base_role_type:, explicit: "1", enabled: "1")
       @account.reload
 
-      expect(@account.available_account_roles.map(&:name)).to_not include(@role_name)
+      expect(@account.available_account_roles.map(&:name)).not_to include(@role_name)
       expect(@account.roles.count).to eq 1
       new_role = @account.roles.first
       expect(new_role.name).to eq @role_name
@@ -285,7 +304,7 @@ describe "Roles API", type: :request do
 
       it "does not recycle a deleted role" do
         @role.destroy
-        expect(@account.roles.active.map(&:name)).to_not include @role_name
+        expect(@account.roles.active.map(&:name)).not_to include @role_name
 
         json = api_call(:post,
                         "/api/v1/accounts/#{@account.id}/roles",
@@ -296,7 +315,7 @@ describe "Roles API", type: :request do
                         { role: @role_name, base_role_type: "TeacherEnrollment" })
 
         new_role = Role.where(id: json["id"]).first
-        expect(@role.id).to_not eq new_role.id
+        expect(@role.id).not_to eq new_role.id
       end
     end
 
@@ -351,7 +370,7 @@ describe "Roles API", type: :request do
       api_call_with_settings(explicit: "1", enabled: "0")
       expect(@account.role_overrides.reload.size).to eq @initial_count + 1
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(override.enabled).to be_falsey
     end
 
@@ -359,7 +378,7 @@ describe "Roles API", type: :request do
       api_call_with_settings(base_role_type: "TeacherEnrollment", explicit: "1", enabled: "0")
       expect(@account.role_overrides.reload.size).to eq @initial_count + 1
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(override.enabled).to be_falsey
     end
 
@@ -367,14 +386,14 @@ describe "Roles API", type: :request do
       api_call_with_settings(locked: "1")
       expect(@account.role_overrides.reload.size).to eq @initial_count + 1
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(override.locked).to be_truthy
     end
 
     it "sets applies to descendents" do
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_descendants: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(json["permissions"][@permission]["applies_to_self"]).to be true
       expect(json["permissions"][@permission]["applies_to_descendants"]).to be false
       expect(override.applies_to_self).to be true
@@ -384,7 +403,7 @@ describe "Roles API", type: :request do
     it "sets applies to self" do
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_self: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(json["permissions"][@permission]["applies_to_self"]).to be false
       expect(json["permissions"][@permission]["applies_to_descendants"]).to be true
       expect(override.applies_to_self).to be false
@@ -404,7 +423,7 @@ describe "Roles API", type: :request do
       sub = @account.sub_accounts.create!
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_descendants: "1", applies_to_self: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(json["permissions"][@permission]["applies_to_self"]).to be false
       expect(json["permissions"][@permission]["applies_to_descendants"]).to be true
       expect(override.applies_to_self).to be false
@@ -426,7 +445,7 @@ describe "Roles API", type: :request do
       sub = @account.sub_accounts.create!
       json = api_call_with_settings(enabled: "1", explicit: "1", applies_to_descendants: "0", applies_to_self: "1")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(json["permissions"][@permission]["applies_to_self"]).to be true
       expect(json["permissions"][@permission]["applies_to_descendants"]).to be false
       expect(override.applies_to_self).to be true
@@ -446,7 +465,7 @@ describe "Roles API", type: :request do
     it "only sets the parts that are specified" do
       api_call_with_settings(explicit: "1", enabled: "0")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(override.enabled).to be false
       expect(override.locked).to be false
 
@@ -457,7 +476,7 @@ describe "Roles API", type: :request do
 
       api_call_with_settings(locked: "1")
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
       expect(override.enabled).to be true
       expect(override.locked).to be true
     end
@@ -483,7 +502,7 @@ describe "Roles API", type: :request do
       expect(override).to be_nil
 
       override = @account.role_overrides.where(permission: @permission, role_id: @role.id).first
-      expect(override).to_not be_nil
+      expect(override).not_to be_nil
     end
 
     describe "json response" do
@@ -824,6 +843,118 @@ describe "Roles API", type: :request do
                         {},
                         { expected_status: 400 })
         expect(json["message"]).to eq "cannot update the 'label' for a built-in role"
+      end
+    end
+  end
+
+  describe "manageable_permissions" do
+    before do
+      allow(RoleOverride).to receive(:manageable_permissions).with(Account.default).and_return(
+        {
+          view_analytics: {
+            label: -> { "Analytics - View" },
+            group: :analytics_stuff,
+            group_label: -> { "Analytics" },
+            available_to: %w[AccountAdmin TaEnrollment TeacherEnrollment StudentEnrollment AccountMembership],
+            true_for: %w[AccountAdmin TaEnrollment TeacherEnrollment]
+          },
+          fabricate_analytics: {
+            group: :analytics_stuff,
+            label: -> { "Analytics - Create" },
+            available_to: %w[AccountAdmin AccountMembership],
+            true_for: %w[AccountAdmin]
+          },
+          play_404_game: {
+            label: -> { "Play 404 Games" },
+            group: :joy,
+            available_to: %w[AccountAdmin StudentEnrollment],
+            true_for: %w[AccountAdmin]
+          }
+        }
+      )
+      allow(Permissions).to receive(:group_label) { |group| group.to_s.titleize }
+    end
+
+    before :once do
+      account_admin_user(account: Account.default)
+    end
+
+    it "requires :manage_role_overrides permission" do
+      user_factory
+      api_call(:get,
+               "/api/v1/accounts/#{Account.default.id}/roles/permissions",
+               { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param },
+               {},
+               {},
+               { expected_status: 403 })
+    end
+
+    it "returns the expected information" do
+      json = api_call(:get,
+                      "/api/v1/accounts/#{Account.default.id}/roles/permissions",
+                      { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param })
+      expect(json).to eq([
+                           {
+                             "key" => "view_analytics",
+                             "label" => "Analytics - View",
+                             "group" => "analytics_stuff",
+                             "group_label" => "Analytics Stuff",
+                             "available_to" => %w[AccountAdmin TaEnrollment TeacherEnrollment StudentEnrollment AccountMembership],
+                             "true_for" => %w[AccountAdmin TaEnrollment TeacherEnrollment]
+                           },
+                           {
+                             "key" => "fabricate_analytics",
+                             "group" => "analytics_stuff",
+                             "group_label" => "Analytics Stuff",
+                             "label" => "Analytics - Create",
+                             "available_to" => %w[AccountAdmin AccountMembership],
+                             "true_for" => %w[AccountAdmin]
+                           },
+                           {
+                             "key" => "play_404_game",
+                             "label" => "Play 404 Games",
+                             "group" => "joy",
+                             "group_label" => "Joy",
+                             "available_to" => %w[AccountAdmin StudentEnrollment],
+                             "true_for" => %w[AccountAdmin]
+                           }
+                         ])
+    end
+
+    describe "searching" do
+      it "searches by key" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=404_game",
+                        { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "404_game" })
+        expect(json.pluck("key")).to contain_exactly("play_404_game")
+      end
+
+      it "searches by label" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=CREATE",
+                        { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "CREATE" })
+        expect(json.pluck("key")).to contain_exactly("fabricate_analytics")
+      end
+
+      it "searches by group" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=stuff",
+                        { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "stuff" })
+        expect(json.pluck("key")).to contain_exactly("view_analytics", "fabricate_analytics")
+      end
+
+      it "searches by group_label" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=joy",
+                        { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "joy" })
+        expect(json.pluck("key")).to contain_exactly("play_404_game")
+      end
+
+      it "returns an empty array if no permissions match" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{Account.default.id}/roles/permissions?search_term=blah",
+                        { controller: "role_overrides", action: "manageable_permissions", format: "json", account_id: Account.default.to_param, search_term: "blah" })
+        expect(json).to eq([])
       end
     end
   end

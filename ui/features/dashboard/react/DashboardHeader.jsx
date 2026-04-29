@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 import classnames from 'classnames'
@@ -30,7 +30,7 @@ import {
   responsiviser,
 } from '@canvas/planner'
 import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
-import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError} from '@instructure/platform-alerts'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import DashboardOptionsMenu from './DashboardOptionsMenu'
 import {CardDashboardLoader} from '@canvas/dashboard-card'
@@ -45,6 +45,8 @@ import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
+import {toggleDashboardView} from '@canvas/dashboard-toggle/utils/dashboardToggle'
+import {LearningAgentButton} from '@canvas/learning-agent'
 
 const I18n = createI18nScope('dashboard')
 
@@ -125,6 +127,7 @@ class DashboardHeader extends React.Component {
       : 'cards',
     loadedViews: [],
     selectedObserveeId: null,
+    switchingDashboard: false,
   }
 
   componentDidMount() {
@@ -244,6 +247,13 @@ class DashboardHeader extends React.Component {
   }
 
   handleChangeObservedUser(id) {
+    if (ENV.widget_dashboard_overridable) {
+      const isObservingSelf = id === ENV.current_user_id || id === null
+      if (!isObservingSelf) {
+        window.location.reload()
+        return
+      }
+    }
     if (id !== this.state.selectedObserveeId) {
       this.props.refetchDashboardCards && this.props.refetchDashboardCards()
       fetchShowK5Dashboard(id)
@@ -312,6 +322,15 @@ class DashboardHeader extends React.Component {
     })
   }
 
+  handleSwitchToNewDashboard = async () => {
+    this.setState({switchingDashboard: true})
+    try {
+      await toggleDashboardView(true)
+    } catch {
+      this.setState({switchingDashboard: false})
+    }
+  }
+
   renderLegacy(canEnableElementaryDashboard) {
     return (
       <div className={classnames(this.props.responsiveSize, 'ic-Dashboard-header__layout')}>
@@ -341,6 +360,17 @@ class DashboardHeader extends React.Component {
                   style={{display: this.state.currentDashboard === 'planner' ? 'block' : 'none'}}
                 />
               )}
+              {ENV.widget_dashboard_overridable === false &&
+                this.state.selectedObserveeId !== ENV.current_user_id && (
+                  <Button
+                    onClick={this.handleSwitchToNewDashboard}
+                    margin="0 small 0 0"
+                    disabled={this.state.switchingDashboard}
+                    data-testid="switch-to-new-dashboard-button"
+                  >
+                    {I18n.t('Switch to new dashboard view')}
+                  </Button>
+                )}
               <div id="DashboardOptionsMenu_Container">
                 <DashboardOptionsMenu
                   view={this.state.currentDashboard}
@@ -352,7 +382,9 @@ class DashboardHeader extends React.Component {
                   canEnableElementaryDashboard={canEnableElementaryDashboard}
                 />
               </div>
+              {ENV.ATHENA && <LearningAgentButton />}
               {this.props.planner_enabled && <div id="dashboard-planner-header-aux" />}
+              {ENV.add_oak_mount_point && <div id="oak-mount-point"></div>}
             </div>
           </Flex.Item>
         </Flex>
@@ -404,6 +436,19 @@ class DashboardHeader extends React.Component {
                   />
                 </Flex.Item>
               )}
+              {ENV.widget_dashboard_overridable === false &&
+                this.state.selectedObserveeId !== ENV.current_user_id && (
+                  <Flex.Item overflowY="visible">
+                    <Button
+                      display={this.props.responsiveSize == 'small' ? 'block' : 'inline-block'}
+                      onClick={this.handleSwitchToNewDashboard}
+                      disabled={this.state.switchingDashboard}
+                      data-testid="switch-to-new-dashboard-button"
+                    >
+                      {I18n.t('Switch to new dashboard view')}
+                    </Button>
+                  </Flex.Item>
+                )}
               <Flex.Item overflowY="visible">
                 <div id="DashboardOptionsMenu_Container">
                   <DashboardOptionsMenu
@@ -418,6 +463,11 @@ class DashboardHeader extends React.Component {
                   />
                 </div>
               </Flex.Item>
+              {ENV.ATHENA && (
+                <Flex.Item overflowY="visible">
+                  <LearningAgentButton />
+                </Flex.Item>
+              )}
               <span
                 style={{
                   display:
@@ -522,10 +572,7 @@ function loadStartNewCourseHandler() {
   if (startButton && modalContainer && ENV.FEATURES?.create_course_subaccount_picker) {
     let root = null
     startButton.addEventListener('click', () => {
-      if (!root) {
-        root = createRoot(modalContainer)
-      }
-      root.render(
+      const element = (
         <CreateCourseModal
           isModalOpen={true}
           setModalOpen={isOpen => {
@@ -537,8 +584,14 @@ function loadStartNewCourseHandler() {
           permissions={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
           restrictToMCCAccount={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
           isK5User={false} // can't be k5 user if classic dashboard is showing
-        />,
+          viewableAccountIds={ENV.CREATE_COURSES_PERMISSIONS.VIEWABLE_ACCOUNT_IDS}
+        />
       )
+      if (!root) {
+        root = render(element, modalContainer)
+      } else {
+        rerender(root, element)
+      }
     })
   }
 }

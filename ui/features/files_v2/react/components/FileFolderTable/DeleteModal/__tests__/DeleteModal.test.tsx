@@ -32,34 +32,37 @@ import {makeBulkItemRequests} from '../../../../queries/makeBulkItemRequests'
 import {deleteItem} from '../../../../queries/deleteItem'
 import {UnauthorizedError} from '../../../../../utils/apiUtils'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: jest.fn(() => jest.fn()),
-  showFlashWarning: jest.fn(() => jest.fn()),
-  showFlashError: jest.fn(() => jest.fn()),
-}))
+import * as FlashAlert from '@instructure/platform-alerts'
+import * as Sentry from '@sentry/react'
 
-jest.mock('@canvas/do-fetch-api-effect')
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(() => vi.fn()),
+    showFlashWarning: vi.fn(() => vi.fn()),
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 
 // Mock makeBulkItemRequests function
-jest.mock('../../../../queries/makeBulkItemRequests', () => ({
-  makeBulkItemRequests: jest.fn(),
+vi.mock('../../../../queries/makeBulkItemRequests', () => ({
+  makeBulkItemRequests: vi.fn(),
 }))
 
 // Mock Sentry
-jest.mock('@sentry/react', () => ({
-  captureException: jest.fn(),
+vi.mock('@sentry/react', () => ({
+  captureException: vi.fn(),
 }))
 
-const mockMakeBulkItemRequests = makeBulkItemRequests as jest.MockedFunction<
-  typeof makeBulkItemRequests
->
-const mockFlashAlerts = require('@canvas/alerts/react/FlashAlert')
-const {captureException} = require('@sentry/react')
+const mockMakeBulkItemRequests = vi.mocked(makeBulkItemRequests)
+const mockFlashAlerts = vi.mocked(FlashAlert)
+const {captureException} = vi.mocked(Sentry)
 
 const defaultProps = {
   open: true,
   items: FAKE_FOLDERS_AND_FILES,
-  onClose: jest.fn(),
+  onClose: vi.fn(),
 }
 
 const renderComponent = (props?: any) =>
@@ -105,7 +108,7 @@ describe('DeleteModal', () => {
   beforeEach(() => {
     user = userEvent.setup()
     mockMakeBulkItemRequests.mockReset()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders header', async () => {
@@ -153,7 +156,7 @@ describe('DeleteModal', () => {
 
   describe('successful deletion', () => {
     it('calls makeBulkItemRequests and shows success message for multiple items', async () => {
-      const onCloseMock = jest.fn()
+      const onCloseMock = vi.fn()
       mockMakeBulkItemRequests.mockResolvedValue(undefined)
 
       renderComponent({onClose: onCloseMock})
@@ -180,7 +183,7 @@ describe('DeleteModal', () => {
 
   describe('error handling', () => {
     it('handles UnauthorizedError by setting session expired', async () => {
-      const mockSetSessionExpired = jest.fn()
+      const mockSetSessionExpired = vi.fn()
       const mockRowsContextWithExpired = {
         ...mockRowsContext,
         setSessionExpired: mockSetSessionExpired,
@@ -237,8 +240,8 @@ describe('DeleteModal', () => {
     })
 
     it('always calls onClose and sets row focus after error', async () => {
-      const onCloseMock = jest.fn()
-      const mockSetRowToFocus = jest.fn()
+      const onCloseMock = vi.fn()
+      const mockSetRowToFocus = vi.fn()
       const mockRowFocusContextWithSetter = {
         ...mockRowFocusContext,
         setRowToFocus: mockSetRowToFocus,

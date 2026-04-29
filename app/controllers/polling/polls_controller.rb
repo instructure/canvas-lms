@@ -63,8 +63,6 @@ module Polling
   class PollsController < ApplicationController
     include ::Filters::Polling
 
-    before_action :require_user
-
     # @API List polls
     #
     # Returns the paginated list of polls for the current user.
@@ -75,7 +73,7 @@ module Polling
     #   }
     #
     def index
-      @polls = @current_user.polls.order("created_at DESC")
+      @polls = @current_user.polls.order(created_at: :desc)
       json, meta = paginate_for(@polls)
 
       render json: serialize_jsonapi(json, meta)

@@ -56,7 +56,9 @@ $(() => {
 
     tab(tab, path) {
       if (tab !== 'outcomes' && tab !== 'assignments') {
-        tab = userSettings.contextGet('grade_summary_tab') || 'assignments'
+        const courseDefault = ENV.default_student_grade_summary_tab
+
+        tab = userSettings.contextGet('grade_summary_tab') || courseDefault || 'assignments'
       }
       $(`a[href='#${tab}']`).click()
       if (tab === 'outcomes') {

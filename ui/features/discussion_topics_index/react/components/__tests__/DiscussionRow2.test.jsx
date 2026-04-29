@@ -17,20 +17,20 @@
  */
 
 import {render, screen} from '@testing-library/react'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // We can't call the wrapped component because a lot of these tests are depending
 // on the class component instances. So we've got to cobble up enough of the date
 // formatter to send in as a prop.
 const dateFormatter = date => {
-  const fmtr = Intl.DateTimeFormat('en').format
+  const fmtr = Intl.DateTimeFormat('en', {timeZone: 'UTC'}).format
   try {
     if (date === null) return ''
     return fmtr(date instanceof Date ? date : new Date(date))
@@ -97,7 +97,7 @@ describe('DiscussionRow', () => {
     )
 
   beforeEach(() => {
-    fakeENV.setup()
+    fakeENV.setup({TIMEZONE: 'UTC'})
     ENV.discussion_anonymity_enabled = true
   })
 
@@ -152,17 +152,17 @@ describe('DiscussionRow', () => {
   })
 
   it('disables publish button when can_unpublish is false', () => {
-    const discussion = {can_unpublish: false}
+    const discussion = {can_unpublish: false, published: true}
     render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
-    const button = screen.getByRole('button', {name: 'Unpublish Hello World'})
-    expect(button.hasAttribute('disabled')).toBe(true)
+    const button = screen.getByTestId('discussion-publish').querySelector('button')
+    expect(button).toHaveAttribute('disabled')
   })
 
   it('allows to publish even if you cannot unpublish', () => {
     const discussion = {can_unpublish: false, published: false}
     render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
-    const button = screen.getByRole('button', {name: 'Publish Hello World'})
-    expect(button.hasAttribute('disabled')).toBe(false)
+    const button = screen.getByTestId('discussion-publish').querySelector('button')
+    expect(button).not.toHaveAttribute('disabled')
   })
 
   describe('publish ToggleIcon', () => {
@@ -318,9 +318,8 @@ describe('DiscussionRow', () => {
   })
 
   it('renders the further available until date for ungraded overrides', () => {
-    // Use specific dates with very different formatted representations to make the test more robust
     const futureDate = new Date('2027-01-17T00:00:00Z')
-    const furtherFutureDate = new Date('2028-12-25T00:00:00Z') // Christmas 2028, very distinct date
+    const furtherFutureDate = new Date('2028-12-25T00:00:00Z')
 
     const discussion = {
       ungraded_discussion_overrides: [
@@ -329,17 +328,21 @@ describe('DiscussionRow', () => {
       ],
     }
 
-    const {container} = render(<DiscussionRow {...makeProps({discussion})} />)
+    render(<DiscussionRow {...makeProps({discussion})} />)
 
-    // Format the date we're looking for
+    // The component actually shows the LATEST lock date (least restrictive)
+    // This is the "furthest" date as the test name implies
     const formattedLaterDate = dateFormatter(furtherFutureDate)
 
-    // Look for the exact text with the formatted date
-    const availabilityText = `Available until ${formattedLaterDate}`
+    // Find all elements that contain "Available until" text
+    const availabilityElements = screen.getAllByText(/Available until/)
+    expect(availabilityElements.length).toBeGreaterThan(0)
 
-    // Use a more reliable query that searches for the text anywhere in the document
-    const textContent = container.textContent
-    expect(textContent.includes(availabilityText)).toBe(true)
+    // Check if any of the elements contain the later date
+    const hasLaterDate = availabilityElements.some(el =>
+      el.textContent.includes(formattedLaterDate),
+    )
+    expect(hasLaterDate).toBe(true)
   })
 
   it('renders locked at if appropriate', () => {

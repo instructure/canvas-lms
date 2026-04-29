@@ -27,11 +27,11 @@ import SpeedGraderSelectMenu, {
 
 describe('SpeedGraderSelectMenu', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   describe('#updateSelectMenuStatus', () => {
@@ -79,7 +79,7 @@ describe('SpeedGraderSelectMenu', () => {
       selectMenu.appendTo(testArea)
 
       // Wait for jQuery UI to initialize
-      jest.advanceTimersByTime(0)
+      vi.advanceTimersByTime(0)
     })
 
     afterEach(() => {
@@ -315,7 +315,7 @@ describe('SpeedGraderSelectMenu (2)', () => {
   let selectMenu
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     fixtureNode = document.createElement('div')
     fixtureNode.id = 'fixtures'
     document.body.appendChild(fixtureNode)
@@ -332,11 +332,11 @@ describe('SpeedGraderSelectMenu (2)', () => {
     selectMenu = new SpeedGraderSelectMenu([])
 
     // Wait for jQuery UI to initialize
-    jest.advanceTimersByTime(0)
+    vi.advanceTimersByTime(0)
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
     fixtureNode.remove()
     $('.ui-selectmenu-menu').remove()
   })
@@ -469,7 +469,7 @@ describe('SpeedGraderSelectMenu (2)', () => {
       selectMenu.appendTo('#test_area')
 
       // Wait for jQuery UI to initialize
-      jest.advanceTimersByTime(0)
+      vi.advanceTimersByTime(0)
     })
 
     afterEach(() => {
@@ -543,7 +543,7 @@ describe('SpeedGraderSelectMenu - rendered select control (2)', () => {
   let optionsArray
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     fixtureNode = document.createElement('div')
     fixtureNode.id = 'fixtures'
     document.body.appendChild(fixtureNode)
@@ -588,11 +588,11 @@ describe('SpeedGraderSelectMenu - rendered select control (2)', () => {
     selectMenu.appendTo('#test_area')
 
     // Wait for jQuery UI to initialize
-    jest.advanceTimersByTime(0)
+    vi.advanceTimersByTime(0)
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
     fixtureNode.remove()
     $('.ui-selectmenu-menu').remove()
   })

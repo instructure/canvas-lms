@@ -30,7 +30,7 @@ describe('AuthenticationProviders', () => {
     let $container: HTMLDivElement
 
     beforeEach(() => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       $container = document.createElement('div')
       document.body.appendChild($container)
       $container.innerHTML = `
@@ -46,8 +46,8 @@ describe('AuthenticationProviders', () => {
     })
 
     afterEach(() => {
-      jest.advanceTimersByTime(100)
-      jest.useRealTimers()
+      vi.advanceTimersByTime(100)
+      vi.useRealTimers()
       $container.remove()
     })
 
@@ -72,24 +72,22 @@ describe('AuthenticationProviders', () => {
       })
     })
 
-    // doesn't work in Jest due to lack of support for focusable in jQuery UI
-    test.skip('shows the form for the matching auth type', () => {
+    test('shows the form for the matching auth type', () => {
       AuthenticationProviders.changedAuthType('facebook')
       const $form = $container.querySelector<HTMLFormElement>('#facebook_form')
       strictEqual($form!.style.display, '')
     })
 
-    // doesn't work in Jest due to lack of support for focusable in jQuery UI
-    test.skip('does not show unrelated forms', () => {
+    test('does not show unrelated forms', () => {
       AuthenticationProviders.changedAuthType('facebook')
       const $form = $container.querySelector<HTMLFormElement>('#google_form')
       equal($form!.style.display, 'none')
     })
 
-    // doesn't work in Jest due to lack of support for focusable in jQuery UI
+    // jQuery UI's :focusable selector doesn't work in jsdom
     test.skip('sets focus on the first focusable element of the visible form', () => {
       AuthenticationProviders.changedAuthType('google')
-      jest.advanceTimersByTime(100)
+      vi.advanceTimersByTime(100)
       const $input = $container.querySelector<HTMLInputElement>('#google-auth-input')
       strictEqual(document.activeElement, $input)
     })

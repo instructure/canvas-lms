@@ -32,7 +32,7 @@ describe('RemoteLookupFieldSelector', () => {
   })
 
   it('calls the passed in callback on input', () => {
-    const callbackMock = jest.fn()
+    const callbackMock = vi.fn()
     const container = setup({
       fieldChangedHandler: callbackMock,
     })

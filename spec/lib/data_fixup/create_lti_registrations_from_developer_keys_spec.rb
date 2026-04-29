@@ -78,6 +78,17 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
       end
     end
 
+    context "with a deleted developer key" do
+      before do
+        second_account_key.update(workflow_state: "deleted")
+      end
+
+      it "creates a deleted registration" do
+        described_class.run
+        expect(second_account_key.reload.lti_registration.workflow_state).to eq("deleted")
+      end
+    end
+
     context "with invalid developer key" do
       before do
         second_account_key.scopes += ["invalid_scope"]
@@ -130,7 +141,7 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
     end
 
     context "when the registraton can't be saved" do
-      let(:scope) { double("scope") }
+      let(:scope) { instance_double(Sentry::Scope) }
 
       before do
         second_account_key.update_attribute!("account_id", Account.last.id + 1)
@@ -140,9 +151,9 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
         expect(Sentry).to receive(:with_scope).and_yield(scope)
         expect(Sentry).to receive(:capture_message)
           .with("DataFixup#create_lti_registrations_from_developer_keys", { level: :warning })
-        expect(scope).to receive(:set_tags).with(developer_key_id: second_account_key.global_id)
+        expect(scope).to receive(:set_tags).with(developer_key_id: second_account_key.global_id).and_return(nil)
         expect(scope).to receive(:set_context)
-          .with("exception", { name: "ActiveRecord::RecordInvalid", message: "Validation failed: Account must exist" })
+          .with("exception", { name: "ActiveRecord::RecordInvalid", message: "Validation failed: Account must exist" }).and_return(nil)
         described_class.run
       end
     end
@@ -159,6 +170,7 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
     let(:policy_uri) { "http://example.com/policy" }
     let(:lti_tool_configuration) do
       {
+        target_link_uri: "https://example.com/launch",
         domain: "example.com",
         messages: [],
         claims: []

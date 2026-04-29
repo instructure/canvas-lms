@@ -16,7 +16,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import I18n from '@canvas/i18n'
 import round from '@canvas/round'
 import Backbone from '@canvas/backbone'
@@ -32,7 +32,10 @@ class AssignmentGroupWeightsView extends Backbone.View {
 
   findWeight() {
     const input = document.getElementById(`ag_${this.model.get('id')}_weight_input`)
-    return round(numberHelper.parse(document.getElementById(`ag_${this.model.get('id')}_weight_input`).value), 2)
+    return round(
+      numberHelper.parse(document.getElementById(`ag_${this.model.get('id')}_weight_input`).value),
+      2,
+    )
   }
 
   toJSON() {
@@ -45,8 +48,7 @@ class AssignmentGroupWeightsView extends Backbone.View {
     setTimeout(() => {
       const groupId = this.model.get('id')
       const mount = document.getElementById(`assignment_group_${groupId}_weight_input`)
-      if (!this.weightInputRoot) this.weightInputRoot = createRoot(mount)
-      this.weightInputRoot.render(
+      const element = (
         <GroupWeightInput
           groupId={groupId}
           name={this.model.attributes.name}
@@ -54,6 +56,11 @@ class AssignmentGroupWeightsView extends Backbone.View {
           initialValue={this.model.attributes.group_weight}
         />
       )
+      if (!this.weightInputRoot) {
+        this.weightInputRoot = render(element, mount)
+      } else {
+        rerender(this.weightInputRoot, element)
+      }
     }, 0)
   }
 }

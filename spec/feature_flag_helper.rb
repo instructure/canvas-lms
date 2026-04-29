@@ -34,6 +34,14 @@ module FeatureFlagHelper
     end
   end
 
+  def mock_feature_flag_on_account(feature_flag, value)
+    allow_any_instance_of(Account)
+      .to receive(:feature_enabled?).and_call_original
+
+    allow_any_instance_of(Account)
+      .to receive(:feature_enabled?).with(feature_flag.to_sym).and_return(value)
+  end
+
   # feature_enabled? raises an error if the flag isn't defined, but flags
   # aren't autodefined in specs. this mock returns false if the flag
   # isn't defined, so specs can do what they want

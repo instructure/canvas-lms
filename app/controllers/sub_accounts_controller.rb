@@ -29,6 +29,7 @@ class SubAccountsController < ApplicationController
   before_action :require_account_management, except: [:index]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index]
 
   def index
@@ -94,7 +95,7 @@ class SubAccountsController < ApplicationController
   #
   # @returns Account
   def create
-    parent_id = if params[:account][:parent_account_id]
+    parent_id = if params.dig(:account, :parent_account_id)
                   params[:account].delete(:parent_account_id)
                 else
                   api_find(Account.active, params[:account_id]).id
@@ -102,14 +103,20 @@ class SubAccountsController < ApplicationController
     @parent_account = subaccount_or_self(parent_id)
     return unless authorized_action(@parent_account, @current_user, :manage_account_settings)
 
-    @sub_account = @parent_account.sub_accounts.build(account_params)
+    account_attributes = account_params
+    if account_attributes[:name].blank?
+      return render json: { message: I18n.t("Account name is required") }, status: :bad_request
+    end
+
+    @sub_account = @parent_account.sub_accounts.build(account_attributes)
     @sub_account.root_account = @context.root_account
     if params[:account][:sis_account_id]
       can_manage_sis = @account.grants_right?(@current_user, :manage_sis)
       if can_manage_sis
         @sub_account.sis_source_id = params[:account][:sis_account_id]
       else
-        return render json: { message: I18n.t("user not authorized to manage SIS data - account[sis_account_id]") }, status: :unauthorized
+        return render json: { message: I18n.t("user not authorized to manage SIS data - account[sis_account_id]") },
+                      status: :unauthorized
       end
     end
     if @sub_account.save
@@ -137,10 +144,12 @@ class SubAccountsController < ApplicationController
   def destroy
     @sub_account = subaccount_or_self(params[:id])
     if @sub_account.associated_courses.not_deleted.exists?
-      return render json: { message: I18n.t("You can't delete a sub-account that has courses in it.") }, status: :conflict
+      return render json: { message: I18n.t("You can't delete a sub-account that has courses in it.") },
+                    status: :conflict
     end
     if @sub_account.sub_accounts.exists?
-      return render json: { message: I18n.t("You can't delete a sub-account that has sub-accounts in it.") }, status: :conflict
+      return render json: { message: I18n.t("You can't delete a sub-account that has sub-accounts in it.") },
+                    status: :conflict
     end
     if @sub_account.root_account?
       return render json: { message: I18n.t("You can't delete a root_account.") }, status: :unauthorized
@@ -164,6 +173,7 @@ class SubAccountsController < ApplicationController
   end
 
   def account_params
-    params.require(:account).permit(:name, :default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb)
+    params.require(:account)
+          .permit(:name, :default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb)
   end
 end

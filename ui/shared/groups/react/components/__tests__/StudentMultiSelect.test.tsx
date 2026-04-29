@@ -19,7 +19,6 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import '@testing-library/jest-dom/extend-expect'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import StudentMultiSelect from '../StudentMultiSelect'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
@@ -62,7 +61,7 @@ describe('StudentMultiSelect', () => {
   const renderComponent = (props = {}) => {
     const defaultProps = {
       selectedOptionIds: [],
-      onSelect: jest.fn(),
+      onSelect: vi.fn(),
     }
 
     return render(
@@ -91,7 +90,7 @@ describe('StudentMultiSelect', () => {
 
   it('calls onSelect when a student is selected', async () => {
     const user = userEvent.setup()
-    const onSelectMock = jest.fn()
+    const onSelectMock = vi.fn()
     renderComponent({onSelect: onSelectMock})
     const input = screen.getByPlaceholderText('Search')
     await user.type(input, 'Student')

@@ -29,7 +29,7 @@ const createMockStore = state => ({
     this.subs.push(cb)
   },
   getState: () => state,
-  dispatch: jest.fn(),
+  dispatch: vi.fn(),
   mockStateChange() {
     this.subs.forEach(sub => sub())
   },
@@ -53,7 +53,7 @@ describe('Redux Pagination', () => {
       expect(typeof actionCreators.getThings).toBe('function')
     })
 
-    it('creates get action creator from thunk that calls start with current page', done => {
+    it('creates get action creator from thunk that calls start with current page', async () => {
       const mockStore = createMockStore({
         things: {
           currentPage: 3,
@@ -64,17 +64,16 @@ describe('Redux Pagination', () => {
       const {actionCreators} = createPaginationActions('things', thunk)
       actionCreators.getThings()(mockStore.dispatch, mockStore.getState)
 
-      setTimeout(() => {
+      await vi.waitFor(() => {
         expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
         expect(mockStore.dispatch).toHaveBeenCalledWith({
           type: 'GET_THINGS_START',
           payload: {page: 3},
         })
-        done()
       })
     })
 
-    it('creates get action creator from thunk that calls start with a payload page', done => {
+    it('creates get action creator from thunk that calls start with a payload page', async () => {
       const mockStore = createMockStore({
         things: {
           currentPage: 1,
@@ -85,17 +84,16 @@ describe('Redux Pagination', () => {
       const {actionCreators} = createPaginationActions('things', thunk)
       actionCreators.getThings({page: 5})(mockStore.dispatch, mockStore.getState)
 
-      setTimeout(() => {
+      await vi.waitFor(() => {
         expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
         expect(mockStore.dispatch).toHaveBeenCalledWith({
           type: 'GET_THINGS_START',
           payload: {page: 5},
         })
-        done()
       })
     })
 
-    it('creates get action creator from thunk that calls success', done => {
+    it('creates get action creator from thunk that calls success', async () => {
       const mockStore = createMockStore({
         things: {
           currentPage: 1,
@@ -106,17 +104,16 @@ describe('Redux Pagination', () => {
       const {actionCreators} = createPaginationActions('things', thunk)
       actionCreators.getThings({page: 5})(mockStore.dispatch, mockStore.getState)
 
-      setTimeout(() => {
+      await vi.waitFor(() => {
         expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
         expect(mockStore.dispatch).toHaveBeenLastCalledWith({
           type: 'GET_THINGS_SUCCESS',
           payload: {page: 5, data: ['item1']},
         })
-        done()
       })
     })
 
-    it('creates get action creator from thunk that calls success with lastPage from response link header', done => {
+    it('creates get action creator from thunk that calls success with lastPage from response link header', async () => {
       const mockStore = createMockStore({
         things: {
           currentPage: 1,
@@ -133,17 +130,16 @@ describe('Redux Pagination', () => {
       const {actionCreators} = createPaginationActions('things', thunk)
       actionCreators.getThings()(mockStore.dispatch, mockStore.getState)
 
-      setTimeout(() => {
+      await vi.waitFor(() => {
         expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
         expect(mockStore.dispatch).toHaveBeenLastCalledWith({
           type: 'GET_THINGS_SUCCESS',
           payload: {page: 1, data: ['item1'], lastPage: 5},
         })
-        done()
       })
     })
 
-    it('creates get action creator from thunk that calls fail', done => {
+    it('creates get action creator from thunk that calls fail', async () => {
       const mockStore = createMockStore({
         things: {
           currentPage: 1,
@@ -154,17 +150,16 @@ describe('Redux Pagination', () => {
       const {actionCreators} = createPaginationActions('things', thunk)
       actionCreators.getThings({page: 5})(mockStore.dispatch, mockStore.getState)
 
-      setTimeout(() => {
+      await vi.waitFor(() => {
         expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
         expect(mockStore.dispatch).toHaveBeenLastCalledWith({
           type: 'GET_THINGS_FAIL',
           payload: {page: 5, message: 'oops error'},
         })
-        done()
       })
     })
 
-    it('creates get action creator from thunk that does not call thunk if page is already loaded', done => {
+    it('creates get action creator from thunk that does not call thunk if page is already loaded', async () => {
       const mockStore = createMockStore({
         things: {
           currentPage: 1,
@@ -175,13 +170,12 @@ describe('Redux Pagination', () => {
       const {actionCreators} = createPaginationActions('things', thunk)
       actionCreators.getThings()(mockStore.dispatch, mockStore.getState)
 
-      setTimeout(() => {
+      await vi.waitFor(() => {
         expect(mockStore.dispatch).not.toHaveBeenCalled()
-        done()
       })
     })
 
-    it('creates get action creator from thunk that calls thunk if page is loaded and forceGet is true', done => {
+    it('creates get action creator from thunk that calls thunk if page is loaded and forceGet is true', async () => {
       const mockStore = createMockStore({
         things: {
           currentPage: 1,
@@ -192,17 +186,16 @@ describe('Redux Pagination', () => {
       const {actionCreators} = createPaginationActions('things', thunk)
       actionCreators.getThings({forceGet: true})(mockStore.dispatch, mockStore.getState)
 
-      setTimeout(() => {
+      await vi.waitFor(() => {
         expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
         expect(mockStore.dispatch).toHaveBeenLastCalledWith({
           type: 'GET_THINGS_SUCCESS',
           payload: {page: 1, data: ['item1']},
         })
-        done()
       })
     })
 
-    it('creates get action creator from thunk that selects the page if select is true', done => {
+    it('creates get action creator from thunk that selects the page if select is true', async () => {
       const mockStore = createMockStore({
         things: {
           currentPage: 1,
@@ -213,17 +206,16 @@ describe('Redux Pagination', () => {
       const {actionCreators} = createPaginationActions('things', thunk)
       actionCreators.getThings({select: true, page: 5})(mockStore.dispatch, mockStore.getState)
 
-      setTimeout(() => {
+      await vi.waitFor(() => {
         expect(mockStore.dispatch).toHaveBeenCalledTimes(3)
         expect(mockStore.dispatch).toHaveBeenCalledWith({
           type: 'SELECT_THINGS_PAGE',
           payload: {page: 5},
         })
-        done()
       })
     })
 
-    it('can get all pagination results under a single set of dispatches', done => {
+    it('can get all pagination results under a single set of dispatches', async () => {
       const mockStore = createMockStore({
         things: {
           currentPage: 1,
@@ -243,23 +235,25 @@ describe('Redux Pagination', () => {
       })
       actionCreators.getThings()(mockStore.dispatch, mockStore.getState)
 
-      setTimeout(() => {
-        expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
-        expect(mockStore.dispatch).toHaveBeenCalledWith({
-          type: 'GET_THINGS_START',
-          payload: {page: 1},
-        })
-        const expectedResults = {
-          type: 'GET_THINGS_SUCCESS',
-          payload: {
-            data: ['item1', 'item1', 'item1', 'item1', 'item1'],
-            lastPage: 1,
-            page: 1,
-          },
-        }
-        expect(mockStore.dispatch).toHaveBeenLastCalledWith(expectedResults)
-        done()
-      }, 750)
+      await vi.waitFor(
+        () => {
+          expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
+          expect(mockStore.dispatch).toHaveBeenCalledWith({
+            type: 'GET_THINGS_START',
+            payload: {page: 1},
+          })
+          const expectedResults = {
+            type: 'GET_THINGS_SUCCESS',
+            payload: {
+              data: ['item1', 'item1', 'item1', 'item1', 'item1'],
+              lastPage: 1,
+              page: 1,
+            },
+          }
+          expect(mockStore.dispatch).toHaveBeenLastCalledWith(expectedResults)
+        },
+        {timeout: 1000}
+      )
     })
   })
 

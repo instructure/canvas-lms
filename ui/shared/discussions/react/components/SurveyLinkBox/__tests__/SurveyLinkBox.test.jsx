@@ -20,6 +20,8 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {SurveyLinkBox} from '../SurveyLinkBox'
 
+const url = 'https://example.com'
+
 const enableFeatureFlag = () => {
   window.ENV = {
     ...window.ENV,
@@ -47,40 +49,39 @@ describe('SurveyLinkBox', () => {
   })
 
   it('does not render when feature flag is disabled', () => {
-    const {container} = render(<SurveyLinkBox text={{__html: 'Test content'}} />)
+    const {container} = render(<SurveyLinkBox url={url} text={{__html: 'Test content'}} />)
     expect(container).toBeEmptyDOMElement()
   })
 
   it('does not render when current user is a student', () => {
     enableFeatureFlag()
     setCurrentUserIsStudent()
-    const {container} = render(<SurveyLinkBox text={{__html: 'Test content'}} />)
+    const {container} = render(<SurveyLinkBox url={url} text={{__html: 'Test content'}} />)
     expect(container).toBeEmptyDOMElement()
   })
 
   it('renders content and link when feature flag is enabled', () => {
     enableFeatureFlag()
     const {getByTestId, getByRole} = render(
-      <SurveyLinkBox text={{__html: '<strong>Bold feedback</strong>'}} />,
+      <SurveyLinkBox url={url} text={{__html: '<strong>Bold feedback</strong>'}} />,
     )
 
     expect(getByTestId('discussion-ai-survey-text')).toBeInTheDocument()
-    expect(getByRole('link', {name: 'Please share your feedback'})).toHaveAttribute(
-      'href',
-      'https://inst.bid/ai/feedback/',
-    )
+    expect(getByRole('link', {name: 'Please share your feedback'})).toHaveAttribute('href', url)
   })
 
   it('applies default marginTop when none is provided', () => {
     enableFeatureFlag()
-    const {container} = render(<SurveyLinkBox text={{__html: 'Default margin'}} />)
+    const {container} = render(<SurveyLinkBox url={url} text={{__html: 'Default margin'}} />)
     const div = container.querySelector('div')
     expect(div).toHaveStyle('margin: 0 0 0 0')
   })
 
   it('applies custom marginTop when provided', () => {
     enableFeatureFlag()
-    const {container} = render(<SurveyLinkBox text={{__html: 'Custom margin'}} marginTop="large" />)
+    const {container} = render(
+      <SurveyLinkBox url={url} text={{__html: 'Custom margin'}} marginTop="large" />,
+    )
     const div = container.querySelector('div')
     expect(div).toHaveStyle('margin: 2.25rem 0 0 0')
   })

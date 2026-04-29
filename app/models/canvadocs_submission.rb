@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CanvadocsSubmission < ActiveRecord::Base
+class CanvadocsSubmission < ApplicationRecord
   belongs_to :canvadoc
-  belongs_to :crocodoc_document
   belongs_to :submission
+
+  self.ignored_columns += %w[crocodoc_document_id]
 end

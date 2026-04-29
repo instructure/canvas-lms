@@ -20,12 +20,17 @@ import React from 'react'
 import {render, act} from '@testing-library/react'
 import App from '../App'
 
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
-  showFlashSuccess: jest.fn(() => jest.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+    showFlashSuccess: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 const makeKey = ({id, name, inherited_from = 'global', account_owns_binding = true}) => ({
   id,
@@ -86,7 +91,7 @@ const initialApplicationState = inheritedList => {
     },
   }
 }
-const renderApp = ({ENV, inheritedList, ...overrides}) => {
+const renderApp = ({inheritedList, ...overrides}) => {
   const props = {
     applicationState: initialApplicationState(inheritedList),
     actions: {
@@ -129,8 +134,8 @@ describe('DeveloperKeys App', () => {
   let getAllByRole
   let queryByTestId
 
-  const setup = (ENV, inheritedList) => {
-    const wrapper = renderApp({ENV, inheritedList}).wrapper
+  const setup = inheritedList => {
+    const wrapper = renderApp({inheritedList}).wrapper
     getByText = wrapper.getByText
     queryByText = wrapper.queryByText
     getAllByRole = wrapper.getAllByRole
@@ -139,11 +144,82 @@ describe('DeveloperKeys App', () => {
     act(() => getByText('Inherited').click())
   }
 
+  beforeEach(() => {
+    fakeENV.setup()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  describe('alerts', () => {
+    it('shows info about new Apps page', () => {
+      setup([])
+      expect(getByText('LTI tool management is now live', {exact: false})).toBeInTheDocument()
+    })
+
+    describe('when user agent alert flag is disabled', () => {
+      beforeEach(() => {
+        fakeENV.setup({FEATURES: {developer_key_user_agent_alert: false}})
+      })
+
+      it('does not show user agent alert', () => {
+        setup([])
+        expect(
+          queryByText('API requests now require the User-Agent header', {exact: false}),
+        ).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when user agent alert flag is enabled', () => {
+      beforeEach(() => {
+        fakeENV.setup({FEATURES: {developer_key_user_agent_alert: true}})
+      })
+
+      it('shows user agent alert', () => {
+        setup([])
+        expect(
+          getByText('API requests now require the User-Agent header', {exact: false}),
+        ).toBeInTheDocument()
+      })
+    })
+
+    describe('when account setting is set', () => {
+      beforeEach(() => {
+        fakeENV.setup({showApiGetWithBodyNotice: true})
+      })
+
+      it('shows get body alert', () => {
+        setup([])
+        expect(
+          getByText('API GET requests with a body instead of query parameters will be blocked', {
+            exact: false,
+          }),
+        ).toBeInTheDocument()
+      })
+    })
+
+    describe('when account setting is not set', () => {
+      beforeEach(() => {
+        fakeENV.setup({showApiGetWithBodyNotice: false})
+      })
+
+      it('does not show get body alert', () => {
+        setup([])
+        expect(
+          queryByText('API GET requests with a body instead of query parameters will be blocked', {
+            exact: false,
+          }),
+        ).not.toBeInTheDocument()
+      })
+    })
+  })
+
   describe('inherited tab', () => {
     describe('when parent keys are present', () => {
       beforeEach(() => {
-        ENV = {FEATURES: {developer_key_page_checkboxes: true}}
-        setup(ENV, [...parentKeys, ...siteAdminKeys])
+        fakeENV.setup({FEATURES: {developer_key_page_checkboxes: true}})
+        setup([...parentKeys, ...siteAdminKeys])
       })
 
       it('renders Parent Keys heading', () => {
@@ -172,7 +248,7 @@ describe('DeveloperKeys App', () => {
 
     describe('when parent keys are not present', () => {
       beforeEach(() => {
-        setup({}, siteAdminKeys)
+        setup(siteAdminKeys)
       })
 
       it('does not render Parent Keys heading', () => {
@@ -190,70 +266,70 @@ describe('DeveloperKeys App', () => {
   })
 
   describe('when developer keys saved ', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     let ref
     beforeEach(() => {
-      const ENV = {FEATURES: {developer_key_page_checkboxes: true}}
+      fakeENV.setup({FEATURES: {developer_key_page_checkboxes: true}})
       const inheritedList = [...parentKeys, ...siteAdminKeys]
-      ref = renderApp({ENV, inheritedList}).ref
+      ref = renderApp({inheritedList}).ref
     })
 
     describe('with list of warnings', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         ref.current.developerKeySaveSuccessfulHandler(['warning1', 'warning2'])
       })
       it('Alert is shown for each warning message', () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(2)
       })
     })
 
     describe('with a warning', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         ref.current.developerKeySaveSuccessfulHandler('warning1')
       })
       it('Alert is shown for each warning message', () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
       })
     })
 
     describe('without a warning (null)', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         ref.current.developerKeySaveSuccessfulHandler(null)
       })
       it('No alert is shown', () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
       })
     })
 
     describe('without a warning (undefined)', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         ref.current.developerKeySaveSuccessfulHandler(undefined)
       })
       it('No Alert is shown', () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
       })
     })
 
     describe('without a warning (empty array)', () => {
       beforeEach(() => {
-        jest.clearAllMocks()
-        jest.clearAllTimers()
+        vi.clearAllMocks()
+        vi.clearAllTimers()
         ref.current.developerKeySaveSuccessfulHandler([])
       })
       it('Alert is shown for each warning message', () => {
-        jest.runOnlyPendingTimers()
+        vi.runOnlyPendingTimers()
         expect(FlashAlert.showFlashAlert).not.toHaveBeenCalled()
       })
     })

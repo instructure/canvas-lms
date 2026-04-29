@@ -659,6 +659,83 @@ describe Group do
     end
   end
 
+  describe ".ids_hidden_by_section_restriction" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @section1 = @course.default_section
+      @section2 = @course.course_sections.create!
+    end
+
+    it "hides a group whose members are only in a different section" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+      other = @section2.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+      group.add_user(other)
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).to include(group.id)
+    end
+
+    it "never hides a group the user is a member of" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+      other = @section2.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+      group.add_user(other)
+      group.add_user(viewer)
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).not_to include(group.id)
+    end
+
+    it "does not hide an empty group" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).not_to include(group.id)
+    end
+
+    it "does not hide a group with members in the same section" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+      same_section = @section1.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+      group.add_user(same_section)
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).not_to include(group.id)
+    end
+
+    it "returns an empty Set for empty input" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+
+      hidden = Group.ids_hidden_by_section_restriction([], viewer, @course)
+      expect(hidden).to eq(Set.new)
+    end
+
+    it "does not hide a group when the viewer shares a section via a second enrollment" do
+      viewer = user_model
+      @course.enroll_user(viewer, "StudentEnrollment", section: @section1, enrollment_state: "active")
+      @course.enroll_user(viewer, "StudentEnrollment", section: @section2, enrollment_state: "active", allow_multiple_enrollments: true)
+      other = @section2.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+      group.add_user(other)
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).not_to include(group.id)
+    end
+
+    it "excludes members with inactive enrollments from the section check" do
+      viewer = @section1.enroll_user(user_model, "StudentEnrollment").user
+      other = @section1.enroll_user(user_model, "StudentEnrollment").user
+      group = @course.groups.create!
+      group.add_user(other)
+      Enrollment.where(user_id: other.id, course_id: @course.id).update_all(workflow_state: "inactive")
+
+      hidden = Group.ids_hidden_by_section_restriction([group.id], viewer, @course)
+      expect(hidden).not_to include(group.id)
+    end
+  end
+
   context "tabs_available" do
     before :once do
       course_with_teacher(active_course: true)
@@ -756,6 +833,7 @@ describe Group do
         # should reload
         account.default_group_storage_quota = 20.decimal_megabytes
         account.save!
+        run_jobs
         @group = Group.find(@group.id)
 
         expect(@group.quota).to eq 20.decimal_megabytes
@@ -879,6 +957,20 @@ describe Group do
       users = @group.participating_users_in_context(include_inactive_users: true)
       expect(users.length).to eq 1
       expect(users.first.id).to eq @user.id
+    end
+
+    it "includes pending_active students when course has not started yet" do
+      course_with_student(active_all: true)
+      @course.start_at = 1.week.from_now
+      @course.conclude_at = 2.weeks.from_now
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+
+      group = @course.groups.create(name: "test_group")
+      group.add_user(@student, "accepted")
+
+      users = group.participating_users_in_context
+      expect(users).to include(@student)
     end
   end
 
@@ -1011,7 +1103,6 @@ describe Group do
     context "permissions" do
       before do
         @group = Group.create!(context: @course, group_category: @non_collaborative_category, name: "Test Group", non_collaborative: true)
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
         @course.account.reload
@@ -1121,6 +1212,18 @@ describe Group do
         expect(group.errors[:base]).to include("Variant limit reached for tag")
       end
 
+      it "does not allow to move a tag to a tag set that has reached the variant limit" do
+        # c1 already has 10 variants (the limit)
+        expect(Group.active.non_collaborative.where(group_category_id: @c1.id).count).to eq Group.MAX_VARIANTS_PER_TAG_CATEGORY
+
+        # Try to move a tag from c2 to c1
+        group_to_move = Group.where(group_category: @c2).first
+        group_to_move.group_category = @c1
+
+        expect(group_to_move).not_to be_valid
+        expect(group_to_move.errors[:base]).to include("Variant limit reached for tag")
+      end
+
       it "leaves out soft deleted tags" do
         expect(@c4.max_diff_tag_validation_count).to eq GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE
         GroupCategory.last.update(deleted_at: Time.zone.now)
@@ -1130,6 +1233,57 @@ describe Group do
         tag = GroupCategory.create(context: @course, name: "Category 5", non_collaborative: true)
         expect(tag).to be_valid
         expect(tag.errors).to be_empty
+      end
+    end
+  end
+
+  describe "#block_content_editor_enabled?" do
+    context "when context is a Course" do
+      before do
+        @course_context_group = Group.create!(name: "Course Group", context: @course)
+      end
+
+      it "delegates to the course's block_content_editor_enabled? method and returns true" do
+        allow(@course).to receive(:block_content_editor_enabled?).and_return(true)
+
+        expect(@course_context_group.block_content_editor_enabled?).to be true
+        expect(@course).to have_received(:block_content_editor_enabled?)
+      end
+
+      it "delegates to the course's block_content_editor_enabled? method and returns false" do
+        allow(@course).to receive(:block_content_editor_enabled?).and_return(false)
+
+        expect(@course_context_group.block_content_editor_enabled?).to be false
+        expect(@course).to have_received(:block_content_editor_enabled?)
+      end
+    end
+
+    context "when context is not a Course" do
+      before do
+        @account = account_model
+        @account_context_group = Group.create!(name: "Account Group", context: @account)
+      end
+
+      it "returns false" do
+        expect(@account_context_group.block_content_editor_enabled?).to be false
+      end
+
+      it "does not call any methods on the context" do
+        allow(@account).to receive(:block_content_editor_enabled?).and_return(true)
+
+        expect(@account_context_group.block_content_editor_enabled?).to be false
+        expect(@account).not_to have_received(:block_content_editor_enabled?)
+      end
+    end
+
+    context "when context is nil" do
+      before do
+        @group_without_context = Group.new(name: "Group Without Context")
+        @group_without_context.context = nil
+      end
+
+      it "returns false" do
+        expect(@group_without_context.block_content_editor_enabled?).to be false
       end
     end
   end

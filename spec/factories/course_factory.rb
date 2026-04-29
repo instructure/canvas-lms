@@ -28,13 +28,13 @@ module Factories
         course_code: opts[:course_code],
         account:,
         is_public: !!opts[:is_public],
-        enrollment_term_id: opts[:enrollment_term_id]
+        enrollment_term_id: opts[:enrollment_term_id],
+        career_learning_library_only: opts[:career_learning_library_only] || false
       )
       @course.offer! if opts[:active_course] || opts[:active_all]
       if opts[:active_all]
         u = User.create!
         u.register!
-        u.enable_feature!(:new_user_tutorial_on_off) if opts[:new_user]
         e = @course.enroll_teacher(u)
         e.workflow_state = "active"
         e.save!
@@ -77,6 +77,12 @@ module Factories
       @enrollment.save!
     end
     @course.reload
+    @enrollment
+  end
+
+  def course_with_test_student(opts = {})
+    course_with_user("StudentViewEnrollment", opts)
+    @test_student = @user
     @enrollment
   end
 

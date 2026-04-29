@@ -15,28 +15,30 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {Component} from 'react'
-import {arrayOf, bool, func, objectOf, shape, string, element, oneOfType} from 'prop-types'
-import {StyleSheet, css} from 'aphrodite'
+
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {IconTrashLine, IconQuestionLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {IconQuestionLine, IconTrashLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
+import {css, StyleSheet} from 'aphrodite'
+import {arrayOf, bool, element, func, objectOf, oneOfType, shape, string} from 'prop-types'
+import React, {Component} from 'react'
 import formatMessage from '../format-message'
 import CanvasSelect from '../shared/CanvasSelect'
 import {CC_FILE_MAX_BYTES} from '../shared/constants'
 
 export default class ClosedCaptionCreatorRow extends Component {
+  static _instanceCounter = 0
   static propTypes = {
     languages: arrayOf(
       shape({
         id: string,
         label: string,
-      })
+      }),
     ),
     liveRegion: func,
     uploadMediaTranslations: shape({
@@ -68,6 +70,7 @@ export default class ClosedCaptionCreatorRow extends Component {
   constructor(props) {
     super(props)
 
+    this._instanceId = ++ClosedCaptionCreatorRow._instanceCounter
     this.state = {
       isValidCC: true,
       messageErrorCC: '',
@@ -96,7 +99,7 @@ export default class ClosedCaptionCreatorRow extends Component {
         'The selected file exceeds the {maxSize} Byte limit',
         {
           maxSize: maxCCFileSize,
-        }
+        },
       )
       this.setState({
         isValidCC: false,
@@ -145,7 +148,7 @@ export default class ClosedCaptionCreatorRow extends Component {
         <CanvasSelect
           ref={this._langSelectRef}
           value={this.props.selectedLanguage?.id}
-          label={<ScreenReaderContent>{CLOSED_CAPTIONS_SELECT_LANGUAGE}</ScreenReaderContent>}
+          label={CLOSED_CAPTIONS_SELECT_LANGUAGE}
           liveRegion={this.props.liveRegion}
           onChange={this.handleLanguageChange}
           placeholder={CLOSED_CAPTIONS_SELECT_LANGUAGE}
@@ -180,9 +183,12 @@ export default class ClosedCaptionCreatorRow extends Component {
           type="file"
         />
         <View as="div">
-          <Text as="div">{SUPPORTED_FILE_TYPES}</Text>
+          <Text as="div" id={`cc-supported-types-${this._instanceId}`}>
+            {SUPPORTED_FILE_TYPES}
+          </Text>
           <Button
             id="attachmentFileButton"
+            aria-describedby={`cc-supported-types-${this._instanceId}${!this.props.selectedFile ? ` cc-file-status-${this._instanceId}` : ''}`}
             onClick={() => {
               this.fileInput.click()
             }}
@@ -194,7 +200,11 @@ export default class ClosedCaptionCreatorRow extends Component {
             <ScreenReaderContent>{this.state.messageErrorCC}</ScreenReaderContent>
           </Button>
           {!this.props.selectedFile && (
-            <View display="inline-block" margin="0 0 0 small">
+            <View
+              display="inline-block"
+              margin="0 0 0 small"
+              id={`cc-file-status-${this._instanceId}`}
+            >
               <Text color="secondary">{NO_FILE_CHOSEN}</Text>
             </View>
           )}

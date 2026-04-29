@@ -19,7 +19,7 @@
 import React from 'react'
 import {createCache} from '@canvas/apollo-v3'
 import {MockedProvider} from '@apollo/client/testing'
-import {render as realRender, fireEvent, waitFor} from '@testing-library/react'
+import {cleanup, render as realRender, fireEvent, waitFor} from '@testing-library/react'
 import OutcomeRemoveModal from '../OutcomeRemoveModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {accountMocks, deleteOutcomeMock} from '@canvas/outcomes/mocks/Management'
@@ -59,14 +59,16 @@ describe('OutcomeRemoveModal', () => {
 
   beforeEach(() => {
     cache = createCache()
-    onCloseHandlerMock = jest.fn()
-    onCleanupHandlerMock = jest.fn()
-    onRemoveLearningOutcomesHandlerMock = jest.fn()
-    removeOutcomes = jest.fn()
+    onCloseHandlerMock = vi.fn()
+    onCleanupHandlerMock = vi.fn()
+    onRemoveLearningOutcomesHandlerMock = vi.fn()
+    removeOutcomes = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+    cleanup()
+    cache.reset()
   })
 
   const render = (

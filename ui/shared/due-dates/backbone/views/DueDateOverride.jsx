@@ -20,7 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import DueDateOverride from '@canvas/assignments/jst/DueDateOverride.handlebars'
 import DateValidator from '@canvas/grading/DateValidator'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
@@ -32,6 +32,10 @@ import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import '@canvas/jquery/jquery.instructure_forms'
 import sanitizeData from '../../../forms/sanitizeData'
 import {showPostToSisFlashAlert, combinedDates} from '../../util/differentiatedModulesUtil'
+import {
+  getAssignmentAndPeerReviewOverrides,
+  hasPeerReviewOverrideDates,
+} from '../../../context-modules/differentiated-modules/utils/assignToHelper'
 
 const I18n = createI18nScope('DueDateOverrideView')
 
@@ -75,8 +79,7 @@ DueDateOverrideView.prototype.render = function () {
     return
   }
   if (this.options && this.options.inPacedCourse && this.options.isModuleItem) {
-    // eslint-disable-next-line react/no-render-return-value
-    return ReactDOM.render(
+    return legacyRender(
       React.createElement(CoursePacingNotice, {
         courseId: this.options.courseId,
       }),
@@ -145,25 +148,25 @@ DueDateOverrideView.prototype.render = function () {
     onTrayClose: () => this.trigger('tray:close'),
   })
 
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(assignToSection, div, () => {
-    // Run this function until the focus is performed after all re-renders
-    // Needs to be wrapped in a setTimeout since there are some internal
-    // re-renders to apply all card validations
-    const forceFocus = () => {
-      const sectionViewRef = document.getElementById(
-        'manage-assign-to-container',
-      )?.reactComponentInstance
-      if (!sectionViewRef?.focusErrors()) {
-        setTimeout(forceFocus, 500)
-      } else {
-        this.shouldForceFocusAfterRender = false
-      }
+  const result = legacyRender(assignToSection, div)
+  // legacyRender is synchronous, so run the post-render callback inline
+  // Run this function until the focus is performed after all re-renders
+  // Needs to be wrapped in a setTimeout since there are some internal
+  // re-renders to apply all card validations
+  const forceFocus = () => {
+    const sectionViewRef = document.getElementById(
+      'manage-assign-to-container',
+    )?.reactComponentInstance
+    if (!sectionViewRef?.focusErrors()) {
+      setTimeout(forceFocus, 500)
+    } else {
+      this.shouldForceFocusAfterRender = false
     }
-    if (this.shouldForceFocusAfterRender) {
-      forceFocus()
-    }
-  })
+  }
+  if (this.shouldForceFocusAfterRender) {
+    forceFocus()
+  }
+  return result
 }
 
 DueDateOverrideView.prototype.gradingPeriods = GradingPeriodsAPI.deserializePeriods(
@@ -375,8 +378,23 @@ DueDateOverrideView.prototype.showError = function (element, message) {
 // ==============================
 
 DueDateOverrideView.prototype.setNewOverridesCollection = function (newOverrides, importantDates) {
-  this.resetOverrides(newOverrides)
-  return this.model.assignment.importantDates(importantDates)
+  const hasPeerReviews = this.model.assignment.get('peer_reviews')
+  const peerReviewAllocationAndGradingEnabled = ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED
+  const hasPeerReviewDatesInOverrides = newOverrides?.some(hasPeerReviewOverrideDates)
+
+  // Check override dates in addition to hasPeerReviews to prevent race condition during form submission
+  if ((hasPeerReviews || hasPeerReviewDatesInOverrides) && peerReviewAllocationAndGradingEnabled) {
+    const {assignmentOverrides, peerReview} = getAssignmentAndPeerReviewOverrides(newOverrides)
+
+    this.resetOverrides(assignmentOverrides)
+    if (peerReview && Object.keys(peerReview).length > 0) {
+      this.model.assignment.set('peer_review_data', peerReview)
+    }
+  } else {
+    this.resetOverrides(newOverrides)
+  }
+
+  this.model.assignment.importantDates(importantDates)
 }
 
 DueDateOverrideView.prototype.resetOverrides = function (overrides) {

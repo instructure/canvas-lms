@@ -34,9 +34,9 @@ describe('GradebookGrid TotalGradeColumnHeaderRenderer', () => {
 
     gradebook = createGradebook()
     gradebook.keyboardNav = {
-      addGradebookElement: jest.fn(),
-      removeGradebookElement: jest.fn(),
-      handleMenuOrDialogClose: jest.fn(),
+      addGradebookElement: vi.fn(),
+      removeGradebookElement: vi.fn(),
+      handleMenuOrDialogClose: vi.fn(),
     }
     gradebook.gradingPeriodSet = {id: '1', weighted: false}
     gradebook.options = {
@@ -48,7 +48,7 @@ describe('GradebookGrid TotalGradeColumnHeaderRenderer', () => {
       message_attachment_upload_folder_id: '1',
     }
 
-    jest.spyOn(gradebook, 'saveSettings')
+    vi.spyOn(gradebook, 'saveSettings')
 
     columns = {
       frozen: [{id: 'student'}],
@@ -93,13 +93,13 @@ describe('GradebookGrid TotalGradeColumnHeaderRenderer', () => {
     })
 
     it('sets grabFocus to true when the column header option menu needs focus', () => {
-      jest.spyOn(gradebook, 'totalColumnShouldFocus').mockReturnValue(true)
+      vi.spyOn(gradebook, 'totalColumnShouldFocus').mockReturnValue(true)
       renderHeader()
       expect(component.props.grabFocus).toBe(true)
     })
 
     it('sets grabFocus to false when the column header option menu does not need focus', () => {
-      jest.spyOn(gradebook, 'totalColumnShouldFocus').mockReturnValue(false)
+      vi.spyOn(gradebook, 'totalColumnShouldFocus').mockReturnValue(false)
       renderHeader()
       expect(component.props.grabFocus).toBe(false)
     })
@@ -117,7 +117,7 @@ describe('GradebookGrid TotalGradeColumnHeaderRenderer', () => {
     })
 
     it('hides the action to change grade display when assignment groups are weighted', () => {
-      jest.spyOn(gradebook, 'weightedGroups').mockReturnValue(true)
+      vi.spyOn(gradebook, 'weightedGroups').mockReturnValue(true)
       renderHeader()
       expect(component.props.gradeDisplay.hidden).toBe(true)
     })
@@ -129,7 +129,7 @@ describe('GradebookGrid TotalGradeColumnHeaderRenderer', () => {
     })
 
     it('shows the action to change grade display when assignment groups are not weighted', () => {
-      jest.spyOn(gradebook, 'weightedGroups').mockReturnValue(false)
+      vi.spyOn(gradebook, 'weightedGroups').mockReturnValue(false)
       renderHeader()
       expect(component.props.gradeDisplay.hidden).toBe(false)
     })
@@ -141,30 +141,30 @@ describe('GradebookGrid TotalGradeColumnHeaderRenderer', () => {
     })
 
     it('includes a callback to toggle grade display', () => {
-      jest.spyOn(gradebook, 'togglePointsOrPercentTotals')
+      vi.spyOn(gradebook, 'togglePointsOrPercentTotals')
       renderHeader()
       // Mock the dialog to prevent jQuery errors
-      jest.spyOn(gradebook, 'togglePointsOrPercentTotals').mockImplementation(() => {})
+      vi.spyOn(gradebook, 'togglePointsOrPercentTotals').mockImplementation(() => {})
       component.props.gradeDisplay.onSelect()
       expect(gradebook.togglePointsOrPercentTotals).toHaveBeenCalled()
     })
 
     it('calls Gradebook#handleHeaderKeyDown with the event and column id', () => {
       const event = new Event('keydown')
-      jest.spyOn(gradebook, 'handleHeaderKeyDown').mockImplementation(() => {})
+      vi.spyOn(gradebook, 'handleHeaderKeyDown').mockImplementation(() => {})
       renderHeader()
       component.props.onHeaderKeyDown(event)
       expect(gradebook.handleHeaderKeyDown).toHaveBeenCalledWith(event, column.id)
     })
 
     it('includes a callback for closing the column header menu', () => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       renderHeader()
       component.props.onMenuDismiss()
       expect(gradebook.keyboardNav.handleMenuOrDialogClose).not.toHaveBeenCalled()
-      jest.runAllTimers()
+      vi.runAllTimers()
       expect(gradebook.keyboardNav.handleMenuOrDialogClose).toHaveBeenCalled()
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('sets position.isInBack to true when the column is the last scrollable column', () => {
@@ -186,7 +186,7 @@ describe('GradebookGrid TotalGradeColumnHeaderRenderer', () => {
     })
 
     it('sets weightedGroups to true when groups are weighted', () => {
-      jest.spyOn(gradebook, 'weightedGroups').mockReturnValue(true)
+      vi.spyOn(gradebook, 'weightedGroups').mockReturnValue(true)
       renderHeader()
       expect(component.props.weightedGroups).toBe(true)
     })

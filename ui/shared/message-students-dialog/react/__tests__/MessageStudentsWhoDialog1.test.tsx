@@ -25,7 +25,7 @@ import MessageStudentsWhoDialog, {
   MSWLaunchContext,
 } from '../MessageStudentsWhoDialog'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import type {CamelizedAssignment} from '@canvas/grading/grading'
 import fakeENV from '@canvas/test-utils/fakeENV'
 const students: Student[] = [
@@ -90,6 +90,7 @@ const scoredAssignment: CamelizedAssignment = {
   hasRubric: false,
   moderatedGrading: false,
   muted: false,
+  newQuizzesAnonymousParticipants: false,
   pointsPossible: 10,
   postManually: false,
   published: true,
@@ -110,6 +111,7 @@ const ungradedAssignment: CamelizedAssignment = {
   hasRubric: false,
   moderatedGrading: false,
   muted: false,
+  newQuizzesAnonymousParticipants: false,
   pointsPossible: 10,
   postManually: false,
   published: true,
@@ -124,6 +126,7 @@ const passFailAssignment: CamelizedAssignment = {
   name: 'A pass-fail assignment',
   submissionTypes: ['online_text_entry'],
   anonymizeStudents: false,
+  newQuizzesAnonymousParticipants: false,
   anonymousGrading: false,
   gradesPublished: true,
   htmlUrl: 'http://example.com',
@@ -144,6 +147,7 @@ const unsubmittableAssignment: CamelizedAssignment = {
   name: 'An unsubmittable assignment',
   submissionTypes: ['on_paper'],
   anonymizeStudents: false,
+  newQuizzesAnonymousParticipants: false,
   anonymousGrading: false,
   gradesPublished: true,
   htmlUrl: 'http://example.com',

@@ -108,6 +108,67 @@ describe GraphQLNodeLoader do
       end
     end
 
+    describe "PeerReviewSubAssignment" do
+      let!(:course) { course_model }
+      let!(:teacher) { teacher_in_course(active_all: true, course:).user }
+      let(:context) { { current_user: teacher } }
+
+      before do
+        course.enable_feature!(:peer_review_allocation_and_grading)
+        @parent_assignment = course.assignments.create!(
+          title: "Parent Assignment",
+          peer_reviews: true,
+          peer_review_count: 2
+        )
+        @peer_review_sub_assignment = peer_review_model(parent_assignment: @parent_assignment)
+      end
+
+      context "when feature flag is enabled" do
+        it "returns peer review sub assignment if valid id" do
+          GraphQL::Batch.batch do
+            GraphQLNodeLoader.load("PeerReviewSubAssignment", @peer_review_sub_assignment.id, context).then do |result|
+              expect(result).not_to be_nil
+              expect(result.id).to eq @peer_review_sub_assignment.id
+              expect(result).to be_a(PeerReviewSubAssignment)
+            end
+          end
+        end
+
+        it "returns nil if invalid id" do
+          GraphQL::Batch.batch do
+            GraphQLNodeLoader.load("PeerReviewSubAssignment", "9999999", context).then do |result|
+              expect(result).to be_nil
+            end
+          end
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before do
+          course.disable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "returns nil" do
+          GraphQL::Batch.batch do
+            GraphQLNodeLoader.load("PeerReviewSubAssignment", @peer_review_sub_assignment.id, context).then do |result|
+              expect(result).to be_nil
+            end
+          end
+        end
+      end
+
+      context "for user without permission" do
+        it "returns nil" do
+          ctx = { current_user: user_without_permisssion }
+          GraphQL::Batch.batch do
+            GraphQLNodeLoader.load("PeerReviewSubAssignment", @peer_review_sub_assignment.id, ctx).then do |result|
+              expect(result).to be_nil
+            end
+          end
+        end
+      end
+    end
+
     describe "SubmissionByAssignmentAndUser" do
       let!(:course) { course_model }
       let!(:teacher) { teacher_in_course(active_all: true, course:).user }

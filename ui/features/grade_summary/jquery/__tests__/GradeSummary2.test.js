@@ -119,7 +119,7 @@ describe('GradeSummary', () => {
   afterEach(() => {
     fakeENV.teardown()
     $fixtures.remove()
-    jest.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('getOriginalScore', () => {
@@ -154,7 +154,7 @@ describe('GradeSummary', () => {
   })
 
   describe('calculateTotals', () => {
-    const screenReaderFlashMock = jest.fn()
+    const screenReaderFlashMock = vi.fn()
 
     beforeEach(() => {
       ENV.assignment_groups = createAssignmentGroups()
@@ -196,7 +196,7 @@ describe('GradeSummary', () => {
     })
 
     it('localizes displayed grade', () => {
-      jest.spyOn(I18n.constructor.prototype, 'n').mockReturnValue('1,234')
+      vi.spyOn(I18n.constructor.prototype, 'n').mockReturnValue('1,234')
       GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
       const $teaser = $($fixtures).find('.student_assignment.final_grade .score_teaser')
       expect($teaser.text()).toContain('1,234')

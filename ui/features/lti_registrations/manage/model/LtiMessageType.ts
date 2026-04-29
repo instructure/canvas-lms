@@ -19,13 +19,19 @@ import * as z from 'zod'
 
 export const LtiResourceLinkRequest = 'LtiResourceLinkRequest' as const
 export const LtiDeepLinkingRequest = 'LtiDeepLinkingRequest' as const
+export const LtiEulaRequest = 'LtiEulaRequest' as const
 export const ZResourceLinkRequest = z.literal(LtiResourceLinkRequest)
 export const ZDeepLinkingRequest = z.literal(LtiDeepLinkingRequest)
+export const ZLtiEulaRequest = z.literal(LtiEulaRequest)
 
-export const ZLtiMessageType = z.union([ZDeepLinkingRequest, ZResourceLinkRequest])
+export const ZLtiMessageType = z.union([ZDeepLinkingRequest, ZResourceLinkRequest, ZLtiEulaRequest])
 
 export type LtiMessageType = z.infer<typeof ZLtiMessageType>
 
 export const isLtiMessageType = (s: string): s is LtiMessageType => {
   return ZLtiMessageType.safeParse(s).success
 }
+
+//Should match with Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES in backend
+export const ZLtiPlacementlessMessageType = ZLtiEulaRequest // add as union later if needed
+export type LtiPlacementlessMessageType = z.infer<typeof ZLtiPlacementlessMessageType>

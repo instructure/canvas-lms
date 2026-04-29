@@ -20,15 +20,21 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import GradePostingPolicyTabPanel from '../GradePostingPolicyTabPanel'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 describe('GradePostingPolicyTabPanel', () => {
   const defaultProps = {
     anonymousAssignmentsPresent: true,
     gradebookIsEditable: true,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
     settings: {
       postManually: false,
     },
@@ -39,7 +45,7 @@ describe('GradePostingPolicyTabPanel', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderComponent = (props = {}) => {
@@ -96,14 +102,14 @@ describe('GradePostingPolicyTabPanel', () => {
 
     describe('onChange behavior', () => {
       it('calls onChange when automatic posting is selected', async () => {
-        const onChange = jest.fn()
+        const onChange = vi.fn()
         renderComponent({onChange, settings: {postManually: true}})
         await userEvent.click(getAutomaticRadio())
         expect(onChange).toHaveBeenCalled()
       })
 
       it('calls onChange when manual posting is selected', async () => {
-        const onChange = jest.fn()
+        const onChange = vi.fn()
         renderComponent({onChange})
         await userEvent.click(getManualRadio())
         expect(onChange).toHaveBeenCalled()

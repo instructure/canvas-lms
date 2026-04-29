@@ -43,16 +43,16 @@ RSpec.shared_context "name_bookmarker_base_shared_examples" do
         end
 
         it "doesn't skip or repeat items (test set #{test_name})" do
-          pager = double(current_bookmark: nil, include_bookmark: false)
+          pager = instance_double(BookmarkedCollection::Collection, current_bookmark: nil, include_bookmark: false)
           first_page = described_class.restrict_scope(model_base_scope, pager).first(2)
           bookmark = described_class.bookmark_for(first_page.last)
-          pager = double(current_bookmark: bookmark, include_bookmark: false)
+          pager = instance_double(BookmarkedCollection::Collection, current_bookmark: bookmark, include_bookmark: false)
           next_page = described_class.restrict_scope(model_base_scope, pager).to_a
           expect((first_page + next_page).sort).to eq(models.sort)
         end
 
         it "orders bookmarks in Ruby the same way as the items returned from the database" do
-          pager = double(current_bookmark: nil, include_bookmark: false)
+          pager = instance_double(BookmarkedCollection::Collection, current_bookmark: nil, include_bookmark: false)
           from_db = described_class.restrict_scope(model_base_scope, pager).to_a
           bookmark_order = models.sort_by { |model| described_class.bookmark_for(model) }
 

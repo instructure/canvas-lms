@@ -29,27 +29,25 @@ module Lti::Messages
       raise ArgumentError, "asset_report is required" unless asset_report
 
       @asset_report = asset_report
+      raise ArgumentError, "Submission not found for asset report" unless submission
+
       @message = LtiAdvantage::Messages::ReportReviewRequest.new
     end
 
     def generate_post_payload_message
-      add_activity_claim!
+      add_activity_claim!(submission.assignment)
       add_submissions_claim!
       add_assetreport_type_claim!
       add_for_user_claim!
       add_asset_claim!
+      add_legacy_custom_sourcedid_claim!
       super(validate_launch: true)
     end
 
     private
 
-    def add_activity_claim!
-      @message.activity.id = submission.assignment.lti_context_id
-      @message.activity.title = submission.assignment.title
-    end
-
     def add_submissions_claim!
-      @message.submission.id =  submission.lti_attempt_id(@opts[:submission_attempt])
+      @message.submission.id = @asset_report.asset.submission_lti_claim_id
     end
 
     def add_assetreport_type_claim!
@@ -62,6 +60,11 @@ module Lti::Messages
 
     def add_asset_claim!
       @message.asset.id = @asset_report.asset.uuid
+    end
+
+    def add_legacy_custom_sourcedid_claim!
+      legacy_custom_sourced_id = @asset_report.extensions&.dig("https://www.instructure.com/legacy_custom_sourcedid")
+      add_extension("legacy_custom_sourcedid", legacy_custom_sourced_id) if legacy_custom_sourced_id
     end
 
     def submission

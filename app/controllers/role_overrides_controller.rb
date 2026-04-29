@@ -121,7 +121,7 @@
 #           "type": "datetime"
 #         },
 #         "permissions": {
-#           "description": "A dictionary of permissions keyed by name (see permissions input parameter in the 'Create a role' API).",
+#           "description": "A dictionary of permissions keyed by name (see 'List assignable permissions' API).",
 #           "example": {"read_course_content": {"enabled": true, "locked": false, "readonly": false, "explicit": true, "prior_default": false}, "read_course_list": {"enabled": true, "locked": true, "readonly": true, "explicit": false}, "read_question_banks": {"enabled": false, "locked": true, "readonly": false, "explicit": true, "prior_default": false}, "read_reports": {"enabled": true, "locked": false, "readonly": false, "explicit": false}},
 #           "type": "object",
 #           "key": { "type": "string" },
@@ -130,10 +130,53 @@
 #       }
 #     }
 #
+# @model Permission
+#     {
+#       "id": "Permission",
+#       "description": "A permission that can be granted to a role",
+#       "properties": {
+#         "key": {
+#           "description": "The API identifier for the permission",
+#           "example": "manage_lti_add",
+#           "type": "string"
+#         },
+#         "label": {
+#           "description": "The human-readable label for the permission",
+#           "example": "LTI - add",
+#           "type": "string"
+#         },
+#         "group": {
+#           "description": "The group this permission belongs to, if it is part of a granular permission group",
+#           "example": "manage_lti",
+#           "type": "string"
+#         },
+#         "group_label": {
+#           "description": "The human-readable label for the group this permission belongs to",
+#           "example": "Manage LTI",
+#           "type": "string"
+#         },
+#         "available_to": {
+#           "description": "The base role types this permission can be enabled for",
+#           "example": ["AccountAdmin", "AccountMembership", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment"],
+#           "type": "array",
+#           "items": {"type": "string"}
+#         },
+#         "true_for": {
+#           "description": "The base role types this permission is enabled for by default",
+#           "example": ["AccountAdmin", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment"],
+#           "type": "array",
+#           "items": {"type": "string"}
+#         }
+#       }
+#     }
+#
 class RoleOverridesController < ApplicationController
   before_action :require_context
 
   include HorizonMode
+
+  OVERRIDE_VALUES = %w[checked unchecked].freeze
+
   before_action :load_canvas_career, only: [:index]
 
   before_action :require_role, only: %i[activate_role remove_role update show]
@@ -162,7 +205,7 @@ class RoleOverridesController < ApplicationController
       roles = []
       roles += Role.visible_built_in_roles(root_account_id: @context.resolved_root_account_id) if states.include?("active")
 
-      scope = value_to_boolean(params[:show_inherited]) ? @context.available_custom_roles(true) : @context.roles
+      scope = value_to_boolean(params[:show_inherited]) ? @context.available_custom_roles(include_inactive: true) : @context.roles
       roles += scope.where(workflow_state: states).order(:id).to_a
 
       roles = Api.paginate(roles, self, route)
@@ -185,12 +228,22 @@ class RoleOverridesController < ApplicationController
         role_json(@context, role, @current_user, session, preloaded_overrides:)
       end
 
+      permission_groups = Permissions.permission_groups(@context).transform_values do |group_info|
+        {
+          label: group_info[:label].call,
+          subtitle: group_info[:subtitle].call
+        }.tap do |h|
+          h[:course_subtitle] = group_info[:course_subtitle].call if group_info[:course_subtitle]
+        end
+      end
+
       js_env({
                ACCOUNT_ROLES: account_role_data,
                COURSE_ROLES: course_role_data,
                ACCOUNT_PERMISSIONS: account_permissions(@context),
                COURSE_PERMISSIONS: course_permissions(@context),
-               ACCOUNT_ENABLE_ALERTS: @context.settings[:enable_alerts]
+               ACCOUNT_ENABLE_ALERTS: @context.settings[:enable_alerts],
+               PERMISSION_GROUPS: permission_groups
              })
 
       add_crumb t "Permissions"
@@ -248,129 +301,8 @@ class RoleOverridesController < ApplicationController
   #   Ignored if permission <X> is locked upstream (in an ancestor account).
   #
   #   May occur multiple times with unique values for <X>. Recognized
-  #   permission names for <X> are:
-  #
-  #     [For Account-Level Roles Only]
-  #     become_user                      -- Users - act as
-  #     import_sis                       -- SIS Data - import
-  #     manage_account_memberships       -- Admins - add / remove
-  #     manage_account_settings          -- Account-level settings - manage
-  #     manage_alerts                    -- Global announcements - add / edit / delete
-  #     manage_catalog                   -- Catalog - manage
-  #     Manage Course Templates granular permissions
-  #         add_course_template          -- Course Templates - add
-  #         delete_course_template       -- Course Templates - delete
-  #         edit_course_template         -- Course Templates - edit
-  #     manage_courses_add               -- Courses - add
-  #     manage_courses_admin             -- Courses - manage / update
-  #     manage_developer_keys            -- Developer keys - manage
-  #     manage_feature_flags             -- Feature Options - enable / disable
-  #     manage_master_courses            -- Blueprint Courses - add / edit / associate / delete
-  #     manage_role_overrides            -- Permissions - manage
-  #     manage_storage_quotas            -- Storage Quotas - manage
-  #     manage_sis                       -- SIS data - manage
-  #     Manage Temporary Enrollments granular permissions
-  #         temporary_enrollments_add     -- Temporary Enrollments - add
-  #         temporary_enrollments_edit    -- Temporary Enrollments - edit
-  #         temporary_enrollments_delete  -- Temporary Enrollments - delete
-  #     manage_user_logins               -- Users - manage login details
-  #     manage_user_observers            -- Users - manage observers
-  #     manage_users_in_bulk             -- Bulk actions - People page
-  #     moderate_user_content            -- Users - moderate content
-  #     read_course_content              -- Course Content - view
-  #     read_course_list                 -- Courses - view list
-  #     view_course_changes              -- Courses - view change logs
-  #     view_feature_flags               -- Feature Options - view
-  #     view_grade_changes               -- Grades - view change logs
-  #     view_notifications               -- Notifications - view
-  #     view_quiz_answer_audits          -- Quizzes - view submission log
-  #     view_statistics                  -- Statistics - view
-  #     undelete_courses                 -- Courses - undelete
-  #
-  #     [For both Account-Level and Course-Level roles]
-  #      Note: Applicable enrollment types for course-level roles are given in brackets:
-  #            S = student, T = teacher (instructor), A = TA, D = designer, O = observer.
-  #            Lower-case letters indicate permissions that are off by default.
-  #            A missing letter indicates the permission cannot be enabled for the role
-  #            or any derived custom roles.
-  #     allow_course_admin_actions       -- [ Tad ] Users - allow administrative actions in courses
-  #     create_collaborations            -- [STADo] Student Collaborations - create
-  #     create_conferences               -- [STADo] Web conferences - create
-  #     create_forum                     -- [STADo] Discussions - create
-  #     generate_observer_pairing_code   -- [ tado] Users - Generate observer pairing codes for students
-  #     import_outcomes                  -- [ TaDo] Learning Outcomes - import
-  #     manage_account_banks             -- [ td  ] Item Banks - manage account
-  #     share_banks_with_subaccounts     -- [ tad ] Item Banks - share with subaccounts
-  #     Manage Assignments and Quizzes granular permissions
-  #         manage_assignments_add       -- [ TADo] Assignments and Quizzes - add
-  #         manage_assignments_edit      -- [ TADo] Assignments and Quizzes - edit / manage
-  #         manage_assignments_delete    -- [ TADo] Assignments and Quizzes - delete
-  #     manage_calendar                  -- [sTADo] Course Calendar - add / edit / delete
-  #     Manage Course Content granular permissions
-  #         manage_course_content_add    -- [ TADo] Course Content - add
-  #         manage_course_content_edit   -- [ TADo] Course Content - edit
-  #         manage_course_content_delete -- [ TADo] Course Content - delete
-  #     manage_course_visibility         -- [ TAD ] Course - change visibility
-  #     Manage Courses granular permissions
-  #         manage_courses_conclude      -- [ TaD ] Courses - conclude
-  #         manage_courses_delete        -- [ TaD ] Courses - delete
-  #         manage_courses_publish       -- [ TaD ] Courses - publish
-  #         manage_courses_reset         -- [ TaD ] Courses - reset
-  #     Manage Files granular permissions
-  #         manage_files_add             -- [ TADo] Course Files - add
-  #         manage_files_edit            -- [ TADo] Course Files - edit
-  #         manage_files_delete          -- [ TADo] Course Files - delete
-  #     manage_grades                    -- [ TA  ] Grades - edit
-  #     Manage Groups granular permissions
-  #         manage_groups_add            -- [ TAD ] Groups - add
-  #         manage_groups_delete         -- [ TAD ] Groups - delete
-  #         manage_groups_manage         -- [ TAD ] Groups - manage
-  #     manage_interaction_alerts        -- [ Ta  ] Alerts - add / edit / delete
-  #     manage_outcomes                  -- [sTaDo] Learning Outcomes - add / edit / delete
-  #     manage_proficiency_calculations  -- [ t d ] Outcome Proficiency Calculations - add / edit / delete
-  #     manage_proficiency_scales        -- [ t d ] Outcome Proficiency/Mastery Scales - add / edit / delete
-  #     Manage Sections granular permissions
-  #         manage_sections_add          -- [ TaD ] Course Sections - add
-  #         manage_sections_edit         -- [ TaD ] Course Sections - edit
-  #         manage_sections_delete       -- [ TaD ] Course Sections - delete
-  #     manage_students                  -- [ TAD ] Users - manage students in courses
-  #     manage_rubrics                   -- [ TAD ] Rubrics - add / edit / delete
-  #     Manage Pages granular permissions
-  #         manage_wiki_create           -- [ TADo] Pages - create
-  #         manage_wiki_delete           -- [ TADo] Pages - delete
-  #         manage_wiki_update           -- [ TADo] Pages - update
-  #     moderate_forum                   -- [sTADo] Discussions - moderate
-  #     post_to_forum                    -- [STADo] Discussions - post
-  #     read_announcements               -- [STADO] Announcements - view
-  #     read_email_addresses             -- [sTAdo] Users - view primary email address
-  #     read_forum                       -- [STADO] Discussions - view
-  #     read_question_banks              -- [ TADo] Question banks - view and link
-  #     read_reports                     -- [ TAD ] Reports - manage
-  #     read_roster                      -- [STADo] Users - view list
-  #     read_sis                         -- [sTa  ] SIS Data - read
-  #     select_final_grade               -- [ TA  ] Grades - select final grade for moderation
-  #     send_messages                    -- [STADo] Conversations - send messages to individual course members
-  #     send_messages_all                -- [sTADo] Conversations - send messages to entire class
-  #     Users - Teacher granular permissions
-  #         add_teacher_to_course        -- [ Tad ] Add a teacher enrollment to a course
-  #         remove_teacher_from_course   -- [ Tad ] Remove a Teacher enrollment from a course
-  #     Users - TA granular permissions
-  #         add_ta_to_course             -- [ Tad ] Add a TA enrollment to a course
-  #         remove_ta_from_course        -- [ Tad ] Remove a TA enrollment from a course
-  #     Users - Designer granular permissions
-  #         add_designer_to_course       -- [ Tad ] Add a designer enrollment to a course
-  #         remove_designer_from_course  -- [ Tad ] Remove a designer enrollment from a course
-  #     Users - Observer granular permissions
-  #         add_observer_to_course       -- [ Tad ] Add an observer enrollment to a course
-  #         remove_observer_from_course  -- [ Tad ] Remove an observer enrollment from a course
-  #     Users - Student granular permissions
-  #         add_student_to_course        -- [ Tad ] Add a student enrollment to a course
-  #         remove_student_from_course   -- [ Tad ] Remove a student enrollment from a course
-  #     view_all_grades                  -- [ TAd ] Grades - view all grades
-  #     view_analytics                   -- [sTA  ] Analytics - view pages
-  #     view_audit_trail                 -- [ t   ] Grades - view audit trail
-  #     view_group_pages                 -- [sTADo] Groups - view all student groups
-  #     view_user_logins                 -- [ TA  ] Users - view login IDs
+  #   permission names for <X> can be found on the
+  #   {file:file.permissions.html Permissions list page}.
   #
   #   Some of these permissions are applicable only for roles on the site admin
   #   account, on a root account, or for course-level roles with a particular base role type;
@@ -417,7 +349,12 @@ class RoleOverridesController < ApplicationController
 
     name = api_request? ? (params[:label].presence || params[:role]) : params[:role_type]
 
-    return render json: { message: "missing required parameter 'role'" }, status: :bad_request if api_request? && name.blank?
+    if api_request?
+      return render json: { message: "missing required parameter 'role'" }, status: :bad_request if name.blank?
+
+      used_names = @context.available_roles.map(&:name)
+      return render json: { message: "role name #{name} already in use" }, status: :bad_request if used_names.include?(name)
+    end
 
     base_role_type = params[:base_role_type] || Role::DEFAULT_ACCOUNT_TYPE
     role = @context.roles.build(name:)
@@ -449,9 +386,8 @@ class RoleOverridesController < ApplicationController
     # Add base_role_type_label for this role
     json = role_json(@context, role, @current_user, session)
 
-    if (base_role = RoleOverride.enrollment_type_labels.find { |br| br[:base_role_name] == base_role_type })
-      # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      json["base_role_type_label"] = base_role.key?(:label_v2) ? base_role[:label_v2].call : base_role[:label].call
+    if (base_role = RoleOverride.enrollment_type_labels(@context).find { |br| br[:base_role_name] == base_role_type })
+      json["base_role_type_label"] = base_role[:label].call
     end
 
     render json:
@@ -512,6 +448,31 @@ class RoleOverridesController < ApplicationController
     end
   end
 
+  def create
+    if authorized_action(@context, @current_user, :manage_role_overrides)
+      roles = if params[:account_roles] || @context == Account.site_admin
+                @context.available_account_roles(include_inactive: true)
+              else
+                @context.available_course_roles(include_inactive: true)
+              end
+      if params[:permissions]
+        RoleOverride.permissions.each_key do |key|
+          next unless params[:permissions][key]
+
+          roles.each do |role|
+            next unless (settings = params[:permissions][key][role.id.to_s] || params[:permissions][key][role.id])
+
+            override = settings[:override] == "checked" if OVERRIDE_VALUES.include?(settings[:override])
+            locked = settings[:locked] == "true" if settings[:locked]
+            RoleOverride.manage_role_override(@context, role, key.to_s, override:, locked:)
+          end
+        end
+      end
+      flash[:notice] = t "notices.saved", "Changes Saved Successfully."
+      redirect_to named_context_url(@context, :context_permissions_url, account_roles: params[:account_roles])
+    end
+  end
+
   # @API Update a role
   # Update permissions for an existing role.
   #
@@ -531,6 +492,8 @@ class RoleOverridesController < ApplicationController
   # @argument permissions[<X>][enabled] [Boolean]
   #   These arguments are described in the documentation for the
   #   {api:RoleOverridesController#add_role add_role method}.
+  #   The list of available permissions can be found on the
+  #   {file:file.permissions.html Permissions list page}.
   #
   # @argument permissions[<X>][applies_to_self] [Boolean]
   #   If the value is 1, permission <X> applies to the account this role is in.
@@ -578,28 +541,44 @@ class RoleOverridesController < ApplicationController
     end
   end
 
-  def create
+  # @API List assignable permissions
+  # List all permissions that can be granted to roles in the given account.
+  #
+  # This returns largely the same information documented on the {file:file.permissions.html Permissions list page},
+  # with a few caveats:
+  # * Permission labels and group labels returned by this API are localized (the same text visible in the web UI).
+  # * This API includes permissions added by plugins.
+  # * This API excludes permissions that are disabled in or otherwise do not apply to the given account.
+  #
+  # @argument search_term [String]
+  #  If provided, return only permissions whose key, label, group, or group_label match the search string.
+  #
+  # @returns [Permission]
+  def manageable_permissions
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      roles = if params[:account_roles] || @context == Account.site_admin
-                @context.available_account_roles(true)
-              else
-                @context.available_course_roles(true)
-              end
-      if params[:permissions]
-        RoleOverride.permissions.each_key do |key|
-          next unless params[:permissions][key]
+      perms = RoleOverride.manageable_permissions(@context)
 
-          roles.each do |role|
-            next unless (settings = params[:permissions][key][role.id.to_s] || params[:permissions][key][role.id])
-
-            override = settings[:override] == "checked" if ["checked", "unchecked"].include?(settings[:override])
-            locked = settings[:locked] == "true" if settings[:locked]
-            RoleOverride.manage_role_override(@context, role, key.to_s, override:, locked:)
-          end
+      perms.transform_values! do |info|
+        {
+          label: info[:label].call,
+          available_to: info[:available_to],
+          true_for: info[:true_for]
+        }.tap do |h|
+          h[:group] = info[:group].to_s if info[:group]
+          h[:group_label] = Permissions.group_label(info[:group]) if info[:group]
         end
       end
-      flash[:notice] = t "notices.saved", "Changes Saved Successfully."
-      redirect_to named_context_url(@context, :context_permissions_url, account_roles: params[:account_roles])
+      if params[:search_term].present?
+        search = params[:search_term].downcase
+        perms.select! do |key, info|
+          key.to_s.include?(search) ||
+            info[:label].downcase.include?(search) ||
+            info[:group]&.downcase&.include?(search) ||
+            info[:group_label]&.downcase&.include?(search)
+        end
+      end
+
+      render json: perms.map { |key, info| { key: }.merge(info) }
     end
   end
 
@@ -744,11 +723,9 @@ class RoleOverridesController < ApplicationController
     }
 
     RoleOverride.manageable_permissions(context).each do |p|
-      # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      hash = { label: p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, permission_name: p[0] }
+      hash = { label: p[1][:label].call, permission_name: p[0] }
       if p[1].key?(:group)
-        hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
-        hash[:granular_permission_group_label] = p[1][:group_label].call
+        hash[:granular_permission_group] = p[1][:group]
       end
 
       # Check to see if the base role name is in the list of other base role names in p[1]
@@ -771,9 +748,7 @@ class RoleOverridesController < ApplicationController
     res << course if course[:group_permissions].any?
 
     res.each do |pg|
-      # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      pg[:group_permissions] =
-        pg[:group_permissions].sort_by { |p| p.key?(:label_v2) ? p[:label_v2] : p[:label] }
+      pg[:group_permissions].sort_by! { |p| p[:label] }
     end
 
     res
@@ -817,11 +792,9 @@ class RoleOverridesController < ApplicationController
     RoleOverride.manageable_permissions(context).each do |p|
       next if !context.root_account? && p[0].to_s == "manage_developer_keys"
 
-      # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      hash = { label: p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, permission_name: p[0] }
+      hash = { label: p[1][:label].call, permission_name: p[0] }
       if p[1].key?(:group)
-        hash[:granular_permission_group] = p[1][:group] if p[1].key?(:group)
-        hash[:granular_permission_group_label] = p[1][:group_label].call
+        hash[:granular_permission_group] = p[1][:group]
       end
 
       if p[1][:account_only]
@@ -844,9 +817,7 @@ class RoleOverridesController < ApplicationController
     res << course if course[:group_permissions].any?
 
     res.each do |pg|
-      # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
-      pg[:group_permissions] =
-        pg[:group_permissions].sort_by { |p| p.key?(:label_v2) ? p[:label_v2] : p[:label] }
+      pg[:group_permissions].sort_by! { |p| p[:label] }
     end
 
     res

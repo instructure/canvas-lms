@@ -1,5 +1,4 @@
 # it is intended that this be used exclusive of all other docker-compose.*yml files in CI
-version: "2.3"
 services:
   canvas:
     links:
@@ -14,7 +13,7 @@ services:
       SASS_STYLE: 'compressed'
 
   canvasrceapi:
-    image: starlord.inscloudgate.net/jenkins/canvas-rce-api
+    image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/canvas-rce-api
     environment:
       ECOSYSTEM_KEY: "astringthatisactually32byteslong"
       ECOSYSTEM_SECRET: "astringthatisactually32byteslong"
@@ -28,7 +27,7 @@ services:
     init: true
 
   selenium-hub:
-    image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:${HUB_VERSION:-4.22.0}
+    image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/hub:${HUB_VERSION:-4.41.0}
     ports:
       - "4442:4442"
       - "4443:4443"
@@ -37,12 +36,13 @@ services:
       GRID_BROWSER_TIMEOUT: 5000
 
   selenium-chrome: &NODE_CHROME
-    image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:${CHROME_VERSION:-126.0-20240621}
+    image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/selenium/node-chromium:${CHROME_VERSION:-145.0}
     shm_size: 2gb
     environment: &NODE_CHROME_ENV
       SE_EVENT_BUS_HOST: selenium-hub
       SE_EVENT_BUS_PUBLISH_PORT: 4442
       SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
+      SE_NODE_GRID_URL: "http://selenium-hub:4444"
       SE_NODE_HOST: selenium-chrome
       JAVA_OPTS: '-Dwebdriver.chrome.whitelistedIps='
     depends_on:

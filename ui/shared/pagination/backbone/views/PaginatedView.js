@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'

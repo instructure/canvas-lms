@@ -57,8 +57,8 @@ describe "calendar2" do
 
           # turns out that sometimes you don't have any days from other months showing
           # whoda thunk that? (curse you february 2015!)
-          while f("#minical .fc-other-month").nil?
-            f("#minical .fc-button-prev").click
+          until element_exists?("#minical .fc-other-month")
+            f("#minical .fc-prev-button").click
             wait_for_ajaximations
           end
 
@@ -122,7 +122,7 @@ describe "calendar2" do
 
           create_courses 17, enroll_user: @user
           # Page takes an extra second or two to load, so we need to increase the timeout
-          with_timeouts({ script: 7 }) { get "/calendar2" }
+          with_timeouts({ script: 10 }) { get "/calendar2" }
           ff(".context_list_context").each(&:click)
           expect(ff(".context_list_context.checked").count).to eq 15
         end

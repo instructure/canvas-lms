@@ -31,7 +31,7 @@ const server = setupServer(
   }),
 )
 
-const onChange = jest.fn()
+const onChange = vi.fn()
 
 const renderComponent = (overrideProps?: any) =>
   render(<QuestionBankSelector onChange={onChange} {...overrideProps} />)

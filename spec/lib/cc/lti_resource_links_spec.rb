@@ -23,6 +23,25 @@ require "nokogiri"
 describe CC::LtiResourceLinks do
   include CC::LtiResourceLinks
 
+  # Provide create_key method for testing (mimics CC::Resource delegation)
+  def create_key(obj, prepend = "")
+    CC::CCHelper.create_key(obj, prepend, global: true)
+  end
+
+  let(:assignment) do
+    Assignment.create!(
+      course: tool.context,
+      name: "Test Assignment",
+      workflow_state: "published",
+      submission_types: "external_tool",
+      external_tool_tag_attributes: {
+        url: tool_url,
+        custom:,
+        vendor_code: "test_vendor_code"
+      }
+    )
+  end
+
   let(:resource_link) do
     Lti::ResourceLink.create!(
       context: tool.context,
@@ -88,8 +107,8 @@ describe CC::LtiResourceLinks do
 
     it "sets the custom params" do
       expect(
-        subject.xpath("//blti:custom/lticm:property").each_with_object({}) do |el, h|
-          h[el.attribute("name").text] = el.text
+        subject.xpath("//blti:custom/lticm:property").to_h do |el|
+          [el.attribute("name").text, el.text]
         end
       ).to eq(custom.stringify_keys)
     end
@@ -131,6 +150,77 @@ describe CC::LtiResourceLinks do
     context "when the lookup uuid is populated" do
       it "includes the lookup_uuid extension property" do
         expect(find_extension(subject, "lookup_uuid")).to eq lookup_uuid
+      end
+    end
+
+    context "when the resource link is associated with an assignment" do
+      before do
+        resource_link.context = assignment
+        resource_link.save!
+      end
+
+      it "includes the assignment_migration_id extension property" do
+        expect(find_extension(subject, "assignment_migration_id")).to eq CC::CCHelper.create_key(resource_link.context, global: true)
+      end
+    end
+  end
+
+  describe "#add_lti_resource_links" do
+    let(:course) { tool.context }
+    let(:assignment) do
+      Assignment.create!(
+        course:,
+        name: "Test Assignment",
+        workflow_state: "published",
+        submission_types: "none"
+      )
+    end
+    let(:assignment_resource_link) do
+      Lti::ResourceLink.create!(
+        context: assignment,
+        lookup_uuid: SecureRandom.uuid,
+        context_external_tool: tool,
+        url: tool_url
+      )
+    end
+    let(:resources_double) { double("resources") } # rubocop:disable RSpec/VerifiedDoubles
+    let(:rl_document) { Struct.new(:file_name, :file, :document).new("test.xml", double(close: nil), double) }
+
+    before do
+      @course = course
+      @resources = resources_double
+      assignment_resource_link
+      allow(self).to receive(:create_resource_link_document).and_return(rl_document)
+      allow(self).to receive(:add_lti_resource_link)
+      allow(resources_double).to receive(:resource)
+    end
+
+    it "exports the resource link when the assignment is selected for export" do
+      allow(self).to receive(:export_object?).with(assignment).and_return(true)
+      expect(resources_double).to receive(:resource).once
+      add_lti_resource_links
+    end
+
+    it "skips the resource link when neither the assignment nor the resource link is selected for export" do
+      allow(self).to receive(:export_object?).with(assignment).and_return(false)
+      allow(self).to receive(:export_object?).with(assignment_resource_link).and_return(false)
+      expect(resources_double).not_to receive(:resource)
+      add_lti_resource_links
+    end
+
+    context "when in a master migration" do
+      it "exports when only the resource link was updated (not the assignment)" do
+        allow(self).to receive(:export_object?).with(assignment).and_return(false)
+        allow(self).to receive(:export_object?).with(assignment_resource_link).and_return(true)
+        expect(resources_double).to receive(:resource).once
+        add_lti_resource_links
+      end
+
+      it "skips when neither the assignment nor the resource link was updated" do
+        allow(self).to receive(:export_object?).with(assignment).and_return(false)
+        allow(self).to receive(:export_object?).with(assignment_resource_link).and_return(false)
+        expect(resources_double).not_to receive(:resource)
+        add_lti_resource_links
       end
     end
   end

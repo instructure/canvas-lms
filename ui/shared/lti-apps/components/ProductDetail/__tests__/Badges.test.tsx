@@ -19,15 +19,16 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import Badges from '../Badges'
-import '@testing-library/jest-dom/extend-expect'
 import {Badges as BadgesType} from '../../../models/Product'
 
 // Mock the useBreakpoints hook
-jest.mock('../../../hooks/useBreakpoints', () => ({
-  __esModule: true,
-  default: jest.fn(() => ({
+vi.mock('../../../hooks/useBreakpoints', () => ({
+  default: vi.fn(() => ({
     isDesktop: true,
     isMobile: false,
+    isTablet: false,
+    isMaxMobile: false,
+    isMaxTablet: false,
   })),
 }))
 

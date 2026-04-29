@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "Instructure",
-  "main": "index.tsx"
+  "main": "index.tsx",
+  "owner": "FOO"
 }

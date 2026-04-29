@@ -317,7 +317,7 @@ describe('OutcomeView', () => {
 
   describe('Confirmation Dialog', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'warn').mockImplementation(() => {})
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
     })
 
     afterEach(() => {
@@ -338,7 +338,7 @@ describe('OutcomeView', () => {
       view.$('#title').val('this is a brand new title')
       view.$('form').trigger('submit')
       await waitFrames(10)
-      
+
       return new Promise(resolve => {
         setTimeout(() => {
           expect($('.confirm-outcome-edit-modal-container').length).toBeGreaterThan(0)
@@ -361,11 +361,11 @@ describe('OutcomeView', () => {
       await waitFrames(10)
       view.edit($.Event())
       await waitFrames(10)
-      const submitSpy = jest.fn()
+      const submitSpy = vi.fn()
       view.on('submit', submitSpy)
       view.$('form').trigger('submit')
       await waitFrames(10)
-      
+
       return new Promise(resolve => {
         setTimeout(async () => {
           $('#confirm-outcome-edit-modal').trigger('click')
@@ -387,11 +387,11 @@ describe('OutcomeView', () => {
       await waitFrames(10)
       view.edit($.Event())
       await waitFrames(10)
-      const submitSpy = jest.fn()
+      const submitSpy = vi.fn()
       view.on('submit', submitSpy)
       view.$('form').trigger('submit')
       await waitFrames(10)
-      
+
       return new Promise(resolve => {
         setTimeout(async () => {
           $('#confirm-outcome-edit-modal').trigger('click')

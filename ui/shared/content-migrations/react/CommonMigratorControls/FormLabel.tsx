@@ -37,9 +37,7 @@ type RequiredFormLabelProps = {
 export const FormLabel = ({children, htmlFor}: FormLabelProps) => {
   return (
     <label htmlFor={htmlFor}>
-      <Text weight="bold">
-        {children}
-      </Text>
+      <Text weight="bold">{children}</Text>
     </label>
   )
 }

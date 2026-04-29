@@ -377,6 +377,43 @@ RSpec.describe Mutations::CreateConversation do
     ).to eq "Hello there"
   end
 
+  context "with multiple recipients as an observer" do
+    let(:observer) { user_with_pseudonym }
+    let(:teacher2) { teacher_in_course(active_all: true).user }
+    let(:student) { @student }
+
+    context "mixed with teachers and students" do
+      subject do
+        run_mutation(
+          { recipients: [student.id.to_s, teacher2.id.to_s], body: "Hello there", context_code: @course.asset_string },
+          observer
+        )
+      end
+
+      context "when sending to observed student" do
+        before do
+          add_linked_observer(student, observer, root_account: @course.root_account)
+        end
+
+        it "allows observer to send combined message to both" do
+          expect(
+            subject.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
+          ).to eq "Hello there"
+        end
+      end
+
+      context "when sending to not observed student" do
+        it "does not allow observer to send message" do
+          result = subject
+          expect(result.dig("data", "createConversation", "conversations")).to be_nil
+          expect(
+            result.dig("data", "createConversation", "errors", 0, "message")
+          ).to eql "Invalid recipients"
+        end
+      end
+    end
+  end
+
   it "infers context tags" do
     course_with_teacher_logged_in(active_all: true)
     @course1 = @course
@@ -428,9 +465,37 @@ RSpec.describe Mutations::CreateConversation do
     expect(c.tags.sort).to eql [@course1.asset_string, @course2.asset_string, @course3.asset_string, @group1.asset_string, @group3.asset_string].sort
   end
 
+  it "rejects recipients from different course context" do
+    course_with_teacher_logged_in(active_all: true)
+    course1 = @course
+    course2 = course_factory(active_all: true)
+
+    student1 = User.create
+    enrollment1 = course1.enroll_student(student1)
+    enrollment1.workflow_state = "active"
+    enrollment1.save
+
+    student2 = User.create
+    enrollment2 = course2.enroll_student(student2)
+    enrollment2.workflow_state = "active"
+    enrollment2.save
+
+    result = run_mutation(
+      {
+        recipients: [course2.asset_string],
+        body: "test message",
+        group_conversation: true,
+        context_code: course1.asset_string
+      },
+      @user
+    )
+
+    expect(result.dig("data", "createConversation", "conversations")).to be_nil
+    expect(result.dig("data", "createConversation", "errors", 0, "message")).to eq("Invalid recipients")
+  end
+
   context "non_collaborative groups" do
     before(:once) do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload

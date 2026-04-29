@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
+import type {Root} from 'react-dom/client'
 import {
   RubricAssignmentContainer,
   RubricSelfAssessmentSettingsWrapper,
@@ -31,6 +32,7 @@ import {
 type ENVType = {
   ACCOUNT_LEVEL_MASTERY_SCALES: boolean
   ASSIGNMENT_ID: string
+  ASSIGNMENT_POINTS?: number
   COURSE_ID: string
   PERMISSIONS: {
     manage_rubrics: boolean
@@ -44,22 +46,24 @@ type ENVType = {
   rubric_association: RubricAssociationUnderscore
   rubric_self_assessment_ff_enabled: boolean
   context_asset_string: string
+  current_user_id: string
 }
 declare const ENV: ENVType
 
 // Keep track of React roots
-const roots = new Map()
+const roots = new Map<string, Root>()
 
-function createOrUpdateRoot(elementId: string, component: React.ReactNode) {
+function createOrUpdateRoot(elementId: string, component: React.ReactElement) {
   const container = document.getElementById(elementId)
   if (!container) return
 
   let root = roots.get(elementId)
   if (!root) {
-    root = createRoot(container)
+    root = render(component, container)
     roots.set(elementId, root)
+  } else {
+    rerender(root, component)
   }
-  root.render(component)
 }
 
 $(() => {
@@ -71,7 +75,6 @@ $(() => {
     const assignmentRubric = envRubric
       ? {
           ...mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric),
-          can_update: ENV.assigned_rubric?.can_update,
           association_count: ENV.assigned_rubric?.association_count,
         }
       : undefined
@@ -85,8 +88,10 @@ $(() => {
         assignmentId={ENV.ASSIGNMENT_ID}
         assignmentRubric={assignmentRubric}
         assignmentRubricAssociation={assignmentRubricAssociation}
+        assignmentPointsPossible={ENV.ASSIGNMENT_POINTS}
         canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
         courseId={ENV.COURSE_ID}
+        currentUserId={ENV.current_user_id}
         rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
         aiRubricsEnabled={ENV.ai_rubrics_enabled}
       />,

@@ -18,7 +18,15 @@
 
 import * as Api from '../api/pace_contexts_api'
 import type {Dispatch} from 'redux'
-import type {BulkEditStudentsState, SortableColumn, OrderType, Section, BulkStudentsApiResponse, Student, CoursePace} from '../types'
+import type {
+  BulkEditStudentsState,
+  SortableColumn,
+  OrderType,
+  Section,
+  BulkStudentsApiResponse,
+  Student,
+  CoursePace,
+} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('bulk_edit_students_actions')
@@ -52,7 +60,7 @@ export const setFilterPaceStatus = (status: string) => ({
 
 export const setSort = (sortBy: SortableColumn, orderType: OrderType) => ({
   type: SET_SORT,
-  payload: { sortBy, orderType },
+  payload: {sortBy, orderType},
 })
 
 export const setPage = (page: number) => ({
@@ -86,24 +94,21 @@ export const setPageCount = (pageCount: number) => ({
 })
 
 export const resetBulkEditState = () => ({
-  type: RESET_BULK_EDIT_STATE
+  type: RESET_BULK_EDIT_STATE,
 })
 
 export const fetchStudents = () => {
-  return async (dispatch: Dispatch, getState: () => { bulkEditStudents: BulkEditStudentsState, coursePace: CoursePace }) => {
+  return async (
+    dispatch: Dispatch,
+    getState: () => {bulkEditStudents: BulkEditStudentsState; coursePace: CoursePace},
+  ) => {
     try {
       dispatch(setLoading(true))
       dispatch(setError(''))
-      const {
-        searchTerm,
-        filterSection,
-        filterPaceStatus,
-        sortBy,
-        orderType,
-        page,
-      } = getState().bulkEditStudents
+      const {searchTerm, filterSection, filterPaceStatus, sortBy, orderType, page} =
+        getState().bulkEditStudents
       const courseId = getState().coursePace.course_id
-      const response = await Api.getStudentBulkPaceEditView({
+      const response = (await Api.getStudentBulkPaceEditView({
         courseId,
         page,
         entriesPerRequest: 10,
@@ -111,9 +116,9 @@ export const fetchStudents = () => {
         sortBy,
         orderType,
         filterPaceStatus,
-        filterSection
-      }) as BulkStudentsApiResponse
-      const allSectionsOption: Section = { id: 'all', course_id: '', name: I18n.t('All Sections') }
+        filterSection,
+      })) as BulkStudentsApiResponse
+      const allSectionsOption: Section = {id: 'all', course_id: '', name: I18n.t('All Sections')}
       const sectionsWithAll = [allSectionsOption, ...response.sections]
 
       dispatch(setStudents(response.students))
@@ -126,4 +131,3 @@ export const fetchStudents = () => {
     }
   }
 }
-

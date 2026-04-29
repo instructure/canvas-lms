@@ -19,7 +19,7 @@
 import React from 'react'
 import {render as testingLibraryRender} from '@testing-library/react'
 import GroupsTray from '../GroupsTray'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const render = (children: unknown) =>

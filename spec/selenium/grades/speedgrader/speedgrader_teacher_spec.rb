@@ -69,6 +69,7 @@ describe "SpeedGrader" do
 
   context "alerts" do
     it "alerts the teacher before leaving the page if comments are not saved", priority: "1" do
+      skip "QE Team will revisit due to chrome update TESTOPS-232 2025-07-23"
       student_in_course(active_user: true).user
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       comment_textarea = f("#speed_grader_comment_textarea")
@@ -275,8 +276,11 @@ describe "SpeedGrader" do
     @assignment.submit_homework(s3, body: "Homework!?")
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
+    wait_for_dom_ready
+    wait_for_initializers
 
+    # Wait for the student selector to be fully loaded
+    expect(f("#students_selectmenu")).to be_displayed
     expect(fj("#students_selectmenu option[value=#{s3.id}]")[:selected]).to be_truthy
   end
 
@@ -475,41 +479,8 @@ describe "SpeedGrader" do
       # Verify that the grade is .5
       wait_for_ajaximations
       expect { f("#grading-box-extended")["value"] }.to become("3.5")
-      expect(f("#students_selectmenu-button")).to_not have_class("not_graded")
+      expect(f("#students_selectmenu-button")).not_to have_class("not_graded")
       expect(f("#students_selectmenu-button")).to have_class("graded")
-    end
-  end
-
-  context "Crocodocable Submissions" do
-    # set up course and users
-    let(:test_course) { @course }
-    let(:student)     { user_factory(active_all: true) }
-    let!(:crocodoc_plugin) { PluginSetting.create! name: "crocodoc", settings: { api_key: "abc123" } }
-    let!(:enroll_student) do
-      test_course.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
-    end
-    # create an assignment with online_upload type submission
-    let!(:assignment) { test_course.assignments.create!(title: "Assignment A", submission_types: "online_text_entry,online_upload") }
-    # submit to the assignment as a student twice, one with file and other with text
-    let!(:file_attachment) { attachment_model(content_type: "application/pdf", context: student) }
-    let!(:submit_with_attachment) do
-      assignment.submit_homework(
-        student,
-        submission_type: "online_upload",
-        attachments: [file_attachment]
-      )
-    end
-
-    it "displays a flash warning banner when viewed in Firefox", priority: "2" do
-      skip_if_chrome("This test applies to Firefox")
-      skip_if_ie("This test applies to Firefox")
-      # sometimes google docs is slow to load, which causes the flash
-      # message to go away before `get` finishes. we're not testing
-      # google docs here anyway, so ¯\_(ツ)_/¯
-      Account.default.disable_service(:google_docs_previews)
-      Account.default.save
-      get "/courses/#{test_course.id}/gradebook/speed_grader?assignment_id=#{assignment.id}"
-      assert_flash_notice_message "Warning: Crocodoc has limitations when used in Firefox. Comments will not always be saved."
     end
   end
 end

@@ -55,7 +55,7 @@ const ProgressionModuleHeader = ({bridge}: Props) => {
     <Flex margin="0 0 medium">
       <Flex.Item>
         <Heading level="h1">
-          <span dangerouslySetInnerHTML={{__html: renderTitle()}} />
+          <span dangerouslySetInnerHTML={{__html: renderTitle() || ''}} />
         </Heading>
       </Flex.Item>
     </Flex>

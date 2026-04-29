@@ -21,15 +21,16 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ProgressCircle} from '@instructure/ui-progress'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {func, string} from 'prop-types'
 
 const I18n = createI18nScope('groups')
-const pctFormat = new Intl.NumberFormat(ENV.LOCALE || navigator.language, {style: 'percent'}).format
 
 const POLLING_INTERVAL = 1000
 
 export const AssignmentProgress = ({url, onCompletion, apiCall}) => {
+  const pctFormat = new Intl.NumberFormat(ENV.LOCALE || navigator.language, {style: 'percent'})
+    .format
   const [progressPercent, setProgressPercent] = useState(0)
 
   function startPolling() {

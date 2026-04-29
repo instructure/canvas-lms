@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, cleanup, waitFor, fireEvent} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 
 import AssignmentColumnHeader from '../AssignmentColumnHeader'
 import {getMenuItem} from './ColumnHeaderSpecHelpers'
@@ -210,7 +209,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.hideGradesAction.onSelect = jest.fn()
+        props.hideGradesAction.onSelect = vi.fn()
       })
 
       test('does not restore focus to the "Options" menu trigger', () => {
@@ -260,7 +259,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         hidden: false,
         selected: 'points',
         showGradingSchemeOption: false,
-        onSelect: jest.fn(),
+        onSelect: vi.fn(),
       }
     })
 
@@ -290,7 +289,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
       describe('when clicked', () => {
         beforeEach(() => {
           props.enterGradesAsSetting.selected = 'percent'
-          props.enterGradesAsSetting.onSelect = jest.fn()
+          props.enterGradesAsSetting.onSelect = vi.fn()
         })
 
         test('calls the onSelect callback', () => {
@@ -323,7 +322,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
       describe('when clicked', () => {
         beforeEach(() => {
           props.enterGradesAsSetting.selected = 'points'
-          props.enterGradesAsSetting.onSelect = jest.fn()
+          props.enterGradesAsSetting.onSelect = vi.fn()
           mountAndOpenOptionsMenu()
         })
 
@@ -376,7 +375,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.downloadSubmissionsAction.onSelect = jest.fn()
+        props.downloadSubmissionsAction.onSelect = vi.fn()
         mountAndOpenOptionsMenu()
       })
 
@@ -413,7 +412,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.reuploadSubmissionsAction.onSelect = jest.fn()
+        props.reuploadSubmissionsAction.onSelect = vi.fn()
         mountAndOpenOptionsMenu()
       })
 
@@ -440,7 +439,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
     let preventDefault
 
     beforeEach(() => {
-      preventDefault = jest.fn()
+      preventDefault = vi.fn()
       mountComponent()
     })
 

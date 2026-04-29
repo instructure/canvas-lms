@@ -22,7 +22,7 @@
  */
 
 import $ from 'jquery'
-import {sumBy} from 'lodash'
+import {sumBy} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import I18n from '@canvas/i18n'
 import OutcomeResultCollection from '../collections/OutcomeResultCollection'
@@ -164,14 +164,13 @@ class OutcomeLineGraphView extends Backbone.View {
   data() {
     if (this._data === null || typeof this._data === 'undefined') {
       this._data = this.collection
-        .chain()
-        .last(this.limit)
+        .toArray()
+        .slice(-this.limit)
         .map((outcomeResult, i) => ({
           x: i,
           y: this.percentageFor(outcomeResult.get('score')),
           date: outcomeResult.get('submitted_or_assessed_at'),
         }))
-        .value()
     }
     return this._data
   }

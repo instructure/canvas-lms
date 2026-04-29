@@ -18,7 +18,7 @@
 
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -27,7 +27,7 @@ import {BulkEditStudentsTable} from './bulk_edit_students_table'
 import {actions} from '../actions/ui'
 import {connect} from 'react-redux'
 import {PaceContext} from '../types'
-import { showFlashAlert } from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('bulk_edit_students')
 
@@ -52,16 +52,15 @@ export const BulkEditStudentPaces = ({
   openModal,
   closeModal,
   handleContextSelect,
-  setSelectedPaceContext
+  setSelectedPaceContext,
 }: StateProps & DispatchProps & PassedProps) => {
-
   const handleBulkEditClick = () => {
     closeModal()
-    const selectedStudentsString = selectedBulkStudents.join(",")
+    const selectedStudentsString = selectedBulkStudents.join(',')
 
     const paceContext = {
       name: I18n.t('Bulk Edit'),
-      type: "BulkEnrollment",
+      type: 'BulkEnrollment',
       item_id: selectedStudentsString,
       associated_section_count: 0,
       associated_student_count: selectedBulkStudents.length,
@@ -71,7 +70,9 @@ export const BulkEditStudentPaces = ({
     handleContextSelect(paceContext, true)
     setSelectedPaceContext('BulkEnrollment', selectedStudentsString)
     showFlashAlert({
-      message: I18n.t('Any changes made to these students pacing will effect all individual student paces.'),
+      message: I18n.t(
+        'Any changes made to these students pacing will effect all individual student paces.',
+      ),
       err: null,
       type: 'warning',
     })
@@ -103,7 +104,9 @@ export const BulkEditStudentPaces = ({
               {I18n.t('Select two or more students to bulk edit course pacing.')}
             </Text>
             <Alert variant="info" margin="small">
-              {I18n.t('Only students with default course paces and same enrollment dates can be edited in bulk.')}
+              {I18n.t(
+                'Only students with default course paces and same enrollment dates can be edited in bulk.',
+              )}
             </Alert>
             <BulkEditStudentsTable />
           </View>
@@ -113,7 +116,11 @@ export const BulkEditStudentPaces = ({
             <Button color="secondary" onClick={closeModal} margin="0 small 0 0">
               {I18n.t('Cancel')}
             </Button>
-            <Button color="primary" onClick={handleBulkEditClick} disabled={selectedBulkStudents.length < 2}>
+            <Button
+              color="primary"
+              onClick={handleBulkEditClick}
+              disabled={selectedBulkStudents.length < 2}
+            >
               {I18n.t('Bulk Edit')}
             </Button>
           </View>
@@ -131,8 +138,8 @@ const mapStateToProps = (state: any): StateProps => ({
 const mapDispatchToProps: DispatchProps = {
   openModal: actions.openBulkEditModal,
   closeModal: actions.closeBulkEditModal,
-  setSelectedPaceContext: actions.setSelectedPaceContext
+  setSelectedPaceContext: actions.setSelectedPaceContext,
 }
 
-// @ts-expect-error
+// @ts-expect-error Redux connect type incompatibility
 export default connect(mapStateToProps, mapDispatchToProps)(BulkEditStudentPaces)

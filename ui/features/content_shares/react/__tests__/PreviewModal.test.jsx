@@ -34,7 +34,7 @@ describe('content_shares/PreviewModal', () => {
   })
 
   it('dismisses the modal', () => {
-    const handleDismiss = jest.fn()
+    const handleDismiss = vi.fn()
     const {getAllByText} = render(<PreviewModal open={true} onDismiss={handleDismiss} />)
     const closeButtons = getAllByText(/close/i)
     closeButtons.forEach(button => fireEvent.click(button))

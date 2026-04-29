@@ -41,8 +41,8 @@ describe('Gradebook', () => {
     })
 
     beforeEach(() => {
-      onSuccess = jest.fn()
-      onFailure = jest.fn()
+      onSuccess = vi.fn()
+      onFailure = vi.fn()
       capturedRequest = null
 
       server.use(

@@ -83,6 +83,20 @@ it('renders peer review icon and title for peer reviews', () => {
   expect(getByText(/Peer Review for/)).toBeInTheDocument()
 })
 
+it('renders peer review icon for peer review assignments without adding prefix', () => {
+  const {container, getByText, queryByText} = render(
+    <ToDoItem
+      {...getDefaultProps({
+        type: 'Peer Review Sub Assignment',
+        title: 'Assignment 1 Peer Review (2)',
+      })}
+    />,
+  )
+  expect(container.querySelector('svg[name="IconPeerReview"]')).toBeInTheDocument()
+  expect(getByText('Assignment 1 Peer Review (2)')).toBeInTheDocument()
+  expect(queryByText(/Peer Review for/)).not.toBeInTheDocument()
+})
+
 it('renders note icon for planner_notes', () => {
   const {container} = render(<ToDoItem {...getDefaultProps({type: ''})} />)
   expect(container.querySelector('svg[name="IconNote"]')).toBeInTheDocument()
@@ -125,7 +139,7 @@ it('renders unique text for dismiss button', () => {
 })
 
 it('calls the handleDismissClick prop when the dismiss X is clicked', () => {
-  const handleDismissClick = jest.fn()
+  const handleDismissClick = vi.fn()
   const item = {
     type: 'Assignment',
     title: 'Introduction to Board Games',

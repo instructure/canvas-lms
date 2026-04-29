@@ -21,7 +21,7 @@ import {bool, shape, string} from 'prop-types'
 
 export const Group = {
   fragment: gql`
-    fragment Group on Group {
+    fragment InboxGroup on Group {
       _id
       contextName: name
       assetString

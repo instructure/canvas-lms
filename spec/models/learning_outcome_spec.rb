@@ -18,7 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../feature_flag_helper"
+
 describe LearningOutcome do
+  include FeatureFlagHelper
+
   let(:calc_method_no_int) { %w[highest latest average] }
 
   def outcome_errors(prop)
@@ -817,8 +821,8 @@ describe LearningOutcome do
         ]
 
         calc_method.each do |method|
-          invalid_value_error = "not a valid value for this calculation method"
-          unused_value_error = "A calculation value is not used with this calculation method"
+          let(:invalid_value_error) { "not a valid value for this calculation method" }
+          let(:unused_value_error) { "A calculation value is not used with this calculation method" }
 
           it "rejects creation of a learning outcome with an illegal calculation_int for calculation_method of '#{method}'" do
             @outcome = @course.created_learning_outcomes.create(
@@ -1048,9 +1052,9 @@ describe LearningOutcome do
         expect(@outcome.points_possible).to be 5
       end
 
-      it "defaults calculation_method to decaying_average" do
+      it "defaults calculation_method to standard_decaying_average" do
         @outcome = LearningOutcome.create!(title: "outcome")
-        expect(@outcome.calculation_method).to eql("decaying_average")
+        expect(@outcome.calculation_method).to eql("standard_decaying_average")
         expect(@outcome.calculation_int).to be 65
       end
 
@@ -1083,7 +1087,7 @@ describe LearningOutcome do
 
       # This is to prevent changing behavior of existing outcomes made before we added the
       # ability to set a calculation_method
-      it "sets calculation_method to decaying_average if the record is pre-existing and nil" do
+      it "sets calculation_method to standard_decaying_average if the record is pre-existing and nil" do
         @outcome = LearningOutcome.create!(title: "outcome")
         @outcome.update_column(:calculation_method, nil)
         @outcome.reload
@@ -1092,7 +1096,7 @@ describe LearningOutcome do
         @outcome.save!
         @outcome.reload
         expect(@outcome.description).to eq("foo bar baz qux")
-        expect(@outcome.calculation_method).to eq("decaying_average")
+        expect(@outcome.calculation_method).to eq("standard_decaying_average")
       end
 
       context "color and mastery defaults" do
@@ -1641,6 +1645,269 @@ describe LearningOutcome do
       o3.update(copied_from_outcome_id: o2.id)
       o4.update(copied_from_outcome_id: o3.id)
       expect(o4.fetch_outcome_copies.count).to eq 4
+    end
+  end
+
+  describe "rollup calculation integration" do
+    let_once(:course) { course_model }
+    let_once(:account) { account_model }
+
+    describe "#rollup_relevant_changes?" do
+      it "returns true when calculation_method changes" do
+        outcome = course.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+        outcome.update!(calculation_method: "latest")
+        expect(outcome.rollup_relevant_changes?).to be true
+      end
+
+      it "returns true when calculation_int changes" do
+        outcome = course.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "decaying_average", calculation_int: 65)
+        outcome.update!(calculation_int: 75)
+        expect(outcome.rollup_relevant_changes?).to be true
+      end
+    end
+
+    describe "#rollup_calculation" do
+      context "with course context" do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+        end
+
+        it "enqueues rollup calculation for the course when calculation_method changes" do
+          outcome = course.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+          expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+            .with(course_id: course.id)
+
+          outcome.update!(calculation_method: "latest")
+        end
+
+        it "enqueues rollup calculation for the course when calculation_int changes" do
+          outcome = course.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "decaying_average", calculation_int: 65)
+          expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+            .with(course_id: course.id)
+
+          outcome.update!(calculation_int: 75)
+        end
+      end
+
+      context "with account context" do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+        end
+
+        context "with account_outcome_rollup_orchestrator feature disabled" do
+          before do
+            mock_feature_flag_on_account(:account_outcome_rollup_orchestrator, false)
+          end
+
+          it "does not enqueue rollup calculation for account-level changes" do
+            outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+            expect(Outcomes::AccountOutcomeRollupOrchestrator).not_to receive(:process_account_outcome_change)
+            expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+            outcome.update!(calculation_method: "latest")
+          end
+        end
+
+        context "with account_outcome_rollup_orchestrator feature enabled" do
+          before do
+            mock_feature_flag_on_account(:account_outcome_rollup_orchestrator, true)
+          end
+
+          it "uses orchestrator for account-level changes when calculation_method changes" do
+            outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+            expect(Outcomes::AccountOutcomeRollupOrchestrator).to receive(:process_account_outcome_change)
+              .with(account_id: account.id, outcome_id: outcome.id)
+
+            outcome.update!(calculation_method: "latest")
+          end
+
+          it "uses orchestrator for account-level changes when calculation_int changes" do
+            outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "decaying_average", calculation_int: 65)
+
+            expect(Outcomes::AccountOutcomeRollupOrchestrator).to receive(:process_account_outcome_change)
+              .with(account_id: account.id, outcome_id: outcome.id)
+
+            outcome.update!(calculation_int: 75)
+          end
+
+          it "uses orchestrator when rubric criterion changes" do
+            outcome = account.created_learning_outcomes.create!(
+              title: "Test Outcome",
+              data: {
+                rubric_criterion: {
+                  ratings: [
+                    { description: "Excellent", points: 4 },
+                    { description: "Good", points: 3 }
+                  ],
+                  mastery_points: 3,
+                  points_possible: 4
+                }
+              }
+            )
+
+            expect(Outcomes::AccountOutcomeRollupOrchestrator).to receive(:process_account_outcome_change)
+              .with(account_id: account.id, outcome_id: outcome.id)
+
+            outcome.update!(
+              data: {
+                rubric_criterion: {
+                  ratings: [
+                    { description: "Excellent", points: 5 },
+                    { description: "Good", points: 3 }
+                  ],
+                  mastery_points: 3,
+                  points_possible: 5
+                }
+              }
+            )
+          end
+
+          it "does not enqueue course-level calculation for account outcomes" do
+            outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+            expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+            outcome.update!(calculation_method: "latest")
+          end
+
+          it "handles errors gracefully" do
+            outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+            allow(Outcomes::AccountOutcomeRollupOrchestrator).to receive(:process_account_outcome_change)
+              .and_raise(StandardError.new("Test error"))
+
+            expect(Canvas::Errors).to receive(:capture_exception).with(
+              :outcome_rollup_callback,
+              instance_of(StandardError),
+              hash_including(
+                context_type: "Account",
+                context_id: account.id,
+                learning_outcome_id: outcome.id
+              )
+            )
+
+            expect { outcome.update!(calculation_method: "latest") }.not_to raise_error
+          end
+        end
+      end
+
+      context "with feature flag disabled" do
+        before do
+          Account.site_admin.disable_feature!(:outcomes_rollup_propagation)
+        end
+
+        it "does not enqueue rollup calculation when feature flag is disabled" do
+          outcome = course.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+          expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+          outcome.update!(calculation_method: "latest")
+        end
+      end
+    end
+
+    describe "rubric criterion changes" do
+      before do
+        Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+      end
+
+      it "enqueues rollup calculation when rubric criterion ratings change" do
+        outcome = course.created_learning_outcomes.create!(
+          title: "Test Outcome",
+          data: {
+            rubric_criterion: {
+              ratings: [
+                { description: "Excellent", points: 4 },
+                { description: "Good", points: 3 }
+              ],
+              mastery_points: 3,
+              points_possible: 4
+            }
+          }
+        )
+
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+          .with(course_id: course.id)
+
+        outcome.update!(
+          data: {
+            rubric_criterion: {
+              ratings: [
+                { description: "Excellent", points: 5 },
+                { description: "Good", points: 3 },
+                { description: "Fair", points: 2 }
+              ],
+              mastery_points: 3,
+              points_possible: 5
+            }
+          }
+        )
+      end
+
+      it "enqueues rollup calculation when mastery_points change" do
+        outcome = course.created_learning_outcomes.create!(
+          title: "Test Outcome",
+          data: {
+            rubric_criterion: {
+              ratings: [{ description: "Good", points: 4 }],
+              mastery_points: 3,
+              points_possible: 4
+            }
+          }
+        )
+
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+          .with(course_id: course.id)
+
+        outcome.update!(
+          data: {
+            rubric_criterion: {
+              ratings: [{ description: "Good", points: 4 }],
+              mastery_points: 4,
+              points_possible: 4
+            }
+          }
+        )
+      end
+
+      it "enqueues rollup calculation when points_possible change" do
+        outcome = course.created_learning_outcomes.create!(
+          title: "Test Outcome",
+          data: {
+            rubric_criterion: {
+              ratings: [{ description: "Good", points: 4 }],
+              mastery_points: 3,
+              points_possible: 4
+            }
+          }
+        )
+
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+          .with(course_id: course.id)
+
+        outcome.update!(
+          data: {
+            rubric_criterion: {
+              ratings: [{ description: "Good", points: 4 }],
+              mastery_points: 3,
+              points_possible: 5
+            }
+          }
+        )
+      end
+
+      it "does not enqueue rollup when non-criterion data changes" do
+        outcome = course.created_learning_outcomes.create!(
+          title: "Test Outcome",
+          data: { other_field: "value" }
+        )
+
+        expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+        outcome.update!(data: { other_field: "new_value" })
+      end
     end
   end
 end

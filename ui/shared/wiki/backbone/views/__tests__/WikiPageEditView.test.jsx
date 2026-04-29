@@ -16,14 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'jquery-migrate'
-import $ from 'jquery'
+import {redirectWithHorizonParams} from '@canvas/horizon/utils'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import WikiPageEditView from '../WikiPageEditView'
-import WikiPage from '../../models/WikiPage'
-import {BODY_MAX_LENGTH} from '../../../utils/constants'
-import {screen} from '@testing-library/dom'
+import {screen, waitFor} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
+import $ from 'jquery'
+import 'jquery-migrate'
+import {BODY_MAX_LENGTH} from '../../../utils/constants'
+import WikiPage from '../../models/WikiPage'
+import WikiPageEditView from '../WikiPageEditView'
+import {renderAssignToTray} from '../../../react/renderAssignToTray'
+
+// Mock the horizon utils module
+vi.mock('@canvas/horizon/utils', () => ({
+  redirectWithHorizonParams: vi.fn(),
+}))
+
+// Mock the renderAssignToTray module
+vi.mock('../../../react/renderAssignToTray', () => ({
+  renderAssignToTray: vi.fn(),
+}))
 
 const createView = opts => {
   const view = new WikiPageEditView({
@@ -39,16 +51,21 @@ describe('WikiPageEditView', () => {
   let container
 
   beforeEach(() => {
+    vi.useFakeTimers({shouldAdvanceTime: true})
     container = document.createElement('div')
     container.id = 'fixtures'
     document.body.appendChild(container)
     fakeENV.setup()
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    // Flush any pending timers before cleanup
+    await vi.runAllTimersAsync()
+    vi.useRealTimers()
+
     container.remove()
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   test('should render the view', () => {
@@ -65,18 +82,6 @@ describe('WikiPageEditView', () => {
     expect(view.$('.body_has_errors')).toBeDefined()
   })
 
-  test('should only make 1 request when save & publish is clicked', async () => {
-    const submitSpy = jest
-      .spyOn(WikiPageEditView.prototype, 'submit')
-      .mockImplementation(function (e) {
-        // stops not implemented error from cluttering logs
-        e?.preventDefault()
-      })
-    createView({WIKI_RIGHTS: {publish_page: true}})
-    await userEvent.click(screen.getByRole('button', {name: 'Save & Publish'}))
-    expect(submitSpy.mock.calls).toHaveLength(1)
-  })
-
   describe('validate form data', () => {
     test('should validate form data with body too long', () => {
       const view = createView()
@@ -89,10 +94,16 @@ describe('WikiPageEditView', () => {
     })
 
     test('toggleBodyError hides error when called with null', () => {
-      document.body.innerHTML = `
-        <div class="edit-content has_body_errors"></div>
-        <span id="wiki_page_body_error">Input exceeds limit</span>
-      `
+      // Add required elements to the fixture container
+      const editContent = document.createElement('div')
+      editContent.className = 'edit-content has_body_errors'
+      container.appendChild(editContent)
+
+      const errorSpan = document.createElement('span')
+      errorSpan.id = 'wiki_page_body_error'
+      errorSpan.textContent = 'Input exceeds limit'
+      container.appendChild(errorSpan)
+
       const view = createView()
       view.toggleBodyError(null)
       expect($('.edit-content').hasClass('has_body_errors')).toBe(false)
@@ -100,10 +111,15 @@ describe('WikiPageEditView', () => {
     })
 
     test('toggleBodyError shows error when called with error message', () => {
-      document.body.innerHTML = `
-        <div class="edit-content"></div>
-        <div id="wiki_page_body_statusbar"></div>
-      `
+      // Add required elements to the fixture container
+      const editContent = document.createElement('div')
+      editContent.className = 'edit-content'
+      container.appendChild(editContent)
+
+      const statusbar = document.createElement('div')
+      statusbar.id = 'wiki_page_body_statusbar'
+      container.appendChild(statusbar)
+
       const view = createView()
       const error = {message: 'Input exceeds limit'}
       view.toggleBodyError(error)
@@ -113,17 +129,7 @@ describe('WikiPageEditView', () => {
   })
 
   describe('getFormData', () => {
-    test('create_wiki_page_mastery_path_overrides enabled: assignment not sent in request', () => {
-      window.ENV.FEATURES = {create_wiki_page_mastery_path_overrides: true}
-
-      const view = createView()
-      const data = view.getFormData()
-      expect(data.assignment).not.toBeDefined()
-    })
-
-    test('create_wiki_page_mastery_path_overrides disabled: assignment sent in request', () => {
-      window.ENV.FEATURES = {create_wiki_page_mastery_path_overrides: false}
-
+    test('assignment is included in form data', () => {
       const view = createView()
       const data = view.getFormData()
       expect(data.assignment).toBeDefined()

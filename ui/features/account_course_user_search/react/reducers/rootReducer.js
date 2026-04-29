@@ -91,6 +91,7 @@ const userListHandlers = {
     return {
       ...state,
       errors: {
+        ...state.errors,
         search_term: '',
       },
       searchFilter: {
@@ -108,10 +109,19 @@ const userListHandlers = {
       },
     }
   },
+  FAILED_USER_LOAD(state, _action) {
+    return {
+      ...state,
+      users: [],
+      isLoading: false,
+      errors: {...state.errors, requestFailed: true},
+    }
+  },
   LOADING_USERS(state, _action) {
     return {
       ...state,
       isLoading: true,
+      errors: {...state.errors, requestFailed: false},
     }
   },
 }

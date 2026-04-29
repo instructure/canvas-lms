@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import _ from 'lodash'
+import {get} from 'es-toolkit/compat'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -58,13 +58,18 @@ const renderUnlinkedResult = name => (
 const AssignmentResult = ({outcome, result, outcomeProficiency}) => {
   const ratings = result.outcomeRatingsFromRubric || outcome.ratings
   const pointsPossibleFromOutcomeRatingsFromRubric = result.outcomeRatingsFromRubric
-  ? Math.max(...ratings.map(rating => rating.points)) || null
-  : null
+    ? Math.max(...ratings.map(rating => rating.points)) || null
+    : null
   const {html_url: url, name, submission_types: types} = result.assignment
   const isQuiz = types && types.indexOf('online_quiz') >= 0
   const score = result.percent
     ? scoreFromPercent(result.percent, outcome, pointsPossibleFromOutcomeRatingsFromRubric)
-    : scaleScore(result.score, result.points_possible, outcome, pointsPossibleFromOutcomeRatingsFromRubric)
+    : scaleScore(
+        result.score,
+        result.points_possible,
+        outcome,
+        pointsPossibleFromOutcomeRatingsFromRubric,
+      )
   return (
     <Flex padding="small" direction="column" alignItems="stretch">
       <Flex.Item>
@@ -85,7 +90,7 @@ const AssignmentResult = ({outcome, result, outcomeProficiency}) => {
               points={score}
               hidePoints={result.hide_points}
               useRange={false}
-              customRatings={_.get(outcomeProficiency, 'ratings')}
+              customRatings={get(outcomeProficiency, 'ratings')}
               defaultMasteryThreshold={outcome.mastery_points}
               pointsPossible={outcome.points_possible}
               assessing={false}

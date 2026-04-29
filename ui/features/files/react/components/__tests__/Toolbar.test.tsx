@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
+import '@canvas/files/mockFilesENV'
 import Toolbar from '../Toolbar'
 import Folder from '@canvas/files/backbone/models/Folder'
 import File from '@canvas/files/backbone/models/File'
@@ -54,9 +55,15 @@ const buttonsEnabled = (toolbar: any, config: any) => {
 
 describe('Toolbar', () => {
   beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore Legacy class constructor not typed
     file = new File({id: 1})
     courseFolder = new Folder({context_type: 'Course', context_id: 1})
     userFolder = new Folder({context_type: 'User', context_id: 2})
+  })
+
+  afterEach(() => {
+    delete window.ENV.FEATURES?.restrict_student_access
   })
 
   test('renders multi select action items when there is more than one item selected', () => {
@@ -117,6 +124,37 @@ describe('Toolbar', () => {
       '.btn-delete': true,
       '.btn-add-folder': true,
       '.btn-upload': true,
+    }
+    expect(buttonsEnabled(toolbar, config)).toBeTruthy()
+  })
+
+  test.skip('does not renders upload, move & download buttons for student with restricted permissions', () => {
+    if (!window.ENV) window.ENV = {} as any
+    if (!window.ENV.FEATURES) window.ENV.FEATURES = {}
+    window.ENV.FEATURES.restrict_student_access = true
+    window.ENV.current_user_roles = ['student']
+    const toolbar = render(
+      <Toolbar
+        params="foo"
+        query=""
+        selectedItems={[file]}
+        currentFolder={courseFolder}
+        contextId="1"
+        contextType="courses"
+        userCanAddFilesForContext={true}
+        userCanEditFilesForContext={true}
+        userCanDeleteFilesForContext={true}
+        userCanRestrictFilesForContext={true}
+      />,
+    )
+    const config = {
+      '.btn-view': true,
+      '.btn-download': false,
+      '.btn-move': false,
+      '.btn-restrict': true,
+      '.btn-delete': true,
+      '.btn-add-folder': true,
+      '.btn-upload': false,
     }
     expect(buttonsEnabled(toolbar, config)).toBeTruthy()
   })

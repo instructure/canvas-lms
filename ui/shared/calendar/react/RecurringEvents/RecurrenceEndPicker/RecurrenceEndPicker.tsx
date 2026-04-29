@@ -96,8 +96,7 @@ export const CountValidator = {
 
   isValidCount: (cnt: number | undefined, mode: ModeValues): boolean => {
     if (mode === 'ON') return true // we don't care
-    // @ts-expect-error isInteger will prevent the following checks being done on undefined, but ts doesn't know that
-    if (Number.isInteger(cnt) && cnt > 0 && cnt <= MAX_COUNT) return true
+    if (cnt !== undefined && Number.isInteger(cnt) && cnt > 0 && cnt <= MAX_COUNT) return true
     return false
   },
 
@@ -256,8 +255,7 @@ export default function RecurrenceEndPicker({
   }
 
   const fireOnChange = useCallback(
-    // @ts-expect-error
-    (newMode, newUntil, newCount): void => {
+    (newMode: ModeValues, newUntil: string | undefined, newCount: number | undefined): void => {
       if (newMode === 'ON') {
         if (newUntil === undefined) return
         onChange({until: newUntil, count: undefined})
@@ -285,8 +283,13 @@ export default function RecurrenceEndPicker({
   )
 
   const handleCountChange = useCallback(
-    // @ts-expect-error
-    (_event, value: string | number): void => {
+    (
+      _event:
+        | React.ChangeEvent<HTMLInputElement>
+        | React.KeyboardEvent<HTMLInputElement>
+        | React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      value: string | number,
+    ): void => {
       const cnt = typeof value === 'string' ? parseFloat(value) : value
       setCountNumber(cnt)
       setCountValue(value.toString())

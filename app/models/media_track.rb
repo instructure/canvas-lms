@@ -17,8 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class MediaTrack < ActiveRecord::Base
+class MediaTrack < ApplicationRecord
   include MasterCourses::CollectionRestrictor
+  include Workflow
+
+  ASR_SUBTITLES_SYNC_MAX_ATTEMPTS = 48 # hourly polls × 2 days
+
   self.collection_owner_association = :attachment
 
   belongs_to :user
@@ -29,14 +33,21 @@ class MediaTrack < ActiveRecord::Base
   before_validation :set_media_and_attachment
   before_save :convert_srt_to_wvtt
   before_create :mark_downstream_create_destroy
+  after_create :sync_asr_subtitles_later, if: -> { it.asr? && it.processing? }
   before_update :mark_downstream_changes
   before_destroy :mark_downstream_create_destroy
   before_destroy :check_for_restricted_updates, prepend: true
+  workflow do
+    state :ready
+    state :failed
+    state :processing
+  end
+
   validates :media_object_id, presence: true
   validates :kind, inclusion: { in: %w[subtitles captions descriptions chapters metadata] }
-  validates :content, presence: true
-  validates :locale, format: { with: /\A[A-Za-z-]+\z/ }, uniqueness: { scope: :attachment_id, unless: ->(mt) { mt.attachment_id.blank? } }
-  restrict_columns :content, %i[attachment_id content locale media_object_id webvtt_content]
+  validates :content, presence: true, unless: -> { it.asr? && (it.processing? || it.failed?) }
+  validates :locale, format: { with: /\A[A-Za-z-]+\z/ }, uniqueness: { scope: :attachment_id, unless: -> { it.attachment_id.blank? } }
+  restrict_columns :content, %i[attachment_id content locale media_object_id webvtt_content external_id]
 
   RE_LOOKS_LIKE_TTML = /<tt\s+xml/i
   validates :content, format: {
@@ -64,6 +75,8 @@ class MediaTrack < ActiveRecord::Base
   end
 
   def convert_srt_to_wvtt
+    return if content.blank?
+
     if content.exclude?("WEBVTT") && (content_changed? || self["webvtt_content"].nil?)
       srt_content = content.dup
       srt_content.gsub!(/(:|^)(\d)(,|:)/, '\10\2\3')
@@ -71,5 +84,51 @@ class MediaTrack < ActiveRecord::Base
       srt_content.gsub!("\r\n", "\n")
       self.webvtt_content = "WEBVTT\n\n#{srt_content}".strip
     end
+  end
+
+  def asr?
+    kind == "subtitles" && external_id?
+  end
+
+  def sync_asr_subtitles_later(attempt: 1)
+    delay(run_at: asr_subtitles_sync_interval.from_now, strand: "asr_subtitle_sync:#{global_id}").sync_asr_subtitles(attempt:)
+  end
+
+  def sync_kaltura_caption_asset(caption_asset_status, kaltura_client:)
+    case CanvasKaltura::ClientV3::Enums::KalturaCaptionAssetStatus[caption_asset_status]
+    when :READY
+      caption_asset_contents = kaltura_client.caption_asset_contents(external_id)
+      assign_attributes(workflow_state: "ready", content: caption_asset_contents)
+    when :ERROR
+      assign_attributes(workflow_state: "failed", content: "")
+    else
+      assign_attributes(workflow_state: "processing", content: "")
+    end
+  end
+
+  def sync_asr_subtitles(attempt:)
+    if attempt > ASR_SUBTITLES_SYNC_MAX_ATTEMPTS
+      update!(workflow_state: "failed")
+      return
+    end
+
+    kaltura_client = CanvasKaltura::ClientV3.new
+    kaltura_client.startSession(CanvasKaltura::SessionType::ADMIN)
+    caption_asset = kaltura_client.caption_asset(external_id)
+
+    unless caption_asset
+      sync_asr_subtitles_later(attempt: attempt + 1)
+      return
+    end
+
+    sync_kaltura_caption_asset(caption_asset[:status], kaltura_client:)
+    save!
+    sync_asr_subtitles_later(attempt: attempt + 1) if processing?
+  end
+
+  private
+
+  def asr_subtitles_sync_interval
+    Setting.get("asr_subtitles_sync_poll_interval_minutes", "60").to_i.minutes
   end
 end

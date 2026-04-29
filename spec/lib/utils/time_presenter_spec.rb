@@ -31,8 +31,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 
-require_relative "../../spec_helper"
-
 module Utils
   describe TimePresenter do
     describe "#as_string" do
@@ -81,7 +79,7 @@ module Utils
         native_zone_presenter = TimePresenter.new(time)
         zone = ActiveSupport::TimeZone["America/Juneau"]
         presenter = TimePresenter.new(time, zone)
-        expect(presenter.as_string).to_not eq(native_zone_presenter.as_string)
+        expect(presenter.as_string).not_to eq(native_zone_presenter.as_string)
       end
 
       it "can handle a nil zone override" do

@@ -35,9 +35,9 @@ const defaultProps = {
   },
   disabled: false,
   readOnly: false,
-  onDeleteGradingPeriod: jest.fn(),
-  onDateChange: jest.fn(),
-  onTitleChange: jest.fn(),
+  onDeleteGradingPeriod: vi.fn(),
+  onDateChange: vi.fn(),
+  onTitleChange: vi.fn(),
 }
 
 function renderComponent(props = {}) {
@@ -49,8 +49,8 @@ describe('custom prop validation for editable periods', () => {
 
   beforeEach(() => {
     // Suppress React act warnings and other unrelated warnings
-    jest.spyOn(console, 'warn').mockImplementation(() => {})
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -199,7 +199,7 @@ describe('editable GradingPeriod', () => {
   })
 
   it("ignores clicks on 'delete grading period' when disabled", () => {
-    const deleteSpy = jest.fn()
+    const deleteSpy = vi.fn()
     renderComponent({onDeleteGradingPeriod: deleteSpy, disabled: true})
     userEvent.click(screen.getByText(/delete grading period/i))
     expect(deleteSpy).not.toHaveBeenCalled()

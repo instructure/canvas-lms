@@ -48,9 +48,9 @@ describe('Gradebook#sortGridRows', () => {
       },
     })
     gradebook.gridDisplaySettings.viewUngradedAsZero = false
-    gradebook.gradebookGrid.updateColumns = jest.fn()
-    gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders = jest.fn()
-    gradebook.saveSettings = jest.fn().mockResolvedValue({})
+    gradebook.gradebookGrid.updateColumns = vi.fn()
+    gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders = vi.fn()
+    gradebook.saveSettings = vi.fn().mockResolvedValue({})
   })
 
   afterEach(() => {
@@ -65,12 +65,12 @@ describe('Gradebook#sortGridRows', () => {
     expect(secondRow.id).toBe('3')
   })
 
-  test.skip('optionally sorts by a custom column', () => {
+  test('optionally sorts by a custom column', () => {
     gradebook.setSortRowsBySetting('custom_col_2301', 'ascending')
     gradebook.sortGridRows()
     const [firstRow, secondRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('4')
-    expect(secondRow.id).toBe('3')
+    expect(firstRow.id).toBe('3')
+    expect(secondRow.id).toBe('4')
   })
 
   test('uses the saved sort setting for custom column sorting', () => {
@@ -89,20 +89,20 @@ describe('Gradebook#sortGridRows', () => {
     expect(secondRow.id).toBe('4')
   })
 
-  test.skip('uses the saved sort setting for assignment sorting', () => {
+  test('uses the saved sort setting for assignment sorting', () => {
     gradebook.setSortRowsBySetting('assignment_2301', 'descending')
     gradebook.sortGridRows()
     const [firstRow, secondRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('4')
-    expect(secondRow.id).toBe('3')
+    expect(firstRow.id).toBe('3')
+    expect(secondRow.id).toBe('4')
   })
 
-  test.skip('optionally sorts by the total grade column', () => {
+  test('optionally sorts by the total grade column', () => {
     gradebook.setSortRowsBySetting('total_grade', 'ascending')
     gradebook.sortGridRows()
     const [firstRow, secondRow] = gradebook.gridData.rows
-    expect(firstRow.id).toBe('4')
-    expect(secondRow.id).toBe('3')
+    expect(firstRow.id).toBe('3')
+    expect(secondRow.id).toBe('4')
   })
 
   test('uses the saved sort setting for total grade sorting', () => {
@@ -138,8 +138,8 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
       },
     }
     gradebook = createGradebook()
-    gradebook.arrangeColumnsBy = jest.fn()
-    gradebook.saveSettings = jest.fn().mockResolvedValue({})
+    gradebook.arrangeColumnsBy = vi.fn()
+    gradebook.saveSettings = vi.fn().mockResolvedValue({})
   })
 
   afterEach(async () => {
@@ -300,10 +300,10 @@ describe('when enhanced_gradebook_filters is enabled', () => {
     gradebook.setAssignments({2301: assignment})
     gradebook.setAssignmentsLoaded()
 
-    errorFn = jest.fn()
-    successFn = jest.fn()
+    errorFn = vi.fn()
+    successFn = vi.fn()
 
-    GradebookApi.saveUserSettings = jest.fn().mockResolvedValue({})
+    GradebookApi.saveUserSettings = vi.fn().mockResolvedValue({})
   })
 
   afterEach(() => {

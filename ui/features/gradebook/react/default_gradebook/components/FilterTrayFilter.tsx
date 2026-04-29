@@ -38,6 +38,8 @@ import natcompare from '@canvas/util/natcompare'
 const I18n = createI18nScope('gradebook')
 
 const {Option, Group: OptionGroup} = SimpleSelect as any
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
 const formatDate = (date: Date) => tz.format(date, 'date.formats.medium') as string
 const dateLabels = {'start-date': I18n.t('Start Date'), 'end-date': I18n.t('End Date')}
 

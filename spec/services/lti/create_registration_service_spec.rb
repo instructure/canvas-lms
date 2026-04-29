@@ -31,7 +31,6 @@ describe Lti::CreateRegistrationService do
       configuration_params:,
       unified_tool_id:,
       overlay_params:,
-      binding_params:,
       developer_key_params:
     )
   end
@@ -46,7 +45,9 @@ describe Lti::CreateRegistrationService do
       name: "Foo bar baz",
       admin_nickname: "who named this tool",
       vendor: "acme",
-      description: "looney man"
+      description: "looney man",
+      lock_deploying: true,
+      workflow_state:
     }
   end
   let(:configuration_params) do
@@ -55,7 +56,7 @@ describe Lti::CreateRegistrationService do
   let(:unified_tool_id) { nil }
   let(:developer_key_params) { {} }
   let(:overlay_params) { {} }
-  let(:binding_params) { {} }
+  let(:workflow_state) { "active" }
 
   it "creates the expected objects with the expected values" do
     expect { subject }
@@ -78,11 +79,29 @@ describe Lti::CreateRegistrationService do
       .to eql(configuration_params.with_indifferent_access)
   end
 
+  it "defaults lock_deploying to true" do
+    registration_params.delete(:lock_deploying)
+    expect(subject.lock_deploying).to be true
+  end
+
+  it "uses lock_deploying if provided" do
+    registration_params[:lock_deploying] = false
+    expect(subject.lock_deploying).to be false
+  end
+
   it "infers properties on the developer key from the tool configuration" do
     subject
 
     expect(DeveloperKey.last.scopes).to eql(configuration_params[:scopes])
     expect(DeveloperKey.last.redirect_uris).to eql([configuration_params[:target_link_uri]])
+  end
+
+  context "with nil workflow_state" do
+    let(:registration_params) { super().merge(workflow_state: nil) }
+
+    it "defaults the workflow_state to active" do
+      expect(subject.workflow_state).to eq("active")
+    end
   end
 
   context "creating a site admin registration" do
@@ -97,19 +116,36 @@ describe Lti::CreateRegistrationService do
   end
 
   context "with overlay params specified" do
-    let(:overlay_params) { { disabled_scopes: [TokenScopes::LTI_SCOPES.keys[0]] } }
+    let(:overlay_params) do
+      {
+        title: "Overlaid Title",
+        disabled_scopes: [TokenScopes::LTI_SCOPES.keys[0]],
+        placements: {
+          course_navigation: {
+            text: "Overlaid Text"
+          }
+        }
+      }
+    end
 
-    it "creates a new overlay" do
-      expect { subject }
-        .to change { Lti::Overlay.count }
-        .by(1)
+    it "does not create an overlay (merges into configuration instead)" do
+      expect { subject }.not_to change { Lti::Overlay.count }
+    end
 
-      expect(Lti::Overlay.last.data.with_indifferent_access).to eql(overlay_params.with_indifferent_access)
+    it "merges overlay into the configuration" do
+      subject
+
+      config = Lti::ToolConfiguration.last
+      expect(config.title).to eq("Overlaid Title")
+      expect(config.scopes).not_to include(TokenScopes::LTI_SCOPES.keys[0])
+
+      # Verify placement overlay was applied
+      course_nav = config.placements.find { |p| p["placement"] == "course_navigation" }
+      expect(course_nav["text"]).to eq("Overlaid Text") if course_nav
     end
 
     it "uses the scopes from the overlay when creating the developer key" do
       subject
-      puts overlay_params[:scopes]
       expect(DeveloperKey.last.scopes).not_to include(TokenScopes::LTI_SCOPES.keys[0])
     end
   end
@@ -143,13 +179,55 @@ describe Lti::CreateRegistrationService do
     end
   end
 
-  context "with binding_params defined" do
-    let(:binding_params) { { workflow_state: :on } }
+  context "with workflow_state in registration_params" do
+    context "when workflow_state is inactive" do
+      let(:registration_params) { super().merge(workflow_state: "inactive") }
+      let(:course) { course_model(account:) }
 
-    it "sets the registration account binding to the specified state" do
-      expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
+      it "creates the registration with workflow_state inactive" do
+        expect(subject.workflow_state).to eq("inactive")
+      end
 
-      expect(Lti::RegistrationAccountBinding.last.workflow_state).to eql("on")
+      it "sets the registration account binding to off" do
+        expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
+
+        expect(Lti::RegistrationAccountBinding.last.workflow_state).to eql("off")
+      end
+
+      it "tool is not available even with available context control" do
+        registration = subject
+        deployment = registration.deployments.first
+
+        # Tool should not be available when binding is off
+        expect(Lti::ContextToolFinder.all_tools_for(course))
+          .not_to include(deployment)
+
+        # Try to make it available at course level via context control
+        Lti::ContextControl.create!(
+          course:,
+          deployment:,
+          workflow_state: "available"
+        )
+
+        # Tool should still not be available because binding is off
+        expect(Lti::ContextToolFinder.all_tools_for(course))
+          .not_to include(deployment)
+      end
+    end
+
+    context "when workflow_state is active" do
+      let(:registration_params) { super().merge(workflow_state: "active") }
+
+      it "creates the registration with workflow_state active" do
+        subject
+        expect(subject.workflow_state).to eq("active")
+      end
+
+      it "sets the registration account binding to on" do
+        expect { subject }.to change { Lti::RegistrationAccountBinding.count }.by(1)
+
+        expect(Lti::RegistrationAccountBinding.last.workflow_state).to eql("on")
+      end
     end
   end
 
@@ -180,6 +258,7 @@ describe Lti::CreateRegistrationService do
     end
   end
 
+  # TEMPORARY: With overlay merging, validation happens earlier and raises ArgumentError
   context "with invalid overlay params" do
     let(:overlay_params) do
       {
@@ -188,7 +267,7 @@ describe Lti::CreateRegistrationService do
     end
 
     it "raises an error" do
-      expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
+      expect { subject }.to raise_error(ArgumentError, /Invalid overlay parameters/)
     end
   end
 

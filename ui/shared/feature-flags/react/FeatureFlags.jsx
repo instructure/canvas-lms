@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useEffect, useState} from 'react'
-import {groupBy} from 'lodash'
+import {groupBy} from 'es-toolkit/compat'
 
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'

@@ -296,21 +296,26 @@ module CC
       end
 
       node.tag!(:turnitin_settings, assignment.send(:turnitin_settings).to_json) if assignment.turnitin_enabled || assignment.vericite_enabled
+
+      export_new_quizzes_settings(assignment, node)
+
       if assignment.assignment_configuration_tool_lookup_ids.present?
         resource_codes = assignment.tool_settings_tool.try(:resource_codes) || {}
-        node.similarity_detection_tool({
-                                         resource_type_code: resource_codes[:resource_type_code],
-                                         vendor_code: resource_codes[:vendor_code],
-                                         product_code: resource_codes[:product_code],
-                                         visibility: assignment.turnitin_settings.with_indifferent_access[:originality_report_visibility]
-                                       })
+        if resource_codes.present? || !Account.site_admin.feature_enabled?(:exclude_deleted_lti2_tools_on_assignment_export)
+          node.similarity_detection_tool({
+                                           resource_type_code: resource_codes[:resource_type_code],
+                                           vendor_code: resource_codes[:vendor_code],
+                                           product_code: resource_codes[:product_code],
+                                           visibility: assignment.turnitin_settings.with_indifferent_access[:originality_report_visibility]
+                                         })
 
-        tool_setting = Lti::ToolSetting.find_by(
-          resource_link_id: assignment.lti_context_id
-        )
+          tool_setting = Lti::ToolSetting.find_by(
+            resource_link_id: assignment.lti_context_id
+          )
 
-        if tool_setting.present?
-          AssignmentResources.create_tool_setting_node(tool_setting, node)
+          if tool_setting.present?
+            AssignmentResources.create_tool_setting_node(tool_setting, node)
+          end
         end
       end
 
@@ -328,6 +333,22 @@ module CC
 
       if assignment.annotated_document? && assignment.annotatable_attachment
         node.annotatable_attachment_migration_id(key_generator.create_key(assignment.annotatable_attachment))
+      end
+
+      if assignment.root_account.feature_enabled?(:lti_asset_processor) && assignment.lti_asset_processors.any?
+        node.lti_context_id assignment.lti_context_id
+        node.asset_processors do |asset_processors_node|
+          assignment.lti_asset_processors.active.find_each do |asset_processor|
+            add_asset_processor(asset_processors_node, asset_processor, key_generator)
+          end
+        end
+      end
+    end
+
+    def self.export_new_quizzes_settings(assignment, node)
+      if assignment.settings&.dig("new_quizzes")
+        node.new_quizzes_type assignment.settings["new_quizzes"]["type"] if assignment.settings["new_quizzes"]["type"]
+        node.new_quizzes_anonymous_participants assignment.settings["new_quizzes"]["anonymous_participants"] unless assignment.settings["new_quizzes"]["anonymous_participants"].nil?
       end
     end
 
@@ -350,6 +371,21 @@ module CC
         if line_item.score_maximum != assignment.points_possible
           li_node.score_maximum line_item.score_maximum
         end
+      end
+    end
+
+    def self.add_asset_processor(asset_processors_node, asset_processor, key_generator)
+      asset_processors_node.asset_processor(identifier: key_generator.create_key(asset_processor)) do |ap_node|
+        ap_node.url asset_processor.url
+        ap_node.title asset_processor.title if asset_processor.title.present?
+        ap_node.text asset_processor.text if asset_processor.text.present?
+        ap_node.custom asset_processor.custom.to_json if asset_processor.custom.present?
+        ap_node.icon asset_processor.icon.to_json if asset_processor.icon.present?
+        ap_node.window asset_processor.window.to_json if asset_processor.window.present?
+        ap_node.iframe asset_processor.iframe.to_json if asset_processor.iframe.present?
+        ap_node.report asset_processor.report.to_json if asset_processor.report.present?
+        ap_node.context_external_tool_global_id asset_processor.context_external_tool.global_id
+        ap_node.context_external_tool_url asset_processor.context_external_tool.url
       end
     end
   end

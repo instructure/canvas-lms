@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import _ from 'lodash'
+import {filter, every, includes, isNumber} from 'es-toolkit/compat'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
@@ -32,7 +32,7 @@ import UnassessedAssignment from './UnassessedAssignment'
 import OutcomePopover from './OutcomePopover'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import TruncateWithTooltip from '../TruncateWithTooltip'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import * as shapes from './shapes'
 
 const I18n = createI18nScope('IndividualStudentMasteryOutcome')
@@ -43,7 +43,6 @@ class Outcome extends React.Component {
     expanded: PropTypes.bool.isRequired,
     onExpansionChange: PropTypes.func.isRequired,
     outcomeProficiency: shapes.outcomeProficiencyShape,
-    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {
@@ -63,7 +62,7 @@ class Outcome extends React.Component {
 
     return (
       <Flex direction="row" justifyItems="start" padding="0 0 0 x-small">
-        {_.isNumber(score) && !_.every(results, ['hide_points', true]) && (
+        {isNumber(score) && !every(results, ['hide_points', true]) && (
           <Flex.Item padding="0 x-small 0 0">
             <span>
               <PresentationContent>
@@ -133,17 +132,17 @@ class Outcome extends React.Component {
   renderDetails() {
     const {outcome, outcomeProficiency} = this.props
     const {assignments, results} = outcome
-    const assignmentsWithResults = _.filter(results, r =>
+    const assignmentsWithResults = filter(results, r =>
       r.assignment.id.startsWith('assignment_'),
     ).map(r => r.assignment.id.split('_')[1])
-    const assessmentsWithResults = _.filter(results, r =>
+    const assessmentsWithResults = filter(results, r =>
       r.assignment.id.startsWith('live_assessments/assessment_'),
     ).map(r => r.assignment.id.split('_')[2])
-    const unassessed = _.filter(
+    const unassessed = filter(
       assignments,
       a =>
-        (a.assignment_id && !_.includes(assignmentsWithResults, a.assignment_id.toString())) ||
-        (a.assessment_id && !_.includes(assessmentsWithResults, a.assessment_id.toString())),
+        (a.assignment_id && !includes(assignmentsWithResults, a.assignment_id.toString())) ||
+        (a.assessment_id && !includes(assessmentsWithResults, a.assessment_id.toString())),
     )
     return (
       <List isUnstyled={true} delimiter="dashed">

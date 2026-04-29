@@ -23,7 +23,6 @@ import {IconGroupLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../../hooks/useModuleContext'
-import {Prerequisite} from '../../utils/types'
 import {handleOpeningModuleUpdateTray} from '../../handlers/modulePageActionHandlers'
 import {useModuleItems} from '../../hooks/queries/useModuleItems'
 import {useModules} from '../../hooks/queries/useModules'
@@ -35,7 +34,6 @@ export interface ViewAssignToProps {
   moduleName: string
   expanded: boolean
   isMenuOpen: boolean
-  prerequisites?: Prerequisite[]
 }
 
 const ViewAssignTo: React.FC<ViewAssignToProps> = ({
@@ -43,12 +41,12 @@ const ViewAssignTo: React.FC<ViewAssignToProps> = ({
   moduleName,
   expanded,
   isMenuOpen,
-  prerequisites,
 }) => {
   const {courseId} = useContextModule()
   const {data} = useModules(courseId)
   const {data: moduleItems, isLoading: isModuleItemsLoading} = useModuleItems(
     moduleId,
+    null,
     expanded || isMenuOpen,
   )
 
@@ -58,11 +56,10 @@ const ViewAssignTo: React.FC<ViewAssignToProps> = ({
       courseId,
       moduleId,
       moduleName,
-      prerequisites,
       'assign-to',
       moduleItems?.moduleItems,
     )
-  }, [data, courseId, moduleId, moduleName, prerequisites, moduleItems])
+  }, [data, courseId, moduleId, moduleName, moduleItems])
 
   return (
     <View>

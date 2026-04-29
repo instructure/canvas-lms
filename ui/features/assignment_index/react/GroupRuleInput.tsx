@@ -23,10 +23,10 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('editAssignmentGroup')
 
 export type GroupRuleInputProps = {
-  groupId: number,
-  type: string,
-  initialValue?: string,
-  onBlur?: () => void,
+  groupId: number
+  type: string
+  initialValue?: string
+  onBlur?: () => void
   onChange?: () => void
 }
 
@@ -35,7 +35,7 @@ const GroupRuleInput = ({
   type,
   initialValue = '',
   onBlur = () => {},
-  onChange = () => {}
+  onChange = () => {},
 }: GroupRuleInputProps) => {
   const [ruleValue, setRuleValue] = useState<string>(initialValue)
 
@@ -44,13 +44,17 @@ const GroupRuleInput = ({
     onChange()
   }
 
-  const handleIncrement = (_event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const handleIncrement = (
+    _event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>,
+  ) => {
     const newValue = Math.floor(parseFloat(ruleValue || '0')) + 1
     setRuleValue(newValue.toString())
     onChange()
   }
 
-  const handleDecrement = (_event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const handleDecrement = (
+    _event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>,
+  ) => {
     const newValue = Math.floor(parseFloat(ruleValue || '0')) - 1
     setRuleValue(newValue.toString())
     onChange()

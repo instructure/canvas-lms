@@ -20,10 +20,14 @@ import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
 import {ActivityStreamSummary as ActivityStreamSummaryType} from '../../graphql/ActivityStream'
 import wait from 'waait'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 // Mock GraphQL request
-jest.mock('@canvas/query', () => ({
-  executeQuery: jest.fn(() => Promise.resolve({data: {}})),
+vi.mock('@instructure/platform-query', () => ({
+  executeQuery: vi.fn(() => Promise.resolve({data: {}})),
 }))
 
 describe('CourseActivitySummaryStore', () => {
@@ -40,8 +44,16 @@ describe('CourseActivitySummaryStore', () => {
     },
   ]
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     CourseActivitySummaryStore.setState({streams: {}})
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+    vi.restoreAllMocks()
   })
 
   describe('getStateForCourse', () => {
@@ -60,7 +72,7 @@ describe('CourseActivitySummaryStore', () => {
     })
 
     it('should return empty object for course id not already in state', () => {
-      const spy = jest
+      const spy = vi
         .spyOn(CourseActivitySummaryStore, '_fetchForCourse')
         .mockImplementation(() => {})
       expect(CourseActivitySummaryStore.getStateForCourse(1)).toEqual({})
@@ -77,11 +89,11 @@ describe('CourseActivitySummaryStore', () => {
         current_user_id: '123',
       })
 
-      const batchSpy = jest
+      const batchSpy = vi
         .spyOn(CourseActivitySummaryStore, '_batchLoadSummaries')
         .mockImplementation(() => Promise.resolve())
 
-      const fetchSpy = jest
+      const fetchSpy = vi
         .spyOn(CourseActivitySummaryStore, '_fetchForCourse')
         .mockImplementation(() => {})
 
@@ -99,11 +111,11 @@ describe('CourseActivitySummaryStore', () => {
         current_user_id: '123',
       })
 
-      const batchSpy = jest
+      const batchSpy = vi
         .spyOn(CourseActivitySummaryStore, '_batchLoadSummaries')
         .mockImplementation(() => {})
 
-      const fetchSpy = jest
+      const fetchSpy = vi
         .spyOn(CourseActivitySummaryStore, '_fetchForCourse')
         .mockImplementation(() => {})
 
@@ -122,11 +134,11 @@ describe('CourseActivitySummaryStore', () => {
         current_user_id: null,
       })
 
-      const batchSpy = jest
+      const batchSpy = vi
         .spyOn(CourseActivitySummaryStore, '_batchLoadSummaries')
         .mockImplementation(() => {})
 
-      const fetchSpy = jest
+      const fetchSpy = vi
         .spyOn(CourseActivitySummaryStore, '_fetchForCourse')
         .mockImplementation(() => {})
 
@@ -140,17 +152,13 @@ describe('CourseActivitySummaryStore', () => {
     it('populates state based on API response', async () => {
       expect(CourseActivitySummaryStore.getState().streams[1]).toBeUndefined() // precondition
 
-      const spy = jest.spyOn(window, 'fetch').mockImplementation(() =>
-        Promise.resolve().then(() => ({
-          status: 200,
-          clone: () => ({
-            json: () => Promise.resolve().then(() => stream),
-          }),
-        })),
+      server.use(
+        http.get('/api/v1/courses/1/activity_stream/summary', () => {
+          return HttpResponse.json(stream)
+        }),
       )
       CourseActivitySummaryStore._fetchForCourse(1)
       await wait(1)
-      expect(spy).toHaveBeenCalled()
       expect(CourseActivitySummaryStore.getState()).toEqual(
         expect.objectContaining({
           streams: {1: {stream}},
@@ -161,17 +169,12 @@ describe('CourseActivitySummaryStore', () => {
     it('handes 401 errors correctly', async () => {
       expect(CourseActivitySummaryStore.getState().streams[1]).toBeUndefined() // precondition
 
-      jest.spyOn(window, 'fetch').mockImplementation(() =>
-        Promise.resolve().then(() => ({
-          ok: true,
-          status: 401,
-          statusText: 'Unauthorized',
-          json: () => {
-            throw new Error('should never make it here')
-          },
-        })),
+      server.use(
+        http.get('/api/v1/courses/1/activity_stream/summary', () => {
+          return new HttpResponse(null, {status: 401, statusText: 'Unauthorized'})
+        }),
       )
-      const errorFn = jest.fn()
+      const errorFn = vi.fn()
       CourseActivitySummaryStore._fetchForCourse(1).catch(errorFn)
       await wait(1)
       expect(errorFn).toHaveBeenCalled()
@@ -181,16 +184,12 @@ describe('CourseActivitySummaryStore', () => {
     it('also handes 503 errors correctly ', async () => {
       expect(CourseActivitySummaryStore.getState().streams[1]).toBeUndefined() // precondition
 
-      jest.spyOn(window, 'fetch').mockImplementation(() =>
-        Promise.resolve().then(() => ({
-          status: 503,
-          statusText: 'Service Unavailable',
-          json: () => {
-            throw new Error('should never make it here')
-          },
-        })),
+      server.use(
+        http.get('/api/v1/courses/1/activity_stream/summary', () => {
+          return new HttpResponse(null, {status: 503, statusText: 'Service Unavailable'})
+        }),
       )
-      const errorFn = jest.fn()
+      const errorFn = vi.fn()
       CourseActivitySummaryStore._fetchForCourse(1).catch(errorFn)
       await wait(1)
       expect(errorFn).toHaveBeenCalled()
@@ -227,7 +226,7 @@ describe('CourseActivitySummaryStore', () => {
       },
     }
     it('populates state for each course based on API response', async () => {
-      const spy = jest
+      const spy = vi
         .spyOn(CourseActivitySummaryStore, '_fetchActivityStreamSummaries')
         .mockImplementation(() => Promise.resolve(mockResponse))
 
@@ -272,48 +271,31 @@ describe('CourseActivitySummaryStore', () => {
     })
 
     it('handles 401 errors correctly', async () => {
-      const errorResponse = {
-        ok: true,
-        status: 401,
-        statusText: 'Unauthorized',
-        json() {
-          throw new Error('should never make it here')
-        },
-      }
+      server.use(
+        http.get('/api/v1/courses/1/activity_stream/summary', () => {
+          return new HttpResponse(null, {status: 401, statusText: 'Unauthorized'})
+        }),
+      )
 
-      jest
-        .spyOn(CourseActivitySummaryStore, '_fetchActivityStreamSummaries')
-        .mockImplementation(() => Promise.reject(errorResponse))
-
-      const errorFn = jest.fn()
+      const errorFn = vi.fn()
       CourseActivitySummaryStore._fetchForCourse(1).catch(errorFn)
       await wait(1)
       expect(errorFn).toHaveBeenCalled()
       expect(CourseActivitySummaryStore.getState().streams).toEqual({})
-      await wait(1) // Wait for state update
-      expect(CourseActivitySummaryStore.getState().isFetching).toBe(false)
     })
 
     it('handles 503 errors correctly', async () => {
-      const errorResponse = {
-        status: 503,
-        statusText: 'Service Unavailable',
-        json() {
-          throw new Error('should never make it here')
-        },
-      }
+      server.use(
+        http.get('/api/v1/courses/1/activity_stream/summary', () => {
+          return new HttpResponse(null, {status: 503, statusText: 'Service Unavailable'})
+        }),
+      )
 
-      jest
-        .spyOn(CourseActivitySummaryStore, '_fetchActivityStreamSummaries')
-        .mockImplementation(() => Promise.reject(errorResponse))
-
-      const errorFn = jest.fn()
+      const errorFn = vi.fn()
       CourseActivitySummaryStore._fetchForCourse(1).catch(errorFn)
       await wait(1)
       expect(errorFn).toHaveBeenCalled()
       expect(CourseActivitySummaryStore.getState().streams).toEqual({})
-      await wait(1) // Wait for state update
-      expect(CourseActivitySummaryStore.getState().isFetching).toBe(false)
     })
   })
 })

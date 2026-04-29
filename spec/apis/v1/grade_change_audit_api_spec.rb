@@ -50,6 +50,11 @@ describe "GradeChangeAudit API", type: :request do
       query_string << "per_page=#{arguments[:per_page]}"
     end
 
+    if (page = options.delete(:page))
+      arguments[:page] = page.to_s
+      query_string << "page=#{CGI.escape(arguments[:page])}"
+    end
+
     if (start_time = options.delete(:start_time))
       arguments[:start_time] = start_time.iso8601
       query_string << "start_time=#{arguments[:start_time]}"
@@ -401,13 +406,13 @@ describe "GradeChangeAudit API", type: :request do
         api_call_as_user(@viewing_user, :get, path, params, {}, {}, expected_status: 404)
       end
 
-      it "returns a 403 when teacher" do
-        api_call_as_user(@teacher, :get, path, params, {}, {}, expected_status: 403)
+      it "returns a 404 when teacher" do
+        api_call_as_user(@teacher, :get, path, params, {}, {}, expected_status: 404)
       end
 
-      it "returns a 403 when not a teacher nor admin" do
+      it "returns a 404 when not a teacher nor admin" do
         user = user_model
-        api_call_as_user(user, :get, path, params, {}, {}, expected_status: 403)
+        api_call_as_user(user, :get, path, params, {}, {}, expected_status: 404)
       end
     end
 
@@ -428,13 +433,13 @@ describe "GradeChangeAudit API", type: :request do
         api_call_as_user(@viewing_user, :get, path, params, {}, {}, expected_status: 404)
       end
 
-      it "returns a 403 when teacher" do
-        api_call_as_user(@teacher, :get, path, params, {}, {}, expected_status: 403)
+      it "returns a 404 when teacher" do
+        api_call_as_user(@teacher, :get, path, params, {}, {}, expected_status: 404)
       end
 
-      it "returns a 403 when not teacher nor admin" do
+      it "returns a 404 when not teacher nor admin" do
         user = user_model
-        api_call_as_user(user, :get, path, params, {}, {}, expected_status: 403)
+        api_call_as_user(user, :get, path, params, {}, {}, expected_status: 404)
       end
     end
   end
@@ -443,12 +448,12 @@ describe "GradeChangeAudit API", type: :request do
     it "does not authorize the endpoints with no permissions" do
       @user, @viewing_user = @user, user_model
 
-      fetch_for_context(@course, expected_status: 403)
-      fetch_for_context(@assignment, expected_status: 403)
+      fetch_for_context(@course, expected_status: 404)
+      fetch_for_context(@assignment, expected_status: 404)
       fetch_for_context(@student, expected_status: 403, type: "student")
       fetch_for_context(@teacher, expected_status: 403, type: "grader")
       test_course_and_contexts do |contexts|
-        fetch_for_course_and_other_contexts(contexts, expected_status: 403)
+        fetch_for_course_and_other_contexts(contexts, expected_status: 404)
       end
     end
 
@@ -466,12 +471,12 @@ describe "GradeChangeAudit API", type: :request do
                                         :view_all_grades.to_s,
                                         override: false)
 
-      fetch_for_context(@course, expected_status: 403)
-      fetch_for_context(@assignment, expected_status: 403)
+      fetch_for_context(@course, expected_status: 404)
+      fetch_for_context(@assignment, expected_status: 404)
       fetch_for_context(@student, expected_status: 403, type: "student")
       fetch_for_context(@teacher, expected_status: 403, type: "grader")
       test_course_and_contexts do |contexts|
-        fetch_for_course_and_other_contexts(contexts, expected_status: 403)
+        fetch_for_course_and_other_contexts(contexts, expected_status: 404)
       end
     end
 
@@ -480,20 +485,16 @@ describe "GradeChangeAudit API", type: :request do
       allow(LoadAccount).to receive(:default_domain_root_account).and_return(new_root_account)
       @viewing_user = user_with_pseudonym(account: new_root_account)
 
-      fetch_for_context(@course, expected_status: 403)
-      fetch_for_context(@assignment, expected_status: 403)
+      fetch_for_context(@course, expected_status: 404)
+      fetch_for_context(@assignment, expected_status: 404)
       fetch_for_context(@student, expected_status: 403, type: "student")
       fetch_for_context(@teacher, expected_status: 403, type: "grader")
       test_course_and_contexts do |contexts|
-        fetch_for_course_and_other_contexts(contexts, expected_status: 403)
+        fetch_for_course_and_other_contexts(contexts, expected_status: 404)
       end
     end
 
     context "for teachers" do
-      it "returns a 403 on for_assignment" do
-        fetch_for_context(@assignment, expected_status: 403, user: @teacher)
-      end
-
       it "returns a 403 on for_student" do
         fetch_for_context(@student, expected_status: 403, type: "student", user: @teacher)
       end
@@ -517,17 +518,17 @@ describe "GradeChangeAudit API", type: :request do
         end
       end
 
-      it "returns a 403 on for_course when not teacher in that course" do
+      it "returns a 404 on for_course when not teacher in that course" do
         other_teacher = User.create!
         Course.create!.enroll_teacher(other_teacher).accept!
-        fetch_for_context(@course, expected_status: 403, user: other_teacher)
+        fetch_for_context(@course, expected_status: 404, user: other_teacher)
       end
 
-      it "returns a 403 on for_course_and_other_parameters when not teacher in that course" do
+      it "returns a 404 on for_course_and_other_parameters when not teacher in that course" do
         other_teacher = User.create!
         Course.create!.enroll_teacher(other_teacher).accept!
         test_course_and_contexts do |context|
-          fetch_for_course_and_other_contexts(context, expected_status: 403, user: other_teacher)
+          fetch_for_course_and_other_contexts(context, expected_status: 404, user: other_teacher)
         end
       end
     end
@@ -572,6 +573,75 @@ describe "GradeChangeAudit API", type: :request do
 
     it "has pagination headers" do
       expect(response.headers["Link"]).to match(/rel="next"/)
+    end
+  end
+
+  context "when multiple records share the same timestamp" do
+    let(:test_record_count) { 10 }
+    let(:page_size) { 5 }
+
+    before do
+      # Use future timestamp to ensure test records appear on first pages
+      # (avoids interference from the @event created in global before block)
+      timestamp = 1.hour.from_now
+
+      @test_records = []
+      test_record_count.times do |i|
+        assignment = @course.assignments.create!(title: "Test Assignment #{i}", points_possible: 10)
+        submission = assignment.grade_student(@student, grade: i + 1, grader: @teacher).first
+
+        record = Auditors::GradeChange::Record.new(
+          "created_at" => timestamp,
+          "submission" => submission
+        )
+        @test_records << Auditors::GradeChange::Stream.insert(record)
+      end
+    end
+
+    it "returns all records across pages with no duplicates or gaps" do
+      # Fetch first two pages
+      json_page1 = fetch_for_context(@course, per_page: page_size)
+      link_header = response.headers["Link"]
+      next_url = link_header.match(/<([^>]+)>;\s*rel="next"/)[1]
+      next_page_value = CGI.parse(URI.parse(next_url).query)["page"].first
+
+      json_page2 = fetch_for_context(@course, per_page: page_size, page: next_page_value)
+
+      # Filter to just our test records (those with identical timestamps)
+      test_timestamp = @test_records.first.created_at.iso8601
+      test_events_page1 = json_page1["events"].select { |e| e["created_at"] == test_timestamp }
+      test_events_page2 = json_page2["events"].select { |e| e["created_at"] == test_timestamp }
+
+      test_ids_page1 = test_events_page1.pluck("id")
+      test_ids_page2 = test_events_page2.pluck("id")
+
+      # Should find all test records across both pages
+      total_test_events = (test_ids_page1 + test_ids_page2).size
+      expect(total_test_events).to eq(test_record_count),
+                                   "Expected all #{test_record_count} test records but got #{total_test_events}"
+
+      # Should have no duplicates
+      duplicates = test_ids_page1 & test_ids_page2
+      expect(duplicates).to be_empty, "Found duplicates: #{duplicates}"
+    end
+
+    it "uses array bookmark format with [timestamp, id]" do
+      fetch_for_context(@course, per_page: page_size)
+
+      link_header = response.headers["Link"]
+      next_url = link_header.match(/<([^>]+)>;\s*rel="next"/)[1]
+      bookmark_param = CGI.parse(URI.parse(next_url).query)["page"].first
+
+      # Decode bookmark (format: "bookmark:BASE64_JSON")
+      bookmark_data = bookmark_param.gsub(/^bookmark:/, "")
+      bookmark = JSONToken.decode(bookmark_data)
+
+      # Verify structure
+      expect(bookmark).to be_an(Array)
+      expect(bookmark.size).to eq(2)
+      expect(bookmark[0]).to be_a(String)
+      expect(bookmark[1]).to be_an(Integer)
+      expect { Time.zone.parse(bookmark[0]) }.not_to raise_error
     end
   end
 end

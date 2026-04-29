@@ -35,8 +35,10 @@ export function mimeClass(file) {
     return file.mime_class
   } else {
     const contentType = getContentType(file)
+    // Strip MIME parameters (charset, boundary, etc.) before lookup
     // NOTE: Keep this list in sync with what's in canvas-lms/app/models/attachment.rb
-    return contentMapping(contentType) || file.mime_class || 'file'
+    const baseType = contentType?.split(';')[0]?.trim()
+    return contentMapping(baseType) || file.mime_class || 'file'
   }
 }
 

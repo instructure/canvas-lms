@@ -28,5 +28,5 @@ describe "new_file_added" do
   let(:asset) { @attachment }
   let(:notification_name) { :new_file_added }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

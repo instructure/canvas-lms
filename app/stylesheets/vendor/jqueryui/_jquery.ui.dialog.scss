@@ -30,7 +30,7 @@
     border-color: transparent;
   }
 }
-.ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
+.ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 0; width: 24px; height: 24px; }
 .ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
 .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
 .ui-dialog .ui-dialog-buttonpane { text-align: direction(left); border-width: direction-sides(1px 0 0 0); background-image: none; margin: direction-sides(.5em 0 0 0); padding: direction-sides(.3em 1em .5em .4em); }
@@ -46,12 +46,15 @@
 
   .ui-dialog-titlebar-close {
     #{direction(right)}: 12px;
-    width: 20px; height: 20px;
+    width: 24px; height: 24px;
     span {
       transition: opacity 0.2s;
       background: url(/images/icon-x-black.svg) 50% 50% no-repeat;
-      background-size: 10px;
+      background-size: 12px;
       opacity: 0.6;
+      margin: 0;
+      width: 24px;
+      height: 24px;
     }
     &.ui-state-hover, &.ui-state-focus {
       border: 1px solid transparent;

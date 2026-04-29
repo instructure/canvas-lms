@@ -23,7 +23,6 @@ module Submissions
     include KalturaHelper
     include Submissions::ShowHelper
     include CoursesHelper
-    include AssetProcessorStudentHelper
 
     before_action :require_context
 
@@ -47,10 +46,6 @@ module Submissions
         @body_classes.push("full-width", "student-annotation-container")
       end
 
-      if @assignment.moderated_grading?
-        @moderated_grading_allow_list = @submission.moderated_grading_allow_list
-      end
-
       @anonymous_instructor_annotations = @context.grants_right?(@current_user, :manage_grades) &&
                                           @assignment.anonymous_instructor_annotations
 
@@ -65,8 +60,6 @@ module Submissions
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
           @anonymize_students = anonymize_students?
-          @asset_reports = asset_reports(submission: @submission)
-          @asset_processors = asset_processors(assignment: @assignment)
           flash.now[:notice] = flash_message if flash_message
           render template: "submissions/show_preview", locals: {
             anonymize_students: @anonymize_students,

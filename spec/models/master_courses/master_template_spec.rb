@@ -210,7 +210,7 @@ describe MasterCourses::MasterTemplate do
 
       @template.update_attribute(:default_restrictions, { content: true, due_dates: true })
       # now should update
-      expect(@quiz1.reload.updated_at.to_i).to_not eq old_time.to_i
+      expect(@quiz1.reload.updated_at.to_i).not_to eq old_time.to_i
       expect(@quiz2.reload.updated_at.to_i).to eq old_time.to_i # has custom restrictions
     end
 
@@ -237,8 +237,8 @@ describe MasterCourses::MasterTemplate do
                          "Quizzes::Quiz" => { content: true, due_dates: true }
                        })
       expect(@assmt.reload.updated_at.to_i).to eq old_time.to_i
-      expect(@topic.reload.updated_at.to_i).to_not eq old_time.to_i
-      expect(@quiz.reload.updated_at.to_i).to_not eq old_time.to_i
+      expect(@topic.reload.updated_at.to_i).not_to eq old_time.to_i
+      expect(@quiz.reload.updated_at.to_i).not_to eq old_time.to_i
     end
   end
 
@@ -355,6 +355,38 @@ describe MasterCourses::MasterTemplate do
 
         expect(@t.deletions_since_last_export).to eq({ "ContentTag" => [@out_master_tag.migration_id] })
       end
+    end
+  end
+
+  describe "#deletions_for_sub_types" do
+    before do
+      @t = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      @t.add_child_course!(Course.create!)
+      time = 2.days.ago
+      @t.master_migrations.create!(exports_started_at: time, workflow_state: "completed")
+      MasterCourses::MasterTemplate.preload_index_data([@t])
+    end
+
+    it "returns sub-type deletions without filtering by last_export_started_at" do
+      assignment = @course.assignments.create!(title: "Test Assignment")
+      tool = @course.context_external_tools.create!(
+        name: "Test Tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        url: "http://example.com/launch"
+      )
+      asset_processor = Lti::AssetProcessor.create!(
+        assignment:,
+        context_external_tool: tool,
+        url: "http://example.com/process",
+        title: "Test Processor"
+      )
+      asset_processor.workflow_state = "deleted"
+      asset_processor.save!
+
+      expected_mig_id = @t.migration_id_for(asset_processor)
+      expect(@t.deletions_for_sub_types).to eq({ "Lti::AssetProcessor" => [expected_mig_id] })
+      expect(@t.deletions_by_type).to eq({ "Lti::AssetProcessor" => [expected_mig_id] })
     end
   end
 end

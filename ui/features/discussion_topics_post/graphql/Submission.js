@@ -21,7 +21,7 @@ import {shape, string} from 'prop-types'
 
 export const Submission = {
   fragment: gql`
-    fragment Submission on Submission {
+    fragment DiscussionSubmission on Submission {
       id
       _id
       submissionStatus

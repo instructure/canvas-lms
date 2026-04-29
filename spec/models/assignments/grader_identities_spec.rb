@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Assignments::GraderIdentities do
   before :once do
     course_with_teacher(active_all: true)
@@ -130,7 +128,7 @@ describe Assignments::GraderIdentities do
         @course.enroll_teacher(teacher3, enrollment_state: :active)
 
         identities = assignment_with_slots.grader_identities
-        user_ids = identities.map { |identity| identity[:user_id] }
+        user_ids = identities.pluck(:user_id)
 
         expect(user_ids).not_to include(teacher3.id)
       end

@@ -90,13 +90,17 @@ describe('GridColor', () => {
   it('renders with blank custom status and standard status colors', () => {
     const {getByTestId} = render(<GridColor statuses={[]} colors={colors} customStatuses={[]} />)
     const styleTag = getByTestId('grid-color')
-    expect(styleTag).toHaveTextContent('')
+    expect(styleTag).toHaveTextContent(
+      '.Grid__GradeCell__StatusIcon { display: flex; align-items: center; justify-content: center; padding: 4px; } .Grid__GradeCell__StatusIcon img { display: block; width: 16px; height: 16px; }',
+    )
   })
 
   it('renders with blank custom statuses if no prop is passed in', () => {
     const {getByTestId} = render(<GridColor statuses={[]} colors={colors} />)
     const styleTag = getByTestId('grid-color')
-    expect(styleTag).toHaveTextContent('')
+    expect(styleTag).toHaveTextContent(
+      '.Grid__GradeCell__StatusIcon { display: flex; align-items: center; justify-content: center; padding: 4px; } .Grid__GradeCell__StatusIcon img { display: block; width: 16px; height: 16px; }',
+    )
   })
 
   it('it renders style', function () {
@@ -130,7 +134,20 @@ describe('GridColor', () => {
     expect(rules).toEqual(
       `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }` +
         `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }` +
-        `.slick-cell.editable .gradebook-cell.late { background-color: white; }`,
+        `.slick-cell.editable .gradebook-cell.late { background-color: white; }` +
+        `
+    .Grid__GradeCell__StatusIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    .Grid__GradeCell__StatusIcon img {
+      display: block;
+      width: 16px;
+      height: 16px;
+    }
+  `,
     )
   })
 
@@ -143,7 +160,20 @@ describe('GridColor', () => {
         '.slick-cell.editable .gradebook-cell.late { background-color: white; }' +
         `.even .gradebook-cell.missing { background-color: ${defaultColors.salmon}; }` +
         `.odd .gradebook-cell.missing { background-color: ${darken(defaultColors.salmon, 5)}; }` +
-        '.slick-cell.editable .gradebook-cell.missing { background-color: white; }',
+        '.slick-cell.editable .gradebook-cell.missing { background-color: white; }' +
+        `
+    .Grid__GradeCell__StatusIcon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    .Grid__GradeCell__StatusIcon img {
+      display: block;
+      width: 16px;
+      height: 16px;
+    }
+  `,
     )
   })
 })

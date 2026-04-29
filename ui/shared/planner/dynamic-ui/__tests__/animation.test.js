@@ -110,7 +110,7 @@ describe('#acceptAction (2)', () => {
 describe('lifecycle methods', () => {
   it('calls uiWillUpdate when invokeUiWillUpdate is called', () => {
     class Foo extends Animation {
-      uiWillUpdate = jest.fn()
+      uiWillUpdate = vi.fn()
     }
     const foo = new Foo(['foo-action'], mockManager())
     foo.invokeUiWillUpdate()
@@ -119,7 +119,7 @@ describe('lifecycle methods', () => {
 
   it('does not allow recursive invokeUiWillUpdate calls', () => {
     class Foo extends Animation {
-      uiWillUpdate = jest.fn(() => this.invokeUiWillUpdate())
+      uiWillUpdate = vi.fn(() => this.invokeUiWillUpdate())
     }
     const foo = new Foo(['foo-action'], mockManager())
     foo.invokeUiWillUpdate()
@@ -128,7 +128,7 @@ describe('lifecycle methods', () => {
 
   it('calls uiDidUpdate when invokeUiDidUpdate is called', () => {
     class Foo extends Animation {
-      uiDidUpdate = jest.fn()
+      uiDidUpdate = vi.fn()
     }
     const foo = new Foo(['foo-action'], mockManager())
     foo.invokeUiDidUpdate()
@@ -137,7 +137,7 @@ describe('lifecycle methods', () => {
 
   it('does not allow recursive invokeUiDidUpdate calls', () => {
     class Foo extends Animation {
-      uiDidUpdate = jest.fn(() => this.invokeUiDidUpdate())
+      uiDidUpdate = vi.fn(() => this.invokeUiDidUpdate())
     }
     const foo = new Foo(['foo-action'], mockManager())
     foo.invokeUiDidUpdate()
@@ -146,7 +146,7 @@ describe('lifecycle methods', () => {
 
   it('resets the animations data after uiDidUpdate', () => {
     class Foo extends Animation {
-      uiDidUpdate = jest.fn()
+      uiDidUpdate = vi.fn()
     }
     const foo = new Foo(['foo-action'], mockManager())
     foo.acceptAction({type: 'foo-action'})

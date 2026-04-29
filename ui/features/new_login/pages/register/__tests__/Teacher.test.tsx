@@ -21,28 +21,43 @@ import {within} from '@testing-library/dom'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import {userEvent} from '@testing-library/user-event'
 import React from 'react'
-import {MemoryRouter} from 'react-router-dom'
+import {MemoryRouter, useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../../context'
 import {createTeacherAccount} from '../../../services'
 import Teacher from '../Teacher'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: vi.fn(),
+    useNavigationType: vi.fn(),
+    useLocation: vi.fn(),
+  }
+})
+
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
-jest.mock('../../../services', () => ({
-  createTeacherAccount: jest.fn(),
+vi.mock('../../../services', () => ({
+  createTeacherAccount: vi.fn(),
 }))
 
-jest.mock('../../../context', () => {
-  const actualContext = jest.requireActual('../../../context')
+vi.mock('../../../context', async () => {
+  const actualContext = await vi.importActual<typeof import('../../../context')>('../../../context')
   return {
     ...actualContext,
-    useNewLoginData: jest.fn(() => ({
+    useNewLoginData: vi.fn(() => ({
       ...actualContext.useNewLoginData(),
     })),
   }
 })
+
+const mockNavigate = vi.fn()
+const mockedUseNavigate = useNavigate as ReturnType<typeof vi.fn>
+const mockNavigationType = useNavigationType as ReturnType<typeof vi.fn>
+const mockedUseLocation = useLocation as ReturnType<typeof vi.fn>
 
 describe('Teacher', () => {
   const setup = () => {
@@ -58,10 +73,13 @@ describe('Teacher', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
+    mockedUseNavigate.mockReturnValue(mockNavigate)
+    mockNavigationType.mockReturnValue('PUSH')
+    mockedUseLocation.mockReturnValue({key: 'default'})
     // reset the mock implementation to return the default values
-    ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+    ;(useNewLoginData as ReturnType<typeof vi.fn>).mockImplementation(() => ({
       loginHandleName: 'Email',
       privacyPolicyUrl: '',
       termsOfUseUrl: '',
@@ -81,15 +99,15 @@ describe('Teacher', () => {
       expect(screen.queryByTestId('terms-and-policy-checkbox')).not.toBeInTheDocument()
     })
 
-    it('renders terms checkbox when required', async () => {
-      ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
-        ...jest.requireActual('../../../context').useNewLoginData(),
+    it('renders terms checkbox when required', () => {
+      ;(useNewLoginData as ReturnType<typeof vi.fn>).mockImplementation(() => ({
+        loginHandleName: 'Email',
         termsRequired: true,
         privacyPolicyUrl: 'http://www.example.com/privacy',
         termsOfUseUrl: 'http://www.example.com/terms',
       }))
       setup()
-      expect(await screen.findByTestId('terms-and-policy-checkbox')).toBeInTheDocument()
+      expect(screen.getByTestId('terms-and-policy-checkbox')).toBeInTheDocument()
     })
   })
 
@@ -115,7 +133,7 @@ describe('Teacher', () => {
     })
 
     it('validates the terms checkbox when required', async () => {
-      ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+      ;(useNewLoginData as ReturnType<typeof vi.fn>).mockImplementation(() => ({
         termsRequired: true,
         privacyPolicyUrl: 'http://www.example.com/privacy',
         termsOfUseUrl: 'http://www.example.com/terms',
@@ -147,7 +165,7 @@ describe('Teacher', () => {
 
   describe('form submission', () => {
     it('submits successfully with valid inputs', async () => {
-      ;(createTeacherAccount as jest.Mock).mockResolvedValueOnce({
+      ;(createTeacherAccount as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         status: 200,
         data: {redirect_url: '/dashboard'},
       })
@@ -166,7 +184,7 @@ describe('Teacher', () => {
     })
 
     it('shows error messages for failed api validation', async () => {
-      ;(createTeacherAccount as jest.Mock).mockRejectedValueOnce({
+      ;(createTeacherAccount as ReturnType<typeof vi.fn>).mockRejectedValueOnce({
         response: {
           json: async () => ({
             errors: {
@@ -185,7 +203,7 @@ describe('Teacher', () => {
     })
 
     it('handles generic server errors gracefully', async () => {
-      ;(createTeacherAccount as jest.Mock).mockRejectedValueOnce({
+      ;(createTeacherAccount as ReturnType<typeof vi.fn>).mockRejectedValueOnce({
         response: {
           status: 500,
           json: async () => ({}),
@@ -205,7 +223,7 @@ describe('Teacher', () => {
     })
 
     it('redirects to the provided destination after a successful submission', async () => {
-      ;(createTeacherAccount as jest.Mock).mockResolvedValueOnce({
+      ;(createTeacherAccount as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         status: 200,
         data: {destination: '/custom-redirect'},
       })
@@ -219,7 +237,7 @@ describe('Teacher', () => {
     })
 
     it('redirects to the default location if no destination is provided', async () => {
-      ;(createTeacherAccount as jest.Mock).mockResolvedValueOnce({
+      ;(createTeacherAccount as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         status: 200,
         data: {},
       })
@@ -233,12 +251,36 @@ describe('Teacher', () => {
     })
   })
 
-  it('navigates back to login when the cancel button is clicked', async () => {
-    setup()
-    const backButton = screen.getByTestId('back-button')
-    await userEvent.click(backButton)
-    await waitFor(() => {
-      expect(assignLocation).toHaveBeenCalledWith('/login')
+  describe('navigation behavior', () => {
+    describe('when the cancel button is clicked', () => {
+      it('navigates back to login when there is no previous history', async () => {
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+      })
+
+      it('navigates back to the previous page when history exists', async () => {
+        mockNavigationType.mockReturnValue('PUSH')
+        mockedUseLocation.mockReturnValue({key: 'abc123'})
+        mockedUseNavigate.mockReturnValue(mockNavigate)
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith(-1)
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+      })
+
+      it('navigates to fallback when navigationType is POP or key is default', async () => {
+        mockNavigationType.mockReturnValue('POP')
+        mockedUseLocation.mockReturnValue({key: 'default'})
+        mockedUseNavigate.mockReturnValue(mockNavigate)
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+      })
     })
   })
 })

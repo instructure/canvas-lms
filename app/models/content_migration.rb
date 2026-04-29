@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ContentMigration < ActiveRecord::Base
+class ContentMigration < ApplicationRecord
   include Workflow
   include HtmlTextHelper
   include Rails.application.routes.url_helpers
@@ -70,7 +70,7 @@ class ContentMigration < ActiveRecord::Base
     state :failed
   end
 
-  def self.migration_plugins(exclude_hidden = false)
+  def self.migration_plugins(exclude_hidden: false)
     plugins = Canvas::Plugin.all_for_tag(:export_system)
     exclude_hidden ? plugins.reject { |p| p.meta[:hide_from_users] } : plugins
   end
@@ -628,13 +628,13 @@ class ContentMigration < ActiveRecord::Base
             # ripped from copy_attachments_from_course
             root_folder_name = Folder.root_folders(context).first.name + "/"
             context.attachments.where(migration_id: file_mig_ids).each do |file|
-              add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ""), file.migration_id)
+              add_attachment_path(file.full_display_path.delete_prefix(root_folder_name), file.migration_id)
             end
           end
         end
         # sync the existing folders first in case someone did something weird like deleted and replaced a folder in the same sync
         MasterCourses::FolderHelper.update_folder_names_and_states(context, source_export)
-        context.copy_attachments_from_course(source_export.context, content_export: source_export, content_migration: self)
+        copy_attachments_for_migration(source_export)
         MasterCourses::FolderHelper.recalculate_locked_folders(context)
       elsif for_course_template?
         data = JSON.parse(exported_attachment.open, max_nesting: 50)
@@ -646,10 +646,12 @@ class ContentMigration < ActiveRecord::Base
         data = JSON.parse(@zip_file.read("course_export.json"), max_nesting: 50)
         data = prepare_data(data)
 
-        if @zip_file.find_entry("all_files.zip")
+        if (e = @zip_file.find_entry("all_files.zip"))
           # the file importer needs an actual file to process
-          all_files_path = create_all_files_path(@exported_data_zip.path)
-          @zip_file.extract("all_files.zip", all_files_path)
+          dir, filename = File.split(@exported_data_zip.path)
+          all_files_path = create_all_files_path(filename)
+          e.extract(all_files_path, destination_directory: dir)
+          all_files_path = File.join(dir, all_files_path)
           data["all_files_export"]["file_path"] = all_files_path
         else
           data["all_files_export"]["file_path"] = nil
@@ -745,7 +747,7 @@ class ContentMigration < ActiveRecord::Base
 
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
-    Utf8Cleaner.recursively_strip_invalid_utf8!(data, true)
+    Utf8Cleaner.recursively_strip_invalid_utf8!(data, force_utf8: true)
     data["all_files_export"] ||= {}
     data
   end
@@ -787,6 +789,10 @@ class ContentMigration < ActiveRecord::Base
 
   def process_master_deletions(deletions)
     deletions.each_key do |klass|
+      if MasterCourses::SUB_TYPES_FOR_DELETIONS.include?(klass)
+        process_master_deletion_for_subtypes(deletions[klass], klass) if deletions[klass].present?
+        next
+      end
       next unless MasterCourses::CONTENT_TYPES_FOR_DELETIONS.include?(klass)
 
       mig_ids = deletions[klass]
@@ -818,6 +824,22 @@ class ContentMigration < ActiveRecord::Base
           Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are active Alignments to Content" }
           add_skipped_item(child_tag)
         else
+          if Account.site_admin.feature_enabled?(:skip_blueprint_module_downstream_changes)
+            ContentTag.not_deleted.where(
+              content_type: klass,
+              content_id: content.id,
+              context_id: context.id,
+              context_type: context.class.name,
+              tag_type: "context_module"
+            ).find_each do |tag|
+              if tag.context_module.present?
+                mod = tag.context_module
+                mod.skip_downstream_changes!
+                mod.remove_completion_requirement(tag.id)
+              end
+            end
+          end
+
           if content.is_a?(Attachment)
             Attachment.not_deleted_content_tags_for_attachments([content.id]).find_each do |tag|
               tag.skip_downstream_changes!
@@ -830,6 +852,137 @@ class ContentMigration < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def process_master_deletion_for_subtypes(migration_ids, klass)
+    return unless context.is_a?(Course) # blueprint syncs works only for courses
+    return if klass == "Lti::AssetProcessor" && !root_account.feature_enabled?(:lti_asset_processor)
+
+    item_scope = case klass
+                 when "Lti::AssetProcessor"
+                   Lti::AssetProcessor.active.where(migration_id: migration_ids, assignment: context.assignments)
+                 end
+    item_scope.each do |subcontent|
+      content = case klass
+                when "Lti::AssetProcessor"
+                  subcontent.assignment.discussion_topic? ? subcontent.assignment.discussion_topic : subcontent.assignment
+                end
+      if skip_blueprint_sync_deletion?(content)
+        Rails.logger.debug { "skipping deletion sync for #{klass} #{subcontent.migration_id} due to downstream changes" }
+        add_skipped_item(subcontent.migration_id)
+        next
+      end
+      subcontent.destroy
+    end
+  end
+
+  def skip_blueprint_sync_deletion?(content)
+    child_tag = master_course_subscription.content_tag_for(content)
+    child_tag&.downstream_changes&.any? && !content.editing_restricted?(:any)
+  end
+
+  def map_merge(old_item, new_item)
+    @merge_mappings ||= {}
+    @merge_mappings[old_item.asset_string] = new_item && new_item.id
+  end
+
+  def merge_mapped_id(old_item)
+    @merge_mappings ||= {}
+    return nil unless old_item
+    return @merge_mappings[old_item] if old_item.is_a?(String)
+
+    @merge_mappings[old_item.asset_string]
+  end
+
+  def copy_attachments_for_migration(source_export)
+    copy_attachments_from_course(source_export)
+
+    destination_media_folder = Folder.media_folder(context)
+    bp_user_files = Attachment.where(id: source_export.settings["referenced_user_file_ids"]) if source_export.settings["referenced_user_file_ids"].present?
+    (source_export.referenced_files.values + bp_user_files.to_a).each do |att|
+      next unless att.context_type == "User"
+
+      export_path = "#{destination_media_folder.name}/#{att.display_name}"
+      copy_attachment_to_destination_course(source_export, att, export_path, destination_media_folder.id)
+    end
+  end
+
+  def copy_attachments_from_course(source_export)
+    source_course = source_export.context
+    root_folder = Folder.root_folders(context).first
+    root_folder_name = root_folder.name + "/"
+
+    attachments = source_course.attachments.not_deleted.to_a
+    total = attachments.count + 1
+
+    Attachment.skip_media_object_creation do
+      attachments.each_with_index do |file, i|
+        update_import_progress((i.to_f / total) * 18.0) if i % 10 == 0
+        next if source_export && !source_export.export_object?(file)
+
+        begin
+          new_folder_id = merge_mapped_id(file.folder)
+
+          if file.folder && file.folder.parent_folder_id.nil?
+            new_folder_id = root_folder.id
+          end
+          # make sure the file has somewhere to go
+          unless new_folder_id
+            # gather mapping of needed folders from old course to new course
+            old_folders = []
+            old_folders << file.folder
+            new_folders = []
+            new_folders << old_folders.last.clone_for(context, nil, { include_subcontent: false })
+            while old_folders.last.parent_folder&.parent_folder_id
+              old_folders << old_folders.last.parent_folder
+              new_folders << old_folders.last.clone_for(context, nil, { include_subcontent: false })
+            end
+            old_folders.reverse!
+            new_folders.reverse!
+            # try to use folders that already match if possible
+            final_new_folders = []
+            parent_folder = Folder.root_folders(context).first
+            old_folders.each_with_index do |folder, idx|
+              final_new_folders << if (f = parent_folder.active_sub_folders.where(name: folder.name).first)
+                                     f
+                                   else
+                                     new_folders[idx]
+                                   end
+              parent_folder = final_new_folders.last
+            end
+            # add or update the folder structure needed for the file
+            final_new_folders.first.parent_folder_id ||=
+              merge_mapped_id(old_folders.first.parent_folder) ||
+              Folder.root_folders(context).first.id
+            old_folders.each_with_index do |folder, idx|
+              final_new_folders[idx].save!
+              map_merge(folder, final_new_folders[idx])
+              final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
+            end
+            new_folder_id = merge_mapped_id(file.folder)
+          end
+          copy_attachment_to_destination_course(source_export, file, file.full_display_path.delete_prefix(root_folder_name), new_folder_id)
+        rescue => e
+          Canvas::Errors.capture(e) unless e.message.include?("Cannot create attachments in deleted folders")
+          Rails.logger.error "Couldn't copy file: #{e}"
+          add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", name: file.display_name || file.path_name), $!)
+        end
+      end
+    end
+  end
+
+  def copy_attachment_to_destination_course(source_export, file, export_path, new_folder_id)
+    migration_id = source_export&.create_key(file)
+    new_file = file.clone_for(context, nil, overwrite: true, migration_id:, migration: self, match_on_migration_id: for_master_course_import?)
+    add_attachment_path(export_path, new_file.migration_id)
+
+    new_file.folder_id = new_folder_id
+    new_file.need_notify = false
+    new_file.save_without_broadcasting!
+    new_file.handle_duplicates(:rename)
+    add_imported_item(new_file)
+    add_imported_item(new_file.folder, key: new_file.folder.id)
+    map_merge(file, new_file)
   end
 
   def get_outcome_and_link(content, context)
@@ -1039,11 +1192,40 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
+  def user_file_link_matches_uuid?(html, attachment)
+    # TODO: We changed how user files are exported into export packages in
+    # 600e3abd10eb6f4e2746d866dd8f757659ff884a and 21e87b373408165938e73e2bf7aad097e7d0f582
+    # This whole method should be removed in a few years once content migrations are less
+    # likely to have user files directly linked in them.
+    return false if html.blank? || attachment.context_type != "User"
+
+    Nokogiri::HTML5.fragment(html, max_tree_depth: 10_000).search("*").each do |node|
+      CanvasLinkMigrator::LinkParser::LINK_ATTRS.each do |attr|
+        next unless node[attr]&.include?(attachment.id.to_s)
+
+        url = begin
+          Rails.application.routes.recognize_path(node[attr])
+        rescue ActionController::RoutingError
+          next
+        end
+        next if Shard.integral_id_for(url[:attachment_id] || url[:file_id] || url[:id]) != attachment.id
+
+        query_values = Addressable::URI.parse(node[attr]).query_values || {}
+        return true if query_values["verifier"] == attachment.uuid
+      end
+    end
+    false
+  end
+
+  def add_association_for_migration?(html, attachment)
+    context == attachment.context || context.shard.activate { user_file_link_matches_uuid?(html, attachment) }
+  end
+
   def convert_block_editor_blocks(blocks_json, migration_id, context)
     blocks_json.each_value { |block| convert_block(block, context, migration_id) }
   end
 
-  delegate :resolve_content_links!, to: :html_converter
+  delegate :resolve_content_links!, :create_attachment_associations, to: :html_converter
 
   def add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
     add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{type} #{field}",
@@ -1272,9 +1454,6 @@ class ContentMigration < ActiveRecord::Base
     dest_id = dest_asset_fields[:id]
 
     mapping[key][src_id] = dest_id if src_id.present?
-
-    return unless asset_map_v2?
-
     mapping[key][mig_id] = {
       source: src_asset_fields,
       destination: dest_asset_fields
@@ -1368,8 +1547,8 @@ class ContentMigration < ActiveRecord::Base
         srcs = {}
         if source_course.present?
           source_course.shard.activate do
-            srcs = klass.where(context: source_course).select(*src_fields).each_with_object({}) do |src, by_mig_id|
-              by_mig_id[CC::CCHelper.create_key(src.asset_string, global: global_ids)] = src.attributes.with_indifferent_access.slice(*src_fields)
+            srcs = klass.where(context: source_course).select(*src_fields).to_h do |src|
+              [CC::CCHelper.create_key(src.asset_string, global: global_ids), src.attributes.with_indifferent_access.slice(*src_fields)]
             end
           end
         end
@@ -1395,29 +1574,21 @@ class ContentMigration < ActiveRecord::Base
     file_download_url(asset_map_attachment, options)
   end
 
-  def asset_map_v2?
-    Account.site_admin.feature_enabled?(:content_migration_asset_map_v2)
-  end
-
   def generate_asset_map
     data = asset_id_mapping
     return if data.nil?
 
+    root_folder = Folder.root_folders(context).first
     payload = {
       "source_host" => source_course&.root_account&.domain(ApplicationController.test_cluster_name),
       "source_course" => source_course_id&.to_s,
-      "contains_migration_ids" => Account.site_admin.feature_enabled?(:content_migration_asset_map_v2),
       "resource_mapping" => data,
-      "migration_user_uuid" => user&.uuid
+      "migration_user_uuid" => user&.uuid,
+      "destination_course" => context.id.to_s,
+      "destination_hosts" => destination_hosts,
+      "attachment_path_id_lookup" => migration_settings[:attachment_path_id_lookup].presence || attachment_path_id_lookup
     }
-
-    if asset_map_v2?
-      payload["destination_course"] = context.id.to_s
-      payload["destination_hosts"] = destination_hosts
-      root_folder = Folder.root_folders(context).first
-      payload["destination_root_folder"] = root_folder.name + "/" if root_folder
-      payload["attachment_path_id_lookup"] = migration_settings[:attachment_path_id_lookup].presence || attachment_path_id_lookup
-    end
+    payload["destination_root_folder"] = root_folder.name + "/" if root_folder
 
     self.asset_map_attachment = Attachment.new(context: self, filename: "asset_map.json")
     Attachments::Storage.store_for_attachment(asset_map_attachment, StringIO.new(payload.to_json))

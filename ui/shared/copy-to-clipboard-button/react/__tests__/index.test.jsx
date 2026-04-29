@@ -25,7 +25,7 @@ describe('CopyToClipboardButton', () => {
   let originalClipboard
 
   beforeAll(() => {
-    const writeText = jest.fn(() => Promise.resolve({}))
+    const writeText = vi.fn(() => Promise.resolve({}))
     originalClipboard = navigator.clipboard
     navigator.clipboard = {writeText}
   })

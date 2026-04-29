@@ -25,6 +25,7 @@ require_relative "concerns/lti_services_shared_examples"
 module Lti::IMS
   RSpec.describe ScoresController do
     include_context "advantage services context"
+    include AccountDomainSpecHelper
 
     let(:admin) { account_admin_user }
     let(:context) { course }
@@ -81,7 +82,7 @@ module Lti::IMS
       it_behaves_like "advantage services"
       it_behaves_like "lti services"
 
-      shared_examples_for "a successful scores request" do
+      context "with valid params" do
         context "when the lti_id userId is used" do
           let(:userId) { user.lti_id }
 
@@ -97,7 +98,7 @@ module Lti::IMS
         end
 
         it "uses the Account#domain in the resultUrl" do
-          allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+          stub_host_for_environment_specific_domain("canonical.host")
           send_request
           expect(json["resultUrl"]).to start_with(
             "http://canonical.host/api/lti/courses/#{course.id}/line_items/"
@@ -221,6 +222,13 @@ module Lti::IMS
               expect(result.submission.reload.submission_type).to eq "external_tool"
             end
 
+            it "logs asset access for participation tracking" do
+              send_request
+              accessed_asset = assigns[:accessed_asset]
+              expect(accessed_asset[:level]).to eq "participate"
+              expect(accessed_asset[:category]).to eq "assignments"
+            end
+
             it_behaves_like "creates a new submission"
           end
 
@@ -230,7 +238,7 @@ module Lti::IMS
             end
 
             it "does not submit homework" do
-              expect_any_instance_of(Assignment).to_not receive(:submit_homework)
+              expect_any_instance_of(Assignment).not_to receive(:submit_homework)
               expect_any_instance_of(Assignment).to receive(:find_or_create_submission)
               send_request
             end
@@ -270,7 +278,7 @@ module Lti::IMS
             end
 
             it "does not submit homework" do
-              expect_any_instance_of(Assignment).to_not receive(:submit_homework)
+              expect_any_instance_of(Assignment).not_to receive(:submit_homework)
               expect_any_instance_of(Assignment).to receive(:find_or_create_submission)
               send_request
             end
@@ -603,7 +611,7 @@ module Lti::IMS
                 attachment = Attachment.last
                 expect(attachment.user).to eq user
                 expect(attachment.display_name).to eq content_items.first[:title]
-                expect(result.submission.attachments).to include attachment
+                expect(result.submission.reload.attachments).to include attachment
               end
 
               let(:actual_progress_url) do
@@ -611,7 +619,7 @@ module Lti::IMS
               end
 
               it "returns a progress URL with the Account#domain" do
-                allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+                stub_host_for_environment_specific_domain("canonical.host")
                 send_request
                 expect(actual_progress_url)
                   .to start_with("http://canonical.host/api/lti/courses/#{context_id}/progress/")
@@ -697,7 +705,7 @@ module Lti::IMS
                 allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: ["jwt signing key"])
                 @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
                 allow(CanvasHttp).to receive(:post).and_return(
-                  double(class: Net::HTTPCreated, code: 201, body: {})
+                  instance_double(Net::HTTPCreated, class: Net::HTTPCreated, code: 201, body: {})
                 )
               end
 
@@ -706,7 +714,7 @@ module Lti::IMS
               # that doesn't work well in a controller spec for this controller
 
               it "returns a progress url" do
-                allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+                stub_host_for_environment_specific_domain("canonical.host")
                 send_request
                 progress_url =
                   json[Lti::Result::AGS_EXT_SUBMISSION]["content_items"].first["progress"]
@@ -763,7 +771,7 @@ module Lti::IMS
               context "when InstFS responds with a 500" do
                 before do
                   allow(CanvasHttp).to receive(:post).and_return(
-                    double(class: Net::HTTPServerError, code: 500, body: {})
+                    instance_double(Net::HTTPServerError, class: Net::HTTPServerError, code: 500, body: {})
                   )
                 end
 
@@ -773,7 +781,7 @@ module Lti::IMS
               context "when InstFS responds with a 400" do
                 before do
                   allow(CanvasHttp).to receive(:post).and_return(
-                    double(class: Net::HTTPBadRequest, code: 400, body: {})
+                    instance_double(Net::HTTPBadRequest, class: Net::HTTPBadRequest, code: 400, body: {})
                   )
                 end
 
@@ -784,7 +792,7 @@ module Lti::IMS
                 context "and InstFS responds with a 502" do
                   before do
                     allow(CanvasHttp).to receive(:post).and_return(
-                      double(class: Net::HTTPBadRequest, code: 502, body: {})
+                      instance_double(Net::HTTPBadRequest, class: Net::HTTPBadRequest, code: 502, body: {})
                     )
                   end
 
@@ -798,7 +806,7 @@ module Lti::IMS
                 context "and InstFS responds with a 400" do
                   before do
                     allow(CanvasHttp).to receive(:post).and_return(
-                      double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
+                      instance_double(Net::HTTPBadRequest, class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
                     )
                   end
 
@@ -896,6 +904,63 @@ module Lti::IMS
 
               it_behaves_like "existing submission"
               it_behaves_like "attempt-limited new submission"
+            end
+          end
+
+          context "when over attempt limit with new submissions" do
+            before { result.submission.update!(attempt: 4) }
+
+            context "when submitted_at is unchanged from existing submission" do
+              let(:existing_submitted_at) { Time.zone.parse("2025-01-01 12:00:00").iso8601(3) }
+              let(:params_overrides) do
+                super().merge(
+                  Lti::Result::AGS_EXT_SUBMISSION => {
+                    new_submission: true,
+                    submitted_at: existing_submitted_at
+                  },
+                  :scoreGiven => 15,
+                  :scoreMaximum => 20
+                )
+              end
+
+              before do
+                assignment.submit_homework(user, { submitted_at: existing_submitted_at, submission_type: "external_tool" })
+              end
+
+              it "succeeds and updates score when submitted_at unchanged despite being over attempt limit" do
+                original_attempt = result.submission.attempt
+                send_request
+                expect(response.status.to_i).to eq 200
+                # Score is scaled from scoreGiven (15) / scoreMaximum (20) * line_item.score_maximum
+                expected_score = (15.0 / 20.0) * line_item.score_maximum
+                expect(result.submission.reload.score).to eq expected_score
+                expect(result.submission.attempt).to eq original_attempt
+              end
+            end
+
+            context "when submitted_at changes from existing submission" do
+              let(:existing_submitted_at) { Time.zone.parse("2025-01-01 12:00:00").iso8601(3) }
+              let(:new_submitted_at) { Time.zone.parse("2025-01-01 13:00:00").iso8601(3) }
+              let(:params_overrides) do
+                super().merge(
+                  Lti::Result::AGS_EXT_SUBMISSION => {
+                    new_submission: true,
+                    submitted_at: new_submitted_at
+                  },
+                  :scoreGiven => 15,
+                  :scoreMaximum => 20
+                )
+              end
+
+              before do
+                assignment.submit_homework(user, { submitted_at: existing_submitted_at, submission_type: "external_tool" })
+              end
+
+              it "fails when submitted_at changes and over attempt limit" do
+                send_request
+                expect(response.status.to_i).to eq 422
+                expect(response.body).to include("maximum number of allowed attempts")
+              end
             end
           end
 
@@ -1130,30 +1195,8 @@ module Lti::IMS
         end
       end
 
-      context "with valid params" do
-        it_behaves_like "a successful scores request"
-      end
-
-      context "when activityProgress is set to Initialized" do
-        let(:params_overrides) { super().merge(activityProgress: "Initialized") }
-
-        before do
-          Account.root_accounts.first.disable_feature! :ags_score_trigger_needs_grading_after_submitted
-        end
-
-        it "does not update the submission" do
-          send_request
-          rslt = Lti::Result.find(json["resultUrl"].split("/").last)
-          expect(rslt.submission.workflow_state).to eq("unsubmitted")
-        end
-      end
-
       %w[Initialized Started InProgress].each do |activity_progress|
         context "when activityProgress is set to #{activity_progress}" do
-          before do
-            Account.root_accounts.first.enable_feature! :ags_score_trigger_needs_grading_after_submitted
-          end
-
           let(:params_overrides) { super().merge(activityProgress: activity_progress) }
 
           it "does not update the submission" do
@@ -1166,10 +1209,6 @@ module Lti::IMS
 
       %w[Submitted Completed].each do |activity_progress|
         context "when activityProgress is set to #{activity_progress}" do
-          before do
-            Account.root_accounts.first.enable_feature! :ags_score_trigger_needs_grading_after_submitted
-          end
-
           let(:params_overrides) { super().merge(activityProgress: activity_progress) }
 
           it "does update the submission" do
@@ -1185,7 +1224,28 @@ module Lti::IMS
           course_with_user("StudentViewEnrollment", course:, active_all: true).user
         end
 
-        it_behaves_like "a successful scores request"
+        let(:userId) { user.lti_id }
+
+        it "returns a valid resultUrl in the body" do
+          send_request
+          expect(json["resultUrl"]).to include "results"
+        end
+
+        context "when line_item is an assignment" do
+          let(:result) { lti_result_model line_item:, user: }
+
+          before do
+            allow(CanvasHttp).to receive(:get).with("https://getsamplefiles.com/download/txt/sample-1.txt").and_return("sample data")
+            allow(CanvasHttp).to receive(:get).with("https://getsamplefiles.com/download/txt/sample-2.txt").and_return("moar sample data")
+          end
+
+          it "increments attempt" do
+            submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
+            attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
+            send_request
+            expect(result.submission.reload.attempt).to eq attempt + 1
+          end
+        end
       end
 
       context "with different activityProgress values" do
@@ -1223,7 +1283,7 @@ module Lti::IMS
           it "returns an unprocessable_entity error" do
             result
             send_request
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
           end
         end
 
@@ -1270,7 +1330,7 @@ module Lti::IMS
             expect do
               result
               send_request
-            end.to_not change { result.submission.reload.score }
+            end.not_to change { result.submission.reload.score }
           end
 
           it "has the model validation error in the response" do
@@ -1290,6 +1350,25 @@ module Lti::IMS
           let(:user) { ta_in_course(course:, active_all: true).user }
 
           it_behaves_like "an unprocessable entity"
+        end
+
+        context "when user's enrollment is completed and grading happens" do
+          let(:user) do
+            student_in_course(course:, active_all: true, enrollment_state: :completed).user
+          end
+          let(:params_overrides) { super().merge(scoreGiven: 10, scoreMaximum: 10) }
+
+          before do
+            user.enrollments.find_by(course:).update!(workflow_state: "completed")
+          end
+
+          it_behaves_like "an unprocessable entity"
+
+          it "includes error message" do
+            result
+            send_request
+            expect(response.body).to include("Student must be enrolled in the course as a student to be graded")
+          end
         end
 
         context "when timestamp is a timestamp, but not an iso8601 timestamp" do
@@ -1389,7 +1468,7 @@ module Lti::IMS
             result
             send_request
             expect(assignment.find_or_create_submission(user).workflow_state).to eq "unsubmitted"
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
             expect(response.body).to include "This assignment is still unpublished"
           end
         end

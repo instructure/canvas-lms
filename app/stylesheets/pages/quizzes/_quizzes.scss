@@ -1490,6 +1490,9 @@ ul#quiz_versions {
           white-space: nowrap;
         }
       }
+      .form-control__label{
+        display: block;
+      }
       #keep_score_select,
       #quiz_allowed_attempts {
         margin-#{direction(left)}: 10px;

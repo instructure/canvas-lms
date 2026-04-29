@@ -28,8 +28,8 @@ import {
   uploadPreflight,
   uploadToIconMakerFolder,
   uploadToMediaFolder,
+  uploadToMediaFolderWithoutEditor,
 } from '../actions/upload'
-import {searchFlickr, openOrCloseFlickrForm} from '../actions/flickr'
 import {toggle as toggleFolder} from '../actions/files'
 import {openOrCloseNewPageForm} from '../actions/links'
 import {fetchInitialDocs, fetchNextDocs} from '../actions/documents'
@@ -52,16 +52,14 @@ export default function propsFromDispatch(dispatch) {
     fetchInitialImages: (opts = {category: DEFAULT_FILE_CATEGORY}) =>
       dispatch(fetchInitialImages(opts)),
     fetchNextImages: (opts = {category: DEFAULT_FILE_CATEGORY}) => dispatch(fetchNextImages(opts)),
-    startUpload: (tabContext, fileMetaProps) =>
-      dispatch(uploadPreflight(tabContext, fileMetaProps)),
-    flickrSearch: term => dispatch(searchFlickr(term)),
-    toggleFlickrForm: () => dispatch(openOrCloseFlickrForm()),
+    startUpload: fileMetaProps => dispatch(uploadPreflight(fileMetaProps)),
     toggleUploadForm: () => dispatch(openOrCloseUploadForm()),
     toggleNewPageForm: () => dispatch(openOrCloseNewPageForm()),
     startIconMakerUpload: (fileMetaProps, uploadSettings) =>
       dispatch(uploadToIconMakerFolder(fileMetaProps, uploadSettings)),
-    startMediaUpload: (tabContext, fileMetaProps) =>
-      dispatch(uploadToMediaFolder(tabContext, fileMetaProps)),
+    startMediaUpload: fileMetaProps => dispatch(uploadToMediaFolder(fileMetaProps)),
+    startMediaUploadInStandaloneMode: fileMetaProps =>
+      dispatch(uploadToMediaFolderWithoutEditor(fileMetaProps)),
     createMediaServerSession: () => dispatch(createMediaServerSession()),
     // saveMediaRecording: (file, editor, dismiss) => dispatch(saveMediaRecording(file, editor, dismiss)),
     mediaUploadComplete: (error, uploadData) => dispatch(mediaUploadComplete(error, uploadData)),

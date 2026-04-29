@@ -35,7 +35,7 @@ describe('LoadMore', () => {
 
   it('function is called on load more link click', async () => {
     const user = userEvent.setup()
-    const mockLoadMore = jest.fn()
+    const mockLoadMore = vi.fn()
     const {container} = render(
       <LoadMore {...defaultProps} hasMore={true} loadMore={mockLoadMore} />,
     )

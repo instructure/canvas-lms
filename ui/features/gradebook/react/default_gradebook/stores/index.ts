@@ -33,6 +33,9 @@ import rubricAssessmentImport, {
 import rubricAssessmentExport, {
   type RubricAssessmentExportState,
 } from './rubricAssessmentExportState'
+import {v4 as uuidv4} from 'uuid'
+import PQueue from 'p-queue'
+import GRADEBOOK_GRAPHQL_CONFIG from './graphql/config'
 
 const defaultPerformanceControls = new PerformanceControls()
 
@@ -45,6 +48,10 @@ type State = {
   dispatch: RequestDispatch
   courseId: string
   flashMessages: FlashMessage[]
+  correlationId: string
+  queue: PQueue
+  useQueueForRateLimiting: boolean
+  returnQueueIfDefined: () => PQueue | undefined
 }
 
 export type GradebookStore = State &
@@ -61,11 +68,24 @@ export type GradebookStore = State &
 const store = create<GradebookStore>((set, get) => ({
   performanceControls: defaultPerformanceControls,
 
+  queue: new PQueue({concurrency: GRADEBOOK_GRAPHQL_CONFIG.concurrency}),
+
+  useQueueForRateLimiting: false,
+
+  returnQueueIfDefined: () => (get().useQueueForRateLimiting ? get().queue : undefined),
+
   dispatch: defaultDispatch,
 
   courseId: '0',
 
   flashMessages: [],
+
+  // Unique identifier for tracking related API requests that belong to the same page load session.
+  // Currently used to correlate REST API and GraphQL requests by appending as a custom header
+  // {'Correlation-Id': 'xxx'}. This allows observability tools like Observe to group related
+  // requests and calculate total/average load times for performance monitoring and REST vs
+  // GraphQL comparison analysis.
+  correlationId: uuidv4(),
 
   ...filters(set, get),
 

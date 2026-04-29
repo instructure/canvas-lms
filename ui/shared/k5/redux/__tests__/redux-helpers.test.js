@@ -18,10 +18,12 @@
 
 import {mapStateToProps} from '../redux-helpers'
 
-jest.mock('moment-timezone', () => ({
-  tz: jest.fn(() => ({
-    format: () => '2021-02-06',
-  })),
+vi.mock('moment-timezone', () => ({
+  default: {
+    tz: vi.fn(() => ({
+      format: () => '2021-02-06',
+    })),
+  },
 }))
 
 const state = weekOverrides => ({

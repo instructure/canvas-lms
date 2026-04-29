@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% js_env :CAN_READ => can_do(@context, @current_user, :read) %>
-<% js_env :SYLLABUS_BODY => (@syllabus_body || '') %>
+<% js_env({ CAN_READ: can_do(@context, @current_user, :read),
+            SYLLABUS_BODY: (@syllabus_body || '') }) %>
 <%
   show_summary = @context.syllabus_course_summary? && !@context.elementary_enabled? && !@context.horizon_course?
   if @context.elementary_enabled?
@@ -44,18 +44,24 @@ To add some comments, click the "Edit" link at the top.
 <% header_content = course_home ? @context.nickname_for(@current_user) : title_text %>
 <div class="ic-Action-header">
   <div class="ic-Action-header__Primary">
-  <% if @context.show_announcements_on_home_page? && !@context.elementary_subject_course? %>
-    <h2 class="ic-Action-header__Heading"><%= header_content %></h2>
-  <% else %>
     <h1 class="ic-Action-header__Heading"><%= header_content %></h1>
-  <% end %>
   </div>
   <div class="ic-Action-header__Secondary">
   <% if show_summary %>
     <a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a>
   <% end %>
   <% if can_do(@context, @current_user, :manage_course_content_edit) %>
-    <button class="edit_syllabus_link btn button-sidebar-wide" aria-expanded=”false”><i class="icon-edit"></i> <%= t 'links.edit_syllabus_description', "Edit" %></button>
+    <% if @context.account.feature_enabled?(:syllabus_versioning) %>
+      <button
+        id="syllabus_revisions_btn"
+        class="btn btn-primary"
+        data-show-text="<%= t('View revision history') %>"
+        data-hide-text="<%= t('Hide revision history') %>"
+      >
+        <%= t('View revision history') %>
+      </button>
+    <% end %>
+    <button class="edit_syllabus_link btn button-sidebar-wide" aria-expanded="false"><i class="icon-edit"></i> <%= t 'links.edit_syllabus_description', "Edit" %></button>
   <% end %>
   </div>
 </div>
@@ -97,6 +103,9 @@ To add some comments, click the "Edit" link at the top.
   </div>
   <% css_bundle("syllabus") %>
   <table id="syllabus" class="ic-Table ic-Table--condensed">
+    <caption class="screenreader-only">
+      <%= t 'Course Summary' %>
+    </caption>
     <thead>
       <tr>
         <th scope="col"><%= t 'headers.date', "Date" %></th>

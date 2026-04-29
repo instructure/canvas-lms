@@ -36,6 +36,7 @@ module Api::V1
 
     INCLUDE_CHECKERS = { grading: "needs_grading_count",
                          syllabus: "syllabus_body",
+                         syllabus_versions: "syllabus_versions",
                          url: "html_url",
                          description: "public_description",
                          permissions: "permissions" }.freeze
@@ -130,8 +131,8 @@ module Api::V1
 
     def needs_grading_count(enrollments, course)
       if include_grading && enrollments&.any?(&:participating_instructor?)
-        proxy = Assignments::NeedsGradingCountQuery::CourseProxy.new(course, user)
-        course.assignments.active.to_a.sum { |a| Assignments::NeedsGradingCountQuery.new(a, user, proxy).count }
+        assignments = course.assignments.active.to_a
+        Assignments::NeedsGradingCountQuery.new(assignments, user).count.values.sum
       end
     end
 

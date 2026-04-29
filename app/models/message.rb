@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Message < ActiveRecord::Base
+class Message < ApplicationRecord
   # Included modules
   include Rails.application.routes.url_helpers
 
@@ -32,6 +32,7 @@ class Message < ActiveRecord::Base
   include Messages::SendStudentNamesHelper
 
   include CanvasPartman::Concerns::Partitioned
+
   self.partitioning_strategy = :by_date
   self.partitioning_interval = :weeks
 
@@ -74,6 +75,7 @@ class Message < ActiveRecord::Base
   belongs_to :communication_channel
   belongs_to :context, polymorphic: [], exhaustive: false
   include NotificationPreloader
+
   belongs_to :user
   belongs_to :root_account, class_name: "Account"
   has_many   :attachments, as: :context, inverse_of: :context
@@ -303,9 +305,7 @@ class Message < ActiveRecord::Base
     # which can't handle URLs with spaces. As that is the root cause
     # of this change, we'll just use the deprecated URI::DEFAULT_PARSER.escape method.
     #
-    # rubocop:disable Lint/UriEscapeUnescape
     URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", URI::DEFAULT_PARSER.escape(url)).to_s if url
-    # rubocop:enable Lint/UriEscapeUnescape
   end
 
   def author_short_name
@@ -752,7 +752,7 @@ self.user,
     global_account_id = Shard.global_id_for(root_account_id, shard)
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{global_account_id}",
                                  short_stat: "message.deliver_per_account",
-                                 tags: { path_type:, root_account_id: global_account_id })
+                                 tags: { path_type: }.merge(Utils::InstStatsdUtils::Tags.tags_for(shard)))
 
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
@@ -793,7 +793,7 @@ self.user,
           notification_message,
           path_type,
           target,
-          notification&.priority?
+          priority: notification&.priority?
         )
       end
       complete_dispatch
@@ -835,7 +835,12 @@ self.user,
   def notification_targets
     case path_type
     when "push"
-      user.notification_endpoints.select("DISTINCT ON (token, arn) *").map(&:arn)
+      # get all unique tokens/arns for the user, preferring the most recently updated ones
+      # without the order_by, DISTINCT ON would be non-deterministic
+      user.notification_endpoints
+          .select("DISTINCT ON (token, arn) *")
+          .order(:token, :arn, updated_at: :desc)
+          .map(&:arn)
     when "slack"
       [
         "recipient" => to,
@@ -1088,39 +1093,21 @@ self.user,
     true
   end
 
-  # Internal: Send the message through SMS. This currently sends it via Twilio if the recipient is a E.164 phone
-  # number, or via email otherwise.
+  # Internal: Send the message through SMS.
   #
   # Returns nothing.
   def deliver_via_sms
     if /^\+[0-9]+$/.match?(to)
-      begin
-        unless user.account.feature_enabled?(:international_sms)
-          raise "International SMS is currently disabled for this user's account"
-        end
-
-        if Canvas::Twilio.enabled?
-          Canvas::Twilio.deliver(
-            to,
-            body,
-            from_recipient_country: true
-          )
-        end
-      rescue => e
-        logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-        Canvas::Errors.capture(
-          e,
-          message: "SMS delivery failed",
-          to:,
-          object: inspect,
-          tags: {
-            type: :sms_message
-          }
-        )
-        cancel
-      else
-        complete_dispatch
-      end
+      Canvas::Errors.capture(
+        "SMS delivery is disabled",
+        message: "SMS delivery failed",
+        to:,
+        object: inspect,
+        tags: {
+          type: :sms_message
+        }
+      )
+      cancel
     else
       deliver_via_email
     end

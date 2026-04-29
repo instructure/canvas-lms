@@ -24,14 +24,23 @@ module Types
 
     implements Interfaces::LegacyIDInterface
 
+    field :association_id, String, null: false
+    field :association_type, String, null: false
+
     field :hide_outcome_results, Boolean, null: false
     def hide_outcome_results
       !!object.hide_outcome_results
     end
 
-    field :hide_points, Boolean, null: false
-    def hide_points
-      !!object.hide_points(current_user)
+    field :hide_points, Boolean, null: false do
+      argument :check_extra_permissions,
+               Boolean,
+               required: false,
+               default_value: false,
+               description: "used for additional permissions checks if restrict_quantitative_data is enabled"
+    end
+    def hide_points(check_extra_permissions: false)
+      !!object.hide_points(current_user, check_extra_permissions:)
     end
 
     field :hide_score_total, Boolean, null: false

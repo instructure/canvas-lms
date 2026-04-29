@@ -129,8 +129,7 @@ module AccountReports
                        else
                          " Unable to create error_report_id for #{e}"
                        end
-      finalize_report(account_report, error_message, exception: e)
-      @er = nil
+      finalize_report(account_report, error_message, exception: e, error_report_id:)
     end
   end
 
@@ -169,7 +168,7 @@ module AccountReports
       filename += ".zip"
       temp.close!
 
-      Zip::File.open(filepath, Zip::File::CREATE) do |zipfile|
+      Zip::File.open(filepath, create: true) do |zipfile|
         csv.each do |report_name, contents|
           zipfile.add(report_name + ".csv", contents)
         end
@@ -221,24 +220,32 @@ module AccountReports
         attachment.display_name = filename
         attachment.filename = filename
         attachment.user = account_report.user
-        attachment.save!
+        Attachment.skip_touch_context { attachment.save! }
       else
-        attachment = account_report.account.attachments.create!(
-          uploaded_data: data,
-          display_name: filename,
-          filename:,
-          user: account_report.user
-        )
+        Attachment.skip_touch_context do
+          attachment = account_report.account.attachments.create!(
+            uploaded_data: data,
+            display_name: filename,
+            filename:,
+            user: account_report.user
+          )
+        end
       end
     end
     account_report.attachment = attachment
   end
 
-  def self.failed_report(account_report, exception: nil)
-    fail_text = if @er
+  def self.failed_report(account_report, exception: nil, error_report_id: nil)
+    requires_root_account = begin
+      exception.is_a?(CustomReports::Rubrics::RootAccountRequiredError)
+    rescue NameError
+      false
+    end
+
+    fail_text = if error_report_id
                   I18n.t("Failed, please report the following error code to your system administrator: ErrorReport:%{error};",
-                         error: @er.id.to_s)
-                elsif exception.is_a?(CustomReports::Rubrics::RootAccountRequiredError)
+                         error: error_report_id.to_s)
+                elsif requires_root_account
                   I18n.t("This report can only be run on the root account.")
                 else
                   I18n.t("Failed, the report failed to generate a file. Please try again.")
@@ -246,7 +253,7 @@ module AccountReports
     account_report.parameters["extra_text"] = fail_text
   end
 
-  def self.finalize_report(account_report, message, csv = nil, exception: nil)
+  def self.finalize_report(account_report, message, csv = nil, exception: nil, error_report_id: nil)
     account_report.reload
     account_report.message = message
 
@@ -256,7 +263,13 @@ module AccountReports
       report_attachment(account_report, csv)
       account_report.workflow_state = "complete"
     else
-      failed_report(account_report, exception:)
+      if error_report_id.nil?
+        error = exception || RuntimeError.new("Report failed to generate a file: #{account_report.report_type}")
+        context = { tags: { type: :account_report }, extra: { user: account_report.user } }
+        error_report_id = Canvas::Errors.capture(error, context)&.dig(:error_report)
+      end
+      account_report.message = I18n.t("Generating the report, %{title}, failed.", title: account_report.title)
+      failed_report(account_report, exception:, error_report_id:)
       account_report.workflow_state = "error"
     end
 

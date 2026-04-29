@@ -23,27 +23,78 @@ module Accessibility
       self.id = "adjacent-links"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H2.html"
 
-      def self.test(elem)
+      # Accessibility::Rule methods
+
+      def test(elem)
         return nil if elem.tag_name != "a"
+        return nil unless adjacent_link_with_same_href?(elem)
 
-        next_elem = elem.next_element_sibling
-        return nil unless next_elem && next_elem.tag_name == "a"
-
-        elem_href = elem.get_attribute("href")
-        next_href = next_elem.get_attribute("href")
-
-        I18n.t("Adjacent links contain the same URL.") if elem_href == next_href
+        I18n.t("Adjacent links contain the same URL.")
       end
 
-      def self.display_name
-        I18n.t("Adjacent links")
+      def form(_elem)
+        Accessibility::Forms::Button.new(
+          label: I18n.t("Merge links"),
+          value: "false",
+          undo_text: I18n.t("Links merged")
+        )
       end
 
-      def self.message
+      def fix!(elem, value)
+        return { changed: nil } if test(elem).nil?
+        return { changed: nil } unless value == "true" || elem.tag_name == "a"
+
+        next_elem = get_adjacent_link(elem)
+        return { changed: elem } unless next_elem
+
+        left_image = self.class.single_child_image(elem)
+        right_image = self.class.single_child_image(next_elem)
+
+        if left_image && !right_image && self.class.normalize_text(left_image.get_attribute("alt")) == self.class.normalize_text(next_elem.text_content)
+          left_image.set_attribute("alt", "")
+        elsif right_image && !left_image && self.class.normalize_text(right_image.get_attribute("alt")) == self.class.normalize_text(elem.text_content)
+          right_image.set_attribute("alt", "")
+        end
+
+        intermediate_nodes = collect_intermediate_nodes(elem, next_elem)
+
+        elem.inner_html += " " + next_elem.inner_html
+
+        next_elem.remove
+
+        intermediate_nodes.reverse_each do |node|
+          elem.add_next_sibling(node)
+        end
+
+        html = elem.to_html
+        html += elem.next_sibling.to_html if elem.next_sibling
+        { changed: elem, content_preview: html }
+      end
+
+      def display_name
+        I18n.t("Duplicate links found")
+      end
+
+      def message
         I18n.t("These are two links that go to the same place. Turn them into one link to avoid repetition.")
       end
 
-      def self.why
+      def issue_preview(elem)
+        next_elem = get_adjacent_link(elem)
+        return nil unless next_elem
+
+        intermediate_nodes = collect_intermediate_nodes(elem, next_elem)
+
+        html = elem.to_html
+        intermediate_nodes.each do |node|
+          html += node.to_html
+        end
+        html += next_elem.to_html
+
+        html
+      end
+
+      def why
         I18n.t(
           "When two or more links are next to each other and lead to the same destination, " \
           "screen readers interpret them as two separate links, even though the intent is usually displaying a single link. " \
@@ -51,40 +102,35 @@ module Accessibility
         )
       end
 
+      # Helper methods
+
+      def adjacent_link_with_same_href?(elem)
+        next_elem = elem.next_element_sibling
+        return false unless next_elem && next_elem.tag_name == "a"
+
+        elem.get_attribute("href") == next_elem.get_attribute("href")
+      end
+
+      def get_adjacent_link(elem)
+        next_elem = elem.next_element_sibling
+        return nil unless next_elem && next_elem.tag_name == "a"
+        return nil unless elem.get_attribute("href") == next_elem.get_attribute("href")
+
+        next_elem
+      end
+
+      def collect_intermediate_nodes(elem, next_elem)
+        intermediate_nodes = []
+        current = elem.next_sibling
+        while current && current != next_elem
+          intermediate_nodes << current
+          current = current.next_sibling
+        end
+        intermediate_nodes
+      end
+
       def self.root_node(elem)
         elem.parent_node
-      end
-
-      def self.form(_elem)
-        Accessibility::Forms::Button.new(
-          label: I18n.t("Merge links"),
-          value: "false",
-          undo_text: I18n.t("Link merged")
-        )
-      end
-
-      def self.fix!(elem, value)
-        return nil if test(elem).nil?
-        return nil unless value == "true" || elem.tag_name == "a"
-
-        next_elem = elem.next_element_sibling
-
-        return elem unless next_elem && next_elem.tag_name == "a" && elem.get_attribute("href") == next_elem.get_attribute("href")
-
-        left_image = single_child_image(elem)
-        right_image = single_child_image(next_elem)
-
-        if left_image && !right_image && normalize_text(left_image.get_attribute("alt")) == normalize_text(next_elem.text_content)
-          left_image.set_attribute("alt", "")
-        elsif right_image && !left_image && normalize_text(right_image.get_attribute("alt")) == normalize_text(elem.text_content)
-          right_image.set_attribute("alt", "")
-        end
-
-        elem.inner_html += " " + next_elem.inner_html
-
-        next_elem.remove
-
-        elem
       end
 
       def self.single_child_image(link)

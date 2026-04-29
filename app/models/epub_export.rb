@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class EpubExport < ActiveRecord::Base
+class EpubExport < ApplicationRecord
   include CC::Exporter::Epub::Exportable
   include LocaleSelection
   include Workflow
@@ -25,9 +25,9 @@ class EpubExport < ActiveRecord::Base
   belongs_to :content_export
   belongs_to :course
   belongs_to :user
-  has_many :attachments, -> { order("created_at DESC") }, dependent: :destroy, as: :context, inverse_of: :context, class_name: "Attachment"
-  has_one :epub_attachment, -> { where(content_type: "application/epub+zip").order("created_at DESC") }, as: :context, inverse_of: :context, class_name: "Attachment"
-  has_one :zip_attachment, -> { where(content_type: "application/zip").order("created_at DESC") }, as: :context, inverse_of: :context, class_name: "Attachment"
+  has_many :attachments, -> { order(created_at: :desc) }, dependent: :destroy, as: :context, inverse_of: :context, class_name: "Attachment"
+  has_one :epub_attachment, -> { where(content_type: "application/epub+zip").order(created_at: :desc) }, as: :context, inverse_of: :context, class_name: "Attachment"
+  has_one :zip_attachment, -> { where(content_type: "application/zip").order(created_at: :desc) }, as: :context, inverse_of: :context, class_name: "Attachment"
   has_one :job_progress, as: :context, inverse_of: :context, class_name: "Progress"
   validates :course_id, :workflow_state, presence: true
   has_a_broadcast_policy
@@ -163,7 +163,7 @@ class EpubExport < ActiveRecord::Base
 
   def self.fail_stuck_epub_exports(exports)
     cutoff = 2.hours.ago
-    exports.select { |e| (e.generating? || e.exporting?) && e.updated_at < cutoff }.each(&:mark_as_failed)
+    exports.select { |e| (e.generating? || e.exporting?) && e.job_progress&.updated_at&.<(cutoff) }.each(&:mark_as_failed)
   end
 
   def convert_to_epub

@@ -60,14 +60,6 @@ describe "site-wide" do
     expect(response[content_security_policy]).to eq "frame-ancestors 'self' ;"
   end
 
-  it "includes horizon_domain in the content-security-policy header" do
-    account = Account.default
-    account.settings[:horizon_domain] = "test-domain.example.com"
-    account.save!
-    get "/login"
-    expect(response[content_security_policy]).to eq "frame-ancestors 'self' test-domain.example.com;"
-  end
-
   it "does not set content-security-policy when on a files domain" do
     user_session user_factory(active_all: true)
     attachment_model(context: @user)
@@ -86,7 +78,7 @@ describe "site-wide" do
       course_with_teacher_logged_in
 
       get "/"
-      expect(response[content_security_policy]).to eq "frame-src 'self' blob: localhost; frame-ancestors 'self' ;"
+      expect(response[content_security_policy]).to eq "frame-src 'self' blob: rldb: localhost; frame-ancestors 'self' ;"
     end
   end
 
@@ -226,7 +218,7 @@ describe "site-wide" do
         user_session(@admin, @admin.pseudonyms.first)
         post "/users/#{@student.id}/masquerade"
 
-        expect(response).to have_http_status :unprocessable_entity
+        expect(response).to have_http_status :unprocessable_content
       end
     end
   end

@@ -125,6 +125,12 @@ $icon-discussion-color: $ic-color-alert;
     #{direction(right)}: 0;
     width: 32px;
   }
+
+  &.cr-assignment-card__read-only {
+    .cr-assignment-card__content {
+      cursor: default;
+    }
+  }
 }
 
 label.cr_label__abox {

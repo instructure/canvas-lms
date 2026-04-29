@@ -66,8 +66,10 @@ function getAllStudentsPages(url, callbacks) {
     })
 }
 
-export function loadStudents(courseId, assignmentId, callbacks) {
-  const queryParams = `include[]=provisional_grades&allow_new_anonymous_id=true&per_page=${STUDENTS_PER_PAGE}`
+export function loadStudents(courseId, assignmentId, callbacks, options = {}) {
+  const sortParam = options.sort ? `&sort=${options.sort}` : ''
+  const orderParam = options.order ? `&order=${options.order}` : ''
+  const queryParams = `include[]=provisional_grades&allow_new_anonymous_id=true&per_page=${STUDENTS_PER_PAGE}${sortParam}${orderParam}`
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/gradeable_students?${queryParams}`
 
   getAllStudentsPages(url, callbacks)

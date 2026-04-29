@@ -26,18 +26,23 @@ import {Text} from '@instructure/ui-text'
 const I18n = createI18nScope('rubrics-assessment-tray')
 
 type SelfAssessmentRatingButtonProps = {
-  buttonDisplay: string
+  ariaLabel?: string
+  buttonLabel: string
   isPreviewMode: boolean
   isSelected: boolean
   onClick: () => void
 }
 export const SelfAssessmentRatingButton = ({
-  buttonDisplay,
+  ariaLabel,
+  buttonLabel,
   isPreviewMode,
   isSelected,
   onClick,
 }: SelfAssessmentRatingButtonProps) => {
   const selectedText = isSelected ? I18n.t('Selected') : ''
+  const screenReaderLabel = ariaLabel
+    ? `${ariaLabel} ${selectedText}`.trim()
+    : I18n.t('Rating Button %{buttonLabel} %{selectedText}', {buttonLabel, selectedText})
 
   return (
     <View
@@ -51,15 +56,13 @@ export const SelfAssessmentRatingButton = ({
     >
       <View as="div" position="relative">
         <IconButton
-          screenReaderLabel={I18n.t('Rating Button %{buttonDisplay} %{selectedText}', {
-            buttonDisplay,
-            selectedText,
-          })}
+          screenReaderLabel={screenReaderLabel}
+          aria-label={ariaLabel ? screenReaderLabel : undefined}
           size="large"
           color="primary-inverse"
           onClick={onClick}
           readOnly={isPreviewMode}
-          data-testid={`rubric-self-assessment-rating-button-${buttonDisplay}`}
+          data-testid={`rubric-self-assessment-rating-button-${buttonLabel}`}
           cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
         >
           <div
@@ -84,7 +87,7 @@ export const SelfAssessmentRatingButton = ({
                   }
             }
           >
-            <Text size="medium">{buttonDisplay}</Text>
+            <Text size="medium">{buttonLabel}</Text>
           </div>
         </IconButton>
       </View>

@@ -103,4 +103,31 @@ describe('DueDateList', () => {
     const dueDateList = new DueDateList(partialOverrides, new SectionList([]), assignment)
     expect(dueDateList.sections).toHaveLength(1)
   })
+
+  test(`constructor adds peer review dates from peer_review_sub_assignment to the default override`, () => {
+    const peerReviewDate = new Date('2026-01-06T12:00:00Z')
+    const peerReviewUnlock = new Date('2026-01-05T12:00:00Z')
+    const peerReviewLock = new Date('2026-01-07T12:00:00Z')
+    const assignmentWithPeerReview = new Assignment({
+      due_at: date,
+      unlock_at: date,
+      lock_at: date,
+      peer_review_sub_assignment: {
+        due_at: peerReviewDate,
+        unlock_at: peerReviewUnlock,
+        lock_at: peerReviewLock,
+      },
+    })
+    const freshPartialOverrides = new AssignmentOverrideCollection([
+      new AssignmentOverride({course_section_id: '1'}),
+      new AssignmentOverride({course_section_id: '2'}),
+    ])
+    const dueDateList = new DueDateList(freshPartialOverrides, sections, assignmentWithPeerReview)
+
+    expect(dueDateList.overrides).toHaveLength(3)
+    const override = dueDateList.overrides.pop()
+    expect(override.get('peer_review_due_at')).toBe(peerReviewDate)
+    expect(override.get('peer_review_available_from')).toBe(peerReviewUnlock)
+    expect(override.get('peer_review_available_to')).toBe(peerReviewLock)
+  })
 })

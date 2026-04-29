@@ -55,14 +55,14 @@ describe('ReuploadSubmissionsDialogManager', () => {
     let attrMock
 
     beforeEach(() => {
-      attrMock = jest.fn().mockReturnValue({dialog: jest.fn()})
-      getReuploadFormMock = jest
+      attrMock = vi.fn().mockReturnValue({dialog: vi.fn()})
+      getReuploadFormMock = vi
         .spyOn(ReuploadSubmissionsDialogManager.prototype, 'getReuploadForm')
         .mockReturnValue({attr: attrMock})
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     it('sets form action to reupload url', () => {

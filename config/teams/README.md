@@ -22,4 +22,6 @@ owned_globs:
   # https://ruby-doc.org/3.2.2/Dir.html#method-c-glob
   - "app/models/my_model/**/*"
   - "lib/gems/my_gem/**/*"
+github:
+  team: '' # the code_ownership gem requires this, even though we don't use it
 ```

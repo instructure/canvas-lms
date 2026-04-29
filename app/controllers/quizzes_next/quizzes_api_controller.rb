@@ -54,7 +54,7 @@ class QuizzesNext::QuizzesApiController < ApplicationController
       value = Rails.cache.fetch(cache_key, expires_in: CACHE_EXPIRATION_TIME) do
         api_route = api_v1_course_all_quizzes_url(@context)
         @quizzes = Api.paginate(cached_all_quizzes, self, api_route)
-        assignments = @quizzes.select { |q| q.is_a?(Assignment) }
+        assignments = @quizzes.grep(Assignment)
         quiz_data = ListNewQuizzesWithQuestionCountService.new(@context, @current_user, request.host_with_port, @domain_root_account, assignments).question_count
         @quizzes = merge_question_counts(@quizzes, quiz_data)
         {

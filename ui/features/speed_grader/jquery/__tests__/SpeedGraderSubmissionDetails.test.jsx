@@ -21,13 +21,14 @@ import {allowsReassignment} from '../speed_grader.utils'
 import SpeedGrader from '../speed_grader'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('../speed_grader.utils', () => ({
-  allowsReassignment: jest.fn(),
-  teardownSettingsMenu: jest.fn(),
-  renderSettingsMenu: jest.fn(),
-  teardownHandleStatePopped: jest.fn(),
-  tearDownAssessmentAuditTray: jest.fn(),
-  renderPostGradesMenu: jest.fn(),
+vi.mock('../speed_grader.utils', () => ({
+  allowsReassignment: vi.fn(),
+  teardownSettingsMenu: vi.fn(),
+  renderSettingsMenu: vi.fn(),
+  teardownHandleStatePopped: vi.fn(),
+  tearDownAssessmentAuditTray: vi.fn(),
+  renderPostGradesMenu: vi.fn(),
+  speedGraderJSONErrorFn: vi.fn(),
 }))
 
 describe('SpeedGrader Submission Details', () => {
@@ -141,7 +142,7 @@ describe('SpeedGrader Submission Details', () => {
     SpeedGrader.teardown()
     fakeENV.teardown()
     fixtures.remove()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('Reassign button visibility', () => {

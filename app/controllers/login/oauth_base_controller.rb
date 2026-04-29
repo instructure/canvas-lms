@@ -72,10 +72,6 @@ class Login::OAuthBaseController < ApplicationController
     end
 
     pseudonym = @aac.account.pseudonyms.for_auth_configuration(unique_ids, @aac)
-    if !pseudonym && need_email_verification?(unique_ids, @aac)
-      increment_statsd(:failure, reason: :need_email_verification)
-      return
-    end
 
     # Apply any authentication-provider-specific validations on the found pseudonym. This validation needs to happen
     # before we apply any federated attributes so that we do not update the user and pseudonym if the validation
@@ -106,7 +102,7 @@ class Login::OAuthBaseController < ApplicationController
       session[:login_aac] = @aac.global_id
       @aac.try(:persist_to_session, request, session, pseudonym, @domain_root_account, token) if token
 
-      successful_login(user, pseudonym, @aac.try(:mfa_passed?, token))
+      successful_login(user, pseudonym, otp_passed: @aac.try(:mfa_passed?, token))
     else
       logger.warn "Received OAuth2 login for unknown user: #{unique_ids.inspect}"
       redirect_to_unknown_user_url(t("Canvas doesn't have an account for user: %{user}", user: unique_id))

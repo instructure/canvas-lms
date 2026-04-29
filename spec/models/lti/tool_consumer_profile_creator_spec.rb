@@ -20,9 +20,9 @@
 module Lti
   describe ToolConsumerProfileCreator do
     let(:root_account) do
-      double("root account", lti_guid: "my_guid", name: "root_account_name", feature_enabled?: false)
+      instance_double(Account, lti_guid: "my_guid", name: "root_account_name", feature_enabled?: false)
     end
-    let(:account) { double("account", id: 3, root_account:, class: Account) }
+    let(:account) { instance_double(Account, id: 3, root_account:, class: Account) }
     let(:tcp_url) { "http://example.instructure.com/tcp/#{ToolConsumerProfile::DEFAULT_TCP_UUID}" }
     let(:tcp_creator) { ToolConsumerProfileCreator.new(account, tcp_url) }
     let(:tcp_url_ssl) { "https://example.instructure.com/tcp/#{ToolConsumerProfile::DEFAULT_TCP_UUID}" }

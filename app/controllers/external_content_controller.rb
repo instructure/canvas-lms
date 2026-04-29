@@ -27,7 +27,7 @@ class ExternalContentController < ApplicationController
 
   protect_from_forgery except: [:selection_test, :success], with: :exception
 
-  before_action :require_user, only: :oembed_retrieve
+  skip_before_action :require_user, only: %i[cancel selection_test success]
   before_action :check_disable_oembed_retrieve_feature_flag, only: :oembed_retrieve
   before_action :validate_oembed_token!, only: :oembed_retrieve
 
@@ -42,14 +42,8 @@ class ExternalContentController < ApplicationController
   def success
     normalize_deprecated_data!
     @retrieved_data = {}
-    if params[:service] == "equella"
-      params.each do |key, value|
-        if key.to_s.start_with?("eq_")
-          @retrieved_data[key.to_s.delete_prefix("eq_")] = value
-        end
-      end
-    elsif params[:return_type] == "oembed"
-      js_env(oembed: { endpoint: params[:endpoint], url: params[:url] })
+    if params[:return_type] == "oembed"
+      js_env({ oembed: { endpoint: params[:endpoint], url: params[:url] } })
       @oembed_token = params[:oembed_token]
     elsif params[:service] == "external_tool_dialog"
       get_context
@@ -73,9 +67,9 @@ class ExternalContentController < ApplicationController
     end
     if params[:id]
       message_auth = Lti::MessageAuthenticator.new(request.original_url, request.GET.merge(request.POST))
-      render_unauthorized_action and return unless message_auth.valid?
-      render_unauthorized_action and return unless json_data[:content_item_id] == params[:id]
-      render_unauthorized_action and return unless json_data[:oauth_consumer_key] == params[:oauth_consumer_key]
+      return render_unauthorized_action unless message_auth.valid?
+      return render_unauthorized_action unless json_data[:content_item_id] == params[:id]
+      return render_unauthorized_action unless json_data[:oauth_consumer_key] == params[:oauth_consumer_key]
     end
     @headers = false
 
@@ -90,7 +84,7 @@ class ExternalContentController < ApplicationController
              error_log: param_if_set(:lti_errorlog)
            })
     if parent_frame_origin
-      js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+      js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, overwrite: true)
       set_extra_csp_frame_ancestor!
     end
   end
@@ -109,12 +103,12 @@ class ExternalContentController < ApplicationController
   end
 
   def oembed_retrieve
-    begin
+    content_item = InstrumentTLSCiphers.without_tls_metrics do
       res = CanvasHttp.get(oembed_object_uri.to_s)
       data = JSON.parse(res.body)
-      content_item = Lti::ContentItemConverter.convert_oembed(data)
+      Lti::ContentItemConverter.convert_oembed(data)
     rescue
-      content_item = {}
+      {}
     end
     render json: [content_item]
   end
@@ -136,7 +130,7 @@ class ExternalContentController < ApplicationController
 
   def cancel
     @headers = false
-    js_env(service: params[:service])
+    js_env({ service: params[:service] })
   end
 
   def content_items_for_canvas

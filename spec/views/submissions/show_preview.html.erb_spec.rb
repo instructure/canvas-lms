@@ -42,6 +42,20 @@ describe "submissions/show_preview" do
     expect(response.body).to match(/.*www\.example\.com.*/)
   end
 
+  it "renders a visible 'click here to view' link for media recording submissions" do
+    course_with_student
+    view_context
+    a = @course.assignments.create!(title: "media assignment", submission_types: "media_recording")
+    MediaObject.create!(media_id: "1_abc12345", media_type: "video", context: @user)
+    sub = a.submit_homework(@user, submission_type: "media_recording", media_comment_id: "1_abc12345", media_comment_type: "video")
+    assign(:assignment, a)
+    assign(:submission, sub)
+    render "submissions/show_preview"
+    link = Nokogiri::HTML5.fragment(response.body).at_css("a.play_media_recording_link")
+    expect(link).not_to be_nil
+    expect(link.text).to eq("click here to view.")
+  end
+
   it "gives a user-friendly explanation why there's no preview" do
     course_with_student
     view_context
@@ -116,6 +130,25 @@ describe "submissions/show_preview" do
     end
   end
 
+  describe "media recording submissions" do
+    it "renders data attributes with underscores for JavaScript compatibility" do
+      course_with_student
+      view_context
+      assignment = @course.assignments.create!(title: "media assignment", submission_types: "media_recording")
+      submission = assignment.submit_homework(@user, submission_type: "media_recording", media_comment_id: "test_media_id", media_comment_type: "video")
+      assign(:assignment, assignment)
+      assign(:submission, submission)
+
+      render "submissions/show_preview"
+
+      # Verify data attributes use underscores (data-media_comment_id) not hyphens (data-media-comment-id)
+      # This is required for the JavaScript thumbnail generation to find the media ID
+      expect(response.body).to include('data-media_comment_id="test_media_id"')
+      expect(response.body).to include('data-media_comment_type="video"')
+      expect(response.body).to include('class="play_media_recording_link"')
+    end
+  end
+
   describe "originality score" do
     let(:course) { Course.create! }
     let(:assignment) { course.assignments.create!(title: "an assignment", submission_types: "online_text_entry") }
@@ -168,6 +201,90 @@ describe "submissions/show_preview" do
       it "does not render an icon if there is no similarity data" do
         render template: "submissions/show_preview"
         expect(output.css(".turnitin_score_container")).not_to be_present
+      end
+    end
+  end
+
+  describe "asset report status containers" do
+    let(:course) { Course.create! }
+    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+
+    before do
+      assign(:context, course)
+      assign(:current_user, student)
+    end
+
+    context "when submission is online_upload" do
+      let(:assignment) { course.assignments.create!(title: "upload assignment", submission_types: "online_upload") }
+      let(:attachment) { Attachment.create!(context: student, uploaded_data: stub_png_data, filename: "homework.png") }
+      let(:submission) { assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment]) }
+
+      before do
+        assign(:assignment, assignment)
+        assign(:submission, submission)
+      end
+
+      it "renders asset report status table header with correct data attributes" do
+        render template: "submissions/show_preview", locals: { anonymize_students: false }
+
+        expect(response.body).to include('class="asset-report-status-header"')
+        expect(response.body).to match(/class="[^"]*asset-report-status-header[^"]*"[^>]*data-submission-id="#{submission.id}"/)
+        expect(response.body).to match(/class="[^"]*asset-report-status-header[^"]*"[^>]*data-submission-type="online_upload"/)
+      end
+
+      it "renders asset report status container for each attachment with correct data attributes" do
+        render template: "submissions/show_preview", locals: { anonymize_students: false }
+
+        expect(response.body.scan(/class="[^"]*asset-report-status-container[^"]*"/).size).to eq(1)
+        expect(response.body).to match(/class="[^"]*asset-report-status-container[^"]*"[^>]*data-attachment-id="#{attachment.id}"/)
+        expect(response.body).to match(/class="[^"]*asset-report-status-container[^"]*"[^>]*data-submission-id="#{submission.id}"/)
+        expect(response.body).to match(/class="[^"]*asset-report-status-container[^"]*"[^>]*data-submission-type="online_upload"/)
+      end
+
+      it "renders asset report status containers for multiple attachments" do
+        another_attachment = Attachment.create!(context: student, uploaded_data: stub_png_data, filename: "homework2.png")
+        multi_submission = assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment, another_attachment])
+        assign(:submission, multi_submission)
+
+        render template: "submissions/show_preview", locals: { anonymize_students: false }
+
+        expect(response.body.scan(/class="[^"]*asset-report-status-container[^"]*"/).size).to eq(2)
+        expect(response.body).to include("data-attachment-id=\"#{attachment.id}\"")
+        expect(response.body).to include("data-attachment-id=\"#{another_attachment.id}\"")
+      end
+    end
+
+    context "when submission is online_text_entry" do
+      let(:assignment) { course.assignments.create!(title: "text assignment", submission_types: "online_text_entry") }
+      let(:submission) { assignment.submit_homework(student, submission_type: "online_text_entry", body: "my text") }
+
+      before do
+        assign(:assignment, assignment)
+        assign(:submission, submission)
+      end
+
+      it "does not render asset report status containers" do
+        render template: "submissions/show_preview", locals: { anonymize_students: false }
+
+        expect(response.body).not_to include('class="asset-report-status-header"')
+        expect(response.body).not_to include('class="asset-report-status-container"')
+      end
+    end
+
+    context "when submission has no attachments" do
+      let(:assignment) { course.assignments.create!(title: "upload assignment", submission_types: "online_upload") }
+      let(:submission) { assignment.submit_homework(student, submission_type: "online_upload", attachments: []) }
+
+      before do
+        assign(:assignment, assignment)
+        assign(:submission, submission)
+      end
+
+      it "renders empty table with header but no containers" do
+        render template: "submissions/show_preview", locals: { anonymize_students: false }
+
+        expect(response.body).not_to include('class="asset-report-status-header"')
+        expect(response.body.scan(/class="[^"]*asset-report-status-container[^"]*"/).size).to eq(0)
       end
     end
   end

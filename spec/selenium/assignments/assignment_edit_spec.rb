@@ -20,6 +20,7 @@
 require_relative "../common"
 require_relative "page_objects/assignment_create_edit_page"
 require_relative "page_objects/assignment_page"
+require_relative "../helpers/items_assign_to_tray"
 
 describe "assignment" do
   include_context "in-process server selenium tests"
@@ -188,6 +189,1028 @@ describe "assignment" do
       AssignmentCreateEditPage.save_assignment
 
       expect(@assignment.assignment_overrides.active.find_by(set_id: AssignmentOverride::NOOP_MASTERY_PATHS, set_type: AssignmentOverride::SET_TYPE_NOOP)).not_to be_present
+    end
+  end
+
+  context "peer review allocation and grading" do
+    before(:once) do
+      @pr_course = course_factory(name: "Peer Review Course", active_course: true)
+      @pr_course.enable_feature!(:peer_review_allocation_and_grading)
+      @pr_course.enable_feature!(:moderated_grading)
+      @pr_teacher = teacher_in_course(name: "PR Teacher", course: @pr_course, enrollment_state: :active).user
+    end
+
+    before do
+      user_session(@pr_teacher)
+    end
+
+    context "data submission" do
+      it "includes peer review data in API call when creating assignment" do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Peer Review Test Assignment")
+        f("#assignment_points_possible").send_keys("10")
+        f("#assignment_text_entry").click
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        reviews_required_input = f("input[data-testid='reviews-required-input']")
+        reviews_required_input.send_keys([:control, "a"], :backspace, "3")
+
+        points_per_review_input = f("input[data-testid='points-per-review-input']")
+        points_per_review_input.send_keys([:control, "a"], :backspace, "5")
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment = @pr_course.assignments.last
+        expect(assignment.peer_reviews).to be true
+        expect(assignment.peer_review_count).to eq 3
+        expect(assignment.peer_review_sub_assignment).not_to be_nil
+        expect(assignment.peer_review_sub_assignment.points_possible).to eq 15 # 3 * 5
+        expect(assignment.peer_review_sub_assignment.grading_type).to eq "points"
+      end
+
+      it "includes peer review sub-assignment with pass_fail grading type" do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Pass/Fail Peer Review Assignment")
+        f("#assignment_text_entry").click
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        f("[data-testid='pass-fail-grading-checkbox'] + label").click
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment = @pr_course.assignments.last
+        expect(assignment.peer_review_sub_assignment.grading_type).to eq "pass_fail"
+      end
+
+      it "includes anonymous peer reviews setting" do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Anonymous Peer Review Assignment")
+        f("#assignment_text_entry").click
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        f("[data-testid='anonymity-checkbox'] + label").click
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment = @pr_course.assignments.last
+        expect(assignment.anonymous_peer_reviews).to be true
+      end
+
+      it "correctly rounds peer review points_possible to avoid floating point precision issues" do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Floating Point Test Assignment")
+        f("#assignment_text_entry").click
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        reviews_required_input = f("input[data-testid='reviews-required-input']")
+        reviews_required_input.send_keys([:control, "a"], :backspace, "3")
+
+        points_per_review_input = f("input[data-testid='points-per-review-input']")
+        points_per_review_input.send_keys([:control, "a"], :backspace, "1.12")
+
+        # Verify UI shows correctly rounded value
+        total_points_display = f("span[data-testid='total-peer-review-points']")
+        expect(total_points_display.text).to eq("3.36")
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment = @pr_course.assignments.last
+        peer_review_sub = assignment.peer_review_sub_assignment
+
+        # Verify backend stores correctly rounded value: 3.36, not 3.3600000000000003
+        expect(peer_review_sub.points_possible).to eq 3.36
+      end
+    end
+
+    context "data loading from existing assignment" do
+      before(:once) do
+        @pr_assignment = @pr_course.assignments.create!(
+          name: "Existing Peer Review Assignment",
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          peer_reviews: true,
+          peer_review_count: 5
+        )
+
+        @peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: @pr_assignment,
+          points_possible: 25, # 5 reviews * 5 points each
+          grading_type: "points"
+        )
+      end
+
+      it "loads existing peer review configuration when editing" do
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment.id}/edit"
+        wait_for_ajaximations
+
+        expect(f("[data-testid='peer-review-checkbox']")).to be_checked
+
+        reviews_required_input = f("input[data-testid='reviews-required-input']")
+        expect(reviews_required_input.attribute("value")).to eq("5")
+
+        # Verify points per review is calculated correctly (25 / 5 = 5)
+        points_per_review_input = f("input[data-testid='points-per-review-input']")
+        expect(points_per_review_input.attribute("value")).to eq("5")
+
+        total_points_display = f("span[data-testid='total-peer-review-points']")
+        expect(total_points_display.text).to eq("25")
+      end
+
+      it "updates peer review configuration when editing" do
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment.id}/edit"
+        wait_for_ajaximations
+
+        reviews_required_input = f("input[data-testid='reviews-required-input']")
+        reviews_required_input.send_keys([:control, "a"], :backspace, "4")
+
+        points_per_review_input = f("input[data-testid='points-per-review-input']")
+        points_per_review_input.send_keys([:control, "a"], :backspace, "6")
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        @pr_assignment.reload
+        @peer_review_sub.reload
+        expect(@pr_assignment.peer_review_count).to eq 4
+        expect(@peer_review_sub.points_possible).to eq 24 # 4 * 6
+      end
+
+      it "loads the initial value of submission required when editing an assignment", custom_timeout: 30 do
+        @pr_assignment.update!(peer_review_submission_required: true)
+
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment.id}/edit"
+        wait_for_ajaximations
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        submission_required_checkbox = f("#peer_reviews_submission_required_checkbox")
+        expect(submission_required_checkbox).to be_selected
+      end
+
+      it "allows toggling submission required and persists the value", custom_timeout: 40 do
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment.id}/edit"
+        wait_for_ajaximations
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        submission_required_checkbox = f("#peer_reviews_submission_required_checkbox")
+        expect(submission_required_checkbox).to be_selected
+
+        f("[data-testid='submission-required-checkbox'] + label").click
+        expect(submission_required_checkbox).not_to be_selected
+
+        find_button("Save").click
+        wait_for_ajaximations
+
+        expect(@pr_assignment.reload.peer_review_submission_required).to be false
+
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment.id}/edit"
+        wait_for_ajaximations
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        submission_required_checkbox = f("#peer_reviews_submission_required_checkbox")
+        expect(submission_required_checkbox).not_to be_selected
+
+        f("[data-testid='submission-required-checkbox'] + label").click
+        expect(submission_required_checkbox).to be_selected
+
+        find_button("Save").click
+        wait_for_ajaximations
+
+        expect(@pr_assignment.reload.peer_review_submission_required).to be true
+      end
+
+      it "preserves toggle values when updating assignment with Advanced Configuration collapsed", custom_timeout: 60 do
+        # Create a group category for testing within-groups toggle
+        group_category = @pr_course.group_categories.create!(name: "Test Group Category")
+
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Peer Review Assignment with Toggles")
+        f("#assignment_text_entry").click
+
+        # Set up as group assignment
+        f("#has_group_category").click
+        click_option("#assignment_group_category_id", group_category.name)
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        reviews_required_input = f("input[data-testid='reviews-required-input']")
+        reviews_required_input.send_keys([:control, "a"], :backspace, "2")
+
+        points_per_review_input = f("input[data-testid='points-per-review-input']")
+        points_per_review_input.send_keys([:control, "a"], :backspace, "5")
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        f("[data-testid='within-groups-checkbox'] + label").click
+        f("[data-testid='pass-fail-grading-checkbox'] + label").click
+        f("[data-testid='anonymity-checkbox'] + label").click
+        f("[data-testid='submission-required-checkbox'] + label").click
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment = @pr_course.assignments.last
+        expect(assignment.intra_group_peer_reviews).to be true
+        expect(assignment.anonymous_peer_reviews).to be true
+        expect(assignment.peer_review_submission_required).to be true
+
+        peer_review_sub = assignment.peer_review_sub_assignment
+        expect(peer_review_sub.grading_type).to eq "pass_fail"
+
+        # Edit assignment with Advanced Configuration COLLAPSED
+        get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        find_button("Save").click
+        wait_for_ajaximations
+
+        # Verify all toggles are still enabled after update
+        assignment.reload
+        expect(assignment.intra_group_peer_reviews).to be true
+        expect(assignment.anonymous_peer_reviews).to be true
+        expect(assignment.peer_review_submission_required).to be true
+
+        peer_review_sub.reload
+        expect(peer_review_sub.grading_type).to eq "pass_fail"
+      end
+    end
+
+    context "error handling" do
+      it "displays flash alert for peer review backend errors" do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Test Assignment")
+        f("#assignment_text_entry").click
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        # rubocop:disable Specs/NoExecuteScript
+        driver.execute_script(<<~JS)
+          jQuery.ajax = function(options) {
+            if (options.url && options.url.includes('/assignments')) {
+              const xhr = { responseJSON: { errors: 'Failed to create or update peer review sub assignment' } }
+              if (options.error) options.error(xhr)
+              return jQuery.Deferred().reject(xhr).promise()
+            }
+          }
+        JS
+        # rubocop:enable Specs/NoExecuteScript
+
+        f(".btn-primary[type=submit]").click
+        wait_for_ajaximations
+        expect(fj("span:contains('Failed to create or update peer review sub assignment')")).to be_present
+      end
+    end
+
+    context "toggle and field reset" do
+      it "resets all peer review fields and toggles to defaults when peer review is disabled then re-enabled", custom_timeout: 30 do
+        # Create a group category for testing within-groups toggle
+        group_category = @pr_course.group_categories.create!(name: "Test Group Category")
+
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Toggle Reset Test Assignment")
+        f("#assignment_text_entry").click
+
+        # Set up as group assignment
+        f("#has_group_category").click
+        click_option("#assignment_group_category_id", group_category.name)
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        reviews_required_input = f("input[data-testid='reviews-required-input']")
+        reviews_required_input.send_keys([:control, "a"], :backspace, "5")
+
+        points_per_review_input = f("input[data-testid='points-per-review-input']")
+        points_per_review_input.send_keys([:control, "a"], :backspace, "10")
+
+        total_points_display = f("span[data-testid='total-peer-review-points']")
+        expect(total_points_display.text).to eq("50")
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        f("[data-testid='within-groups-checkbox'] + label").click
+        f("[data-testid='pass-fail-grading-checkbox'] + label").click
+        f("[data-testid='anonymity-checkbox'] + label").click
+        f("[data-testid='submission-required-checkbox'] + label").click
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment = @pr_course.assignments.last
+
+        # Verify assignment was created with custom values
+        expect(assignment.peer_reviews).to be true
+        expect(assignment.peer_review_count).to eq 5
+        expect(assignment.peer_review_sub_assignment.points_possible).to eq 50
+        expect(assignment.intra_group_peer_reviews).to be true
+        expect(assignment.peer_review_sub_assignment.grading_type).to eq "pass_fail"
+        expect(assignment.anonymous_peer_reviews).to be true
+        expect(assignment.peer_review_submission_required).to be true
+
+        get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        find_button("Save").click
+        wait_for_ajaximations
+
+        # Edit assignment again and re-enable peer reviews
+        get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        # Verify numeric fields are reset to defaults
+        reviews_required_input = f("input[data-testid='reviews-required-input']")
+        expect(reviews_required_input.attribute("value")).to eq("1")
+
+        points_per_review_input = f("input[data-testid='points-per-review-input']")
+        expect(points_per_review_input.attribute("value")).to eq("0")
+
+        total_points_display = f("span[data-testid='total-peer-review-points']")
+        expect(total_points_display.text).to eq("0")
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        # Verify all toggles are disabled (default state)
+        within_groups_checkbox = f("#peer_reviews_within_groups_checkbox")
+        expect(within_groups_checkbox).not_to be_selected
+
+        pass_fail_checkbox = f("#peer_reviews_pass_fail_grading_checkbox")
+        expect(pass_fail_checkbox).not_to be_selected
+
+        anonymity_checkbox = f("#peer_reviews_anonymity_checkbox")
+        expect(anonymity_checkbox).not_to be_selected
+
+        submission_required_checkbox = f("#peer_reviews_submission_required_checkbox")
+        expect(submission_required_checkbox).not_to be_selected
+      end
+
+      it "resets all peer review settings when peer reviews are disabled", custom_timeout: 30 do
+        pr_assignment = @pr_course.assignments.create!(
+          name: "Test Assignment with Peer Reviews",
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          peer_reviews: true,
+          peer_review_count: 3,
+          anonymous_peer_reviews: true,
+          intra_group_peer_reviews: true,
+          peer_review_submission_required: true
+        )
+        peer_review_model(parent_assignment: pr_assignment)
+
+        get "/courses/#{@pr_course.id}/assignments/#{pr_assignment.id}/edit"
+        wait_for_ajaximations
+
+        peer_review_checkbox = f("[data-testid='peer-review-checkbox']")
+        expect(peer_review_checkbox).to be_checked
+
+        # Uncheck peer reviews
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        # Verify all peer review fields are reset
+        pr_assignment.reload
+        expect(pr_assignment.peer_reviews).to be false
+        expect(pr_assignment.peer_review_count).to eq 0
+        expect(pr_assignment.anonymous_peer_reviews).to be false
+        expect(pr_assignment.intra_group_peer_reviews).to be false
+        expect(pr_assignment.peer_review_submission_required).to be false
+      end
+
+      it "resets intra_group_peer_reviews when assignment changes from group to non-group", custom_timeout: 30 do
+        group_category = @pr_course.group_categories.create!(name: "Test Group Category")
+        pr_assignment = @pr_course.assignments.create!(
+          name: "Group Assignment with Peer Reviews",
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          peer_reviews: true,
+          peer_review_count: 2,
+          group_category_id: group_category.id,
+          intra_group_peer_reviews: true
+        )
+        peer_review_model(parent_assignment: pr_assignment)
+
+        get "/courses/#{@pr_course.id}/assignments/#{pr_assignment.id}/edit"
+        wait_for_ajaximations
+
+        # uncheck group assignment checkbox
+        group_assignment_checkbox = f("#has_group_category")
+        group_assignment_checkbox.click
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        pr_assignment.reload
+        expect(pr_assignment.peer_reviews).to be true
+        expect(pr_assignment.group_category_id).to be_nil
+        expect(pr_assignment.intra_group_peer_reviews).to be false
+      end
+    end
+
+    describe "peer reviews and grading type interaction" do
+      include ItemsAssignToTray
+
+      it "hides peer review options when grading type is set to Not Graded", custom_timeout: 30 do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Not Graded Peer Review Test")
+        f("#assignment_text_entry").click
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        peer_review_fields = f("#assignment_peer_reviews_fields")
+        peer_review_details = f("#peer_reviews_allocation_and_grading_details")
+        expect(peer_review_fields).to be_displayed
+        expect(peer_review_details).to be_displayed
+
+        click_option("#assignment_grading_type", "Not Graded")
+        wait_for_ajaximations
+
+        expect(peer_review_fields).not_to be_displayed
+        expect(peer_review_details).not_to be_displayed
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment = @pr_course.assignments.last
+        expect(assignment.grading_type).to eq "not_graded"
+        expect(assignment.peer_reviews).to be false
+        expect(assignment.peer_review_count).to eq 0
+        expect(assignment.peer_review_sub_assignment).to be_nil
+      end
+
+      it "shows peer review options when grading type changes back from Not Graded", custom_timeout: 30 do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Grading Type Toggle Test")
+        f("#assignment_text_entry").click
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        peer_review_fields = f("#assignment_peer_reviews_fields")
+        expect(peer_review_fields).to be_displayed
+
+        click_option("#assignment_grading_type", "Not Graded")
+        wait_for_ajaximations
+
+        expect(peer_review_fields).not_to be_displayed
+
+        click_option("#assignment_grading_type", "Points")
+        wait_for_ajaximations
+
+        expect(peer_review_fields).to be_displayed
+
+        peer_review_checkbox = f("[data-testid='peer-review-checkbox']")
+        expect(peer_review_checkbox).not_to be_checked
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        peer_review_details = f("#peer_reviews_allocation_and_grading_details")
+        expect(peer_review_details).to be_displayed
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment = @pr_course.assignments.last
+        expect(assignment.grading_type).to eq "points"
+        expect(assignment.peer_reviews).to be true
+        expect(assignment.peer_review_sub_assignment).not_to be_nil
+      end
+
+      it "hides 'Not Graded' option when peer reviews have submissions", custom_timeout: 30 do
+        assignment = @pr_course.assignments.create!(
+          title: "Locked PR Assignment",
+          submission_types: "online_text_entry",
+          peer_reviews: true,
+          peer_review_count: 1,
+          points_possible: 10
+        )
+
+        student1 = student_in_course(course: @pr_course, active_all: true).user
+        student2 = student_in_course(course: @pr_course, active_all: true).user
+
+        submission1 = assignment.submit_homework(student1, body: "Student 1 submission")
+        submission2 = assignment.submit_homework(student2, body: "Student 2 submission")
+
+        assessment_request = AssessmentRequest.create!(
+          assessor: student1,
+          assessor_asset: submission1,
+          asset: submission2,
+          user: student2
+        )
+        assessment_request.complete!
+
+        get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        grading_type_options = ff("#assignment_grading_type option").map(&:text)
+        expect(grading_type_options).not_to include("Not Graded")
+        expect(grading_type_options).to include("Points")
+        expect(grading_type_options).to include("Letter Grade")
+      end
+
+      it "enables moderated grading after peer reviews disabled via grading type change", custom_timeout: 30 do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Moderated Grading Re-enable Test")
+        f("#assignment_text_entry").click
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        moderated_grading_checkbox = f("#assignment_moderated_grading")
+        expect(moderated_grading_checkbox).to be_disabled
+
+        click_option("#assignment_grading_type", "Not Graded")
+        wait_for_ajaximations
+
+        click_option("#assignment_grading_type", "Points")
+        wait_for_ajaximations
+
+        moderated_grading_checkbox = f("#assignment_moderated_grading")
+        expect(moderated_grading_checkbox).not_to be_disabled
+      end
+
+      it "destroys peer review sub-assignment when changing grading type to Not Graded", custom_timeout: 30 do
+        assignment = @pr_course.assignments.create!(
+          title: "Existing PR Assignment",
+          submission_types: "online_text_entry",
+          peer_reviews: true,
+          peer_review_count: 3,
+          points_possible: 10
+        )
+        sub_assignment = PeerReview::PeerReviewCreatorService.call(parent_assignment: assignment)
+        expect(sub_assignment).to be_present
+        expect(assignment.reload.peer_review_sub_assignment).to eq(sub_assignment)
+
+        get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        peer_review_checkbox = f("[data-testid='peer-review-checkbox']")
+        expect(peer_review_checkbox).to be_checked
+
+        click_option("#assignment_grading_type", "Not Graded")
+        wait_for_ajaximations
+
+        peer_review_fields = f("#assignment_peer_reviews_fields")
+        expect(peer_review_fields).not_to be_displayed
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment.reload
+        expect(assignment.grading_type).to eq "not_graded"
+        expect(assignment.peer_reviews).to be false
+        expect(assignment.peer_review_sub_assignment).to be_nil
+      end
+
+      it "preserves peer review settings when re-enabling after grading type toggle", custom_timeout: 30 do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Settings Preservation Test")
+        f("#assignment_text_entry").click
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        review_count_input = f("input[data-testid='reviews-required-input']")
+        replace_content(review_count_input, "7")
+
+        click_option("#assignment_grading_type", "Not Graded")
+        wait_for_ajaximations
+
+        click_option("#assignment_grading_type", "Points")
+        wait_for_ajaximations
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        review_count_input = f("input[data-testid='reviews-required-input']")
+        expect(review_count_input["value"]).to eq "7"
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment = @pr_course.assignments.last
+        expect(assignment.peer_reviews).to be true
+        expect(assignment.peer_review_count).to eq 7
+      end
+
+      it "does not persist peer review settings when grading type changed to Not Graded before save", custom_timeout: 30 do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("PR Settings Not Graded Test")
+        f("#assignment_text_entry").click
+
+        update_due_date(0, format_date_for_view(1.week.from_now, "%-m/%-d/%Y"))
+        update_due_time(0, "11:59 PM")
+        wait_for_ajaximations
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        reviews_required_input = f("input[data-testid='reviews-required-input']")
+        reviews_required_input.send_keys([:control, "a"], :backspace, "5")
+
+        expect(element_exists?("[data-testid='peer_review_due_at_input']")).to be true
+
+        click_option("#assignment_grading_type", "Not Graded")
+        wait_for_ajaximations
+
+        expect(element_exists?("[data-testid='peer_review_due_at_input']")).to be false
+
+        expect_new_page_load { f(".btn-primary[type=submit]").click }
+        wait_for_ajaximations
+
+        assignment = @pr_course.assignments.last
+        expect(assignment.grading_type).to eq "not_graded"
+        expect(assignment.peer_reviews).to be false
+        expect(assignment.peer_review_sub_assignment).to be_nil
+      end
+    end
+
+    describe "peer review date fields" do
+      include ItemsAssignToTray
+
+      it "shows peer review date fields when peer reviews enabled and hides when disabled", custom_timeout: 30 do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("PR Date Fields Test")
+        f("#assignment_text_entry").click
+
+        update_due_date(0, format_date_for_view(1.week.from_now, "%-m/%-d/%Y"))
+        update_due_time(0, "11:59 PM")
+        wait_for_ajaximations
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        expect(element_exists?("[data-testid='peer_review_due_at_input']")).to be true
+
+        click_option("#assignment_grading_type", "Not Graded")
+        wait_for_ajaximations
+
+        expect(element_exists?("[data-testid='peer_review_due_at_input']")).to be false
+
+        click_option("#assignment_grading_type", "Points")
+        wait_for_ajaximations
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        expect(element_exists?("[data-testid='peer_review_due_at_input']")).to be true
+      end
+    end
+
+    describe "peer reviews and external tool submission type" do
+      it "hides peer review section when submission type changes to External Tool", custom_timeout: 30 do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("External Tool PR Test")
+        f("#assignment_text_entry").click
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        peer_review_details = f("#peer_reviews_allocation_and_grading_details")
+        expect(peer_review_details).to be_displayed
+
+        click_option("#assignment_submission_type", "External Tool")
+        wait_for_ajaximations
+
+        expect(peer_review_details).not_to be_displayed
+      end
+
+      it "re-enables peer review section when switching away from External Tool", custom_timeout: 30 do
+        get "/courses/#{@pr_course.id}/assignments/new"
+        wait_for_ajaximations
+
+        f("#assignment_name").send_keys("Switch From External Tool")
+
+        click_option("#assignment_submission_type", "External Tool")
+        wait_for_ajaximations
+
+        peer_review_fields = f("#assignment_peer_reviews_fields")
+        expect(peer_review_fields).not_to be_displayed
+
+        click_option("#assignment_submission_type", "Online")
+        wait_for_ajaximations
+        f("#assignment_text_entry").click
+
+        expect(peer_review_fields).to be_displayed
+
+        f("[data-testid='peer-review-checkbox'] + label").click
+        wait_for_ajaximations
+
+        peer_review_details = f("#peer_reviews_allocation_and_grading_details")
+        expect(peer_review_details).to be_displayed
+      end
+
+      context "editing existing assignment with peer review sub-assignment" do
+        before(:once) do
+          @pr_assignment_for_edit = @pr_course.assignments.create!(
+            name: "Existing PR Assignment for External Tool Edit",
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            peer_reviews: true,
+            peer_review_count: 3
+          )
+
+          @peer_review_sub_for_edit = PeerReview::PeerReviewCreatorService.call(
+            parent_assignment: @pr_assignment_for_edit,
+            points_possible: 15,
+            grading_type: "points"
+          )
+
+          @external_tool = @pr_course.context_external_tools.create!(
+            url: "http://www.example.com/tool",
+            domain: "example.com",
+            shared_secret: "test123",
+            consumer_key: "test123",
+            name: "Test External Tool"
+          )
+        end
+
+        it "allows saving when changing existing peer review assignment to External Tool", custom_timeout: 30 do
+          get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment_for_edit.id}/edit"
+          wait_for_ajaximations
+
+          expect(f("[data-testid='peer-review-checkbox']")).to be_checked
+
+          click_option("#assignment_submission_type", "External Tool")
+          wait_for_ajaximations
+
+          f("#assignment_external_tool_tag_attributes_url").send_keys(@external_tool.url)
+          wait_for_ajaximations
+
+          scroll_to(f(".btn-primary[type=submit]"))
+          f(".btn-primary[type=submit]").click
+
+          wait_for_ajaximations
+          @pr_assignment_for_edit.reload
+
+          expect(@pr_assignment_for_edit.submission_types).to eq "external_tool"
+          expect(@pr_assignment_for_edit.peer_reviews).to be false
+        end
+
+        it "destroys peer_review_sub_assignment when submission type changes to external tool", custom_timeout: 30 do
+          assignment = @pr_course.assignments.create!(
+            name: "PR Assignment for External Tool Test",
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            peer_reviews: true,
+            peer_review_count: 3
+          )
+
+          peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+            parent_assignment: assignment,
+            points_possible: 15,
+            grading_type: "points"
+          )
+
+          expect(PeerReviewSubAssignment.find(peer_review_sub.id).workflow_state).to eq "published"
+
+          get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+          wait_for_ajaximations
+
+          expect(f("[data-testid='peer-review-checkbox']")).to be_checked
+
+          click_option("#assignment_submission_type", "External Tool")
+          wait_for_ajaximations
+
+          f("#assignment_external_tool_tag_attributes_url").send_keys(@external_tool.url)
+          wait_for_ajaximations
+
+          scroll_to(f(".btn-primary[type=submit]"))
+          f(".btn-primary[type=submit]").click
+
+          wait_for_ajaximations
+          assignment.reload
+
+          expect(assignment.submission_types).to eq "external_tool"
+          expect(assignment.peer_reviews).to be false
+          expect(PeerReviewSubAssignment.unscoped.find(peer_review_sub.id).workflow_state).to eq "deleted"
+        end
+
+        it "destroys peer_review_sub_assignment when unchecking peer reviews", custom_timeout: 30 do
+          assignment = @pr_course.assignments.create!(
+            name: "PR Assignment for Uncheck Test",
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            peer_reviews: true,
+            peer_review_count: 3
+          )
+
+          peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+            parent_assignment: assignment,
+            points_possible: 15,
+            grading_type: "points"
+          )
+
+          expect(PeerReviewSubAssignment.find(peer_review_sub.id).workflow_state).to eq "published"
+
+          get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+          wait_for_ajaximations
+
+          expect(f("[data-testid='peer-review-checkbox']")).to be_checked
+
+          f("[data-testid='peer-review-checkbox'] + label").click
+          wait_for_ajaximations
+
+          scroll_to(f(".btn-primary[type=submit]"))
+          f(".btn-primary[type=submit]").click
+
+          wait_for_ajaximations
+          assignment.reload
+
+          expect(assignment.peer_reviews).to be false
+          expect(PeerReviewSubAssignment.unscoped.find(peer_review_sub.id).workflow_state).to eq "deleted"
+        end
+      end
+    end
+
+    describe "peer review across sections" do
+      before(:once) do
+        @pr_assignment_sections = @pr_course.assignments.create!(
+          title: "Peer Review Assignment",
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          peer_reviews: true
+        )
+        peer_review_model(parent_assignment: @pr_assignment_sections)
+      end
+
+      it "loads the initial value of allow across sections when editing an assignment", custom_timeout: 30 do
+        @pr_assignment_sections.update!(peer_review_across_sections: false)
+
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment_sections.id}/edit"
+        wait_for_ajaximations
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        across_sections_checkbox = f("#peer_reviews_across_sections_checkbox")
+        expect(across_sections_checkbox).not_to be_selected
+      end
+
+      it "allows toggling allow across sections and persists the value", custom_timeout: 40 do
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment_sections.id}/edit"
+        wait_for_ajaximations
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        f("[data-testid='across-sections-checkbox'] + label").click
+
+        find_button("Save").click
+        wait_for_ajaximations
+
+        expect(@pr_assignment_sections.reload.peer_review_across_sections).to be false
+
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment_sections.id}/edit"
+        wait_for_ajaximations
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        f("[data-testid='across-sections-checkbox'] + label").click
+
+        find_button("Save").click
+        wait_for_ajaximations
+
+        expect(@pr_assignment_sections.reload.peer_review_across_sections).to be true
+      end
+
+      it "persists disabled state after collapsing Advanced Configuration section", custom_timeout: 40 do
+        get "/courses/#{@pr_course.id}/assignments/#{@pr_assignment_sections.id}/edit"
+        wait_for_ajaximations
+
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        f("[data-testid='across-sections-checkbox'] + label").click
+
+        # Collapse the Advanced Configuration section
+        fj("button:contains('Advanced Peer Review Configurations')").click
+        wait_for_ajaximations
+
+        find_button("Save").click
+        wait_for_ajaximations
+
+        expect(@pr_assignment_sections.reload.peer_review_across_sections).to be false
+      end
+    end
+
+    context "peer review settings UI" do
+      it "shows legacy peer review settings when feature flag is disabled" do
+        @pr_course.disable_feature!(:peer_review_allocation_and_grading)
+        assignment = assignment_model(
+          course: @pr_course,
+          peer_reviews: true,
+          automatic_peer_reviews: true,
+          peer_review_count: 1
+        )
+
+        get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+        wait_for_ajaximations
+
+        expect(f("#assignment_peer_reviews")).to be_displayed
+        expect(f("#peer_reviews_details")).to be_displayed
+        expect(element_exists?("#peer_reviews_allocation_and_grading_details")).to be false
+      end
+
+      context "with peer_review_allocation_and_grading feature enabled" do
+        before do
+          @pr_course.enable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "shows legacy peer review settings UI for assignment with legacy peer reviews" do
+          assignment = assignment_model(
+            course: @pr_course,
+            peer_reviews: true,
+            automatic_peer_reviews: true,
+            peer_review_count: 1
+          )
+
+          get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+          wait_for_ajaximations
+
+          expect(f("#assignment_peer_reviews")).to be_displayed
+          expect(f("#peer_reviews_details")).to be_displayed
+          expect(element_exists?("#peer_reviews_allocation_and_grading_details")).to be false
+        end
+
+        it "shows graded peer review settings UI for assignment with graded peer reviews" do
+          assignment = assignment_model(
+            course: @pr_course,
+            peer_reviews: true,
+            peer_review_count: 1
+          )
+          peer_review_model(parent_assignment: assignment)
+
+          get "/courses/#{@pr_course.id}/assignments/#{assignment.id}/edit"
+          wait_for_ajaximations
+
+          expect(f("#peer_reviews_allocation_and_grading_details")).to be_displayed
+          expect(f("[data-testid='peer-review-checkbox']")).to be_displayed
+          expect(element_exists?("#assignment_peer_reviews")).to be false
+        end
+      end
     end
   end
 end

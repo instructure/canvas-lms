@@ -18,10 +18,11 @@
 
 import * as tz from '@instructure/moment-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {getActiveCanvasTheme} from '@canvas/react'
 import {Alert} from '@instructure/ui-alerts'
-import {IconButton} from '@instructure/ui-buttons'
+import {IconButton, Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconMoreLine, IconSearchLine} from '@instructure/ui-icons'
+import {IconMoreLine, IconSearchLine, IconRefreshLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Responsive, type ResponsivePropsObject} from '@instructure/ui-responsive'
 import {Table} from '@instructure/ui-table'
@@ -32,20 +33,28 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Link as RouterLink} from 'react-router-dom'
 import React from 'react'
 import type {PaginatedList} from '../../api/PaginatedList'
-import type {AppsSortDirection, AppsSortProperty} from '../../api/registrations'
+import {
+  LIST_REGISTRATIONS_PAGE_LIMIT,
+  refreshRegistrations,
+  useDeleteRegistration,
+  type AppsSortDirection,
+  type AppsSortProperty,
+} from '../../api/registrations'
 import {isForcedOn, type LtiRegistration} from '../../model/LtiRegistration'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 import {colors} from '@instructure/canvas-theme'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Pagination} from '@instructure/ui-pagination'
-import {MANAGE_APPS_PAGE_LIMIT, refreshRegistrations} from './ManagePageLoadingState'
 import {
   openEditDynamicRegistrationWizard,
   openEditManualRegistrationWizard,
 } from '../../registration_wizard/RegistrationWizardModalState'
-import {alert} from '@canvas/instui-bindings/react/Alert'
+import {alert} from '@instructure/platform-instui-bindings'
 import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDefault'
+import type {AccountId} from '../../model/AccountId'
+import {confirmDanger} from '@instructure/platform-instui-bindings'
+import {useRegistrationUpdateWizardModalState} from '../../registration_update_wizard/RegistrationUpdateWizardModalState'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -54,8 +63,8 @@ export type AppsTableProps = {
   sort: AppsSortProperty
   dir: AppsSortDirection
   stale: boolean
+  accountId: AccountId
   updateSearchParams: ReturnType<typeof useManageSearchParams>[1]
-  deleteApp: CallbackWithRegistration
   page: number
 }
 
@@ -84,7 +93,7 @@ const renderEditButton = (r: LtiRegistration) => {
     return (
       <Menu.Item
         onClick={() => {
-          openEditDynamicRegistrationWizard(r.id, refreshRegistrations)
+          openEditDynamicRegistrationWizard(r.id, () => refreshRegistrations())
         }}
       >
         {I18n.t('Edit App')}
@@ -94,7 +103,7 @@ const renderEditButton = (r: LtiRegistration) => {
     return (
       <Menu.Item
         onClick={() => {
-          openEditManualRegistrationWizard(r.id, refreshRegistrations)
+          openEditManualRegistrationWizard(r.id, () => refreshRegistrations())
         }}
       >
         {I18n.t('Edit App')}
@@ -192,6 +201,8 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('Installed On'),
     width: '130px',
     sortable: true,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
     render: r => <div>{tz.format(r.created_at, 'date.formats.medium')}</div>,
   },
   {
@@ -220,6 +231,8 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('Updated On'),
     width: '130px',
     sortable: true,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
     render: r => <div>{tz.format(r.updated_at, 'date.formats.medium')}</div>,
   },
   {
@@ -227,9 +240,14 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('On/Off'),
     width: '80px',
     sortable: true,
-    render: r => (
-      <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
-    ),
+    render: r => {
+      const checkWorkflowState = window.ENV.FEATURES.lti_deactivate_registrations
+      const isOn = checkWorkflowState
+        ? r.workflow_state === 'active'
+        : r.account_binding?.workflow_state === 'on'
+
+      return <div>{isOn ? I18n.t('On') : I18n.t('Off')}</div>
+    },
   },
   {
     id: 'actions',
@@ -287,6 +305,8 @@ const Columns: ReadonlyArray<Column> = [
                     message: I18n.t('This app is locked on by Instructure, and cannot be deleted.'),
                     title: I18n.t('Delete App'),
                     okButtonLabel: I18n.t('Close'),
+                    closeButtonLabel: I18n.t('Close'),
+                    theme: getActiveCanvasTheme(),
                   })
                 }}
               >
@@ -315,11 +335,11 @@ const Columns: ReadonlyArray<Column> = [
   },
 ]
 
-const CondensedColumns: ReadonlyArray<Column> = [
+const CondensedColumnsWithStatus: ReadonlyArray<Column> = [
   {
     id: 'name',
     header: I18n.t('App Name'),
-    width: '42%',
+    width: '27%',
     sortable: true,
     render: r => {
       const appName = (
@@ -350,25 +370,149 @@ const CondensedColumns: ReadonlyArray<Column> = [
   {
     id: 'nickname',
     header: I18n.t('Nickname'),
-    width: '40%',
+    width: '20%',
     sortable: true,
     render: r => (r.admin_nickname ? <Text wrap="break-word">{r.admin_nickname}</Text> : null),
+  },
+  {
+    id: 'installed',
+    header: I18n.t('Installed On'),
+    width: '15%',
+    sortable: true,
+    textAlign: 'center',
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
+    render: r => <div>{tz.format(r.created_at, 'date.formats.medium')}</div>,
   },
   {
     id: 'lti_version',
     sortable: true,
     header: I18n.t('Version'),
     width: '8%',
+    textAlign: 'center',
+
     render: r => <div>{'legacy_configuration_id' in r ? '1.1' : '1.3'}</div>,
   },
   {
     id: 'on',
+    textAlign: 'center',
     header: I18n.t('On/Off'),
     width: '10%',
     sortable: true,
-    render: r => (
-      <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
-    ),
+    render: r => {
+      const checkWorkflowState = window.ENV.FEATURES.lti_deactivate_registrations
+      const isOn = checkWorkflowState
+        ? r.workflow_state === 'active'
+        : r.account_binding?.workflow_state === 'on'
+
+      return <div>{isOn ? I18n.t('On') : I18n.t('Off')}</div>
+    },
+  },
+  {
+    id: 'status',
+    header: I18n.t('Status'),
+    width: '20%',
+    sortable: true,
+    render: r => {
+      // Check if feature flag is enabled
+      if (!window.ENV.LTI_DR_REGISTRATIONS_UPDATE) {
+        return <div>{I18n.t('Up to date')}</div>
+      }
+
+      const pendingUpdate = r.pending_update
+      if (pendingUpdate) {
+        return (
+          <Button
+            color="secondary"
+            size="small"
+            renderIcon={() => <IconRefreshLine />}
+            data-pendo="lti-registrations-update-available-button"
+            onClick={() => {
+              useRegistrationUpdateWizardModalState.getState().open(r)
+            }}
+          >
+            {I18n.t('Update Available')}
+          </Button>
+        )
+      } else {
+        return <div>{I18n.t('Up to date')}</div>
+      }
+    },
+  },
+]
+
+const CondensedColumns: ReadonlyArray<Column> = [
+  {
+    id: 'name',
+    header: I18n.t('App Name'),
+    width: '37%',
+    sortable: true,
+    render: r => {
+      const appName = (
+        <Flex display="inline-flex">
+          <ToolIconOrDefault
+            iconUrl={r.icon_url}
+            toolId={r.id}
+            toolName={r.name}
+            size={27}
+            marginRight={12}
+            hideFromScreenReader={true}
+          />
+          {r.name}
+        </Flex>
+      )
+      return (
+        <Link
+          as={RouterLink}
+          to={`/manage/${r.id}`}
+          isWithinText={false}
+          data-testid={`reg-link-${r.id}`}
+        >
+          {appName}
+        </Link>
+      )
+    },
+  },
+  {
+    id: 'nickname',
+    header: I18n.t('Nickname'),
+    width: '30%',
+    sortable: true,
+    render: r => (r.admin_nickname ? <Text wrap="break-word">{r.admin_nickname}</Text> : null),
+  },
+  {
+    id: 'installed',
+    header: I18n.t('Installed On'),
+    width: '15%',
+    sortable: true,
+    textAlign: 'center',
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
+    render: r => <div>{tz.format(r.created_at, 'date.formats.medium')}</div>,
+  },
+  {
+    id: 'lti_version',
+    sortable: true,
+    header: I18n.t('Version'),
+    width: '10%',
+    textAlign: 'center',
+
+    render: r => <div>{'legacy_configuration_id' in r ? '1.1' : '1.3'}</div>,
+  },
+  {
+    id: 'on',
+    textAlign: 'center',
+    header: I18n.t('On/Off'),
+    width: '10%',
+    sortable: true,
+    render: r => {
+      const checkWorkflowState = window.ENV.FEATURES.lti_deactivate_registrations
+      const isOn = checkWorkflowState
+        ? r.workflow_state === 'active'
+        : r.account_binding?.workflow_state === 'on'
+
+      return <div>{isOn ? I18n.t('On') : I18n.t('Off')}</div>
+    },
   },
 ]
 
@@ -467,7 +611,20 @@ const AppsTableResponsiveWrapper = React.memo(
   },
 )
 
-type AppsTableInnerProps = {
+const confirmDeletion = (registration: LtiRegistration): Promise<boolean> =>
+  confirmDanger({
+    title: I18n.t('Delete App'),
+    confirmButtonLabel: I18n.t('Delete'),
+    cancelButtonLabel: I18n.t('Cancel'),
+    closeButtonLabel: I18n.t('Close'),
+    heading: I18n.t('You are about to delete “%{appName}”.', {appName: registration.name}),
+    message: I18n.t(
+      'You are removing the app from the entire account. It will be removed from its placements and any resource links to it will stop working. To reestablish placements and links, you will need to reinstall the app.',
+    ),
+    theme: getActiveCanvasTheme(),
+  })
+
+export type AppsTableInnerProps = {
   responsiveProps: ResponsivePropsObject | null | undefined
   tableProps: Omit<AppsTableProps, 'stale' | 'pageCount' | 'updatePage'>
 }
@@ -475,19 +632,47 @@ type AppsTableInnerProps = {
 export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
   const [, setManageSearchParams] = useManageSearchParams()
   const responsiveProps = props.responsiveProps
-  const {page, apps} = props.tableProps
-  const columns = window.ENV.FEATURES.lti_registrations_next ? CondensedColumns : Columns
+  const deleteMutation = useDeleteRegistration()
+  const {page, apps, accountId} = props.tableProps
+  const columns = window.ENV.FEATURES.lti_registrations_next
+    ? window.ENV.LTI_DR_REGISTRATIONS_UPDATE
+      ? CondensedColumnsWithStatus
+      : CondensedColumns
+    : Columns
+
+  const deleteApp = React.useCallback(
+    async (app: LtiRegistration) => {
+      if (await confirmDeletion(app)) {
+        try {
+          await deleteMutation.mutateAsync({
+            registrationId: app.id,
+            accountId,
+          })
+          showFlashAlert({
+            type: 'success',
+            message: I18n.t('App “%{appName}” successfully deleted', {appName: app.name}),
+          })
+        } catch {
+          showFlashAlert({
+            type: 'error',
+            message: I18n.t('There was an error deleting “%{appName}”', {appName: app.name}),
+          })
+        }
+      }
+    },
+    [deleteMutation, accountId],
+  )
   const rows = React.useMemo(() => {
     return props.tableProps.apps.data.map(row => (
       <Table.Row key={row.id}>
         {columns.map(({id, render, textAlign}) => (
           <Table.Cell key={id} textAlign={textAlign}>
-            {render(row, {deleteApp: props.tableProps.deleteApp})}
+            {render(row, {deleteApp})}
           </Table.Cell>
         ))}
       </Table.Row>
     ))
-  }, [props.tableProps.apps, props.tableProps.deleteApp])
+  }, [props.tableProps.apps.data, columns, deleteApp])
 
   const layout = responsiveProps && responsiveProps.layout === 'stacked' ? 'stacked' : 'fixed'
 
@@ -534,8 +719,8 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
       >
         <div style={{flex: layout === 'stacked' ? undefined : 1}}>
           {I18n.t('%{first_item} - %{last_item} of %{total_items} displayed', {
-            first_item: (page - 1) * MANAGE_APPS_PAGE_LIMIT + 1,
-            last_item: Math.min(page * MANAGE_APPS_PAGE_LIMIT, apps.total),
+            first_item: (page - 1) * LIST_REGISTRATIONS_PAGE_LIMIT + 1,
+            last_item: Math.min(page * LIST_REGISTRATIONS_PAGE_LIMIT, apps.total),
             total_items: apps.total,
           })}
         </div>
@@ -547,17 +732,19 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
             labelNext="Next Page"
             labelPrev="Previous Page"
           >
-            {Array.from(Array(Math.ceil(apps.total / MANAGE_APPS_PAGE_LIMIT))).map((_, i) => (
-              <Pagination.Page
-                key={i}
-                current={i === page - 1}
-                onClick={() => {
-                  setManageSearchParams({page: (i + 1).toString()})
-                }}
-              >
-                {i + 1}
-              </Pagination.Page>
-            ))}
+            {Array.from(Array(Math.ceil(apps.total / LIST_REGISTRATIONS_PAGE_LIMIT))).map(
+              (_, i) => (
+                <Pagination.Page
+                  key={i}
+                  current={i === page - 1}
+                  onClick={() => {
+                    setManageSearchParams({page: (i + 1).toString()})
+                  }}
+                >
+                  {i + 1}
+                </Pagination.Page>
+              ),
+            )}
           </Pagination>
         </div>
         {layout === 'stacked' ? null : <div style={{flex: 1}} />}

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cloneDeep} from 'lodash'
+import {cloneDeep} from 'es-toolkit/compat'
 import React from 'react'
 import {render, screen, within} from '@testing-library/react'
 import DuplicateSection from '../duplicate_section'
@@ -52,15 +52,15 @@ const duplicates = {
 const defaultProps = {
   duplicates,
   inviteUsersURL: '/courses/#/invite_users',
-  onSelectDuplicate: jest.fn(),
-  onNewForDuplicate: jest.fn(),
-  onSkipDuplicate: jest.fn(),
+  onSelectDuplicate: vi.fn(),
+  onNewForDuplicate: vi.fn(),
+  onSkipDuplicate: vi.fn(),
   fieldsRefAndError: {},
 }
 
 describe('DuplicateSection', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the component with user list', () => {

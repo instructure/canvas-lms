@@ -178,6 +178,7 @@ describe "Rubric form page" do
     expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("4 pts")
     expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("No Evidence")
     expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("0 pts")
+    expect(RubricsForm.criterion_ratings_flex_direction).to eq("row")
   end
 
   it "allows creating rubrics with ratings scaled low to high" do
@@ -190,10 +191,15 @@ describe "Rubric form page" do
     RubricsForm.low_high_rating_order.click
     RubricsForm.preview_rubric_button.click
 
-    expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("No Evidence")
-    expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("0 pts")
-    expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("Exceeds")
-    expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("4 pts")
+    # Because we now use Flex row-reverse, data-testid and dom changes are not
+    # reflected in order of ratings so the ratings should be in the same order as high to low
+    # In addition, we check that the flex direction is row-reverse to ensure the ratings are
+    # displayed in the correct order for low to high
+    expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("Exceeds")
+    expect(RubricsForm.traditional_grid_rating_button(0)).to include_text("4 pts")
+    expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("No Evidence")
+    expect(RubricsForm.traditional_grid_rating_button(4)).to include_text("0 pts")
+    expect(RubricsForm.criterion_ratings_flex_direction).to eq("row-reverse")
   end
 
   it "creates criterion with an optional description" do
@@ -330,69 +336,6 @@ describe "Rubric form page" do
 
     expect(RubricsForm.criterion_rating_points_inputs[0].attribute("value")).to eq("7")
     expect(RubricsForm.criterion_rating_points_inputs[1].attribute("value")).to eq("5")
-  end
-
-  it "informs the user that the rubric is in limited edit mode when a rubric is associated with an assignment" do
-    RubricsIndex.rubric_popover(@rubric2.id).click
-    RubricsIndex.edit_rubric_button.click
-
-    expect(RubricsForm.limited_edit_mode_message).to include_text("Editing is limited for this rubric as it has already been used for grading.")
-  end
-
-  it "does not allow changing the points associated with a rating when the rubric is in limited edit mode" do
-    RubricsIndex.rubric_popover(@rubric2.id).click
-    RubricsIndex.edit_rubric_button.click
-    RubricsForm.criterion_row_edit_buttons[0].click
-
-    expect(RubricsForm.non_editable_rating_points[0]).to include_text("10")
-  end
-
-  it "allows changing the rubric name when in limited edit mode" do
-    RubricsIndex.rubric_popover(@rubric2.id).click
-    RubricsIndex.edit_rubric_button.click
-    RubricsForm.rubric_title_input.send_keys(" Edited")
-    RubricsForm.save_rubric_button.click
-
-    expect(RubricsIndex.saved_rubrics_panel).to include_text("Rubric 2 Edited")
-  end
-
-  it "allows changing the criterion name when in limited edit mode" do
-    RubricsIndex.rubric_popover(@rubric2.id).click
-    RubricsIndex.edit_rubric_button.click
-    RubricsForm.criterion_row_edit_buttons[0].click
-    RubricsForm.criterion_name_input.send_keys(" Edited")
-    RubricsForm.save_criterion_button.click
-
-    expect(RubricsForm.criteria_row_names[0]).to include_text("Crit1 Edited")
-  end
-
-  it "allows changing the criterion description when in limited edit mode" do
-    RubricsIndex.rubric_popover(@rubric2.id).click
-    RubricsIndex.edit_rubric_button.click
-    RubricsForm.criterion_row_edit_buttons[0].click
-    RubricsForm.criterion_description_input.send_keys(" Edited")
-    RubricsForm.save_criterion_button.click
-
-    expect(RubricsForm.criteria_row_description).to include_text("Edited")
-  end
-
-  it "allows changing the rating name when in limited edit mode" do
-    RubricsIndex.rubric_popover(@rubric2.id).click
-    RubricsIndex.edit_rubric_button.click
-    RubricsForm.criterion_row_edit_buttons[0].click
-    RubricsForm.rating_name_inputs[0].send_keys(" Edited")
-    RubricsForm.save_criterion_button.click
-    RubricsForm.criterion_row_rating_accordion.click
-
-    expect(RubricsForm.criterion_rating_scale_accordion_items[0]).to include_text("A Edited")
-  end
-
-  it "allows changing the rating description when in limited edit mode" do
-    RubricsIndex.rubric_popover(@rubric2.id).click
-    RubricsIndex.edit_rubric_button.click
-    RubricsForm.criterion_row_edit_buttons[0].click
-
-    expect(RubricsForm.rating_description_inputs[0]).to_not be_disabled
   end
 
   it "allows previewing a rubric" do

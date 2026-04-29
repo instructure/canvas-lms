@@ -25,13 +25,13 @@ import K5Dashboard from '../K5Dashboard'
 import {defaultK5DashboardProps as defaultProps} from './mocks'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
-jest.useFakeTimers()
-
 const render = children =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const server = setupServer(
   http.get('/api/v1/dashboard/dashboard_cards', () => HttpResponse.json([])),
+  http.get('/api/v1/calendar_events', () => HttpResponse.json([])),
+  http.get('/api/v1/users/self/courses', () => HttpResponse.json([])),
 )
 
 // getByRole() causes these tests to be very slow, so provide a much faster helper
@@ -103,14 +103,15 @@ describe('K5Dashboard Tabs', () => {
       render(<K5Dashboard {...defaultProps} />)
 
       act(() => findTabByName('Grades', {selected: false}).click())
-      await act(async () => jest.runAllTimers())
-      expect(findTabByName('Grades', {selected: true})).toBeInTheDocument()
+      await waitFor(() => {
+        expect(findTabByName('Grades', {selected: true})).toBeInTheDocument()
+      }, {timeout: 10000})
 
       act(() => findTabByName('Resources', {selected: false}).click())
-      await act(async () => jest.runAllTimers())
-
-      expect(findTabByName('Grades', {selected: false})).toBeInTheDocument()
-      expect(findTabByName('Resources', {selected: true})).toBeInTheDocument()
+      await waitFor(() => {
+        expect(findTabByName('Grades', {selected: false})).toBeInTheDocument()
+        expect(findTabByName('Resources', {selected: true})).toBeInTheDocument()
+      }, {timeout: 10000})
     })
   })
 })

@@ -23,7 +23,7 @@ import {List} from '@instructure/ui-list'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -50,8 +50,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
     this.handlePostPolicySelected = this.handlePostPolicySelected.bind(this)
   }
 
-  // @ts-expect-error
-  handlePostPolicySelected(_e, value) {
+  handlePostPolicySelected(_e: React.SyntheticEvent, value: string) {
     if (value === AUTOMATIC_POST && this.props.anonymousAssignmentsPresent) {
       showFlashAlert({
         message: I18n.t(

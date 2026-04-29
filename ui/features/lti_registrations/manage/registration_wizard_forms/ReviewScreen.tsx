@@ -38,6 +38,12 @@ import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 import {Link} from '@instructure/ui-link'
+import {MessageSetting} from '../model/internal_lti_configuration/InternalBaseLaunchSettings'
+import {launchTypeSpecificSettingsLabels} from './LaunchTypeSpecificSettingsConfirmation'
+import {LtiPlacementlessMessageType} from '../model/LtiMessageType'
+import {Alert} from '@instructure/ui-alerts'
+import type {DuplicateRegistration} from '../api/domainDuplicates'
+import {AccountId} from '../model/AccountId'
 
 const I18n = createI18nScope('lti_registration.wizard')
 
@@ -62,17 +68,23 @@ export type ReviewScreenProps = {
   iconUrls: Partial<Record<LtiPlacementWithIcon, string>>
   defaultPlacementIconUrls: Partial<Record<LtiPlacementWithIcon, string>>
   launchSettings?: LaunchSettings
+  eulaSettings?: MessageSetting
   defaultIconUrl?: string
+  includeIconUrls?: boolean
+  domainDuplicates?: DuplicateRegistration[]
+  accountId: AccountId
   onEditScopes: () => void
   onEditPrivacyLevel: () => void
   onEditPlacements: () => void
   onEditNaming: () => void
   onEditIconUrls: () => void
   onEditLaunchSettings?: () => void
+  onEditMessageSettings?: (type: LtiPlacementlessMessageType) => void
 }
 
 export const ReviewScreen = ({
   launchSettings,
+  eulaSettings,
   scopes,
   privacyLevel,
   placements,
@@ -82,8 +94,12 @@ export const ReviewScreen = ({
   iconUrls,
   defaultIconUrl,
   defaultPlacementIconUrls = {},
+  includeIconUrls = true,
+  domainDuplicates = [],
+  accountId,
   onEditScopes,
   onEditLaunchSettings,
+  onEditMessageSettings,
   onEditPrivacyLevel,
   onEditPlacements,
   onEditNaming,
@@ -95,8 +111,16 @@ export const ReviewScreen = ({
         <Heading level="h3">{I18n.t('Review')}</Heading>
         <Text>{I18n.t('Review your changes before finalizing.')}</Text>
       </View>
+      <DuplicateAlert domainDuplicates={domainDuplicates} accountId={accountId} />
       {launchSettings && onEditLaunchSettings && (
         <LaunchSettingsSection {...launchSettings} onEditLaunchSettings={onEditLaunchSettings} />
+      )}
+      {eulaSettings && onEditMessageSettings && (
+        <MessageSettingsSection
+          messageSetting={eulaSettings}
+          type="LtiEulaRequest"
+          onEditMessageSettings={onEditMessageSettings}
+        />
       )}
       <ReviewSection>
         <View>
@@ -209,18 +233,20 @@ export const ReviewScreen = ({
           onClick={onEditNaming}
         />
       </ReviewSection>
-      <IconUrlsReviewSection
-        placements={placements}
-        iconUrls={iconUrls}
-        defaultPlacementIconUrls={defaultPlacementIconUrls}
-        defaultIconUrl={defaultIconUrl}
-        onEditIconUrls={onEditIconUrls}
-      />
+      {includeIconUrls && (
+        <IconUrlsReviewSection
+          placements={placements}
+          iconUrls={iconUrls}
+          defaultPlacementIconUrls={defaultPlacementIconUrls}
+          defaultIconUrl={defaultIconUrl}
+          onEditIconUrls={onEditIconUrls}
+        />
+      )}
     </RegistrationModalBody>
   )
 }
 
-export const ReviewSection = ({children}: React.PropsWithChildren<{}>) => {
+export const ReviewSection = ({children}: React.PropsWithChildren) => {
   return (
     <Flex margin="medium 0 medium 0" alignItems="start" justifyItems="space-between">
       {children}
@@ -228,7 +254,7 @@ export const ReviewSection = ({children}: React.PropsWithChildren<{}>) => {
   )
 }
 
-export const LaunchSettingsHeader = ({children}: React.PropsWithChildren<{}>) => {
+export const LaunchSettingsHeader = ({children}: React.PropsWithChildren) => {
   return (
     <h5
       style={{
@@ -350,6 +376,71 @@ export const LaunchSettingsSection = React.memo(
   },
 )
 
+export const MessageSettingsSection = React.memo(
+  ({
+    messageSetting,
+    type,
+    onEditMessageSettings,
+  }: {
+    messageSetting: MessageSetting | undefined
+    type: LtiPlacementlessMessageType
+    onEditMessageSettings: (type: LtiPlacementlessMessageType) => void
+  }) => {
+    const labels = launchTypeSpecificSettingsLabels[type]
+    return (
+      <ReviewSection>
+        <View>
+          <Heading level="h4">{labels.title}</Heading>
+          <List
+            margin="small 0 0 0"
+            isUnstyled={true}
+            delimiter="none"
+            itemSpacing="small"
+            size="small"
+          >
+            <List.Item key="enabled">
+              <LaunchSettingsHeader>{labels.enableLabel}</LaunchSettingsHeader>
+              <Text size="small">{messageSetting?.enabled ? I18n.t('Yes') : I18n.t('No')}</Text>
+            </List.Item>
+            {messageSetting?.target_link_uri && (
+              <List.Item key="target_link_uri">
+                <LaunchSettingsHeader>{labels.targetLinkUriLabel}</LaunchSettingsHeader>
+                <Text size="small">{messageSetting.target_link_uri}</Text>
+              </List.Item>
+            )}
+            {messageSetting?.custom_fields &&
+              Object.keys(messageSetting.custom_fields).length > 0 && (
+                <List.Item key="custom_fields">
+                  <LaunchSettingsHeader>{labels.customFieldsLabel}:</LaunchSettingsHeader>
+                  <List
+                    margin="x-small 0 0 0"
+                    isUnstyled={true}
+                    delimiter="none"
+                    itemSpacing="small"
+                    size="small"
+                  >
+                    {Object.entries(messageSetting.custom_fields).map(([key, value]) => (
+                      <List.Item key={key}>
+                        <Text size="small">
+                          {key}={value}
+                        </Text>
+                      </List.Item>
+                    ))}
+                  </List>
+                </List.Item>
+              )}
+          </List>
+        </View>
+        <IconButton
+          renderIcon={IconEditLine}
+          screenReaderLabel={I18n.t('Edit %{title}', {title: labels.title})}
+          onClick={() => onEditMessageSettings(type)}
+        />
+      </ReviewSection>
+    )
+  },
+)
+
 export type IconUrlsReviewSectionProps = {
   placements: LtiPlacement[]
   iconUrls: ReviewScreenProps['iconUrls']
@@ -423,3 +514,67 @@ export const IconUrlsReviewSection = React.memo(
     )
   },
 )
+
+type DuplicateAlertProps = {
+  domainDuplicates: DuplicateRegistration[]
+  accountId: AccountId
+}
+
+const DuplicateAlert = ({domainDuplicates, accountId}: DuplicateAlertProps) => {
+  if (domainDuplicates.length === 0) {
+    return null
+  }
+
+  return (
+    <View margin="medium 0 0 0">
+      <Alert variant="warning" renderCloseButtonLabel={I18n.t('Close')}>
+        <Text
+          dangerouslySetInnerHTML={{
+            __html: createDuplicateMessage(domainDuplicates, accountId),
+          }}
+        />
+      </Alert>
+    </View>
+  )
+}
+
+const createDuplicateMessage = (
+  domainDuplicates: DuplicateRegistration[],
+  accountId: AccountId,
+): string => {
+  // It was way easier to just hard-code these messages than try and use Intl.ListFormat,
+  // especially with the wrappers. The routes also have to be hand-interpolated strings, as these
+  // routes only exist on the front-end, not the backend, so no Rails helpers available.
+  const unnamedTool = I18n.t('Unnamed Tool')
+  const dupes = domainDuplicates.slice(0, 3)
+
+  const getDisplayName = (dup: DuplicateRegistration) =>
+    htmlEscape(dup.admin_nickname || dup.name || unnamedTool)
+
+  const createLink = (dup: DuplicateRegistration) =>
+    `<strong><a href="/accounts/${htmlEscape(accountId)}/apps/manage/${htmlEscape(dup.id)}" target="_blank" rel="noopener noreferrer">$1</a></strong>`
+
+  const wrappers = dupes.map((dup, i) => createLink(dup))
+
+  if (dupes.length === 1) {
+    return I18n.t(
+      "Another tool configuration uses this domain: *%{name}*. To avoid conflicts, ensure the availability settings don't overlap.",
+      {name: getDisplayName(dupes[0]), wrappers},
+    )
+  } else if (dupes.length === 2) {
+    return I18n.t(
+      `Other tool configurations use this domain including *%{first}* and **%{second}**. To avoid conflicts, ensure the availability settings don't overlap.`,
+      {first: getDisplayName(dupes[0]), second: getDisplayName(dupes[1]), wrappers},
+    )
+  } else {
+    return I18n.t(
+      `Other tool configurations use this domain including *%{first}*, **%{second}**, and ***%{third}***. To avoid conflicts, ensure the availability settings don't overlap.`,
+      {
+        first: getDisplayName(dupes[0]),
+        second: getDisplayName(dupes[1]),
+        third: getDisplayName(dupes[2]),
+        wrappers,
+      },
+    )
+  }
+}

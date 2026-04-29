@@ -131,7 +131,7 @@ module FeatureFlags
 
   # find the feature flag setting that applies to this object
   # it may be defined on the object or inherited
-  def lookup_feature_flag(feature, override_hidden: false, skip_cache: false, hide_inherited_enabled: false, inherited_only: false, include_shadowed: true)
+  def lookup_feature_flag(feature, override_hidden: false, skip_cache: false, inherited_only: false, include_shadowed: true)
     feature = feature.to_s
     feature_def = Feature.definitions[feature]
     raise "no such feature - #{feature}" unless feature_def
@@ -139,7 +139,7 @@ module FeatureFlags
     return nil if feature_def.shadow? && !include_shadowed
 
     return nil if feature_def.visible_on.is_a?(Proc) && !feature_def.visible_on.call(self)
-    return return_flag(feature_def, hide_inherited_enabled) unless feature_def.can_override? || feature_def.hidden?
+    return feature_def unless feature_def.can_override? || feature_def.hidden?
 
     is_root_account = is_a?(Account) && root_account?
     is_site_admin = is_a?(Account) && site_admin?
@@ -148,7 +148,7 @@ module FeatureFlags
     retval = feature_def.clone_for_cache unless feature_def.hidden? && !is_site_admin && !override_hidden
 
     @feature_flag_cache ||= {}
-    return return_flag(@feature_flag_cache[feature], hide_inherited_enabled) if @feature_flag_cache.key?(feature) && !inherited_only
+    return @feature_flag_cache[feature] if @feature_flag_cache.key?(feature) && !inherited_only
 
     # find the highest flag that doesn't allow override,
     # or the most specific flag otherwise
@@ -190,20 +190,7 @@ module FeatureFlags
     end
 
     @feature_flag_cache[feature] = retval unless inherited_only
-    return_flag(retval, hide_inherited_enabled)
-  end
-
-  def return_flag(retval, hide_inherited_enabled)
-    return nil unless retval
-
-    unless hide_inherited_enabled && retval.enabled? && !retval.can_override? && (
-      # Hide feature flag configs if they belong to a different context
-      (!retval.default? && (retval.context_type != self.class.name || retval.context_id != id)) ||
-      # Hide flags that are forced on in config as well
-      retval.default?
-    )
-      retval
-    end
+    retval
   end
 
   private

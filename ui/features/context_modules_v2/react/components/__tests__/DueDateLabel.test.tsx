@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
-import type {ModuleItemContent, CompletionRequirement} from '../../utils/types'
+import type {ModuleItemContent} from '../../utils/types'
 import {format} from '@instructure/moment-utils'
 import DueDateLabel from '../DueDateLabel'
 
@@ -28,57 +28,52 @@ const defaultContent: ModuleItemContent = {
   id: '19',
   dueAt: currentDate,
   pointsPossible: 100,
+  assignedToDates: [
+    {
+      id: 'everyone',
+      dueAt: currentDate,
+      title: 'Everyone',
+      base: true,
+    },
+  ],
 }
 
 const contentWithManyDueDates: ModuleItemContent = {
   ...defaultContent,
-  assignmentOverrides: {
-    edges: [
-      {
-        cursor: 'cursor',
-        node: {
-          set: {
-            students: [
-              {
-                id: 'student_id_1',
-              },
-            ],
-          },
-          dueAt: new Date().addDays(-1).toISOString(), // # yesterday
-        },
+  assignedToDates: [
+    {
+      id: 'student_id_1',
+      dueAt: new Date().addDays(-1).toISOString(), // # yesterday
+      title: '1 student',
+      set: {
+        id: '1',
+        type: 'ADHOC',
       },
-      {
-        cursor: 'cursor_2',
-        node: {
-          set: {
-            sectionId: 'section_id',
-          },
-          dueAt: new Date().addDays(1).toISOString(), // # tomorrow
-        },
+    },
+    {
+      id: 'section_id',
+      dueAt: new Date().addDays(1).toISOString(), // # tomorrow
+      title: '1 section',
+      set: {
+        id: '1',
+        type: 'CourseSection',
       },
-    ],
-  },
+    },
+  ],
 }
 
-const contentWithRedundantDueDates: ModuleItemContent = {
-  ...defaultContent,
-  assignmentOverrides: {
-    edges: [
-      {
-        cursor: 'cursor',
-        node: {
-          set: {
-            students: [
-              {
-                id: 'student_id_1',
-              },
-            ],
-          },
-          dueAt: currentDate,
-        },
-      },
-    ],
-  },
+const contentWithConflictingAssignmentDueAt: ModuleItemContent = {
+  id: '13',
+  _id: '13',
+  dueAt: '2024-01-18T23:59:59Z',
+  assignedToDates: [
+    {
+      id: 'everyone',
+      dueAt: '2024-01-15T23:59:59Z',
+      title: 'Everyone',
+      base: true,
+    },
+  ],
 }
 
 const setUp = (content: ModuleItemContent = defaultContent) => {
@@ -96,6 +91,12 @@ describe('DueDateLabel', () => {
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('due-date')).toBeInTheDocument()
     })
+
+    it('prefers assignedToDates for due date if it differs from dueAt', () => {
+      const container = setUp(contentWithConflictingAssignmentDueAt)
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.getAllByText('Jan 15, 2024')[0]).toBeInTheDocument()
+    })
   })
   describe('with multiple due dates', () => {
     it('renders', () => {
@@ -108,12 +109,14 @@ describe('DueDateLabel', () => {
       const container = setUp(contentWithManyDueDates)
       const dueAtFormat = '%b %-d at %l:%M%P'
       const dueDate1 = format(
-        contentWithManyDueDates.assignmentOverrides?.edges?.[0].node.dueAt,
+        contentWithManyDueDates.assignedToDates?.[0].dueAt,
         dueAtFormat,
+        undefined,
       ) as string
       const dueDate2 = format(
-        contentWithManyDueDates.assignmentOverrides?.edges?.[1].node.dueAt,
+        contentWithManyDueDates.assignedToDates?.[1].dueAt,
         dueAtFormat,
+        undefined,
       ) as string
 
       fireEvent.mouseOver(container.getByText('Multiple Due Dates'))
@@ -125,11 +128,153 @@ describe('DueDateLabel', () => {
       expect(container.getByTestId('override-details')).toHaveTextContent('1 section')
       expect(container.getByTestId('override-details').textContent).toContain(dueDate2)
     })
+  })
 
-    it('shows a single date when overrides are redundant', () => {
-      const container = setUp(contentWithRedundantDueDates)
+  describe('graded discussion date handling', () => {
+    const gradedDiscussionWithMultipleDates: ModuleItemContent = {
+      id: '1',
+      _id: '1',
+      type: 'Discussion',
+      graded: true,
+      dueAt: '2024-01-15T23:59:59Z',
+      assignment: {
+        _id: 'assignment-1',
+        dueAt: '2024-01-15T23:59:59Z',
+      },
+      assignedToDates: [
+        {
+          id: 'section-1',
+          dueAt: '2024-01-16T23:59:59Z',
+          title: 'Section 1',
+          set: {id: '1', type: 'CourseSection'},
+        },
+        {
+          id: 'section-2',
+          dueAt: '2024-01-17T23:59:59Z',
+          title: 'Section 2',
+          set: {id: '2', type: 'CourseSection'},
+        },
+      ],
+    }
+    const gradedDiscussionWithOneDate: ModuleItemContent = {
+      id: '13',
+      _id: '13',
+      type: 'Discussion',
+      graded: true,
+      assignment: {
+        _id: 'assignment-13',
+        dueAt: '2024-01-15T23:59:59Z',
+      },
+      assignedToDates: [
+        {
+          id: 'everyone',
+          dueAt: '2024-01-15T23:59:59Z',
+          title: 'Everyone',
+          base: true,
+        },
+      ],
+    }
+
+    const gradedDiscussionWithCheckpointDate: ModuleItemContent = {
+      id: '14',
+      _id: '14',
+      type: 'Discussion',
+      graded: true,
+      checkpoints: [
+        {
+          dueAt: '2024-01-20T23:59:59Z',
+          name: 'Reply to Topic',
+          tag: 'reply_to_topic',
+          assignedToDates: [
+            {
+              id: 'everyone',
+              dueAt: '2024-01-20T23:59:59Z',
+              title: 'Everyone',
+              base: true,
+            },
+          ],
+        },
+      ],
+      assignment: {
+        _id: 'assignment-14',
+      },
+    }
+
+    const gradedDiscussionWithMultipleCheckpointDates: ModuleItemContent = {
+      id: '14',
+      _id: '14',
+      type: 'Discussion',
+      graded: true,
+      checkpoints: [
+        {
+          dueAt: '2024-01-20T23:59:59Z',
+          name: 'Reply to Topic',
+          tag: 'reply_to_topic',
+          assignedToDates: [
+            {
+              id: 'everyone',
+              dueAt: '2024-01-20T23:59:59Z',
+              title: 'Everyone',
+              base: true,
+            },
+            {
+              id: 'section-1',
+              dueAt: '2024-01-21T23:59:59Z',
+              title: 'Section 1',
+              set: {
+                id: '1',
+                type: 'CourseSection',
+              },
+            },
+          ],
+        },
+      ],
+      assignment: {
+        _id: 'assignment-14',
+      },
+    }
+
+    it('shows multiple due dates for graded discussion with multiple assign to dates', () => {
+      const container = setUp(gradedDiscussionWithMultipleDates)
       expect(container.container).toBeInTheDocument()
+      expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
+      // Should show "Multiple Due Dates" link for discussions with assignment-level overrides
+      expect(container.queryByText('Multiple Due Dates')).toBeInTheDocument()
+    })
+
+    it('shows one due date for graded discussion with one assign to date', () => {
+      const container = setUp(gradedDiscussionWithOneDate)
       expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
+    })
+
+    it('shows single date for checkpointed discussion with single date', () => {
+      const container = setUp(gradedDiscussionWithCheckpointDate.checkpoints?.[0])
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
+    })
+
+    it('shows multiple dates for checkpointed discussion with multiple dates', () => {
+      const container = setUp(gradedDiscussionWithMultipleCheckpointDates.checkpoints?.[0])
+      expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
+    })
+
+    describe('edge cases', () => {
+      const discussionWithNullDates: ModuleItemContent = {
+        id: '17',
+        _id: '17',
+        type: 'Discussion',
+        graded: false,
+        todoDate: undefined,
+        lockAt: undefined,
+        dueAt: undefined,
+        assignedToDates: [],
+      }
+
+      it('returns null when discussion has no dates', () => {
+        const container = setUp(discussionWithNullDates)
+        expect(container.container.firstChild).toBeNull()
+      })
     })
   })
 })

@@ -138,6 +138,37 @@ describe "Importers::QuizImporter" do
           expect(quiz.assignment.settings).to be_nil
         end
 
+        it "uses quiz migration_id for assignment when qti_new_quiz is true" do
+          quiz_migration_id = "quiz_migration_id_123"
+          assignment_migration_id = "assignment_migration_id_456"
+
+          data[:migration_id] = quiz_migration_id
+          data[:qti_new_quiz] = true
+          data[:assignment][:migration_id] = assignment_migration_id
+
+          Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+          quiz = Quizzes::Quiz.where(migration_id: quiz_migration_id).first
+
+          # The assignment should use the quiz's migration_id, not its own
+          expect(quiz.assignment.migration_id).to eq(quiz_migration_id)
+          expect(quiz.assignment.migration_id).not_to eq(assignment_migration_id)
+        end
+
+        it "uses assignment migration_id when qti_new_quiz is false" do
+          quiz_migration_id = "quiz_migration_id_123"
+          assignment_migration_id = "assignment_migration_id_456"
+
+          data[:migration_id] = quiz_migration_id
+          data[:qti_new_quiz] = false
+          data[:assignment][:migration_id] = assignment_migration_id
+
+          Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+          quiz = Quizzes::Quiz.where(migration_id: quiz_migration_id).first
+
+          # The assignment should keep its own migration_id
+          expect(quiz.assignment.migration_id).to eq(assignment_migration_id)
+        end
+
         context "is import_quizzes_next" do
           before do
             allow(@migration)
@@ -294,7 +325,7 @@ describe "Importers::QuizImporter" do
 
     quiz = Quizzes::Quiz.where(migration_id: quiz_hash[:migration_id]).first
     expect(quiz.unpublished?).to be true
-    expect(quiz.assignment).to_not be_nil
+    expect(quiz.assignment).not_to be_nil
   end
 
   it "does not create an extra assignment if it already references one (but not set unpublished)" do
@@ -358,7 +389,7 @@ describe "Importers::QuizImporter" do
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
 
     expect(quiz.reload.quiz_data).to include(hash_including("question_name" => "Not Rocket Bee?"))
-    expect(quiz.quiz_data).to_not include(hash_including("question_name" => "Rocket Bee!"))
+    expect(quiz.quiz_data).not_to include(hash_including("question_name" => "Rocket Bee!"))
   end
 
   it "does not clear dates if these are null in the source hash" do
@@ -414,7 +445,7 @@ describe "Importers::QuizImporter" do
 
     context "when FF pre_date_shift_for_assignment_importing disabled" do
       it "should not use the try_to_save_with_date_shift method" do
-        expect(Importers::QuizImporter).to_not receive(:try_to_save_with_date_shift)
+        expect(Importers::QuizImporter).not_to receive(:try_to_save_with_date_shift)
         subject
       end
     end

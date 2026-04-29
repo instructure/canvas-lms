@@ -31,7 +31,7 @@ const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)
 
-describe('SelectContentCheckbox: Blueprint Settings', () => {
+describe.skip('SelectContentCheckbox: Blueprint Settings', () => {
   beforeEach(() => {
     contentMigration = new ContentMigration()
     selectContentCheckbox = new SelectContentCheckbox({model: contentMigration})

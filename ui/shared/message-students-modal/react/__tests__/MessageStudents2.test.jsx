@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, act} from '@testing-library/react'
+import {render, act, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
@@ -52,31 +52,31 @@ describe('MessageStudents', () => {
 
   beforeEach(() => {
     user = userEvent.setup({delay: null})
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    jest.clearAllTimers()
-    jest.useRealTimers()
+    vi.clearAllMocks()
+    vi.clearAllTimers()
+    vi.useRealTimers()
   })
 
   describe('form validation', () => {
     it('displays validation error when submitting without subject', async () => {
-      const {getByTestId, getByText} = renderMessageStudents()
+      renderMessageStudents()
       await act(async () => {
-        await user.click(getByTestId('message-students-submit'))
-        jest.runAllTimers()
+        await user.click(screen.getByTestId('message-students-submit'))
+        vi.runAllTimers()
       })
-      expect(getByText(/please provide a subject/i)).toBeInTheDocument()
+      expect(screen.getByText(/please provide a subject/i)).toBeInTheDocument()
     })
   })
 
   describe('message submission', () => {
-    const fillForm = async ({getByLabelText}) => {
+    const fillForm = async () => {
       await act(async () => {
-        await user.type(getByLabelText(/subject/i), 'Test Subject')
-        await user.type(getByLabelText(/body/i), 'Test Message')
+        await user.type(screen.getByLabelText(/subject/i), 'Test Subject')
+        await user.type(screen.getByLabelText(/body/i), 'Test Message')
       })
     }
 
@@ -89,24 +89,38 @@ describe('MessageStudents', () => {
         }),
       )
 
-      const {getByTestId, getByLabelText, findByText} = renderMessageStudents()
-      await fillForm({getByLabelText})
+      renderMessageStudents()
+      await fillForm()
       await act(async () => {
-        await user.click(getByTestId('message-students-submit'))
-        jest.runAllTimers()
+        await user.click(screen.getByTestId('message-students-submit'))
+        vi.runAllTimers()
       })
-      const errorMessage = await findByText('Invalid subject')
+      const errorMessage = await screen.findByText('Invalid subject')
       expect(errorMessage).toBeInTheDocument()
+    })
+
+    it('calls onRequestClose after successful message send', async () => {
+      const onRequestClose = vi.fn()
+      renderMessageStudents({onRequestClose})
+      await fillForm()
+      await act(async () => {
+        await user.click(screen.getByTestId('message-students-submit'))
+      })
+      await screen.findByText('Your message was sent!')
+      await act(async () => {
+        vi.runAllTimers()
+      })
+      expect(onRequestClose).toHaveBeenCalled()
     })
   })
 
   describe('modal behavior', () => {
     it('closes when clicking close button', async () => {
-      const onRequestClose = jest.fn()
-      const {getByTestId} = renderMessageStudents({onRequestClose})
+      const onRequestClose = vi.fn()
+      renderMessageStudents({onRequestClose})
       await act(async () => {
-        await user.click(getByTestId('message-students-cancel'))
-        jest.runAllTimers()
+        await user.click(screen.getByTestId('message-students-cancel'))
+        vi.runAllTimers()
       })
       expect(onRequestClose).toHaveBeenCalled()
     })
@@ -114,9 +128,9 @@ describe('MessageStudents', () => {
 
   describe('recipients display', () => {
     it('shows list of recipients', () => {
-      const {getByText} = renderMessageStudents()
-      expect(getByText('John Doe')).toBeInTheDocument()
-      expect(getByText('Jane Smith')).toBeInTheDocument()
+      renderMessageStudents()
+      expect(screen.getByText('John Doe')).toBeInTheDocument()
+      expect(screen.getByText('Jane Smith')).toBeInTheDocument()
     })
   })
 })

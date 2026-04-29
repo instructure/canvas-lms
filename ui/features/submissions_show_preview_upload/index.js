@@ -19,7 +19,7 @@ import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import swfobject from 'swfobject'
 import 'jqueryui/dialog'
-import {loadDocPreview} from '@instructure/canvas-rce/es/enhance-user-content/doc_previews'
+import {loadDocPreview} from '@instructure/canvas-rce/enhance-user-content'
 
 const I18n = createI18nScope('submissions.show_preview')
 

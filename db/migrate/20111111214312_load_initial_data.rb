@@ -123,14 +123,15 @@ class LoadInitialData < ActiveRecord::Migration[7.0]
                              "Enrollment Invitation",
                              "Enrollment Notification",
                              "Forgot Password",
+                             "Access Token Expiring Soon",
                              "Manually Created Access Token Created",
                              "Access Token Created On Behalf Of User",
                              "Access Token Deleted",
                              "Merge Email Communication Channel",
                              "Pseudonym Registration",
                              "Pseudonym Registration Done",
-                             "Self Enrollment Registration",
-                             "Account Verification"].freeze
+                             "Pseudonym Suspended After Failed Login",
+                             "Self Enrollment Registration"].freeze
 
     Notification.where(name: priority_message_list).update_all(priority: true)
   end

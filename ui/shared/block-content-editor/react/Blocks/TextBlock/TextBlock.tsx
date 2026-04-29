@@ -16,52 +16,102 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {TextBlockEdit} from './TextBlockEdit'
-import {TextBlockEditPreview} from './TextBlockEditPreview'
-import {BaseBlock, useGetRenderMode} from '../BaseBlock'
-import {useSave} from '../BaseBlock/useSave'
+import {TextBlockSettings} from './TextBlockSettings'
+import {BaseBlock} from '../BaseBlock'
+import {useSave} from '../../hooks/useSave'
+import {TextBlockProps} from './types'
+import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
+import {TitleEdit} from '../BlockItems/Title/TitleEdit'
+import {TextEdit} from '../BlockItems/Text/TextEdit'
+import {useFocusElement} from '../../hooks/useFocusElement'
+import {TextBlockLayout} from './TextBlockLayout'
+import {TitleView} from '../BlockItems/Title/TitleView'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {TextView} from '../BlockItems/Text/TextView'
+import {defaultProps} from './defaultProps'
+import {getContrastingTextColorCached} from '../../utilities/getContrastingTextColor'
 
-export type TextBlockProps = {
-  title: string
-  content: string
+const I18n = createI18nScope('block_content_editor')
+
+const TextBlockView = (props: TextBlockProps) => {
+  return (
+    <TextBlockLayout
+      title={
+        props.includeBlockTitle &&
+        !!props.title && <TitleView title={props.title} contentColor={props.titleColor} />
+      }
+      text={<TextView content={props.content} />}
+    />
+  )
 }
 
-export const TextBlockContent = (props: TextBlockProps) => {
-  const renderMode = useGetRenderMode()
-  const save = useSave<typeof TextBlock>()
+const TextBlockEditView = (props: TextBlockProps) => {
+  return (
+    <TextBlockLayout
+      title={
+        props.includeBlockTitle && (
+          <TitleEditPreview title={props.title} contentColor={props.titleColor} />
+        )
+      }
+      text={<TextEditPreview content={props.content} />}
+    />
+  )
+}
 
+const TextBlockEdit = (props: TextBlockProps) => {
+  const {focusHandler} = useFocusElement()
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
+  const labelColor = getContrastingTextColorCached(props.backgroundColor)
 
-  useEffect(() => {
-    if (renderMode === 'editPreview') {
-      save({
-        title,
-        content,
-      })
-    }
-  }, [renderMode, title, content, save])
+  useSave<typeof TextBlock>(() => ({
+    title,
+    content,
+  }))
 
-  return renderMode === 'edit' ? (
-    <TextBlockEdit
-      title={title}
-      content={content}
-      onTitleChange={(newTitle: string) => setTitle(newTitle)}
-      onContentChange={(newContent: string) => setContent(newContent)}
+  return (
+    <TextBlockLayout
+      title={
+        props.includeBlockTitle && (
+          <TitleEdit
+            title={title}
+            onTitleChange={setTitle}
+            focusHandler={focusHandler}
+            labelColor={labelColor}
+          />
+        )
+      }
+      text={
+        <TextEdit
+          content={content}
+          onContentChange={setContent}
+          height={300}
+          focusHandler={props.includeBlockTitle && focusHandler}
+        />
+      }
     />
-  ) : (
-    <TextBlockEditPreview title={title} content={content} />
   )
 }
 
-const I18n = createI18nScope('page_editor')
-
-export const TextBlock = (props: TextBlockProps) => {
+export const TextBlock = (props: Partial<TextBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
-    <BaseBlock title={I18n.t('Text Block')}>
-      <TextBlockContent {...props} />
-    </BaseBlock>
+    <BaseBlock
+      ViewComponent={TextBlockView}
+      EditComponent={TextBlockEdit}
+      EditViewComponent={TextBlockEditView}
+      componentProps={componentProps}
+      title={TextBlock.craft.displayName}
+      backgroundColor={componentProps.backgroundColor}
+    />
   )
+}
+
+TextBlock.craft = {
+  displayName: I18n.t('Text column') as string,
+  related: {
+    settings: TextBlockSettings,
+  },
 }

@@ -89,8 +89,10 @@ describe('SpeedGrader Discussion', () => {
       }),
     )
     // No need to mock getJSON since we're already using MSW for all network requests
-    jest.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
-    $appendSpy = jest.spyOn(window.$.fn, 'append')
+    vi.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'jsonReady').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'setInitiallyLoadedStudent').mockImplementation(() => {})
+    $appendSpy = vi.spyOn(window.$.fn, 'append')
 
     window.INST = {
       kalturaSettings: {
@@ -103,6 +105,12 @@ describe('SpeedGrader Discussion', () => {
       id: 27,
       GROUP_GRADING_MODE: false,
       points_possible: 10,
+      context: {
+        students: [],
+        enrollments: [],
+        active_course_sections: [],
+      },
+      submissions: [],
     }
 
     SpeedGrader.EG.currentStudent = {
@@ -157,7 +165,7 @@ describe('SpeedGrader Discussion', () => {
 
   afterEach(() => {
     SpeedGrader.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     fixtures.remove()
     fakeENV.teardown()
     delete window.jsonData
@@ -169,6 +177,7 @@ describe('SpeedGrader Discussion', () => {
 
   it('does not show private comments for a group assignment', async () => {
     window.jsonData.GROUP_GRADING_MODE = true
+    window.jsonData.HAS_GROUPS = true
     SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = null
     SpeedGrader.EG.showDiscussion()
     await awhile()
@@ -177,6 +186,7 @@ describe('SpeedGrader Discussion', () => {
 
   it('shows group comments for group assignments', async () => {
     window.jsonData.GROUP_GRADING_MODE = true
+    window.jsonData.HAS_GROUPS = true
     SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = 'hippo'
     SpeedGrader.EG.showDiscussion()
     await awhile()

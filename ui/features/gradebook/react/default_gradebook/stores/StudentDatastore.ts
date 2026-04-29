@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {difference} from 'es-toolkit/compat'
 import type {GradebookStudent, GradebookStudentMap} from '../gradebook.d'
 
 function createStudentPlaceholder(id: string) {
@@ -52,11 +52,11 @@ export default class StudentDatastore {
   setStudentIds(studentIds: string[]) {
     this.studentIds = studentIds
     const idsOfStoredStudents = Object.keys(this.userStudentMap)
-    _.difference(idsOfStoredStudents, studentIds).forEach(removedStudentId => {
+    difference(idsOfStoredStudents, studentIds).forEach(removedStudentId => {
       delete this.userStudentMap[removedStudentId]
     })
     const idsOfStoredTestStudents = Object.keys(this.testStudentMap)
-    _.difference(idsOfStoredTestStudents, studentIds).forEach(removedStudentId => {
+    difference(idsOfStoredTestStudents, studentIds).forEach(removedStudentId => {
       delete this.testStudentMap[removedStudentId]
     })
   }

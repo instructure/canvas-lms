@@ -17,15 +17,14 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {includes} from 'lodash'
+import {includes} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/GradingTypeSelector.handlebars'
 import '../../jquery/toggleAccessibly'
-import '@canvas/util/jquery/fixDialogButtons'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {GradingSchemesSelector} from '@canvas/grading-scheme'
 
 const I18n = createI18nScope('assignment_grading_type')
@@ -153,7 +152,10 @@ GradingTypeSelector.prototype.toJSON = function () {
     nested: this.nested,
     preventNotGraded:
       this.preventNotGraded ||
-      (((ref = this.lockedItems) != null ? ref.points : void 0) && !this.parentModel.isNotGraded()),
+      (((ref = this.lockedItems) != null ? ref.points : void 0) &&
+        !this.parentModel.isNotGraded()) ||
+      (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED &&
+        this.parentModel.hasPeerReviewSubmissions?.()),
     freezeGradingType:
       includes(this.parentModel.frozenAttributes(), 'grading_type') ||
       this.parentModel.inClosedGradingPeriod() ||
@@ -186,6 +188,7 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
       ? this.parentModel.gradingStandardId()
       : undefined,
     canManage: ENV.PERMISSIONS.manage_grading_schemes,
+    canSet: ENV.PERMISSIONS.set_grading_scheme,
     courseDefaultSchemeId: courseDefaultGradingSchemeId,
     onChange: this.handleGradingStandardIdChanged,
     contextId: ENV.COURSE_ID,
@@ -197,10 +200,12 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
         : undefined,
   }
   const mountPoint = document.querySelector('#grading_scheme_selector-target')
+  const element = React.createElement(GradingSchemesSelector, props)
   if (!this.root) {
-    this.root = createRoot(mountPoint)
+    this.root = render(element, mountPoint)
+  } else {
+    rerender(this.root, element)
   }
-  this.root.render(React.createElement(GradingSchemesSelector, props))
 }
 
 export default GradingTypeSelector

@@ -22,13 +22,13 @@ import {UsageRights} from './UsageRights'
 
 export const Attachment = {
   fragment: gql`
-    fragment Attachment on File {
+    fragment EditV2Attachment on File {
       id
       _id
       displayName
       url
       usageRights {
-        ...UsageRights
+        ...EditV2UsageRights
       }
     }
     ${UsageRights.fragment}

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {Link} from '@instructure/ui-link'
@@ -33,7 +33,9 @@ const CoursePacingNotice = props => {
           {I18n.t('This course is using Course Pacing. Go to Course Pacing to manage due dates.')}
         </View>
         {props.courseId && (
-          <Link href={`/courses/${props.courseId}/course_pacing`}>{I18n.t('Course Pacing')}</Link>
+          <Link data-testid="course-pacing-link" href={`/courses/${props.courseId}/course_pacing`}>
+            {I18n.t('Course Pacing')}
+          </Link>
         )}
       </Alert>
     </View>
@@ -41,8 +43,7 @@ const CoursePacingNotice = props => {
 }
 
 export function renderCoursePacingNotice(mountPoint, courseId) {
-  const root = createRoot(mountPoint)
-  root.render(<CoursePacingNotice courseId={courseId} />)
+  const root = render(<CoursePacingNotice courseId={courseId} />, mountPoint)
   return () => root.unmount()
 }
 

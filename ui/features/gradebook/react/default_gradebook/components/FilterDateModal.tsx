@@ -29,6 +29,8 @@ import {isoDateFromInput} from '../../../util/DateUtils'
 
 const I18n = createI18nScope('gradebook')
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
 const formatDate = (date: Date) => tz.format(date, 'date.formats.medium')
 
 function useResetState<T>(initialState: T): [T, (value: T) => void] {

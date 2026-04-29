@@ -35,7 +35,7 @@ describe('Button', () => {
   })
 
   afterEach(() => {
-    buttons.forEach((button) => button.$el.remove())
+    buttons.forEach(button => button.$el.remove())
   })
 
   test('removes existing tooltips upon render', () => {
@@ -68,7 +68,7 @@ describe('Button', () => {
     tooltip.innerHTML = 'tooltip contents'
     document.body.appendChild(tooltip)
 
-    for(var i = 0; i < 100; i++) {
+    for (var i = 0; i < 100; i++) {
       const mountPoint = document.createElement('div')
       document.body.appendChild(mountPoint)
 

@@ -18,15 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Canvadoc < ActiveRecord::Base
+class Canvadoc < ApplicationRecord
   class UploadTimeout < StandardError; end
 
   include Canvadocs::Session
+
   alias_method :session_url, :canvadocs_session_url
 
   belongs_to :attachment
 
-  has_many :canvadocs_submissions
+  has_many :canvadocs_submissions, dependent: :destroy
 
   def upload(opts = {})
     return if document_id.present?
@@ -54,9 +55,10 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def submissions
+    # NOTE: submissions may be cross-shard, so we can't filter via join here
     canvadocs_submissions
       .preload(submission: :assignment)
-      .map(&:submission)
+      .filter_map(&:submission)
   end
 
   def document_id

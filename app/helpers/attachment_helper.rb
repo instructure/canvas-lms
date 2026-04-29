@@ -24,20 +24,14 @@ module AttachmentHelper
     url_opts = {
       anonymous_instructor_annotations: attrs.delete(:anonymous_instructor_annotations),
       enable_annotations: attrs.delete(:enable_annotations),
-      moderated_grading_allow_list: attrs[:moderated_grading_allow_list],
       submission_id: attrs.delete(:submission_id)
     }
     url_opts[:enrollment_type] = attrs.delete(:enrollment_type) if url_opts[:enable_annotations]
 
-    if attachment.crocodoc_available?
-      begin
-        attrs[:crocodoc_session_url] = attachment.crocodoc_url(@current_user, url_opts)
-      rescue => e
-        Canvas::Errors.capture_exception(:crocodoc, e)
-      end
-    elsif attachment.canvadocable?
+    if attachment.canvadocable?
       attrs[:canvadoc_session_url] = attachment.canvadoc_url(@current_user, url_opts, access_token: params[:access_token])
     end
+    attrs[:attachment_name] = attachment.display_name
     attrs[:attachment_id] = attachment.id
     attrs[:mimetype] = attachment.mimetype
     context_name = url_helper_context_from_object(attachment.context)
@@ -59,7 +53,7 @@ module AttachmentHelper
     end
     attrs.map do |attr, val|
       %(data-#{attr}="#{ERB::Util.html_escape(val)}")
-    end.join(" ").html_safe
+    end.join(" ").html_safe # rubocop:disable Rails/OutputSafety
   end
 
   def media_preview_attributes(attachment, attrs = {})
@@ -71,16 +65,18 @@ module AttachmentHelper
     attrs.inject(+"") { |s, (attr, val)| s << "data-#{attr}=#{val} " }
   end
 
+  def sf_verifier_match?(attachment, access_type)
+    return false unless @access_verifier
+
+    access_permission = (@access_verifier[:permission] == "download") ? %w[download read] : Array(@access_verifier[:permission])
+    @sf_verifier_match ||= @access_verifier && access_permission.include?(access_type.to_s) && @access_verifier[:attachment_id] == attachment.global_id.to_s
+  end
+
   def jwt_resource_match(attachment)
     # If we're getting a JWT token from New Quizzes, the file might be in a an item
     # bank, which can be used in multiple contexts, and we need to give access to
     # it in all of them, even if the user doesn't have access to the context the file
     # original comes from.
-    # And also used in Lti Asset Processor Asset service to accept DeveloperKeys::AccessVerifier
-    @jwt_resource_match ||= if params[:sf_verifier]
-                              jwt_payload = Canvas::Security.decode_jwt(params[:sf_verifier], ignore_expiration: true)
-                              jwt_payload["permission"] == "download" && jwt_payload["attachment_id"] == attachment.global_id.to_s
-                            end
     @jwt_resource_match ||= ensure_token_resource_link(@token, attachment)
   end
 
@@ -123,7 +119,6 @@ module AttachmentHelper
 
     {
       canvadoc_session_url: attachment.canvadoc_url(@current_user, access_token:),
-      crocodoc_session_url: attachment.crocodoc_url(@current_user),
     }
   end
 
@@ -159,17 +154,19 @@ module AttachmentHelper
     end
   end
 
-  def access_allowed(
-    attachment:,
-    user:,
-    access_type:,
-    no_error_on_failure: false
-  )
-    return true if jwt_resource_match(attachment) || access_via_location?(attachment, user, access_type)
+  def access_allowed(attachment:, user:, access_type:, no_error_on_failure: false)
+    return true if sf_verifier_match?(attachment, access_type) || jwt_resource_match(attachment) || access_via_location?(attachment, user, access_type)
 
-    if params[:verifier]
+    if params[:verifier] && !params[:location]
       verifier_checker = Attachments::Verification.new(attachment)
-      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, @domain_root_account, session)
+      return true if verifier_checker.valid_verifier_for_permission?(
+        params[:verifier],
+        access_type,
+        @domain_root_account,
+        session,
+        request:,
+        files_domain: @files_domain
+      )
     end
 
     submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context)
@@ -180,53 +177,39 @@ module AttachmentHelper
       return no_error_on_failure ? false : render_unauthorized_action
     end
 
-    if params[:sf_token]
-      return true if check_safe_files_token(attachment, params[:sf_token])
-    end
-
     no_error_on_failure ? attachment.grants_right?(user, session, access_type) : authorized_action(attachment, user, access_type)
   end
 
   def access_via_location?(attachment, user, access_type)
-    if params[:location] && [:read, :download].include?(access_type)
-      return AttachmentAssociation.verify_access(params[:location], attachment, user, session)
+    location = params[:location]
+    if location && [:read, :download].include?(access_type)
+      if location.start_with?("avatar_")
+        avatar_user = User.find_by(id: location.split("_").last)
+        return avatar_user&.allow_avatar_access?(attachment) || false
+      else
+        return AttachmentAssociation.verify_access(location, attachment, user, session)
+      end
     end
 
     false
   end
 
-  def check_safe_files_token(attachment, sf_token)
-    return false unless Account.site_admin.feature_enabled?(:safe_files_token) && sf_token && !safer_domain_available?
-
-    sf_token_key = "sf_token:#{sf_token}"
-    sf_token_data = Rails.cache.read(sf_token_key)
-    return false unless sf_token_data
-
-    if sf_token_data[:full_path] == attachment.full_path
-      # access is checked twice so delete token after second check
-      if sf_token_data[:used]
-        Rails.cache.delete(sf_token_key)
-      else
-        sf_token_data[:used] = true
-        Rails.cache.write(sf_token_key, sf_token_data, expires_in: 5.minutes)
-      end
-      true
-    else
-      false
-    end
-  end
-
-  def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false)
+  def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false, options: {})
     can_proxy = inline && attachment.can_be_proxied?
     must_proxy = inline && csp_enforced? && attachment.mime_class == "html"
     direct = attachment.stored_locally? || can_proxy || must_proxy
 
+    if !inline && attachment.kaltura_manifest_file? && (download_url = attachment.kaltura_media_download_url)
+      redirect_to download_url
+      return
+    end
+
     # up here to preempt files domain redirect
     if attachment.instfs_hosted? && file_location_mode? && !direct
       url = if inline
-              authenticated_inline_url(attachment)
+              authenticated_inline_url(attachment, options:)
             else
-              authenticated_download_url(attachment)
+              authenticated_download_url(attachment, options:)
             end
       render_file_location(url)
       return
@@ -238,7 +221,8 @@ module AttachmentHelper
                                        host_and_shard: @safer_domain_host,
                                        verifier:,
                                        download: !inline,
-                                       authorization: @attachment_authorization)
+                                       authorization: @attachment_authorization,
+                                       query_params: options.slice(:location))
     elsif attachment.stored_locally?
       @headers = false if @files_domain
       send_file(attachment.full_filename, type: attachment.content_type_with_encoding, disposition: (inline ? "inline" : "attachment"), filename: attachment.display_name)
@@ -250,9 +234,9 @@ module AttachmentHelper
     elsif must_proxy
       render 400, text: I18n.t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
     elsif inline
-      redirect_to authenticated_inline_url(attachment)
+      redirect_to authenticated_inline_url(attachment, options:)
     else
-      redirect_to authenticated_download_url(attachment)
+      redirect_to authenticated_download_url(attachment, options:)
     end
   end
 

@@ -18,14 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe AdheresToPolicy::InstanceMethods do
   let(:some_class) do
     Class.new do
       attr_accessor :user
 
       extend AdheresToPolicy::ClassMethods
+
       set_policy do
         given { |user| self.user == user }
         can :read
@@ -50,6 +49,7 @@ describe AdheresToPolicy::InstanceMethods do
   it "allows multiple forms of can statements" do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
+
       set_policy do
         given { |user| user == 1 }
         can :read and can :write
@@ -71,6 +71,7 @@ describe AdheresToPolicy::InstanceMethods do
   it "checks parent conditions" do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
+
       set_policy do
         given { |value| value[0] == true }
         use_additional_policy do
@@ -90,6 +91,7 @@ describe AdheresToPolicy::InstanceMethods do
   it "checks deeply nested parent conditions" do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
+
       set_policy do
         given { |value| value[0] == true }
         use_additional_policy do
@@ -457,6 +459,7 @@ describe AdheresToPolicy::InstanceMethods do
           attr_reader :session
 
           extend AdheresToPolicy::ClassMethods
+
           set_policy do
             given { |_, session| @session = session }
             can :read
@@ -475,6 +478,7 @@ describe AdheresToPolicy::InstanceMethods do
         }
         actor_class = Class.new do
           extend AdheresToPolicy::ClassMethods
+
           set_policy do
             given { |_| true }
             can :read
@@ -497,6 +501,7 @@ describe AdheresToPolicy::InstanceMethods do
       it "must not use the rails cache for permissions included in the configured blacklist" do
         klass = Class.new do
           extend AdheresToPolicy::ClassMethods
+
           set_policy do
             given { |_| true }
             can :read
@@ -513,6 +518,7 @@ describe AdheresToPolicy::InstanceMethods do
       it "must cache permissions calculated using the same given block by default" do
         klass = Class.new do
           extend AdheresToPolicy::ClassMethods
+
           set_policy do
             given { |_| true }
             can :read, :write
@@ -532,6 +538,7 @@ describe AdheresToPolicy::InstanceMethods do
         AdheresToPolicy.configuration.cache_related_permissions = false
         klass = Class.new do
           extend AdheresToPolicy::ClassMethods
+
           set_policy do
             given { |_| true }
             can :read, :write
@@ -642,6 +649,51 @@ describe AdheresToPolicy::InstanceMethods do
         full_failure = non_context.grants_right?("disallowed actor", :read, with_justifications: true)
         expect(full_failure.success?).to be false
         expect(full_failure.justifications.first.justification).to eq(:wrong_actor)
+      end
+    end
+
+    context "override_proc" do
+      before do
+        AdheresToPolicy.configuration.override_proc = lambda do |user, sought_right|
+          if sought_right == :read
+            if user.odd?
+              AdheresToPolicy::JustifiedFailure.new(:odd_user)
+            elsif user.zero?
+              AdheresToPolicy::Success.instance
+            end
+          end
+        end
+      end
+
+      after do
+        AdheresToPolicy.configuration.reset!
+      end
+
+      it "does regular permissions checks if the override proc returns nil" do
+        some_instance = some_class.new
+        some_instance.user = 2
+        expect(some_instance.grants_right?(2, :read)).to be true
+        expect(some_instance.grants_right?(2, :write)).to be false
+        expect(some_instance.grants_right?(4, :read)).to be false
+      end
+
+      it "returns a justified failure if the override proc returns a justified failure" do
+        some_instance = some_class.new
+        some_instance.user = 1
+        expect(some_instance.grants_right?(1, :read)).to be false
+
+        full_failure = some_instance.grants_right?(1, :read, with_justifications: true)
+        expect(full_failure.success?).to be false
+        expect(full_failure.justifications.first.justification).to eq(:odd_user)
+      end
+
+      it "returns success if the override_proc returns success" do
+        some_instance = some_class.new
+        some_instance.user = 1
+        expect(some_instance.grants_right?(0, :read)).to be true
+
+        full_success = some_instance.grants_right?(0, :read, with_justifications: true)
+        expect(full_success.success?).to be true
       end
     end
   end

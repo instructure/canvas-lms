@@ -23,13 +23,14 @@ import TrayController, {
   CONTAINER_ID,
   videoDefaultSize,
   STUDIO_PLAYER_VIDEO_SIZE_DEFAULT,
-  VIDEO_SIZE_DEFAULT,
 } from '../TrayController'
 import FakeEditor from '../../../../__tests__/FakeEditor'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 import RCEGlobals from '../../../../RCEGlobals'
+import bridge from '../../../../../bridge'
+import {findMediaPlayerIframe} from '../../../shared/iframeUtils'
 
 const mockVideoPlayers = [
   {
@@ -64,14 +65,20 @@ const mockVideoPlayers = [
   },
 ]
 
+let previousOrigin = ''
+
 beforeAll(() => {
-  contentSelection.asVideoElement = jest.fn(elem => {
+  jest.spyOn(contentSelection, 'asVideoElement').mockImplementation(elem => {
     const vid = elem.parentElement.getAttribute('id')
     return mockVideoPlayers.find(vp => vp.id === vid)
   })
+
+  previousOrigin = bridge.canvasOrigin
+  bridge.canvasOrigin = 'http://localhost'
 })
 
 afterAll(() => {
+  bridge.canvasOrigin = previousOrigin
   jest.restoreAllMocks()
 })
 
@@ -91,6 +98,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       $videos.push($video)
       editor.appendElement($video)
       editor.setSelectedNode($video)
+      findMediaPlayerIframe($video).contentWindow.postMessage = jest.fn()
     })
 
     trayController = new TrayController()
@@ -138,7 +146,10 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 
       it('uses the selected video from the editor', async () => {
         trayController.showTrayForEditor(editors[0])
-        expect(getVideoOptionsFromTray().titleText).toEqual($videos[0].getAttribute('title'))
+        window.postMessage({subject: 'media_player.iframe_ready', mediaId: $videos[0].id}, '*')
+        await waitFor(() => {
+          expect(getVideoOptionsFromTray().titleText).toEqual($videos[0].getAttribute('title'))
+        })
       })
     })
 
@@ -191,20 +202,44 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       trayController.hideTrayForEditor(editors[0])
       expect(getTray()).toBeNull()
     })
+
+    it('sets isOpen to false immediately without waiting for the exit animation', () => {
+      trayController.showTrayForEditor(editors[0])
+      trayController._isOpen = true
+      trayController.hideTrayForEditor(editors[0])
+      expect(trayController.isOpen).toBe(false)
+    })
+
+    describe('with skipFocusOnExit parameter', () => {
+      it('does not select video container when skipFocusOnExit is true', async () => {
+        const selectSpy = jest.spyOn(editors[0].selection, 'select')
+        trayController.showTrayForEditor(editors[0])
+        trayController.hideTrayForEditor(editors[0], true)
+        await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+        expect(selectSpy).not.toHaveBeenCalled()
+      })
+
+      it('selects video container when skipFocusOnExit is false', async () => {
+        const selectSpy = jest.spyOn(editors[0].selection, 'select')
+        trayController.showTrayForEditor(editors[0])
+        trayController.hideTrayForEditor(editors[0], false)
+        await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+        expect(selectSpy).toHaveBeenCalledWith(trayController.$videoContainer)
+      })
+
+      it('selects video container when skipFocusOnExit is not provided', async () => {
+        const selectSpy = jest.spyOn(editors[0].selection, 'select')
+        trayController.showTrayForEditor(editors[0])
+        trayController.hideTrayForEditor(editors[0])
+        await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+        expect(selectSpy).toHaveBeenCalledWith(trayController.$videoContainer)
+      })
+    })
   })
 })
 
 describe('#videoDefaultSize', () => {
-  describe('when the consolidated media player feature is enabled', () => {
-    it('returns the STUDIO_PLAYER_VIDEO_SIZE_DEFAULT', () => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({consolidated_media_player: true})
-      expect(videoDefaultSize()).toEqual(STUDIO_PLAYER_VIDEO_SIZE_DEFAULT)
-    })
-  })
-  describe('when the consolidated media player feature is disabled', () => {
-    it('returns the VIDEO_SIZE_DEFAULT', () => {
-      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({consolidated_media_player: false})
-      expect(videoDefaultSize()).toEqual(VIDEO_SIZE_DEFAULT)
-    })
+  it('returns the STUDIO_PLAYER_VIDEO_SIZE_DEFAULT', () => {
+    expect(videoDefaultSize()).toEqual(STUDIO_PLAYER_VIDEO_SIZE_DEFAULT)
   })
 })

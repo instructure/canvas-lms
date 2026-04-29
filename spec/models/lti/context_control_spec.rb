@@ -24,8 +24,7 @@ describe Lti::ContextControl do
 
   let(:params) do
     {
-      account:,
-      course:,
+      context: account || course,
       registration:,
       deployment:,
       available:,
@@ -52,20 +51,12 @@ describe Lti::ContextControl do
   end
 
   describe "validations" do
-    context "when both account and course are present" do
-      let(:course) { course_model(account:) }
-
-      it "is invalid" do
-        expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /must have either an account or a course, not both/)
-      end
-    end
-
     context "when neither account nor course are present" do
       let(:account) { nil }
       let(:course) { nil }
 
       it "is invalid" do
-        expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /must have either an account or a course/)
+        expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /Exactly one context must be present/)
       end
     end
 
@@ -106,9 +97,19 @@ describe Lti::ContextControl do
       end
     end
 
-    context "without registration" do
+    context "without deployment link to registration" do
+      before do
+        deployment.lti_registration = nil
+      end
+
       it "is invalid" do
         expect { create!(registration: nil) }.to raise_error(ActiveRecord::RecordInvalid, /Registration must exist/)
+      end
+    end
+
+    context "without registration" do
+      it "uses deployment to find registration" do
+        expect { create!(registration: nil) }.not_to raise_error
       end
     end
 
@@ -215,8 +216,7 @@ describe Lti::ContextControl do
       let_once(:controls) do
         contexts.map do |context|
           Lti::ContextControl.create!(
-            account: context.is_a?(Account) ? context : nil,
-            course: context.is_a?(Course) ? context : nil,
+            context:,
             registration:,
             deployment:
           )
@@ -376,11 +376,20 @@ describe Lti::ContextControl do
                              "a#{account.id}.a#{subaccount.id}.c#{course.id}.",
                            ])
     end
+
+    it "handles being passed a bare path" do
+      result = Lti::ContextControl.send(:self_and_all_parent_paths, "a1.a2.c3.")
+      expect(result).to eq([
+                             "a1.",
+                             "a1.a2.",
+                             "a1.a2.c3.",
+                           ])
+    end
   end
 
   describe ".deployment_ids_for_context" do
     let(:tool) { deployment }
-    let(:root_control) { tool.context_controls.first }
+    let(:root_control) { tool.primary_context_control }
     let(:delete_controls) { false }
 
     before { tool }
@@ -578,10 +587,50 @@ describe Lti::ContextControl do
     end
   end
 
+  describe ".primary_controls_for" do
+    subject { described_class.primary_controls_for(deployments:) }
+
+    let(:deployment) { registration.deployments.first }
+    let(:delete_controls) { false }
+    let(:subdeployment) { registration.new_external_tool(subaccount) }
+    let(:subaccount) { account_model(parent_account: root_account) }
+    let(:course) { course_model(account: subaccount) }
+    let(:course_deployment) { registration.new_external_tool(course) }
+    let(:other_control) { Lti::ContextControl.create!(course:, registration:, deployment: subdeployment, available: true) }
+
+    let(:deployments) { [deployment, subdeployment, course_deployment] }
+
+    before do
+      other_control
+    end
+
+    it "returns primary controls for each deployment" do
+      controls = subject
+
+      expect(controls.size).to eq(3)
+      expect(controls.map(&:deployment_id)).to match_array(deployments.map(&:id))
+      expect(controls.map(&:account_id)).to match_array([root_account.id, subaccount.id, nil])
+      expect(controls.map(&:course_id)).to match_array([nil, nil, course.id])
+    end
+
+    context "with ids" do
+      let(:deployments) { [deployment.id, subdeployment.id, course_deployment.id] }
+
+      it "still returns primary controls for each deployment" do
+        controls = subject
+
+        expect(controls.size).to eq(3)
+        expect(controls.map(&:deployment_id)).to match_array(deployments)
+        expect(controls.map(&:account_id)).to match_array([root_account.id, subaccount.id, nil])
+        expect(controls.map(&:course_id)).to match_array([nil, nil, course.id])
+      end
+    end
+  end
+
   describe ".nearest_control_for_registration" do
     let(:subaccount) { root_account.sub_accounts.create! }
     let(:course) { course_model(account: subaccount) }
-    let(:root_account_control) { tool.context_controls.first }
+    let(:root_account_control) { tool.primary_context_control }
     let(:tool) { deployment }
     let(:delete_controls) { false }
 
@@ -846,6 +895,96 @@ describe Lti::ContextControl do
     it "returns the correct path" do
       expect(described_class.calculate_path_for_account_ids([1, 2, 3]))
         .to eq("a3.a2.a1.")
+    end
+  end
+
+  describe "#sync_app_id" do
+    context "when registration_id is local (same shard)" do
+      it "sets app_id to registration_id" do
+        control = create!
+        expect(control.app_id).to be(registration.id)
+      end
+    end
+
+    context "when registration_id is cross-shard" do
+      specs_require_sharding
+
+      let(:account) { @shard2.activate { account_model } }
+      let(:user) { @shard2.activate { user_model } }
+      let(:deployment) { @shard2.activate { registration.new_external_tool(account, current_user: user) } }
+      let(:registration) do
+        Account.site_admin.shard.activate { lti_registration_with_tool(account: Account.site_admin) }
+      end
+
+      def clear_out_controls
+        Shard.find_each do |shard|
+          # No really, we want a clean slate
+          shard.activate { Lti::ContextControl.connection.execute("DELETE FROM #{Lti::ContextControl.quoted_table_name}") }
+        end
+      end
+
+      before(:once) do
+        clear_out_controls
+      end
+
+      context "when a local registration exists" do
+        let(:local_copy) do
+          @shard2.activate do
+            Lti::InstallTemplateRegistrationService.call(
+              account:,
+              user:,
+              template: registration
+            )[:local_copy]
+          end
+        end
+
+        it "sets app_id to the local copy's id" do
+          local_copy
+          deployment
+          clear_out_controls
+          @shard2.activate do
+            control = create!(registration:, deployment:)
+            expect(control.app_id).to be(local_copy.id)
+          end
+        end
+      end
+
+      context "when no local registration exists" do
+        it "raises" do
+          # Create a local copy so the deployment can be created, then destroy
+          # it to simulate bad DB state (e.g. a missed backfill entry).
+          local_reg = @shard2.activate do
+            Lti::InstallTemplateRegistrationService.call(
+              account:, user:, template: registration
+            )[:local_copy]
+          end
+          deployment
+          clear_out_controls
+          local_reg.destroy!
+          @shard2.activate do
+            expect { create!(registration:, deployment:) }.to raise_error(Lti::LocalAppNotFound)
+          end
+        end
+      end
+    end
+  end
+
+  describe "#deleted?" do
+    let(:control) { create! }
+
+    it "returns false when workflow_state is active" do
+      expect(control.workflow_state).to eq("active")
+      expect(control.deleted?).to be false
+    end
+
+    it "returns true when workflow_state is deleted" do
+      control.update!(workflow_state: "deleted")
+      expect(control.deleted?).to be true
+    end
+
+    it "returns true when workflow_state is deleted_with_context" do
+      control.update!(workflow_state: "deleted_with_context")
+      expect(control.deleted?).to be true
     end
   end
 end

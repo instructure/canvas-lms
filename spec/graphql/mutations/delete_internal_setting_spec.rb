@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require "spec_helper"
+
 require_relative "../graphql_spec_helper"
+
 describe Mutations::DeleteInternalSetting do
   let(:internal_setting) { Setting.create!(name: "setting_to_be_deleted", value: "😭") }
   let(:secret_internal_setting) { Setting.create!(name: "secret_setting_to_be_deleted", value: "supersecret", secret: true) }
@@ -49,6 +50,15 @@ describe Mutations::DeleteInternalSetting do
     expect(result.dig("data", "deleteInternalSetting", "errors")).to be_nil
     expect(result.dig("data", "deleteInternalSetting", "internalSettingId")).to eq CanvasSchema.id_from_object(internal_setting, Types::InternalSettingType, nil)
     expect(Setting.find_by(id: internal_setting.id)).to be_nil
+  end
+
+  it "clears the HA cache" do
+    # Force lazy setup to happen before we track calls to MultiCache.delete
+    sender
+
+    expect(MultiCache).to receive(:delete).with("all_settings")
+
+    execute
   end
 
   context "errors" do

@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {act, fireEvent, render} from '@testing-library/react'
+import {act, cleanup, fireEvent, render} from '@testing-library/react'
 
 import {Search} from '../search'
 import type {OrderType, SortableColumn} from '../../types'
 
-const fetchPaceContexts = jest.fn()
-const setSearchTerm = jest.fn()
+const fetchPaceContexts = vi.fn()
+const setSearchTerm = vi.fn()
 
 const defaultProps = {
   searchTerm: '',
@@ -35,7 +35,8 @@ const defaultProps = {
 }
 
 afterEach(() => {
-  jest.clearAllMocks()
+  cleanup()
+  vi.clearAllMocks()
 })
 
 describe('Search', () => {
@@ -97,7 +98,7 @@ describe('Search', () => {
 
   describe('SR-only alerts on search', () => {
     it("renders a SR-only alert with the number of results when there's lots of results", () => {
-      const fetchPaceContextsMock = jest.fn(({afterFetch}) => afterFetch([1, 2, 3]))
+      const fetchPaceContextsMock = vi.fn(({afterFetch}) => afterFetch([1, 2, 3]))
       const {getByRole, getByText} = render(
         <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />,
       )
@@ -106,7 +107,7 @@ describe('Search', () => {
     })
 
     it('renders a SR-only alert indicating one result', () => {
-      const fetchPaceContextsMock = jest.fn(({afterFetch}) => afterFetch([1]))
+      const fetchPaceContextsMock = vi.fn(({afterFetch}) => afterFetch([1]))
       const {getByRole, getByText} = render(
         <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />,
       )
@@ -115,7 +116,7 @@ describe('Search', () => {
     })
 
     it('renders a SR-only alert indicating no results found', () => {
-      const fetchPaceContextsMock = jest.fn(({afterFetch}) => afterFetch([]))
+      const fetchPaceContextsMock = vi.fn(({afterFetch}) => afterFetch([]))
       const {getByRole, getByText} = render(
         <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />,
       )

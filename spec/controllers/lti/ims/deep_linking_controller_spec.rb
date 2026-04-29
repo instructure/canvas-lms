@@ -69,17 +69,7 @@ module Lti
         let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
         let(:course) { course_model(account:) }
 
-        let(:context_external_tool) do
-          ContextExternalTool.create!(
-            context: course.account,
-            url: "http://tool.url/login",
-            name: "test tool",
-            shared_secret: "secret",
-            consumer_key: "key",
-            developer_key:,
-            lti_version: "1.3"
-          )
-        end
+        let(:context_external_tool) { registration.deployments.first }
 
         it { is_expected.to be_ok }
 
@@ -173,15 +163,7 @@ module Lti
               { type: "link", url: "http://too.url/sample", title: "Item 2" }
             ]
           end
-          let!(:tool) do
-            external_tool_1_3_model(
-              context: account,
-              opts: {
-                url: "http://tool.url/login",
-                developer_key:
-              }
-            )
-          end
+          let!(:tool) { registration.deployments.first }
 
           shared_examples_for "creates resource links in context" do
             let(:context) { raise "set in examples " }
@@ -407,9 +389,7 @@ module Lti
 
         context "when the developer key binding is off" do
           before do
-            developer_key.developer_key_account_bindings.first.update!(
-              workflow_state: "off"
-            )
+            registration.deactivate!
           end
 
           it_behaves_like "errors" do
@@ -446,33 +426,23 @@ module Lti
         end
 
         context "content_item claim message" do
-          let(:course) { course_model(account:) }
-          let(:developer_key) do
-            key = DeveloperKey.create!(account: course.account)
-            key.generate_rsa_keypair!
-            key.developer_key_account_bindings.first.update!(
-              workflow_state: "on"
-            )
-            key.save!
-            key
+          before do
+            user_session(teacher)
           end
-          let(:context_external_tool) do
-            ContextExternalTool.create!(
-              context: course.account,
-              url: "http://tool.url/login",
-              name: "test tool",
-              shared_secret: "secret",
-              consumer_key: "key",
-              developer_key:,
-              lti_version: "1.3"
-            )
+
+          let!(:course) { course_model(account:) }
+          let!(:teacher) do
+            course_with_teacher(course:, active_all: true)
+            @teacher
           end
+          let(:context_external_tool) { registration.deployments.first }
           let(:launch_url) { "http://tool.url/launch" }
-          let(:params) { super().merge({ course_id: course.id }) }
+          let(:params) { super().except(:account_id).merge({ course_id: course.id }) }
           let(:return_url_params) { super().merge({ placement: "course_assignments_menu" }) }
 
-          context "when is empty" do
+          context "when content items is empty (placement without lineItem support)" do
             let(:content_items) { nil }
+            let(:return_url_params) { super().merge({ placement: "editor_button" }) }
 
             it { is_expected.to be_ok }
 
@@ -486,7 +456,9 @@ module Lti
             end
           end
 
-          context "when is omitted" do
+          context "when content items is omitted (placement without lineItem support)" do
+            let(:return_url_params) { super().merge({ placement: "editor_button" }) }
+
             let(:deep_linking_jwt) do
               body = {
                 "iss" => iss,
@@ -525,9 +497,9 @@ module Lti
               context_external_tool
             end
 
-            context "when context_module_id param is included" do
+            context "when context_module_id param is included (placement without lineItem support)" do
               let(:context_module) { course.context_modules.create!(name: "Test Module") }
-              let(:return_url_params) { super().merge({ context_module_id: context_module.id }) }
+              let(:return_url_params) { super().merge({ placement: "editor_button", context_module_id: context_module.id }) }
 
               context "single item" do
                 let(:content_items) do
@@ -558,7 +530,7 @@ module Lti
                   expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be true
                 end
 
-                context "when placement is link_selection" do
+                context "when placement is link_selection (placement with lineItem support)" do
                   let(:return_url_params) { super().merge({ placement: :link_selection }) }
 
                   it "doesn't create a resource link" do
@@ -580,38 +552,18 @@ module Lti
                       [{ type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 5 } }]
                     end
 
-                    it "doesn't create a resource link" do
-                      # The resource links for these are rather created when the module item is created
-                      expect { subject }.not_to change { course.lti_resource_links.count }
+                    it "creates a resource link" do
+                      # the resource link has an Assignment context, not course
+                      expect { subject }.to change { Lti::ResourceLink.count }.by 1
                     end
 
-                    it "doesn't create a module item" do
-                      expect { subject }.not_to change { context_module.content_tags.count }
+                    it "creates a module item" do
+                      expect { subject }.to change { context_module.content_tags.count }.by 1
                     end
 
-                    it "doesn't ask to reload page" do
+                    it "asks to reload page" do
                       subject
-                      expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be false
-                    end
-
-                    context "with flag enabled" do
-                      before do
-                        course.root_account.enable_feature!(:lti_deep_linking_line_items)
-                      end
-
-                      it "creates a resource link" do
-                        # the resource link has an Assignment context, not course
-                        expect { subject }.to change { Lti::ResourceLink.count }.by 1
-                      end
-
-                      it "creates a module item" do
-                        expect { subject }.to change { context_module.content_tags.count }.by 1
-                      end
-
-                      it "asks to reload page" do
-                        subject
-                        expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be true
-                      end
+                      expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be true
                     end
                   end
                 end
@@ -711,137 +663,137 @@ module Lti
             context "when placement should create new module" do
               let(:return_url_params) { super().merge({ placement: "module_index_menu_modal" }) }
 
-              context "when feature flag is disabled" do
-                it "does not change anything" do
-                  expect { subject }.not_to change { course.context_modules.count }
-                  expect { subject }.not_to change { course.lti_resource_links.count }
-                  expect { subject }.not_to change { ContentTag.where(context: course).count }
+              context "single item" do
+                let(:content_items) do
+                  [{ type: "ltiResourceLink", url: launch_url, title: "Item 1" }]
+                end
+
+                it "creates a new context module" do
+                  expect { subject }.to change { course.context_modules.count }.by 1
+                end
+
+                it "creates a resource link" do
+                  expect { subject }.to change { course.lti_resource_links.count }.by 1
+                end
+
+                context "from the assignment_selection placement" do
+                  let(:return_url_params) { super().merge({ placement: "assignment_selection" }) }
+
+                  context "with no line items" do
+                    let(:content_items) do
+                      [{ type: "ltiResourceLink", url: launch_url, title: "Item 1" }]
+                    end
+
+                    it "does not create a resource link" do
+                      expect { subject }.not_to change { Lti::ResourceLink.count }
+                    end
+                  end
+
+                  context "with line items" do
+                    let(:content_items) do
+                      [
+                        { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 4 } },
+                        { type: "ltiResourceLink", url: launch_url, title: "Item 2", lineItem: { scoreMaximum: 4 } },
+                      ]
+                    end
+
+                    it "creates resource links and only resource links for the course" do
+                      expect { subject }.not_to change { Lti::ResourceLink.count }
+                    end
+                  end
+                end
+
+                context "from the submission_type_selection placement" do
+                  let(:return_url_params) { super().merge({ placement: "submission_type_selection" }) }
+
+                  context "with no line items" do
+                    let(:content_items) do
+                      [{ type: "ltiResourceLink", url: launch_url, title: "Item 1" }]
+                    end
+
+                    it "does not create a resource link" do
+                      expect { subject }.not_to change { Lti::ResourceLink.count }
+                    end
+                  end
+                end
+
+                it "creates a module item" do
+                  expect { subject }.to change { ContentTag.where(context: course).count }.by 1
+                end
+
+                it "leaves module items unpublished" do
+                  subject
+                  expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
+                end
+
+                it "tells the frontend a module was created" do
+                  subject
+                  expect(assigns.dig(:js_env, :deep_link_response, :moduleCreated)).to be true
+                end
+
+                it "names the module with the default name when no module_name claim is given" do
+                  subject
+                  expect(course.context_modules.last.name).to eq("New Content From App")
+                end
+
+                context "when module_name claim is provided" do
+                  let(:module_name) { "My Custom Module" }
+
+                  it "creates a module with the provided name" do
+                    subject
+                    expect(course.context_modules.last.name).to eq("My Custom Module")
+                  end
                 end
               end
 
-              context "when feature flag is enabled" do
-                before do
-                  course.root_account.enable_feature!(:lti_deep_linking_module_index_menu_modal)
+              context "multiple items" do
+                let(:content_items) do
+                  [
+                    { type: "ltiResourceLink", url: launch_url, title: "Item 1" },
+                    { type: "ltiResourceLink", url: launch_url, title: "Item 2" },
+                    { type: "ltiResourceLink", url: launch_url, title: "Item 3" }
+                  ]
                 end
 
-                context "single item" do
-                  let(:content_items) do
-                    [{ type: "ltiResourceLink", url: launch_url, title: "Item 1" }]
-                  end
-
-                  it "creates a new context module" do
-                    expect { subject }.to change { course.context_modules.count }.by 1
-                  end
-
-                  it "creates a resource link" do
-                    expect { subject }.to change { course.lti_resource_links.count }.by 1
-                  end
-
-                  context "from the assignment_selection placement" do
-                    let(:return_url_params) { super().merge({ placement: "assignment_selection" }) }
-
-                    context "with no line items" do
-                      let(:content_items) do
-                        [{ type: "ltiResourceLink", url: launch_url, title: "Item 1" }]
-                      end
-
-                      it "does not create a resource link" do
-                        expect { subject }.not_to change { Lti::ResourceLink.count }
-                      end
-                    end
-
-                    context "with line items" do
-                      let(:content_items) do
-                        [
-                          { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 4 } },
-                          { type: "ltiResourceLink", url: launch_url, title: "Item 2", lineItem: { scoreMaximum: 4 } },
-                        ]
-                      end
-
-                      it "creates resource links and only resource links for the course" do
-                        expect { subject }.not_to change { Lti::ResourceLink.count }
-                      end
-                    end
-                  end
-
-                  context "from the submission_type_selection placement" do
-                    let(:return_url_params) { super().merge({ placement: "submission_type_selection" }) }
-
-                    context "with no line items" do
-                      let(:content_items) do
-                        [{ type: "ltiResourceLink", url: launch_url, title: "Item 1" }]
-                      end
-
-                      it "does not create a resource link" do
-                        expect { subject }.not_to change { Lti::ResourceLink.count }
-                      end
-                    end
-                  end
-
-                  it "creates a module item" do
-                    expect { subject }.to change { ContentTag.where(context: course).count }.by 1
-                  end
-
-                  it "leaves module items unpublished" do
-                    subject
-                    expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
-                  end
-
-                  it "tells the frontend a module was created" do
-                    subject
-                    expect(assigns.dig(:js_env, :deep_link_response, :moduleCreated)).to be true
-                  end
+                it "creates a new context module" do
+                  expect { subject }.to change { course.context_modules.count }.by 1
                 end
 
-                context "multiple items" do
-                  let(:content_items) do
-                    [
-                      { type: "ltiResourceLink", url: launch_url, title: "Item 1" },
-                      { type: "ltiResourceLink", url: launch_url, title: "Item 2" },
-                      { type: "ltiResourceLink", url: launch_url, title: "Item 3" }
-                    ]
-                  end
+                it "creates one resource link per item" do
+                  expect { subject }.to change { course.lti_resource_links.count }.by 3
+                end
 
-                  it "creates a new context module" do
-                    expect { subject }.to change { course.context_modules.count }.by 1
-                  end
+                it "creates one module item per item" do
+                  expect { subject }.to change { ContentTag.where(context: course).count }.by 3
+                end
 
-                  it "creates one resource link per item" do
-                    expect { subject }.to change { course.lti_resource_links.count }.by 3
-                  end
+                it "leaves module items unpublished" do
+                  subject
+                  expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
+                end
 
-                  it "creates one module item per item" do
-                    expect { subject }.to change { ContentTag.where(context: course).count }.by 3
-                  end
+                it "returns access denied if user does not have manage_course_content_add permission" do
+                  department_admin_role = custom_role("AccountMembership", "Test Admin", { account: })
+                  account_admin_user_with_role_changes(
+                    account:,
+                    role: department_admin_role,
+                    role_changes: { manage_course_content_add: false }
+                  )
+                  user_session(@user)
+                  subject
+                  expect(response).to have_http_status(:unauthorized)
+                end
 
-                  it "leaves module items unpublished" do
-                    subject
-                    expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
-                  end
-
-                  it "returns access denied if user does not have manage_course_content_add permission" do
-                    department_admin_role = custom_role("AccountMembership", "Test Admin", { account: })
-                    account_admin_user_with_role_changes(
-                      account:,
-                      role: department_admin_role,
-                      role_changes: { manage_course_content_add: false }
-                    )
-                    user_session(@user)
-                    subject
-                    expect(response).to have_http_status(:unauthorized)
-                  end
-
-                  it "returns ok if user has manage_course_content_add permission" do
-                    department_admin_role = custom_role("AccountMembership", "Department Admin", { account: })
-                    account_admin_user_with_role_changes(
-                      account:,
-                      role: department_admin_role,
-                      role_changes: { manage_course_content_add: true }
-                    )
-                    user_session(@user)
-                    subject
-                    expect(response).to have_http_status(:ok)
-                  end
+                it "returns ok if user has manage_course_content_add permission" do
+                  department_admin_role = custom_role("AccountMembership", "Department Admin", { account: })
+                  account_admin_user_with_role_changes(
+                    account:,
+                    role: department_admin_role,
+                    role_changes: { manage_course_content_add: true }
+                  )
+                  user_session(@user)
+                  subject
+                  expect(response).to have_http_status(:ok)
                 end
               end
             end
@@ -860,22 +812,12 @@ module Lti
               course
               user_session(@user)
               context_external_tool
-              course.root_account.enable_feature! :lti_deep_linking_line_items
-              course.root_account.enable_feature! :lti_deep_linking_module_index_menu_modal
             end
 
             shared_examples_for "does nothing" do
               it "does not create an assignment" do
                 expect { subject }.not_to change { course.assignments.count }
               end
-            end
-
-            context "when feature flag is disabled" do
-              before do
-                course.root_account.disable_feature! :lti_deep_linking_line_items
-              end
-
-              it_behaves_like "does nothing"
             end
 
             context "when context is an account" do
@@ -1020,10 +962,6 @@ module Lti
             context "when placement should create new module" do
               let(:return_url_params) { super().merge({ placement: "module_index_menu_modal" }) }
 
-              before do
-                course.root_account.enable_feature! :lti_deep_linking_module_index_menu_modal
-              end
-
               it "creates a new context module" do
                 expect { subject }.to change { course.context_modules.count }.by 1
               end
@@ -1126,7 +1064,7 @@ module Lti
             it "does not create a resource link" do
               expect do
                 subject
-              end.to_not change { Lti::ResourceLink.count }
+              end.not_to change { Lti::ResourceLink.count }
             end
 
             it "includes tool_id in the js_env deep_link_response" do
@@ -1151,6 +1089,7 @@ module Lti
             let(:content_items) do
               [
                 { type: "ltiAssetProcessor", url: launch_url, title: "Asset Processor 1" },
+                { type: "ltiAssetProcessorContribution", url: launch_url, title: "Asset Processor Contribution 1" },
                 { type: "ltiResourceLink", url: launch_url, title: "Item 1" }
               ]
             end
@@ -1160,13 +1099,13 @@ module Lti
             it "does not create a resource link" do
               expect do
                 subject
-              end.to_not change { Lti::ResourceLink.count }
+              end.not_to change { Lti::ResourceLink.count }
             end
 
             it "does not create an Lti::AssetProcessor" do
               expect do
                 subject
-              end.to_not change { Lti::AssetProcessor.count }
+              end.not_to change { Lti::AssetProcessor.count }
             end
 
             it "includes tool_id and ltiAssetProcessor type content items in the js_env deep_link_response" do
@@ -1174,7 +1113,48 @@ module Lti
               subject
               expected_js_env_attributes = {
                 tool_id: context_external_tool.id,
-                content_items: content_items.reject { |item| item[:type] == "ltiResourceLink" }
+                content_items: content_items.filter { |item| item[:type] == "ltiAssetProcessor" }
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
+            end
+          end
+
+          context "when a content item for a ActivityAssetProcessorContribution is received" do
+            before do
+              course
+              user_session(@user)
+              context_external_tool
+            end
+
+            let(:content_items) do
+              [
+                { type: "ltiAssetProcessor", url: launch_url, title: "Asset Processor 1" },
+                { type: "ltiAssetProcessorContribution", url: launch_url, title: "Asset Processor Contribution 1" },
+                { type: "ltiResourceLink", url: launch_url, title: "Item 1" }
+              ]
+            end
+
+            let(:return_url_params) { super().merge(placement: "ActivityAssetProcessorContribution") }
+
+            it "does not create a resource link" do
+              expect do
+                subject
+              end.not_to change { Lti::ResourceLink.count }
+            end
+
+            it "does not create an Lti::AssetProcessor" do
+              expect do
+                subject
+              end.not_to change { Lti::AssetProcessor.count }
+            end
+
+            it "includes tool_id and ltiAssetProcessorContribution type content items in the js_env deep_link_response" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                tool_id: context_external_tool.id,
+                content_items: content_items.filter { |item| item[:type] == "ltiAssetProcessorContribution" }
               }
 
               expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))

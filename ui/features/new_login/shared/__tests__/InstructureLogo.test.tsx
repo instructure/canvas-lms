@@ -16,24 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import React from 'react'
 import {InstructureLogo} from '..'
 import {NewLoginDataProvider, NewLoginProvider, useNewLogin, useNewLoginData} from '../../context'
 
-jest.mock('../assets/images/instructure.svg', () => 'mocked-image-path.svg')
+vi.mock('../assets/images/instructure.svg', () => 'mocked-image-path.svg')
 
-jest.mock('../../context', () => {
-  const originalModule = jest.requireActual('../../context')
+vi.mock('../../context', async () => {
+  const originalModule = await vi.importActual('../../context')
   return {
     ...originalModule,
-    useNewLogin: jest.fn(),
-    useNewLoginData: jest.fn(),
+    useNewLogin: vi.fn(),
+    useNewLoginData: vi.fn(),
   }
 })
 
-const mockUseNewLogin = useNewLogin as jest.Mock
-const mockUseNewLoginData = useNewLoginData as jest.Mock
+const mockUseNewLogin = useNewLogin as ReturnType<typeof vi.fn>
+const mockUseNewLoginData = useNewLoginData as ReturnType<typeof vi.fn>
 
 describe('InstructureLogo', () => {
   const renderInstructureLogo = () =>
@@ -45,13 +45,17 @@ describe('InstructureLogo', () => {
       </NewLoginProvider>,
     )
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseNewLoginData.mockReturnValue({isPreviewMode: false})
   })
 
-  jest.mock('../assets/images/instructure.svg', () => 'mocked-image-path.svg')
+  vi.mock('../assets/images/instructure.svg', () => 'mocked-image-path.svg')
 
   it('renders the InstructureLogo with correct attributes and structure', () => {
     renderInstructureLogo()
@@ -61,7 +65,9 @@ describe('InstructureLogo', () => {
     expect(logoLink).not.toHaveAttribute('target', '_blank')
     const logoImage = screen.getByTestId('instructure-logo-img')
     expect(logoImage).toBeInTheDocument()
-    expect(logoImage).toHaveAttribute('src', 'mocked-image-path.svg')
+    // The svg mock doesn't work correctly with Vite's import system, so just check it has a src
+    expect(logoImage).toHaveAttribute('src')
+    expect(logoImage.getAttribute('src')).toContain('instructure.svg')
     expect(logoImage).toHaveAttribute('alt', '')
   })
 
@@ -88,7 +94,7 @@ describe('InstructureLogo', () => {
     renderInstructureLogo()
     const link = screen.getByTestId('instructure-logo-link')
     const clickEvent = new MouseEvent('click', {bubbles: true, cancelable: true})
-    jest.spyOn(clickEvent, 'preventDefault')
+    vi.spyOn(clickEvent, 'preventDefault')
     link.dispatchEvent(clickEvent)
     expect(clickEvent.preventDefault).toHaveBeenCalled()
     expect(link).toHaveAttribute('href', 'https://instructure.com')
@@ -100,7 +106,7 @@ describe('InstructureLogo', () => {
     renderInstructureLogo()
     const link = screen.getByTestId('instructure-logo-link')
     const clickEvent = new MouseEvent('click', {bubbles: true, cancelable: true})
-    jest.spyOn(clickEvent, 'preventDefault')
+    vi.spyOn(clickEvent, 'preventDefault')
     link.dispatchEvent(clickEvent)
     expect(link).toHaveAttribute('href', 'https://instructure.com')
     expect(clickEvent.preventDefault).not.toHaveBeenCalled()

@@ -17,16 +17,32 @@
  */
 
 import {render, screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {userEvent} from '@testing-library/user-event'
 import DifferentiationTagConverterMessage from '../DifferentiationTagConverterMessage'
+import axios from 'axios'
+import {showFlashAlert} from '@instructure/platform-alerts'
+
+vi.mock('axios')
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 describe('DifferentiationTagConverterMessage', () => {
+  let user: ReturnType<typeof userEvent.setup>
+
+  beforeEach(() => {
+    user = userEvent.setup()
+  })
   const renderComponent = (props: any) => {
     const defaultProps = {
       courseId: '1',
       learningObjectType: 'assignment',
       learningObjectId: '1',
-      onFinish: jest.fn(),
+      onFinish: vi.fn(),
       ...props,
     }
 
@@ -110,34 +126,31 @@ describe('DifferentiationTagConverterMessage', () => {
   })
 
   describe('button click', () => {
-    it('calls "onFinish" when button is clicked and query is successful', () => {
-      jest.mock('axios', () => ({
-        put: jest.fn(() => Promise.resolve({status: 204})),
-      }))
+    it('calls "onFinish" when button is clicked and query is successful', async () => {
+      vi.mocked(axios.put).mockResolvedValueOnce({status: 204} as any)
 
-      const onFinishMethod = jest.fn()
+      const onFinishMethod = vi.fn()
       renderComponent({onFinish: onFinishMethod})
 
-      const button = screen.getByText('Convert Differentiation Tags')
-      userEvent.click(button)
+      const button = screen.getByTestId('convert-differentiation-tags-button')
+      await user.click(button)
 
-      waitFor(() => {
-        expect(onFinishMethod).toHaveBeenCalledTimes(0)
+      await waitFor(() => {
+        expect(onFinishMethod).toHaveBeenCalledTimes(1)
       })
     })
 
-    it('shows error message when query fails', () => {
-      jest.mock('axios', () => ({
-        put: jest.fn(() => Promise.reject(new Error('Failed to convert differentiation tags.'))),
-      }))
+    it('shows error message when query fails', async () => {
+      vi.mocked(axios.put).mockRejectedValueOnce(
+        new Error('Failed to convert differentiation tags.'),
+      )
 
-      const showFlashAlert = jest.fn()
-      renderComponent({showFlashAlert})
+      renderComponent({})
 
-      const button = screen.getByText('Convert Differentiation Tags')
-      userEvent.click(button)
+      const button = screen.getByTestId('convert-differentiation-tags-button')
+      await user.click(button)
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(showFlashAlert).toHaveBeenCalledWith({
           type: 'error',
           message: 'Failed to convert differentiation tags.',

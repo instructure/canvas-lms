@@ -22,9 +22,18 @@ import {responsiveQuerySizes} from '../../../../util/utils'
 import {MessageDetailItem} from '../MessageDetailItem'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('../../../../util/utils', () => ({
-  ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
+vi.mock('../../../../util/utils', async () => {
+  const actual = await vi.importActual('../../../../util/utils')
+  return {
+    ...actual,
+    responsiveQuerySizes: vi.fn(),
+  }
+})
+
+vi.mock('@canvas/canvas-studio-player', () => ({
+  default: props => {
+    return <div>Player with media_id: {props.media_id}</div>
+  },
 }))
 
 const defaultProps = {
@@ -60,13 +69,13 @@ describe('MessageDetailItem', () => {
 
   beforeAll(() => {
     // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -210,7 +219,7 @@ describe('MessageDetailItem', () => {
     expect(getByText('attachment1.jpeg')).toBeInTheDocument()
   })
 
-  it('shows media attachment link if it exists', () => {
+  it('shows media player if it exists', () => {
     const props = {
       conversationMessage: {
         author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
@@ -238,7 +247,7 @@ describe('MessageDetailItem', () => {
     }
 
     const {getByText} = render(<MessageDetailItem {...props} />)
-    expect(getByText('Course Video')).toBeInTheDocument()
+    expect(getByText('Player with media_id: 123')).toBeInTheDocument()
   })
 
   it('does not render the reply or reply all options when function is not provided', () => {
@@ -283,10 +292,10 @@ describe('MessageDetailItem', () => {
         htmlBody: 'This is the body text for the message.',
       },
       contextName: 'Fake Course 1',
-      onReply: jest.fn(),
-      onReplyAll: jest.fn(),
-      onDelete: jest.fn(),
-      onForward: jest.fn(),
+      onReply: vi.fn(),
+      onReplyAll: vi.fn(),
+      onDelete: vi.fn(),
+      onForward: vi.fn(),
     }
 
     const {getByTestId, getByText} = render(<MessageDetailItem {...props} />)

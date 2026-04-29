@@ -42,7 +42,7 @@ describe "courses/settings" do
       view_context(@course, @user)
       assign(:current_user, @user)
       render
-      expect(response).to_not have_tag("input#course_hide_sections_on_course_users_page")
+      expect(response).not_to have_tag("input#course_hide_sections_on_course_users_page")
     end
 
     it "displays checkbox for teacher when there is more than one section" do
@@ -292,6 +292,86 @@ describe "courses/settings" do
       expect(Course::CUSTOMIZABLE_PERMISSIONS["files"][:get_setting_name]).to receive(:call).once.and_call_original
       view_context(@course, @user)
       render
+    end
+  end
+
+  describe "manage_course_content_edit permission" do
+    before :once do
+      RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+    end
+
+    before do
+      view_context(@course, @user)
+      assign(:current_user, @user)
+    end
+
+    it "disables the course form when user lacks manage_course_content_edit" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      form = doc.at_css("form#course_form")
+      expect(form["disabled"]).to eq "disabled"
+    end
+
+    it "does not show the save button when user lacks manage_course_content_edit" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.at_css("footer.sticky-footer button[type=submit]")).to be_nil
+    end
+
+    it "disables visibility controls when user lacks manage_course_content_edit" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      visibility_select = doc.at_css("select#course_course_visibility")
+      expect(visibility_select["disabled"]).to eq "disabled"
+    end
+
+    it "disables grading scheme checkbox when user lacks manage_course_content_edit" do
+      render
+      doc = Nokogiri::HTML5(response.body)
+      checkbox = doc.at_css("input#course_course_grading_standard_enabled")
+      expect(checkbox["disabled"]).to eq "disabled"
+    end
+  end
+
+  describe "course pacing setting" do
+    context "with course_pace_enable_from_account_setting ff off" do
+      it "is visible" do
+        render
+        doc = Nokogiri::HTML5(response.body)
+        expect(doc.at_css("input#course_enable_course_paces")).not_to be_nil
+      end
+    end
+
+    context "with course_pace_enable_from_account_setting ff on" do
+      before do
+        @course.root_account.enable_feature!(:course_pace_enable_from_account_setting)
+        @course.reload
+      end
+
+      it "is visible when account setting is enabled" do
+        @course.root_account.update(settings: { enable_course_paces: { value: true, locked: false } })
+
+        render
+        doc = Nokogiri::HTML5(response.body)
+        expect(doc.at_css("input#course_enable_course_paces")).not_to be_nil
+      end
+
+      it "is hidden when account setting is disabled" do
+        @course.root_account.update(settings: { enable_course_paces: { value: false, locked: false } })
+
+        render
+        doc = Nokogiri::HTML5(response.body)
+        expect(doc.at_css("input#course_enable_course_paces")).to be_nil
+      end
+
+      it "is visible when account setting is disabled but already using course pacing" do
+        @course.update(settings: { enable_course_paces: true })
+        @course.root_account.update(settings: { enable_course_paces: { value: false, locked: false } })
+
+        render
+        doc = Nokogiri::HTML5(response.body)
+        expect(doc.at_css("input#course_enable_course_paces")).not_to be_nil
+      end
     end
   end
 end

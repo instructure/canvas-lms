@@ -16,18 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {render, screen} from '@testing-library/react'
-import '@testing-library/jest-dom'
 import {
   AssetProcessorsForAssignment,
   AssetProcessorsForAssignmentProps,
 } from '../AssetProcessorsForAssignment'
-import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
+import {ExistingAttachedAssetProcessor, AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 import {useAssetProcessorsToolsList} from '@canvas/lti-asset-processor/react/hooks/useAssetProcessorsToolsList'
 
-jest.mock('@canvas/lti-asset-processor/react/hooks/useAssetProcessorsToolsList', () => ({
-  useAssetProcessorsToolsList: jest.fn(),
+vi.mock('@canvas/lti-asset-processor/react/hooks/useAssetProcessorsToolsList', () => ({
+  useAssetProcessorsToolsList: vi.fn(),
 }))
 
 const queryClient = new QueryClient()
@@ -84,11 +83,11 @@ describe('AssetProcessorsForAssignment', () => {
   }
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   const mockUseAssetProcessorsToolsList = (tools: LtiLaunchDefinition[]) => {
-    ;(useAssetProcessorsToolsList as jest.Mock).mockReturnValue({
+    ;(useAssetProcessorsToolsList as any).mockReturnValue({
       data: tools,
       isLoading: false,
       isError: false,
@@ -128,5 +127,18 @@ describe('AssetProcessorsForAssignment', () => {
     renderComponent({initialAttachedProcessors: []})
     expect(screen.getByText('Document Processing App(s)')).toBeInTheDocument()
     expect(screen.queryByTestId('asset_processors[0]')).not.toBeInTheDocument()
+  })
+
+  it('uses ActivityAssetProcessor type for querying tools', () => {
+    const mockToolsList = vi.fn().mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+    })
+    ;(useAssetProcessorsToolsList as any).mockImplementation(mockToolsList)
+
+    renderComponent({initialAttachedProcessors: []})
+
+    expect(mockToolsList).toHaveBeenCalledWith(1, 'ActivityAssetProcessor')
   })
 })

@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./react/app.jsx"
+  "main": "./react/app.jsx",
+  "owner": "LX"
 }

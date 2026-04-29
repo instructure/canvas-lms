@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
-import {map, maxBy, isEqual, isNaN, extend as lodashExtend} from 'lodash'
+import {map, maxBy, isNaN, isEqual, extend as lodashExtend} from 'es-toolkit/compat'
 import OutcomeContentBase from './OutcomeContentBase'
 import CalculationMethodFormView from './CalculationMethodFormView'
 import outcomeTemplate from '../../jst/outcome.handlebars'
@@ -31,12 +31,13 @@ import {addCriterionInfoButton} from '../../react/CriterionInfo'
 import 'jqueryui/dialog'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 import {raw} from '@instructure/html-escape'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {createElement} from 'react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import OutcomeContextTag from '@canvas/outcome-context-tag'
 
 const I18n = createI18nScope('OutcomeView')
 
@@ -374,13 +375,22 @@ export default class OutcomeView extends OutcomeContentBase {
     this.screenreaderTitleFocus()
     this._afterRender()
 
+    this._outcomeMasteryAtRoot = null
     this._outcomeMasteryAtContainer = (() => {
       const container = this.$('#outcome_mastery_at_container')[0]
       if (!container) return
-      return createRoot(container)
+      return container
+    })()
+
+    this._outcomeContextTagRoot = null
+    this._outcomeContextTagContainer = (() => {
+      const container = this.$('#outcome_context_tag_container')[0]
+      if (!container) return
+      return container
     })()
 
     this._renderOutcomeMasteryAtInput()
+    this._renderOutcomeContextTag()
 
     return this
   }
@@ -408,8 +418,8 @@ export default class OutcomeView extends OutcomeContentBase {
         text: I18n.t('mastery_at_range_error', 'Must be between 1 and 100'),
       },
     }[errorType]
-    this._outcomeMasteryAtContainer?.render(
-      createElement(
+    if (this._outcomeMasteryAtContainer) {
+      const element = createElement(
         View,
         {as: 'div', margin: 'small'},
         createElement(TextInput, {
@@ -425,8 +435,42 @@ export default class OutcomeView extends OutcomeContentBase {
             ...(errorMessage ? [errorMessage] : []),
           ],
         }),
-      ),
-    )
+      )
+      if (!this._outcomeMasteryAtRoot) {
+        this._outcomeMasteryAtRoot = render(element, this._outcomeMasteryAtContainer)
+      } else {
+        rerender(this._outcomeMasteryAtRoot, element)
+      }
+    }
+  }
+
+  _getOutcomeContext() {
+    const contextType = this.model.get('context_type') || this.model.outcomeLink?.context_type
+    const contextId = this.model.get('context_id') || this.model.outcomeLink?.context_id
+    return {contextType, contextId}
+  }
+
+  _renderOutcomeContextTag() {
+    if (!this._outcomeContextTagContainer) return
+
+    const {contextType, contextId} = this._getOutcomeContext()
+
+    if (contextType && contextId) {
+      const element = createElement(
+        View,
+        {as: 'div'},
+        createElement(OutcomeContextTag, {
+          outcomeContextType: contextType,
+          outcomeContextId: String(contextId),
+        }),
+      )
+      if (!this._outcomeContextTagRoot) {
+        this._outcomeContextTagRoot = render(element, this._outcomeContextTagContainer)
+      } else {
+        rerender(this._outcomeContextTagRoot, element)
+      }
+      this.$el.addClass('has-outcome-context-tag')
+    }
   }
 
   validateOutcomeMasteryAtInput() {
@@ -452,26 +496,31 @@ export default class OutcomeView extends OutcomeContentBase {
         root: (() => {
           const el = this.$('#title_container')[0]
           if (!el) return null
-          return {rootElement: createRoot(el), initialValue: el.dataset.initialValue}
+          return {container: el, reactRoot: null, initialValue: el.dataset.initialValue}
         })(),
         render: errorMessages => {
-          this._OutcomeFormInstUIInputs.title.root?.rootElement.render(
-            createElement(
-              View,
-              {as: 'div', margin: 'none none small none'},
-              createElement(TextInput, {
-                name: 'title',
-                id: 'title',
-                isRequired: true,
-                defaultValue: this._OutcomeFormInstUIInputs.title.root?.initialValue,
-                width: '40ch',
-                placeholder: I18n.t('New Outcome'),
-                renderLabel: () =>
-                  createElement(ScreenReaderContent, null, I18n.t('title', 'Name this outcome')),
-                messages: errorMessages?.map(m => ({text: m.message, type: 'newError'})),
-              }),
-            ),
+          const data = this._OutcomeFormInstUIInputs.title.root
+          if (!data) return
+          const element = createElement(
+            View,
+            {as: 'div', margin: 'none none small none'},
+            createElement(TextInput, {
+              name: 'title',
+              id: 'title',
+              isRequired: true,
+              defaultValue: data.initialValue,
+              width: '40ch',
+              placeholder: I18n.t('New Outcome'),
+              renderLabel: () =>
+                createElement(ScreenReaderContent, null, I18n.t('title', 'Name this outcome')),
+              messages: errorMessages?.map(m => ({text: m.message, type: 'newError'})),
+            }),
           )
+          if (!data.reactRoot) {
+            data.reactRoot = render(element, data.container)
+          } else {
+            rerender(data.reactRoot, element)
+          }
         },
         inputElement: () => this.$('#title')[0],
       },
@@ -479,24 +528,29 @@ export default class OutcomeView extends OutcomeContentBase {
         root: (() => {
           const el = this.$('#display_name_container')[0]
           if (!el) return null
-          return {rootElement: createRoot(el), initialValue: el.dataset.initialValue}
+          return {container: el, reactRoot: null, initialValue: el.dataset.initialValue}
         })(),
         render: errorMessages => {
-          this._OutcomeFormInstUIInputs.display_name.root?.rootElement.render(
-            createElement(
-              View,
-              {as: 'div', margin: 'none none small none'},
-              createElement(TextInput, {
-                name: 'display_name',
-                id: 'display_name',
-                defaultValue: this._OutcomeFormInstUIInputs.display_name.root?.initialValue,
-                width: '40ch',
-                renderLabel: () =>
-                  createElement(ScreenReaderContent, null, I18n.t('display_name', 'Friendly name')),
-                messages: errorMessages?.map(m => ({text: m.message, type: 'newError'})),
-              }),
-            ),
+          const data = this._OutcomeFormInstUIInputs.display_name.root
+          if (!data) return
+          const element = createElement(
+            View,
+            {as: 'div', margin: 'none none small none'},
+            createElement(TextInput, {
+              name: 'display_name',
+              id: 'display_name',
+              defaultValue: data.initialValue,
+              width: '40ch',
+              renderLabel: () =>
+                createElement(ScreenReaderContent, null, I18n.t('display_name', 'Friendly name')),
+              messages: errorMessages?.map(m => ({text: m.message, type: 'newError'})),
+            }),
           )
+          if (!data.reactRoot) {
+            data.reactRoot = render(element, data.container)
+          } else {
+            rerender(data.reactRoot, element)
+          }
         },
         inputElement: () => this.$('#display_name')[0],
       },
@@ -504,26 +558,31 @@ export default class OutcomeView extends OutcomeContentBase {
         root: (() => {
           const el = this.$('#mastery_point_container')[0]
           if (!el) return null
-          return {rootElement: createRoot(el), initialValue: el.dataset.initialValue}
+          return {container: el, reactRoot: null, initialValue: el.dataset.initialValue}
         })(),
         render: errorMessages => {
-          this._OutcomeFormInstUIInputs.mastery_points.root?.rootElement.render(
-            createElement(
-              View,
-              {as: 'div', margin: 'none none small none'},
-              createElement(TextInput, {
-                name: 'mastery_points',
-                id: 'mastery_points',
-                as: 'span',
-                defaultValue: this._OutcomeFormInstUIInputs.mastery_points.root?.initialValue,
-                display: 'inline-block',
-                width: '8ch',
-                renderLabel: () =>
-                  createElement(ScreenReaderContent, null, I18n.t('mastery', 'mastery_at')),
-                messages: errorMessages?.map(m => ({text: m.message, type: 'newError'})),
-              }),
-            ),
+          const data = this._OutcomeFormInstUIInputs.mastery_points.root
+          if (!data) return
+          const element = createElement(
+            View,
+            {as: 'div', margin: 'none none small none'},
+            createElement(TextInput, {
+              name: 'mastery_points',
+              id: 'mastery_points',
+              as: 'span',
+              defaultValue: data.initialValue,
+              display: 'inline-block',
+              width: '8ch',
+              renderLabel: () =>
+                createElement(ScreenReaderContent, null, I18n.t('mastery', 'mastery_at')),
+              messages: errorMessages?.map(m => ({text: m.message, type: 'newError'})),
+            }),
           )
+          if (!data.reactRoot) {
+            data.reactRoot = render(element, data.container)
+          } else {
+            rerender(data.reactRoot, element)
+          }
         },
         inputElement: () => this.$('#mastery_points')[0],
       },

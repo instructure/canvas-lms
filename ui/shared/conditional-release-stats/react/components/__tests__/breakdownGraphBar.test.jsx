@@ -27,8 +27,8 @@ const defaultProps = {
   rangeStudents: 50,
   totalStudents: 100,
   rangeIndex: 0,
-  selectRange: jest.fn(),
-  openSidebar: jest.fn(),
+  selectRange: vi.fn(),
+  openSidebar: vi.fn(),
 }
 
 describe('Breakdown Stats Graph Bar', () => {

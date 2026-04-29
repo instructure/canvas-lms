@@ -29,22 +29,23 @@ const user = userEvent.setup()
 
 let props: IconBlockProps = {...IconBlock.craft.defaultProps}
 
-const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
+const mockSetProp = vi.fn((callback: (props: Record<string, any>) => void) => {
   callback(props)
 })
 
-jest.mock('@craftjs/core', () => {
+vi.mock('@craftjs/core', () => {
   return {
-    useNode: jest.fn(_node => {
+    useNode: vi.fn(_node => {
       return {
         actions: {setProp: mockSetProp},
         props: IconBlock.craft.defaultProps,
+        nodeDomNode: undefined,
       }
     }),
-    useEditor: jest.fn(() => {
+    useEditor: vi.fn(() => {
       return {
         query: {
-          getSerializedNodes: jest.fn(() => ({})),
+          getSerializedNodes: vi.fn(() => ({})),
         },
       }
     }),

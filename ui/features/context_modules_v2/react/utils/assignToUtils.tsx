@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {createRoot, type Root} from 'react-dom/client'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import {mapContentTypeForSharing} from './utils'
 import type {ItemType, IconType} from '@canvas/context-modules/differentiated-modules/react/types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {
@@ -30,6 +31,7 @@ import {
 } from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 // Import payload types directly in onSave function to make TypeScript happy
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -59,8 +61,9 @@ export const getItemType = (contentType?: string): ItemType => {
 
   if (type.includes('assignment')) return 'assignment'
   if (type.includes('quiz')) return 'quiz'
-  if (type.includes('discussion')) return 'discussion_topic'
-  if (type.includes('wiki') || type.includes('page')) return 'wiki_page'
+  if (type.includes('discussion')) return mapContentTypeForSharing('discussion') as ItemType
+  if (type.includes('wiki') || type.includes('page'))
+    return mapContentTypeForSharing('page') as ItemType
 
   return 'wiki_page'
 }
@@ -74,6 +77,7 @@ export interface ItemAssignToProps {
   moduleId?: string
   isCheckpointed?: boolean
   isGraded?: boolean
+  cursor: string | null
 }
 
 export const renderItemAssignToManager = (
@@ -94,8 +98,7 @@ export const renderItemAssignToManager = (
   if (container.reactRoot) {
     container.reactRoot.unmount()
   }
-  container.reactRoot = createRoot(container)
-  container.reactRoot.render(
+  container.reactRoot = render(
     <ItemAssignToManager
       open={open}
       onClose={() => {
@@ -136,7 +139,10 @@ export const renderItemAssignToManager = (
               // On success, invalidate queries with exact module ID if available
               if (itemProps.moduleId) {
                 queryClient.invalidateQueries({
-                  queryKey: ['moduleItems', itemProps.moduleId],
+                  queryKey: [MODULE_ITEMS_ALL, itemProps.moduleId || ''],
+                })
+                queryClient.invalidateQueries({
+                  queryKey: [MODULE_ITEMS, itemProps.moduleId, itemProps.cursor],
                   exact: true,
                 })
               }
@@ -175,5 +181,6 @@ export const renderItemAssignToManager = (
       locale={ENV.LOCALE || 'en'}
       timezone={ENV.TIMEZONE || 'UTC'}
     />,
+    container,
   )
 }

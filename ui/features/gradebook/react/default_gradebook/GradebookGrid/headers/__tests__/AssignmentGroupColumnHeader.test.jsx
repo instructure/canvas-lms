@@ -192,7 +192,7 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
 
     describe('when closed', () => {
       beforeEach(() => {
-        props.onMenuDismiss = jest.fn()
+        props.onMenuDismiss = vi.fn()
         mountAndOpenOptionsMenu()
         closeOptionsMenu()
       })
@@ -265,7 +265,7 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
 
       describe('when clicked', () => {
         beforeEach(() => {
-          props.sortBySetting.onSortByGradeAscending = jest.fn()
+          props.sortBySetting.onSortByGradeAscending = vi.fn()
         })
 
         it('calls the .sortBySetting.onSortByGradeAscending callback', () => {
@@ -281,13 +281,12 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
           expect(document.activeElement).toBe(getOptionsMenuTrigger())
         })
 
-        // TODO: GRADE-____
-        it.skip('does not call the .sortBySetting.onSortByGradeAscending callback when already selected', () => {
+        it('calls the .sortBySetting.onSortByGradeAscending callback when already selected', () => {
           props.sortBySetting.settingKey = 'grade'
           props.sortBySetting.direction = 'ascending'
           mountAndOpenOptionsMenu()
-          getSortByOption('Grade - Low to High').focus()
-          expect(props.sortBySetting.onSortByGradeAscending).not.toHaveBeenCalled()
+          getSortByOption('Grade - Low to High').click()
+          expect(props.sortBySetting.onSortByGradeAscending).toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -327,7 +326,7 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
 
       describe('when clicked', () => {
         beforeEach(() => {
-          props.sortBySetting.onSortByGradeDescending = jest.fn()
+          props.sortBySetting.onSortByGradeDescending = vi.fn()
         })
 
         it('calls the .sortBySetting.onSortByGradeDescending callback', () => {
@@ -343,13 +342,12 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
           expect(document.activeElement).toBe(getOptionsMenuTrigger())
         })
 
-        // TODO: GRADE-____
-        it.skip('does not call the .sortBySetting.onSortByGradeDescending callback when already selected', () => {
+        it('calls the .sortBySetting.onSortByGradeDescending callback when already selected', () => {
           props.sortBySetting.settingKey = 'grade'
           props.sortBySetting.direction = 'ascending'
           mountAndOpenOptionsMenu()
           getSortByOption('Grade - High to Low').click()
-          expect(props.sortBySetting.onSortByGradeDescending).not.toHaveBeenCalled()
+          expect(props.sortBySetting.onSortByGradeDescending).toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -384,14 +382,14 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
     }
 
     it('is present when the onApplyScoreToUngraded prop is non-null', () => {
-      props.onApplyScoreToUngraded = jest.fn()
+      props.onApplyScoreToUngraded = vi.fn()
       mountAndOpenOptionsMenu()
 
       expect(applyScoreToUngradedItem()).toBeTruthy()
     })
 
     it('calls the onApplyScoreToUngraded prop when clicked', () => {
-      props.onApplyScoreToUngraded = jest.fn()
+      props.onApplyScoreToUngraded = vi.fn()
       mountAndOpenOptionsMenu()
 
       applyScoreToUngradedItem().click()
@@ -404,13 +402,13 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
     })
 
     it('is enabled when isRunningScoreToUngraded is false', () => {
-      props.onApplyScoreToUngraded = jest.fn()
+      props.onApplyScoreToUngraded = vi.fn()
       mountAndOpenOptionsMenu()
       expect(applyScoreToUngradedItem().getAttribute('aria-disabled')).toBeNull()
     })
 
     it('is disabled when isRunningScoreToUngraded is true', () => {
-      props.onApplyScoreToUngraded = jest.fn()
+      props.onApplyScoreToUngraded = vi.fn()
       props.isRunningScoreToUngraded = true
       mountAndOpenOptionsMenu()
       const menuItem = applyScoreToUngradedItem({showAlternativeText: true})
@@ -422,7 +420,7 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
     let preventDefault
 
     beforeEach(() => {
-      preventDefault = jest.fn()
+      preventDefault = vi.fn()
       mountComponent()
     })
 

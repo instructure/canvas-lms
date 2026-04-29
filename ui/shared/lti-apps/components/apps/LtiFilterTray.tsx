@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-import {capitalize} from 'lodash'
+import {capitalize} from 'es-toolkit/compat'
 import FilterOptions from './FilterOptions'
 import type {FilterItem, LtiFilters, LpFilters} from '../../models/Filter'
 import type {DiscoverParams} from '../../hooks/useDiscoverQueryParams'
@@ -34,7 +34,7 @@ export type LtiFilterTrayProps = {
   isTrayOpen: boolean
   setIsTrayOpen: (isOpen: boolean) => void
   filterValues: LtiFilters
-  lpFilterValues: [LpFilters] | []
+  lpFilterValues?: [LpFilters] | []
   setQueryParams: (params: Partial<DiscoverParams>) => void
   queryParams: DiscoverParams
 }

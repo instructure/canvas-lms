@@ -17,11 +17,29 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, fireEvent, waitFor, act} from '@testing-library/react'
 import ContentTypeExternalToolDrawer from '../ContentTypeExternalToolDrawer'
 import MutexManager from '@canvas/mutex-manager/MutexManager'
 import {fallbackIframeAllowances} from '../constants'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
+import useGlobalNavWidth from '../hooks/useGlobalNavWidth'
+
+// Mock the useBreakpoints hook
+vi.mock('../../../lti-apps/hooks/useBreakpoints', () => ({
+  __esModule: true,
+  default: vi.fn(() => ({
+    isDesktop: true,
+    isMaxMobile: false,
+    isMaxTablet: false,
+  })),
+}))
+
+// Mock the useGlobalNavWidth hook
+vi.mock('../hooks/useGlobalNavWidth', () => ({
+  __esModule: true,
+  default: vi.fn(() => '50px'),
+}))
 
 describe('ContentTypeExternalToolDrawer', () => {
   const tool = {
@@ -31,8 +49,8 @@ describe('ContentTypeExternalToolDrawer', () => {
     pinned: true,
     placement: 'top_navigation',
   }
-  const onDismiss = jest.fn()
-  const onExternalContentReady = jest.fn()
+  const onDismiss = vi.fn()
+  const onExternalContentReady = vi.fn()
   const pageContent = (() => {
     const el = document.createElement('div')
     el.setAttribute('id', 'page-content-id')
@@ -40,6 +58,17 @@ describe('ContentTypeExternalToolDrawer', () => {
     return el
   })()
   const pageContentTitle = 'page-content-title'
+
+  beforeEach(() => {
+    onDismiss.mockClear()
+    onExternalContentReady.mockClear()
+    useBreakpoints.mockClear()
+    useGlobalNavWidth.mockClear()
+  })
+
+  afterAll(() => {
+    vi.resetAllMocks()
+  })
 
   function renderTray(props) {
     return render(
@@ -56,10 +85,6 @@ describe('ContentTypeExternalToolDrawer', () => {
       />,
     )
   }
-
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
 
   it('labels page content with LTI title', () => {
     const {getByLabelText} = renderTray()
@@ -92,6 +117,136 @@ describe('ContentTypeExternalToolDrawer', () => {
     it('renders an icon', () => {
       const {getByAltText} = renderTray()
       expect(getByAltText('First LTI Icon')).toHaveAttribute('src', icon_url)
+    })
+  })
+
+  describe('tray width', () => {
+    it('sets the width to 100vw on mobile view', () => {
+      useBreakpoints.mockReturnValue({
+        isMaxMobile: true,
+        isMaxTablet: true,
+      })
+      const {getByTestId} = renderTray()
+      expect(getByTestId('drawer-header')).toHaveStyle('width: 100vw')
+    })
+
+    it('sets the width to 100vw on tablet view', () => {
+      useBreakpoints.mockReturnValue({
+        isMaxMobile: false,
+        isMaxTablet: true,
+      })
+      const {getByTestId} = renderTray()
+      expect(getByTestId('drawer-header')).toHaveStyle('width: 100vw')
+    })
+
+    it('sets the width to 33vw on desktop view', () => {
+      useBreakpoints.mockReturnValue({
+        isMaxMobile: false,
+        isMaxTablet: false,
+      })
+      const {getByTestId} = renderTray()
+      expect(getByTestId('drawer-header')).toHaveStyle('width: 33vw')
+    })
+
+    describe('fullscreen functionality', () => {
+      const toolWithFullscreen = {
+        ...tool,
+        allow_fullscreen: true,
+      }
+
+      it('does not render the fullscreen button if allow_fullscreen is false', () => {
+        const {queryByTestId} = renderTray({tool: {...tool, allow_fullscreen: false}})
+        expect(queryByTestId('fullscreen-button')).not.toBeInTheDocument()
+      })
+
+      it('does not render the fullscreen button on mobile view', () => {
+        useBreakpoints.mockReturnValue({
+          isMaxMobile: true,
+          isMaxTablet: true,
+        })
+        const {queryByTestId} = renderTray({tool: toolWithFullscreen})
+        expect(queryByTestId('fullscreen-button')).not.toBeInTheDocument()
+      })
+
+      it('renders the fullscreen button on desktop view when enabled', () => {
+        useBreakpoints.mockReturnValue({isDesktop: true})
+        const {getByTestId} = renderTray({tool: toolWithFullscreen})
+        expect(getByTestId('fullscreen-button')).toBeInTheDocument()
+      })
+
+      it('toggles drawer width and button state on click', () => {
+        useBreakpoints.mockReturnValue({isDesktop: true})
+        const mockNavToggle = document.createElement('div')
+        Object.defineProperty(mockNavToggle, 'getBoundingClientRect', {
+          value: () => ({width: 50}),
+        })
+        vi.spyOn(document, 'getElementById').mockReturnValue(mockNavToggle)
+
+        const {getByTestId, queryByTestId} = renderTray({tool: toolWithFullscreen})
+        const drawerHeader = getByTestId('drawer-header')
+
+        fireEvent.click(getByTestId('fullscreen-button'))
+
+        expect(getByTestId('exit-fullscreen-button')).toBeInTheDocument()
+        expect(queryByTestId('fullscreen-button')).not.toBeInTheDocument()
+        expect(drawerHeader).toHaveStyle('width: calc(100vw - 50px)')
+
+        fireEvent.click(getByTestId('exit-fullscreen-button'))
+
+        expect(getByTestId('fullscreen-button')).toBeInTheDocument()
+        expect(queryByTestId('exit-fullscreen-button')).not.toBeInTheDocument()
+        expect(drawerHeader).toHaveStyle('width: 33vw')
+      })
+
+      it('resets fullscreen state when the drawer is closed and reopened', async () => {
+        useBreakpoints.mockReturnValue({
+          isMaxMobile: false,
+          isMaxTablet: false,
+          isDesktop: true,
+        })
+        const {getByTestId, queryByTestId, rerender} = renderTray({
+          tool: toolWithFullscreen,
+          open: true,
+        })
+
+        fireEvent.click(getByTestId('fullscreen-button'))
+        expect(getByTestId('exit-fullscreen-button')).toBeInTheDocument()
+
+        await act(async () => {
+          await rerender(
+            <ContentTypeExternalToolDrawer
+              {...{
+                tool: toolWithFullscreen,
+                pageContent,
+                pageContentTitle,
+                onDismiss,
+                onExternalContentReady,
+                open: false,
+              }}
+            />,
+          )
+        })
+
+        await act(async () => {
+          await rerender(
+            <ContentTypeExternalToolDrawer
+              {...{
+                tool: toolWithFullscreen,
+                pageContent,
+                pageContentTitle,
+                onDismiss,
+                onExternalContentReady,
+                open: true,
+              }}
+            />,
+          )
+        })
+
+        await waitFor(() => {
+          expect(getByTestId('fullscreen-button')).toBeInTheDocument()
+          expect(queryByTestId('exit-fullscreen-button')).not.toBeInTheDocument()
+        })
+      })
     })
   })
 

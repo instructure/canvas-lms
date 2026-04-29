@@ -32,6 +32,7 @@ export const ZManageSearchParams = {
       'updated_by',
       'updated',
       'on',
+      'status',
     ])
     .default('installed'),
   dir: z.enum(['asc', 'desc']).default('desc'),

@@ -64,7 +64,7 @@ describe('JQuerySelectorCache', () => {
   describe('#set', () => {
     test('caches the value that subsequent `get` calls will use', () => {
       selectorCache.set('#foo')
-      jest.spyOn(selectorCache, 'set')
+      vi.spyOn(selectorCache, 'set')
       selectorCache.get('#foo')
       // we verify the `get` call uses the cached value
       // by asserting that `set` is not called

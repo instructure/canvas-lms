@@ -29,6 +29,8 @@ class Announcement < DiscussionTopic
 
   before_save :infer_content
   before_save :respect_context_lock_rules
+  after_update :update_participants_for_section_changes
+  after_update :create_participants_on_activation
   after_save :create_observer_alerts_job
   validates :context_id, presence: true
   validates :context_type, presence: true
@@ -83,7 +85,7 @@ class Announcement < DiscussionTopic
 
   set_broadcast_policy! do
     dispatch :new_announcement
-    to { users_with_permissions(active_participants_include_tas_and_teachers(true) - [user]) }
+    to { new_announcement_recipients }
     whenever do |record|
       is_new_announcement = (record.previously_new_record? and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished)
 
@@ -209,4 +211,107 @@ class Announcement < DiscussionTopic
     end
   end
   handle_asynchronously :create_observer_alerts, priority: Delayed::LOW_PRIORITY, max_attempts: 1
+
+  private
+
+  def create_participants_on_activation
+    return unless context.is_a?(Course)
+
+    # Check if transitioning from post_delayed to active
+    became_active = workflow_state_before_last_save == "post_delayed" && workflow_state == "active"
+    if became_active && should_send_to_stream
+      delay_if_production.create_participants_for_course
+    end
+  end
+
+  def update_participants_for_section_changes
+    return unless context.is_a?(Course)
+    # Skip section changes for delayed announcements
+    return unless should_send_to_stream
+
+    section_changed = is_section_specific? ? @sections_changed : is_section_specific_before_last_save
+
+    if section_changed
+      delay_if_production.sync_participants_with_visibility
+    end
+  end
+
+  def sync_participants_with_visibility
+    ActiveRecord::Base.transaction do
+      current_valid_user_ids = participants_to_insert
+
+      # Remove participants who no longer have visibility
+      discussion_topic_participants.where.not(user_id: current_valid_user_ids).destroy_all
+
+      # Add participants for users who gained visibility
+      existing_participant_ids = discussion_topic_participants.pluck(:user_id)
+      new_user_ids = current_valid_user_ids - existing_participant_ids
+
+      bulk_insert_participants(new_user_ids) if new_user_ids.any?
+    end
+  rescue ActiveRecord::RecordNotUnique
+    # If a race condition occurred, check if any participants are still missing
+    current_valid_user_ids = participants_to_insert
+    existing_participant_ids = discussion_topic_participants.pluck(:user_id)
+    missing_user_ids = current_valid_user_ids - existing_participant_ids
+
+    if missing_user_ids.any?
+      begin
+        bulk_insert_participants(missing_user_ids)
+      rescue ActiveRecord::RecordNotUnique
+        nil
+      end
+    end
+  end
+
+  def participants_to_insert
+    participants = context.participants(include_observers: false, by_date: true)
+    users_with_section_visibility(participants.compact).pluck(:id)
+  end
+
+  def create_participant
+    super # Create participant for author (from DiscussionTopic)
+    delay_if_production.create_participants_for_course if should_send_to_stream
+  end
+
+  # Creates participant records for all users who have visibility and don't already have them
+  # This ensures proper read/unread tracking for announcements
+  def create_participants_for_course
+    return unless context.is_a?(Course)
+
+    participants = context.participants(include_observers: false, by_date: true)
+    visible_user_ids = users_with_section_visibility(
+      participants.compact
+    ).pluck(:id)
+
+    return if visible_user_ids.empty?
+
+    existing_participant_ids = discussion_topic_participants.pluck(:user_id)
+    users_without_participants = visible_user_ids - existing_participant_ids
+
+    return if users_without_participants.empty?
+
+    bulk_insert_participants(users_without_participants)
+  end
+
+  def new_announcement_recipients
+    potential_recipients = active_participants_include_tas_and_teachers(include_observers: true).without(user)
+    recipients = users_with_permissions(potential_recipients)
+
+    # users_with_permissions checks :read_announcement permission
+    # but Admin-only announcements require :moderate_forum
+    if visible_to_admins_only?
+      context.filter_users_by_permission(recipients, :moderate_forum)
+    else
+      recipients
+    end
+  end
+
+  def a11y_scannable_attributes
+    %i[title message workflow_state]
+  end
+
+  def excluded_from_accessibility_scan?
+    !context.try(:a11y_checker_additional_resources?)
+  end
 end

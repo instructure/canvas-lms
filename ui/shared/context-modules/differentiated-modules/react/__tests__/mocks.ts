@@ -30,9 +30,30 @@ export const FILTERED_SECTIONS_DATA = [
 ]
 
 export const DIFFERENTIATION_TAGS_DATA = [
-  {id: '1', course_id: '1', name: 'Tag 1', group_category_id: '1', non_collaborative: true, group_category: {id: '1', name: 'Differentiation Tags'}},
-  {id: '2', course_id: '1', name: 'Tag 2', group_category_id: '1', non_collaborative: true, group_category: {id: '1', name: 'Differentiation Tags'}},
-  {id: '3', course_id: '1', name: 'Tag 3', group_category_id: '1', non_collaborative: true, group_category: {id: '1', name: 'Differentiation Tags'}},
+  {
+    id: '1',
+    course_id: '1',
+    name: 'Tag 1',
+    group_category_id: '1',
+    non_collaborative: true,
+    group_category: {id: '1', name: 'Differentiation Tags'},
+  },
+  {
+    id: '2',
+    course_id: '1',
+    name: 'Tag 2',
+    group_category_id: '1',
+    non_collaborative: true,
+    group_category: {id: '1', name: 'Differentiation Tags'},
+  },
+  {
+    id: '3',
+    course_id: '1',
+    name: 'Tag 3',
+    group_category_id: '1',
+    non_collaborative: true,
+    group_category: {id: '1', name: 'Differentiation Tags'},
+  },
 ]
 
 export const STUDENTS_DATA = [

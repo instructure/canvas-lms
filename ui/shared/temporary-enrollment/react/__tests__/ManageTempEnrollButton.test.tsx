@@ -18,9 +18,12 @@
 
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import ManageTempEnrollButton from '../ManageTempEnrollButton'
 import type {ManageTempEnrollButtonProps} from '../ManageTempEnrollButton'
+
+const server = setupServer()
 
 const defaultProps: ManageTempEnrollButtonProps = {
   user: {
@@ -44,25 +47,33 @@ const defaultProps: ManageTempEnrollButtonProps = {
 }
 
 describe('ManageTempEnrollButton', () => {
-  afterEach(() => {
-    fetchMock.restore()
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   it('renders the button when user is a provider', async () => {
-    fetchMock.get(`/api/v1/users/${defaultProps.user.id}/temporary_enrollment_status`, {
-      is_provider: true,
-      is_recipient: true,
-    })
+    server.use(
+      http.get(`/api/v1/users/${defaultProps.user.id}/temporary_enrollment_status`, () =>
+        HttpResponse.json({
+          is_provider: true,
+          is_recipient: true,
+        }),
+      ),
+    )
     const {findByText} = render(<ManageTempEnrollButton {...defaultProps} />)
     const button = await findByText('Temporary Enrollments')
     expect(button).toBeInTheDocument()
   })
 
   it('does not render the button when user is not a provider', async () => {
-    fetchMock.get(`/api/v1/users/${defaultProps.user.id}/temporary_enrollment_status`, {
-      is_provider: false,
-      is_recipient: true,
-    })
+    server.use(
+      http.get(`/api/v1/users/${defaultProps.user.id}/temporary_enrollment_status`, () =>
+        HttpResponse.json({
+          is_provider: false,
+          is_recipient: true,
+        }),
+      ),
+    )
     const {queryByText} = render(<ManageTempEnrollButton {...defaultProps} />)
     const button = await waitFor(() => queryByText('Temporary Enrollments'))
     expect(button).not.toBeInTheDocument()

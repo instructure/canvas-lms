@@ -17,24 +17,28 @@
  */
 
 import {GetAllPagesCallbacks, getAllPages, GetAllPagesReturnValue} from '../getAllPages'
-import {flatten} from 'lodash'
+import {flatten} from 'es-toolkit/compat'
 import {
   Assignment,
   getAssignments,
   GetAssignmentsParams,
   GetAssignmentsResult,
 } from './getAssignments'
+import PQueue from 'p-queue'
 
 type GetAllAssignmentsParams = {
   queryParams: Pick<GetAssignmentsParams, 'assignmentGroupId' | 'gradingPeriodId'>
+  headers?: Record<string, string>
+  queue?: PQueue
 } & GetAllPagesCallbacks<GetAssignmentsResult>
 
 export const getAllAssignments = ({
   queryParams,
+  headers,
   ...params
 }: GetAllAssignmentsParams): GetAllPagesReturnValue<Assignment[]> =>
   getAllPages({
-    query: (after: string) => getAssignments({...queryParams, after}),
+    query: (after: string) => getAssignments({...queryParams, after}, headers),
     getPageInfo: page => page.assignmentGroup.assignmentsConnection.pageInfo,
     flattenPages: pages =>
       flatten(pages.map(page => page.assignmentGroup.assignmentsConnection.nodes)),

@@ -38,7 +38,7 @@ describe('DatetimeField', () => {
   beforeEach(() => {
     fakeENV.setup()
     // Mock moment.localeData to provide firstDayOfWeek method
-    jest.spyOn(moment, 'localeData').mockImplementation(locale => ({
+    vi.spyOn(moment, 'localeData').mockImplementation(locale => ({
       firstDayOfWeek: () => 0,
       longDateFormat: _format => (locale === 'es' ? 'DD/MM/YYYY' : 'MM/DD/YYYY'),
     }))
@@ -58,7 +58,7 @@ describe('DatetimeField', () => {
 
   describe('processTimeOptions', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'warn').mockImplementation(() => {})
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
       createField()
     })
 
@@ -140,8 +140,8 @@ describe('DatetimeField', () => {
       const momentLocale = 'MOMENT_LOCALE'
       const firstDayOfWeek = 1
       ENV.MOMENT_LOCALE = momentLocale
-      jest.spyOn(moment, 'localeData').mockReturnValue({firstDayOfWeek: () => firstDayOfWeek})
-      const datepickerSpy = jest.spyOn($field, 'datepicker')
+      vi.spyOn(moment, 'localeData').mockReturnValue({firstDayOfWeek: () => firstDayOfWeek})
+      const datepickerSpy = vi.spyOn($field, 'datepicker')
       field.addDatePicker({})
       expect(moment.localeData).toHaveBeenCalledWith(momentLocale)
       expect(datepickerSpy).toHaveBeenCalledWith(
@@ -228,9 +228,9 @@ describe('DatetimeField', () => {
       field.fudged = fudgeDateForProfileTimezone(field.datetime)
       field.showDate = true
       field.allowTime = true
-      field.parseValue = jest.fn()
-      field.update = jest.fn()
-      field.updateSuggest = jest.fn()
+      field.parseValue = vi.fn()
+      field.update = vi.fn()
+      field.updateSuggest = vi.fn()
     })
 
     it('sets data fields', () => {
@@ -286,31 +286,31 @@ describe('DatetimeField', () => {
 
     it('puts formatSuggest result in suggest text', () => {
       const value = 'suggested value'
-      jest.spyOn(field, 'formatSuggest').mockReturnValue(value)
+      vi.spyOn(field, 'formatSuggest').mockReturnValue(value)
       field.updateSuggest()
       expect(field.$suggest.text()).toBe(value)
     })
 
     it('puts non-empty formatSuggestContext result with Course prefix in course suggest text', () => {
       const value = 'context value'
-      jest.spyOn(field, 'formatSuggestContext').mockReturnValue(value)
+      vi.spyOn(field, 'formatSuggestContext').mockReturnValue(value)
       field.updateSuggest()
       expect(field.$contextSuggest.text()).toBe(`Course: ${value}`)
     })
 
     it('adds Local prefix to suggest text if non-empty formatSuggestContext result', () => {
       const value = 'context value'
-      jest.spyOn(field, 'formatSuggestContext').mockReturnValue(value)
+      vi.spyOn(field, 'formatSuggestContext').mockReturnValue(value)
       const suggestValue = 'suggested value'
-      jest.spyOn(field, 'formatSuggest').mockReturnValue(suggestValue)
+      vi.spyOn(field, 'formatSuggest').mockReturnValue(suggestValue)
       field.updateSuggest()
       expect(field.$suggest.text()).toBe(`Local: ${suggestValue}`)
     })
 
     it('omits course suggest text if formatSuggestContext is empty', () => {
-      jest.spyOn(field, 'formatSuggestContext').mockReturnValue('')
+      vi.spyOn(field, 'formatSuggestContext').mockReturnValue('')
       const suggestValue = 'suggested value'
-      jest.spyOn(field, 'formatSuggest').mockReturnValue(suggestValue)
+      vi.spyOn(field, 'formatSuggest').mockReturnValue(suggestValue)
       field.updateSuggest()
       expect(field.$suggest.text()).toBe(suggestValue)
       expect(field.$contextSuggest.text()).toBe('')
@@ -331,7 +331,7 @@ describe('DatetimeField', () => {
       it('does not show example format while typing', () => {
         field.blank = false
         const value = '12/31/2020'
-        jest.spyOn(field, 'formatSuggest').mockReturnValue(value)
+        vi.spyOn(field, 'formatSuggest').mockReturnValue(value)
         field.updateSuggest(true)
         expect(field.$formatExample.text()).toBe('')
       })
@@ -363,7 +363,7 @@ describe('DatetimeField', () => {
   describe('screenreader alerts', () => {
     beforeEach(() => {
       createField()
-      field.debouncedSRFME = jest.fn()
+      field.debouncedSRFME = vi.fn()
     })
 
     it('alerts screenreader on an invalid parse no matter what', () => {
@@ -376,8 +376,8 @@ describe('DatetimeField', () => {
       const value = 'suggested value'
       const contextValue = 'context value'
       const combinedValue = `Local: ${value}\nCourse: ${contextValue}`
-      jest.spyOn(field, 'formatSuggest').mockReturnValue(value)
-      jest.spyOn(field, 'formatSuggestContext').mockReturnValue(contextValue)
+      vi.spyOn(field, 'formatSuggest').mockReturnValue(value)
+      vi.spyOn(field, 'formatSuggestContext').mockReturnValue(contextValue)
       field.$suggest = $('<div>').text(`Local: ${value}`)
       field.$contextSuggest = $('<div>').text(`Course: ${contextValue}`)
       $field.change()
@@ -386,7 +386,7 @@ describe('DatetimeField', () => {
 
     it('does not reflash same suggest text when key presses do not change anything', () => {
       const value = 'suggested value'
-      jest.spyOn(field, 'formatSuggest').mockReturnValue(value)
+      vi.spyOn(field, 'formatSuggest').mockReturnValue(value)
       $field.keyup()
       expect(field.debouncedSRFME).toHaveBeenCalledTimes(1)
       expect(field.debouncedSRFME).toHaveBeenCalledWith(value)

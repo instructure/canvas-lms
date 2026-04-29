@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {keys} from 'es-toolkit/compat'
 import * as timezone from '@instructure/moment-utils'
 import {scopeToUser, updateWithSubmissions} from '../EffectiveDueDates'
 
@@ -46,8 +46,8 @@ describe('EffectiveDueDates', () => {
 
     test('returns a map with effective due dates keyed to assignment ids', () => {
       const scopedDueDates = scopeToUser(exampleDueDatesData, '101')
-      expect(_.keys(scopedDueDates).sort()).toEqual(['201', '202'])
-      expect(_.keys(scopedDueDates[201]).sort()).toEqual([
+      expect(keys(scopedDueDates).sort()).toEqual(['201', '202'])
+      expect(keys(scopedDueDates[201]).sort()).toEqual([
         'due_at',
         'grading_period_id',
         'in_closed_grading_period',
@@ -66,7 +66,7 @@ describe('EffectiveDueDates', () => {
 
     test('excludes assignments not assigned to the given user', () => {
       const scopedDueDates = scopeToUser(exampleDueDatesData, '102')
-      expect(_.keys(scopedDueDates)).toEqual(['201'])
+      expect(keys(scopedDueDates)).toEqual(['201'])
       expect(scopedDueDates[201].due_at).toBe('2015-05-05T12:00:00Z')
       expect(scopedDueDates[201].grading_period_id).toBe('701')
       expect(scopedDueDates[201].in_closed_grading_period).toBe(true)

@@ -21,6 +21,9 @@ import {Flex} from '@instructure/ui-flex'
 import {BaseTableProps} from './SimpleTable'
 import SortableTable from './SortableTable'
 import useInsightStore from '../../hooks/useInsightStore'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('discussion_insights')
 
 export type PaginatedTableProps = BaseTableProps & {
   perPage: number
@@ -59,8 +62,8 @@ const PaginatedTable: React.FC<PaginatedTableProps> = ({caption, headers, rows, 
           <Pagination
             as="nav"
             variant="input"
-            labelNext="Next Page"
-            labelPrev="Previous Page"
+            labelNext={I18n.t('Next Page')}
+            labelPrev={I18n.t('Previous Page')}
             margin="small"
             currentPage={currentPage}
             onPageChange={handlePageChange}

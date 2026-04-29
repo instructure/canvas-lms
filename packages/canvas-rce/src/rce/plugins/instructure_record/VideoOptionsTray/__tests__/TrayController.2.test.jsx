@@ -25,6 +25,9 @@ import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 import bridge from '../../../../../bridge'
+import RCEGlobals from '../../../../RCEGlobals'
+
+import {findMediaPlayerIframe} from '../../../shared/iframeUtils'
 
 const mockVideoPlayers = [
   {
@@ -59,14 +62,19 @@ const mockVideoPlayers = [
   },
 ]
 
+let previousOrigin = ''
+
 beforeAll(() => {
-  contentSelection.asVideoElement = jest.fn(elem => {
-    const vid = elem.parentElement.getAttribute('id')
-    return mockVideoPlayers.find(vp => vp.id === vid)
+  jest.spyOn(contentSelection, 'asVideoElement').mockImplementation(elem => {
+    const vid = elem?.parentElement?.getAttribute('id')
+    return vid ? mockVideoPlayers.find(vp => vp.id === vid) : {}
   })
+  previousOrigin = bridge.canvasOrigin
+  bridge.canvasOrigin = 'http://localhost'
 })
 
 afterAll(() => {
+  bridge.canvasOrigin = previousOrigin
   jest.restoreAllMocks()
 })
 
@@ -86,6 +94,8 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       $videos.push($video)
       editor.appendElement($video)
       editor.setSelectedNode($video)
+      const iframe = findMediaPlayerIframe($video)
+      iframe.contentWindow.postMessage = jest.fn()
     })
 
     trayController = new TrayController()
@@ -152,7 +162,64 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(updateMediaObject).toHaveBeenCalledWith({
         attachment_id: '123',
         media_object_id: 'm_somevideo',
+        skipCaptionUpdate: false,
         subtitles: undefined,
+        title: 'new title',
+      })
+    })
+
+    it('sets skipCaptionUpdate to true when rce_asr_captioning_improvements flag is ON', () => {
+      const RCEGlobals = require('../../../../RCEGlobals').default
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({rce_asr_captioning_improvements: true})
+
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '321',
+        titleText: 'new title',
+        media_object_id: 'm_somevideo',
+        attachment_id: '123',
+        subtitles: [{locale: 'en', file: {name: 'test.vtt'}}],
+        updateMediaObject,
+      })
+
+      // skipCaptionUpdate should be true to prevent duplicate caption updates
+      expect(updateMediaObject).toHaveBeenCalledWith({
+        attachment_id: '123',
+        media_object_id: 'm_somevideo',
+        subtitles: [{locale: 'en', file: {name: 'test.vtt'}}],
+        skipCaptionUpdate: true,
+        title: 'new title',
+      })
+    })
+
+    it('sets skipCaptionUpdate to false when rce_asr_captioning_improvements flag is OFF', () => {
+      const RCEGlobals = require('../../../../RCEGlobals').default
+      jest
+        .spyOn(RCEGlobals, 'getFeatures')
+        .mockReturnValue({rce_asr_captioning_improvements: false})
+
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '321',
+        titleText: 'new title',
+        media_object_id: 'm_somevideo',
+        attachment_id: '123',
+        subtitles: [{locale: 'en', file: {name: 'test.vtt'}}],
+        updateMediaObject,
+      })
+
+      // skipCaptionUpdate should be false to allow caption updates
+      expect(updateMediaObject).toHaveBeenCalledWith({
+        attachment_id: '123',
+        media_object_id: 'm_somevideo',
+        subtitles: [{locale: 'en', file: {name: 'test.vtt'}}],
+        skipCaptionUpdate: false,
         title: 'new title',
       })
     })
@@ -193,9 +260,30 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(updateMediaObject).toHaveBeenCalledWith({
         attachment_id: '123',
         media_object_id: undefined,
+        skipCaptionUpdate: false,
         subtitles: undefined,
         title: 'new title',
       })
+    })
+
+    it('passes viewerRestrictions to updateMediaObject', () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '321',
+        titleText: 'new title',
+        media_object_id: 'm_somevideo',
+        attachment_id: '123',
+        viewerRestrictions: {show_rolling_transcript: true},
+        updateMediaObject,
+      })
+      expect(updateMediaObject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          viewerRestrictions: {show_rolling_transcript: true},
+        }),
+      )
     })
 
     it('does not try to save data to the db on a locked media attachment', () => {
@@ -231,20 +319,9 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   })
 
   describe('#requestSubtitlesFromIframe', () => {
-    let previousOrigin = ''
-
-    beforeAll(() => {
-      previousOrigin = bridge.canvasOrigin
-      bridge.canvasOrigin = 'http://localhost'
-    })
-
-    afterAll(() => {
-      bridge.canvasOrigin = previousOrigin
-    })
-
     it('posts message to iframe onload', () => {
       const postMessageMock = jest.fn()
-      const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
+      const iframe = findMediaPlayerIframe(editors[0].selection.getNode())
       iframe.contentWindow.postMessage = postMessageMock
       trayController.showTrayForEditor(editors[0])
       expect(postMessageMock).toHaveBeenCalledTimes(1)
@@ -252,7 +329,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
 
     it('cleans up event listener on tray close', () => {
       const postMessageMock = jest.fn()
-      const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
+      const iframe = findMediaPlayerIframe(editors[0].selection.getNode())
       iframe.contentWindow.postMessage = postMessageMock
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])
@@ -277,6 +354,174 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       msgEvent.data = {subject: 'wrong_response', payload: [{locale: 'en'}]}
       window.dispatchEvent(msgEvent)
       expect(eventMock).toHaveBeenCalledTimes(0)
+    })
+  })
+
+  describe('focus behavior on tray close', () => {
+    beforeEach(() => {
+      jest.spyOn(bridge, 'focusActiveEditor')
+    })
+
+    afterEach(() => {
+      bridge.focusActiveEditor.mockRestore()
+    })
+
+    it('calls bridge.focusActiveEditor when closing normally', async () => {
+      trayController.showTrayForEditor(editors[0])
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+      expect(bridge.focusActiveEditor).toHaveBeenCalledWith(false)
+    })
+
+    it('does not call bridge.focusActiveEditor when skipFocusOnExit is true', async () => {
+      trayController.showTrayForEditor(editors[0])
+      trayController.hideTrayForEditor(editors[0], true)
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+      expect(bridge.focusActiveEditor).not.toHaveBeenCalled()
+    })
+
+    it('resets skipFocusOnExit flag after tray closes', async () => {
+      trayController.showTrayForEditor(editors[0])
+      trayController.hideTrayForEditor(editors[0], true)
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+      expect(bridge.focusActiveEditor).not.toHaveBeenCalled()
+
+      bridge.focusActiveEditor.mockClear()
+
+      trayController.showTrayForEditor(editors[0])
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+      expect(bridge.focusActiveEditor).toHaveBeenCalledWith(false)
+    })
+  })
+
+  describe('caption reload on tray dismiss', () => {
+    it('does NOT reload iframe on dismiss when feature flag is OFF', async () => {
+      // Mock feature flag OFF
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: false,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Spy on the _reloadVideoPlayer method
+      const reloadSpy = jest.spyOn(trayController, '_reloadVideoPlayer')
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+
+      // Close tray
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+
+      // Assert: reload should NOT be called (old behavior preserved)
+      expect(reloadSpy).not.toHaveBeenCalled()
+
+      // Cleanup
+      reloadSpy.mockRestore()
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('reloads iframe on dismiss when feature flag is ON and captions were modified', async () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Spy on the _reloadVideoPlayer method
+      const reloadSpy = jest.spyOn(trayController, '_reloadVideoPlayer')
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+
+      // Close tray
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull(), {timeout: 2000})
+
+      // Assert: reload SHOULD be called
+      expect(reloadSpy).toHaveBeenCalledTimes(1)
+
+      // Cleanup
+      reloadSpy.mockRestore()
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('does NOT reload iframe on dismiss when feature flag is ON but captions were NOT modified', async () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Spy on the _reloadVideoPlayer method
+      const reloadSpy = jest.spyOn(trayController, '_reloadVideoPlayer')
+
+      // Do NOT modify captions (trayController._captionsModified stays false)
+
+      // Close tray
+      trayController.hideTrayForEditor(editors[0])
+      await waitFor(() => expect(getTray()).toBeNull())
+
+      // Assert: reload should NOT be called (no changes made)
+      expect(reloadSpy).not.toHaveBeenCalled()
+
+      // Cleanup
+      reloadSpy.mockRestore()
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('resets caption modified flag when opening tray again', () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+      expect(trayController._captionsModified).toBe(true)
+
+      // Close and reopen
+      trayController.hideTrayForEditor(editors[0])
+      trayController.showTrayForEditor(editors[0])
+
+      // Assert: flag should be reset to false
+      expect(trayController._captionsModified).toBe(false)
+
+      // Cleanup
+      getFeaturesSpy.mockRestore()
+    })
+
+    it('does not crash when video container is null on dismiss', async () => {
+      // Mock feature flag ON
+      const getFeaturesSpy = jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({
+        rce_asr_captioning_improvements: true,
+      })
+
+      // Open tray
+      trayController.showTrayForEditor(editors[0])
+
+      // Simulate caption modification
+      trayController._captionsModified = true
+
+      // Clear video container (edge case)
+      trayController.$videoContainer = null
+
+      // Close tray - should not crash
+      expect(() => {
+        trayController.hideTrayForEditor(editors[0])
+      }).not.toThrow()
+
+      // Cleanup
+      getFeaturesSpy.mockRestore()
     })
   })
 })

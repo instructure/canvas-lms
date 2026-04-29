@@ -22,13 +22,13 @@ import {useManageThreadedRepliesStore} from '../../../hooks/useManageThreadedRep
 import DiscussionTable from '../DiscussionTable'
 
 // Mock the store hook
-jest.mock('../../../hooks/useManageThreadedRepliesStore')
-const mockedUseManageThreadedRepliesStore = useManageThreadedRepliesStore as unknown as jest.Mock
+vi.mock('../../../hooks/useManageThreadedRepliesStore')
+const mockedUseManageThreadedRepliesStore = useManageThreadedRepliesStore as unknown as any
 
 describe('DiscussionTable', () => {
-  const mockToggleSelectedDiscussions = jest.fn()
-  const mockSetDiscussionState = jest.fn()
-  const mockToggleSelectedDiscussion = jest.fn()
+  const mockToggleSelectedDiscussions = vi.fn()
+  const mockSetDiscussionState = vi.fn()
+  const mockToggleSelectedDiscussion = vi.fn()
   const mockState = {
     showAlert: true,
     selectedDiscussions: [],
@@ -40,8 +40,8 @@ describe('DiscussionTable', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    mockedUseManageThreadedRepliesStore.mockImplementation(selector => selector(mockState))
+    vi.clearAllMocks()
+    mockedUseManageThreadedRepliesStore.mockImplementation((selector: any) => selector(mockState))
   })
 
   const discussions = [
@@ -75,7 +75,7 @@ describe('DiscussionTable', () => {
     fireEvent.click(selectAllCheckbox)
     expect(mockToggleSelectedDiscussions).toHaveBeenCalledWith(['1', '2'])
 
-    mockedUseManageThreadedRepliesStore.mockImplementation(selector =>
+    mockedUseManageThreadedRepliesStore.mockImplementation((selector: any) =>
       selector({
         ...mockState,
         selectedDiscussions: ['1', '2'],
@@ -89,7 +89,7 @@ describe('DiscussionTable', () => {
   })
 
   it('handles "Set to Threaded" button click', () => {
-    mockedUseManageThreadedRepliesStore.mockImplementation(selector =>
+    mockedUseManageThreadedRepliesStore.mockImplementation((selector: any) =>
       selector({
         ...mockState,
         selectedDiscussions: ['1'],
@@ -105,7 +105,7 @@ describe('DiscussionTable', () => {
   })
 
   it('handles "Set to Not threaded" button click', () => {
-    mockedUseManageThreadedRepliesStore.mockImplementation(selector =>
+    mockedUseManageThreadedRepliesStore.mockImplementation((selector: any) =>
       selector({
         ...mockState,
         selectedDiscussions: ['2'],

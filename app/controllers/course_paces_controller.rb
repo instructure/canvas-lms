@@ -339,7 +339,7 @@ class CoursePacesController < ApplicationController
              PACES_PUBLISHING: paces_publishing,
              CONTEXT_URL_ROOT: polymorphic_path([@context])
            },
-           true)
+           overwrite: true)
     js_bundle :course_paces
     css_bundle :course_paces
   end
@@ -449,7 +449,7 @@ class CoursePacesController < ApplicationController
   end
 
   # @API Create a Course pace
-  #
+  # Creates a new course pace with specified parameters.
   # @argument course_id [Required, Integer]
   #   The id of the course
   #
@@ -513,7 +513,7 @@ class CoursePacesController < ApplicationController
         progress: @progress.present? ? progress_json(@progress, @current_user, session) : nil
       }
     else
-      render json: { success: false, errors: @course_pace.errors.full_messages }, status: :unprocessable_entity
+      render json: { success: false, errors: @course_pace.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -582,7 +582,7 @@ class CoursePacesController < ApplicationController
         progress: @progress.present? ? progress_json(@progress, @current_user, session) : nil
       }
     else
-      render json: { success: false, errors: @course_pace.errors.full_messages }, status: :unprocessable_entity
+      render json: { success: false, errors: @course_pace.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -599,22 +599,23 @@ class CoursePacesController < ApplicationController
     end
 
     unless @course_pace.valid?
-      return render json: { success: false, errors: @course_pace.errors.full_messages }, status: :unprocessable_entity
+      return render json: { success: false, errors: @course_pace.errors.full_messages }, status: :unprocessable_content
     end
 
     @course_pace.course = @course
     start_date = params.dig(:course_pace, :start_date).present? ? Date.parse(params.dig(:course_pace, :start_date)) : @course_pace.start_date
 
     if @course_pace.end_date && start_date && @course_pace.end_date < start_date
-      return render json: { success: false, errors: "End date cannot be before start date" }, status: :unprocessable_entity
+      return render json: { success: false, errors: "End date cannot be before start date" }, status: :unprocessable_content
     end
 
-    compressed_module_items = @course_pace.compress_dates(save: false, start_date:)
-                                          .sort_by { |ppmi| ppmi.module_item.position }
-                                          .group_by { |ppmi| ppmi.module_item.context_module }
-                                          .sort_by { |context_module, _items| context_module.position }
-                                          .to_h.values.flatten
-    compressed_dates = CoursePaceDueDatesCalculator.new(@course_pace).get_due_dates(compressed_module_items, start_date:)
+    # Wrap date calculations in the course timezone to match the publish path
+    compressed_dates = Time.use_zone(@course.time_zone) do
+      # Compressor handles sorting internally, so no need to sort after
+      compressed_module_items = @course_pace.compress_dates(save: false, start_date:)
+
+      CoursePaceDueDatesCalculator.new(@course_pace).get_due_dates(compressed_module_items, start_date:)
+    end
 
     render json: compressed_dates.to_json
   end
@@ -639,7 +640,7 @@ class CoursePacesController < ApplicationController
     return unless authorized_action(@course, @current_user, :manage_course_content_delete)
 
     if @course_pace.primary? && @course_pace.published?
-      return render json: { success: false, errors: t("You cannot delete the default course pace.") }, status: :unprocessable_entity
+      return render json: { success: false, errors: t("You cannot delete the default course pace.") }, status: :unprocessable_content
     end
 
     was_published = @course_pace.published?
@@ -732,7 +733,7 @@ class CoursePacesController < ApplicationController
   def load_calendar_event_blackout_dates
     account_codes = Account.multi_account_chain_ids([@context.account.id]).map { |id| "account_#{id}" }
     context_codes = account_codes.append("course_#{@context.id}")
-    @calendar_event_blackout_dates = CalendarEvent.with_blackout_date.active.for_context_codes(context_codes)
+    @calendar_event_blackout_dates = CalendarEvent.with_blackout_date.active.valid_ranges.for_context_codes(context_codes)
   end
 
   def update_params

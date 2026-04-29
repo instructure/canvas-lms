@@ -34,6 +34,6 @@ module Types
       !!object.mastery
     end
 
-    field :points, Float, null: true
+    field :points, Float, null: false
   end
 end

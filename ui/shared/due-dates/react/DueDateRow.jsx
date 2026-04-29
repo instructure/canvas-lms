@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {groupBy, map, reduce, union} from 'lodash'
+import {groupBy, union, map, reduce} from 'es-toolkit/compat'
 import React from 'react'
 import PropTypes from 'prop-types'
 import DueDateTokenWrapper from './DueDateTokenWrapper'

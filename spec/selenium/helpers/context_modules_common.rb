@@ -21,10 +21,10 @@ require_relative "../common"
 
 module ContextModulesCommon
   def io
-    fixture_file_upload("docs/txt.txt", "text/plain", true)
+    fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
   end
 
-  def create_modules(number_to_create, published = false)
+  def create_modules(number_to_create, published: false)
     modules = []
     number_to_create.times do |i|
       m = @course.context_modules.create!(name: "module #{i}")
@@ -91,8 +91,11 @@ module ContextModulesCommon
   def ignore_relock
     scroll_to_the_top_of_modules_page
     continue_button_selector = "//*[contains(@class, 'ui-dialog') and not(contains(@style, 'display: none')) and ./*[@id = 'relock_modules_dialog']]//button[. = 'Continue']"
-    if element_exists?(continue_button_selector, true)
+    presave_continue_button_selector = "[data-testid='continue-without-relock-button']"
+    if element_exists?(continue_button_selector, xpath: true)
       fxpath(continue_button_selector).click
+    elsif element_exists?(presave_continue_button_selector)
+      f(presave_continue_button_selector).click
     end
   end
 
@@ -406,7 +409,7 @@ module ContextModulesCommon
   end
 
   def create_module_with_two_items
-    modules = create_modules(1, true)
+    modules = create_modules(1, published: true)
     modules[0].add_item({ id: @assignment.id, type: "assignment" })
     modules[0].add_item({ id: @assignment2.id, type: "assignment" })
     modules[0]
@@ -425,6 +428,23 @@ module ContextModulesCommon
   def uncollapse_modules(modules, user)
     modules.each do |mod|
       mod.find_or_create_progression(user)&.uncollapse!
+    end
+  end
+
+  def verify_publication_state(modules, module_published:, items_published:)
+    modules.each do |mod|
+      mod.reload
+      expect(mod.published?).to eq(module_published)
+      mod.content_tags.each do |tag|
+        expect(tag.published?).to eq(items_published)
+      end
+    end
+  end
+
+  def prepare_unpublished_modules(modules)
+    modules.each do |mod|
+      mod.update(workflow_state: "unpublished")
+      mod.unpublish_items!
     end
   end
 end

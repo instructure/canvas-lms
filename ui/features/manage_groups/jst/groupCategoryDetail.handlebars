@@ -54,6 +54,13 @@
           {{#ifEqual ENV.group_user_type "student"}}
           {{#if canManage}}
           <li>
+            <a href="{{downloadGroupCategoryRosterCSVPath}}" class="icon-download download-group-category-roster-csv">
+              {{#t}}Download Group Category Roster CSV{{/t}}
+            </a>
+          </li>
+          {{/if}}
+          {{#if canManage}}
+          <li>
             <a href="#" class="icon-copy-course clone-category">
               {{#t}}Clone Group Set{{/t}}
             </a>

@@ -23,28 +23,28 @@ const buildModule = published => new Publishable({published}, {url: '/api/1/2/3'
 describe('Publishable:', () => {
   test('publish updates the state of the model', () => {
     const cModule = buildModule(false)
-    cModule.save = jest.fn()
+    cModule.save = vi.fn()
     cModule.publish()
     expect(cModule.get('published')).toBeTruthy()
   })
 
   test('publish saves to the server', () => {
     const cModule = buildModule(true)
-    cModule.save = jest.fn()
+    cModule.save = vi.fn()
     cModule.publish()
     expect(cModule.save).toHaveBeenCalledTimes(1)
   })
 
   test('unpublish updates the state of the model', () => {
     const cModule = buildModule(true)
-    cModule.save = jest.fn()
+    cModule.save = vi.fn()
     cModule.unpublish()
     expect(cModule.get('published')).toBeFalsy()
   })
 
   test('unpublish saves to the server', () => {
     const cModule = buildModule(true)
-    cModule.save = jest.fn()
+    cModule.save = vi.fn()
     cModule.unpublish()
     expect(cModule.save).toHaveBeenCalledTimes(1)
   })

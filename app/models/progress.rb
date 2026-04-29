@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Progress < ActiveRecord::Base
+class Progress < ApplicationRecord
   belongs_to :context, polymorphic: [
     :content_migration,
     :course,
@@ -46,9 +46,10 @@ class Progress < ActiveRecord::Base
   serialize :results
   attr_reader :total
 
-  scope :is_pending, -> { where(workflow_state: ["queued", "running"]) }
+  scope :is_pending, -> { where(workflow_state: %w[queued running waiting_for_external_tool]) }
 
   include Workflow
+
   workflow do
     state :queued do
       event :start, transitions_to: :running
@@ -56,6 +57,11 @@ class Progress < ActiveRecord::Base
       event :cancel, transitions_to: :canceled
     end
     state :running do
+      event(:complete, transitions_to: :completed) { self.completion = 100 }
+      event :fail, transitions_to: :failed
+      event :wait_for_external_tool, transitions_to: :waiting_for_external_tool
+    end
+    state :waiting_for_external_tool do
       event(:complete, transitions_to: :completed) { self.completion = 100 }
       event :fail, transitions_to: :failed
     end
@@ -105,7 +111,7 @@ class Progress < ActiveRecord::Base
   end
 
   def pending?
-    queued? || running?
+    queued? || running? || waiting_for_external_tool?
   end
 
   # Tie this Progress model to a delayed job. Rather than `obj.delay.long_method`, use:

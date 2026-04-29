@@ -20,7 +20,9 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import CoursePeopleHeader from '../CoursePeopleHeader'
 
-jest.mock('../CoursePeopleOptionsMenu', () => () => <div>Options Menu</div>)
+vi.mock('../CoursePeopleOptionsMenu', () => ({
+  default: () => <div>Options Menu</div>,
+}))
 
 describe('CoursePeopleHeader', () => {
   it('renders the heading with the correct text', () => {

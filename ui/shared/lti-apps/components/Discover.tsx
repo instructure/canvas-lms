@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 import {Alert} from '@instructure/ui-alerts'
 import {useQuery, QueryFunction} from '@tanstack/react-query'
 import {useMemo, useState} from 'react'
@@ -105,7 +105,6 @@ export const Discover = () => {
       <Disclaimer />
 
       {filterData && (
-        // @ts-expect-error
         <LtiFilterTray
           isTrayOpen={isTrayOpen}
           setIsTrayOpen={setIsTrayOpen}

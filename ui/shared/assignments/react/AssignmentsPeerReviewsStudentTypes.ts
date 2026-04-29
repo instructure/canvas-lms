@@ -1,0 +1,184 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+export interface Attachment {
+  _id: string
+  displayName: string
+  mimeClass: string
+  size: string
+  thumbnailUrl?: string | null
+  submissionPreviewUrl?: string | null
+  url?: string | null
+}
+
+export interface MediaObject {
+  _id: string
+  mediaType: string | null
+  title: string | null
+}
+
+export interface RubricAssessmentRating {
+  _id: string
+  criterion: {
+    _id: string
+  }
+  comments?: string | null
+  commentsHtml?: string | null
+  description?: string | null
+  points: number
+}
+
+export interface RubricAssessmentNode {
+  _id: string
+  assessmentType: string
+  score: number
+  assessor: {
+    _id: string
+  }
+  assessmentRatings: RubricAssessmentRating[]
+}
+
+export interface Submission {
+  _id: string
+  id?: string
+  attempt: number
+  body?: string | null
+  submissionType: string
+  url?: string | null
+  attachments?: Attachment[] | null
+  user?: {
+    _id: string
+  } | null
+  anonymousId?: string | null
+  submittedAt?: string | null
+  mediaObject?: MediaObject | null
+}
+
+export interface PeerReviewSubAssignment {
+  dueAt: string | null
+  unlockAt: string | null
+  lockAt: string | null
+}
+
+export interface RubricRating {
+  _id: string
+  description: string
+  longDescription?: string
+  points: number
+}
+
+export interface RubricCriterion {
+  _id: string
+  description: string
+  longDescription?: string
+  points: number
+  criterionUseRange?: boolean
+  ratings: RubricRating[]
+  ignoreForScoring?: boolean
+  masteryPoints?: number
+  learningOutcomeId?: string
+}
+
+export interface Rubric {
+  _id: string
+  title: string
+  criteria: RubricCriterion[]
+  freeFormCriterionComments?: boolean
+  hideScoreTotal?: boolean
+  pointsPossible: number
+  ratingOrder?: string
+  buttonDisplay?: string
+}
+
+export interface RubricAssociation {
+  _id: string
+  hidePoints?: boolean
+  hideScoreTotal?: boolean
+  useForGrading?: boolean
+}
+
+export interface Assignment {
+  _id: string
+  name: string
+  dueAt: string | null
+  description: string | null
+  expectsSubmission: boolean
+  nonDigitalSubmission: boolean
+  pointsPossible: number
+  courseId: string
+  peerReviews: PeerReviews | null
+  peerReviewSubAssignment: PeerReviewSubAssignment | null
+  submissionsConnection: SubmissionsConnection | null
+  assessmentRequestsForCurrentUser: AssessmentRequest[] | null
+  rubric?: Rubric | null
+  rubricAssociation?: RubricAssociation | null
+  env?: {
+    currentUser?: {
+      avatar_image_url?: string
+      display_name?: string
+    }
+    courseId?: string
+  }
+}
+
+export interface AssessmentRequest {
+  _id: string
+  available: boolean | null
+  workflowState: string
+  createdAt: string
+  anonymousId: string | null
+  anonymizedUser: {
+    _id: string
+    displayName: string
+  } | null
+  submission: Submission | null
+  rubricAssessment?: {
+    _id: string
+    assessmentRatings: RubricAssessmentRating[]
+  } | null
+}
+
+interface PeerReviews {
+  count: number | null
+  submissionRequired: boolean | null
+  pointsPossible: number | null
+  anonymousReviews: boolean | null
+}
+
+interface SubmissionsConnection {
+  nodes: SubmissionNode[] | null
+}
+
+interface SubmissionNode {
+  _id: string
+  submittedAt: string | null
+}
+
+export interface ReviewerSubmission {
+  _id: string
+  id: string
+  attempt: number
+  assignedAssessments: {
+    assetId: string
+    workflowState: string
+    assetSubmissionType: string | null
+  }[]
+  rubricAssessmentsConnection?: {
+    nodes: RubricAssessmentNode[]
+  } | null
+}

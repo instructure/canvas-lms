@@ -45,8 +45,6 @@ describe "Standard Common Cartridge importing" do
       expect(a.description.delete("\n")).to eq "You should turn this in for points.<ul><li><a href=\"/courses/#{@course.id}/files/#{att.id}/preview\">common.html</a></li></ul>"
       a.submission_types = "online_upload,online_text_entry,online_url"
     end
-
-    it "should import multiple question banks"
   end
 
   def import_from_file(filename)

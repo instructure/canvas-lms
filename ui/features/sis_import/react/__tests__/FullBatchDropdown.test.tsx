@@ -21,8 +21,11 @@ import FullBatchDropdown from '../FullBatchDropdown'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
 import {EnrollmentTerms, Term} from 'api'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import userEvent from '@testing-library/user-event'
+
+const server = setupServer()
 
 const allTerms: Term[] = [
   {
@@ -37,10 +40,12 @@ const allTerms: Term[] = [
     start_at: '',
     end_at: '',
   },
+  {id: '3', name: 'Spring 1998', start_at: '', end_at: ''},
+  {id: '4', name: 'Spring', start_at: '', end_at: ''},
 ]
 
 const props = {
-  onSelect: jest.fn(),
+  onSelect: vi.fn(),
   accountId: '1',
   isVisible: true,
 }
@@ -55,20 +60,36 @@ const renderDropdown = (overrides = {}) => {
   )
 }
 
+// Store dynamic term filters that can be set per-test
+const termFilters: Map<string, EnrollmentTerms> = new Map()
+
 const mockQuery = (termName: string, terms: EnrollmentTerms) => {
-  fetchMock.get(
-    `/api/v1/accounts/${props.accountId}/terms?per_page=100&page=1&term_name=${termName}`,
-    terms,
-  )
+  termFilters.set(termName, terms)
 }
 
 describe('FullBatchDropdown', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    mockQuery('', {enrollment_terms: allTerms})
+    termFilters.clear()
+    termFilters.set('', {enrollment_terms: allTerms})
+
+    server.use(
+      http.get(`/api/v1/accounts/${props.accountId}/terms`, ({request}) => {
+        const url = new URL(request.url)
+        const requestedTermName = url.searchParams.get('term_name') || ''
+        const terms = termFilters.get(requestedTermName)
+        if (terms) {
+          return HttpResponse.json(terms)
+        }
+        return HttpResponse.json({enrollment_terms: []})
+      }),
+    )
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     queryClient.clear()
   })
 
@@ -124,5 +145,22 @@ describe('FullBatchDropdown', () => {
     await user.click(option1)
 
     expect(props.onSelect).toHaveBeenCalledWith('1')
+  })
+
+  it('sticks to the selected option after blurring', async () => {
+    const user = userEvent.setup()
+    const {getByTestId} = renderDropdown(props)
+
+    const dropdown = getByTestId('full-batch-dropdown')
+    await user.click(dropdown)
+    const option1 = getByTestId('option-4')
+    await user.click(option1)
+
+    expect(props.onSelect).toHaveBeenCalledWith('4')
+
+    dropdown.blur()
+    await waitFor(() => {
+      expect(dropdown).toHaveValue('Spring')
+    })
   })
 })

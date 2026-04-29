@@ -80,4 +80,98 @@ describe('PastMessages', () => {
       expect(getAllByText(expectedDate).length > 0).toBe(true)
     })
   })
+
+  it('decodes HTML entities in author names', () => {
+    const props = {
+      messages: [
+        {
+          author: {
+            name: 'John O&#39;Brien',
+          },
+          body: 'Test message',
+          createdAt: 'TA 3019',
+        },
+        {
+          author: {
+            name: 'Alice &amp; Bob',
+          },
+          body: 'Another test',
+          createdAt: 'TA 3019',
+        },
+      ],
+    }
+
+    const {getByText} = render(<PastMessages {...props} />)
+
+    expect(getByText("John O'Brien")).toBeInTheDocument()
+    expect(getByText('Alice & Bob')).toBeInTheDocument()
+  })
+
+  it('handles empty author name', () => {
+    const props = {
+      messages: [
+        {
+          author: {
+            name: '',
+          },
+          body: 'Test message',
+          createdAt: 'TA 3019',
+        },
+      ],
+    }
+
+    const {getByText} = render(<PastMessages {...props} />)
+
+    expect(getByText('DELETED USER')).toBeInTheDocument()
+    expect(getByText('Test message')).toBeInTheDocument()
+  })
+
+  it('handles null or undefined author', () => {
+    const props = {
+      messages: [
+        {
+          author: null,
+          body: 'Message from null author',
+          createdAt: 'TA 3019',
+        },
+        {
+          author: undefined,
+          body: 'Message from undefined author',
+          createdAt: 'TA 3019',
+        },
+      ],
+    }
+
+    const {getAllByText, getByText} = render(<PastMessages {...props} />)
+
+    expect(getAllByText('DELETED USER')).toHaveLength(2)
+    expect(getByText('Message from null author')).toBeInTheDocument()
+    expect(getByText('Message from undefined author')).toBeInTheDocument()
+  })
+
+  it('handles author names with HTML tags', () => {
+    const props = {
+      messages: [
+        {
+          author: {
+            name: 'John &lt;script&gt;alert()&lt;/script&gt; Doe',
+          },
+          body: 'Test message',
+          createdAt: 'TA 3019',
+        },
+        {
+          author: {
+            name: 'Jane &lt;b&gt;Bold&lt;/b&gt; Smith',
+          },
+          body: 'Another message',
+          createdAt: 'TA 3019',
+        },
+      ],
+    }
+
+    const {getByText} = render(<PastMessages {...props} />)
+
+    expect(getByText('John <script>alert()</script> Doe')).toBeInTheDocument()
+    expect(getByText('Jane <b>Bold</b> Smith')).toBeInTheDocument()
+  })
 })

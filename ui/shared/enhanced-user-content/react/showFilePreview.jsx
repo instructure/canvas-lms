@@ -17,10 +17,10 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {instanceOf} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import FilePreview from '@canvas/files/react/components/FilePreview'
 import File from '@canvas/files/backbone/models/File'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
@@ -46,23 +46,24 @@ export function showFilePreview(
     document.body.appendChild(container)
   }
 
-  if (!root) {
-    root = createRoot(container)
-  }
-
   let url = `/api/v1/files/${file_id}?include[]=enhanced_preview_url`
-  if (verifier) {
+  if (location) {
+    url += `&location=${encodeURIComponent(location)}`
+  } else if (verifier) {
     url += `&verifier=${verifier}`
   } else if (access_token && instfs_id) {
     url += `&access_token=${access_token}&instfs_id=${instfs_id}`
-  } else if (location) {
-    url += `&location=${encodeURIComponent(location)}`
   }
 
   asJson(fetch(url, defaultFetchOptions()))
     .then(file => {
       const backboneFile = new File(file)
-      root.render(<StandaloneFilePreview preview_file={backboneFile} />)
+      const element = <StandaloneFilePreview preview_file={backboneFile} />
+      if (!root) {
+        root = render(element, container)
+      } else {
+        rerender(root, element)
+      }
     })
     .catch(err => {
       showFlashAlert({

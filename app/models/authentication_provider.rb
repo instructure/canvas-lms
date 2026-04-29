@@ -19,12 +19,13 @@
 #
 
 require "net-ldap"
-require "net_ldap_extensions"
 NetLdapExtensions.apply
 
-class AuthenticationProvider < ActiveRecord::Base
+class AuthenticationProvider < ApplicationRecord
   include Workflow
+
   validates :auth_filter, length: { maximum: maximum_text_length, allow_blank: true }
+  validate :not_in_discovery_page
 
   DEBUG_EXPIRE = 30.minutes
 
@@ -101,8 +102,10 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   scope :active, -> { where.not(workflow_state: "deleted") }
+  scope :valid_for_discovery_page, -> { active }
   belongs_to :account
   include ::Canvas::RootAccountCacher
+
   has_many :pseudonyms, inverse_of: :authentication_provider
   acts_as_list scope: { account: self, workflow_state: [nil, "active"] }
 
@@ -156,6 +159,36 @@ class AuthenticationProvider < ActiveRecord::Base
     return unless provider_class.singleton? && provider_class.restorable?
 
     root_account.authentication_providers.where.not(workflow_state: :active).find_by(auth_type:)
+  end
+
+  def used_on_discovery_page?
+    return false unless persisted?
+    return false unless account.discovery_page_allowed?
+    return false unless account.discovery_page_active?
+
+    provider_used = ->(configured_provider) { configured_provider[:authentication_provider_id]&.to_i == id }
+    discovery_configuration = account.settings[:discovery_page]
+
+    discovery_configuration[:primary].any?(&provider_used) || discovery_configuration[:secondary].any?(&provider_used)
+  end
+
+  def creation_timeout_options
+    { raise_on_timeout: true, fallback_timeout_length: 10.seconds, exception_class: Timeout::Error }
+  end
+
+  def login_authentication_provider_path
+    unless self.class.valid_auth_types.include? self.class.sti_name
+      raise ActionController::UrlGenerationError, "No route matches #{self.class.sti_name} authentication provider"
+    end
+
+    base_path = "/login/#{self.class.sti_name}"
+    return base_path if self.class.singleton?
+
+    unless persisted?
+      raise ActionController::UrlGenerationError, "Cannot generate URL for unsaved authentication provider"
+    end
+
+    "#{base_path}/#{id}"
   end
 
   def visible_to?(_user)
@@ -235,6 +268,11 @@ class AuthenticationProvider < ActiveRecord::Base
     settings["federated_attributes"] ||= {}
   end
 
+  def show_mfa_configuration_options?
+    account.mfa_settings != :disabled &&
+      (auth_type != "canvas" || account.mfa_settings != :required)
+  end
+
   def mfa_required?
     return false if account.mfa_settings == :disabled
     return true if account.mfa_settings == :required
@@ -299,7 +337,7 @@ class AuthenticationProvider < ActiveRecord::Base
     time_zone
   ].freeze
 
-  def provision_user(unique_ids, provider_attributes = {})
+  def provision_user(unique_ids, provider_attributes = {}, default_name = nil)
     unique_id = nil
     User.transaction(requires_new: true) do
       if unique_ids.is_a?(Hash)
@@ -308,13 +346,13 @@ class AuthenticationProvider < ActiveRecord::Base
         unique_id = unique_ids
         unique_ids = {}
       end
+      user = User.new(default_name: default_name || unique_id, workflow_state: "registered")
       pseudonym = account.pseudonyms.build
-      pseudonym.user = User.create!(name: unique_id) { |u| u.workflow_state = "registered" }
+      pseudonym.user = user
       pseudonym.authentication_provider = self
       pseudonym.unique_id = unique_id
       pseudonym.unique_ids = unique_ids
-      pseudonym.save!
-      apply_federated_attributes(pseudonym, provider_attributes, purpose: :provisioning)
+      apply_federated_attributes(pseudonym, provider_attributes, purpose: :provisioning, strict: true)
       try(:post_provision_user, pseudonym:, provider_attributes:)
       pseudonym
     end
@@ -324,11 +362,14 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   end
 
-  def apply_federated_attributes(pseudonym, provider_attributes, purpose: :login)
+  def apply_federated_attributes(pseudonym, provider_attributes, purpose: :login, translate_attributes: true, strict: false)
     user = pseudonym.user
 
-    canvas_attributes = translate_provider_attributes(provider_attributes,
-                                                      purpose:)
+    canvas_attributes = translate_attributes ? translate_provider_attributes(provider_attributes) : provider_attributes.dup
+    # Only should matter when translate_attributes == false, but safe regardless
+    canvas_attributes.delete_if { |k, _| !federated_attributes[k] }
+    canvas_attributes.delete_if { |k, _| federated_attributes[k]["provisioning_only"] } if purpose != :provisioning
+
     given_name = canvas_attributes.delete("given_name")
     surname = canvas_attributes.delete("surname")
     if given_name || surname
@@ -368,6 +409,13 @@ class AuthenticationProvider < ActiveRecord::Base
           pseudonym[attribute] = value
         when "display_name"
           user.short_name = value
+
+          # Previously, there was an issue where setting the short_name would not
+          # propagate to the name if no other name attributes were set, resulting in
+          # the name being the unique_id. Fix that the first time we get a display_name.
+          if user.name == pseudonym.unique_id
+            user.name = value
+          end
         when "email"
           next if value.empty?
 
@@ -381,8 +429,11 @@ class AuthenticationProvider < ActiveRecord::Base
               cc.workflow_state = "unconfirmed"
             end
             if cc.changed?
-              cc.save!
-              cc.send_confirmation!(pseudonym.account) unless autoconfirm
+              if cc.save
+                cc.send_confirmation!(pseudonym.account) unless autoconfirm
+              else
+                logger.warn("Unable to save federated email #{email} for user #{user.id}: #{cc.errors.full_messages.join(", ")}")
+              end
             end
           end
         when "locale"
@@ -405,13 +456,16 @@ class AuthenticationProvider < ActiveRecord::Base
           user.send(:"#{attribute}=", value)
         end
       end
-      if pseudonym.changed? && !pseudonym.save
-        Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors.to_hash}")
+
+      save_method = strict ? :save! : :save
+
+      if pseudonym.changed? && !pseudonym.send(save_method)
+        Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors.full_messages.join(", ")}")
       end
-      if user.changed? && !user.save
-        Rails.logger.warn("Unable to save federated user: #{user.errors.to_hash}")
+      if user.changed? && !user.send(save_method)
+        Rails.logger.warn("Unable to save federated user: #{user.errors.full_messages.join(", ")}")
       end
-      try(:post_federated_attribute_application, pseudonym:, provider_attributes:)
+      try(:post_federated_attribute_application, pseudonym:, provider_attributes:, purpose:)
     end
   end
 
@@ -455,6 +509,14 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   private
+
+  def not_in_discovery_page
+    return unless workflow_state == "deleted" && workflow_state_was == "active"
+
+    if used_on_discovery_page?
+      errors.add(:base, t("Please remove the authentication provider from the discovery page before deleting it"))
+    end
+  end
 
   BOOLEAN_ATTRIBUTE_PROPERTIES = %w[provisioning_only autoconfirm].freeze
   private_constant :BOOLEAN_ATTRIBUTE_PROPERTIES
@@ -503,11 +565,9 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   end
 
-  def translate_provider_attributes(provider_attributes, purpose:)
+  def translate_provider_attributes(provider_attributes)
     result = {}
     federated_attributes.each do |(canvas_attribute_name, provider_attribute_config)|
-      next if purpose != :provisioning && provider_attribute_config["provisioning_only"]
-
       provider_attribute_name = provider_attribute_config["attribute"]
 
       if provider_attributes.key?(provider_attribute_name)

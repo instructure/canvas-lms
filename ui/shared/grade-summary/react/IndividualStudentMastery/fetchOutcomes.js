@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {mergeWith, chunk, groupBy, keyBy} from 'es-toolkit/compat'
 import uuid from 'uuid'
 import parseLinkHeader from '@canvas/parse-link-header'
 import NaiveFetchDispatch from './NaiveFetchDispatch'
@@ -28,7 +28,7 @@ const deepMerge = (lhs, rhs) => {
   } else if (Array.isArray(lhs)) {
     return lhs.concat(rhs)
   } else if (typeof lhs === 'object') {
-    return _.mergeWith(lhs, rhs, deepMerge)
+    return mergeWith(lhs, rhs, deepMerge)
   } else {
     return rhs
   }
@@ -91,21 +91,22 @@ const fetchOutcomes = (courseId, studentId) => {
         page++
       }
       return results
-    })()
+    })(),
   ])
     .then(([groups, links, rollups, alignments, allAssignments]) => {
       outcomeGroups = groups
       outcomeLinks = links
       outcomeRollups = rollups
-      outcomeAssignmentsByOutcomeId = _.groupBy(alignments, 'learning_outcome_id')
+      outcomeAssignmentsByOutcomeId = groupBy(alignments, 'learning_outcome_id')
       ratingsByOutcomeIdByAssignmentId = allAssignments.reduce((acc, a) => {
-        const outcomesInRubric =  a.rubric?.reduce((acc, criterion) => {
-          if (criterion.outcome_id) {
-            acc[criterion.outcome_id] = criterion.ratings
-          }
-          return acc
-        }, {}) || {}
-        if(Object.keys(outcomesInRubric).length) {
+        const outcomesInRubric =
+          a.rubric?.reduce((acc, criterion) => {
+            if (criterion.outcome_id) {
+              acc[criterion.outcome_id] = criterion.ratings
+            }
+            return acc
+          }, {}) || {}
+        if (Object.keys(outcomesInRubric).length) {
           acc[a.id] = outcomesInRubric
         }
         return acc
@@ -113,7 +114,7 @@ const fetchOutcomes = (courseId, studentId) => {
     })
     .then(() => {
       const outcomeIds = outcomeLinks.map(link => link.outcome.id)
-      const chunks = _.chunk(outcomeIds, 10)
+      const chunks = chunk(outcomeIds, 10)
       return makePromisePool(chunks, chunk => {
         const chunkArgs = chunk.map(id => `outcome_ids[]=${id}`).join('&')
         return fetchWithDispatch(
@@ -152,11 +153,11 @@ const fetchOutcomes = (courseId, studentId) => {
       }))
 
       // filter empty outcome groups
-      const outcomesByGroup = _.groupBy(outcomes, o => o.groupId)
+      const outcomesByGroup = groupBy(outcomes, o => o.groupId)
       outcomeGroups = outcomeGroups.filter(g => outcomesByGroup[g.id])
 
       // add rollup scores, mastered
-      const outcomesById = _.keyBy(outcomes, o => o.id)
+      const outcomesById = keyBy(outcomes, o => o.id)
       outcomeRollups.rollups[0].scores.forEach(scoreData => {
         const outcome = outcomesById[scoreData.links.outcome]
         if (outcome) {
@@ -173,9 +174,7 @@ const fetchOutcomes = (courseId, studentId) => {
           const key = result.links.assignment || result.links.alignment
           result.assignment = assignmentsByAssignmentId[key]
           result.outcomeRatingsFromRubric =
-            ratingsByOutcomeIdByAssignmentId[
-              result.assignment.id.split('_').pop()]?.[outcome.id
-            ]
+            ratingsByOutcomeIdByAssignmentId[result.assignment.id.split('_').pop()]?.[outcome.id]
         })
       })
       return {outcomeGroups, outcomes}

@@ -33,7 +33,7 @@ import UploadMedia from '@instructure/canvas-media'
 import {formatTracksForMediaPlayer} from '@canvas/canvas-media-player'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Link} from '@instructure/ui-link'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {
   UploadMediaStrings,
   MediaCaptureStrings,
@@ -46,10 +46,10 @@ import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
-import _ from 'lodash'
+import {sortBy} from 'es-toolkit/compat'
 import {type ObserverEnrollmentConnectionUser} from '../graphql/Queries'
 import Pill from './Pill'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {
   FileAttachmentUpload,
   AttachmentUploadSpinner,
@@ -61,6 +61,9 @@ import {
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 import {View} from '@instructure/ui-view'
 import {useObserverEnrollments} from './hooks/useObserverEnrollments'
+import type {Student} from './types'
+
+export type {Student}
 
 export enum MSWLaunchContext {
   ASSIGNMENT_CONTEXT,
@@ -81,22 +84,10 @@ export type SendMessageArgs = {
 
 const I18n = createI18nScope('public_message_students_who')
 
-export type Student = {
-  id: string
-  grade?: string | null
-  name: string
-  redoRequest?: boolean
-  score?: number | null
-  currentScore?: number
-  sortableName: string
-  submittedAt: null | Date
-  excused?: boolean
-  workflowState: string
-}
-
 export type Props = {
-  assignment: CamelizedAssignment
-  launchContext: MSWLaunchContext
+  assignment?: CamelizedAssignment | null
+  launchContext?: MSWLaunchContext | null
+  hideCriterionSection?: boolean
   assignmentGroupName?: string
   onClose: () => void
   students: Student[]
@@ -148,22 +139,20 @@ type FilterCriterionValue =
   | 'total_grade_lower_than'
 
 const isScored = (assignment: CamelizedAssignment) =>
-  assignment !== null &&
+  !!assignment &&
   ['points', 'percent', 'letter_grade', 'gpa_scale'].includes(assignment.gradingType)
 
 const isReassignable = (assignment: CamelizedAssignment) =>
-  assignment !== null &&
+  !!assignment &&
   (assignment.allowedAttempts === -1 || (assignment.allowedAttempts || 0) > 1) &&
   assignment.dueAt !== null &&
-  new Set(assignment.submissionTypes).isDisjointFrom(
-    new Set(['on_paper', 'external_tool', 'none', 'discussion_topic', 'online_quiz']),
+  !['on_paper', 'external_tool', 'none', 'discussion_topic', 'online_quiz'].some(type =>
+    assignment.submissionTypes.includes(type),
   )
 
 const isSubmittableAssignment = (assignment: CamelizedAssignment) =>
   !!assignment &&
-  new Set(assignment.submissionTypes).isDisjointFrom(
-    new Set(['on_paper', 'none', 'not_graded', '']),
-  )
+  !['on_paper', 'none', 'not_graded', ''].some(type => assignment.submissionTypes.includes(type))
 
 const filterCriteria: FilterCriterion[] = [
   {
@@ -198,7 +187,7 @@ const filterCriteria: FilterCriterion[] = [
   },
   {
     requiresCutoff: false,
-    shouldShow: assignment => assignment !== null,
+    shouldShow: assignment => !!assignment,
     title: I18n.t('Have not been graded'),
     value: 'ungraded',
   },
@@ -216,7 +205,7 @@ const filterCriteria: FilterCriterion[] = [
   },
   {
     requiresCutoff: false,
-    shouldShow: assignment => assignment !== null && assignment.gradingType === 'pass_fail',
+    shouldShow: assignment => !!assignment && assignment.gradingType === 'pass_fail',
     title: I18n.t('Marked incomplete'),
     value: 'marked_incomplete',
   },
@@ -322,7 +311,7 @@ function filterStudents(criterion: FilterCriterion, students: Student[], cutoff:
 
 function cumulativeScoreDefaultSubject(
   criterion: 'total_grade_higher_than' | 'total_grade_lower_than',
-  launchContext: MSWLaunchContext,
+  launchContext: MSWLaunchContext | null | undefined,
   cutoff: number,
   assignmentGroupName = '',
 ) {
@@ -340,9 +329,9 @@ function cumulativeScoreDefaultSubject(
 function defaultSubject(
   criterion: FilterCriterionValue,
 
-  assignment: CamelizedAssignment,
+  assignment: CamelizedAssignment | null | undefined,
 
-  launchContext: MSWLaunchContext,
+  launchContext: MSWLaunchContext | null | undefined,
 
   cutoff: number,
 
@@ -397,6 +386,7 @@ function defaultSubject(
 const MessageStudentsWhoDialog = ({
   assignment,
   launchContext,
+  hideCriterionSection = false,
   assignmentGroupName,
   onClose,
   students,
@@ -460,20 +450,26 @@ const MessageStudentsWhoDialog = ({
 
   const [cutoff, setCutoff] = useState(0.0)
 
-  const availableCriteria = filterCriteria.filter(criterion => criterion.shouldShow(assignment))
+  const availableCriteria = hideCriterionSection
+    ? []
+    : filterCriteria.filter(criterion => criterion.shouldShow(assignment as CamelizedAssignment))
   const sortedStudents = [...students].sort((a, b) => a.sortableName.localeCompare(b.sortableName))
   const [filteredStudents, setFilteredStudents] = useState(
-    filterStudents(availableCriteria[0], sortedStudents, cutoff),
+    availableCriteria.length > 0
+      ? filterStudents(availableCriteria[0], sortedStudents, cutoff)
+      : sortedStudents,
   )
   const [subject, setSubject] = useState(
-    defaultSubject(
-      availableCriteria[0].value,
-      assignment,
-      launchContext,
-      cutoff,
-      pointsBasedGradingScheme,
-      assignmentGroupName,
-    ),
+    availableCriteria.length > 0
+      ? defaultSubject(
+          availableCriteria[0].value,
+          assignment,
+          launchContext,
+          cutoff,
+          pointsBasedGradingScheme,
+          assignmentGroupName,
+        )
+      : '',
   )
 
   const [observerRecipientCount, setObserverRecipientCount] = useState(0)
@@ -545,10 +541,6 @@ const MessageStudentsWhoDialog = ({
     }
   }, [mediaPreviewURL])
 
-  if (loading) {
-    return <LoadingIndicator />
-  }
-
   const handleCriterionSelected = (
     _e: React.SyntheticEvent,
     {value}: {value?: string | number},
@@ -589,7 +581,7 @@ const MessageStudentsWhoDialog = ({
 
       const args: SendMessageArgs = {
         recipientsIds: uniqueRecipientsIds,
-        subject,
+        subject: subject ?? '',
         body: message.trim(),
       }
 
@@ -747,260 +739,272 @@ const MessageStudentsWhoDialog = ({
         </Modal.Header>
 
         <Modal.Body>
-          <View as="div" width="19.75em">
-            <View as="div" padding="0 0 small 0">
-              <SimpleSelect
-                renderLabel={I18n.t('For students who…')}
-                onChange={handleCriterionSelected}
-                value={selectedCriterion.value}
-                data-testid="criterion-dropdown"
-              >
-                {availableCriteria.map(criterion => (
-                  <SimpleSelect.Option
-                    id={`criteria_${criterion.value}`}
-                    key={criterion.value}
-                    value={criterion.value}
-                    data-testid="criterion-dropdown-item"
-                  >
-                    {criterion.title}
-                  </SimpleSelect.Option>
-                ))}
-              </SimpleSelect>
-            </View>
-            {selectedCriterion.requiresCutoff && (
-              <>
-                <NumberInput
-                  allowStringValue={true}
-                  value={cutoff}
-                  onChange={(_e, value) => {
-                    const actualValue = value === '' ? 0 : parseFloat(value)
-                    setCutoff(actualValue)
-                    if (actualValue !== 0) {
-                      setFilteredStudents(
-                        filterStudents(selectedCriterion, sortedStudents, actualValue),
-                      )
-                      setSubject(
-                        defaultSubject(
-                          selectedCriterion.value,
-                          assignment,
-                          launchContext,
-                          actualValue,
-                          pointsBasedGradingScheme,
-                          assignmentGroupName,
-                        ),
-                      )
-                    }
-                  }}
-                  showArrows={false}
-                  renderLabel={I18n.t('Cutoff Value')}
-                  data-testid="cutoff-input"
-                />
-                <Text size="small" data-testid="cutoff-footnote">
-                  {I18n.t(
-                    'This is based on values seen in this grade book. It may not be the same values students see.',
-                  )}
-                </Text>
-              </>
-            )}
-            {selectedCriterion.value === 'submitted' && (
-              <RadioInputGroup
-                description=""
-                defaultValue="all"
-                name="include-students"
-                data-testid="include-student-radio-group"
-              >
-                <RadioInput
-                  label={I18n.t('All submissions')}
-                  value="all"
-                  onClick={() => onSubmissionRadioSelect('submitted')}
-                  data-testid="all-students-radio-button"
-                />
-                <RadioInput
-                  label={I18n.t('Graded submissions')}
-                  value="graded"
-                  onClick={() => onSubmissionRadioSelect('submitted_and_graded')}
-                  data-testid="graded-students-radio-button"
-                />
-                <RadioInput
-                  label={I18n.t('Not graded submissions')}
-                  value="not_graded"
-                  onClick={() => onSubmissionRadioSelect('submitted_and_not_graded')}
-                  data-testid="not-graded-students-radio-button"
-                />
-              </RadioInputGroup>
-            )}
-            {selectedCriterion.value === 'unsubmitted' && (
-              <Checkbox
-                onChange={onExcusedCheckBoxChange}
-                data-testid="skip-excused-checkbox"
-                label={<Text>{I18n.t('Skip excused students when messaging')}</Text>}
-              />
-            )}
-          </View>
-          <br />
-          <Flex>
-            <Flex.Item>
-              <Text weight="bold">{I18n.t('Send Message To:')}</Text>
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 medium">
-              <Checkbox
-                indeterminate={isIndeterminateStudentsCheckbox}
-                disabled={isDisabledStudentsCheckbox}
-                onChange={onStudentsCheckboxChanged}
-                checked={isCheckedStudentsCheckbox}
-                defaultChecked={true}
-                data-testid="total-student-checkbox"
-                label={
-                  <Text weight="bold">
-                    {I18n.t('%{studentCount} Students', {studentCount: selectedStudents.length})}
-                  </Text>
-                }
-              />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 medium">
-              <Checkbox
-                indeterminate={isIndeterminateObserversCheckbox}
-                disabled={isDisabledObserversCheckbox}
-                onChange={onObserversCheckboxChanged}
-                checked={isCheckedObserversCheckbox}
-                data-testid="total-observer-checkbox"
-                label={
-                  <Text weight="bold">
-                    {I18n.t('%{observerCount} Observers', {
-                      observerCount: observerRecipientCount,
-                    })}
-                  </Text>
-                }
-              />
-            </Flex.Item>
-            <Flex.Item as="div" shouldGrow={true} textAlign="end">
-              <Link
-                onClick={() => setShowTable(!showTable)}
-                renderIcon={showTable ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
-                iconPlacement="end"
-                data-testid="show_all_recipients"
-              >
-                {showTable ? I18n.t('Hide all recipients') : I18n.t('Show all recipients')}
-              </Link>
-            </Flex.Item>
-          </Flex>
-          {!areRecipientsPresent && isSubmitted && (
-            <View as="div" margin="0 xxx-small xx-small 0">
-              <Text size="small" color="danger">
-                <View textAlign="center">
-                  <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
-                    <IconWarningSolid />
-                  </View>
-                  {I18n.t('Please select at least one recipient.')}
-                </View>
-              </Text>
-            </View>
-          )}
-          {showTable && (
-            <Table caption={I18n.t('List of students and observers')}>
-              <Table.Head>
-                <Table.Row>
-                  <Table.ColHeader id="students">{I18n.t('Students')}</Table.ColHeader>
-                  <Table.ColHeader id="observers">{I18n.t('Observers')}</Table.ColHeader>
-                </Table.Row>
-              </Table.Head>
-              <Table.Body>
-                {filteredStudents.map(student => (
-                  <Table.Row key={student.id}>
-                    <Table.Cell>
-                      <Pill
-                        studentId={student.id}
-                        text={student.name}
-                        selected={selectedStudents.includes(student.id)}
-                        onClick={toggleStudentSelection}
-                      />
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Flex direction="row" margin="0 0 0 small" wrap="wrap">
-                        {_.sortBy(
-                          observersByStudentID[student.id] || [],
-                          observer => observer.sortableName,
-                        ).map(observer => (
-                          <Flex.Item key={observer._id}>
-                            <Pill
-                              studentId={student.id}
-                              observerId={observer._id}
-                              text={observer.name}
-                              selected={selectedObservers[student.id]?.includes(observer._id)}
-                              onClick={toggleObserverSelection}
-                            />
-                          </Flex.Item>
+          {loading ? (
+            <LoadingIndicator />
+          ) : (
+            <>
+              {!hideCriterionSection && selectedCriterion && (
+                <>
+                  <View as="div" width="19.75em">
+                    <View as="div" padding="0 0 small 0">
+                      <SimpleSelect
+                        renderLabel={I18n.t('For students who…')}
+                        onChange={handleCriterionSelected}
+                        value={selectedCriterion.value}
+                        data-testid="criterion-dropdown"
+                      >
+                        {availableCriteria.map(criterion => (
+                          <SimpleSelect.Option
+                            id={`criteria_${criterion.value}`}
+                            key={criterion.value}
+                            value={criterion.value}
+                            data-testid="criterion-dropdown-item"
+                          >
+                            {criterion.title}
+                          </SimpleSelect.Option>
                         ))}
-                      </Flex>
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-          )}
+                      </SimpleSelect>
+                    </View>
+                    {selectedCriterion.requiresCutoff && (
+                      <>
+                        <NumberInput
+                          allowStringValue={true}
+                          value={cutoff}
+                          onChange={(_e, value) => {
+                            const actualValue = value === '' ? 0 : parseFloat(value)
+                            setCutoff(actualValue)
+                            if (actualValue !== 0) {
+                              setFilteredStudents(
+                                filterStudents(selectedCriterion, sortedStudents, actualValue),
+                              )
+                              setSubject(
+                                defaultSubject(
+                                  selectedCriterion.value,
+                                  assignment,
+                                  launchContext,
+                                  actualValue,
+                                  pointsBasedGradingScheme,
+                                  assignmentGroupName,
+                                ),
+                              )
+                            }
+                          }}
+                          showArrows={false}
+                          renderLabel={I18n.t('Cutoff Value')}
+                          data-testid="cutoff-input"
+                        />
+                        <Text size="small" data-testid="cutoff-footnote">
+                          {I18n.t(
+                            'This is based on values seen in this grade book. It may not be the same values students see.',
+                          )}
+                        </Text>
+                      </>
+                    )}
+                    {selectedCriterion.value === 'submitted' && (
+                      <RadioInputGroup
+                        description=""
+                        defaultValue="all"
+                        name="include-students"
+                        data-testid="include-student-radio-group"
+                      >
+                        <RadioInput
+                          label={I18n.t('All submissions')}
+                          value="all"
+                          onClick={() => onSubmissionRadioSelect('submitted')}
+                          data-testid="all-students-radio-button"
+                        />
+                        <RadioInput
+                          label={I18n.t('Graded submissions')}
+                          value="graded"
+                          onClick={() => onSubmissionRadioSelect('submitted_and_graded')}
+                          data-testid="graded-students-radio-button"
+                        />
+                        <RadioInput
+                          label={I18n.t('Not graded submissions')}
+                          value="not_graded"
+                          onClick={() => onSubmissionRadioSelect('submitted_and_not_graded')}
+                          data-testid="not-graded-students-radio-button"
+                        />
+                      </RadioInputGroup>
+                    )}
+                    {selectedCriterion.value === 'unsubmitted' && (
+                      <Checkbox
+                        onChange={onExcusedCheckBoxChange}
+                        data-testid="skip-excused-checkbox"
+                        label={<Text>{I18n.t('Skip excused students when messaging')}</Text>}
+                      />
+                    )}
+                  </View>
+                  <br />
+                </>
+              )}
+              <Flex>
+                <Flex.Item>
+                  <Text weight="bold">{I18n.t('Send Message To:')}</Text>
+                </Flex.Item>
+                <Flex.Item margin="0 0 0 medium">
+                  <Checkbox
+                    indeterminate={isIndeterminateStudentsCheckbox}
+                    disabled={isDisabledStudentsCheckbox}
+                    onChange={onStudentsCheckboxChanged}
+                    checked={isCheckedStudentsCheckbox}
+                    defaultChecked={true}
+                    data-testid="total-student-checkbox"
+                    label={
+                      <Text weight="bold">
+                        {I18n.t('%{studentCount} Students', {
+                          studentCount: selectedStudents.length,
+                        })}
+                      </Text>
+                    }
+                  />
+                </Flex.Item>
+                <Flex.Item margin="0 0 0 medium">
+                  <Checkbox
+                    indeterminate={isIndeterminateObserversCheckbox}
+                    disabled={isDisabledObserversCheckbox}
+                    onChange={onObserversCheckboxChanged}
+                    checked={isCheckedObserversCheckbox}
+                    data-testid="total-observer-checkbox"
+                    label={
+                      <Text weight="bold">
+                        {I18n.t('%{observerCount} Observers', {
+                          observerCount: observerRecipientCount,
+                        })}
+                      </Text>
+                    }
+                  />
+                </Flex.Item>
+                <Flex.Item as="div" shouldGrow={true} textAlign="end">
+                  <Link
+                    onClick={() => setShowTable(!showTable)}
+                    renderIcon={showTable ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
+                    iconPlacement="end"
+                    data-testid="show_all_recipients"
+                  >
+                    {showTable ? I18n.t('Hide all recipients') : I18n.t('Show all recipients')}
+                  </Link>
+                </Flex.Item>
+              </Flex>
+              {!areRecipientsPresent && isSubmitted && (
+                <View as="div" margin="0 xxx-small xx-small 0">
+                  <Text size="small" color="danger">
+                    <View textAlign="center">
+                      <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+                        <IconWarningSolid />
+                      </View>
+                      {I18n.t('Please select at least one recipient.')}
+                    </View>
+                  </Text>
+                </View>
+              )}
+              {showTable && (
+                <Table caption={I18n.t('List of students and observers')}>
+                  <Table.Head>
+                    <Table.Row>
+                      <Table.ColHeader id="students">{I18n.t('Students')}</Table.ColHeader>
+                      <Table.ColHeader id="observers">{I18n.t('Observers')}</Table.ColHeader>
+                    </Table.Row>
+                  </Table.Head>
+                  <Table.Body>
+                    {filteredStudents.map(student => (
+                      <Table.Row key={student.id}>
+                        <Table.Cell>
+                          <Pill
+                            studentId={student.id}
+                            text={student.name}
+                            selected={selectedStudents.includes(student.id)}
+                            onClick={toggleStudentSelection}
+                          />
+                        </Table.Cell>
+                        <Table.Cell>
+                          <Flex direction="row" margin="0 0 0 small" wrap="wrap">
+                            {sortBy(
+                              observersByStudentID[student.id] || [],
+                              observer => observer.sortableName,
+                            ).map(observer => (
+                              <Flex.Item key={observer._id}>
+                                <Pill
+                                  studentId={student.id}
+                                  observerId={observer._id}
+                                  text={observer.name}
+                                  selected={selectedObservers[student.id]?.includes(observer._id)}
+                                  onClick={toggleObserverSelection}
+                                />
+                              </Flex.Item>
+                            ))}
+                          </Flex>
+                        </Table.Cell>
+                      </Table.Row>
+                    ))}
+                  </Table.Body>
+                </Table>
+              )}
 
-          <br />
-          <TextInput
-            data-testid="subject-input"
-            renderLabel={I18n.t('Subject')}
-            placeholder={I18n.t('Type Something…')}
-            value={subject}
-            onChange={(_event, value) => {
-              setSubject(value)
-            }}
-          />
-          <br />
-          <TextArea
-            data-testid="message-input"
-            required={true}
-            height="200px"
-            label={I18n.t('Message')}
-            placeholder={I18n.t('Type your message here…')}
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            messages={
-              !isMessagePresent && isSubmitted
-                ? [
-                    {
-                      type: 'error',
-                      text: (
-                        <View textAlign="center">
-                          <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
-                            <IconWarningSolid />
-                          </View>
-                          {I18n.t('A message is required to send this message.')}
-                        </View>
-                      ),
-                    },
-                  ]
-                : []
-            }
-          />
-
-          <Flex alignItems="start">
-            {mediaUploadFile && mediaPreviewURL && (
-              <Flex.Item>
-                <MediaAttachment
-                  file={{
-                    mediaID: mediaUploadFile.media_id,
-                    src: mediaPreviewURL,
-                    title: mediaTitle || mediaUploadFile.title,
-                    type: mediaUploadFile.media_type,
-                    mediaTracks: mediaUploadFile.media_tracks,
-                  }}
-                  onRemoveMediaComment={onRemoveMediaComment}
-                />
-              </Flex.Item>
-            )}
-
-            <Flex.Item shouldShrink={true}>
-              <AttachmentDisplay
-                attachments={[...attachments, ...pendingUploads]}
-                onDeleteItem={onDeleteAttachment}
-                onReplaceItem={onReplaceAttachment}
+              <br />
+              <TextInput
+                data-testid="subject-input"
+                renderLabel={I18n.t('Subject')}
+                placeholder={I18n.t('Type Something…')}
+                value={subject}
+                onChange={(_event, value) => {
+                  setSubject(value)
+                }}
               />
-            </Flex.Item>
-          </Flex>
+              <br />
+              <TextArea
+                data-testid="message-input"
+                required={true}
+                height="200px"
+                label={I18n.t('Message')}
+                placeholder={I18n.t('Type your message here…')}
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                messages={
+                  !isMessagePresent && isSubmitted
+                    ? [
+                        {
+                          type: 'error',
+                          text: (
+                            <View textAlign="center">
+                              <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+                                <IconWarningSolid />
+                              </View>
+                              {I18n.t('A message is required to send this message.')}
+                            </View>
+                          ),
+                        },
+                      ]
+                    : []
+                }
+              />
+
+              <Flex alignItems="start">
+                {mediaUploadFile && mediaPreviewURL && (
+                  <Flex.Item>
+                    <MediaAttachment
+                      file={{
+                        mediaID: mediaUploadFile.media_id,
+                        src: mediaPreviewURL,
+                        title: mediaTitle || mediaUploadFile.title,
+                        type: mediaUploadFile.media_type,
+                        mediaTracks: mediaUploadFile.media_tracks,
+                      }}
+                      onRemoveMediaComment={onRemoveMediaComment}
+                    />
+                  </Flex.Item>
+                )}
+
+                <Flex.Item shouldShrink={true}>
+                  <AttachmentDisplay
+                    attachments={[...attachments, ...pendingUploads]}
+                    onDeleteItem={onDeleteAttachment}
+                    onReplaceItem={onReplaceAttachment}
+                  />
+                </Flex.Item>
+              </Flex>
+            </>
+          )}
         </Modal.Body>
 
         <Modal.Footer>

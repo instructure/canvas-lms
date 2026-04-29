@@ -21,7 +21,7 @@ import Pubsub from '../pubsub'
 const pubsub = new Pubsub()
 describe('PubSub Helper', () => {
   it('should properly subscribe to published values', () => {
-    const myMock = jest.fn()
+    const myMock = vi.fn()
 
     pubsub.subscribe('test-channel', myMock)
     expect(myMock).not.toHaveBeenCalled()
@@ -30,7 +30,7 @@ describe('PubSub Helper', () => {
     expect(myMock).toHaveBeenCalledWith('testing')
   })
   it('should properly unsubscribe from published values', () => {
-    const myMock = jest.fn()
+    const myMock = vi.fn()
 
     const unsub = pubsub.subscribe('test-channel', myMock)
     expect(myMock).not.toHaveBeenCalled()

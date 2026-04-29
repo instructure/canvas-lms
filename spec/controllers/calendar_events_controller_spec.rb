@@ -114,6 +114,15 @@ describe CalendarEventsController do
       get "show", params: { course_section_id: section.id, id: section_event.id }
       expect(response).to be_redirect
     end
+
+    it "finds section events via course URL" do
+      section = @course.default_section
+      section_event = section.calendar_events.create!(title: "Section event")
+      user_session(@student)
+      get "show", params: { course_id: @course.id, id: section_event.id }
+      expect(response).to be_successful
+      expect(assigns[:event]).to eq(section_event)
+    end
   end
 
   describe "GET 'new'" do
@@ -142,7 +151,7 @@ describe CalendarEventsController do
         expect(@controller.js_env.dig(:conferences, :conference_types).length).to eq 1
       end
 
-      include_examples "accepts web_conference" do
+      it_behaves_like "accepts web_conference" do
         let(:make_request) do
           ->(params) { get "new", params: { course_id: @course.id, web_conference: params } }
         end
@@ -171,7 +180,7 @@ describe CalendarEventsController do
       expect(assigns[:event].title).to eql("some event")
     end
 
-    include_examples "accepts web_conference" do
+    it_behaves_like "accepts web_conference" do
       let(:make_request) do
         lambda do |params|
           post "create",
@@ -254,7 +263,7 @@ describe CalendarEventsController do
       assert_status(302)
     end
 
-    include_examples "accepts web_conference" do
+    it_behaves_like "accepts web_conference" do
       let(:make_request) do
         lambda do |params|
           put "update",

@@ -17,7 +17,7 @@
  */
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {each, find, every} from 'lodash'
+import {each, find, every} from 'es-toolkit/compat'
 import htmlEscape from '@instructure/html-escape'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {waitForProcessing} from './wait_for_processing'

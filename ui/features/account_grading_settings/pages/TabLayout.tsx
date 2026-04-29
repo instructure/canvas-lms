@@ -29,8 +29,12 @@ export const Component = () => {
   const navigate = useNavigate()
   const isCustomGradebookStatusesEnabled = !!ENV.CUSTOM_GRADEBOOK_STATUSES_ENABLED
 
-  const pathMatch = useMatch('/accounts/:accountId/grading_settings/:tabPath/*')
+  const pathMatch = useMatch({
+    path: '/accounts/:accountId/grading_settings/:tabPath',
+    end: false,
+  })
   const selectedTab = pathMatch?.params?.tabPath
+  const accountId = pathMatch?.params?.accountId
 
   const mountPoint: HTMLElement | null = document.querySelector('#content')
   if (!mountPoint) {
@@ -38,15 +42,17 @@ export const Component = () => {
   }
 
   const handleTabChange = (index: number) => {
+    if (!accountId) return
+
     switch (index) {
       case TabLayoutPanel.GRADING_PERIODS:
-        navigate('../periods', {relative: 'path'})
+        navigate(`/accounts/${accountId}/grading_settings/periods`)
         break
       case TabLayoutPanel.GRADING_SCHEMES:
-        navigate('../schemes', {relative: 'path'})
+        navigate(`/accounts/${accountId}/grading_settings/schemes`)
         break
       case TabLayoutPanel.GRADING_STATUSES:
-        navigate('../statuses', {relative: 'path'})
+        navigate(`/accounts/${accountId}/grading_settings/statuses`)
         break
     }
   }
@@ -67,7 +73,7 @@ export const Component = () => {
         <Tabs.Panel
           id="gradingPeriodTab"
           renderTitle={I18n.t('Grading Periods')}
-          selected={selectedTab === 'periods'}
+          isSelected={selectedTab === 'periods'}
         >
           {selectedTab === 'periods' ? <Outlet /> : null}
         </Tabs.Panel>

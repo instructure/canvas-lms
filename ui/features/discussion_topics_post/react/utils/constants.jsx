@@ -40,8 +40,6 @@ const searchFilter = {
   setSearchTerm: () => {},
   filter: 'all',
   setFilter: () => {},
-  sort: '',
-  setSort: () => {},
   pageNumber: 0,
   setPageNumber: () => {},
   allThreadsStatus: AllThreadsState.None,

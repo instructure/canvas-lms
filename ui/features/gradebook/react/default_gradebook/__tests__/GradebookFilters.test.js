@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 import 'jquery-migrate'
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import ContentFilterDriver from '@canvas/grading/content-filters/ContentFilterDriver'
@@ -114,9 +114,9 @@ describe('Gradebook#getFilterSettingsViewOptionsMenuProps', () => {
     gradebook.setContextModules([{id: '2601'}, {id: '2602'}])
     gradebook.sections_enabled = true
     gradebook.studentGroupsEnabled = true
-    gradebook.renderViewOptionsMenu = jest.fn()
-    gradebook.renderFilters = jest.fn()
-    gradebook.saveSettings = jest.fn()
+    gradebook.renderViewOptionsMenu = vi.fn()
+    gradebook.renderFilters = vi.fn()
+    gradebook.saveSettings = vi.fn()
   })
 
   test('includes available filters', () => {
@@ -427,14 +427,14 @@ describe('Gradebook#updateCurrentSection', () => {
       course: {id: '1', sis_id: null},
       selected: {id: '1', type: 'course'},
     })
-    postGradesStore.setSelectedSection = jest.fn()
+    postGradesStore.setSelectedSection = vi.fn()
 
     gradebook = createGradebook({
       settings_update_url: '/settingUrl',
       postGradesStore: postGradesStore,
     })
-    gradebook.saveSettings = jest.fn().mockResolvedValue({})
-    gradebook.updateSectionFilterVisibility = jest.fn()
+    gradebook.saveSettings = vi.fn().mockResolvedValue({})
+    gradebook.updateSectionFilterVisibility = vi.fn()
   })
 
   test('updates the filter setting with the given section id', () => {

@@ -136,7 +136,7 @@
 #           "value": { "type": "boolean" }
 #         },
 #         "users": {
-#           "description": "optional: A list of users that are members in the group. Returned only if include[]=users. WARNING: this collection's size is capped (if there are an extremely large number of users in the group (thousands) not all of them will be returned).  If you need to capture all the users in a group with certainty consider using the paginated /api/v1/groups/<group_id>/memberships endpoint.",
+#           "description": "optional: A list of users that are members in the group. Returned only if include[]=users. WARNING: this collection's size is capped (if there are an extremely large number of users in the group (thousands) not all of them will be returned). If you need to capture all the users in a group with certainty or experiencing slow response consider using the paginated /api/v1/groups/<group_id>/users endpoint.",
 #           "type": "array",
 #           "items": { "$ref": "User" }
 #         },
@@ -149,7 +149,7 @@
 #
 class GroupsController < ApplicationController
   before_action :get_context
-  before_action :require_user, only: %w[index accept_invitation activity_stream activity_stream_summary]
+  skip_before_action :require_user, only: %i[preview_html public_feed]
   before_action :check_limited_access_for_students, only: %i[create_file]
 
   include Api::V1::Attachment
@@ -158,6 +158,7 @@ class GroupsController < ApplicationController
   include Context
   include K5Mode
   include GroupPermissionHelper
+  include SectionRestrictionsHelper
 
   SETTABLE_GROUP_ATTRIBUTES = %w[
     name
@@ -198,7 +199,14 @@ class GroupsController < ApplicationController
              end
 
     users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause("users"))
-                    .paginate(page:, per_page:)
+
+    # Apply section restrictions using helper for check and section IDs
+    if user_has_section_restrictions?(@context, @current_user)
+      user_section_ids = get_user_section_ids(@context, @current_user)
+      users = users.where(enrollments: { course_section_id: user_section_ids })
+    end
+
+    users = users.paginate(page:, per_page:)
 
     if authorized_action(@context, @current_user, :manage)
       json = {
@@ -259,7 +267,7 @@ class GroupsController < ApplicationController
           scope.preload(:group_category, :context)
         end
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        render json: (@groups.map { |g| group_json(g, @current_user, session, includes) })
+        render json: @groups.map { |g| group_json(g, @current_user, session, includes) }
       end
     end
   end
@@ -315,19 +323,13 @@ class GroupsController < ApplicationController
     @groups = all_groups = @groups.order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
                                   .eager_load(:group_category).preload(:root_account)
 
-    # run this only for students
-    if params[:section_restricted] && @context.is_a?(Course) && @context.user_is_student?(@current_user)
-      is_current_user_section_restricted = @context.membership_for_user(@current_user)&.limit_privileges_to_course_section
-      if is_current_user_section_restricted
-        # Gets all groups in the context
-        group_scope = @context.groups.active.eager_load(:group_category).preload(:root_account)
-        # Find all groups from that scope that can be limited from the section restriction parameter
-        groups_with_restricted_categories_or_teacher_assigned = group_scope.where(group_categories: { self_signup: nil }).or(group_scope.where(group_categories: { self_signup: "restricted" }))
-        # Find all groups that have users with different sections than the current user and DONT have the current_user in them
-        groups_with_no_common_section_with_current_user = groups_with_restricted_categories_or_teacher_assigned.reject { |g| g.has_common_section_with_user?(@current_user) || g.includes_user?(@current_user) }
-        # Remove the groups found above from the groups returned by the api
-        @groups = all_groups -= groups_with_no_common_section_with_current_user
-      end
+    if params[:section_restricted] && @context.is_a?(Course) && @context.user_is_student?(@current_user) && @context.membership_for_user(@current_user)&.limit_privileges_to_course_section
+      candidate_ids = all_groups
+                      .where(group_categories: { self_signup: [nil, "restricted"] })
+                      .pluck(:id)
+
+      hidden_ids = Group.ids_hidden_by_section_restriction(candidate_ids, @current_user, @context)
+      @groups = all_groups = all_groups.where.not(id: hidden_ids)
     end
 
     unless api_request?
@@ -402,21 +404,25 @@ class GroupsController < ApplicationController
             can_delete_groups: @context.grants_right?(@current_user, session, :manage_groups_delete)
           }
 
-          js_env group_categories: categories_json,
-                 group_user_type: @group_user_type,
-                 allow_self_signup: @allow_self_signup,
-                 context_class_name: @context.class.name,
-                 permissions: js_permissions
+          js_env({
+                   group_categories: categories_json,
+                   group_user_type: @group_user_type,
+                   allow_self_signup: @allow_self_signup,
+                   context_class_name: @context.class.name,
+                   permissions: js_permissions
+                 })
 
           if @context.is_a?(Course)
             # get number of sections with students in them so we can enforce a min group size for random assignment on sections
-            js_env(student_section_count: @context.enrollments.active_or_pending.where(type: "StudentEnrollment").distinct.count(:course_section_id))
-            js_env(self_signup_deadline_enabled: @context.account.feature_enabled?(:self_signup_deadline))
+            js_env({
+                     student_section_count: @context.enrollments.active_or_pending.where(type: "StudentEnrollment").distinct.count(:course_section_id),
+                     self_signup_deadline_enabled: @context.account.feature_enabled?(:self_signup_deadline)
+                   })
           end
 
           # since there are generally lots of users in an account, always do large roster view
           if @context.is_a?(Account)
-            js_env({ IS_LARGE_ROSTER: true }, true)
+            js_env({ IS_LARGE_ROSTER: true }, overwrite: true)
           end
           render :context_manage_groups
         else
@@ -451,6 +457,54 @@ class GroupsController < ApplicationController
         }
       end
     end
+  end
+
+  # @API Bulk fetch user tags for multiple users in a course
+  #
+  # Returns a mapping of user IDs to arrays of non-collaborative group (tag) IDs for each user in the given course.
+  #
+  # @argument course_id [Integer]
+  #   The ID of the course context (from the route).
+  #
+  # @argument user_ids[] [Integer]
+  #   An array of user IDs to fetch tags for.
+  #
+  # @example_request
+  #     curl "https://<canvas>/api/v1/courses/1/bulk_user_tags?user_ids[]=35&user_ids[]=79" \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Hash]
+  #   A mapping of user IDs to arrays of tag (group) IDs.
+  #   Example:
+  #     {
+  #       "35": [5],
+  #       "79": [3, 4, 5]
+  #     }
+  def bulk_user_tags
+    return unless authorized_action(@context, @current_user, %i[manage_tags_add manage_tags_manage manage_tags_delete])
+
+    course_id = params[:course_id].to_i
+
+    @groups = Group.where(
+      non_collaborative: true,
+      context_type: "Course",
+      context_id: course_id
+    )
+
+    user_ids = Array(params[:user_ids]).map(&:to_i)
+    result = {}
+
+    user_groups = @groups.left_outer_joins(:users)
+                         .where(users: { id: user_ids })
+                         .select("groups.id as group_id, users.id as user_id")
+                         .distinct
+
+    user_groups_by_user = user_groups.group_by(&:user_id)
+
+    user_ids.each do |user_id|
+      result[user_id] = user_groups_by_user[user_id]&.map(&:group_id) || []
+    end
+    render json: result
   end
 
   # @API Get a single group
@@ -763,7 +817,11 @@ class GroupsController < ApplicationController
                     else
                       User.where(id: user_ids)
                     end
+            # Capture users being removed before set_users destroys their memberships
+            removed_user_ids = @group.group_memberships.where.not(user_id: user_ids).pluck(:user_id)
             @memberships = @group.set_users(users)
+            # Invalidate visibility caches for removed users (set_users uses destroy_all which bypasses callbacks)
+            GroupMembership.invalidate_visibility_caches_for_group(@group, removed_user_ids) if removed_user_ids.any?
           end
         end
 
@@ -885,13 +943,14 @@ class GroupsController < ApplicationController
   end
 
   include Api::V1::User
+
   # @API List group's users
   #
   # Returns a paginated list of users in the group.
   #
   # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the
-  #   results list. Must be at least 3 characters.
+  #   results list. Must be at least 2 characters.
   #
   # @argument include[] [String, "avatar_url"]
   #   "avatar_url": Include users' avatar_urls.
@@ -909,7 +968,6 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
 
     search_term = params[:search_term].presence
-
     include_inactive = params[:exclude_inactive].present? ? !value_to_boolean(params[:exclude_inactive]) : true
 
     users = if search_term
@@ -917,6 +975,12 @@ class GroupsController < ApplicationController
             else
               UserSearch.scope_for(@context, @current_user, { include_inactive_enrollments: include_inactive })
             end
+
+    # Apply section restrictions using helper for check and filtering
+    if @context.context_type == "Course" && @context.context.course_sections.active.length > 1 && user_has_section_restrictions?(@context.context, @current_user)
+      student_ids_in_sections = get_visible_student_ids_in_course(@context.context, @current_user)
+      users = users.where(id: student_ids_in_sections)
+    end
 
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_users_url)
@@ -931,7 +995,7 @@ class GroupsController < ApplicationController
     end
 
     if (includes.include? "active_status") && (@context.context.is_a? Course)
-      enrollments = Enrollment.where(user_id: json_users.pluck(:id), course_id: @context.context_id)
+      enrollments = Enrollment.active.where(user_id: json_users.pluck(:id), course_id: @context.context_id)
 
       inactive_students = enrollments.group_by(&:user_id).select { |_id, es| es.all?(&:hard_inactive?) }.map(&:first)
       json_users.each do |user|
@@ -999,6 +1063,7 @@ class GroupsController < ApplicationController
   end
 
   include Api::V1::PreviewHtml
+
   # @API Preview processed html
   #
   # Preview html content processed for this group
@@ -1023,6 +1088,7 @@ class GroupsController < ApplicationController
   end
 
   include Api::V1::StreamItem
+
   # @API Group activity stream
   # Returns the current user's group-specific activity stream, paginated.
   #
@@ -1060,7 +1126,7 @@ class GroupsController < ApplicationController
   #
   # @argument permissions[] [String]
   #   List of permissions to check against the authenticated user.
-  #   Permission names are documented in the {api:RoleOverridesController#add_role Create a role} endpoint.
+  #   Permission names are documented in the {api:RoleOverridesController#manageable_permissions List assignable permissions} endpoint.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id>/permissions \

@@ -20,7 +20,7 @@ import type {QueryFunctionContext, InfiniteData} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../api'
 import type {NextPageTerms, Term} from '../types'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import {useMemo} from 'react'
 import {courseCopyRootKey, enrollmentTermsFetchKey} from '../types'
 
@@ -31,8 +31,12 @@ export const getTermsNextPage = (
   if (isResultEmpty) {
     return
   }
-  // @ts-expect-error
-  return lastPage.link?.next
+  const nextLink = lastPage.link?.next
+  if (!nextLink) return undefined
+  return {
+    page: nextLink.page,
+    per_page: nextLink.per_page,
+  }
 }
 
 export const termsQuery = async ({
@@ -47,12 +51,12 @@ export const termsQuery = async ({
 
   // Handle the pageParam which might be unknown
   let page = '1'
-  let perPage = '10'
+  let perPage = '100'
 
   if (pageParam && typeof pageParam === 'object' && pageParam !== null) {
     const params = pageParam as Partial<NextPageTerms>
     page = params.page || '1'
-    perPage = params.per_page || '10'
+    perPage = params.per_page || '100'
   }
 
   const path = `/api/v1/accounts/${accountId}/terms?page=${page}&per_page=${perPage}`

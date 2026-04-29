@@ -21,9 +21,9 @@ import React from 'react'
 import {IndividualMessageCheckbox} from '../IndividualMessageCheckbox'
 import {responsiveQuerySizes} from '../../../../util/utils'
 
-jest.mock('../../../../util/utils', () => ({
-  ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn(() => ({
+vi.mock('../../../../util/utils', async () => ({
+  ...(await vi.importActual('../../../../util/utils')),
+  responsiveQuerySizes: vi.fn(() => ({
     mobile: {maxWidth: '67px'},
     desktop: {minWidth: '768px'},
   })),
@@ -38,12 +38,12 @@ const setup = props => {
 describe('Button', () => {
   beforeAll(() => {
     // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(query => ({
+    window.matchMedia = vi.fn().mockImplementation(query => ({
       matches: query.includes('max-width'),
       media: query,
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }))
 
     // Responsive Query Mock Default
@@ -59,7 +59,7 @@ describe('Button', () => {
   })
 
   it('should call onChange when typing occurs', () => {
-    const onChangeMock = jest.fn()
+    const onChangeMock = vi.fn()
     const {individualCheckbox} = setup({
       onChange: onChangeMock,
     })
@@ -82,12 +82,12 @@ describe('Button', () => {
   describe('checkedAndDisabled prop', () => {
     beforeEach(() => {
       // Ensure mobile view for these tests
-      window.matchMedia = jest.fn().mockImplementation(query => ({
+      window.matchMedia = vi.fn().mockImplementation(query => ({
         matches: query.includes('max-width'),
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }))
 
       responsiveQuerySizes.mockImplementation(() => ({
@@ -99,7 +99,7 @@ describe('Button', () => {
     it('should render checked and disabled checkbox when true', () => {
       const props = {
         checkedAndDisabled: true,
-        onChange: jest.fn(),
+        onChange: vi.fn(),
         title: 'Test Item',
       }
 
@@ -113,7 +113,7 @@ describe('Button', () => {
     it('should render unchecked and enabled checkbox when false', () => {
       const props = {
         checkedAndDisabled: false,
-        onChange: jest.fn(),
+        onChange: vi.fn(),
         title: 'Test Item',
       }
 

@@ -20,7 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 import GravatarView from '../GravatarView'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toBe(y)
@@ -55,11 +55,11 @@ describe('GravatarView', () => {
   afterEach(() => {
     window.ENV = oldEnv
     view.remove()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
-  test('it should be accessible', function (done) {
-    isAccessible(view, done, {a11yReport: true})
+  test('it should be accessible', async () => {
+    await isAccessible(view, {a11yReport: true})
   })
 
   test('pre-populates preview with default', function () {
@@ -74,10 +74,10 @@ describe('GravatarView', () => {
     equal($preview.attr('src'), `https://secure.gravatar.com/avatar/${md5}?s=200&d=identicon`)
   })
 
-  test('calls avatar url with specified size', function () {
-    $.ajaxJSON = jest.fn()
+  test('calls avatar url with specified size and returns gravatarURL', async function () {
+    $.ajaxJSON = vi.fn(() => Promise.resolve())
 
-    view.updateAvatar()
+    const gravatarURL = view.updateAvatar()
 
     expect($.ajaxJSON).toHaveBeenCalledWith(
       '/api/v1/users/self',
@@ -86,6 +86,8 @@ describe('GravatarView', () => {
         'user[avatar][url]': expect.stringContaining('s=42'),
       }),
     )
+    // just validate that the returned URL looks like a gravatar URL
+    expect(await gravatarURL).toMatch(/^https:\/\/secure\.gravatar\.com\/avatar\//)
 
     const avatarUrl = $.ajaxJSON.mock.calls[0][2]['user[avatar][url]']
     ok(avatarUrl.includes('s=42'), 'did not specify correct size')

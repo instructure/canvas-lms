@@ -280,15 +280,15 @@ describe Folder do
       foo = @course.folders.create! name: "foo", parent_folder: @root_folder
       foo.update_attribute(:workflow_state, "hidden")
       bar = @course.folders.create! name: "bar", parent_folder: foo
-      expect(Folder.resolve_path(@course, "foo/bar", true)).to eql [@root_folder, foo, bar]
-      expect(Folder.resolve_path(@course, "foo/bar", false)).to be_nil
+      expect(Folder.resolve_path(@course, "foo/bar", include_hidden_and_locked: true)).to eql [@root_folder, foo, bar]
+      expect(Folder.resolve_path(@course, "foo/bar", include_hidden_and_locked: false)).to be_nil
     end
 
     it "excludes locked if specified" do
       foo = @course.folders.create! name: "foo", parent_folder: @root_folder, locked: true
       bar = @course.folders.create! name: "bar", parent_folder: foo
-      expect(Folder.resolve_path(@course, "foo/bar", true)).to eql [@root_folder, foo, bar]
-      expect(Folder.resolve_path(@course, "foo/bar", false)).to be_nil
+      expect(Folder.resolve_path(@course, "foo/bar", include_hidden_and_locked: true)).to eql [@root_folder, foo, bar]
+      expect(Folder.resolve_path(@course, "foo/bar", include_hidden_and_locked: false)).to be_nil
     end
 
     it "accepts an array" do
@@ -625,6 +625,38 @@ describe Folder do
       expect(child2.parent_folder).to eql(f)
       child.restore
       expect(child.full_name).to eql("course files/child 2")
+    end
+  end
+
+  describe "clone_for cloned_item handling" do
+    before(:once) do
+      @folder = @course.folders.create!(name: "test folder")
+    end
+
+    it "does not touch updated_at when feature flag is enabled" do
+      Account.site_admin.enable_feature!(:fix_bp_folder_unsynced_issue)
+      @folder.reload
+      original_updated_at = @folder.updated_at
+
+      # Trigger the clone_for code path that creates a cloned_item
+      @folder.clone_for(@course)
+
+      @folder.reload
+      expect(@folder.cloned_item).to be_present
+      expect(@folder.updated_at).to eq(original_updated_at)
+    end
+
+    it "touches updated_at when feature flag is disabled" do
+      Account.site_admin.disable_feature!(:fix_bp_folder_unsynced_issue)
+      @folder.reload
+      original_updated_at = @folder.updated_at
+
+      # Trigger the clone_for code path that creates a cloned_item
+      @folder.clone_for(@course)
+
+      @folder.reload
+      expect(@folder.cloned_item).to be_present
+      expect(@folder.updated_at).not_to eq(original_updated_at)
     end
   end
 

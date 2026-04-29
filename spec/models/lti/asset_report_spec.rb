@@ -136,213 +136,6 @@ RSpec.describe Lti::AssetReport do
     end
   end
 
-  describe ".info_for_display_by_submission" do
-    subject do
-      # Ensure the factory objects are created
-      [rep1aIi, rep1aIii, rep1bIi, rep2aIi, rep2aIIi]
-      Lti::AssetReport.info_for_display_by_submission(submission_ids: [sub1.id, sub2.id])
-    end
-
-    let(:course) { course_factory }
-    let(:assignment) { assignment_model(course:) }
-    let(:processorI) { lti_asset_processor_model(assignment:) }
-    let(:processorII) { lti_asset_processor_model(assignment:) }
-
-    # Student 1
-    let(:student1) { student_in_course(course:).user }
-    let(:sub1) { assignment.submissions.find_by(user: student1) }
-    let(:att1a) { attachment_model(context: student1) }
-    let(:asset1a) { lti_asset_model(submission: sub1, attachment: att1a) }
-    let(:att1b) { attachment_model(context: student1) }
-    let(:asset1b) { lti_asset_model(submission: sub1, attachment: att1b) }
-
-    # Student 2
-    let(:student2) { student_in_course(course:).user }
-    let(:sub2) { assignment.submissions.find_by(user: student2) }
-    let(:att2a) { attachment_model(context: student2) }
-    let(:asset2a) { lti_asset_model(submission: sub2, attachment: att2a) }
-
-    # Student 1 (submission 1) reports:
-    # Student 1, attachment a (1a), processor I, report type i
-    let(:rep1aIi) { lti_asset_report_model(asset: asset1a, asset_processor: processorI, report_type: "type_i") }
-    let(:rep1aIii) { lti_asset_report_model(asset: asset1a, asset_processor: processorI, report_type: "type_ii") }
-    let(:rep1bIi) { lti_asset_report_model(asset: asset1b, asset_processor: processorI) }
-
-    # Student 2 (submission 2) reports:
-    let(:rep2aIi) { lti_asset_report_model(asset: asset2a, asset_processor: processorI, visible_to_owner: false) }
-    let(:rep2aIIi) { lti_asset_report_model(asset: asset2a, asset_processor: processorII, visible_to_owner: true) }
-
-    it "organizes reports by submission and attachment" do
-      expect(subject.keys).to match_array([sub1.id, sub2.id])
-      expect(subject[sub1.id]).to \
-        match({
-                by_attachment: {
-                  att1a.id => { processorI.id => an_instance_of(Array) },
-                  att1b.id => { processorI.id => an_instance_of(Array) },
-                }
-              })
-      expect(subject[sub2.id]).to \
-        match({
-                by_attachment: {
-                  att2a.id => {
-                    processorI.id => an_instance_of(Array),
-                    processorII.id => an_instance_of(Array)
-                  }
-                }
-              })
-
-      sub1_reports = subject[sub1.id][:by_attachment]
-      sub2_reports = subject[sub2.id][:by_attachment]
-
-      expect(sub1_reports[att1a.id][processorI.id].map { it[:_id] }).to \
-        match_array([rep1aIi.id, rep1aIii.id])
-      expect(sub1_reports[att1b.id][processorI.id].map { it[:_id] }).to \
-        match_array([rep1bIi.id])
-      expect(sub2_reports[att2a.id][processorI.id].map { it[:_id] }).to \
-        match_array([rep2aIi.id])
-      expect(sub2_reports[att2a.id][processorII.id].map { it[:_id] }).to \
-        match_array([rep2aIIi.id])
-    end
-
-    it "includes report details in the result" do
-      r = subject[sub1.id][:by_attachment][att1a.id][processorI.id].find do |r|
-        r[:_id] == rep1aIi.id
-      end
-      expect(r).to eq(rep1aIi.info_for_display)
-    end
-
-    context "when some reports are deleted" do
-      before { rep2aIIi.destroy! }
-
-      it "does not include the reports" do
-        expect(subject[sub2.id][:by_attachment][att2a.id].keys).not_to \
-          include(processorII.id)
-      end
-    end
-
-    context "when listing for a student" do
-      subject do
-        # Ensure the factory objects are created
-        [rep2aIi, rep2aIIi]
-        Lti::AssetReport.info_for_display_by_submission(submission_ids: [sub2.id], for_student: true)
-      end
-
-      it "only includes reports visible to the owner" do
-        expect(subject.keys).to match_array([sub2.id])
-        expect(subject[sub2.id][:by_attachment].keys).to match_array([att2a.id])
-        expect(subject[sub2.id][:by_attachment][att2a.id].keys).to include(processorII.id)
-        expect(subject[sub2.id][:by_attachment][att2a.id][processorII.id].map { it[:_id] }).to \
-          match_array([rep2aIIi.id])
-      end
-    end
-
-    context "when a processor is deleted" do
-      before { processorII.destroy! }
-
-      it "does not include the reports" do
-        expect(subject[sub2.id][:by_attachment][att2a.id].keys).not_to \
-          include(processorII.id)
-      end
-    end
-
-    it "returns empty results when no matching reports exist" do
-      rep1aIi
-      result = Lti::AssetReport.info_for_display_by_submission(submission_ids: Submission.last.id + 1)
-      expect(result).to be_empty
-    end
-
-    context "when submission_ids is nil" do
-      it "returns empty results" do
-        rep1aIi
-        result = Lti::AssetReport.info_for_display_by_submission(submission_ids: nil)
-        expect(result).to be_empty
-      end
-    end
-
-    context "when submission_ids is empty" do
-      it "returns empty results" do
-        rep1aIi
-        result = Lti::AssetReport.info_for_display_by_submission(submission_ids: [])
-        expect(result).to be_empty
-      end
-    end
-
-    context "with online text entry submissions" do
-      let(:online_text_assignment) { assignment_model(course:, submission_types: "online_text_entry") }
-      let(:online_submission) do
-        submission = online_text_assignment.submissions.find_by(user: student1)
-        submission.update!(submission_type: "online_text_entry")
-        submission
-      end
-      let(:online_asset) { lti_asset_model(submission: online_submission) }
-      let(:online_processor) { lti_asset_processor_model(assignment: online_text_assignment) }
-      let!(:online_report) { lti_asset_report_model(asset: online_asset, asset_processor: online_processor, report_type: "text_entry_report") }
-
-      it "includes online text entry asset reports organized by submission and asset in text_entry_by_attempt" do
-        result = Lti::AssetReport.info_for_display_by_submission(submission_ids: [online_submission.id])
-        expect(result.keys).to include(online_submission.id)
-        text_entry_by_attempt = result[online_submission.id][:by_attempt]
-        expect(text_entry_by_attempt).to be_a(Hash)
-        expect(text_entry_by_attempt.keys).to include(online_submission.attempt)
-
-        processor_hash = text_entry_by_attempt[online_submission.attempt]
-        expect(processor_hash.keys).to include(online_processor.id)
-        report_ids = processor_hash[online_processor.id].map { |r| r[:_id] }
-        expect(report_ids).to include(online_report.id)
-      end
-
-      it "returns empty results for non-matching online text entry submissions" do
-        result = Lti::AssetReport.info_for_display_by_submission(submission_ids: [online_submission.id + 1000])
-        expect(result).to be_empty
-      end
-    end
-  end
-
-  describe "#info_for_display" do
-    subject { report.info_for_display }
-
-    let(:report) do
-      lti_asset_report_model(
-        title: "My cool report",
-        comment: "What a great report",
-        indication_color: "#008800",
-        indication_alt: "WOW",
-        result: "8/10",
-        error_code: "MYERRORCODE",
-        processing_progress: "Processed"
-      )
-    end
-
-    it "returns a hash with the report's details" do
-      expect(subject[:_id]).to eq(report.id)
-      expect(subject[:title]).to eq("My cool report")
-      expect(subject[:comment]).to eq("What a great report")
-      expect(subject[:result]).to eq("8/10")
-      expect(subject).to_not have_key(:resultTruncated)
-      expect(subject[:indicationColor]).to eq("#008800")
-      expect(subject[:indicationAlt]).to eq("WOW")
-      expect(subject[:errorCode]).to eq("MYERRORCODE")
-      expect(subject[:processingProgress]).to eq("Processed")
-      expect(subject[:resubmitAvailable]).to be(false)
-    end
-
-    it "defaults processingProgress to NotReady if it is unrecognized" do
-      report.update! processing_progress: "something unrecognized"
-      expect(subject[:processingProgress]).to eq("NotReady")
-    end
-
-    it "truncates result_truncated to 16 characters" do
-      report.update!(result: "12345678901234567890")
-      expect(subject[:resultTruncated]).to eq("123456789012345…")
-      expect(subject[:result]).to eq("12345678901234567890")
-    end
-
-    it "includes launchUrlPath for processed reports" do
-      expect(subject[:launchUrlPath]).to \
-        eq "/asset_processors/#{report.lti_asset_processor_id}/reports/#{report.id}/launch"
-    end
-  end
-
   describe "#result_truncated" do
     context "when result is < 16 chars" do
       it "is nil" do
@@ -356,6 +149,21 @@ RSpec.describe Lti::AssetReport do
         report = lti_asset_report_model(result: "12345678901234567890")
         expect(report.result_truncated).to eq("123456789012345…")
       end
+    end
+  end
+
+  describe "#launch_url_path" do
+    let(:report) { lti_asset_report_model(processing_progress: "Processed") }
+
+    it "returns nil when not Processed" do
+      report.processing_progress = "Processing"
+      expect(report.launch_url_path).to be_nil
+    end
+
+    it "includes the asset_processor_id and report_id" do
+      path = report.launch_url_path
+      expect(path).to include(report.lti_asset_processor_id.to_s)
+      expect(path).to include(report.id.to_s)
     end
   end
 
@@ -428,6 +236,18 @@ RSpec.describe Lti::AssetReport do
 
       it "returns true for a teacher" do
         expect(report.visible_to_user?(teacher)).to be true
+      end
+    end
+
+    context "when submission has been hard-deleted" do
+      let(:report) { lti_asset_report_model(asset:, asset_processor:, visible_to_owner: true) }
+
+      it "returns false for all users" do
+        report # materialize before destroying submission
+        submission.destroy
+        asset.reload
+        expect(report.visible_to_user?(student)).to be false
+        expect(report.visible_to_user?(teacher)).to be false
       end
     end
   end

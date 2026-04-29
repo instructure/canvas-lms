@@ -449,6 +449,301 @@ describe "Accounts API", type: :request do
                       {})
       expect(json[0]["lti_guid"]).to eq "hey"
     end
+
+    describe "horizon_account field" do
+      describe "GET /api/v1/accounts/:id" do
+        it "does not include horizon_account by default" do
+          json = api_call(:get,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "show", id: @a1.to_param, format: "json" })
+
+          expect(json).not_to have_key("horizon_account")
+        end
+
+        it "includes horizon_account when requested via includes parameter" do
+          json = api_call(:get,
+                          "/api/v1/accounts/#{@a1.id}?includes[]=horizon_account",
+                          { controller: "accounts", action: "show", id: @a1.to_param, format: "json", includes: ["horizon_account"] })
+
+          expect(json).to have_key("horizon_account")
+          expect(json["horizon_account"]).to be false
+        end
+
+        it "returns false for non-horizon accounts" do
+          json = api_call(:get,
+                          "/api/v1/accounts/#{@a1.id}?includes[]=horizon_account",
+                          { controller: "accounts", action: "show", id: @a1.to_param, format: "json", includes: ["horizon_account"] })
+
+          expect(json["horizon_account"]).to be false
+        end
+
+        it "returns true for horizon accounts" do
+          @a1.settings[:horizon_account] = { value: true, locked: true }
+          @a1.save!
+
+          json = api_call(:get,
+                          "/api/v1/accounts/#{@a1.id}?includes[]=horizon_account",
+                          { controller: "accounts", action: "show", id: @a1.to_param, format: "json", includes: ["horizon_account"] })
+
+          expect(json["horizon_account"]).to be true
+        end
+
+        it "returns true for sub-accounts inheriting horizon setting from root" do
+          @a1.settings[:horizon_account] = { value: true, locked: true }
+          @a1.save!
+
+          json = api_call(:get,
+                          "/api/v1/accounts/#{@a2.id}?includes[]=horizon_account",
+                          { controller: "accounts", action: "show", id: @a2.to_param, format: "json", includes: ["horizon_account"] })
+
+          expect(json["horizon_account"]).to be true
+        end
+
+        it "returns true for sub-accounts with direct horizon setting" do
+          @a2.settings[:horizon_account] = { value: true, locked: true }
+          @a2.save!
+
+          json = api_call(:get,
+                          "/api/v1/accounts/#{@a2.id}?includes[]=horizon_account",
+                          { controller: "accounts", action: "show", id: @a2.to_param, format: "json", includes: ["horizon_account"] })
+
+          expect(json["horizon_account"]).to be true
+        end
+      end
+
+      describe "GET /api/v1/accounts" do
+        it "does not include horizon_account by default" do
+          json = api_call(:get,
+                          "/api/v1/accounts.json",
+                          { controller: "accounts", action: "index", format: "json" })
+
+          expect(json[0]).not_to have_key("horizon_account")
+        end
+
+        it "includes horizon_account when requested via includes parameter" do
+          json = api_call(:get,
+                          "/api/v1/accounts?includes[]=horizon_account",
+                          { controller: "accounts", action: "index", format: "json", includes: ["horizon_account"] })
+
+          expect(json[0]).to have_key("horizon_account")
+        end
+
+        it "returns correct values for multiple accounts" do
+          @a1.settings[:horizon_account] = { value: true, locked: true }
+          @a1.save!
+
+          json = api_call(:get,
+                          "/api/v1/accounts?includes[]=horizon_account",
+                          { controller: "accounts", action: "index", format: "json", includes: ["horizon_account"] })
+
+          a1_json = json.find { |a| a["id"] == @a1.id }
+          a2_json = json.find { |a| a["id"] == @a2.id }
+
+          expect(a1_json["horizon_account"]).to be true
+          expect(a2_json["horizon_account"]).to be true
+        end
+
+        it "also supports include parameter for consistency" do
+          @a1.settings[:horizon_account] = { value: true, locked: true }
+          @a1.save!
+
+          json = api_call(:get,
+                          "/api/v1/accounts?include[]=horizon_account",
+                          { controller: "accounts", action: "index", format: "json", include: ["horizon_account"] })
+
+          expect(json[0]).to have_key("horizon_account")
+          expect(json[0]["horizon_account"]).to be true
+        end
+      end
+    end
+  end
+
+  describe "horizon_accounts" do
+    it "returns only horizon accounts that the user has access to" do
+      @a1.settings[:horizon_account_ids] = [@a1.id]
+      @a1.save!
+
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" })
+
+      expect(json.length).to eq 2
+      expect(json.pluck("id")).to match_array([@a1.id, @a2.id])
+    end
+
+    it "returns multiple horizon accounts" do
+      @a1.settings[:horizon_account_ids] = [@a1.id, @a2.id]
+      @a1.save!
+
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" })
+
+      expect(json.length).to eq 2
+      expect(json.pluck("id")).to match_array([@a1.id, @a2.id])
+    end
+
+    it "returns empty array when no horizon accounts exist" do
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" })
+
+      expect(json).to eq []
+    end
+
+    it "does not return non-horizon accounts" do
+      @a1.settings[:horizon_account_ids] = [@a2.id]
+      @a1.save!
+
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" })
+
+      expect(json.length).to eq 1
+      expect(json[0]["id"]).to eq @a2.id
+      expect(json.pluck("id")).not_to include(@a1.id)
+    end
+
+    it "only returns horizon accounts the user has admin access to" do
+      @a1.settings[:horizon_account_ids] = [@a1.id]
+      @a1.save!
+      @a3.settings[:horizon_account_ids] = [@a3.id]
+      @a3.save!
+
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" })
+
+      expect(json.length).to eq 2
+      expect(json.pluck("id")).to match_array([@a1.id, @a2.id])
+    end
+
+    it "supports include parameters" do
+      @a1.settings[:horizon_account_ids] = [@a1.id]
+      @a1.lti_guid = "test-guid"
+      @a1.save!
+
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts?include[]=lti_guid",
+                      { controller: "accounts", action: "horizon_accounts", format: "json", include: ["lti_guid"] })
+
+      expect(json[0]).to have_key("lti_guid")
+      expect(json[0]["lti_guid"]).to eq "test-guid"
+    end
+
+    it "returns empty array when user is not logged in" do
+      remove_user_session
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" },
+                      {},
+                      {},
+                      expected_status: 200)
+
+      expect(json).to eq []
+    end
+
+    it "honors the deprecated includes parameter" do
+      @a1.settings[:horizon_account_ids] = [@a1.id]
+      @a1.lti_guid = "test-guid"
+      @a1.save!
+
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts?includes[]=lti_guid",
+                      { controller: "accounts", action: "horizon_accounts", format: "json", includes: ["lti_guid"] })
+
+      expect(json[0]).to have_key("lti_guid")
+      expect(json[0]["lti_guid"]).to eq "test-guid"
+    end
+
+    it "doesn't include deleted accounts" do
+      @a1.settings[:horizon_account_ids] = [@a1.id, @a2.id]
+      @a1.save!
+      @a2.destroy
+
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" })
+
+      expect(json.length).to eq 1
+      expect(json[0]["id"]).to eq @a1.id
+    end
+
+    it "includes site admin if user has access and there are horizon accounts" do
+      # Enable horizon_account on a regular account
+      @a1.settings[:horizon_account_ids] = [@a1.id]
+      @a1.save!
+
+      # Give user access to site admin (without setting horizon_account on it)
+      site_admin = Account.site_admin
+      site_admin.account_users.create!(user: @user)
+
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" })
+
+      expect(json.pluck("id")).to include(site_admin.id)
+      expect(json.pluck("id")).to include(@a1.id)
+    end
+
+    it "does not include site admin if there are no horizon accounts" do
+      # Give user access to site admin
+      site_admin = Account.site_admin
+      site_admin.account_users.create!(user: @user)
+
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" })
+
+      expect(json).to eq []
+    end
+
+    it "does not include site admin if user does not have access to it" do
+      # Enable horizon_account on a regular account
+      @a1.settings[:horizon_account_ids] = [@a1.id]
+      @a1.save!
+
+      # User does NOT have access to site admin
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" })
+
+      site_admin = Account.site_admin
+      expect(json.pluck("id")).not_to include(site_admin.id)
+      expect(json.pluck("id")).to include(@a1.id)
+    end
+
+    it "includes site_admin field only when requested via includes parameter" do
+      # Enable horizon_account on a regular account
+      @a1.settings[:horizon_account_ids] = [@a1.id]
+      @a1.save!
+
+      # Give user access to site admin
+      site_admin = Account.site_admin
+      site_admin.account_users.create!(user: @user)
+
+      # Without include parameter
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts.json",
+                      { controller: "accounts", action: "horizon_accounts", format: "json" })
+
+      site_admin_json = json.find { |a| a["id"] == site_admin.id }
+      regular_account_json = json.find { |a| a["id"] == @a1.id }
+
+      expect(site_admin_json).not_to have_key("site_admin")
+      expect(regular_account_json).not_to have_key("site_admin")
+
+      # With include parameter
+      json = api_call(:get,
+                      "/api/v1/horizon_accounts?include[]=site_admin",
+                      { controller: "accounts", action: "horizon_accounts", format: "json", include: ["site_admin"] })
+
+      site_admin_json = json.find { |a| a["id"] == site_admin.id }
+      regular_account_json = json.find { |a| a["id"] == @a1.id }
+
+      expect(site_admin_json["site_admin"]).to be true
+      expect(regular_account_json).not_to have_key("site_admin")
+    end
   end
 
   describe "update" do
@@ -497,6 +792,42 @@ describe "Accounts API", type: :request do
 
       @a1.reload
       expect(@a1.restrict_student_past_view).to eq({ value: true, locked: false })
+    end
+
+    describe "suppress_notifications" do
+      def update_suppress_notifications(value)
+        api_call(:put,
+                 "/api/v1/accounts/#{@a1.id}",
+                 { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                 { account: { settings: { suppress_notifications: value } } })
+        @a1.reload
+      end
+
+      it "sets to true" do
+        update_suppress_notifications(true)
+        expect(@a1.settings[:suppress_notifications]).to be true
+      end
+
+      it "sets to an array of category slugs" do
+        Notification.create!(name: "Test Grading", category: "Grading")
+        Notification.create!(name: "Test Announcement", category: "Announcement")
+        update_suppress_notifications(%w[grading announcement])
+        expect(@a1.settings[:suppress_notifications]).to match_array(%w[grading announcement])
+      end
+
+      it "filters out invalid category slugs" do
+        Notification.create!(name: "Test Grading", category: "Grading")
+        update_suppress_notifications(%w[grading not_a_real_category])
+        expect(@a1.settings[:suppress_notifications]).to eq(%w[grading])
+      end
+
+      it "clears when set to false" do
+        @a1.settings[:suppress_notifications] = true
+        @a1.save!
+
+        update_suppress_notifications(false)
+        expect(@a1.settings[:suppress_notifications]).to be false
+      end
     end
 
     it "updates services" do
@@ -1167,7 +1498,23 @@ describe "Accounts API", type: :request do
     end
 
     describe "horizon_account setting" do
-      it "can enable the horizon account setting" do
+      let(:pine_client_mock) { class_double(PineClient) }
+      let(:redwood_client_mock) { class_double(RedwoodClient) }
+
+      before do
+        # Enable the horizon_course_setting feature flag
+        @a1.root_account.enable_feature!(:horizon_course_setting)
+
+        # Set up PineClient mock
+        allow(pine_client_mock).to receive_messages(enabled?: true, provision_tenant: true, delete_tenant: true)
+        stub_const("PineClient", pine_client_mock)
+
+        # Set up RedwoodClient mock
+        allow(redwood_client_mock).to receive_messages(enabled?: true, provision_tenant: true, delete_tenant: true)
+        stub_const("RedwoodClient", redwood_client_mock)
+      end
+
+      it "can be enabled" do
         api_call(:put,
                  "/api/v1/accounts/#{@a1.id}",
                  { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
@@ -1177,7 +1524,7 @@ describe "Accounts API", type: :request do
         expect(@a1.settings[:horizon_account][:locked]).to be true
       end
 
-      it "can disable the horizon account setting" do
+      it "can be disabled" do
         @a1.settings[:horizon_account] = { value: true }
         @a1.save!
         api_call(:put,
@@ -1185,6 +1532,116 @@ describe "Accounts API", type: :request do
                  { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
                  { account: { settings: { horizon_account: { value: false } } } })
         expect(@a1.reload.settings[:horizon_account][:value]).to be false
+      end
+
+      context "tenant provisioning" do
+        it "provisions the tenant when enabled for the first account in the root account" do
+          api_call(:put,
+                   "/api/v1/accounts/#{@a1.id}",
+                   { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                   { account: { settings: { horizon_account: { value: true } } } })
+          expect(@a1.reload.settings[:horizon_account][:value]).to be true
+
+          run_jobs
+          expect(PineClient).to have_received(:provision_tenant).with(root_account_uuid: @a1.root_account.uuid, feature_slug: "horizon", current_user: @user)
+          expect(RedwoodClient).to have_received(:provision_tenant).with(root_account_uuid: @a1.root_account.uuid, feature_slug: "horizon", current_user: @user)
+        end
+
+        it "does not provision the tenant when enabled for a non-first account in the root account" do
+          @a2.settings[:horizon_account] = { value: true }
+          @a2.save!
+          api_call(:put,
+                   "/api/v1/accounts/#{@a2.id}",
+                   { controller: "accounts", action: "update", id: @a2.to_param, format: "json" },
+                   { account: { settings: { horizon_account: { value: true } } } })
+          expect(@a2.reload.settings[:horizon_account][:value]).to be true
+          run_jobs
+          expect(PineClient).not_to have_received(:provision_tenant)
+          expect(RedwoodClient).not_to have_received(:provision_tenant)
+        end
+
+        it "deletes the tenant when disabled and no other accounts in the root account have it enabled" do
+          @a1.settings[:horizon_account] = { value: true }
+          @a1.save!
+          api_call(:put,
+                   "/api/v1/accounts/#{@a1.id}",
+                   { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                   { account: { settings: { horizon_account: { value: false } } } })
+          expect(@a1.reload.settings[:horizon_account][:value]).to be false
+          run_jobs
+          expect(PineClient).to have_received(:delete_tenant).with(root_account_uuid: @a1.root_account.uuid, feature_slug: "horizon", current_user: @user)
+          expect(RedwoodClient).to have_received(:delete_tenant).with(root_account_uuid: @a1.root_account.uuid, feature_slug: "horizon", current_user: @user)
+        end
+
+        it "does not delete the tenant when disabled and other accounts in the root account have it enabled" do
+          @a1.settings[:horizon_account] = { value: true }
+          @a1.save!
+          @a2.settings[:horizon_account] = { value: true }
+          @a2.save!
+          api_call(:put,
+                   "/api/v1/accounts/#{@a1.id}",
+                   { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                   { account: { settings: { horizon_account: { value: false } } } })
+          expect(@a1.reload.settings[:horizon_account][:value]).to be false
+
+          run_jobs
+          expect(PineClient).not_to have_received(:delete_tenant)
+          expect(RedwoodClient).not_to have_received(:delete_tenant)
+        end
+
+        it "takes no action when enabling a second account" do
+          @a1.settings[:horizon_account] = { value: true }
+          @a1.save!
+          api_call(:put,
+                   "/api/v1/accounts/#{@a2.id}",
+                   { controller: "accounts", action: "update", id: @a2.to_param, format: "json" },
+                   { account: { settings: { horizon_account: { value: true } } } })
+          expect(@a2.reload.settings[:horizon_account][:value]).to be true
+          run_jobs
+          expect(PineClient).not_to have_received(:provision_tenant)
+          expect(RedwoodClient).not_to have_received(:provision_tenant)
+        end
+      end
+
+      describe "when at the horizon account limit" do
+        before :once do
+          @a1.root_account.settings[:horizon_account_ids] = Array.new(AccountsController::HORIZON_MAX_ACCOUNTS, 1)
+          @a1.root_account.save!
+        end
+
+        it "prevents enabling horizon_account" do
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { horizon_account: { value: true } } } })
+
+          expect(json["errors"]["horizon_account"].first["message"]).to include("You cannot enable horizon_account on more than 100 accounts")
+          expect(@a1.reload.settings[:horizon_account]).to be_nil
+        end
+
+        it "allows saving other account settings" do
+          # Set some other setting to verify we can still update settings
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { restrict_student_past_view: { value: true } } } })
+
+          expect(json["errors"]).to be_nil
+          expect(@a1.reload.settings[:restrict_student_past_view][:value]).to be true
+        end
+
+        it "allows disabling horizon_account" do
+          @a1.horizon_account = true
+          @a1.save!
+
+          json = api_call(:put,
+                          "/api/v1/accounts/#{@a1.id}",
+                          { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                          { account: { settings: { horizon_account: { value: false } } } })
+
+          expect(json["errors"]).to be_nil
+          expect(@a1.reload.settings[:horizon_account][:value]).to be false
+        end
       end
     end
 
@@ -1545,6 +2002,219 @@ describe "Accounts API", type: :request do
                               format: "json",
                               homeroom: "1")
       expect(json.pluck("name")).to match_array(["c2"])
+    end
+
+    context "career_learning_library_only filtering" do
+      before :once do
+        @test_account = Account.create!
+        @test_account.enable_feature!(:horizon_learning_library_ms2)
+        @test_account.enable_feature!(:horizon_course_setting)
+        @test_account.settings[:horizon_account] = { value: true }
+        @test_account.save!
+
+        @admin = account_admin_user(account: @test_account)
+
+        @regular_course = course_factory(
+          account: @test_account,
+          course_name: "Regular Course"
+        )
+        @regular_course.career_learning_library_only = false
+        @regular_course.save!
+
+        @cll_course = course_factory(
+          account: @test_account,
+          course_name: "Career Learning Library Course"
+        )
+        @cll_course.career_learning_library_only = true
+        @cll_course.save!
+      end
+
+      it "returns all courses when parameter is not provided" do
+        json = api_call_as_user(@admin,
+                                :get,
+                                "/api/v1/accounts/#{@test_account.id}/courses",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: @test_account.to_param,
+                                format: "json")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Regular Course")
+        expect(course_names).to include("Career Learning Library Course")
+      end
+
+      it "returns only career_learning_library_only courses when parameter is true" do
+        json = api_call_as_user(@admin,
+                                :get,
+                                "/api/v1/accounts/#{@test_account.id}/courses?career_learning_library_only=true",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: @test_account.to_param,
+                                format: "json",
+                                career_learning_library_only: "true")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Career Learning Library Course")
+        expect(course_names).not_to include("Regular Course")
+      end
+
+      it "returns only regular courses when parameter is false" do
+        json = api_call_as_user(@admin,
+                                :get,
+                                "/api/v1/accounts/#{@test_account.id}/courses?career_learning_library_only=false",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: @test_account.to_param,
+                                format: "json",
+                                career_learning_library_only: "false")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Regular Course")
+        expect(course_names).not_to include("Career Learning Library Course")
+      end
+
+      it "works in any account with the feature flag enabled" do
+        regular_account = Account.create!
+        regular_account.enable_feature!(:horizon_learning_library_ms2)
+        regular_account.enable_feature!(:horizon_course_setting)
+        regular_account.settings[:horizon_account] = { value: true }
+        regular_account.save!
+        admin = account_admin_user(account: regular_account)
+
+        regular_course = course_factory(
+          account: regular_account,
+          course_name: "Regular Test Course"
+        )
+        regular_course.career_learning_library_only = false
+        regular_course.save!
+
+        cll_course = course_factory(
+          account: regular_account,
+          course_name: "CLL Test Course"
+        )
+        cll_course.career_learning_library_only = true
+        cll_course.save!
+
+        # Without parameter, should return all courses
+        json = api_call_as_user(admin,
+                                :get,
+                                "/api/v1/accounts/#{regular_account.id}/courses",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: regular_account.to_param,
+                                format: "json")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Regular Test Course")
+        expect(course_names).to include("CLL Test Course")
+
+        # With parameter=true, should return only CLL courses
+        json = api_call_as_user(admin,
+                                :get,
+                                "/api/v1/accounts/#{regular_account.id}/courses?career_learning_library_only=true",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: regular_account.to_param,
+                                format: "json",
+                                career_learning_library_only: "true")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("CLL Test Course")
+        expect(course_names).not_to include("Regular Test Course")
+      end
+
+      it "does not filter when feature flag is disabled" do
+        account_without_flag = Account.create!
+        admin = account_admin_user(account: account_without_flag)
+
+        course_factory(
+          account: account_without_flag,
+          course_name: "Test Course"
+        )
+
+        json = api_call_as_user(admin,
+                                :get,
+                                "/api/v1/accounts/#{account_without_flag.id}/courses",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: account_without_flag.to_param,
+                                format: "json")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Test Course")
+      end
+
+      it "filters correctly for sub-accounts when root account has feature flag" do
+        # Root account has feature flag
+        root_account = Account.create!
+        root_account.enable_feature!(:horizon_learning_library_ms2)
+        root_account.enable_feature!(:horizon_course_setting)
+        root_account.save!
+
+        # Create a sub-account as a horizon account
+        sub_account = root_account.sub_accounts.create!
+        sub_account.settings[:horizon_account] = { value: true }
+        sub_account.save!
+
+        admin = account_admin_user(account: sub_account)
+
+        # Create courses in the sub-account
+        regular_course = course_factory(
+          account: sub_account,
+          course_name: "Sub Account Regular Course"
+        )
+        regular_course.career_learning_library_only = false
+        regular_course.save!
+
+        cll_course = course_factory(
+          account: sub_account,
+          course_name: "Sub Account CLL Course"
+        )
+        cll_course.career_learning_library_only = true
+        cll_course.save!
+
+        # Test default behavior (should include all courses)
+        json = api_call_as_user(admin,
+                                :get,
+                                "/api/v1/accounts/#{sub_account.id}/courses",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: sub_account.to_param,
+                                format: "json")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Sub Account Regular Course")
+        expect(course_names).to include("Sub Account CLL Course")
+
+        # Test with parameter=true (should only show CLL courses)
+        json = api_call_as_user(admin,
+                                :get,
+                                "/api/v1/accounts/#{sub_account.id}/courses?career_learning_library_only=true",
+                                controller: "accounts",
+                                action: "courses_api",
+                                account_id: sub_account.to_param,
+                                format: "json",
+                                career_learning_library_only: "true")
+
+        course_names = json.pluck("name")
+        expect(course_names).to include("Sub Account CLL Course")
+        expect(course_names).not_to include("Sub Account Regular Course")
+      end
+    end
+
+    it "does not set pagination total_pages/last page link for token-authenticated API requests" do
+      course_factory(account: @a1, course_name: "c1")
+      api_call_as_user(account_admin_user(account: @a1),
+                       :get,
+                       "/api/v1/accounts/#{@a1.id}/courses",
+                       account_id: @a1.to_param,
+                       controller: "accounts",
+                       action: "courses_api",
+                       format: "json",
+                       per_page: 1)
+
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).not_to include("last")
     end
 
     describe "sort" do
@@ -2325,6 +2995,19 @@ describe "Accounts API", type: :request do
         expect(json.length).to be 1
         expect(json.first["name"]).to eq @course.name
       end
+
+      it "finds a SIS ID that looks like a global ID" do
+        not_a_global_id = "#{@shard1.id}~1"
+        course = @a1.courses.create!(name: "wat", sis_source_id: not_a_global_id)
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@a1.id}/courses?search_term=#{not_a_global_id}",
+                        { controller: "accounts",
+                          action: "courses_api",
+                          account_id: @a1.to_param,
+                          format: "json",
+                          search_term: not_a_global_id })
+        expect(json.pluck("id")).to include course.id
+      end
     end
 
     context "blueprint courses" do
@@ -2381,6 +3064,44 @@ describe "Accounts API", type: :request do
                           format: "json",
                           blueprint_associated: false })
         expect(json.pluck("name")).to match_array %w[MasterCourse OtherCourse]
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "filters blueprint courses correctly across shards" do
+          admin_user = account_admin_user
+
+          @shard1.activate do
+            @cross_shard_account = Account.create!
+            @cross_shard_account.account_users.create!(user: admin_user)
+            master_course = course_model(name: "CrossShardMaster", account: @cross_shard_account)
+            child_course = course_model(name: "CrossShardChild", account: @cross_shard_account)
+            course_model(name: "CrossShardOther", account: @cross_shard_account)
+            template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
+            template.add_child_course!(child_course)
+          end
+
+          json = api_call_as_user(admin_user,
+                                  :get,
+                                  "/api/v1/accounts/#{@cross_shard_account.global_id}/courses?blueprint=false",
+                                  { controller: "accounts",
+                                    action: "courses_api",
+                                    account_id: @cross_shard_account.global_id.to_s,
+                                    format: "json",
+                                    blueprint: false })
+          expect(json.pluck("name")).to match_array %w[CrossShardChild CrossShardOther]
+
+          json = api_call_as_user(admin_user,
+                                  :get,
+                                  "/api/v1/accounts/#{@cross_shard_account.global_id}/courses?blueprint=true",
+                                  { controller: "accounts",
+                                    action: "courses_api",
+                                    account_id: @cross_shard_account.global_id.to_s,
+                                    format: "json",
+                                    blueprint: true })
+          expect(json.pluck("name")).to match_array %w[CrossShardMaster]
+        end
       end
     end
 

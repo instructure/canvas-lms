@@ -29,7 +29,7 @@ it('renders', () => {
 })
 
 it('calls onClick when clicked', () => {
-  const onclick = jest.fn()
+  const onclick = vi.fn()
   const {getByText} = render(<AddHorizontalRuleButton onClick={onclick} label="click me" />)
 
   const btn = getByText('click me')

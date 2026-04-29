@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import elideString from '../../helpers/elideString'
 import {arrayOf, bool, func, number, shape, string, object} from 'prop-types'
@@ -26,7 +26,7 @@ import MoreOptions from './MoreOptions/index'
 import React, {Component, createRef} from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import UploadFileSVG from '../../../images/UploadFile.svg'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
@@ -35,7 +35,7 @@ import {IconCompleteSolid, IconTrashLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {ProgressBar} from '@instructure/ui-progress'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -49,7 +49,6 @@ const FILE_REQUIRED_ERROR_MESSAGE = I18n.t('At least one submission type is requ
 class FileUpload extends Component {
   static propTypes = {
     assignment: Assignment.shape,
-    breakpoints: breakpointsShape,
     createSubmissionDraft: func,
     filesToUpload: arrayOf(
       shape({
@@ -64,7 +63,7 @@ class FileUpload extends Component {
     onCanvasFileRequested: func.isRequired,
     onUploadRequested: func.isRequired,
     submission: Submission.shape,
-    submitButtonRef: object
+    submitButtonRef: object,
   }
 
   state = {
@@ -456,7 +455,13 @@ class FileUpload extends Component {
 
     return (
       <>
-        <Flex id="file-upload-container" data-testid="upload-pane" direction="column" width="100%" alignItems="stretch">
+        <Flex
+          id="file-upload-container"
+          data-testid="upload-pane"
+          direction="column"
+          width="100%"
+          alignItems="stretch"
+        >
           {files.length > 0 && (
             <Flex.Item padding="0 x-large x-large">{this.renderUploadedFiles(files)}</Flex.Item>
           )}
@@ -466,7 +471,7 @@ class FileUpload extends Component {
           </Flex.Item>
         </Flex>
         {this.state.showErrorMessage && (
-          <View as='div' padding='small 0 0 0' background='primary'>
+          <View as="div" padding="small 0 0 0" background="primary">
             <FormattedErrorMessage message={FILE_REQUIRED_ERROR_MESSAGE} />
           </View>
         )}

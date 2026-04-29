@@ -20,8 +20,8 @@ import Backbone from '@canvas/backbone'
 import ExternalContentHomeworkSubmissionView from '../ExternalContentHomeworkSubmissionView'
 
 // mock windowAlert
-jest.mock('@canvas/util/globalUtils', () => ({
-  windowAlert: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  windowAlert: vi.fn(),
 }))
 
 const container = document.createElement('div')
@@ -42,7 +42,7 @@ describe('ExternalContentHomeworkSubmissionView#uploadFileFromUrl', () => {
 
   test('Does submit the assignment if the EULA checkbox is not checked', () => {
     const view = newView()
-    const submitSpy = jest.fn()
+    const submitSpy = vi.fn()
 
     const input = document.createElement('input')
     input.id = 'turnitin_pledge_external_content'
@@ -58,7 +58,7 @@ describe('ExternalContentHomeworkSubmissionView#uploadFileFromUrl', () => {
 
   test('Does submit the assignment if the EULA checkbox is checked', () => {
     const view = newView()
-    const submitSpy = jest.fn()
+    const submitSpy = vi.fn()
 
     const input = document.createElement('input')
     input.id = 'turnitin_pledge_external_content'
@@ -74,7 +74,7 @@ describe('ExternalContentHomeworkSubmissionView#uploadFileFromUrl', () => {
 
   test('Does submit the assignment if the EULA checkbox does not exist', () => {
     const view = newView()
-    const submitSpy = jest.fn()
+    const submitSpy = vi.fn()
 
     view.submitHomework = submitSpy
     view._triggerSubmit({preventDefault: () => {}, stopPropagation: () => {}})

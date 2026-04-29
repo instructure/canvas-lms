@@ -19,14 +19,23 @@
 import {ImageBlock} from '../ImageBlock'
 import {renderBlock} from '../../__tests__/render-helper'
 
-jest.mock('../../../BlockContentEditorContext', () => ({
+vi.mock('../../../BlockContentEditorContext', () => ({
   __esModule: true,
-  useBlockContentEditorContext: jest.fn(() => ({})),
 }))
 
 describe('ImageBlock', () => {
   it('should render without crashing', () => {
-    renderBlock(ImageBlock, {url: '', altText: ''})
+    renderBlock(ImageBlock, {
+      title: '',
+      includeBlockTitle: false,
+      backgroundColor: 'color',
+      titleColor: 'color',
+      url: 'https://example.com/image.jpg',
+      altText: 'Example Image',
+      caption: 'This is an example image.',
+      altTextAsCaption: false,
+      decorativeImage: false,
+    })
     expect(true).toBe(true)
   })
 })

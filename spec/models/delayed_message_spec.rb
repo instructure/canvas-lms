@@ -65,6 +65,17 @@ describe DelayedMessage do
       expect(DelayedMessage.for(@assignment)).to eq [@delayed_message]
     end
 
+    it "accepts PeerReviewSubAssignment as a valid context" do
+      peer_review_sub = peer_review_model
+      delayed_message_model
+      expect do
+        @delayed_message.context = peer_review_sub
+        @delayed_message.save!
+      end.not_to raise_error
+      expect(@delayed_message.reload.context).to eq peer_review_sub
+      expect(DelayedMessage.for(peer_review_sub)).to eq [@delayed_message]
+    end
+
     it "has a scope to filter by the state" do
       notification_model name: "New Stuff"
       delayed_message_model(workflow_state: "pending")
@@ -161,6 +172,83 @@ describe DelayedMessage do
         expect(@cc.messages.last).not_to be_nil
         expect(@cc.messages.last.shard).to eq @shard1
       end
+    end
+  end
+
+  describe "summarize with inactive enrollments" do
+    before :once do
+      Canvas::MessageHelper.create_notification(name: "Summaries", category: "Summaries")
+      @course = course_factory(active_all: true)
+      @student = user_factory(active_all: true)
+      @enrollment = @course.enroll_student(@student, enrollment_state: "active")
+      @student.communication_channels.create!(path: "test@example.com", path_type: "email").confirm!
+      @assignment = @course.assignments.create!(title: "Test Assignment", due_at: 1.day.from_now)
+      @notification = notification_model
+    end
+
+    let(:delayed_message) do
+      DelayedMessage.create!(
+        summary: "Assignment notification",
+        context: @assignment,
+        communication_channel: @student.communication_channels.first,
+        notification: @notification,
+        workflow_state: "pending"
+      )
+    end
+
+    after do
+      @enrollment.update!(workflow_state: "active")
+      DelayedMessage.where(communication_channel_id: @student.communication_channels.first.id).delete_all
+    end
+
+    it "does not send summary when enrollment is inactive" do
+      dm = delayed_message
+      @enrollment.update!(workflow_state: "inactive")
+
+      result = DelayedMessage.summarize([dm.id])
+      expect(result).to be_nil
+    end
+
+    it "sends summary when enrollment is active" do
+      dm = delayed_message
+      expect(@enrollment.workflow_state).to eq "active"
+
+      result = DelayedMessage.summarize([dm.id])
+      expect(result).not_to be_nil
+    end
+
+    it "sends summary for non-course contexts regardless of enrollment state" do
+      account = Account.create!(name: "Test Account")
+      non_course_dm = DelayedMessage.create!(
+        summary: "Account notification",
+        context: account,
+        communication_channel: @student.communication_channels.first,
+        notification: @notification,
+        workflow_state: "pending"
+      )
+      @enrollment.update!(workflow_state: "inactive")
+
+      result = DelayedMessage.summarize([non_course_dm.id])
+      expect(result).not_to be_nil
+    end
+  end
+
+  describe ".course_from_context" do
+    before :once do
+      @course = course_factory
+      @assignment = @course.assignments.create!(title: "Test")
+    end
+
+    it "returns the course when context is a Course" do
+      expect(DelayedMessage.course_from_context(@course)).to eq @course
+    end
+
+    it "returns the course when context has a context that is a Course" do
+      expect(DelayedMessage.course_from_context(@assignment)).to eq @course
+    end
+
+    it "returns nil when context is nil" do
+      expect(DelayedMessage.course_from_context(nil)).to be_nil
     end
   end
 

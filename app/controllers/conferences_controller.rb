@@ -157,7 +157,7 @@ class ConferencesController < ApplicationController
   include CalendarConferencesHelper
 
   before_action :require_context, except: :for_user
-  skip_before_action :load_user, only: [:recording_ready]
+  skip_before_action :load_user, :require_user, only: [:recording_ready]
 
   add_crumb(proc { t "#crumbs.conferences", "Conferences" }) do |c|
     if c.context.present?
@@ -196,32 +196,8 @@ class ConferencesController < ApplicationController
                   else
                     @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
                   end
-    conferences = conferences.with_config_for(context: @context).order("created_at DESC, id DESC")
+    conferences = conferences.with_config_for(context: @context).order(created_at: :desc, id: :desc)
     api_request? ? api_index(conferences, polymorphic_url([:api_v1, @context, :conferences])) : web_index(conferences)
-  end
-
-  module UserConferencesBookmarker
-    def self.bookmark_for(conference)
-      # We're sorting in descending order, so we need to "flip" our sort values
-      # to make sure a conference is ordered properly vis-a-vis its neighbors
-      [Time.zone.now - conference.created_at, -conference.id]
-    end
-
-    def self.validate(bookmark)
-      return false unless bookmark.is_a?(Array) && bookmark.length == 2
-
-      bookmark.first.is_a?(ActiveSupport::TimeWithZone) && bookmark.second.is_a?(Integer)
-    end
-
-    def self.restrict_scope(scope, pager)
-      if pager.current_bookmark
-        creation_date, id = pager.current_bookmark
-        comparison = pager.include_bookmark ? "<=" : "<"
-
-        scope = scope.where("ROW(created_at, id) #{comparison} ROW(?, ?)", creation_date, id)
-      end
-      scope.order("created_at DESC, id DESC")
-    end
   end
 
   # @API List conferences for the current user
@@ -246,27 +222,28 @@ class ConferencesController < ApplicationController
     return render json: api_conferences_json([], @current_user, session) unless WebConference.config
 
     log_api_asset_access(["conferences"], "conferences", "other")
+    bookmarker = Plannable::Bookmarker.new(WebConference, true, :created_at, :id)
 
-    courses_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.enrollments) do |enrollments_scope|
+    courses_collection = ShardedBookmarkedCollection.build(bookmarker, @current_user.enrollments) do |enrollments_scope|
       conference_scope = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id))
                                       .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
-      conference_scope.order("created_at DESC, id DESC")
+      conference_scope.order(created_at: :desc, id: :desc)
     end
 
-    groups_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.groups) do |groups_scope|
+    groups_collection = ShardedBookmarkedCollection.build(bookmarker, @current_user.groups) do |groups_scope|
       conference_scope = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id))
                                       .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
-      conference_scope.order("created_at DESC, id DESC")
+      conference_scope.order(created_at: :desc, id: :desc)
     end
 
     # ShardedBookmarkedCollection.build will return an ActiveRecord relation as
     # a shortcut if it finds results on fewer than two shards. We still need to
     # merge these two result sets, so re-wrap results in a bookmarked
     # collection if needed.
-    courses_collection = BookmarkedCollection.wrap(UserConferencesBookmarker, courses_collection) if courses_collection.is_a?(ActiveRecord::Relation)
-    groups_collection = BookmarkedCollection.wrap(UserConferencesBookmarker, groups_collection) if groups_collection.is_a?(ActiveRecord::Relation)
+    courses_collection = BookmarkedCollection.wrap(bookmarker, courses_collection) if courses_collection.is_a?(ActiveRecord::Relation)
+    groups_collection = BookmarkedCollection.wrap(bookmarker, groups_collection) if groups_collection.is_a?(ActiveRecord::Relation)
 
     merged_collection = BookmarkedCollection.merge(
       ["courses", courses_collection],
@@ -322,22 +299,22 @@ class ConferencesController < ApplicationController
     bbb_config = WebConference.config(class_name: BigBlueButtonConference.to_s)
 
     # exposing the initial data as json embedded on page.
-    js_env(
-      current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),
-      concluded_conferences: ui_conferences_json(@concluded_conferences, @context, @current_user, session),
-      default_conference: default_conference_json(@context, @current_user, session),
-      conference_type_details: conference_types_json(WebConference.conference_types(@context)),
-      users: @users.map { |u| { id: u.id, name: u.last_name_first } },
-      groups: @groups&.map { |g| { id: g.id, name: g.full_name } },
-      sections: @sections&.map { |s| { id: s.id, name: s.display_name } },
-      group_user_ids_map: @group_user_ids_map,
-      section_user_ids_map: @section_user_ids_map,
-      can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
-      can_manage_calendar: @context.grants_right?(@current_user, session, :manage_calendar),
-      render_alternatives: @render_alternatives,
-      bbb_recording_enabled: bbb_config ? bbb_config[:recording_enabled] : false,
-      context_name: @context&.name || nil
-    )
+    js_env({
+             current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),
+             concluded_conferences: ui_conferences_json(@concluded_conferences, @context, @current_user, session),
+             default_conference: default_conference_json(@context, @current_user, session),
+             conference_type_details: conference_types_json(WebConference.conference_types(@context)),
+             users: @users.map { |u| { id: u.id, name: u.last_name_first } },
+             groups: @groups&.map { |g| { id: g.id, name: g.full_name } },
+             sections: @sections&.map { |s| { id: s.id, name: s.display_name } },
+             group_user_ids_map: @group_user_ids_map,
+             section_user_ids_map: @section_user_ids_map,
+             can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
+             can_manage_calendar: @context.grants_right?(@current_user, session, :manage_calendar),
+             render_alternatives: @render_alternatives,
+             bbb_recording_enabled: bbb_config ? bbb_config[:recording_enabled] : false,
+             context_name: @context&.name || nil
+           })
     set_tutorial_js_env
     flash[:error] = t("Some conferences on this page are hidden because of errors while retrieving their status") if @errors
   end
@@ -366,13 +343,21 @@ class ConferencesController < ApplicationController
 
   def create
     if authorized_action(@context.web_conferences.temp_record, @current_user, :create)
-      calendar_event_param = params[:web_conference].try(:delete, :calendar_event).try(&:to_i)
+      calendar_event_param = params[:web_conference].try(:delete, :calendar_event)
       @conference = @context.web_conferences.build(conference_params)
       @conference.settings[:default_return_url] = named_context_url(@context, :context_url, include_host: true)
       @conference.user = @current_user
       respond_to do |format|
         if @conference.save
-          if calendar_event_param && calendar_event_param == 1
+          # Detect and track invite_all option
+          # Match the logic in member_ids method
+          remove_observers = value_to_boolean(params.dig(:observers, :remove))
+          invite_all = !params[:user] || value_to_boolean(params.dig(:user, :all)) || remove_observers
+
+          @conference.invite_all_enabled = invite_all
+          @conference.remove_observers_enabled = remove_observers if remove_observers
+
+          if value_to_boolean(calendar_event_param)
             calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
             calendar_event&.save
           end
@@ -400,23 +385,17 @@ class ConferencesController < ApplicationController
       respond_to do |format|
         params[:web_conference].try(:delete, :long_running)
         params[:web_conference].try(:delete, :conference_type)
-        sync_attendees = params[:web_conference].try(:delete, :sync_attendees).try(&:to_i)
-
-        @conference.invite_users_from_context if sync_attendees == 1
-
-        calendar_event_param = params[:web_conference].try(:delete, :calendar_event).try(&:to_i)
+        calendar_event_param = params[:web_conference].try(:delete, :calendar_event)
         if @conference.update(conference_params)
-          # TODO: ability to dis-invite people
-          @conference.invite_users_from_context(member_ids) unless sync_attendees == 1
+          user_ids = member_ids
+          (user_ids.count > WebConference.max_invitees_sync_size) ? @conference.delay.invite_users_from_context(user_ids) : @conference.invite_users_from_context(user_ids)
 
-          unless sync_attendees == 1
-            if calendar_event_param && calendar_event_param == 1
-              calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
-              calendar_event&.save
-            elsif @conference.calendar_event
-              @conference.calendar_event.destroy
-              @conference.calendar_event = nil
-            end
+          if value_to_boolean(calendar_event_param)
+            calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
+            calendar_event&.save
+          elsif @conference.calendar_event
+            @conference.calendar_event.destroy
+            @conference.calendar_event = nil
           end
 
           @conference.save
@@ -440,7 +419,9 @@ class ConferencesController < ApplicationController
         redirect_to named_context_url(@context, :context_conferences_url)
         return
       end
-      if @conference.grants_right?(@current_user, session, :initiate) || @conference.grants_right?(@current_user, session, :resume) || @conference.active?(true)
+      if @conference.grants_right?(@current_user, session, :initiate) ||
+         @conference.grants_right?(@current_user, session, :resume) ||
+         @conference.active?(force_check: true)
         @conference.add_attendee(@current_user)
         @conference.restart if @conference.ended_at && @conference.grants_right?(@current_user, session, :initiate)
         log_asset_access(@conference, "conferences", "conferences", "participate")
@@ -469,7 +450,7 @@ class ConferencesController < ApplicationController
         @conference.recording_ready!
         render json: [], status: :accepted
       else
-        render json: signed_id_invalid_json, status: :unprocessable_entity
+        render json: signed_id_invalid_json, status: :unprocessable_content
       end
     rescue Canvas::Security::InvalidToken
       render json: invalid_jwt_token_json, status: :unauthorized

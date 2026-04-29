@@ -23,8 +23,12 @@ describe ItemBanksController do
       course_with_teacher(active_all: true)
     end
 
-    it "returns a 404 when ams_service feature flag is disabled" do
-      @course.root_account.disable_feature!(:ams_service)
+    before do
+      user_session(@teacher)
+    end
+
+    it "returns a 404 when ams_root_account_integration feature flag is disabled" do
+      @course.root_account.disable_feature!(:ams_root_account_integration)
 
       get :show, params: { course_id: @course.id }
 
@@ -32,12 +36,25 @@ describe ItemBanksController do
       expect(response).to render_template("shared/errors/404_message")
     end
 
-    it "renders successfully when ams_service feature flag is enabled" do
-      @course.root_account.enable_feature!(:ams_service)
+    it "returns a 404 when ams_course_integration feature flag is disabled" do
+      @course.disable_feature!(:ams_course_integration)
+
+      get :show, params: { course_id: @course.id }
+
+      expect(response).to have_http_status(:not_found)
+      expect(response).to render_template("shared/errors/404_message")
+    end
+
+    it "renders successfully when ams_root_account_integration and ams_course_integration are enabled" do
+      @course.root_account.enable_feature!(:ams_root_account_integration)
+      @course.enable_feature!(:ams_course_integration)
 
       get :show, params: { course_id: @course.id }
 
       expect(response).to be_successful
+      expect(controller.remote_env[:ams]).not_to be_nil
+      expect(controller.remote_env[:ams][:launch_url]).to eq(Services::Ams.launch_url)
+      expect(controller.remote_env[:ams][:API_URL]).to eq(Services::Ams.api_url)
     end
   end
 end

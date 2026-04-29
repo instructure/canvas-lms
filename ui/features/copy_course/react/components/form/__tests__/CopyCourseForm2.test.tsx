@@ -70,8 +70,8 @@ describe('CourseCopyForm', () => {
     course,
     terms,
     isSubmitting: false,
-    onSubmit: jest.fn(),
-    onCancel: jest.fn(),
+    onSubmit: vi.fn(),
+    onCancel: vi.fn(),
     canImportAsNewQuizzes: true,
   }
 
@@ -107,12 +107,12 @@ describe('CourseCopyForm', () => {
     })
 
     // Mock the current date to be January 1st of the current year at noon
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date(`${currentYear}-01-01T12:00:00.000Z`))
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(`${currentYear}-01-01T12:00:00.000Z`))
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
     fakeENV.teardown()
   })
 

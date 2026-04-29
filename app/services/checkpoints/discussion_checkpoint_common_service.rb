@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
-  require_relative "discussion_checkpoint_error"
-
-  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible: nil, replies_required: 1, saved_by: nil)
+  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible: nil, replies_required: 1, saved_by: nil, updating_user: nil)
     super()
     @discussion_topic = discussion_topic
     @assignment = discussion_topic.assignment
@@ -29,6 +27,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
     @points_possible = points_possible
     @replies_required = replies_required
     @saved_by = saved_by
+    @updating_user = updating_user
   end
 
   private
@@ -75,6 +74,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
 
   def update_assignment
     @assignment.assign_attributes(assignment_attributes)
+    @assignment.updating_user = @updating_user
     @assignment.save! if @assignment.changed?
   end
 
@@ -86,8 +86,52 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
     inherited_attributes.merge(specified_attributes)
   end
 
+  def checkpoint_attributes_for_update(existing_checkpoint)
+    # Only return attributes that have actually changed to avoid
+    # triggering Master Course validation on unchanged restricted columns
+    new_attributes = checkpoint_attributes
+    changed_attributes = {}
+
+    new_attributes.each do |key, new_value|
+      current_value = existing_checkpoint.send(key)
+      # Compare values, handling nil/empty cases appropriately
+      if attribute_changed?(current_value, new_value)
+        changed_attributes[key] = new_value
+      end
+    end
+
+    changed_attributes
+  end
+
+  def attribute_changed?(current_value, new_value)
+    # Handle cases where nil and empty string should be considered the same
+    # for certain attributes like description
+    return false if current_value == new_value
+    return false if current_value.blank? && new_value.blank?
+
+    # Special handling for User objects - compare by id
+    if current_value.is_a?(User) && new_value.is_a?(User)
+      return current_value.id != new_value.id
+    end
+
+    # Handle dates properly
+    if current_value.is_a?(Time) && new_value.is_a?(Time)
+      return current_value.to_i != new_value.to_i
+    end
+
+    true
+  end
+
   def inherited_attributes
-    @assignment.attributes.slice(*attributes_to_inherit_from_parent).symbolize_keys
+    attributes = @assignment.attributes.slice(*attributes_to_inherit_from_parent).symbolize_keys
+
+    # Don't inherit description if the assignment has content restrictions to avoid
+    # Blueprint validation errors when trying to set description on child content
+    if @assignment.respond_to?(:editing_restricted?) && @assignment.editing_restricted?(:content)
+      attributes.delete(:description)
+    end
+
+    attributes
   end
 
   def update_required_replies?
@@ -102,6 +146,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   def specified_attributes
     attrs = { sub_assignment_tag: @checkpoint_label }
     attrs[:points_possible] = @points_possible if @points_possible
+    attrs[:updating_user] = @updating_user
     attrs.merge(date_fields)
   end
 

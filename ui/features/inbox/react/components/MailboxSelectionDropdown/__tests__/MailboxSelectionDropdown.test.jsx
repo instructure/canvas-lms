@@ -29,7 +29,7 @@ describe('MailboxSelectionDropdown', () => {
 
   it('passes selection type to callback', () => {
     global.event = undefined
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
     const {container, getByText} = render(
       <MailboxSelectionDropdown onSelect={mockCallback} activeMailbox="inbox" />,
     )

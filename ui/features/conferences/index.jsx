@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {clone} from 'lodash'
+import {clone} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import CollectionView from '@canvas/backbone-collection-view'
 import ConferenceCollection from './backbone/collections/ConferenceCollection'
@@ -35,9 +35,9 @@ import '@canvas/util/templateData'
 import renderConferenceAlternatives from './react/renderAlternatives'
 import ready from '@instructure/ready'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {VideoConferenceModal} from './react/components/VideoConferenceModal/VideoConferenceModal'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const I18n = createI18nScope('conferences')
@@ -152,7 +152,7 @@ ready(() => {
 
         const menuData = availableAttendeesList.concat(availableSectionsList, availableGroupsList)
 
-        ReactDOM.render(
+        legacyRender(
           <VideoConferenceModal
             open={true}
             isEditing={false}
@@ -160,7 +160,7 @@ ready(() => {
             onDismiss={() => {
               window.location.hash = ''
 
-              ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
+              legacyRender(<span />, document.getElementById('react-conference-modal-container'))
             }}
             onSubmit={async (e, data) => {
               const context =
@@ -330,7 +330,7 @@ ready(() => {
         }
       })
 
-      ReactDOM.render(
+      legacyRender(
         <VideoConferenceModal
           open={true}
           isEditing={true}
@@ -351,7 +351,7 @@ ready(() => {
           onDismiss={() => {
             window.location.hash = ''
 
-            ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
+            legacyRender(<span />, document.getElementById('react-conference-modal-container'))
           }}
           onSubmit={async (e, data) => {
             const context =

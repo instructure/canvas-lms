@@ -80,9 +80,10 @@ describe TokenScopes do
         ]
       end
 
-      it "formats the scopes with url:http_verb|api_path" do
+      it "formats the scopes with url:http_verb|api_path and url:http|file_access_path" do
         generated_scopes.each do |scope|
-          expect(%r{^url:(?:GET|OPTIONS|POST|PUT|PATCH|DELETE)\|/api/.+} =~ scope).not_to be_nil
+          regex = %r{^url:(?:GET|OPTIONS|POST|PUT|PATCH|DELETE)\|/(api/.+|.+/download|.+/preview)$}
+          expect(regex =~ scope).not_to be_nil
         end
       end
 
@@ -91,6 +92,25 @@ describe TokenScopes do
           expect(scope.include?("(.:format)")).to be false
         end
       end
+
+      it "does not include the optional type part of the route path" do
+        generated_scopes.each do |scope|
+          expect(scope.include?("(.:type)")).to be false
+        end
+      end
+    end
+  end
+
+  describe "api_routes_for_openapi_docs" do
+    it "formats routes in the correct format" do
+      # Arbitrarily choosing "account_domain_lookups#search" because it's currently
+      # first in the list. Just change this in the future if that endpoint is deleted.
+      key = "account_domain_lookups#search"
+      result = TokenScopes.api_routes_for_openapi_docs
+      expect(result).to include(key)
+      # result[key] should be an array of objects; each object should contain :method
+      # and :path
+      expect(result[key].first).to include(:method, :path)
     end
   end
 

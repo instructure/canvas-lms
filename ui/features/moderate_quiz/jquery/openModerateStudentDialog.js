@@ -18,7 +18,6 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 
 const I18n = createI18nScope('quizzes.openModerateStudentDialog')
 

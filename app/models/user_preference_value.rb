@@ -23,7 +23,7 @@
 # then you can write it to users with `User#set_preference`
 # and retrieve the values using `User#get_preference`
 
-class UserPreferenceValue < ActiveRecord::Base
+class UserPreferenceValue < ApplicationRecord
   belongs_to :user
   serialize :value
   serialize :sub_key, coder: JSON # i'm too lazy to force a distinction between integer and string/symbol keys
@@ -62,6 +62,10 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :viewed_auto_subscribed_account_calendars
   add_user_preference :text_editor_preference
   add_user_preference :files_ui_version
+  add_user_preference :learning_mastery_gradebook_settings, use_sub_keys: true
+  add_user_preference :learner_dashboard_tab_selection
+  add_user_preference :widget_dashboard_config
+  add_user_preference :educator_dashboard_config
 
   def self.settings
     @preference_settings ||= {}

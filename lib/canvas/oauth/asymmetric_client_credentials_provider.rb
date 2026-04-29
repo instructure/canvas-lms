@@ -81,8 +81,10 @@ module Canvas::OAuth
       # Unlike in the deep linking response, we are intentionally not caching
       # the JWKs here (for now), as this code path is less used (tools can
       # reuse tokens) and accepting revoked keys here has higher consequences
-      pub_jwk_from_url = CanvasHttp.get(key.public_jwk_url)
-      JSON::JWT.decode(jwt, JSON::JWK::Set.new(JSON.parse(pub_jwk_from_url.body)))
+      InstrumentTLSCiphers.without_tls_metrics do
+        pub_jwk_from_url = CanvasHttp.get(key.public_jwk_url)
+        JSON::JWT.decode(jwt, JSON::JWK::Set.new(JSON.parse(pub_jwk_from_url.body)))
+      end
     rescue JSON::ParserError
       @invalid_json = true
     rescue CanvasHttp::Error, EOFError, JSON::JWT::Exception => e

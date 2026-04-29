@@ -17,17 +17,20 @@
     "add_alt_text_for_the_image_48cd88aa": {
         "message": "Alt-tekst toevoegen voor de afbeelding"
     },
-    "add_another_f4e50d57": {
-        "message": "Nog een toevoegen"
-    },
     "add_cc_subtitles_55f0394e": {
         "message": "CC/ondertiteling toevoegen"
     },
     "add_image_60b2de07": {
         "message": "Afbeelding toevoegen"
     },
+    "add_new_a9226085": {
+        "message": "Nieuwe toevoegen"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Nieuwe ondertiteling toevoegen"
+    },
     "add_one_9e34a6f8": {
-        "message": "Voer er één toe!"
+        "message": "Voeg er één toe!"
     },
     "additional_considerations_f3801683": {
         "message": "Extra overwegingen"
@@ -43,12 +46,6 @@
     },
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
-    },
-    "ai_response_9624e8e8": {
-        "message": "AI-reactie"
-    },
-    "ai_tools_fda01177": {
-        "message": "AI-tools"
     },
     "albanian_21ed929e": {
         "message": "Albanees"
@@ -67,6 +64,12 @@
     },
     "all_apps_a50dea49": {
         "message": "Alle apps"
+    },
+    "allow_media_download_16dcf2bd": {
+        "message": "Downloaden media toestaan"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Downloaden transcript toestaan"
     },
     "alpha_15d59033": {
         "message": "Alfa"
@@ -88,9 +91,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Er is een fout opgetreden bij het maken van een netwerkaanvraag"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "Er is een fout opgetreden bij het verwerken van je aanvraag "
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Er is een fout opgetreden bij het uploaden van je media."
@@ -170,6 +170,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Er is automatisch opgeslagen inhoud aanwezig. Wil je liever  de automatisch opgeslagen inhoud laden?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Automatische ondertiteling"
+    },
     "available_folders_694d0436": {
         "message": "Beschikbare mappen"
     },
@@ -242,6 +245,27 @@
     "cap_product_3a5265a6": {
         "message": "Cap-product"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "Kan geen ondertiteling genereren"
+    },
+    "caption_manager_aae0906f": {
+        "message": "Ondertitelingsmanager"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "Kan ondertiteling { captionName } niet verwijderen"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "Kan ondertiteling { captionName } niet genereren"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "Kan ondertiteling { captionName } niet uploaden"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Ondertiteling is verwijderd voor { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Ondertitelingen zijn verwijderd voor { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Ondertiteling overgenomen van een bovenliggende cursus kan niet worden verwijderd."
     },
@@ -268,6 +292,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Tekstkleur wijzigen"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Wijzigingen worden toegepast nadat je deze pagina opslaat."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Je wijzigingen worden niet opgeslagen."
@@ -299,6 +326,12 @@
     "choose_caption_file_9c45bc4e": {
         "message": "Ondertitelingsbestand kiezen"
     },
+    "choose_file_8d89ccab": {
+        "message": "Bestand kiezen"
+    },
+    "choose_file_required_61f0d716": {
+        "message": "Kies een bestand (vereist)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Gebruiksrechten kiezen..."
     },
@@ -313,12 +346,6 @@
     },
     "clear_image_3213fe62": {
         "message": "Afbeelding wissen"
-    },
-    "clear_selected_file_82388e50": {
-        "message": "Verwijder geselecteerd bestand"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "Verwijder geselecteerd bestand: { filename }"
     },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "Klik of schuif-klik voor de HTML-editor."
@@ -344,6 +371,9 @@
     "close_d634289d": {
         "message": "Sluiten"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Modaliteit Toetsenbordsneltoetsen sluiten"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Ondertitelingsbestand moet kleiner zijn dan { maxKb } kb"
     },
@@ -352,6 +382,9 @@
     },
     "clubs_suit_c1ffedff": {
         "message": "Klaveren (speelkaart)"
+    },
+    "collab_575ac7bc": {
+        "message": "Samenwerking"
     },
     "collaborations_5c56c15f": {
         "message": "Samenwerkingen"
@@ -386,9 +419,6 @@
     "complex_numbers_a543d004": {
         "message": "Complexe getallen"
     },
-    "compose_44c904f4": {
-        "message": "Samenstellen"
-    },
     "computer_1d7dfa6f": {
         "message": "Computer"
     },
@@ -413,11 +443,11 @@
     "content_type_2cf90d95": {
         "message": "Inhoudtype"
     },
+    "continue_to_youtube_content_a34f0f85": {
+        "message": "Doorgaan naar YouTube-inhoud"
+    },
     "coproduct_e7838082": {
         "message": "Coproduct"
-    },
-    "copy_9748f9f": {
-        "message": "Kopiëren"
     },
     "copyright_holder_66ee111": {
         "message": "Houder van auteursrecht:"
@@ -491,9 +521,6 @@
     "custom_6979cd81": {
         "message": "Aangepast"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Aangepaste breedte en hoogte (in pixels)"
-    },
     "cyan_c1d5f68a": {
         "message": "Cyaan"
     },
@@ -542,6 +569,9 @@
     "degree_symbol_4a823d5f": {
         "message": "Gradensymbool"
     },
+    "delete_failed_6529e336": {
+        "message": "Verwijderen mislukt"
+    },
     "delimiters_4db4840d": {
         "message": "Scheidingstekens"
     },
@@ -553,9 +583,6 @@
     },
     "describe_the_type_ff448da5": {
         "message": "(Beschrijf het { TYPE })"
-    },
-    "describe_the_video_2fe8f46a": {
-        "message": "(beschrijf de video)"
     },
     "description_436c48d7": {
         "message": "Beschrijving"
@@ -578,9 +605,6 @@
     "dimension_type_f5fa9170": {
         "message": "Afmetingstype"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Afmetingen"
-    },
     "directionality_26ae9e08": {
         "message": "richting"
     },
@@ -601,9 +625,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Disjuncte verbinding"
-    },
-    "dislike_14befc48": {
-        "message": "Afkeuren"
     },
     "display_options_315aba85": {
         "message": "Weergaveopties"
@@ -640,6 +661,9 @@
     },
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Pijl omlaag en rechts diagonaal"
+    },
+    "download_captionname_2e5eea35": {
+        "message": "{ captionName } downloaden"
     },
     "download_filename_2baae924": {
         "message": "{ filename } downloaden"
@@ -746,6 +770,9 @@
     "english_united_kingdom_a613f831": {
         "message": "Engels (Verenigd Koninkrijk)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "Titel van media invoeren"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Voer minimaal 3 tekens in om te gaan zoeken"
     },
@@ -754,9 +781,6 @@
     },
     "enter_search_text_26cb4459": {
         "message": "voer zoektekst in"
-    },
-    "enter_text_8b35c65b": {
-        "message": "Tekst invoeren"
     },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
@@ -812,6 +836,9 @@
     "extra_large_b6cdf1ff": {
         "message": "Extra groot"
     },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "Extra groot ({ width } x { height } px)"
+    },
     "extra_small_9ae33252": {
         "message": "Extra klein"
     },
@@ -827,14 +854,20 @@
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Kan geen bestandsinhoud ophalen"
     },
-    "failed_to_copy_response_d3def551": {
-        "message": "Kopiëren van reactie mislukt"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Kan geen inhoud ophalen uit externe tool"
     },
+    "file_d1b70050": {
+        "message": "Bestand*"
+    },
     "file_name_8fd421ff": {
         "message": "Bestandsnaam"
+    },
+    "file_preview_21667a6e": {
+        "message": "Bestandsvoorbeeld"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Bestandsvoorbeeld voor { fileName }"
     },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Opslagquota voor bestanden overschreden"
@@ -1040,12 +1073,6 @@
     "height_69b03e15": {
         "message": "Hoogte"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Hallo. Beschrijf de wijzigingen die je aan je compositie wilt aanbrengen."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Hallo. Beschrijf de wijzigingen die je aan je selectie wilt aanbrengen."
-    },
     "hexagon_d8468e0d": {
         "message": "Zeshoek"
     },
@@ -1064,6 +1091,9 @@
     "home_351838cd": {
         "message": "Startpagina"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Hoe kun je om ondertiteling vragen en deze bewerken?"
+    },
     "html_code_editor_fd967a44": {
         "message": "HTML-code-editor"
     },
@@ -1078,9 +1108,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Ik heb het auteursrecht"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Het spijt me maar ik kan het antwoord van de AI niet vinden"
     },
     "icelandic_9d6d35de": {
         "message": "IJslands"
@@ -1259,8 +1286,17 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
+    "language_91effaa0": {
+        "message": "Taal*"
+    },
     "language_arts_icon_a798b0f8": {
         "message": "Linguïstiekpictogram"
+    },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Taal die wordt gesproken in deze media*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (automatisch)"
     },
     "languages_icon_9d20539": {
         "message": "Talenpictogram"
@@ -1271,8 +1307,14 @@
     "large_text_e7ba08cd": {
         "message": "Grote tekst"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "Groot ({ width } x { height } px)"
+    },
     "latvian_2bbb6aab": {
         "message": "Lets"
+    },
+    "learn_ad3b3505": {
+        "message": "Leren"
     },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "Meer informatie over aangrenzende links"
@@ -1376,6 +1418,12 @@
     "links_to_an_external_site_de74145d": {
         "message": "Koppelingen naar een externe site."
     },
+    "list_collapsed_9ac35920": {
+        "message": "Lijst samengevouwen."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Lijst uitgevouwen."
+    },
     "lists_cd1336fc": {
         "message": "Lijsten"
     },
@@ -1417,6 +1465,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Voorbeeld laden"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Snelheid vergrendelen op 1x"
     },
     "locked_762f138b": {
         "message": "Vergrendeld"
@@ -1463,11 +1514,17 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "Verwerken van mediabestand. Probeer het later opnieuw."
     },
+    "media_options_saved_560c4ec8": {
+        "message": "Media-opties opgeslagen."
+    },
     "media_title_2112243b": {
         "message": "Mediatitel"
     },
     "medium_5a8e9ead": {
         "message": "Medium"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "Gemiddeld ({ width } x { height } px)"
     },
     "merge_links_2478df96": {
         "message": "Koppelingen samenvoegen"
@@ -1498,9 +1555,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "Diversen"
-    },
-    "modify_6b0b13e3": {
-        "message": "Wijzigen"
     },
     "module_90d9fd32": {
         "message": "Module"
@@ -1700,6 +1754,9 @@
     "operators_a2ef9a93": {
         "message": "Operators"
     },
+    "options_3ab0ea65": {
+        "message": "Opties"
+    },
     "or_9b70ccaa": {
         "message": "Of"
     },
@@ -1711,6 +1768,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Andere editorsnelkoppelingen zijn te vinden op"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Onze technologie genereert ondertiteling met een nauwkeurigheid van ~85%."
     },
     "outline_color_3ef2cea7": {
         "message": "Omtrekkleur"
@@ -1814,20 +1874,32 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Media-opmerking van { name } afspelen die gemaakt is op { createdAt }."
     },
+    "player_layout_14e09a29": {
+        "message": "Lay-out van speler"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Geef Canvas toegang tot je microfoon en webcam."
     },
     "please_choose_a_file_c2449cc": {
         "message": "Kies een bestand"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Beschrijf wat je wilt opstellen."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Voer een bestandsnaam in"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "Voer een geldige video-URL in van een ondersteund platform."
+    },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Selecteer een bestand voordat je begint met uploaden."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Selecteer een bestand van een ondersteund type"
+    },
+    "please_select_a_language_d90256fb": {
+        "message": "Selecteer een taal"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Selecteer een .vtt- of .srt-bestand"
     },
     "plus_d43cd4ec": {
         "message": "Plus"
@@ -1889,6 +1961,9 @@
     "prime_numbers_13464f61": {
         "message": "Priemgetallen"
     },
+    "processing_8c569014": {
+        "message": "Bezig met verwerken..."
+    },
     "product_39cf144f": {
         "message": "Product"
     },
@@ -1949,6 +2024,12 @@
     "religion_icon_246e0be1": {
         "message": "Religiepictogram"
     },
+    "remove_f47dc62a": {
+        "message": "Verwijderen"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "{ filename } verwijderen"
+    },
     "remove_heading_style_5fdc8855": {
         "message": "Koptekststijl verwijderen"
     },
@@ -1976,14 +2057,14 @@
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Alle { alertFindText } zijn vervangen door { alertReplaceText }"
     },
+    "request_d1129f7d": {
+        "message": "Aanvraag"
+    },
     "reset_95a81614": {
         "message": "Opnieuw instellen"
     },
     "resize_ec83d538": {
         "message": "Grootte wijzigen"
-    },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Reactie gekopieerd naar klembord"
     },
     "restore_auto_save_deccd84b": {
         "message": "Automatisch opslaan herstellen?"
@@ -1991,8 +2072,8 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Resultaat { index } van { max }."
     },
-    "retry_ebd5f8ba": {
-        "message": "Opnieuw proberen"
+    "retry_captionname_5ed0a12f": {
+        "message": "{ captionName } opnieuw proberen"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Inverse tourniquet (conclusie volgt)"
@@ -2123,6 +2204,9 @@
     "selected_274ce24f": {
         "message": "Geselecteerd"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Geselecteerd bestand: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Geselecteerd { linkFileName }"
     },
@@ -2153,23 +2237,17 @@
     "shortcut_911d6255": {
         "message": "Snelkoppeling"
     },
-    "show_all_967a90f0": {
-        "message": "Alles tonen"
-    },
-    "show_audio_options_b489926b": {
-        "message": "Audio-opties weergeven"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Afbeeldingsopties weergeven"
     },
     "show_link_options_545338fd": {
         "message": "Linkopties weergeven"
     },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Studio Media-opties weergeven"
+    "show_rolling_transcript_c1481744": {
+        "message": "Doorlopend transcript weergeven"
     },
-    "show_video_options_6ed3721a": {
-        "message": "Video-opties weergeven"
+    "show_rolling_transcript_d353aca4": {
+        "message": "Doorlopend transcript weergeven"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Slechtzienden bladeren snel door webpagina''s, op zoek naar grote of vette koppen. Gebruikers van schermlezers zijn afhankelijk van koppen om een idee van de context te krijgen. Koppen moeten de juiste structuur hebben."
@@ -2203,6 +2281,9 @@
     },
     "small_b070434a": {
         "message": "Klein"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "Klein ({ width } x { height } px)"
     },
     "solid_circle_9f061dfc": {
         "message": "Dichte cirkel"
@@ -2471,11 +2552,20 @@
     "this_image_is_currently_unavailable_25c68857": {
         "message": "Deze afbeelding is momenteel niet beschikbaar"
     },
+    "this_video_may_display_youtube_ads_4d19d590": {
+        "message": "Deze video kan YouTube-advertenties afspelen"
+    },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Ook al krijgt je video de juiste titel in de browser, de video kon niet worden bijgewerkt in de database."
     },
+    "thumbnail_e0de666f": {
+        "message": "Miniatuur"
+    },
     "timebar_a4d18443": {
         "message": "Tijdbalk"
+    },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "Titel kan niet leeg zijn"
     },
     "title_ee03d132": {
         "message": "Titel"
@@ -2497,6 +2587,9 @@
     },
     "top_66e0adb6": {
         "message": "Boven"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "Het transcriptvenster is beschikbaar in breedtes van meer dan 720 px."
     },
     "tray_839df38a": {
         "message": "Houder"
@@ -2537,6 +2630,9 @@
     "unpublished_dfd8801": {
         "message": "niet-gepubliceerd"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "Niet-opgeslagen wijzigingen gaan verloren."
+    },
     "untitled_16aa4f2b": {
         "message": "Zonder titel"
     },
@@ -2555,8 +2651,17 @@
     "updated_link_a827e441": {
         "message": "Bijgewerkte koppeling"
     },
+    "upload_8b403d05": {
+        "message": "Uploaden"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Upload een ondertitelingstrack of in de SRT- of de *WebVTT*-indeling."
+    },
     "upload_document_253f0478": {
         "message": "Document uploaden"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "Uploaden mislukt"
     },
     "upload_file_fd2361b8": {
         "message": "Bestand uploaden"
@@ -2660,9 +2765,6 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Gebruikt door schermlezers om de inhoud van een afbeelding te beschrijven"
     },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Gebruikt door schermlezers om de video te beschrijven"
-    },
     "user_documents_c206e61f": {
         "message": "Gebruikersdocumenten"
     },
@@ -2699,6 +2801,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Videospeler voor { title }"
     },
+    "video_url_889d3263": {
+        "message": "Video-URL"
+    },
     "vietnamese_e7a76583": {
         "message": "Vietnamees"
     },
@@ -2720,8 +2825,8 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "Aantal woorden en tekens bekijken"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Wachten op antwoord"
+    "viewer_restrictions_e14274c9": {
+        "message": "Kijkersrestricties"
     },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "We kunnen geen werkende microfoon detecteren die op je apparaat is aangesloten."
@@ -2743,9 +2848,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Welsh"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Wat wil je doen?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Wanneer een markering is gebruikt die items visueel opmaakt als een lijst maar de lijstrelatie niet aangeeft, kan het voor gebruikers moeilijk zijn om door de informatie te navigeren."
@@ -2776,9 +2878,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Kransproduct"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Schrijfassistent"
     },
     "xi_149681d0": {
         "message": "Xi"
@@ -2824,6 +2923,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Mogelijk is je webcam al in gebruik."
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "Insluitings-URL YouTube"
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

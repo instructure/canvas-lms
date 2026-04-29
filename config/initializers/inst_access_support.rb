@@ -21,18 +21,41 @@ require "inst_access"
 class InstAccessSupport
   def self.configure_inst_access!
     conf = Rails.application.credentials.inst_access_signature
+
     if conf
+      service_keys = public_service_keys.merge(Hash(conf[:service_keys]))
       service_jwks = JSON::JWK::Set.new
-      conf[:service_keys]&.each do |kid, key|
-        service_jwks << JSON::JWK.new(kid: kid.to_s, k: key[:secret], kty: key[:key_type]) if key[:secret] && key[:key_type]
+      service_keys.each do |kid, key|
+        key_type = key[:key_type]
+        base_jwk = { kid: kid.to_s, kty: key[:key_type] }
+
+        service_jwks <<
+          case key_type
+          when "oct"
+            JSON::JWK.new(**base_jwk, k: key[:secret])
+          when "RSA"
+            JSON::JWK.new(**base_jwk, **key.slice(:n, :e))
+          else
+            raise ArgumentError, "Key #{kid.inspect} type #{key[:key_type].inspect} not supported for InstAccess Token"
+          end
       end
 
       InstAccess.configure(
         signing_key: Base64.decode64(conf[:private_key]),
         encryption_key: Base64.decode64(conf[:encryption_public_key]),
-        issuers: conf[:service_keys]&.values&.pluck(:issuer),
+        issuers: service_keys.values.pluck(:issuer),
         service_jwks:
       )
+    end
+  end
+
+  class << self
+    private
+
+    def public_service_keys
+      YAML.safe_load(
+        DynamicSettings.find(tree: :private)["inst_access_service_keys.yml", failsafe: nil].presence || "{}"
+      ).deep_symbolize_keys
     end
   end
 end

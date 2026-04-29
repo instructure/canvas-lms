@@ -118,8 +118,8 @@ DateShiftView.prototype.createDaySubView = function (event) {
 
 DateShiftView.prototype.updateNewDates = function (course) {
   // Prefer locale date, fallback if unavailable
-  const startDate = course.start_at_locale || course.start_at;
-  const endDate = course.end_at_locale || course.end_at;
+  const startDate = course.start_at_locale || course.start_at
+  const endDate = course.end_at_locale || course.end_at
 
   this.$oldStartDate.val(startDate).trigger('change')
   return this.$oldEndDate.val(endDate).trigger('change')

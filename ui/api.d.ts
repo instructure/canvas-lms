@@ -65,7 +65,7 @@ export type Student = Readonly<{
   group_ids: string[]
   id: string
   integration_id: null | string
-  login_id: string
+  login_id: string | null
   short_name: string
   sis_import_id: null | string
   sis_user_id: null | string
@@ -136,6 +136,7 @@ export type StudentGroupCategory = Readonly<{
   self_signup: null | string
   sis_group_category_id: null | string
   sis_import_id: null | string
+  non_collaborative: null | boolean
 }>
 
 export type StudentGroupMap = {
@@ -223,7 +224,10 @@ export type Assignment = Readonly<{
   original_lti_resource_link_id: null | string
   original_quiz_id: null | string
   peer_reviews: boolean
-  points_possible: number
+  peer_review_sub_assignment: PeerReviewSubAssignment | null
+  parent_assignment_id?: string
+  parent_assignment?: Assignment
+  points_possible: number | null
   position: number
   post_to_sis: boolean
   published: boolean
@@ -241,6 +245,7 @@ export type Assignment = Readonly<{
 }> & {
   anonymize_students: boolean
   assignment_visibility: string[]
+  new_quizzes_anonymous_participants: boolean
   post_manually: boolean
 } & Partial<{
     assignment_group: AssignmentGroup
@@ -249,6 +254,18 @@ export type Assignment = Readonly<{
     inClosedGradingPeriod: boolean
     overrides: Override[]
   }>
+
+export type PeerReviewSubAssignment = Readonly<{
+  id: string
+  name: string
+  html_url: string
+  points_possible: number | null
+  grading_type: GradingType
+  submission_types: string[]
+  workflow_state: WorkflowState
+  published: boolean
+  assignment_group_id: string
+}>
 
 export type AssignmentMap = {
   [assignmentId: string]: Assignment
@@ -302,15 +319,11 @@ export type Attachment = {
   comment_id?: string
   content_type: string
   created_at: string
-  crocodoc_url?: string
   display_name: string
   filename: string
-  hijack_crocodoc_session?: boolean
   id: string
   mime_class: string
   provisional_canvadoc_url?: null | string
-  provisional_crocodoc_url?: null | string
-  submitted_to_crocodoc?: boolean
   submitter_id: string
   updated_at: string
   upload_status: 'pending' | 'failed' | 'success'
@@ -425,7 +438,7 @@ export type Submission = Readonly<{
   entered_score: null | number
   grade_matches_current_submission: boolean
   gradeLocked: boolean
-  grading_period_id: string
+  grading_period_id: string | null
   grading_type: GradingType
   has_originality_report: boolean
   has_postable_comments: boolean
@@ -449,7 +462,6 @@ export type Submission = Readonly<{
   sub_assignment_submissions?: SubAssignmentSubmission[]
 }> & {
   assignedAssessments?: AssignedAssessments[]
-  attempt?: number
   excused: boolean
   external_tool_url?: string
   grade: string | null
@@ -671,6 +683,7 @@ export type ProfileTab = Readonly<{
   label: string
   html_url: string
   counts: TabCountsObj
+  type?: 'internal' | 'external'
 }>
 
 // '/api/v1/users/self/groups?include[]=can_access',
@@ -679,6 +692,8 @@ export type AccessibleGroup = Readonly<{
   name: string
   can_access?: boolean
   concluded: boolean
+  context_type?: string
+  context_name?: string
 }>
 
 // '/help_links',
@@ -731,6 +746,45 @@ export type CheckpointOverride = {
   lock_at: string | null
 }
 
+export type AttachmentPreflight = {
+  upload_url: string
+  upload_params: any
+  file_param: string
+}
+
+export type PreAttachmentRequest = {
+  name: string
+  size?: number
+  content_type?: string
+  no_redirect?: boolean
+  [key: string]: any // Other file upload properties per documentation
+}
+
+export type SisImportRequestBody = {
+  import_type?: 'instructure_csv'
+  // File upload options
+  attachment?: File | Blob
+  pre_attachment?: PreAttachmentRequest
+  extension?: 'zip' | 'xml' | 'csv' | string
+  // Batch mode options
+  batch_mode?: boolean
+  batch_mode_term_id?: string
+  multi_term_batch_mode?: boolean
+  // Processing options
+  skip_deletes?: boolean
+  override_sis_stickiness?: boolean
+  add_sis_stickiness?: boolean
+  clear_sis_stickiness?: boolean
+  update_sis_id_if_login_claimed?: boolean
+  // Diffing options
+  diffing_data_set_identifier?: string
+  diffing_remaster_data_set?: boolean
+  diffing_drop_status?: 'deleted' | 'completed' | 'inactive'
+  diffing_user_remove_status?: 'deleted' | 'suspended'
+  batch_mode_enrollment_drop_status?: 'deleted' | 'completed' | 'inactive'
+  change_threshold?: number
+}
+
 export type SisImport = {
   id: string
   created_at: string
@@ -758,6 +812,7 @@ export type SisImport = {
   change_threshold: number
   diff_row_count_threshold: number
   user: User
+  pre_attachment?: AttachmentPreflight
 }
 
 export type ExperienceSummary = {
@@ -776,22 +831,35 @@ export type YoutubeEmbed = Readonly<{
   field: string
   id: number
   resource_group_key: string
+  converted?: boolean
+  converted_at?: string
 }>
 
 export type YoutubeScanResource = Readonly<{
+  id: number
   name: string
   type: string
   content_url: string
   count: number
+  converted_count?: number
   failed?: boolean
   embeds: Array<YoutubeEmbed>
 }>
 
-export type YoutubeScanWorkflowState = 'completed' | 'failed' | 'queued' | 'running'
+export type YoutubeScanWorkflowState =
+  | 'completed'
+  | 'failed'
+  | 'queued'
+  | 'running'
+  | 'waiting_for_external_tool'
 
 export type YoutubeScanResultReport = Readonly<{
   workflow_state: YoutubeScanWorkflowState | null
   resources: Array<YoutubeScanResource>
   total_count: number | null
+  total_converted?: number
   id: number
+  page: number
+  per_page: number
+  total_pages: number
 }>

@@ -21,7 +21,7 @@ import moment from 'moment'
 export default function getFormats({customI18nFormats}) {
   const i18nFormatsForCurrentLocale = customI18nFormats.map(x => x()).filter(x => !!x)
   const momentCompatibleI18nFormats = specifyMinutesImplicitly(i18nFormatsForCurrentLocale).map(
-    convertI18nFormatToMomentFormat
+    convertI18nFormatToMomentFormat,
   )
 
   return union(momentStockFormats, momentCompatibleI18nFormats)
@@ -100,6 +100,6 @@ const convertI18nFormatToMomentFormat = i18nFormat => {
 
   return Object.keys(i18nToMomentTokenMapping).reduce(
     (acc, i18nToken) => acc.replace(i18nToken, i18nToMomentTokenMapping[i18nToken]),
-    escapedI18nFormat
+    escapedI18nFormat,
   )
 }

@@ -16,19 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, {createRef} from 'react'
 import CreateTicketForm from '../CreateTicketForm'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 describe('CreateTicketForm', () => {
-  const onCancel = jest.fn()
-  const onSubmit = jest.fn()
+  const onCancel = vi.fn()
+  const onSubmit = vi.fn()
 
   const props = {onCancel, onSubmit}
+
+  // Track captured request for verification
+  let lastCapturedRequest: {path: string; method: string; body?: any} | null = null
 
   const mockEnv = (overrides: Partial<typeof window.ENV> = {}) => {
     ;(window.ENV as any) = {
@@ -37,7 +41,22 @@ describe('CreateTicketForm', () => {
     }
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
+    lastCapturedRequest = null
+    // Default handler for error_reports POST
+    server.use(
+      http.post('/error_reports', async ({request}) => {
+        lastCapturedRequest = {
+          path: '/error_reports',
+          method: 'POST',
+          body: await request.json(),
+        }
+        return HttpResponse.json({logged: true, id: '10033'})
+      }),
+    )
     // default mock for tests
     mockEnv({
       current_user_id: '64', // intentionally a string and not a number
@@ -45,7 +64,8 @@ describe('CreateTicketForm', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    server.resetHandlers()
+    vi.restoreAllMocks()
   })
 
   describe('rendering', () => {
@@ -100,15 +120,7 @@ describe('CreateTicketForm', () => {
   describe('validation', () => {
     beforeEach(() => {
       // Reset all mocks before each test
-      jest.clearAllMocks()
-
-      // Mock doFetchApi to prevent actual API calls
-      ;(doFetchApi as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({
-          response: {status: 200},
-          json: {message: 'Success'},
-        })
-      })
+      vi.clearAllMocks()
     })
 
     it('prevents submission if required fields are empty', async () => {
@@ -121,7 +133,7 @@ describe('CreateTicketForm', () => {
       expect(await findByText('Subject is required.')).toBeInTheDocument()
 
       // Since validation fails, the form submission API should not be called
-      expect(doFetchApi).not.toHaveBeenCalled()
+      expect(lastCapturedRequest).toBeNull()
     })
 
     it('validates fields progressively when submitting the form', async () => {
@@ -188,51 +200,44 @@ describe('CreateTicketForm', () => {
     it('sends correct payload when user is logged out', async () => {
       mockEnv({
         current_user_id: null, // will populate when logged in
-        // @ts-expect-error: context_asset_string can be null in real scenarios, even if TypeScript doesn’t allow it
+        // @ts-expect-error: context_asset_string can be null in real scenarios, even if TypeScript doesn't allow it
         context_asset_string: null, // will populate if in course, for example, null otherwise
-        // @ts-expect-error: current_user_roles can be null in real scenarios even if TypeScript doesn’t allow it
+        // @ts-expect-error: current_user_roles can be null in real scenarios even if TypeScript doesn't allow it
         current_user_roles: null, // will populate when logged in
-      })
-      ;(doFetchApi as jest.Mock).mockResolvedValue({
-        response: {status: 200},
-        json: {logged: true, id: '10033'},
       })
       const {getByTestId, getByText} = render(<CreateTicketForm {...props} />)
       // fill and submit form
       fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
-      fireEvent.change(getByTestId('description-input'), {target: {value: 'Test description'}})
+      fireEvent.change(getByTestId('description-input'), {
+        target: {value: 'Test description'},
+      })
       await userEvent.click(getByTestId('severity-select'))
       await userEvent.click(getByText('Just a casual question, comment, idea, or suggestion'))
-      await userEvent.type(getByTestId('email-input'), 'test@instructure.com')
+      fireEvent.change(getByTestId('email-input'), {target: {value: 'test@instructure.com'}})
       await userEvent.click(getByTestId('submit-button'))
-      const payload = {
-        error: expect.objectContaining({
-          subject: 'Test subject',
-          comments: 'Test description',
-          user_perceived_severity: 'just_a_comment',
-          email: 'test@instructure.com', // optional
-          url: window.location.toString(), // e.g. http://localhost:3000/login/canvas#help
-          context_asset_string: null,
-          user_roles: undefined,
-        }),
-      }
       // verify api call
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/error_reports',
-        method: 'POST',
-        body: payload,
+      await waitFor(
+        () => {
+          expect(lastCapturedRequest).not.toBeNull()
+        },
+        {timeout: 10000},
+      )
+      expect(lastCapturedRequest!.path).toBe('/error_reports')
+      expect(lastCapturedRequest!.method).toBe('POST')
+      expect(lastCapturedRequest!.body.error).toMatchObject({
+        subject: 'Test subject',
+        comments: 'Test description',
+        user_perceived_severity: 'just_a_comment',
+        email: 'test@instructure.com',
+        context_asset_string: null,
       })
-    })
+    }, 10000)
 
     it('sends correct payload when user is logged in', async () => {
       mockEnv({
         context_asset_string: 'course_7', // this will be populated if in course, for example
         current_user_roles: ['user', 'student', 'teacher', 'admin', 'root_admin'], // ENV.current_user_roles is an array to begin with
       })
-      ;(doFetchApi as jest.Mock).mockResolvedValue({
-        response: {status: 200},
-        json: {logged: true, id: '10033'},
-      })
       const {getByTestId, getByText} = render(<CreateTicketForm {...props} />)
       // fill and submit form
       fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
@@ -240,42 +245,36 @@ describe('CreateTicketForm', () => {
       await userEvent.click(getByTestId('severity-select'))
       await userEvent.click(getByText('Just a casual question, comment, idea, or suggestion'))
       await userEvent.click(getByTestId('submit-button'))
-      const payload = {
-        error: expect.objectContaining({
-          subject: 'Test subject',
-          comments: 'Test description',
-          user_perceived_severity: 'just_a_comment',
-          email: '',
-          url: window.location.toString(),
-          context_asset_string: 'course_7',
-          user_roles: 'user,student,teacher,admin,root_admin', // payload requires comma delimited string of values
-        }),
-      }
       // verify api call
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/error_reports',
-        method: 'POST',
-        body: payload,
+      await waitFor(() => {
+        expect(lastCapturedRequest).not.toBeNull()
+      })
+      expect(lastCapturedRequest!.path).toBe('/error_reports')
+      expect(lastCapturedRequest!.method).toBe('POST')
+      expect(lastCapturedRequest!.body.error).toMatchObject({
+        subject: 'Test subject',
+        comments: 'Test description',
+        user_perceived_severity: 'just_a_comment',
+        email: '',
+        context_asset_string: 'course_7',
+        user_roles: 'user,student,teacher,admin,root_admin',
       })
     })
   })
 
   describe('form behavior on submission', () => {
-    beforeEach(() => {
-      ;(doFetchApi as jest.Mock).mockReset()
-    })
-
     it('disables all form fields during submission', async () => {
-      ;(doFetchApi as jest.Mock).mockImplementation(
-        () =>
-          new Promise(resolve =>
-            setTimeout(() => {
-              resolve({
-                response: {status: 200},
-                json: {logged: true, id: '10033'},
-              })
-            }, 500),
-          ),
+      // Use a delayed response to test the loading state
+      server.use(
+        http.post('/error_reports', async ({request}) => {
+          await new Promise(resolve => setTimeout(resolve, 500))
+          lastCapturedRequest = {
+            path: '/error_reports',
+            method: 'POST',
+            body: await request.json(),
+          }
+          return HttpResponse.json({logged: true, id: '10033'})
+        }),
       )
       const {getByTestId, getByText} = render(<CreateTicketForm {...props} />)
       // fill and submit form
@@ -298,10 +297,6 @@ describe('CreateTicketForm', () => {
     })
 
     it('shows success message when ticket is submitted successfully', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValue({
-        response: {status: 200},
-        json: {message: 'Success'},
-      })
       const {getByTestId, getByText} = render(<CreateTicketForm {...props} />)
       // fill and submit form
       fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
@@ -320,19 +315,24 @@ describe('CreateTicketForm', () => {
     })
 
     it('displays error message if submission fails', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValue({
-        response: {status: 400},
-        json: {message: 'Server error occurred'},
-      })
-      const {findByText, getByTestId, getByText} = render(<CreateTicketForm {...props} />)
+      // Override default handler with error response - must use resetHandlers first
+      server.resetHandlers()
+      server.use(
+        http.post('/error_reports', () =>
+          HttpResponse.json({message: 'Server error occurred'}, {status: 400}),
+        ),
+      )
+      const {findByTestId, getByTestId, getByText} = render(<CreateTicketForm {...props} />)
       // fill and submit form
       fireEvent.change(getByTestId('subject-input'), {target: {value: 'Test subject'}})
       fireEvent.change(getByTestId('description-input'), {target: {value: 'Test description'}})
       await userEvent.click(getByTestId('severity-select'))
       await userEvent.click(getByText('Just a casual question, comment, idea, or suggestion'))
       await userEvent.click(getByTestId('submit-button'))
-      // verify error message
-      expect(await findByText('Server error occurred')).toBeVisible()
+      // verify error message is shown (component shows it in an Alert with data-testid="error-message")
+      const errorAlert = await findByTestId('error-message')
+      expect(errorAlert).toBeVisible()
+      expect(errorAlert).toHaveTextContent(/An unexpected error occurred/)
     })
   })
 

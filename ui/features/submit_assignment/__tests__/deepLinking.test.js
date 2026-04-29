@@ -21,9 +21,9 @@ import $ from 'jquery'
 
 describe('handleContentItem', () => {
   const contentView = {
-    trigger: jest.fn(),
+    trigger: vi.fn(),
   }
-  const callback = jest.fn()
+  const callback = vi.fn()
 
   beforeEach(() => {
     contentView.trigger.mockReset()
@@ -105,12 +105,12 @@ describe('handleDeepLinkingError', () => {
       id: 1,
     },
   }
-  const reloadTool = jest.fn()
+  const reloadTool = vi.fn()
 
   beforeEach(() => {
     reloadTool.mockReset()
-    jest.spyOn($, 'flashError').mockImplementation()
-    jest.spyOn(console, 'error').mockImplementation()
+    vi.spyOn($, 'flashError').mockImplementation()
+    vi.spyOn(console, 'error').mockImplementation()
     handleDeepLinkingError(error, contentView, reloadTool)
   })
 

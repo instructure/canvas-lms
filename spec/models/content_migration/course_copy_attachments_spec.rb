@@ -43,6 +43,7 @@ describe ContentMigration do
       att = Attachment.create!(filename: "dummy.txt", uploaded_data: StringIO.new("fakety"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
 
       @copy_from.syllabus_body = "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>"
+      @copy_from.saving_user = @user
       @copy_from.save!
 
       run_course_copy
@@ -110,8 +111,8 @@ describe ContentMigration do
 
       asmnt_des = %(<a href="/courses/%s/files/%s/preview">First file</a>)
       wiki_body = %(<img src="/courses/%s/files/%s/preview">)
-      asmnt = @copy_from.assignments.create!(points_possible: 40, grading_type: "points", description: (asmnt_des % [@copy_from.id, att.id]), title: "assignment")
-      wiki = @copy_from.wiki_pages.create!(title: "wiki", body: (wiki_body % [@copy_from.id, att2.id]))
+      asmnt = @copy_from.assignments.create!(points_possible: 40, grading_type: "points", description: (asmnt_des % [@copy_from.id, att.id]), title: "assignment", saving_user: @user)
+      wiki = @copy_from.wiki_pages.create!(title: "wiki", body: (wiki_body % [@copy_from.id, att2.id]), saving_user: @user)
 
       # don't mark the attachments
       @cm.copy_options = {
@@ -137,7 +138,7 @@ describe ContentMigration do
       new_att = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
       expect(@copy_from.attachments.find(att.id)).to eq new_att
 
-      page = @copy_from.wiki_pages.create!(title: "some page", body: "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>")
+      page = @copy_from.wiki_pages.create!(title: "some page", body: "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>", saving_user: @user)
 
       @cm.copy_options = { wiki_pages: { mig_id(page) => "1" } }
       @cm.save!
@@ -151,7 +152,7 @@ describe ContentMigration do
 
     it "updates RCE mediahref iframes to media_attachment_iframes" do
       att = @copy_from.attachments.create!(filename: "videro.mov", uploaded_data: StringIO.new("..."), folder: Folder.root_folders(@copy_from).first)
-      page = @copy_from.wiki_pages.create!(title: "watch this y'all", body: %(<iframe data-media-type="video" src="/media_objects_iframe?mediahref=/courses/#{@copy_from.id}/files/#{att.id}/download" data-media-id="#{att.id}"/>))
+      page = @copy_from.wiki_pages.create!(title: "watch this y'all", body: %(<iframe data-media-type="video" src="/media_objects_iframe?mediahref=/courses/#{@copy_from.id}/files/#{att.id}/download" data-media-id="#{att.id}"/>), saving_user: @user)
       run_course_copy
       att_to = @copy_to.attachments.find_by(migration_id: mig_id(att))
       page_to = @copy_to.wiki_pages.find_by(migration_id: mig_id(page))
@@ -165,25 +166,22 @@ describe ContentMigration do
       mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "WEBVTT\n00:00.001 --> 00:00.900\n- Hi!\n", attachment_id: nil)
       page = @copy_from.wiki_pages.create!(title: "watch this y'all", body: %(<iframe data-media-type="video" src="/media_objects_iframe/#{mo.media_id}" data-media-id="#{mo.media_id}"/>))
 
-      kaltura_session = double("kaltura_admin_session")
-      expect(CC::CCHelper).to receive_messages(kaltura_admin_session: kaltura_session)
-      expect(kaltura_session).to receive(:flavorAssetGetByEntryId).and_return([
-                                                                                {
-                                                                                  isOriginal: 1,
-                                                                                  containerFormat: "mp4",
-                                                                                  fileExt: "mp4",
-                                                                                  id: "one",
-                                                                                  size: 15,
-                                                                                }
-                                                                              ])
-      expect(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return(kaltura_session.flavorAssetGetByEntryId.first)
-      expect(kaltura_session).to receive(:media_sources).and_return([{
-                                                                      isOriginal: "0",
-                                                                      fileExt: "mp4",
-                                                                      url: "http://example.com/media_path",
-                                                                      content_type: "video/mp4"
-                                                                    }])
-      expect(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_session)
+      kaltura_session = instance_double(CanvasKaltura::ClientV3)
+      flavor_asset = {
+        isOriginal: 1,
+        containerFormat: "mp4",
+        fileExt: "mp4",
+        id: "one",
+        size: 15,
+      }
+      allow(CC::CCHelper).to receive_messages(kaltura_admin_session: kaltura_session)
+      allow(kaltura_session).to receive_messages(flavorAssetGetByEntryId: [flavor_asset], flavorAssetGetOriginalAsset: flavor_asset, media_sources: [{
+                                                   isOriginal: "0",
+                                                   fileExt: "mp4",
+                                                   url: "http://example.com/media_path",
+                                                   content_type: "video/mp4"
+                                                 }])
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_session)
       allow(kaltura_session).to receive_messages(media_sources:
         [{ height: "240",
            bitrate: "382",

@@ -18,8 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-class TermsOfServiceContent < ActiveRecord::Base
+class TermsOfServiceContent < ApplicationRecord
   include Canvas::SoftDeletable
+
   sanitize_field :content, CanvasSanitize::SANITIZE
   validates :terms_updated_at, presence: true
 
@@ -30,8 +31,8 @@ class TermsOfServiceContent < ActiveRecord::Base
   before_save :set_terms_updated_at
   after_save :clear_cache
 
-  delegate :root_account, to: :account
-  delegate :root_account_id, to: :account
+  delegate :root_account, to: :account, allow_nil: true
+  delegate :root_account_id, to: :account, allow_nil: true
 
   include LinkedAttachmentHandler
 
@@ -47,7 +48,7 @@ class TermsOfServiceContent < ActiveRecord::Base
     end
   end
 
-  def access_for_attachment_association?(_user, _session, _association, _location_param)
+  def access_for_attachment_association?(_user, _session, _association)
     true
   end
 

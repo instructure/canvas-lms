@@ -28,7 +28,7 @@ describe "updated_wiki_page" do
   let(:asset) { @page }
   let(:notification_name) { :updated_wiki_page }
 
-  include_examples "a message"
+  it_behaves_like "a message"
   context "locked Wiki Pages" do
     it "sends locked notification if availibility date is locked for email" do
       enrollment = course_with_student(active_all: true)

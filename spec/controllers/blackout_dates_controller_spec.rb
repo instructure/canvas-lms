@@ -33,13 +33,6 @@ describe BlackoutDatesController do
   end
 
   describe "GET #index" do
-    it "loads all the blackout dates for the context" do
-      get :index, params: { course_id: @course.id }
-
-      expect(response).to be_successful
-      expect(assigns[:blackout_dates]).to include(@blackout_date)
-    end
-
     it "returns a json response if using the API" do
       get :index, format: :json, params: { course_id: @course.id }
 
@@ -146,7 +139,7 @@ describe BlackoutDatesController do
       # updated
       expect(blackout_dates.find_by(id: blackout_date2.id).event_title).to eq("update me")
       # created
-      expect(blackout_dates.find_by(event_title: "summer break")).to_not be_nil
+      expect(blackout_dates.find_by(event_title: "summer break")).not_to be_nil
     end
   end
 end

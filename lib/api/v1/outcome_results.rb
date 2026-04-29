@@ -21,6 +21,7 @@
 module Api::V1::OutcomeResults
   include Api::V1::Outcome
   include Outcomes::OutcomeFriendlyDescriptionResolver
+  include AlignmentsHelper
 
   # Public: Serializes OutcomeResults
   #
@@ -61,14 +62,21 @@ module Api::V1::OutcomeResults
   # Public: Serializes outcomes in a hash that can be added to the linked hash.
   #
   # Returns a Hash containing serialized outcomes.
-  def outcome_results_include_outcomes_json(outcomes, context, percents = {})
+  def outcome_results_include_outcomes_json(outcomes, context, percents = {}, outcome_links = [])
     alignment_asset_string_map = {}
     outcomes.each_slice(50).each do |outcomes_slice|
       ActiveRecord::Associations.preload(outcomes_slice, [:context])
-      ContentTag.learning_outcome_alignments.not_deleted.where(learning_outcome_id: outcomes_slice)
-                .pluck(:learning_outcome_id, :content_type, :content_id).each do |lo_id, content_type, content_id|
-        (alignment_asset_string_map[lo_id] ||= []) << "#{content_type.underscore}_#{content_id}"
+      outcomes_slice.each do |outcome|
+        alignments = filter_assignment_alignments(find_all_outcome_alignments(outcome, context))
+                     .reject { |a| a.content.unpublished? }
+        alignment_asset_string_map[outcome.id] = alignments.map { |a| a.content.asset_string }
       end
+    end
+
+    # Build mapping from outcome_id to group_id (associated_asset_id from ContentTag)
+    outcome_to_group_map = {}
+    outcome_links.each do |link|
+      outcome_to_group_map[link.content_id] = link.associated_asset_id
     end
     assessed_outcomes = []
     outcomes.map(&:id).each_slice(100) do |outcome_ids|
@@ -98,6 +106,7 @@ module Api::V1::OutcomeResults
       )
 
       hash[:alignments] = alignment_asset_string_map[o.id]
+      hash[:group_id] = outcome_to_group_map[o.id]&.to_s
       hash
     end
   end
@@ -122,16 +131,18 @@ module Api::V1::OutcomeResults
   end
 
   # Public: Returns an Array of serialized User objects for the linked hash.
-  def outcome_results_linked_users_json(users)
+  def outcome_results_linked_users_json(users, context)
+    includes = %w[sis_user_id avatar_url]
+    excludes = %w[personal_info]
+    user_json_preloads(users, accounts: true)
+    users = users_json(users, @current_user, session, includes, context, nil, excludes)
+
+    allowed_fields = %w[id name display_name sortable_name sis_id integration_id login_id avatar_url]
     users.map do |u|
-      hash = {
-        id: u.id.to_s,
-        name: u.name,
-        display_name: u.short_name,
-        sortable_name: u.sortable_name
-      }
-      hash[:avatar_url] = avatar_url_for_user(u) if service_enabled?(:avatars)
-      hash
+      u[:id] = u[:id].to_s if u[:id]
+      u[:display_name] = u[:short_name] if u[:short_name]
+      u[:sis_id] = u[:sis_user_id] if u[:sis_user_id]
+      u.select! { |field| allowed_fields.include?(field) }
     end
   end
 
@@ -241,26 +252,7 @@ module Api::V1::OutcomeResults
 
   # Internal: returns hash for rollup score links
   def serialize_rollup_score_links(score)
-    links = { outcome: score.outcome.id.to_s }
-    if defined?(params) && params[:contributing_scores] == "true"
-      links[:contributing_scores] = serialize_contributing_scores(score.outcome_results)
-    end
-    links
-  end
-
-  # Internal: returns an Array of serialized contributing scores
-  def serialize_contributing_scores(contributing_scores)
-    contributing_scores.map { |score| serialize_contributing_score(score) }
-  end
-
-  # Internal: returns hash for contributing score
-  def serialize_contributing_score(score)
-    {
-      association_id: score.association_id,
-      association_type: score.association_type,
-      title: score.title,
-      score: score.score
-    }
+    { outcome: score.outcome.id.to_s }
   end
 
   def outcome_results_rollups_csv(current_user, _context, rollups, outcomes, outcome_paths)
@@ -290,5 +282,114 @@ module Api::V1::OutcomeResults
         csv << row
       end
     end
+  end
+
+  # Public: Serializes contributing scores for a specific outcome and users
+  #
+  # outcome - The learning outcome
+  # alignments - Array of AlignmentWithMetadata objects for this outcome
+  # results - The learning outcome results (includes both Canvas and external results)
+  # only_assignment_alignments - Optional boolean to filter only assignment alignments (default: false)
+  #
+  # Returns a hash with outcome, alignments, and scores
+  def contributing_scores_json(outcome, alignments, results, only_assignment_alignments: false)
+    filtered_alignments = only_assignment_alignments ? filter_assignment_alignments(alignments) : alignments
+    alignment_lookup = build_alignment_lookup(filtered_alignments)
+
+    {
+      outcome: outcome_summary_json(outcome),
+      alignments: alignments_json(filtered_alignments),
+      scores: scores_json(results, alignment_lookup)
+    }
+  end
+
+  private
+
+  # Filters alignments to only include Assignment type
+  #
+  # alignments - Array of AlignmentWithMetadata objects
+  #
+  # Returns filtered array containing only Assignment alignments
+  def filter_assignment_alignments(alignments)
+    alignments.select { |alignment| alignment.content_type == "Assignment" }
+  end
+
+  # Builds a hash for efficient alignment lookup
+  #
+  # alignments - Array of AlignmentWithMetadata objects
+  #
+  # Returns a hash with two lookup strategies:
+  #   - By ContentTag ID (for Canvas results with persisted alignments)
+  #   - By assignment ID (for external results without persisted alignments)
+  def build_alignment_lookup(alignments)
+    lookup = { by_tag_id: {}, by_assignment_id: {} }
+
+    alignments.each do |alignment|
+      # Index by ContentTag ID if it exists (direct alignments)
+      lookup[:by_tag_id][alignment.id] = alignment if alignment.id
+
+      # Index by assignment ID for external/indirect alignment matching
+      if alignment.content.is_a?(Assignment)
+        lookup[:by_assignment_id][alignment.content_id] = alignment
+      end
+    end
+
+    lookup
+  end
+
+  def outcome_summary_json(outcome)
+    {
+      id: outcome.id.to_s,
+      title: outcome.title
+    }
+  end
+
+  def alignments_json(alignments)
+    alignments.filter_map do |alignment|
+      content = alignment.content
+      next unless content
+
+      {
+        alignment_id: alignment.prefixed_id,
+        associated_asset_id: content.id.to_s,
+        associated_asset_name: content.title,
+        associated_asset_type: alignment.content_type,
+        html_url: outcome_alignment_html_url(content),
+      }
+    end
+  end
+
+  def scores_json(results, alignment_lookup)
+    results.filter_map do |result|
+      alignment = find_alignment_for_result(result, alignment_lookup)
+      next unless alignment
+
+      {
+        user_id: result.user_id.to_s,
+        alignment_id: alignment.prefixed_id,
+        score: result.score,
+        submitted_or_assessed_at: result.submitted_or_assessed_at&.iso8601
+      }
+    end
+  end
+
+  # Finds the matching alignment for a result
+  #
+  # result - LearningOutcomeResult
+  # alignment_lookup - Hash with lookup indices
+  #
+  # Returns AlignmentWithMetadata or nil
+  def find_alignment_for_result(result, alignment_lookup)
+    if result.associated_asset.is_a?(Assignment)
+      return alignment_lookup[:by_assignment_id][result.associated_asset.id]
+    elsif result.associated_asset.is_a?(Quizzes::Quiz)
+      return alignment_lookup[:by_assignment_id][result.associated_asset.assignment_id]
+    end
+
+    if result.alignment&.id
+      return alignment_lookup[:by_tag_id][result.alignment.id]
+    end
+
+    nil
   end
 end

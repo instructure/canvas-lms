@@ -41,7 +41,7 @@ describe DataFixup::BackfillNewDefaultHelpLink do
     }.freeze
   end
 
-  let(:help_links_builder_double) { double(:help_links_builder) }
+  let(:help_links_builder_double) { instance_double(Account::HelpLinks) }
 
   before(:once) do
     @account = Account.create!(root_account_id: nil)
@@ -65,7 +65,7 @@ describe DataFixup::BackfillNewDefaultHelpLink do
     it "does nothing" do
       expect do
         DataFixup::BackfillNewDefaultHelpLink.run(:covid)
-      end.to_not change { @account.reload.settings[:custom_help_links] }
+      end.not_to change { @account.reload.settings[:custom_help_links] }
     end
   end
 
@@ -77,7 +77,7 @@ describe DataFixup::BackfillNewDefaultHelpLink do
     it "does nothing" do
       expect do
         DataFixup::BackfillNewDefaultHelpLink.run(:covid)
-      end.to_not change { @account.reload.settings[:custom_help_links] }
+      end.not_to change { @account.reload.settings[:custom_help_links] }
     end
   end
 
@@ -91,7 +91,7 @@ describe DataFixup::BackfillNewDefaultHelpLink do
     it "does nothing" do
       expect do
         DataFixup::BackfillNewDefaultHelpLink.run(:covid)
-      end.to_not change { @account.reload.settings[:custom_help_links] }
+      end.not_to change { @account.reload.settings[:custom_help_links] }
     end
   end
 

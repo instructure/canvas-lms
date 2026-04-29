@@ -23,7 +23,9 @@ import {responsiveQuerySizes} from '../../../utils/index'
 import React from 'react'
 import {render} from '@testing-library/react'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils', () => ({
+  responsiveQuerySizes: vi.fn(),
+}))
 
 const mockOverrides = [
   {
@@ -53,28 +55,28 @@ const mockOverrides = [
 ]
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
 
 beforeEach(() => {
-  responsiveQuerySizes.mockImplementation(() => ({
+  vi.mocked(responsiveQuerySizes).mockReturnValue({
     desktop: {maxWidth: '1000px'},
-  }))
+  })
 })
 
 const setup = props => {
   return render(
     <AssignmentMultipleAvailabilityWindows
       assignmentOverrides={mockOverrides}
-      onSetDueDateTrayOpen={jest.fn()}
+      onSetDueDateTrayOpen={vi.fn()}
       {...props}
     />,
   )
@@ -90,9 +92,9 @@ describe('AssignmentAvailabilityContainer', () => {
 
   describe('mobile', () => {
     beforeEach(() => {
-      responsiveQuerySizes.mockImplementation(() => ({
+      vi.mocked(responsiveQuerySizes).mockReturnValue({
         tablet: {maxWidth: '767px'},
-      }))
+      })
     })
 
     it('should render', () => {

@@ -27,13 +27,13 @@ describe('EpubExportApp', () => {
 
   beforeEach(() => {
     // Initial empty state
-    mockGetState = jest.spyOn(CourseEpubExportStore, 'getState').mockReturnValue({})
+    mockGetState = vi.spyOn(CourseEpubExportStore, 'getState').mockReturnValue({})
 
     // Mock getAll to do nothing (we'll control state changes manually)
-    jest.spyOn(CourseEpubExportStore, 'getAll').mockImplementation(() => {})
+    vi.spyOn(CourseEpubExportStore, 'getAll').mockImplementation(() => {})
 
     // Mock setState to update our mock getState
-    jest.spyOn(CourseEpubExportStore, 'setState').mockImplementation(newState => {
+    vi.spyOn(CourseEpubExportStore, 'setState').mockImplementation(newState => {
       mockGetState.mockReturnValue(newState)
       // Simulate the store triggering change listeners
       CourseEpubExportStore.emitChange()
@@ -53,7 +53,7 @@ describe('EpubExportApp', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('initializes with empty state', () => {

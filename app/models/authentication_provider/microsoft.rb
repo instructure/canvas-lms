@@ -20,6 +20,7 @@
 
 class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   include AuthenticationProvider::PluginSettings
+
   self.plugin = :microsoft
   plugin_settings :application_id, application_secret: :application_secret_dec
 

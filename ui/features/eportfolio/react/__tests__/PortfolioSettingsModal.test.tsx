@@ -18,7 +18,13 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import PortfolioSettingsModal from '../PortfolioSettingsModal'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
+
+// Track API calls
+let putCalled = false
 
 describe('PortfolioSettingsModal', () => {
   const portfolio = {
@@ -27,10 +33,23 @@ describe('PortfolioSettingsModal', () => {
     public: true,
     profile_url: '/path/to/profile',
   }
-  const mockConfirm = jest.fn()
-  const mockCancel = jest.fn()
-  afterEach(() => {
-    fetchMock.restore()
+  const mockConfirm = vi.fn()
+  const mockCancel = vi.fn()
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
+  beforeEach(() => {
+    server.resetHandlers()
+    putCalled = false
+    vi.clearAllMocks()
+
+    server.use(
+      http.put('/eportfolios/:portfolioId', () => {
+        putCalled = true
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
   })
 
   it('renders default values', () => {
@@ -72,11 +91,9 @@ describe('PortfolioSettingsModal', () => {
         onCancel={mockCancel}
       />,
     )
-    const path = encodeURI('/eportfolios/0?eportfolio[name]=Test Portfolio&eportfolio[public]=true')
-    fetchMock.put(path, {status: 200})
     const saveButton = getByText('Save')
     saveButton.click()
-    await waitFor(() => expect(fetchMock.called(path, 'PUT')).toBe(true))
+    await waitFor(() => expect(putCalled).toBe(true))
     await waitFor(() => expect(mockConfirm).toHaveBeenCalled())
   })
 
@@ -88,11 +105,9 @@ describe('PortfolioSettingsModal', () => {
         onCancel={mockCancel}
       />,
     )
-    const path = encodeURI('/eportfolios/0?eportfolio[name]=Test Portfolio&eportfolio[public]=true')
-    fetchMock.put(path, {status: 200})
     const cancelButton = getByText('Cancel')
     cancelButton.click()
-    await waitFor(() => expect(fetchMock.called(path, 'PUT')).toBe(false))
+    await waitFor(() => expect(putCalled).toBe(false))
     await waitFor(() => expect(mockCancel).toHaveBeenCalled())
   })
 })

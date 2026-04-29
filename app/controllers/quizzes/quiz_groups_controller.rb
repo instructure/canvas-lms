@@ -77,6 +77,21 @@ class Quizzes::QuizGroupsController < ApplicationController
 
   before_action :require_context, :require_quiz
 
+  # @API List question groups in a quiz
+  #
+  # Returns a list of question groups in a quiz.
+  #
+  # @example_response
+  #  {
+  #    "quiz_groups": [QuizGroup]
+  #  }
+  def index
+    if authorized_action(@quiz, @current_user, :read)
+      @groups = @quiz.quiz_groups
+      render json: quiz_groups_compound_json(@groups, @context, @current_user, session)
+    end
+  end
+
   # @API Get a single quiz group
   #
   # Returns details of the quiz group with the given id.
@@ -125,7 +140,7 @@ class Quizzes::QuizGroupsController < ApplicationController
         render json: quiz_groups_compound_json([@group], @context, @current_user, session),
                status: :created
       else
-        render json: format_errors(@group), status: :unprocessable_entity
+        render json: format_errors(@group), status: :unprocessable_content
       end
     end
   end
@@ -156,7 +171,7 @@ class Quizzes::QuizGroupsController < ApplicationController
       if update_api_quiz_group(@group, quiz_group_params)
         render json: quiz_groups_compound_json([@group], @context, @current_user, session)
       else
-        render json: format_errors(@group), status: :unprocessable_entity
+        render json: format_errors(@group), status: :unprocessable_content
       end
     end
   end

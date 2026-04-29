@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import '@testing-library/jest-dom'
 import StudentDetailsComponent from '../student-details-view'
 
 describe('StudentDetailsView', () => {
@@ -56,13 +55,13 @@ describe('StudentDetailsView', () => {
         },
       },
     ],
-    selectNextStudent: jest.fn(),
-    selectPrevStudent: jest.fn(),
-    unselectStudent: jest.fn(),
+    selectNextStudent: vi.fn(),
+    selectPrevStudent: vi.fn(),
+    unselectStudent: vi.fn(),
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the student details component', () => {

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../../spec_helper"
-
 RSpec.describe Lti::Pns::LtiContextCopyNoticeBuilder do
   let(:account) { account_model }
   let(:developer_key) do

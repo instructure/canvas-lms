@@ -18,7 +18,7 @@
 
 describe SmartSearchController do
   before do
-    allow(SmartSearch).to receive(:bedrock_client).and_return(double)
+    allow(SmartSearch).to receive(:bedrock_client).and_return(instance_double(Aws::BedrockRuntime::Client))
     course_with_student_logged_in
   end
 
@@ -73,7 +73,7 @@ describe SmartSearchController do
     before do
       skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
 
-      allow(SmartSearch).to receive(:bedrock_client).and_return(double)
+      allow(SmartSearch).to receive(:bedrock_client).and_return(instance_double(Aws::BedrockRuntime::Client))
       allow(SmartSearch).to receive(:generate_embedding) { |input| input.chars.map(&:ord).fill(0, input.size...1024).slice(0...1024) }
     end
 

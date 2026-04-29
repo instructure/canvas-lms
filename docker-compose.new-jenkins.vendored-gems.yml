@@ -1,5 +1,4 @@
 # it is intended that this be used exclusive of all other docker-compose.*yml files in CI
-version: "2.3"
 services:
   canvas:
     environment:
@@ -7,5 +6,5 @@ services:
     init: true
 
   redis:
-    image: starlord.inscloudgate.net/jenkins/redis:alpine
+    image: 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/library/redis:alpine
     init: true

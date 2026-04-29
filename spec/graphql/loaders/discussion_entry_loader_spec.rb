@@ -203,32 +203,6 @@ describe Loaders::DiscussionEntryLoader do
   end
 
   context "allow filtering discussion entries" do
-    it "loads draft entries for draft" do
-      DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: "hey", parent: @de1)
-      DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: "howdy", parent: nil)
-      GraphQL::Batch.batch do
-        Loaders::DiscussionEntryLoader.for(
-          current_user: @teacher,
-          filter: "drafts"
-        ).load(@discussion).then do |discussion_entries|
-          expect(discussion_entries.map(&:message)).to match_array(%w[hey howdy])
-        end
-      end
-    end
-
-    it "excludes entry edits for draft entries" do
-      DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: "hey", entry: @de1)
-      DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: "howdy")
-      GraphQL::Batch.batch do
-        Loaders::DiscussionEntryLoader.for(
-          current_user: @teacher,
-          filter: "drafts"
-        ).load(@discussion).then do |discussion_entries|
-          expect(discussion_entries.map(&:message)).to match_array(%w[howdy])
-        end
-      end
-    end
-
     it "by any workflow state" do
       GraphQL::Batch.batch do
         Loaders::DiscussionEntryLoader.for(

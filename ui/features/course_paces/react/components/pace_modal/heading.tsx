@@ -17,16 +17,16 @@
  */
 
 import React from 'react'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 import {actions} from '../../actions/ui'
 import type {Dispatch} from 'redux'
-import { Flex } from '@instructure/ui-flex'
-import { useScope as createI18nScope } from '@canvas/i18n'
-import { View } from '@instructure/ui-view'
-import type { CoursePace, PaceContext, Section, StoreState } from '../../types'
-import { Text } from '@instructure/ui-text'
-import { IconEditLine, IconUserSolid } from '@instructure/ui-icons'
-import { getBlueprintLocked } from '../../reducers/ui'
+import {Flex} from '@instructure/ui-flex'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {View} from '@instructure/ui-view'
+import type {CoursePace, PaceContext, Section, StoreState} from '../../types'
+import {Text} from '@instructure/ui-text'
+import {IconEditLine, IconUserSolid} from '@instructure/ui-icons'
+import {getBlueprintLocked} from '../../reducers/ui'
 import Settings from '../header/settings/settings'
 import BlueprintLock from '../header/blueprint_lock'
 import CourseStats from './CourseStats'
@@ -62,7 +62,7 @@ const PaceModalHeading = ({
   isBulkEnrollment,
   selectedBulkStudents,
   hidePaceModal,
-  showBulkEditModal
+  showBulkEditModal,
 }: Props & StoreProps & DispatchProps) => {
   const renderPaceInfo = () => {
     if (['Section', 'Course'].includes(coursePace.context_type)) {
@@ -86,8 +86,7 @@ const PaceModalHeading = ({
   }
 
   const getPaceName = () => {
-    if(isBulkEnrollment)
-    return null
+    if (isBulkEnrollment) return null
 
     if (['Section', 'Course'].includes(coursePace.context_type)) return contextName
     return enrolledSection.name
@@ -110,7 +109,6 @@ const PaceModalHeading = ({
   }
 
   const renderDetails = () => {
-
     return (
       <>
         <Text tabIndex={0} data-testid="pace-type" as="div" size="medium" weight="bold">
@@ -119,26 +117,26 @@ const PaceModalHeading = ({
         <Text data-testid="section-name" as="div" size="x-large" weight="bold">
           {getPaceName()}
         </Text>
-        {(window.ENV.FEATURES.course_pace_time_selection) ? 
+        {window.ENV.FEATURES.course_pace_time_selection ? (
           <CourseStats paceContext={paceContext} />
-          :(<Flex as="div" margin="medium none">
+        ) : (
+          <Flex as="div" margin="medium none">
             <IconUserSolid size="medium" />
             <View data-testid="pace-info" as="div" margin="none small">
               {renderPaceInfo()}
             </View>
-          </Flex>)}
-          {
-            isBulkEnrollment && (
-              <Link
-                id="edit-bulk-pace-students"
-                isWithinText={false}
-                onClick={handleEditStudents}
-                margin="xxx-small none"
-              >
-                <IconEditLine /> {I18n.t('Edit Students')}
-              </Link>
-            )
-          }
+          </Flex>
+        )}
+        {isBulkEnrollment && (
+          <Link
+            id="edit-bulk-pace-students"
+            isWithinText={false}
+            onClick={handleEditStudents}
+            margin="xxx-small none"
+          >
+            <IconEditLine /> {I18n.t('Edit Students')}
+          </Link>
+        )}
       </>
     )
   }
@@ -158,7 +156,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     blueprintLocked: getBlueprintLocked(state),
     isBulkEnrollment: isBulkEnrollment(state),
-    selectedBulkStudents: getSelectedBulkStudents(state)
+    selectedBulkStudents: getSelectedBulkStudents(state),
   }
 }
 

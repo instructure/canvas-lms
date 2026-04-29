@@ -26,7 +26,7 @@ import {Alert as AlertData, AlertUIMetadata, SaveAlertPayload} from './types'
 import {View} from '@instructure/ui-view'
 import SaveAlert from './SaveAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('alerts')
 

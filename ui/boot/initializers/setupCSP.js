@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 
 const I18n = createI18nScope('common_bundle')
 
@@ -30,7 +30,7 @@ export default function setupCSP(rootElement) {
     const cspViolationFunction = () => {
       showFlashAlert({
         message: I18n.t(
-          'Content on this page violates the security policy, contact your admin for assistance.'
+          'Content on this page violates the security policy, contact your admin for assistance.',
         ),
         type: 'error',
       })
@@ -43,7 +43,7 @@ export default function setupCSP(rootElement) {
             frame.setAttribute('csp', csp)
           }
         }),
-      300
+      300,
     )
 
     // Set up CSP on any iframes currently on the page

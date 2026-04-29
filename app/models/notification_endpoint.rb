@@ -20,7 +20,7 @@
 
 require "aws-sdk-sns"
 
-class NotificationEndpoint < ActiveRecord::Base
+class NotificationEndpoint < ApplicationRecord
   class FailedSnsInteraction < StandardError; end
 
   include Canvas::SoftDeletable

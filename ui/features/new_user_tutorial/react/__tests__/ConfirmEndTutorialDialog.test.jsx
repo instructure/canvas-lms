@@ -30,7 +30,7 @@ describe('ConfirmEndTutorialDialog Spec', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
   afterAll(() => server.close())
 
@@ -39,10 +39,15 @@ describe('ConfirmEndTutorialDialog Spec', () => {
     handleRequestClose() {},
   }
 
-  // fails in Jest, passes in QUnit
-  test.skip('handleOkayButtonClick calls the proper api endpoint and data', async () => {
+  test('handleOkayButtonClick calls the proper api endpoint and data', async () => {
+    server.use(
+      http.put('/api/v1/users/self/features/flags/new_user_tutorial_on_off', () => {
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
+
     const user = userEvent.setup()
-    const putSpy = jest.spyOn(axios, 'put')
+    const putSpy = vi.spyOn(axios, 'put')
     const {getByRole} = render(<ConfirmEndTutorialDialog {...defaultProps} />)
     const okButton = getByRole('button', {name: /okay/i})
     await user.click(okButton)
@@ -53,8 +58,7 @@ describe('ConfirmEndTutorialDialog Spec', () => {
     )
   })
 
-  // fails in Jest, passes in QUnit
-  test.skip('handleOkayButtonClick calls onSuccessFunc after calling the api', async () => {
+  test('handleOkayButtonClick calls onSuccessFunc after calling the api', async () => {
     server.use(
       http.put('/api/v1/users/self/features/flags/new_user_tutorial_on_off', () => {
         return HttpResponse.json({}, {status: 200})
@@ -62,8 +66,8 @@ describe('ConfirmEndTutorialDialog Spec', () => {
     )
 
     const user = userEvent.setup()
-    const onSuccessSpy = jest
-      .spyOn(ConfirmEndTutorialDialog.prototype, 'onSuccess')
+    const onSuccessSpy = vi
+      .spyOn(ConfirmEndTutorialDialog, 'onSuccess')
       .mockImplementation(() => {})
     const {getByRole} = render(<ConfirmEndTutorialDialog {...defaultProps} />)
     const okButton = getByRole('button', {name: /okay/i})

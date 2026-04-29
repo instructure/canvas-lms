@@ -21,8 +21,8 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 
 export const sharedMatchingAssessmentCheckboxTests = (InputComponent: React.ComponentType<any>) => {
-  const onSubmit = jest.fn()
-  const onCancel = jest.fn()
+  const onSubmit = vi.fn()
+  const onCancel = vi.fn()
 
   const renderComponent = (overrideProps?: any) =>
     render(<InputComponent onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
@@ -53,8 +53,8 @@ export const sharedMatchingAssessmentCheckboxTests = (InputComponent: React.Comp
 }
 
 export const sharedImportAsNQTests = (InputComponent: React.ComponentType<any>) => {
-  const onSubmit = jest.fn()
-  const onCancel = jest.fn()
+  const onSubmit = vi.fn()
+  const onCancel = vi.fn()
 
   const renderComponent = (overrideProps?: any) =>
     render(<InputComponent onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
@@ -78,8 +78,8 @@ export const sharedImportAsNQTests = (InputComponent: React.ComponentType<any>) 
 }
 
 export const sharedBankTests = (InputComponent: React.ComponentType<any>) => {
-  const onSubmit = jest.fn()
-  const onCancel = jest.fn()
+  const onSubmit = vi.fn()
+  const onCancel = vi.fn()
 
   const renderComponent = (overrideProps?: any) =>
     render(<InputComponent onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
@@ -93,8 +93,8 @@ export const sharedBankTests = (InputComponent: React.ComponentType<any>) => {
 }
 
 export const sharedAdjustDateTests = (InputComponent: React.ComponentType<any>) => {
-  const onSubmit = jest.fn()
-  const onCancel = jest.fn()
+  const onSubmit = vi.fn()
+  const onCancel = vi.fn()
 
   const renderComponent = (overrideProps?: any) =>
     render(<InputComponent onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
@@ -129,8 +129,8 @@ export const sharedAdjustDateTests = (InputComponent: React.ComponentType<any>) 
 }
 
 export const sharedContentTests = (InputComponent: React.ComponentType<any>) => {
-  const onSubmit = jest.fn()
-  const onCancel = jest.fn()
+  const onSubmit = vi.fn()
+  const onCancel = vi.fn()
 
   const renderComponent = (overrideProps?: any) =>
     render(<InputComponent onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
@@ -144,8 +144,8 @@ export const sharedContentTests = (InputComponent: React.ComponentType<any>) => 
 }
 
 export const sharedFormTests = (InputComponent: React.ComponentType<any>) => {
-  const onSubmit = jest.fn()
-  const onCancel = jest.fn()
+  const onSubmit = vi.fn()
+  const onCancel = vi.fn()
 
   const renderComponent = (overrideProps?: any) =>
     render(<InputComponent onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
@@ -203,8 +203,8 @@ export const sharedFormTests = (InputComponent: React.ComponentType<any>) => {
 }
 
 export const sharedDateParsingTests = (InputComponent: React.ComponentType<any>) => {
-  const onSubmit = jest.fn()
-  const onCancel = jest.fn()
+  const onSubmit = vi.fn()
+  const onCancel = vi.fn()
 
   const renderComponent = (overrideProps?: any) =>
     render(<InputComponent onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)

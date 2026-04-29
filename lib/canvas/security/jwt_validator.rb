@@ -20,6 +20,7 @@
 module Canvas::Security
   class JwtValidator
     include ActiveModel::Validations
+
     REQUIRED_ASSERTIONS = Set.new(%w[sub aud exp iat jti])
 
     validate :assertions, :aud, :exp, :iat, :jti

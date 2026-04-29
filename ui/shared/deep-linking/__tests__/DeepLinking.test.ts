@@ -117,7 +117,7 @@ describe('handleDeepLinking', () => {
   })
 
   it('passes event to callback', async () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
     const ev = event({})
     await handleDeepLinking(callback)(ev)
 
@@ -130,7 +130,7 @@ describe('handleDeepLinking', () => {
     }
 
     it('does not pass event to callback', async () => {
-      const callback = jest.fn()
+      const callback = vi.fn()
       await handleDeepLinking(callback)(event(overrides))
 
       expect(callback).not.toHaveBeenCalled()

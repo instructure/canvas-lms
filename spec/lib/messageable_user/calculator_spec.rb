@@ -404,7 +404,7 @@ describe "MessageableUser::Calculator" do
 
       it "does not include groups in restricted visibility courses, even with the user in it" do
         RoleOverride.manage_role_override(Account.default, student_role, "send_messages", override: false)
-        expect(@calculator.uncached_section_visible_group_ids).to_not include(@group.id)
+        expect(@calculator.uncached_section_visible_group_ids).not_to include(@group.id)
       end
     end
 
@@ -1252,10 +1252,22 @@ describe "MessageableUser::Calculator" do
             .to be_a(BookmarkedCollection::Proxy)
         end
 
-        it "does not include yourself if you're not in that context" do
-          @enrollment.destroy
-          expect(messageable_user_ids(context: @course.asset_string))
-            .not_to include(@student.id)
+        context "when recipient list is restricted to teachers" do
+          it "excludes the current user from the messageable list even if you are in a context" do
+            expect(messageable_user_ids(restrict_to_teacher_recipients: true)).not_to include(@viewing_user.id)
+          end
+        end
+
+        context "when recipient list is not restricted to teachers" do
+          it "includes the current user if enrolled in any context" do
+            expect(messageable_user_ids).to include(@viewing_user.id)
+          end
+
+          it "does not include yourself if you're not in that context" do
+            @enrollment.destroy
+            expect(messageable_user_ids(context: @course.asset_string))
+              .not_to include(@student.id)
+          end
         end
 
         it "includes messageable users from that context" do
@@ -1297,8 +1309,16 @@ describe "MessageableUser::Calculator" do
             .to be_a(BookmarkedCollection::Proxy)
         end
 
-        it "includes yourself even if you're not in any contexts" do
-          expect(messageable_user_ids).to include(@viewing_user.id)
+        context "when recipient list is restricted to teachers" do
+          it "excludes the current user from the messageable list" do
+            expect(messageable_user_ids(restrict_to_teacher_recipients: true)).not_to include(@viewing_user.id)
+          end
+        end
+
+        context "when recipient list is not restricted to teachers" do
+          it "includes the current user even if not enrolled in any context" do
+            expect(messageable_user_ids).to include(@viewing_user.id)
+          end
         end
 
         it "includes users messageable via courses" do
@@ -1363,20 +1383,51 @@ describe "MessageableUser::Calculator" do
 
       context "search parameter" do
         before do
-          course_with_teacher(user: @viewing_user, active_all: true)
+          student_in_course(user: @viewing_user, active_all: true)
           student_in_course(name: "Jim Bob")
+          course_with_teacher(user: @teacher, active_all: true)
         end
 
-        it "includes users that match all search terms" do
-          expect(messageable_user_ids(search: "Jim Bob")).to include(@student.id)
+        context "when recipient list is restricted to teachers" do
+          it "excludes the current user from the messageable list" do
+            expect(
+              messageable_user_ids(search: @viewing_user.name, restrict_to_teacher_recipients: true)
+            ).not_to include(@viewing_user.id)
+          end
+
+          it "excludes the other students even if it match all the search term" do
+            expect(
+              messageable_user_ids(search: "Jim Bob", restrict_to_teacher_recipients: true)
+            ).not_to include(@student.id)
+          end
+
+          it "includes teachers that match all search terms" do
+            expect(
+              messageable_user_ids(search: @teacher.name, restrict_to_teacher_recipients: true)
+            ).to include(@teacher.id)
+          end
         end
 
-        it "excludes users that match only some terms" do
-          expect(messageable_user_ids(search: "Uncle Jim")).not_to include(@student.id)
-        end
+        context "when recipient list is not restricted to teachers" do
+          it "includes the current user even if not enrolled in any context" do
+            expect(messageable_user_ids(search: @viewing_user.name)).to include(@viewing_user.id)
+          end
 
-        it "ignores case when matching search terms" do
-          expect(messageable_user_ids(search: "jim")).to include(@student.id)
+          it "includes teachers that match all search terms" do
+            expect(messageable_user_ids(search: @teacher.name)).to include(@teacher.id)
+          end
+
+          it "includes users that match all search terms" do
+            expect(messageable_user_ids(search: "Jim Bob")).to include(@student.id)
+          end
+
+          it "excludes users that match only some terms" do
+            expect(messageable_user_ids(search: "Uncle Jim")).not_to include(@student.id)
+          end
+
+          it "ignores case when matching search terms" do
+            expect(messageable_user_ids(search: "jim")).to include(@student.id)
+          end
         end
       end
 
@@ -1397,6 +1448,86 @@ describe "MessageableUser::Calculator" do
           end
         end
       end
+    end
+  end
+
+  describe "temporary enrollment filtering" do
+    before(:once) do
+      Account.default.enable_feature!(:temporary_enrollments)
+      @provider = user_factory(active_all: true)
+      @course = course_with_teacher(active_all: true, user: @provider).course
+      @pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
+    end
+
+    before do
+      Account.current_domain_root_account = Account.default
+      @calculator = MessageableUser::Calculator.new(@provider)
+    end
+
+    after do
+      Account.current_domain_root_account = nil
+    end
+
+    def create_temp_enrollment(user, start_at: nil, end_at: nil)
+      enrollment = @course.enroll_user(
+        user,
+        "TeacherEnrollment",
+        {
+          role: teacher_role,
+          temporary_enrollment_source_user_id: @provider.id,
+          temporary_enrollment_pairing_id: @pairing.id,
+        }
+      )
+      enrollment.update!(start_at:, end_at:) if start_at
+      enrollment
+    end
+
+    it "excludes users with future temporary enrollments from messageable_users_in_course" do
+      recipient = user_factory(active_all: true)
+      create_temp_enrollment(recipient, start_at: 1.day.from_now, end_at: 1.week.from_now)
+
+      messageable_ids = @calculator.messageable_users_in_course(@course).map(&:id)
+      expect(messageable_ids).not_to include(recipient.id)
+    end
+
+    it "includes users with active temporary enrollments in messageable_users_in_course" do
+      recipient = user_factory(active_all: true)
+      create_temp_enrollment(recipient, start_at: 1.day.ago, end_at: 1.week.from_now)
+
+      messageable_ids = @calculator.messageable_users_in_course(@course).map(&:id)
+      expect(messageable_ids).to include(recipient.id)
+    end
+
+    it "includes users with non-temporary enrollments" do
+      student = user_factory(active_all: true)
+      @course.enroll_student(student, enrollment_state: "active")
+
+      messageable_ids = @calculator.messageable_users_in_course(@course).map(&:id)
+      expect(messageable_ids).to include(student.id)
+    end
+
+    it "does not filter when feature flag is disabled" do
+      Account.default.disable_feature!(:temporary_enrollments)
+      recipient = user_factory(active_all: true)
+      create_temp_enrollment(recipient, start_at: 1.day.from_now, end_at: 1.week.from_now)
+
+      messageable_ids = @calculator.messageable_users_in_course(@course).map(&:id)
+      expect(messageable_ids).to include(recipient.id)
+    end
+
+    it "excludes future temporary enrollments from section-visible group messaging" do
+      recipient = user_factory(active_all: true)
+      create_temp_enrollment(recipient, start_at: 1.day.from_now, end_at: 1.week.from_now)
+
+      group = @course.groups.create!(name: "Test Group")
+      group.add_user(recipient)
+      group.add_user(@provider)
+
+      Enrollment.limit_privileges_to_course_section!(@course, @provider, true)
+      calculator = MessageableUser::Calculator.new(@provider)
+
+      messageable_ids = calculator.messageable_users_in_group(group).map(&:id)
+      expect(messageable_ids).not_to include(recipient.id)
     end
   end
 end

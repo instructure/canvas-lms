@@ -19,12 +19,13 @@
 import React, {FC} from 'react'
 import {QueryClientProvider} from '@tanstack/react-query'
 import CoursePeople from './CoursePeople'
-import ErrorBoundary from '@canvas/error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import CoursePeopleContext, {getCoursePeopleContext} from './contexts/CoursePeopleContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('course_people')
 
@@ -35,6 +36,8 @@ const CoursePeopleApp: FC = () => (
         errorComponent={
           <GenericErrorPage
             imageUrl={errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
             errorCategory={I18n.t('Course People Error Page')}
           />
         }

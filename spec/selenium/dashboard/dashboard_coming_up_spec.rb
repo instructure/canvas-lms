@@ -43,7 +43,7 @@ describe "dashboard" do
         if should_have_text
           expect(list_element).to include_text(text)
         else
-          expect(list_element).to_not include_text(text)
+          expect(list_element).not_to include_text(text)
         end
       end
 
@@ -95,6 +95,40 @@ describe "dashboard" do
 
       get "/"
       expect(f(".events_list .event-details")).to include_text "10 points"
+    end
+
+    context "peer review sub assignments" do
+      it "displays peer review sub assignment in coming up list" do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+        @peer_review = peer_review_model(course: @course)
+        get "/"
+        event = f(".events_list .event a")
+        expect(event).to include_text(@peer_review.title)
+        expect(event).to include_text(@course.short_name)
+        expect(f(".events_list .event-details")).to include_text("10 points")
+        expect(f(".events_list .event i.icon-peer-review")).to be_displayed
+        event.click
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{@parent_assignment.id}")
+        expect(f("h1.title")).to include_text(@parent_assignment.title)
+      end
+
+      it "displays graded peer review for student in coming up list", custom_timeout: 25 do
+        @course.account.enable_feature!(:peer_review_allocation_and_grading)
+        student = student_in_course(active_all: true).user
+        # Coming Up sidebar only renders for users with a non-student enrollment
+        @course.enroll_teacher(student, enrollment_state: :active)
+        @peer_review = peer_review_model(course: @course)
+        @peer_review.submit_homework(student, { submission_type: "online_text_entry", body: "my review" })
+        @peer_review.grade_student(student, grade: 5, grader: @teacher)
+        user_session(student)
+        get "/"
+        event_details = f(".events_list .event-details")
+        expect(event_details).to include_text("5 out of 10")
+        expect(f(".events_list .event i.icon-peer-review")).to be_displayed
+        f(".events_list .event a").click
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{@parent_assignment.id}")
+        expect(f("h1.title")).to include_text(@parent_assignment.title)
+      end
     end
 
     it "displays checkpoints in coming up list", priority: "1" do

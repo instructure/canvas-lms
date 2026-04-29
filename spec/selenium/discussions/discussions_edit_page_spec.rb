@@ -130,17 +130,18 @@ describe "discussions" do
 
       it "can convert ungraded to graded and checkpointed" do
         get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
-        force_click_native("input[data-testid='graded-checkbox']")
-        force_click_native("input[data-testid='checkpoints-checkbox']")
-        fj("button:contains('Save')").click
+        force_click_native("span[data-testid='graded-checkbox'] input")
+        force_click_native("span[data-testid='checkpoints-checkbox'] input")
+        wait_for_new_page_load { Discussion.save_button.click }
         expect(@topic_no_options.reload.checkpoints?).to be_truthy
       end
 
       it "cannot convert ungraded to checkpointed if there are replies" do
-        @topic_no_options.reply_from({ user: teacher, text: "I feel pretty" })
+        student = student_in_course(course:, active_all: true).user
+        @topic_no_options.reply_from({ user: student, text: "I feel pretty" })
         get "/courses/#{course.id}/discussion_topics/#{@topic_no_options.id}/edit"
-        force_click_native("input[data-testid='graded-checkbox']")
-        expect(f("input[data-testid='checkpoints-checkbox']").attribute("disabled")).to be_truthy
+        force_click_native("span[data-testid='graded-checkbox'] input")
+        expect(f("span[data-testid='checkpoints-checkbox'] input").attribute("disabled")).to be_truthy
         expect(fj("span[class*='screenReaderContent']:contains('Checkpoints cannot be toggled after replies have been made.')")).to be_present
       end
 
@@ -216,7 +217,7 @@ describe "discussions" do
 
         force_click_native("input[value='add-to-student-to-do']")
 
-        fj("button:contains('Save')").click
+        wait_for_new_page_load { Discussion.save_button.click }
 
         @topic_all_options.reload
         expect(@topic_all_options.title).to eq "new title"
@@ -297,12 +298,11 @@ describe "discussions" do
           # Set Message
           Discussion.update_discussion_message(message)
 
-          update_available_date(0, available_date, true)
-          update_available_time(0, "8:00 AM", true)
+          update_available_date(0, available_date, exclude_due_date: true)
+          update_available_time(0, "8:00 AM", exclude_due_date: true)
 
           # Save and publish
-          Discussion.save_button.click
-          wait_for_ajaximations
+          wait_for_new_page_load { Discussion.save_button.click }
 
           dt = DiscussionTopic.last
 
@@ -311,8 +311,7 @@ describe "discussions" do
           new_title = "My New Test Topic"
           Discussion.update_discussion_topic_title(new_title)
 
-          Discussion.save_button.click
-          wait_for_ajaximations
+          wait_for_new_page_load { Discussion.save_button.click }
 
           dt.reload
           expect(dt.title).to eq(new_title)
@@ -344,13 +343,12 @@ describe "discussions" do
           click_add_assign_to_card
           expect(element_exists?(due_date_input_selector)).to be_falsey
           select_module_item_assignee(1, student1.name)
-          update_available_date(1, format_date_for_view(available_from, "%-m/%-d/%Y"), true)
-          update_available_time(1, "8:00 AM", true)
-          update_until_date(1, format_date_for_view(available_until, "%-m/%-d/%Y"), true)
-          update_until_time(1, "9:00 PM", true)
+          update_available_date(1, format_date_for_view(available_from, "%-m/%-d/%Y"), exclude_due_date: true)
+          update_available_time(1, "8:00 AM", exclude_due_date: true)
+          update_until_date(1, format_date_for_view(available_until, "%-m/%-d/%Y"), exclude_due_date: true)
+          update_until_time(1, "9:00 PM", exclude_due_date: true)
 
-          Discussion.save_button.click
-          wait_for_ajaximations
+          wait_for_new_page_load { Discussion.save_button.click }
 
           @topic_no_options.reload
           new_override = @topic_no_options.active_assignment_overrides.last
@@ -382,8 +380,7 @@ describe "discussions" do
           expect(is_checked(Discussion.graded_checkbox)).to be_falsey
 
           Discussion.click_graded_checkbox
-          Discussion.save_button.click
-          wait_for_ajaximations
+          wait_for_new_page_load { Discussion.save_button.click }
 
           get "/courses/#{course.id}/discussion_topics/#{discussion_topic.id}/edit"
 
@@ -426,10 +423,10 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{discussion_topic.id}/edit"
 
           expect(assign_to_date_and_time[1].text).not_to include("Due Date")
-          expect(assign_to_available_from_date(1, true).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
-          expect(assign_to_available_from_time(1, true).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
-          expect(assign_to_until_date(1, true).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
-          expect(assign_to_until_time(1, true).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
+          expect(assign_to_available_from_date(1, exclude_due_date: true).attribute("value")).to eq(format_date_for_view(available_from, "%b %-e, %Y"))
+          expect(assign_to_available_from_time(1, exclude_due_date: true).attribute("value")).to eq(available_from.strftime("%-l:%M %p"))
+          expect(assign_to_until_date(1, exclude_due_date: true).attribute("value")).to eq(format_date_for_view(available_until, "%b %-e, %Y"))
+          expect(assign_to_until_time(1, exclude_due_date: true).attribute("value")).to eq(available_until.strftime("%-l:%M %p"))
         end
 
         it "does not recover a deleted card when adding an assignee", :ignore_js_errors do
@@ -564,7 +561,7 @@ describe "discussions" do
         expect(fj("span:contains('#{grading_standard.title}')").present?).to be_truthy
         expect(fj("span:contains('Manage All Grading Schemes')").present?).to be_truthy
         # Graded checkbox
-        expect(is_checked(f("input[data-testid='graded-checkbox']"))).to be_truthy
+        expect(is_checked(f("span[data-testid='graded-checkbox'] input"))).to be_truthy
         # Points possible
         expect(f("input[data-testid='points-possible-input']").attribute("value")).to eq "10"
         # Grading type
@@ -592,7 +589,7 @@ describe "discussions" do
 
         # Uncheck the "graded" checkbox
         force_click_native('input[type=checkbox][value="graded"]')
-        fj("button:contains('Save')").click
+        wait_for_new_page_load { Discussion.save_button.click }
 
         expect(DiscussionTopic.last.assignment).to be_nil
       end
@@ -612,8 +609,7 @@ describe "discussions" do
         scroll_to_element(mark_important_dates)
         click_mark_important_dates
 
-        Discussion.save_button.click
-        wait_for_ajaximations
+        wait_for_new_page_load { Discussion.save_button.click }
 
         assignment = Assignment.last
 
@@ -716,7 +712,7 @@ describe "discussions" do
           f("[data-testid='grading-schemes-selector-option-#{grading_standard.id}']").click
           f("[data-testid='save-button']").click
           wait_for_ajaximations
-          expect_new_page_load { f("[data-testid='continue-button']").click }
+          expect_new_page_load { Discussion.section_warning_continue_button.click }
           a = DiscussionTopic.last.assignment
           expect(a.grading_standard_id).to eq grading_standard.id
         end
@@ -728,7 +724,7 @@ describe "discussions" do
         force_click_native("input[title='assignment group']")
         wait_for(method: nil, timeout: 3) { fj("li:contains('Group 2')").present? }
         fj("li:contains('Group 2')").click
-        fj("button:contains('Save')").click
+        wait_for_new_page_load { Discussion.save_button.click }
         expect(assignment.reload.assignment_group_id).to eq assign_group_2.id
       end
 
@@ -747,11 +743,11 @@ describe "discussions" do
 
         force_click_native("input[data-testid='peer_review_manual']")
 
-        force_click_native("input[data-testid='group-discussion-checkbox']")
+        force_click_native("span[data-testid='group-discussion-checkbox'] input")
         force_click_native("input[placeholder='Select a group category']")
         fj("li:contains('#{group_cat.name}')").click
 
-        fj("button:contains('Save')").click
+        wait_for_new_page_load { Discussion.save_button.click }
         updated_assignment = assignment.reload
         expect(updated_assignment.points_possible).to eq 80
         expect(updated_assignment.grading_type).to eq "letter_grade"
@@ -765,7 +761,7 @@ describe "discussions" do
         get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}/edit"
         _filename, fullpath, _data = get_file("testfile5.zip")
         f("input[data-testid='attachment-input']").send_keys(fullpath)
-        fj("button:contains('Save')").click
+        wait_for_new_page_load { Discussion.save_button.click }
         expect(assignment_topic.reload.attachment_id).to eq Attachment.last.id
       end
 
@@ -996,7 +992,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
 
           # select group category
-          force_click_native("input[data-testid='group-discussion-checkbox']")
+          force_click_native("span[data-testid='group-discussion-checkbox'] input")
           force_click_native("input[placeholder='Select a group category']")
           fj("li:contains('#{group_category.name}')").click
 
@@ -1138,9 +1134,8 @@ describe "discussions" do
           expect(selected_assignee_options.count).to be(1)
         end
 
-        context "differentiaiton tags" do
+        context "differentiation tags" do
           before do
-            @course.account.enable_feature! :assign_to_differentiation_tags
             @course.account.tap do |a|
               a.settings[:allow_assign_to_differentiation_tags] = { value: true }
               a.save!
@@ -1257,16 +1252,16 @@ describe "discussions" do
             # available from
             available_from_date = 2.days.from_now(Time.zone.now).to_date + 17.hours
             available_from_date_formatted = format_date_for_view(available_from_date, "%m/%d/%Y")
-            update_available_date(0, available_from_date_formatted, true, false)
-            update_available_time(0, "5:00 PM", true, false)
+            update_available_date(0, available_from_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_available_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
 
             # available until
             until_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
             until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
-            update_until_date(0, until_date_formatted, true, false)
-            update_until_time(0, "5:00 PM", true, false)
+            update_until_date(0, until_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_until_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
 
-            fj("button:contains('Save')").click
+            Discussion.save_button.click
             Discussion.section_warning_continue_button.click
             wait_for_new_page_load
 
@@ -1304,16 +1299,16 @@ describe "discussions" do
             # available from
             available_from_date = 3.days.from_now(Time.zone.now).to_date + 17.hours
             available_from_date_formatted = format_date_for_view(available_from_date, "%m/%d/%Y")
-            update_available_date(0, available_from_date_formatted, true, false)
-            update_available_time(0, "5:00 PM", true, false)
+            update_available_date(0, available_from_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_available_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
 
             # available until
             until_date = 6.days.from_now(Time.zone.now).to_date + 17.hours
             until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
-            update_until_date(0, until_date_formatted, true, false)
-            update_until_time(0, "5:00 PM", true, false)
+            update_until_date(0, until_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_until_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
 
-            fj("button:contains('Save')").click
+            Discussion.save_button.click
             Discussion.section_warning_continue_button.click
             wait_for_new_page_load
 
@@ -1356,9 +1351,9 @@ describe "discussions" do
 
             # available from
             available_from_date_formatted = format_date_for_view(2.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
-            update_available_date(0, available_from_date_formatted, true, false)
-            update_available_time(0, "5:00 PM", true, false)
-            expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after reply to topic due date")
+            update_available_date(0, available_from_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_available_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
+            expect(assign_to_date_and_time[2].text).to include("Available from date cannot be after reply to topic due date")
 
             # correct reply to topic
             reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
@@ -1369,18 +1364,18 @@ describe "discussions" do
             required_replies_date_formatted = format_date_for_view(1.day.from_now(Time.zone.now).to_date, "%m/%d/%Y")
             update_required_replies_date(0, required_replies_date_formatted)
             update_required_replies_time(0, "5:00 PM")
-            expect(assign_to_date_and_time[2].text).to include("Unlock date cannot be after required replies due date")
+            expect(assign_to_date_and_time[2].text).to include("Available from date cannot be after required replies due date")
 
             # available until
             until_date = 5.days.from_now(Time.zone.now).to_date + 17.hours
             until_date_formatted = format_date_for_view(until_date, "%m/%d/%Y")
-            update_until_date(0, until_date_formatted, true, false)
-            update_until_time(0, "5:00 PM", true, false)
+            update_until_date(0, until_date_formatted, exclude_due_date: true, exclude_checkpoints: false)
+            update_until_time(0, "5:00 PM", exclude_due_date: true, exclude_checkpoints: false)
 
             reply_to_topic_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
             update_reply_to_topic_date(0, reply_to_topic_date_formatted)
             update_reply_to_topic_time(0, "5:00 PM")
-            expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before reply to topic due date")
+            expect(assign_to_date_and_time[3].text).to include("Until date cannot be before reply to topic due date")
 
             # correct reply to topic
             reply_to_topic_date_formatted = format_date_for_view(3.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
@@ -1391,7 +1386,7 @@ describe "discussions" do
             required_replies_date_formatted = format_date_for_view(6.days.from_now(Time.zone.now).to_date, "%m/%d/%Y")
             update_required_replies_date(0, required_replies_date_formatted)
             update_required_replies_time(0, "5:00 PM")
-            expect(assign_to_date_and_time[3].text).to include("Lock date cannot be before required replies due date")
+            expect(assign_to_date_and_time[3].text).to include("Until date cannot be before required replies due date")
           end
         end
 
@@ -1493,7 +1488,7 @@ describe "discussions" do
           f("input[data-testid='reply-to-entry-required-count']").send_keys "6"
           f("input[data-testid='points-possible-input-reply-to-entry']").send_keys :backspace
           f("input[data-testid='points-possible-input-reply-to-entry']").send_keys "7"
-          fj("button:contains('Save')").click
+          wait_for_new_page_load { Discussion.save_button.click }
 
           expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 6
 
@@ -1514,9 +1509,9 @@ describe "discussions" do
           )
 
           get "/courses/#{course.id}/discussion_topics/#{@checkpointed_discussion.id}/edit"
-          fj("button:contains('Save')").click
+          wait_for_new_page_load { Discussion.save_button.click }
 
-          expect(f("h2[data-testid='message_title']").text).to include(@checkpointed_discussion.title)
+          expect(f("h1[data-testid='message_title']").text).to include(@checkpointed_discussion.title)
         end
 
         it "deletes checkpoints if the checkpoint checkbox is unselected on an existing discussion with checkpoints" do
@@ -1526,7 +1521,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{@checkpointed_discussion.id}/edit"
 
           force_click_native('input[type=checkbox][value="checkpoints"]')
-          fj("button:contains('Save')").click
+          wait_for_new_page_load { Discussion.save_button.click }
 
           expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 0
           expect(assignment.sub_assignments.count).to eq 0
@@ -1547,7 +1542,7 @@ describe "discussions" do
           f("input[data-testid='points-possible-input-reply-to-entry']").send_keys :backspace
           f("input[data-testid='points-possible-input-reply-to-entry']").send_keys "7"
 
-          fj("button:contains('Save')").click
+          wait_for_new_page_load { Discussion.save_button.click }
 
           assignment = Assignment.last
 
@@ -1564,8 +1559,9 @@ describe "discussions" do
 
         it "cannot edit a non-checkpointed discussion with replies into a checkpointed discussion" do
           graded_discussion = create_graded_discussion(course)
+          student = student_in_course(course:, active_all: true).user
           graded_discussion.discussion_entries.create!(
-            user: @teacher,
+            user: student,
             message: "Initial post"
           )
 
@@ -1582,7 +1578,7 @@ describe "discussions" do
 
           # Uncheck the "graded" checkbox
           force_click_native('input[type=checkbox][value="graded"]')
-          fj("button:contains('Save')").click
+          wait_for_new_page_load { Discussion.save_button.click }
 
           # Expect the assignment an the checkpoints to no longer exist
           expect(DiscussionTopic.last.reply_to_entry_required_count).to eq 0
@@ -1595,13 +1591,13 @@ describe "discussions" do
           topic = group_discussion_assignment
           preserved_id = topic.group_category.id
           get "/courses/#{course.id}/discussion_topics/#{topic.id}/edit"
-          expect(f("input[data-testid='group-discussion-checkbox']").attribute("checked")).to be_truthy
+          expect(f("span[data-testid='group-discussion-checkbox'] input").attribute("checked")).to be_truthy
           expect(f("#discussion_group_category_id").attribute("value")).to eq topic.group_category.name
 
-          force_click_native("input[data-testid='checkpoints-checkbox']")
-          expect(f("input[data-testid='group-discussion-checkbox']").attribute("checked")).to be_truthy
+          force_click_native("span[data-testid='checkpoints-checkbox'] input")
+          expect(f("span[data-testid='group-discussion-checkbox'] input").attribute("checked")).to be_truthy
           expect(f("#discussion_group_category_id").attribute("value")).to eq topic.group_category.name
-          fj("button:contains('Save')").click
+          wait_for_new_page_load { Discussion.save_button.click }
           expect(topic.reload.group_category.id).to eq preserved_id
         end
 
@@ -1614,8 +1610,7 @@ describe "discussions" do
           force_click_native('input[type=checkbox][value="graded"]')
           force_click_native('input[type=checkbox][value="checkpoints"]')
 
-          fj("button:contains('Save')").click
-          wait_for_ajaximations
+          wait_for_new_page_load { Discussion.save_button.click }
 
           graded_discussion = DiscussionTopic.last
           get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
@@ -1659,9 +1654,7 @@ describe "discussions" do
           assign_to_element.send_keys :backspace
           assign_to_element.send_keys "student 1"
 
-          f("button[data-testid='save-button']").click
-          wait_for_ajaximations
-
+          Discussion.save_button.click
           Discussion.section_warning_continue_button.click
           wait_for_new_page_load
           dt = DiscussionTopic.last

@@ -55,6 +55,7 @@ export function formatAssignment(
     assessmentRequestsForCurrentUser: assessmentRequests = [],
     name,
     peerReviews,
+    peerReviewSubAssignment,
   }: GraphQLAssignment,
   moduleId: string,
 ): {
@@ -62,13 +63,19 @@ export function formatAssignment(
   assignmentId: string
   studentViewPeerReviewsAssignment: StudentViewPeerReviewsAssignment
 } | null {
-  if (assessmentRequests.length === 0 || ENV.course_id == null) return null
+  if (
+    (assessmentRequests.length === 0 &&
+      !(ENV.FEATURES.peer_review_allocation_and_grading && peerReviewSubAssignment)) ||
+    ENV.course_id == null
+  )
+    return null
 
   const container: Element | undefined = $(
     `#module_student_view_peer_reviews_${assignmentId}_${moduleId}`,
   )[0]
 
-  const {anonymousReviews} = peerReviews
+  const {anonymousReviews, count, pointsPossible} = peerReviews
+  const peerReviewDueAt = peerReviewSubAssignment?.dueAt ?? null
 
   return {
     studentViewPeerReviewsAssignment: {
@@ -79,6 +86,10 @@ export function formatAssignment(
           course_id: ENV.course_id,
           id: assignmentId,
           name,
+          peer_review_count: count,
+          peer_review_points_possible: pointsPossible,
+          peer_review_due_at: peerReviewDueAt,
+          peer_review_sub_assignment: peerReviewSubAssignment ?? null,
         },
         container,
       },
@@ -113,7 +124,7 @@ export function formatGraphqlModuleNodes(
       const {studentViewPeerReviewsAssignment, assessmentRequests, assignmentId} =
         formattedAssignment
 
-      if (!assessmentRequests.length) return
+      if (!assessmentRequests.length && !ENV.FEATURES.peer_review_allocation_and_grading) return
 
       const formattedAssessmentRequests = assessmentRequests.map(formatAssessmentRequest)
       studentViewPeerReviewsAssignment[assignmentId].assignment.assessment_requests =
@@ -127,18 +138,28 @@ export function formatGraphqlModuleNodes(
 }
 
 export async function getAssignments(courseId: string): Promise<Array<GraphQLModuleItemsNode>> {
-  return createClient()
-    .query({
+  const client = createClient()
+  const allNodes: GraphQLModuleItemsNode[] = []
+  let cursor: string | null = null
+
+  do {
+    const response: GraphQLResponse = await client.query({
       query: ASSIGNMENT_QUERY,
-      variables: {courseId},
+      variables: {courseId, cursor},
     })
-    .then((response: GraphQLResponse) => {
-      const queryResponse = response && response.data && response.data.course
 
-      if (queryResponse) {
-        const moduleItemNodes = queryResponse?.modulesConnection?.nodes
+    const queryResponse = response?.data?.course
+    if (!queryResponse) {
+      break
+    }
 
-        if (moduleItemNodes != null) return moduleItemNodes
-      }
-    })
+    const connection = queryResponse.modulesConnection
+    if (connection?.nodes) {
+      allNodes.push(...connection.nodes)
+    }
+
+    cursor = connection?.pageInfo?.hasNextPage ? connection.pageInfo.endCursor : null
+  } while (cursor)
+
+  return allNodes
 }

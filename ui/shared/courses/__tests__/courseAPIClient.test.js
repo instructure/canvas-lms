@@ -22,8 +22,8 @@ import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import * as apiClient from '../courseAPIClient'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  forceReload: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  forceReload: vi.fn(),
 }))
 
 const server = setupServer()
@@ -33,8 +33,8 @@ describe('apiClient', () => {
 
   beforeAll(() => {
     server.listen()
-    $.flashWarning = jest.fn()
-    $.flashError = jest.fn()
+    $.flashWarning = vi.fn()
+    $.flashError = vi.fn()
   })
 
   afterEach(() => {
@@ -72,7 +72,7 @@ describe('apiClient', () => {
     })
 
     it('calls onSuccess function on success if provided', async () => {
-      const onSuccess = jest.fn()
+      const onSuccess = vi.fn()
       let resolvePromise
       const promise = new Promise(resolve => {
         resolvePromise = resolve
@@ -153,7 +153,7 @@ describe('apiClient', () => {
     })
 
     it('calls onSuccess function on success if provided', async () => {
-      const onSuccess = jest.fn()
+      const onSuccess = vi.fn()
       let resolvePromise
       const promise = new Promise(resolve => {
         resolvePromise = resolve

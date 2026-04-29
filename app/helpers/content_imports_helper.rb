@@ -29,7 +29,7 @@ module ContentImportsHelper
 
   def error_link_or_message(string)
     if string =~ /ErrorReport(?: id)?: ?(\d+)\z/
-      %(<a href="#{error_url($1)}">Error Report #{$1}</a>).html_safe
+      tag.a "Error Report #{$1}", href: error_url($1)
     else
       user_content(string, safe_html: true)
     end

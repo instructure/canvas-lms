@@ -84,12 +84,45 @@ module Context
     end
   end
 
-  def self.sorted_rubrics(context)
+  def self.sorted_rubrics(context, search_term: nil)
+    if Account.site_admin.feature_enabled?(:optimized_grading_rubrics)
+      sorted_rubrics_optimized(context, search_term:)
+    else
+      sorted_rubrics_legacy(context)
+    end
+  end
+
+  # LEGACY: Original implementation
+  # This version has N+1 queries on association's context
+  def self.sorted_rubrics_legacy(context)
     associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).joins(:rubric).where(rubrics: { workflow_state: "active" }).preload(rubric: :context)
     Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select(&:rubric)) { |r| r.rubric.title || CanvasSort::Last }
   end
 
-  def rubric_contexts(user)
+  # OPTIMIZED: Removed redundant .select(&:rubric) since .joins guarantees rubric exists
+  def self.sorted_rubrics_optimized(context, search_term: nil)
+    associations = RubricAssociation.active.bookmarked
+                                    .for_context_codes(context.asset_string)
+                                    .joins(:rubric)
+                                    .where(rubrics: { workflow_state: "active" })
+                                    .preload(:context, rubric: :context)
+    if search_term.present? && context.root_account.feature_enabled?(:grading_rubrics_pagination)
+      associations = associations.where("rubrics.title ILIKE ?", "%#{search_term.strip}%")
+    end
+    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id)) { |r| r.rubric.title || CanvasSort::Last }
+  end
+
+  def rubric_contexts(user, context_code: nil)
+    if Account.site_admin.feature_enabled?(:optimized_grading_rubrics)
+      rubric_contexts_optimized(user, context_code:)
+    else
+      rubric_contexts_legacy(user)
+    end
+  end
+
+  # LEGACY: Original implementation (kept for comparison)
+  # This version has N+1 queries and loads all contexts even when filtering
+  def rubric_contexts_legacy(user)
     associations = []
     course_ids = [id]
     course_ids = (course_ids + user.participating_instructor_course_with_concluded_ids.map { |id| Shard.relative_id_for(id, user.shard, Shard.current) }).uniq if user
@@ -116,6 +149,84 @@ module Context
     Canvas::ICU.collate_by(contexts) { |r| r[:name] }
   end
 
+  # OPTIMIZED: New implementation with N+1 fix and context filtering
+  def rubric_contexts_optimized(user, context_code: nil)
+    associations = []
+    course_ids = [id]
+    course_ids = (course_ids + user.participating_instructor_course_with_concluded_ids.map { |id| Shard.relative_id_for(id, user.shard, Shard.current) }).uniq if user
+
+    # Pre-validate filter: find the context if filtering
+    # This handles both global and local asset strings, and determines the correct shard
+    filter_context = if context_code
+                       begin
+                         Context.find_by_asset_string(context_code)
+                       rescue
+                         nil
+                       end
+                     end
+
+    return [] if context_code && filter_context.nil?
+
+    Shard.partition_by_shard(course_ids) do |sharded_course_ids|
+      # Skip this shard if filtering and context not on this shard
+      next if filter_context && Shard.current != filter_context.shard
+
+      # Build context codes for this shard (local IDs)
+      context_codes = sharded_course_ids.map { |id| "course_#{id}" }
+
+      # Add account hierarchy for courses on same shard as self
+      if Shard.current == shard
+        context = self
+        while context.respond_to?(:account) || context.respond_to?(:parent_account)
+          context = context.respond_to?(:account) ? context.account : context.parent_account
+          context_codes << context.asset_string if context
+        end
+      end
+
+      # If filtering, verify the filter is in the user's available contexts
+      if filter_context
+        filter_code = filter_context.asset_string
+        next unless context_codes.include?(filter_code)
+
+        query_codes = [filter_code]
+      else
+        query_codes = context_codes
+      end
+
+      # Query associations with optimizations:
+      # - select: limit columns to reduce data transfer
+      # - distinct: deduplicate at SQL level per-shard
+      # - preload: eliminate N+1 queries
+      associations += RubricAssociation.active.bookmarked
+                                       .for_context_codes(query_codes)
+                                       .joins(:rubric)
+                                       .where(rubrics: { workflow_state: "active" })
+                                       .select("rubric_associations.rubric_id, rubric_associations.context_type, rubric_associations.context_id, rubric_associations.context_code")
+                                       .distinct
+                                       .preload(:context)
+                                       .to_a
+    end
+
+    # Deduplicate associations by rubric_id and context
+    associations = associations.uniq { |a| [a.rubric_id, a.context.asset_string] }
+
+    # Group by context and build summary data
+    contexts = associations.group_by { |a| a.context.asset_string }.map do |code, code_associations|
+      {
+        rubrics: code_associations.length,
+        context_code: code,
+        name: code_associations.first.context_name
+      }
+    end
+
+    Canvas::ICU.collate_by(contexts) { |r| r[:name] }
+  end
+
+  def ams_integration_enabled?
+    respond_to?(:root_account) && root_account.feature_enabled?(:ams_root_account_integration) &&
+      is_a?(Course) && feature_enabled?(:ams_course_integration)
+  end
+
   def active_record_types(only_check: nil)
     only_check = only_check.sort if only_check.present? # so that we always have consistent cache keys
     @active_record_types ||= {}
@@ -126,7 +237,8 @@ module Context
       modules: -> { respond_to?(:context_modules) && context_modules.active.exists? },
       quizzes: lambda do
                  (respond_to?(:quizzes) && quizzes.active.exists?) ||
-                   (respond_to?(:assignments) && assignments.active.quiz_lti.exists?)
+                   (respond_to?(:assignments) && assignments.active.quiz_lti.exists?) ||
+                   ams_integration_enabled?
                end,
       assignments: -> { respond_to?(:assignments) && assignments.active.exists? },
       pages: -> { respond_to?(:wiki_pages) && wiki_pages.active.exists? },

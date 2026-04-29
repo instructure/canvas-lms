@@ -32,6 +32,7 @@
 #
 class SecurityController < ApplicationController
   skip_before_action :load_user
+  skip_before_action :require_user
 
   def self.messages_supported(account)
     Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys
@@ -46,12 +47,12 @@ class SecurityController < ApplicationController
   end
 
   def self.placements_supported(message_type, account)
-    (
-      Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type]
+    Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type]
       .reject { |p| p == :resource_selection }
       .reject { |p| p == :ActivityAssetProcessor unless account.root_account.feature_enabled?(:lti_asset_processor) }
-      .map { |p| Lti::ResourcePlacement.add_extension_prefix_if_necessary(p) }
-    ) + [Lti::ResourcePlacement::CONTENT_AREA] + (
+      .reject { |p| p == :ActivityAssetProcessorContribution unless account.root_account.feature_enabled?(:lti_asset_processor_discussions) }
+      .reject { |p| p == :top_navigation unless account.root_account.feature_enabled?(:top_navigation_placement) }
+      .map { |p| Lti::ResourcePlacement.add_extension_prefix_if_necessary(p) } + [Lti::ResourcePlacement::CONTENT_AREA] + (
       (message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE) ? [Lti::ResourcePlacement::RICH_TEXT_EDITOR] : []
     )
   end
@@ -105,19 +106,20 @@ class SecurityController < ApplicationController
     token = Canvas::Security.decode_jwt(access_token)
 
     account = Account.find_by(id: token["root_account_global_id"])
+    account_domain = token["root_account_domain"]
     unless account
       render json: { error: "Account #{token["root_account_global_id"]} not found." }, status: :not_found
       return
     end
 
-    account_domain = HostUrl.context_host(account, ApplicationController.test_cluster_name)
+    host = Lti::Oidc.auth_domain(account.environment_specific_domain)
 
     render json: {
       issuer: Canvas::Security.config["lti_iss"],
-      authorization_endpoint: lti_authorize_redirect_url(host: Lti::Oidc.auth_domain(account_domain)),
-      registration_endpoint: create_lti_registration_url(host: account_domain),
-      jwks_uri: lti_jwks_url(host: Lti::Oidc.auth_domain(account_domain)),
-      token_endpoint: oauth2_token_url(host: Lti::Oidc.auth_domain(account_domain)),
+      authorization_endpoint: lti_authorize_redirect_url(host:),
+      registration_endpoint: create_lti_registration_url(host:),
+      jwks_uri: lti_jwks_url(host:),
+      token_endpoint: oauth2_token_url(host:),
       token_endpoint_auth_methods_supported: ["private_key_jwt"],
       token_endpoint_auth_signing_alg_values_supported: ["RS256"],
       scopes_supported:
@@ -127,8 +129,8 @@ class SecurityController < ApplicationController
       # TODO: this list can probably be dynamic, with admins choosing the scopes they want to admit to this tool
       claims_supported: %w[sub picture email name given_name family_name locale],
       subject_types_supported: ["public"],
-      authorization_server: Lti::Oidc.auth_domain(account_domain),
-      "https://purl.imsglobal.org/spec/lti-platform-configuration": lti_platform_configuration(account)
+      authorization_server: host,
+      "https://purl.imsglobal.org/spec/lti-platform-configuration": lti_platform_configuration(account, account_domain)
     }
   end
 
@@ -136,7 +138,7 @@ class SecurityController < ApplicationController
     "OpenSource"
   end
 
-  def lti_platform_configuration(account)
+  def lti_platform_configuration(account, account_domain)
     notice_types_supported = SecurityController.notice_types_supported
     {
       product_family_code: "canvas",
@@ -145,7 +147,8 @@ class SecurityController < ApplicationController
       notice_types_supported:,
       variables: Lti::VariableExpander.expansion_keys,
       "https://canvas.instructure.com/lti/account_name": account.name,
-      "https://canvas.instructure.com/lti/account_lti_guid": account.lti_guid
+      "https://canvas.instructure.com/lti/account_lti_guid": account.lti_guid,
+      "https://canvas.instructure.com/lti/account_domain": account_domain
     }.with_indifferent_access.compact
   end
 end

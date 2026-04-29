@@ -401,7 +401,7 @@ class SisImportsApiController < ApplicationController
   # @returns [SisImport]
   def index
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
-      scope = @account.sis_batches.order("created_at DESC")
+      scope = @account.sis_batches.order(created_at: :desc)
       if (created_since = CanvasTime.try_parse(params[:created_since]))
         scope = scope.where("created_at > ?", created_since)
       end
@@ -460,12 +460,15 @@ class SisImportsApiController < ApplicationController
   #   will be assumed to be so. Can be part of the query string.
   #
   # @argument attachment
-  #   There are two ways to post SIS import data - either via a
-  #   multipart/form-data form-field-style attachment, or via a non-multipart
-  #   raw post request.
+  #   There are three ways to post SIS import data:
+  #   1. As a multipart/form-data form field named +attachment+
+  #   2. As a raw post with a Content-Type of application/zip or application/octet-stream
+  #   3. Using the {file:file.file_uploads.html File Upload} process, which can be more reliable
+  #      for large files. Use the +pre_attachment[name]+ argument to start that flow. See that
+  #      parameter below for more information.
   #
-  #   'attachment' is required for multipart/form-data style posts. Assumed to
-  #   be SIS data from a file upload form field named 'attachment'.
+  #   +attachment+ is required for multipart/form-data style posts. Assumed to
+  #   be SIS data from a file upload form field named +attachment+.
   #
   #   Examples:
   #     curl -F attachment=@<filename> -H "Authorization: Bearer <token>" \
@@ -495,6 +498,26 @@ class SisImportsApiController < ApplicationController
   #   If the attachment is a zip file, the uncompressed file(s) cannot be 100x larger than the zip, or the import will fail.
   #   For example, if the zip file is 1KB but the total size of the uncompressed file(s) is 100KB or greater the import will
   #   fail. There is a hard cap of 50 GB.
+  #
+  # @argument pre_attachment[name] [String]
+  #   The name of the file to be uploaded (in a separate request) via the
+  #   {file:file.file_uploads.html File Upload} workflow. This is the recommended
+  #   way to upload larger batches, since the upload itself no longer has to finish
+  #   within the 1-minute Canvas request timeout period. This argument cannot be combined
+  #   with the +attachment+ argument; use one or the other.
+  #
+  #   To use this flow:
+  #   1. Perform a POST to this endpoint with file information in +pre_attachment+
+  #   2. {file:file.file_uploads.html Upload the file} using the data in the response's +pre_attachment+
+  #   3. Once the file has been uploaded, the SIS import will begin.
+  #   4. {api:SisImportsApiController#show Check the progress} of the import as usual.
+  #
+  #   NOTE: this option must be sent as either a query parameter or as a JSON
+  #   body parameter; +application/x-www-form-urlencoded+ is not supported due to
+  #   conflicts with raw post body data.
+  #
+  # @argument pre_attachment[*] [String]
+  #   Other file upload properties; see {file:file.file_uploads.html File Upload Documentation}
   #
   # @argument extension [String]
   #   Recommended for raw post request style imports. This field will be used to
@@ -601,7 +624,9 @@ class SisImportsApiController < ApplicationController
       end
 
       file_obj = nil
-      if params.key?(:attachment)
+      if params.key?(:pre_attachment)
+        return render json: { error: true, error_message: "Cannot specify both attachment and pre_attachment" }, status: :bad_request if params.key?(:attachment)
+      elsif params.key?(:attachment)
         file_obj = params[:attachment]
       elsif request.media_type == "multipart/form-data"
         # don't interpret the form itself as a SIS batch
@@ -657,7 +682,7 @@ class SisImportsApiController < ApplicationController
         end
       end
 
-      batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj, @current_user) do |batch| # rubocop:disable Lint/ShadowingOuterLocalVariable
+      batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj, @current_user) do |batch|
         batch.change_threshold = params[:change_threshold]
 
         batch.options ||= {}
@@ -701,14 +726,18 @@ class SisImportsApiController < ApplicationController
         end
       end
 
-      batch.process
+      if batch.attachment
+        batch.process
+      else
+        attachment_preflight = api_attachment_preflight(batch, request, params: params[:pre_attachment], check_quota: false, return_json: true)
+      end
 
       unless api_request?
         @account.current_sis_batch_id = batch.id
         @account.save
       end
 
-      render json: sis_import_json(batch, @current_user, session)
+      render json: sis_import_json(batch, @current_user, session, attachment_preflight:)
     end
   end
 

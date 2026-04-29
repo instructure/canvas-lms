@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import GroupLimitInput, {GroupLimitInputProps} from '../GroupLimitInput'
 
 describe('GroupLimitInput', () => {
   const setup = (props?: Partial<GroupLimitInputProps>) => {
     const defaultProps: GroupLimitInputProps = {
       id: '1',
-      initialValue: ''
+      initialValue: '',
     }
     return <GroupLimitInput {...defaultProps} {...props} />
   }
@@ -39,14 +39,14 @@ describe('GroupLimitInput', () => {
   it('updates value when changed', () => {
     const {getByTestId} = render(setup())
     const input = getByTestId('group_limit_input_1')
-    fireEvent.change(input, { target: { value: '10' } })
+    fireEvent.change(input, {target: {value: '10'}})
     expect(input).toHaveValue('10')
   })
 
   it('shows error if value is not a number', () => {
     const {getByTestId, getByText} = render(setup())
     const input = getByTestId('group_limit_input_1')
-    fireEvent.change(input, { target: { value: 'abc' } })
+    fireEvent.change(input, {target: {value: 'abc'}})
     fireEvent.blur(input)
     expect(getByText('Value must be a whole number')).toBeInTheDocument()
   })
@@ -54,7 +54,7 @@ describe('GroupLimitInput', () => {
   it('shows error if value is less than 2', () => {
     const {getByTestId, getByText} = render(setup())
     const input = getByTestId('group_limit_input_1')
-    fireEvent.change(input, { target: { value: '1' } })
+    fireEvent.change(input, {target: {value: '1'}})
     fireEvent.blur(input)
     expect(getByText('Value must be greater than or equal to 2')).toBeInTheDocument()
   })
@@ -62,7 +62,7 @@ describe('GroupLimitInput', () => {
   it('shows error value is not a whole number', () => {
     const {getByTestId, getByText} = render(setup())
     const input = getByTestId('group_limit_input_1')
-    fireEvent.change(input, { target: { value: '3.5' } })
+    fireEvent.change(input, {target: {value: '3.5'}})
     fireEvent.blur(input)
     expect(getByText('Value must be a whole number')).toBeInTheDocument()
   })
@@ -70,10 +70,10 @@ describe('GroupLimitInput', () => {
   it('clears error messages when input is changed', () => {
     const {getByTestId, getByText, queryByText} = render(setup())
     const input = getByTestId('group_limit_input_1')
-    fireEvent.change(input, { target: { value: '1' } })
+    fireEvent.change(input, {target: {value: '1'}})
     fireEvent.blur(input)
     expect(getByText('Value must be greater than or equal to 2')).toBeInTheDocument()
-    fireEvent.change(input, { target: { value: '3' } })
+    fireEvent.change(input, {target: {value: '3'}})
     expect(queryByText('Value must be greater than or equal to 2')).not.toBeInTheDocument()
   })
 })

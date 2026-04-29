@@ -108,23 +108,88 @@ describe TermsApiController do
   end
 
   context "used_in_subaccount indicator" do
-    before do
+    before :once do
       account_model
       account_admin_user(account: @account)
+      @term0 = @account.enrollment_terms.create!(name: "term 0")
+      @term1 = @account.enrollment_terms.create!(name: "term 1")
+    end
+
+    before do
       user_session(@user)
     end
 
-    it "correctly sets used_in_subaccount indicator" do
-      2.times do |i|
-        @account.enrollment_terms.create!(id: i, name: "term #{i}", root_account_id: @account.id)
-      end
-      @account.courses.create!(account_id: @account.id, enrollment_term_id: 0)
+    it "correctly sets used_in_subaccount indicator when subaccount_id is the root account" do
+      @account.courses.create!(enrollment_term_id: @term0)
       get "index", params: { account_id: @account.id, subaccount_id: @account.id }, format: :json
       expect(response).to be_successful
-      term_0 = response.parsed_body["enrollment_terms"].find { |term| term["id"] == 0 }
-      term_1 = response.parsed_body["enrollment_terms"].find { |term| term["id"] == 1 }
+      term_0 = response.parsed_body["enrollment_terms"].find { |term| term["id"] == @term0.id }
+      term_1 = response.parsed_body["enrollment_terms"].find { |term| term["id"] == @term1.id }
       expect(term_0["used_in_subaccount"]).to be(true)
       expect(term_1["used_in_subaccount"]).to be(false)
+    end
+
+    it "sets used_in_subaccount indicator when subaccount_id is a subaccount" do
+      subaccount = @account.sub_accounts.create!(name: "sub")
+      subsub = subaccount.sub_accounts.create!(name: "subsub")
+      subsub.courses.create!(enrollment_term_id: @term0)
+      get "index", params: { account_id: @account.id, subaccount_id: subsub.id }, format: :json
+      expect(response).to be_successful
+      term_0 = response.parsed_body["enrollment_terms"].find { |term| term["id"] == @term0.id }
+      term_1 = response.parsed_body["enrollment_terms"].find { |term| term["id"] == @term1.id }
+      expect(term_0["used_in_subaccount"]).to be(true)
+      expect(term_1["used_in_subaccount"]).to be(false)
+    end
+
+    it "404s if subaccount_id is an unrelated account" do
+      get "index", params: { account_id: @account.id, subaccount_id: account_model.id }, format: :json
+      expect(response).to have_http_status :not_found
+    end
+  end
+
+  context "permission checks" do
+    before(:once) do
+      account_model
+      @admin_user = account_admin_user(account: @account)
+      @term0 = @account.enrollment_terms.create!(name: "term 0")
+      course_with_teacher_and_student_enrolled(account: @account)
+    end
+
+    it "returns json for teachers" do
+      user_session(@teacher)
+      get "index", params: { account_id: @account.id, format: :json }
+
+      expect(response).to be_successful
+      terms = assigns[:terms]
+      expect(terms).to eq @account.enrollment_terms
+    end
+
+    it "renders unauthorized access for teachers" do
+      user_session(@teacher)
+      get "index", params: { account_id: @account.id, format: :html }
+      # render_unauthorized_action => 401 when html format
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "returns 403 for students" do
+      user_session(@student)
+      get "index", params: { account_id: @account.id, format: :json }
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it "renders view for admin users" do
+      user_session(@admin_user)
+      get "index", params: { account_id: @account.id, format: :html }
+      expect(response).to be_successful
+    end
+
+    it "returns json for admin users" do
+      user_session(@admin_user)
+      get "index", params: { account_id: @account.id, format: :json }
+      expect(response).to be_successful
+      terms = assigns[:terms]
+      expect(terms).to eq @account.enrollment_terms
     end
   end
 end

@@ -92,11 +92,22 @@ module Factories
   def lti_asset_model(overrides = {})
     props = overrides.dup
     props[:submission] ||= submission_model
-    if props[:submission].submission_type == "online_text_entry"
-      props[:submission_attempt] ||= props[:submission].attempt
-    elsif props[:submission_attempt].blank?
-      props[:attachment] ||= attachment_model
+
+    locator_props = %i[
+      attachment
+      attachment_id
+      submission_attempt
+      discussion_entry_version
+      discussion_entry_version_id
+    ]
+    unless props.slice(*locator_props).values.any?
+      if props[:submission].submission_type == "online_text_entry"
+        props[:submission_attempt] = props[:submission].attempt
+      else
+        props[:attachment] = attachment_model
+      end
     end
+
     Lti::Asset.create!(**props)
   end
 

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {map, pick, each, filter, partial} from 'lodash'
+import {map, each, filter, partial, pick} from 'es-toolkit/compat'
 import '@canvas/backbone/createStore'
 import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 

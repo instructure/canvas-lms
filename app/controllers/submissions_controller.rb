@@ -96,6 +96,7 @@ class SubmissionsController < SubmissionsBaseController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   include K5Mode
@@ -379,7 +380,8 @@ class SubmissionsController < SubmissionsBaseController
   end
 
   def update
-    @assignment = api_find(@context.assignments.active, params.fetch(:assignment_id))
+    abstract_assignment = AbstractAssignment.where(context: @context).assignment_or_peer_review.active
+    @assignment = api_find(abstract_assignment, params.fetch(:assignment_id))
     @user = @context.all_students.find(params.fetch(:id))
     @submission = @assignment.find_or_create_submission(@user)
 

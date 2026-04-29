@@ -17,12 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require "oauth/request_proxy/action_controller_request"
+require "oauth/client/action_controller_request"
 
 module Lti
   class MembershipServiceController < ApplicationController
     before_action :require_context
     before_action :check_authorized_action
+    skip_before_action :require_user
 
     def course_index
       render_page_presenter

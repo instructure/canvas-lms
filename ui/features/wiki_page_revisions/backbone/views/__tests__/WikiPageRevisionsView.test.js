@@ -69,7 +69,7 @@ describe('WikiPageRevisionsView', () => {
   describe('pagination', () => {
     it('fetches previous page from collection', () => {
       // Arrange
-      const fetchSpy = jest.spyOn(collection, 'fetch').mockResolvedValue()
+      const fetchSpy = vi.spyOn(collection, 'fetch').mockResolvedValue()
 
       // Act
       view.prevPage()
@@ -83,7 +83,7 @@ describe('WikiPageRevisionsView', () => {
 
     it('fetches next page from collection', () => {
       // Arrange
-      const fetchSpy = jest.spyOn(collection, 'fetch').mockResolvedValue()
+      const fetchSpy = vi.spyOn(collection, 'fetch').mockResolvedValue()
 
       // Act
       view.nextPage()
@@ -99,7 +99,7 @@ describe('WikiPageRevisionsView', () => {
   describe('navigation state', () => {
     it('indicates when previous page is available', () => {
       // Arrange
-      jest.spyOn(collection, 'canFetch').mockImplementation(arg => arg === 'prev')
+      vi.spyOn(collection, 'canFetch').mockImplementation(arg => arg === 'prev')
 
       // Act & Assert
       expect(view.toJSON().CAN.FETCH_PREV).toBe(true)
@@ -107,7 +107,7 @@ describe('WikiPageRevisionsView', () => {
 
     it('indicates when next page is available', () => {
       // Arrange
-      jest.spyOn(collection, 'canFetch').mockImplementation(arg => arg === 'next')
+      vi.spyOn(collection, 'canFetch').mockImplementation(arg => arg === 'next')
 
       // Act & Assert
       expect(view.toJSON().CAN.FETCH_NEXT).toBe(true)

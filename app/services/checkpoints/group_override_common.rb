@@ -47,6 +47,6 @@ module Checkpoints::GroupOverrideCommon
 
   def differentiation_tags_enabled_for_context?(checkpoint)
     account = checkpoint.course.account
-    account.feature_enabled?(:assign_to_differentiation_tags) && account.allow_assign_to_differentiation_tags?
+    account.allow_assign_to_differentiation_tags?
   end
 end

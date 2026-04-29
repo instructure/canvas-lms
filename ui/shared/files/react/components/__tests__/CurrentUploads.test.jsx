@@ -32,7 +32,7 @@ describe('CurrentUploads', () => {
   it('pulls FileUploaders from UploadQueue', () => {
     const {getByText, getAllByRole} = render(<CurrentUploads />)
     const allUploads = [makeUploader('name'), makeUploader('other')]
-    UploadQueue.getAllUploaders = jest.fn().mockReturnValue(allUploads)
+    UploadQueue.getAllUploaders = vi.fn().mockReturnValue(allUploads)
     UploadQueue.onChange()
     expect(getByText('name')).toBeInTheDocument()
     expect(getByText('other')).toBeInTheDocument()
@@ -42,7 +42,7 @@ describe('CurrentUploads', () => {
   it('responds to changes in progress', () => {
     const {container} = render(<CurrentUploads />)
     const uploader = makeUploader('name')
-    UploadQueue.getAllUploaders = jest.fn().mockReturnValue([uploader])
+    UploadQueue.getAllUploaders = vi.fn().mockReturnValue([uploader])
     UploadQueue.onChange()
 
     expect(container.querySelector('[aria-valuenow="0"]')).toBeInTheDocument()

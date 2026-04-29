@@ -104,11 +104,13 @@ describe Importers::CalendarEventImporter do
 
   describe ".import_from_migration" do
     it "initializes a calendar event based on hash data" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(migration_course.account, migration_course)
+      migration.user = @teacher
       event = migration_course.calendar_events.build
       hash = {
         migration_id: "42",
         title: "event title",
-        description: "the event description",
+        description: aa_test_data.base_html,
         start_at: Time.zone.now,
         end_at: 2.hours.from_now,
         attachment_type: "external_url",
@@ -120,7 +122,7 @@ describe Importers::CalendarEventImporter do
       expect(event.imported).to be_truthy
       expect(event.migration_id).to eq "42"
       expect(event.title).to eq "event title"
-      expect(event.description).to match("the event description")
+      expect(event.description).to match(aa_test_data.base_html)
       expect(event.description).to match("example.com")
       expect(event.blackout_date).to be_truthy
     end

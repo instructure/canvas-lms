@@ -17,12 +17,11 @@
  */
 
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
+import {render, screen, fireEvent} from '@testing-library/react'
 import SortOrderDropDown from '../SortOrderDropDown'
 
 describe('SortOrderDropDown', () => {
-  const mockOnSortClick = jest.fn()
+  const mockOnSortClick = vi.fn()
 
   const renderComponent = (isLocked = false, selectedSortType = 'desc') => {
     render(
@@ -30,7 +29,7 @@ describe('SortOrderDropDown', () => {
         isLocked={isLocked}
         selectedSortType={selectedSortType}
         onSortClick={mockOnSortClick}
-      />
+      />,
     )
   }
 

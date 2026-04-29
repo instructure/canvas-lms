@@ -18,17 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# == Schema Information
-#
-# Table name: plugin_settings
-#
-#  id         :integer(4)      not null, primary key
-#  name       :string(255)     default(""), not null
-#  settings   :text
-#  created_at :datetime
-#  updated_at :datetime
-#
-class PluginSetting < ActiveRecord::Base
+class PluginSetting < ApplicationRecord
   validates :name, uniqueness: { if: :validate_uniqueness_of_name? }
   before_save :validate_posted_settings
   serialize :settings, yaml: { permitted_classes: [Symbol, Class] }

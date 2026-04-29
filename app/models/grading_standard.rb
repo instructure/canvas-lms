@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GradingStandard < ActiveRecord::Base
+class GradingStandard < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :context, polymorphic: [:account, :course], optional: false
@@ -85,7 +85,7 @@ class GradingStandard < ActiveRecord::Base
   VERSION = 2
 
   set_policy do
-    given { |user| context.grants_right?(user, :manage_grades) }
+    given { |user| context.grants_right?(user, :manage_grading_schemes) }
     can :manage
   end
 
@@ -370,12 +370,18 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def used_as_default?
-    courses.active.any? || accounts.active.any? || assignments.active.any?
+    courses.active.not_completed.any? || accounts.active.any?
   end
 
   def data_with_calculated_value
     scaling_factor = points_based ? self.scaling_factor : 100.0
     data.map { |name, value| { name:, value:, calculated_value: (value * scaling_factor).round(2) } }
+  end
+
+  # Returns a correctly-cased key that matches the lookup key (ignoring case), or nil if no match is found
+  def matching_scheme_key(lookup_key)
+    matching_key, = ordered_scheme.find { |scheme_key, _| keys_match?(scheme_key, lookup_key) }
+    matching_key&.to_s
   end
 
   private
@@ -393,6 +399,10 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def index_of_key(key)
-    ordered_scheme.index { |scheme_key, _| scheme_key.to_s.casecmp?(key) }
+    ordered_scheme.index { |scheme_key, _| keys_match?(scheme_key, key) }
+  end
+
+  def keys_match?(key1, key2)
+    key1.to_s.casecmp?(key2.to_s)
   end
 end

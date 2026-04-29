@@ -18,12 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CommentBankItem < ActiveRecord::Base
+class CommentBankItem < ApplicationRecord
   include Canvas::SoftDeletable
   extend RootAccountResolver
 
   belongs_to :course, optional: false, inverse_of: :comment_bank_items
   belongs_to :user, optional: false
+  belongs_to :assignment, class_name: "AbstractAssignment", optional: true
   resolves_root_account through: :course
 
   validates :comment, length: { maximum: maximum_text_length, allow_blank: false }

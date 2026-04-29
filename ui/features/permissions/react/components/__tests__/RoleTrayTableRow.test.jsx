@@ -139,7 +139,7 @@ describe('RoleTrayTableRow', () => {
   })
 
   it('renders a checkbox for a granular permission', () => {
-    const {container, debug} = renderRoleTrayTableRow({
+    const {container} = renderRoleTrayTableRow({
       title: 'banana',
       roleId: '1',
       props: {
@@ -148,7 +148,6 @@ describe('RoleTrayTableRow', () => {
         },
       },
     })
-    debug()
     const node = container.querySelector('input.mocked-permissioncheckbox')
 
     expect(node).toBeInTheDocument()

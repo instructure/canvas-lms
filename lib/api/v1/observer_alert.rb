@@ -44,7 +44,7 @@ module Api::V1::ObserverAlert
           when "DiscussionTopic"
             course_discussion_topic_url(alert.context.context_id, alert.context)
           when "Assignment"
-            course_assignment_url(alert.context.context_id, alert.context)
+            course_assignment_url(alert.context.context_id, alert.context.is_a?(SubAssignment) ? alert.context.parent_assignment : alert.context)
           when "Course"
             course_url(alert.context)
           when "Submission"

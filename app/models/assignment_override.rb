@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssignmentOverride < ActiveRecord::Base
+class AssignmentOverride < ApplicationRecord
   include Workflow
   include TextHelper
 
@@ -153,12 +153,12 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def validate_parent_override_for_sub_assignment
-    if assignment.is_a?(SubAssignment)
+    if assignment.is_a?(SubAssignment) || assignment.is_a?(PeerReviewSubAssignment)
       if parent_override_id.blank?
-        errors.add(:parent_override_id, "must be present for sub-assignment overrides")
+        errors.add(:parent_override_id, "must be present for overrides belonging to SubAssignment or PeerReviewSubAssignment")
       end
     elsif parent_override_id.present?
-      errors.add(:parent_override_id, "can only be set for overrides belonging to a SubAssignment")
+      errors.add(:parent_override_id, "can only be set for overrides belonging to SubAssignment or PeerReviewSubAssignment")
     end
   end
 
@@ -219,6 +219,9 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def update_due_date_smart_alerts
+    return unless assignment&.context&.active_now?
+    return if assignment&.workflow_state != "published"
+
     if due_at.nil? || due_at < Time.zone.now
       ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: id, alert_type: :due_date_reminder)&.destroy
     else
@@ -575,5 +578,29 @@ class AssignmentOverride < ActiveRecord::Base
         due_at: child.due_at
       }
     end
+  end
+
+  def peer_review_override
+    return nil unless assignment
+
+    peer_review_sub = assignment.peer_review_sub_assignment
+    return nil unless peer_review_sub
+
+    peer_review_sub.active_assignment_overrides.find_by(parent_override_id: id)
+  end
+
+  def peer_review_dates_for_override(peer_review_overrides = nil)
+    peer_review_overrides ||= assignment&.peer_review_overrides_for_dates
+    return nil unless peer_review_overrides
+
+    peer_review_sub = peer_review_overrides[:peer_review_sub]
+    override = peer_review_overrides[:overrides][id]
+    source = override || peer_review_sub
+
+    {
+      due_at: source.due_at,
+      unlock_at: source.unlock_at,
+      lock_at: source.lock_at
+    }
   end
 end

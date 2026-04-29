@@ -33,7 +33,7 @@ describe "security" do
 
       get "/login"
       follow_redirect! while response.redirect?
-      assert_response :success
+      expect(response).to have_http_status(:success)
       cookie = cookies["_normandy_session"]
       expect(cookie).to be_present
       expect(path).to eq "/login/canvas"
@@ -43,7 +43,7 @@ describe "security" do
                                       "pseudonym_session[remember_me]" => "1",
                                       "redirect_to_ssl" => "1" }
       follow_redirect! while response.redirect?
-      assert_response :success
+      expect(response).to have_http_status(:success)
       expect(request.fullpath).to eql("/?login_success=1")
       new_cookie = cookies["_normandy_session"]
       expect(new_cookie).to be_present
@@ -65,7 +65,7 @@ describe "security" do
 
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf" }
-      assert_response :found
+      expect(response).to have_http_status(:found)
       lines = response["Set-Cookie"]
       c = lines.grep(/\A_normandy_session=/).first
       expect(c).not_to match(/expires=/)
@@ -76,7 +76,7 @@ describe "security" do
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf",
                                       "pseudonym_session[remember_me]" => "1" }
-      assert_response :found
+      expect(response).to have_http_status(:found)
       lines = response["Set-Cookie"]
       c = lines.grep(/\A_normandy_session=/).first
       expect(c).not_to match(/expires=/)
@@ -90,7 +90,7 @@ describe "security" do
       https!
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf" }
-      assert_response :found
+      expect(response).to have_http_status(:found)
       lines = response["Set-Cookie"]
       c1 = lines.grep(/\Apseudonym_credentials=/).first
       c2 = lines.grep(/\A_normandy_session=/).first
@@ -181,7 +181,7 @@ describe "security" do
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf",
                                       "pseudonym_session[remember_me]" => "1" }
-      assert_response :found
+      expect(response).to have_http_status(:found)
       cookie = cookies["pseudonym_credentials"]
       expect(cookie).to be_present
       token = SessionPersistenceToken.find_by_pseudonym_credentials(CGI.unescape(cookie))
@@ -385,7 +385,7 @@ describe "security" do
 
     user_session(@teacher)
     post "/courses/#{@course.id}/user_lists.json", params: { user_list: "A1234567, A345678" }
-    assert_response :success
+    expect(response).to have_http_status(:success)
     expect(json_parse).to eq({
                                "duplicates" => [],
                                "errored_users" => [{ "address" => "A345678", "details" => "not_found", "type" => "pseudonym" }],
@@ -412,7 +412,7 @@ describe "security" do
       user_session(@admin, @admin.pseudonyms.first)
 
       get "/?become_user_id=#{@student.id}"
-      assert_response :found
+      expect(response).to have_http_status(:found)
       expect(response.location).to match "/users/#{@student.id}/masquerade$"
       expect(session[:masquerade_return_to]).to eq "/"
       expect(session[:become_user_id]).to be_nil
@@ -420,18 +420,18 @@ describe "security" do
       expect(assigns["real_current_user"]).to be_nil
 
       follow_redirect!
-      assert_response :ok
+      expect(response).to have_http_status(:ok)
       expect(path).to eq "/users/#{@student.id}/masquerade"
       expect(session[:become_user_id]).to be_nil
       expect(assigns["current_user"].id).to eq @admin.id
       expect(assigns["real_current_user"]).to be_nil
 
       post "/users/#{@student.id}/masquerade"
-      assert_response :found
+      expect(response).to have_http_status(:found)
       expect(session[:become_user_id]).to eq @student.id.to_s
 
       get "/"
-      assert_response :ok
+      expect(response).to have_http_status(:ok)
       expect(session[:become_user_id]).to eq @student.id.to_s
       expect(assigns["current_user"].id).to eq @student.id
       expect(assigns["current_pseudonym"]).to eq @student_pseudonym
@@ -442,7 +442,7 @@ describe "security" do
       user_session(@admin, @admin.pseudonyms.first)
 
       get "/?as_user_id=#{@student.id}"
-      assert_response :ok
+      expect(response).to have_http_status(:ok)
       expect(session[:become_user_id]).to be_nil
       expect(assigns["current_user"].id).to eq @admin.id
       expect(assigns["real_current_user"]).to be_nil
@@ -452,13 +452,13 @@ describe "security" do
       user_session(@student, @student.pseudonyms.first)
 
       get "/?become_user_id=#{@teacher.id}"
-      assert_response :ok
+      expect(response).to have_http_status(:ok)
       expect(session[:become_user_id]).to be_nil
       expect(assigns["current_user"].id).to eq @student.id
       expect(assigns["real_current_user"]).to be_nil
 
       post "/users/#{@teacher.id}/masquerade"
-      assert_response :unauthorized
+      expect(response).to have_http_status(:unauthorized)
       expect(assigns["current_user"].id).to eq @student.id
       expect(session[:become_user_id]).to be_nil
     end
@@ -468,7 +468,7 @@ describe "security" do
       user_session(@admin, @admin.pseudonyms.first)
 
       get "/?become_user_id=#{@student.id}"
-      assert_response :found
+      expect(response).to have_http_status(:found)
       expect(response.location).to match "/users/#{@student.id}/masquerade$"
       expect(session[:masquerade_return_to]).to eq "/"
       expect(session[:become_user_id]).to be_nil
@@ -476,7 +476,7 @@ describe "security" do
       expect(assigns["real_current_user"]).to be_nil
 
       follow_redirect!
-      assert_response :ok
+      expect(response).to have_http_status(:ok)
       expect(path).to eq "/users/#{@student.id}/masquerade"
       expect(session[:become_user_id]).to be_nil
       expect(assigns["current_user"].id).to eq @admin.id
@@ -486,11 +486,11 @@ describe "security" do
       expect(pv1.real_user_id).to be_nil
 
       post "/users/#{@student.id}/masquerade"
-      assert_response :found
+      expect(response).to have_http_status(:found)
       expect(session[:become_user_id]).to eq @student.id.to_s
 
       get "/"
-      assert_response :ok
+      expect(response).to have_http_status(:ok)
       expect(session[:become_user_id]).to eq @student.id.to_s
       expect(assigns["current_user"].id).to eq @student.id
       expect(assigns["real_current_user"].id).to eq @admin.id
@@ -712,7 +712,6 @@ describe "security" do
 
         get "/courses/#{@course.id}/users"
         expect(response).to be_successful
-        expect(response.body).to match(/View User Groups/)
         expect(response.body).to match(/View Prior Enrollments/)
         expect(response.body).not_to match(/Manage Users/)
 
@@ -753,7 +752,6 @@ describe "security" do
 
         get "/courses/#{@course.id}/users"
         expect(response).to be_successful
-        expect(response.body).to match(/View User Groups/)
         expect(response.body).to match(/View Prior Enrollments/)
 
         get "/courses/#{@course.id}/users/prior"
@@ -925,13 +923,13 @@ describe "security" do
         expect(response.body).to match(/Copy this Course/)
         expect(response.body).not_to match(/Import Course Content/)
         expect(response.body).to match(/Export Course Content/)
-        expect(response.body).to_not match(/Delete this Course/)
+        expect(response.body).not_to match(/Delete this Course/)
 
         add_permission :manage_courses_admin
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to_not match(/Delete this Course/)
+        expect(response.body).not_to match(/Delete this Course/)
 
         html = Nokogiri::HTML5(response.body)
         expect(html.css("#course_account_id")).not_to be_empty

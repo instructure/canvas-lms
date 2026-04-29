@@ -17,7 +17,7 @@
  */
 
 import * as React from 'react'
-import {useOutletContext, Link as RouterLink} from 'react-router-dom'
+import {useOutletContext, useNavigate} from 'react-router-dom'
 import type {ToolDetailsOutletContext} from '../ToolDetails'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -27,90 +27,94 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconCopyLine, IconRefreshLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import type {Spacing} from '@instructure/emotion'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {i18nLtiPrivacyLevel} from '../../../model/i18nLtiPrivacyLevel'
 import {i18nLtiPlacement} from '../../../model/i18nLtiPlacement'
 import {DefaultLtiPrivacyLevel} from '../../../model/LtiPrivacyLevel'
-import {isLtiPlacementWithDefaultIcon, isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
-import {ltiToolDefaultIconUrl} from '../../../model/ltiToolIcons'
+import {isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
+import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
-import {isForcedOn} from '../../../model/LtiRegistration'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showFlashAlert} from '@instructure/platform-alerts'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {
-  resetLtiRegistration,
+  useResetLtiRegistration,
   fetchLtiRegistrationWithLegacyConfig,
 } from '../../../api/registrations'
 import {isSuccessful} from '../../../../common/lib/apiResult/ApiResult'
+import {PlacementInfoTooltip} from '../../../components/PlacementInfoTooltip'
+import {MessageSetting} from '../../../model/internal_lti_configuration/InternalBaseLaunchSettings'
+import {LtiPlacementlessMessageType} from '../../../model/LtiMessageType'
+import {launchTypeSpecificSettingsLabels} from '../../../registration_wizard_forms/LaunchTypeSpecificSettingsConfirmation'
+import {Section, SubSection} from '../../../components/Section'
+import {LaunchSettingsReadOnlyView} from '../../../components/LaunchSettingsReadOnlyView'
+import {IconUrlsReadOnlyView} from '../../../components/IconUrlsReadOnlyView'
+import {CustomVariablesList} from '../../../components/CustomVariablesList'
+import {canEdit, canEditAsJson, canRestoreDefault} from '../../../model/LtiRegistration'
 
 const I18n = createI18nScope('lti_registrations')
 
-const Section = ({
-  title,
-  children,
-  margin = '0 small medium small',
-}: {
-  title: string
-  children: React.ReactNode
-  margin?: Spacing
-}) => {
-  return (
-    <View
-      borderRadius="large"
-      borderColor="secondary"
-      borderWidth="small"
-      margin={margin}
-      as="div"
-      padding="medium"
-    >
-      <Heading level="h3" margin="0 0 small 0">
-        {title}
-      </Heading>
-      {children}
-    </View>
-  )
-}
+const LaunchTypeSpecificSettingsSection = (
+  settings: MessageSetting[],
+  type: LtiPlacementlessMessageType,
+) => {
+  const setting = settings.find(s => s.type === type)
+  if (!setting) return null
 
-const SubSection = ({
-  title,
-  children,
-  margin = 'small 0 0 0',
-}: {
-  title: string
-  children?: React.ReactNode
-  margin?: Spacing
-}) => {
+  const typeLabels = launchTypeSpecificSettingsLabels[type as LtiPlacementlessMessageType]
+
+  const customFields = Object.entries(setting.custom_fields || {})
   return (
-    <>
-      <Heading level="h4" margin={margin}>
-        {title}
-      </Heading>
-      {children}
-    </>
+    <Section title={typeLabels.title} margin="0 small medium small">
+      <SubSection title={typeLabels.enableLabel}>
+        <Text size="small">{setting?.enabled ? I18n.t('Yes') : I18n.t('No')}</Text>
+      </SubSection>
+      {setting.target_link_uri && (
+        <SubSection title={typeLabels.targetLinkUriLabel}>
+          <Text>{setting.target_link_uri}</Text>
+        </SubSection>
+      )}
+      <SubSection title={typeLabels.customFieldsLabel}>
+        {customFields.length === 0 ? (
+          <Text fontStyle="italic">{I18n.t('No custom fields configured.')}</Text>
+        ) : (
+          <View as="div" margin="x-small 0 0 0">
+            <pre style={{fontFamily: 'monospace'}}>
+              {customFields.map(([key, field]) => `${key}=${field}`).join('\n')}
+            </pre>
+          </View>
+        )}
+      </SubSection>
+    </Section>
   )
 }
 
 export const ToolConfigurationView = () => {
-  const {registration, refreshRegistration} = useOutletContext<ToolDetailsOutletContext>()
+  const {registration} = useOutletContext<ToolDetailsOutletContext>()
+  const mutation = useResetLtiRegistration()
+  const navigate = useNavigate()
 
-  const customFields = Object.entries(registration.overlaid_configuration.custom_fields || {})
   const redirectUris = registration.overlaid_configuration.redirect_uris || []
-  const enabledPlacements = registration.overlaid_configuration.placements.filter(p => {
-    return !('enabled' in p) || p.enabled
-  })
+  const enabledPlacements = filterPlacementObjectsByFeatureFlags(
+    registration.overlaid_configuration.placements.filter(p => {
+      return !('enabled' in p) || p.enabled
+    }),
+  )
 
   const enabledPlacementsWithIcons = enabledPlacements.filter(p =>
     isLtiPlacementWithIcon(p.placement),
   )
 
-  const [tooltipShowing, setTooltipShowing] = React.useState(false)
-  const resetAppConfiguration = async () => {
-    const result = await resetLtiRegistration(registration.account_id, registration.id)
-    await refreshRegistration()
-  }
+  const enabledMessageSettings = (
+    registration.overlaid_configuration.launch_settings?.message_settings || []
+  ).filter(setting => setting.enabled)
 
-  const canRestoreDefault = !registration.inherited
+  const [tooltipShowing, setTooltipShowing] = React.useState(false)
+  const [editTooltipShowing, setEditTooltipShowing] = React.useState(false)
+
+  // Local Manual registrations no longer use overlays (they edit the base config directly),
+  // so "Restore Default" doesn't make sense for them. Only show it for dynamic registrations and inherited keys.
+  const isLocalManualRegistration =
+    registration.manual_configuration_id !== null && registration.template_registration_id === null
 
   const handleRestoreDefault = React.useCallback(
     async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
@@ -126,10 +130,13 @@ export const ToolConfigurationView = () => {
       })
 
       if (confirmed) {
-        resetAppConfiguration()
+        await mutation.mutateAsync({
+          ltiRegistrationId: registration.id,
+          accountId: registration.account_id,
+        })
       }
     },
-    [],
+    [mutation, registration.account_id, registration.id],
   )
 
   const handleCopyJsonConfig = React.useCallback(
@@ -168,99 +175,65 @@ export const ToolConfigurationView = () => {
     <div>
       {registration.manual_configuration_id ? (
         <Section title={I18n.t('Launch Settings')}>
-          <SubSection title={I18n.t('Redirect URIs:')}>
-            {redirectUris.map((uri, i) => (
-              <Text key={i}>{uri}</Text>
-            ))}
-          </SubSection>
-
-          <SubSection title={I18n.t('Default Target Link URI:')}>
-            <Text>{registration.overlaid_configuration.target_link_uri}</Text>
-          </SubSection>
-
-          <SubSection title={I18n.t('Open ID Connect Initiation URI:')}>
-            {registration.overlaid_configuration.oidc_initiation_url}
-          </SubSection>
-
-          <Flex direction="row" alignItems="end" margin="small 0 0">
-            <Flex.Item margin="0 xx-small 0 0">
-              <Text weight="bold">{I18n.t('JWK Method:')}</Text>
-            </Flex.Item>
-
-            <Flex.Item>
-              {registration.overlaid_configuration.public_jwk_url ? (
-                <Text>{I18n.t('Public JWK URL')}</Text>
-              ) : (
-                <Text>{I18n.t('Public JWK')}</Text>
-              )}
-            </Flex.Item>
-          </Flex>
-
-          {registration.overlaid_configuration.public_jwk_url ? (
-            <SubSection title={I18n.t('Public JWK URL:')}>
-              <Text>{registration.overlaid_configuration.public_jwk_url}</Text>
-            </SubSection>
-          ) : registration.overlaid_configuration.public_jwk ? (
-            <SubSection title={I18n.t('Public JWK:')}>
-              <View as="div" margin="x-small 0 0 0">
-                <pre style={{fontFamily: 'monospace'}}>
-                  {JSON.stringify(registration.overlaid_configuration.public_jwk, null, 2)}
-                </pre>
-              </View>
-            </SubSection>
-          ) : null}
-
-          <SubSection title={I18n.t('Domain:')}>
-            {registration.overlaid_configuration.domain ? (
-              <Text>{registration.overlaid_configuration.domain}</Text>
-            ) : (
-              <Text fontStyle="italic">{I18n.t('No domain configured.')}</Text>
-            )}
-          </SubSection>
-
-          <SubSection title={I18n.t('Custom Fields:')}>
-            {customFields.length === 0 ? (
-              <Text fontStyle="italic">{I18n.t('No custom fields configured.')}</Text>
-            ) : (
-              <View as="div" margin="x-small 0 0 0">
-                <pre style={{fontFamily: 'monospace'}}>
-                  {customFields.map(([key, field]) => `${key}=${field}`).join('\n')}
-                </pre>
-              </View>
-            )}
-          </SubSection>
+          <LaunchSettingsReadOnlyView
+            redirectUris={redirectUris}
+            targetLinkUri={registration.overlaid_configuration.target_link_uri}
+            oidcInitiationUrl={registration.overlaid_configuration.oidc_initiation_url}
+            publicJwkUrl={registration.overlaid_configuration.public_jwk_url}
+            publicJwk={registration.overlaid_configuration.public_jwk}
+            domain={registration.overlaid_configuration.domain}
+            customFields={registration.overlaid_configuration.custom_fields}
+          />
         </Section>
       ) : null}
 
       <Section title={I18n.t('Permissions')}>
-        <Flex direction="column" data-testid="permissions">
+        <Flex direction="column" data-testid="permissions" gap="xx-small">
           {registration.overlaid_configuration.scopes.length === 0 ? (
             <Text fontStyle="italic">{I18n.t('This app has no permissions configured.')}</Text>
           ) : (
             registration.overlaid_configuration.scopes.map(scope => (
-              <Text key={scope} as="div">
-                {i18nLtiScope(scope)}
-              </Text>
+              <Flex.Item key={scope}>
+                <Text as="div">{i18nLtiScope(scope)}</Text>
+              </Flex.Item>
             ))
           )}
         </Flex>
       </Section>
 
       <Section title={I18n.t('Data Sharing')}>
-        {i18nLtiPrivacyLevel(
-          registration.overlaid_configuration.privacy_level || DefaultLtiPrivacyLevel,
-        )}
+        <SubSection title={I18n.t('Privacy Level')}>
+          <Text>
+            {i18nLtiPrivacyLevel(
+              registration.overlaid_configuration.privacy_level || DefaultLtiPrivacyLevel,
+            )}
+          </Text>
+        </SubSection>
+        <CustomVariablesList internalConfiguration={registration.overlaid_configuration} />
       </Section>
 
       <Section title={I18n.t('Placements')}>
-        <Flex direction="column">
+        <Flex direction="column" gap="xx-small">
           {enabledPlacements.length === 0 ? (
             <Text fontStyle="italic">{I18n.t('No placements enabled.')}</Text>
           ) : (
-            enabledPlacements.map((p, i) => <Text key={i}>{i18nLtiPlacement(p.placement)}</Text>)
+            enabledPlacements.map((p, i) => (
+              <Flex.Item key={p.placement}>
+                <Flex gap="x-small">
+                  <Flex.Item>
+                    <Text key={i}>{i18nLtiPlacement(p.placement)}</Text>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <PlacementInfoTooltip placement={p.placement} />
+                  </Flex.Item>
+                </Flex>
+              </Flex.Item>
+            ))
           )}
         </Flex>
       </Section>
+
+      {LaunchTypeSpecificSettingsSection(enabledMessageSettings, 'LtiEulaRequest')}
 
       <Section title={I18n.t('Administration Nickname and Description')}>
         <Flex direction="row" alignItems="center" margin="small 0 0">
@@ -293,8 +266,8 @@ export const ToolConfigurationView = () => {
           {I18n.t('Placement Names')}
         </Heading>
         {enabledPlacements.map((p, i) => (
-          <Flex direction="row" alignItems="center" margin="small 0 0" key={i}>
-            <Flex.Item margin="0 xx-small 0 0">
+          <Flex direction="row" alignItems="center" margin="small 0 0" key={i} gap="xx-small">
+            <Flex.Item>
               <Text weight="bold">{i18nLtiPlacement(p.placement)}:</Text>
             </Flex.Item>
             <Flex.Item shouldShrink>
@@ -308,97 +281,47 @@ export const ToolConfigurationView = () => {
         ))}
       </Section>
 
-      <Section title={I18n.t('Icon URLs')}>
-        {enabledPlacementsWithIcons.length > 0 ? (
-          enabledPlacementsWithIcons.map((p, i) => (
-            <View key={p.placement} as="div" margin="0 0 small 0" style={{overflow: 'hidden'}}>
-              <Text weight="bold">{i18nLtiPlacement(p.placement)}:</Text>
-              <Flex
-                direction="row"
-                alignItems="center"
-                margin="0"
-                key={i}
-                style={{overflow: 'hidden'}}
-              >
-                {p.icon_url ? (
-                  <>
-                    <Flex.Item margin="0 xx-small 0 0">
-                      <img style={{height: '24px'}} src={p.icon_url} alt={registration.name}></img>
-                    </Flex.Item>
-                    {/* Can't use Flex.Item here, because it won't let us
-                      set flex:1 which is needed for the text-overflow */}
-                    <div
-                      data-testid={`icon-url-${p.placement}`}
-                      style={{
-                        textOverflow: 'ellipsis',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        flex: 1,
-                      }}
-                    >
-                      {p.icon_url}
-                    </div>
-                  </>
-                ) : isLtiPlacementWithDefaultIcon(p.placement) ? (
-                  <>
-                    <Flex.Item margin="0 xx-small 0 0">
-                      <img
-                        style={{height: '24px'}}
-                        src={ltiToolDefaultIconUrl({
-                          base: window.location.origin,
-                          toolName: registration.name,
-                          developerKeyId: registration.developer_key_id || undefined,
-                        })}
-                        alt={registration.name}
-                      ></img>
-                    </Flex.Item>
-                    <Flex.Item margin="0 xx-small 0 0" data-testid={`icon-url-${p.placement}`}>
-                      <Text fontStyle="italic">{I18n.t('Default Icon')}</Text>
-                    </Flex.Item>
-                  </>
-                ) : (
-                  <Text fontStyle="italic" data-testid={`icon-url-${p.placement}`}>
-                    {I18n.t('Not Included')}
-                  </Text>
-                )}
-              </Flex>
-            </View>
-          ))
-        ) : (
-          <Text fontStyle="italic">{I18n.t('No placements with icons are enabled.')}</Text>
-        )}
+      <Section title={I18n.t('Tool Icon URL')}>
+        <IconUrlsReadOnlyView
+          toolIconUrl={registration.overlaid_configuration.launch_settings?.icon_url}
+          placements={enabledPlacementsWithIcons}
+          registrationName={registration.name}
+          developerKeyId={registration.developer_key_id}
+        />
       </Section>
 
       <ToolConfigurationFooter>
         <Flex direction="row" justifyItems="space-between" padding="0 small">
           <Flex.Item>
             <Flex gap="small">
-              <Flex.Item>
-                <Tooltip
-                  renderTip={I18n.t(
-                    "This account does not own this app and therefore can't reset its configuration.",
-                  )}
-                  isShowingContent={tooltipShowing}
-                  onShowContent={e => {
-                    // The tooltip should only be shown if they *can't* click the restore default button
-                    setTooltipShowing(!canRestoreDefault)
-                  }}
-                  onHideContent={e => {
-                    setTooltipShowing(false)
-                  }}
-                >
-                  <Button
-                    data-pendo="lti-registrations-restore-default"
-                    color="primary-inverse"
-                    interaction={canRestoreDefault ? 'enabled' : 'disabled'}
-                    renderIcon={<IconRefreshLine />}
-                    margin="0"
-                    onClick={handleRestoreDefault}
+              {!isLocalManualRegistration || registration.inherited ? (
+                <Flex.Item>
+                  <Tooltip
+                    renderTip={I18n.t(
+                      "This account does not own this app and therefore can't reset its configuration.",
+                    )}
+                    isShowingContent={tooltipShowing}
+                    onShowContent={() => {
+                      // The tooltip should only be shown if they *can't* click the restore default button
+                      setTooltipShowing(!canRestoreDefault(registration))
+                    }}
+                    onHideContent={() => {
+                      setTooltipShowing(false)
+                    }}
                   >
-                    {I18n.t('Restore Default')}
-                  </Button>
-                </Tooltip>
-              </Flex.Item>
+                    <Button
+                      data-pendo="lti-registrations-restore-default"
+                      color="primary-inverse"
+                      interaction={canRestoreDefault(registration) ? 'enabled' : 'disabled'}
+                      renderIcon={<IconRefreshLine />}
+                      margin="0"
+                      onClick={handleRestoreDefault}
+                    >
+                      {I18n.t('Restore Default')}
+                    </Button>
+                  </Tooltip>
+                </Flex.Item>
+              ) : null}
               {registration.ims_registration_id === null ? (
                 <Flex.Item>
                   <Button
@@ -413,15 +336,51 @@ export const ToolConfigurationView = () => {
               ) : null}
             </Flex>
           </Flex.Item>
+
           <Flex.Item>
-            <Button
-              data-pendo="lti-registrations-edit-config"
-              color="primary"
-              as={RouterLink}
-              to={`/manage/${registration.id}/configuration/edit`}
-            >
-              {I18n.t('Edit')}
-            </Button>
+            <Flex gap="small">
+              <Flex.Item>
+                {window.ENV.LTI_EDIT_JSON && canEditAsJson(registration) && (
+                  <Flex.Item>
+                    <Button
+                      data-pendo="lti-registrations-edit-json"
+                      color="secondary"
+                      onClick={_ => {
+                        navigate(`/manage/${registration.id}/configuration/edit-json`)
+                      }}
+                    >
+                      {I18n.t('Edit as JSON')}
+                    </Button>
+                  </Flex.Item>
+                )}
+              </Flex.Item>
+              <Flex.Item>
+                <Tooltip
+                  renderTip={I18n.t(
+                    "This account does not own this app and therefore can't edit its configuration.",
+                  )}
+                  isShowingContent={editTooltipShowing}
+                  onShowContent={() => {
+                    // The tooltip should only be shown if they *can't* click the edit button
+                    setEditTooltipShowing(!canEdit(registration))
+                  }}
+                  onHideContent={() => {
+                    setEditTooltipShowing(false)
+                  }}
+                >
+                  <Button
+                    data-pendo="lti-registrations-edit-config"
+                    color="primary"
+                    interaction={canEdit(registration) ? 'enabled' : 'disabled'}
+                    onClick={_ => {
+                      navigate(`/manage/${registration.id}/configuration/edit`)
+                    }}
+                  >
+                    {I18n.t('Edit')}
+                  </Button>
+                </Tooltip>
+              </Flex.Item>
+            </Flex>
           </Flex.Item>
         </Flex>
       </ToolConfigurationFooter>

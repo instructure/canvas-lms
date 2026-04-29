@@ -55,8 +55,8 @@ import {
 } from './utils'
 import {getSettingAsync, setSetting} from '@canvas/settings-query/react/settingsQuery'
 import {SVGIcon} from '@instructure/ui-svg-images'
-import {sessionStoragePersister} from '@canvas/query'
-import {useBroadcastQuery} from '@canvas/query/broadcast'
+import {sessionStoragePersister} from '@instructure/platform-query'
+import {useBroadcastQuery} from '@instructure/platform-query/broadcast'
 
 const I18n = createI18nScope('sidenav')
 
@@ -108,8 +108,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     })
   }
 
-  // @ts-expect-error
-  const handleActiveTray = useCallback((tray, showActiveTray = false) => {
+  const handleActiveTray = useCallback((tray: string | null, showActiveTray = false) => {
     if (showActiveTray) {
       dispatch({type: 'SET_ACTIVE_TRAY', payload: tray})
     }
@@ -166,7 +165,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSettingAsync,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   const {data: unreadContentSharesCount} = useQuery({
@@ -175,7 +174,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     staleTime: 60 * 60 * 1000, // 1 hour
     enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
     refetchOnWindowFocus: true,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   useBroadcastQuery({
@@ -187,7 +186,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
     refetchOnWindowFocus: true,
   })
 
@@ -200,7 +199,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     queryFn: getUnreadCount,
     staleTime: 24 * 60 * 60 * 1000, // 24 hours
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes && !releaseNotesBadgeDisabled,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   useLayoutEffect(() => {
@@ -428,30 +427,36 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
             minimized={collapseSideNav}
           />
 
-          {processedTools.map(tool => (
-            <SideNavBar.Item
-              key={tool.toolId}
-              id={`${tool.toolId}-external-tool-tray`}
-              icon={
-                tool.svgPath ? (
-                  <SVGIcon viewBox="0 0 64 64" src={tool.svgPath} title="svg-external-tool" />
-                ) : tool.toolImg ? (
-                  <Img width="26px" height="26px" src={tool.toolImg} alt="" />
-                ) : (
-                  <IconExternalLinkLine data-testid="IconExternalLinkLine" size="small" />
-                )
-              }
-              label={tool.label}
-              href={`${tool.href?.toString() || '#'}&toolId=${tool.toolId}`}
-              onClick={() => handleActiveTray(tool.toolId)}
-              selected={selectedNavItem === tool.toolId}
-              data-selected={selectedNavItem === tool.toolId}
-              themeOverride={{
-                fontWeight: 400,
-              }}
-              minimized={collapseSideNav}
-            />
-          ))}
+          {processedTools.map(tool => {
+            let toolHref = tool.href?.toString() || '#'
+            if (!tool.href?.includes('toolId')) {
+              toolHref += `&toolId=${tool.toolId}`
+            }
+            return (
+              <SideNavBar.Item
+                key={tool.toolId}
+                id={`${tool.toolId}-external-tool-tray`}
+                icon={
+                  tool.svgPath ? (
+                    <SVGIcon viewBox="0 0 64 64" src={tool.svgPath} title="svg-external-tool" />
+                  ) : tool.toolImg ? (
+                    <Img width="26px" height="26px" src={tool.toolImg} alt="" />
+                  ) : (
+                    <IconExternalLinkLine data-testid="IconExternalLinkLine" size="small" />
+                  )
+                }
+                label={tool.label}
+                href={toolHref}
+                onClick={() => handleActiveTray(tool.toolId)}
+                selected={selectedNavItem === tool.toolId}
+                data-selected={selectedNavItem === tool.toolId}
+                themeOverride={{
+                  fontWeight: 400,
+                }}
+                minimized={collapseSideNav}
+              />
+            )
+          })}
 
           <SideNavBar.Item
             id="help-tray"
@@ -459,7 +464,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
               <Badge
                 count={unreadReleaseNotesCount}
                 formatOutput={(count: string) =>
-                  (unreadReleaseNotesCount || 0) > 0 ? (
+                  (unreadReleaseNotesCount || 0) > 0 && !releaseNotesBadgeDisabled ? (
                     <AccessibleContent
                       alt={I18n.t(
                         {
@@ -480,7 +485,6 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
               </Badge>
             }
             label={I18n.t('Help')}
-            href="https://help.instructure.com/"
             onClick={event => {
               event.preventDefault()
               handleActiveTray('help', true)

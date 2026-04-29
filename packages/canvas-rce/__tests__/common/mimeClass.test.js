@@ -33,7 +33,7 @@ describe('fileEmbed', () => {
     const video = fileEmbed(getBaseFile({'content-type': 'video/mp4'}))
     const audio = fileEmbed(getBaseFile({'content-type': 'audio/mpeg'}))
     const notaudio = fileEmbed(
-      getBaseFile({'content-type': 'x-audio/mpeg', preview_url: undefined})
+      getBaseFile({'content-type': 'x-audio/mpeg', preview_url: undefined}),
     )
     const notvideo = fileEmbed(getBaseFile({'content-type': 'x-video/mp4', preview_url: undefined}))
 
@@ -81,5 +81,29 @@ describe('mimeClass', () => {
     expect(mimeClass({type: 'image/svg+xml'})).toEqual('image')
     expect(mimeClass({type: 'image/webp'})).toEqual('image')
     expect(mimeClass({type: 'application/vnd.ms-powerpoint'})).toEqual('ppt')
+  })
+
+  it('strips charset parameter from content-type', () => {
+    expect(mimeClass({'content-type': 'text/plain; charset=UTF-8'})).toEqual('text')
+    expect(mimeClass({'content-type': 'text/html; charset=iso-8859-1'})).toEqual('html')
+  })
+
+  it('strips multiple parameters from content-type', () => {
+    expect(mimeClass({'content-type': 'text/plain; charset=UTF-8; boundary=something'})).toEqual(
+      'text',
+    )
+  })
+
+  it('handles content-type with parameter but no space after semicolon', () => {
+    expect(mimeClass({'content-type': 'text/plain;charset=UTF-8'})).toEqual('text')
+  })
+
+  it('handles content-type with spaces around semicolon', () => {
+    expect(mimeClass({'content-type': 'text/plain ; charset=UTF-8'})).toEqual('text')
+  })
+
+  it('still works for content-types without parameters', () => {
+    expect(mimeClass({'content-type': 'text/plain'})).toEqual('text')
+    expect(mimeClass({'content-type': 'application/pdf'})).toEqual('pdf')
   })
 })

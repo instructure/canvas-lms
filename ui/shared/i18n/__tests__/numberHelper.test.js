@@ -33,7 +33,7 @@ describe('Number Helper Tests', () => {
 
     input = '47'
     output = 47
-    jest.spyOn(numberHelper, '_parseNumber').mockReturnValue(output)
+    vi.spyOn(numberHelper, '_parseNumber').mockReturnValue(output)
   })
 
   afterEach(() => {

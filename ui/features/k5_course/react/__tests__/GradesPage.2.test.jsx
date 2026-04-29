@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {render, waitFor, act} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {GradesPage} from '../GradesPage'
 import {
   MOCK_GRADING_PERIODS_EMPTY,
@@ -29,20 +30,15 @@ import {
   MOCK_GRADEBOOK_HIDDEN_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
 } from './mocks'
 
-const GRADING_PERIODS_URL = encodeURI(
-  '/api/v1/courses/12?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores',
-)
-const OBSERVER_GRADING_PERIODS_URL = encodeURI(
-  '/api/v1/courses/12?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores&include[]=observed_users',
-)
-const ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments',
-)
-const OBSERVER_ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments&include[]=observed_users',
-)
-const ENROLLMENTS_URL = '/api/v1/courses/12/enrollments?user_id=1'
-const OBSERVER_ENROLLMENTS_URL = '/api/v1/courses/12/enrollments?user_id=1&include=observed_users'
+const server = setupServer()
+
+beforeAll(() => {
+  server.listen()
+})
+
+afterAll(() => {
+  server.close()
+})
 
 const dtf = new Intl.DateTimeFormat('en', {
   // MMM D, YYYY h:mma
@@ -88,7 +84,7 @@ describe('GradesPage', () => {
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     localStorage.clear()
   })
 
@@ -122,9 +118,34 @@ describe('GradesPage', () => {
 
   describe('observer support', () => {
     beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
-      fetchMock.get(OBSERVER_ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
-      fetchMock.get(OBSERVER_ENROLLMENTS_URL, MOCK_ENROLLMENTS_WITH_OBSERVED_USERS)
+      server.use(
+        http.get('*/api/v1/courses/12', ({request}) => {
+          const url = new URL(request.url)
+          const include = url.searchParams.getAll('include[]')
+          if (include.includes('grading_periods') && include.includes('observed_users')) {
+            return HttpResponse.json(MOCK_GRADING_PERIODS_EMPTY)
+          }
+          if (include.includes('grading_periods')) {
+            return HttpResponse.json(MOCK_GRADING_PERIODS_EMPTY)
+          }
+          return HttpResponse.json({})
+        }),
+        http.get('*/api/v1/courses/12/assignment_groups', ({request}) => {
+          const url = new URL(request.url)
+          const include = url.searchParams.getAll('include[]')
+          if (include.includes('observed_users')) {
+            return HttpResponse.json(MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
+          }
+          return HttpResponse.json(MOCK_ASSIGNMENT_GROUPS)
+        }),
+        http.get('*/api/v1/courses/12/enrollments', ({request}) => {
+          const url = new URL(request.url)
+          if (url.searchParams.get('include') === 'observed_users') {
+            return HttpResponse.json(MOCK_ENROLLMENTS_WITH_OBSERVED_USERS)
+          }
+          return HttpResponse.json(MOCK_ENROLLMENTS)
+        }),
+      )
     })
 
     it('only shows assignment details for the observed user', async () => {
@@ -181,10 +202,15 @@ describe('GradesPage', () => {
     })
 
     it('does not show assignment details for the observed user when it is hidden for student page', async () => {
-      fetchMock.get(
-        OBSERVER_ASSIGNMENT_GROUPS_URL,
-        MOCK_GRADEBOOK_HIDDEN_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
-        {overwriteRoutes: true},
+      server.use(
+        http.get('*/api/v1/courses/12/assignment_groups', ({request}) => {
+          const url = new URL(request.url)
+          const include = url.searchParams.getAll('include[]')
+          if (include.includes('observed_users')) {
+            return HttpResponse.json(MOCK_GRADEBOOK_HIDDEN_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
+          }
+          return HttpResponse.json(MOCK_ASSIGNMENT_GROUPS)
+        }),
       )
 
       const {getByText, queryByText, getByTestId} = render(
@@ -239,8 +265,19 @@ describe('GradesPage', () => {
   describe('with Restrict Quantitative Data enabled', () => {
     let mockAssignmentGroups = []
     beforeEach(() => {
-      fetchMock.get(GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
-      fetchMock.get(ENROLLMENTS_URL, MOCK_ENROLLMENTS)
+      server.use(
+        http.get('*/api/v1/courses/12', ({request}) => {
+          const url = new URL(request.url)
+          const include = url.searchParams.getAll('include[]')
+          if (include.includes('grading_periods')) {
+            return HttpResponse.json(MOCK_GRADING_PERIODS_EMPTY)
+          }
+          return HttpResponse.json({})
+        }),
+        http.get('*/api/v1/courses/12/enrollments', () => {
+          return HttpResponse.json(MOCK_ENROLLMENTS)
+        }),
+      )
       window.ENV = {
         RESTRICT_QUANTITATIVE_DATA: true,
         GRADING_SCHEME: DEFAULT_GRADING_SCHEME,
@@ -249,7 +286,11 @@ describe('GradesPage', () => {
     })
 
     it('renders the returned assignment details as a letter grade only', async () => {
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
+      server.use(
+        http.get('*/api/v1/courses/12/assignment_groups', () => {
+          return HttpResponse.json(mockAssignmentGroups)
+        }),
+      )
 
       const {findByText, queryByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
@@ -268,7 +309,11 @@ describe('GradesPage', () => {
       mockAssignmentGroups[0].assignments[0].submission.score = 10
       mockAssignmentGroups[0].assignments[0].submission.grade = 'complete'
       mockAssignmentGroups[0].assignments[0].grading_type = 'pass_fail'
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
+      server.use(
+        http.get('*/api/v1/courses/12/assignment_groups', () => {
+          return HttpResponse.json(mockAssignmentGroups)
+        }),
+      )
 
       const {findByText, queryByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
@@ -287,7 +332,11 @@ describe('GradesPage', () => {
       mockAssignmentGroups[0].assignments[0].submission.score = 10
       mockAssignmentGroups[0].assignments[0].submission.grade = '10'
       mockAssignmentGroups[0].assignments[0].points_possible = 0
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
+      server.use(
+        http.get('*/api/v1/courses/12/assignment_groups', () => {
+          return HttpResponse.json(mockAssignmentGroups)
+        }),
+      )
 
       const {findByText, queryByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
@@ -307,7 +356,11 @@ describe('GradesPage', () => {
       mockAssignmentGroups[0].assignments[0].submission.grade = '0'
       mockAssignmentGroups[0].assignments[0].points_possible = 0
 
-      fetchMock.get(ASSIGNMENT_GROUPS_URL, mockAssignmentGroups)
+      server.use(
+        http.get('*/api/v1/courses/12/assignment_groups', () => {
+          return HttpResponse.json(mockAssignmentGroups)
+        }),
+      )
 
       const {findByText, queryByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())

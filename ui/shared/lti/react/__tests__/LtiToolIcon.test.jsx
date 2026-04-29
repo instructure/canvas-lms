@@ -39,6 +39,6 @@ describe('LtiToolIcon', () => {
     delete _tool.icon_url
     render(<LtiToolIcon tool={_tool} />)
     const img = document.querySelector('img')
-    expect(img.src).toContain('/lti/tool_default_icon?id=1&name=%22Tool%20Title%22')
+    expect(img.src).toContain('/lti/tool_default_icon?id=1&name=Tool%20Title')
   })
 })

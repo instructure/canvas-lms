@@ -24,20 +24,27 @@ import {
   getItemsDurationFromTimeToComplete,
   getTimeToCompleteCalendarDaysFromItemsDuration,
   isTimeToCompleteCalendarDaysValid,
-  setItemsDurationFromWeightedAssignments
+  setItemsDurationFromWeightedAssignments,
 } from '../utils'
-import { PACE_ITEM_1, PACE_ITEM_2, PACE_ITEM_3, PACE_ITEM_4, PACE_MODULE_1, PACE_MODULE_2, PRIMARY_PACE } from '../../__tests__/fixtures'
-import { AssignmentWeightening, CoursePaceItem } from '../../types'
+import {
+  PACE_ITEM_1,
+  PACE_ITEM_2,
+  PACE_ITEM_3,
+  PACE_ITEM_4,
+  PACE_MODULE_1,
+  PACE_MODULE_2,
+  PRIMARY_PACE,
+} from '../../__tests__/fixtures'
+import {AssignmentWeightening, CoursePaceItem} from '../../types'
 
 describe('utils', () => {
   const startDate = moment('2022-01-01')
   const endDate = moment('2022-01-10')
 
-  const expectedDuration = { weeks: 1, days: 3 }
+  const expectedDuration = {weeks: 1, days: 3}
 
   describe('calculatePaceDuration', () => {
     it('should calculate the correct pace duration', () => {
-
       const result = calculatePaceDuration(startDate, endDate)
       expect(result).toEqual(expectedDuration)
     })
@@ -46,7 +53,7 @@ describe('utils', () => {
   describe('calendarDaysToPaceDuration', () => {
     it('should convert calendar days to pace duration correctly', () => {
       const calendarDays = 10
-      const expectedDuration = { weeks: 1, days: 3 }
+      const expectedDuration = {weeks: 1, days: 3}
       const result = calendarDaysToPaceDuration(calendarDays)
       expect(result).toEqual(expectedDuration)
     })
@@ -57,7 +64,7 @@ describe('utils', () => {
       assignment: 2,
       discussion: 3,
       quiz: 4,
-      page: 1
+      page: 1,
     }
 
     const coursePaceItem: CoursePaceItem[] = [
@@ -65,26 +72,26 @@ describe('utils', () => {
         //assignment
         ...PACE_ITEM_1,
         module_item_type: 'Assignment',
-        duration: 6
+        duration: 6,
       },
       {
         //discussion
         ...PACE_ITEM_2,
         module_item_type: 'DiscussionTopic',
-        duration: 6
+        duration: 6,
       },
       {
         //quiz
         ...PACE_ITEM_3,
         module_item_type: 'Quizzes::Quiz',
-        duration: 6
+        duration: 6,
       },
       {
         //page
         ...PACE_ITEM_3,
         id: '54',
         module_item_type: 'Page',
-        duration: 6
+        duration: 6,
       },
     ]
 
@@ -98,10 +105,9 @@ describe('utils', () => {
     })
 
     it('adds the right duration (no weighting duration for page)', () => {
-
       const newWeightedDuration = {
         ...assignmentWeightedDuration,
-        page: undefined
+        page: undefined,
       }
 
       const result = calculatePaceItemDuration(coursePaceItem, newWeightedDuration)
@@ -233,12 +239,12 @@ describe('utils', () => {
         ...coursePace,
         exclude_weekends: false,
         selected_days_to_skip: [],
-        modules: coursePace.modules.map((module) => {
+        modules: coursePace.modules.map(module => {
           return {
             ...module,
-            items: coursePaceItem
+            items: coursePaceItem,
           }
-        })
+        }),
       }
 
       const result = getTimeToCompleteCalendarDaysFromItemsDuration(newCoursePace, [])
@@ -253,12 +259,12 @@ describe('utils', () => {
         ...coursePace,
         exclude_weekends: true,
         selected_days_to_skip: [],
-        modules: coursePace.modules.map((module) => {
+        modules: coursePace.modules.map(module => {
           return {
             ...module,
-            items: coursePaceItem
+            items: coursePaceItem,
           }
-        })
+        }),
       }
       // Calculates calendar days from 2021-09-01 excluding weekends
       // pace durations is 13 days, and there are 2 weekends in that period
@@ -276,12 +282,12 @@ describe('utils', () => {
         ...coursePace,
         exclude_weekends: false,
         selected_days_to_skip: ['sun', 'mon', 'fri'],
-        modules: coursePace.modules.map((module) => {
+        modules: coursePace.modules.map(module => {
           return {
             ...module,
-            items: coursePaceItem
+            items: coursePaceItem,
           }
-        })
+        }),
       }
       // Calculates calendar days from 2021-09-01 excluding Sundays, Mondays and Fridays
       // pace durations is 13 days, and there are 3 fridays, 3 sundays and 3 Mondays
@@ -299,12 +305,12 @@ describe('utils', () => {
         ...coursePace,
         exclude_weekends: true,
         selected_days_to_skip: [],
-        modules: coursePace.modules.map((module) => {
+        modules: coursePace.modules.map(module => {
           return {
             ...module,
-            items: coursePaceItem
+            items: coursePaceItem,
           }
-        })
+        }),
       }
       // Calculates calendar days from 2021-09-01 excluding weekends
       // pace durations is 13 days, days from 2021-09-06 to 2021-09-08 are blacked out
@@ -322,12 +328,12 @@ describe('utils', () => {
         ...coursePace,
         exclude_weekends: true,
         selected_days_to_skip: ['sun', 'mon', 'fri'],
-        modules: coursePace.modules.map((module) => {
+        modules: coursePace.modules.map(module => {
           return {
             ...module,
-            items: coursePaceItem
+            items: coursePaceItem,
           }
-        })
+        }),
       }
       // Calculates calendar days from 2021-09-01 excluding weekends
       // pace durations is 13 days, days from 2021-09-07 to 2021-09-08 are blacked out
@@ -350,7 +356,7 @@ describe('utils', () => {
       const newCoursePace = {
         ...coursePace,
         exclude_weekends: false,
-        selected_days_to_skip: []
+        selected_days_to_skip: [],
       }
 
       const result = getItemsDurationFromTimeToComplete(newCoursePace, [], -100, 4)
@@ -362,7 +368,7 @@ describe('utils', () => {
       const newCoursePace = {
         ...coursePace,
         exclude_weekends: false,
-        selected_days_to_skip: []
+        selected_days_to_skip: [],
       }
       // Calendar days are 11 and Start date is ignored from calculation,
       // Then 10 / 3 = 3 and 10 % 3 = 1
@@ -380,7 +386,7 @@ describe('utils', () => {
       const newCoursePace = {
         ...coursePace,
         exclude_weekends: false,
-        selected_days_to_skip: ['sun', 'mon', 'fri']
+        selected_days_to_skip: ['sun', 'mon', 'fri'],
       }
       // Start date is ignored from calculation,
       // Start date is 2021-09-01, Calendar days are 11, so end date is 2021-09-11
@@ -400,11 +406,11 @@ describe('utils', () => {
       const newCoursePace = {
         ...coursePace,
         exclude_weekends: false,
-        selected_days_to_skip: ['sun', 'mon', 'fri']
+        selected_days_to_skip: ['sun', 'mon', 'fri'],
       }
       // Start date is ignored from calculation,
       // excluding Sundays, Mondays and Fridays
-      // Start date is 2021-09-01, Calendar days are 12, 
+      // Start date is 2021-09-01, Calendar days are 12,
       // but end date is 2021-09-12 is sunday, an skipped day, so it is ignored
       // duration: 2, reminder: 0
 
@@ -420,7 +426,7 @@ describe('utils', () => {
       const newCoursePace = {
         ...coursePace,
         exclude_weekends: true,
-        selected_days_to_skip: []
+        selected_days_to_skip: [],
       }
       // Start date is 2021-09-01 and is ignored from calculation,
       // Calendar days are 11, Then end date is 2021-09-11
@@ -437,7 +443,7 @@ describe('utils', () => {
       const newCoursePace = {
         ...coursePace,
         exclude_weekends: false,
-        selected_days_to_skip: []
+        selected_days_to_skip: [],
       }
 
       const blackoutDates = [
@@ -478,8 +484,8 @@ describe('utils', () => {
             {
               ...PACE_ITEM_2,
               module_item_type: 'DiscussionTopic',
-            }
-          ]
+            },
+          ],
         },
         {
           ...PACE_MODULE_2,
@@ -492,21 +498,25 @@ describe('utils', () => {
               ...PACE_ITEM_4,
               module_item_type: 'Page',
             },
-          ]
+          ],
         },
-      ]
+      ],
     }
 
     const assignmentWeightedDuration: AssignmentWeightening = {
       assignment: 2,
       discussion: 3,
       quiz: 4,
-      page: 1
+      page: 1,
     }
 
     it('set item durations from weighted assignments', () => {
-      const modules = setItemsDurationFromWeightedAssignments(coursePace, [], assignmentWeightedDuration)
-      const items = modules.flatMap((module) => module.items)
+      const modules = setItemsDurationFromWeightedAssignments(
+        coursePace,
+        [],
+        assignmentWeightedDuration,
+      )
+      const items = modules.flatMap(module => module.items)
 
       expect(items[0].duration).toEqual(assignmentWeightedDuration.assignment)
       expect(items[1].duration).toEqual(assignmentWeightedDuration.discussion)
@@ -517,11 +527,15 @@ describe('utils', () => {
     it('set item durations from weighted assignments, no weighteds for page or quiz', () => {
       const newAssignmentDurations: AssignmentWeightening = {
         assignment: 2,
-        discussion: 3
+        discussion: 3,
       }
 
-      const modules = setItemsDurationFromWeightedAssignments(coursePace, [], newAssignmentDurations)
-      const items = modules.flatMap((module) => module.items)
+      const modules = setItemsDurationFromWeightedAssignments(
+        coursePace,
+        [],
+        newAssignmentDurations,
+      )
+      const items = modules.flatMap(module => module.items)
 
       // There is not weighted for quiz and page, then the duration for
       // those items is calculated with the remaining days from time to complete
@@ -537,7 +551,7 @@ describe('utils', () => {
     it('set item durations from weighted assignments, blackout days', () => {
       const newAssignmentDurations: AssignmentWeightening = {
         assignment: 2,
-        discussion: 3
+        discussion: 3,
       }
 
       const blackoutDates = [
@@ -550,8 +564,12 @@ describe('utils', () => {
         },
       ]
 
-      const modules = setItemsDurationFromWeightedAssignments(coursePace, blackoutDates, newAssignmentDurations)
-      const items = modules.flatMap((module) => module.items)
+      const modules = setItemsDurationFromWeightedAssignments(
+        coursePace,
+        blackoutDates,
+        newAssignmentDurations,
+      )
+      const items = modules.flatMap(module => module.items)
 
       // There is not weighted for quiz and page, then the duration for
       // those items is calculated with the remaining days from time to complete.

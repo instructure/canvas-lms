@@ -18,7 +18,7 @@
 
 const $ = require('jquery')
 
-$.widget = jest.fn()
+$.widget = vi.fn()
 $.ui = {
   mouse: {},
   sortable: {},

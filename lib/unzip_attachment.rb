@@ -126,7 +126,7 @@ class UnzipAttachment
         # have to worry about what this name actually is.
         Tempfile.open do |f|
           file_size = 0
-          sha512 = entry.extract(f.path, true) do |bytes|
+          sha512 = entry.extract(f.path, overwrite: true) do |bytes|
             file_size += bytes
           end
           zip_stats.charge_quota(file_size)
@@ -186,12 +186,12 @@ class UnzipAttachment
 
   def with_unzip_configuration
     Attachment.skip_touch_context do
-      Attachment.skip_3rd_party_submits(true)
-      FileInContext.queue_files_to_delete(true)
+      Attachment.skip_3rd_party_submits(skip: true)
+      FileInContext.queue_files_to_delete(queue: true)
       yield
     ensure
-      Attachment.skip_3rd_party_submits(false)
-      FileInContext.queue_files_to_delete(false)
+      Attachment.skip_3rd_party_submits(skip: false)
+      FileInContext.queue_files_to_delete(queue: false)
       FileInContext.destroy_queued_files
     end
   end
@@ -248,7 +248,7 @@ class UnzipAttachment
 
   # A cached list of folders that we know about.
   # Used by infer_folder to know whether to create a folder or not.
-  def folders(reset = false)
+  def folders(reset: false)
     @folders = nil if reset
     return @folders if @folders
 

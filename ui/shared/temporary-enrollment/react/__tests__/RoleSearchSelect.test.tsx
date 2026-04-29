@@ -26,11 +26,11 @@ const props = {
   isLoading: false,
   noResultsLabel: 'empty results',
   noSearchMatchLabel: 'empty search',
-  onChange: jest.fn(),
+  onChange: vi.fn(),
   id: '',
   value: '',
-  setRef: jest.fn(),
-  invalidRole: jest.fn(),
+  setRef: vi.fn(),
+  invalidRole: vi.fn(),
 }
 
 const roleOptions = [

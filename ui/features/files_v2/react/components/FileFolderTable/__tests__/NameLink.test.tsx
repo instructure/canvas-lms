@@ -22,20 +22,20 @@ import NameLink from '../NameLink'
 import {BrowserRouter} from 'react-router-dom'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import userEvent from '@testing-library/user-event'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(() => jest.fn()),
-  showFlashAlert: jest.fn(),
+vi.mock('@instructure/platform-alerts', () => ({
+  showFlashError: vi.fn(() => vi.fn()),
+  showFlashAlert: vi.fn(),
 }))
 
-const mockNavigate = jest.fn()
-const mockUseLocation = jest.fn()
+const mockNavigate = vi.fn()
+const mockUseLocation = vi.fn()
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
   useNavigate: () => mockNavigate,
   useLocation: () => mockUseLocation(),
 }))
@@ -61,7 +61,7 @@ describe('NameLink', () => {
   const queryParams = '?sort=name&order=asc&preview=123&search_term=example'
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockUseLocation.mockReturnValue({
       pathname: path,
       search: queryParams,
@@ -124,25 +124,74 @@ describe('NameLink', () => {
     })
   })
 
-  it('should call the navigate with existing query params, but the preview query param is removed when closing modal', async () => {
-    const user = userEvent.setup()
-    const file = {...FAKE_FILES[0]}
-    renderComponent({item: file})
+  describe('file preview functionality', () => {
+    const mockOnPreviewFile = vi.fn()
 
-    await user.click(screen.getByText(file.display_name))
-
-    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining(`preview=${file.id}`), {
-      replace: true,
+    beforeEach(() => {
+      mockOnPreviewFile.mockClear()
     })
 
-    mockNavigate.mockClear()
+    describe('when item is a file', () => {
+      it('calls onPreviewFile when file link is clicked', async () => {
+        const file = FAKE_FILES[0]
+        renderComponent({
+          item: file,
+          onPreviewFile: mockOnPreviewFile,
+        })
 
-    const closeButton = screen.getByTestId('close-button')
-    await user.click(closeButton)
+        const link = screen.getByTestId(file.display_name)
+        await userEvent.click(link)
+        expect(mockOnPreviewFile).toHaveBeenCalledWith(file)
+      })
 
-    const expectedUrl = `${path}${queryParams.replace('&preview=123', '')}`
-    expect(mockNavigate).toHaveBeenCalledWith(expectedUrl, {
-      replace: true,
+      it('does not call onPreviewFile when onPreviewFile is not provided', async () => {
+        const file = FAKE_FILES[0]
+        renderComponent({
+          item: file,
+          onPreviewFile: undefined,
+        })
+
+        const link = screen.getByTestId(file.display_name)
+        await userEvent.click(link)
+        expect(mockOnPreviewFile).not.toHaveBeenCalled()
+      })
+
+      it('should call onPreviewFile when isStacked is true', async () => {
+        const file = FAKE_FILES[0]
+        renderComponent({
+          item: file,
+          isStacked: true,
+          onPreviewFile: mockOnPreviewFile,
+        })
+
+        const link = screen.getByTestId(file.display_name)
+        await userEvent.click(link)
+        expect(mockOnPreviewFile).toHaveBeenCalledWith(file)
+      })
+    })
+
+    describe('when item is a folder', () => {
+      it('does not call onPreviewFile for folders', async () => {
+        const folder = FAKE_FOLDERS[0]
+        renderComponent({
+          item: folder,
+          onPreviewFile: mockOnPreviewFile,
+        })
+
+        const link = screen.getByTestId(folder.name)
+        await userEvent.click(link)
+        expect(mockOnPreviewFile).not.toHaveBeenCalled()
+      })
+
+      it('navigates to folder URL when folder link is clicked', async () => {
+        const user = userEvent.setup()
+        const folder = FAKE_FOLDERS[1]
+        renderComponent({item: folder, onPreviewFile: mockOnPreviewFile})
+
+        const link = screen.getByTestId(folder.name)
+        await user.click(link)
+        expect(window.location.pathname).toBe(`/folder/${encodeURIComponent(folder.name)}`)
+      })
     })
   })
 })

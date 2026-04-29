@@ -23,6 +23,39 @@ import {mergeTimeAndDate} from '@instructure/moment-utils'
 import {fireEvent, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import $ from 'jquery'
+
+// Mock spin.js to prevent spinner issues in tests
+vi.mock('spin.js/jquery.spin', () => ({
+  default: {},
+}))
+
+// Set up jQuery mocks
+$.fn.disableWhileLoading = vi.fn(function (promise) {
+  return this
+})
+$.fn.errorBox = vi.fn()
+$.when = vi.fn(promise => ({
+  done: callback => {
+    callback()
+    return {fail: vi.fn()}
+  },
+  always: callback => {
+    callback()
+    return {fail: vi.fn()}
+  },
+}))
+$.fn.data = vi.fn()
+$.fn.val = vi.fn()
+$.fn.spin = vi.fn(function () {
+  return this
+})
+$.fn.show = vi.fn(function () {
+  return this
+})
+$.fn.css = vi.fn(function () {
+  return this
+})
 
 describe('RestrictedDialogForm', () => {
   const defaultProps = {
@@ -36,22 +69,12 @@ describe('RestrictedDialogForm', () => {
   }
 
   beforeEach(() => {
-    // Mock jQuery plugins
-    const $ = require('jquery')
-    $.fn.disableWhileLoading = jest.fn()
-    $.fn.errorBox = jest.fn()
-    $.when = jest.fn(() => ({
-      done: callback => {
-        callback()
-        return {fail: jest.fn()}
-      },
-    }))
-    $.fn.data = jest.fn()
-    $.fn.val = jest.fn()
+    // Reset mocks but keep them defined
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('with multiple selected items', () => {
@@ -90,7 +113,7 @@ describe('RestrictedDialogForm', () => {
         lock_at: undefined,
         unlock_at: undefined,
       })
-      const saveSpy = jest.spyOn(folder, 'save')
+      const saveSpy = vi.spyOn(folder, 'save')
       const props = {
         models: [folder],
       }
@@ -118,7 +141,7 @@ describe('RestrictedDialogForm', () => {
         lock_at: undefined,
         unlock_at: undefined,
       })
-      const saveSpy = jest.spyOn(folder, 'save')
+      const saveSpy = vi.spyOn(folder, 'save')
       const props = {
         models: [folder],
       }
@@ -137,17 +160,18 @@ describe('RestrictedDialogForm', () => {
       const lockAtDate = screen.getByLabelText('Available Until Date')
       const lockAtTime = screen.getByLabelText('Available Until Time')
 
-      const $ = require('jquery')
-      $.fn.data = jest.fn(function (key) {
+      $.fn.data = vi.fn(function (key) {
         if (key === 'unfudged-date') {
-          if (this[0] === unlockAtDate) return startDate
-          if (this[0] === lockAtDate) return endDate
+          const label = this[0]?.getAttribute('aria-label')
+          if (label === 'Available From Date') return startDate
+          if (label === 'Available Until Date') return endDate
         }
         return undefined
       })
-      $.fn.val = jest.fn(function () {
-        if (this[0] === unlockAtTime) return '5 AM'
-        if (this[0] === lockAtTime) return '5 PM'
+      $.fn.val = vi.fn(function () {
+        const label = this[0]?.getAttribute('aria-label')
+        if (label === 'Available From Time') return '5 AM'
+        if (label === 'Available Until Time') return '5 PM'
         return ''
       })
 
@@ -173,7 +197,7 @@ describe('RestrictedDialogForm', () => {
         lock_at: undefined,
         unlock_at: undefined,
       })
-      const saveSpy = jest.spyOn(folder, 'save')
+      const saveSpy = vi.spyOn(folder, 'save')
       const props = {
         models: [folder],
       }
@@ -189,15 +213,16 @@ describe('RestrictedDialogForm', () => {
       const lockAtDate = screen.getByLabelText('Available Until Date')
       const lockAtTime = screen.getByLabelText('Available Until Time')
 
-      const $ = require('jquery')
-      $.fn.data = jest.fn(function (key) {
+      $.fn.data = vi.fn(function (key) {
         if (key === 'unfudged-date') {
-          if (this[0] === lockAtDate) return endDate
+          const label = this[0]?.getAttribute('aria-label')
+          if (label === 'Available Until Date') return endDate
         }
         return undefined
       })
-      $.fn.val = jest.fn(function () {
-        if (this[0] === lockAtTime) return '5 PM'
+      $.fn.val = vi.fn(function () {
+        const label = this[0]?.getAttribute('aria-label')
+        if (label === 'Available Until Time') return '5 PM'
         return ''
       })
 
@@ -223,7 +248,7 @@ describe('RestrictedDialogForm', () => {
         lock_at: undefined,
         unlock_at: undefined,
       })
-      const saveSpy = jest.spyOn(folder, 'save')
+      const saveSpy = vi.spyOn(folder, 'save')
       const props = {
         models: [folder],
       }
@@ -239,15 +264,16 @@ describe('RestrictedDialogForm', () => {
       const unlockAtDate = screen.getByLabelText('Available From Date')
       const unlockAtTime = screen.getByLabelText('Available From Time')
 
-      const $ = require('jquery')
-      $.fn.data = jest.fn(function (key) {
+      $.fn.data = vi.fn(function (key) {
         if (key === 'unfudged-date') {
-          if (this[0] === unlockAtDate) return startDate
+          const label = this[0]?.getAttribute('aria-label')
+          if (label === 'Available From Date') return startDate
         }
         return undefined
       })
-      $.fn.val = jest.fn(function () {
-        if (this[0] === unlockAtTime) return '5 AM'
+      $.fn.val = vi.fn(function () {
+        const label = this[0]?.getAttribute('aria-label')
+        if (label === 'Available From Time') return '5 AM'
         return ''
       })
 
@@ -273,7 +299,7 @@ describe('RestrictedDialogForm', () => {
         lock_at: undefined,
         unlock_at: undefined,
       })
-      const saveSpy = jest.spyOn(folder, 'save')
+      const saveSpy = vi.spyOn(folder, 'save')
       const props = {
         models: [folder],
       }
@@ -291,17 +317,18 @@ describe('RestrictedDialogForm', () => {
       const lockAtDate = screen.getByLabelText('Available Until Date')
       const lockAtTime = screen.getByLabelText('Available Until Time')
 
-      const $ = require('jquery')
-      $.fn.data = jest.fn(function (key) {
+      $.fn.data = vi.fn(function (key) {
         if (key === 'unfudged-date') {
-          if (this[0] === unlockAtDate) return startDate
-          if (this[0] === lockAtDate) return endDate
+          const label = this[0]?.getAttribute('aria-label')
+          if (label === 'Available From Date') return startDate
+          if (label === 'Available Until Date') return endDate
         }
         return undefined
       })
-      $.fn.val = jest.fn(function () {
-        if (this[0] === unlockAtTime) return '5 PM'
-        if (this[0] === lockAtTime) return '5 AM'
+      $.fn.val = vi.fn(function () {
+        const label = this[0]?.getAttribute('aria-label')
+        if (label === 'Available From Time') return '5 PM'
+        if (label === 'Available Until Time') return '5 AM'
         return ''
       })
 

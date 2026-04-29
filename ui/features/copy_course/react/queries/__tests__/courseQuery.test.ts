@@ -17,31 +17,37 @@
  */
 
 import {coursesQuery} from '../courseQuery'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {QueryFunctionContext} from '@tanstack/react-query'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
-const mockDoFetchApi = doFetchApi as jest.MockedFunction<typeof doFetchApi>
+const server = setupServer()
 
 describe('coursesQuery', () => {
   const mockCourse = {id: '1', name: 'Test Course'}
-  const mockPromiseResolveValue = {json: mockCourse, text: '', response: new Response()}
   const signal = new AbortController().signal
   const queryKey: any = ['copy_course', 'course', '1']
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   afterEach(() => {
-    jest.clearAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
   })
 
   it('should fetch course data', async () => {
-    mockDoFetchApi.mockResolvedValue(mockPromiseResolveValue)
+    let capturedPath = ''
+    server.use(
+      http.get('/api/v1/courses/:courseId', ({request}) => {
+        capturedPath = new URL(request.url).pathname
+        return HttpResponse.json(mockCourse)
+      }),
+    )
 
     const result = await coursesQuery({signal, queryKey} as QueryFunctionContext)
 
-    expect(mockDoFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/courses/1',
-      fetchOpts: {signal},
-    })
+    expect(capturedPath).toBe('/api/v1/courses/1')
     expect(result).toEqual(mockCourse)
   })
 })

@@ -42,19 +42,6 @@ describe "drag and drop reordering" do
     expect(new_data[2][:id]).to eq old_data[2][:id]
   end
 
-  it "adds questions to a group", priority: "1" do
-    skip_if_chrome("fragile in chrome")
-
-    create_question_group
-    drag_question_into_group(@quest1.id, @group.id)
-    drag_question_into_group(@quest2.id, @group.id)
-    click_save_settings_button
-
-    refresh_page
-    wait_for_ajaximations
-    group_should_contain_question(@group, @quest1)
-  end
-
   it "removes questions from a group", priority: "1" do
     # drag it out
     click_questions_tab

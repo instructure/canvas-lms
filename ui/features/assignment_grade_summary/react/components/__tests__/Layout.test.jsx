@@ -25,36 +25,42 @@ import Layout from '../Layout'
 import configureStore from '../../configureStore'
 
 const getMockFirstArg = mock => mock.mock.calls[0][0]
-const gradesGridMock = jest.fn(() => <div data-testid="grades-grid" />)
+const gradesGridMock = vi.fn(() => <div data-testid="grades-grid" />)
 
-jest.mock('../GradesGrid', () => props => gradesGridMock(props))
-jest.mock('../FlashMessageHolder', () => () => <div data-testid="flash-message-holder" />)
-jest.mock('../Header', () => () => <div data-testid="header" />)
-jest.mock('../../students/StudentActions', () => {
-  const originalModule = jest.requireActual('../../students/StudentActions')
+vi.mock('../GradesGrid', () => ({
+  default: props => gradesGridMock(props),
+}))
+vi.mock('../FlashMessageHolder', () => ({
+  default: () => <div data-testid="flash-message-holder" />,
+}))
+vi.mock('../Header', () => ({
+  default: () => <div data-testid="header" />,
+}))
+vi.mock('../../students/StudentActions', async () => {
+  const originalModule = await vi.importActual('../../students/StudentActions')
 
   return {
     ...originalModule,
-    loadStudents: jest.fn().mockImplementation(() => {
+    loadStudents: vi.fn().mockImplementation(() => {
       return {
         type: 'SET_LOAD_STUDENTS_STATUS',
         payload: 'STARTED',
       }
     }),
-    setLoadStudentsStatus: jest.fn(),
+    setLoadStudentsStatus: vi.fn(),
     STARTED: 'STARTED',
   }
 })
-jest.mock('../../grades/GradeActions', () => {
-  const originalModule = jest.requireActual('../../grades/GradeActions')
+vi.mock('../../grades/GradeActions', async () => {
+  const originalModule = await vi.importActual('../../grades/GradeActions')
 
   return {
     ...originalModule,
-    selectFinalGrade: jest.fn(gradeInfo => ({
+    selectFinalGrade: vi.fn(gradeInfo => ({
       type: 'SET_SELECTED_PROVISIONAL_GRADE',
       payload: gradeInfo,
     })),
-    setSelectedProvisionalGrade: jest.fn(),
+    setSelectedProvisionalGrade: vi.fn(),
   }
 })
 
@@ -95,7 +101,7 @@ describe('GradeSummary Layout', () => {
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'},
       ],
-      selectGrade: jest.fn(),
+      selectGrade: vi.fn(),
     }
 
     window.ENV = {
@@ -108,7 +114,7 @@ describe('GradeSummary Layout', () => {
 
   afterEach(() => {
     wrapper.unmount()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('includes the Header', () => {

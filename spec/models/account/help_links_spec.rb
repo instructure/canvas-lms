@@ -55,7 +55,7 @@ describe Account::HelpLinks do
       links = [{ type: "default", id: "instructor_question", available_to: ["user"] }]
       translated = subject.map_default_links(links)
       expect(translated.first[:text].call).to eq "Ask Your Instructor a Question"
-      expect(translated.first[:subtext].call).to eq "Questions are submitted to your instructor"
+      expect(translated.first[:subtext].call).to eq "Questions are submitted to your instructor."
       expect(translated.first[:url]).to eq "#teacher_feedback"
     end
 
@@ -71,6 +71,18 @@ describe Account::HelpLinks do
       links = [{ type: "default", text: "bob", available_to: ["user"] }]
       translated = subject.map_default_links(links)
       expect(translated.first).to eq({ type: "default", text: "bob", available_to: ["user"] })
+    end
+
+    it "drops default-type links with no text whose definition no longer exists" do
+      links = [{ type: "default", id: :obsolete_link, available_to: ["user"] }]
+      translated = subject.map_default_links(links)
+      expect(translated).to be_empty
+    end
+
+    it "keeps default-type links with custom text even if their definition no longer exists" do
+      links = [{ type: "default", id: :obsolete_link, text: "Our Bot", available_to: ["user"] }]
+      translated = subject.map_default_links(links)
+      expect(translated.first[:text]).to eq "Our Bot"
     end
   end
 
@@ -111,6 +123,16 @@ describe Account::HelpLinks do
     it "includes error if a link is marked new and featured" do
       links = [{ is_featured: false, is_new: false }, { is_featured: true, is_new: true }, { is_featured: false, is_new: false }]
       expect(described_class.validate_links(links)).to include(/cannot be featured and new/)
+    end
+  end
+
+  describe "#default_links" do
+    it "includes ada chatbot link when feature flag is enabled" do
+      account.root_account.enable_feature!(:ada_chatbot)
+      default_links = subject.default_links(filter: false)
+      ada_link = default_links.find { |link| link[:id] == :ada_chatbot }
+      expect(ada_link).to be_present
+      expect(ada_link[:url]).to eq("#ada_chatbot")
     end
   end
 end

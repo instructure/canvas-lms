@@ -22,15 +22,19 @@ import LMGBContext from '../contexts/LMGBContext'
 const useLMGBContext = () => {
   const context = useContext(LMGBContext)
   const contextURL = context?.env?.contextURL
-  const outcomeProficiency = context?.env?.contextURL
+  const outcomeProficiency = context?.env?.outcomeProficiency
   const accountLevelMasteryScalesFF = context?.env?.accountLevelMasteryScalesFF
   const outcomesFriendlyDescriptionFF = context?.env?.outcomesFriendlyDescriptionFF
+  const allowDifferentiationTags = context?.env?.allowDifferentiationTags
+  const lmgbStudentReportingFF = context?.env?.lmgbStudentReportingFF
 
   return {
     contextURL,
     outcomeProficiency,
     accountLevelMasteryScalesFF,
     outcomesFriendlyDescriptionFF,
+    allowDifferentiationTags,
+    lmgbStudentReportingFF,
   }
 }
 

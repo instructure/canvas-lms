@@ -87,6 +87,14 @@ module CanvasCache
 
         node_for(key).pipelined(...)
       end
+
+      %i[xacck xackdel xadd xautoclaim xclaim xdel xdelex xlen xpending xrange xrevrange xsetid xtrim].each do |method|
+        class_eval <<~RUBY, __FILE__, __LINE__ + 1
+          def #{method}(key, ...)              # def xadd(key, ...)
+            node_for(key).#{method}(key, ...)  #   node_for(key).xadd(key, ...)
+          end                                  # end
+        RUBY
+      end
     end
 
     class << self
@@ -170,7 +178,7 @@ module CanvasCache
         # Redis::Distributed manually wraps every command, and not all of those
         # wrappers support kwargs, so we have to add the failsafe here
         ::Redis::Distributed.instance_methods.each do |m|
-          next unless ::Redis::Commands.instance_methods.include?(m)
+          next unless ::Redis::Commands.method_defined?(m)
           next if ::Redis::Distributed.instance_method(m).parameters.any? { |type, _name| type == :keyrest }
 
           def_failsafe_method(Distributed, m)

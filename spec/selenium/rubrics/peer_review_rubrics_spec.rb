@@ -28,7 +28,6 @@ describe "Peer reviews with in rubrics" do
 
   before do
     Account.default.enable_feature!(:assignments_2_student)
-    Account.default.enable_feature!(:peer_reviews_for_a2)
     @course = course_factory(name: "course", active_course: true)
     @course.enable_feature!(:enhanced_rubrics)
     @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
@@ -169,5 +168,30 @@ describe "Peer reviews with in rubrics" do
     RubricAssessmentTray.submit_rubric_assessment_button.click
 
     expect(StudentAssignmentPageV2.peer_review_prompt_modal).to include_text("You have completed your Peer Reviews!")
+  end
+
+  describe "Rubric panel display" do
+    it "shows criterion rating buttons for a scale, scored rubric" do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/?reviewee_id=#{@student2.id}"
+
+      expect(RubricAssessmentTray.traditional_grid_rating_button(@rubric.data[0][:id], 0)).to be_displayed
+      expect(f("body")).not_to contain_css("[data-testid='free-form-comment-area-#{@rubric.data[0][:id]}']")
+    end
+
+    it "shows criterion written feedback areas for a written feedback, unscored rubric" do
+      @rubric.update!(free_form_criterion_comments: true)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/?reviewee_id=#{@student2.id}"
+
+      expect(RubricAssessmentTray.free_form_comment_area(@rubric.data[0][:id])).to be_displayed
+      expect(f("body")).not_to contain_css("[data-testid^='traditional-criterion-#{@rubric.data[0][:id]}'][data-testid$='-ratings-0']")
+    end
+
+    it "displays criterion descriptions when descriptions are provided" do
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/?reviewee_id=#{@student2.id}"
+
+      rubric_container = RubricAssessmentTray.container
+      expect(rubric_container).to include_text(@rubric.data[0][:description])
+      expect(rubric_container).to include_text(@rubric.data[1][:description])
+    end
   end
 end

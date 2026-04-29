@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require "views/views_helper"
 
 describe "lti full width launch view" do

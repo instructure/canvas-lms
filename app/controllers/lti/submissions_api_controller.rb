@@ -116,7 +116,7 @@ module Lti
   #           "type": "string"
   #         },
   #         "url": {
-  #           "example": "http://www.example.com/files/569/download?download_frd=1&verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
+  #           "example": "http://www.example.com/files/569/download?download_frd=1",
   #           "type": "string"
   #         },
   #         "id": {
@@ -160,7 +160,7 @@ module Lti
       }.freeze
     ].freeze
 
-    skip_before_action :load_user
+    skip_before_action :load_user, :require_user
     around_action :activate_tool_shard, only: :attachment
     before_action :authorized_lti2_tool
     before_action :authorized?

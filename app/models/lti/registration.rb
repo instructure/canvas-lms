@@ -17,16 +17,37 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Lti::Registration < ActiveRecord::Base
-  DEFAULT_PRIVACY_LEVEL = "anonymous"
+class Lti::Registration < ApplicationRecord
+  DEFAULT_PRIVACY_LEVEL = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
   CANVAS_EXTENSION_LABEL = "canvas.instructure.com"
+  TRACKED_ATTRIBUTES = %w[
+    admin_nickname
+    name
+    vendor
+    workflow_state
+    description
+    lock_deploying
+  ].freeze
 
   extend RootAccountResolver
   include Canvas::SoftDeletable
 
+  workflow do
+    state :active do
+      event :deactivate, transitions_to: :inactive
+    end
+    state :inactive do
+      event :activate, transitions_to: :active
+    end
+    state :deleted
+  end
+
   belongs_to :account, inverse_of: :lti_registrations, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
   belongs_to :updated_by, class_name: "User", inverse_of: :updated_lti_registrations, optional: true
+
+  belongs_to :template_registration, class_name: "Lti::Registration", inverse_of: :local_copies, optional: true
+  has_many :local_copies, class_name: "Lti::Registration", inverse_of: :template_registration
 
   # If this tool has been installed via dynamic registration, it will have an ims_registration.
   has_one :ims_registration, class_name: "Lti::IMS::Registration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
@@ -35,22 +56,64 @@ class Lti::Registration < ActiveRecord::Base
   has_one :manual_configuration, class_name: "Lti::ToolConfiguration", inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
   has_many :deployments, class_name: "ContextExternalTool", inverse_of: :lti_registration, foreign_key: :lti_registration_id
+  alias_method :old_deployments, :deployments
+  has_many :app_deployments, class_name: "ContextExternalTool", foreign_key: :app_id, inverse_of: :app
+
+  def deployments
+    root_account&.feature_enabled?(:lti_registrations_templates) ? app_deployments : super
+  end
+
   has_one :developer_key, inverse_of: :lti_registration, foreign_key: :lti_registration_id
 
   has_many :lti_registration_account_bindings, class_name: "Lti::RegistrationAccountBinding", inverse_of: :registration
   has_many :lti_overlays, class_name: "Lti::Overlay", inverse_of: :registration
+  has_many :lti_registration_history_entries, class_name: "Lti::RegistrationHistoryEntry", inverse_of: :lti_registration
+  alias_method :old_lti_registration_history_entries, :lti_registration_history_entries
+  has_many :app_history_entries, class_name: "Lti::RegistrationHistoryEntry", foreign_key: :app_id, inverse_of: :app
+
+  def lti_registration_history_entries
+    root_account&.feature_enabled?(:lti_registrations_templates) ? app_history_entries : old_lti_registration_history_entries
+  end
+
   has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :registration
+  alias_method :old_context_controls, :context_controls
+  has_many :app_context_controls, class_name: "Lti::ContextControl", foreign_key: :app_id, inverse_of: :app
+
+  def context_controls
+    root_account&.feature_enabled?(:lti_registrations_templates) ? app_context_controls : old_context_controls
+  end
 
   validates :name, :admin_nickname, :vendor, length: { maximum: 255 }
   validates :description, length: { maximum: 2048 }, allow_blank: true
   validates :name, presence: true
+  validate :account_is_root_account
+  validate :template_registration_must_be_in_site_admin, if: :template_registration_id?
 
-  scope :active, -> { where(workflow_state: "active") }
+  scope :active, -> { where.not(workflow_state: "deleted") }
   scope :site_admin, -> { where(account: Account.site_admin) }
 
   resolves_root_account through: :account
 
   before_destroy :destroy_associations
+
+  # Returns the local copy of this Registration for the given account, if one exists.
+  # If this Registration is not a template or is already the local copy, returns self.
+  #
+  # @return [Lti::Registration | nil]
+  def local_copy_for(account)
+    return self if root_account == account
+
+    local_copy = local_copies.shard(account.shard).find_by(template_registration: self, account:)
+
+    if local_copy.blank?
+      if account.feature_enabled?(:lti_registrations_templates)
+        raise Lti::LocalAppNotFound
+      else
+        Canvas::Errors.capture_exception(Lti::LocalAppNotFound, "No local copy found for registration #{global_id} on account #{account.global_id}")
+      end
+    end
+    local_copy
+  end
 
   # Searches for an applicable binding for this Registration and Account in
   # the given root account, its parent root account (for federated consortia), and Site Admin.
@@ -123,63 +186,81 @@ class Lti::Registration < ActiveRecord::Base
   # @param available [Boolean] Sets availability on the ContextControl created alongside this tool. Defaults to true,
   #   which means the tool will be available for use directly after creation.
   # @return [ContextExternalTool] A new ContextExternalTool for this Registration and the given context.
-  def new_external_tool(context, existing_tool: nil, verify_uniqueness: false, current_user: nil, available: true)
+  def new_external_tool(context, existing_tool: nil, verify_uniqueness: false, current_user: nil, available: true, enabled: true)
     # disabled tools should stay disabled while getting updated
     # deleted tools are never updated during a dev key update so can be safely ignored
     tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
 
-    tool = existing_tool || ContextExternalTool.new(context:)
-    Importers::ContextExternalToolImporter.import_from_migration(
-      deployment_configuration(context:),
-      context,
-      nil,
-      tool,
-      false
-    )
-    tool.lti_registration = self
-    tool.developer_key = developer_key
-    tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || privacy_level
+    context.shard.activate do
+      Lti::Registration.transaction do
+        tool = existing_tool || ContextExternalTool.new(context:)
+        Importers::ContextExternalToolImporter.import_from_migration(
+          deployment_configuration(context:),
+          context,
+          item: tool,
+          persist: false
+        )
+        tool.lti_registration = self
+        tool.developer_key = developer_key
+        tool.workflow_state = privacy_level
+        if tool_is_disabled || !enabled
+          tool.workflow_state = ContextExternalTool::DISABLED_STATE
+        end
 
-    if verify_uniqueness
-      tool.check_for_duplication
+        if verify_uniqueness
+          tool.check_for_duplication
+        end
+
+        if tool.errors.any? || !tool.save
+          raise Lti::ContextExternalToolErrors, tool.errors
+        end
+
+        if existing_tool
+          # Do not update availability when propagating tool changes
+          available = nil
+        end
+        Lti::ContextControlService.create_or_update(
+          {
+            available:,
+            course_id: context.is_a?(Course) ? context.id : nil,
+            account_id: context.is_a?(Account) ? context.id : nil,
+            registration_id: id,
+            deployment_id: tool.id,
+            created_by_id: current_user&.id,
+            updated_by_id: current_user&.id
+          }.compact
+        )
+
+        tool
+      end
     end
-
-    if tool.errors.any? || !tool.save
-      raise Lti::ContextExternalToolErrors, tool.errors
-    end
-
-    if existing_tool
-      # Do not update availability when propagating tool changes
-      available = nil
-    end
-    Lti::ContextControlService.create_or_update(
-      {
-        available:,
-        course_id: context.is_a?(Course) ? context.id : nil,
-        account_id: context.is_a?(Account) ? context.id : nil,
-        registration_id: id,
-        deployment_id: tool.id,
-        created_by_id: current_user&.id,
-        updated_by_id: current_user&.id
-      }.compact
-    )
-
-    tool
   end
 
-  # Returns true if this Registration is from a different account than the given account.
+  # Returns true if this Registration is inherited from somewhere else like Site Admin.
   #
   # This will not properly account for a possible future scenario where the account is
   # for a _sub_ account underneath the registration's root account.
   def inherited_for?(account)
-    account != self.account
+    inherited_from_template? || account != self.account
+  end
+
+  def inherited_from_template?
+    template_registration_id.present?
+  end
+
+  def developer_key
+    super || template_registration&.developer_key
+  end
+
+  def developer_key_id
+    super || template_registration&.developer_key_id
   end
 
   delegate :site_admin?, to: :account
 
   # TODO: this will eventually need to account for 1.1 registrations
-  def icon_url
-    ims_registration&.logo_uri || manual_configuration&.launch_settings&.dig("icon_url")
+  def icon_url(context: nil)
+    internal_lti_configuration(context:).dig(:launch_settings, :icon_url)
   end
 
   # Returns an LtiConfiguration-conforming Hash with the overlay appropriate
@@ -193,9 +274,10 @@ class Lti::Registration < ActiveRecord::Base
   # overlay for said context, if one exists, will be applied to the configuration.
   # @param [Account | Course | nil] context The context for which to generate the configuration.
   # @param [Boolean] include_overlay Whether or not to apply the overlay to the configuration.
+  # @param [Lti::Overlay | nil] overlay An optional overlay object to apply directly.
   # @return [Hash] A Hash conforming to the InternalLtiConfiguration schema.
   # TODO: this will eventually need to account for 1.1 registrations
-  def internal_lti_configuration(context: nil, include_overlay: true)
+  def internal_lti_configuration(context: nil, include_overlay: true, overlay: nil)
     # hack; remove the need to look for developer_key.tool_configuration and ensure that is
     # always available as manual_configuration. This would need to happen in an after_save
     # callback on the developer key.
@@ -205,15 +287,9 @@ class Lti::Registration < ActiveRecord::Base
 
     return internal_config unless include_overlay
 
-    overlay = overlay_for(context)&.data
-    # TODO: Remove this clause once we have backfilled all Lti::IMS::Registration overlays into the
-    # actual Lti::Overlay table.
-    if ims_registration.present? && overlay.blank?
-      overlay = Schemas::Lti::IMS::RegistrationOverlay
-                .to_lti_overlay(ims_registration.registration_overlay)
-    end
+    overlay_data = overlay&.data || overlay_for(context)&.data
 
-    Lti::Overlay.apply_to(overlay, internal_config)
+    Lti::Overlay.apply_to(overlay_data, internal_config)
   end
 
   # Returns a Hash that's usable with the ContextExternalToolImporter to create a new ContextExternalTool.
@@ -253,25 +329,28 @@ class Lti::Registration < ActiveRecord::Base
 
   def undestroy(active_state: "active")
     ims_registration&.undestroy
-    developer_key&.update!(workflow_state: active_state)
+    developer_key&.update!(workflow_state: active_state) unless inherited_from_template?
     lti_registration_account_bindings.each(&:undestroy)
     manual_configuration&.undestroy
     super
   end
 
+  def current_tracked_attributes
+    attributes.with_indifferent_access.slice(*TRACKED_ATTRIBUTES)
+  end
+
   private
 
-  # Returns which placements are disabled at the Lti::IMS::Registration or Lti::ToolConfiguration level.
-  # Note that this is legacy behavior, as moving forward, the overlay will be the source of truth. This method
-  # is only used for backwards compatibility.
+  # Returns which placements are disabled at the Lti::ToolConfiguration level.
+  # Note: For IMS registrations, disabled placements are now handled via Lti::Overlay
+  # and applied in internal_lti_configuration, so this method returns an empty array.
+  # This method is only used for backwards compatibility with manual configurations.
   #
   # @return [Array<String>] An array of placement names that are disabled.
   def registration_level_disabled_placements
     @registration_level_disabled_placements ||=
       if ims_registration.present?
-        ims_registration&.registration_overlay
-                        &.with_indifferent_access
-                        &.dig(:disabledPlacements) || []
+        []
       else
         manual_configuration&.disabled_placements || []
       end
@@ -283,10 +362,13 @@ class Lti::Registration < ActiveRecord::Base
   # Additionally, dependent: :destroy removes the bindings from the association which we do not want.
   # Finally, dependent: :destroy on the tool_configuration will also hard delete it, which we also don't want.
   def destroy_associations
-    ims_registration&.destroy
-    developer_key&.destroy
-    lti_registration_account_bindings.each(&:destroy)
     manual_configuration&.destroy
+    ims_registration&.destroy
+    unless inherited_from_template?
+      developer_key&.destroy
+    end
+    lti_registration_account_bindings.each(&:destroy)
+    deployments.each(&:destroy)
   end
 
   # Overridden in MRA, where federated consortia are supported
@@ -297,5 +379,18 @@ class Lti::Registration < ActiveRecord::Base
   # Overridden in MRA, where federated consortia are supported
   def overlay_for_federated_parent(_account)
     nil
+  end
+
+  def account_is_root_account
+    return unless account
+
+    errors.add :account, "account is not a root account" unless account.root_account?
+  end
+
+  def template_registration_must_be_in_site_admin
+    return unless template_registration
+
+    errors.add :template_registration, "Site Admin registrations cannot inherit from a template" if site_admin? && template_registration.present?
+    errors.add :template_registration, "must be inherited from Site Admin" unless template_registration.site_admin?
   end
 end

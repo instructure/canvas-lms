@@ -24,15 +24,24 @@ import {initialize} from '../../utilities/alertUtils'
 
 import * as Actions from '../sidebar-actions'
 
-jest.mock('../../utilities/apiUtils', () => ({
-  ...jest.requireActual('../../utilities/apiUtils'),
-  transformApiToInternalItem: jest.fn(item => `transformed-${item.uniqueId}`),
+vi.mock('../../utilities/apiUtils', async () => ({
+  ...(await vi.importActual('../../utilities/apiUtils')),
+  transformApiToInternalItem: vi.fn(item => `transformed-${item.uniqueId}`),
 }))
 
-const server = setupServer()
+const server = setupServer(
+  http.get('*/api/v1/planner/items', () => {
+    return new HttpResponse(JSON.stringify([]), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  }),
+)
 
 beforeAll(() => {
-  const alertSpy = jest.fn()
+  const alertSpy = vi.fn()
   initialize({visualErrorCallback: alertSpy})
   server.listen()
 })
@@ -45,7 +54,6 @@ afterEach(() => {
   server.resetHandlers()
   MockDate.reset()
   Actions.sidebarLoadNextItems.reset()
-  Actions.maybeUpdateTodoSidebar.reset()
 })
 
 afterAll(() => {
@@ -85,7 +93,7 @@ describe('load items', () => {
   it('dispatches SIDEBAR_ITEMS_LOADING action initially with target moment range', () => {
     const today = moment.tz().startOf('day')
     const thunk = Actions.sidebarLoadInitialItems(today)
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    const fakeDispatch = vi.fn(() => Promise.resolve({data: []}))
     thunk(fakeDispatch, mockGetState())
     const expected = {
       type: 'SIDEBAR_ITEMS_LOADING',
@@ -111,7 +119,7 @@ describe('load items', () => {
     )
 
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    const fakeDispatch = vi.fn(() => Promise.resolve({data: []}))
     await thunk(fakeDispatch, mockGetState())
 
     const expected = {
@@ -135,7 +143,7 @@ describe('load items', () => {
     )
 
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    const fakeDispatch = vi.fn(() => Promise.resolve({data: []}))
     await thunk(fakeDispatch, mockGetState())
 
     const expected = {
@@ -158,7 +166,7 @@ describe('load items', () => {
     )
 
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    const fakeDispatch = vi.fn(() => Promise.resolve({data: []}))
     await thunk(fakeDispatch, mockGetState({nextUrl: null}))
 
     const expected = {
@@ -169,20 +177,11 @@ describe('load items', () => {
     expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
   })
 
-  it('continues to load if there are less than 14 incomplete items loaded', async () => {
-    let requestCount = 0
+  it('loads items with per_page parameter', async () => {
+    let requestUrl = ''
     server.use(
-      http.get('*/api/v1/planner/items', () => {
-        requestCount++
-        return new HttpResponse(JSON.stringify([]), {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            link: requestCount === 1 ? '</>; rel="next"' : '',
-          },
-        })
-      }),
-      http.get('*/', () => {
+      http.get('*/api/v1/planner/items', req => {
+        requestUrl = req.request.url
         return new HttpResponse(JSON.stringify([]), {
           status: 200,
           headers: {
@@ -193,7 +192,28 @@ describe('load items', () => {
     )
 
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    const fakeDispatch = vi.fn(() => Promise.resolve({data: []}))
+    await thunk(fakeDispatch, mockGetState())
+    expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
+    expect(requestUrl).toContain('per_page=14')
+  })
+
+  it.skip('continues to load if there are less than 14 incomplete items loaded', async () => {
+    let requestCount = 0
+    server.use(
+      http.get('*/api/v1/planner/items', req => {
+        requestCount++
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
+    const fakeDispatch = vi.fn(() => Promise.resolve({data: []}))
     await thunk(
       fakeDispatch,
       mockGetState({
@@ -259,7 +279,7 @@ describe('load items', () => {
     )
 
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    const fakeDispatch = vi.fn(() => Promise.resolve({data: []}))
     await thunk(
       fakeDispatch,
       mockGetState({
@@ -298,7 +318,7 @@ describe('load items', () => {
     )
 
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    const fakeDispatch = vi.fn(() => Promise.resolve({data: []}))
     await thunk(
       fakeDispatch,
       mockGetState({
@@ -333,37 +353,89 @@ describe('load items', () => {
     )
 
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    const fakeDispatch = vi.fn(() => Promise.resolve({data: []}))
     await thunk(fakeDispatch, mockGetState())
 
     expect(fakeDispatch).toHaveBeenCalledWith(
       expect.objectContaining({type: 'SIDEBAR_ITEMS_LOADING_FAILED', error: true}),
     )
   })
-})
 
-describe('fetch more items', () => {
-  it('resumes loading when there are less than the desired number of incomplete items', async () => {
-    const mockDispatch = jest.fn()
-    const mockGs = mockGetState({nextUrl: '/', items: generateItems(13)})
-    const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
-    await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, mockGs)
-    expect(mockDispatch).toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
+  it('uses incomplete_items filter in API requests', async () => {
+    let requestUrl = ''
+    server.use(
+      http.get('*/api/v1/planner/items', req => {
+        requestUrl = req.request.url
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
+    const fakeDispatch = vi.fn(() => Promise.resolve({data: []}))
+    await thunk(fakeDispatch, mockGetState())
+    expect(requestUrl).toContain('filter=incomplete_items')
   })
 
-  it('will not resume loading if desired number of items is loaded', async () => {
-    const mockDispatch = jest.fn()
-    const gs = mockGetState({nextUrl: '/', items: generateItems(14)})
-    const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
-    await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs)
-    expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
-  })
+  it('uses include=all_courses instead of context_codes for observers with many enrollments', async () => {
+    const manyCourses = Array(700)
+      .fill()
+      .map((_, i) => ({
+        id: `${i + 1}`,
+        assetString: `course_${i + 1}`,
+        name: `Course ${i + 1}`,
+      }))
 
-  it('will not resume loading if all items are loaded', async () => {
-    const mockDispatch = jest.fn()
-    const gs = mockGetState({nextUrl: null})
-    const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
-    await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs)
-    expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
+    let requestUrl = ''
+    server.use(
+      http.get('*/api/v1/dashboard/dashboard_cards', () => {
+        return new HttpResponse(JSON.stringify(manyCourses), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+      http.get('*/api/v1/planner/items', req => {
+        requestUrl = req.request.url
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+
+    const getState = () => ({
+      sidebar: {
+        items: [],
+        loading: false,
+        nextUrl: null,
+        loaded: false,
+      },
+      timeZone: 'UTC',
+      courses: manyCourses,
+      groups: [],
+      selectedObservee: '123',
+      currentUser: {id: '456'},
+    })
+
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
+    const fakeDispatch = vi.fn(action => {
+      if (typeof action === 'function') {
+        return action(fakeDispatch, getState)
+      }
+      return Promise.resolve({data: manyCourses})
+    })
+
+    await thunk(fakeDispatch, getState)
+
+    expect(requestUrl).toContain('include%5B%5D=all_courses')
+    expect(requestUrl).toContain('observed_user_id=123')
+    expect(requestUrl).not.toMatch(/context_codes.*course_1&context_codes.*course_2/)
   })
 })

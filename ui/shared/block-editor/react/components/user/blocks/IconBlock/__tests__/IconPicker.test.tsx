@@ -31,7 +31,7 @@ describe('IconPicker', () => {
   })
 
   it('should call onSelect with the selected icon', () => {
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     // @ts-expect-error
     const {getByTitle} = render(<IconPicker onSelect={onSelect} />)
 

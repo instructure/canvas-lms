@@ -17,17 +17,11 @@
  */
 
 import {updatePermissionForItem, UpdatePermissionBody} from '../updatePermissionForItem'
-import {doFetchApiWithAuthCheck} from '../../../utils/apiUtils'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../fixtures/fakeData'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('../../../utils/apiUtils', () => ({
-  ...jest.requireActual('../../../utils/apiUtils'),
-  doFetchApiWithAuthCheck: jest.fn(),
-}))
-
-const mockDoFetchApiWithAuthCheck = doFetchApiWithAuthCheck as jest.MockedFunction<
-  typeof doFetchApiWithAuthCheck
->
+const server = setupServer()
 
 describe('updatePermissionForItem', () => {
   const mockFile = FAKE_FILES[0]
@@ -40,51 +34,63 @@ describe('updatePermissionForItem', () => {
     lock_at: '',
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    mockDoFetchApiWithAuthCheck.mockResolvedValue({
-      text: '',
-      response: {
-        ok: true,
-        status: 200,
-        text: () => Promise.resolve(''),
-      } as Response,
-    })
+    server.use(
+      http.put(`/api/v1/files/${mockFile.id}`, () => new HttpResponse(null, {status: 200})),
+      http.put(`/api/v1/folders/${mockFolder.id}`, () => new HttpResponse(null, {status: 200})),
+    )
   })
 
   afterEach(() => {
-    mockDoFetchApiWithAuthCheck.mockReset()
+    server.resetHandlers()
   })
 
   describe('successful permission update', () => {
-    it('should call doFetchApiWithAuthCheck with correct path and options for a file', async () => {
+    it('should make PUT request with correct path and body for a file', async () => {
+      let requestMade = false
+      let requestBody: any = null
+      server.use(
+        http.put(`/api/v1/files/${mockFile.id}`, async ({request}) => {
+          requestMade = true
+          requestBody = await request.json()
+          return new HttpResponse(null, {status: 200})
+        }),
+      )
+
       await updatePermissionForItem(mockFile, permissionData)
 
-      expect(mockDoFetchApiWithAuthCheck).toHaveBeenCalledWith({
-        path: `/api/v1/files/${mockFile.id}`,
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: permissionData,
-      })
+      expect(requestMade).toBe(true)
+      expect(requestBody).toEqual(permissionData)
     })
   })
 
-  it('should call doFetchApiWithAuthCheck with correct path and options for a folder', async () => {
+  it('should make PUT request with correct path and body for a folder', async () => {
+    let requestMade = false
+    let requestBody: any = null
+    server.use(
+      http.put(`/api/v1/folders/${mockFolder.id}`, async ({request}) => {
+        requestMade = true
+        requestBody = await request.json()
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
+
     await updatePermissionForItem(mockFolder, permissionData)
 
-    expect(mockDoFetchApiWithAuthCheck).toHaveBeenCalledWith({
-      path: `/api/v1/folders/${mockFolder.id}`,
-      method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: permissionData,
-    })
+    expect(requestMade).toBe(true)
+    expect(requestBody).toEqual(permissionData)
   })
 
   describe('error handling', () => {
-    it('should throw the same error which doFetchApiWithAuthCheck throws', async () => {
-      const error = new Error('Network error')
-      mockDoFetchApiWithAuthCheck.mockRejectedValueOnce(error)
+    it('should throw an error when request fails', async () => {
+      server.use(
+        http.put(`/api/v1/files/${mockFile.id}`, () => new HttpResponse(null, {status: 500})),
+      )
 
-      await expect(updatePermissionForItem(mockFile, permissionData)).rejects.toThrow(error)
+      await expect(updatePermissionForItem(mockFile, permissionData)).rejects.toThrow()
     })
   })
 })

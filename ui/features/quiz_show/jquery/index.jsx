@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import MessageStudentsDialog from '@canvas/message-students-dialog'
 import QuizArrowApplicator from '@canvas/quizzes/jquery/quiz_arrows'
 import inputMethods from '@canvas/quizzes/jquery/quiz_inputs'
@@ -29,7 +29,6 @@ import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_ev
 import CyoeStats from '@canvas/conditional-release-stats/react/index'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, confirmDelete */
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -57,10 +56,11 @@ function createOrUpdateRoot(elementId, component) {
 
   let root = roots.get(elementId)
   if (!root) {
-    root = createRoot(container)
+    root = render(component, container)
     roots.set(elementId, root)
+  } else {
+    rerender(root, component)
   }
-  root.render(component)
 }
 
 function unmountRoot(elementId) {
@@ -80,7 +80,6 @@ function renderRubric() {
     const assignmentRubric = envRubric
       ? {
           ...mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric),
-          can_update: ENV.assigned_rubric?.can_update,
           association_count: ENV.assigned_rubric?.association_count,
         }
       : undefined
@@ -94,18 +93,16 @@ function renderRubric() {
         assignmentId={ENV.ASSIGNMENT_ID}
         assignmentRubric={assignmentRubric}
         assignmentRubricAssociation={assignmentRubricAssociation}
+        assignmentPointsPossible={ENV.ASSIGNMENT_POINTS}
         canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
+        canUseForGrading={false}
         courseId={ENV.COURSE_ID}
-        rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
+        currentUserId={ENV.current_user_id}
+        rubricSelfAssessmentFFEnabled={false}
         aiRubricsEnabled={ENV.ai_rubrics_enabled}
       />,
     )
   }
-
-  createOrUpdateRoot(
-    'enhanced-rubric-self-assessment-edit',
-    <RubricSelfAssessmentSettingsWrapper assignmentId={ENV.ASSIGNMENT_ID} />,
-  )
 }
 
 $(document).ready(function () {
@@ -248,8 +245,7 @@ $(document).ready(function () {
     if (event) event.preventDefault()
 
     const container = document.getElementById('direct-share-mount-point')
-    const root = createRoot(container)
-    root.render(
+    const root = render(
       <DirectShareUserModal
         open={open}
         sourceCourseId={ENV.COURSE_ID}
@@ -260,6 +256,7 @@ $(document).ready(function () {
           $('.al-trigger').focus()
         }}
       />,
+      container,
     )
   }
 
@@ -269,8 +266,7 @@ $(document).ready(function () {
     if (event) event.preventDefault()
 
     const container = document.getElementById('direct-share-mount-point')
-    const root = createRoot(container)
-    root.render(
+    const root = render(
       <DirectShareCourseTray
         open={open}
         sourceCourseId={ENV.COURSE_ID}
@@ -281,6 +277,7 @@ $(document).ready(function () {
           $('.al-trigger').focus()
         }}
       />,
+      container,
     )
   }
 
@@ -367,10 +364,14 @@ $(document).ready(function () {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
 
-    const courseId = event.target.getAttribute('data-quiz-context-id')
-    const itemName = event.target.getAttribute('data-quiz-name')
-    const itemContentId = event.target.getAttribute('data-quiz-id')
-    const pointsString = event.target.getAttribute('data-quiz-points-possible')
+    // Get data from the inner span with translate="no"
+    const $button = $(event.target).closest('.assign-to-link')
+    const $dataSpan = $button.find('.assign-to-link-resources')
+
+    const courseId = $dataSpan.attr('data-quiz-context-id')
+    const itemName = $dataSpan.attr('data-quiz-name')
+    const itemContentId = $dataSpan.attr('data-quiz-id')
+    const pointsString = $dataSpan.attr('data-quiz-points-possible')
     const pointsPossible = pointsString ? parseFloat(pointsString) : undefined
     renderItemAssignToTray(true, returnFocusTo, {
       courseId,

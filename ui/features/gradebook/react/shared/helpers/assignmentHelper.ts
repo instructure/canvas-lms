@@ -48,8 +48,7 @@ const assignmentHelper = {
     return aDate - bDate
   },
 
-  // @ts-expect-error
-  getComparator(arrangeBy) {
+  getComparator(arrangeBy: string) {
     if (arrangeBy === 'due_date') {
       return this.compareByDueDate.bind(this)
     }

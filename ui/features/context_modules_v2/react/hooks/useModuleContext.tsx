@@ -17,43 +17,67 @@
  */
 
 import {createContext, useContext, useState} from 'react'
-import {ExternalTool} from '../utils/types'
+import {
+  ExternalTool,
+  ModuleCursorState,
+  MenuItemActionState,
+  PerModuleState,
+  QuizEngine,
+} from '../utils/types'
 
 const ContextModule = createContext<{
   courseId: string
   isMasterCourse: boolean
   isChildCourse: boolean
   permissions: Record<string, boolean>
-  NEW_QUIZZES_BY_DEFAULT: boolean
   DEFAULT_POST_TO_SIS: boolean
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
   restrictQuantitativeData: boolean
+  isObserver: boolean
+  observedStudent: {id: string; name: string} | null
   externalTools: ExternalTool[]
   moduleMenuModalTools: ExternalTool[]
   moduleGroupMenuTools: ExternalTool[]
   moduleMenuTools: ExternalTool[]
   moduleIndexMenuModalTools: ExternalTool[]
-  state: Record<string, any>
-  setState: (state: Record<string, any>) => void
+  menuItemLoadingState: PerModuleState<MenuItemActionState>
+  setMenuItemLoadingState: React.Dispatch<React.SetStateAction<PerModuleState<MenuItemActionState>>>
+  moduleCursorState: ModuleCursorState
+  setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
+  modulesArePaginated: boolean
+  pageSize: number
+  showQuizzesEngineSelection: boolean
+  quizEngine: QuizEngine
+  setQuizEngine: React.Dispatch<React.SetStateAction<QuizEngine>>
 }>(
   {} as {
     courseId: string
     isMasterCourse: boolean
     isChildCourse: boolean
     permissions: Record<string, boolean>
-    NEW_QUIZZES_BY_DEFAULT: boolean
     DEFAULT_POST_TO_SIS: boolean
     teacherViewEnabled: boolean
     studentViewEnabled: boolean
     restrictQuantitativeData: boolean
+    isObserver: boolean
+    observedStudent: {id: string; name: string} | null
     externalTools: ExternalTool[]
     moduleMenuModalTools: ExternalTool[]
     moduleGroupMenuTools: ExternalTool[]
     moduleMenuTools: ExternalTool[]
     moduleIndexMenuModalTools: ExternalTool[]
-    state: Record<string, any>
-    setState: (state: Record<string, any>) => void
+    menuItemLoadingState: PerModuleState<MenuItemActionState>
+    setMenuItemLoadingState: React.Dispatch<
+      React.SetStateAction<PerModuleState<MenuItemActionState>>
+    >
+    moduleCursorState: ModuleCursorState
+    setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
+    modulesArePaginated: boolean
+    pageSize: number
+    showQuizzesEngineSelection: boolean
+    quizEngine: QuizEngine
+    setQuizEngine: React.Dispatch<React.SetStateAction<QuizEngine>>
   },
 )
 
@@ -63,15 +87,20 @@ export const ContextModuleProvider = ({
   isMasterCourse,
   isChildCourse,
   permissions,
+  NEW_QUIZZES_ENABLED,
   NEW_QUIZZES_BY_DEFAULT,
   DEFAULT_POST_TO_SIS,
   teacherViewEnabled,
   studentViewEnabled,
   restrictQuantitativeData,
+  isObserver,
+  observedStudent,
   moduleMenuModalTools,
   moduleGroupMenuTools,
   moduleMenuTools,
   moduleIndexMenuModalTools,
+  modulesArePaginated,
+  pageSize,
 }: {
   children: React.ReactNode
   courseId: string
@@ -83,21 +112,35 @@ export const ContextModuleProvider = ({
         canAdd: boolean
         canEdit: boolean
         canDelete: boolean
+        canView: boolean
         canViewUnpublished: boolean
         canDirectShare: boolean
       }
     | undefined
+  NEW_QUIZZES_ENABLED: boolean | undefined
   NEW_QUIZZES_BY_DEFAULT: boolean | undefined
   DEFAULT_POST_TO_SIS: boolean | undefined
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
   restrictQuantitativeData: boolean | undefined
+  isObserver?: boolean
+  observedStudent?: {id: string; name: string} | null
   moduleMenuModalTools: ExternalTool[]
   moduleGroupMenuTools: ExternalTool[]
   moduleMenuTools: ExternalTool[]
   moduleIndexMenuModalTools: ExternalTool[]
+  modulesArePaginated?: boolean
+  pageSize?: number
 }) => {
-  const [state, setState] = useState({})
+  const [menuItemLoadingState, setMenuItemLoadingState] = useState<
+    PerModuleState<MenuItemActionState>
+  >({})
+  const [moduleCursorState, setModuleCursorState] = useState<ModuleCursorState>({})
+
+  const initialQuizEngine = NEW_QUIZZES_ENABLED ? 'new' : 'classic'
+  const [quizEngine, setQuizEngine] = useState<QuizEngine>(initialQuizEngine)
+
+  const showQuizzesEngineSelection = !!(NEW_QUIZZES_ENABLED && !NEW_QUIZZES_BY_DEFAULT)
 
   return (
     <ContextModule.Provider
@@ -106,18 +149,26 @@ export const ContextModuleProvider = ({
         isMasterCourse,
         isChildCourse,
         permissions: permissions ?? {},
-        NEW_QUIZZES_BY_DEFAULT: NEW_QUIZZES_BY_DEFAULT ?? false,
         DEFAULT_POST_TO_SIS: DEFAULT_POST_TO_SIS ?? false,
         teacherViewEnabled,
         studentViewEnabled,
         restrictQuantitativeData: restrictQuantitativeData ?? false,
+        isObserver: isObserver ?? false,
+        observedStudent: observedStudent ?? null,
         externalTools: moduleMenuModalTools,
         moduleMenuModalTools,
         moduleGroupMenuTools,
         moduleMenuTools,
         moduleIndexMenuModalTools,
-        state,
-        setState,
+        menuItemLoadingState,
+        setMenuItemLoadingState,
+        moduleCursorState,
+        setModuleCursorState,
+        modulesArePaginated: modulesArePaginated ?? false,
+        pageSize: pageSize ?? 10,
+        showQuizzesEngineSelection: showQuizzesEngineSelection,
+        quizEngine,
+        setQuizEngine,
       }}
     >
       {children}
@@ -137,20 +188,29 @@ export const contextModuleDefaultProps = {
     canAdd: true,
     canEdit: true,
     canDelete: true,
+    canView: true,
     canViewUnpublished: true,
     canDirectShare: true,
     readAsAdmin: true,
+    canManageSpeedGrader: true,
   },
-  NEW_QUIZZES_BY_DEFAULT: false,
+  NEW_QUIZZES_BY_DEFAULT: true,
+  NEW_QUIZZES_ENABLED: false,
   DEFAULT_POST_TO_SIS: false,
   teacherViewEnabled: false,
   studentViewEnabled: false,
   restrictQuantitativeData: false,
+  isObserver: false,
+  observedStudent: null,
   externalTools: [],
   moduleMenuModalTools: [],
   moduleGroupMenuTools: [],
   moduleMenuTools: [],
   moduleIndexMenuModalTools: [],
-  state: {},
-  setState: () => {},
+  menuItemLoadingState: {},
+  setMenuItemLoadingState: () => {},
+  moduleCursorState: {},
+  setModuleCursorState: () => {},
+  modulesArePaginated: false,
+  pageSize: 10,
 }

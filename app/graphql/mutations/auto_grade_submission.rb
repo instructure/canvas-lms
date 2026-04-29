@@ -28,16 +28,12 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
     submission_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:submission_id], "Submission")
     submission = Submission.find(submission_id)
 
-    assignment_errors = GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment: submission.assignment)
-    submission_errors = GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
-    errors = assignment_errors + submission_errors
+    errors = []
+    GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment: submission.assignment).each { |i| append_issue_message(errors, i) }
+    GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:).each { |i| append_issue_message(errors, i) }
 
     if errors.any?
       raise GraphQL::ExecutionError, "Auto-grading failed due to the following issue(s): #{errors.join(", ")}"
-    end
-
-    if GraphQLHelpers::AutoGradeEligibilityHelper.contains_rce_file_link?(submission.body)
-      raise GraphQL::ExecutionError, I18n.t("Submission contains a linked file uploaded via RCE.")
     end
 
     course = submission.assignment&.course
@@ -49,7 +45,7 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
 
     verify_authorized_action!(course, :manage_grades)
 
-    service = AutoGradeOrchestrationService.new(course:)
+    service = AutoGradeOrchestrationService.new(course:, current_user:)
     progress = service.auto_grade_in_background(submission:)
 
     { progress: }
@@ -59,5 +55,9 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
   rescue => e
     Rails.logger.error("[AutoGradeSubmission ERROR] #{e.message}")
     raise GraphQL::ExecutionError, I18n.t("An unexpected error occurred while grading.")
+  end
+
+  def append_issue_message(errors, issue)
+    errors << issue[:message] if issue && issue[:level] == "error"
   end
 end

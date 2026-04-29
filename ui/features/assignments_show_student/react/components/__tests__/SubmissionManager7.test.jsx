@@ -22,22 +22,20 @@ import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/re
 import {render, waitFor, within} from '@testing-library/react'
 import React from 'react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
-import StudentViewContext, {StudentViewContextDefaults} from '../Context'
+import StudentViewContext, {
+  StudentViewContextDefaults,
+} from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
-jest.mock('../../apis/ContextModuleApi')
-
-jest.mock('@canvas/do-fetch-api-effect')
-
-jest.useFakeTimers()
+vi.mock('../../apis/ContextModuleApi')
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}

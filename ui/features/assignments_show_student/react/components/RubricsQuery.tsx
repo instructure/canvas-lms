@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import RubricTab from './RubricTab'
 import {
   RUBRIC_QUERY,
@@ -29,7 +30,7 @@ import {useQuery} from '@apollo/client'
 import {transformRubricData, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import useStore from './stores/index'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 import {executeQuery} from '@canvas/graphql'
 import {Assignment, Submission} from './RubricsQuery.types'
 
@@ -87,6 +88,8 @@ export default function RubricsQuery({
         ? // @ts-expect-error
           parsedAssessments?.find(assessment => assessment.assessor?._id === ENV.current_user.id)
         : parsedAssessments?.[0]
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - fillAssessment's third argument (rubricSavedComments) is optional at runtime but required by tsgo
       const filledAssessment = fillAssessment(parsedRubric, assessment || {})
 
       useStore.setState({
@@ -106,7 +109,7 @@ export default function RubricsQuery({
     getNextPageParam: lastPage => {
       const pageInfo =
         // @ts-expect-error
-        lastPage?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
+        lastPage?.course?.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
       return pageInfo?.hasNextPage ? pageInfo.endCursor : null
     },
     initialPageParam: null,
@@ -120,9 +123,11 @@ export default function RubricsQuery({
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Assignments 2 Student initial query error')}
         errorCategory={I18n.t('Assignments 2 Student Error Page')}
-        errorMessage={error?.message || error}
+        errorMessage={error?.message}
       />
     )
   }
@@ -136,7 +141,7 @@ export default function RubricsQuery({
       key={submission.attempt}
       // @ts-expect-error
       proficiencyRatings={ratingsData.pages.reduce((acc, page) => {
-        const nodes = page?.course?.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
+        const nodes = page?.course?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
         if (nodes) {
           return acc.concat(nodes)
         }
@@ -147,6 +152,7 @@ export default function RubricsQuery({
       peerReviewModeEnabled={assignment.env.peerReviewModeEnabled}
       rubricExpanded={rubricExpanded}
       toggleRubricExpanded={toggleRubricExpanded}
+      isAiEvaluated={submission.autoGradeResultPresent && submission.state === 'graded'}
     />
   )
 }

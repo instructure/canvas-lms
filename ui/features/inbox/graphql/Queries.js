@@ -24,9 +24,13 @@ import {Course} from './Course'
 import {Group} from './Group'
 import {SubmissionComment} from './SubmissionComment'
 import {PageInfo} from './PageInfo'
+import {TotalCountPageInfo} from './TotalCountPageInfo'
+
+// TODO: clean :inbox_sis_id_for_duplicates flag after release, VICE-5840
+const inbox_sis_enabled = !!ENV?.inbox_sis_id_for_duplicates
 
 export const ADDRESS_BOOK_RECIPIENTS = gql`
-  query GetAddressBookRecipients(
+  query GetInboxAddressBookRecipients(
     $userID: ID!
     $context: String
     $search: String
@@ -45,7 +49,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
               name
             }
             pageInfo {
-              ...PageInfo
+              ...InboxPageInfo
             }
           }
           usersConnection(first: 20, after: $afterUser) {
@@ -55,6 +59,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
               name
               shortName
               pronouns
+              sisId @include(if: ${inbox_sis_enabled})
               observerEnrollmentsConnection(contextCode: $courseContextCode) {
                 nodes {
                   associatedUser {
@@ -65,7 +70,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
               }
             }
             pageInfo {
-              ...PageInfo
+              ...InboxPageInfo
             }
           }
         }
@@ -77,7 +82,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
 
 // This query is used for the compose modal
 export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
-  query GetAddressBookRecipients(
+  query GetAddressBookRecipientsWithCommonCourses(
     $userID: ID!
     $context: String
     $search: String
@@ -97,7 +102,7 @@ export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
               userCount
             }
             pageInfo {
-              ...PageInfo
+              ...InboxPageInfo
             }
           }
           usersConnection(first: 20, after: $afterUser) {
@@ -107,6 +112,7 @@ export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
               name
               shortName
               pronouns
+              sisId @include(if: ${inbox_sis_enabled})
               commonCoursesConnection {
                 nodes {
                   _id
@@ -130,7 +136,7 @@ export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
               }
             }
             pageInfo {
-              ...PageInfo
+              ...InboxPageInfo
             }
           }
         }
@@ -216,7 +222,7 @@ export const CONVERSATIONS_QUERY = gql`
             }
           }
           pageInfo {
-            ...PageInfo
+            ...InboxPageInfo
           }
         }
       }
@@ -229,14 +235,14 @@ export const CONVERSATION_MESSAGES_QUERY = gql`
   query GetConversationMessagesQuery($conversationID: ID!, $afterMessage: String) {
     legacyNode(_id: $conversationID, type: Conversation) {
       ... on Conversation {
-        ...Conversation
+        ...InboxConversation
         canReply
         conversationMessagesConnection(first: 20, after: $afterMessage) {
           nodes {
-            ...ConversationMessage
+            ...InboxConversationMessage
           }
           pageInfo {
-            ...PageInfo
+            ...InboxPageInfo
           }
         }
         contextName
@@ -259,16 +265,16 @@ export const COURSES_QUERY = gql`
         email
         favoriteGroupsConnection {
           nodes {
-            ...Group
+            ...InboxGroup
           }
         }
         favoriteCoursesConnection {
           nodes {
-            ...Course
+            ...InboxCourse
           }
         }
         enrollments(horizonCourses: $horizonCourses) {
-          ...Enrollment
+          ...InboxEnrollment
         }
       }
     }
@@ -299,7 +305,7 @@ export const REPLY_CONVERSATION_QUERY = gql`
           first: $first
         ) {
           nodes {
-            ...ConversationMessage
+            ...InboxConversationMessage
           }
         }
       }
@@ -325,23 +331,23 @@ export const VIEWABLE_SUBMISSIONS_QUERY = gql`
             readState
             commentsConnection(sortOrder: $sort, filter: {allComments: $allComments}) {
               nodes {
-                ...SubmissionComment
+                ...InboxSubmissionComment
               }
             }
           }
           pageInfo {
-            ...PageInfo
+            ...InboxTotalCountPageInfo
           }
         }
       }
     }
   }
   ${SubmissionComment.fragment}
-  ${PageInfo.fragment}
+  ${TotalCountPageInfo.fragment}
 `
 
 export const SUBMISSION_COMMENTS_QUERY = gql`
-  query GetSubmissionComments(
+  query GetInboxSubmissionComments(
     $submissionID: ID!
     $sort: SubmissionCommentsSortOrderType
     $allComments: Boolean = true
@@ -358,10 +364,10 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
           after: $afterComment
         ) {
           nodes {
-            ...SubmissionComment
+            ...InboxSubmissionComment
           }
           pageInfo {
-            ...PageInfo
+            ...InboxTotalCountPageInfo
           }
         }
         user {
@@ -371,24 +377,28 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
     }
   }
   ${SubmissionComment.fragment}
-  ${PageInfo.fragment}
+  ${TotalCountPageInfo.fragment}
 `
 
 export const RECIPIENTS_OBSERVERS_QUERY = gql`
-  query GetRecipientsObservers($userID: ID!, $contextCode: String!, $recipientIds: [String!]!) {
+  query GetRecipientsObservers($userID: ID!, $contextCode: String!, $recipientIds: [String!]!, $after: String) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
         id
-        recipientsObservers(contextCode: $contextCode, recipientIds: $recipientIds) {
+        recipientsObservers(contextCode: $contextCode, recipientIds: $recipientIds, first: 20, after: $after) {
           nodes {
             id
             name
             _id
           }
+          pageInfo {
+            ...InboxPageInfo
+          }
         }
       }
     }
   }
+  ${PageInfo.fragment}
 `
 
 export const INBOX_SETTINGS_QUERY = gql`

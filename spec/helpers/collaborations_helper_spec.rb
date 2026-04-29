@@ -19,9 +19,9 @@
 #
 
 describe CollaborationsHelper do
-  let(:user) { double("user") }
-  let(:course) { Course.new(name: "my course").tap { |t| allow(t).to receive_messages(id: 1) } }
-  let(:collab) { double("single collaboration").tap { |t| allow(t).to receive_messages(id: 1, resource_link_lookup_uuid: "fake_uuid") } }
+  let(:user) { instance_double(User) }
+  let(:course) { Course.new(name: "my course", id: 1) }
+  let(:collab) { instance_double(ExternalToolCollaboration, id: 1, resource_link_lookup_uuid: "fake_uuid") }
 
   describe "collaboration" do
     it "renders the collaborations" do

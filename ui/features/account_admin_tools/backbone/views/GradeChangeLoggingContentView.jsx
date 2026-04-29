@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
@@ -52,15 +52,16 @@ Object.assign(GradeChangeLoggingContentView.prototype, {
 
   afterRender() {
     const mountPoint = document.getElementById('grade_change_activity_form_mount_point')
-    const root = createRoot(mountPoint)
 
-    root.render(
+    render(
       <GradeChangeActivityForm
         accountId={ENV.ACCOUNT_ID}
+        searchAsSubaccount={this.options.searchAsSubaccount}
         onSubmit={data => {
           this.updateCollection(data)
         }}
       />,
+      mountPoint,
     )
   },
 
@@ -76,7 +77,7 @@ Object.assign(GradeChangeLoggingContentView.prototype, {
     return this.collection.fetch({error: this.onFail})
   },
 
-  onFail(collection, xhr) {
+  onFail(_collection, xhr) {
     // Received a 404, empty the collection and don't let the paginated
     // view try to fetch more.
 

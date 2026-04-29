@@ -21,7 +21,7 @@
 module Canvas
   module RootAccountCacher
     class CacheRootAccountOnAssociation < ::ActiveRecord::Associations::BelongsToAssociation
-      def find_target
+      def find_target(...)
         key = Switchman::Shard.default.activate { ["root_account", owner.attribute(reflection.foreign_key)].cache_key }
         RequestCache.cache(key) { Account.find_cached(owner.attribute(reflection.foreign_key)) }
       end

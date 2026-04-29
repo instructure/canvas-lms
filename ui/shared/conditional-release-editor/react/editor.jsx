@@ -30,6 +30,7 @@ class ConditionalReleaseEditor {
   constructor(options = {}) {
     this.rootReducer = createRootReducer()
     this.store = options.store || createReduxStore(this.rootReducer)
+    this.readOnly = options.readOnly || false
 
     initActors(this.store)
 
@@ -61,7 +62,7 @@ class ConditionalReleaseEditor {
     targetRoot = targetRoot || targetDomNode
     ReactDom.render(
       <Provider store={this.store}>
-        <EditorView appElement={targetRoot} />
+        <EditorView appElement={targetRoot} readOnly={this.readOnly} />
       </Provider>,
       targetDomNode,
     )

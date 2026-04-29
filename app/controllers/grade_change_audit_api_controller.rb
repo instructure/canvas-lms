@@ -138,10 +138,9 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_assignment
-    return render_unauthorized_action unless admin_authorized?
-
     @assignment = api_find(Assignment.active, params[:assignment_id])
-    unless @assignment.context.root_account == @domain_root_account
+
+    unless @assignment.context.root_account == @domain_root_account && course_authorized?(@assignment.course)
       raise ActiveRecord::RecordNotFound, "Couldn't find assignment with API id '#{params[:assignment_id]}'"
     end
 
@@ -162,15 +161,8 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_course
-    begin
-      course = Course.find(params[:course_id])
-    rescue ActiveRecord::RecordNotFound => e
-      return render_unauthorized_action unless admin_authorized?
-
-      raise e
-    end
-
-    return render_unauthorized_action unless course_authorized?(course)
+    course = api_find(Course, params[:course_id])
+    raise ActiveRecord::RecordNotFound, "Couldn't find course with API id '#{params[:course_id]}'" unless course_authorized?(course)
 
     events = Auditors::GradeChange.for_course(course, query_options)
     render_events(events, polymorphic_url([:api_v1, :audit_grade_change, course]), course:)
@@ -191,7 +183,7 @@ class GradeChangeAuditApiController < AuditorApiController
   def for_student
     return render_unauthorized_action unless admin_authorized?
 
-    @student = User.active.find(params[:student_id])
+    @student = api_find(User.active, params[:student_id])
     unless @domain_root_account.associated_user?(@student)
       raise ActiveRecord::RecordNotFound, "Couldn't find user with API id '#{params[:student_id]}'"
     end
@@ -215,7 +207,7 @@ class GradeChangeAuditApiController < AuditorApiController
   def for_grader
     return render_unauthorized_action unless admin_authorized?
 
-    @grader = User.active.find(params[:grader_id])
+    @grader = api_find(User.active, params[:grader_id])
     unless @domain_root_account.associated_user?(@grader)
       raise ActiveRecord::RecordNotFound, "Couldn't find user with API id '#{params[:grader_id]}'"
     end
@@ -227,7 +219,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @API Advanced query
   #
   # List grade change events satisfying all given parameters. Teachers may query for events in courses they teach.
-  # Queries without +course_id+ require account administrator rights.
+  # Queries without +course_id+ or +assignment_id+ require account administrator rights.
   #
   # At least one of +course_id+, +assignment_id+, +student_id+, or +grader_id+ must be specified.
   #
@@ -256,17 +248,23 @@ class GradeChangeAuditApiController < AuditorApiController
 
     if params[:course_id].present?
       course = api_find(Course, params[:course_id])
-      return render_unauthorized_action unless course_authorized?(course)
+      raise ActiveRecord::RecordNotFound, "Couldn't find course with API id '#{params[:course_id]}'" unless course_authorized?(course)
 
       student = api_find(course.all_users, params[:student_id]) if params[:student_id].present?
       grader = api_find(User.active, params[:grader_id]) if params[:grader_id].present?
       assignment ||= api_find(course.assignments, params[:assignment_id]) if params[:assignment_id].present?
+    elsif params[:assignment_id].present?
+      assignment ||= api_find(Assignment.active, params[:assignment_id])
+      course = assignment.course
+      raise ActiveRecord::RecordNotFound, "Couldn't find assignment with API id '#{params[:assignment_id]}'" unless course_authorized?(course)
+
+      student = api_find(course.all_users, params[:student_id]) if params[:student_id].present?
+      grader = api_find(User.active, params[:grader_id]) if params[:grader_id].present?
     else
       return render_unauthorized_action unless admin_authorized?
 
       student = api_find(User.active, params[:student_id]) if params[:student_id].present?
       grader = api_find(User.active, params[:grader_id]) if params[:grader_id].present?
-      assignment ||= api_find(Assignment, params[:assignment_id]) if params[:assignment_id].present?
     end
 
     conditions = {}
@@ -287,15 +285,8 @@ class GradeChangeAuditApiController < AuditorApiController
 
   # TODO: make Gradebook History use the admin search above
   def for_course_and_other_parameters
-    begin
-      course = Course.find(params[:course_id])
-    rescue ActiveRecord::RecordNotFound => e
-      return render_unauthorized_action unless admin_authorized?
-
-      raise e
-    end
-
-    return render_unauthorized_action unless course_authorized?(course)
+    course = api_find(Course, params[:course_id])
+    raise ActiveRecord::RecordNotFound, "Couldn't find course with API id '#{params[:course_id]}'" unless course_authorized?(course)
 
     args = { course: }
     restrict_to_override_grades = params[:assignment_id] == "override"
@@ -323,7 +314,15 @@ class GradeChangeAuditApiController < AuditorApiController
                    :api_v1_audit_grade_change_course_student_url
                  end
 
-    events = Auditors::GradeChange.for_course_and_other_arguments(course, args, query_options)
+    events = if args[:assignment]&.checkpoints_parent?
+               assignment_ids = [args[:assignment].id, *args[:assignment].sub_assignments.pluck(:id)]
+               conditions = { context_id: course.id, context_type: "Course", assignment_id: assignment_ids }
+               conditions[:grader_id] = args[:grader].id if args[:grader]
+               conditions[:student_id] = args[:student].id if args[:student]
+               Auditors::GradeChange.for_scope_conditions(conditions, query_options)
+             else
+               Auditors::GradeChange.for_course_and_other_arguments(course, args, query_options)
+             end
 
     route_args = restrict_to_override_grades ? args.merge({ assignment: "override" }) : args
     render_events(events, send(url_method, route_args), course:, remove_anonymous: params[:student_id].present?)

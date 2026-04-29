@@ -81,14 +81,14 @@ describe "assignments" do
     end
 
     context "save and publish button" do
-      def create_assignment(publish = true, params = { name: "Test Assignment" })
+      def create_assignment(params = { name: "Test Assignment" }, publish: true)
         @assignment = @course.assignments.create(params)
         @assignment.unpublish unless publish
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       end
 
       it "can save and publish an assignment", priority: "1" do
-        create_assignment false
+        create_assignment(publish: false)
 
         expect(f("#assignment-draft-state")).to be_displayed
 
@@ -240,7 +240,7 @@ describe "assignments" do
       end
 
       def create_zip_file(zip_path, files)
-        Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
+        Zip::File.open(zip_path, create: true) do |zipfile|
           files.each do |file|
             zipfile.add(File.basename(file), file)
           end
@@ -369,6 +369,7 @@ describe "assignments" do
       end
 
       it "preserves all assignment attributes for checkpointed discussion when opening and submitting without changes using more options", :ignore_js_errors do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         sub_account = Account.create!(name: "sub1", parent_account: Account.default)
         @course.update!(account: sub_account)
         sub_account.enable_feature!(:discussion_checkpoints)
@@ -734,6 +735,30 @@ describe "assignments" do
       expect(@assignment.title).to eq "VDD Test Assignment Updated"
       # Assert the time didn't change
       expect(@assignment.due_at.strftime("%b %d")).to eq expected_date
+    end
+
+    it "shows Due Date field as disabled with message in edit modal when assignment has peer review sub assignment and FF is enabled" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      assignment = @course.assignments.create!(
+        title: "Assignment with Graded Peer Reviews - Due Date Test",
+        due_at: 1.day.from_now,
+        peer_reviews: true,
+        peer_review_count: 2,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+      peer_review_model(parent_assignment: assignment)
+
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
+      fj("#assign_#{assignment.id}_manage_link").click
+      wait_for_ajaximations
+      f("#assignment_#{assignment.id} .edit_assignment").click
+      wait_for_ajaximations
+
+      due_date_field = f("[data-testid='multiple-due-dates-message']")
+      expect(due_date_field).to have_value("Peer Review Due Date")
+      expect(due_date_field).to be_disabled
     end
 
     it "preserves assignment submission type when editing an assignment" do
@@ -1158,8 +1183,8 @@ describe "assignments" do
         expect(f("#assignment_annotated_document_info")).to be_displayed
 
         # select attachment from file explorer
-        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
-        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+        f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child > button').click
+        f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child [role="group"] [role="treeitem"] button').click
 
         # set usage rights
         f("#usageRightSelector").click
@@ -1190,8 +1215,8 @@ describe "assignments" do
         expect(f("#assignment_annotated_document_info")).to be_displayed
 
         # select attachment from file explorer
-        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
-        fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+        f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child > button').click
+        f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child [role="group"] [role="treeitem"] button').click
 
         # set usage rights
         f("#usageRightSelector").click
@@ -1232,8 +1257,8 @@ describe "assignments" do
             expect(f("#online_submission_types\\[student_annotation\\]_errors")).to include_text("This submission type requires a file upload")
 
             # select attachment from file explorer
-            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
-            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+            f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child > button').click
+            f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child [role="group"] [role="treeitem"] button').click
 
             expect(f("#online_submission_types\\[student_annotation\\]_errors")).not_to include_text("This submission type requires a file upload")
           end
@@ -1267,8 +1292,8 @@ describe "assignments" do
             wait_for_ajaximations
 
             # select attachment from file explorer
-            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/button').click
-            fxpath('//*[@id="annotated_document_chooser_container"]/div/div[1]/ul/li[1]/ul/li/button').click
+            f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child > button').click
+            f('#annotated_document_chooser_container [role="tree"] > [role="treeitem"]:first-child [role="group"] [role="treeitem"] button').click
 
             submit_assignment_form
             wait_for_ajaximations
@@ -1583,7 +1608,7 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
-        expect(f("#assignment_post_to_sis")).to_not be_nil
+        expect(f("#assignment_post_to_sis")).not_to be_nil
       end
 
       it "shows when post_grades lti tool installed", priority: "1" do
@@ -1591,7 +1616,7 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments/new"
         wait_for_ajaximations
-        expect(f("#assignment_post_to_sis")).to_not be_nil
+        expect(f("#assignment_post_to_sis")).not_to be_nil
       end
 
       it "does not show when post_grades lti tool not installed", priority: "1" do
@@ -1744,7 +1769,7 @@ describe "assignments" do
   end
 
   context "with restrict_quantitative_data" do
-    all_options = ["Percentage", "Complete/Incomplete", "Points", "Letter Grade", "GPA Scale", "Not Graded"]
+    let(:all_options) { ["Percentage", "Complete/Incomplete", "Points", "Letter Grade", "GPA Scale", "Not Graded"].freeze }
 
     before do
       course_with_teacher_logged_in
@@ -2177,6 +2202,31 @@ describe "assignments" do
       expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
       expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
       expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
+    end
+  end
+
+  context "Icelandic language pack" do
+    before do
+      @teacher = user_with_pseudonym
+      course_with_teacher_logged_in({ user: @teacher, active_course: true, active_enrollment: true })
+      @course.locale = "is"
+      @course.save!
+    end
+
+    it "creates/edit an assignment" do
+      get "/courses/#{@course.id}/assignments/new"
+      f("#assignment_name").send_keys("You can create an assignment")
+      click_option("#assignment_submission_type", "Online")
+      f("#assignment_text_entry").click
+      submit_assignment_form
+      assignment = @course.assignments.last
+
+      get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+      f("#assignment_name").clear
+      f("#assignment_name").send_keys("You can edit an assignment")
+      submit_assignment_form
+
+      expect(assignment.reload.title).to eq("You can edit an assignment")
     end
   end
 end

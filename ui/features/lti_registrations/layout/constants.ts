@@ -17,7 +17,7 @@
  */
 
 export const LtiRegistrationsTab = {
-    discover: 'discover',
-    manage: 'manage',
-    monitor: 'monitor',
-} as const;
+  discover: 'discover',
+  manage: 'manage',
+  monitor: 'monitor',
+} as const

@@ -48,16 +48,23 @@ class CoursePaceDueDatesCalculator
 
       # If the course pace hasn't been committed yet we need to group the items from their module_item_id or we will
       # end up grouping them by nil and losing the data for each item as it gets overwritten by the next item.
-      key = if by_assignment && item.module_item.content_type == "Assignment"
-              item.module_item.content_id
+      key = if by_assignment && ["Assignment", "Quizzes::Quiz", "DiscussionTopic"].include?(item.module_item.content_type)
+              # For quizzes and discussions, we need to use the assignment ID, not the content ID
+              # because mastery paths works with assignment objects
+              if item.module_item.content_type == "Assignment"
+                item.module_item.content_id
+              else
+                item.module_item.content&.assignment_id || item.module_item.content_id
+              end
             elsif course_pace.persisted?
               item.id
             else
               item.module_item_id
             end
 
-      due_dates[key] = due_date.to_date
-      start_date = due_date # The next item's start date is this item's due date
+      due_date_in_zone = due_date.in_time_zone(course_pace.course.time_zone).midnight
+      due_dates[key] = due_date_in_zone
+      start_date = due_date_in_zone
     end
 
     due_dates
@@ -73,6 +80,6 @@ class CoursePaceDueDatesCalculator
     account_codes =
       Account.multi_account_chain_ids([course_pace.course.account.id]).map { |id| "account_#{id}" }
     context_codes = account_codes.append("course_#{course_pace.course.id}")
-    CalendarEvent.with_blackout_date.active.for_context_codes(context_codes)
+    CalendarEvent.with_blackout_date.active.valid_ranges.for_context_codes(context_codes)
   end
 end

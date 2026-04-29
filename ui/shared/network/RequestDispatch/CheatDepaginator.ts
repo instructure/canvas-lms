@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {find, isArray} from 'lodash'
+import {find, isArray} from 'es-toolkit/compat'
 import parseLinkHeader from '@canvas/parse-link-header'
 import deferPromise from '@instructure/defer-promise'
 
@@ -86,6 +86,7 @@ function cheaterDepaginate(
   pageCallback: (response: any) => void,
   pagesEnqueuedCallback: (promises: Promise<any>[]) => void = _deferred => {},
   dispatch: any,
+  headers?: Record<string, string>,
 ): Promise<any[]> {
   const gotAllPagesDeferred: DeferredPromise = deferPromise()
   const data: any[] = []
@@ -96,7 +97,7 @@ function cheaterDepaginate(
   const orderedPageCallback = consumePagesInOrder(pageCallback, data)
 
   dispatch
-    ._getJSON(url, params)
+    ._getJSON(url, params, headers)
     .then(({data: firstPageResponse, xhr}: PageResponse) => {
       orderedPageCallback(firstPageResponse, 1)
 

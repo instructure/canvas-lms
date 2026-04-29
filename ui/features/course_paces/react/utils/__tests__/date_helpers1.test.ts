@@ -144,6 +144,41 @@ describe('date_helpers', () => {
     describe('course_paces_skip_selected_days = true', () => {
       runTests(true)
     })
+
+    describe('with explicit timezone parameter', () => {
+      beforeAll(() => {
+        fakeENV.setup({
+          FEATURES: {
+            course_paces_skip_selected_days: false,
+          },
+        })
+      })
+
+      afterAll(() => {
+        fakeENV.teardown()
+      })
+
+      it('uses the specified timezone instead of browser timezone', () => {
+        // Start with May 2nd in Mountain Time
+        const startDate = '2022-05-02T00:00:00-06:00'
+
+        // Add 1 day
+        const result = addDays(startDate, 1, false, [], [], 'America/Denver')
+
+        // Should be May 3rd at midnight Mountain Time
+        expect(result).toMatch(/2022-05-03T00:00:00.000-0[67]:00/)
+      })
+
+      it('handles weekend exclusion correctly with timezone', () => {
+        // Friday May 6th in Mountain Time
+        const startDate = '2022-05-06T00:00:00-06:00'
+
+        // Adding 2 business days (skipping weekend) should give us Tuesday May 10th
+        const result = addDays(startDate, 2, true, ['sat', 'sun'], [], 'America/Denver')
+
+        expect(result).toMatch(/2022-05-10T00:00:00.000-0[67]:00/)
+      })
+    })
   })
 
   describe('daysBetween', () => {

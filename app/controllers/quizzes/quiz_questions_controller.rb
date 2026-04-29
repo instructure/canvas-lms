@@ -37,6 +37,18 @@
 #         "type": "integer",
 #         "format": "int64"
 #       },
+#       "assessment_question_bank_id": {
+#         "description": "The ID of the assessment question bank this question belongs to. If assessment_question_bank_id has been enabled by SiteAdmin.",
+#         "example": 3,
+#         "type": "integer",
+#         "format": "int64"
+#       },
+#       "created_at": {
+#         "description": "The date and time when the quiz question was created.",
+#         "example": "2013-01-23T23:59:00-07:00",
+#         "type": "string",
+#         "format": "date-time"
+#       },
 #       "position": {
 #         "description": "The order in which the question will be retrieved and displayed.",
 #         "example": 1,
@@ -217,7 +229,15 @@ class Quizzes::QuizQuestionsController < ApplicationController
       # are not guaranteed to be unique by position (due to the way we position questions in groups),
       # we also order by id here to ensure a consistent ordering. Without this secondary order,
       # pagination can result in duplicates or omissions accross pages.
-      render_question_set(@quiz.active_quiz_questions.order(:id))
+      if Account.site_admin.feature_enabled?(:ams_add_question_bank_to_quiz_question)
+        render_question_set(
+          @quiz.active_quiz_questions
+               .preload(assessment_question: :assessment_question_bank)
+               .order(:id)
+        )
+      else
+        render_question_set(@quiz.active_quiz_questions.order(:id))
+      end
     end
   end
 
@@ -234,9 +254,10 @@ class Quizzes::QuizQuestionsController < ApplicationController
       render json: question_json(@question,
                                  @current_user,
                                  session,
-                                 @context,
-                                 parse_includes,
-                                 censored?)
+                                 context: @context,
+                                 includes: parse_includes,
+                                 censored: censored?,
+                                 location: "quiz_question_#{@question.id}")
     end
   end
 
@@ -293,9 +314,9 @@ class Quizzes::QuizQuestionsController < ApplicationController
       process_answer_html_content(question_data)
 
       guard_against_big_fields do
-        @question = @quiz.quiz_questions.create(quiz_group: @group, question_data:)
+        @question = @quiz.quiz_questions.create(quiz_group: @group, question_data:, updating_user: @current_user)
         @quiz.did_edit if @quiz.created?
-        render json: question_json(@question, @current_user, session, @context, [:assessment_question, :plain_html])
+        render json: question_json(@question, @current_user, session, context: @context, includes: [:assessment_question, :plain_html], location: "quiz_question_#{@question.id}")
       end
 
     end
@@ -306,9 +327,15 @@ class Quizzes::QuizQuestionsController < ApplicationController
       @assessment_questions = @bank.assessment_questions.active.where(id: params[:assessment_questions_ids].split(",")).to_a
       @group = @quiz.quiz_groups.where(id: params[:quiz_group_id]).first if params[:quiz_group_id].to_i > 0
       @questions = @quiz.add_assessment_questions(@assessment_questions, @group)
+
+      if Account.site_admin.feature_enabled?(:ams_add_question_bank_to_quiz_question)
+        @questions = Quizzes::QuizQuestion.where(id: @questions.map(&:id))
+                                          .preload(assessment_question: :assessment_question_bank)
+      end
+
       bank_outcome_ids = @bank.learning_outcome_alignments.select(:learning_outcome_id)
       LearningOutcome.ensure_presence_in_context(bank_outcome_ids, @context)
-      render json: questions_json(@questions, @current_user, session, [:assessment_question])
+      render json: questions_json(@questions, @current_user, session, context: @context, includes: [:assessment_question])
     end
   end
   protected :add_questions
@@ -359,6 +386,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   def update
     if authorized_action(@quiz, @current_user, :update)
       @question = @quiz.quiz_questions.active.find(params[:id])
+      @question.updating_user = @current_user
       question_data = params[:question].to_unsafe_h
       question_data[:regrade_user] = @current_user
       question_data[:question_text] = process_incoming_html_content(question_data[:question_text])
@@ -377,7 +405,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
         @question.question_data = question_data
         @question.save
         @quiz.did_edit if @quiz.created?
-        render json: question_json(@question, @current_user, session, @context, [:assessment_question, :plain_html])
+        render json: question_json(@question, @current_user, session, context: @context, includes: [:assessment_question, :plain_html], location: "quiz_question_#{@question.id}")
       end
     end
   end
@@ -395,6 +423,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   def destroy
     if authorized_action(@quiz, @current_user, :update)
       @question = @quiz.quiz_questions.active.find(params[:id])
+      @question.updating_user = @current_user
       @question.destroy
 
       head :no_content
@@ -448,6 +477,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       scope = Quizzes::QuizQuestion.where({
                                             id: @quiz_submission.quiz_data.pluck("id")
                                           })
+      scope = scope.preload(assessment_question: :assessment_question_bank) if Account.site_admin.feature_enabled?(:ams_add_question_bank_to_quiz_question)
 
       results_visible = @quiz_submission.results_visible?(user: @current_user)
       reject! "Cannot view questions due to quiz settings", 401 unless results_visible
@@ -459,15 +489,17 @@ class Quizzes::QuizQuestionsController < ApplicationController
   def render_question_set(scope, quiz_data = nil)
     api_route = polymorphic_url([:api, :v1, @context, :quiz_questions], { quiz_id: @quiz })
     questions = Api.paginate(scope, self, api_route)
+    location = quiz_data ? "quiz_submission_#{@quiz_submission.id}" : nil
 
     render json: questions_json(questions,
                                 @current_user,
                                 session,
-                                @context,
-                                parse_includes,
-                                censored?,
-                                quiz_data,
-                                shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user))
+                                context: @context,
+                                includes: parse_includes,
+                                censored: censored?,
+                                quiz_data:,
+                                shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user),
+                                location:)
   end
 
   def process_answer_html_content(question_data)

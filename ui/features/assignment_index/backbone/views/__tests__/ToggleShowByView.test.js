@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import _ from 'lodash'
+import {each} from 'es-toolkit/compat'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
@@ -23,7 +23,7 @@ import ToggleShowByView from '../ToggleShowByView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 
@@ -120,17 +120,22 @@ describe('ToggleShowByView', function () {
   beforeEach(() => {
     fakeENV.setup()
     ENV.observed_student_ids = []
+    document.documentElement.setAttribute('lang', 'en')
+    if (!document.title) {
+      document.title = 'Test Page'
+    }
   })
 
   afterEach(() => {
     fakeENV.teardown()
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
+    document.documentElement.removeAttribute('lang')
   })
 
-  test('should be accessible', done => {
+  test('should be accessible', async () => {
     const view = createView(true)
-    isAccessible(view, done, {a11yReport: true})
+    await isAccessible(view, {a11yReport: true})
   })
 
   test('should sort assignments into groups correctly', async function () {
@@ -140,7 +145,7 @@ describe('ToggleShowByView', function () {
     equal(view.assignmentGroups.length, 4)
     view.assignmentGroups.each(group => {
       const assignments = group.get('assignments').models
-      _.each(assignments, as => equal(group.name(), as.name()))
+      each(assignments, as => equal(group.name(), as.name()))
     })
   })
 
@@ -222,5 +227,62 @@ describe('ToggleShowByView', function () {
     const upcoming = view.assignmentGroups.findWhere({id: 'upcoming'})
     assignments = upcoming.get('assignments').models
     equal(assignments.length, 2)
+  })
+
+  test('should sort checkpointed discussions by reply to entry checkpoint due date', async function () {
+    ENV.PERMISSIONS = {manage: false, read_grades: true}
+    const course = new Course({id: 1})
+
+    const assignments = [
+      {
+        id: 1,
+        name: 'Regular Assignment',
+        due_at: new Date(2023, 5, 15),
+        position: 1,
+      },
+      {
+        id: 2,
+        name: 'Checkpointed Discussion',
+        due_at: new Date(2023, 5, 20),
+        has_sub_assignments: true,
+        checkpoints: [
+          {
+            tag: 'reply_to_topic',
+            due_at: new Date(2023, 5, 12).toISOString(),
+          },
+          {
+            tag: 'reply_to_entry',
+            due_at: new Date(2023, 5, 18).toISOString(),
+          },
+        ],
+        position: 2,
+      },
+      {
+        id: 3,
+        name: 'Another Assignment',
+        due_at: new Date(2023, 5, 14),
+        position: 3,
+      },
+    ]
+
+    const group = new AssignmentGroup({assignments})
+    const collection = new AssignmentGroupCollection([group], {
+      courseSubmissionsURL: COURSE_SUBMISSIONS_URL,
+      course,
+    })
+
+    const view = new ToggleShowByView({course, assignmentGroups: collection})
+    await getGrades(view.assignmentGroups)
+
+    const past = view.assignmentGroups.findWhere({id: 'past'})
+    const sortedAssignments = past.get('assignments').models
+    // Assignment 2 should be sorted by its reply_to_entry checkpoint date (June 18)
+    // not by reply_to_topic (June 12) or the main due_at (June 20)
+    // Verify that assignment 2 uses the checkpoint date
+    const assignment2 = sortedAssignments.find(a => a.get('id') === 2)
+    equal(assignment2.sortingDueAt(), new Date(2023, 5, 18).toISOString())
+    equal(sortedAssignments[0].get('id'), 1)
+    equal(sortedAssignments[1].get('id'), 3)
+    equal(sortedAssignments[2].get('id'), 2)
   })
 })

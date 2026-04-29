@@ -77,6 +77,7 @@ module Importers
         item.public = hash[:public] unless hash[:public].nil?
         item.hide_score_total = hash[:hide_score_total] unless hash[:hide_score_total].nil?
         item.free_form_criterion_comments = hash[:free_form_criterion_comments] unless hash[:free_form_criterion_comments].nil?
+        item.rating_order = hash[:rating_order] if hash[:rating_order].present?
 
         item.data = hash[:data]
         item.data.each do |crit|
@@ -103,7 +104,7 @@ module Importers
         end
 
         item.skip_updating_points_possible = true
-        item.update_mastery_scales(false)
+        item.update_mastery_scales(save: false)
         migration.add_imported_item(item)
         item.save!
       end
@@ -116,7 +117,7 @@ module Importers
 
     def self.process_rubric_association(context, migration, item)
       associate_with = context
-      opts = {}
+      opts = { skip_updating_rubric_association_count: true }
 
       if context.is_a?(Course) && migration.migration_settings[:associate_with_assignment_id].present?
         assignment = context.assignments.where(id: migration.migration_settings[:associate_with_assignment_id]).first
@@ -141,6 +142,11 @@ module Importers
       else
         item.associate_with(associate_with, context, opts)
       end
+    end
+
+    def self.process_rubric_association_count(migration)
+      rubrics = migration.imported_migration_items_by_class(Rubric)
+      rubrics.each(&:update_association_count)
     end
 
     def self.track_metrics(migration)

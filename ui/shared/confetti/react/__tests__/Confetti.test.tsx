@@ -21,12 +21,12 @@ import Confetti from '../Confetti'
 import React from 'react'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('Confetti', () => {
   beforeEach(() => {
     act(() => {
-      jest.advanceTimersByTime(10000)
+      vi.advanceTimersByTime(10000)
     })
   })
 
@@ -43,7 +43,7 @@ describe('Confetti', () => {
     const {queryByTestId} = render(<Confetti />)
     expect(queryByTestId('confetti-canvas')).toBeInTheDocument()
     act(() => {
-      jest.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(3000)
     })
     expect(queryByTestId('confetti-canvas')).not.toBeInTheDocument()
   })
@@ -53,7 +53,7 @@ describe('Confetti', () => {
       const {queryByText} = render(<Confetti />)
       expect(queryByText('Great work! From the Canvas developers')).toBeInTheDocument()
       act(() => {
-        jest.advanceTimersByTime(10000)
+        vi.advanceTimersByTime(10000)
       })
       expect(queryByText('Great work! From the Canvas developers')).not.toBeInTheDocument()
     })

@@ -10,15 +10,6 @@ analytics_2:
       to ON.
   after_state_change_proc: analytics_2_after_state_change_hook
   beta: false
-hide_legacy_course_analytics:
-  state: hidden
-  applies_to: Course
-  display_name: Hide Legacy Course Analytics
-  description:
-    hide_legacy_course_analytics_description: Hides the Legacy Course Analytics feature.
-  root_opt_in: true
-  beta: true
-  shadow: true
 
 # Admin Analytics - Provided through K20 LTI App
 admin_analytics_view_permission:
@@ -36,11 +27,9 @@ admin_analytics:
   description:
     admin_analytics_description: Enables Analytics at the account-level. Admin Analytics dashboards provide
       details on Canvas usage, Canvas course success, and student engagement.
-      Learn more in the Admin Analytics Hub in the Canvas community.
   after_state_change_proc: analytics_2_after_state_change_hook
   root_opt_in: true
   beta: false
-
 
 # Intelligent Insights - Provided through K20 LTI App
 k20_course_readiness:
@@ -57,7 +46,7 @@ k20_course_readiness_due_date_criteria:
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Due Date Criteria
   description:
-    k20_course_readiness_due_date_criteria: Enables the Intelligent Insights - Course Readiness - Due Date Criteria feature and accompanying permission.
+    k20_course_readiness_due_date_criteria: Enables the Intelligent Insights - Course Readiness - Due Date Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
@@ -66,7 +55,7 @@ k20_course_readiness_gradebook_criteria:
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Gradebook Criteria
   description:
-    k20_course_readiness_gradebook_criteria: Enables the Intelligent Insights - Course Readiness - Gradebook Criteria feature and accompanying permission.
+    k20_course_readiness_gradebook_criteria: Enables the Intelligent Insights - Course Readiness - Gradebook Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
@@ -75,7 +64,70 @@ k20_course_readiness_broken_links_criteria:
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Broken Links Criteria
   description:
-    k20_course_readiness_broken_links_criteria: Enables the Intelligent Insights - Course Readiness - Broken Links Criteria feature and accompanying permission.
+    k20_course_readiness_broken_links_criteria: Enables the Intelligent Insights - Course Readiness - Broken Links Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_lti_apps_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - LTI Apps Criteria
+  description:
+    k20_course_readiness_lti_apps_criteria: Enables the Intelligent Insights - Course Readiness - LTI Apps Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_homepage_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Homepage Criteria
+  description:
+    k20_course_readiness_homepage_criteria: Enables the Intelligent Insights - Course Readiness - Homepage Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_criteria_set_results_preview:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Criteria Set Results Preview
+  description:
+    k20_course_readiness_criteria_set_results_preview: Enables the Intelligent Insights - Course Readiness - Criteria Set Results Preview feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_top_level_dashboard:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Top Level Dashboard
+  description:
+    k20_course_readiness_top_level_dashboard: Enables the Intelligent Insights - Course Readiness - Top Level Dashboard feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_criteria_set_preview:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Criteria Set Preview
+  description:
+    k20_criteria_set_preview: Enables the Intelligent Insights - Criteria Set Preview feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_course_nav_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Course Nav Criteria
+  description:
+    k20_course_readiness_course_nav_criteria: Enables the Intelligent Insights - Course Readiness - Course Nav Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_rubric_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Rubric Criteria
+  description:
+    k20_course_readiness_rubric_criteria: Enables the Intelligent Insights - Course Readiness - Rubric Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
@@ -94,6 +146,51 @@ title_iv_financial_aid_report:
   display_name: Intelligent Insights - Financial Aid Compliance
   description:
     title-iv-financial-aid-report: Enables the Intelligent Insights - Financial Aid Compliance feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+intelligent_insights_rsi_report:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Regular and Substantive Interaction
+  description:
+    intelligent-insights-rsi-report: Enables the Intelligent Insights - Regular and Substantive Interaction feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+intelligent_insights_rsi_ignore_course:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - RSI - Ignore functionality
+  description:
+    intelligent-insights-rsi-ignore-course: Enables the Intelligent Insights - RSI - Ignore course feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_improved_criteria_builder:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Improved Criteria Builder
+  description:
+    k20_improved_criteria_builder: Enables the Intelligent Insights - Improved Criteria Builder feature
+  root_opt_in: true
+  beta: true
+  shadow: true
+intelligent_insights_accessibility_insights:
+  state: hidden
+  applies_to: Account
+  display_name:  Intelligent Insights - Accessibility Insights
+  description:
+    intelligent-insights-accessibility-insights: Enables the Intelligent Insights - Accessibility Insights feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+intelligent_insights_modernisation:
+  state: hidden
+  applies_to: Account
+  display_name:  Intelligent Insights - Modernisation
+  description:
+    intelligent-insights-modernisation: Enables the Intelligent Insights - Modernisation feature.
   root_opt_in: true
   beta: true
   shadow: true
@@ -130,6 +227,14 @@ intelligent_insights_contextual_messaging:
   applies_to: Account
   display_name: "Intelligent Insights - Contextual Messaging"
   description: Show Intelligent Insights new contextual messaging feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+intelligent_insights_student_level_contextual_messaging:
+  state: hidden
+  applies_to: Account
+  display_name: "Intelligent Insights - Student level contextual messaging"
+  description: Show Intelligent Insights new student level contextual messaging feature.
   root_opt_in: true
   beta: true
   shadow: true

@@ -18,7 +18,7 @@
 
 import {render, screen} from '@testing-library/react'
 import PreviewUserMerge, {type PreviewMergeProps} from '../PreviewUserMerge'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {createUserToMergeQueryKey} from '../common'
 import userEvent from '@testing-library/user-event'
 import {sourceUser, destinationUser} from './test-data'
@@ -33,8 +33,8 @@ describe('PreviewUserMerge', () => {
     currentUserId: '1',
     sourceUserId: sourceUser.id,
     destinationUserId: destinationUser.id,
-    onSwap: jest.fn(),
-    onStartOver: jest.fn(),
+    onSwap: vi.fn(),
+    onStartOver: vi.fn(),
   }
   const MERGE_USERS_URL = `/api/v1/users/${sourceUser.id}/merge_into/${destinationUser.id}`
 

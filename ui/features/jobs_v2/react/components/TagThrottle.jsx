@@ -18,7 +18,8 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconSettingsLine, IconInfoLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
@@ -129,7 +130,14 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
           <IconSettingsLine />
         </IconButton>
       </Tooltip>
-      <CanvasModal footer={<Footer />} label={caption} open={modalOpen} onDismiss={handleClose}>
+      <CanvasModal
+        footer={<Footer />}
+        label={caption}
+        open={modalOpen}
+        onDismiss={handleClose}
+        closeButtonLabel={I18n.t('Close')}
+        errorComponent={canvasErrorComponent()}
+      >
         <Flex direction="column">
           {error && (
             <Flex.Item>

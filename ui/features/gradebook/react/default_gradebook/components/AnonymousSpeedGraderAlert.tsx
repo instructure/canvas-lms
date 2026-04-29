@@ -30,6 +30,7 @@ const I18n = createI18nScope('gradebook')
 type Props = {
   speedGraderUrl: string
   onClose: () => void
+  initiallyOpen?: boolean
 }
 
 type State = {
@@ -44,17 +45,12 @@ class AnonymousSpeedGraderAlert extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
-    this.state = {isOpen: false}
+    this.state = {isOpen: props.initiallyOpen ?? false}
 
-    this.open = this.open.bind(this)
     this.close = this.close.bind(this)
 
     this.openButton = React.createRef()
     this.cancelButton = React.createRef()
-  }
-
-  open() {
-    this.setState({isOpen: true})
   }
 
   close() {

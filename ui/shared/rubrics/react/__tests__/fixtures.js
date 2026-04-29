@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'lodash'
+import {cloneDeep} from 'es-toolkit/compat'
 import {fillAssessment} from '../helpers'
 
 export const rubric = {
@@ -208,7 +208,7 @@ const freeFormAssessment = {
 export const rubrics = {
   points: rubric,
   freeForm: {
-    ..._.cloneDeep(rubric),
+    ...cloneDeep(rubric),
     title: 'Free-form Rubric',
     free_form_criterion_comments: true,
   },

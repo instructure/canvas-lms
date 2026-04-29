@@ -29,16 +29,19 @@
 #
 # @see AssessmentQuestion#create_quiz_question()
 # @see AssessmentQuestionBank#select_for_submission()
-class Quizzes::QuizQuestion < ActiveRecord::Base
+class Quizzes::QuizQuestion < ApplicationRecord
   extend RootAccountResolver
+
   self.table_name = "quiz_questions"
 
   include Workflow
+  include LinkedAttachmentHandler
 
   attr_readonly :quiz_id
   belongs_to :quiz, class_name: "Quizzes::Quiz", inverse_of: :quiz_questions
   belongs_to :assessment_question
   belongs_to :quiz_group, class_name: "Quizzes::QuizGroup"
+  has_many :attachment_associations, as: :context, inverse_of: :context
 
   Q_TEXT_ONLY = "text_only_question"
   Q_FILL_IN_MULTIPLE_BLANKS = "fill_in_multiple_blanks_question"
@@ -54,9 +57,12 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   serialize :question_data
   after_save :update_quiz
 
+  delegate :assessment_question_bank, to: :assessment_question, allow_nil: true
+
   resolves_root_account through: :quiz
 
   include MasterCourses::CollectionRestrictor
+
   self.collection_owner_association = :quiz
   restrict_columns :content, %i[question_data position quiz_group_id workflow_state]
 
@@ -70,6 +76,49 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   scope :active, -> { where("workflow_state='active' OR workflow_state IS NULL") }
   scope :generated, -> { where(workflow_state: "generated") }
   scope :not_deleted, -> { where.not(workflow_state: "deleted").or(where(workflow_state: nil)) }
+  scope :without_assessment_question_association, -> { where(assessment_question_id: nil) }
+
+  QUESTION_DATA_HTML_FIELDS = %i[
+    question_text
+    comments_html
+    correct_comments_html
+    incorrect_comments_html
+    neutral_comments_html
+    text_after_answers
+  ].freeze
+
+  QUESTION_DATA_ANSWER_HTML_FIELDS = %i[
+    html
+    comments_html
+  ].freeze
+
+  def update_attachment_associations(migration: nil, skip_user_verification: false)
+    unless skip_user_verification
+      return if workflow_state == "deleted"
+      return unless attachment_associations_creation_enabled?
+      return unless migration || saved_change_to_attribute?(:question_data)
+    end
+
+    all_html = []
+
+    Quizzes::QuizQuestion::QUESTION_DATA_HTML_FIELDS.each do |field|
+      all_html << question_data[field] if question_data[field].present?
+    end
+
+    question_data[:answers]&.each do |answer|
+      to_check = answer[0].present? ? answer[1] : answer
+      Quizzes::QuizQuestion::QUESTION_DATA_ANSWER_HTML_FIELDS.each do |field|
+        all_html << to_check[field] if to_check[field].present?
+      end
+    end
+
+    user = skip_user_verification ? nil : updating_user
+    associate_attachments_to_rce_object(all_html.compact.join("\n"), user, skip_user_verification:, migration:)
+  end
+
+  def access_for_attachment_association?(user, session, _association)
+    user && quiz.grants_right?(user, session, :read)
+  end
 
   def infer_defaults
     if !position && quiz
@@ -159,6 +208,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     if aq.editable_by?(self)
       aq.question_data = question_data
       aq.initial_context = quiz.context if quiz&.context
+      aq.updating_user = updating_user
       aq.save! if aq.new_record?
     end
 
@@ -167,14 +217,20 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     true
   end
 
-  def update_assessment_question!(aq, quiz_group_id, duplicate_index)
-    if assessment_question_version.blank? || assessment_question_version < aq.version_number
-      self.assessment_question = aq
-      self["question_data"] = aq.question_data
+  def update_from_assessment_question!(assessment_question, quiz_group_id, duplicate_index)
+    if assessment_question_version.blank? || assessment_question_version < assessment_question.version_number
+      self.assessment_question = assessment_question
+      self["question_data"] = assessment_question.question_data
     end
     self.quiz_group_id = quiz_group_id
     self.duplicate_index = duplicate_index
-    save! if changed?
+
+    if changed?
+      # does not need copying or recreating; AQs are supposed to have only AQ-scoped attachments
+      Quizzes::QuizQuestion.suspend_callbacks(:update_attachment_associations) do
+        save!
+      end
+    end
 
     self
   end

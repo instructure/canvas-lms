@@ -28,7 +28,7 @@ describe.skip('EmojiPicker', () => {
   beforeEach(() => {
     originalENV = window.ENV
     window.ENV = {}
-    insertEmoji = jest.fn()
+    insertEmoji = vi.fn()
   })
 
   afterEach(() => {
@@ -81,7 +81,7 @@ describe.skip('EmojiPicker', () => {
   })
 
   it('emits an event when skin tone is changed', async () => {
-    const handleSkinToneChange = jest.fn()
+    const handleSkinToneChange = vi.fn()
     window.addEventListener('emojiSkinChange', handleSkinToneChange)
     const {getByRole} = render(<EmojiPicker insertEmoji={insertEmoji} />)
     const triggerButton = getByRole('button', {name: /Open emoji menu/})
@@ -98,7 +98,7 @@ describe.skip('EmojiPicker', () => {
   })
 
   it('emits an event when an emoji is selected', async () => {
-    const handleEmojiSelected = jest.fn()
+    const handleEmojiSelected = vi.fn()
     window.addEventListener('emojiSelected', handleEmojiSelected)
     const {getByRole} = render(<EmojiPicker insertEmoji={insertEmoji} />)
     const triggerButton = getByRole('button', {name: /Open emoji menu/})

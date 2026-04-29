@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {AnonymousUser} from '../../../../graphql/AnonymousUser'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
@@ -27,34 +27,36 @@ import {fireEvent, render} from '@testing-library/react'
 import {getSpeedGraderUrl} from '../../../utils'
 import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   updateDiscussionEntryParticipantMock,
   updateDiscussionThreadReadStateMock,
 } from '../../../../graphql/Mocks'
 import {User} from '../../../../graphql/User'
 import {waitFor} from '@testing-library/dom'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
-jest.mock('@canvas/util/globalUtils')
+vi.mock('@canvas/util/globalUtils')
 
 describe('DiscussionThreadContainer', () => {
-  const onFailureStub = jest.fn()
-  const onSuccessStub = jest.fn()
-  const openMock = jest.fn()
+  const onFailureStub = vi.fn()
+  const onSuccessStub = vi.fn()
+  const openMock = vi.fn()
 
   beforeAll(() => {
-    window.ENV = {
+    fakeENV.setup({
       course_id: '1',
       SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
       discussions_reporting: false,
-    }
+    })
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -66,7 +68,7 @@ describe('DiscussionThreadContainer', () => {
     onSuccessStub.mockClear()
     openMock.mockClear()
     window.ENV.discussions_reporting = false
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const defaultProps = ({
@@ -85,7 +87,11 @@ describe('DiscussionThreadContainer', () => {
         <AlertManagerContext.Provider
           value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
         >
-          <DiscussionThreadContainer {...props} />
+          <ObserverContext.Provider
+            value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
+          >
+            <DiscussionThreadContainer {...props} />
+          </ObserverContext.Provider>
         </AlertManagerContext.Provider>
       </MockedProvider>,
     )
@@ -150,6 +156,59 @@ describe('DiscussionThreadContainer', () => {
     })
   })
 
+  describe('restore button', () => {
+    it('does not render if the discussion entry is not deleted', () => {
+      const {queryByTestId} = setup(defaultProps())
+      expect(queryByTestId('restore-button')).not.toBeInTheDocument()
+    })
+
+    describe('when feature flag is enabled', () => {
+      beforeAll(() => {
+        window.ENV.restore_discussion_entry = true
+      })
+
+      afterAll(() => {
+        window.ENV.restore_discussion_entry = false
+      })
+
+      it('renders the restore button if is deleted', async () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {deleted: true},
+        })
+        const {getByTestId} = setup(props)
+        expect(getByTestId('threading-toolbar-restore')).toBeInTheDocument()
+      })
+
+      it('renders the restore button if the user is not the owner, but has the permission', () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {
+            deleted: true,
+            editor: User.mock({_id: '3', displayName: 'Jane Doe'}),
+          },
+        })
+
+        const {getByTestId} = setup(props)
+        expect(getByTestId('threading-toolbar-restore')).toBeInTheDocument()
+      })
+
+      it('does not render the restore button if the user is not the owner and does not have the permission', () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {
+            deleted: true,
+            author: User.mock({_id: '3', displayName: 'Jane Doe'}),
+            editor: User.mock({_id: '3', displayName: 'Jane Doe'}),
+          },
+          discussionOverrides: {
+            permissions: DiscussionPermissions.mock({moderateForum: false}),
+          },
+        })
+        props.discussionEntry.permissions.delete = false
+        const {queryByTestId} = setup(props)
+        expect(queryByTestId('threading-toolbar-restore')).not.toBeInTheDocument()
+      })
+    })
+  })
+
   describe('Roles', () => {
     it('does not display author role if not the author', async () => {
       const {queryByTestId} = setup(defaultProps())
@@ -187,7 +246,7 @@ describe('DiscussionThreadContainer', () => {
     })
 
     it('Should render Mark Thread as Unread and Read', () => {
-      const setHighlightEntryId = jest.fn()
+      const setHighlightEntryId = vi.fn()
       const {getByTestId, getAllByText} = setup(
         defaultProps({
           propOverrides: {setHighlightEntryId},
@@ -280,6 +339,62 @@ describe('DiscussionThreadContainer', () => {
     })
   })
 
+  describe('pin', () => {
+    describe('when feature flag enabled', () => {
+      beforeAll(() => {
+        window.ENV.discussion_pin_post = true
+      })
+
+      afterAll(() => {
+        window.ENV.discussion_pin_post = false
+      })
+
+      it('renders the pin button if user has moderate forum permission', () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {
+            editor: User.mock({_id: '1', displayName: 'Teacher Bipin'}),
+          },
+        })
+
+        const {getByTestId} = setup(props)
+        expect(getByTestId('threading-toolbar-pin')).toBeInTheDocument()
+      })
+
+      it('does not render the pin button if entry is deleted', () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {
+            deleted: true,
+            editor: User.mock({_id: '1', displayName: 'Teacher Bipin'}),
+          },
+        })
+
+        const {queryByTestId} = setup(props)
+        expect(queryByTestId('threading-toolbar-pin')).not.toBeInTheDocument()
+      })
+
+      it('does not render the pin button if user permission is missing', () => {
+        const props = defaultProps({
+          discussionEntryOverrides: {
+            editor: User.mock({_id: '2', displayName: 'Student Little'}),
+          },
+          discussionOverrides: {
+            permissions: DiscussionPermissions.mock({moderateForum: false}),
+          },
+        })
+
+        const {queryByTestId} = setup(props)
+        expect(queryByTestId('threading-toolbar-pin')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when feature flag disabled', () => {
+      it('does not render the pin button', () => {
+        const {queryByTestId} = setup(defaultProps())
+        expect(queryByTestId('threading-toolbar-pin')).not.toBeInTheDocument()
+      })
+    })
+  })
+
   describe('SpeedGrader', () => {
     it('Should be able to open SpeedGrader when speedGrader permission is true', async () => {
       const {getByTestId} = setup(defaultProps())
@@ -309,7 +424,7 @@ describe('DiscussionThreadContainer', () => {
 
   describe('Go to Buttons', () => {
     it('Should call scrollTo when go to topic is pressed', async () => {
-      const goToTopic = jest.fn()
+      const goToTopic = vi.fn()
       const {getByTestId} = setup(defaultProps({propOverrides: {goToTopic}}))
 
       fireEvent.click(getByTestId('thread-actions-menu'))
@@ -321,7 +436,7 @@ describe('DiscussionThreadContainer', () => {
     })
 
     it('Should call props.setHighlightEntryId when go to parent is pressed', async () => {
-      const setHighlightEntryId = jest.fn()
+      const setHighlightEntryId = vi.fn()
       const parentId = '1'
       const {getByTestId} = setup(
         defaultProps({propOverrides: {setHighlightEntryId, parentId, depth: 2}}),

@@ -161,6 +161,11 @@ describe ContentMigration do
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
 
+    it "returns true for empty string if the all_ option is true" do
+      @cm.migration_ids_to_import = { copy: { all_course_settings: "1" } }
+      expect(@cm.import_object?("course_settings", "")).to be true
+    end
+
     it "returns false for objects not selected" do
       @cm.save!
       @cm.migration_ids_to_import = { copy: { all_content_migrations: "0" } }
@@ -212,7 +217,7 @@ describe ContentMigration do
 
   it "excludes user-hidden migration plugins" do
     ab = Canvas::Plugin.find(:academic_benchmark_importer)
-    expect(ContentMigration.migration_plugins(true)).not_to include(ab)
+    expect(ContentMigration.migration_plugins(exclude_hidden: true)).not_to include(ab)
   end
 
   context "zip file import" do
@@ -250,7 +255,7 @@ describe ContentMigration do
     end
 
     it "records the job id" do
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123))
       cm = setup_zip_import(@course)
       test_zip_import(@course, cm)
       expect(cm.reload.migration_settings[:job_ids]).to eq([123])
@@ -282,7 +287,7 @@ describe ContentMigration do
     it "does not expand the mac system folder" do
       cm = setup_zip_import(@course, "macfile.zip")
       test_zip_import(@course, cm, 4)
-      expect(@course.folders.pluck(:name)).to_not include("__MACOSX")
+      expect(@course.folders.pluck(:name)).not_to include("__MACOSX")
     end
 
     it "updates unzip progress often" do
@@ -351,7 +356,8 @@ describe ContentMigration do
                                              global_identifiers: true,
                                              for_content_export: true)
       end
-      let(:dev_key) { DeveloperKey.create! }
+      let(:lti_registration) { lti_registration_with_tool(account: course.account) }
+      let(:dev_key) { lti_registration.developer_key }
       let(:tool) do
         # ContentMigrations change things that were nil to their default values,
         # like an empty array or hash. This changes the identity hash, so we
@@ -440,7 +446,7 @@ describe ContentMigration do
         let(:assignments) do
           assignments = []
           3.times do |i|
-            dev_key = DeveloperKey.create!
+            dev_key = lti_registration_with_tool(account: course.account).developer_key
             tool = external_tool_1_3_model(context: course,
                                            opts: {
                                              developer_key: dev_key,
@@ -780,7 +786,7 @@ describe ContentMigration do
     expect(plain_text).to eq "This is &lt;b&gt;Bold&lt;/b&gt;"
   end
 
-  it "identifies and import compressed tarball archives" do
+  it "identifies and imports compressed tarball archives" do
     skip unless Qti.qti_enabled?
 
     cm = @cm
@@ -1036,7 +1042,7 @@ describe ContentMigration do
           .and_return(false)
       end
 
-      let(:importer) { class_double("Importers::CourseContentImporter") }
+      let(:importer) { class_double(Importers::CourseContentImporter) }
 
       it "should not calls QuizzesNext::Importers" do
         expect(QuizzesNext::Importers::CourseContentImporter)
@@ -1435,131 +1441,158 @@ describe ContentMigration do
     context "when :disable_adding_uuid_verifier_in_api flag is off" do
       before :once do
         Account.default.disable_feature!(:disable_adding_uuid_verifier_in_api)
+        # not actually doing a course copy here, just simulating a finished one
+        @src = course_factory
+        @dst = course_factory
+        @old = @src.assignments.create! title: "foo"
+        @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
+
+        @old_wp = @src.wiki_pages.create! title: "bar"
+        @new_wp = @dst.wiki_pages.create!(
+          title: "bar",
+          migration_id: CC::CCHelper.create_key(@old_wp, global: true)
+        )
+
+        @cm = @dst.content_migrations.build(migration_type: "course_copy_importer", user: @teacher)
+        @cm.workflow_state = "imported"
+        @cm.source_course = @src
+        @cm.save!
       end
 
-      context "when the :content_migration_asset_map_v2 flag is off" do
-        before :once do
-          # not actually doing a course copy here, just simulating a finished one
-          @src = course_factory
-          @dst = course_factory
-          @old = @src.assignments.create! title: "foo"
-          @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
-
-          @old_wp = @src.wiki_pages.create! title: "bar"
-          @new_wp = @dst.wiki_pages.create!(
-            title: "bar",
-            migration_id: CC::CCHelper.create_key(@old_wp, global: true)
-          )
-          @cm = @dst.content_migrations.build(migration_type: "course_copy_importer", user: @teacher)
-          @cm.workflow_state = "imported"
-          @cm.source_course = @src
-          @cm.save!
-        end
-
-        def expect_map_to_be_generated
-          allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
-          url = @cm.asset_map_url(generate_if_needed: true)
-          @cm.reload
-          expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
-          expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
-          expect(@cm.asset_map_attachment.context).to eq @cm
-          json = JSON.parse(@cm.asset_map_attachment.open.read)
-          expect(json).to eq({ "source_course" => @src.id.to_s,
-                               "source_host" => "pineapple.edu",
-                               "contains_migration_ids" => false,
-                               "migration_user_uuid" => @cm.user.uuid,
-                               "resource_mapping" => {
-                                 "assignments" => { @old.id.to_s => @new.id.to_s },
-                                 "pages" => { @old_wp.id.to_s => @new_wp.id.to_s }
-                               } })
-        end
-
-        it "returns a url to a file containing the asset map" do
-          expect_map_to_be_generated
-        end
-
-        context "when not on a test cluster" do
-          let(:content_migration) do
-            @cm.update!(source_course:)
-
-            @cm
-          end
-          let(:source_course) { course_factory }
-
-          before do
-            allow(ApplicationController).to receive(:test_cluster_name).and_return nil
-            allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
-          end
-
-          it "uses the 'production' host" do
-            expect(content_migration.context.root_account).to receive(:domain).with(nil)
-
-            content_migration.asset_map_url(generate_if_needed: true)
-          end
-        end
-
-        context "when on a test cluster" do
-          let(:content_migration) do
-            @cm.update!(source_course:)
-
-            @cm
-          end
-          let(:source_course) { course_factory }
-
-          before do
-            allow(ApplicationController).to receive(:test_cluster_name).and_return "banana"
-            allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
-          end
-
-          it "uses the test host" do
-            expect(content_migration.context.root_account).to receive(:domain).with("banana")
-
-            content_migration.asset_map_url(generate_if_needed: true)
-          end
-        end
-
-        context "when the permanent_page_links flag is on" do
-          before do
-            Account.site_admin.enable_feature!(:permanent_page_links)
-          end
-
-          after do
-            Account.site_admin.disable_feature!(:permanent_page_links)
-          end
-
-          it "generates the asset map" do
-            expect_map_to_be_generated
-          end
-        end
+      before do
+        allow(HostUrl).to receive_messages(default_host: "pineapple.edu", context_hosts: ["apple.edu", "kiwi.edu:8080"])
       end
 
-      context "when the :content_migration_asset_map_v2 flag is on" do
-        before :once do
-          # not actually doing a course copy here, just simulating a finished one
-          @src = course_factory
-          @dst = course_factory
-          @old = @src.assignments.create! title: "foo"
-          @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
+      it "returns a url to a file containing the asset map" do
+        url = @cm.asset_map_url(generate_if_needed: true)
 
-          @old_wp = @src.wiki_pages.create! title: "bar"
-          @new_wp = @dst.wiki_pages.create!(
-            title: "bar",
-            migration_id: CC::CCHelper.create_key(@old_wp, global: true)
-          )
+        @cm.reload
+        expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+        expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
+        expect(@cm.asset_map_attachment.context).to eq @cm
+        json = JSON.parse(@cm.asset_map_attachment.open.read)
+        old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
+        old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
+        expect(json).to eq({ "source_course" => @src.id.to_s,
+                             "source_host" => "pineapple.edu",
+                             "destination_course" => @dst.id.to_s,
+                             "destination_hosts" => ["apple.edu", "kiwi.edu"],
+                             "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                             "migration_user_uuid" => @cm.user.uuid,
+                             "resource_mapping" => {
+                               "assignments" => {
+                                 @old.id.to_s => @new.id.to_s,
+                                 old_migration_id => {
+                                   "source" => { "id" => @old.id.to_s },
+                                   "destination" => { "id" => @new.id.to_s }
+                                 }
+                               },
+                               "pages" => {
+                                 @old_wp.id.to_s => @new_wp.id.to_s,
+                                 old_wp_migration_id => {
+                                   "source" => {
+                                     "id" => @old_wp.id.to_s,
+                                     "url" => @old_wp.url.to_s,
+                                     "current_lookup_id" => @old_wp.current_lookup_id
+                                   },
+                                   "destination" => {
+                                     "id" => @new_wp.id.to_s,
+                                     "url" => @new_wp.url.to_s,
+                                     "current_lookup_id" => @new_wp.current_lookup_id
+                                   }
+                                 }
+                               }
+                             },
+                             "attachment_path_id_lookup" => nil })
+      end
 
-          @cm = @dst.content_migrations.build(migration_type: "course_copy_importer", user: @teacher)
-          @cm.workflow_state = "imported"
-          @cm.source_course = @src
-          @cm.save!
-        end
+      it "returns a url to a file containing the asset map for QTI imports" do
+        @cm.source_course = nil
+        @cm.migration_type = "qti_converter"
+        @cm.save!
 
+        url = @cm.asset_map_url(generate_if_needed: true)
+
+        @cm.reload
+        expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+        expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
+        expect(@cm.asset_map_attachment.context).to eq @cm
+        json = JSON.parse(@cm.asset_map_attachment.open.read)
+        old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
+        old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
+        expect(json).to eq({ "source_course" => nil,
+                             "source_host" => nil,
+                             "destination_course" => @dst.id.to_s,
+                             "destination_hosts" => ["apple.edu", "kiwi.edu"],
+                             "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                             "migration_user_uuid" => @cm.user.uuid,
+                             "resource_mapping" => {
+                               "assignments" => {
+                                 old_migration_id => {
+                                   "source" => {},
+                                   "destination" => { "id" => @new.id.to_s }
+                                 },
+                               },
+                               "pages" => {
+                                 old_wp_migration_id => {
+                                   "source" => {},
+                                   "destination" => {
+                                     "id" => @new_wp.id.to_s,
+                                     "url" => @new_wp.url.to_s,
+                                     "current_lookup_id" => @new_wp.current_lookup_id
+                                   }
+                                 }
+                               }
+                             },
+                             "attachment_path_id_lookup" => nil })
+      end
+
+      context "with file_verifiers_for_quiz_links enabled" do
         before do
-          allow(HostUrl).to receive_messages(default_host: "pineapple.edu", context_hosts: ["apple.edu", "kiwi.edu:8080"])
-          Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
+          Account.site_admin.enable_feature!(:file_verifiers_for_quiz_links)
+        end
+
+        it "shows files that were created for quizzes that aren't in Canvas in the asset map" do
+          old = attachment_model(context: @src, filename: "foo.txt")
+          attachment_model(context: @dst, filename: "foo.txt", migration_id: CC::CCHelper.create_key(old, global: true))
+          att = attachment_model(context: @dst, filename: "bar.txt", migration_id: "what_quizzes_put_in_here")
+
+          @cm.asset_map_url(generate_if_needed: true)
+
+          @cm.reload
+          json = JSON.parse(@cm.asset_map_attachment.open.read)
+          expect(json["resource_mapping"]["files"]).to include({
+                                                                 "what_quizzes_put_in_here" => {
+                                                                   "source" => {},
+                                                                   "destination" => {
+                                                                     "id" => att.id.to_s,
+                                                                     "media_entry_id" => nil,
+                                                                     "uuid" => att.uuid
+                                                                   },
+                                                                 },
+                                                               })
+        end
+      end
+
+      it "shows files that were created for quizzes that aren't in Canvas in the asset map" do
+        old = attachment_model(context: @src, filename: "foo.txt")
+        attachment_model(context: @dst, filename: "foo.txt", migration_id: CC::CCHelper.create_key(old, global: true))
+        att = attachment_model(context: @dst, filename: "bar.txt", migration_id: "what_quizzes_put_in_here")
+
+        @cm.asset_map_url(generate_if_needed: true)
+
+        @cm.reload
+        json = JSON.parse(@cm.asset_map_attachment.open.read)
+        expect(json["resource_mapping"]["files"]["what_quizzes_put_in_here"]["destination"]).not_to include({ "uuid" => att.uuid })
+      end
+
+      context "when the permanent_page_links flag is on" do
+        before do
+          Account.site_admin.enable_feature!(:permanent_page_links)
         end
 
         after do
-          Account.site_admin.disable_feature!(:content_migration_asset_map_v2)
+          Account.site_admin.disable_feature!(:permanent_page_links)
         end
 
         it "returns a url to a file containing the asset map" do
@@ -1574,7 +1607,6 @@ describe ContentMigration do
           old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
           expect(json).to eq({ "source_course" => @src.id.to_s,
                                "source_host" => "pineapple.edu",
-                               "contains_migration_ids" => true,
                                "destination_course" => @dst.id.to_s,
                                "destination_hosts" => ["apple.edu", "kiwi.edu"],
                                "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
@@ -1622,7 +1654,6 @@ describe ContentMigration do
           old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
           expect(json).to eq({ "source_course" => nil,
                                "source_host" => nil,
-                               "contains_migration_ids" => true,
                                "destination_course" => @dst.id.to_s,
                                "destination_hosts" => ["apple.edu", "kiwi.edu"],
                                "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
@@ -1632,7 +1663,7 @@ describe ContentMigration do
                                    old_migration_id => {
                                      "source" => {},
                                      "destination" => { "id" => @new.id.to_s }
-                                   },
+                                   }
                                  },
                                  "pages" => {
                                    old_wp_migration_id => {
@@ -1646,269 +1677,164 @@ describe ContentMigration do
                                  }
                                },
                                "attachment_path_id_lookup" => nil })
-        end
-
-        context "with file_verifiers_for_quiz_links enabled" do
-          before do
-            Account.site_admin.enable_feature!(:file_verifiers_for_quiz_links)
-          end
-
-          it "shows files that were created for quizzes that aren't in Canvas in the asset map" do
-            old = attachment_model(context: @src, filename: "foo.txt")
-            attachment_model(context: @dst, filename: "foo.txt", migration_id: CC::CCHelper.create_key(old, global: true))
-            att = attachment_model(context: @dst, filename: "bar.txt", migration_id: "what_quizzes_put_in_here")
-
-            @cm.asset_map_url(generate_if_needed: true)
-
-            @cm.reload
-            json = JSON.parse(@cm.asset_map_attachment.open.read)
-            expect(json["resource_mapping"]["files"]).to include({
-                                                                   "what_quizzes_put_in_here" => {
-                                                                     "source" => {},
-                                                                     "destination" => {
-                                                                       "id" => att.id.to_s,
-                                                                       "media_entry_id" => nil,
-                                                                       "uuid" => att.uuid
-                                                                     },
-                                                                   },
-                                                                 })
-          end
-        end
-
-        it "shows files that were created for quizzes that aren't in Canvas in the asset map" do
-          old = attachment_model(context: @src, filename: "foo.txt")
-          attachment_model(context: @dst, filename: "foo.txt", migration_id: CC::CCHelper.create_key(old, global: true))
-          att = attachment_model(context: @dst, filename: "bar.txt", migration_id: "what_quizzes_put_in_here")
-
-          @cm.asset_map_url(generate_if_needed: true)
-
-          @cm.reload
-          json = JSON.parse(@cm.asset_map_attachment.open.read)
-          expect(json["resource_mapping"]["files"]["what_quizzes_put_in_here"]["destination"]).not_to include({ "uuid" => att.uuid })
-        end
-
-        context "when the permanent_page_links flag is on" do
-          before do
-            Account.site_admin.enable_feature!(:permanent_page_links)
-          end
-
-          after do
-            Account.site_admin.disable_feature!(:permanent_page_links)
-          end
-
-          it "returns a url to a file containing the asset map" do
-            url = @cm.asset_map_url(generate_if_needed: true)
-
-            @cm.reload
-            expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
-            expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
-            expect(@cm.asset_map_attachment.context).to eq @cm
-            json = JSON.parse(@cm.asset_map_attachment.open.read)
-            old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
-            old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
-            expect(json).to eq({ "source_course" => @src.id.to_s,
-                                 "source_host" => "pineapple.edu",
-                                 "contains_migration_ids" => true,
-                                 "destination_course" => @dst.id.to_s,
-                                 "destination_hosts" => ["apple.edu", "kiwi.edu"],
-                                 "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
-                                 "migration_user_uuid" => @cm.user.uuid,
-                                 "resource_mapping" => {
-                                   "assignments" => {
-                                     @old.id.to_s => @new.id.to_s,
-                                     old_migration_id => {
-                                       "source" => { "id" => @old.id.to_s },
-                                       "destination" => { "id" => @new.id.to_s }
-                                     }
-                                   },
-                                   "pages" => {
-                                     @old_wp.id.to_s => @new_wp.id.to_s,
-                                     old_wp_migration_id => {
-                                       "source" => {
-                                         "id" => @old_wp.id.to_s,
-                                         "url" => @old_wp.url.to_s,
-                                         "current_lookup_id" => @old_wp.current_lookup_id
-                                       },
-                                       "destination" => {
-                                         "id" => @new_wp.id.to_s,
-                                         "url" => @new_wp.url.to_s,
-                                         "current_lookup_id" => @new_wp.current_lookup_id
-                                       }
-                                     }
-                                   }
-                                 },
-                                 "attachment_path_id_lookup" => nil })
-          end
-
-          it "returns a url to a file containing the asset map for QTI imports" do
-            @cm.source_course = nil
-            @cm.migration_type = "qti_converter"
-            @cm.save!
-
-            url = @cm.asset_map_url(generate_if_needed: true)
-
-            @cm.reload
-            expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
-            expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
-            expect(@cm.asset_map_attachment.context).to eq @cm
-            json = JSON.parse(@cm.asset_map_attachment.open.read)
-            old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
-            old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
-            expect(json).to eq({ "source_course" => nil,
-                                 "source_host" => nil,
-                                 "contains_migration_ids" => true,
-                                 "destination_course" => @dst.id.to_s,
-                                 "destination_hosts" => ["apple.edu", "kiwi.edu"],
-                                 "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
-                                 "migration_user_uuid" => @cm.user.uuid,
-                                 "resource_mapping" => {
-                                   "assignments" => {
-                                     old_migration_id => {
-                                       "source" => {},
-                                       "destination" => { "id" => @new.id.to_s }
-                                     }
-                                   },
-                                   "pages" => {
-                                     old_wp_migration_id => {
-                                       "source" => {},
-                                       "destination" => {
-                                         "id" => @new_wp.id.to_s,
-                                         "url" => @new_wp.url.to_s,
-                                         "current_lookup_id" => @new_wp.current_lookup_id
-                                       }
-                                     }
-                                   }
-                                 },
-                                 "attachment_path_id_lookup" => nil })
-          end
         end
       end
     end
 
     context "when the :disable_adding_uuid_verifier_in_api flag is on" do
-      context "when the :content_migration_asset_map_v2 flag is off" do
-        before :once do
-          # not actually doing a course copy here, just simulating a finished one
-          @src = course_factory
-          @dst = course_factory
-          @old = @src.assignments.create! title: "foo"
-          @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
+      before :once do
+        # not actually doing a course copy here, just simulating a finished one
+        @src = course_factory
+        @dst = course_factory
+        @old = @src.assignments.create! title: "foo"
+        @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
 
-          @old_wp = @src.wiki_pages.create! title: "bar"
-          @new_wp = @dst.wiki_pages.create!(
-            title: "bar",
-            migration_id: CC::CCHelper.create_key(@old_wp, global: true)
-          )
-          @cm = @dst.content_migrations.build(migration_type: "course_copy_importer", user: @teacher)
-          @cm.workflow_state = "imported"
-          @cm.source_course = @src
-          @cm.save!
+        @old_wp = @src.wiki_pages.create! title: "bar"
+        @new_wp = @dst.wiki_pages.create!(
+          title: "bar",
+          migration_id: CC::CCHelper.create_key(@old_wp, global: true)
+        )
+
+        @cm = @dst.content_migrations.build(migration_type: "course_copy_importer", user: @teacher)
+        @cm.workflow_state = "imported"
+        @cm.source_course = @src
+        @cm.save!
+      end
+
+      before do
+        allow(HostUrl).to receive_messages(default_host: "pineapple.edu", context_hosts: ["apple.edu", "kiwi.edu:8080"])
+      end
+
+      it "returns a url to a file containing the asset map" do
+        url = @cm.asset_map_url(generate_if_needed: true)
+
+        @cm.reload
+        expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+        expect(url).not_to include "verifier=#{@cm.asset_map_attachment.uuid}"
+        expect(@cm.asset_map_attachment.context).to eq @cm
+        json = JSON.parse(@cm.asset_map_attachment.open.read)
+        old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
+        old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
+        expect(json).to eq({ "source_course" => @src.id.to_s,
+                             "source_host" => "pineapple.edu",
+                             "destination_course" => @dst.id.to_s,
+                             "destination_hosts" => ["apple.edu", "kiwi.edu"],
+                             "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                             "migration_user_uuid" => @cm.user.uuid,
+                             "resource_mapping" => {
+                               "assignments" => {
+                                 @old.id.to_s => @new.id.to_s,
+                                 old_migration_id => {
+                                   "source" => { "id" => @old.id.to_s },
+                                   "destination" => { "id" => @new.id.to_s }
+                                 }
+                               },
+                               "pages" => {
+                                 @old_wp.id.to_s => @new_wp.id.to_s,
+                                 old_wp_migration_id => {
+                                   "source" => {
+                                     "id" => @old_wp.id.to_s,
+                                     "url" => @old_wp.url.to_s,
+                                     "current_lookup_id" => @old_wp.current_lookup_id
+                                   },
+                                   "destination" => {
+                                     "id" => @new_wp.id.to_s,
+                                     "url" => @new_wp.url.to_s,
+                                     "current_lookup_id" => @new_wp.current_lookup_id
+                                   }
+                                 }
+                               }
+                             },
+                             "attachment_path_id_lookup" => nil })
+      end
+
+      it "returns a url to a file containing the asset map for QTI imports" do
+        @cm.source_course = nil
+        @cm.migration_type = "qti_converter"
+        @cm.save!
+
+        url = @cm.asset_map_url(generate_if_needed: true)
+
+        @cm.reload
+        expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+        expect(url).not_to include "verifier=#{@cm.asset_map_attachment.uuid}"
+        expect(@cm.asset_map_attachment.context).to eq @cm
+        json = JSON.parse(@cm.asset_map_attachment.open.read)
+        old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
+        old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
+        expect(json).to eq({ "source_course" => nil,
+                             "source_host" => nil,
+                             "destination_course" => @dst.id.to_s,
+                             "destination_hosts" => ["apple.edu", "kiwi.edu"],
+                             "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                             "migration_user_uuid" => @cm.user.uuid,
+                             "resource_mapping" => {
+                               "assignments" => {
+                                 old_migration_id => {
+                                   "source" => {},
+                                   "destination" => { "id" => @new.id.to_s }
+                                 },
+                               },
+                               "pages" => {
+                                 old_wp_migration_id => {
+                                   "source" => {},
+                                   "destination" => {
+                                     "id" => @new_wp.id.to_s,
+                                     "url" => @new_wp.url.to_s,
+                                     "current_lookup_id" => @new_wp.current_lookup_id
+                                   }
+                                 }
+                               }
+                             },
+                             "attachment_path_id_lookup" => nil })
+      end
+
+      context "with file_verifiers_for_quiz_links enabled" do
+        before do
+          Account.site_admin.enable_feature!(:file_verifiers_for_quiz_links)
         end
 
-        def expect_map_to_be_generated
-          allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
-          url = @cm.asset_map_url(generate_if_needed: true)
+        it "shows files that were created for quizzes that aren't in Canvas in the asset map" do
+          old = attachment_model(context: @src, filename: "foo.txt")
+          attachment_model(context: @dst, filename: "foo.txt", migration_id: CC::CCHelper.create_key(old, global: true))
+          att = attachment_model(context: @dst, filename: "bar.txt", migration_id: "what_quizzes_put_in_here")
+
+          @cm.asset_map_url(generate_if_needed: true)
+
           @cm.reload
-          expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
-          expect(url).not_to include "verifier=#{@cm.asset_map_attachment.uuid}"
-          expect(@cm.asset_map_attachment.context).to eq @cm
           json = JSON.parse(@cm.asset_map_attachment.open.read)
-          expect(json).to eq({ "source_course" => @src.id.to_s,
-                               "source_host" => "pineapple.edu",
-                               "contains_migration_ids" => false,
-                               "migration_user_uuid" => @cm.user.uuid,
-                               "resource_mapping" => {
-                                 "assignments" => { @old.id.to_s => @new.id.to_s },
-                                 "pages" => { @old_wp.id.to_s => @new_wp.id.to_s }
-                               } })
-        end
-
-        it "returns a url to a file containing the asset map" do
-          expect_map_to_be_generated
-        end
-
-        context "when not on a test cluster" do
-          let(:content_migration) do
-            @cm.update!(source_course:)
-
-            @cm
-          end
-          let(:source_course) { course_factory }
-
-          before do
-            allow(ApplicationController).to receive(:test_cluster_name).and_return nil
-            allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
-          end
-
-          it "uses the 'production' host" do
-            expect(content_migration.context.root_account).to receive(:domain).with(nil)
-
-            content_migration.asset_map_url(generate_if_needed: true)
-          end
-        end
-
-        context "when on a test cluster" do
-          let(:content_migration) do
-            @cm.update!(source_course:)
-
-            @cm
-          end
-          let(:source_course) { course_factory }
-
-          before do
-            allow(ApplicationController).to receive(:test_cluster_name).and_return "banana"
-            allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
-          end
-
-          it "uses the test host" do
-            expect(content_migration.context.root_account).to receive(:domain).with("banana")
-
-            content_migration.asset_map_url(generate_if_needed: true)
-          end
-        end
-
-        context "when the permanent_page_links flag is on" do
-          before do
-            Account.site_admin.enable_feature!(:permanent_page_links)
-          end
-
-          after do
-            Account.site_admin.disable_feature!(:permanent_page_links)
-          end
-
-          it "generates the asset map" do
-            expect_map_to_be_generated
-          end
+          expect(json["resource_mapping"]["files"]).to include({
+                                                                 "what_quizzes_put_in_here" => {
+                                                                   "source" => {},
+                                                                   "destination" => {
+                                                                     "id" => att.id.to_s,
+                                                                     "media_entry_id" => nil,
+                                                                     "uuid" => att.uuid
+                                                                   },
+                                                                 },
+                                                               })
         end
       end
 
-      context "when the :content_migration_asset_map_v2 flag is on" do
-        before :once do
-          # not actually doing a course copy here, just simulating a finished one
-          @src = course_factory
-          @dst = course_factory
-          @old = @src.assignments.create! title: "foo"
-          @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
+      it "shows files that were created for quizzes that aren't in Canvas in the asset map" do
+        old = attachment_model(context: @src, filename: "foo.txt")
+        attachment_model(context: @dst, filename: "foo.txt", migration_id: CC::CCHelper.create_key(old, global: true))
+        att = attachment_model(context: @dst, filename: "bar.txt", migration_id: "what_quizzes_put_in_here")
 
-          @old_wp = @src.wiki_pages.create! title: "bar"
-          @new_wp = @dst.wiki_pages.create!(
-            title: "bar",
-            migration_id: CC::CCHelper.create_key(@old_wp, global: true)
-          )
+        @cm.asset_map_url(generate_if_needed: true)
 
-          @cm = @dst.content_migrations.build(migration_type: "course_copy_importer", user: @teacher)
-          @cm.workflow_state = "imported"
-          @cm.source_course = @src
-          @cm.save!
-        end
+        @cm.reload
+        json = JSON.parse(@cm.asset_map_attachment.open.read)
+        expect(json["resource_mapping"]["files"]["what_quizzes_put_in_here"]["destination"]).not_to include({ "uuid" => att.uuid })
+      end
 
+      context "when the permanent_page_links flag is on" do
         before do
-          allow(HostUrl).to receive_messages(default_host: "pineapple.edu", context_hosts: ["apple.edu", "kiwi.edu:8080"])
-          Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
+          Account.site_admin.enable_feature!(:permanent_page_links)
         end
 
         after do
-          Account.site_admin.disable_feature!(:content_migration_asset_map_v2)
+          Account.site_admin.disable_feature!(:permanent_page_links)
         end
 
         it "returns a url to a file containing the asset map" do
@@ -1923,7 +1849,6 @@ describe ContentMigration do
           old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
           expect(json).to eq({ "source_course" => @src.id.to_s,
                                "source_host" => "pineapple.edu",
-                               "contains_migration_ids" => true,
                                "destination_course" => @dst.id.to_s,
                                "destination_hosts" => ["apple.edu", "kiwi.edu"],
                                "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
@@ -1971,7 +1896,6 @@ describe ContentMigration do
           old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
           expect(json).to eq({ "source_course" => nil,
                                "source_host" => nil,
-                               "contains_migration_ids" => true,
                                "destination_course" => @dst.id.to_s,
                                "destination_hosts" => ["apple.edu", "kiwi.edu"],
                                "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
@@ -1981,7 +1905,7 @@ describe ContentMigration do
                                    old_migration_id => {
                                      "source" => {},
                                      "destination" => { "id" => @new.id.to_s }
-                                   },
+                                   }
                                  },
                                  "pages" => {
                                    old_wp_migration_id => {
@@ -1996,140 +1920,394 @@ describe ContentMigration do
                                },
                                "attachment_path_id_lookup" => nil })
         end
+      end
+    end
+  end
 
-        context "with file_verifiers_for_quiz_links enabled" do
-          before do
-            Account.site_admin.enable_feature!(:file_verifiers_for_quiz_links)
-          end
+  context "creating attachment associations" do
+    include_context "course copy"
 
-          it "shows files that were created for quizzes that aren't in Canvas in the asset map" do
-            old = attachment_model(context: @src, filename: "foo.txt")
-            attachment_model(context: @dst, filename: "foo.txt", migration_id: CC::CCHelper.create_key(old, global: true))
-            att = attachment_model(context: @dst, filename: "bar.txt", migration_id: "what_quizzes_put_in_here")
+    it "creates attachment associations during imports" do
+      @copy_to = @cm.context
+      mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
+      user_att1 = @teacher.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "sekret")
+      user_att2 = @teacher.attachments.create(id: 100_000_000_002, uploaded_data: fixture_file_upload("instructure.png"), uuid: "sekret2")
+      user_att3 = @teacher.attachments.create(id: 100_000_000_003, uploaded_data: fixture_file_upload("test_image.jpg"), uuid: "sekret3")
+      user_att4 = @teacher.attachments.create(id: 100_000_000_004, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "sekret4")
+      run_import(mig_att.id)
+      course_att1 = @copy_to.attachments.find_by(migration_id: "ge928eec163f37c0b61e80a894e6fd1ba")
+      course_att2 = @copy_to.attachments.find_by(migration_id: "gd91205577b505bf54004413542b7bc8f")
+      course_att3 = @copy_to.attachments.find_by(migration_id: "g5e93e9ae3fda026e2dd50748c5e73be3")
+      course_att4 = @copy_to.attachments.find_by(migration_id: "gde8766ea2e0e0caec384afbd42abff7a")
+      aq_att1 = @copy_to.attachments.find_by(migration_id: "g1ff2608316adc0fea6b11d467802d489")
+      aq_att2 = @copy_to.attachments.find_by(migration_id: "gb2c45b1f7e46fdd4ff7f00667378c740")
+      aq_att3 = @copy_to.attachments.find_by(migration_id: "g7191e0c44af1be2f5bb3b3a06e5a08ee")
+      aq_att4 = @copy_to.attachments.find_by(migration_id: "gd9b1ab391754152b6a6ced71370b306a")
 
-            @cm.asset_map_url(generate_if_needed: true)
+      # Syllabus
+      expect(@copy_to.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
 
-            @cm.reload
-            json = JSON.parse(@cm.asset_map_attachment.open.read)
-            expect(json["resource_mapping"]["files"]).to include({
-                                                                   "what_quizzes_put_in_here" => {
-                                                                     "source" => {},
-                                                                     "destination" => {
-                                                                       "id" => att.id.to_s,
-                                                                       "media_entry_id" => nil,
-                                                                       "uuid" => att.uuid
-                                                                     },
-                                                                   },
-                                                                 })
+      # Announcements
+      announcement1 = @copy_to.announcements.find_by(migration_id: "g30b2d9e601dc05f254d87b77c1031a93")
+      announcement2 = @copy_to.announcements.find_by(migration_id: "g56c0929f69c2967a2651f95f89e5c9ba")
+      expect(announcement1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(announcement2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Assignments
+      assignment1 = @copy_to.assignments.find_by(migration_id: "g4ca1d58c8946b27f14e91181625a6d8e")
+      assignment2 = @copy_to.assignments.find_by(migration_id: "g19aade4d7fe339e69183df246429ac22")
+      expect(assignment1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(assignment2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Calendar Events
+      calendar_event1 = @copy_to.calendar_events.find_by(migration_id: "g178f17835368bb297554a3f7c63e5589")
+      calendar_event2 = @copy_to.calendar_events.find_by(migration_id: "g3b34792093f1bf6fc5a4bb47a036fe5d")
+      expect(calendar_event1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(calendar_event2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Discussion Topics
+      discussion1 = @copy_to.discussion_topics.find_by(migration_id: "g14c7dc3dd951b0307fd7313abd640a32")
+      discussion2 = @copy_to.discussion_topics.find_by(migration_id: "ga3d3feeba4b59114a04d14f4958d41bc")
+      expect(discussion1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(discussion1.assignment.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(discussion2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+      expect(discussion2.assignment.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Outcomes
+      outcome1 = @copy_to.learning_outcomes.find_by(migration_id: "g490cf41c1abd43daef779ba114f43d05")
+      outcome2 = @copy_to.learning_outcomes.find_by(migration_id: "g468bd697538ae5f8a2edabecae834430")
+      expect(outcome1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(outcome2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Outcome Groups
+      outcome_group1 = @copy_to.learning_outcome_groups.find_by(migration_id: "gfab89850a1b0ca6aebab2eb4267d0783")
+      outcome_group2 = @copy_to.learning_outcome_groups.find_by(migration_id: "g3b5c6d92ced0a73c668137478dc8bcb9")
+      expect(outcome_group1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(outcome_group2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Pages
+      page1 = @copy_to.wiki_pages.find_by(migration_id: "gd7317fea42eb13fb5bc92127baabdf8d")
+      page2 = @copy_to.wiki_pages.find_by(migration_id: "g5870e63ac70483ee49477ae0ee284d66")
+      expect(page1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(page2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Quizzes
+      quiz1 = @copy_to.quizzes.find_by(migration_id: "g16bf75ed6636a1c1ff52cd643355de37")
+      quiz2 = @copy_to.quizzes.find_by(migration_id: "g5937bf4cc9f3ff85f138215e21fb776a")
+      expect(quiz1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(quiz1.assignment.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id])
+      expect(quiz2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+      expect(quiz2.assignment.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id])
+
+      # Quiz Questions
+      question1 = quiz1.quiz_questions.first
+      question2 = quiz2.quiz_questions.first
+      aq_question = @copy_to.quizzes.find_by(migration_id: "g7ac529a0e5f5a22a49d1076b16027515").quiz_questions.first
+      expect(question1.attachment_associations.pluck(:attachment_id)).to match_array([course_att1.id, course_att2.id, course_att3.id, course_att4.id])
+      expect(question2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id, user_att2.id, user_att3.id, user_att4.id])
+      expect(aq_question.attachment_associations.pluck(:attachment_id)).to match_array([aq_att1.id, aq_att2.id, aq_att3.id, aq_att4.id])
+
+      # Assessment Questions
+      aq1 = @copy_to.assessment_questions.find { |aq| aq.migration_id == "g35ed128ee5141890513071a090a55ea1" }
+      aq2 = @copy_to.assessment_questions.find { |aq| aq.migration_id == "gaf93143a49786b1582443d81cd6e2b4a" }
+      expect(aq1.attachments.pluck(:display_name)).to match_array(%w[27.jpg ab.jpg basic_sql.png beavercode1.png])
+      expect(aq2.attachments.pluck(:display_name)).to match_array(%w[cn_image.jpg instructure.png test_image.jpg])
+    end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      it "creates attachment_associations during content migration for user attachments with matching UUIDs" do
+        other_user = user_factory
+        @copy_to = @cm.context
+        mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
+        user_att1 = other_user.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "sekret")
+        @shard1.update(id: 5)
+        @shard1.activate do
+          second_shard_user = user_factory
+          @user_att2 = second_shard_user.attachments.create(id: 50_000_000_000_005, uploaded_data: fixture_file_upload("292.mp3"), uuid: "sekret")
+        end
+        run_import(mig_att.id)
+        page2 = @copy_to.wiki_pages.find_by(migration_id: "g5870e63ac70483ee49477ae0ee284d66")
+        expect(page2.attachment_associations.pluck(:attachment_id)).to match_array([user_att1.id, @user_att2.id])
+      end
+    end
+
+    it "does not create attachment_associations during content migration for user attachments without matching UUIDs" do
+      other_user = user_factory
+      @copy_to = @cm.context
+      mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
+      user_att1 = other_user.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "wrong_sekret")
+      user_att2 = other_user.attachments.create(id: 100_000_000_005, uploaded_data: fixture_file_upload("292.mp3"), uuid: "wrong_sekret")
+      run_import(mig_att.id)
+      page2 = @copy_to.wiki_pages.find_by(migration_id: "g5870e63ac70483ee49477ae0ee284d66")
+      expect(page2.attachment_associations.pluck(:attachment_id)).not_to match_array([user_att1.id, user_att2.id])
+    end
+
+    it "does not create attachment_associations during content migration for other course files" do
+      other_course = course_factory
+      other_file = other_course.attachments.create!(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"), uuid: "sekret")
+      @copy_to = @cm.context
+      mig_att = @copy_to.attachments.create(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("migration/migration_example.imscc"))
+      run_import(mig_att.id)
+      page1 = @copy_to.wiki_pages.find_by(migration_id: "gd7317fea42eb13fb5bc92127baabdf8d")
+      expect(page1.attachment_associations.pluck(:attachment_id)).not_to match_array([other_file.id])
+    end
+  end
+
+  context "syncing master deletions" do
+    context "deleting module item" do
+      def setup_master_course_deletion_test
+        # Setup master course and child course
+        master_course = course_factory
+        template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
+        child_course = course_factory
+        subscription = template.add_child_course!(child_course)
+
+        # Create content migration for child course
+        cm = ContentMigration.new(context: child_course, migration_type: "master_course_import")
+        cm.child_subscription_id = subscription.id
+        cm.save!
+
+        # Create module
+        mod = child_course.context_modules.create!(name: "Test Module", migration_id: "#{MasterCourses::MIGRATION_ID_PREFIX}_test_module_mig_id")
+
+        [child_course, subscription, cm, mod]
+      end
+
+      def verify_deletion_test(content_item, mod, subscription, deletion_key)
+        initial_downstream_changes = subscription.content_tag_for(mod).downstream_changes
+        expect(initial_downstream_changes).to be_empty
+
+        deletions = {
+          deletion_key => [content_item.migration_id]
+        }
+
+        yield deletions if block_given?
+
+        expect(content_item.reload).to be_deleted
+        expect(mod.reload.completion_requirements).to be_empty
+        module_content_tag = subscription.content_tag_for(mod)
+        expect(module_content_tag.reload.downstream_changes).to be_empty
+      end
+
+      it "does not mark downstream changes in module when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:skip_blueprint_module_downstream_changes)
+        child_course, subscription, cm, mod = setup_master_course_deletion_test
+
+        assignment = child_course.assignments.create!(name: "Test Assignment", points_possible: 10)
+        assignment.migration_id = "#{MasterCourses::MIGRATION_ID_PREFIX}_test_assignment_mig_id"
+        assignment.save!
+
+        tag = mod.add_item(type: "assignment", id: assignment.id)
+        mod.completion_requirements = [{ id: tag.id, type: "must_submit" }]
+        mod.save!
+
+        subscription.create_content_tag_for!(assignment)
+        subscription.create_content_tag_for!(mod)
+
+        verify_deletion_test(assignment, mod, subscription, "Assignment") do |deletions|
+          cm.process_master_deletions(deletions)
+        end
+      end
+
+      it "preserves old behavior when feature flag is disabled" do
+        Account.site_admin.disable_feature!(:skip_blueprint_module_downstream_changes)
+        child_course, subscription, cm, mod = setup_master_course_deletion_test
+
+        assignment = child_course.assignments.create!(name: "Test Assignment", points_possible: 10)
+        assignment.migration_id = "#{MasterCourses::MIGRATION_ID_PREFIX}_test_assignment_mig_id"
+        assignment.save!
+
+        tag = mod.add_item(type: "assignment", id: assignment.id)
+        mod.completion_requirements = [{ id: tag.id, type: "must_submit" }]
+        mod.save!
+
+        subscription.create_content_tag_for!(assignment)
+        subscription.create_content_tag_for!(mod)
+
+        initial_downstream_changes = subscription.content_tag_for(mod).downstream_changes
+        expect(initial_downstream_changes).to be_empty
+
+        deletions = {
+          "Assignment" => [assignment.migration_id]
+        }
+
+        cm.process_master_deletions(deletions)
+
+        expect(assignment.reload).to be_deleted
+        expect(subscription.content_tag_for(mod).downstream_changes).to eq(["completion_requirements"])
+      end
+
+      it "does not mark downstream changes in module for quiz deletion when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:skip_blueprint_module_downstream_changes)
+        child_course, subscription, cm, mod = setup_master_course_deletion_test
+
+        quiz = child_course.quizzes.create!(title: "Test Quiz", quiz_type: "assignment")
+        quiz.migration_id = "#{MasterCourses::MIGRATION_ID_PREFIX}_test_quiz_mig_id"
+        quiz.save!
+
+        tag = mod.add_item(type: "quiz", id: quiz.id)
+        mod.completion_requirements = [{ id: tag.id, type: "must_submit" }]
+        mod.save!
+
+        subscription.create_content_tag_for!(quiz)
+        subscription.create_content_tag_for!(mod)
+
+        verify_deletion_test(quiz, mod, subscription, "Quizzes::Quiz") do |deletions|
+          cm.process_master_deletions(deletions)
+        end
+      end
+
+      it "does not mark downstream changes in module for wiki page deletion when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:skip_blueprint_module_downstream_changes)
+        child_course, subscription, cm, mod = setup_master_course_deletion_test
+
+        wiki_page = child_course.wiki_pages.create!(title: "Test Page", body: "Test content")
+        wiki_page.migration_id = "#{MasterCourses::MIGRATION_ID_PREFIX}_test_page_mig_id"
+        wiki_page.save!
+
+        tag = mod.add_item(type: "wiki_page", id: wiki_page.id)
+        mod.completion_requirements = [{ id: tag.id, type: "must_view" }]
+        mod.save!
+
+        subscription.create_content_tag_for!(wiki_page)
+        subscription.create_content_tag_for!(mod)
+
+        verify_deletion_test(wiki_page, mod, subscription, "WikiPage") do |deletions|
+          cm.process_master_deletions(deletions)
+        end
+      end
+
+      it "does not mark downstream changes in module for discussion topic deletion when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:skip_blueprint_module_downstream_changes)
+        child_course, subscription, cm, mod = setup_master_course_deletion_test
+
+        discussion_topic = child_course.discussion_topics.create!(title: "Test Discussion", message: "Test message")
+        discussion_topic.migration_id = "#{MasterCourses::MIGRATION_ID_PREFIX}_test_discussion_mig_id"
+        discussion_topic.save!
+
+        tag = mod.add_item(type: "discussion_topic", id: discussion_topic.id)
+        mod.completion_requirements = [{ id: tag.id, type: "must_contribute" }]
+        mod.save!
+
+        subscription.create_content_tag_for!(discussion_topic)
+        subscription.create_content_tag_for!(mod)
+
+        verify_deletion_test(discussion_topic, mod, subscription, "DiscussionTopic") do |deletions|
+          cm.process_master_deletions(deletions)
+        end
+      end
+    end
+
+    context "deleting Lti::AssetProcessor" do
+      let(:master_course) { course_factory }
+      let(:template) { MasterCourses::MasterTemplate.set_as_master_course(master_course) }
+      let(:child_course) { course_factory }
+      let(:subscription) { template.add_child_course!(child_course) }
+      let(:cm) do
+        ContentMigration.create!(
+          context: child_course,
+          migration_type: "master_course_import",
+          child_subscription_id: subscription.id
+        )
+      end
+      let(:tool) do
+        child_course.context_external_tools.create!(
+          name: "Test Tool",
+          consumer_key: "key",
+          shared_secret: "secret",
+          url: "http://example.com/launch"
+        )
+      end
+      let(:deletions) { { "Lti::AssetProcessor" => [asset_processor.migration_id] } }
+
+      shared_examples "processes asset processor deletion" do |expected_state|
+        it "#{(expected_state == :deleted) ? "deletes" : "skips deletion of"} the asset processor" do
+          expect(asset_processor).to be_active
+          cm.process_master_deletions(deletions)
+          if expected_state == :deleted
+            expect(asset_processor.reload).to be_deleted
+          else
+            expect(asset_processor.reload).to be_active
           end
         end
+      end
 
-        it "shows files that were created for quizzes that aren't in Canvas in the asset map" do
-          old = attachment_model(context: @src, filename: "foo.txt")
-          attachment_model(context: @dst, filename: "foo.txt", migration_id: CC::CCHelper.create_key(old, global: true))
-          att = attachment_model(context: @dst, filename: "bar.txt", migration_id: "what_quizzes_put_in_here")
-
-          @cm.asset_map_url(generate_if_needed: true)
-
-          @cm.reload
-          json = JSON.parse(@cm.asset_map_attachment.open.read)
-          expect(json["resource_mapping"]["files"]["what_quizzes_put_in_here"]["destination"]).not_to include({ "uuid" => att.uuid })
+      context "with assignment" do
+        let(:assignment) { child_course.assignments.create!(title: "Test Assignment") }
+        let(:asset_processor) do
+          Lti::AssetProcessor.create!(
+            assignment:,
+            context_external_tool: tool,
+            url: "http://example.com/process",
+            title: "Test Processor",
+            migration_id: "#{MasterCourses::MIGRATION_ID_PREFIX}_test_processor_mig_id"
+          )
         end
 
-        context "when the permanent_page_links flag is on" do
+        before { subscription.create_content_tag_for!(assignment) }
+
+        context "without downstream changes" do
+          it_behaves_like "processes asset processor deletion", :deleted
+        end
+
+        context "with downstream changes and not locked" do
           before do
-            Account.site_admin.enable_feature!(:permanent_page_links)
+            content_tag = subscription.create_content_tag_for!(assignment)
+            content_tag.update!(downstream_changes: ["content"])
           end
 
-          after do
-            Account.site_admin.disable_feature!(:permanent_page_links)
+          it_behaves_like "processes asset processor deletion", :active
+        end
+
+        context "with downstream changes but locked" do
+          before do
+            assignment.update!(migration_id: "#{MasterCourses::MIGRATION_ID_PREFIX}_test_assignment_mig_id")
+            content_tag = subscription.create_content_tag_for!(assignment)
+            content_tag.update!(downstream_changes: ["content"])
+            allow_any_instance_of(Assignment).to receive(:editing_restricted?).with(:any).and_return(true)
           end
 
-          it "returns a url to a file containing the asset map" do
-            url = @cm.asset_map_url(generate_if_needed: true)
+          it_behaves_like "processes asset processor deletion", :deleted
+        end
+      end
 
-            @cm.reload
-            expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
-            expect(url).not_to include "verifier=#{@cm.asset_map_attachment.uuid}"
-            expect(@cm.asset_map_attachment.context).to eq @cm
-            json = JSON.parse(@cm.asset_map_attachment.open.read)
-            old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
-            old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
-            expect(json).to eq({ "source_course" => @src.id.to_s,
-                                 "source_host" => "pineapple.edu",
-                                 "contains_migration_ids" => true,
-                                 "destination_course" => @dst.id.to_s,
-                                 "destination_hosts" => ["apple.edu", "kiwi.edu"],
-                                 "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
-                                 "migration_user_uuid" => @cm.user.uuid,
-                                 "resource_mapping" => {
-                                   "assignments" => {
-                                     @old.id.to_s => @new.id.to_s,
-                                     old_migration_id => {
-                                       "source" => { "id" => @old.id.to_s },
-                                       "destination" => { "id" => @new.id.to_s }
-                                     }
-                                   },
-                                   "pages" => {
-                                     @old_wp.id.to_s => @new_wp.id.to_s,
-                                     old_wp_migration_id => {
-                                       "source" => {
-                                         "id" => @old_wp.id.to_s,
-                                         "url" => @old_wp.url.to_s,
-                                         "current_lookup_id" => @old_wp.current_lookup_id
-                                       },
-                                       "destination" => {
-                                         "id" => @new_wp.id.to_s,
-                                         "url" => @new_wp.url.to_s,
-                                         "current_lookup_id" => @new_wp.current_lookup_id
-                                       }
-                                     }
-                                   }
-                                 },
-                                 "attachment_path_id_lookup" => nil })
+      context "with discussion topic" do
+        let(:discussion_topic) { DiscussionTopic.create_graded_topic!(course: child_course, title: "Test Discussion") }
+        let(:assignment) { discussion_topic.assignment }
+        let(:asset_processor) do
+          Lti::AssetProcessor.create!(
+            assignment:,
+            context_external_tool: tool,
+            url: "http://example.com/process",
+            title: "Test Processor",
+            migration_id: "#{MasterCourses::MIGRATION_ID_PREFIX}_test_processor_mig_id"
+          )
+        end
+
+        before do
+          subscription.create_content_tag_for!(assignment)
+        end
+
+        context "with downstream changes and not locked" do
+          before do
+            discussion_content_tag = subscription.create_content_tag_for!(discussion_topic)
+            discussion_content_tag.update!(downstream_changes: ["content"])
           end
 
-          it "returns a url to a file containing the asset map for QTI imports" do
-            @cm.source_course = nil
-            @cm.migration_type = "qti_converter"
-            @cm.save!
+          it_behaves_like "processes asset processor deletion", :active
+        end
 
-            url = @cm.asset_map_url(generate_if_needed: true)
-
-            @cm.reload
-            expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
-            expect(url).not_to include "verifier=#{@cm.asset_map_attachment.uuid}"
-            expect(@cm.asset_map_attachment.context).to eq @cm
-            json = JSON.parse(@cm.asset_map_attachment.open.read)
-            old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
-            old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
-            expect(json).to eq({ "source_course" => nil,
-                                 "source_host" => nil,
-                                 "contains_migration_ids" => true,
-                                 "destination_course" => @dst.id.to_s,
-                                 "destination_hosts" => ["apple.edu", "kiwi.edu"],
-                                 "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
-                                 "migration_user_uuid" => @cm.user.uuid,
-                                 "resource_mapping" => {
-                                   "assignments" => {
-                                     old_migration_id => {
-                                       "source" => {},
-                                       "destination" => { "id" => @new.id.to_s }
-                                     }
-                                   },
-                                   "pages" => {
-                                     old_wp_migration_id => {
-                                       "source" => {},
-                                       "destination" => {
-                                         "id" => @new_wp.id.to_s,
-                                         "url" => @new_wp.url.to_s,
-                                         "current_lookup_id" => @new_wp.current_lookup_id
-                                       }
-                                     }
-                                   }
-                                 },
-                                 "attachment_path_id_lookup" => nil })
+        context "with downstream changes but locked" do
+          before do
+            discussion_topic.update!(migration_id: "#{MasterCourses::MIGRATION_ID_PREFIX}_test_discussion_mig_id")
+            discussion_content_tag = subscription.create_content_tag_for!(discussion_topic)
+            discussion_content_tag.update!(downstream_changes: ["content"])
+            allow_any_instance_of(DiscussionTopic).to receive(:editing_restricted?).with(:any).and_return(true)
           end
+
+          it_behaves_like "processes asset processor deletion", :deleted
         end
       end
     end
@@ -2316,6 +2494,9 @@ describe ContentMigration do
             @rubric_from.destroy!
             @outcome_from.destroy!
             @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id(@outcome_from)).first
+            allow_any_instance_of(ContentMigration).to receive(:get_outcome_alignments).and_return nil
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return false
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return false
             run_migration
             expect(@outcome_to.reload).to be_deleted
           end
@@ -2351,6 +2532,9 @@ describe ContentMigration do
             @rubric_from.update_criteria({ criteria: })
             @outcome_from.destroy!
             @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id(@outcome_from)).first
+            allow_any_instance_of(ContentMigration).to receive(:get_outcome_alignments).and_return nil
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return false
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return false
             run_migration
             expect(@outcome_to.reload).to be_deleted
           end
@@ -2359,6 +2543,9 @@ describe ContentMigration do
         it "there are no learning outcome results, authoritative results, and alignments" do
           @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id(@outcome_from)).first
           @outcome_from.destroy!
+          allow_any_instance_of(ContentMigration).to receive(:get_outcome_alignments).and_return nil
+          allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return false
+          allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return false
           run_migration
           expect(@outcome_from.reload).to be_deleted
           expect(@outcome_to.reload).to be_deleted
@@ -2392,6 +2579,8 @@ describe ContentMigration do
             @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
             create_outcome_alignment(@outcome_to)
             @outcome_from.destroy!
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return false
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return false
             run_migration
             expect(@outcome_from.reload).to be_deleted
             expect(@outcome_to.reload).not_to be_deleted
@@ -2403,6 +2592,7 @@ describe ContentMigration do
             @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
             @outcome_from.destroy!
             allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return true
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return false
             run_migration
             expect(@outcome_from.reload).to be_deleted
             expect(@outcome_to.reload).not_to be_deleted
@@ -2427,6 +2617,9 @@ describe ContentMigration do
           @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
           @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
           @ct_from.destroy!
+          allow_any_instance_of(ContentMigration).to receive(:get_outcome_alignments).and_return nil
+          allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return false
+          allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return false
           run_migration
           expect(@ct_from.reload).to be_deleted
           expect(@ct_to.reload).to be_deleted
@@ -2463,6 +2656,8 @@ describe ContentMigration do
             @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
             mig_id = @ct_to.migration_id
             @ct_from.destroy!
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return false
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return false
             run_migration
             expect(@ct_from.reload).to be_deleted
             expect(@ct_to.reload).not_to be_deleted
@@ -2475,6 +2670,7 @@ describe ContentMigration do
             mig_id = @ct_to.migration_id
             @ct_from.destroy!
             allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return true
+            allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return false
             run_migration
             expect(@ct_from.reload).to be_deleted
             expect(@ct_to.reload).not_to be_deleted
@@ -2552,18 +2748,27 @@ describe ContentMigration do
     end
 
     before do
+      # Save empty course as target
       @copy_to = @course
+
+      # Set up new course as source
       course_with_teacher(active_all: true)
       @copy_from = @course
       root = Folder.root_folders(@copy_from).first
       uploaded_media_folder = root.sub_folders.create!(name: "Uploaded Media", context: @copy_from)
-      @att1 = Attachment.create!(filename: "first.webm", uploaded_data: stub_file_data("first.webm", "asdf", "video/mp4"), folder: uploaded_media_folder, context: @copy_from, media_entry_id: "m-media_id_1")
-      @att2 = Attachment.create!(filename: "second.webm", uploaded_data: stub_file_data("second.webm", "asdf", "video/mp4"), folder: uploaded_media_folder, context: @copy_from, media_entry_id: "m-media_id_2")
+      att1_file = stub_file_data("first.webm", "asdf", "video/mp4")
+      att2_file = stub_file_data("second.webm", "asdf", "video/mp4")
+      @att1 = Attachment.create!(filename: "first.webm", uploaded_data: att1_file, folder: uploaded_media_folder, context: @copy_from, media_entry_id: "m-media_id_1")
+      @att2 = Attachment.create!(filename: "second.webm", uploaded_data: att2_file, folder: uploaded_media_folder, context: @copy_from, media_entry_id: "m-media_id_2")
       MediaObject.create!(attachment_id: @att1.id, media_id: "m-media_id_1")
       MediaObject.create!(attachment_id: @att2.id, media_id: "m-media_id_2")
-      @copy_from.wiki_pages.create! title: "wp1", body: "<iframe data-media-type=\"audio\" data-media-id=\"#{@att1.media_entry_id}\" src=\"/media_attachments_iframe/#{@att1.id}?type=audio\"></iframe>"
-      @copy_from.wiki_pages.create! title: "wp2", body: "<iframe data-media-type=\"video\" data-media-id=\"#{@att2.media_entry_id}\" src=\"/media_attachments_iframe/#{@att2.id}?type=video\"></iframe>"
-      @kaltura = double("CanvasKaltura::ClientV3")
+      @copy_from.wiki_pages.create! title: "wp1", body: "<iframe data-media-type=\"audio\" data-media-id=\"#{@att1.media_entry_id}\" src=\"/media_attachments_iframe/#{@att1.id}?type=audio\"></iframe>", saving_user: @teacher
+      @copy_from.wiki_pages.create! title: "wp2", body: "<iframe data-media-type=\"video\" data-media-id=\"#{@att2.media_entry_id}\" src=\"/media_attachments_iframe/#{@att2.id}?type=video\"></iframe>", saving_user: @teacher
+
+      # Mock Kaltura Config
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+
+      # Mock API calls for bulk upload
       @kaltura_media_handler = instance_double(KalturaMediaFileHandler)
       expect(@kaltura_media_handler).to receive(:add_media_files) do |_attachments, _wait_for_completion|
         att3 = @copy_to.attachments.where(migration_id: mig_id(@att1)).first.id
@@ -2585,7 +2790,23 @@ describe ContentMigration do
         MediaObject.build_media_objects(bulk_upload_response, @course.root_account_id)
       end
       expect(KalturaMediaFileHandler).to receive(:new).and_return(@kaltura_media_handler)
-      expect(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+
+      # Mock API calls for Kaltura redirects during media downloads
+      kaltura_client_double = instance_double(CanvasKaltura::ClientV3)
+
+      allow(kaltura_client_double).to receive(:media_download_url).with("m-media_id_1").and_return("http://kaltura.example/download/t-123")
+      Net::HTTPSuccess.new(1.1, 200, "OK").tap do |response|
+        allow(response).to receive(:read_body).and_yield(att1_file.tap(&:rewind).read)
+        allow(CanvasHttp).to receive(:get).with("http://kaltura.example/download/t-123?filename=first.webm").and_yield(response)
+      end
+
+      allow(kaltura_client_double).to receive(:media_download_url).with("m-media_id_2").and_return("http://kaltura.example/download/t-234")
+      Net::HTTPSuccess.new(1.1, 200, "OK").tap do |response|
+        allow(response).to receive(:read_body).and_yield(att2_file.tap(&:rewind).read)
+        allow(CanvasHttp).to receive(:get).with("http://kaltura.example/download/t-234?filename=second.webm").and_yield(response)
+      end
+
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_client_double)
     end
 
     it "properly migrates webm embeds" do
@@ -2602,7 +2823,12 @@ describe ContentMigration do
     end
 
     it "properly migrates media files without extensions" do
-      @att1.update(filename: "first", display_name: "first", uploaded_data: fixture_file_upload("292"))
+      att1_file = fixture_file_upload("292")
+      Net::HTTPSuccess.new(1.1, 200, "OK").tap do |response|
+        allow(response).to receive(:read_body).and_yield(att1_file.tap(&:rewind).read)
+        allow(CanvasHttp).to receive(:get).with("http://kaltura.example/download/t-123?filename=first").and_yield(response)
+      end
+      @att1.update(filename: "first", display_name: "first", uploaded_data: att1_file)
 
       run_export_and_import
 
@@ -2651,11 +2877,9 @@ describe ContentMigration do
       converter.export
       @course_data = converter.course.with_indifferent_access
 
-      @course = course_factory
-      @migration = ContentMigration.create(context: @course)
-      @migration.migration_type = "canvas_cartridge_importer"
-      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+      @cm.migration_type = "canvas_cartridge_importer"
+      @cm.migration_settings[:migration_ids_to_import] = { copy: {} }
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
       run_jobs
       expect(@course.attachments.last.media_entry_id).not_to eq("maybe")
       expect(@course.attachments.last.file_state).not_to eq("deleted")

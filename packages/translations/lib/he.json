@@ -95,9 +95,6 @@
     "content_type_2cf90d95": {
         "message": "סוג תוכן"
     },
-    "copy_9748f9f": {
-        "message": "העתקה"
-    },
     "copyright_holder_66ee111": {
         "message": "בעלים של זכויות יוצרים:"
     },
@@ -142,9 +139,6 @@
     },
     "details_98a31b68": {
         "message": "פרטים"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "ממדים"
     },
     "discussion_6719c51d": {
         "message": "דיון"
@@ -332,6 +326,9 @@
     "operators_a2ef9a93": {
         "message": "מפעילים"
     },
+    "options_3ab0ea65": {
+        "message": "אפשרויות"
+    },
     "orange_81386a62": {
         "message": "כתום"
     },
@@ -359,6 +356,9 @@
     "previous_bd2ac015": {
         "message": "קודם"
     },
+    "processing_8c569014": {
+        "message": "מעבד..."
+    },
     "published_c944a23d": {
         "message": "פורסם"
     },
@@ -383,14 +383,14 @@
     "relationships_6602af70": {
         "message": "יחסים"
     },
+    "remove_f47dc62a": {
+        "message": "הסרה"
+    },
     "replace_e61834a7": {
         "message": "החלפה"
     },
     "reset_95a81614": {
         "message": "חזרה למצב ברירת מחדל"
-    },
-    "retry_ebd5f8ba": {
-        "message": "נסה/י שוב"
     },
     "rich_content_editor_2708ef21": {
         "message": "עורך תוכן עשיר"
@@ -451,6 +451,9 @@
     },
     "up_c553575d": {
         "message": "מעלה"
+    },
+    "upload_8b403d05": {
+        "message": "העלאה"
     },
     "upload_file_fd2361b8": {
         "message": "העלאת קובץ"

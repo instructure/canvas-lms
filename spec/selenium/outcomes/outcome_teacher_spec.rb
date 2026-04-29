@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../helpers/outcome_common"
+require "feature_flag_helper"
 
 describe "outcomes as a teacher" do
   include_context "in-process server selenium tests"
   include OutcomeCommon
+  include FeatureFlagHelper
 
   let(:who_to_login) { "teacher" }
   let(:outcome_url) { "/courses/#{@course.id}/outcomes" }
@@ -33,6 +35,10 @@ describe "outcomes as a teacher" do
     wait_for_ajaximations
     f(".ellipsis[title='Default Account']").click
     wait_for_ajaximations
+  end
+
+  before do
+    mock_feature_flag_on_account(:improved_outcomes_management, false)
   end
 
   context "account level outcomes" do
@@ -53,16 +59,6 @@ describe "outcomes as a teacher" do
       f(".ellipsis[title='outcome 0']").click
       import_account_level_outcomes
       expect(f(".ellipsis[title='outcome 0']")).to be_displayed
-    end
-
-    it "removes account outcomes from course" do
-      skip("no delete button when seeding, functionality should be available")
-      f(".ellipsis[title='outcome 0']").click
-      import_account_level_outcomes
-      f(".ellipsis[title='outcome 0']").click
-      wait_for_ajaximations
-      msg = "redmine bug on this functionality"
-      expect(msg).to eq ""
     end
   end
 

@@ -18,8 +18,11 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import UserSuspendLink from '../UserSuspendLink'
+
+const server = setupServer()
 
 const allSuspended = {
   pseudonyms: [
@@ -43,19 +46,25 @@ const mixedStates = {
 }
 
 const USER_ID = '31337'
-const route = `/api/v1/users/${USER_ID}`
 const PERMISSIONS = {can_manage_sis_pseudonyms: true}
 
 describe('UserSuspendLink::', () => {
   let savedUserId
+  let capturedRequests
 
   beforeAll(() => {
+    server.listen()
     savedUserId = ENV.USER_ID
     ENV.USER_ID = USER_ID
     ENV.PERMISSIONS = PERMISSIONS
   })
 
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
   afterAll(() => {
+    server.close()
     delete ENV.user_suspend_status
     delete ENV.PERMISSIONS
     ENV.USER_ID = savedUserId
@@ -121,17 +130,16 @@ describe('UserSuspendLink::', () => {
   })
 
   describe('API calls', () => {
-    beforeAll(() => {
+    beforeEach(() => {
+      capturedRequests = []
       ENV.user_suspend_status = mixedStates
-      fetchMock.put(route, 200)
-    })
-
-    afterAll(() => {
-      fetchMock.restore()
-    })
-
-    afterEach(() => {
-      fetchMock.resetHistory()
+      server.use(
+        http.put(`/api/v1/users/${USER_ID}`, async ({request}) => {
+          const body = await request.json()
+          capturedRequests.push(body)
+          return HttpResponse.json({}, {status: 200})
+        }),
+      )
     })
 
     it('makes no API call if the modal is canceled', async () => {
@@ -140,7 +148,7 @@ describe('UserSuspendLink::', () => {
       fireEvent.click(button)
       button = await findByTestId('cancel-button')
       fireEvent.click(button)
-      expect(fetchMock.calls(route)).toHaveLength(0)
+      expect(capturedRequests).toHaveLength(0)
     })
 
     it('makes the proper call for suspending', async () => {
@@ -149,8 +157,9 @@ describe('UserSuspendLink::', () => {
       fireEvent.click(button)
       button = await findByTestId('action-button')
       fireEvent.click(button)
-      expect(fetchMock.lastCall(route)[1]).toMatchObject({
-        body: JSON.stringify({user: {event: 'suspend'}}),
+      await vi.waitFor(() => {
+        expect(capturedRequests).toHaveLength(1)
+        expect(capturedRequests[0]).toEqual({user: {event: 'suspend'}})
       })
     })
 
@@ -160,8 +169,9 @@ describe('UserSuspendLink::', () => {
       fireEvent.click(button)
       button = await findByTestId('action-button')
       fireEvent.click(button)
-      expect(fetchMock.lastCall(route)[1]).toMatchObject({
-        body: JSON.stringify({user: {event: 'unsuspend'}}),
+      await vi.waitFor(() => {
+        expect(capturedRequests).toHaveLength(1)
+        expect(capturedRequests[0]).toEqual({user: {event: 'unsuspend'}})
       })
     })
   })

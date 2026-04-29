@@ -45,7 +45,7 @@ describe('EmptyDays', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the date range and empty state message', () => {

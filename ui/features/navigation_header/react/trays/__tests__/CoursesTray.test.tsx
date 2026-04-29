@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {render as testingLibraryRender} from '@testing-library/react'
+import {cleanup, render as testingLibraryRender} from '@testing-library/react'
 import CoursesTray from '../CoursesTray'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
@@ -29,6 +29,10 @@ const render = (children: unknown) =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 describe('CoursesTray', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   const courses = [
     {
       id: '1',
@@ -112,8 +116,7 @@ describe('CoursesTray', () => {
     window.ENV.K5_USER = false
     window.ENV.FEATURES.courses_popout_sisid = true
     window.ENV.current_user_roles = []
-    // @ts-expect-error
-    window.ENV.SETTINGS = {show_sections_in_course_tray: true}
+    ;(window.ENV as any).SETTINGS = {show_sections_in_course_tray: true}
   })
 
   afterEach(() => {
@@ -188,8 +191,7 @@ describe('CoursesTray', () => {
   })
 
   it('does not render sections if setting show_sections_in_course_tray is disabled', () => {
-    // @ts-expect-error
-    window.ENV.SETTINGS.show_sections_in_course_tray = false
+    ;(window.ENV as any).SETTINGS.show_sections_in_course_tray = false
     const {queryByText} = render(<CoursesTray />)
     expect(queryByText('Section3, Section4, Section5')).not.toBeInTheDocument()
   })

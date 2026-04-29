@@ -44,7 +44,6 @@
 // </form>
 
 import $ from 'jquery'
-import '@canvas/util/jquery/fixDialogButtons'
 
 function updateTextToState(newStateOfRegion) {
   return function () {

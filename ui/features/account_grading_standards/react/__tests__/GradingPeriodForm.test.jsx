@@ -26,8 +26,8 @@ import timezone from 'timezone'
 import GradingPeriodForm from '../GradingPeriodForm'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 
-const onSave = jest.fn()
-const onCancel = jest.fn()
+const onSave = vi.fn()
+const onCancel = vi.fn()
 const defaultProps = (props = {}) => {
   let period = {
     closeDate: new Date('2016-01-07T12:00:00Z'),
@@ -86,7 +86,7 @@ describe('GradingPeriodForm', () => {
 
     datePickerElement.datepicker('destroy')
     datePickerElement.remove()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Title" input', () => {

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Types::CommentBankItemType do
@@ -34,6 +33,7 @@ describe Types::CommentBankItemType do
     expect(item_type.resolve("comment")).to eq @item.comment
     expect(item_type.resolve("courseId")).to eq @item.course_id.to_s
     expect(item_type.resolve("userId")).to eq @item.user_id.to_s
+    expect(item_type.resolve("assignmentId")).to eq @item.assignment_id.to_s
   end
 
   it "requires read permission on record" do

@@ -23,7 +23,6 @@ import {Tag} from '@instructure/ui-tag'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('differentiation_tags')
-
 export interface TagData {
   id: number
   name: string

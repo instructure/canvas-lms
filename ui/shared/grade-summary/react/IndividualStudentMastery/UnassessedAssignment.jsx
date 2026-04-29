@@ -19,7 +19,7 @@
 import React from 'react'
 import {object} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import _ from 'lodash'
+import {includes} from 'es-toolkit/compat'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {View} from '@instructure/ui-view'
 import {IconAssignmentLine, IconQuizLine} from '@instructure/ui-icons'
@@ -45,9 +45,7 @@ const UnassessedAssignment = ({assignment}) => {
         <Link
           href={url}
           isWithinText={false}
-          renderIcon={
-            _.includes(submission_types, 'online_quiz') ? IconQuizLine : IconAssignmentLine
-          }
+          renderIcon={includes(submission_types, 'online_quiz') ? IconQuizLine : IconAssignmentLine}
         >
           {title} ({I18n.t('Not yet assessed')})
         </Link>

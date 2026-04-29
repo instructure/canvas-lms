@@ -18,91 +18,77 @@
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {uniqueId} from 'lodash'
-import htmlEscape from '@instructure/html-escape'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {uniqueId, sortBy} from 'es-toolkit/compat'
+import {fromNow} from '@canvas/fuzzy-relative-time'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import {enhanceUserContent} from '@instructure/canvas-rce'
-import {makeAllExternalLinksExternalLinks} from '@instructure/canvas-rce/es/enhance-user-content/external_links'
-import './instructure_helper'
+import {
+  enhanceUserContent,
+  makeAllExternalLinksExternalLinks,
+} from '@instructure/canvas-rce/enhance-user-content'
+import {getMountPoint} from '@canvas/top-navigation/react/TopNavPortalBase'
+import 'jqueryui/dialog'
 import 'jqueryui/draggable'
+import 'jqueryui/resizable'
+import 'jqueryui/sortable'
+import 'jqueryui/tabs'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {datetimeString, fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
-import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, youTubeID */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */
 import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import '@instructure/date-js'
-import 'jquery-tinypubsub' /* /\.publish\(/ */
-import 'jqueryui/resizable'
-import 'jqueryui/sortable'
-import 'jqueryui/tabs'
 import {captureException} from '@sentry/browser'
+import preventDefault from '@canvas/util/preventDefault'
 
 const I18n = createI18nScope('instructure_js')
 
+const dateFormatter = new Intl.DateTimeFormat(ENV?.LOCALE ?? navigator.language, {
+  // ddd, D MMM YYYY HH:mma
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+}).format
+
 export function formatTimeAgoTitle(date) {
   const fudgedDate = fudgeDateForProfileTimezone(date)
-  return fudgedDate.toString('MMM d, yyyy h:mmtt')
+  return dateFormatter(fudgedDate)
 }
 
-export function formatTimeAgoDate(date) {
-  if (typeof date === 'string') {
-    date = Date.parse(date)
-  }
-  const diff = new Date() - date
-  if (diff < 24 * 3600 * 1000) {
-    if (diff < 3600 * 1000) {
-      if (diff < 60 * 1000) {
-        return I18n.t('#time.less_than_a_minute_ago', 'less than a minute ago')
-      } else {
-        const minutes = parseInt(diff / (60 * 1000), 10)
-        return I18n.t(
-          '#time.count_minutes_ago',
-          {one: '1 minute ago', other: '%{count} minutes ago'},
-          {count: minutes},
-        )
-      }
-    } else {
-      const hours = parseInt(diff / (3600 * 1000), 10)
-      return I18n.t(
-        '#time.count_hours_ago',
-        {one: '1 hour ago', other: '%{count} hours ago'},
-        {count: hours},
-      )
-    }
-  } else {
-    return formatTimeAgoTitle(date)
-  }
+// This is temporarily here while we finish the announced deprecation of
+// this functionality. It's been warning users for nine years but is still
+// apparently fairly widely used, so it has to stay until we can get users
+// transitioned off of it. It has to go because it decorates customer content
+// with jQueryUI functionality, which we are moving away from entirely, and
+// also there are security concerns with it.
+const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
+function deprecationWarning(els) {
+  const msg =
+    'Deprecated use of magic jQueryUI widget markup detected:\n\n' +
+    "You're relying on undocumented functionality where Canvas makes " +
+    'jQueryUI widgets out of rich content that has the following class names: ' +
+    JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE +
+    '.\n\n' +
+    'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
+    "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
+    'you should use your own custom JS file to do any such customizations.'
+  console.error(msg, els)
+  captureException(new Error(msg))
 }
 
-// this code was lifted from the original jquery version of enhanceUserContent
-// it's what wires up jquery widgets to DOM elements with magic class names
 function enhanceUserJQueryWidgetContent() {
-  const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
   $('.user_content.unenhanced')
     .find('.enhanceable_content')
     .show()
     .filter(JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE)
-    .ifExists($elements => {
-      const msg =
-        'Deprecated use of magic jQueryUI widget markup detected:\n\n' +
-        "You're relying on undocumented functionality where Canvas makes " +
-        'jQueryUI widgets out of rich content that has the following class names: ' +
-        JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE +
-        '.\n\n' +
-        'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
-        "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
-        'you should use your own custom JS file to do any such customizations.'
-      console.error(msg, $elements)
-      captureException(new Error(msg))
-    })
+    .ifExists(deprecationWarning)
     .end()
     .filter('.dialog')
     .each(function () {
@@ -137,36 +123,32 @@ function enhanceUserJQueryWidgetContent() {
 }
 
 function ellipsifyBreadcrumbs() {
-  // this next block of code adds the ellipsis on the breadcrumb if it overflows one line
-  const $breadcrumbs = $('#breadcrumbs')
-  if ($breadcrumbs.length) {
-    let $breadcrumbEllipsis
-    let addedEllipsisClass = false
-    // if we ever change the styling of the breadcrumbs so their height changes, change this too. the * 1.5 part is just in case to ever handle any padding or margin.
-    const hightOfOneBreadcrumb = 27 * 1.5
-    let taskID
-    const resizeBreadcrumb = () => {
-      if (taskID) (window.cancelIdleCallback || window.cancelAnimationFrame)(taskID)
-      taskID = (window.requestIdleCallback || window.requestAnimationFrame)(() => {
-        let maxWidth = 500
-        $breadcrumbEllipsis = $breadcrumbEllipsis || $breadcrumbs.find('.ellipsible')
-        $breadcrumbEllipsis.ifExists(() => {
-          $breadcrumbEllipsis.css('maxWidth', '')
-          for (let i = 0; $breadcrumbs.height() > hightOfOneBreadcrumb && i < 20; i++) {
-            // the i here is just to make sure we don't get into an ifinite loop somehow
-            if (!addedEllipsisClass) {
-              addedEllipsisClass = true
-              $breadcrumbEllipsis.addClass('ellipsis')
-            }
-            $breadcrumbEllipsis.css('maxWidth', (maxWidth -= 20))
+  const breadcrumbs = document.getElementById('breadcrumbs')
+  if (breadcrumbs === null || getMountPoint() !== null) return // if page uses InstUI top nav
+  let breadcrumbEllipsis
+  let addedEllipsisClass = false
+  const heightOfOneBreadcrumb = 27 * 1.5
+  let taskID
+  function resizeBreadcrumb() {
+    if (taskID) (window.cancelIdleCallback || window.cancelAnimationFrame)(taskID)
+    taskID = (window.requestIdleCallback || window.requestAnimationFrame)(() => {
+      let maxWidth = 500
+      breadcrumbEllipsis = breadcrumbEllipsis || breadcrumbs.querySelector('.ellipsible')
+      if (breadcrumbEllipsis) {
+        breadcrumbEllipsis.style.maxWidth = ''
+        for (let i = 0; breadcrumbs.offsetHeight > heightOfOneBreadcrumb && i < 20; i++) {
+          if (!addedEllipsisClass) {
+            addedEllipsisClass = true
+            breadcrumbEllipsis.classList.add('ellipsis')
           }
-        })
-      })
-    }
-    resizeBreadcrumb() // force it to run once right now
-    $(window).resize(resizeBreadcrumb)
-    // end breadcrumb ellipsis
+          maxWidth -= 20
+          breadcrumbEllipsis.style.maxWidth = `${maxWidth}px`
+        }
+      }
+    })
   }
+  resizeBreadcrumb() // force it to run once right now
+  window.addEventListener('resize', resizeBreadcrumb)
 }
 
 function bindKeyboardShortcutsHelpPanel() {
@@ -237,87 +219,6 @@ function expandQuotedTextWhenClicked() {
   })
 }
 
-function previewEquellaContentWhenClicked() {
-  $(document).on('click', 'a.equella_content_link', function (event) {
-    event.preventDefault()
-    let $dialog = $('#equella_preview_dialog')
-    if (!$dialog.length) {
-      $dialog = $('<div/>')
-      $dialog.attr('id', 'equella_preview_dialog').hide()
-      $dialog.html(
-        "<h2/><iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: 350px; border: 0;' src='about:blank' borderstyle='0'/><div style='text-align: right;'><a href='#' class='original_link external external_link' target='_blank'>" +
-          htmlEscape(
-            I18n.t('links.view_equella_content_in_new_window', 'view the content in a new window'),
-          ) +
-          '</a>',
-      )
-      $dialog
-        .find('h2')
-        .text(
-          $(this).attr('title') ||
-            $(this).text() ||
-            I18n.t('titles.equella_content_preview', 'Equella Content Preview'),
-        )
-      const $iframe = $dialog.find('iframe')
-      setTimeout(() => {
-        $iframe.css('background', '#fff')
-      }, 2500)
-      $('body').append($dialog)
-      $dialog.dialog({
-        autoOpen: false,
-        width: 'auto',
-        resizable: false,
-        title: I18n.t('titles.equella_content_preview', 'Equella Content Preview'),
-        close() {
-          $dialog.find('iframe').attr('src', 'about:blank')
-        },
-        modal: true,
-        zIndex: 1000,
-      })
-    }
-    $dialog.find('.original_link').attr('href', $(this).attr('href'))
-    $dialog.dialog('close').dialog('open')
-    $dialog.find('iframe').attr('src', $(this).attr('href'))
-  })
-}
-
-function openDialogsWhenClicked() {
-  // Adds a way to automatically open dialogs by just giving them the .dialog_opener class.
-  // Uses the aria-controls attribute to specify id of dialog to open because that is already
-  // a best practice accessibility-wise (as a side note you should also add "role=button").
-  // You can pass in options to the dialog with the data-dialog-options attribute.
-  //
-  // Examples:
-  //
-  // <a class="dialog_opener" aria-controls="foobar" role="button" href="#">
-  // opens the dialog with id="foobar"
-  //
-  // <a class="dialog_opener" aria-controls="my_dialog" data-dialog-opts="{resizable:false, width: 300}" role="button" href="#">
-  // opens the .my_dialog dialog and passes the options {resizable:false, width: 300}
-  // the :not clause is to not allow users access to this functionality in their content.
-  $(document).on('click', '.dialog_opener[aria-controls]:not(.user_content *)', function (event) {
-    const link = this
-    $('#' + $(this).attr('aria-controls')).ifExists($dialog => {
-      event.preventDefault()
-      // if the linked dialog has not already been initialized, initialize it (passing in opts)
-      if (!$dialog.data('ui-dialog')) {
-        $dialog.dialog(
-          $.extend(
-            {
-              autoOpen: false,
-              modal: true,
-              zIndex: 1000,
-            },
-            $(link).data('dialogOpts'),
-          ),
-        )
-        $dialog.fixDialogButtons()
-      }
-      $dialog.dialog('open')
-    })
-  })
-}
-
 let enhanceUserContentTimeout
 function enhanceUserContentWhenAsked() {
   if (ENV?.SKIP_ENHANCING_USER_CONTENT) {
@@ -328,14 +229,14 @@ function enhanceUserContentWhenAsked() {
   enhanceUserContentTimeout = setTimeout(
     () =>
       enhanceUserContent(document, {
-        customEnhanceFunc: enhanceUserJQueryWidgetContent,
+        customEnhance: enhanceUserJQueryWidgetContent,
         canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin,
         kalturaSettings: INST.kalturaSettings,
         disableGooglePreviews: !!INST.disableGooglePreviews,
         new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
         explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
         locale: ENV?.LOCALE ?? 'en',
-        showYoutubeAdOverlay: ENV?.FEATURES?.youtube_migration,
+        showYoutubeAdOverlay: ENV?.FEATURES?.youtube_overlay,
       }),
     50,
   )
@@ -370,44 +271,75 @@ function showDiscussionTopicSubMessagesWhenClicked() {
 
 // app/views/discussion_topics/_entry.html.erb
 function addDiscussionTopicEntryWhenClicked() {
-  $('.communication_message .add_entry_link').click(function (event) {
-    event.preventDefault()
-    const $message = $(this).parents('.communication_message')
-    const $reply = $message.find('.reply_message').hide()
-    const $response = $message
-      .find('.communication_sub_message.blank')
-      .clone(true)
-      .removeClass('blank')
-    $reply.before($response.show())
-    const id = uniqueId('textarea_')
-    $response.find('textarea.rich_text').attr('id', id)
-    $(document).triggerHandler('richTextStart', $('#' + id))
-    $response.find('textarea:first').focus().select()
+  document.querySelectorAll('.communication_message').forEach(message => {
+    message.addEventListener('click', e => {
+      const entry = e.target.closest('.add_entry_link')
+      if (!entry) return
+      e.preventDefault()
+
+      // Find and hide reply message
+      const reply = message.querySelector('.reply_message')
+      if (reply) reply.style.display = 'none'
+
+      // Clone the blank response template
+      const blankResponse = message.querySelector('.communication_sub_message.blank')
+      if (blankResponse === null) return
+
+      const response = blankResponse.cloneNode(true)
+      response.classList.remove('blank')
+      response.style.display = 'block'
+
+      // Insert the response before the reply element
+      if (reply) reply.parentNode.insertBefore(response, reply)
+
+      // Unfortunately we still need jQuery for the RCE launch because
+      // the RCE uses the jQuery event system
+      const textarea = response.querySelector('textarea.rich_text')
+      if (textarea) {
+        const id = uniqueId('textarea_')
+        textarea.id = id
+        $(document).triggerHandler('richTextStart', $('#' + id))
+      }
+
+      // Focus and select the first textarea
+      const firstTextarea = response.querySelector('textarea')
+      if (firstTextarea) {
+        firstTextarea.focus()
+        firstTextarea.select()
+      }
+    })
   })
 }
 
 function showAndHideRCEWhenAsked() {
-  $(document)
-    .bind('richTextStart', (event, $editor) => {
-      if (!$editor || $editor.length === 0) {
-        return
-      }
-      $editor = $($editor)
-      if (!$editor || $editor.length === 0) {
-        return
-      }
-      RichContentEditor.loadNewEditor($editor, {focus: true})
-    })
-    .bind('richTextEnd', (event, $editor) => {
-      if (!$editor || $editor.length === 0) {
-        return
-      }
-      $editor = $($editor)
-      if (!$editor || $editor.length === 0) {
-        return
-      }
-      RichContentEditor.destroyRCE($editor)
-    })
+  // Note: We're keeping jQuery event handling here because:
+  // 1. Custom events with data like 'richTextStart' are handled differently in jQuery vs native
+  // 2. Much of the existing code uses triggerHandler() to pass jQuery elements
+  // 3. RichContentEditor expects jQuery elements
+  //
+  // TODO: Implement a way to handle rich text editing without relying on jQuery, but
+  // that will require native event handling that can handle complex data, and also
+  // modifying the RCE to match.
+
+  const $document = $(document)
+
+  $document.on('richTextStart', (_e, $editor) => {
+    if (!$editor || $editor.length === 0) return
+
+    // Ensure we're working with a jQuery object as RichContentEditor expects
+    if (!($editor instanceof $)) $editor = $($editor)
+    if (!$editor || $editor.length === 0) return
+    RichContentEditor.loadNewEditor($editor, {focus: true})
+  })
+
+  $document.on('richTextEnd', (_e, $editor) => {
+    if (!$editor || $editor.length === 0) return
+
+    // Ensure we're working with a jQuery object as RichContentEditor expects
+    if (!($editor instanceof $)) $editor = $($editor)
+    if (!$editor || $editor.length === 0) return
+    RichContentEditor.destroyRCE($editor)
+  })
 }
 
 function doThingsWhenDiscussionTopicSubMessageIsPosted() {
@@ -496,11 +428,13 @@ function highlightDiscussionTopicMessagesOnHover() {
 
 function makeDatesPretty() {
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-  // vvvvvvvvvvvvvvvvv BEGIN stuf form making pretty dates vvvvvvvvvvvvvvvvvv
+  // vvvvvvvvvvvvvvvvv BEGIN stuff for making pretty dates vvvvvvvvvvvvvvvvvv
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
   let timeAgoEvents = []
   function timeAgoRefresh() {
-    timeAgoEvents = [...document.querySelectorAll('.time_ago_date')].filter($.expr.filters.visible)
+    timeAgoEvents = Array.from(document.querySelectorAll('.time_ago_date')).filter(
+      $.expr.filters.visible,
+    )
     processNextTimeAgoEvent()
   }
   function processNextTimeAgoEvent() {
@@ -509,9 +443,11 @@ function makeDatesPretty() {
       const $event = $(eventElement),
         date = $event.data('parsed_date') || Date.parse($event.data('timestamp') || '')
       if (date) {
+        const diff = new Date() - date
+        const relative = diff < 24 * 3600 * 1000 // less than 24 hours ago
         $event.data('timestamp', date.toISOString())
         $event.data('parsed_date', date)
-        $event.text(formatTimeAgoDate(date))
+        $event.text(relative ? fromNow(date) : formatTimeAgoTitle(date))
         $event.attr('title', formatTimeAgoTitle(date))
       }
       setTimeout(processNextTimeAgoEvent, 1)
@@ -548,52 +484,96 @@ function doThingsToModuleSequenceFooter() {
   }
 }
 
-function showHideRemoveThingsToRightSideMoreLinksWhenClicked() {
+function showRightSideHiddenItemsWhenClicked() {
   // this is for things like the to-do, recent items and upcoming, it
-  // happend a lot so rather than duplicating it everywhere I stuck it here
-  $('#right-side').on('click', '.more_link', function (event) {
-    const $this = $(this)
-    const $children = $this.parents('ul').children(':hidden').show()
-    $this.closest('li').remove()
+  // happened a lot so rather than duplicating it everywhere I stuck it here
+  const rightSide = document.getElementById('right-side')
+  if (!rightSide) return
+
+  rightSide.addEventListener('click', event => {
+    const target = event.target.closest('.more_link')
+    if (!target) return
+
+    event.preventDefault()
+
+    const ul = target.closest('ul')
+    const hiddenCSS = ':scope > li[style*="display: none"], :scope > li[hidden]'
+    const hiddenItems = Array.from(ul.querySelectorAll(hiddenCSS))
+
+    // Show all hidden items
+    hiddenItems.forEach(item => {
+      item.style.display = ''
+      if (item.hasAttribute('hidden')) item.removeAttribute('hidden')
+    })
+
+    // Remove the "more" list item
+    target.closest('li')?.remove()
+
     // if they are using the keyboard to navigate (they hit enter on the link instead of actually
     // clicking it) then put focus on the first of the now-visible items--otherwise, since the
     // .more_link is hidden, focus would be completely lost and leave a blind person stranded.
     // don't want to set focus if came from a mouse click because then you'd have 2 of the tooltip
     // bubbles staying visible, see #9211
-    if (event.screenX === 0) {
-      $children.first().find(':tabbable:first').focus()
+    if (event.screenX === 0 && hiddenItems.length > 0) {
+      const focusableCSS = 'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      hiddenItems[0].querySelector(focusableCSS)?.focus()
     }
-    return false
   })
 }
 
 function confirmAndDeleteRightSideTodoItemsWhenClicked() {
-  $('#right-side').on('click', '.disable-todo-item-link', function (event) {
+  const rightSide = document.getElementById('right-side')
+  if (!rightSide) return
+
+  rightSide.addEventListener('click', event => {
+    const target = event.target.closest('.disable-todo-item-link')
+    if (!target) return
+
     event.preventDefault()
-    const $item = $(this).parents('li, div.topic_message').last()
-    const $prevItem = $(this).closest('.to-do-list > li').prev()
-    const toFocus =
-      ($prevItem.find('.disable-todo-item-link').length &&
-        $prevItem.find('.disable-todo-item-link')) ||
-      $('.todo-list-header')
-    const url = $(this).data('api-href')
-    const flashMessage = $(this).data('flash-message')
-    function remove(delete_url) {
-      $item.confirmDelete({
-        url: delete_url,
-        noMessage: true,
-        success() {
-          if (flashMessage) {
-            $.flashMessage(flashMessage)
-          }
-          $(this).slideUp(function () {
-            $(this).remove()
-            toFocus.focus()
-          })
-        },
-      })
+
+    // Find the item to be removed (equivalent to $(this).parents('li, div.topic_message').last())
+    const item = target.closest('li') || target.closest('div.topic_message')
+    if (!item) return
+
+    // Find previous item for focus management
+    const todoList = target.closest('.to-do-list')
+    let toFocus
+
+    if (todoList) {
+      const parentLi = target.closest('li')
+      const prevItem = parentLi.previousElementSibling
+      if (prevItem) {
+        toFocus = prevItem.querySelector('.disable-todo-item-link')
+      }
     }
-    remove(url)
+
+    if (!toFocus) {
+      toFocus = document.querySelector('.todo-list-header')
+    }
+
+    // Get data attributes
+    const url = target.dataset.apiHref
+    const flashMessage = target.dataset.flashMessage
+
+    // This is a complex part because confirmDelete is a jQuery plugin
+    // We need to use the jQuery implementation for now since creating a full
+    // native confirmation dialog with AJAX would be too complex
+    const $item = $(item)
+    $item.confirmDelete({
+      url: url,
+      noMessage: true,
+      success() {
+        if (flashMessage) {
+          $.flashMessage(flashMessage)
+        }
+
+        // Use jQuery for animation for now (slideUp with callback)
+        $(this).slideUp(function () {
+          this.remove()
+          toFocus?.focus()
+        })
+      },
+    })
   })
 }
 
@@ -619,6 +599,12 @@ function showFilePreviewInOverlayHandler({file_id, verifier, access_token, instf
 }
 
 function wireUpFilePreview() {
+  if (
+    ENV?.PLATFORM_SERVICE_SPEEDGRADER_ENABLED &&
+    window.location.href.includes('gradebook/speed_grader')
+  ) {
+    return
+  }
   window.addEventListener('message', event => {
     if (event.data.subject === 'preview_file') {
       showFilePreviewInOverlayHandler(event.data)
@@ -634,14 +620,57 @@ const setDialogCloseText = () => {
   $.ui.dialog.prototype.options.closeText = I18n.t('Close')
 }
 
+export const registerFixDialogButtonsPlugin = () => {
+  // Registers a jQuery plugin that converts button markup in dialogs
+  // to proper jQueryUI dialog buttons. This is called during boot to
+  // make the .fixDialogButtons() method available throughout the app.
+  $.fn.fixDialogButtons = function () {
+    return this.each(function () {
+      const $dialog = $(this)
+      const $buttons = $dialog.find('.button-container:last .btn, button[type=submit]')
+      if ($buttons.length) {
+        $dialog.find('.button-container:last, button[type=submit]').hide()
+        let buttons = $.map($buttons.toArray(), button => {
+          const $button = $(button)
+          let classes = $button.attr('class') || ''
+          const id = $button.attr('id')
+
+          // if you add the class 'dialog_closer' to any of the buttons,
+          // clicking it will cause the dialog to close
+          if ($button.is('.dialog_closer')) {
+            $button.off('.fixdialogbuttons')
+            $button.on(
+              'click.fixdialogbuttons',
+              preventDefault(() => $dialog.dialog('close')),
+            )
+          }
+
+          if ($button.prop('type') === 'submit' && $button[0].form) {
+            classes += ' button_type_submit'
+          }
+
+          return {
+            text: $button.text(),
+            'data-text-while-loading': $button.data('textWhileLoading'),
+            click: () => $button.click(),
+            class: classes,
+            id,
+          }
+        })
+        // put the primary button(s) on the far right
+        buttons = sortBy(buttons, button => (button.class.match(/btn-primary/) ? 1 : 0))
+        $dialog.dialog('option', 'buttons', buttons)
+      }
+    })
+  }
+}
+
 export function enhanceTheEntireUniverse() {
   ;[
     ellipsifyBreadcrumbs,
     bindKeyboardShortcutsHelpPanel,
     warnAboutRolesBeingSwitched,
     expandQuotedTextWhenClicked,
-    previewEquellaContentWhenClicked,
-    openDialogsWhenClicked,
     enhanceUserContentWhenAsked,
     enhanceUserContentRepeatedly,
     showDiscussionTopicSubMessagesWhenClicked,
@@ -652,10 +681,11 @@ export function enhanceTheEntireUniverse() {
     highlightDiscussionTopicMessagesOnHover,
     makeDatesPretty,
     doThingsToModuleSequenceFooter,
-    showHideRemoveThingsToRightSideMoreLinksWhenClicked,
+    showRightSideHiddenItemsWhenClicked,
     confirmAndDeleteRightSideTodoItemsWhenClicked,
     makeAllExternalLinksExternalLinks,
     wireUpFilePreview,
     setDialogCloseText,
+    registerFixDialogButtonsPlugin,
   ].map(x => x())
 }

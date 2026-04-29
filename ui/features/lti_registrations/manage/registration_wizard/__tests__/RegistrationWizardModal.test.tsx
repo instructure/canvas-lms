@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {RegistrationWizardModal} from '../RegistrationWizardModal'
 import {ZAccountId} from '../../model/AccountId'
 import {
@@ -45,9 +44,9 @@ describe('RegistrationWizardModal', () => {
 
     warn = console.warn
 
-    console.error = jest.fn()
+    console.error = vi.fn()
 
-    console.warn = jest.fn()
+    console.warn = vi.fn()
   })
 
   afterAll(() => {
@@ -56,7 +55,11 @@ describe('RegistrationWizardModal', () => {
     console.warn = warn
   })
 
-  const fetchRegistrationToken = jest.fn().mockImplementation(() => new Promise(() => {}))
+  afterEach(() => {
+    cleanup()
+  })
+
+  const fetchRegistrationToken = vi.fn().mockImplementation(() => new Promise(() => {}))
 
   const emptyServices = {
     jsonUrlWizardService: mockJsonUrlWizardService({}),
@@ -76,9 +79,8 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: undefined,
         method: 'dynamic_registration',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
-        onSuccessfulInstallation: jest.fn(),
+        onSuccessfulInstallation: vi.fn(),
         jsonFetch: {_tag: 'initial'},
       })
     })
@@ -141,10 +143,9 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: undefined,
         method: 'json_url',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         jsonCode: '',
-        onSuccessfulInstallation: jest.fn(),
+        onSuccessfulInstallation: vi.fn(),
         jsonFetch: {_tag: 'initial'},
       })
     })
@@ -155,7 +156,7 @@ describe('RegistrationWizardModal', () => {
 
     it('should validate the json configuration from the URL', async () => {
       const accountId = ZAccountId.parse('123')
-      const fetchThirdPartyToolConfiguration = jest
+      const fetchThirdPartyToolConfiguration = vi
         .fn()
         .mockResolvedValue(success(mockInternalConfiguration()))
 
@@ -182,7 +183,7 @@ describe('RegistrationWizardModal', () => {
 
     it('renders an error screen when the third party configuration fetch fails', async () => {
       const accountId = ZAccountId.parse('123')
-      const fetchThirdPartyToolConfiguration = jest
+      const fetchThirdPartyToolConfiguration = vi
         .fn()
         .mockResolvedValue(
           genericError('An error occurred while fetching the third party tool configuration.'),
@@ -218,7 +219,7 @@ describe('RegistrationWizardModal', () => {
     it('renders an error screen when the third party configuration is invalid', async () => {
       const accountId = ZAccountId.parse('123')
 
-      const fetchThirdPartyToolConfiguration = jest
+      const fetchThirdPartyToolConfiguration = vi
         .fn()
         .mockResolvedValue(apiError(422, {errors: ['Bad config']}))
 
@@ -263,17 +264,16 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: undefined,
         method: 'json',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         jsonCode: '',
-        onSuccessfulInstallation: jest.fn(),
+        onSuccessfulInstallation: vi.fn(),
         jsonFetch: {_tag: 'initial'},
       })
     })
 
     it('should validate the json configuration', async () => {
       const accountId = ZAccountId.parse('123')
-      const fetchThirdPartyToolConfiguration = jest
+      const fetchThirdPartyToolConfiguration = vi
         .fn()
         .mockResolvedValue(success(mockInternalConfiguration()))
 
@@ -300,7 +300,7 @@ describe('RegistrationWizardModal', () => {
 
     it('renders an error screen when the third party configuration fetch fails', async () => {
       const accountId = ZAccountId.parse('123')
-      const fetchThirdPartyToolConfiguration = jest
+      const fetchThirdPartyToolConfiguration = vi
         .fn()
         .mockResolvedValue(
           genericError('An error occurred while fetching the third party tool configuration.'),
@@ -336,7 +336,7 @@ describe('RegistrationWizardModal', () => {
     it('renders an error screen when the third party configuration is invalid', async () => {
       const accountId = ZAccountId.parse('123')
 
-      const fetchThirdPartyToolConfiguration = jest
+      const fetchThirdPartyToolConfiguration = vi
         .fn()
         .mockResolvedValue(apiError(422, {errors: ['Bad config']}))
 
@@ -381,10 +381,9 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: undefined,
         method: 'manual',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         jsonCode: '',
-        onSuccessfulInstallation: jest.fn(),
+        onSuccessfulInstallation: vi.fn(),
         jsonFetch: {_tag: 'initial'},
       })
     })
@@ -461,10 +460,9 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: true,
         method: 'manual',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         jsonCode: '',
-        onSuccessfulInstallation: jest.fn(),
+        onSuccessfulInstallation: vi.fn(),
         jsonFetch: {_tag: 'initial'},
       })
 
@@ -489,10 +487,9 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: true,
         method: 'manual',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         jsonCode: '',
-        onSuccessfulInstallation: jest.fn(),
+        onSuccessfulInstallation: vi.fn(),
         jsonFetch: {_tag: 'initial'},
       })
 
@@ -511,7 +508,15 @@ describe('RegistrationWizardModal', () => {
   })
 
   describe('when pre-opened with dynamic registration', () => {
-    it('should exit the modal when the cancel button is clicked & exitOnCancel is true', async () => {
+    beforeEach(() => {
+      vi.spyOn(window, 'confirm').mockReturnValue(true)
+    })
+
+    afterEach(() => {
+      ;(window.confirm as unknown as any).mockReset()
+    })
+
+    it('should exit the modal when the cancel button is clicked', async () => {
       openRegistrationWizard({
         dynamicRegistrationUrl: 'http://example.com',
         unifiedToolId: ZUnifiedToolId.parse('asdf'),
@@ -520,9 +525,8 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: undefined,
         method: 'dynamic_registration',
         registering: true,
-        exitOnCancel: true,
         jsonUrl: '',
-        onSuccessfulInstallation: jest.fn(),
+        onSuccessfulInstallation: vi.fn(),
         jsonFetch: {_tag: 'initial'},
       })
       const accountId = ZAccountId.parse('123')
@@ -532,6 +536,7 @@ describe('RegistrationWizardModal', () => {
       })
       fireEvent.click(cancelButton)
       await waitFor(() => {
+        expect(window.confirm).toHaveBeenCalled()
         expect(screen.queryByText(/Install App/i)).not.toBeInTheDocument()
       })
     })

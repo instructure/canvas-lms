@@ -538,7 +538,6 @@ describe AssignmentOverridesController, type: :request do
 
       context "differentiation tags" do
         before do
-          @course.account.enable_feature!(:assign_to_differentiation_tags)
           @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
           @course.account.save!
           @course.account.reload
@@ -849,7 +848,7 @@ describe AssignmentOverridesController, type: :request do
 
       it "does not requeue processing if nothing changes" do
         @override.update_attribute(:all_day, false)
-        expect_any_instantiation_of(@assignment).to_not receive(:run_if_overrides_changed_later!)
+        expect_any_instantiation_of(@assignment).not_to receive(:run_if_overrides_changed_later!)
         api_update_override(@course, @assignment, @override, assignment_override: { title: @override.title, student_ids: [@student.id] })
       end
 
@@ -1433,26 +1432,6 @@ describe AssignmentOverridesController, type: :request do
                                  ],
                                  expected_status: 400)
         expect(json["errors"][0]).to eq ["may not specify an override id"]
-      end
-
-      it "succeeds if formatted correctly" do
-        skip "DEMO-119 (1/27/2021)"
-        section = @course.course_sections.create!
-        student = student_in_section(section)
-        date = Time.zone.now.tomorrow
-        @user = @teacher
-
-        json = call_batch_create([
-                                   args_for(@a, nil, course_section_id: section.id, due_at: date),
-                                   args_for(@b, nil, course_section_id: section.id, unlock_at: date),
-                                   args_for(@a, nil, student_ids: [student.id], title: "foo")
-                                 ])
-        override1 = @a.assignment_overrides.find(json[0]["id"])
-        override2 = @b.assignment_overrides.find(json[1]["id"])
-        override3 = @a.assignment_overrides.find(json[2]["id"])
-        validate_override_json(override1, json[0])
-        validate_override_json(override2, json[1])
-        validate_override_json(override3, json[2])
       end
     end
   end

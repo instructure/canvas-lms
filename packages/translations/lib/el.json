@@ -83,9 +83,6 @@
     "content_type_2cf90d95": {
         "message": "Τύπος Περιεχομένου"
     },
-    "copy_9748f9f": {
-        "message": "Αντιγραφή"
-    },
     "copyright_holder_66ee111": {
         "message": "Κάτοχος Πνευματικών Δικαιωμάτων:"
     },
@@ -121,9 +118,6 @@
     },
     "details_98a31b68": {
         "message": "Λεπτομέρειες"
-    },
-    "dimensions_45ddb7b7": {
-        "message": "Διαστάσεις"
     },
     "discussion_6719c51d": {
         "message": "Συζήτηση"
@@ -305,6 +299,9 @@
     "operators_a2ef9a93": {
         "message": "Χειριστές"
     },
+    "options_3ab0ea65": {
+        "message": "Επιλογές"
+    },
     "orange_81386a62": {
         "message": "Πορτοκαλί"
     },
@@ -332,6 +329,9 @@
     "previous_bd2ac015": {
         "message": "Προηγούμενο"
     },
+    "processing_8c569014": {
+        "message": "Γίνεται Επεξεργασία..."
+    },
     "published_c944a23d": {
         "message": "δημοσιευμένο/α"
     },
@@ -356,14 +356,14 @@
     "relationships_6602af70": {
         "message": "Σχέσεις"
     },
+    "remove_f47dc62a": {
+        "message": "Αφαίρεση"
+    },
     "replace_e61834a7": {
         "message": "Αντικατάσταση"
     },
     "reset_95a81614": {
         "message": "Επαναφορά"
-    },
-    "retry_ebd5f8ba": {
-        "message": "Δοκιμάστε ξανά"
     },
     "rich_content_editor_2708ef21": {
         "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
@@ -421,6 +421,9 @@
     },
     "up_c553575d": {
         "message": "Επάνω"
+    },
+    "upload_8b403d05": {
+        "message": "Μεταφόρτωση"
     },
     "upload_file_fd2361b8": {
         "message": "Φόρτωση Αρχείου"

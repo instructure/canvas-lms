@@ -250,7 +250,7 @@ class NotificationMessageCreator
     # only use new policies for default channel when there are no other policies for the notification and user.
     # If another policy exists then it means the notification preferences page has been visited and null values
     # show as never policies in the UI.
-    default_email?(user, channel) && (user.notification_policies.find { |np| np.notification_id == @notification.id }).nil?
+    default_email?(user, channel) && user.notification_policies.find { |np| np.notification_id == @notification.id }.nil?
   end
 
   def default_email?(user, channel)
@@ -297,8 +297,8 @@ class NotificationMessageCreator
     to_list = [to_list] unless to_list.is_a? Enumerable
 
     to_users = []
-    to_users += User.find(to_list.select { |to| to.is_a? Numeric }.uniq)
-    to_users += to_list.select { |to| to.is_a? User }
+    to_users += User.find(to_list.grep(Numeric).uniq)
+    to_users += to_list.grep(User)
     to_users.uniq!
 
     to_users
@@ -306,7 +306,7 @@ class NotificationMessageCreator
 
   def communication_channels_from_to_list(to_list)
     to_list = [to_list] unless to_list.is_a? Enumerable
-    to_list.select { |to| to.is_a? CommunicationChannel }.uniq
+    to_list.grep(CommunicationChannel).uniq
   end
 
   def asset_applied_to(user)

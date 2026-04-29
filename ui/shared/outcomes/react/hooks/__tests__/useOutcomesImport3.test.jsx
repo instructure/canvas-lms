@@ -23,34 +23,38 @@ import {createCache} from '@canvas/apollo-v3'
 import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {importGroupMocks} from '../../../mocks/Management'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {waitFor} from '@testing-library/react'
 
-jest.mock('@canvas/progress/resolve_progress')
+vi.mock('@canvas/progress/resolve_progress')
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(params => {
-    // For the Course context test, ensure we get the correct message
-    if (
-      params.message &&
-      params.message.includes('[missing %{groupTitle} value]') &&
-      params.message.includes('account')
-    ) {
-      // Check if this is from the Course context test
-      const stack = new Error().stack
-      if (stack.includes('imports group in Course context')) {
-        return jest.fn(() => {})({
-          message: 'All outcomes from New Group have been successfully added to this course.',
-          type: 'success',
-        })
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(params => {
+      // For the Course context test, ensure we get the correct message
+      if (
+        params.message &&
+        params.message.includes('[missing %{groupTitle} value]') &&
+        params.message.includes('account')
+      ) {
+        // Check if this is from the Course context test
+        const stack = new Error().stack
+        if (stack.includes('imports group in Course context')) {
+          return vi.fn(() => {})({
+            message: 'All outcomes from New Group have been successfully added to this course.',
+            type: 'success',
+          })
+        }
       }
-    }
-    return jest.fn(() => {})(params)
-  }),
-}))
+      return vi.fn(() => {})(params)
+    }),
+  }
+})
 
 describe('useOutcomesImport', () => {
   let cache
@@ -61,7 +65,7 @@ describe('useOutcomesImport', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const wrapper = ({
@@ -126,7 +130,7 @@ describe('useOutcomesImport', () => {
           targetGroupTitle: 'Target Group',
         })
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
 
       // Verify that showFlashAlert was called with a success message
       expect(showFlashAlert).toHaveBeenCalled()
@@ -149,7 +153,7 @@ describe('useOutcomesImport', () => {
           groupTitle: 'New Group',
         })
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).not.toHaveBeenCalled()
     })
 
@@ -180,7 +184,7 @@ describe('useOutcomesImport', () => {
           groupTitle: 'New Group',
         })
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
 
       expect(showFlashAlert).toHaveBeenCalled()
       const calls = showFlashAlert.mock.calls
@@ -197,7 +201,7 @@ describe('useOutcomesImport', () => {
           outcomeOrGroupId: groupId,
         })
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.hasAddedOutcomes).toEqual(true)
     })
 
@@ -211,7 +215,7 @@ describe('useOutcomesImport', () => {
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: '100'})
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing these outcomes: Network error.',
         type: 'error',
@@ -228,7 +232,7 @@ describe('useOutcomesImport', () => {
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: '100'})
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while importing these outcomes.',
         type: 'error',
@@ -244,7 +248,7 @@ describe('useOutcomesImport', () => {
           outcomeOrGroupId: groupId,
         })
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_COMPLETED})
       act(() => {
         result.current.clearGroupsStatus()

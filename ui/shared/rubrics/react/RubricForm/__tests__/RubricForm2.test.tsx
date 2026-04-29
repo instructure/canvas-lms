@@ -17,23 +17,19 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
 import * as RubricFormQueries from '../queries/RubricFormQueries'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
-import {queryClient} from '@canvas/query'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
+import {queryClient} from '@instructure/platform-query'
 import {RUBRICS_QUERY_RESPONSE} from './fixtures'
 import {RUBRIC, RUBRIC_ASSOCIATION} from '../../RubricAssignment/__tests__/fixtures'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
-jest.mock('../queries/RubricFormQueries', () => ({
-  ...jest.requireActual('../queries/RubricFormQueries'),
-  saveRubric: jest.fn(),
-  generateCriteria: jest.fn(),
-}))
-
-jest.mock('@canvas/progress/ProgressHelpers', () => ({
-  monitorProgress: jest.fn(),
+vi.mock('../queries/RubricFormQueries', async () => ({
+  ...(await vi.importActual('../queries/RubricFormQueries')),
+  saveRubric: vi.fn(),
 }))
 
 const ROOT_OUTCOME_GROUP = {
@@ -52,14 +48,16 @@ const ROOT_OUTCOME_GROUP = {
 
 describe('RubricForm Tests', () => {
   beforeEach(() => {
-    window.ENV = {
-      ...window.ENV,
+    queryClient.clear()
+    fakeEnv.setup({
       context_asset_string: 'user_1',
-    }
+    })
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    queryClient.clear()
+    vi.resetAllMocks()
+    fakeEnv.teardown()
     destroyFlashAlertContainer()
   })
 
@@ -85,17 +83,17 @@ describe('RubricForm Tests', () => {
 
   describe('save rubric', () => {
     afterEach(() => {
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     it('will navigate back to /rubrics after successfully saving', async () => {
-      jest.spyOn(RubricFormQueries, 'saveRubric').mockImplementation(() =>
+      vi.spyOn(RubricFormQueries, 'saveRubric').mockImplementation(() =>
         Promise.resolve({
           rubric: {
             id: '1',
             criteriaCount: 1,
             pointsPossible: 10,
-            title: 'Rubric 1',
+            title: 'Rubric 1 (edited)',
             criteria: [
               {
                 id: '1',
@@ -105,6 +103,7 @@ describe('RubricForm Tests', () => {
                 ratings: [],
               },
             ],
+            public: false,
           },
           rubricAssociation: {
             hidePoints: false,
@@ -112,23 +111,24 @@ describe('RubricForm Tests', () => {
             hideOutcomeResults: false,
             id: '1',
             useForGrading: true,
+            associationType: 'Assignment',
+            associationId: '1',
           },
         }),
       )
-      const {getByTestId} = renderComponent()
+
+      // Pre-populate the query cache with a rubric that has criteria
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
+
+      const {getByTestId} = renderComponent({rubricId: '1'})
       const titleInput = getByTestId('rubric-form-title')
-      fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
-      fireEvent.click(getByTestId('add-criterion-button'))
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
-        target: {value: 'New Criterion Test'},
-      })
-      fireEvent.click(getByTestId('rubric-criterion-save'))
+      fireEvent.change(titleInput, {target: {value: 'Rubric 1 (edited)'}})
+
       fireEvent.click(getByTestId('save-rubric-button'))
 
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getSRAlert()).toContain('Rubric saved successfully')
+      await waitFor(() => {
+        expect(getSRAlert()).toContain('Rubric saved successfully')
+      })
     })
 
     it('save button is disabled when title is empty', () => {
@@ -143,46 +143,8 @@ describe('RubricForm Tests', () => {
       expect(getByTestId('save-rubric-button')).toBeDisabled()
     })
 
-    it('save button is disabled when title is 255 whitespace even with criteria', async () => {
-      const {getByTestId} = renderComponent()
-      const titleInput = getByTestId('rubric-form-title')
-      fireEvent.change(titleInput, {
-        target: {
-          value:
-            '                                                                                                                                                                                                                                                               ',
-        },
-      })
-      fireEvent.click(getByTestId('add-criterion-button'))
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-
-      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
-        target: {value: 'New Criterion Test'},
-      })
-      fireEvent.click(getByTestId('rubric-criterion-save'))
-      expect(getByTestId('save-rubric-button')).toBeDisabled()
-    })
-
-    it('save button is enabled when title is 254 whitespace and 1 letter', async () => {
-      const {getByTestId} = renderComponent()
-      const titleInput = getByTestId('rubric-form-title')
-      fireEvent.change(titleInput, {
-        target: {
-          value:
-            'e                                                                                                                                                                                                                                                              ',
-        },
-      })
-      fireEvent.click(getByTestId('add-criterion-button'))
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-
-      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
-        target: {value: 'New Criterion Test'},
-      })
-      fireEvent.click(getByTestId('rubric-criterion-save'))
-
-      expect(getByTestId('save-rubric-button')).toBeEnabled()
-    })
+    // Tests involving criterion modal moved to RubricFormSaveButtonWithCriteria.test.tsx
+    // to avoid CI timeouts
 
     it('save button is disabled when there are no criteria', () => {
       const {getByTestId} = renderComponent()
@@ -191,24 +153,86 @@ describe('RubricForm Tests', () => {
       expect(getByTestId('save-rubric-button')).toBeDisabled()
     })
 
-    it('save button is enabled when title is not empty and there is criteria', async () => {
-      const {getByTestId} = renderComponent()
-      const titleInput = getByTestId('rubric-form-title')
-      fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
+    it('preserves masteryPoints when saving a rubric with outcome criteria', async () => {
+      const saveRubricSpy = vi.spyOn(RubricFormQueries, 'saveRubric').mockImplementation(() =>
+        Promise.resolve({
+          rubric: {
+            id: '1',
+            criteriaCount: 1,
+            pointsPossible: 10,
+            title: 'Rubric with Outcome',
+            public: false,
+            criteria: [
+              {
+                id: '2',
+                description: 'Outcome Criterion',
+                points: 5,
+                criterionUseRange: false,
+                masteryPoints: 3.5,
+                learningOutcomeId: 'outcome_123',
+                ratings: [],
+              },
+            ],
+          },
+          rubricAssociation: {
+            hidePoints: false,
+            hideScoreTotal: false,
+            hideOutcomeResults: false,
+            id: '1',
+            useForGrading: true,
+            associationType: 'Assignment',
+            associationId: '1',
+          },
+        }),
+      )
 
-      fireEvent.click(getByTestId('add-criterion-button'))
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
-        target: {value: 'New Criterion Test'},
+      // Load a rubric with an outcome criterion that has masteryPoints
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], {
+        ...RUBRICS_QUERY_RESPONSE,
+        criteria: [
+          {
+            id: '2',
+            points: 5,
+            description: 'Outcome Criterion',
+            longDescription: '',
+            ignoreForScoring: false,
+            masteryPoints: 3.5,
+            criterionUseRange: false,
+            outcome: {
+              displayName: 'Test Outcome',
+              title: 'Test Outcome Title',
+            },
+            learningOutcomeId: 'outcome_123',
+            ratings: [
+              {
+                id: '1',
+                description: 'Excellent',
+                longDescription: '',
+                points: 5,
+              },
+            ],
+          },
+        ],
       })
-      fireEvent.click(getByTestId('rubric-criterion-save'))
 
-      expect(getByTestId('save-rubric-button')).toBeEnabled()
+      const {getByTestId} = renderComponent({rubricId: '1'})
+      const titleInput = getByTestId('rubric-form-title')
+      fireEvent.change(titleInput, {target: {value: 'Rubric with Outcome'}})
+      fireEvent.click(getByTestId('save-rubric-button'))
+
+      await waitFor(() => {
+        expect(getSRAlert()).toContain('Rubric saved successfully')
+      })
+
+      // Verify saveRubric was called with masteryPoints preserved
+      expect(saveRubricSpy).toHaveBeenCalledTimes(1)
+      const rubricArg = saveRubricSpy.mock.calls[0][0]
+      expect(rubricArg.criteria[0].masteryPoints).toBe(3.5)
+      expect(rubricArg.criteria[0].learningOutcomeId).toBe('outcome_123')
     })
 
     it('does not display save as draft button if rubric has associations', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], {
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], {
         ...RUBRICS_QUERY_RESPONSE,
         hasRubricAssociations: true,
       })
@@ -219,11 +243,11 @@ describe('RubricForm Tests', () => {
 
     describe('Confirmation Modal', () => {
       afterEach(() => {
-        jest.clearAllMocks()
+        vi.clearAllMocks()
       })
 
       it('does not render when not on assignment level', () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryByTestId} = renderComponent({
           rubricId: '1',
@@ -275,7 +299,7 @@ describe('RubricForm Tests', () => {
         const {getByTestId, queryByTestId} = renderComponent({
           rubricId: '1',
           assignmentId: '1',
-          rubric: RUBRIC,
+          rubric: {...RUBRIC, unassessed: false},
           rubricAssociation: RUBRIC_ASSOCIATION,
         })
 
@@ -291,7 +315,7 @@ describe('RubricForm Tests', () => {
         fireEvent.click(getByTestId('scoring_type_unscored'))
 
         fireEvent.click(getByTestId('rubric-criteria-row-edit-button'))
-        // await new Promise(resolve => setTimeout(resolve, 0))
+
         const criterionNameInput = getByTestId('rubric-criterion-name-input')
         fireEvent.change(criterionNameInput, {target: {value: 'Criterion 1 (edited)'}})
         fireEvent.click(getByTestId('rubric-criterion-save'))
@@ -300,11 +324,26 @@ describe('RubricForm Tests', () => {
         expect(queryByTestId('edit-confirm-modal')).toBeInTheDocument()
       })
 
+      it('does not render when rubric is unassessed', () => {
+        const {getByTestId, queryByTestId} = renderComponent({
+          rubricId: '1',
+          assignmentId: '1',
+          rubric: {...RUBRIC, unassessed: true},
+          rubricAssociation: RUBRIC_ASSOCIATION,
+        })
+
+        const titleInput = getByTestId('rubric-form-title')
+        fireEvent.change(titleInput, {target: {value: 'Rubric 1 (edited)'}})
+
+        fireEvent.click(getByTestId('save-rubric-button'))
+        expect(queryByTestId('edit-confirm-modal')).toBeNull()
+      })
+
       it('calls save on confirmation', async () => {
         const {getByTestId} = renderComponent({
           rubricId: '1',
           assignmentId: '1',
-          rubric: RUBRIC,
+          rubric: {...RUBRIC, unassessed: false},
           rubricAssociation: RUBRIC_ASSOCIATION,
         })
 
@@ -314,15 +353,17 @@ describe('RubricForm Tests', () => {
         fireEvent.click(getByTestId('save-rubric-button'))
 
         fireEvent.click(getByTestId('edit-confirm-btn'))
-        await new Promise(resolve => setTimeout(resolve, 0))
-        expect(RubricFormQueries.saveRubric).toHaveBeenCalled()
+
+        await waitFor(() => {
+          expect(RubricFormQueries.saveRubric).toHaveBeenCalled()
+        })
       })
 
       it('does not call save on cancel', async () => {
         const {getByTestId} = renderComponent({
           rubricId: '1',
           assignmentId: '1',
-          rubric: RUBRIC,
+          rubric: {...RUBRIC, unassessed: false},
           rubricAssociation: RUBRIC_ASSOCIATION,
         })
 
@@ -332,8 +373,10 @@ describe('RubricForm Tests', () => {
         fireEvent.click(getByTestId('save-rubric-button'))
 
         fireEvent.click(getByTestId('edit-cancel-btn'))
-        await new Promise(resolve => setTimeout(resolve, 0))
-        expect(RubricFormQueries.saveRubric).not.toHaveBeenCalled()
+
+        await waitFor(() => {
+          expect(RubricFormQueries.saveRubric).not.toHaveBeenCalled()
+        })
       })
     })
   })

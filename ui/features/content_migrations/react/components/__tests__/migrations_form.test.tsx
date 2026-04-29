@@ -20,8 +20,16 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ContentMigrationsForm from '../migrations_form'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {completeUpload} from '@canvas/upload-file'
+import fakeEnv from '@canvas/test-utils/fakeENV'
+
+const server = setupServer()
+
+// Track API calls
+let postCalled = false
+let postRequestBody: any = null
 
 const attachment = {
   id: '183',
@@ -48,19 +56,20 @@ const attachment = {
   locked_for_user: false,
 }
 
-jest.mock('@canvas/upload-file', () => ({
-  completeUpload: jest.fn(async () => attachment),
+vi.mock('@canvas/upload-file', () => ({
+  completeUpload: vi.fn(async () => attachment),
 }))
 
-const CommonCartridgeImporter = jest.fn()
-// @ts-expect-error
-jest.mock('../migrator_forms/common_cartridge', () => props => {
-  CommonCartridgeImporter(props)
-  // @ts-expect-error
-  return <mock-CommonCartridgeImporter />
-})
+const CommonCartridgeImporter = vi.fn()
+vi.mock('../migrator_forms/common_cartridge', () => ({
+  default: (props: any) => {
+    CommonCartridgeImporter(props)
+    // @ts-expect-error
+    return <mock-CommonCartridgeImporter />
+  },
+}))
 
-const setMigrationsMock = jest.fn()
+const setMigrationsMock = vi.fn()
 
 const renderComponent = (overrideProps?: any) =>
   render(<ContentMigrationsForm setMigrations={setMigrationsMock} {...overrideProps} />)
@@ -84,37 +93,51 @@ describe('ContentMigrationForm', () => {
     workflow_state: 'queued',
   }
 
-  beforeEach(() => {
-    window.ENV.COURSE_ID = '0'
-    window.ENV.NEW_QUIZZES_MIGRATION = true
-    // @ts-expect-error
-    window.ENV.current_user = {id: '1'}
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
-    fetchMock.mock('/api/v1/courses/0/content_migrations/migrators', [
-      {
-        name: 'Copy a Canvas Course',
-        type: 'course_copy_importer',
-      },
-      {
-        name: 'Canvas Course Export Package',
-        type: 'canvas_cartridge_importer',
-      },
-      {
-        name: 'Common Course Export Package',
-        type: 'common_cartridge_importer',
-      },
-    ])
-    fetchMock.mock('/api/v1/courses/0/content_migrations', postResponseMock, {
-      overwriteRoutes: true,
+  beforeEach(() => {
+    server.resetHandlers()
+    postCalled = false
+    postRequestBody = null
+
+    fakeEnv.setup({
+      COURSE_ID: '0',
+      NEW_QUIZZES_MIGRATION: true,
+      current_user: {id: '1'},
     })
-    fetchMock.mock(
-      /users\/1\/manageable_courses\?(.*&)?term=.*(&.*)?current_course_id=.*|current_course_id=.*(&.*)?term=.*/,
-      [{id: '3', label: 'MyCourse'}],
+
+    server.use(
+      http.get('/api/v1/courses/0/content_migrations/migrators', () => {
+        return HttpResponse.json([
+          {
+            name: 'Copy a Canvas Course',
+            type: 'course_copy_importer',
+          },
+          {
+            name: 'Canvas Course Export Package',
+            type: 'canvas_cartridge_importer',
+          },
+          {
+            name: 'Common Course Export Package',
+            type: 'common_cartridge_importer',
+          },
+        ])
+      }),
+      http.post('/api/v1/courses/0/content_migrations', async ({request}) => {
+        postCalled = true
+        postRequestBody = await request.json()
+        return HttpResponse.json(postResponseMock)
+      }),
+      http.get(/\/users\/1\/manageable_courses/, () => {
+        return HttpResponse.json([{id: '3', label: 'MyCourse'}])
+      }),
     )
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    vi.clearAllMocks()
+    fakeEnv.teardown()
   })
 
   it('does not show any form by default', () => {
@@ -130,7 +153,7 @@ describe('ContentMigrationForm', () => {
   })
 
   it('Populates select with migrator options', async () => {
-    render(<ContentMigrationsForm setMigrations={jest.fn()} />)
+    render(<ContentMigrationsForm setMigrations={vi.fn()} />)
     const selectOne = await screen.findByTitle('Select one')
     await userEvent.click(selectOne)
     expect(screen.getByText('Copy a Canvas Course')).toBeInTheDocument()
@@ -148,20 +171,21 @@ describe('ContentMigrationForm', () => {
 
     await userEvent.click(screen.getByTestId('submitMigration'))
 
-    const foundCall = fetchMock.calls('/api/v1/courses/0/content_migrations')[0]
-    expect(foundCall[0]).toBe('/api/v1/courses/0/content_migrations')
-    expect(JSON.parse(foundCall[1]?.body as string)).toStrictEqual({
-      course_id: '0',
-      migration_type: 'course_copy_importer',
-      settings: {import_quizzes_next: false, source_course_id: '3'},
-      selective_import: false,
-      date_shift_options: {
-        day_substitutions: {},
-        new_end_date: '',
-        new_start_date: '',
-        old_end_date: '',
-        old_start_date: '',
-      },
+    await waitFor(() => {
+      expect(postCalled).toBe(true)
+      expect(postRequestBody).toStrictEqual({
+        course_id: '0',
+        migration_type: 'course_copy_importer',
+        settings: {import_quizzes_next: false, source_course_id: '3'},
+        selective_import: false,
+        date_shift_options: {
+          day_substitutions: {},
+          new_end_date: '',
+          new_start_date: '',
+          old_end_date: '',
+          old_start_date: '',
+        },
+      })
     })
   })
 
@@ -169,19 +193,19 @@ describe('ContentMigrationForm', () => {
     // Reset the mock before this test to ensure clean state
     setMigrationsMock.mockReset()
 
-    fetchMock.mock(
-      '/api/v1/courses/0/content_migrations',
-      {
-        id: '4',
-        migration_type: 'course_copy_importer',
-        migration_type_title: 'Test',
-        pre_attachment: {
-          name: 'my_file.zip',
-          size: 1024,
-          no_redirect: false,
-        },
-      },
-      {overwriteRoutes: true},
+    server.use(
+      http.post('/api/v1/courses/0/content_migrations', async () => {
+        return HttpResponse.json({
+          id: '4',
+          migration_type: 'course_copy_importer',
+          migration_type_title: 'Test',
+          pre_attachment: {
+            name: 'my_file.zip',
+            size: 1024,
+            no_redirect: false,
+          },
+        })
+      }),
     )
 
     renderComponent()
@@ -308,9 +332,11 @@ describe('ContentMigrationForm', () => {
           workflow_state: 'running', // Explicitly set the workflow_state
         }
 
-        fetchMock.mock('/api/v1/courses/0/content_migrations', runningResponse, {
-          overwriteRoutes: true,
-        })
+        server.use(
+          http.post('/api/v1/courses/0/content_migrations', async () => {
+            return HttpResponse.json(runningResponse)
+          }),
+        )
         renderComponent()
         await submitAMigration()
 
@@ -335,9 +361,11 @@ describe('ContentMigrationForm', () => {
           workflow_state: 'waiting_for_select', // Explicitly set the workflow_state
         }
 
-        fetchMock.mock('/api/v1/courses/0/content_migrations', waitingForSelectResponse, {
-          overwriteRoutes: true,
-        })
+        server.use(
+          http.post('/api/v1/courses/0/content_migrations', async () => {
+            return HttpResponse.json(waitingForSelectResponse)
+          }),
+        )
         renderComponent()
         await submitAMigration()
 

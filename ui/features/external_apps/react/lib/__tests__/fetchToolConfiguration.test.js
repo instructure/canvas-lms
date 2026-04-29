@@ -19,12 +19,12 @@
 import axios from '@canvas/axios'
 import fetchToolConfiguration from '../fetchToolConfiguration'
 
-const errorHandler = jest.fn()
+const errorHandler = vi.fn()
 const clientId = 10000000009
 const showUrl = 'https://www.test.com/:developer_key_id/tool_configuration'
 
 beforeEach(() => {
-  axios.get = jest.fn()
+  axios.get = vi.fn()
 })
 
 afterEach(() => {

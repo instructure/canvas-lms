@@ -21,8 +21,8 @@ import useResize from '../useResize'
 import {render, screen, fireEvent} from '@testing-library/react'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 
-jest.mock('@canvas/i18n/rtlHelper', () => ({
-  isRTL: jest.fn(),
+vi.mock('@canvas/i18n/rtlHelper', () => ({
+  isRTL: vi.fn(),
 }))
 
 const mockContainer = {
@@ -46,7 +46,7 @@ const mockDelimiter = {
   bottom: 500,
 }
 const mockElement = () => {
-  Element.prototype.getBoundingClientRect = jest
+  Element.prototype.getBoundingClientRect = vi
     .fn()
     .mockReturnValueOnce(mockContainer)
     .mockReturnValueOnce(mockDelimiter)
@@ -86,13 +86,13 @@ const renderTestComponent = () => render(<TestComponent />)
 
 describe('useResize', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     mockElement()
     isRTL.mockImplementation(() => false)
   })
 
   it('adds event listeners on mount', () => {
-    const addEventListenerSpy = jest.spyOn(EventTarget.prototype, 'addEventListener')
+    const addEventListenerSpy = vi.spyOn(EventTarget.prototype, 'addEventListener')
 
     const {unmount} = renderTestComponent()
 
@@ -104,7 +104,7 @@ describe('useResize', () => {
   })
 
   it('removes event listeners on unmount', () => {
-    const removeEventListenerSpy = jest.spyOn(EventTarget.prototype, 'removeEventListener')
+    const removeEventListenerSpy = vi.spyOn(EventTarget.prototype, 'removeEventListener')
 
     const {unmount} = renderTestComponent()
 

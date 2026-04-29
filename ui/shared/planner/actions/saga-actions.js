@@ -95,9 +95,23 @@ export const mergeWeekItems =
     return false
   }
 
-export const consumePeekIntoPast = (newPastItems, _response) => (dispatch, _getState) => {
+export const consumePeekIntoPast = (newPastItems, response) => (dispatch, getState) => {
   const hasSomeItems = newPastItems.length > 0
   dispatch(LA.peekedIntoPast({hasSomeItems}))
+
+  if (hasSomeItems) {
+    dispatch(LA.gotPartialPastDays(itemsToDays(newPastItems), response))
+    const state = getState()
+    if (state && state.loading) {
+      const completeDays = extractCompleteDays(
+        state.loading.partialPastDays,
+        state.loading.allPastItemsLoaded,
+        'desc',
+      )
+      mergeCompleteDays(completeDays, dispatch, state.loading.allPastItemsLoaded, response)
+    }
+  }
+
   return true
 }
 

@@ -18,8 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Course < ActiveRecord::Base
+class Course < ApplicationRecord
   include Context
+  include Accessibility::Scannable
   include Workflow
   include TextHelper
   include HtmlTextHelper
@@ -33,10 +34,44 @@ class Course < ActiveRecord::Base
   include CopiedAssets
   include LinkedAttachmentHandler
 
-  attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by
+  include MasterCourses::Restrictor
+
+  restrict_columns :content, [:syllabus_body]
+
+  attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by, :saving_user
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
 
   alias_attribute :short_name, :course_code
+
+  SIMPLY_VERSIONED_EXCLUDE_FIELDS = %w[
+    id
+    account_id
+    root_account_id
+    wiki_id
+    enrollment_term_id
+    abstract_course_id
+    grading_standard_id
+    template_course_id
+    replacement_course_id
+    latest_outcome_import_id
+    homeroom_course_id
+    sis_source_id
+    sis_batch_id
+    stuck_sis_fields
+    integration_id
+    lti_context_id
+    turnitin_id
+    workflow_state
+    uuid
+    indexed
+    delete_me_frd
+    deleted_at
+    archived_at
+    storage_quota
+    created_at
+    updated_at
+    career_learning_library_only
+  ].freeze
 
   time_zone_attribute :time_zone
   def time_zone
@@ -100,7 +135,9 @@ class Course < ActiveRecord::Base
   has_many :all_real_student_enrollments, -> { where("enrollments.type = 'StudentEnrollment' AND enrollments.workflow_state <> 'deleted'").preload(:user) }, class_name: "StudentEnrollment"
   has_many :all_real_students, through: :all_real_student_enrollments, source: :user
   has_many :teacher_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: "TeacherEnrollment"
-  has_many :teachers, -> { order("sortable_name") }, through: :teacher_enrollments, source: :user
+  has_many :teachers, -> { order(:sortable_name) }, through: :teacher_enrollments, source: :user
+  has_many :active_teacher_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type = 'TeacherEnrollment'").preload(:user) }, class_name: "TeacherEnrollment"
+  has_many :active_teachers, -> { order(:sortable_name) }, through: :active_teacher_enrollments, source: :user
   has_many :ta_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: "TaEnrollment"
   has_many :tas, through: :ta_enrollments, source: :user
   has_many :observer_enrollments, -> { where("enrollments.workflow_state NOT IN ('rejected', 'deleted')").preload(:user) }, class_name: "ObserverEnrollment"
@@ -179,6 +216,7 @@ class Course < ActiveRecord::Base
   has_many :combined_groups_and_differentiation_tags, class_name: "Group", as: :context, inverse_of: :context
   has_many :assignment_groups, -> { order("assignment_groups.position", AssignmentGroup.best_unicode_collation_key("assignment_groups.name")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :assignments, -> { order("assignments.created_at") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :ai_experiences, dependent: :destroy
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :submissions, -> { active.order("submissions.updated_at DESC") }, inverse_of: :course, dependent: :destroy
   has_many :submission_comments, -> { published }, as: :context, inverse_of: :context
@@ -195,7 +233,7 @@ class Course < ActiveRecord::Base
   has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order("folders.name") }, class_name: "Folder", as: :context, inverse_of: :context
   has_many :messages, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :context_external_tools, -> { order("name") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :context_external_tools, -> { order(:name) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :tool_proxies, class_name: "Lti::ToolProxy", as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :wiki
   has_many :wiki_pages, as: :context, inverse_of: :context
@@ -205,14 +243,14 @@ class Course < ActiveRecord::Base
   has_many :active_quizzes, -> { preload(:assignment).where("quizzes.workflow_state<>'deleted'").order(:created_at) }, class_name: "Quizzes::Quiz", as: :context, inverse_of: :context
   has_many :assessment_question_banks, -> { preload(:assessment_questions, :assessment_question_bank_users) }, as: :context, inverse_of: :context
   has_many :assessment_questions, through: :assessment_question_banks
-  def inherited_assessment_question_banks(include_self = false)
-    account.inherited_assessment_question_banks(true, *(include_self ? [self] : []))
+  def inherited_assessment_question_banks(include_self: false)
+    account.inherited_assessment_question_banks(*(include_self ? [self] : []), include_self: true)
   end
 
   has_many :external_feeds, as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :grading_standard
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
-  has_many :web_conferences, -> { order("created_at DESC") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :web_conferences, -> { order(created_at: :desc) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :collaborations, -> { order(Arel.sql("collaborations.title, collaborations.created_at")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :context_modules, -> { ordered }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :context_module_progressions, through: :context_modules
@@ -224,7 +262,7 @@ class Course < ActiveRecord::Base
   has_many :role_overrides, as: :context, inverse_of: :context
   has_many :content_migrations, as: :context, inverse_of: :context
   has_many :content_exports, as: :context, inverse_of: :context
-  has_many :epub_exports, -> { where(type: nil).order("created_at DESC") }
+  has_many :epub_exports, -> { where(type: nil).order(created_at: :desc) }
   has_many :course_reports, dependent: :destroy
 
   has_many :gradebook_filters, inverse_of: :course, dependent: :destroy
@@ -247,6 +285,8 @@ class Course < ActiveRecord::Base
 
   has_many :progresses, as: :context, inverse_of: :context
   has_many :gradebook_csvs, inverse_of: :course, class_name: "GradebookCSV"
+  has_many :institutional_tag_associations
+  has_many :institutional_tags, through: :institutional_tag_associations
 
   has_many :master_course_templates, class_name: "MasterCourses::MasterTemplate"
   # only valid if non-nil
@@ -291,9 +331,16 @@ class Course < ActiveRecord::Base
   has_many :favorites, as: :context, inverse_of: :context, dependent: :destroy
   has_many :group_and_membership_importers, dependent: :destroy, inverse_of: :course
 
+  has_many :accessibility_resource_scans, dependent: :destroy
+  has_many :accessibility_issues, dependent: :destroy
+  has_many :allocation_rules, dependent: :destroy
+
+  has_one :accessibility_course_statistic, dependent: :destroy
+
   prepend Profile::Association
 
   before_create :set_restrict_quantitative_data_when_needed
+  before_create :snapshot_account_default_discussion_settings
 
   before_save :assign_uuid
   before_validation :assert_defaults
@@ -301,13 +348,19 @@ class Course < ActiveRecord::Base
   before_save :update_show_total_grade_as_on_weighting_scheme_change
   before_save :set_self_enrollment_code
   before_save :validate_license
+  before_save :set_career_learning_library_only, if: -> { account_id_changed? || new_record? || career_learning_library_only_changed? }
   before_save :set_horizon_course, if: -> { account_id_changed? || new_record? }
+  before_save :update_syllabus_timestamp
+  before_save :handle_syllabus_master_template_tracking
+  before_save :touch_root_folder_if_necessary
+  after_save :handle_horizon_activation, if: :just_became_horizon_course?
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_lti_context_controls_if_necessary
   after_save :update_enrollment_states_if_necessary
   after_save :clear_caches_if_necessary
   after_save :log_published_assignment_count
+  after_save :remove_course_pacing_overrides_if_disabled
   after_commit :update_cached_due_dates
 
   after_create :set_default_post_policy
@@ -320,10 +373,8 @@ class Course < ActiveRecord::Base
   after_update :log_course_format_publish_update, if: :saved_change_to_workflow_state?
   after_update :log_course_pacing_settings_update, if: :change_to_logged_settings?
   after_update :log_rqd_setting_enable_or_disable
+  after_update :queue_remap_enrollment_roles
 
-  before_update :handle_syllabus_changes_for_master_migration
-
-  before_save :touch_root_folder_if_necessary
   before_validation :verify_unique_ids
   validate :validate_course_dates
   validate :validate_course_image
@@ -331,6 +382,7 @@ class Course < ActiveRecord::Base
   validate :validate_default_view
   validate :validate_template
   validate :validate_not_on_siteadmin
+  validate :validate_enrollment_roles
   validates :sis_source_id, uniqueness: { scope: :root_account }, allow_nil: true
   validates :account_id, :root_account_id, :enrollment_term_id, :workflow_state, presence: true
   validates :syllabus_body, length: { maximum: maximum_long_text_length, allow_blank: true }
@@ -341,7 +393,55 @@ class Course < ActiveRecord::Base
 
   sanitize_field :syllabus_body, CanvasSanitize::SANITIZE
 
+  before_save :check_if_should_save_original_syllabus_version
+  after_save :save_original_syllabus_version_if_needed
+
+  def check_if_should_save_original_syllabus_version
+    @should_save_original_syllabus_version = syllabus_body_changed? &&
+                                             syllabus_body_was.present? &&
+                                             account&.feature_enabled?(:syllabus_versioning) &&
+                                             unversioned?
+  rescue
+    @should_save_original_syllabus_version = false
+  end
+
+  def save_original_syllabus_version_if_needed
+    return unless @should_save_original_syllabus_version
+
+    original_attributes = attributes.merge("syllabus_body" => syllabus_body_previously_was)
+    versions.create(yaml: original_attributes.except(*simply_versioned_options[:exclude]).to_yaml)
+  rescue => e
+    Rails.logger.warn("Error saving original syllabus version: #{e.message}")
+  end
+
+  simply_versioned exclude: SIMPLY_VERSIONED_EXCLUDE_FIELDS,
+                   keep: 5,
+                   when: lambda { |course|
+                     return false unless course.syllabus_body_changed?
+
+                     begin
+                       !!course.account&.feature_enabled?(:syllabus_versioning)
+                     rescue => e
+                       Rails.logger.warn("Error checking syllabus_versioning flag: #{e.message}")
+                       false
+                     end
+                   },
+                   on_create: lambda { |course, version|
+                     if course.updating_user
+                       begin
+                         yaml_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+                         yaml_data["user_id"] = course.updating_user.id
+                         version.yaml = yaml_data.to_yaml
+                         version.save
+                       rescue => e
+                         Rails.logger.error("Failed to add user_id to course version: #{e.message}")
+                       end
+                     end
+                   },
+                   versioned_associations: [:attachment_associations]
+
   include StickySisFields
+
   are_sis_sticky :name,
                  :course_code,
                  :start_at,
@@ -355,6 +455,7 @@ class Course < ActiveRecord::Base
   include FeatureFlags
 
   include ContentNotices
+
   define_content_notice :import_in_progress,
                         text: -> { t("One or more items are currently being imported. They will be shown in the course below once they are available.") },
                         link_text: -> { t("Import Status") },
@@ -368,6 +469,9 @@ class Course < ActiveRecord::Base
   # A hard limit on the number of graders (excluding the moderator) a moderated
   # assignment can have.
   MODERATED_GRADING_GRADER_LIMIT = 10
+
+  # Maximum number of resources that can be scanned for accessibility issues
+  MAX_ACCESSIBILITY_SCAN_RESOURCES = 1000
 
   # using a lambda for setting name to avoid caching the translated string when the model is loaded
   # (in case selected language changes)
@@ -483,6 +587,17 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def delete_lti_context_controls
+    updates = { workflow_state: "deleted_with_context", updated_at: Time.current }
+    Lti::ContextControl.where(course_id: id).active.in_batches.update_all(updates)
+  end
+
+  def undelete_lti_context_controls
+    updates = { workflow_state: "active", updated_at: Time.current }
+    # Only restore context controls that were deleted with the context (course)
+    Lti::ContextControl.where(course_id: id, workflow_state: "deleted_with_context").in_batches.update_all(updates)
+  end
+
   def update_enrollment_states_if_necessary
     return if previously_new_record? # new object, nothing to possibly invalidate
 
@@ -521,6 +636,21 @@ class Course < ActiveRecord::Base
     return if just_published # Don't decrement on publish
 
     InstStatsd::Statsd.decrement(settings_before_last_save[:enable_course_paces] ? "course.paced.has_end_date" : "course.unpaced.has_end_date") if had_end_date
+  end
+
+  def remove_course_pacing_overrides_if_disabled
+    return unless root_account&.feature_enabled?(:course_pace_remove_overrides_on_disable)
+    return unless saved_changes[:settings]
+
+    old_settings = saved_changes[:settings][0] || {}
+    new_settings = saved_changes[:settings][1] || {}
+
+    return unless old_settings[:enable_course_paces] == true && new_settings[:enable_course_paces] == false
+
+    CoursePacing::RemoveOverridesService.delay_if_production(
+      priority: Delayed::LOW_PRIORITY,
+      n_strand: ["course_pacing_remove_overrides", global_root_account_id]
+    ).call(id)
   end
 
   def module_based?
@@ -706,10 +836,62 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def validate_enrollment_roles
+    return unless account_id_changed?
+
+    @role_map = build_role_map
+    if @role_map[:missing].present?
+      errors.add(:account_id,
+                 t("course roles unavailable in %{account}: %{roles}",
+                   account: account.name,
+                   roles: @role_map[:missing].join(", ")))
+    end
+  end
+
+  def queue_remap_enrollment_roles
+    return unless @role_map.present?
+
+    self.class.connection.after_transaction_commit do
+      delay_if_production.remap_enrollment_roles(@role_map.except(:missing))
+    end
+  end
+
+  def remap_enrollment_roles(role_map)
+    Course.transaction do
+      role_map.each do |old_role_id, new_role_id|
+        enrollments.where(role_id: old_role_id).in_batches.update_all(role_id: new_role_id, updated_at: Time.now.utc)
+      end
+    end
+  end
+
+  # returns a mapping from (existing role id => role id in the new account), matching by role name and built_in status
+  # names of roles unavailable in the new account are returned under the :missing key
+  def build_role_map
+    role_map = {}
+    used_roles = Role.where(id: enrollments.distinct.select(:role_id)).to_a
+    if used_roles.any?
+      available_roles = account.available_course_roles(include_inactive: true)
+      (used_roles - available_roles).each do |missing_role|
+        replacement_role = available_roles.find do |role|
+          role.built_in? == missing_role.built_in? &&
+            role.name == missing_role.name &&
+            role.base_role_type == missing_role.base_role_type
+        end
+        if replacement_role
+          role_map[missing_role.id] = replacement_role.id
+        else
+          role_map[:missing] ||= []
+          role_map[:missing] << missing_role.name
+        end
+      end
+    end
+    role_map
+  end
+
   def image
     @image ||= if image_id.present?
                  shard.activate do
-                   attachments.active.find_by(id: image_id)&.public_download_url(1.week)
+                   attachments.active.find_by(id: image_id)&.public_download_url(expires_in: 1.week, no_jti: true)
                  end
                elsif image_url
                  image_url
@@ -719,7 +901,7 @@ class Course < ActiveRecord::Base
   def banner_image
     @banner_image ||= if banner_image_id.present?
                         shard.activate do
-                          attachments.active.find_by(id: banner_image_id)&.public_download_url(1.week)
+                          attachments.active.find_by(id: banner_image_id)&.public_download_url(expires_in: 1.week, no_jti: true)
                         end
                       elsif banner_image_url
                         banner_image_url
@@ -962,9 +1144,9 @@ class Course < ActiveRecord::Base
     end
   end
 
-  scope :recently_started, -> { where(start_at: 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_ended, -> { where(conclude_at: 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_created, -> { where(created_at: 1.month.ago..Time.zone.now).order("created_at DESC").limit(50).preload(:teachers) }
+  scope :recently_started, -> { where(start_at: 1.month.ago..Time.zone.now).order(start_at: :desc).limit(10) }
+  scope :recently_ended, -> { where(conclude_at: 1.month.ago..Time.zone.now).order(start_at: :desc).limit(10) }
+  scope :recently_created, -> { where(created_at: 1.month.ago..Time.zone.now).order(created_at: :desc).limit(50).preload(:teachers) }
   scope :for_term, ->(term) { term ? where(enrollment_term_id: term) : all }
   scope :active_first, -> { order(Arel.sql("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key("name")}")) }
   scope :name_like, lambda { |query|
@@ -1060,17 +1242,26 @@ class Course < ActiveRecord::Base
       where(CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids).arel.exists)
     end
   }
-  scope :published, -> { where(workflow_state: %w[available completed]) }
-  scope :unpublished, -> { where(workflow_state: %w[created claimed]) }
+  PUBLISHED_STATES = %w[available completed].freeze
+  UNPUBLISHED_STATES = %w[created claimed].freeze
+
+  # Maps virtual API state names to real workflow states
+  API_STATE_EXPANSIONS = {
+    "unpublished" => UNPUBLISHED_STATES,
+    "current_and_concluded" => PUBLISHED_STATES,
+  }.freeze
+
+  scope :published, -> { where(workflow_state: PUBLISHED_STATES) }
+  scope :unpublished, -> { where(workflow_state: UNPUBLISHED_STATES) }
 
   scope :deleted, -> { where(workflow_state: "deleted") }
   scope :archived, -> { deleted.where.not(archived_at: nil) }
 
   scope :master_courses, -> { joins(:master_course_templates).where.not(MasterCourses::MasterTemplate.table_name => { workflow_state: "deleted" }) }
-  scope :not_master_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::MasterTemplate.quoted_table_name} AS mct ON mct.course_id=courses.id AND mct.workflow_state<>'deleted'").where("mct IS NULL") } # rubocop:disable Rails/WhereEquals -- mct is a table, not a column
+  scope :not_master_courses, -> { left_joins(:master_course_templates).where("master_courses_master_templates.id IS NULL OR master_courses_master_templates.workflow_state = 'deleted'") }
 
   scope :associated_courses, -> { joins(:master_course_subscriptions).where.not(MasterCourses::ChildSubscription.table_name => { workflow_state: "deleted" }) }
-  scope :not_associated_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'").where("mcs IS NULL") } # rubocop:disable Rails/WhereEquals -- mcs is a table, not a column
+  scope :not_associated_courses, -> { left_joins(:master_course_subscriptions).where("master_courses_child_subscriptions.id IS NULL OR master_courses_child_subscriptions.workflow_state = 'deleted'") }
 
   scope :public_courses, -> { where(is_public: true) }
   scope :not_public_courses, -> { where(is_public: false) }
@@ -1078,10 +1269,13 @@ class Course < ActiveRecord::Base
   scope :templates, -> { where(template: true) }
 
   scope :homeroom, -> { where(homeroom_course: true) }
-  scope :syncing_subjects, -> { joins("INNER JOIN #{Course.quoted_table_name} AS homeroom ON homeroom.id = courses.homeroom_course_id").where("homeroom.homeroom_course = true AND homeroom.workflow_state <> 'deleted'").where(sis_batch_id: nil).where(sync_enrollments_from_homeroom: true) }
+  scope :syncing_subjects, -> { joins("INNER JOIN #{Course.quoted_table_name} AS homeroom ON homeroom.id = courses.homeroom_course_id").where("homeroom.homeroom_course = true AND homeroom.workflow_state <> 'deleted'").where(sis_batch_id: nil).where(sync_enrollments_from_homeroom: true).where.not(workflow_state: "deleted") }
 
   scope :horizon, -> { where(horizon_course: true) }
   scope :not_horizon, -> { where(horizon_course: false) }
+
+  scope :career_learning_library, -> { where(career_learning_library_only: true) }
+  scope :not_career_learning_library, -> { where(career_learning_library_only: false) }
 
   def potential_collaborators
     current_users
@@ -1377,17 +1571,16 @@ class Course < ActiveRecord::Base
     shard.activate do
       if workflow_state_changed? || (sis_batch && saved_change_to_workflow_state?)
         if completed?
-          enrollment_info = Enrollment.where(course_id: self, workflow_state: ["active", "invited"]).select(:id, :workflow_state).to_a
-          if enrollment_info.any?
-            data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: enrollment_info, updated_state: "completed")
-            Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "completed", completed_at: Time.now.utc)
+          current_enrollments = enrollments.where(workflow_state: ["active", "invited"])
+          if current_enrollments.any?
+            data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: current_enrollments.select(:id, :workflow_state), updated_state: "completed")
+            current_enrollments.update_all(workflow_state: "completed", completed_at: Time.now.utc)
 
             EnrollmentState.transaction do
-              locked_ids = EnrollmentState.where(enrollment_id: enrollment_info.map(&:id)).lock("FOR NO KEY UPDATE").order(:enrollment_id).pluck(:enrollment_id)
-              EnrollmentState.where(enrollment_id: locked_ids)
-                             .update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "completed", true, false, Time.now.utc])
+              enroll_states = EnrollmentState.where(enrollment_id: current_enrollments).lock("FOR NO KEY UPDATE").order(:enrollment_id)
+              enroll_states.update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "completed", true, false, Time.now.utc])
             end
-            EnrollmentState.delay_if_production.process_states_for_ids(enrollment_info.map(&:id)) # recalculate access
+            EnrollmentState.delay_if_production.process_states_for_ids(current_enrollments.pluck(:id)) # recalculate access
           end
 
           appointment_participants.active.current.update_all(workflow_state: "deleted")
@@ -1395,14 +1588,12 @@ class Course < ActiveRecord::Base
         elsif deleted?
           user_ids = enrollments.group(:user_id).pluck(:user_id).uniq
           if user_ids.any?
-            enrollment_info = enrollments.select(:id, :workflow_state).to_a
-            if enrollment_info.any?
-              data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: enrollment_info, updated_state: "deleted")
-              Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "deleted", archived_at:)
+            if enrollments.any?
+              data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: enrollments.select(:id, :workflow_state), updated_state: "deleted")
+              enrollments.update_all(workflow_state: "deleted", archived_at:)
               EnrollmentState.transaction do
-                locked_ids = EnrollmentState.where(enrollment_id: enrollment_info.map(&:id)).lock("FOR NO KEY UPDATE").order(:enrollment_id).pluck(:enrollment_id)
-                EnrollmentState.where(enrollment_id: locked_ids)
-                               .update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "deleted", true, Time.now.utc])
+                enroll_states = EnrollmentState.where(enrollment_id: enrollments).lock("FOR NO KEY UPDATE").order(:enrollment_id)
+                enroll_states.update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "deleted", true, Time.now.utc])
               end
             end
             User.delay_if_production.update_account_associations(user_ids)
@@ -1491,6 +1682,17 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def set_career_learning_library_only
+    return if dummy?
+
+    new_account = Account.find(account_id)
+    return unless new_account
+
+    unless root_account.feature_enabled?(:horizon_learning_library_ms2) && new_account.horizon_account?
+      self.career_learning_library_only = false
+    end
+  end
+
   def set_horizon_course
     return if dummy?
 
@@ -1507,6 +1709,14 @@ class Course < ActiveRecord::Base
       Folder.root_folders(self).each(&:touch) if files_tab_was_hidden != tab_hidden?(TAB_FILES)
     end
     true
+  end
+
+  def just_became_horizon_course?
+    saved_change_to_horizon_course? && horizon_course?
+  end
+
+  def handle_horizon_activation
+    delay(n_strand: ["horizon_content_discovery", global_root_account_id], singleton: "horizon_content_discovery:#{global_id}").ingest_horizon_content
   end
 
   def update_cached_due_dates
@@ -1571,34 +1781,64 @@ class Course < ActiveRecord::Base
     )
   end
 
-  def handle_syllabus_changes_for_master_migration
-    if syllabus_body_changed?
-      self.syllabus_updated_at = Time.now.utc
-      if @master_migration
-        updating_master_template_id = @master_migration.master_course_subscription.master_template_id
-        # master migration sync
-        self.syllabus_master_template_id ||= updating_master_template_id if syllabus_body_was.blank? # sync if there was no syllabus before
-        if self.syllabus_master_template_id.to_i != updating_master_template_id
-          restore_syllabus_body! # revert the change
-          @master_migration.add_skipped_item(:syllabus)
-        end
-      elsif self.syllabus_master_template_id
-        # local change - remove the template id to prevent future syncs
-        self.syllabus_master_template_id = nil
-      end
-    end
+  def ingest_horizon_content
+    return unless horizon_course?
+
+    files = attachments
+            .active
+            .by_content_types(PineClient.allowed_attachment_content_types)
+
+    pages = wiki_pages.active
+
+    files.find_each(&:index_in_pine)
+
+    pages.find_each(&:index_in_pine)
   end
 
   def self.html_fields
     %w[syllabus_body].freeze
   end
 
+  # rubocop:disable Naming/PredicatePrefix
+  # Method name matches existing convention used across master courses
+  # Course uses cached lookup since it doesn't have migration_id column
+  def is_child_content?
+    MasterCourses::ChildSubscription.is_child_course?(id)
+  end
+  # rubocop:enable Naming/PredicatePrefix
+
+  def find_child_content_restrictions
+    {}
+  end
+
+  def update_syllabus_timestamp
+    if syllabus_body_changed?
+      self.syllabus_updated_at = Time.now.utc
+    end
+  end
+
+  def handle_syllabus_master_template_tracking
+    return unless syllabus_body_changed?
+
+    migration = @importing_migration || @master_migration
+    if migration
+      updating_master_template_id = migration.master_course_subscription.master_template_id
+      self.syllabus_master_template_id ||= updating_master_template_id if syllabus_body_was.blank?
+      if self.syllabus_master_template_id.to_i != updating_master_template_id
+        restore_syllabus_body!
+        migration.add_skipped_item(:syllabus)
+      end
+    elsif self.syllabus_master_template_id
+      self.syllabus_master_template_id = nil
+    end
+  end
+
   def attachment_associations_enabled?
     root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
   end
 
-  def access_for_attachment_association?(user, session, _association, location_param)
-    location_param.start_with?("course_syllabus_") && grants_right?(user, session, :read_syllabus)
+  def access_for_attachment_association?(user, session, _association)
+    grants_right?(user, session, :read_syllabus)
   end
 
   def home_page
@@ -1667,6 +1907,9 @@ class Course < ActiveRecord::Base
       event :offer, transitions_to: :available
       event :complete, transitions_to: :completed
       event :delete, transitions_to: :deleted
+      on_entry do |prior_state, _event|
+        undelete_lti_context_controls if prior_state == :deleted
+      end
     end
 
     state :available do
@@ -1684,6 +1927,7 @@ class Course < ActiveRecord::Base
 
     state :deleted do
       event :undelete, transitions_to: :claimed
+      on_entry { delete_lti_context_controls }
     end
   end
 
@@ -1703,8 +1947,8 @@ class Course < ActiveRecord::Base
     return false if template?
 
     gradebook_filters.in_batches.destroy_all
-    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
+    process_event(:delete)
     save!
   end
 
@@ -1756,7 +2000,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.require_assignment_groups(contexts)
-    courses = contexts.select { |c| c.is_a?(Course) }
+    courses = contexts.grep(Course)
     groups = Shard.partition_by_shard(courses) do |shard_courses|
       AssignmentGroup.select("id, context_id, context_type").where(context_type: "Course", context_id: shard_courses)
     end.index_by(&:context_id)
@@ -1867,7 +2111,7 @@ class Course < ActiveRecord::Base
 
     RoleOverride.permissions.each do |permission, details|
       given do |user|
-        active_enrollment_allows(user, permission, !details[:restrict_future_enrollments]) ||
+        active_enrollment_allows(user, permission, allow_future: !details[:restrict_future_enrollments]) ||
           account_membership_allows(user, permission)
       end
       can permission
@@ -1906,11 +2150,16 @@ class Course < ActiveRecord::Base
       update
       read_outcomes
       view_unpublished_items
-      manage_feature_flags
       view_feature_flags
       read_rubrics
       use_student_view
     ]
+
+    given { |user| grants_right?(user, :manage) && !root_account.settings[:restrict_grading_scheme_editing_to_admins] }
+    can :set_grading_scheme
+
+    given { |user| grants_right?(user, :manage_grades) && !root_account.settings[:restrict_grading_scheme_editing_to_admins] }
+    can :manage_grading_schemes
 
     # Teachers and Designers can reset content, but not TAs
     given do |user|
@@ -1985,8 +2234,14 @@ class Course < ActiveRecord::Base
     given do |user|
       account_membership_allows(user, :manage_courses_admin)
     end
-    can :manage and can :update and can :use_student_view and can :manage_feature_flags and
-      can :view_feature_flags
+    can %i[
+      manage
+      update
+      use_student_view
+      view_feature_flags
+      set_grading_scheme
+      manage_grading_schemes
+    ]
 
     # reset course content
     given do |user|
@@ -2019,6 +2274,30 @@ class Course < ActiveRecord::Base
         (grants_right?(user, :manage) && !root_account.settings[:prevent_course_availability_editing_by_teachers])
     end
     can :edit_course_availability
+
+    given do |user|
+      # manage_feature_flags was extracted from the arrays where the :manage permission was granted.
+      # When the Feature flag is disabled and the user has the :manage permission, this means they also have the :manage_feature_flags permission
+      # Otherwise, also require the new permission
+      grants_right?(user, :manage) &&
+        (!account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions) || grants_right?(user, :manage_course_feature_options))
+    end
+    can :manage_feature_flags # match the permission name in the Account model (both models use the same controller)
+
+    given do |user|
+      grants_right?(user, :update) &&
+        (!account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions) || grants_right?(user, :manage_course_navigation))
+    end
+    can :update_nav
+
+    given do |user|
+      if account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions)
+        grants_right?(user, :manage_course_details)
+      else
+        grants_right?(user, :manage_course_content_edit)
+      end
+    end
+    can :update_course_details
   end
 
   def allows_gradebook_uploads?
@@ -2032,17 +2311,52 @@ class Course < ActiveRecord::Base
     !large_roster?
   end
 
-  def active_enrollment_allows(user, permission, allow_future = true)
+  UNPUBLISHED_PERMISSION_ENROLLMENT_TYPES = %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment].freeze
+
+  def active_enrollment_allows(user, permission, allow_future: true)
     return false unless user && permission && !deleted?
 
     is_unpublished = created? || claimed?
     active_enrollments = fetch_on_enrollments("active_enrollments_for_permissions2", user, is_unpublished) do
       scope = enrollments.for_user(user).active_or_pending_by_date.select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
-      scope = scope.where(type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]) if is_unpublished
+      scope = scope.where(type: UNPUBLISHED_PERMISSION_ENROLLMENT_TYPES) if is_unpublished
       scope.to_a.each(&:clear_association_cache)
     end
     active_enrollments.each { |e| e.course = self } # set association so we don't requery
     active_enrollments.any? { |e| (allow_future || e.date_based_state_in_db == "active") && e.has_permission_to?(permission) }
+  end
+
+  def self.preload_active_enrollments_for_permissions(user, courses)
+    return unless user && courses.present?
+
+    Array(courses).group_by(&:shard).each do |shard, shard_courses|
+      shard.activate do
+        bulk_rows_by_course = nil
+        load_bulk = lambda do
+          bulk_rows_by_course ||= begin
+            rows = Enrollment
+                   .where(course_id: shard_courses.map(&:id))
+                   .where.not(workflow_state: "deleted")
+                   .for_user(user)
+                   .active_or_pending_by_date
+                   .select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
+                   .to_a
+            rows.each(&:clear_association_cache)
+            rows.group_by(&:course_id)
+          end
+        end
+
+        shard_courses.each do |course|
+          is_unpublished = course.created? || course.claimed?
+          course.fetch_on_enrollments("active_enrollments_for_permissions2", user, is_unpublished) do
+            load_bulk.call
+            for_course = bulk_rows_by_course[course.id] || []
+            for_course = for_course.select { |e| UNPUBLISHED_PERMISSION_ENROLLMENT_TYPES.include?(e.type) } if is_unpublished
+            for_course
+          end
+        end
+      end
+    end
   end
 
   def self.find_all_by_context_code(codes)
@@ -2084,6 +2398,15 @@ class Course < ActiveRecord::Base
     end_at ? end_at < now : false
   end
 
+  def soft_concluded_for_all?(enrollment_types)
+    now = Time.zone.now
+    return end_at < now if end_at && restrict_enrollments_to_course_dates
+
+    override = enrollment_term.enrollment_dates_overrides.where(enrollment_type: enrollment_types).pluck(:end_at).compact.max
+    end_at = [enrollment_term.end_at, override].compact.max
+    end_at ? end_at < now : false
+  end
+
   def soft_conclude!
     self.conclude_at = Time.zone.now
     self.restrict_enrollments_to_course_dates = true
@@ -2091,6 +2414,18 @@ class Course < ActiveRecord::Base
 
   def concluded?(enrollment_type = nil)
     completed? || soft_concluded?(enrollment_type)
+  end
+
+  def active_now?
+    now = Time.zone.now
+    if restrict_enrollments_to_course_dates
+      started = start_at.nil? || start_at <= now
+      not_concluded = conclude_at.nil? || conclude_at > now
+    else
+      started = enrollment_term&.start_at.nil? || enrollment_term.start_at <= now
+      not_concluded = enrollment_term&.end_at.nil? || enrollment_term.end_at > now
+    end
+    started && not_concluded
   end
 
   def set_concluded_assignments_grading_standard
@@ -2581,32 +2916,37 @@ class Course < ActiveRecord::Base
     end
 
     Course.unique_constraint_retry do
-      scope = all_enrollments.where(user_id: user,
-                                    type:,
-                                    role_id: role,
-                                    associated_user_id:)
+      course_scope = all_enrollments.where(user_id: user, type:, role_id: role, associated_user_id:)
+      section_scope = section.all_enrollments.where(user_id: user, type:, role_id: role, associated_user_id:)
+
       if root_account.feature_enabled?(:temporary_enrollments) && opts[:temporary_enrollment_source_user_id] &&
          opts[:temporary_enrollment_pairing_id]
         source_user_id = opts[:temporary_enrollment_source_user_id]
         pairing_id = opts[:temporary_enrollment_pairing_id]
       end
-      e = if opts[:allow_multiple_enrollments]
-            scope.where(course_section_id: section.id).first
-          else
-            # order by course_section_id<>section.id so that if there *is* an existing
-            # enrollment for this section, we get it (false orders before true)
-            scope.order(Arel.sql("course_section_id<>#{section.id}")).first
-          end
+
+      # Try to find an existing enrollment for this user/role in the target section.
+      # If not found AND allow_multiple_enrollments is NOT set, fall back to any enrollment in this course.
+      # If still not found, check for an enrollment in the same physical section, but tied
+      # to another course via cross‑listing
+      e = course_scope.find_by(course_section_id: section.id)
+      e ||= course_scope.first unless opts[:allow_multiple_enrollments]
+      e ||= section_scope.where.not(course_id: id).first
+
       if e && (!e.active? || opts[:force_update])
         e.already_enrolled = true
-        if e.workflow_state == "deleted"
-          e.sis_batch_id = nil
+        e.course_id = id if e.course_id != id # in case we found it via section_scope
+        e.sis_batch_id = nil if e.workflow_state == "deleted" # clear sis_batch_id so it can be reimported
+
+        desired_workflow_state = e.is_a?(StudentViewEnrollment) ? "active" : enrollment_state
+        needs_state_change = e.completed? || e.rejected? || e.deleted? || e.workflow_state != desired_workflow_state
+
+        if e.course_section_id != section.id && (needs_state_change || e.saved_change_to_course_id?)
+          e.course_section = section
         end
-        if e.completed? || e.rejected? || e.deleted? || e.workflow_state != enrollment_state
-          e.attributes = {
-            course_section: section,
-            workflow_state: e.is_a?(StudentViewEnrollment) ? "active" : enrollment_state
-          }
+
+        if needs_state_change && e.workflow_state != desired_workflow_state
+          e.workflow_state = desired_workflow_state
         end
       end
       # if we're reusing an enrollment and +limit_privileges_to_course_section+ was supplied, apply it
@@ -2657,7 +2997,7 @@ class Course < ActiveRecord::Base
 
   def self_enroll_student(user, opts = {})
     enrollment = enroll_student(user, opts.merge(self_enrolled: true))
-    enrollment.accept(:force)
+    enrollment.accept(force: true)
     unless opts[:skip_pseudonym]
       new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
       new_pseudonym.save if new_pseudonym&.changed?
@@ -2775,6 +3115,7 @@ class Course < ActiveRecord::Base
       comments += turnitin_comments
     end
     extend TextHelper
+
     format_message(comments).first
   end
 
@@ -2808,19 +3149,6 @@ class Course < ActiveRecord::Base
                 :assignment_group_no_drop_assignments,
                 :migration_results
 
-  def map_merge(old_item, new_item)
-    @merge_mappings ||= {}
-    @merge_mappings[old_item.asset_string] = new_item && new_item.id
-  end
-
-  def merge_mapped_id(old_item)
-    @merge_mappings ||= {}
-    return nil unless old_item
-    return @merge_mappings[old_item] if old_item.is_a?(String)
-
-    @merge_mappings[old_item.asset_string]
-  end
-
   def same_dates?(old, new, columns)
     old && new && columns.all? do |column|
       old.respond_to?(column) && new.respond_to?(column) && old.send(column) == new.send(column)
@@ -2833,81 +3161,6 @@ class Course < ActiveRecord::Base
       Folder::STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE,
       -> { t "Student Annotation Documents" }
     )
-  end
-
-  def copy_attachments_from_course(course, options = {})
-    root_folder = Folder.root_folders(self).first
-    root_folder_name = root_folder.name + "/"
-    ce = options[:content_export]
-    cm = options[:content_migration]
-
-    attachments = course.attachments.not_deleted.to_a
-    total = attachments.count + 1
-
-    Attachment.skip_media_object_creation do
-      attachments.each_with_index do |file, i|
-        cm.update_import_progress((i.to_f / total) * 18.0) if cm && (i % 10 == 0)
-
-        next unless !ce || ce.export_object?(file)
-
-        begin
-          migration_id = ce&.create_key(file)
-          new_file = file.clone_for(self, nil, overwrite: true, migration_id:, migration: cm, match_on_migration_id: cm.for_master_course_import?)
-          cm.add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ""), new_file.migration_id)
-          new_folder_id = merge_mapped_id(file.folder)
-
-          if file.folder && file.folder.parent_folder_id.nil?
-            new_folder_id = root_folder.id
-          end
-          # make sure the file has somewhere to go
-          unless new_folder_id
-            # gather mapping of needed folders from old course to new course
-            old_folders = []
-            old_folders << file.folder
-            new_folders = []
-            new_folders << old_folders.last.clone_for(self, nil, options.merge({ include_subcontent: false }))
-            while old_folders.last.parent_folder&.parent_folder_id
-              old_folders << old_folders.last.parent_folder
-              new_folders << old_folders.last.clone_for(self, nil, options.merge({ include_subcontent: false }))
-            end
-            old_folders.reverse!
-            new_folders.reverse!
-            # try to use folders that already match if possible
-            final_new_folders = []
-            parent_folder = Folder.root_folders(self).first
-            old_folders.each_with_index do |folder, idx|
-              final_new_folders << if (f = parent_folder.active_sub_folders.where(name: folder.name).first)
-                                     f
-                                   else
-                                     new_folders[idx]
-                                   end
-              parent_folder = final_new_folders.last
-            end
-            # add or update the folder structure needed for the file
-            final_new_folders.first.parent_folder_id ||=
-              merge_mapped_id(old_folders.first.parent_folder) ||
-              Folder.root_folders(self).first.id
-            old_folders.each_with_index do |folder, idx|
-              final_new_folders[idx].save!
-              map_merge(folder, final_new_folders[idx])
-              final_new_folders[idx + 1].parent_folder_id ||= final_new_folders[idx].id if final_new_folders[idx + 1]
-            end
-            new_folder_id = merge_mapped_id(file.folder)
-          end
-          new_file.folder_id = new_folder_id
-          new_file.need_notify = false
-          new_file.save_without_broadcasting!
-          new_file.handle_duplicates(:rename)
-          cm.add_imported_item(new_file)
-          cm.add_imported_item(new_file.folder, key: new_file.folder.id)
-          map_merge(file, new_file)
-        rescue => e
-          Canvas::Errors.capture(e) unless e.message.include?("Cannot create attachments in deleted folders")
-          Rails.logger.error "Couldn't copy file: #{e}"
-          cm.add_warning(t(:file_copy_error, "Couldn't copy file \"%{name}\"", name: file.display_name || file.path_name), $!)
-        end
-      end
-    end
   end
 
   def self.clonable_attributes
@@ -2959,6 +3212,7 @@ class Course < ActiveRecord::Base
        alt_name
        restrict_quantitative_data
        horizon_course
+       career_learning_library_only
        conditional_release
        default_due_time
        content_library]
@@ -3018,7 +3272,12 @@ class Course < ActiveRecord::Base
   ADMIN_TYPES = %w[TeacherEnrollment TaEnrollment DesignerEnrollment].freeze
   def section_visibilities_for(user, opts = {})
     fetch_on_enrollments("section_visibilities_for", user, opts) do
-      workflow_not = opts[:excluded_workflows] || "deleted"
+      include_concluded = opts.fetch(:include_concluded, true)
+      workflow_not = if include_concluded
+                       opts[:excluded_workflows] || %w[deleted rejected inactive]
+                     else
+                       opts[:excluded_workflows] || %w[completed deleted rejected inactive]
+                     end
 
       enrollment_rows = all_enrollments
                         .where(user:)
@@ -3116,13 +3375,13 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def users_visible_to(user, include_priors = false, opts = {})
+  def users_visible_to(user, include_priors: false, include_inactive: false, enrollment_state: nil, exclude_enrollment_state: nil, section_ids: nil)
     visibilities = section_visibilities_for(user)
     visibility = enrollment_visibility_level_for(user, visibilities)
 
     scope = if include_priors
               users
-            elsif opts[:include_inactive] && [:full, :sections].include?(visibility)
+            elsif include_inactive && [:full, :sections].include?(visibility)
               all_current_users
             else
               current_users
@@ -3132,9 +3391,9 @@ class Course < ActiveRecord::Base
                                            user,
                                            visibilities,
                                            visibility,
-                                           enrollment_state: opts[:enrollment_state],
-                                           exclude_enrollment_state: opts[:exclude_enrollment_state],
-                                           section_ids: opts[:section_ids])
+                                           enrollment_state:,
+                                           exclude_enrollment_state:,
+                                           section_ids:)
   end
 
   def enrollments_visible_to(user, opts = {})
@@ -3273,6 +3532,9 @@ class Course < ActiveRecord::Base
   TAB_SEARCH = 21
   TAB_ACCESSIBILITY = 22
   TAB_ITEM_BANKS = 23
+  TAB_YOUTUBE_MIGRATION = 24
+  TAB_AI_EXPERIENCES = 25
+  TAB_NOTEBOOK = 26
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3453,6 +3715,7 @@ class Course < ActiveRecord::Base
     cache_key = [user, self, opts].cache_key
     @tabs_available ||= {}
     @tabs_available[cache_key] ||= uncached_tabs_available(user, opts)
+    @tabs_available[cache_key]
   end
 
   def uncached_tabs_available(user, opts)
@@ -3474,7 +3737,7 @@ class Course < ActiveRecord::Base
       default_tabs.insert(1,
                           {
                             id: TAB_SEARCH,
-                            label: t("#tabs.search", "Smart Search"),
+                            label: t("IgniteAI Search"),
                             css_class: "search",
                             href: :course_search_path
                           })
@@ -3489,15 +3752,37 @@ class Course < ActiveRecord::Base
                           })
     end
 
-    if feature_enabled?(:accessibility_tab_enable)
-      # Add Accessibility tab at the end of the tabs (except for Settings tab)
+    if a11y_checker_enabled? && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       default_tabs.push({
                           id: TAB_ACCESSIBILITY,
                           label: t("#tabs.accessibility", "Accessibility"),
                           css_class: "accessibility",
-                          href: :course_accessibility_index_path,
-                          visibility: "admins"
+                          href: :course_accessibility_index_path
                         })
+    end
+
+    # Add AI Experiences tab before Settings if feature flag is enabled
+    # Tab is visible to all users, but functionality differs based on permissions
+    # Teachers can create/edit/delete, students can only view published experiences
+    if feature_enabled?(:ai_experiences)
+      settings_index = default_tabs.index { |t| t[:id] == TAB_SETTINGS }
+      settings_index ||= default_tabs.length
+      default_tabs.insert(settings_index, {
+                            id: TAB_AI_EXPERIENCES,
+                            label: t("#tabs.ai_experiences", "AI Experiences"),
+                            css_class: "ai_experiences",
+                            href: :course_ai_experiences_path
+                          })
+    end
+
+    if account.feature_enabled?(:notebook)
+      default_tabs << {
+        id: TAB_NOTEBOOK,
+        label: t("#tabs.notebook", "Notebook"),
+        css_class: "notebook",
+        href: :course_notebook_path,
+        visibility: "members"
+      }
     end
 
     # Remove already cached tabs for Horizon courses
@@ -3511,18 +3796,26 @@ class Course < ActiveRecord::Base
 
     GuardRail.activate(:secondary) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
-      tabs = (elementary_subject_course? && !course_subject_tabs) ? [] : tab_configuration.compact
+
+      start_from_tab_config = !elementary_subject_course? || course_subject_tabs
+      tabs = start_from_tab_config ? tab_configuration.compact : []
       home_tab = default_tabs.find { |t| t[:id] == TAB_HOME }
       settings_tab = default_tabs.find { |t| t[:id] == TAB_SETTINGS }
-      external_tabs = if opts[:include_external]
-                        external_tool_tabs(opts, user) + Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
-                      else
-                        []
-                      end
-      item_banks_tab = Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(external_tabs)
+      external_tool_tabs = if opts[:include_external]
+                             external_tool_tabs(opts, user) +
+                               Lti::MessageHandler.lti_apps_tabs(self, [Lti::ResourcePlacement::COURSE_NAVIGATION], opts)
+                           else
+                             []
+                           end
+      item_banks_tab = Lti::ResourcePlacement.update_tabs_and_return_item_banks_tab(external_tool_tabs)
+      external_tabs = external_tool_tabs
+      if opts[:include_external] && root_account.feature_enabled?(:nav_menu_links)
+        external_tabs += NavMenuLinkTabs.course_tabs(self)
+      end
 
       tabs = tabs.map do |tab|
-        default_tab = default_tabs.find { |t| t[:id] == tab[:id] } || external_tabs.find { |t| t[:id] == tab[:id] }
+        default_tab = default_tabs.find { |t| t[:id] == tab[:id] } ||
+                      external_tabs.find { |t| t[:id] == tab[:id] }
         next unless default_tab
 
         tab[:label] = default_tab[:label]
@@ -3533,6 +3826,7 @@ class Course < ActiveRecord::Base
         tab[:external] = default_tab[:external]
         tab[:icon] = default_tab[:icon]
         tab[:target] = default_tab[:target] if default_tab[:target]
+        tab[:link_context_type] = default_tab[:link_context_type] if default_tab[:link_context_type]
         default_tabs.delete_if { |t| t[:id] == tab[:id] }
         external_tabs.delete_if { |t| t[:id] == tab[:id] }
         tab
@@ -3544,30 +3838,54 @@ class Course < ActiveRecord::Base
         schedule_tab = default_tabs.detect { |t| t[:id] == TAB_SCHEDULE }
         tabs.insert(1, default_tabs.delete(schedule_tab)) if schedule_tab && !tabs.empty?
       end
+
+      # since TAB_SEARCH is added dynamically, we don't need an extra smart search check
+      smart_search_tab = default_tabs.detect { |t| t[:id] == TAB_SEARCH }
+      tabs.insert(1, default_tabs.delete(smart_search_tab)) if smart_search_tab && !tabs.empty?
+
+      # since TAB_AI_EXPERIENCES is added dynamically, insert it before Settings if not already configured
+      # If it was configured by the user, it will have been removed from default_tabs by the mapping above
+      ai_experiences_tab = default_tabs.detect { |t| t[:id] == TAB_AI_EXPERIENCES }
+      if ai_experiences_tab && !tabs.empty?
+        settings_index = tabs.index { |t| t[:id] == TAB_SETTINGS }
+        settings_index ||= tabs.length
+        tabs.insert(settings_index, default_tabs.delete(ai_experiences_tab))
+      end
+
       tabs += default_tabs
       tabs += external_tabs
 
-      if root_account.feature_enabled?(:ams_service) && tabs.any? { |t| t[:label] == "Item Banks" }
-        ams_item_banks_tab = {
-          id: TAB_ITEM_BANKS,
-          label: t("#tabs.item_banks", "Item Banks"),
-          css_class: "item_banks",
-          href: :course_item_banks_path,
-        }
+      is_ams = root_account.feature_enabled?(:ams_root_account_integration) &&
+               feature_enabled?(:ams_course_integration)
 
-        item_banks_index = tabs.find_index { |t| t[:label] == "Item Banks" }
-        tabs.delete_at(item_banks_index)
-        tabs.insert(item_banks_index, ams_item_banks_tab)
+      item_bank_href_override = if is_ams
+                                  :course_item_banks_path
+                                elsif feature_enabled?(:new_quizzes_native_experience)
+                                  :course_new_quizzes_banks_path
+                                else
+                                  nil
+                                end
+
+      if item_bank_href_override
+        item_banks_tab = NewQuizzesHelper.override_item_banks_tab(
+          tabs:,
+          href: item_bank_href_override,
+          context: self,
+          css_class: is_ams ? "item_banks" : nil
+        ) || item_banks_tab
       end
 
       tabs.delete_if { |t| t[:id] == TAB_SETTINGS }
       if course_subject_tabs
-        # Don't show Settings, ensure that all external tools are at the bottom (with the exception of Groups, which
-        # should stick to the end unless it has been re-ordered)
-        lti_tabs = tabs.filter { |t| t[:external] }
-        tabs -= lti_tabs
+        # Don't show Settings or AI Experiences, ensure that all
+        # external tool and nav menu links tools are at the bottom
+        # (with the exception of Groups, which should stick to the
+        # end unless it has been re-ordered)
+        tabs.delete_if { |t| t[:id] == TAB_AI_EXPERIENCES }
+        ext_tabs = tabs.filter { |t| t[:external] }
+        tabs -= ext_tabs
         groups_tab = tabs.pop if tabs.last&.dig(:id) == TAB_GROUPS && !opts[:for_reordering]
-        tabs += lti_tabs
+        tabs += ext_tabs
         tabs << groups_tab if groups_tab
       else
         # Ensure that Settings is always at the bottom
@@ -3645,11 +3963,24 @@ class Course < ActiveRecord::Base
         admin_only_tabs = tabs.select { |t| t[:visibility] == "admins" }
         tabs -= admin_only_tabs if admin_only_tabs.present? && !check_for_permission.call(:read_as_admin)
 
-        hidden_external_tabs = tabs.select do |t|
-          next false unless t[:external]
+        # For K5 subject courses on the settings page (left-nav), tabs start
+        # as [] so tab_configuration is never consulted during the mapping
+        # loop above. We have to mark hidden nav_menu_link tabs explicitly.
+        unless start_from_tab_config
+          hidden_tab_ids = tab_configuration.filter_map { |t| t[:id] if t[:hidden] }.to_set
+          tabs.each do |tab|
+            if NavMenuLinkTabs.nav_menu_link_tab_id?(tab[:id]) && hidden_tab_ids.include?(tab[:id])
+              tab[:hidden] = true
+            end
+          end
+        end
 
-          elementary_enabled = elementary_subject_course? && !course_subject_tabs
-          (t[:hidden] && !elementary_enabled) || (elementary_enabled && tab_hidden?(t[:id]))
+        hidden_external_tabs = tabs.select do |t|
+          # Hidden tools do not show for admins. Hidden Nav Menu Links are
+          # shown with "crossed-out eye" icon like other tabs.
+          t[:external] &&
+            !NavMenuLinkTabs.nav_menu_link_tab_id?(t[:id]) &&
+            (start_from_tab_config ? t[:hidden] : hidden_tab_ids.include?(t[:id]))
         end
         tabs -= hidden_external_tabs if hidden_external_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
 
@@ -3658,6 +3989,7 @@ class Course < ActiveRecord::Base
 
         delete_unless.call([TAB_PEOPLE], :read_roster)
         delete_unless.call([TAB_DISCUSSIONS], :read_forum, :post_to_forum, :create_forum, :moderate_forum)
+        delete_unless.call([TAB_NOTEBOOK], :participate_as_student)
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
@@ -3692,6 +4024,18 @@ class Course < ActiveRecord::Base
         end
       end
 
+      # Add YouTube migration tab before Settings if conditions are met
+      if feature_enabled?(:youtube_migration) && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) && has_studio_integration?
+        settings_index = tabs.index { |t| t[:id] == TAB_SETTINGS }
+        settings_index ||= tabs.length
+        tabs.insert(settings_index, {
+                      id: TAB_YOUTUBE_MIGRATION,
+                      label: t("#tabs.youtube_migration", "YouTube Migration"),
+                      css_class: "youtube_migration",
+                      href: :course_youtube_migration_path
+                    })
+      end
+
       tabs
     end
   end
@@ -3704,16 +4048,6 @@ class Course < ActiveRecord::Base
 
   def term_name
     enrollment_term.name
-  end
-
-  def equella_settings
-    account = self.account
-    while account
-      settings = account.equella_settings
-      return settings if settings
-
-      account = account.parent_account
-    end
   end
 
   cattr_accessor :settings_options
@@ -3786,8 +4120,11 @@ class Course < ActiveRecord::Base
   add_setting :allow_student_forum_attachments, boolean: true, default: true
   add_setting :allow_student_discussion_reporting, boolean: true, default: true
   add_setting :allow_student_anonymous_discussion_topics, boolean: true, default: false
+  add_setting :use_default_discussion_settings, boolean: true, default: false
+  add_setting :default_discussion_settings, arbitrary: true
   add_setting :show_total_grade_as_points, boolean: true, default: false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
+  add_setting :default_student_gradebook_view, boolean: true, default: false
   add_setting :lock_all_announcements, boolean: true, default: false, inherited: true
   add_setting :large_roster, boolean: true, default: ->(c) { c.root_account.large_course_rosters? }
   add_setting :course_format
@@ -3824,6 +4161,16 @@ class Course < ActiveRecord::Base
   add_setting :show_student_only_module_id
   add_setting :show_teacher_only_module_id
 
+  def block_content_editor_enabled?
+    account.feature_enabled?(:block_content_editor) && feature_enabled?(:block_content_editor_eap)
+  end
+
+  # the feature_flag(:a11y_checker_eap) check is for testing purposes. Unfortunately multiple_root_accounts plugin mocking out Feature.definitions
+  # so we have a redundant call for that
+  def a11y_checker_enabled?
+    (account.feature_enabled?(:a11y_checker) && feature_flag(:a11y_checker_eap) && feature_enabled?(:a11y_checker_eap)) || account.feature_enabled?(:a11y_checker_ga1)
+  end
+
   def elementary_enabled?
     account.enable_as_k5_account?
   end
@@ -3855,7 +4202,7 @@ class Course < ActiveRecord::Base
     false
   end
 
-  def restrict_quantitative_data?(user = nil, check_extra_permissions = false)
+  def restrict_quantitative_data?(user = nil, check_extra_permissions: false)
     return false unless user.is_a?(User)
 
     # When check_extra_permissions is true, return false for a teacher,ta, admin, or designer
@@ -4437,8 +4784,8 @@ class Course < ActiveRecord::Base
                .where.not(matching_post_policies_scope.arel.exists)
                .preload(:post_policy)
                .each do |assignment|
-      assignment.ensure_post_policy(post_manually:)
-    end
+                 assignment.ensure_post_policy(post_manually:)
+               end
   end
 
   CUSTOMIZABLE_PERMISSIONS.each do |key, cfg|
@@ -4570,15 +4917,49 @@ class Course < ActiveRecord::Base
     horizon_course && account&.feature_enabled?(:horizon_course_setting)
   end
 
+  def horizon_back_to_units_enabled?
+    horizon_course?
+  end
+
+  def requirement_count_api_enabled?
+    horizon_course?
+  end
+
   def use_modules_rewrite_view?(user, session)
     if grants_right?(user, session, :read_as_admin)
       return root_account.feature_enabled?(:modules_page_rewrite)
     elsif feature_enabled?(:modules_page_rewrite_student_view)
-      return user || Account.site_admin.feature_enabled?(:disable_graphql_authentication) || root_account.feature_enabled?(:graphql_persisted_queries)
+      return user || root_account.feature_enabled?(:graphql_persisted_queries)
     end
 
     false
   end
+
+  # Accessibility scan limit check
+  def exceeds_accessibility_scan_limit?
+    wiki_page_count = wiki_pages.not_deleted.count
+    assignment_count = assignments.active.not_excluded_from_accessibility_scan.count
+    discussion_topic_count = discussion_topics.scannable.count
+    announcement_count = announcements.active.count
+
+    total = wiki_page_count + assignment_count + discussion_topic_count + announcement_count
+    total > MAX_ACCESSIBILITY_SCAN_RESOURCES
+  end
+
+  def self.find_studio_tool(course)
+    Lti::ContextToolFinder.all_tools_for(course).find_by(domain: "arc.instructure.com")
+  end
+
+  def has_studio_integration?
+    !!Course.find_studio_tool(self)
+  end
+
+  delegate :a11y_checker_ai_table_caption_generation?,
+           :a11y_checker_ai_alt_text_generation?,
+           :a11y_checker_close_issues?,
+           :a11y_checker_account_statistics?,
+           :a11y_checker_additional_resources?,
+           to: :account
 
   private
 
@@ -4623,6 +5004,18 @@ class Course < ActiveRecord::Base
        account.restrict_quantitative_data[:locked] == true
       self.restrict_quantitative_data = true
     end
+  end
+
+  def snapshot_account_default_discussion_settings
+    return unless account&.root_account&.feature_enabled?(:default_discussion_options)
+    # When a course is created, snapshot the course template's default
+    # discussion settings so that discussions use the defaults active at
+    # creation time.
+    return unless (template = account&.effective_course_template)
+
+    self.use_default_discussion_settings = template.use_default_discussion_settings?
+    defaults = template.default_discussion_settings
+    self.default_discussion_settings = defaults if defaults.present?
   end
 
   def log_create_to_publish_time
@@ -4744,5 +5137,17 @@ class Course < ActiveRecord::Base
     elsif old_rqd_setting == true && new_rqd_setting == false
       InstStatsd::Statsd.distributed_increment("course.settings.restrict_quantitative_data.disabled")
     end
+  end
+
+  def a11y_scannable_attributes
+    [:syllabus_body, :workflow_state]
+  end
+
+  def any_completed_accessibility_scan?
+    Accessibility::CourseScanService.last_accessibility_course_scan(self)&.completed? || false
+  end
+
+  def excluded_from_accessibility_scan?
+    !a11y_checker_additional_resources?
   end
 end

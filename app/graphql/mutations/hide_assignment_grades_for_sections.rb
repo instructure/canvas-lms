@@ -30,7 +30,7 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
 
   def resolve(input:)
     begin
-      assignment = Assignment.find(input[:assignment_id])
+      assignment = AbstractAssignment.find_assignment_or_peer_review(input[:assignment_id])
       course = assignment.context
       sections = course.course_sections.where(id: input[:section_ids])
     rescue ActiveRecord::RecordNotFound
@@ -59,7 +59,7 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
       progress.process_job(
         assignment,
         :hide_submissions,
-        { preserve_method_args: true },
+        { preserve_method_args: true, priority: Delayed::HIGH_PRIORITY },
         progress:,
         submission_ids: submissions_scope.pluck(:id),
         skip_content_participation_refresh: false

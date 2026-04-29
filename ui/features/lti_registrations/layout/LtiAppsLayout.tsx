@@ -27,14 +27,11 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
 import {openRegistrationWizard} from '../manage/registration_wizard/RegistrationWizardModalState'
-import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingState'
 import {useMedia} from 'react-use'
 import {View} from '@instructure/ui-view'
-import {Pill} from '@instructure/ui-pill'
 import {LtiRegistrationsTab} from './constants'
-import {isLtiRegistrationsDiscoverEnabled} from '../discover/utils'
 import {isLtiRegistrationsUsageEnabled} from '../monitor/utils'
-
+import {refreshRegistrations} from '../manage/api/registrations'
 const I18n = createI18nScope('lti_registrations')
 
 export const LtiAppsLayout = React.memo(() => {
@@ -44,13 +41,22 @@ export const LtiAppsLayout = React.memo(() => {
   const navigate = useNavigate()
   const isMobile = useMedia('(max-width: 767px)')
 
+  const isSubAccount = React.useMemo(() => {
+    return window.ENV.ACCOUNT_GLOBAL_ID !== window.ENV.DOMAIN_ROOT_ACCOUNT_ID
+  }, [])
+
   const tabSelected = React.useMemo(() => {
+    // If we're in a sub-account, force the monitor tab
+    if (isSubAccount) {
+      return LtiRegistrationsTab.monitor
+    }
+
     return isManage
       ? LtiRegistrationsTab.manage
       : isMonitor
         ? LtiRegistrationsTab.monitor
         : LtiRegistrationsTab.discover
-  }, [isManage, isMonitor])
+  }, [isManage, isMonitor, isSubAccount])
 
   const {isTabManage, isTabDiscover, isTabMonitor} = React.useMemo(() => {
     return {
@@ -62,23 +68,34 @@ export const LtiAppsLayout = React.memo(() => {
 
   const onTabClick = React.useCallback(
     (_: any, tab: {id?: string}) => {
-      switch (tab.id) {
-        case LtiRegistrationsTab.discover:
-          navigate('/')
-          break
-        case LtiRegistrationsTab.manage:
-          navigate('/manage')
-          break
-        case LtiRegistrationsTab.monitor:
-          navigate('/monitor')
-          break
-        default:
-          navigate('/')
-          break
+      if (isSubAccount) {
+        navigate('/monitor')
+      } else {
+        switch (tab.id) {
+          case LtiRegistrationsTab.discover:
+            navigate('/')
+            break
+          case LtiRegistrationsTab.manage:
+            navigate('/manage')
+            break
+          case LtiRegistrationsTab.monitor:
+            navigate('/monitor')
+            break
+          default:
+            navigate(isSubAccount ? '/monitor' : '/')
+            break
+        }
       }
     },
-    [navigate],
+    [navigate, isSubAccount],
   )
+
+  // Redirect sub-accounts to monitor tab if they're on discover or manage
+  React.useEffect(() => {
+    if (isSubAccount && !isMonitor) {
+      navigate('/monitor', {replace: true})
+    }
+  }, [isSubAccount, isMonitor, navigate])
 
   const open = React.useCallback(() => {
     openRegistrationWizard({
@@ -89,13 +106,15 @@ export const LtiAppsLayout = React.memo(() => {
       lti_version: '1p3',
       method: 'dynamic_registration',
       registering: false,
-      exitOnCancel: false,
-      onSuccessfulInstallation: () => {
+      onSuccessfulInstallation: registrationId => {
         refreshRegistrations()
+        if (window.ENV.FEATURES.lti_registrations_next) {
+          navigate(`/manage/${registrationId}`)
+        }
       },
       jsonFetch: {_tag: 'initial'},
     })
-  }, [])
+  }, [navigate])
 
   return (
     <>
@@ -107,7 +126,7 @@ export const LtiAppsLayout = React.memo(() => {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        {isManage ? (
+        {isManage && !isSubAccount ? (
           <Flex.Item>
             <Button color="primary" onClick={open} id="install-new-lti-app">
               {I18n.t('Install a New App')}
@@ -116,22 +135,28 @@ export const LtiAppsLayout = React.memo(() => {
         ) : null}
       </Flex>
       <Text>
-        {I18n.t(
-          'Apps is the central hub to discover, manage, and monitor integrated apps. Extend and enhance your digital teaching and learning experience with powerful apps that provide and/or enrich your content, assessment, multimedia, collaboration, analytics, accessibility, and more. Select Discover to explore and install new apps, Manage to review and manage installed apps, and Monitor to view and understand usage.',
-        )}
+        {ENV.FEATURES.canvas_apps_sub_account_access
+          ? I18n.t(
+              'The Canvas Apps page lets root account administrators discover, install, and oversee integrated applications, while sub-account administrators can monitor usage.',
+            )
+          : I18n.t(
+              'Apps is the central hub to discover, manage, and monitor integrated apps. Extend and enhance your digital teaching and learning experience with powerful apps that provide and/or enrich your content, assessment, multimedia, collaboration, analytics, accessibility, and more. Select Discover to explore and install new apps, Manage to review and manage installed apps, and Monitor to view and understand usage.',
+            )}
       </Text>
       {isMobile ? (
         <>
           <View margin="small 0" display="block">
             <SimpleSelect renderLabel="" onChange={onTabClick} value={tabSelected}>
-              {isLtiRegistrationsDiscoverEnabled() && (
+              {!isSubAccount && (
                 <SimpleSelect.Option id="discover" value="discover">
                   {I18n.t('Discover')}
                 </SimpleSelect.Option>
               )}
-              <SimpleSelect.Option id="manage" value="manage">
-                {I18n.t('Manage')}
-              </SimpleSelect.Option>
+              {!isSubAccount && (
+                <SimpleSelect.Option id="manage" value="manage">
+                  {I18n.t('Manage')}
+                </SimpleSelect.Option>
+              )}
               {isLtiRegistrationsUsageEnabled() && (
                 <SimpleSelect.Option id="monitor" value="monitor">
                   {I18n.t('Monitor')}
@@ -143,7 +168,7 @@ export const LtiAppsLayout = React.memo(() => {
         </>
       ) : (
         <Tabs margin="medium auto" padding="medium" onRequestTabChange={onTabClick}>
-          {isLtiRegistrationsDiscoverEnabled() && (
+          {!isSubAccount && (
             <Tabs.Panel
               renderTitle={
                 <Text style={{color: 'initial', textDecoration: 'initial'}}>
@@ -160,17 +185,22 @@ export const LtiAppsLayout = React.memo(() => {
               <Outlet />
             </Tabs.Panel>
           )}
-          <Tabs.Panel
-            renderTitle={
-              <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Manage')}</Text>
-            }
-            id={LtiRegistrationsTab.manage}
-            padding="large x-small"
-            active={isTabManage}
-            isSelected={isTabManage}
-          >
-            <Outlet />
-          </Tabs.Panel>
+          {!isSubAccount && (
+            <Tabs.Panel
+              renderTitle={
+                <Text style={{color: 'initial', textDecoration: 'initial'}}>
+                  {I18n.t('Manage')}
+                </Text>
+              }
+              id={LtiRegistrationsTab.manage}
+              padding="large x-small"
+              active={isTabManage}
+              isSelected={isTabManage}
+              themeOverride={{defaultOverflowY: 'unset'}}
+            >
+              <Outlet />
+            </Tabs.Panel>
+          )}
           {isLtiRegistrationsUsageEnabled() ? (
             <Tabs.Panel
               renderTitle={
@@ -181,6 +211,7 @@ export const LtiAppsLayout = React.memo(() => {
               id={LtiRegistrationsTab.monitor}
               active={isTabMonitor}
               isSelected={isTabMonitor}
+              themeOverride={{defaultOverflowY: 'unset'}}
             >
               <Outlet />
             </Tabs.Panel>

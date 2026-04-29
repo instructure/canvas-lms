@@ -24,13 +24,13 @@ import {FilterControls, FilterType} from '../FilterControls'
 const defaultProps = {
   searchValue: '',
   filterValue: FilterType.SHOW_ALL,
-  setSearchValue: jest.fn(),
-  setFilterValue: jest.fn(),
+  setSearchValue: vi.fn(),
+  setFilterValue: vi.fn(),
 }
 
 describe('FilterControls', () => {
   it('calls setSearchValue when search text is changed', () => {
-    const setSearchValue = jest.fn()
+    const setSearchValue = vi.fn()
     const {getByPlaceholderText} = render(
       <FilterControls {...defaultProps} setSearchValue={setSearchValue} />,
     )
@@ -42,7 +42,7 @@ describe('FilterControls', () => {
   })
 
   it('calls setFilterValue when filter is used', () => {
-    const setFilterValue = jest.fn()
+    const setFilterValue = vi.fn()
     const {getByRole, getByText} = render(
       <FilterControls {...defaultProps} setFilterValue={setFilterValue} />,
     )

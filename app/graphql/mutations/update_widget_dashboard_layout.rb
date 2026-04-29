@@ -1,0 +1,62 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2025 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+class Mutations::UpdateWidgetDashboardLayout < Mutations::BaseMutation
+  argument :dashboard_type, Types::WidgetDashboardTypeEnum, required: false
+  argument :layout, String, required: true
+
+  field :layout, String, null: true
+
+  def resolve(input:)
+    layout_value = input[:layout].present? ? JSON.parse(input[:layout]) : nil
+    layout_value = nil if layout_value.is_a?(String) && layout_value.empty?
+
+    if layout_value
+      validator = WidgetDashboardLayoutValidator.new(layout_value)
+      unless validator.valid?
+        return validation_error(validator.errors.join(", "))
+      end
+    end
+
+    pref_key = educator_dashboard?(input) ? :educator_dashboard_config : :widget_dashboard_config
+    config = current_user.get_preference(pref_key) || {}
+    config["layout"] = layout_value
+    current_user.set_preference(pref_key, config)
+
+    { layout: layout_value&.to_json }
+  rescue JSON::ParserError
+    validation_error(I18n.t("Invalid JSON format for widget dashboard layout"))
+  end
+
+  private
+
+  # TODO: Remove this entire helper method once platform-ui passes dashboard_type (EGG-2539)
+  # The resolver should directly use input[:dashboard_type] after that.
+  # The role-based fallback below misroutes mixed-role users'
+  # student-dashboard saves into :educator_dashboard_config
+  # (EGG-2587). When EGG-2539 lands, also drop the load-side
+  # WidgetDashboardLayoutValidator.sanitize_educator_layout scrub.
+  def educator_dashboard?(input)
+    return input[:dashboard_type] == "educator" if input[:dashboard_type].present?
+
+    context[:domain_root_account]&.feature_enabled?(:educator_dashboard) &&
+      current_user.educator_dashboard_user?
+  end
+end

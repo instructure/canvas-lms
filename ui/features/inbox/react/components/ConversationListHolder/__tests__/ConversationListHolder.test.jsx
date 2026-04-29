@@ -152,25 +152,25 @@ const props = {
   isLoading: false,
   isLoadingMoreMenuData: false,
   hasMoreMenuData: false,
-  fetchMoreMenuData: jest.fn(),
+  fetchMoreMenuData: vi.fn(),
   isError: {},
 }
 
-jest.mock('../../../../util/utils', () => ({
-  ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn(),
+vi.mock('../../../../util/utils', async () => ({
+  ...(await vi.importActual('../../../../util/utils')),
+  responsiveQuerySizes: vi.fn(),
 }))
 
 describe('ConversationListHolder', () => {
   beforeAll(() => {
     // Add appropriate mocks for responsive
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -202,7 +202,7 @@ describe('ConversationListHolder', () => {
   })
 
   it('Sets the selected conversation as the conversation not the conversation participant', () => {
-    const onSelect = jest.fn()
+    const onSelect = vi.fn()
     const {getAllByText} = render(<ConversationListHolder {...props} onSelect={onSelect} />)
     const conversation = getAllByText('This is a different subject line')
     fireEvent.click(conversation[0])
@@ -211,7 +211,7 @@ describe('ConversationListHolder', () => {
   })
 
   it('should be able to open conversations', () => {
-    const onSelectMock = jest.fn()
+    const onSelectMock = vi.fn()
     const {getAllByText} = render(<ConversationListHolder onSelect={onSelectMock} {...props} />)
     const conversation = getAllByText('This is a different subject line')
     fireEvent.click(conversation[0])

@@ -26,7 +26,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconTrashLine, IconEndLine} from '@instructure/ui-icons'
 
-import type { DaySub } from "./types";
+import type {DaySub} from './types'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
@@ -57,7 +57,11 @@ type DaySubstitutionProps = {
   substitution: DaySub
   isMobileView: boolean
   disabled?: boolean
-  onChangeSubstitution: (id: number, data: SimpleSelectOption, to_or_from: DaySubstitutionDirection) => void
+  onChangeSubstitution: (
+    id: number,
+    data: SimpleSelectOption,
+    to_or_from: DaySubstitutionDirection,
+  ) => void
   onRemoveSubstitution: (substitution: DaySub) => void
 }
 
@@ -68,24 +72,20 @@ export default ({
   onChangeSubstitution,
   onRemoveSubstitution,
 }: DaySubstitutionProps) => {
-
-  const handleSelectChange = (
-    data: SimpleSelectOption,
-    to_or_from: DaySubstitutionDirection
-  ) => {
+  const handleSelectChange = (data: SimpleSelectOption, to_or_from: DaySubstitutionDirection) => {
     onChangeSubstitution(substitution.id, data, to_or_from)
   }
 
   const handleMoveFromSelectChange = (
     _e: React.SyntheticEvent<Element, Event>,
-    data: SimpleSelectOption
+    data: SimpleSelectOption,
   ) => {
     handleSelectChange(data, 'from')
   }
 
   const handleMoveToSelectChange = (
     _e: React.SyntheticEvent<Element, Event>,
-    data: SimpleSelectOption
+    data: SimpleSelectOption,
   ) => {
     handleSelectChange(data, 'to')
   }

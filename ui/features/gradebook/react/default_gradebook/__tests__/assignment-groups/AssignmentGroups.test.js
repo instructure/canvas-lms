@@ -31,7 +31,7 @@ describe('Gradebook > Assignment Groups', () => {
   afterEach(() => {
     gradebook.destroy()
     $container.remove()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   describe('#updateAssignmentGroups()', () => {
@@ -94,13 +94,13 @@ describe('Gradebook > Assignment Groups', () => {
     })
 
     test('renders the view options menu', () => {
-      const renderViewOptionsMenuSpy = jest.spyOn(gradebook, 'renderViewOptionsMenu')
+      const renderViewOptionsMenuSpy = vi.spyOn(gradebook, 'renderViewOptionsMenu')
       gradebook.updateAssignmentGroups(assignmentGroups)
       expect(renderViewOptionsMenuSpy).toHaveBeenCalledTimes(1)
     })
 
     test('renders the view options menu after storing the assignment groups', () => {
-      jest.spyOn(gradebook, 'renderViewOptionsMenu').mockImplementation(() => {
+      vi.spyOn(gradebook, 'renderViewOptionsMenu').mockImplementation(() => {
         const storedGroups = gradebook.assignmentGroupList()
         expect(storedGroups).toHaveLength(2)
       })
@@ -108,20 +108,20 @@ describe('Gradebook > Assignment Groups', () => {
     })
 
     test('renders the view options menu after updating the assignment groups loaded status', () => {
-      jest.spyOn(gradebook, 'renderViewOptionsMenu').mockImplementation(() => {
+      vi.spyOn(gradebook, 'renderViewOptionsMenu').mockImplementation(() => {
         expect(gradebook.contentLoadStates.assignmentGroupsLoaded).toBe(true)
       })
       gradebook.updateAssignmentGroups(assignmentGroups)
     })
 
     test('updates column headers', () => {
-      const updateColumnHeadersSpy = jest.spyOn(gradebook, 'updateColumnHeaders')
+      const updateColumnHeadersSpy = vi.spyOn(gradebook, 'updateColumnHeaders')
       gradebook.updateAssignmentGroups(assignmentGroups)
       expect(updateColumnHeadersSpy).toHaveBeenCalledTimes(1)
     })
 
     test('updates column headers after storing the assignment groups', () => {
-      jest.spyOn(gradebook, 'updateColumnHeaders').mockImplementation(() => {
+      vi.spyOn(gradebook, 'updateColumnHeaders').mockImplementation(() => {
         const storedGroups = gradebook.assignmentGroupList()
         expect(storedGroups).toHaveLength(2)
       })
@@ -129,28 +129,28 @@ describe('Gradebook > Assignment Groups', () => {
     })
 
     test('updates column headers after updating the assignment groups loaded status', () => {
-      jest.spyOn(gradebook, 'updateColumnHeaders').mockImplementation(() => {
+      vi.spyOn(gradebook, 'updateColumnHeaders').mockImplementation(() => {
         expect(gradebook.contentLoadStates.assignmentGroupsLoaded).toBe(true)
       })
       gradebook.updateAssignmentGroups(assignmentGroups)
     })
 
     test('updates essential data load status', () => {
-      const updateEssentialDataLoadedSpy = jest.spyOn(gradebook, '_updateEssentialDataLoaded')
+      const updateEssentialDataLoadedSpy = vi.spyOn(gradebook, '_updateEssentialDataLoaded')
       gradebook.updateAssignmentGroups(assignmentGroups)
       expect(updateEssentialDataLoadedSpy).toHaveBeenCalledTimes(1)
     })
 
     test('updates essential data load status after updating the assignment groups loaded status', () => {
-      jest.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
+      vi.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
         expect(gradebook.contentLoadStates.assignmentGroupsLoaded).toBe(true)
       })
       gradebook.updateAssignmentGroups(assignmentGroups)
     })
 
     test('updates essential data load status after rendering filters', () => {
-      const updateColumnHeadersSpy = jest.spyOn(gradebook, 'updateColumnHeaders')
-      jest.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
+      const updateColumnHeadersSpy = vi.spyOn(gradebook, 'updateColumnHeaders')
+      vi.spyOn(gradebook, '_updateEssentialDataLoaded').mockImplementation(() => {
         expect(updateColumnHeadersSpy).toHaveBeenCalledTimes(1)
       })
       gradebook.updateAssignmentGroups(assignmentGroups)

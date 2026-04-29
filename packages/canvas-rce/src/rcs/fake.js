@@ -367,43 +367,6 @@ const IMAGE_RESPONSES = [
   },
 ]
 
-const FLICKR_RESULTS = {
-  go: [
-    {
-      id: '1',
-      href: 'https://farm9.static.flickr.com/8491/8297692520_4e7a43ffcf_s.jpg',
-      title: 'Game of Go in our club.',
-    },
-    {
-      id: '2',
-      href: 'https://farm1.static.flickr.com/5/7270219_6d3f41bc71_s.jpg',
-      title: 'Another game of Go',
-    },
-    {
-      id: '3',
-      href: 'https://farm1.static.flickr.com/8/9686480_c726bf6c5d_s.jpg',
-      title: 'the fourth game',
-    },
-  ],
-  chess: [
-    {
-      id: '4',
-      href: 'https://farm5.static.flickr.com/4051/4627936161_39df5d616a_s.jpg',
-      title: 'Chess.',
-    },
-    {
-      id: '5',
-      href: 'https://farm8.static.flickr.com/7428/9646564428_0e359a1092_s.jpg',
-      title: 'chess',
-    },
-    {
-      id: '6',
-      href: 'https://farm9.static.flickr.com/8309/7961751980_66333f83cf_s.jpg',
-      title: 'champion chess',
-    },
-  ],
-}
-
 function makeFiles(bookmark_base, extension, content_type) {
   return {
     [`${bookmark_base}1`]: {
@@ -467,14 +430,6 @@ export function initializeUpload() {
   return {
     uploading: false,
     folders: {},
-    formExpanded: false,
-  }
-}
-
-export function initializeFlickr() {
-  return {
-    searchResults: [],
-    searching: false,
     formExpanded: false,
   }
 }
@@ -598,21 +553,9 @@ export function fetchPage(uri) {
   })
 }
 
-export function searchFlickr(term) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (FLICKR_RESULTS[term]) {
-        resolve(FLICKR_RESULTS[term])
-      } else {
-        reject(new Error('No search results!'))
-      }
-    }, 1000)
-  })
-}
-
 export function setUsageRights(id, usageRights) {
   const msg = 'Setting the following usage rights for file (id: %s):'
-  console.log(msg, id, usageRights) // eslint-disable-line no-console
+  console.log(msg, id, usageRights)
 }
 
 export function getFile(id) {

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ConditionalRelease
-  class ScoringRange < ActiveRecord::Base
+  class ScoringRange < ApplicationRecord
     include BoundsValidations
     include Deletion
 
@@ -37,15 +37,33 @@ module ConditionalRelease
 
     acts_as_list scope: { rule: self, deleted_at: nil }
 
+    def self.score_at_100_percent?(score)
+      score.present? && (score.to_f * 100).round == 100
+    end
+
     scope :for_score, lambda { |score|
-      where(arel_table[:upper_bound].gt(score).or(arel_table[:upper_bound].eq(nil))
-              .and(arel_table[:lower_bound].lteq(score).or(arel_table[:lower_bound].eq(nil))))
+      # Special case: if score is 1.0 (100%) and upper_bound is 1.0, include it
+      # Otherwise, upper bound is exclusive (upper_bound > score)
+      upper_condition = if (score * 100).round == 100
+                          arel_table[:upper_bound].gteq(score).or(arel_table[:upper_bound].eq(nil))
+                        else
+                          arel_table[:upper_bound].gt(score).or(arel_table[:upper_bound].eq(nil))
+                        end
+      lower_condition = arel_table[:lower_bound].lteq(score).or(arel_table[:lower_bound].eq(nil))
+      where(upper_condition.and(lower_condition))
     }
 
     def contains_score(score)
       return false unless score
       return false if lower_bound.present? && lower_bound > score
-      return false if upper_bound.present? && upper_bound <= score
+
+      # Special case: if score is 1.0 (100%) and upper_bound is 1.0, include it
+      # Otherwise, upper bound is exclusive
+      if (score * 100).round == 100 && upper_bound.present? && (upper_bound * 100).round == 100
+        return false if upper_bound < score
+      elsif upper_bound.present? && upper_bound <= score
+        return false
+      end
 
       true
     end

@@ -85,19 +85,17 @@ module Factories
 
   def jpeg_data_frd
     fixture_path = "test_image.jpg"
-    fixture_file_upload(fixture_path, "image/jpeg", true)
+    fixture_file_upload(fixture_path, "image/jpeg", binary: true)
   end
 
   def one_hundred_megapixels_of_highly_compressed_png_data
     fixture_path = "100mpx.png"
-    fixture_file_upload(fixture_path, "image/png", true)
+    fixture_file_upload(fixture_path, "image/png", binary: true)
   end
 
-  def crocodocable_attachment_model(opts = {})
+  def canvadocable_attachment_model(opts = {})
     attachment_model({ content_type: "application/pdf" }.merge(opts))
   end
-
-  alias_method :canvadocable_attachment_model, :crocodocable_attachment_model
 
   def attachment_obj_with_context(obj, opts = {})
     @attachment = Attachment.create!(valid_attachment_attributes.merge(opts))

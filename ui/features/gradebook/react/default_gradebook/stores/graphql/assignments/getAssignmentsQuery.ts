@@ -18,92 +18,180 @@
 
 import {gql} from '@apollo/client'
 
-export const GET_ASSIGNMENTS_QUERY = gql`
-query getAssignments($assignmentGroupId: ID!, $gradingPeriodId: ID, $after: String) {
-  assignmentGroup(id: $assignmentGroupId) {
-    assignmentsConnection(
-      filter: {
-        gradingPeriodId: $gradingPeriodId
-        submissionTypes: [
-          attendance,
-          basic_lti_launch,
-          discussion_topic,
-          external_tool,
-          media_recording,
-          none,
-          not_graded,
-          on_paper,
-          online_quiz,
-          online_text_entry,
-          online_upload,
-          online_url,
-          student_annotation,
-        ]
-      },
-      first: 100,
-      after: $after
-    ) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      nodes {
+const GRADEBOOK_ASSIGNMENT_FIELDS_FRAGMENT = gql`
+  fragment GradebookAssignmentFields on Assignment {
+    _id
+    allowedAttempts
+    allowedExtensions
+    anonymizeStudents
+    anonymousGrading
+    anonymousInstructorAnnotations
+    assignmentGroupId
+    assignmentVisibility
+    checkpoints {
+      dueAt
+      lockAt
+      name
+      onlyVisibleToOverrides
+      pointsPossible
+      tag
+      unlockAt
+    }
+    courseId
+    createdAt
+    dueAt(applyOverrides: false)
+    dueDateRequired
+    gradedSubmissionsExist
+    gradeGroupStudentsIndividually
+    gradesPublished
+    gradingStandardId
+    gradingType
+    groupCategoryId
+    hasRubric
+    hasSubAssignments
+    hasSubmittedSubmissions
+    htmlUrl
+    importantDates
+    lockAt(applyOverrides: false)
+    moderatedGradingEnabled
+    moduleItems {
+      position
+      module {
         _id
-        allowedAttempts
-        allowedExtensions
-        anonymizeStudents
-        anonymousGrading
-        anonymousInstructorAnnotations  
-        assignmentGroupId
-        assignmentVisibility
-        checkpoints {
-          dueAt
-          lockAt
-          name
-          onlyVisibleToOverrides
-          pointsPossible
-          tag
-          unlockAt
+      }
+    }
+    muted
+    name
+    newQuizzesAnonymousParticipants
+    omitFromFinalGrade
+    onlyVisibleToOverrides
+    peerReviews {
+      anonymousReviews
+      automaticReviews
+      enabled
+      intraReviews
+    }
+    pointsPossible
+    position
+    postManually
+    postToSis
+    published
+    state
+    submissionTypes
+    unlockAt(applyOverrides: false)
+    updatedAt
+    visibleToEveryone
+  }
+`
+
+const GRADEBOOK_PEER_REVIEW_SUB_ASSIGNMENT_FIELDS_FRAGMENT = gql`
+  fragment GradebookPeerReviewSubAssignmentFields on PeerReviewSubAssignment {
+    _id
+    allowedAttempts
+    allowedExtensions
+    anonymizeStudents
+    anonymousGrading
+    anonymousInstructorAnnotations
+    assignmentGroupId
+    assignmentVisibility
+    checkpoints {
+      dueAt
+      lockAt
+      name
+      onlyVisibleToOverrides
+      pointsPossible
+      tag
+      unlockAt
+    }
+    courseId
+    createdAt
+    dueAt(applyOverrides: false)
+    dueDateRequired
+    gradedSubmissionsExist
+    gradeGroupStudentsIndividually
+    gradesPublished
+    gradingStandardId
+    gradingType
+    groupCategoryId
+    hasRubric
+    hasSubAssignments
+    hasSubmittedSubmissions
+    htmlUrl
+    importantDates
+    lockAt(applyOverrides: false)
+    moderatedGradingEnabled
+    moduleItems {
+      position
+      module {
+        _id
+      }
+    }
+    muted
+    name
+    newQuizzesAnonymousParticipants
+    omitFromFinalGrade
+    onlyVisibleToOverrides
+    peerReviews {
+      anonymousReviews
+      automaticReviews
+      enabled
+      intraReviews
+    }
+    pointsPossible
+    position
+    postManually
+    postToSis
+    published
+    state
+    submissionTypes
+    unlockAt(applyOverrides: false)
+    updatedAt
+    visibleToEveryone
+  }
+`
+
+export const GET_ASSIGNMENTS_QUERY = gql`
+  query Gradebook__GetAssignments(
+    $assignmentGroupId: ID!
+    $gradingPeriodId: ID
+    $after: String
+  ) {
+    assignmentGroup(id: $assignmentGroupId) {
+      assignmentsConnection(
+        filter: {
+          gradingPeriodId: $gradingPeriodId
+          submissionTypes: [
+            attendance
+            basic_lti_launch
+            discussion_topic
+            external_tool
+            media_recording
+            none
+            not_graded
+            on_paper
+            online_quiz
+            online_text_entry
+            online_upload
+            online_url
+            student_annotation
+          ]
         }
-        courseId
-        createdAt
-        dueAt
-        dueDateRequired
-        gradedSubmissionsExist
-        gradeGroupStudentsIndividually
-        gradesPublished
-        gradingStandardId
-        gradingType
-        groupCategoryId
-        hasRubric
-        hasSubAssignments
-        hasSubmittedSubmissions
-        htmlUrl
-        importantDates
-        lockAt
-        moderatedGradingEnabled
-        moduleItems { position module { _id } }
-        muted
-        name
-        omitFromFinalGrade
-        onlyVisibleToOverrides
-        peerReviews {
-          anonymousReviews
-          automaticReviews
-          enabled
-          intraReviews
+        first: 100
+        after: $after
+      ) {
+        pageInfo {
+          hasNextPage
+          endCursor
         }
-        pointsPossible
-        position
-        postManually
-        postToSis
-        published
-        state
-        submissionTypes
-        unlockAt
-        updatedAt
-        visibleToEveryone
+        nodes {
+          ...GradebookAssignmentFields
+          peerReviewSubAssignment {
+            ...GradebookPeerReviewSubAssignmentFields
+          }
+        }
       }
     }
   }
-}`
+  ${GRADEBOOK_ASSIGNMENT_FIELDS_FRAGMENT}
+  ${GRADEBOOK_PEER_REVIEW_SUB_ASSIGNMENT_FIELDS_FRAGMENT}
+`

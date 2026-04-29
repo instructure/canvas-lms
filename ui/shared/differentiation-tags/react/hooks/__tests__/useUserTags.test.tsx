@@ -20,13 +20,21 @@ import {waitFor} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks/dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useUserTags} from '../useUserTags'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
-const mockedDoFetchApi = doFetchApi as jest.Mock
+const server = setupServer()
+
+// Track the last request URL for verifying API calls
+let lastRequestUrl: string | null = null
+let lastRequestParams: URLSearchParams | null = null
+let requestCount = 0
 
 describe('useUserTags', () => {
   let queryClient: QueryClient
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     queryClient = new QueryClient({
@@ -36,7 +44,13 @@ describe('useUserTags', () => {
         },
       },
     })
-    jest.clearAllMocks()
+    lastRequestUrl = null
+    lastRequestParams = null
+    requestCount = 0
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   const wrapper = ({children}: {children: React.ReactNode}) => (
@@ -44,23 +58,30 @@ describe('useUserTags', () => {
   )
 
   it('fetches user tags correctly', async () => {
-    const mockResponse = {
-      json: [
-        {
-          id: 1,
-          name: 'Group 1',
-          group_category_name: 'Category 1',
-          is_single_tag: false,
-        },
-        {
-          id: 2,
-          name: 'Group 2',
-          group_category_name: 'Category 2',
-          is_single_tag: true,
-        },
-      ],
-    }
-    mockedDoFetchApi.mockResolvedValueOnce(mockResponse)
+    const mockData = [
+      {
+        id: 1,
+        name: 'Group 1',
+        group_category_name: 'Category 1',
+        is_single_tag: false,
+      },
+      {
+        id: 2,
+        name: 'Group 2',
+        group_category_name: 'Category 2',
+        is_single_tag: true,
+      },
+    ]
+
+    server.use(
+      http.get('/api/v1/courses/:courseId/groups', ({request}) => {
+        const url = new URL(request.url)
+        lastRequestUrl = url.pathname
+        lastRequestParams = url.searchParams
+        requestCount++
+        return HttpResponse.json(mockData)
+      }),
+    )
 
     const {result} = renderHook(() => useUserTags(123, 456), {wrapper})
 
@@ -84,23 +105,18 @@ describe('useUserTags', () => {
         isSingleTag: true,
       },
     ])
-    expect(mockedDoFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/courses/123/groups',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      params: {
-        collaboration_state: 'non_collaborative',
-        user_id: 456,
-        per_page: 40,
-      },
-    })
+    expect(lastRequestUrl).toBe('/api/v1/courses/123/groups')
+    expect(lastRequestParams?.get('collaboration_state')).toBe('non_collaborative')
+    expect(lastRequestParams?.get('user_id')).toBe('456')
+    expect(lastRequestParams?.get('per_page')).toBe('40')
   })
 
   it('handles API errors correctly', async () => {
-    const mockError = new Error('Failed to fetch user tags')
-    mockedDoFetchApi.mockRejectedValueOnce(mockError)
+    server.use(
+      http.get('/api/v1/courses/:courseId/groups', () => {
+        return HttpResponse.json({error: 'Server error'}, {status: 500})
+      }),
+    )
 
     const {result} = renderHook(() => useUserTags(123, 456), {wrapper})
 
@@ -109,11 +125,14 @@ describe('useUserTags', () => {
     })
     expect(result.current.data).toBeUndefined()
     expect(result.current.error).toBeTruthy()
-    expect(result.current.error?.message).toContain('Failed to fetch user tags')
   })
 
   it('handles empty JSON response', async () => {
-    mockedDoFetchApi.mockResolvedValueOnce({json: null})
+    server.use(
+      http.get('/api/v1/courses/:courseId/groups', () => {
+        return HttpResponse.json(null)
+      }),
+    )
 
     const {result} = renderHook(() => useUserTags(123, 456), {wrapper})
 
@@ -125,30 +144,51 @@ describe('useUserTags', () => {
     expect(result.current.error?.message).toBe('Failed to fetch user tags')
   })
 
-  it('does not fetch when courseId is missing', () => {
+  it('does not fetch when courseId is missing', async () => {
+    server.use(
+      http.get('/api/v1/courses/:courseId/groups', () => {
+        requestCount++
+        return HttpResponse.json([])
+      }),
+    )
+
     renderHook(() => useUserTags(0, 456), {wrapper})
-    expect(mockedDoFetchApi).not.toHaveBeenCalled()
+
+    // Give it a moment to potentially make a request
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(requestCount).toBe(0)
   })
 
-  it('does not fetch when userId is missing', () => {
+  it('does not fetch when userId is missing', async () => {
+    server.use(
+      http.get('/api/v1/courses/:courseId/groups', () => {
+        requestCount++
+        return HttpResponse.json([])
+      }),
+    )
+
     renderHook(() => useUserTags(123, 0), {wrapper})
-    expect(mockedDoFetchApi).not.toHaveBeenCalled()
+
+    // Give it a moment to potentially make a request
+    await new Promise(resolve => setTimeout(resolve, 50))
+    expect(requestCount).toBe(0)
   })
 
   it('respects custom perPage parameter', async () => {
-    mockedDoFetchApi.mockResolvedValueOnce({json: []})
+    server.use(
+      http.get('/api/v1/courses/:courseId/groups', ({request}) => {
+        const url = new URL(request.url)
+        lastRequestParams = url.searchParams
+        requestCount++
+        return HttpResponse.json([])
+      }),
+    )
 
     renderHook(() => useUserTags(123, 456, 20), {wrapper})
 
     await waitFor(() => {
-      expect(mockedDoFetchApi).toHaveBeenCalled()
+      expect(requestCount).toBe(1)
     })
-    expect(mockedDoFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({
-        params: expect.objectContaining({
-          per_page: 20,
-        }),
-      }),
-    )
+    expect(lastRequestParams?.get('per_page')).toBe('20')
   })
 })

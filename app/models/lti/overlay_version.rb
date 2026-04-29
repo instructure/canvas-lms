@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Lti::OverlayVersion < ActiveRecord::Base
+class Lti::OverlayVersion < ApplicationRecord
   extend RootAccountResolver
+
   belongs_to :account, inverse_of: :lti_overlay_versions, optional: false
   belongs_to :lti_overlay, class_name: "Lti::Overlay", inverse_of: :lti_overlay_versions, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :lti_overlay_versions, optional: false

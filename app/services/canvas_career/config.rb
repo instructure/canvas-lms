@@ -22,28 +22,32 @@
 # Canvas Career.
 module CanvasCareer
   class Config
-    def initialize(root_account)
+    def initialize(root_account, session = nil)
       @root_account = root_account
+      @session = session
     end
 
     def learner_app_launch_url
-      @root_account.horizon_url("remoteEntry.js").to_s
+      override_service.get_override("canvas_career_learner") || config["learner_launch_url"]
     end
 
     def learning_provider_app_launch_url
-      @root_account.horizon_url("learning-provider/remoteEntry.js").to_s
+      override_service.get_override("canvas_career_learning_provider") || config["learning_provider_launch_url"]
     end
 
-    # This is the account's url on *.canvasforcareer.com. The redirect strategy is legacy
-    # and will be removed once the MF approach is adopted.
-    def learner_app_redirect_url(path)
-      @root_account.horizon_redirect_url(path)
+    def theme_url
+      config["theme_url"]
+    end
+
+    def dark_theme_url
+      config["dark_theme_url"]
     end
 
     # These values are passed to the frontend; they should not contain any secrets!
     def public_app_config(request)
       config["public_app_config"].tap do |c|
         c["hosts"]["canvas"] = request.base_url
+        c["experience_mode"] = @root_account.settings[:horizon_academic_mode] ? "academic" : "career"
       end
     end
 
@@ -51,6 +55,10 @@ module CanvasCareer
 
     def config
       @_config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["canvas_career.yml", failsafe: nil] || "{}")
+    end
+
+    def override_service
+      @_override_service ||= MicrofrontendsReleaseTagOverrideService.new(@session)
     end
   end
 end

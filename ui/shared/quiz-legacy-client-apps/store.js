@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {assignIn} from 'lodash'
+import {assignIn} from 'es-toolkit/compat'
 
 const Store = function (key, proto, Dispatcher) {
   const emitChange = this.emitChange.bind(this)
@@ -71,14 +71,13 @@ assignIn(Store.prototype, {
   },
 
   /**
-   * @private
-   *
    * A hook for tests to reset the Store to its initial state. Override this
    * to restore any side-effects.
    *
    * Usually during the life-time of the app, we will never have to reset a
    * Store, but in tests we do.
    */
+  // @ts-expect-error - test-only method not in class interface
   __reset__() {
     this._callbacks = []
     this.state = this.getInitialState()

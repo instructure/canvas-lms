@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AttemptInformation from './AttemptInformation'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
 import AvailabilityDates from '@canvas/assignments/react/AvailabilityDates'
 import SubmissionSticker from '@canvas/submission-sticker'
-import StudentViewContext from './Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import MarkAsDoneButton from './MarkAsDoneButton'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import MissingPrereqs from './MissingPrereqs'
 import DateLocked from '../DateLocked'
 import React, {Suspense, lazy, useContext, useEffect, useState} from 'react'
@@ -45,6 +45,7 @@ import {Flex} from '@instructure/ui-flex'
 import {arrayOf, func, bool} from 'prop-types'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiToolIframe} from './LtiToolIframe'
+import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import DocumentProcessorsSection from './DocumentProcessorsSection'
 import {SelfAssessmentButton} from './RubricSelfAssessment/SelfAssessmentButton'
 import {SelfAssessmentTrayClient} from './RubricSelfAssessment/SelfAssessmentTrayClient'
@@ -151,6 +152,8 @@ function SubmissionlessFooter({assignment, submission, onMarkAsDoneError}) {
 }
 
 function renderAttemptsAndAvailability(assignment) {
+  const coursePacingEnabled = window.ENV.course_pacing_enabled
+
   return (
     <StudentViewContext.Consumer>
       {context => (
@@ -167,9 +170,11 @@ function renderAttemptsAndAvailability(assignment) {
               )}
             </Text>
           )}
-          <Text as="div">
-            <AvailabilityDates assignment={assignment} formatStyle="long" />
-          </Text>
+          {!coursePacingEnabled && (
+            <Text as="div">
+              <AvailabilityDates assignment={assignment} formatStyle="long" />
+            </Text>
+          )}
         </View>
       )}
     </StudentViewContext.Consumer>
@@ -209,12 +214,15 @@ function renderContentBaseOnAvailability(
     const onMarkAsDoneError = () =>
       alertContext.setOnFailure(I18n.t('Error updating status of module item'))
 
-    const queryClient = new QueryClient()
+    // I don't know why, but using the global queryClient with Rubrics seems to
+    // break the page in the Selenium specs. But we need to use global one for
+    // AssetProcessor to avoid duplicate fetching with other components.
+    const rubricsQueryClient = new QueryClient()
 
     return (
       <>
         <Flex margin="medium 0 0 0" alignItems="start">
-          <div style={{flexGrow: 1}}>
+          <div style={{flexGrow: 1, maxWidth: '100%'}} data-testid="student-content-flex-container">
             {/* EVAL-3711 Remove ICE Feature Flag */}
             {!window.ENV.FEATURES?.instui_nav &&
               !assignment.env.peerReviewModeEnabled &&
@@ -226,11 +234,26 @@ function renderContentBaseOnAvailability(
                 )}
               />
             )}
-            <DocumentProcessorsSection submission={submission} />
+            {
+              // For submissions with multiple files, this is shown in FilePreview
+              (submission?.attachments?.length ?? 0) <= 1 && (
+                <DocumentProcessorsSection
+                  submission={{
+                    submissionId: submission._id,
+                    submissionType: submission.submissionType,
+                    attempt: submission.attempt,
+                    attachmentId: submission.attachments?.[0]?._id,
+                    attachmentIds: submission.attachments?.[0]?._id
+                      ? [submission.attachments[0]._id]
+                      : undefined,
+                  }}
+                />
+              )
+            }
             <AssignmentToggleDetails description={assignment.description} />
             {assignment.rubric && (
               <Suspense fallback={<LoadingIndicator />}>
-                <QueryClientProvider client={queryClient}>
+                <QueryClientProvider client={rubricsQueryClient}>
                   <RubricsQuery
                     assignment={assignment}
                     submission={submission}
@@ -252,6 +275,8 @@ function renderContentBaseOnAvailability(
             </View>
           )}
         </Flex>
+        <LtiToolIframe assignment={assignment} submission={submission} />
+        <div id="assignment_external_tools" />
         {assignment.expectsSubmission ? (
           <ContentTabs
             assignment={assignment}
@@ -266,7 +291,6 @@ function renderContentBaseOnAvailability(
             submission={submission}
           />
         )}
-        <LtiToolIframe assignment={assignment} submission={submission} />
         {(ENV.enrollment_state === 'completed' || !ENV.can_submit_assignment_from_section) && (
           <EnrollmentConcludedNotice hasActiveEnrollment={ENV.enrollment_state === 'active'} />
         )}
@@ -278,7 +302,12 @@ function renderContentBaseOnAvailability(
 function StudentContent(props) {
   const alertContext = useContext(AlertManagerContext)
   const [, setAssignedAssessments] = useState([])
+
+  const urlParams = new URLSearchParams(window.location.search)
+  const openFeedbackParam = urlParams.get('open_feedback') === 'true'
+
   const initialCommentTrayState =
+    openFeedbackParam ||
     !!props.submission?.unreadCommentCount ||
     (!!props.assignment.env.peerReviewModeEnabled &&
       props.assignment.env.peerReviewAvailable &&
@@ -314,6 +343,18 @@ function StudentContent(props) {
 
     setUpImmersiveReader()
   }, [description, name])
+
+  useEffect(() => {
+    const element = document.getElementById('assignment_external_tools')
+    if (element) {
+      AssignmentExternalTools.attach(
+        element,
+        'assignment_view',
+        parseInt(ENV.COURSE_ID, 10),
+        parseInt(ENV.ASSIGNMENT_ID, 10),
+      )
+    }
+  }, [])
 
   const onSuccessfulPeerReview = assignedAssessments => {
     setAssignedAssessments(assignedAssessments)

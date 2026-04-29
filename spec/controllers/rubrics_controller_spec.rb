@@ -1215,114 +1215,941 @@ describe RubricsController do
     end
   end
 
-  describe "POST 'llm_criteria'" do
-    before do
-      course_with_teacher_logged_in(active_all: true)
-      @assignment = @course.assignments.create!(assignment_valid_attributes)
-
-      @course.enable_feature!(:enhanced_rubrics)
-      @course.enable_feature!(:ai_rubrics)
-
-      @inst_llm = double("InstLLM::Client")
-      allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
-    end
-
-    it "queues job for generation of criteria via LLM when features are enabled" do
-      llm_response = {
-        criteria: [
-          {
-            name: "Critical Analysis",
-            description: "Demonstrates thorough understanding and analysis",
-            ratings: [
-              { title: "Excellent", description: "Thoroughly demonstrated understanding" },
-              { title: "Good", description: "Partially demonstrated understanding" },
-              { title: "Needs Improvement", description: "Failed to demonstrate understanding" }
-            ]
-          },
-          {
-            name: "Detailed Diagrams",
-            description: "Demonstrates diagramming ability ",
-            ratings: [
-              { title: "Excellent", description: "Thoroughly demonstrated diagramming" },
-              { title: "Good", description: "Partially demonstrated diagramming" },
-              { title: "Needs Improvement", description: "Failed to demonstrate diagramming" }
-            ]
-          }
-        ]
-      }
-
-      expect(@inst_llm).to receive(:chat).and_return(
-        InstLLM::Response::ChatResponse.new(
-          model: "model",
-          message: { role: :assistant, content: llm_response.to_json },
-          stop_reason: "stop_reason",
-          usage: {
-            input_tokens: 10,
-            output_tokens: 20,
-          }
-        )
-      )
-
-      post "llm_criteria",
-           params: {
-             course_id: @course.id,
-             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
-             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5, use_range: true, additional_prompt_info: "Focus on content", grade_level: "second" }
-           },
-           format: :json
-
-      expect(response).to be_successful
-      json = response.parsed_body
-      expect(json).to be_present
-      expect(json["workflow_state"]).to eq "queued"
-
-      run_jobs
-
-      progress = Progress.find(json["id"])
-      expect(progress.results).to be_present
-      expect(progress.results[:criteria].length).to eq 2
-      expect(progress.results[:criteria][0][:criterion_use_range]).to be_truthy
-    end
-
+  # Shared examples for AI rubric generation endpoints
+  shared_examples "requires enabled features" do |endpoint|
     it "returns error when features are disabled" do
       @course.disable_feature!(:enhanced_rubrics)
       @course.disable_feature!(:ai_rubrics)
 
-      post "llm_criteria",
-           params: {
-             course_id: @course.id,
-             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
-             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5 }
-           },
-           format: :json
-
+      post endpoint, params: request_params, format: :json
       expect(response).to be_forbidden
     end
+  end
 
+  shared_examples "requires manage rubric permission" do |endpoint|
     it "returns error when user lacks permissions" do
       course_with_student_logged_in(active_all: true, course: @course)
-
-      post "llm_criteria",
-           params: {
-             course_id: @course.id,
-             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
-             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5 }
-           },
-           format: :json
-
+      post endpoint, params: request_params, format: :json
       expect(response).to be_forbidden
     end
+  end
 
-    it "returns error when user specifies out-of-bounds parameters" do
-      post "llm_criteria",
-           params: {
-             course_id: @course.id,
-             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
-             generate_options: { criteria_count: 1, rating_count: 3, points_per_criterion: 5 }
-           },
-           format: :json
-
+  shared_examples "validates parameter bounds" do |endpoint|
+    it "returns error when criteria_count is out of bounds" do
+      params = request_params.deep_merge(generate_options: { criteria_count: 1 })
+      post endpoint, params:, format: :json
       expect(response).to be_bad_request
+      expect(response.parsed_body["error"]).to include("criteria_count must be between 2 and 8")
+    end
+
+    it "returns error when rating_count is out of bounds" do
+      params = request_params.deep_merge(generate_options: { rating_count: 9 })
+      post endpoint, params:, format: :json
+      expect(response).to be_bad_request
+      expect(response.parsed_body["error"]).to include("rating_count must be between 2 and 8")
+    end
+  end
+
+  shared_examples "validates association" do |endpoint|
+    it "returns unauthorized when association_object is invalid" do
+      params = request_params.deep_merge(
+        rubric_association: { association_type: "Assignment", association_id: 999_999 }
+      )
+      post endpoint, params:, format: :json
+      expect(response).to be_forbidden
+    end
+  end
+
+  describe "ai rubrics" do
+    let(:cedar_response_struct) { Struct.new(:response) }
+    let(:mock_cedar_prompt_response) do
+      Struct.new(:response).new(response: "<RUBRIC_DATA>\n</RUBRIC_DATA>")
+    end
+
+    let(:mock_cedar_conversation_response) do
+      Struct.new(:response).new(response: '{"criteria": []}')
+    end
+
+    before do
+      allow(Rails.env).to receive(:test?).and_return(true)
+      stub_const("CedarClient", Class.new do
+        def self.prompt(*)
+          mock_cedar_prompt_response
+        end
+
+        def self.conversation(*)
+          mock_cedar_conversation_response
+        end
+      end)
+    end
+
+    describe "POST 'llm_criteria'" do
+      before do
+        course_with_teacher_logged_in(active_all: true)
+        @assignment = @course.assignments.create!(assignment_valid_attributes)
+
+        @course.enable_feature!(:enhanced_rubrics)
+        @course.enable_feature!(:ai_rubrics)
+      end
+
+      let(:request_params) do
+        {
+          course_id: @course.id,
+          rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+          generate_options: { criteria_count: 2, rating_count: 3, total_points: 5, use_range: true, grade_level: "college" }
+        }
+      end
+
+      it "queues job for generation of criteria via LLM when features are enabled" do
+        llm_response = {
+          criteria: [
+            {
+              name: "Critical Analysis",
+              description: "Demonstrates thorough understanding and analysis",
+              ratings: [
+                { title: "Excellent", description: "Thoroughly demonstrated understanding" },
+                { title: "Good", description: "Partially demonstrated understanding" },
+                { title: "Needs Improvement", description: "Failed to demonstrate understanding" }
+              ]
+            },
+            {
+              name: "Detailed Diagrams",
+              description: "Demonstrates diagramming ability ",
+              ratings: [
+                { title: "Excellent", description: "Thoroughly demonstrated diagramming" },
+                { title: "Good", description: "Partially demonstrated diagramming" },
+                { title: "Needs Improvement", description: "Failed to demonstrate diagramming" }
+              ]
+            }
+          ]
+        }
+        expect(CedarClient).to receive(:conversation).and_return(
+          cedar_response_struct.new(response: llm_response.to_json[1..])
+        )
+
+        post "llm_criteria",
+             params: {
+               course_id: @course.id,
+               rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+               generate_options: { criteria_count: 2, rating_count: 3, total_points: 5, use_range: true, additional_prompt_info: "Focus on content", grade_level: "second" }
+             },
+             format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+        expect(json).to be_present
+        expect(json["workflow_state"]).to eq "queued"
+
+        run_jobs
+
+        progress = Progress.find(json["id"])
+        expect(progress.results).to be_present
+        expect(progress.results[:criteria].length).to eq 2
+        expect(progress.results[:criteria][0][:criterion_use_range]).to be_truthy
+      end
+
+      context "authorization and feature flags" do
+        it_behaves_like "requires enabled features", "llm_criteria"
+        it_behaves_like "requires manage rubric permission", "llm_criteria"
+      end
+
+      context "validation" do
+        it_behaves_like "validates parameter bounds", "llm_criteria"
+        it_behaves_like "validates association", "llm_criteria"
+
+        it "accepts request when criteria_count is missing" do
+          params = request_params.tap { |p| p[:generate_options].delete(:criteria_count) }
+          post "llm_criteria", params:, format: :json
+          expect(response).to be_successful
+        end
+      end
+    end
+
+    describe "POST 'llm_regenerate_criteria'" do
+      before do
+        course_with_teacher_logged_in(active_all: true)
+        @assignment = @course.assignments.create!(assignment_valid_attributes)
+
+        @course.enable_feature!(:enhanced_rubrics)
+        @course.enable_feature!(:ai_rubrics)
+
+        @existing_criteria = {
+          "0" => {
+            id: "1",
+            description: "Original Criterion 1",
+            long_description: "Original long description 1",
+            points: 10,
+            criterion_use_range: false,
+            ratings: [
+              { id: "1", criterion_id: "1", description: "Excellent", long_description: "Excellent work", points: 10 },
+              { id: "2", criterion_id: "1", description: "Good", long_description: "Good work", points: 7 },
+              { id: "3", criterion_id: "1", description: "Poor", long_description: "Poor work", points: 4 }
+            ]
+          },
+          "1" => {
+            id: "2",
+            description: "Original Criterion 2",
+            long_description: "Original long description 2",
+            points: 10,
+            criterion_use_range: true,
+            ratings: [
+              { id: "4", criterion_id: "2", description: "Excellent", long_description: "Excellent work", points: 10 },
+              { id: "5", criterion_id: "2", description: "Good", long_description: "Good work", points: 7 },
+              { id: "6", criterion_id: "2", description: "Poor", long_description: "Poor work", points: 4 }
+            ]
+          }
+        }
+      end
+
+      let(:request_params) do
+        {
+          course_id: @course.id,
+          rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+          criteria: @existing_criteria,
+          generate_options: { criteria_count: 2, rating_count: 3, total_points: 10, use_range: true, grade_level: "higher-ed" }
+        }
+      end
+
+      it "regenerates criteria via LLM when features are enabled" do
+        llm_response = "<RUBRIC_DATA>
+          criterion:_new_c_1:description=Critical Thinking
+          criterion:_new_c_1:long_description=Ability to analyze ideas, identify assumptions, and evaluate arguments
+          rating:_new_r_1:description=Excellent
+          rating:_new_r_1:long_description=Consistently demonstrates deep analysis and evaluation of ideas
+          rating:_new_r_2:description=Good
+          rating:_new_r_2:long_description=Shows some analysis and evaluation but lacks consistency
+          rating:_new_r_3:description=Needs Improvement
+          rating:_new_r_3:long_description=Minimal or no analysis demonstrated
+
+          criterion:_new_c_2:description=Clarity of Communication
+          criterion:_new_c_2:long_description=Ability to express ideas clearly and effectively in writing
+          rating:_new_r_4:description=Excellent
+          rating:_new_r_4:long_description=Writing is consistently clear, well-structured, and easy to understand
+          rating:_new_r_5:description=Good
+          rating:_new_r_5:long_description=Writing is understandable but may have lapses in clarity or structure
+          rating:_new_r_6:description=Needs Improvement
+          rating:_new_r_6:long_description=Writing is unclear, disorganized, or difficult to follow
+        </RUBRIC_DATA>"
+
+        expect(CedarClient).to receive(:prompt).and_return(
+          cedar_response_struct.new(response: llm_response)
+        )
+
+        post "llm_regenerate_criteria",
+             params: {
+               course_id: @course.id,
+               rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+               criteria: @existing_criteria,
+               additional_user_prompt: "Make this more comprehensive",
+               regenerate_options: { additional_user_prompt: "Make this more comprehensive" },
+               generate_options: { criteria_count: 2, rating_count: 3, total_points: 10, use_range: true, grade_level: "college" }
+             },
+             format: :json
+        expect(response).to be_successful
+        json = response.parsed_body
+        expect(json).to be_present
+        expect(json["workflow_state"]).to eq "queued"
+        run_jobs
+        progress = Progress.find(json["id"])
+        expect(progress.results).to be_present
+        expect(progress.results[:criteria].length).to eq 2
+      end
+
+      it "regenerates criterion when criterion_id is provided" do
+        llm_response = "<RUBRIC_DATA>
+          criterion:1:description=Modified Criterion 1
+          criterion:1:long_description=Modified long description 1
+          rating:1:description=Excellent
+          rating:1:long_description=Excellent work
+          rating:2:description=Good
+          rating:2:long_description=Good work
+          rating:3:description=Poor
+          rating:3:long_description=Poor work
+        </RUBRIC_DATA>"
+
+        expect(CedarClient).to receive(:prompt).and_return(
+          cedar_response_struct.new(response: llm_response)
+        )
+
+        post "llm_regenerate_criteria",
+             params: {
+               course_id: @course.id,
+               rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+               criteria: @existing_criteria,
+               regenerate_options: { additional_user_prompt: "update criterion", criterion_id: 1 },
+               generate_options: {
+                 criteria_count: 2,
+                 rating_count: 3,
+                 total_points: 20,
+                 use_range: false,
+                 grade_level: "higher-ed"
+               }
+             },
+             format: :json
+        expect(response).to be_successful
+        json = response.parsed_body
+        expect(json["workflow_state"]).to eq "queued"
+        run_jobs
+        progress = Progress.find(json["id"])
+        expect(progress.results).to be_present
+        expect(progress.results[:criteria].length).to eq 2
+
+        expect(progress.results[:criteria][0][:id]).to eq("1")
+        expect(progress.results[:criteria][0][:description]).to eq("Modified Criterion 1")
+
+        expect(progress.results[:criteria][1][:id]).to eq("2")
+        expect(progress.results[:criteria][1][:description]).to eq("Original Criterion 2")
+      end
+
+      context "criteria count management" do
+        it "extends criteria when criteria_count is higher than original, keeping old IDs untouched" do
+          existing_criteria_with_three = @existing_criteria.merge(
+            "2" => {
+              id: "3",
+              description: "Original Criterion 3",
+              long_description: "Original long description 3",
+              points: 10,
+              criterion_use_range: false,
+              ratings: [
+                { id: "7", criterion_id: "3", description: "Excellent", long_description: "Excellent work", points: 10 },
+                { id: "8", criterion_id: "3", description: "Good", long_description: "Good work", points: 7 },
+                { id: "9", criterion_id: "3", description: "Poor", long_description: "Poor work", points: 4 }
+              ]
+            }
+          )
+
+          llm_response = "<RUBRIC_DATA>
+            criterion:1:description=Original Criterion 1
+            criterion:1:long_description=Original long description 1
+            rating:1:description=Excellent
+            rating:1:long_description=Excellent work
+            rating:2:description=Good
+            rating:2:long_description=Good work
+            rating:3:description=Poor
+            rating:3:long_description=Poor work
+
+            criterion:2:description=Original Criterion 2
+            criterion:2:long_description=Original long description 2
+            rating:4:description=Excellent
+            rating:4:long_description=Excellent work
+            rating:5:description=Good
+            rating:5:long_description=Good work
+            rating:6:description=Poor
+            rating:6:long_description=Poor work
+
+            criterion:3:description=Added Criterion 3
+            criterion:3:long_description=Newly generated criterion
+            rating:7:description=Excellent
+            rating:7:long_description=Excellent work
+            rating:8:description=Good
+            rating:8:long_description=Good work
+            rating:9:description=Poor
+            rating:9:long_description=Poor work
+          </RUBRIC_DATA>"
+
+          expect(CedarClient).to receive(:prompt).and_return(
+            cedar_response_struct.new(response: llm_response)
+          )
+
+          post "llm_regenerate_criteria",
+               params: {
+                 course_id: @course.id,
+                 rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+                 criteria: existing_criteria_with_three,
+                 generate_options: { criteria_count: 3, rating_count: 3, total_points: 10 }
+               },
+               format: :json
+
+          expect(response).to be_successful
+          json = response.parsed_body
+          run_jobs
+          progress = Progress.find(json["id"])
+
+          expect(progress.results[:criteria].length).to eq 3
+          expect(progress.results[:criteria].pluck(:id)).to include("1", "2", "3")
+          expect(progress.results[:criteria].last[:description]).to eq("Added Criterion 3")
+        end
+
+        it "preserves all incoming criteria count even when generate_options specifies different count" do
+          existing_criteria_with_three = @existing_criteria.merge(
+            "2" => {
+              id: "3",
+              description: "Original Criterion 3",
+              long_description: "Original long description 3",
+              points: 10,
+              criterion_use_range: false,
+              ratings: [
+                { id: "7", criterion_id: "3", description: "Excellent", long_description: "Excellent work", points: 10 },
+                { id: "8", criterion_id: "3", description: "Good", long_description: "Good work", points: 7 },
+                { id: "9", criterion_id: "3", description: "Poor", long_description: "Poor work", points: 4 }
+              ]
+            }
+          )
+
+          llm_response = "<RUBRIC_DATA>
+            criterion:1:description=Retained Criterion 1
+            criterion:1:long_description=Still present
+            rating:1:description=Excellent
+            rating:1:long_description=Excellent work
+            rating:2:description=Good
+            rating:2:long_description=Good work
+            rating:3:description=Poor
+            rating:3:long_description=Poor work
+
+            criterion:2:description=Retained Criterion 2
+            criterion:2:long_description=Still present
+            rating:4:description=Excellent
+            rating:4:long_description=Excellent work
+            rating:5:description=Good
+            rating:5:long_description=Good work
+            rating:6:description=Poor
+            rating:6:long_description=Poor work
+
+            criterion:3:description=Retained Criterion 3
+            criterion:3:long_description=Still present
+            rating:7:description=Excellent
+            rating:7:long_description=Excellent work
+            rating:8:description=Good
+            rating:8:long_description=Good work
+            rating:9:description=Poor
+            rating:9:long_description=Poor work
+          </RUBRIC_DATA>"
+
+          expect(CedarClient).to receive(:prompt).and_return(
+            cedar_response_struct.new(response: llm_response)
+          )
+
+          post "llm_regenerate_criteria",
+               params: {
+                 course_id: @course.id,
+                 rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+                 criteria: existing_criteria_with_three,
+                 generate_options: { criteria_count: 2, rating_count: 3, total_points: 10 }
+               },
+               format: :json
+
+          expect(response).to be_successful
+          json = response.parsed_body
+          run_jobs
+          progress = Progress.find(json["id"])
+
+          expect(progress.results[:criteria].length).to eq 3
+          expect(progress.results[:criteria].pluck(:id)).to include("1", "2", "3")
+        end
+      end
+
+      context "authorization and feature flags" do
+        it_behaves_like "requires enabled features", "llm_regenerate_criteria"
+        it_behaves_like "requires manage rubric permission", "llm_regenerate_criteria"
+      end
+
+      context "parameter validation" do
+        it_behaves_like "validates parameter bounds", "llm_regenerate_criteria"
+        it_behaves_like "validates association", "llm_regenerate_criteria"
+
+        context "string length limits" do
+          it "returns error when additional_user_prompt is too long" do
+            long_prompt = "a" * 1001
+            params = request_params.deep_merge(
+              regenerate_options: { additional_user_prompt: long_prompt }
+            )
+            post "llm_regenerate_criteria", params:, format: :json
+            expect(response).to be_bad_request
+            expect(response.parsed_body["error"]).to eq "additional_user_prompt must be 1000 characters or less"
+          end
+
+          it "returns error when additional_prompt_info is too long in generate_options" do
+            long_info = "b" * 1001
+            params = request_params.deep_merge(
+              generate_options: { additional_prompt_info: long_info }
+            )
+            post "llm_regenerate_criteria", params:, format: :json
+            expect(response).to be_bad_request
+            expect(response.parsed_body["error"]).to eq "additional_prompt_info must be 1000 characters or less"
+          end
+
+          it "returns error when standard in regenerate_options is too long" do
+            long_standard = "s" * 1001
+            params = request_params.deep_merge(
+              generate_options: { standard: long_standard }
+            )
+            post "llm_regenerate_criteria", params:, format: :json
+            expect(response).to be_bad_request
+            expect(response.parsed_body["error"]).to eq "standard must be 1000 characters or less"
+          end
+        end
+
+        context "criteria parameter validation" do
+          it "returns 400 when criteria is empty or missing" do
+            [{}].each do |invalid_criteria|
+              params = request_params.merge(criteria: invalid_criteria)
+              post "llm_regenerate_criteria", params:, format: :json
+              expect(response).to have_http_status(:bad_request)
+              expect(response.parsed_body["error"]).to include("criteria must be provided")
+            end
+          end
+
+          it "returns 400 when criteria param is missing entirely" do
+            params = request_params.tap { |p| p.delete(:criteria) }
+            post "llm_regenerate_criteria", params:, format: :json
+            expect(response).to have_http_status(:bad_request)
+            expect(response.parsed_body["error"]).to include("criteria must be provided")
+          end
+
+          it "accepts malformed rating data (fails later in service layer)" do
+            malformed_criteria = {
+              "0" => {
+                id: "c1",
+                description: "Clarity",
+                points: 10,
+                ratings: "not_an_array"
+              }
+            }
+            params = request_params.merge(criteria: malformed_criteria)
+            post "llm_regenerate_criteria", params:, format: :json
+
+            expect(response).to be_successful
+          end
+        end
+      end
+
+      context "edge cases" do
+        it "accepts regenerate_options without standard" do
+          params = request_params.deep_merge(
+            regenerate_options: { additional_user_prompt: "refine clarity" }
+          )
+          post "llm_regenerate_criteria", params:, format: :json
+          expect(response).to be_successful
+          expect(response.parsed_body["workflow_state"]).to eq "queued"
+        end
+
+        it "accepts use_range = false and grade_level = higher-ed in generate_options" do
+          params = request_params.deep_merge(
+            regenerate_options: { criterion_id: "1", additional_user_prompt: "add detail" },
+            generate_options: {
+              criteria_count: 5,
+              rating_count: 4,
+              total_points: 20,
+              use_range: false,
+              grade_level: "higher-ed"
+            }
+          )
+          post "llm_regenerate_criteria", params:, format: :json
+          expect(response).to be_successful
+          expect(response.parsed_body["workflow_state"]).to eq "queued"
+        end
+
+        it "queues job successfully when both generate_options and regenerate_options are empty" do
+          params = request_params.tap do |p|
+            p.delete(:regenerate_options)
+            p[:generate_options] = {}
+          end
+          post "llm_regenerate_criteria", params:, format: :json
+          expect(response).to be_successful
+          expect(response.parsed_body["workflow_state"]).to eq "queued"
+        end
+
+        it "handles nonexistent criterion_id gracefully in background job" do
+          params = request_params.deep_merge(
+            regenerate_options: {
+              criterion_id: "nonexistent_id",
+              additional_user_prompt: "Improve it"
+            }
+          )
+          post "llm_regenerate_criteria", params:, format: :json
+          expect(response).to be_successful
+        end
+      end
+
+      context "LLM response error handling" do
+        before do
+          allow(LLMConfigs).to receive(:config_for).with("rubric_regenerate_criteria").and_return(
+            instance_double(LLMConfig,
+                            name: "rubric-regenerate-criteriaV2",
+                            model_id: "anthropic.claude-3-haiku-20240307-v1:0",
+                            generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
+          )
+        end
+
+        it "handles empty RUBRIC_DATA responses during regeneration" do
+          expect(CedarClient).to receive(:prompt).and_return(
+            cedar_response_struct.new(response: "<RUBRIC_DATA></RUBRIC_DATA>")
+          )
+
+          post "llm_regenerate_criteria", params: request_params, format: :json
+          expect(response).to be_successful
+          run_jobs
+
+          progress = Progress.find(response.parsed_body["id"])
+          expect(progress.workflow_state).to eq "failed"
+          expect(progress.results[:error]).to eq "There was an error with the criteria regeneration. Please try again later."
+        end
+
+        it "handles missing RUBRIC_DATA tags" do
+          expect(CedarClient).to receive(:prompt).and_return(
+            cedar_response_struct.new(response: "This response has no proper tags for regeneration")
+          )
+
+          post "llm_regenerate_criteria", params: request_params, format: :json
+          expect(response).to be_successful
+          run_jobs
+
+          progress = Progress.find(response.parsed_body["id"])
+          expect(progress.workflow_state).to eq "failed"
+          expect(progress.results[:error]).to eq "There was an error with the criteria regeneration. Please try again later."
+        end
+      end
+    end
+
+    describe "End-to-end LLM criteria generation" do
+      before do
+        allow(Rails.env).to receive(:test?).and_return(true)
+
+        course_with_teacher_logged_in(active_all: true)
+        @assignment = @course.assignments.create!(
+          title: "Essay Assignment",
+          description: "Write a well-structured argumentative essay about climate change, focusing on evidence-based reasoning and clear communication.",
+          points_possible: 100
+        )
+
+        @course.enable_feature!(:enhanced_rubrics)
+        @course.enable_feature!(:ai_rubrics)
+      end
+
+      it "creates rubric with LLM-generated criteria from controller to service with proper LLMResponse persistence" do
+        llm_response_payload = {
+          criteria: [
+            {
+              name: "Evidence-Based Reasoning",
+              description: "Demonstrates use of credible sources and logical reasoning",
+              ratings: [
+                { title: "Exemplary", description: "Uses multiple credible sources with sophisticated analysis" },
+                { title: "Proficient", description: "Uses credible sources with clear analysis" },
+                { title: "Developing", description: "Uses some sources but analysis is limited" },
+                { title: "Beginning", description: "Limited or unreliable sources used" }
+              ]
+            },
+            {
+              name: "Clear Communication",
+              description: "Demonstrates clear writing and organization",
+              ratings: [
+                { title: "Exemplary", description: "Writing is exceptionally clear and well-organized" },
+                { title: "Proficient", description: "Writing is clear with good organization" },
+                { title: "Developing", description: "Writing is somewhat clear but organization needs work" },
+                { title: "Beginning", description: "Writing lacks clarity and organization" }
+              ]
+            }
+          ]
+        }
+
+        expect(CedarClient).to receive(:conversation).and_return(
+          cedar_response_struct.new(response: llm_response_payload.to_json[1..])
+        )
+
+        initial_llm_response_count = LLMResponse.count
+
+        post "llm_criteria",
+             params: {
+               course_id: @course.id,
+               rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+               generate_options: {
+                 criteria_count: 2,
+                 rating_count: 4,
+                 total_points: 25,
+                 use_range: true,
+                 additional_prompt_info: "Focus on academic writing skills",
+                 grade_level: "college"
+               }
+             },
+             format: :json
+
+        expect(response).to be_successful
+        json = response.parsed_body
+        expect(json["workflow_state"]).to eq "queued"
+
+        run_jobs
+
+        progress = Progress.find(json["id"])
+        expect(progress.workflow_state).to eq "completed"
+        expect(progress.results).to have_key(:criteria)
+        expect(progress.results[:criteria].length).to eq 2
+
+        expect(LLMResponse.count).to eq(initial_llm_response_count + 1)
+
+        llm_response = LLMResponse.last
+        expect(llm_response.prompt_name).to eq "rubric-create-V3"
+        expect(llm_response.prompt_model_id).to eq "anthropic.claude-3-haiku-20240307-v1:0"
+        expect(llm_response.associated_assignment).to eq @assignment
+        expect(llm_response.user).to eq @teacher
+        expect(llm_response.input_tokens).to eq 0
+        expect(llm_response.output_tokens).to eq 0
+        expect(llm_response.raw_response).to include("Evidence-Based Reasoning")
+
+        first_criterion = progress.results[:criteria].first
+        expect(first_criterion[:description]).to eq "Evidence-Based Reasoning"
+        expect(first_criterion[:long_description]).to eq "Demonstrates use of credible sources and logical reasoning"
+        expect(first_criterion[:criterion_use_range]).to be true
+        expect(first_criterion[:points]).to eq 12.5
+        expect(first_criterion[:ratings].length).to eq 4
+
+        points = first_criterion[:ratings].pluck(:points)
+        expect(points).to eq points.sort.reverse
+      end
+    end
+
+    describe "End-to-end integration tests for llm_regenerate_criteria" do
+      before do
+        allow(Rails.env).to receive(:test?).and_return(true)
+
+        course_with_teacher_logged_in(active_all: true)
+        @assignment = @course.assignments.create!(
+          title: "Essay Assignment",
+          description: "Write a persuasive essay analyzing a contemporary social issue"
+        )
+
+        @course.enable_feature!(:enhanced_rubrics)
+        @course.enable_feature!(:ai_rubrics)
+
+        allow(LLMConfigs).to receive(:config_for).with("rubric_regenerate_criteria").and_return(
+          instance_double(LLMConfig,
+                          name: "rubric-regenerate-criteriaV2",
+                          model_id: "anthropic.claude-3-haiku-20240307-v1:0",
+                          generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
+        )
+
+        allow(LLMConfigs).to receive(:config_for).with("rubric_regenerate_criterion").and_return(
+          instance_double(LLMConfig,
+                          name: "rubric-regenerate-criterionV2",
+                          model_id: "anthropic.claude-3-haiku-20240307-v1:0",
+                          generate_prompt_and_options: ["PROMPT", { temperature: 1.0 }])
+        )
+
+        @existing_criteria = {
+          "0" => {
+            id: "existing_c1",
+            description: "Original Argument",
+            long_description: "Presents a clear central argument",
+            points: 20,
+            criterion_use_range: true,
+            ratings: [
+              { id: "existing_r1", criterion_id: "existing_c1", description: "Excellent", long_description: "Compelling argument", points: 20 },
+              { id: "existing_r2", criterion_id: "existing_c1", description: "Good", long_description: "Clear argument", points: 15 },
+              { id: "existing_r3", criterion_id: "existing_c1", description: "Fair", long_description: "Basic argument", points: 10 },
+              { id: "existing_r4", criterion_id: "existing_c1", description: "Poor", long_description: "Weak argument", points: 0 }
+            ]
+          },
+          "1" => {
+            id: "existing_c2",
+            description: "Original Evidence",
+            long_description: "Uses credible sources effectively",
+            points: 15,
+            criterion_use_range: true,
+            ratings: [
+              { id: "existing_r5", criterion_id: "existing_c2", description: "Excellent", long_description: "Multiple credible sources", points: 15 },
+              { id: "existing_r6", criterion_id: "existing_c2", description: "Good", long_description: "Some credible sources", points: 10 },
+              { id: "existing_r7", criterion_id: "existing_c2", description: "Fair", long_description: "Limited sources", points: 5 },
+              { id: "existing_r8", criterion_id: "existing_c2", description: "Poor", long_description: "No credible sources", points: 0 }
+            ]
+          },
+          "2" => {
+            id: "_new_c_3",
+            description: "Writing Mechanics",
+            long_description: "Grammar and style",
+            points: 25,
+            criterion_use_range: true,
+            ratings: [
+              { id: "_new_r_9", criterion_id: "_new_c_3", description: "Excellent", long_description: "Flawless", points: 25 },
+              { id: "_new_r_10", criterion_id: "_new_c_3", description: "Good", long_description: "Strong", points: 18 },
+              { id: "_new_r_11", criterion_id: "_new_c_3", description: "Fair", long_description: "Generally correct", points: 10 },
+              { id: "_new_r_12", criterion_id: "_new_c_3", description: "Poor", long_description: "Frequent errors", points: 0 }
+            ]
+          }
+        }
+      end
+
+      it "regenerates entire criteria set with LLM from controller to service with proper LLMResponse persistence" do
+        llm_regeneration_response = <<~TEXT
+          <RUBRIC_DATA>
+            criterion:existing_c1:description=Enhanced Argument Development
+            criterion:existing_c1:long_description=Develops sophisticated and nuanced arguments with clear thesis
+            rating:existing_r1:description=Exemplary
+            rating:existing_r1:long_description=Presents exceptionally sophisticated and original arguments
+            rating:existing_r2:description=Proficient
+            rating:existing_r2:long_description=Develops clear and well-reasoned arguments
+            rating:existing_r3:description=Developing
+            rating:existing_r3:long_description=Presents basic arguments with some clarity
+            rating:existing_r4:description=Beginning
+            rating:existing_r4:long_description=Arguments are unclear or poorly developed
+
+            criterion:existing_c2:description=Research Integration
+            criterion:existing_c2:long_description=Effectively integrates research to support arguments
+            rating:existing_r5:description=Exemplary
+            rating:existing_r5:long_description=Seamlessly integrates diverse, high-quality sources
+            rating:existing_r6:description=Proficient
+            rating:existing_r6:long_description=Effectively uses credible sources to support points
+            rating:existing_r7:description=Developing
+            rating:existing_r7:long_description=Uses some sources but integration needs improvement
+            rating:existing_r8:description=Beginning
+            rating:existing_r8:long_description=Limited or inappropriate use of sources
+
+            criterion:_new_c_3:description=Writing Mechanics
+            criterion:_new_c_3:long_description=Demonstrates command of grammar, syntax, and style
+            rating:_new_r_9:description=Exemplary
+            rating:_new_r_9:long_description=Flawless grammar and sophisticated writing style
+            rating:_new_r_10:description=Proficient
+            rating:_new_r_10:long_description=Strong grammar and clear writing style
+            rating:_new_r_11:description=Developing
+            rating:_new_r_11:long_description=Generally correct grammar with some style issues
+            rating:_new_r_12:description=Beginning
+            rating:_new_r_12:long_description=Frequent grammar errors that impede understanding
+          </RUBRIC_DATA>
+        TEXT
+
+        expect(CedarClient).to receive(:prompt).and_return(
+          cedar_response_struct.new(response: llm_regeneration_response)
+        )
+
+        initial_llm_response_count = LLMResponse.count
+
+        post "llm_regenerate_criteria",
+             params: {
+               course_id: @course.id,
+               rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+               criteria: @existing_criteria,
+               generate_options: { criteria_count: 3, rating_count: 4, total_points: 25, use_range: true, grade_level: "higher-ed" },
+               regenerate_options: { additional_user_prompt: "Make the criteria more detailed and add writing mechanics" }
+             },
+             format: :json
+
+        expect(response).to be_successful
+        progress_id = response.parsed_body["id"]
+        expect(progress_id).to be_present
+
+        run_jobs
+
+        progress = Progress.find(progress_id)
+        expect(progress.workflow_state).to eq "completed"
+        expect(progress.results[:criteria]).to be_present
+        expect(progress.results[:criteria].length).to eq 3
+
+        expect(LLMResponse.count).to eq(initial_llm_response_count + 1)
+
+        llm_response = LLMResponse.last
+        expect(llm_response.prompt_name).to eq "rubric-regenerate-criteriaV2"
+        expect(llm_response.prompt_model_id).to eq "anthropic.claude-3-haiku-20240307-v1:0"
+        expect(llm_response.associated_assignment).to eq @assignment
+        expect(llm_response.user).to eq @teacher
+        expect(llm_response.input_tokens).to eq 0
+        expect(llm_response.output_tokens).to eq 0
+        expect(llm_response.raw_response).to include("Enhanced Argument Development")
+
+        criteria_results = progress.results[:criteria]
+
+        first_criterion = criteria_results.find { |c| c[:id] == "existing_c1" }
+        expect(first_criterion).to be_present
+        expect(first_criterion[:description]).to eq "Enhanced Argument Development"
+        expect(first_criterion[:long_description]).to eq "Develops sophisticated and nuanced arguments with clear thesis"
+        expect(first_criterion[:criterion_use_range]).to be true
+        expect(first_criterion[:points]).to eq 8.33
+        expect(first_criterion[:ratings].length).to eq 4
+
+        second_criterion = criteria_results.find { |c| c[:id] == "existing_c2" }
+        expect(second_criterion).to be_present
+        expect(second_criterion[:description]).to eq "Research Integration"
+        expect(second_criterion[:points]).to eq 8.33
+        expect(second_criterion[:ratings].length).to eq 4
+        expect(second_criterion[:long_description]).to eq "Effectively integrates research to support arguments"
+
+        third_criterion = criteria_results.find { |c| c[:description] == "Writing Mechanics" }
+        expect(third_criterion).to be_present
+        expect(third_criterion[:id]).not_to start_with("_new_c_") # Should have real generated ID
+        expect(third_criterion[:long_description]).to eq "Demonstrates command of grammar, syntax, and style"
+        expect(third_criterion[:points]).to eq 8.34
+        expect(third_criterion[:ratings].length).to eq 4
+
+        criteria_results.each do |criterion|
+          points = criterion[:ratings].pluck(:points)
+          expect(points).to eq points.sort.reverse
+        end
+      end
+
+      it "regenerates single criterion with LLM while preserving other criteria" do
+        llm_criterion_response = <<~TEXT
+          <RUBRIC_DATA>
+          criterion:existing_c1:description=Refined Argument Quality
+          criterion:existing_c1:long_description=Constructs well-reasoned arguments with clear evidence
+          rating:existing_r1:description=Outstanding
+          rating:existing_r1:long_description=Arguments are exceptionally well-crafted and persuasive
+          rating:existing_r2:description=Proficient
+          rating:existing_r2:long_description=Arguments are clear and well-supported
+          rating:existing_r3:description=Developing
+          rating:existing_r3:long_description=Arguments show promise but need refinement
+          rating:existing_r4:description=Inadequate
+          rating:existing_r4:long_description=Arguments are poorly constructed or unsupported
+          </RUBRIC_DATA>
+        TEXT
+
+        expect(CedarClient).to receive(:prompt).and_return(
+          cedar_response_struct.new(response: llm_criterion_response)
+        )
+
+        initial_llm_response_count = LLMResponse.count
+
+        post "llm_regenerate_criteria",
+             params: {
+               course_id: @course.id,
+               rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+               criteria: @existing_criteria,
+               generate_options: { criteria_count: 3, rating_count: 4, total_points: 60, use_range: false, standard: "Focus on logical reasoning and evidence quality" },
+               regenerate_options: { criterion_id: "existing_c1" }
+             },
+             format: :json
+
+        expect(response).to be_successful
+        progress_id = response.parsed_body["id"]
+        expect(progress_id).to be_present
+
+        run_jobs
+
+        progress = Progress.find(progress_id)
+        expect(progress.workflow_state).to eq "completed"
+        expect(progress.results[:criteria]).to be_present
+        expect(progress.results[:criteria].length).to eq 3
+
+        expect(LLMResponse.count).to eq(initial_llm_response_count + 1)
+
+        llm_response = LLMResponse.last
+        expect(llm_response.prompt_name).to eq "rubric-regenerate-criterionV2"
+        expect(llm_response.prompt_model_id).to eq "anthropic.claude-3-haiku-20240307-v1:0"
+        expect(llm_response.associated_assignment).to eq @assignment
+        expect(llm_response.user).to eq @teacher
+        expect(llm_response.input_tokens).to eq 0
+        expect(llm_response.output_tokens).to eq 0
+        expect(llm_response.raw_response).to include("Refined Argument Quality")
+
+        criteria_results = progress.results[:criteria]
+
+        first_criterion = criteria_results.find { |c| c[:id] == "existing_c1" }
+        expect(first_criterion).to be_present
+        expect(first_criterion[:description]).to eq "Refined Argument Quality"
+        expect(first_criterion[:long_description]).to eq "Constructs well-reasoned arguments with clear evidence"
+        expect(first_criterion[:criterion_use_range]).to be true
+        expect(first_criterion[:points]).to eq 20
+        expect(first_criterion[:ratings].length).to eq 4
+        expect(first_criterion[:generated]).to be true
+
+        ratings = first_criterion[:ratings]
+        expect(ratings.find { |r| r[:id] == "existing_r1" }[:description]).to eq "Outstanding"
+        expect(ratings.find { |r| r[:id] == "existing_r2" }[:description]).to eq "Proficient"
+        expect(ratings.find { |r| r[:id] == "existing_r3" }[:description]).to eq "Developing"
+        expect(ratings.find { |r| r[:id] == "existing_r4" }[:description]).to eq "Inadequate"
+
+        second_criterion = criteria_results.find { |c| c[:id] == "existing_c2" }
+        expect(second_criterion).to be_present
+        expect(second_criterion[:description]).to eq "Original Evidence"
+        expect(second_criterion[:long_description]).to eq "Uses credible sources effectively"
+        expect(second_criterion[:criterion_use_range]).to be true
+      end
     end
   end
 end

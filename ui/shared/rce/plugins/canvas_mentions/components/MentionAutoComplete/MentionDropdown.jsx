@@ -32,9 +32,13 @@ import {
 } from '../../constants'
 import {MENTIONABLE_USERS_QUERY} from './graphql/Queries'
 import {useQuery} from '@apollo/client'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('mentions')
 
 const MOUSE_FOCUS_TYPE = 'mouse'
 const KEYBOARD_FOCUS_TYPE = 'keyboard'
+const LOAD_MORE_MARKER = {id: '__LOAD_MORE__', name: I18n.t('Load More Users'), isLoadMore: true}
 
 const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
   // Setup State
@@ -50,6 +54,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
   const focusedUserRef = useRef(focusedUser)
   const filteredOptionsRef = useRef([])
   const noResultsRef = useRef(noResults)
+  const hasNextPageRef = useRef(false)
 
   useEffect(() => {
     const debouncer = setTimeout(() => {
@@ -61,14 +66,16 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
     }
   }, [inputText])
 
-  const {data} = useQuery(MENTIONABLE_USERS_QUERY, {
+  const {data, loading, fetchMore} = useQuery(MENTIONABLE_USERS_QUERY, {
     variables: {
       discussionTopicId: ENV.discussion_topic_id,
       searchTerm: debouncedInputText,
+      after: null,
     },
   })
 
   const mentionData = data?.legacyNode?.mentionableUsersConnection?.nodes || []
+  const pageInfo = data?.legacyNode?.mentionableUsersConnection?.pageInfo
 
   const filteredOptions = useMemo(() => {
     return mentionData?.filter(o => {
@@ -79,9 +86,27 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
     })
   }, [mentionData, inputText])
 
+  // Create navigable options including "Load More" if needed
+  const navigableOptions = useMemo(() => {
+    const options = [...filteredOptions]
+    if (pageInfo?.hasNextPage && !loading) {
+      options.push(LOAD_MORE_MARKER)
+    }
+    return options
+  }, [filteredOptions, pageInfo?.hasNextPage, loading])
+
   useEffect(() => {
-    filteredOptionsRef.current = filteredOptions
-  }, [filteredOptions])
+    filteredOptionsRef.current = navigableOptions
+    hasNextPageRef.current = pageInfo?.hasNextPage
+  }, [navigableOptions, pageInfo?.hasNextPage])
+
+  // Store pageInfo in ref for stable access
+  const pageInfoRef = useRef(pageInfo)
+  useEffect(() => {
+    if (pageInfo) {
+      pageInfoRef.current = pageInfo
+    }
+  }, [pageInfo])
 
   const getXYPosition = useCallback(() => {
     const responseObj = getPosition(tinyMCE.activeEditor, `#${MARKER_ID}`)
@@ -141,18 +166,23 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
         // Down
         navigateFocusedUser('down')
         break
+      case KEY_NAMES[KEY_CODES.enter]:
+      case KEY_NAMES[KEY_CODES.tab]:
+        // Enter or Tab - check if Load More is focused
+        if (focusedUserRef.current?.isLoadMore) {
+          handleLoadMore()
+          // Prevent the default mention insertion
+          return
+        }
+        break
       default:
         break
     }
   }
 
   const handleInputChange = value => {
-    // If no results then exit
-    if (noResultsRef.current) {
-      onExited(editor, false)
-      return
-    }
-
+    // Don't exit just because there are no results - let users keep typing
+    // Only exit if the input becomes empty or only spaces
     getXYPosition()
     setInputText(value)
   }
@@ -180,14 +210,15 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
   // Prepare for exiting naturally
   useEffect(() => {
     // Check that last character isn't space and we have results
-    if (mentionData.length === 0 && inputText.length > 0) {
+    // Only mark as no results if we're not loading and have no data
+    if (mentionData.length === 0 && inputText.length > 0 && !loading) {
       setNoResults(true)
       noResultsRef.current = true
-    } else if (mentionData.length > 0) {
+    } else if (mentionData.length > 0 || loading) {
       setNoResults(false)
       noResultsRef.current = false
     }
-  }, [inputText, mentionData])
+  }, [inputText, mentionData, loading])
 
   // When only spces exit without saving mention
   useEffect(() => {
@@ -202,6 +233,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
       onFocusedUserChange({
         ...focusedUser,
         ariaActiveDescendantId: ARIA_ID_TEMPLATES.activeDescendant(editor.id, focusedUser.id),
+        isLoadMore: focusedUser.isLoadMore, // Pass through the isLoadMore flag
       })
     } else {
       onFocusedUserChange(null)
@@ -235,6 +267,48 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
     }
   }, [editor, onExited, shouldExit])
 
+  const handleLoadMore = useCallback(() => {
+    const currentPageInfo = pageInfoRef.current
+    // Count only real users, not the Load More marker
+    const currentUserCount = filteredOptionsRef.current.filter(u => !u.isLoadMore).length
+    if (currentPageInfo?.hasNextPage) {
+      fetchMore({
+        variables: {
+          after: currentPageInfo.endCursor,
+        },
+      })
+        .then(() => {
+          // Wait a bit for the filteredOptionsRef to update, then focus the first newly loaded user
+          setTimeout(() => {
+            const newUserCount = filteredOptionsRef.current.filter(u => !u.isLoadMore).length
+            if (newUserCount > currentUserCount && filteredOptionsRef.current[currentUserCount]) {
+              setFocusedUser(filteredOptionsRef.current[currentUserCount])
+              setFocusType(KEYBOARD_FOCUS_TYPE)
+            }
+          }, 100)
+        })
+        .catch(err => {
+          console.error('Error loading more users:', err)
+        })
+    }
+  }, [fetchMore, loading])
+
+  const handleSelect = useCallback(
+    user => {
+      // If "Load More" is selected, load more users instead of exiting
+      if (user?.isLoadMore) {
+        handleLoadMore()
+        // Don't set focusedUser or shouldExit for Load More
+        return
+      }
+
+      // Only set user and exit for actual user selections
+      setFocusedUser(user)
+      setShouldExit(true)
+    },
+    [handleLoadMore],
+  )
+
   return (
     <>
       <MentionDropdownMenu
@@ -242,10 +316,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
         mentionOptions={filteredOptions}
         coordiantes={mentionCoordinates}
         selectedUser={focusedUser?.id}
-        onSelect={user => {
-          setFocusedUser(user)
-          setShouldExit(true)
-        }}
+        onSelect={handleSelect}
         onMouseEnter={() => {
           setFocusType(MOUSE_FOCUS_TYPE)
         }}
@@ -253,6 +324,9 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
           setFocusedUser(user)
         }}
         highlightMouse={focusType === MOUSE_FOCUS_TYPE}
+        isLoading={loading}
+        hasNextPage={pageInfo?.hasNextPage}
+        onLoadMore={handleLoadMore}
       />
       <MentionDropdownPortal
         instanceId={editor.id}

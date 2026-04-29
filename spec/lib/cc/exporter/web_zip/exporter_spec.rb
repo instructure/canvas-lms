@@ -36,7 +36,7 @@ describe "Exporter" do
 
   context "create web zip package default settings" do
     let(:exporter) do
-      CC::Exporter::WebZip::Exporter.new(@attachment.open, false, :web_zip)
+      CC::Exporter::WebZip::Exporter.new(@attachment.open, export_type: :web_zip)
     end
 
     it "sorts content by module" do

@@ -53,7 +53,7 @@ describe AccountUser do
   end
 
   context "non-sharded" do
-    include_examples "touching"
+    it_behaves_like "touching"
 
     before :once do
       @account = Account.default
@@ -63,7 +63,7 @@ describe AccountUser do
 
   context "sharding" do
     specs_require_sharding
-    include_examples "touching"
+    it_behaves_like "touching"
 
     before :once do
       @account = @shard1.activate { Account.create! }
@@ -142,6 +142,26 @@ describe AccountUser do
       expect(@au1.is_subset_of?(@user2)).to be_falsey
       expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
+
+    context "exclude_non_masquerading_permissions" do
+      before do
+        allow(Permissions).to receive(:non_masquerading_permissions).and_return(Set[:create_access_tokens])
+      end
+
+      before :once do
+        @ro1 = Account.default.role_overrides.create!(role: @role1, permission: :create_access_tokens, enabled: true)
+      end
+
+      it "ignores permissions that are not for masquerading with option" do
+        expect(@au1.is_subset_of?(@user2, exclude_non_masquerading_permissions: true)).to be true
+        expect(@au2.is_subset_of?(@user1, exclude_non_masquerading_permissions: true)).to be true
+      end
+
+      it "doesn't ignore permissions that are not for masquerading when comparing without option" do
+        expect(@au1.is_subset_of?(@user2)).to be false
+        expect(@au2.is_subset_of?(@user1)).to be true
+      end
+    end
   end
 
   describe "set_policy" do
@@ -193,6 +213,32 @@ describe AccountUser do
       it "keeps set value if it already exists" do
         au = AccountUser.create(user: @user, account: @sub1a, role: @sub1role, root_account_id: @sub1.id)
         expect(au.root_account_id).to eq(@sub1.id)
+      end
+    end
+  end
+
+  describe "#destroy" do
+    it "allows deleting account users" do
+      user_model
+      au = Account.default.account_users.create!(user: @user)
+      expect(au.destroy).to be(true)
+      expect(au).to be_deleted
+    end
+
+    it "records an audit log record" do
+      user_model
+      au = Account.default.account_users.create!(user: @user)
+      au.destroy
+      expect(au.auditor_records.where(action: "deleted")).to exist
+    end
+
+    context "with current_user specified" do
+      it "records an audit log with the current_user" do
+        performing_user = user_model
+        au = Account.default.account_users.create!(user: user_model)
+        au.current_user = performing_user
+        au.destroy
+        expect(au.auditor_records.where(action: "deleted", performing_user: performing_user.id)).to exist
       end
     end
   end

@@ -150,7 +150,7 @@ describe('peekIntoPastSaga', () => {
         getState: expect.any(Function),
         fromMoment: moment.tz(TZ).startOf('day'),
         mode: 'past',
-        perPage: 1,
+        perPage: 3,
       }),
     )
     expect(generator.next({transformedItems: ['some items'], response: 'response'}).value).toEqual(
@@ -349,7 +349,7 @@ describe('loadAllOpportunitiesSaga', () => {
   })
 
   it('alerts if there is a loading error', () => {
-    const alertSpy = jest.fn()
+    const alertSpy = vi.fn()
     initialize({visualErrorCallback: alertSpy})
     const generator = loadAllOpportunitiesSaga()
     generator.next() // start saga

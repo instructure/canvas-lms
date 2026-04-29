@@ -19,6 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import BaseUploader from '@canvas/files/react/modules/BaseUploader'
+import {QuizEngine} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -41,6 +42,7 @@ export interface ModuleItemData {
   type: string
   itemCount: number
   indentation: number
+  quizEngine?: QuizEngine
   selectedTabIndex?: number
   textHeaderValue?: string
   externalUrlName?: string
@@ -49,6 +51,7 @@ export interface ModuleItemData {
   selectedItem?: {
     id: string
     name: string
+    quizType?: string
   } | null
   newItemName?: string
 }
@@ -61,6 +64,7 @@ export const prepareModuleItemData = (
     type,
     itemCount,
     indentation,
+    quizEngine,
     textHeaderValue,
     externalUrlName,
     externalUrlValue,
@@ -82,13 +86,26 @@ export const prepareModuleItemData = (
     _method: 'POST',
   }
 
+  // Helper function to apply LTI quiz configuration
+  const applyLtiQuizConfig = (
+    result: Record<string, string | number | string[] | undefined | boolean>,
+  ) => {
+    result['item[type]'] = 'assignment'
+    result['type'] = 'assignment'
+    result['quiz_lti'] = true
+  }
+
   // Add type-specific data
   if (type === 'context_module_sub_header' && textHeaderValue) {
     result['item[id]'] = 'new'
     result['item[title]'] = textHeaderValue
     result['title'] = textHeaderValue
-  } else if (type === 'external_url' && externalUrlName && externalUrlValue) {
-    result['item[id]'] = 'new'
+  } else if (
+    (type === 'external_url' || type === 'external_tool') &&
+    externalUrlName &&
+    externalUrlValue
+  ) {
+    result['item[id]'] = type === 'external_tool' && selectedItem ? selectedItem.id : 'new'
     result['item[title]'] = externalUrlName
     result['title'] = externalUrlName
     result['item[url]'] = externalUrlValue
@@ -96,10 +113,15 @@ export const prepareModuleItemData = (
     result['item[new_tab]'] = externalUrlNewTab ? '1' : '0'
     result['new_tab'] = externalUrlNewTab ? 1 : 0
   } else if (selectedItem && selectedTabIndex === 0) {
+    if (type === 'quiz' && selectedItem.quizType && selectedItem.quizType === 'assignment') {
+      applyLtiQuizConfig(result)
+    }
     // Using an existing item
     result['item[id]'] = selectedItem.id
     result['item[title]'] = selectedItem.name
     result['title'] = selectedItem.name
+  } else if (type === 'quiz' && quizEngine && quizEngine === 'new') {
+    applyLtiQuizConfig(result)
   }
 
   return result
@@ -109,7 +131,7 @@ export const buildFormData = (
   type: string,
   newItemName: string,
   selectedAssignmentGroup: string,
-  NEW_QUIZZES_BY_DEFAULT: boolean,
+  quizEngine: QuizEngine,
   DEFAULT_POST_TO_SIS: boolean,
 ) => {
   const formData = new FormData()
@@ -121,8 +143,7 @@ export const buildFormData = (
     formData.append('assignment[title]', newItemName)
     formData.append('assignment[post_to_sis]', String(DEFAULT_POST_TO_SIS ?? false))
   } else if (type === 'quiz') {
-    const quizType = NEW_QUIZZES_BY_DEFAULT ? 'assignment' : 'quiz'
-    if (quizType === 'assignment') {
+    if (quizEngine === 'new') {
       formData.append('assignment[title]', newItemName || I18n.t('New Quiz'))
       formData.append('quiz_lti', '1')
     } else {
@@ -141,14 +162,14 @@ export const buildFormData = (
 export const createNewItemApiPath = (
   type: string,
   courseId: string,
-  NEW_QUIZZES_BY_DEFAULT: boolean,
+  quizEngine: QuizEngine,
   folderId?: string,
 ) => {
   switch (type) {
     case 'assignment':
       return `/courses/${courseId}/assignments`
     case 'quiz':
-      return NEW_QUIZZES_BY_DEFAULT
+      return quizEngine === 'new'
         ? `/courses/${courseId}/assignments`
         : `/courses/${courseId}/quizzes`
     case 'discussion':
@@ -213,7 +234,7 @@ export const createNewItem = async (
   courseId: string,
   newItemName: string,
   selectedAssignmentGroup: string,
-  NEW_QUIZZES_BY_DEFAULT: boolean,
+  quizEngine: QuizEngine,
   DEFAULT_POST_TO_SIS: boolean,
   selectedFile?: File | null,
   selectedFolder?: string,
@@ -226,13 +247,13 @@ export const createNewItem = async (
 
     // For other types (non-file items)
     const response = await doFetchApi({
-      path: createNewItemApiPath(type, courseId, NEW_QUIZZES_BY_DEFAULT),
+      path: createNewItemApiPath(type, courseId, quizEngine),
       method: 'POST',
       body: buildFormData(
         type,
         newItemName,
         selectedAssignmentGroup,
-        NEW_QUIZZES_BY_DEFAULT,
+        quizEngine,
         DEFAULT_POST_TO_SIS,
       ),
     })
@@ -243,8 +264,12 @@ export const createNewItem = async (
     // Handle different response structures based on item type
     if (type === 'assignment' && responseData?.assignment) {
       return responseData.assignment as NewItemType
-    } else if (type === 'quiz' && responseData?.quiz) {
-      return responseData.quiz as NewItemType
+    } else if (type === 'quiz') {
+      if (quizEngine === 'classic' && responseData?.quiz) {
+        return responseData.quiz as NewItemType
+      } else if (quizEngine === 'new' && responseData?.assignment) {
+        return responseData.assignment as NewItemType
+      }
     } else if (type === 'discussion') {
       return responseData as NewItemType
     } else if (type === 'page') {
@@ -287,28 +312,94 @@ export const submitModuleItem = async (
   }
 }
 
-export const sharedHandleFileDrop = (
-  accepted: ArrayLike<File | DataTransferItem>,
-  _rejected: ArrayLike<File | DataTransferItem>,
-  _event: React.DragEvent<Element>,
-  {
-    setFile,
-    onChange,
-  }: {
-    setFile?: (file: File | null) => void
-    onChange?: (field: string, value: File) => void
-  },
-) => {
-  Array.from(accepted).forEach(item => {
-    if (item instanceof File) {
-      setFile?.(item)
-      onChange?.('file', item)
-    } else if (item.kind === 'file') {
-      const file = item.getAsFile()
-      if (file) {
-        setFile?.(file)
-        onChange?.('file', file)
-      }
+const transformToApiFormat = (
+  itemData: Record<string, string | number | string[] | undefined | boolean>,
+): Record<string, string | number | boolean | undefined> => {
+  const apiData: Record<string, string | number | boolean | undefined> = {}
+
+  Object.entries(itemData).forEach(([key, value]) => {
+    if (value === undefined) return
+
+    if (key === 'item[id]') {
+      apiData.content_id = value as string | number
+    } else if (key === 'item[type]') {
+      apiData.type = value as string
+    } else if (key === 'item[title]') {
+      apiData.title = value as string
+    } else if (key === 'item[position]') {
+      apiData.position = value as number
+    } else if (key === 'item[indent]') {
+      apiData.indent = value as number
+    } else if (key === 'item[url]') {
+      apiData.external_url = value as string
+    } else if (key === 'item[new_tab]') {
+      apiData.new_tab = value as string | boolean
     }
+  })
+
+  return apiData
+}
+
+export const submitModuleItems = async (
+  courseId: string,
+  moduleId: string,
+  itemsData: Array<Record<string, string | number | string[] | undefined | boolean>>,
+): Promise<{
+  created: Record<string, any>[]
+  errors?: Array<{index: number; message: string}>
+} | null> => {
+  try {
+    const formData = new FormData()
+
+    itemsData.forEach((itemData, index) => {
+      const apiData = transformToApiFormat(itemData)
+
+      Object.entries(apiData).forEach(([key, value]) => {
+        if (value !== undefined) {
+          formData.append(`module_items[][${key}]`, String(value))
+        }
+      })
+    })
+
+    const response = await doFetchApi({
+      path: `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
+      method: 'POST',
+      body: formData,
+    })
+
+    return response.json as {
+      created: Record<string, any>[]
+      errors?: Array<{index: number; message: string}>
+    }
+  } catch (error) {
+    console.error('Error submitting module items:', error)
+    return null
+  }
+}
+
+export function sharedHandleFileDrop(
+  accepted: ArrayLike<File | DataTransferItem>,
+  {
+    onChange,
+    dispatch,
+  }: {
+    onChange: (field: string, value: any) => void
+    dispatch?: React.Dispatch<{type: string; field?: string; value?: any}> | null
+  },
+) {
+  const files: File[] = Array.from(accepted).flatMap(item => {
+    if (item instanceof File) return [item]
+    if (item instanceof DataTransferItem && item.kind === 'file') {
+      const fileItem = item.getAsFile()
+      return fileItem ? [fileItem] : []
+    }
+    return []
+  })
+
+  if (files.length === 0) return
+
+  files.forEach(file => {
+    onChange('file', file)
+    dispatch?.({type: 'SET_NEW_ITEM', field: 'file', value: file})
   })
 }

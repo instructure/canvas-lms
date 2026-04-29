@@ -73,6 +73,12 @@ jobs:
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
         run: yarn build:packages
+      - name: Run GraphQL Codegen
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn graphql:codegen
+      - name: Generate Plugin Extensions
+        run: node ui-build/webpack/generatePluginExtensions.js
       - name: Run TypeScript Check
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"

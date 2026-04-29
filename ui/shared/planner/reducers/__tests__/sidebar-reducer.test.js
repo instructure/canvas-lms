@@ -258,7 +258,7 @@ it('does not save an item if the sidebar is not loaded yet', () => {
   expect(nextState).toBe(initialState)
 })
 
-describe('CLEAR_SIDEBAR', () => {
+it('clears sidebar state on CLEAR_SIDEBAR', () => {
   const initialState = getInitialState({
     items: [
       {uniqueId: '41', title: 'aaa', completed: false, date: moment.tz('2018-01-01', 'UTC')},

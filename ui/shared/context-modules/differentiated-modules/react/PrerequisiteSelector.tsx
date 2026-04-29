@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef} from 'react'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
@@ -46,12 +46,13 @@ export default function PrerequisiteSelector({
   focusDropdown = false,
   focusDeleteButton = false,
 }: PrerequisiteSelectorProps) {
-  const removeButton = useRef<Element | null>(null)
+  const removeButton = useRef<HTMLButtonElement | null>(null)
   const dropdown = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
-    // @ts-expect-error
-    focusDeleteButton && removeButton.current?.focus()
+    if (focusDeleteButton) {
+      removeButton.current?.focus()
+    }
   }, [focusDeleteButton, removeButton])
 
   useEffect(() => {
@@ -82,7 +83,9 @@ export default function PrerequisiteSelector({
       </Flex.Item>
       <Flex.Item margin="0 0 0 medium">
         <IconButton
-          elementRef={el => (removeButton.current = el)}
+          elementRef={el => {
+            removeButton.current = el instanceof HTMLButtonElement ? el : null
+          }}
           renderIcon={<IconTrashLine color="error" />}
           onClick={() => onDropPrerequisite(index)}
           screenReaderLabel={I18n.t('Remove %{name} Prerequisite', {

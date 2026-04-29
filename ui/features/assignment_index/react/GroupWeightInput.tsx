@@ -28,9 +28,9 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('editAssignmentGroupWeights')
 
 export type GroupWeightInputProps = {
-  groupId: number,
-  name: string,
-  canChangeWeights: boolean,
+  groupId: number
+  name: string
+  canChangeWeights: boolean
   initialValue?: string
 }
 
@@ -38,7 +38,7 @@ const GroupWeightInput = ({
   groupId,
   name,
   canChangeWeights,
-  initialValue = ''
+  initialValue = '',
 }: GroupWeightInputProps) => {
   const [weightValue, setWeightValue] = useState<string>(initialValue)
   const [errorMessages, setErrorMessages] = useState<FormMessage[]>([])
@@ -63,12 +63,16 @@ const GroupWeightInput = ({
     }
   }
 
-  const handleIncrement = (_event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const handleIncrement = (
+    _event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>,
+  ) => {
     const newValue = parseFloat(weightValue || '0') + 1
     setWeightValue(newValue.toString())
   }
 
-  const handleDecrement = (_event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const handleDecrement = (
+    _event: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>,
+  ) => {
     const newValue = parseFloat(weightValue || '0') - 1
     setWeightValue(newValue.toString())
   }
@@ -76,8 +80,12 @@ const GroupWeightInput = ({
   return (
     <NumberInput
       id={`ag_${groupId}_weight_input`}
-      inputRef={(element) => inputRef.current = element}
-      renderLabel ={<ScreenReaderContent>{I18n.t('Group weight for: %{groupName}', {groupName: name})}</ScreenReaderContent>}
+      inputRef={element => (inputRef.current = element)}
+      renderLabel={
+        <ScreenReaderContent>
+          {I18n.t('Group weight for: %{groupName}', {groupName: name})}
+        </ScreenReaderContent>
+      }
       name={`${name}_group_weight`}
       interaction={canChangeWeights ? 'enabled' : 'readonly'}
       onBlur={handleInputBlur}
@@ -88,7 +96,7 @@ const GroupWeightInput = ({
       onDecrement={handleDecrement}
       data-testid={`ag_${groupId}_weight_input`}
       messages={errorMessages}
-      width='170px'
+      width="170px"
     />
   )
 }

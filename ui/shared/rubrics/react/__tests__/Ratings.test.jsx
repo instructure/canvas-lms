@@ -43,7 +43,7 @@ describe('The Ratings component', () => {
   }
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('renders the root component as expected', () => {
@@ -160,8 +160,8 @@ describe('The Ratings component', () => {
 
   it('calls onPointChange and flashes VO message when a rating is clicked', async () => {
     const user = userEvent.setup()
-    const onPointChange = jest.fn()
-    const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
+    const onPointChange = vi.fn()
+    const flashMock = vi.spyOn($, 'screenReaderFlashMessage')
 
     const {container} = render(
       <Ratings {...defaultProps} assessing={true} onPointChange={onPointChange} />,
@@ -277,7 +277,7 @@ describe('The Ratings component', () => {
 
   it('is navigable and clickable when assessing', async () => {
     const user = userEvent.setup()
-    const onClick = jest.fn()
+    const onClick = vi.fn()
 
     const {container} = render(
       <Rating {...defaultProps.tiers[0]} isSummary={false} assessing={true} onClick={onClick} />,
@@ -291,7 +291,7 @@ describe('The Ratings component', () => {
 
   it('is not navigable or clickable when not assessing', async () => {
     const user = userEvent.setup()
-    const onClick = jest.fn()
+    const onClick = vi.fn()
 
     const {container} = render(
       <Rating {...defaultProps.tiers[0]} isSummary={false} assessing={false} onClick={onClick} />,

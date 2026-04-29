@@ -24,7 +24,7 @@ import React from 'react'
 function makeProps(overrides: MakeOptional<PillProps, 'onClick'>): PillProps {
   const props = {
     ...overrides,
-    onClick: jest.fn().mockResolvedValue({}),
+    onClick: vi.fn().mockResolvedValue({}),
   }
   return props
 }

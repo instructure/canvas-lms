@@ -15,7 +15,8 @@
       "file.compound_documents.html" => "Compound Documents",
       "file.file_uploads.html" => "File Uploads",
       "file.endpoint_attributes.html" => "API Endpoint Attributes",
-      "file.masquerading.html" => "Masquerading"
+      "file.masquerading.html" => "Masquerading",
+      "file.permissions.html" => "Permissions",
     } %>
     <input name="header" class="ac-input" id="sidebar-basics" type="checkbox"
       <%= if @basics_file_list.key?(options[:object]) || @all_checked then 'checked' end %>
@@ -72,7 +73,7 @@
         <% options[:resources].each do |(resource, controllers)| %>
           <%
             next if resource.include?('Plagiarism')
-            link = url_for("#{topicize resource}.html")
+            link = url_for("#{DocumentationHelpers.topicize resource}.html")
             klass = []
             klass << "current" if resource == options[:object]
           %>
@@ -131,7 +132,8 @@
       "file.assignment_tools.html" => "Grading",
       "file.provisioning.html" => "Provisioning",
       "file.lti_window_post_message.html" => "PostMessage",
-      "file.pns.html" => "Platform Notification Service"
+      "file.pns.html" => "Platform Notification Service",
+      "file.document_processor.html" => "Document Processor",
     } %>
 
     <% @placements_file_list = {
@@ -222,7 +224,7 @@
           <a href="<%= url_for("file.plagiarism_platform.html") %>" class="<%= 'current' if options[:object] == 'file.plagiarism_platform.html' %>">Overview</a>
           <% options[:resources].each do |(resource, controllers)| %>
             <% next if resource.exclude?('Plagiarism')
-              link = url_for("#{topicize resource}.html")
+              link = url_for("#{DocumentationHelpers.topicize resource}.html")
               klass = "current" if resource == options[:object]
             %>
             <a class="<%= klass %>" href="<%= link %>"><%= resource %></a>

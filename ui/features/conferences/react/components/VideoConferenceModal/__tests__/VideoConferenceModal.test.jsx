@@ -41,8 +41,8 @@ const startCalendarDate = new Date().toISOString()
 const endCalendarDate = new Date().toISOString()
 
 describe('VideoConferenceModal', () => {
-  const onDismiss = jest.fn()
-  const onSubmit = jest.fn()
+  const onDismiss = vi.fn()
+  const onSubmit = vi.fn()
   let originalEnv
 
   const setup = (props = {}) => {

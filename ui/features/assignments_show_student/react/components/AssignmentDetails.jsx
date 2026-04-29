@@ -21,7 +21,7 @@ import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
-import StudentViewContext from './Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import SubmissionStatusPill, {
   isStatusPillPresent,
 } from '@canvas/assignments/react/SubmissionStatusPill'

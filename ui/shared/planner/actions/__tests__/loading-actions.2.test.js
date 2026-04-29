@@ -23,17 +23,18 @@ import * as Actions from '../loading-actions'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
 import configureStore from '../../store/configureStore'
 
-jest.mock('../../utilities/apiUtils', () => ({
-  ...jest.requireActual('../../utilities/apiUtils'),
-  getContextCodesFromState: jest.requireActual('../../utilities/apiUtils').getContextCodesFromState,
-  findNextLink: jest.fn(),
-  transformApiToInternalItem: jest.fn(response => ({
+vi.mock('../../utilities/apiUtils', async () => ({
+  ...(await vi.importActual('../../utilities/apiUtils')),
+  getContextCodesFromState: (await vi.importActual('../../utilities/apiUtils'))
+    .getContextCodesFromState,
+  findNextLink: vi.fn(),
+  transformApiToInternalItem: vi.fn(response => ({
     ...response,
     newActivity: response.new_activity,
     transformedToInternal: true,
   })),
-  transformInternalToApiItem: jest.fn(internal => ({...internal, transformedToApi: true})),
-  observedUserId: jest.requireActual('../../utilities/apiUtils').observedUserId,
+  transformInternalToApiItem: vi.fn(internal => ({...internal, transformedToApi: true})),
+  observedUserId: (await vi.importActual('../../utilities/apiUtils')).observedUserId,
 }))
 
 const getBasicState = () => ({
@@ -86,7 +87,7 @@ describe('api actions', () => {
     })
 
     beforeEach(() => {
-      mockDispatch = jest.fn(() => Promise.resolve({data: []}))
+      mockDispatch = vi.fn(() => Promise.resolve({data: []}))
       weeklyState = getBasicState().weeklyDashboard
     })
 
@@ -177,7 +178,7 @@ describe('api actions', () => {
           weekStart: weeklyState.weekStart.clone().add(-14, 'days'),
           weekEnd: weeklyState.weekEnd.clone().add(-14, 'days'),
         }
-        const getStateMock = jest
+        const getStateMock = vi
           .fn()
           .mockImplementationOnce(getBasicState) // loadPastWeekItems call
           .mockImplementation(() => {
@@ -210,7 +211,7 @@ describe('api actions', () => {
         const key = lastWeek.weekStart.format()
         const sunday = lastWeek.weekStart.format('YYYY-MM-DD')
         const lastWeekItems = [[sunday, 'this is it']]
-        const getStateMock = jest.fn(() => {
+        const getStateMock = vi.fn(() => {
           const st = getBasicState()
           st.weeklyDashboard.weeks = {
             [`${key}`]: lastWeekItems,
@@ -237,7 +238,7 @@ describe('api actions', () => {
           weekStart: weeklyState.weekStart.clone().add(14, 'days'),
           weekEnd: weeklyState.weekEnd.clone().add(14, 'days'),
         }
-        const getStateMock = jest
+        const getStateMock = vi
           .fn()
           .mockImplementationOnce(getBasicState) // loadPastWeekItems call
           .mockImplementation(() => {
@@ -270,7 +271,7 @@ describe('api actions', () => {
         const key = nextWeek.weekStart.format()
         const sunday = nextWeek.weekStart.format('YYYY-MM-DD')
         const nextWeekItems = [[sunday, 'this is it']]
-        const getStateMock = jest.fn(() => {
+        const getStateMock = vi.fn(() => {
           const st = getBasicState()
           st.weeklyDashboard.weeks = {
             [`${key}`]: nextWeekItems,
@@ -293,7 +294,7 @@ describe('api actions', () => {
           weekStart: weeklyState.weekStart.clone(),
           weekEnd: weeklyState.weekEnd.clone(),
         }
-        const getStateMock = jest.fn().mockImplementation(() => {
+        const getStateMock = vi.fn().mockImplementation(() => {
           const state = getBasicState()
           state.weeklyDashboard = {
             weekStart: thisWeek.weekStart,
@@ -323,9 +324,9 @@ describe('api actions', () => {
       )
 
       const mockUiManager = {
-        setStore: jest.fn(),
-        handleAction: jest.fn(),
-        uiStateUnchanged: jest.fn(),
+        setStore: vi.fn(),
+        handleAction: vi.fn(),
+        uiStateUnchanged: vi.fn(),
       }
 
       const store = configureStore(mockUiManager, {
@@ -337,7 +338,7 @@ describe('api actions', () => {
 
       const expectedContextCodes = /context_codes%5B%5D=course_7/
       // Fetching current week, far future date, and far past date should all be filtered by context_codes
-      expect(capturedUrls.length).toBe(3)
+      expect(capturedUrls).toHaveLength(3)
       expect(capturedUrls[0]).toMatch(expectedContextCodes)
       expect(capturedUrls[1]).toMatch(expectedContextCodes)
       expect(capturedUrls[2]).toMatch(expectedContextCodes)
@@ -362,9 +363,9 @@ describe('api actions', () => {
       )
 
       const mockUiManager = {
-        setStore: jest.fn(),
-        handleAction: jest.fn(),
-        uiStateUnchanged: jest.fn(),
+        setStore: vi.fn(),
+        handleAction: vi.fn(),
+        uiStateUnchanged: vi.fn(),
       }
 
       const store = configureStore(mockUiManager, {
@@ -382,10 +383,48 @@ describe('api actions', () => {
         /include%5B%5D=account_calendars&include%5B%5D=all_courses&order=desc&per_page=1&observed_user_id=35/
       // For multi-course mode, fetching current week, far future date, and far past date should all have observee id
       // , account calendars flag and context codes
-      expect(capturedUrls.length).toBe(4)
+      expect(capturedUrls).toHaveLength(4)
       expect(capturedUrls[0]).toMatch(/dashboard_cards/)
       expect(capturedUrls[1]).toMatch(expectedParamsFutureRequest)
       expect(capturedUrls[2]).toMatch(expectedParamsPastRequest)
+      expect(capturedUrls[3]).toMatch(expectedParams)
+    })
+
+    it('adds account calendars and all_courses flags for regular dashboard users (no observee, no singleCourse)', async () => {
+      const today = moment.tz('UTC').startOf('day')
+      const capturedUrls = []
+
+      server.use(
+        http.get(/\/api\/v1\/planner\/items/, ({request}) => {
+          capturedUrls.push(request.url)
+          return HttpResponse.json([{plannable_date: '2017-05-01T:00:00:00Z'}])
+        }),
+        http.get(/dashboard_cards/, ({request}) => {
+          capturedUrls.push(request.url)
+          return HttpResponse.json([
+            {id: '11', assetString: 'course_11'},
+            {id: '12', assetString: 'course_12'},
+          ])
+        }),
+      )
+
+      const mockUiManager = {
+        setStore: vi.fn(),
+        handleAction: vi.fn(),
+        uiStateUnchanged: vi.fn(),
+      }
+
+      const store = configureStore(mockUiManager, {
+        ...getBasicState(),
+        selectedObservee: null,
+        singleCourse: false,
+      })
+
+      await store.dispatch(Actions.getWeeklyPlannerItems(today))
+
+      const expectedParams = /include%5B%5D=account_calendars&include%5B%5D=all_courses/
+      expect(capturedUrls[1]).toMatch(expectedParams)
+      expect(capturedUrls[2]).toMatch(expectedParams)
       expect(capturedUrls[3]).toMatch(expectedParams)
     })
 
@@ -401,9 +440,9 @@ describe('api actions', () => {
       )
 
       const mockUiManager = {
-        setStore: jest.fn(),
-        handleAction: jest.fn(),
-        uiStateUnchanged: jest.fn(),
+        setStore: vi.fn(),
+        handleAction: vi.fn(),
+        uiStateUnchanged: vi.fn(),
       }
 
       const store = configureStore(mockUiManager, {
@@ -416,7 +455,7 @@ describe('api actions', () => {
       await store.dispatch(Actions.getWeeklyPlannerItems(today))
       const expectedParams = /observed_user_id=35&context_codes%5B%5D=course_11/
       // For single-course mode, fetching current week, far future date, and far past date should all have observee id and context codes
-      expect(capturedUrls.length).toBe(3)
+      expect(capturedUrls).toHaveLength(3)
       expect(capturedUrls[0]).toMatch(expectedParams)
       expect(capturedUrls[1]).toMatch(expectedParams)
       expect(capturedUrls[2]).toMatch(expectedParams)
@@ -438,9 +477,9 @@ describe('api actions', () => {
       )
 
       const mockUiManager = {
-        setStore: jest.fn(),
-        handleAction: jest.fn(),
-        uiStateUnchanged: jest.fn(),
+        setStore: vi.fn(),
+        handleAction: vi.fn(),
+        uiStateUnchanged: vi.fn(),
       }
 
       const store = configureStore(mockUiManager, {
@@ -450,7 +489,7 @@ describe('api actions', () => {
 
       await store.dispatch(Actions.getWeeklyPlannerItems(today))
 
-      expect(capturedUrls.length).toBe(4)
+      expect(capturedUrls).toHaveLength(4)
       expect(capturedUrls[0]).toMatch(/dashboard_cards/)
       expect(capturedUrls[0]).not.toContain('observed_user_id')
       expect(capturedUrls[1]).not.toContain('observed_user_id')

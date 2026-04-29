@@ -7,27 +7,35 @@
     "lib": ["DOM", "ES2020", "ESNext"],
     "incremental": false,
     "module": "es2020",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "verbatimModuleSyntax": false,
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "strict": true,
     "target": "es2020",
     "noImplicitAny": true,
-    "baseUrl": "./ui",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "paths": {
-      "@canvas/*": ["shared/*"],
-      "@instructure/*": ["./packages/*"]
+      "*": ["./ui/*"],
+      "@canvas/*": ["./ui/shared/*"],
+      "@instructure/platform-query/broadcast": ["./node_modules/@instructure/platform-query/dist/broadcast.d.ts"],
+      "@instructure/platform-query/queryify": ["./node_modules/@instructure/platform-query/dist/queryify.d.ts"],
+      "@instructure/outcomes-ui/lib/*": ["./node_modules/@instructure/outcomes-ui/lib/*"],
+      "@instructure/outcomes-ui/es/*": ["./node_modules/@instructure/outcomes-ui/lib/*"],
+      "@instructure/*": ["./packages/*", "./node_modules/@instructure/*"]
     },
     "plugins": [
       {
         "name": "@0no-co/graphqlsp",
         "schema": "./schema.graphql"
       }
-    ]
+    ],
+    "types": ["vitest/globals", "jqueryui"]
   },
-  "include": ["ui/**/*.ts", "ui/**/*.tsx"],
-  "exclude": ["node_modules"],
-  "types": []
+  "include": ["ui/**/*.ts", "ui/**/*.tsx", "ui/**/*.d.ts"],
+  "exclude": ["node_modules"]
 }

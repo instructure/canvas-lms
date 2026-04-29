@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {reject, maxBy, isEmpty, partition, minBy} from 'lodash'
+import {reject, maxBy, partition, minBy, isEmpty} from 'es-toolkit/compat'
 import fcUtil from './fcUtil'
 import commonEventFactory from './CommonEvent/index'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -184,16 +184,30 @@ export default class EventDataSource {
   }
 
   addEventToCache(event) {
+    if (!event) return
+
     if (event.old_context_code) {
       delete this.cache.contexts[event.old_context_code]?.events[event.id]
       delete event.old_context_code
     }
-    // Split by comma, for the odd case where #contextCode() returns a comma seprated list
-    const possibleContexts = event.contextCode().split(',')
-    const okayContexts = possibleContexts.filter(cCode => !!this.cache.contexts[cCode])
+    const possibleContexts = event.contextCode() ? event.contextCode().split(',') : []
+
+    let okayContexts = possibleContexts.filter(cCode => !!this.cache.contexts[cCode])
+
+    if (okayContexts.length === 0) {
+      const cachedContextCodes = Object.keys(this.cache.contexts)
+      okayContexts = cachedContextCodes.filter(cachedCode => event.isOnCalendar(cachedCode))
+    }
+
+    if (okayContexts.length === 0) {
+      return
+    }
+
     const contextCode = okayContexts[0]
     const contextInfo = this.cache.contexts[contextCode]
-    contextInfo.events[event.id] = event
+    if (contextInfo) {
+      contextInfo.events[event.id] = event
+    }
   }
 
   getEventsFromCacheForContext(start, end, context) {
@@ -583,12 +597,12 @@ export default class EventDataSource {
 
   assignmentParams(params, subAssignment = false) {
     // We only want to see assignments from courses that do not use Course Pacing, unless the
-    // user is a student in the course. In that case, they should see their assignments on the calendar
+    // user is a student or observer in the course. In that case, they should see their assignments on the calendar
     if (ENV.CALENDAR?.CONTEXTS) {
       params.context_codes = ENV.CALENDAR.CONTEXTS.filter(
         context =>
           params.context_codes.includes(context.asset_string) &&
-          (!context.course_pacing_enabled || context.user_is_student),
+          (!context.course_pacing_enabled || context.user_is_student || context.user_is_observer),
       ).map(context => context.asset_string)
     }
     const type = subAssignment ? 'sub_assignment' : 'assignment'
@@ -620,6 +634,9 @@ export default class EventDataSource {
           `/api/v1/appointment_groups/${appointmentGroup.id}/${type}`,
           {
             registration_status: registrationStatus,
+            ...(appointmentGroup.context_codes.length > 0 && {
+              context_code: appointmentGroup.context_codes,
+            }),
           },
         ],
       ],

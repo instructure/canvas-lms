@@ -83,6 +83,46 @@ describe "QTI Generator" do
                   <fieldlabel>bank_context_uuid</fieldlabel>
                   <fieldentry>course_uuid</fieldentry>
                 </qtimetadatafield>
+                <qtimetadatafield>
+                  <fieldlabel>bank_state</fieldlabel>
+                  <fieldentry>active</fieldentry>
+                </qtimetadatafield>
+              </qtimetadata>
+            </objectbank>
+          </questestinterop>
+        XML
+
+      expect(@qg.generate_bank(doc, bank, "somemigrationid")).to eq expected_xml
+    end
+
+    it "generates qti xml with bank_state as deleted for soft-deleted banks" do
+      doc = Builder::XmlMarkup.new(target: +"", indent: 2)
+      course = course_model(name: "Test Course", uuid: "course_uuid")
+      bank = course.assessment_question_banks.create!(title: "Deleted Bank")
+      bank.destroy
+
+      expected_xml =
+        <<~XML
+          <?xml version="1.0" encoding="UTF-8"?>
+          <questestinterop xmlns="http://www.imsglobal.org/xsd/ims_qtiasiv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/ims_qtiasiv1p2 http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd">
+            <objectbank ident="somemigrationid">
+              <qtimetadata>
+                <qtimetadatafield>
+                  <fieldlabel>bank_title</fieldlabel>
+                  <fieldentry>Deleted Bank</fieldentry>
+                </qtimetadatafield>
+                <qtimetadatafield>
+                  <fieldlabel>bank_type</fieldlabel>
+                  <fieldentry>Course</fieldentry>
+                </qtimetadatafield>
+                <qtimetadatafield>
+                  <fieldlabel>bank_context_uuid</fieldlabel>
+                  <fieldentry>course_uuid</fieldentry>
+                </qtimetadatafield>
+                <qtimetadatafield>
+                  <fieldlabel>bank_state</fieldlabel>
+                  <fieldentry>deleted</fieldentry>
+                </qtimetadatafield>
               </qtimetadata>
             </objectbank>
           </questestinterop>
@@ -97,7 +137,7 @@ describe "QTI Generator" do
       qti_generator
       allow(@qg).to receive_messages(aq_mig_id: "dummy_id", qq_mig_id: "dummy_id")
 
-      html_exporter = double("HtmlExporter")
+      html_exporter = instance_double(CC::CCHelper::HtmlContentExporter)
       allow(html_exporter).to receive(:html_content) { |s| s }
       @qg.instance_variable_set(:@html_exporter, html_exporter)
 

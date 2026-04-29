@@ -20,14 +20,13 @@
 # NOTE: Indented gems are meant to indicate optional dependencies of parent gems
 
 gem "bootsnap", "~> 1.16", require: false
-gem "rails", "~> 7.2.0"
-gem "rack", "~> 3.1"
+gem "rails", "~> 8.0.0"
+gem "rack", "~> 3.2"
 gem "sqlite3", "~> 2.6"
 
 gem "switchman", "~> 4.0"
 gem "guardrail", "~> 3.0"
 gem "switchman-inst-jobs", "~> 4.0"
-gem "irb", "~> 1.7"
 
 gem "academic_benchmarks", "~> 1.1", require: false
 gem "active_model_serializers", "~> 0.9.9"
@@ -39,8 +38,6 @@ gem "aws-sdk-kinesis", "~> 1.45", require: false
 gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false
 gem "aws-sdk-sqs", "~> 1.53", require: false
-gem "aws-sdk-sagemakerruntime", "~> 1.61", require: false
-gem "aws-sdk-translate", "~> 1.77", require: false
 gem "rqrcode", "~> 3.0", require: false
 gem "bcrypt", "~> 3.1"
 gem "benchmark", "~> 0.4", require: false
@@ -50,19 +47,17 @@ gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
 gem "canvas_link_migrator", "~> 1.0"
 gem "canvas_webex", "0.18.2"
-gem "cld", "~> 0.13"
-gem "crocodoc-ruby", "0.0.1", require: false
-gem "code_ownership", "~> 1.33"
+gem "code_ownership", "~> 2.1"
 gem "datadog", "~> 2.1", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"
-gem "gepub", "~> 1.0"
+gem "gepub", "~> 2.0"
 gem "graphql", "~> 2.3"
 gem "graphql-batch", "~> 0.5"
 gem "hashdiff", "~> 1.1", require: false
 gem "highline", "~> 3.0", require: false
-gem "httparty", "~> 0.21"
-gem "i18nliner", "~> 0.2.4"
+gem "httparty", "~> 0.24"
+gem "i18nliner", "~> 0.3"
 gem "icalendar", "~> 2.9", require: false
 gem "diplomat", "~> 2.6", require: false
 gem "ims-lti", "~> 2.3", require: "ims"
@@ -78,12 +73,10 @@ gem "json_schemer", "~> 2.0"
 gem "json-jwt", "~> 1.13", require: false
 gem "link_header", "0.0.8"
 gem "logger", "~> 1.5"
-gem "marginalia", "1.11.1", require: false
 gem "method_source", "~> 1.1"
 gem "mime-types", "~> 3.5"
-gem "mimemagic", "~> 0.4.3"
 gem "mini_magick", "~> 5.0"
-gem "multi_json", "1.15.0"
+gem "multi_json", "~> 1.19"
 gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "~> 0.18", require: false
 gem "oauth", "~> 1.1", require: false
@@ -93,14 +86,14 @@ gem "outrigger", "~> 3.0"
 gem "parallel", "~> 1.23", require: false
 gem "pdf-reader", "~> 2.11"
 gem "pg_query", "~> 6.0", require: false
-gem "pragmatic_segmenter", "~> 0.3"
 gem "prawn-emoji", "~> 6.0", require: false
 gem "prawn-rails", "~> 1.4"
 gem "prosopite", "~> 2.1"
-gem "puma", "~> 6.3", require: false
+gem "puma", "~> 7.0", require: false
 gem "rack3-brotli", "~> 1.0", require: "rack/brotli"
+gem "waterdrop", "~> 2.9", require: false
 gem "rails-observers", "0.1.5"
-gem "feedjira", "~> 3.2.3", require: false
+gem "feedjira", "~> 4.0", require: false
 gem "redcarpet", "~> 3.6", require: false
 gem "retriable", "~> 3.1"
 gem "ritex", "1.0.1", require: false
@@ -109,19 +102,18 @@ gem "rss", "~> 0.3", require: false
 gem "ruby-duration", "3.2.3", require: false
 gem "rubycas-client", "2.3.9", require: false
   gem "pstore", "~> 0.2", require: false
-gem "ruby-rtf", "0.0.5"
-gem "rubyzip", "~> 2.3", require: "zip"
+gem "rubyzip", "~> 3.0", require: "zip"
 gem "saml2", "~> 3.1"
 gem "sanitize", "~> 7.0", require: false
-gem "stackprof", "~> 0.2" # must be loaded before Sentry
-gem "sentry-rails", "~> 5.10"
-gem "sentry-inst_jobs", "~> 5.10"
+gem "stackprof", github: "instructure/stackprof", branch: "switch-d3-data-to-iterative"
+gem "sentry-rails", "~> 6.0"
+gem "sentry-inst_jobs", "~> 6.0"
 gem "soap4r-ng", github: "instructure/soap4r", require: false # dependency of respondus_soap_endpoint, but we need to use an unreleased fork
 gem "syslog", "~> 0.1"
-gem "twilio-ruby", "~> 7.0", require: false
 gem "vault", "~> 0.17", require: false
 gem "vericite_api", "1.5.3"
 gem "wcag_color_contrast", "0.1.0"
+gem "css_parser", "~> 2.0"
 
 path "../gems" do
   gem "activesupport-suspend_callbacks"

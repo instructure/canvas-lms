@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Login::SamlController do
   before do
     skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
@@ -130,6 +128,10 @@ describe Login::SamlController do
     BASE64
   end
 
+  let(:signing_certificate_fixture) do
+    "MIICgTCCAeoCCQCbOlrWDdX7FTANBgkqhkiG9w0BAQUFADCBhDELMAkGA1UEBhMCTk8xGDAWBgNVBAgTD0FuZHJlYXMgU29sYmVyZzEMMAoGA1UEBxMDRm9vMRAwDgYDVQQKEwdVTklORVRUMRgwFgYDVQQDEw9mZWlkZS5lcmxhbmcubm8xITAfBgkqhkiG9w0BCQEWEmFuZHJlYXNAdW5pbmV0dC5ubzAeFw0wNzA2MTUxMjAxMzVaFw0wNzA4MTQxMjAxMzVaMIGEMQswCQYDVQQGEwJOTzEYMBYGA1UECBMPQW5kcmVhcyBTb2xiZXJnMQwwCgYDVQQHEwNGb28xEDAOBgNVBAoTB1VOSU5FVFQxGDAWBgNVBAMTD2ZlaWRlLmVybGFuZy5ubzEhMB8GCSqGSIb3DQEJARYSYW5kcmVhc0B1bmluZXR0Lm5vMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDivbhR7P516x/S3BqKxupQe0LONoliupiBOesCO3SHbDrl3+q9IbfnfmE04rNuMcPsIxB161TdDpIesLCn7c8aPHISKOtPlAeTZSnb8QAu7aRjZq3+PbrP5uW3TcfCGPtKTytHOge/OlJbo078dVhXQ14d1EDwXJW1rRXuUt4C8QIDAQABMA0GCSqGSIb3DQEBBQUAA4GBACDVfp86HObqY+e8BUoWQ9+VMQx1ASDohBjwOsg2WykUqRXF+dLfcUH9dWR63CtZIKFDbStNomPnQz7nbK+onygwBspVEbnHuUihZq3ZUdmumQqCw4Uvs/1Uvq3orOo/WJVhTyvLgFVK2QarQ4/67OZfHd7R+POBXhophSMv1ZOo"
+  end
+
   describe "#new" do
     let(:account) { account_with_saml(saml_log_in_url: "https://example.com/saml/login") }
 
@@ -223,7 +225,7 @@ describe Login::SamlController do
     @pseudonym.save!
 
     saml_response = SAML2::Response.new
-    allow(saml_response).to receive_messages(errors: [], issuer: double(id: "such a lie"))
+    allow(saml_response).to receive_messages(errors: [], issuer: instance_double(SAML2::NameID, id: "such a lie"))
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
       [saml_response, nil]
     )
@@ -271,7 +273,7 @@ describe Login::SamlController do
     @pseudonym.save!
 
     saml_response = SAML2::Response.new
-    allow(saml_response).to receive_messages(errors: [], issuer: nil, assertions: [double(issuer: double(id: "such a lie"))])
+    allow(saml_response).to receive_messages(errors: [], issuer: nil, assertions: [instance_double(SAML2::Assertion, issuer: instance_double(SAML2::NameID, id: "such a lie"))])
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
       [saml_response, nil]
     )
@@ -304,7 +306,7 @@ describe Login::SamlController do
     # Default to Login url if set to nil or blank
     post :create, params: { SAMLResponse: "foo" }
     expect(response).to redirect_to(login_url)
-    expect(flash[:delegated_message]).to_not be_nil
+    expect(flash[:delegated_message]).not_to be_nil
     expect(session[:saml_unique_id]).to be_nil
 
     account.unknown_user_url = ""
@@ -312,7 +314,7 @@ describe Login::SamlController do
     controller.instance_variable_set(:@aac, nil)
     post :create, params: { SAMLResponse: "foo" }
     expect(response).to redirect_to(login_url)
-    expect(flash[:delegated_message]).to_not be_nil
+    expect(flash[:delegated_message]).not_to be_nil
     expect(session[:saml_unique_id]).to be_nil
 
     # Redirect to a specifiec url
@@ -349,7 +351,7 @@ describe Login::SamlController do
     expect(controller).not_to receive(:logout_user_action)
     controller.request.env["canvas.domain_root_account"] = account
 
-    expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+    expect(account.pseudonyms.active.by_unique_id(unique_id)).not_to be_exists
     # Default to Login url if set to nil or blank
     post :create, params: { SAMLResponse: "foo" }
     expect(response).to redirect_to(dashboard_url(login_success: 1))
@@ -384,7 +386,7 @@ describe Login::SamlController do
 
     post :create, params: { SAMLResponse: "foo" }
     expect(response).to redirect_to(login_url)
-    expect(flash[:delegated_message]).to_not be_nil
+    expect(flash[:delegated_message]).not_to be_nil
     expect(session[:saml_unique_id]).to be_nil
   end
 
@@ -501,9 +503,11 @@ describe Login::SamlController do
         [saml_response, "https://otheraccount/courses/1"]
       )
 
-      account2 = double
+      account2 = instance_double(Account)
       expect(Account).to receive(:find_by_domain).and_return(account2)
-      expect_any_instantiation_of(@pseudonym).to receive(:works_for_account?).with(account2, true).and_return(true)
+      expect_any_instantiation_of(@pseudonym).to receive(:works_for_account?)
+        .with(account2, allow_implicit: true)
+        .and_return(true)
 
       post :create, params: { SAMLResponse: "foo", RelayState: "https://otheraccount/courses/1" }
       expect(response).to be_redirect
@@ -656,7 +660,7 @@ describe Login::SamlController do
 
       it "redirects to login screen with message if no AAC found" do
         saml_response = SAML2::Response.new
-        allow(saml_response).to receive_messages(errors: [], issuer: double(id: "hahahahahahaha"))
+        allow(saml_response).to receive_messages(errors: [], issuer: instance_double(SAML2::NameID, id: "hahahahahahaha"))
         allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
           [saml_response, nil]
         )
@@ -740,7 +744,7 @@ describe Login::SamlController do
           message, = SAML2::Bindings::HTTPRedirect.decode(response.location)
           expect(message).to be_a(SAML2::LogoutResponse)
           expect(message.status).not_to be_a_success
-          expect(message.status.message).to eql ["No current session"]
+          expect(message.status.message).to eql "No current session"
         end
 
         it "redirects an error response to idp if a different user is logged in" do
@@ -760,7 +764,7 @@ describe Login::SamlController do
           message, = SAML2::Bindings::HTTPRedirect.decode(response.location)
           expect(message).to be_a(SAML2::LogoutResponse)
           expect(message.status).not_to be_a_success
-          expect(message.status.message).to eql ["NameID does not match current session"]
+          expect(message.status.message).to eql "NameID does not match current session"
         end
 
         it "redirects a response to idp on logout with a SAMLRequest parameter" do
@@ -812,7 +816,7 @@ describe Login::SamlController do
         end
 
         it "is a bad request if there's no destination to send the request to" do
-          expect(controller).to_not receive(:logout_current_user)
+          expect(controller).not_to receive(:logout_current_user)
           @aac3 = @account.authentication_providers.build(auth_type: "saml")
           @aac3.idp_entity_id = "https://example.com/idp3"
           @aac3.log_in_url = "https://example.com/idp3/sso"
@@ -835,6 +839,47 @@ describe Login::SamlController do
           expect(response).to have_http_status :bad_request
         end
       end
+    end
+  end
+
+  context "OneTimeUse condition" do
+    before do
+      user_with_pseudonym(active_all: 1, account:)
+      allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, nil]
+      )
+    end
+
+    let(:account) { account_with_saml }
+    let(:authentication_provider) { account.authentication_providers.active.where(auth_type: "saml").take! }
+    let(:saml_response) do
+      saml_response = SAML2::Response.new
+      saml_response.issuer = SAML2::NameID.new("saml_entity")
+      saml_response.assertions << (assertion = SAML2::Assertion.new)
+      assertion.subject = SAML2::Subject.new
+      assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
+      saml_response
+    end
+
+    it "does nothing by default" do
+      expect(controller).to receive(:successful_login)
+
+      post :create, params: { SAMLResponse: "foo" }
+
+      expect(response).to have_http_status :no_content
+    end
+
+    it "blocks login when violated" do
+      saml_response.assertions.first.conditions << SAML2::Conditions::OneTimeUse.new
+      allow(controller).to receive(:duplicate_response?).and_return(true)
+      expect(controller).to receive(:increment_statsd).with(:attempts, anything)
+      expect(controller).to receive(:increment_statsd).with(:failure, reason: :one_time_use_violation)
+
+      post :create, params: { SAMLResponse: "foo" }
+
+      expect(response).to redirect_to(login_url)
     end
   end
 
@@ -1050,19 +1095,18 @@ describe Login::SamlController do
     end
   end
 
-  it "decodes an actual saml response via SAML2" do
+  it "decodes an actual saml response with a key" do
     unique_id = "student@example.edu"
 
     account_with_saml
 
     @account.settings[:allow_expired_saml_certificate] = true
     @account.settings[:saml_entity_id] = "http://shard1.localdomain/saml2"
-    @account.settings[:process_saml_responses_with_saml2] = true
     @account.save!
     @aac = @account.authentication_providers.first
     @aac.idp_entity_id = "http://phpsite/simplesaml/saml2/idp/metadata.php"
     @aac.login_attribute = "eduPersonPrincipalName"
-    @aac.certificate_fingerprint = "AF:E7:1C:28:EF:74:0B:C8:74:25:BE:13:A2:26:3D:37:97:1D:A1:F9"
+    @aac.settings["signing_certificates"] = [signing_certificate_fixture]
     @aac.save
 
     user_with_pseudonym(active_all: true, username: unique_id)
@@ -1075,6 +1119,175 @@ describe Login::SamlController do
       post :create, params: { SAMLResponse: saml_response_fixture }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       expect(session[:saml_unique_id]).to eq unique_id
+    end
+  end
+
+  context "certificate recording without real metadata" do
+    let(:account) { account_with_saml }
+    let(:aac) { account.authentication_providers.first }
+    let(:certificate) { OpenSSL::X509::Certificate.new(Base64.decode64(signing_certificate_fixture)) }
+    let(:fingerprint) { SAML2::KeyInfo.format_fingerprint(Digest::SHA1.hexdigest(certificate.to_der)) }
+
+    let(:signing_key) do
+      SAML2::KeyInfo.new(certificate.to_pem)
+    end
+
+    let(:saml_response) do
+      saml_response = SAML2::Response.new
+      saml_response.issuer = SAML2::NameID.new("saml_entity")
+      saml_response.assertions << (assertion = SAML2::Assertion.new)
+      assertion.subject = SAML2::Subject.new
+      assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
+      saml_response
+    end
+
+    before do
+      user_with_pseudonym(active_all: 1, account:)
+      Account.site_admin.enable_feature!(:record_saml_certificates)
+      allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, nil]
+      )
+    end
+
+    def stub_signing_keys(response_key: nil, assertion_key: nil)
+      allow(saml_response).to receive(:signing_key).and_return(response_key)
+      allow(saml_response.assertions.first).to receive(:signing_key).and_return(assertion_key)
+    end
+
+    it "records the certificate from the response signing key" do
+      aac.certificate_fingerprint = fingerprint
+      aac.settings["signing_certificates"] = []
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq [signing_key.x509]
+    end
+
+    it "records the certificate from the assertion signing key when the response has none" do
+      aac.certificate_fingerprint = fingerprint
+      aac.settings["signing_certificates"] = []
+      aac.save!
+
+      stub_signing_keys(assertion_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq [signing_key.x509]
+    end
+
+    it "collects certificates from both response and assertion signing keys" do
+      other_key = OpenSSL::PKey::RSA.generate(2048)
+      other_x509 = OpenSSL::X509::Certificate.new
+      other_x509.subject = OpenSSL::X509::Name.new([["CN", "other"]])
+      other_x509.issuer = other_x509.subject
+      other_x509.serial = 1
+      other_x509.public_key = other_key.public_key
+      other_x509.not_before = Time.zone.now
+      other_x509.not_after = Time.zone.now + 3600
+      other_x509.sign(other_key, OpenSSL::Digest.new("SHA256"))
+      other_signing_key = SAML2::KeyInfo.new(other_x509.to_pem)
+      other_fingerprint = SAML2::KeyInfo.format_fingerprint(Digest::SHA1.hexdigest(other_x509.to_der))
+
+      aac.certificate_fingerprint = "#{fingerprint} #{other_fingerprint}"
+      aac.settings["signing_certificates"] = []
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key, assertion_key: other_signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to contain_exactly(signing_key.x509, other_signing_key.x509)
+    end
+
+    it "replaces a stale certificate when the fingerprint has changed" do
+      aac.certificate_fingerprint = fingerprint
+      # store a different (stale) certificate that doesn't match the current fingerprint
+      old_key = OpenSSL::PKey::RSA.generate(2048)
+      old_x509 = OpenSSL::X509::Certificate.new
+      old_x509.public_key = old_key.public_key
+      old_x509.not_before = Time.zone.now
+      old_x509.not_after = Time.zone.now + 3600
+      old_x509.sign(old_key, OpenSSL::Digest.new("SHA256"))
+      aac.settings["signing_certificates"] = [Base64.strict_encode64(old_x509.to_der)]
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq [signing_key.x509]
+    end
+
+    it "does not save when the certificate already matches" do
+      aac.certificate_fingerprint = fingerprint
+      aac.settings["signing_certificates"] = [signing_key.x509]
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      # certificate should remain unchanged
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq [signing_key.x509]
+    end
+
+    it "does not record the certificate when metadata is not synthetic" do
+      aac.certificate_fingerprint = fingerprint
+      aac.settings["signing_certificates"] = []
+      aac.settings["metadata_source"] = "manual"
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq []
+    end
+
+    it "does not record the certificate when the fingerprint does not match" do
+      aac.certificate_fingerprint = "aa:bb:cc:dd"
+      aac.settings["signing_certificates"] = []
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq []
+    end
+
+    it "does not record the certificate when the record_saml_certificates flag is disabled" do
+      Account.site_admin.disable_feature!(:record_saml_certificates)
+      aac.certificate_fingerprint = fingerprint
+      aac.settings["signing_certificates"] = []
+      aac.save!
+
+      stub_signing_keys(response_key: signing_key)
+
+      post :create, params: { SAMLResponse: "foo" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+
+      aac.reload
+      expect(aac.settings["signing_certificates"]).to eq []
     end
   end
 

@@ -25,7 +25,7 @@ class LoginController < ApplicationController
   before_action :run_login_hooks, only: :new
   before_action :fix_ms_office_redirects, only: :new
   skip_before_action :require_reacceptance_of_terms
-  before_action :require_user, only: :session_token
+  skip_before_action :require_user, only: %i[clear_file_session logout_landing new]
 
   def new
     if @current_user &&
@@ -117,10 +117,17 @@ class LoginController < ApplicationController
     host = return_to.host
     return render_unauthorized_action unless host.casecmp?(request.host)
 
+    consent_from_mobile = if params[:mobile_consent].present?
+                            params[:mobile_consent] == "true"
+                          else
+                            nil
+                          end
+
     login_pseudonym = @real_current_pseudonym || @current_pseudonym
     token = SessionToken.new(login_pseudonym.global_id,
                              current_user_id: @real_current_user ? @current_user.global_id : nil,
-                             used_remember_me_token: true).to_s
+                             used_remember_me_token: true,
+                             consent_from_mobile:).to_s
     return_to.query&.concat("&")
     return_to.query = "" unless return_to.query
     return_to.query.concat("session_token=#{token}")
@@ -142,7 +149,12 @@ class LoginController < ApplicationController
   private
 
   def redirect_to_discovery_url
-    if @domain_root_account.auth_discovery_url(request) && !params[:authentication_provider]
+    if @domain_root_account.discovery_page_allowed? &&
+       @domain_root_account.discovery_page_active? &&
+       !params[:authentication_provider]
+      redirect_to @domain_root_account.discovery_page_url
+      increment_statsd(:discovery_page_redirect)
+    elsif @domain_root_account.auth_discovery_url(request) && !params[:authentication_provider]
       auth_discovery_url = @domain_root_account.auth_discovery_url(request)
       if flash[:delegated_message]
         auth_discovery_url << (URI.parse(auth_discovery_url).query ? "&" : "?")
@@ -154,11 +166,15 @@ class LoginController < ApplicationController
   end
 
   def redirect_to_specific_provider(auth_type)
-    auth_type ||= @domain_root_account.authentication_providers.active.first&.auth_type
+    auth_type ||= inferred_auth_type
     auth_type ||= "canvas"
 
     redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
       .merge(params.permit(:id, :login_hint).to_unsafe_h))
+  end
+
+  def inferred_auth_type
+    @domain_root_account.authentication_providers.active.first&.auth_type
   end
 
   def auth_type; end

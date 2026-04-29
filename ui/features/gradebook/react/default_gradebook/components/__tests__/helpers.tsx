@@ -135,7 +135,7 @@ export const getActionMenuProps = () => {
 }
 
 export function findOption(document: Document, label: string) {
-  return [...document.querySelectorAll('[role=option]')].find(
+  return [...Array.from(document.querySelectorAll('[role=option]'))].find(
     $el => $el.textContent?.trim() === label,
   )
 }

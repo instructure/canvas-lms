@@ -22,7 +22,13 @@ include YARD::Templates::Helpers::HtmlHelper
 
 def init
   super
-  sections :argument, :request_field, :response_field, :example_request, :example_response, :returns, :see
+  sections :hint_section, :argument, :request_field, :response_field, :example_request, :example_response, :returns, :see
+end
+
+def hint_section
+  return unless object.has_tag?(:hint)
+
+  erb(:hint)
 end
 
 def see
@@ -60,13 +66,15 @@ end
 def returns
   return unless object.has_tag?(:returns)
 
-  response_info = object.tag(:returns)
-  case response_info.text
+  response_object_name = object.tag(:returns).text
+  response_object_name = response_object_name.sub("Schemas::Docs::", "")
+
+  case response_object_name
   when /\[(.*)\]/
     @object_name = $1.strip
     @is_list = true
   else
-    @object_name = response_info.text.strip
+    @object_name = response_object_name.strip
     @is_list = false
   end
   @resource_name = options[:json_objects_map][@object_name]

@@ -30,12 +30,12 @@ describe('ThemeEditorColorRow Component', () => {
       default: '#000000',
     },
     placeholder: '#FFFFFF',
-    onChange: jest.fn(),
-    handleThemeStateChange: jest.fn(),
+    onChange: vi.fn(),
+    handleThemeStateChange: vi.fn(),
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('shows warning in appropriate situations', () => {

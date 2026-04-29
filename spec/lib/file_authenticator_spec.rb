@@ -22,7 +22,7 @@ describe FileAuthenticator do
   before do
     @oauth_host = "http://oauth.host/"
     @user = user_model
-    @access_token = @user.access_tokens.create!
+    @access_token = @user.access_tokens.create!(purpose: "test")
     @acting_as = user_model
     @attachment = attachment_with_context(@user)
     @attachment.filename = "test.txt"
@@ -143,12 +143,12 @@ describe FileAuthenticator do
         @authenticator.thumbnail_url(@attachment, size: geometry)
       end
 
-      it "passes along the original_url" do
-        original_url = "http://example.com/preview/1234"
+      it "passes along the fallback_url" do
+        fallback_url = "http://example.com/preview/1234"
         allow(@attachment).to receive(:thumbnailable?).and_return(true)
         expect(InstFS).to receive(:authenticated_thumbnail_url)
-          .with(@attachment, include(original_url:))
-        @authenticator.thumbnail_url(@attachment, original_url:)
+          .with(@attachment, include(fallback_url:))
+        @authenticator.thumbnail_url(@attachment, fallback_url:)
       end
 
       it "constructs a url specific to the authenticator params" do

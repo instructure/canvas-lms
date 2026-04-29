@@ -20,7 +20,7 @@ import React from 'react'
 import {render as testingLibraryRender, act, waitFor} from '@testing-library/react'
 import ReleaseNotesList from '../ReleaseNotesList'
 import userEvent from '@testing-library/user-event'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const render = (children: unknown) =>
@@ -46,8 +46,7 @@ const releaseNotes = [
 describe('ReleaseNotesList', () => {
   beforeEach(() => {
     ENV.FEATURES.embedded_release_notes = true
-    // @ts-expect-error
-    ENV.SETTINGS = {}
+    ENV.SETTINGS = {} as typeof ENV.SETTINGS
     queryClient.setQueryData(['settings', 'release_notes_badge_disabled'], false)
     queryClient.setQueryData(['releaseNotes'], releaseNotes)
   })

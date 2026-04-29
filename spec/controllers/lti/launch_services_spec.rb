@@ -40,7 +40,7 @@ describe Lti::LaunchServices do
   end
 
   describe "#build_jwt_message" do
-    let(:adapter) { double("LtiAdapter") }
+    let(:adapter) { instance_double(Lti::LtiAdvantageAdapter) }
 
     context "when message_type is AssetProcessorSettingsRequest" do
       it "calls generate_post_payload_for_asset_processor_settings on the adapter" do

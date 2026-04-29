@@ -20,7 +20,7 @@ import axios from '@canvas/axios'
 import {camelizeProperties} from '@canvas/convert-case'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {createClient, gql} from '@canvas/apollo-v3'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import type {FinalGradeOverrideMap} from './grading.d'
 
 const I18n = createI18nScope('finalGradeOverrideApi')
@@ -76,15 +76,9 @@ export function updateFinalGradeOverride(
   gradingPeriodId?: string,
   grade?: {percentage: number},
 ): any {
-  const gradingPeriodQuery = gradingPeriodId ? `gradingPeriodId: ${gradingPeriodId}` : ''
-
   const mutation = gql`
-    mutation {
-      setOverrideScore(input: {
-        enrollmentId: ${enrollmentId}
-        ${gradingPeriodQuery}
-        overrideScore: ${grade && grade.percentage}
-      }) {
+    mutation SetOverrideScore($input: SetOverrideScoreInput!) {
+      setOverrideScore(input: $input) {
         grades {
           customGradeStatusId
           overrideScore
@@ -93,20 +87,36 @@ export function updateFinalGradeOverride(
     }
   `
 
-  return (
-    createClient()
-      .mutate({mutation})
-      // @ts-expect-error
-      .then(response => {
-        const {overrideScore, customGradeStatusId} = response.data.setOverrideScore.grades
-        return overrideScore != null ? {percentage: overrideScore, customGradeStatusId} : null
+  const input: {
+    enrollmentId: string
+    gradingPeriodId?: string
+    overrideScore: number | null
+  } = {
+    enrollmentId,
+    overrideScore: grade?.percentage ?? null,
+  }
+  if (gradingPeriodId) input.gradingPeriodId = gradingPeriodId
+
+  type SetOverrideScoreResponse = {
+    setOverrideScore: {
+      grades: {
+        overrideScore: number | null
+        customGradeStatusId: string | null
+      }
+    }
+  }
+
+  return createClient()
+    .mutate({mutation, variables: {input}})
+    .then((response: {data?: SetOverrideScoreResponse | null}) => {
+      const {overrideScore, customGradeStatusId} = response.data!.setOverrideScore.grades
+      return overrideScore != null ? {percentage: overrideScore, customGradeStatusId} : null
+    })
+    .catch((/* error */) => {
+      showFlashAlert({
+        message: I18n.t('There was a problem overriding the grade.'),
+        type: 'error',
+        err: null,
       })
-      .catch((/* error */) => {
-        showFlashAlert({
-          message: I18n.t('There was a problem overriding the grade.'),
-          type: 'error',
-          err: null,
-        })
-      })
-  )
+    })
 }

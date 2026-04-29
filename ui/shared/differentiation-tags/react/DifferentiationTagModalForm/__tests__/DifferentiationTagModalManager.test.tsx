@@ -23,17 +23,17 @@ import type {DifferentiationTagModalManagerProps} from '../DifferentiationTagMod
 import {useDifferentiationTagCategoriesIndex} from '../../hooks/useDifferentiationTagCategoriesIndex'
 import DifferentiationTagModalForm from '../DifferentiationTagModalForm'
 
-jest.mock('../../hooks/useDifferentiationTagCategoriesIndex', () => ({
-  useDifferentiationTagCategoriesIndex: jest.fn(),
+vi.mock('../../hooks/useDifferentiationTagCategoriesIndex', () => ({
+  useDifferentiationTagCategoriesIndex: vi.fn(),
 }))
 
-jest.mock('../DifferentiationTagModalForm', () => ({
+vi.mock('../DifferentiationTagModalForm', () => ({
   __esModule: true,
-  default: jest.fn(() => null),
+  default: vi.fn(() => null),
 }))
 
 describe('DifferentiationTagModalManager', () => {
-  const onCloseMock = jest.fn()
+  const onCloseMock = vi.fn()
   const defaultProps: DifferentiationTagModalManagerProps = {
     isOpen: true,
     onClose: onCloseMock,
@@ -49,13 +49,12 @@ describe('DifferentiationTagModalManager', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
-    const mockUseDifferentiationTagCategoriesIndex =
-      useDifferentiationTagCategoriesIndex as jest.Mock
+    const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as any
     mockUseDifferentiationTagCategoriesIndex.mockReturnValue({data: undefined})
 
-    const mockDifferentiationTagModalForm = DifferentiationTagModalForm as jest.Mock
+    const mockDifferentiationTagModalForm = DifferentiationTagModalForm as any
     mockDifferentiationTagModalForm.mockClear()
   })
 
@@ -73,7 +72,7 @@ describe('DifferentiationTagModalManager', () => {
         {id: 123, name: 'Category 123', extraField: 'ignore'},
         {id: 456, name: 'Category 456', extraField: 'ignore'},
       ]
-      const mockFn = useDifferentiationTagCategoriesIndex as jest.Mock
+      const mockFn = useDifferentiationTagCategoriesIndex as any
       mockFn.mockReturnValue({data: mockCategories})
       renderComponent({mode: 'edit', differentiationTagCategoryId: 123})
 
@@ -96,7 +95,7 @@ describe('DifferentiationTagModalManager', () => {
         {id: 202, name: 'Category 202', groups: ['groupC', 'groupD']},
       ]
 
-      const mockFn = useDifferentiationTagCategoriesIndex as jest.Mock
+      const mockFn = useDifferentiationTagCategoriesIndex as any
       mockFn.mockReturnValue({data: mockCategories})
 
       renderComponent({mode: 'edit', differentiationTagCategoryId: 101})
@@ -123,7 +122,7 @@ describe('DifferentiationTagModalManager', () => {
         {id: 456, name: 'Category 456'},
       ]
 
-      const mockFn = useDifferentiationTagCategoriesIndex as jest.Mock
+      const mockFn = useDifferentiationTagCategoriesIndex as any
       mockFn.mockReturnValue({data: mockCategories})
 
       renderComponent({mode: 'edit', differentiationTagCategoryId: 123})
@@ -145,7 +144,7 @@ describe('DifferentiationTagModalManager', () => {
   describe('create mode', () => {
     it('does not pass a tag set to the form', () => {
       const mockCategories = [{id: 789, name: 'Category 789'}]
-      const mockFn = useDifferentiationTagCategoriesIndex as jest.Mock
+      const mockFn = useDifferentiationTagCategoriesIndex as any
       mockFn.mockReturnValue({data: mockCategories})
 
       renderComponent({mode: 'create'})
@@ -163,7 +162,7 @@ describe('DifferentiationTagModalManager', () => {
 
   it('passes common props (isOpen and onClose) to the form', () => {
     const mockCategories = [{id: 111, name: 'Category 111'}]
-    const mockFn = useDifferentiationTagCategoriesIndex as jest.Mock
+    const mockFn = useDifferentiationTagCategoriesIndex as any
     mockFn.mockReturnValue({data: mockCategories})
 
     renderComponent({isOpen: false, onClose: onCloseMock})
@@ -175,5 +174,138 @@ describe('DifferentiationTagModalManager', () => {
       }),
       expect.anything(),
     )
+  })
+
+  it('passes onCreationSuccess callback to the form', () => {
+    const mockCategories = [{id: 111, name: 'Category 111'}]
+    const mockFn = useDifferentiationTagCategoriesIndex as any
+    mockFn.mockReturnValue({data: mockCategories})
+
+    const onCreationSuccessMock = vi.fn()
+    renderComponent({onCreationSuccess: onCreationSuccessMock})
+
+    expect(DifferentiationTagModalForm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        onCreationSuccess: onCreationSuccessMock,
+      }),
+      expect.anything(),
+    )
+  })
+
+  it('passes courseId from prop to the form', () => {
+    const mockCategories = [{id: 111, name: 'Category 111'}]
+    const mockFn = useDifferentiationTagCategoriesIndex as any
+    mockFn.mockReturnValue({data: mockCategories})
+
+    renderComponent({courseId: 999})
+
+    expect(DifferentiationTagModalForm).toHaveBeenCalledWith(
+      expect.objectContaining({
+        courseId: 999,
+      }),
+      expect.anything(),
+    )
+  })
+
+  describe('courseID retrieval from ENV', () => {
+    let originalEnv: any
+
+    beforeEach(() => {
+      originalEnv = (global as any).ENV
+    })
+
+    afterEach(() => {
+      ;(global as any).ENV = originalEnv
+    })
+
+    it('retrieves courseID from ENV.course.id when courseId prop is not provided', () => {
+      ;(global as any).ENV = {course: {id: '789'}}
+
+      const mockFn = useDifferentiationTagCategoriesIndex as any
+      mockFn.mockReturnValue({data: undefined})
+
+      renderComponent()
+
+      expect(useDifferentiationTagCategoriesIndex).toHaveBeenCalledWith(789, {
+        enabled: true,
+        includeDifferentiationTags: true,
+      })
+    })
+
+    it('uses courseId prop when provided, ignoring ENV.course.id', () => {
+      ;(global as any).ENV = {course: {id: '999'}}
+
+      const mockFn = useDifferentiationTagCategoriesIndex as any
+      mockFn.mockReturnValue({data: undefined})
+
+      renderComponent({courseId: 123})
+
+      expect(useDifferentiationTagCategoriesIndex).toHaveBeenCalledWith(123, {
+        enabled: true,
+        includeDifferentiationTags: true,
+      })
+    })
+
+    it('handles undefined ENV.course gracefully when courseId prop is not provided', () => {
+      ;(global as any).ENV = {
+        course: undefined,
+      }
+
+      const mockFn = useDifferentiationTagCategoriesIndex as any
+      mockFn.mockReturnValue({data: undefined})
+
+      renderComponent()
+
+      expect(useDifferentiationTagCategoriesIndex).toHaveBeenCalledWith(NaN, {
+        enabled: false,
+        includeDifferentiationTags: true,
+      })
+    })
+
+    it('handles null ENV.course.id gracefully when courseId prop is not provided', () => {
+      ;(global as any).ENV = {
+        course: {id: null},
+      }
+
+      const mockFn = useDifferentiationTagCategoriesIndex as any
+      mockFn.mockReturnValue({data: undefined})
+
+      renderComponent()
+
+      expect(useDifferentiationTagCategoriesIndex).toHaveBeenCalledWith(0, {
+        enabled: true,
+        includeDifferentiationTags: true,
+      })
+    })
+
+    it('handles invalid courseID (NaN) and disables the query', () => {
+      ;(global as any).ENV = {
+        course: {id: 'invalid'},
+      }
+
+      const mockFn = useDifferentiationTagCategoriesIndex as any
+      mockFn.mockReturnValue({data: undefined})
+
+      renderComponent()
+
+      expect(useDifferentiationTagCategoriesIndex).toHaveBeenCalledWith(NaN, {
+        enabled: false,
+        includeDifferentiationTags: true,
+      })
+    })
+
+    it('handles missing ENV gracefully when courseId prop is not provided', () => {
+      ;(global as any).ENV = {}
+
+      const mockFn = useDifferentiationTagCategoriesIndex as any
+      mockFn.mockReturnValue({data: undefined})
+
+      renderComponent()
+
+      expect(useDifferentiationTagCategoriesIndex).toHaveBeenCalledWith(NaN, {
+        enabled: false,
+        includeDifferentiationTags: true,
+      })
+    })
   })
 })

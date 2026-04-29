@@ -23,50 +23,50 @@ import GradingPeriod from '../gradingPeriod'
 import DateHelper from '@canvas/datetime/dateHelper'
 import $ from 'jquery'
 
-jest.mock('jquery', () => {
-  const jQueryMock = jest.fn(selector => ({
-    datepicker: jest.fn(),
-    data: jest.fn(key => {
-      if (key === 'unfudged-date') {
-        return new Date('2015-04-01T00:00:00Z')
-      }
-      if (key === 'invalid') {
-        return false
-      }
-      if (key === 'blank') {
-        return false
-      }
-      return null
-    }),
-    val: jest.fn(),
-    on: jest.fn((event, callback) => {
-      // Store the callback to simulate event triggers
-      if (event === 'change') {
-        jQueryMock.changeCallback = callback
-      }
-    }),
-    trigger: jest.fn(event => {
-      // Call stored callback when event is triggered
-      if (event === 'change' && jQueryMock.changeCallback) {
-        jQueryMock.changeCallback({
-          target: {
-            name: 'startDate',
-            id: 'period_start_date_1',
-          },
-        })
-      }
-    }),
-    find: jest.fn().mockReturnThis(),
-  }))
+vi.mock('jquery', () => ({
+  default: vi.fn(selector => {
+    const mockElement = {
+      datepicker: vi.fn(),
+      data: vi.fn(key => {
+        if (key === 'unfudged-date') {
+          return new Date('2015-04-01T00:00:00Z')
+        }
+        if (key === 'invalid') {
+          return false
+        }
+        if (key === 'blank') {
+          return false
+        }
+        return null
+      }),
+      val: vi.fn(),
+      on: vi.fn(),
+      trigger: vi.fn(),
+      find: vi.fn(() => ({
+        datepicker: vi.fn(),
+        data: vi.fn(),
+        val: vi.fn(),
+        on: vi.fn((event, handler) => {
+          // Store the handler for later use
+          if (event === 'change' && typeof selector !== 'string') {
+            const element = selector
+            if (element && element.addEventListener) {
+              element.addEventListener('change', e => handler.call(element, e))
+            }
+          }
+        }),
+        trigger: vi.fn(),
+        find: vi.fn(),
+      })),
+      flashMessage: vi.fn(),
+      flashError: vi.fn(),
+    }
+    return mockElement
+  }),
+}))
 
-  jQueryMock.flashMessage = jest.fn()
-  jQueryMock.flashError = jest.fn()
-
-  return jQueryMock
-})
-
-jest.mock('@canvas/datetime/jquery/DatetimeField', () => ({
-  renderDatetimeField: jest.fn(),
+vi.mock('@canvas/datetime/jquery/DatetimeField', () => ({
+  renderDatetimeField: vi.fn(),
 }))
 
 describe('GradingPeriod', () => {
@@ -89,15 +89,15 @@ describe('GradingPeriod', () => {
         create: true,
         delete: true,
       },
-      onDeleteGradingPeriod: jest.fn(),
-      updateGradingPeriodCollection: jest.fn(),
+      onDeleteGradingPeriod: vi.fn(),
+      updateGradingPeriodCollection: vi.fn(),
     }
 
     window.ENV = {
       GRADING_PERIODS_URL: 'api/v1/courses/1/grading_periods',
     }
 
-    jest.spyOn(DateHelper, 'formatDatetimeForDisplay').mockImplementation(date => {
+    vi.spyOn(DateHelper, 'formatDatetimeForDisplay').mockImplementation(date => {
       if (!date) return ''
       return date.toLocaleDateString('en-US', {
         month: 'short',
@@ -108,7 +108,7 @@ describe('GradingPeriod', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     delete window.ENV
   })
 
@@ -129,18 +129,8 @@ describe('GradingPeriod', () => {
     renderGradingPeriod()
     const startDateInput = screen.getByRole('textbox', {name: /start date/i})
 
-    // Mock jQuery data return and trigger change
-    const jQueryInstance = $(startDateInput)
-    jQueryInstance.data.mockImplementation(key => {
-      if (key === 'unfudged-date') {
-        return new Date('2015-04-01T00:00:00Z')
-      }
-      return false
-    })
-
-    await userEvent.clear(startDateInput)
-    await userEvent.type(startDateInput, '2015-04-01')
-    jQueryInstance.trigger('change')
+    // Trigger a change event directly on the input
+    fireEvent.change(startDateInput, {target: {name: 'startDate', id: 'period_start_date_1'}})
 
     await waitFor(() => {
       expect(DateHelper.formatDatetimeForDisplay).toHaveBeenCalled()
@@ -151,18 +141,8 @@ describe('GradingPeriod', () => {
     renderGradingPeriod()
     const startDateInput = screen.getByRole('textbox', {name: /start date/i})
 
-    // Mock jQuery data return and trigger change
-    const jQueryInstance = $(startDateInput)
-    jQueryInstance.data.mockImplementation(key => {
-      if (key === 'unfudged-date') {
-        return new Date('2015-04-01T00:00:00Z')
-      }
-      return false
-    })
-
-    await userEvent.clear(startDateInput)
-    await userEvent.type(startDateInput, '2015-04-01')
-    jQueryInstance.trigger('change')
+    // Trigger a change event directly on the input
+    fireEvent.change(startDateInput, {target: {name: 'startDate', id: 'period_start_date_1'}})
 
     await waitFor(() => {
       expect(defaultProps.updateGradingPeriodCollection).toHaveBeenCalled()
@@ -197,22 +177,12 @@ describe('GradingPeriod', () => {
   })
 
   it('replaceInputWithDate calls formatDatetimeForDisplay', async () => {
-    const formatDatetime = jest.spyOn(DateHelper, 'formatDatetimeForDisplay')
+    const formatDatetime = vi.spyOn(DateHelper, 'formatDatetimeForDisplay')
     renderGradingPeriod()
     const startDateInput = screen.getByRole('textbox', {name: /start date/i})
 
-    // Mock jQuery data return and trigger change
-    const jQueryInstance = $(startDateInput)
-    jQueryInstance.data.mockImplementation(key => {
-      if (key === 'unfudged-date') {
-        return new Date('2015-04-01T00:00:00Z')
-      }
-      return false
-    })
-
-    await userEvent.clear(startDateInput)
-    await userEvent.type(startDateInput, '2015-04-01')
-    jQueryInstance.trigger('change')
+    // Trigger a change event directly on the input
+    fireEvent.change(startDateInput, {target: {name: 'startDate', id: 'period_start_date_1'}})
 
     await waitFor(() => {
       expect(formatDatetime).toHaveBeenCalledWith(new Date('2015-04-01T00:00:00Z'))

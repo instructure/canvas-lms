@@ -21,6 +21,7 @@
 module Api::V1::Tab
   include Api::V1::Json
   include Api::V1::ExternalTools::UrlHelpers
+  include NavMenuLinkTabs::HrefHelper
   include NewQuizzesFeaturesHelper
 
   def self.tab_is?(tab, context, const_name)
@@ -38,21 +39,21 @@ module Api::V1::Tab
     hash = {}
     hash[:id] = tab[:css_class]
     hash[:html_url] = html_url(tab, context)
-    hash[:full_url] = html_url(tab, context, true)
+    hash[:full_url] = html_url(tab, context, full_url: true)
     hash[:position] = tab[:position]
     hash[:hidden] = true if tab[:hidden]
     hash[:unused] = true if tab[:hidden_unused]
     hash[:visibility] = visibility(tab, hash)
     hash[:label] = tab[:label]
     hash[:type] = (tab[:external] && "external") || "internal"
-    if tab[:external] && tab[:args] && tab[:args].length > 1
+    if tab[:external] && tab[:args] && tab[:args].length > 1 && !NavMenuLinkTabs.nav_menu_link_tab_id?(tab[:id])
       launch_type = context.is_a?(Account) ? "account_navigation" : "course_navigation"
       hash[:url] = sessionless_launch_url(context, id: tab[:args][1], launch_type:)
     end
     api_json(hash, user, session)
   end
 
-  def html_url(tab, context, full_url = false)
+  def html_url(tab, context, full_url: false)
     if full_url
       method = tab[:href].to_s.sub(/_path$/, "_url").to_sym
       opts = { host: HostUrl.context_host(context, request.try(:host_with_port)) }
@@ -81,9 +82,7 @@ module Api::V1::Tab
   end
 
   def visibility(tab, hash)
-    if hash[:type] == "external" && hash[:hidden]
-      "none"
-    elsif hash[:id] == "settings" || hash[:unused] || hash[:hidden]
+    if hash[:id] == "settings" || hash[:unused] || hash[:hidden]
       "admins"
     else
       tab[:visibility] || "public"

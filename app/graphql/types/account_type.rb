@@ -28,6 +28,7 @@ module Types
     global_id_field :id
 
     field :name, String, null: true
+    field :workflow_state, String, null: false
 
     field :outcome_proficiency, OutcomeProficiencyType, null: true
     def outcome_proficiency
@@ -50,11 +51,26 @@ module Types
       account.resolved_outcome_calculation_method
     end
 
-    field :courses_connection, CourseType.connection_type, null: true
-    def courses_connection
+    field :courses_connection, CourseType.connection_type, null: true do
+      argument :career_learning_library_only,
+               Boolean,
+               "Whether or not to include or exclude Canvas Career learning library only courses",
+               required: false
+    end
+    def courses_connection(career_learning_library_only: nil)
       return unless account.grants_right?(current_user, :read_course_list)
 
-      account.associated_courses
+      courses = account.associated_courses
+
+      if account.root_account.feature_enabled?(:horizon_learning_library_ms2) && !career_learning_library_only.nil?
+        courses = if career_learning_library_only
+                    courses.career_learning_library
+                  else
+                    courses.not_career_learning_library
+                  end
+      end
+
+      courses
     end
 
     field :custom_grade_statuses_connection, CustomGradeStatusType.connection_type, null: true
@@ -94,14 +110,103 @@ module Types
       account.account_chain - [account]
     end
 
-    field :rubrics_connection, RubricType.connection_type, null: true
-    def rubrics_connection
+    field :users_connection, Types::UserType.connection_type, null: true do
+      argument :filter, Types::AccountUsersFilterInputType, required: false
+      argument :sort,   Types::AccountUsersSortInputType,   required: false
+    end
+    def users_connection(filter: {}, sort: {})
+      return unless account.grants_any_right?(current_user, session, :read_roster, :manage_students)
+
+      options = {
+        enrollment_type: filter[:enrollment_types],
+        enrollment_role_id: filter[:enrollment_role_ids],
+        include_deleted_users: filter[:include_deleted_users],
+        temporary_enrollment_recipients: filter[:temporary_enrollment_recipients],
+        temporary_enrollment_providers: filter[:temporary_enrollment_providers],
+        sort: sort[:field],
+        order: sort[:direction],
+      }.compact
+
+      search_term = filter[:search_term].presence
+      if search_term
+        UserSearch.for_user_in_context(search_term, account, current_user, session, options)
+      else
+        UserSearch.scope_for(account, current_user, options)
+      end
+    end
+
+    field :institutional_tag_categories_connection,
+          Types::InstitutionalTagCategoryType.connection_type,
+          null: true do
+      argument :has_tags_in_state, Types::InstitutionalTagWorkflowStateType, required: false
+      argument :search_term, String, required: false
+      argument :workflow_state, Types::InstitutionalTagWorkflowStateType, required: false, default_value: "active"
+    end
+    def institutional_tag_categories_connection(search_term: nil, workflow_state: "active", has_tags_in_state: nil)
+      root_account = account.root_account? ? account : nil
+      return unless root_account
+      raise GraphQL::ExecutionError, "feature flag is disabled" unless root_account.feature_enabled?(:institutional_tags)
+      raise GraphQL::ExecutionError, "not authorized" unless root_account.grants_right?(current_user, session, :manage_institutional_tags_view)
+
+      cats = root_account.institutional_tag_categories
+      cats = cats.where(workflow_state:) unless workflow_state == "any"
+      cats = cats.search_by_name(search_term) if search_term.present?
+
+      if has_tags_in_state.present?
+        matching_category_ids = InstitutionalTag
+                                .where(root_account_id: root_account.id, workflow_state: has_tags_in_state)
+                                .select(:category_id)
+                                .distinct
+
+        cats = if workflow_state == "any"
+                 cats.where(workflow_state: has_tags_in_state).or(cats.where(id: matching_category_ids))
+               else
+                 cats.where(id: matching_category_ids)
+               end
+      end
+
+      cats.order(:name)
+    end
+
+    field :institutional_tags_connection,
+          Types::InstitutionalTagType.connection_type,
+          null: true do
+      argument :category_id,
+               ID,
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("InstitutionalTagCategory")
+      argument :search_term, String, required: false
+      argument :workflow_state, Types::InstitutionalTagWorkflowStateType, required: false, default_value: "active"
+    end
+    def institutional_tags_connection(category_id: nil, search_term: nil, workflow_state: "active")
+      root_account = account.root_account? ? account : nil
+      return unless root_account
+      raise GraphQL::ExecutionError, "feature flag is disabled" unless root_account.feature_enabled?(:institutional_tags)
+      raise GraphQL::ExecutionError, "not authorized" unless root_account.grants_right?(current_user, session, :manage_institutional_tags_view)
+
+      tags = InstitutionalTag.where(root_account_id: root_account.id, workflow_state:)
+      tags = tags.where(category_id:) if category_id.present?
+      tags = tags.search_by_name(search_term) if search_term.present?
+      tags.order(:name)
+    end
+
+    field :rubrics_connection, RubricType.connection_type, null: true do
+      argument :id,
+               ID,
+               "Filter by rubric ID",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Rubric")
+    end
+    def rubrics_connection(id: nil)
       rubric_associations = account.rubric_associations
                                    .bookmarked
                                    .include_rubric
                                    .joins(:rubric)
                                    .where.not(rubrics: { workflow_state: "deleted" })
-                                   .to_a
+
+      rubric_associations = rubric_associations.where(rubric_id: id) if id
+
+      rubric_associations = rubric_associations.to_a
       rubric_associations = Canvas::ICU.collate_by(rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
       rubric_associations.map(&:rubric)
     end

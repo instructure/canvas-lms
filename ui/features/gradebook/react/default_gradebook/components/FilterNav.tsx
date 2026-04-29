@@ -19,7 +19,7 @@
 import React, {useState, useCallback, useRef, type SetStateAction} from 'react'
 import {Link} from '@instructure/ui-link'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
@@ -97,6 +97,8 @@ export default function FilterNav({
         return 'grading-periods'
       case 'student-group':
         return 'student-groups'
+      case 'non-collaborative-group':
+        return 'non-collaborative-groups'
       case 'start-date':
         return 'start-date'
       case 'end-date':

@@ -103,7 +103,7 @@ describe "Groups API", type: :request do
     }
   end
 
-  def membership_json(membership, is_admin = false)
+  def membership_json(membership, is_admin: false)
     json = {
       "id" => membership.id,
       "group_id" => membership.group_id,
@@ -991,7 +991,7 @@ describe "Groups API", type: :request do
 
       @membership = GroupMembership.where(user_id: @to_add, group_id: @group).first
       expect(@membership.workflow_state).to eq "accepted"
-      expect(json).to eq membership_json(@membership, true).merge("just_created" => true)
+      expect(json).to eq membership_json(@membership, is_admin: true).merge("just_created" => true)
     end
 
     it "shows sis_import_id for group" do
@@ -1006,7 +1006,7 @@ describe "Groups API", type: :request do
                         filter_states: ["invited"]
                       })
       expect(json.first["sis_import_id"]).to eq sis_batch.id
-      expect(json.first).to eq membership_json(@community.group_memberships.where(workflow_state: "invited").first, true)
+      expect(json.first).to eq membership_json(@community.group_memberships.where(workflow_state: "invited").first, is_admin: true)
     end
 
     it "allows a user to join a group whose self sign-up is still open" do
@@ -1025,7 +1025,7 @@ describe "Groups API", type: :request do
 
       @membership = GroupMembership.where(user_id: @student, group_id: @group).first
       expect(@membership.workflow_state).to eq "accepted"
-      expect(json).to eq membership_json(@membership, true).merge("just_created" => true)
+      expect(json).to eq membership_json(@membership, is_admin: true).merge("just_created" => true)
     end
 
     it "does not allow a user to join a group whose self sign-up is closed" do
@@ -1047,7 +1047,6 @@ describe "Groups API", type: :request do
 
     it "bulks add users to non collaborative groups" do
       course_with_teacher(active_all: true)
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1063,9 +1062,8 @@ describe "Groups API", type: :request do
       expect(user2.differentiation_tag_memberships.pluck(:group_id)).to include @group.id
     end
 
-    it "calls SLM when assignmnets are assigned to the non-collaborative group" do
+    it "calls SLM when assignments are assigned to the non-collaborative group" do
       course_with_teacher(active_all: true)
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1094,7 +1092,6 @@ describe "Groups API", type: :request do
     describe "POST /api/v1/groups/:group_id/memberships (Differentiation Tag Membership)" do
       before do
         course_with_teacher(active_all: true)
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
         @course.account.reload
@@ -1309,8 +1306,8 @@ describe "Groups API", type: :request do
   end
 
   context "group files" do
-    include_examples "file uploads api with folders"
-    include_examples "file uploads api with quotas"
+    it_behaves_like "file uploads api with folders"
+    it_behaves_like "file uploads api with quotas"
 
     before do
       @user = @member

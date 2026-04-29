@@ -68,7 +68,7 @@ describe('EditableHeading', () => {
   })
 
   it('exits edit mode on <Enter>', () => {
-    const onChangeMode = jest.fn()
+    const onChangeMode = vi.fn()
     const {getByDisplayValue} = render(
       <EditableHeading
         mode="edit"
@@ -85,8 +85,8 @@ describe('EditableHeading', () => {
   })
 
   it('reverts to the old value and exits edit mode on Escape', () => {
-    const onChange = jest.fn()
-    const onChangeMode = jest.fn()
+    const onChange = vi.fn()
+    const onChangeMode = vi.fn()
     const {getByDisplayValue} = render(
       <EditableHeading
         mode="edit"

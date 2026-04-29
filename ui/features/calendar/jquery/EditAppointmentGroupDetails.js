@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import _, {some} from 'lodash'
+import {some} from 'es-toolkit/compat'
 import htmlEscape from '@instructure/html-escape'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import TimeBlockList from './TimeBlockList'
@@ -61,6 +61,7 @@ export default class EditAppointmentGroupDetails {
           pattern="[0-9]"
           name="duration"
           value="30"
+          min="1"
           style="width: 40px"
           aria-label="${htmlEscape(I18n.t('Minutes per slot'))}"
         />`,
@@ -141,8 +142,11 @@ export default class EditAppointmentGroupDetails {
 
     this.form.find('[name="slot_duration"]').change(e => {
       if (this.form.find('[name="autosplit_option"]').is(':checked')) {
-        this.timeBlockList.split(e.target.value)
-        return this.timeBlockList.render()
+        const value = parseFloat(e.target.value)
+        if (value > 0) {
+          this.timeBlockList.split(value)
+          return this.timeBlockList.render()
+        }
       }
     })
 
@@ -400,11 +404,9 @@ export default class EditAppointmentGroupDetails {
       }
       if (sectionCodes.length > 0) {
         const sectionCode = sectionCodes[0]
-        const section = _.chain(this.contexts)
-          .pluck('course_sections')
-          .flatten()
+        const section = this.contexts
+          .flatMap(c => c.course_sections)
           .find(s => s.asset_string === sectionCode)
-          .value()
         text = section.name
         if (sectionCodes.length > 1) {
           text += ` ${I18n.t('and_n_sectionCodes', 'and %{n} others', {
@@ -443,6 +445,15 @@ export default class EditAppointmentGroupDetails {
       contextCodes.every(c => this.contextsHash[c].allow_observers_in_appointment_groups)
     this.allowObserverOption = showObserverSignupCheckbox
     this.form.find('#observer-signup-option').toggle(showObserverSignupCheckbox)
+
+    if (showObserverSignupCheckbox && this.creating()) {
+      const shouldDefaultChecked = contextCodes.some(
+        c => this.contextsHash[c].default_allow_observer_signup,
+      )
+      this.form
+        .find('#observer-signup-option input[type="checkbox"]')
+        .prop('checked', shouldDefaultChecked)
+    }
   }
 
   disableGroups() {

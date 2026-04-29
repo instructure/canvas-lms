@@ -21,7 +21,7 @@ import update from 'immutability-helper'
 import GradingPeriod from './gradingPeriod'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {map, isEmpty, every, find, reject, some} from 'lodash'
+import {map, every, find, reject, some, isEmpty} from 'es-toolkit/compat'
 import {camelizeProperties} from '@canvas/convert-case'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 

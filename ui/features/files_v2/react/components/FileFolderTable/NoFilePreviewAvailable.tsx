@@ -26,8 +26,10 @@ import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {File} from '../../../interfaces/File'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 const I18n = createI18nScope('files_v2')
+const isAccessRestricted = getFilesEnv().userFileAccessRestricted
 
 const NoFilePreviewAvailable = ({item}: {item: File}) => (
   <Flex height="100%" alignItems="center" justifyItems="center" id="file-preview">
@@ -68,11 +70,13 @@ const NoFilePreviewAvailable = ({item}: {item: File}) => (
               )}
             </Flex>
           </Flex.Item>
-          <Flex.Item padding="x-small">
-            <Button renderIcon={<IconDownloadSolid />} href={item.url} id="download-button">
-              {I18n.t('Download')}
-            </Button>
-          </Flex.Item>
+          {!isAccessRestricted && (
+            <Flex.Item padding="x-small">
+              <Button renderIcon={<IconDownloadSolid />} href={item.url} id="download-button">
+                {I18n.t('Download')}
+              </Button>
+            </Flex.Item>
+          )}
         </Flex>
       </View>
     </Flex.Item>

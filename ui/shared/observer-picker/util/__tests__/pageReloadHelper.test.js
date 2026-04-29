@@ -21,8 +21,8 @@ import {reloadWindow} from '@canvas/util/globalUtils'
 import {autoFocusObserverPicker, getHandleChangeObservedUser} from '../pageReloadHelper'
 
 // mock reloadWindow
-jest.mock('@canvas/util/globalUtils', () => ({
-  reloadWindow: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: vi.fn(),
 }))
 
 describe('getHandleChangeObservedUser', () => {
@@ -40,9 +40,9 @@ describe('getHandleChangeObservedUser', () => {
 
       // Mock sessionStorage
       window.sessionStorage = {
-        getItem: jest.fn(),
-        setItem: jest.fn(),
-        removeItem: jest.fn(),
+        getItem: vi.fn(),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
       }
 
       handleChangeObservedUser = getHandleChangeObservedUser()
@@ -50,7 +50,7 @@ describe('getHandleChangeObservedUser', () => {
 
     afterEach(() => {
       window.sessionStorage = oldSessionStorage
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('does not trigger reload on initial call', () => {

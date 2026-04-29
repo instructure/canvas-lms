@@ -18,8 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-class TermsOfService < ActiveRecord::Base
+class TermsOfService < ApplicationRecord
   include Canvas::SoftDeletable
+
   belongs_to :account
   belongs_to :terms_of_service_content
   validates :terms_type, presence: true
@@ -44,14 +45,21 @@ class TermsOfService < ActiveRecord::Base
     terms_type == "custom"
   end
 
-  def self.ensure_terms_for_account(account, is_new_account = false)
+  def self.external_url(account)
+    return nil if Rails.env.test?
+    return nil unless account.terms_of_service&.terms_type =~ /^built_in:(.+)$/
+
+    Setting.get("external_aup_url_for_#{$1}", nil)
+  end
+
+  def self.ensure_terms_for_account(account, is_new_account: false)
     return unless table_exists?
     return if account.dummy?
 
     passive = is_new_account || !(Setting.get("terms_required", "true") == "true" && account.account_terms_required?)
     unique_constraint_retry do |retry_count|
       account.reload_terms_of_service if retry_count > 0
-      account.terms_of_service || account.create_terms_of_service!(term_options_for_account(account).merge(passive:))
+      account.terms_of_service || GuardRail.activate(:primary) { account.create_terms_of_service!(term_options_for_account(account).merge(passive:)) }
     end
   end
 
@@ -73,7 +81,7 @@ class TermsOfService < ActiveRecord::Base
   end
 
   class CacheTermsOfServiceContentOnAssociation < ActiveRecord::Associations::BelongsToAssociation
-    def find_target
+    def find_target(...)
       Shard.default.activate do
         key = ["terms_of_service_content", owner.attribute(reflection.foreign_key)].cache_key
         MultiCache.fetch(key) { super }

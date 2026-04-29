@@ -47,19 +47,19 @@ describe('Gradebook Context Modules', () => {
     })
 
     it('renders the view options menu after storing the context modules', () => {
-      const renderViewOptionsMenuSpy = jest.spyOn(gradebook, 'renderViewOptionsMenu')
+      const renderViewOptionsMenuSpy = vi.spyOn(gradebook, 'renderViewOptionsMenu')
       gradebook.updateContextModules(contextModules)
       expect(renderViewOptionsMenuSpy).toHaveBeenCalledTimes(1)
     })
 
     it('renders filters', () => {
-      const renderFiltersSpy = jest.spyOn(gradebook, 'renderFilters')
+      const renderFiltersSpy = vi.spyOn(gradebook, 'renderFilters')
       gradebook.updateContextModules(contextModules)
       expect(renderFiltersSpy).toHaveBeenCalledTimes(1)
     })
 
     it('renders filters after storing the context modules', () => {
-      const renderFiltersSpy = jest.spyOn(gradebook, 'renderFilters').mockImplementation(() => {
+      const renderFiltersSpy = vi.spyOn(gradebook, 'renderFilters').mockImplementation(() => {
         const storedModules = gradebook.courseContent.contextModules
         expect(storedModules).toHaveLength(2)
       })
@@ -68,14 +68,14 @@ describe('Gradebook Context Modules', () => {
     })
 
     it('updates essential data load status', () => {
-      const updateEssentialDataSpy = jest.spyOn(gradebook, '_updateEssentialDataLoaded')
+      const updateEssentialDataSpy = vi.spyOn(gradebook, '_updateEssentialDataLoaded')
       gradebook.updateContextModules(contextModules)
       expect(updateEssentialDataSpy).toHaveBeenCalledTimes(1)
     })
 
     it('updates essential data load status after rendering filters', () => {
-      const renderFiltersSpy = jest.spyOn(gradebook, 'renderFilters')
-      const updateEssentialDataSpy = jest.spyOn(gradebook, '_updateEssentialDataLoaded')
+      const renderFiltersSpy = vi.spyOn(gradebook, 'renderFilters')
+      const updateEssentialDataSpy = vi.spyOn(gradebook, '_updateEssentialDataLoaded')
       gradebook.updateContextModules(contextModules)
       expect(renderFiltersSpy).toHaveBeenCalled()
       expect(updateEssentialDataSpy).toHaveBeenCalled()

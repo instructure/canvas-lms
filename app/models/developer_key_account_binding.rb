@@ -20,6 +20,7 @@
 
 class DeveloperKeyAccountBinding < ApplicationRecord
   include Workflow
+
   workflow do
     state :off
     state :on
@@ -166,7 +167,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   end
 
   def update_tools!
-    if disable_tools?
+    if disable_tools? || delete_tools?
       developer_key.disable_external_tools!(account)
     elsif enable_tools?
       developer_key.enable_external_tools!(account)
@@ -185,6 +186,10 @@ class DeveloperKeyAccountBinding < ApplicationRecord
 
   def restore_tools?
     saved_change_to_workflow_state? && allowed?
+  end
+
+  def delete_tools?
+    saved_change_to_workflow_state? && deleted?
   end
 
   def clear_cache_if_site_admin

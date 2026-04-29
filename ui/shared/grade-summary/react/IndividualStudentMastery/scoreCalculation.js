@@ -17,12 +17,11 @@
  */
 
 const scoreFromPercent = (percent, outcome, pointsPossibleFromOutcomeRatingsFromRubric) => {
-  const points_possible = (
-    typeof pointsPossibleFromOutcomeRatingsFromRubric === 'number'
-    && pointsPossibleFromOutcomeRatingsFromRubric > 0
-  )
-  ? pointsPossibleFromOutcomeRatingsFromRubric
-  : outcome.points_possible
+  const points_possible =
+    typeof pointsPossibleFromOutcomeRatingsFromRubric === 'number' &&
+    pointsPossibleFromOutcomeRatingsFromRubric > 0
+      ? pointsPossibleFromOutcomeRatingsFromRubric
+      : outcome.points_possible
 
   if (points_possible > 0) {
     return +(percent * points_possible).toFixed(2)
@@ -33,12 +32,11 @@ const scoreFromPercent = (percent, outcome, pointsPossibleFromOutcomeRatingsFrom
 
 const scaleScore = (score, possible, outcome, pointsPossibleFromOutcomeRatingsFromRubric) => {
   if (!possible) return score
-  const points_possible = (
-    typeof pointsPossibleFromOutcomeRatingsFromRubric === 'number'
-    && pointsPossibleFromOutcomeRatingsFromRubric > 0
-  )
-  ? pointsPossibleFromOutcomeRatingsFromRubric
-  : outcome.points_possible
+  const points_possible =
+    typeof pointsPossibleFromOutcomeRatingsFromRubric === 'number' &&
+    pointsPossibleFromOutcomeRatingsFromRubric > 0
+      ? pointsPossibleFromOutcomeRatingsFromRubric
+      : outcome.points_possible
 
   if (points_possible > 0) {
     return +((score / possible) * points_possible).toFixed(2)
@@ -47,7 +45,4 @@ const scaleScore = (score, possible, outcome, pointsPossibleFromOutcomeRatingsFr
   }
 }
 
-export {
-  scoreFromPercent,
-  scaleScore,
-}
+export {scoreFromPercent, scaleScore}

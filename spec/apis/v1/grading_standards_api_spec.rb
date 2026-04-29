@@ -283,6 +283,77 @@ describe GradingStandardsApiController, type: :request do
       end
     end
 
+    describe "#update" do
+      let(:account_update_params) do
+        account_resources_params.merge({
+                                         action: "update",
+                                         grading_standard_id: account_standard.id
+                                       })
+      end
+      let(:course_update_params) do
+        course_resources_params.merge({
+                                        action: "update",
+                                        grading_standard_id: course_standard.id
+                                      })
+      end
+
+      it "updates an account grading standard title" do
+        params = account_update_params.merge({ title: "Updated Account Title" })
+        res = api_call(:put, account_resource_path, params)
+        expect(res["id"]).to eq account_standard.id
+        expect(res["title"]).to eq "Updated Account Title"
+        expect(res["context_type"]).to eq "Account"
+      end
+
+      it "updates account grading standard data and settings when unused" do
+        new_scheme = [{ name: "A", value: 88 }, { name: "F", value: 0 }]
+        params = account_update_params.merge({
+                                               title: "New Account Title",
+                                               grading_scheme_entry: new_scheme,
+                                               points_based: true,
+                                               scaling_factor: 5.0
+                                             })
+        res = api_call(:put, account_resource_path, params)
+        expect(res["id"]).to eq account_standard.id
+        expect(res["title"]).to eq "New Account Title"
+        expect(res["points_based"]).to be true
+        expect(res["scaling_factor"]).to eq 5.0
+        expect(res["grading_scheme"].length).to eq 2
+      end
+
+      it "prevents modification of data for used account grading standards" do
+        account.update!(grading_standard: account_standard)
+
+        new_scheme = [{ name: "A", value: 85 }, { name: "F", value: 0 }]
+        params = account_update_params.merge({
+                                               grading_scheme_entry: new_scheme
+                                             })
+        api_call(:put, account_resource_path, params, {}, {}, { expected_status: 400 })
+      end
+
+      it "allows title updates for used account grading standards" do
+        account.update!(grading_standard: account_standard)
+
+        params = account_update_params.merge({ title: "Updated Used Account Standard" })
+        res = api_call(:put, account_resource_path, params)
+        expect(res["id"]).to eq account_standard.id
+        expect(res["title"]).to eq "Updated Used Account Standard"
+      end
+
+      it "updates a course grading standard" do
+        params = course_update_params.merge({ title: "Updated Course Title" })
+        res = api_call(:put, course_resource_path, params)
+        expect(res["id"]).to eq course_standard.id
+        expect(res["title"]).to eq "Updated Course Title"
+        expect(res["context_type"]).to eq "Course"
+      end
+
+      it "returns a 404 if the grading standard does not exist" do
+        invalid_params = account_update_params.merge({ grading_standard_id: "999" })
+        api_call(:put, "#{account_resources_path}/999", invalid_params, {}, {}, { expected_status: 404 })
+      end
+    end
+
     describe "#destroy" do
       it "deletes an account grading standard" do
         standard_id = account_standard.id
@@ -351,6 +422,115 @@ describe GradingStandardsApiController, type: :request do
         expect(res["context_type"]).to eq "Course"
         expect(res["context_id"]).to eq course.id
         expect(res["id"]).to eq course_standard.id
+      end
+    end
+
+    describe "#update" do
+      let(:account_update_params) do
+        account_resources_params.merge({
+                                         action: "update",
+                                         grading_standard_id: account_standard.id
+                                       })
+      end
+      let(:course_update_params) do
+        course_resources_params.merge({
+                                        action: "update",
+                                        grading_standard_id: course_standard.id
+                                      })
+      end
+
+      it "returns forbidden for account grading standards" do
+        api_call(:put, account_resource_path, account_update_params, {}, {}, { expected_status: 403 })
+      end
+
+      it "updates course grading standard title" do
+        params = course_update_params.merge({ title: "Updated Title" })
+        res = api_call(:put, course_resource_path, params)
+        expect(res["id"]).to eq course_standard.id
+        expect(res["title"]).to eq "Updated Title"
+        expect(res["context_type"]).to eq "Course"
+      end
+
+      it "updates unused grading standard data and settings" do
+        new_scheme = [{ name: "A", value: 90 }, { name: "F", value: 0 }]
+        params = course_update_params.merge({
+                                              title: "New Title",
+                                              grading_scheme_entry: new_scheme,
+                                              points_based: true,
+                                              scaling_factor: 4.0
+                                            })
+        res = api_call(:put, course_resource_path, params)
+        expect(res["id"]).to eq course_standard.id
+        expect(res["title"]).to eq "New Title"
+        expect(res["points_based"]).to be true
+        expect(res["scaling_factor"]).to eq 4.0
+        expect(res["grading_scheme"].length).to eq 2
+      end
+
+      it "prevents modification of data for used grading standards" do
+        assignment = course.assignments.create!(
+          title: "Test Assignment",
+          grading_type: "letter_grade",
+          grading_standard: course_standard,
+          points_possible: 100
+        )
+        student = course.enroll_student(User.create!).user
+        assignment.grade_student(student, grade: "A", grader: @user)
+
+        new_scheme = [{ name: "A", value: 85 }, { name: "F", value: 0 }]
+        params = course_update_params.merge({
+                                              grading_scheme_entry: new_scheme
+                                            })
+        api_call(:put, course_resource_path, params, {}, {}, { expected_status: 400 })
+      end
+
+      it "prevents modification of points_based for used grading standards" do
+        assignment = course.assignments.create!(
+          title: "Test Assignment",
+          grading_type: "letter_grade",
+          grading_standard: course_standard,
+          points_possible: 100
+        )
+        student = course.enroll_student(User.create!).user
+        assignment.grade_student(student, grade: "A", grader: @user)
+
+        params = course_update_params.merge({ points_based: true })
+        api_call(:put, course_resource_path, params, {}, {}, { expected_status: 400 })
+      end
+
+      it "prevents modification of scaling_factor for used grading standards" do
+        assignment = course.assignments.create!(
+          title: "Test Assignment",
+          grading_type: "letter_grade",
+          grading_standard: course_standard,
+          points_possible: 100
+        )
+        student = course.enroll_student(User.create!).user
+        assignment.grade_student(student, grade: "A", grader: @user)
+
+        params = course_update_params.merge({ scaling_factor: 4.0 })
+        api_call(:put, course_resource_path, params, {}, {}, { expected_status: 400 })
+      end
+
+      it "allows title updates for used grading standards" do
+        assignment = course.assignments.create!(
+          title: "Test Assignment",
+          grading_type: "letter_grade",
+          grading_standard: course_standard,
+          points_possible: 100
+        )
+        student = course.enroll_student(User.create!).user
+        assignment.grade_student(student, grade: "A", grader: @user)
+
+        params = course_update_params.merge({ title: "Updated Used Standard" })
+        res = api_call(:put, course_resource_path, params)
+        expect(res["id"]).to eq course_standard.id
+        expect(res["title"]).to eq "Updated Used Standard"
+      end
+
+      it "returns a 404 if the grading standard does not exist" do
+        invalid_params = course_update_params.merge({ grading_standard_id: "999" })
+        api_call(:put, "#{course_resources_path}/999", invalid_params, {}, {}, { expected_status: 404 })
       end
     end
 

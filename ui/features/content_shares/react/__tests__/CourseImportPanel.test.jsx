@@ -27,8 +27,8 @@ import useModuleCourseSearchApi, {
 import CourseImportPanel from '../CourseImportPanel'
 import {mockShare} from './test-utils'
 
-jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
-jest.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
+vi.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
+vi.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
 
 const server = setupServer()
 
@@ -49,7 +49,7 @@ describe('CourseImportPanel', () => {
   })
 
   beforeEach(() => {
-    useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
+    vi.mocked(useManagedCourseSearchApi).mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', name: 'abc'},
         {id: 'cde', name: 'cde'},
@@ -59,6 +59,7 @@ describe('CourseImportPanel', () => {
 
   afterEach(() => {
     server.resetHandlers()
+    vi.clearAllMocks()
   })
 
   it('does not include concluded courses', () => {
@@ -107,7 +108,7 @@ describe('CourseImportPanel', () => {
 
   it('starts an import operation and reports status', async () => {
     const share = mockShare()
-    const onImport = jest.fn()
+    const onImport = vi.fn()
     let capturedRequest = null
     server.use(
       http.post('/api/v1/courses/abc/content_migrations', async ({request}) => {
@@ -118,7 +119,7 @@ describe('CourseImportPanel', () => {
         })
       }),
     )
-    useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
+    vi.mocked(useModuleCourseSearchApi).mockImplementationOnce(({success}) => {
       success([
         {id: '1', name: 'Module 1'},
         {id: '2', name: 'Module 2'},
@@ -152,7 +153,7 @@ describe('CourseImportPanel', () => {
 
   it('deletes the module and removes the position selector when a new course is selected', () => {
     const share = mockShare()
-    useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
+    vi.mocked(useModuleCourseSearchApi).mockImplementationOnce(({success}) => {
       success([
         {id: '1', name: 'Module 1'},
         {id: '2', name: 'Module 2'},
@@ -167,10 +168,10 @@ describe('CourseImportPanel', () => {
     fireEvent.click(getByText(/select a module/i))
     fireEvent.click(getByText(/Module 1/))
     expect(getByText(/Place/)).toBeInTheDocument()
-    useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
+    vi.mocked(useManagedCourseSearchApi).mockImplementationOnce(({success}) => {
       success([{id: 'ghi', name: 'foo'}])
     })
-    useCourseModuleItemApi.mockClear()
+    vi.mocked(useCourseModuleItemApi).mockClear()
     const input = getByLabelText(/select a course/i)
     fireEvent.change(input, {target: {value: 'f'}})
     fireEvent.click(getByText('foo'))
@@ -179,12 +180,14 @@ describe('CourseImportPanel', () => {
   })
 
   describe('errors', () => {
+    let consoleErrorSpy
+
     beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation()
+      consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation()
     })
 
     afterEach(() => {
-      console.error.mockRestore()
+      consoleErrorSpy.mockRestore()
     })
 
     it('reports an error if the fetch fails', async () => {
@@ -196,7 +199,7 @@ describe('CourseImportPanel', () => {
         http.get('/api/v1/courses/abc/modules', () => HttpResponse.json([])),
       )
       const share = mockShare()
-      const onImport = jest.fn()
+      const onImport = vi.fn()
       const {getByText, getByLabelText, queryByText} = render(
         <CourseImportPanel contentShare={share} onImport={onImport} />,
       )

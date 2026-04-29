@@ -28,16 +28,16 @@ const defaultProps = {
   contextId: '1',
   contextType: 'course',
   currentFolder: new BBFolderWrapper(FAKE_COURSE_FOLDER),
-  onClose: jest.fn(),
+  onClose: vi.fn(),
   fileDropHeight: '100%',
-  handleFileDropRef: jest.fn(),
+  handleFileDropRef: vi.fn(),
 }
 
 const renderComponent = (props = {}) => render(<FileUploadDrop {...defaultProps} {...props} />)
 
 describe('FileUploadDrop', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders drop area', () => {
@@ -48,7 +48,7 @@ describe('FileUploadDrop', () => {
 
   it('calls onClose when file is dropped', () => {
     const files = [new File(['foo'], 'foo.txt', {type: 'text/plain'})]
-    const onClose = jest.fn()
+    const onClose = vi.fn()
 
     renderComponent({onClose})
     const dropArea = screen.getByTestId('file-upload-drop')
@@ -63,9 +63,9 @@ describe('FileUploadDrop', () => {
 
   // --- queueOptionsCollectionUploads unit tests ---
   describe('queueOptionsCollectionUploads', () => {
-    let mockOnClose: jest.Mock
-    let mockQueueUploads: jest.SpyInstance
-    let mockHasNewOptions: jest.SpyInstance
+    let mockOnClose: any
+    let mockQueueUploads: any
+    let mockHasNewOptions: any
 
     const defaultFileOptions = {
       resolvedNames: [
@@ -81,15 +81,15 @@ describe('FileUploadDrop', () => {
     }
 
     beforeEach(() => {
-      mockOnClose = jest.fn()
-      mockQueueUploads = jest
+      mockOnClose = vi.fn()
+      mockQueueUploads = vi
         .spyOn(FileOptionsCollection, 'queueUploads')
-        .mockImplementation(jest.fn())
-      mockHasNewOptions = jest.spyOn(FileOptionsCollection, 'hasNewOptions')
+        .mockImplementation(vi.fn())
+      mockHasNewOptions = vi.spyOn(FileOptionsCollection, 'hasNewOptions')
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     it('does nothing if fileOptions is null', () => {

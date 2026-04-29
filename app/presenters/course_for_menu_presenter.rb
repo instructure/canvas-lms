@@ -62,7 +62,7 @@ class CourseForMenuPresenter
       canReadAnnouncements: course.grants_right?(@user, :read_announcements),
       image: course.image,
       color: course.elementary_enabled? ? course.course_color : nil,
-      position: position.present? ? position.to_i : nil,
+      position: position.presence&.to_i,
       published: course.published?
     }.tap do |hash|
       if @opts[:tabs]
@@ -76,6 +76,7 @@ class CourseForMenuPresenter
                                        include_external: false,
                                        include_hidden_unused: false,
                                      })
+        tabs = tabs.reject { |tab| tab[:id] == Course::TAB_YOUTUBE_MIGRATION }
         hash[:links] = tabs.map do |tab|
           presenter = SectionTabPresenter.new(tab, course)
           presenter.to_h

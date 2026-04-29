@@ -75,12 +75,6 @@ blueprint_line_item_support:
   description: Allows blueprint courses to keep track of assignment's resource id changes.
   applies_to: SiteAdmin
 
-content_migration_asset_map_v2:
-  state: hidden
-  display_name: Content Migration Asset Map v2
-  description: Adds Additional Fields to the Content Migration Asset Map
-  applies_to: SiteAdmin
-
 instui_for_import_page:
   state: hidden
   display_name: Use InstUI for the course import page
@@ -192,12 +186,19 @@ modules_page_rewrite_student_view:
     If enabled, the modules page will use the new modules page rewrite on student view.
   applies_to: Course
 
-create_wiki_page_mastery_path_overrides:
+module_external_url_seamless_redirect:
   state: hidden
-  display_name: In MasteryPaths Create AssignmentOverrides on WikiPages Instead of Creating a Hidden Assignment
+  display_name: Seamless External URL Redirect for Modules
   description: |-
-    In Mastery Paths create AssignmentOverrides directly onto WikiPages instead of creating a hidden Assignment.
+    When enabled, external URL module items set to "Load in New Tab" will open
+    seamlessly in a new tab. The Canvas intermediate page (which tracks progression)
+    will automatically redirect to the external URL using native browser navigation.
   applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed
+    ci:
+      state: allowed
 
 create_external_apps_side_tray_overrides:
   state: hidden
@@ -245,9 +246,103 @@ blueprint_support_sync_for_folder_movement_to_root_folder:
     development:
       state: allowed_on
 
+syllabus_versioning:
+  state: hidden
+  display_name: Course Syllabus Versioning
+  description: |-
+    Enables full version history tracking for course syllabus content using SimplyVersioned.
+    Provides complete audit trail, recovery capabilities, and API access for syllabus changes.
+    Includes UI for viewing version history and reverting to previous versions.
+  applies_to: Account
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+planner_submittable_completion_filter:
+  state: hidden
+  display_name: Planner Submittable Completion Filter
+  description: |-
+    When enabled, the planner's complete/incomplete filters will correctly
+    account for graded quizzes, graded discussions, and wiki page assignments
+    whose completion state is tracked via a planner override on the submittable
+    object rather than the assignment directly.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
 widget_dashboard:
   state: hidden
-  display_name: Widget Dashboard
+  display_name: Customizable Dashboard for Learners
   description: |-
     When enabled, this allows learners to add, remove, and rearrange dashboard widgets.
   applies_to: RootAccount
+
+widget_dashboard_dark_mode:
+  state: hidden
+  display_name: Widget Dashboard Dark Mode
+  description: |-
+    When enabled, users can toggle a dark color theme for the widget dashboard.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+platform_ui_unified_widgets_dashboard:
+  state: hidden
+  display_name: Platform UI - Unified Widgets Dashboard
+  description: Use dashboard imported from Platform UI.
+  applies_to: SiteAdmin
+
+study_assist:
+  state: hidden
+  root_opt_in: true
+  applies_to: Course
+  visible_on: tier_1_visible_on_hook
+  display_name: IgniteAI Study Tools
+  description: |-
+    Enables IgniteAI Study Tools for courses. When enabled, students can
+    access AI-powered study tools within their course. Root account
+    administrators must enable this feature before subaccounts or courses
+    can use it.
+
+study_assist_summarize:
+  state: allowed_on
+  applies_to: Course
+  visible_on: study_assist_visible_on_hook
+  display_name: IgniteAI Study Tools - Summarize
+  description: |-
+    Enables the Summarize tool in IgniteAI Study Tools.
+    When disabled, students will not see the Summarize option.
+
+study_assist_quiz_me:
+  state: allowed_on
+  applies_to: Course
+  visible_on: study_assist_visible_on_hook
+  display_name: IgniteAI Study Tools - Quiz Me
+  description: |-
+    Enables the Quiz Me tool in IgniteAI Study Tools.
+    When disabled, students will not see the Quiz Me option.
+
+study_assist_flashcards:
+  state: allowed_on
+  applies_to: Course
+  visible_on: study_assist_visible_on_hook
+  display_name: IgniteAI Study Tools - Flashcards
+  description: |-
+    Enables the Flashcards tool in IgniteAI Study Tools.
+    When disabled, students will not see the Flashcards option.
+
+notebook:
+  state: hidden
+  applies_to: Account
+  display_name: Notebook
+  description: |-
+    Enables the Notebook feature. When enabled, students can
+    highlight text on wiki pages and take notes.

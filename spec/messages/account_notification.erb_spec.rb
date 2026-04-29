@@ -28,7 +28,7 @@ describe "account_notification" do
   let(:notification_name) { :account_notification }
   let(:asset) { @announcement }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   describe ".email" do
     let(:path_type) { :email }

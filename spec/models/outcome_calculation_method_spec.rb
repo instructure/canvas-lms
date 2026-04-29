@@ -137,4 +137,61 @@ describe OutcomeCalculationMethod do
       OutcomeProficiency.find_or_create_default!(account)
     end
   end
+
+  describe "rollup calculation integration" do
+    let_once(:course) { course_model(account:) }
+
+    describe "#rollup_relevant_changes?" do
+      it "returns true when calculation_method changes" do
+        method = OutcomeCalculationMethod.create!(context: course, calculation_method: "highest")
+        method.update!(calculation_method: "latest")
+        expect(method.rollup_relevant_changes?).to be true
+      end
+
+      it "returns true when calculation_int changes" do
+        method = OutcomeCalculationMethod.create!(context: course, calculation_method: "decaying_average", calculation_int: 65)
+        method.update!(calculation_int: 75)
+        expect(method.rollup_relevant_changes?).to be true
+      end
+
+      it "returns false when other fields change" do
+        method = OutcomeCalculationMethod.create!(context: course, calculation_method: "highest")
+        method.update!(workflow_state: "deleted")
+        expect(method.rollup_relevant_changes?).to be false
+      end
+    end
+
+    describe "#rollup_calculation" do
+      context "with course context" do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+        end
+
+        it "enqueues rollup calculation for the course" do
+          method = OutcomeCalculationMethod.create!(context: course, calculation_method: "highest")
+          expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+            .with(course_id: course.id)
+
+          method.update!(calculation_method: "latest")
+        end
+
+        it "does not enqueue rollup when non-relevant fields change" do
+          method = OutcomeCalculationMethod.create!(context: course, calculation_method: "highest")
+          expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+          method.update!(workflow_state: "deleted")
+        end
+      end
+
+      context "with account context" do
+        it "does not enqueue rollup calculation for account-level changes" do
+          method = OutcomeCalculationMethod.create!(context: account, calculation_method: "highest")
+
+          expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+          method.update!(calculation_method: "latest")
+        end
+      end
+    end
+  end
 end

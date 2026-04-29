@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../../../spec_helper"
-
 describe Canvas::Migration::ExternalContent::Migrator do
   before :once do
     course_with_teacher(active_all: true)
@@ -65,7 +63,7 @@ describe Canvas::Migration::ExternalContent::Migrator do
 
         it "should skip the regular workflow" do
           expect(migrator).to receive(:should_load_new_quizzes_export?).and_return(true)
-          expect(QuizzesNext::ExportService).to_not receive(:begin_export)
+          expect(QuizzesNext::ExportService).not_to receive(:begin_export)
 
           migrator.begin_exports(@course, @ce, selective: true, exported_assets: @ce.exported_assets.to_a)
         end

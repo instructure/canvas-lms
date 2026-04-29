@@ -19,18 +19,21 @@
 import {render, waitFor} from '@testing-library/react'
 import SubaccountItem from '../SubaccountItem'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 const account = {id: '1', name: 'Account_Name', sub_account_count: 3, course_count: 1}
 
 const props = {
   account,
   depth: 0,
-  onAdd: jest.fn(),
-  onEditSaved: jest.fn(),
-  onDelete: jest.fn(),
-  onExpand: jest.fn(),
-  onCollapse: jest.fn(),
+  onAdd: vi.fn(),
+  onEditSaved: vi.fn(),
+  onDelete: vi.fn(),
+  onExpand: vi.fn(),
+  onCollapse: vi.fn(),
   isExpanded: true,
   canDelete: true,
   show: true,
@@ -38,9 +41,12 @@ const props = {
 }
 
 describe('SubaccountItem', () => {
+  beforeAll(() => server.listen())
   afterEach(() => {
-    jest.resetAllMocks()
+    server.resetHandlers()
+    vi.resetAllMocks()
   })
+  afterAll(() => server.close())
 
   it('renders name and all buttons', () => {
     const {getByText, getByTestId} = render(<SubaccountItem {...props} />)
@@ -66,7 +72,7 @@ describe('SubaccountItem', () => {
   })
 
   it('swaps to expand button when collapsed', async () => {
-    const onExpand = jest.fn()
+    const onExpand = vi.fn()
     const user = userEvent.setup()
     const {queryByTestId, getByTestId} = render(
       <SubaccountItem {...props} isExpanded={false} onExpand={onExpand} />,
@@ -80,9 +86,9 @@ describe('SubaccountItem', () => {
   })
 
   it('triggers callbacks for each respective icon button', async () => {
-    const onAdd = jest.fn()
-    const onDelete = jest.fn()
-    const onCollapse = jest.fn()
+    const onAdd = vi.fn()
+    const onDelete = vi.fn()
+    const onCollapse = vi.fn()
     const user = userEvent.setup()
     const {getByTestId} = render(
       <SubaccountItem {...props} onAdd={onAdd} onDelete={onDelete} onCollapse={onCollapse} />,
@@ -99,10 +105,15 @@ describe('SubaccountItem', () => {
   })
 
   it('renders a form when editing and triggers callback on save', async () => {
-    const onEditSaved = jest.fn()
+    const onEditSaved = vi.fn()
     const user = userEvent.setup()
-    const updatePath = `/accounts/${account.id}`
-    fetchMock.put(updatePath, {account})
+    let requestCalled = false
+    server.use(
+      http.put(`/accounts/${account.id}`, () => {
+        requestCalled = true
+        return HttpResponse.json({account})
+      }),
+    )
     const {queryByTestId, getByTestId} = render(
       <SubaccountItem {...props} onEditSaved={onEditSaved} />,
     )
@@ -117,7 +128,7 @@ describe('SubaccountItem', () => {
     await user.click(getByTestId('save-button'))
     await waitFor(() => {
       expect(onEditSaved).toBeCalledTimes(1)
-      expect(fetchMock.called(updatePath, 'PUT')).toBeTruthy()
+      expect(requestCalled).toBe(true)
     })
   })
 })

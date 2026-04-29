@@ -101,7 +101,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[7.0]
     SQL
 
     # create the insert trigger
-    execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+    execute(<<~SQL)
       CREATE FUNCTION #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")} () RETURNS trigger AS $$
       BEGIN
         IF NEW.strand IS NOT NULL THEN
@@ -128,7 +128,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[7.0]
     execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{connection.quote_table_name(Delayed::Job.table_name)} FOR EACH ROW WHEN (NEW.strand IS NOT NULL OR NEW.singleton IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
 
     # create the delete trigger
-    execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+    execute(<<~SQL)
       CREATE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
       DECLARE
         next_strand varchar;

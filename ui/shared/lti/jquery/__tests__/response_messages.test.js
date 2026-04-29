@@ -19,7 +19,7 @@
 import buildResponseMessages from '../response_messages'
 
 describe('response_messages', () => {
-  const postMessageMock = jest.fn()
+  const postMessageMock = vi.fn()
   let params
   let builder
 
@@ -77,7 +77,7 @@ describe('response_messages', () => {
     describe('when targetWindow does not exist', () => {
       beforeEach(() => {
         resetBuilder({targetWindow: null})
-        jest.spyOn(console, 'error').mockImplementation()
+        vi.spyOn(console, 'error').mockImplementation()
       })
 
       afterEach(() => {

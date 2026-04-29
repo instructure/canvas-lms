@@ -124,6 +124,9 @@
 #     }
 #
 class ContextModulesApiController < ApplicationController
+  include HorizonMode
+
+  allow_public_horizon_access :index, :show
   before_action :require_context
   before_action :find_student, only: [:index, :show]
   include Api::V1::ContextModule
@@ -186,6 +189,7 @@ class ContextModulesApiController < ApplicationController
 
       opts[:can_view_published] = @context.grants_right?(@student || @current_user, session, :read_as_admin)
       opts[:can_have_estimated_time] = @context.horizon_course?
+      opts[:can_have_requirement_count] = @context.requirement_count_api_enabled?
       render json: modules_and_progressions.filter_map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }
     end
   end
@@ -224,6 +228,7 @@ class ContextModulesApiController < ApplicationController
 
       opts = { can_view_published: @context.grants_right?(@current_user, session, :read_as_admin) }
       opts[:can_have_estimated_time] = @context.horizon_course?
+      opts[:can_have_requirement_count] = @context.requirement_count_api_enabled?
       render json: module_json(mod, @student || @current_user, session, prog, includes, opts)
     end
   end
@@ -234,7 +239,7 @@ class ContextModulesApiController < ApplicationController
       return render json: { error: "unable to find module to duplicate" }, status: :bad_request unless old_module
       return render json: { error: "cannot duplicate this module" }, status: :bad_request unless old_module.can_be_duplicated?
 
-      new_module = old_module.duplicate
+      new_module = old_module.duplicate({ user: @current_user })
       new_module.save!
       new_module.insert_at(old_module.position + 1)
       if new_module
@@ -358,6 +363,9 @@ class ContextModulesApiController < ApplicationController
 
       @module = @context.context_modules.build(module_parameters)
 
+      if @context.requirement_count_api_enabled? && params[:module][:requirement_count]
+        @module.requirement_count = params[:module][:requirement_count]
+      end
       if (ids = params[:module][:prerequisite_module_ids])
         @module.prerequisites = ids.map { |id| "module_#{id}" }.join(",")
       end
@@ -417,6 +425,9 @@ class ContextModulesApiController < ApplicationController
 
       module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
+      if @context.requirement_count_api_enabled? && params[:module][:requirement_count]
+        @module.requirement_count = params[:module][:requirement_count]
+      end
       if (ids = params[:module][:prerequisite_module_ids])
         module_parameters[:prerequisites] = if ids.blank?
                                               []
@@ -429,13 +440,21 @@ class ContextModulesApiController < ApplicationController
         if value_to_boolean(params[:module][:published])
           @module.publish
           unless value_to_boolean(params[:module][:skip_content_tags])
-            @module.publish_items!
-            publish_warning = @module.content_tags.any?(&:unpublished?)
+            @module.publish_items!(user: @current_user)
+            tags = @module.content_tags.reload
+            ActiveRecord::Associations.preload(tags, :content)
+            attachment_contents = tags.select { |t| t.content_type == "Attachment" }.filter_map(&:content)
+            ActiveRecord::Associations.preload(attachment_contents, [:folder, :usage_rights])
+            tag_reasons = tags.map { |tag| [tag, publish_failure_reason(tag)] }
+            warning_tag_reasons = tag_reasons.select { |tag, reason| tag.unpublished? || reason != "unknown" }
+            publish_warning = warning_tag_reasons.any?
+            publish_warning_items = warning_tag_reasons.map { |tag, reason| { id: tag.id, title: tag.title, reason: } }
           end
         else
           @module.unpublish
           unless value_to_boolean(params[:module][:skip_content_tags])
-            @module.unpublish_items!
+            @module.unpublish_items!(user: @current_user)
+            unpublish_warning = @module.content_tags.any?(&:published?)
           end
         end
       end
@@ -445,6 +464,8 @@ class ContextModulesApiController < ApplicationController
         json = module_json(@module, @current_user, session, nil)
         json["relock_warning"] = true if relock_warning || @module.relock_warning?
         json["publish_warning"] = publish_warning.present?
+        json["publish_warning_items"] = publish_warning_items if publish_warning_items.present?
+        json["unpublish_warning"] = unpublish_warning.present?
         render json:
       else
         render json: @module.errors, status: :bad_request
@@ -524,4 +545,25 @@ class ContextModulesApiController < ApplicationController
     end
   end
   protected :find_student
+
+  def publish_failure_reason(tag)
+    if tag.content_type == "Attachment"
+      attachment = tag.content
+      return "unknown" unless attachment
+
+      if attachment.folder&.hidden?
+        "file_in_hidden_folder"
+      elsif attachment.context.respond_to?(:usage_rights_required?) &&
+            attachment.context.usage_rights_required? &&
+            attachment.usage_rights.nil?
+        "usage_rights_required"
+      else
+        "unknown"
+      end
+    else
+      content = tag.content
+      (content.respond_to?(:can_publish?) && !content.can_publish?) ? "unpublishable" : "unknown"
+    end
+  end
+  private :publish_failure_reason
 end

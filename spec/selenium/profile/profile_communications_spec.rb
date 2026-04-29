@@ -30,8 +30,8 @@ describe "profile communication settings" do
     @sub_comment = Notification.create(name: "Submission Comment1", category: "Submission Comment")
   end
 
-  let(:sns_response) { double(data: { endpointarn: "endpointarn" }) }
-  let(:sns_client) { double(create_platform_endpoint: sns_response) }
+  let(:sns_response) { instance_double(Aws::SNS::Types::CreateEndpointResponse, data: { endpointarn: "endpointarn" }) }
+  let(:sns_client) { instance_double(Aws::SNS::Client, create_platform_endpoint: sns_response) }
   let(:sns_developer_key_sns_field) { sns_client }
 
   let(:sns_developer_key) do
@@ -78,8 +78,8 @@ describe "profile communication settings" do
 
     it "displays the users email address as channel" do
       get "/profile/communication"
-      expect(fj("th[scope='col'] span:contains('email')")).to be
-      expect(fj("th[scope='col'] span:contains('nobody@example.com')")).to be
+      expect(fj("th[scope='col'] span:contains('email')")).not_to be_nil
+      expect(fj("th[scope='col'] span:contains('nobody@example.com')")).not_to be_nil
     end
 
     it "does not display a SMS number as channel" do
@@ -150,7 +150,7 @@ describe "profile communication settings" do
   it "renders for a user with no enrollments" do
     user_logged_in(username: "somebody@example.com")
     get "/profile/communication"
-    expect(fj("th[scope='col'] span:contains('email')")).to be
-    expect(fj("th[scope='col'] span:contains('somebody@example.com')")).to be
+    expect(fj("th[scope='col'] span:contains('email')")).not_to be_nil
+    expect(fj("th[scope='col'] span:contains('somebody@example.com')")).not_to be_nil
   end
 end

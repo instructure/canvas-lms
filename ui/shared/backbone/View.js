@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from './utils'
-import {forEach, map} from 'lodash'
+import {forEach, map} from 'es-toolkit/compat'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import mixin from './mixin'
@@ -298,9 +296,7 @@ export function patch(Backbone) {
         selector = ref1.selector
         if (this[name] == null) {
           if (typeof console !== 'undefined' && console !== null) {
-             
             if (typeof console.warn === 'function') {
-               
               console.warn("I need a child view '" + name + "' but one was not provided")
             }
           }
@@ -376,7 +372,7 @@ export function patch(Backbone) {
     // @api public
     View.mixin = function () {
       const mixins = arguments.length >= 1 ? slice.call(arguments, 0) : []
-       
+
       return mixin.apply(null, [this].concat(slice.call(mixins)))
     }
 

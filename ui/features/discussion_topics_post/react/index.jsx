@@ -16,19 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo-v3'
 import DiscussionTopicManager from './DiscussionTopicManager'
-import ErrorBoundary from '@canvas/error-boundary'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react'
 import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
 import {useKeyboardShortcuts} from './KeyboardShortcuts/useKeyboardShortcut'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -62,12 +63,17 @@ export const DiscussionTopicsPost = props => {
           errorComponent={
             <GenericErrorPage
               imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
               errorCategory={I18n.t('Discussion Topic Post Error Page')}
             />
           }
         >
           <AlertManager>
-            <DiscussionTopicManager discussionTopicId={props.discussionTopicId} />
+            <DiscussionTopicManager
+              discussionTopicId={props.discussionTopicId}
+              navbarHeight={props.navbarHeight}
+            />
           </AlertManager>
         </ErrorBoundary>
       </ApolloProvider>
@@ -77,4 +83,5 @@ export const DiscussionTopicsPost = props => {
 
 DiscussionTopicsPost.propTypes = {
   discussionTopicId: PropTypes.string,
+  navbarHeight: PropTypes.number,
 }

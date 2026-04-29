@@ -28,9 +28,9 @@ const TZ = 'Asia/Tokyo'
 beforeAll(() => {
   MockDate.set(today, TZ)
   initialize({
-    visualSuccessCallback: jest.fn(),
-    visualErrorCallback: jest.fn(),
-    srAlertCallback: jest.fn(),
+    visualSuccessCallback: vi.fn(),
+    visualErrorCallback: vi.fn(),
+    srAlertCallback: vi.fn(),
   })
 })
 afterAll(() => {

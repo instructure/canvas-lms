@@ -31,6 +31,7 @@ module Accessibility
                      background_color:,
                      value:,
                      contrast_ratio:,
+                     action:,
                      options: {})
         super(
           label:,
@@ -41,6 +42,7 @@ module Accessibility
         @options = options
         @background_color = background_color
         @value = value
+        @action = action
         @contrast_ratio = contrast_ratio
       end
 
@@ -49,7 +51,7 @@ module Accessibility
       end
 
       def to_h
-        super.merge({ options: @options, input_label: @input_label, title_label: @title_label, background_color: @background_color, value: @value, contrast_ratio: @contrast_ratio }.compact)
+        super.merge({ options: @options, input_label: @input_label, title_label: @title_label, background_color: @background_color, value: @value, contrast_ratio: @contrast_ratio, action: @action }.compact)
       end
     end
   end

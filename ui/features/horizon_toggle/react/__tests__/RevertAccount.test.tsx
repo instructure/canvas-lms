@@ -18,10 +18,23 @@
 
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {RevertAccount} from '../RevertAccount'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import * as globalUtils from '@canvas/util/globalUtils'
+import {showFlashError} from '@instructure/platform-alerts'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
+
+vi.mock('@canvas/util/globalUtils', async () => ({
+  ...(await vi.importActual('@canvas/util/globalUtils')),
+  reloadWindow: vi.fn(),
+}))
+
+vi.mock('@instructure/platform-alerts', async () => ({
+  ...(await vi.importActual('@instructure/platform-alerts')),
+  showFlashError: vi.fn(),
+}))
 
 describe('RevertAccount', () => {
   const setup = (propOverrides = {}) => {
@@ -32,8 +45,19 @@ describe('RevertAccount', () => {
     }
     return render(<RevertAccount {...props} />)
   }
-  it('makes an API call when the Revert button is clicked', () => {
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
+
+  it('makes an API call when the Revert button is clicked', async () => {
+    let capturedBody: any = null
+    server.use(
+      http.put('/api/v1/accounts/123', async ({request}) => {
+        capturedBody = await request.json()
+        return HttpResponse.json({})
+      }),
+    )
 
     setup()
 
@@ -44,18 +68,17 @@ describe('RevertAccount', () => {
     expect(revertButton).not.toBeUndefined()
     fireEvent.click(revertButton!)
 
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/accounts/123',
-      method: 'PUT',
-      body: {
+    await waitFor(() => {
+      expect(capturedBody).toEqual({
         id: '123',
         account: {settings: {horizon_account: {value: false}}},
-      },
+      })
+      expect(globalUtils.reloadWindow).toHaveBeenCalled()
     })
   })
 
   it('shows an error message when API call fails', async () => {
-    ;(doFetchApi as jest.Mock).mockRejectedValue({ok: false})
+    server.use(http.put('/api/v1/accounts/123', () => HttpResponse.error()))
 
     setup()
 
@@ -66,8 +89,8 @@ describe('RevertAccount', () => {
     expect(revertButton).not.toBeUndefined()
     fireEvent.click(revertButton!)
 
-    waitFor(() => {
-      expect(screen.getByText('Failed to revert account. Please try again.')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(showFlashError).toHaveBeenCalledWith('Failed to revert account. Please try again.')
     })
   })
 })

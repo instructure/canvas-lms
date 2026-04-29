@@ -72,7 +72,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 it('resorts the order of items when the item date has not changed', () => {

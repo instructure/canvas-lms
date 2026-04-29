@@ -28,5 +28,5 @@ describe "account_user_notification" do
   let(:asset) { @object }
   let(:notification_name) { :account_user_notification }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

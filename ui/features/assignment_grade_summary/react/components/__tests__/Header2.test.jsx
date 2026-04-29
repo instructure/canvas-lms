@@ -16,30 +16,46 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-jest.mock('../../assignment/AssignmentActions', () => ({
-  releaseGrades: jest.fn().mockImplementation(() => ({
+// Mock the API module to prevent real network calls
+vi.mock('../../assignment/AssignmentApi', () => ({
+  releaseGrades: vi.fn().mockResolvedValue({}),
+  unmuteAssignment: vi.fn().mockResolvedValue({}),
+  speedGraderUrl: vi.fn().mockReturnValue('/speed_grader'),
+}))
+
+vi.mock('../../assignment/AssignmentActions', () => ({
+  releaseGrades: vi.fn().mockImplementation(() => ({
     type: 'SET_RELEASE_GRADES_STATUS',
     payload: {status: 'STARTED'},
   })),
-  setReleaseGradesStatus: jest.fn().mockImplementation(status => ({
+  setReleaseGradesStatus: vi.fn().mockImplementation(status => ({
     type: 'SET_RELEASE_GRADES_STATUS',
     payload: {status},
   })),
-  unmuteAssignment: jest.fn().mockImplementation(() => ({
+  unmuteAssignment: vi.fn().mockImplementation(() => ({
     type: 'SET_UNMUTE_ASSIGNMENT_STATUS',
     payload: {status: 'STARTED'},
   })),
-  setUnmuteAssignmentStatus: jest.fn().mockImplementation(status => ({
+  setUnmuteAssignmentStatus: vi.fn().mockImplementation(status => ({
     type: 'SET_UNMUTE_ASSIGNMENT_STATUS',
     payload: {status},
+  })),
+  updateAssignment: vi.fn().mockImplementation(assignment => ({
+    type: 'UPDATE_ASSIGNMENT',
+    payload: {assignment},
   })),
   STARTED: 'STARTED',
   SUCCESS: 'SUCCESS',
   FAILURE: 'FAILURE',
+  GRADES_ALREADY_RELEASED: 'GRADES_ALREADY_RELEASED',
+  NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE: 'NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE',
+  SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS: 'SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS',
+  SET_RELEASE_GRADES_STATUS: 'SET_RELEASE_GRADES_STATUS',
   UPDATE_ASSIGNMENT: 'UPDATE_ASSIGNMENT',
   SET_UNMUTE_ASSIGNMENT_STATUS: 'SET_UNMUTE_ASSIGNMENT_STATUS',
 }))
 
+import {vi} from 'vitest'
 import React from 'react'
 import {render, act, waitFor} from '@testing-library/react'
 import {screen} from '@testing-library/dom'
@@ -55,8 +71,8 @@ import * as AssignmentActions from '../../assignment/AssignmentActions'
 import Header from '../Header'
 import configureStore from '../../configureStore'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  windowConfirm: jest.fn(() => true),
+vi.mock('@canvas/util/globalUtils', () => ({
+  windowConfirm: vi.fn(() => true),
 }))
 
 describe('GradeSummary Header', () => {
@@ -67,14 +83,14 @@ describe('GradeSummary Header', () => {
   let _wrapper
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
     fakeENV.teardown()
     document.body.innerHTML = ''
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   beforeEach(() => {
@@ -182,12 +198,12 @@ describe('GradeSummary Header', () => {
     })
 
     // fickle
-    it.skip('receives the releaseGradesStatus as a prop', () => {
+    it('receives the releaseGradesStatus as a prop', () => {
       mountComponent()
       act(() => {
         store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.STARTED))
       })
-      const button = screen.getByRole('button', {name: /release grades/i})
+      const button = screen.getByRole('button', {name: /releasing grades/i})
       expect(button).toHaveAttribute('aria-readonly', 'true')
     })
 
@@ -205,8 +221,8 @@ describe('GradeSummary Header', () => {
       windowConfirm.mockImplementation(() => true)
       mountComponent()
       await user.click(screen.getByRole('button', {name: /release grades/i}))
-      jest.advanceTimersByTime(100)
-      expect(AssignmentActions.releaseGrades).toHaveBeenCalled()
+      vi.advanceTimersByTime(100)
+      expect(vi.mocked(AssignmentActions.releaseGrades)).toHaveBeenCalled()
     })
 
     it('does not release grades when dialog is dismissed', async () => {
@@ -235,7 +251,7 @@ describe('GradeSummary Header', () => {
     })
 
     // fickle
-    it.skip('disables onClick when there is at least one grade with a not selectable grader', () => {
+    it('disables onClick when there is at least one grade with a not selectable grader', () => {
       // Select a grade from a non-selectable grader (Betty Ford, id: 1102)
       grades[0].selected = false
       grades[1].selected = true // This grade is from Betty Ford who is not selectable
@@ -293,7 +309,7 @@ describe('GradeSummary Header', () => {
       mountComponent()
       const button = screen.getByRole('button', {name: /post to students/i})
       await user.click(button)
-      jest.advanceTimersByTime(100)
+      vi.advanceTimersByTime(100)
       expect(windowConfirm).toHaveBeenCalledTimes(1)
     })
 
@@ -302,8 +318,8 @@ describe('GradeSummary Header', () => {
       windowConfirm.mockImplementation(() => true)
       mountComponent()
       await user.click(screen.getByRole('button', {name: /post to students/i}))
-      jest.advanceTimersByTime(100)
-      expect(AssignmentActions.unmuteAssignment).toHaveBeenCalled()
+      vi.advanceTimersByTime(100)
+      expect(vi.mocked(AssignmentActions.unmuteAssignment)).toHaveBeenCalled()
     })
 
     it('does not unmute the assignment when dialog is dismissed', async () => {
@@ -311,8 +327,8 @@ describe('GradeSummary Header', () => {
       const user = userEvent.setup({delay: null})
       mountComponent()
       await user.click(screen.getByRole('button', {name: /post to students/i}))
-      jest.advanceTimersByTime(100)
-      expect(AssignmentActions.unmuteAssignment).not.toHaveBeenCalled()
+      vi.advanceTimersByTime(100)
+      expect(vi.mocked(AssignmentActions.unmuteAssignment)).not.toHaveBeenCalled()
     })
   })
 })

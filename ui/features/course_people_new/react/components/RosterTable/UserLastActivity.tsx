@@ -22,17 +22,20 @@ import {timeEventToString} from '../../../util/utils'
 import {OBSERVER_ENROLLMENT} from '../../../util/constants'
 import {Enrollment} from '../../../types'
 
-const UserLastActivity: FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
+const UserLastActivity: FC<{enrollments: Enrollment[]}> = ({enrollments}) =>
   enrollments.map(enrollment => {
     if (enrollment.type === OBSERVER_ENROLLMENT) return null
     if (!enrollment.lastActivityAt) return null
 
     return (
-      <View as="div" key={`last-activity-${enrollment._id}`} data-testid={`last-activity-${enrollment._id}`}>
+      <View
+        as="div"
+        key={`last-activity-${enrollment._id}`}
+        data-testid={`last-activity-${enrollment._id}`}
+      >
         {timeEventToString(enrollment.lastActivityAt)}
       </View>
     )
   })
-)
 
 export default UserLastActivity

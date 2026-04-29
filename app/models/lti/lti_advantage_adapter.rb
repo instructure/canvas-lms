@@ -196,11 +196,6 @@ module Lti
     end
 
     def generate_lti_params
-      if resource_type&.to_sym == :module_index_menu_modal &&
-         !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu_modal)
-        return resource_link_request.to_cached_hash
-      end
-
       message_type = @tool.extension_setting(resource_type, :message_type)
       unless Lti::ResourcePlacement.supported_message_type?(resource_type, message_type)
         e = Lti::InvalidMessageTypeForPlacementError.new
@@ -218,8 +213,6 @@ module Lti
     def login_request(lti_params)
       message_hint = cache_payload(lti_params)
       login_hint = Lti::V1p1::Asset.opaque_identifier_for(@user, context: @context) || User.public_lti_id
-      deployment_id_flag_on = @context.root_account.feature_enabled?(:lti_deployment_id_in_login_request)
-
       req_params = {
         iss: Canvas::Security.config["lti_iss"],
         login_hint:,
@@ -230,8 +223,6 @@ module Lti
         canvas_environment: ApplicationController.test_cluster_name || "prod",
         canvas_region: @context.shard.database_server.config[:region] || "not_configured"
       }
-
-      req_params[:deployment_id] = @tool.deployment_id unless deployment_id_flag_on
 
       req = LtiAdvantage::Messages::LoginRequest.new(req_params)
       req.lti_storage_target = Lti::PlatformStorage::FORWARDING_TARGET if @include_storage_target

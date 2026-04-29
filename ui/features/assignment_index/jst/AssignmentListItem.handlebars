@@ -1,6 +1,6 @@
 <div
   id="assignment_{{id}}"
-  class="ig-row {{#ifAll canManage published}}ig-published{{/ifAll}} {{#if is_master_course_master_content}}is-master{{/if}}"
+  class="ig-row {{#ifAll isTeacher published}}ig-published{{/ifAll}} {{#if is_master_course_master_content}}is-master{{/if}}"
   data-item-id="{{labelId}}"
 >
   {{#if isDuplicating}}
@@ -78,7 +78,7 @@
     {{/if}}
     <div class="ig-type-icon">
       {{#if isMasteryConnectTool}}
-        <img src="/images/icons/{{#if published}}mc-assignment-pub.svg{{else}}mc-assignment-unpub.svg{{/if}}" alt="Mastery Connect" style="width: 1rem; height: 1rem;"/>
+          <img src="/images/icons/{{#if published}}mc-assignment-pub-v2.svg{{else}}mc-assignment-unpub-v2.svg{{/if}}" alt="Mastery Connect" style="width: 1rem; height: 1rem;"/>
       {{else}}
         <i aria-hidden="true" class='icon-{{iconType}}'></i>
       {{/if}}
@@ -95,23 +95,17 @@
               {{#ifEqual module_count 1}}
                 {{module_name}} {{#t}}Module{{/t}}
               {{else}}
-                <a
-                  title='{{joined_names}}'
-                  class="tooltip_link"
-                  data-tooltip-selector="#module_tooltip_{{labelId}}"
-                >{{#t}}Multiple Modules{{/t}}</a>
+                <span id="module_tooltip_mount_{{labelId}}"></span>
               {{/ifEqual}}
-              <div id="module_tooltip_{{labelId}}" style="display:none;">
-                {{#each modules}}
-                  <span>{{this}}</span>
-                {{/each}}
-              </div>
             </div>
           {{/if}}
         {{/if}}
         {{#if isCheckpoint}}
           <div id="assignment_teacher_checkpoint_info_{{id}}"></div>
         {{/if}}
+        {{#if hasPeerReviewInfo}}
+          <div id="assignment_peer_review_info_{{id}}" class="peer-review-info-container"></div>
+        {{else}}
         {{#if showAvailability}}
         <div class="ig-details__item assignment-date-available" data-view="date-available">
         </div>
@@ -138,6 +132,7 @@
               {{#t}}No Points Possible{{/t}}
             </span>
           {{/if}}
+        {{/if}}
         {{/if}}
         {{#if isMasteryConnectTool}}
           <div class="ig-details__item mc-objectives">{{externalToolData.objectives}}</div>
@@ -227,6 +222,8 @@
                       class="speed-grader-link icon-speed-grader"
                       id="assignment_{{id}}_link_to_speed_grader"
                       href="/courses/{{courseId}}/gradebook/speed_grader?assignment_id={{id}}"
+                      target="_blank"
+                      rel="noopener"
                       aria-label="{{#t}}Navigate to SpeedGrader for {{name}}{{/t}}"
                       data-focus-returns-to="assign_{{id}}_manage_link"
                       >{{#t}}SpeedGrader{{/t}}</a>
@@ -248,15 +245,16 @@
                       class="assign-to-link icon-permissions"
                       id="assign_to_{{id}}_link"
                       href="{{id}}%>"
+                      title="{{#t}}Assign this Assignment{{/t}}"
+                      aria-label="{{#t}}Assign To...{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    ><span class="assign-to-link-resources"
+                      translate="no"
                       data-assignment-name="{{name}}"
                       data-assignment-context-id="{{courseId}}"
                       data-assignment-id="{{id}}"
                       data-assignment-type="{{item_assignment_type}}"
-                      data-assignment-has-checkpoint="{{isCheckpoint}}"
-                      title="{{#t}}Assign this Assignment{{/t}}"
-                      aria-label="{{#t}}Assign To...{{/t}}"
-                      data-focus-returns-to="assign_{{id}}_manage_link"
-                    >{{#t}}Assign To...{{/t}}</a>
+                      data-assignment-has-checkpoint="{{isCheckpoint}}"></span>{{#t}}Assign To...{{/t}}</a>
                   </li>
                 {{/if}}
             {{/if}}
@@ -421,15 +419,16 @@
                       class="assign-to-link icon-permissions"
                       id="assign_to_{{id}}_link"
                       href="{{id}}%>"
+                      title="{{#t}}Assign this Assignment{{/t}}"
+                      aria-label="{{#t}}Assign To...{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    ><span class="assign-to-link-resources"
+                      translate="no"
                       data-assignment-name="{{name}}"
                       data-assignment-context-id="{{courseId}}"
                       data-assignment-id="{{id}}"
                       data-assignment-type="{{item_assignment_type}}"
-                      data-assignment-has-checkpoint="{{isCheckpoint}}"
-                      title="{{#t}}Assign this Assignment{{/t}}"
-                      aria-label="{{#t}}Assign To...{{/t}}"
-                      data-focus-returns-to="assign_{{id}}_manage_link"
-                    >{{#t}}Assign To...{{/t}}</a>
+                      data-assignment-has-checkpoint="{{isCheckpoint}}"></span>{{#t}}Assign To...{{/t}}</a>
                   </li>
                 {{/if}}
                 {{#if canMove}}

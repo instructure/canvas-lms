@@ -30,7 +30,7 @@ describe('GradebookGrid StudentCellFormatter', () => {
     setFixtureHtml($fixture)
 
     gradebook = createGradebook({})
-    gradebook.saveSettings = jest.fn()
+    gradebook.saveSettings = vi.fn()
     formatter = new StudentCellFormatter(gradebook)
 
     gradebook.setSections([

@@ -86,11 +86,13 @@ Returning postMessage includes the following properties:
 
 - subject: "lti.getPageContent"
 - pageContent: a string containing HTML
+- contentId: the ID of the content (Assignment or WikiPage)
 
 ```js
 {
   subject: 'lti.getPageContent.response',
-  content: '<div>...</div>'
+  content: '<div>...</div>',
+  content_id: 11
 }
 ```
 
@@ -355,9 +357,10 @@ the tool's containing iframe.
 Returning postMessage includes the following properties:
 
 - subject: "lti.fetchWindowSize.response"
-- height: height of the iframe
-- width: width of the iframe
-- footer: height of the "#fixed_bottom" HTML element or 0 if not found
+- height: height of the Canvas window
+- width: width of the Canvas window
+- footer: height of the fixed bottom bar (e.g. "View as Student" or test environment banners), or 0 if not present
+- assignment_footer: combined height of assignment-specific footer elements, or 0 if none are found
 - offset: [jquery.offset()](https://api.jquery.com/offset/) of the iframe's wrapper
 - scrollY: the number of px that the iframe is scrolled vertically
 

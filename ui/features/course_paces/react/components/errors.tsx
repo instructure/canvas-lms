@@ -21,7 +21,7 @@ import {getErrors, getResponsiveSize} from '../reducers/ui'
 import {coursePaceActions} from '../actions/course_paces'
 import {connect} from 'react-redux'
 import React, {createRef, type ReactNode, type RefObject} from 'react'
-import {ExpandableErrorAlert} from '@canvas/alerts/react/ExpandableErrorAlert'
+import {ExpandableErrorAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
@@ -47,7 +47,7 @@ export const Errors = ({errors, responsiveSize, syncUnpublishedChanges}: ErrorsP
       contents?: ReactNode
       error: string
       shouldTransferFocus?: boolean
-      focusRef?: RefObject<HTMLElement>
+      focusRef?: RefObject<HTMLDivElement>
     } = {category, error}
     result.shouldTransferFocus = !!error
 
@@ -59,10 +59,9 @@ export const Errors = ({errors, responsiveSize, syncUnpublishedChanges}: ErrorsP
             category === 'publish'
               ? I18n.t('There was an error publishing your course pace.')
               : I18n.t('There was an error saving your blackout dates')
-          result.focusRef = createRef()
+          result.focusRef = createRef<HTMLDivElement>()
           result.contents = (
             <>
-              {/* @ts-expect-error */}
               <div ref={result.focusRef} tabIndex={-1}>
                 {msg}
               </div>

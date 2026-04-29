@@ -51,6 +51,7 @@ export type DifferentiatedModulesTrayProps = {
   unlockAt?: string
   prerequisites?: Module[]
   moduleList?: Module[]
+  published?: boolean
   courseId: string
   addModuleUI?: (data: Record<string, any>, element: HTMLDivElement) => void
   onChangeAssignedTo?: () => void

@@ -41,7 +41,7 @@ describe('Content Selection', () => {
     })
 
     // fails in jsdom 25
-    it.skip('moves the focus to the previous student button when the last listed student is selected', async () => {
+    it('moves the focus to the previous student button when the last listed student is selected', async () => {
       const props = makeContentSelectionProps({
         students: defaultSortableStudents,
         outcomes: defaultOutcomes,

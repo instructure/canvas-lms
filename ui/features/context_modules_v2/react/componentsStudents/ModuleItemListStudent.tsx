@@ -37,9 +37,10 @@ export interface ModuleItemListStudentProps {
   completionRequirements?: CompletionRequirement[]
   requireSequentialProgress?: boolean
   progression?: ModuleProgression
-  isLoading: boolean
   error: any
+  isLoading?: boolean
   smallScreen?: boolean
+  isEmpty?: boolean
 }
 
 const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
@@ -47,38 +48,58 @@ const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
   completionRequirements,
   requireSequentialProgress,
   progression,
-  isLoading,
   error,
+  isLoading = false,
   smallScreen = false,
+  isEmpty,
 }) => {
+  if (isLoading) {
+    return (
+      <View as="div" textAlign="center" padding="medium">
+        <Spinner
+          renderTitle={I18n.t('Loading %{count} module items...', {
+            count: moduleItems.length || 'module',
+          })}
+          size="small"
+          margin="0 small 0 0"
+        />
+        <Text size="small" color="secondary">
+          {I18n.t('Loading %{count} items...', {count: moduleItems.length})}
+        </Text>
+      </View>
+    )
+  }
+
+  if (error) {
+    return (
+      <View as="div" textAlign="center" padding="medium">
+        <Text color="danger">{I18n.t('Error loading module items')}</Text>
+      </View>
+    )
+  }
+
+  if (isEmpty) {
+    return (
+      <View as="div" textAlign="center" padding="medium">
+        <Text>{I18n.t('No items in this module')}</Text>
+      </View>
+    )
+  }
+
   return (
-    <View as="div" overflowX="hidden">
-      {isLoading ? (
-        <View as="div" textAlign="center" padding="medium">
-          <Spinner renderTitle={I18n.t('Loading module items')} size="small" />
+    <View as="div" overflowX="hidden" padding="0 small">
+      {moduleItems.map((item, index) => (
+        <View as="div" key={item._id}>
+          <MemoizedModuleItemStudent
+            {...item}
+            index={index}
+            completionRequirements={completionRequirements}
+            requireSequentialProgress={!!requireSequentialProgress}
+            progression={progression}
+            smallScreen={smallScreen}
+          />
         </View>
-      ) : error ? (
-        <View as="div" textAlign="center" padding="medium">
-          <Text color="danger">{I18n.t('Error loading module items')}</Text>
-        </View>
-      ) : moduleItems.length === 0 ? (
-        <View as="div" textAlign="center" padding="medium">
-          <Text>{I18n.t('No items in this module')}</Text>
-        </View>
-      ) : (
-        moduleItems.map((item, index) => (
-          <View as="div" key={item._id}>
-            <MemoizedModuleItemStudent
-              {...item}
-              index={index}
-              completionRequirements={completionRequirements}
-              requireSequentialProgress={!!requireSequentialProgress}
-              progression={progression}
-              smallScreen={smallScreen}
-            />
-          </View>
-        ))
-      )}
+      ))}
     </View>
   )
 }

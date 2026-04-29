@@ -29,12 +29,16 @@ import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
 import {findOutcomesMocks, treeGroupMocks} from '@canvas/outcomes/mocks/Management'
 import resolveProgress from '@canvas/progress/resolve_progress'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
-jest.mock('@canvas/progress/resolve_progress')
-jest.useFakeTimers()
+vi.mock('@canvas/progress/resolve_progress')
+vi.useFakeTimers()
 
 treeGroupMocks({
   groupsStruct: {
@@ -76,15 +80,15 @@ describe('FindOutcomesModal', () => {
   })
 
   beforeEach(() => {
-    onCloseHandlerMock = jest.fn()
-    setTargetGroupIdsToRefetchMock = jest.fn()
-    setImportsTargetGroupMock = jest.fn()
+    onCloseHandlerMock = vi.fn()
+    setTargetGroupIdsToRefetchMock = vi.fn()
+    setImportsTargetGroupMock = vi.fn()
     cache = createCache()
     window.ENV = {}
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     resolveProgress.mockReset()
   })
 
@@ -125,24 +129,24 @@ describe('FindOutcomesModal', () => {
     const {getByText, getByLabelText} = render(<FindOutcomesModal {...defaultProps()} />, {
       mocks: [...findModalMocks(), ...findOutcomesMocks()],
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     fireEvent.click(getByText('Account Standards'))
     fireEvent.click(getByText('Root Account Outcome Group 0'))
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText('25 Outcomes')).toBeInTheDocument()
 
     const input = getByLabelText('Search field')
     fireEvent.change(input, {target: {value: 'mathemati'}})
-    await act(async () => jest.advanceTimersByTime(300))
+    await act(async () => vi.advanceTimersByTime(300))
     expect(getByText('25 Outcomes')).toBeInTheDocument()
 
     fireEvent.change(input, {target: {value: 'mathematic'}})
-    await act(async () => jest.advanceTimersByTime(300))
+    await act(async () => vi.advanceTimersByTime(300))
     expect(getByText('25 Outcomes')).toBeInTheDocument()
 
     fireEvent.change(input, {target: {value: 'mathematics'}})
-    await act(async () => jest.runAllTimers())
-    await act(async () => jest.advanceTimersByTime(200))
+    await act(async () => vi.runAllTimers())
+    await act(async () => vi.advanceTimersByTime(200))
     expect(getByText('15 Outcomes')).toBeInTheDocument()
   })
 
@@ -153,17 +157,17 @@ describe('FindOutcomesModal', () => {
         mocks: [...findModalMocks(), ...findOutcomesMocks()],
       },
     )
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     fireEvent.click(getByText('Account Standards'))
     fireEvent.click(getByText('Root Account Outcome Group 0'))
-    await act(async () => jest.runAllTimers())
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(getByText('25 Outcomes')).toBeInTheDocument()
 
     const input = getByLabelText('Search field')
     fireEvent.change(input, {target: {value: 'no results'}})
-    await act(async () => jest.runAllTimers())
-    await act(async () => jest.advanceTimersByTime(200))
+    await act(async () => vi.runAllTimers())
+    await act(async () => vi.advanceTimersByTime(200))
     expect(getByLabelText('Search field')).toBeEnabled()
     expect(queryByTestId('clear-search-icon')).toBeInTheDocument()
   })

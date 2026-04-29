@@ -18,7 +18,7 @@
 
 /* eslint no-console: 0 */
 
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 import {
   NAVIGATION_MESSAGE as MENTIONS_NAVIGATION_MESSAGE,
   INPUT_CHANGE_MESSAGE as MENTIONS_INPUT_CHANGE_MESSAGE,
@@ -27,6 +27,7 @@ import {
 import type {LtiMessageHandler} from './lti_message_handler'
 import buildResponseMessages from './response_messages'
 import {getKey, hasKey, deleteKey} from './util'
+import {forwardedMsgSource} from './forwarded_msg_source'
 import {
   SUBJECT_ALLOW_LIST,
   SUBJECT_IGNORE_LIST,
@@ -79,17 +80,6 @@ function iframeMatches(e: MessageEvent<unknown>, thunk: IFrameThunk): boolean {
     return false
   }
   return iframeSource === e.source || iframeSource === forwardedMsgSource(e)
-}
-
-function forwardedMsgSource(e: MessageEvent<unknown>): Window | undefined {
-  if (!e.source || e.source !== window?.top?.frames['post_message_forwarding' as any]) {
-    return undefined
-  }
-  const frameIndex = getKey('indexInTopFrames', getKey('sourceToolInfo', e.data))
-  if (typeof frameIndex !== 'number' || !window.top) {
-    return undefined
-  }
-  return window.top.frames[frameIndex]
 }
 
 /**
@@ -311,4 +301,5 @@ export {
   monitorLtiMessages,
   callbackOnLtiPostMessage,
   onLtiClosePostMessage,
+  forwardedMsgSource,
 }

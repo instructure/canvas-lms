@@ -63,9 +63,9 @@ describe Lti::LtiOutboundAdapter do
   let(:lti_tool) { LtiOutbound::LTITool.new }
   let(:lti_assignment) { LtiOutbound::LTIAssignment.new }
   let(:controller) do
-    request_mock = double("request")
+    request_mock = instance_double(ActionDispatch::Request)
     allow(request_mock).to receive_messages(host: "/my/url", scheme: "https")
-    m = double("controller")
+    m = instance_double(ApplicationController)
     allow(m).to receive_messages(request: request_mock, logged_in_user: @user || user)
     m
   end
@@ -181,7 +181,7 @@ describe Lti::LtiOutboundAdapter do
 
   describe "#launch_url" do
     it "returns the launch url from the prepared tool launch" do
-      tool_launch = double("tool launch", url: "/launch/url?with_param")
+      tool_launch = instance_double(LtiOutbound::ToolLaunch, url: "/launch/url?with_param")
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
       adapter.prepare_tool_launch(return_url, variable_expander)
 
@@ -190,7 +190,7 @@ describe Lti::LtiOutboundAdapter do
 
     context "with post_only set to true" do
       it "removes the params from the url" do
-        tool_launch = double("tool launch", url: "/launch/url?with_param")
+        tool_launch = instance_double(LtiOutbound::ToolLaunch, url: "/launch/url?with_param")
         allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
         adapter.prepare_tool_launch(return_url, variable_expander)
 
@@ -245,7 +245,7 @@ describe Lti::LtiOutboundAdapter do
 
   describe "#generate_post_payload" do
     it "calls generate on the tool launch" do
-      tool_launch = double("tool launch")
+      tool_launch = instance_double(LtiOutbound::ToolLaunch)
       expect(tool_launch).to receive_messages(generate: {})
       allow(tool_launch).to receive_messages(url: "http://example.com/launch")
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
@@ -254,7 +254,7 @@ describe Lti::LtiOutboundAdapter do
     end
 
     it "errors if the url is ridiculous" do
-      tool_launch = double("tool launch")
+      tool_launch = instance_double(LtiOutbound::ToolLaunch)
       expect(tool_launch).to receive_messages(generate: {})
       allow(tool_launch).to receive_messages(url: "wat;no-way")
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
@@ -325,7 +325,7 @@ describe Lti::LtiOutboundAdapter do
     let(:outcome_service_url) { "/outcome/service" }
     let(:legacy_outcome_service_url) { "/legacy/service" }
     let(:lti_turnitin_outcomes_placement_url) { "turnitin/outcomes/placement" }
-    let(:tool_launch) { double("tool launch", generate: {}, url: "http://example.com/launch") }
+    let(:tool_launch) { instance_double(LtiOutbound::ToolLaunch, generate: {}, url: "http://example.com/launch") }
 
     before do
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
@@ -358,7 +358,7 @@ describe Lti::LtiOutboundAdapter do
 
   describe "#generate_post_payload_for_homework_submission" do
     it "creates an lti_assignment" do
-      tool_launch = double("tool launch", generate: {}, url: "http://example.com/launch")
+      tool_launch = instance_double(LtiOutbound::ToolLaunch, generate: {}, url: "http://example.com/launch")
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
       adapter.prepare_tool_launch(return_url, variable_expander)
 
@@ -385,7 +385,7 @@ describe Lti::LtiOutboundAdapter do
     end
 
     it "add student id to the overrides" do
-      tool_launch = double("tool launch", generate: {}, url: "http://example.com/launch")
+      tool_launch = instance_double(LtiOutbound::ToolLaunch, generate: {}, url: "http://example.com/launch")
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
 
       adapter.prepare_tool_launch(return_url, variable_expander)

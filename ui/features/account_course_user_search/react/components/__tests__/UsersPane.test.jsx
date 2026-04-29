@@ -18,18 +18,25 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import UsersPane, {SEARCH_DEBOUNCE_TIME} from '../UsersPane'
 import UserActions from '../../actions/UserActions'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-const ok = value => expect(value).toBeTruthy()
-const notOk = value => expect(value).toBeFalsy()
-const equal = (value, expected) => expect(value).toEqual(expected)
-
 const fakeStore = () => ({
   state: {
     userList: {
-      users: [{}],
+      users: [
+        {
+          id: '1',
+          name: 'Test User',
+          sortable_name: 'User, Test',
+          short_name: 'Test',
+          email: 'test@example.com',
+          sis_user_id: 'test123',
+          last_login: '2023-01-01T00:00:00Z',
+        },
+      ],
       isLoading: false,
       errors: {search_term: ''},
       next: undefined,
@@ -49,12 +56,14 @@ const fakeStore = () => ({
 
 const renderUsersPane = store =>
   render(
-    <UsersPane
-      store={store}
-      roles={[{id: 'id', label: 'label'}]}
-      queryParams={{}}
-      onUpdateQueryParams={function () {}}
-    />,
+    <MockedQueryProvider>
+      <UsersPane
+        store={store}
+        roles={[{id: 'id', label: 'label'}]}
+        queryParams={{}}
+        onUpdateQueryParams={function () {}}
+      />
+    </MockedQueryProvider>,
   )
 
 describe('Account Course User Search UsersPane View', () => {
@@ -70,7 +79,7 @@ describe('Account Course User Search UsersPane View', () => {
     fakeENV.teardown()
   })
   test('handleUpdateSearchFilter dispatches applySearchFilter action', done => {
-    const spy = jest.spyOn(UserActions, 'applySearchFilter')
+    const spy = vi.spyOn(UserActions, 'applySearchFilter')
     const store = fakeStore()
     renderUsersPane(store)
 

@@ -159,6 +159,51 @@ describe ContentSharesController do
         expect(export.settings["selected_content"]["content_tags"]).not_to be_nil
         expect(export.settings["selected_content"]["context_modules"]).not_to be_nil
       end
+
+      it "sets selective_content_tag_export setting on the export" do
+        subject
+
+        export = ContentExport.find response.parsed_body["content_export"]["id"]
+        expect(export.settings["selective_content_tag_export"]).to be true
+      end
+
+      context "with feature flag enabled" do
+        before do
+          Account.site_admin.enable_feature!(:selective_content_tag_export)
+        end
+
+        it "exports only the shared module item" do
+          # Add another item to the module
+          context_module.content_tags.create!(
+            content_id: 0,
+            tag_type: "context_module",
+            content_type: "ExternalUrl",
+            context_id: course.id,
+            context_type: "Course",
+            title: "Other Item",
+            url: "https://other.com"
+          )
+
+          subject
+
+          export = ContentExport.find response.parsed_body["content_export"]["id"]
+          export.export(synchronous: true)
+
+          expect(export.workflow_state).to eq "exported"
+          attachment = export.attachment
+          require "zip"
+          Zip::File.open(attachment.open.path) do |zip_file|
+            module_xml = zip_file.read("course_settings/module_meta.xml")
+            doc = Nokogiri::XML(module_xml)
+
+            # Should have only 1 item (the shared one)
+            items = doc.css("item")
+            expect(items.count).to eq 1
+            item_title = items.first.at_css("title").text
+            expect(item_title).to eq "Test Title"
+          end
+        end
+      end
     end
 
     it "returns 400 if required parameters aren't included" do

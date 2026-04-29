@@ -20,6 +20,7 @@
 require_relative "../../common"
 require_relative "post_grades_tray_page"
 require_relative "hide_grades_tray_page"
+require_relative "gradebook_grade_detail_tray_page"
 
 module Gradebook
   extend SeleniumDependencies
@@ -424,7 +425,7 @@ module Gradebook
   def self.wait_for_spinner
     begin
       spinner = loading_spinner
-      keep_trying_until(3) { (spinner.displayed? == false) }
+      keep_trying_until(3) { spinner.displayed? == false }
     rescue Selenium::WebDriver::Error::TimeoutError
       # ignore - sometimes spinner doesn't appear in Chrome
     end

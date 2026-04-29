@@ -19,12 +19,13 @@
 #
 
 class BookmarkedCollection::WrapProxy < BookmarkedCollection::Proxy
-  def initialize(bookmarker, base_scope)
+  def initialize(bookmarker, base_scope, count_total_entries: true)
     super(bookmarker, lambda do |pager|
       scope = base_scope
       scope = bookmarker.restrict_scope(scope, pager)
       scope = yield scope if block_given?
-      scope.paginate(page: 1, per_page: pager.per_page, total_entries: scope.except(:group, :select).count)
+      total_entries = scope.except(:group, :select).count if count_total_entries
+      scope.paginate(page: 1, per_page: pager.per_page, total_entries:)
     end)
   end
 

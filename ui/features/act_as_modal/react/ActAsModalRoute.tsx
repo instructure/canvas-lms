@@ -18,17 +18,21 @@
 
 import React from 'react'
 import {Portal} from '@instructure/ui-portal'
-import ActAsModal from './ActAsModal'
+import ActAsModal, {type User} from './ActAsModal'
+
+type ActAsUserData = {
+  user: User
+}
 
 export function Component() {
   const mountPoint: HTMLElement | null = document.querySelector('#act_as_modal')
   if (!mountPoint) {
     return null
   }
+  const actAsUserData = (ENV as unknown as {act_as_user_data: ActAsUserData}).act_as_user_data
   return (
     <Portal open={true} mountNode={mountPoint}>
-      {/* @ts-expect-error */}
-      <ActAsModal user={ENV.act_as_user_data.user} />
+      <ActAsModal user={actAsUserData.user} />
     </Portal>
   )
 }

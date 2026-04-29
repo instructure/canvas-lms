@@ -16,28 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import LoginTroubleLink from '../LoginTroubleLink'
 import {useNewLogin, useNewLoginData} from '../../context'
 import {assignLocation} from '@canvas/util/globalUtils'
 
-jest.mock('../../context', () => {
-  const original = jest.requireActual('../../context')
+vi.mock('../../context', async () => {
+  const original = await vi.importActual('../../context')
   return {
     ...original,
-    useNewLogin: jest.fn(),
-    useNewLoginData: jest.fn(),
+    useNewLogin: vi.fn(),
+    useNewLoginData: vi.fn(),
   }
 })
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
-const mockUseNewLogin = useNewLogin as jest.Mock
-const mockUseNewLoginData = useNewLoginData as jest.Mock
-const mockAssignLocation = assignLocation as jest.Mock
+const mockUseNewLogin = useNewLogin as any
+const mockUseNewLoginData = useNewLoginData as any
+const mockAssignLocation = assignLocation as any
 
 describe('LoginTroubleLink', () => {
   const defaultUrl = 'https://example.com/help'
@@ -45,8 +45,12 @@ describe('LoginTroubleLink', () => {
   const renderLoginTroubleLink = (url: string | null = defaultUrl) =>
     render(<LoginTroubleLink url={url} />)
 
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,

@@ -23,7 +23,7 @@ import {usePathTransform} from '@canvas/pendo/react/hooks/usePathTransform'
 describe('usePathTransform', () => {
   beforeEach(() => {
     window.history.pushState({}, '', '/discussion_topics/12345')
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   function TestComponent({whenPendoReady, searchValue, replaceValue, shouldTransform}: any) {
@@ -45,7 +45,7 @@ describe('usePathTransform', () => {
   })
 
   it('calls pendo.location.addTransforms with transformed pathname when shouldTransform is true', async () => {
-    const mockAddTransforms = jest.fn()
+    const mockAddTransforms = vi.fn()
     const pendoMock = {
       location: {
         addTransforms: mockAddTransforms,
@@ -75,7 +75,7 @@ describe('usePathTransform', () => {
   })
 
   it('does nothing if shouldTransform is false', async () => {
-    const mockAddTransforms = jest.fn()
+    const mockAddTransforms = vi.fn()
     const pendoMock = {
       location: {
         addTransforms: mockAddTransforms,
@@ -99,7 +99,7 @@ describe('usePathTransform', () => {
   })
 
   it('does nothing if shouldTransform is undefined', async () => {
-    const mockAddTransforms = jest.fn()
+    const mockAddTransforms = vi.fn()
     const pendoMock = {
       location: {
         addTransforms: mockAddTransforms,

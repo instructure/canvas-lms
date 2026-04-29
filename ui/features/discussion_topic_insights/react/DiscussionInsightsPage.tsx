@@ -21,7 +21,6 @@ import DiscussionInsights from './components/DiscussionInsights/DiscussionInsigh
 import ReviewModal from './components/InsightsModal/ReviewModal'
 
 const DiscussionInsightsPage: React.FC = () => {
-
   return (
     <>
       <ReviewModal />

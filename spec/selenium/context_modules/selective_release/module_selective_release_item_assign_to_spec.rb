@@ -314,7 +314,6 @@ describe "selective_release module item assign to tray" do
 
     context "differentiation tags" do
       before :once do
-        @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -441,8 +440,8 @@ describe "selective_release module item assign to tray" do
               update_due_date(card_index, date)
               update_due_time(card_index, time)
             elsif date_label == :unlock_at
-              update_available_date(card_index, date, true)
-              update_available_time(card_index, time, true)
+              update_available_date(card_index, date, exclude_due_date: true)
+              update_available_time(card_index, time, exclude_due_date: true)
             end
 
             click_save_button
@@ -671,7 +670,7 @@ describe "selective_release module item assign to tray" do
         update_due_date(0, "12/31/2022")
         update_available_date(0, "1/1/2023")
 
-        expect(assign_to_date_and_time[1].text).to include("Unlock date cannot be after due date")
+        expect(assign_to_date_and_time[1].text).to include("Available from date cannot be after due date")
       end
 
       it "displays due date errors before term start date" do
@@ -722,7 +721,7 @@ describe "selective_release module item assign to tray" do
 
         available_date = 1.month.from_now.to_date
         update_available_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
-        expect(assign_to_date_and_time[1].text).to include("Unlock date cannot be before term start")
+        expect(assign_to_date_and_time[1].text).to include("Available from date cannot be before term start")
       end
 
       it "displays lock date errors past term end date" do
@@ -739,7 +738,7 @@ describe "selective_release module item assign to tray" do
         available_date = 2.months.from_now.to_date
 
         update_until_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
-        expect(assign_to_date_and_time[2].text).to include("Lock date cannot be after term end")
+        expect(assign_to_date_and_time[2].text).to include("Until date cannot be after term end")
       end
 
       it "displays due date errors before course start date" do
@@ -785,7 +784,7 @@ describe "selective_release module item assign to tray" do
 
         available_date = 1.month.from_now.to_date
         update_available_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
-        expect(assign_to_date_and_time[1].text).to include("Unlock date cannot be before course start")
+        expect(assign_to_date_and_time[1].text).to include("Available from date cannot be before course start")
       end
 
       it "displays lock date errors past course end date" do
@@ -800,7 +799,7 @@ describe "selective_release module item assign to tray" do
         available_date = 2.months.from_now.to_date
 
         update_until_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
-        expect(assign_to_date_and_time[2].text).to include("Lock date cannot be after course end")
+        expect(assign_to_date_and_time[2].text).to include("Until date cannot be after course end")
       end
 
       it "displays due date errors before section start date" do
@@ -851,7 +850,7 @@ describe "selective_release module item assign to tray" do
 
         available_date = 1.month.from_now.to_date
         update_available_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
-        expect(assign_to_date_and_time[1].text).to include("Unlock date cannot be before section start")
+        expect(assign_to_date_and_time[1].text).to include("Available from date cannot be before section start")
       end
 
       it "displays lock date errors past section end date" do
@@ -867,7 +866,7 @@ describe "selective_release module item assign to tray" do
         available_date = 2.months.from_now.to_date
 
         update_until_date(0, format_date_for_view(available_date, "%-m/%-d/%Y"))
-        expect(assign_to_date_and_time[2].text).to include("Lock date cannot be after section end")
+        expect(assign_to_date_and_time[2].text).to include("Until date cannot be after section end")
       end
 
       it "allows section due date that is outside of course date range" do
@@ -933,8 +932,8 @@ describe "selective_release module item assign to tray" do
       update_until_time(0, "9:00 PM")
       click_save_button
 
-      # Error: Unlock date cannot be after due date
-      check_element_has_focus assign_to_available_from_date(0)
+      # Error: Available from date cannot be after due date
+      check_element_has_focus assign_to_due_date(0)
     end
 
     it "focus date field if is un-parseable after trying to submit", :ignore_js_errors do

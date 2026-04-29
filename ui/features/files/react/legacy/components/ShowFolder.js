@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import page from 'page'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 import getAllPages from '../util/getAllPages'

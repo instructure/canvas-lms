@@ -50,7 +50,7 @@ class OverrideTooltipPresenter < OverrideListPresenter
   end
 
   def total_dates
-    grouped_and_sorted_by_visible_due_dates.length
+    visible_due_dates.length
   end
 
   def dates_visible
@@ -66,8 +66,16 @@ class OverrideTooltipPresenter < OverrideListPresenter
   end
 
   def due_date_summary
-    grouped_and_sorted_by_visible_due_dates(group_by_date: false)[0...dates_visible].map do |date|
-      { due_for: date[:due_for], due_at: date[:due_at] }
+    visible_due_dates[0...dates_visible].map do |date|
+      summary = { due_for: date[:due_for], due_at: date[:due_at] }
+
+      # Include unlock_at and lock_at only for assignments with peer reviews or peer review sub assignments
+      if assignment.is_a?(PeerReviewSubAssignment) || (assignment.is_a?(Assignment) && assignment.peer_reviews?)
+        summary[:unlock_at] = date[:unlock_at]
+        summary[:lock_at] = date[:lock_at]
+      end
+
+      summary
     end
   end
 

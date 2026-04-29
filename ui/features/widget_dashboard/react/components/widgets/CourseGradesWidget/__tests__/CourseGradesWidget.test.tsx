@@ -1,0 +1,332 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import React from 'react'
+import {render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import CourseGradesWidget from '../CourseGradesWidget'
+import type {BaseWidgetProps, Widget} from '../../../../types'
+import {
+  WidgetDashboardProvider,
+  type SharedCourseData,
+} from '../../../../hooks/useWidgetDashboardContext'
+import {clearWidgetDashboardCache, PlatformTestWrapper} from '../../../../__tests__/testHelpers'
+import {WidgetLayoutProvider} from '../../../../hooks/useWidgetLayout'
+import {WidgetDashboardEditProvider} from '../../../../hooks/useWidgetDashboardEdit'
+import * as useWidgetConfigModule from '../../../../hooks/useWidgetConfig'
+
+jest.mock('../../../../hooks/useWidgetConfig')
+
+const mockWidget: Widget = {
+  id: 'test-course-grades-widget',
+  type: 'course_grades',
+  position: {col: 1, row: 1, relative: 1},
+  title: 'Course Grades',
+}
+
+const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidgetProps => {
+  return {
+    widget: mockWidget,
+    ...overrides,
+  }
+}
+
+const mockSharedCourseData: SharedCourseData[] = [
+  {
+    courseId: '1',
+    courseCode: 'CS101',
+    courseName: 'Course 1',
+    currentGrade: 95,
+    gradingScheme: [
+      ['A', 0.94],
+      ['A-', 0.9],
+      ['B+', 0.87],
+      ['B', 0.84],
+      ['B-', 0.8],
+      ['C+', 0.77],
+      ['C', 0.74],
+      ['C-', 0.7],
+      ['D+', 0.67],
+      ['D', 0.64],
+      ['D-', 0.61],
+      ['F', 0],
+    ] as Array<[string, number]>,
+    lastUpdated: '2025-01-01T00:00:00Z',
+  },
+  {
+    courseId: '2',
+    courseCode: 'MATH201',
+    courseName: 'Course 2',
+    currentGrade: 88,
+    gradingScheme: 'percentage',
+    lastUpdated: '2025-01-02T00:00:00Z',
+  },
+]
+
+const setup = (
+  props: Partial<BaseWidgetProps> = {},
+  sharedCourseData: SharedCourseData[] = mockSharedCourseData,
+) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: 0,
+      },
+    },
+  })
+  const defaultProps = buildDefaultProps(props)
+  return render(
+    <PlatformTestWrapper>
+      <QueryClientProvider client={queryClient}>
+        <WidgetDashboardProvider sharedCourseData={sharedCourseData}>
+          <WidgetDashboardEditProvider>
+            <WidgetLayoutProvider>
+              <CourseGradesWidget {...defaultProps} />
+            </WidgetLayoutProvider>
+          </WidgetDashboardEditProvider>
+        </WidgetDashboardProvider>
+      </QueryClientProvider>
+    </PlatformTestWrapper>,
+  )
+}
+
+const mockUseWidgetConfig = useWidgetConfigModule.useWidgetConfig as jest.MockedFunction<
+  typeof useWidgetConfigModule.useWidgetConfig
+>
+
+describe('CourseGradesWidget', () => {
+  let mockSetShowGrades: jest.Mock
+  let mockSetGradeVisibilities: jest.Mock
+  let mockShowGrades: boolean
+  let mockGradeVisibilities: Record<string, boolean>
+
+  beforeEach(() => {
+    clearWidgetDashboardCache()
+    mockSetShowGrades = jest.fn()
+    mockSetGradeVisibilities = jest.fn()
+    mockShowGrades = true
+    mockGradeVisibilities = {}
+    mockUseWidgetConfig.mockImplementation((_widgetId: string, key: string) => {
+      if (key === 'showGrades') return [mockShowGrades, mockSetShowGrades]
+      if (key === 'gradeVisibilities') return [mockGradeVisibilities, mockSetGradeVisibilities]
+      return [undefined, jest.fn()]
+    })
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('renders basic widget', async () => {
+    setup({}, [])
+
+    expect(screen.getByText('Course Grades')).toBeInTheDocument()
+    expect(screen.queryByText('Loading course grades...')).not.toBeInTheDocument()
+  })
+
+  it('displays courses with shared data', async () => {
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+      expect(screen.getByText('Course 2')).toBeInTheDocument()
+    })
+  })
+
+  it('renders courses with null grades', async () => {
+    const courseDataWithNullGrade: SharedCourseData[] = [
+      {
+        courseId: '1',
+        courseCode: 'CS101',
+        courseName: 'Course Without Grade',
+        currentGrade: null,
+        gradingScheme: 'percentage',
+        lastUpdated: '2025-01-01T00:00:00Z',
+      },
+    ]
+
+    setup({}, courseDataWithNullGrade)
+
+    await waitFor(() => {
+      expect(screen.getByText('Course Without Grade')).toBeInTheDocument()
+    })
+  })
+
+  it('displays N/A when course has no calculable grade', async () => {
+    const courseDataWithNullGrade: SharedCourseData[] = [
+      {
+        courseId: '1',
+        courseCode: 'CS101',
+        courseName: 'Course Without Grade',
+        currentGrade: null,
+        gradingScheme: 'percentage',
+        lastUpdated: '2025-01-01T00:00:00Z',
+      },
+    ]
+
+    setup({}, courseDataWithNullGrade)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('course-1-grade')).toHaveTextContent('N/A')
+    })
+  })
+
+  it('displays grades when available', async () => {
+    const courseDataWithGrade: SharedCourseData[] = [
+      {
+        courseId: '1',
+        courseCode: 'CS101',
+        courseName: 'Course With Grade',
+        currentGrade: 92.5,
+        gradingScheme: 'percentage',
+        lastUpdated: '2025-01-01T00:00:00Z',
+      },
+    ]
+
+    setup({}, courseDataWithGrade)
+
+    await waitFor(() => {
+      expect(screen.getByText('Course With Grade')).toBeInTheDocument()
+      expect(screen.getByText('92%')).toBeInTheDocument()
+    })
+  })
+
+  it('handles mix of courses with and without grades', async () => {
+    const mixedCourseData: SharedCourseData[] = [
+      {
+        courseId: '1',
+        courseCode: 'CS101',
+        courseName: 'Course With Grade',
+        currentGrade: 85,
+        gradingScheme: 'percentage',
+        lastUpdated: '2025-01-01T00:00:00Z',
+      },
+      {
+        courseId: '2',
+        courseCode: 'MATH201',
+        courseName: 'Course Without Grade',
+        currentGrade: null,
+        gradingScheme: 'percentage',
+        lastUpdated: '2025-01-02T00:00:00Z',
+      },
+    ]
+
+    setup({}, mixedCourseData)
+
+    await waitFor(() => {
+      expect(screen.getByText('Course With Grade')).toBeInTheDocument()
+      expect(screen.getByText('Course Without Grade')).toBeInTheDocument()
+      expect(screen.getByText('85%')).toBeInTheDocument()
+    })
+  })
+
+  it('displays "Go to course" link for each course', async () => {
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+      expect(screen.getByText('Course 2')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('course-1-link')).toBeInTheDocument()
+    expect(screen.getByTestId('course-1-link')).toHaveAttribute('href', '/courses/1')
+    expect(screen.getByTestId('course-2-link')).toBeInTheDocument()
+    expect(screen.getByTestId('course-2-link')).toHaveAttribute('href', '/courses/2')
+  })
+
+  it('persists grade visibility using useWidgetConfig', () => {
+    setup()
+
+    expect(mockUseWidgetConfig).toHaveBeenCalledWith(
+      'test-course-grades-widget',
+      'showGrades',
+      true,
+    )
+    expect(mockUseWidgetConfig).toHaveBeenCalledWith(
+      'test-course-grades-widget',
+      'gradeVisibilities',
+      {},
+    )
+  })
+
+  it('restores hidden grades from persisted config', async () => {
+    mockShowGrades = false
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('course-1-grade')).toHaveTextContent('•••')
+  })
+
+  it('saves grade visibility when toggle is clicked', async () => {
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+    })
+
+    const toggle = screen.getByTestId('hide-all-grades-checkbox')
+    await userEvent.click(toggle)
+
+    expect(mockSetShowGrades).toHaveBeenCalledWith(false)
+  })
+
+  it('restores per-course hidden grade from persisted config', async () => {
+    mockGradeVisibilities = {'1': false}
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+      expect(screen.getByText('Course 2')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('course-1-grade')).toHaveTextContent('•••')
+    expect(screen.getByTestId('course-2-grade')).toHaveTextContent('88%')
+  })
+
+  it('saves per-course visibility when eye icon is clicked', async () => {
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+    })
+
+    const hideButton = screen.getByTestId('hide-single-grade-button-1')
+    await userEvent.click(hideButton)
+
+    expect(mockSetGradeVisibilities).toHaveBeenCalledWith({'1': false})
+  })
+
+  it('allows per-course override when global toggle is off', async () => {
+    mockShowGrades = false
+    mockGradeVisibilities = {'1': true}
+    setup()
+
+    await waitFor(() => {
+      expect(screen.getByText('Course 1')).toBeInTheDocument()
+      expect(screen.getByText('Course 2')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('course-1-grade')).not.toHaveTextContent('•••')
+    expect(screen.getByTestId('course-2-grade')).toHaveTextContent('•••')
+  })
+})

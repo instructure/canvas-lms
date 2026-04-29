@@ -26,8 +26,6 @@ describe LearnPlatform::Api do
     account_model
     default_settings = api.learnplatform.default_settings
     default_settings["base_url"] = "http://www.example.com"
-    default_settings["username"] = "user"
-    default_settings["password"] = "pass"
     default_settings["jwt_issuer"] = "service-name"
     default_settings["jwt_secret"] = "service-secret"
     PluginSetting.create!(name: api.learnplatform.id, settings: default_settings)
@@ -42,32 +40,34 @@ describe LearnPlatform::Api do
 
   describe "#products" do
     let(:ok_response) do
-      double(body:
-        {
-          tools: [
-            {
-              id: 1,
-              name: "First Tool",
-            },
-            {
-              id: 2,
-              name: "Second Tool",
-            }
-          ]
-        }.to_json,
-             code: 200)
+      instance_double(Net::HTTPResponse,
+                      body:
+                              {
+                                tools: [
+                                  {
+                                    id: 1,
+                                    name: "First Tool",
+                                  },
+                                  {
+                                    id: 2,
+                                    name: "Second Tool",
+                                  }
+                                ]
+                              }.to_json,
+                      code: 200)
     end
 
     let(:error_response) do
-      double(body:
-        {
-          errors: [
-            {
-              content: "Unauthorized - You must include the correct username and password"
-            },
-          ]
-        }.to_json,
-             code: 401)
+      instance_double(Net::HTTPResponse,
+                      body:
+                              {
+                                errors: [
+                                  {
+                                    content: "Unauthorized - You must include the correct username and password"
+                                  },
+                                ]
+                              }.to_json,
+                      code: 401)
     end
 
     it "gets a list of products" do
@@ -117,32 +117,41 @@ describe LearnPlatform::Api do
         api.products({ company_id: 2 })
       end
     end
+
+    it "does not cache LP error responses" do
+      enable_cache do
+        expect(CanvasHttp).to receive(:get).and_return(error_response).twice
+        api.products
+        api.products
+      end
+    end
   end
 
   describe "#products_by_category" do
     let(:response) do
-      double(body:
-        {
-          categories: [
-            {
-              tag_group: {
-                id: 1,
-                name: "Category 1"
-              },
-              tools: [
-                {
-                  id: 1,
-                  name: "First Tool",
-                },
-                {
-                  id: 2,
-                  name: "Second Tool",
-                }
-              ]
-            }
-          ]
-        }.to_json,
-             code: 200)
+      instance_double(Net::HTTPResponse,
+                      body:
+                              {
+                                categories: [
+                                  {
+                                    tag_group: {
+                                      id: 1,
+                                      name: "Category 1"
+                                    },
+                                    tools: [
+                                      {
+                                        id: 1,
+                                        name: "First Tool",
+                                      },
+                                      {
+                                        id: 2,
+                                        name: "Second Tool",
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }.to_json,
+                      code: 200)
     end
 
     it "gets a list of products by category" do
@@ -169,12 +178,13 @@ describe LearnPlatform::Api do
 
   describe "#product" do
     let(:response) do
-      double(body:
-       {
-         id: 1,
-         name: "First Tool",
-       }.to_json,
-             code: 200)
+      instance_double(Net::HTTPResponse,
+                      body:
+                             {
+                               id: 1,
+                               name: "First Tool",
+                             }.to_json,
+                      code: 200)
     end
 
     it "gets a single product" do
@@ -200,30 +210,31 @@ describe LearnPlatform::Api do
 
   describe "#product_filters" do
     let(:response) do
-      double(body:
-       {
-         companies: [
-           {
-             id: 100,
-             name: "Praxis",
-           },
-           {
-             id: 200,
-             name: "Khan Academy"
-           }
-         ],
-         versions: [
-           {
-             id: 9465,
-             name: "LTI v1.1"
-           },
-           {
-             id: 9494,
-             name: "LTI v1.3"
-           },
-         ],
-       }.to_json,
-             code: 200)
+      instance_double(Net::HTTPResponse,
+                      body:
+                             {
+                               companies: [
+                                 {
+                                   id: 100,
+                                   name: "Praxis",
+                                 },
+                                 {
+                                   id: 200,
+                                   name: "Khan Academy"
+                                 }
+                               ],
+                               versions: [
+                                 {
+                                   id: 9465,
+                                   name: "LTI v1.1"
+                                 },
+                                 {
+                                   id: 9494,
+                                   name: "LTI v1.3"
+                                 },
+                               ],
+                             }.to_json,
+                      code: 200)
     end
 
     it "gets a list of product filters" do
@@ -249,7 +260,7 @@ describe LearnPlatform::Api do
 
   describe "translate_lang parameter" do
     let(:ok_response) do
-      double(body: { tools: [{ id: 1, name: "First Tool" }] }.to_json, code: 200)
+      instance_double(Net::HTTPResponse, body: { tools: [{ id: 1, name: "First Tool" }] }.to_json, code: 200)
     end
 
     it "passes translate_lang param to products API call" do

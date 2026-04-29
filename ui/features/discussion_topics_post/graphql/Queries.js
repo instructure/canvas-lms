@@ -70,11 +70,12 @@ export const DISCUSSION_QUERY = gql`
         )
         searchEntryCount(filter: $filter, searchTerm: $searchTerm)
         groupSet {
-          ...GroupSet
+          ...DiscussionPostGroupSet
           groups {
-            ...Group
+            ...DiscussionPostGroup
           }
         }
+        ${ENV.discussion_pin_post ? 'pinnedEntries { ...DiscussionEntry }' : ''}
       }
     }
   }
@@ -86,7 +87,7 @@ export const DISCUSSION_QUERY = gql`
   ${Group.fragment}
 `
 export const STUDENT_DISCUSSION_QUERY = gql`
-  query GetDiscussionQuery(
+  query GetStudentDiscussionQuery(
     $discussionID: ID!
     $perPage: Int!
     $userSearchId: String
@@ -202,7 +203,7 @@ export const COURSE_USER_QUERY = gql`
   query GetCourseUserQuery($courseId: ID!) {
     legacyNode(_id: $courseId, type: Course) {
       ... on Course {
-        ...Course
+        ...DiscussionPostCourse
       }
     }
   }
@@ -230,6 +231,28 @@ export const SUBMISSION_BY_ASSIGNMENT_QUERY = gql`
             }
           }
         }
+      }
+    }
+  }
+`
+
+export const GET_PREFERRED_LANGUAGE = gql`
+  query GetPreferredLanguage($discussionTopicId: ID!) {
+    legacyNode(_id: $discussionTopicId, type: Discussion) {
+      ... on Discussion {
+        id
+        _id
+        participant{
+          id
+          preferredLanguage
+        }
+      }
+    }
+    __type(name: "PreferredLanguageType") {
+      name
+      enumValues {
+        name
+        description
       }
     }
   }

@@ -30,6 +30,7 @@ module Lti::IMS
     let(:policy_uri) { "http://example.com/policy" }
     let(:lti_tool_configuration) do
       {
+        target_link_uri: "http://example.com/launch",
         domain: "example.com",
         messages: [],
         claims: []
@@ -50,13 +51,21 @@ module Lti::IMS
         lti_tool_configuration:,
         scopes:,
         developer_key:,
-        lti_registration: developer_key.lti_registration
+        lti_registration: developer_key.lti_registration,
+        root_account: developer_key.root_account
       }.compact)
     end
     let(:developer_key) { lti_developer_key_model }
 
     it "is soft_deleted when destroy is called" do
       registration.destroy
+      expect(registration.reload.workflow_state).to eq("deleted")
+    end
+
+    it "can be soft-deleted even with an invalid target_link_uri" do
+      registration.lti_tool_configuration["target_link_uri"] = "localhost"
+      registration.save!(validate: false)
+      expect { registration.destroy }.not_to raise_error
       expect(registration.reload.workflow_state).to eq("deleted")
     end
 
@@ -161,6 +170,22 @@ module Lti::IMS
         end
       end
 
+      context "invalid target_link_uri in config" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            messages: [],
+            claims: [],
+            target_link_uri: "not a valid url"
+          }
+        end
+
+        it "is invalid" do
+          expect(subject).to be false
+          expect(registration.errors[:lti_tool_configuration]).to be_present
+        end
+      end
+
       context "scopes" do
         context "contains invalid scopes" do
           let(:scopes) { ["asdf"] }
@@ -204,9 +229,9 @@ module Lti::IMS
             "privacy_level" => "anonymous",
             "public_jwk_url" => "http://example.com/jwks",
             "scopes" => [],
-            "target_link_uri" => nil,
+            "target_link_uri" => "http://example.com/launch",
+            "url" => "http://example.com/launch",
             "title" => "Example Tool",
-            "url" => nil,
           }
         )
       end
@@ -306,7 +331,8 @@ module Lti::IMS
           {
             domain: "example.com",
             messages: [],
-            claims: []
+            claims: [],
+            target_link_uri: "https://example.com/launch"
           }
         end
 
@@ -472,11 +498,12 @@ module Lti::IMS
         describe "when the tool does not support LtiEulaRequest" do
           let(:eula_message) { nil }
 
-          it "does not add a eula object to the ActivityAssetProcessor placement" do
+          it "does not add EULA to message_settings" do
             expect(registration.canvas_configuration["extensions"][0]["settings"]["placements"]).to match_array([
                                                                                                                   deep_linking_placement("ActivityAssetProcessor"),
                                                                                                                   deep_linking_placement("course_navigation")
                                                                                                                 ])
+            expect(registration.canvas_configuration["extensions"][0]["settings"]).not_to have_key("message_settings")
           end
         end
 
@@ -489,12 +516,17 @@ module Lti::IMS
             registration.canvas_configuration["extensions"][0]["settings"]["placements"]
           end
 
-          it "adds eula: {enabled: true} to the ActivityAssetProcessor placement" do
-            eula = { enabled: true }
+          it "adds EULA to message_settings" do
             expect(actual_placements).to match_array([
-                                                       deep_linking_placement("ActivityAssetProcessor", eula:),
+                                                       deep_linking_placement("ActivityAssetProcessor"),
                                                        deep_linking_placement("course_navigation")
                                                      ])
+            expect(registration.canvas_configuration["extensions"][0]["settings"]["message_settings"]).to match_array([
+                                                                                                                        {
+                                                                                                                          type: "LtiEulaRequest",
+                                                                                                                          enabled: true
+                                                                                                                        }
+                                                                                                                      ])
           end
 
           describe "when eula_message has custom_parameters and target_link_uri" do
@@ -506,16 +538,19 @@ module Lti::IMS
               }
             end
 
-            it "adds those settings to the ActivityAssetProcessor's eula settings" do
-              eula = {
-                enabled: true,
-                target_link_uri: "http://example.com/eula",
-                custom_fields: { "this_is_a_eula" => "yes" },
-              }
+            it "adds those settings to message_settings" do
               expect(actual_placements).to match_array([
-                                                         deep_linking_placement("ActivityAssetProcessor", eula:),
+                                                         deep_linking_placement("ActivityAssetProcessor"),
                                                          deep_linking_placement("course_navigation")
                                                        ])
+              expect(registration.canvas_configuration["extensions"][0]["settings"]["message_settings"]).to match_array([
+                                                                                                                          {
+                                                                                                                            type: "LtiEulaRequest",
+                                                                                                                            enabled: true,
+                                                                                                                            target_link_uri: "http://example.com/eula",
+                                                                                                                            custom_fields: { "this_is_a_eula" => "yes" }
+                                                                                                                          }
+                                                                                                                        ])
             end
           end
         end
@@ -706,7 +741,13 @@ module Lti::IMS
       let(:context) { account_model }
 
       context 'when "disabled_placements" is set' do
-        before { registration.registration_overlay["disabledPlacements"] = ["course_navigation"] }
+        before do
+          Lti::Overlay.create!(
+            registration: registration.developer_key.lti_registration,
+            account: context,
+            data: { "disabled_placements" => ["course_navigation"] }
+          )
+        end
 
         it "does not set the disabled placements" do
           expect(subject.settings.keys).not_to include "course_navigation"
@@ -884,6 +925,7 @@ module Lti::IMS
             {
               title: registration.client_name,
               domain: config[:domain],
+              target_link_uri: config[:target_link_uri],
               privacy_level: registration.privacy_level,
               oidc_initiation_url: registration.initiate_login_uri,
               redirect_uris: registration.redirect_uris,
@@ -942,6 +984,97 @@ module Lti::IMS
       end
     end
 
+    describe "to_internal_lti_configuration" do
+      let(:expected_config) do
+        {
+          title: "Example Tool",
+          domain: "example.com",
+          target_link_uri: "http://example.com/launch",
+          privacy_level: "anonymous",
+          oidc_initiation_url: "http://example.com/login",
+          redirect_uris: ["http://example.com"],
+          public_jwk_url: "http://example.com/jwks",
+          scopes: [],
+          placements: [],
+          launch_settings: {
+            icon_url: "http://example.com/logo.png",
+            text: "Example Tool"
+          }
+        }.with_indifferent_access
+      end
+
+      context "when called with an Lti::IMS::Registration instance" do
+        subject { Registration.to_internal_lti_configuration(registration) }
+
+        it "returns the correct internal configuration" do
+          expect(subject).to eq(expected_config)
+        end
+      end
+
+      context "when called with a hash" do
+        let(:registration_hash) do
+          {
+            "client_name" => "Example Tool",
+            "initiate_login_uri" => "http://example.com/login",
+            "jwks_uri" => "http://example.com/jwks",
+            "scopes" => [],
+            "redirect_uris" => ["http://example.com"],
+            "logo_uri" => "http://example.com/logo.png",
+            "lti_tool_configuration" => {
+              "target_link_uri" => "http://example.com/launch",
+              "domain" => "example.com",
+              "messages" => [],
+              "claims" => []
+            },
+            "https://canvas.instructure.com/lti/privacy_level" => "anonymous"
+          }
+        end
+
+        subject { Registration.to_internal_lti_configuration(registration_hash) }
+
+        it "returns the correct internal configuration" do
+          expect(subject).to eq(expected_config)
+        end
+      end
+    end
+
+    describe "#reinstall_disabled?" do
+      context "when lti_dr_registrations_update flag is off" do
+        before do
+          registration.root_account.disable_feature!(:lti_dr_registrations_update)
+        end
+
+        it "returns true regardless of the extension value" do
+          expect(registration.reinstall_disabled?).to be true
+        end
+
+        it "returns true even when disable_reinstall extension is false" do
+          lti_tool_configuration[Lti::IMS::Registration::DISABLE_REINSTALL_EXTENSION] = false
+          expect(registration.reinstall_disabled?).to be true
+        end
+      end
+
+      context "when lti_dr_registrations_update flag is on" do
+        before do
+          registration.root_account.enable_feature!(:lti_dr_registrations_update)
+        end
+
+        it "returns true when the disable_reinstall extension is true" do
+          lti_tool_configuration[Lti::IMS::Registration::DISABLE_REINSTALL_EXTENSION] = true
+          expect(registration.reinstall_disabled?).to be true
+        end
+
+        it "returns false when the disable_reinstall extension is not set" do
+          expect(registration.reinstall_disabled?).to be false
+        end
+
+        it "returns false when the disable_reinstall extension is false" do
+          lti_tool_configuration[Lti::IMS::Registration::DISABLE_REINSTALL_EXTENSION] = false
+          expect(registration.reinstall_disabled?).to be false
+        end
+      end
+    end
+
     describe "as_json" do
       subject { registration.as_json }
 
@@ -951,7 +1084,6 @@ module Lti::IMS
             id
             lti_registration_id
             developer_key_id
-            overlay
             lti_tool_configuration
             application_type
             grant_types
@@ -972,6 +1104,7 @@ module Lti::IMS
             guid
             tool_configuration
             default_configuration
+            registration_url
           ]
         )
       end

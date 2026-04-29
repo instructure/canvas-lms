@@ -66,53 +66,63 @@ export const ContentSelectionModal = ({
 
   const I18n = useI18nScope('content_migrations_redesign')
 
-  const loadSubItemsFromSubItemUrls = useCallback(async (
-    url: string
-  ): Promise<GenericItemResponse[]> => {
-    const {json} = await doFetchApi<GenericItemResponse[]>({
-      path: url,
-      method: 'GET',
-    })
-    if (!json) {
-      return []
-    }
-
-    for (const subItem of json) {
-      if (subItem.sub_items_url) {
-        subItem.sub_items = await loadSubItemsFromSubItemUrls(subItem.sub_items_url)
+  const loadSubItemsFromSubItemUrls = useCallback(
+    async (url: string): Promise<GenericItemResponse[]> => {
+      const {json} = await doFetchApi<GenericItemResponse[]>({
+        path: url,
+        method: 'GET',
+      })
+      if (!json) {
+        return []
       }
-    }
 
-    return json
-  }, [])
-
-  const getCheckboxTreeNodes = useCallback(async (
-    response: SelectiveDataResponse
-  ): Promise<Record<string, CheckboxTreeNode>> => {
-    const items: Item[] = []
-
-    for (const {type, title, property, sub_items, count, sub_items_url, migration_id} of response) {
-      const item = responseToItem(
-        {
-          type,
-          title,
-          property,
-          sub_items,
-          migration_id,
-        },
-        I18n,
-      )
-
-      if (sub_items_url && count) {
-        const rootSubItems = await loadSubItemsFromSubItemUrls(sub_items_url)
-        item.children = rootSubItems.map(subItem => responseToItem(subItem, I18n))
-        item.label = I18n.t('%{title} (%{count})', {title, count})
+      for (const subItem of json) {
+        if (subItem.sub_items_url) {
+          subItem.sub_items = await loadSubItemsFromSubItemUrls(subItem.sub_items_url)
+        }
       }
-      items.push(item)
-    }
 
-    return mapToCheckboxTreeNodes(items)
-  }, [I18n, loadSubItemsFromSubItemUrls])
+      return json
+    },
+    [],
+  )
+
+  const getCheckboxTreeNodes = useCallback(
+    async (response: SelectiveDataResponse): Promise<Record<string, CheckboxTreeNode>> => {
+      const items: Item[] = []
+
+      for (const {
+        type,
+        title,
+        property,
+        sub_items,
+        count,
+        sub_items_url,
+        migration_id,
+      } of response) {
+        const item = responseToItem(
+          {
+            type,
+            title,
+            property,
+            sub_items,
+            migration_id,
+          },
+          I18n,
+        )
+
+        if (sub_items_url && count) {
+          const rootSubItems = await loadSubItemsFromSubItemUrls(sub_items_url)
+          item.children = rootSubItems.map(subItem => responseToItem(subItem, I18n))
+          item.label = I18n.t('%{title} (%{count})', {title, count})
+        }
+        items.push(item)
+      }
+
+      return mapToCheckboxTreeNodes(items)
+    },
+    [I18n, loadSubItemsFromSubItemUrls],
+  )
 
   const handleEntered = useCallback(async () => {
     setHasErrors(false)

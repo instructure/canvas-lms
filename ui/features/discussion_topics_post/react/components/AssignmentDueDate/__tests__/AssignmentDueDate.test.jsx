@@ -23,23 +23,23 @@ import {responsiveQuerySizes} from '../../../utils/index'
 import React from 'react'
 import {render} from '@testing-library/react'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
 
 const mockProps = {
   dueDate: '2021-03-30T23:59:59-06:00',
-  onSetDueDateTrayOpen: jest.fn(),
+  onSetDueDateTrayOpen: vi.fn(),
 }
 
 const setup = props => {

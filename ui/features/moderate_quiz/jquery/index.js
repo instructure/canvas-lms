@@ -24,7 +24,6 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import '@canvas/jquery/jquery.instructure_forms' /* fillFormData, getFormData */
 import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/rails-flash-notifications'

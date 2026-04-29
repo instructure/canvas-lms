@@ -44,8 +44,7 @@ interface Props {
 export function TempEnrollSearchConfirmation(props: Props) {
   const [userDetails, setUserDetails] = useState<User[]>([])
   const [loading, setLoading] = useState<boolean>(false)
-  // @ts-expect-error
-  const [selectedDupes, setSelectedDupes] = useState<Record<string, DuplicateUser | null>>([])
+  const [selectedDupes, setSelectedDupes] = useState<Record<string, DuplicateUser | null>>({})
   const [attemptedSubmit, setAttemptedSubmit] = useState(false)
 
   useEffect(() => {
@@ -55,11 +54,9 @@ export function TempEnrollSearchConfirmation(props: Props) {
         const promises: Promise<User>[] = []
         users.forEach(user => {
           if (user.id == null) {
-            // @ts-expect-error
             promises.push(fetchUserDetails(user))
           } else {
-            // @ts-expect-error
-            promises.push(user)
+            promises.push(Promise.resolve(user))
           }
         })
         Promise.all(promises)
@@ -106,12 +103,15 @@ export function TempEnrollSearchConfirmation(props: Props) {
   }, [props.duplicateReq])
 
   // user_lists.json does not always return email, sis id, and login
-  const fetchUserDetails = async (user: User) => {
+  const fetchUserDetails = async (user: User): Promise<User> => {
     const userId = user.user_id || user.id
-    const {json} = await doFetchApi({
+    const {json} = await doFetchApi<User>({
       path: `/api/v1/users/${userId}/profile`,
       method: 'GET',
     })
+    if (!json) {
+      throw new Error('Failed to fetch user details')
+    }
     return json
   }
 

@@ -2,5 +2,6 @@
   "name": "@instructure/date-js",
   "version": "1.0.0",
   "main": "parser.js",
-  "private": true
+  "private": true,
+  "type": "module"
 }

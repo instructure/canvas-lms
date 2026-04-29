@@ -219,7 +219,7 @@ describe "course people" do
       f('a[data-event="editSections"]', cog).click
       wait_for_ajaximations
       yield
-      f(".ui-dialog-buttonpane .btn-primary").click
+      f("[data-testid='save-button']").click
       wait_for_ajaximations
     end
 
@@ -371,7 +371,7 @@ describe "course people" do
       add_user(@teacher.name, "Mentor")
       teacher_row = f("#user_#{@teacher.id}")
       expect(teacher_row).to have_class("TeacherEnrollment")
-      expect(teacher_row).to_not have_class("Mentor")
+      expect(teacher_row).not_to have_class("Mentor")
     end
   end
 end

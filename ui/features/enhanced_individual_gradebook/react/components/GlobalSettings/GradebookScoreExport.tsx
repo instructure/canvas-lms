@@ -26,7 +26,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconDownloadLine} from '@instructure/ui-icons'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {useExportGradebook} from '../../hooks/useExportGradebook'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('enhanced_individual_gradebook')
 
@@ -82,8 +82,7 @@ export default function GradebookScoreExport({
       <Button
         data-testid="gradebook-export-button"
         color="secondary"
-        // @ts-expect-error
-        renderIcon={IconDownloadLine}
+        renderIcon={<IconDownloadLine />}
         id="gradebook-export"
         interaction={attachmentStatus === ApiCallStatus.PENDING ? 'disabled' : 'enabled'}
         onClick={exportGradebookCsv}

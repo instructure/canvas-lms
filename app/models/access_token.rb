@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AccessToken < ActiveRecord::Base
+class AccessToken < ApplicationRecord
   include Workflow
 
   extend RootAccountResolver
@@ -33,6 +33,8 @@ class AccessToken < ActiveRecord::Base
   attr_reader :full_token
   attr_reader :plaintext_refresh_token
 
+  scope :user_generated, -> { where(developer_key_id: DeveloperKey.default.id) }
+
   belongs_to :developer_key
   belongs_to :user, inverse_of: :access_tokens
   belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: "User"
@@ -40,12 +42,13 @@ class AccessToken < ActiveRecord::Base
 
   serialize :scopes, type: Array
 
-  validates :purpose, length: { maximum: maximum_string_length }
+  validates :purpose, length: { minimum: 1, maximum: maximum_string_length }
   validate :must_only_include_valid_scopes, unless: :deleted?
 
   has_many :notification_endpoints, -> { where(workflow_state: "active") }, dependent: :destroy
 
   before_validation -> { self.developer_key ||= DeveloperKey.default }
+  before_validation -> { self.purpose ||= self.developer_key&.name unless manually_created? }
 
   resolves_root_account through: :developer_key
 
@@ -71,28 +74,57 @@ class AccessToken < ActiveRecord::Base
     end
   end
 
-  set_policy do
-    given do |user|
-      user.id == user_id && (
-        !user.account.feature_enabled?(:admin_manage_access_tokens) ||
-        !user.account.limit_personal_access_tokens?
-      )
-    end
-    can :create and can :update
+  # helper method to generate a "session" hash that can be passed into
+  # permission checks
+  def self.account_session_for_permissions(root_account)
+    {
+      permissions_key: root_account,
+      root_account:
+    }
+  end
 
-    given do |user|
-      self.user.check_accounts_right?(user, :create_access_tokens)
+  set_policy do
+    given do |user, session|
+      # This block is only for checking if the user can manage their own tokens
+      next false unless user.id == user_id
+
+      next false unless self.class.can_manage_own_access_tokens?(user)
+
+      # if the session wasn't set up correctly, just ignore the additional restrictions
+      next true unless (root_account = session&.dig(:root_account))
+
+      # if personal access tokens are limited, then you can't create tokens for yourself
+      # (from this block; if you're an admin, you'll still be able to from the block below)
+      next false if root_account.limit_personal_access_tokens?
+      # if students are restricted from creating personal access tokens,
+      # then if you're _only_ a student, only an observer, or only both, you can't create tokens
+      # (a teacher that is a student/observer will still be allowed to)
+      next false if root_account.restrict_personal_access_tokens_from_students? &&
+                    (roles = user.roles(root_account) - ["user"]) &&
+                    (roles.empty? || (roles - ["student", "observer"]).empty?)
+
+      true
     end
     can :create and can :update
 
     given { |user| user.id == user_id }
     can :read and can :delete
 
+    given do |user|
+      next false if user.id == user_id && !self.class.can_manage_own_access_tokens?(user)
+
+      self.user.check_accounts_right?(user, :create_access_tokens)
+    end
+    can :create and can :update
+
     given { |user| self.user.check_accounts_right?(user, :delete_access_tokens) }
     can :delete
+
+    given { |user| self.user.check_accounts_right?(user, :view_user_generated_access_tokens) && developer_key_id == DeveloperKey.default.id }
+    can :read
   end
 
-  # For user-generated tokens, purpose can be manually set.
+  # For user-generated tokens, purpose should always be set.
   # For app-generated tokens, this should be generated based
   # on the scope defined in the auth process (scope has not
   # yet been implemented)
@@ -165,8 +197,15 @@ class AccessToken < ActiveRecord::Base
     tokens.uniq.reject { |token| token.developer_key&.internal_service }
   end
 
+  # If the token exists, and belongs to site admin, return the token itself.
+  # Otherwise return falsey (not specified if it's false or nil).
+  #
+  # This can be used to eliminate an additional call to {.authenticate} once
+  # you know the token is relevant, while still being boolean.
+  #
+  # @return [AccessToken, false, nil]
   def self.site_admin?(token_string)
-    !!authenticate(token_string)&.site_admin?
+    (access_token = authenticate(token_string)) && access_token.site_admin? && access_token
   end
 
   def localized_workflow_state
@@ -183,7 +222,17 @@ class AccessToken < ActiveRecord::Base
 
   def set_permanent_expiration
     expires_in = developer_key.tokens_expire_in
-    self.permanent_expires_at = Time.now.utc + expires_in if expires_in
+    # failsafe 1 week
+    if Account.site_admin.feature_enabled?(:site_admin_access_token_expiration) &&
+       Account.site_admin.grants_right?(user, :read) &&
+       (site_admin_expires_in = DynamicSettings.find(tree: :private)["site_admin_access_token_expires_in", failsafe: 604_800]&.seconds || 1.week)
+      expires_in = [expires_in, site_admin_expires_in].compact.min
+    end
+    if expires_in
+      expires_at = Time.now.utc + expires_in
+      expires_at = [permanent_expires_at, expires_at].compact.min if new_record?
+      self.permanent_expires_at = expires_at
+    end
   end
 
   def usable?(token_key = :crypted_token)
@@ -242,7 +291,7 @@ class AccessToken < ActiveRecord::Base
       # not only use optimistic locking, but also don't update if someone else
       # is already in the process of updating it
       updated = AccessToken.where(id: AccessToken.where(id: self, last_used_at: prior_last_used_at)
-                                                 .lock("FOR UPDATE SKIP LOCKED"))
+                                      .lock("FOR UPDATE SKIP LOCKED"))
                            .update_all(last_used_at: at, updated_at: at)
       changes_applied if updated == 1
     end
@@ -270,7 +319,7 @@ class AccessToken < ActiveRecord::Base
     @full_token = nil
   end
 
-  def generate_token(overwrite = false)
+  def generate_token(overwrite: false)
     if overwrite || !crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
@@ -294,7 +343,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def regenerate_access_token
-    generate_token(true)
+    generate_token(overwrite: true)
     save
   end
 
@@ -326,6 +375,7 @@ class AccessToken < ActiveRecord::Base
       path = path.gsub(%r{:[^/)]+}, "[^/]+") # handle dynamic segments /courses/:course_id -> /courses/[^/]+
       path = path.gsub(%r{\*[^/)]+}, ".+") # handle glob segments /files/*path -> /files/.+
       path = path.gsub("(", "(?:").gsub(")", "|)") # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
+      path = path.gsub("/download", "/(?:download|preview)(?:\\.:type)?") # files have preview and download endpoints that do pretty much the same job
       path = "#{path}(?:\\.[^/]+|)" # handle format segments /files(.:format) -> /files(?:\.[^/]+|)
       Regexp.new("^#{path}$")
     end
@@ -361,32 +411,73 @@ class AccessToken < ActiveRecord::Base
     developer_key.account_id
   end
 
+  # If you have a relation, please use the `user_generated` scope instead of this method.
   def manually_created?
-    developer_key_id == DeveloperKey.default.id
+    developer_key_id == DeveloperKey.default.id || developer_key&.name == DeveloperKey::DEFAULT_KEY_NAME
+  end
+
+  def self.send_expiration_reminders
+    return unless Account.site_admin.feature_enabled?(:access_key_expiration_email)
+
+    notification = BroadcastPolicy.notification_finder.by_name("Access Token Expiring Soon")
+    return unless notification
+
+    window_start = 7.days.from_now.beginning_of_day
+    window_end   = 7.days.from_now.end_of_day
+
+    active.user_generated
+          .where(permanent_expires_at: window_start..window_end)
+          .preload(:developer_key, user: { pseudonym: :account })
+          .find_each { |token| notification.create_message(token, [token.user]) }
   end
 
   # if user is not provided, all user tokens in the account will be invalidated
-  def self.invalidate_mobile_tokens!(account, user: nil)
+  # if skip_admins is true, tokens for users with active admin roles in the account will not be invalidated
+  def self.invalidate_mobile_tokens!(account, user: nil, skip_admins: true)
     return unless account.root_account?
 
     developer_key_ids = DeveloperKey.mobile_app_keys.map do |app_key|
       app_key.respond_to?(:global_id) ? app_key.global_id : app_key.id
     end
-    user_ids = if user
-                 [user.id]
-               else
-                 User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account }).ids
-               end
-    tokens = active.where(developer_key_id: developer_key_ids, user_id: user_ids)
+    user_scope = User.active.joins(:pseudonyms).where(pseudonyms: { account_id: account })
+    user_scope = user_scope.where(id: user) if user
+    user_scope = user_scope.where(<<~SQL.squish, account.id) if skip_admins
+      NOT EXISTS (SELECT 1 FROM #{AccountUser.quoted_table_name}
+                  WHERE account_users.user_id = users.id
+                  AND account_users.account_id = ?
+                  AND account_users.workflow_state = 'active')
+    SQL
+    tokens = active.where(developer_key_id: developer_key_ids, user_id: user_scope.select(:id))
 
     now = Time.zone.now
     tokens.in_batches(of: 10_000).update_all(updated_at: now, permanent_expires_at: now)
   end
 
   def queue_developer_key_token_count_increment
-    developer_key&.shard&.activate do
-      strand = "developer_key_token_count_increment_#{developer_key.global_id}"
-      DeveloperKey.delay_if_production(strand:).increment_counter(:access_token_count, developer_key.id)
+    return if developer_key.nil? || developer_key.shard == Shard.default
+
+    developer_key.shard.activate do
+      # Previously this enqueued a delayed job per token creation to increment
+      # the developer key's access_token_count. High-volume token creation was
+      # overwhelming the job shard(s) with many trivial increment jobs, especially
+      # when multiple shards created tokens referencing the same developer key.
+      #
+      # Using ActiveRecord.increment_counter here performs a single, atomic
+      # UPDATE statement (SET access_token_count = access_token_count + 1) on
+      # the developer key's shard, avoiding the background job overhead while
+      # still remaining contention-safe at the DB level.
+      DeveloperKey.increment_counter(:access_token_count, developer_key.id)
+    end
+  end
+
+  class << self
+    def can_manage_own_access_tokens?(user)
+      if Account.site_admin.grants_right?(user, :read) &&
+         !Account.site_admin.grants_right?(user, :site_admin_self_token_create)
+        return false
+      end
+
+      true
     end
   end
 end

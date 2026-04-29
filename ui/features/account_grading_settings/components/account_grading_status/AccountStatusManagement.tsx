@@ -17,11 +17,11 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import type {GradeStatus, GradeStatusType} from '@canvas/grading/accountGradingStatus'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {Alert} from '@instructure/ui-alerts'
 import {Grid} from '@instructure/ui-grid'
 import {Heading} from '@instructure/ui-heading'

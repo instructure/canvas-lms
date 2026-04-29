@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {IconAudioSolid, IconUserSolid} from '@instructure/ui-icons'
@@ -45,7 +45,7 @@ import {
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {usePostComment} from '../../hooks/useComments'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import DefaultGradeInput from './DefaultGradeInput'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
@@ -135,7 +135,7 @@ export default function SubmissionDetailModal({
         />
 
         <View as="div" margin="small 0" padding="0 medium">
-          <Link href={speedGraderUrl()} isWithinText={false}>
+          <Link href={speedGraderUrl()} isWithinText={false} target="_blank" rel="noopener">
             {I18n.t('More details in SpeedGrader')}
           </Link>
         </View>

@@ -26,10 +26,10 @@ describe('Gradebook#loadTrayStudent', () => {
     gradebook.gradebookGrid.gridSupport = {
       state: {
         getActiveLocation: () => ({region: 'body', cell: 0, row: 1}),
-        setActiveLocation: jest.fn(),
+        setActiveLocation: vi.fn(),
       },
       helper: {
-        commitCurrentEdit: jest.fn(),
+        commitCurrentEdit: vi.fn(),
       },
     }
     gradebook.students = {
@@ -67,15 +67,15 @@ describe('Gradebook#loadTrayStudent', () => {
         },
       },
     }
-    jest
+    vi
       .spyOn(gradebook, 'listRows')
       .mockReturnValue([1100, 1101, 1102].map(id => gradebook.students[id]))
-    jest.spyOn(gradebook, 'updateRowAndRenderSubmissionTray').mockImplementation(() => {})
-    jest.spyOn(gradebook, 'unloadSubmissionComments').mockImplementation(() => {})
+    vi.spyOn(gradebook, 'updateRowAndRenderSubmissionTray').mockImplementation(() => {})
+    vi.spyOn(gradebook, 'unloadSubmissionComments').mockImplementation(() => {})
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('changes the highlighted cell to the previous row when called with "previous"', () => {
@@ -107,7 +107,7 @@ describe('Gradebook#loadTrayStudent', () => {
   })
 
   it('does not change the highlighted cell when called with "previous" while on the first row', () => {
-    jest
+    vi
       .spyOn(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .mockReturnValue({region: 'body', cell: 0, row: 0})
     gradebook.loadTrayStudent('previous')
@@ -115,16 +115,16 @@ describe('Gradebook#loadTrayStudent', () => {
   })
 
   it('does not update the submission tray state when called with "previous" while on the first row', () => {
-    jest
+    vi
       .spyOn(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .mockReturnValue({region: 'body', cell: 0, row: 0})
-    jest.spyOn(gradebook, 'setSubmissionTrayState').mockImplementation(() => {})
+    vi.spyOn(gradebook, 'setSubmissionTrayState').mockImplementation(() => {})
     gradebook.loadTrayStudent('previous')
     expect(gradebook.setSubmissionTrayState).not.toHaveBeenCalled()
   })
 
   it('does not update and render the submission tray when called with "previous" while on the first row', () => {
-    jest
+    vi
       .spyOn(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .mockReturnValue({region: 'body', cell: 0, row: 0})
     gradebook.loadTrayStudent('previous')
@@ -160,7 +160,7 @@ describe('Gradebook#loadTrayStudent', () => {
   })
 
   it('does not change the highlighted cell when called with "next" while on the last row', () => {
-    jest
+    vi
       .spyOn(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .mockReturnValue({region: 'body', cell: 0, row: 2})
     gradebook.loadTrayStudent('next')
@@ -168,16 +168,16 @@ describe('Gradebook#loadTrayStudent', () => {
   })
 
   it('does not update the submission tray state when called with "next" while on the last row', () => {
-    jest
+    vi
       .spyOn(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .mockReturnValue({region: 'body', cell: 0, row: 2})
-    jest.spyOn(gradebook, 'setSubmissionTrayState').mockImplementation(() => {})
+    vi.spyOn(gradebook, 'setSubmissionTrayState').mockImplementation(() => {})
     gradebook.loadTrayStudent('next')
     expect(gradebook.setSubmissionTrayState).not.toHaveBeenCalled()
   })
 
   it('does not update and render the submission tray when called with "next" while on the last row', () => {
-    jest
+    vi
       .spyOn(gradebook.gradebookGrid.gridSupport.state, 'getActiveLocation')
       .mockReturnValue({region: 'body', cell: 0, row: 2})
     gradebook.loadTrayStudent('next')

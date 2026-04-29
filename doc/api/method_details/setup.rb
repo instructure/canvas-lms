@@ -31,6 +31,8 @@ def header
   route = @routes.first
   @method_link = "method.#{route.requirements[:controller]}.#{route.requirements[:action]}"
   @beta = object.tag("beta") || object.parent.tag("beta")
+  @internal = object.tag("internal") || object.parent.tag("internal")
+  @show_internal = show_internal?
 
   if object.has_tag?(:deprecated_method)
     @deprecated_method = DeprecatedMethodView.new(object.tag(:deprecated_method))
@@ -44,6 +46,10 @@ def get_routes
   @action = object.path.sub(/^.*#/, "")
   @action = @action.sub(/_with_.*$/, "")
   @routes = ApiRouteSet.api_methods_for_controller_and_action(@controller, @action)
+  if @controller == "files" && @action == "show"
+    file_routes = CanvasRails::Application.routes.set.select { |r| %r{/files/:(?:file_)?id/download\(\.:format\)$} =~ r.path.spec.to_s }
+    @routes += file_routes.sort_by { |r| r.path.spec.to_s }
+  end
   @route = @routes.first
   raise "Could not find route for #{object}" unless @route
 

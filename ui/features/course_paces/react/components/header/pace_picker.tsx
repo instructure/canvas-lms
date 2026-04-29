@@ -87,7 +87,7 @@ export const PacePicker = ({
   const [open, setOpen] = useState(false)
   const [pendingContext, setPendingContext] = useState('')
 
-  let selectedContextName = I18n.t('Course')
+  let selectedContextName: string | undefined = I18n.t('Course')
   if (selectedContextType === 'Section') {
     selectedContextName = sections.find(({id}) => id === selectedContextId)?.name
   }

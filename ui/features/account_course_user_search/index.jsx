@@ -18,7 +18,9 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@instructure/platform-query'
 import App from './react/index'
 import router from './react/router'
 import configureStore from './react/store/configureStore'
@@ -70,15 +72,21 @@ ready(() => {
 
   initializeTopNavPortal({getBreadCrumbSetter: setFunction})
 
+  const AccountCourseUserSearch = () => (
+    <QueryClientProvider client={queryClient}>
+      <App {...props} />
+    </QueryClientProvider>
+  )
+
   const content = document.getElementById('content')
-  const root = createRoot(content)
+  const root = render(<AccountCourseUserSearch />, content)
 
   store.subscribe(() => {
     const tabState = store.getState().tabList
     const selectedTab = tabState.tabs[tabState.selected]
     updateDocumentTitleBreadcrumbAndActiveTab(selectedTab, () => setBreadCrumb)
 
-    root.render(<App {...props} />)
+    rerender(root, <AccountCourseUserSearch />)
   })
 
   router.start(store)

@@ -20,9 +20,10 @@ import {DiscussionEdit} from '../DiscussionEdit'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import $ from '@canvas/rails-flash-notifications'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 injectGlobalAlertContainers()
-jest.mock('@canvas/rce/react/CanvasRce')
+vi.mock('@canvas/rce/react/CanvasRce')
 
 const setup = props => {
   return render(<DiscussionEdit {...props} />)
@@ -31,8 +32,8 @@ const setup = props => {
 const defaultProps = ({
   show = undefined,
   value = undefined,
-  onCancel = jest.fn(),
-  onSubmit = jest.fn(),
+  onCancel = vi.fn(),
+  onSubmit = vi.fn(),
   isEdit = false,
   canReplyAnonymously = false,
   discussionAnonymousState = null,
@@ -51,10 +52,8 @@ const defaultProps = ({
 })
 
 describe('DiscussionEdit', () => {
-  const oldEnv = window.ENV
-
   afterEach(() => {
-    window.ENV = oldEnv
+    fakeENV.teardown()
   })
 
   describe('Rendering', () => {
@@ -95,7 +94,7 @@ describe('DiscussionEdit', () => {
 
   describe('Callbacks', () => {
     it('should fire onCancel when clicked', () => {
-      const onCancelMock = jest.fn()
+      const onCancelMock = vi.fn()
       const {getByTestId} = setup(defaultProps({onCancel: onCancelMock}))
       const cancelButton = getByTestId('DiscussionEdit-cancel')
       fireEvent.click(cancelButton)
@@ -103,7 +102,7 @@ describe('DiscussionEdit', () => {
     })
 
     it('should fire onSubmit when clicked', () => {
-      const onSubmitMock = jest.fn()
+      const onSubmitMock = vi.fn()
       const {getByTestId} = setup(defaultProps({onSubmit: onSubmitMock}))
       const submitButton = getByTestId('DiscussionEdit-submit')
       fireEvent.click(submitButton)
@@ -111,9 +110,9 @@ describe('DiscussionEdit', () => {
     })
 
     it('should trigger error on submit when value is too long', () => {
-      const flashStub = jest.spyOn($, 'flashError')
-      window.ENV.DISCUSSION_ENTRY_SIZE_LIMIT = 10
-      const onSubmitMock = jest.fn()
+      const flashStub = vi.spyOn($, 'flashError')
+      fakeENV.setup({DISCUSSION_ENTRY_SIZE_LIMIT: 10})
+      const onSubmitMock = vi.fn()
       const {getByTestId} = setup(defaultProps({onSubmit: onSubmitMock, value: '<p>1234</p>'}))
       const submitButton = getByTestId('DiscussionEdit-submit')
       fireEvent.click(submitButton)
@@ -127,7 +126,7 @@ describe('DiscussionEdit', () => {
 
   describe('Anonymous Response Selector', () => {
     beforeEach(() => {
-      ENV.current_user = {display_name: 'Ronald Weasley', avatar_image_url: ''}
+      fakeENV.setup({current_user: {display_name: 'Ronald Weasley', avatar_image_url: ''}})
     })
 
     describe('Topic is anonymous', () => {

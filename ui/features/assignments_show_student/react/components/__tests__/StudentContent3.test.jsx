@@ -17,24 +17,23 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/client/testing'
 import {render, waitFor} from '@testing-library/react'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {initializeReaderButton} from '@canvas/immersive-reader/ImmersiveReader'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import StudentContent from '../StudentContent'
 import ContextModuleApi from '../../apis/ContextModuleApi'
-import {withSubmissionContext} from '../../test-utils/submission-context'
 
 injectGlobalAlertContainers()
 
-jest.mock('../AttemptSelect')
+vi.mock('../AttemptSelect')
 
-jest.mock('../../apis/ContextModuleApi')
+vi.mock('../../apis/ContextModuleApi')
 
-jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
+vi.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
   return {
-    initializeReaderButton: jest.fn(),
+    initializeReaderButton: vi.fn(),
   }
 })
 
@@ -69,12 +68,9 @@ describe('Assignment Student Content View', () => {
 
       const props = await mockAssignmentAndSubmission()
       const {getByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
 
       expect(getByText(concludedMatch)).toBeInTheDocument()
@@ -84,12 +80,9 @@ describe('Assignment Student Content View', () => {
       window.ENV.can_submit_assignment_from_section = false
       const props = await mockAssignmentAndSubmission()
       const {getByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
 
       expect(getByText(concludedMatch)).toBeInTheDocument()
@@ -98,12 +91,9 @@ describe('Assignment Student Content View', () => {
     it('does not render when the current enrollment is not concluded', async () => {
       const props = await mockAssignmentAndSubmission()
       const {queryByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
 
       expect(queryByText(concludedMatch)).not.toBeInTheDocument()
@@ -115,12 +105,9 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission()
       props.assignment.env.belongsToUnpublishedModule = true
       const {getByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(
         getByText('This assignment is part of an unpublished module and is not available yet.'),
@@ -144,12 +131,9 @@ describe('Assignment Student Content View', () => {
         ],
       }
       const {getByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(
         getByText('There are no submissions available to review just yet.'),
@@ -162,12 +146,9 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.peerReviewModeEnabled = false
       props.assignment.env.peerReviewAvailable = true
       const {queryByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(
         queryByText('There are no submissions available to review just yet.'),
@@ -179,12 +160,9 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission()
       props.assignment.env.peerReviewModeEnabled = false
       const {queryByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(
         queryByText('There are no submissions available to review just yet.'),
@@ -217,12 +195,9 @@ describe('Assignment Student Content View', () => {
       document.documentElement.append(element)
 
       render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
 
       await waitFor(() => {
@@ -241,12 +216,9 @@ describe('Assignment Student Content View', () => {
       document.documentElement.append(element)
 
       render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
 
       await waitFor(() => {
@@ -261,12 +233,9 @@ describe('Assignment Student Content View', () => {
 
     it('does not set up Immersive Reader if neither mount point is present', async () => {
       render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
 
       await new Promise(resolve => setTimeout(resolve, 0))

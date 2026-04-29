@@ -16,57 +16,176 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PropsWithChildren, useRef} from 'react'
+import {PropsWithChildren} from 'react'
 import {useNode} from '@craftjs/core'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AddButton} from '../../../AddBlock/AddButton'
-import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
 import {useDeleteNode} from '../../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
+import {useMoveBlock} from '../../../hooks/useMoveBlock'
+import {useIsEditingBlock} from '../../../hooks/useIsEditingBlock'
+import {useBlockTitle} from '../../../hooks/useBlockTitle'
+import {showScreenReaderAlert} from '../../../utilities/accessibility'
 import {BaseBlockLayout} from '../layout/BaseBlockLayout'
-import {useSetEditMode} from '../useSetEditMode'
 import {CopyButton} from './CopyButton'
+import {SettingsButton} from './SettingsButton'
 import {RemoveButton} from './RemoveButton'
-import {ApplyButton} from './ApplyButton'
+import {MoveButton} from './MoveButton'
+import {BackgroundColorApplier} from './BackgroundColorApplier'
+import {Flex} from '@instructure/ui-flex'
+import {A11yDoneEditingButton} from './A11yDoneEditingButton'
+import {A11yEditButton} from './A11yEditButton'
+import {useInstUIRef} from '../../../hooks/useInstUIRef'
+import {useAddBlockModal} from '../../../hooks/useAddBlockModal'
+import {useSettingsTray} from '../../../hooks/useSettingsTray'
+import {useEditingBlock} from '../../../hooks/useEditingBlock'
+import {useFocusManagement} from '../../../hooks/useFocusManagement'
+import {useGetBlocksCount} from '../../../hooks/useGetBlocksCount'
+import {usePreviousBlock} from '../../../hooks/usePreviousBlock'
+import {useNextBlock} from '../../../hooks/useNextBlock'
+
+const I18n = createI18nScope('block_content_editor')
 
 const InsertButton = () => {
-  const {addBlockModal} = useBlockContentEditorContext()
   const {id} = useNode()
-  return <AddButton onClicked={() => addBlockModal.open(id)} />
+  const {open} = useAddBlockModal()
+  const {elementRef} = useFocusManagement({buttonType: 'insertButton', nodeId: id})
+  return <AddButton onClicked={() => open(id)} elementRef={elementRef} />
 }
 
-const DeleteButton = () => {
+const DeleteButton = ({title}: {title: string}) => {
   const deleteNode = useDeleteNode()
-  return <RemoveButton onClicked={deleteNode} />
+  const {blocksCount} = useGetBlocksCount()
+  const {getPreviousBlockId} = usePreviousBlock()
+  const {getNextBlockId} = useNextBlock()
+  const {focusAddBlockButton, focusInsertButton, focusCopyButton} = useFocusManagement()
+
+  const handleDelete = () => {
+    const isLastBlock = blocksCount === 1
+    const previousBlockId = getPreviousBlockId()
+    const nextBlockId = getNextBlockId()
+    const isFirstBlock = !previousBlockId
+
+    deleteNode()
+    const alertMessage = I18n.t('Block removed: %{blockType}', {blockType: title})
+    showScreenReaderAlert(alertMessage)
+
+    if (isLastBlock) {
+      focusAddBlockButton()
+    } else if (isFirstBlock && nextBlockId) {
+      focusCopyButton(nextBlockId)
+    } else if (previousBlockId) {
+      focusInsertButton(previousBlockId)
+    }
+  }
+  return <RemoveButton onClicked={handleDelete} title={title} />
 }
 
-const DuplicateButton = () => {
+const DuplicateButton = ({
+  title,
+  elementRef,
+}: {
+  title: string
+  elementRef?: (element: Element | null) => void
+}) => {
   const duplicateNode = useDuplicateNode()
-  return <CopyButton onClicked={duplicateNode} />
+  const handleDuplicate = () => {
+    duplicateNode()
+    const alertMessage = I18n.t('Block duplicated: %{blockType}', {blockType: title})
+    showScreenReaderAlert(alertMessage)
+  }
+  return <CopyButton onClicked={handleDuplicate} title={title} elementRef={elementRef} />
+}
+
+const EditSettingsButton = ({title}: {title: string}) => {
+  const {id} = useNode()
+  const {open} = useSettingsTray()
+  return <SettingsButton onClicked={() => open(id)} title={title} />
+}
+
+const MoveBlockButton = ({title}: {title: string}) => {
+  const {canMoveUp, canMoveDown, moveToTop, moveUp, moveToBottom, moveDown} = useMoveBlock()
+
+  return (
+    <MoveButton
+      canMoveUp={canMoveUp}
+      canMoveDown={canMoveDown}
+      onMoveUp={moveUp}
+      onMoveDown={moveDown}
+      onMoveToTop={moveToTop}
+      onMoveToBottom={moveToBottom}
+      title={title}
+    />
+  )
 }
 
 export const BaseBlockEditWrapper = (
   props: PropsWithChildren<{
     title: string
-    setIsEditMode: (isEditMode: boolean) => void
-    isEditMode: boolean
+    backgroundColor?: string
   }>,
 ) => {
-  const ref = useRef<HTMLDivElement>(null)
-  useSetEditMode(ref, props.setIsEditMode)
+  const {id} = useNode()
+  const {setId} = useEditingBlock()
+  const {isEditing, isEditingViaEditButton: isEditingByKeyboard} = useIsEditingBlock()
+  const [editButtonRef, setEditButtonRef] = useInstUIRef<HTMLButtonElement>()
+  const blockTitle = useBlockTitle()
+  const {elementRef: copyButtonRef} = useFocusManagement({buttonType: 'copyButton', nodeId: id})
+
+  const handleSave = () => {
+    setId(null)
+    setTimeout(() => editButtonRef?.current?.focus(), 0)
+  }
+
+  const handleEditByKeyboard = () => {
+    setId(id, true)
+  }
 
   return (
-    <BaseBlockLayout
-      ref={ref}
-      title={props.title}
-      addButton={<InsertButton />}
-      actionButtons={
-        props.isEditMode
-          ? [<ApplyButton key="action-save-btn" onClick={() => props.setIsEditMode(false)} />]
-          : []
-      }
-      menu={[<DuplicateButton key="menu-duplicate-btn" />, <DeleteButton key="menu-delete-btn" />]}
-    >
-      {props.children}
-    </BaseBlockLayout>
+    <BackgroundColorApplier backgroundColor={props.backgroundColor || 'white'}>
+      <BaseBlockLayout
+        nodeId={id}
+        title={props.title}
+        addButton={<InsertButton />}
+        bottomA11yActionMenu={
+          isEditing && (
+            <A11yDoneEditingButton
+              onUserAction={handleSave}
+              isFullyVisible={isEditingByKeyboard}
+              title={blockTitle}
+            />
+          )
+        }
+        menu={
+          <Flex gap="mediumSmall">
+            <DuplicateButton
+              key="menu-duplicate-button"
+              title={blockTitle}
+              elementRef={copyButtonRef}
+            />
+            <EditSettingsButton key="menu-edit-block-settings-button" title={blockTitle} />
+            <DeleteButton key="menu-delete-button" title={blockTitle} />
+            <MoveBlockButton key="menu-move-block-button" title={blockTitle} />
+          </Flex>
+        }
+        topA11yActionMenu={
+          !isEditing ? (
+            <A11yEditButton
+              onUserAction={handleEditByKeyboard}
+              elementRef={setEditButtonRef}
+              title={blockTitle}
+            />
+          ) : (
+            <A11yDoneEditingButton
+              onUserAction={handleSave}
+              isFullyVisible={false}
+              title={blockTitle}
+            />
+          )
+        }
+      >
+        {props.children}
+      </BaseBlockLayout>
+    </BackgroundColorApplier>
   )
 }

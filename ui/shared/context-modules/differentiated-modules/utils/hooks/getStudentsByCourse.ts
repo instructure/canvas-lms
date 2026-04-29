@@ -19,6 +19,7 @@
 import {executeQuery} from '@canvas/graphql'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {gql} from '@apollo/client'
+import {htmlDecode} from '@canvas/util/TextHelper'
 
 const I18n = createI18nScope('differentiated_modules')
 
@@ -105,7 +106,7 @@ export const getStudentsByCourse = async ({
   return combinedResults
     .map((edge: any) => ({
       id: `student-${edge.node.user.id}`,
-      value: edge.node.user.name,
+      value: htmlDecode(edge.node.user.name),
       sisID: edge.node.user.sisId,
       group: I18n.t('Students'),
     }))

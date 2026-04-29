@@ -67,7 +67,7 @@ describe('TutorialTray', () => {
   })
 
   it('handleExiting calls focus on the return value of the returnFocusToFunc', () => {
-    const focusSpy = jest.fn()
+    const focusSpy = vi.fn()
     const fakeReturnFocusToFunc = () => ({focus: focusSpy})
     const {ref} = renderTutorialTray({returnFocusToFunc: fakeReturnFocusToFunc})
 

@@ -52,4 +52,35 @@ describe Types::ExternalToolType do
       module_item_type.resolve("content { ... on ExternalTool { modules { _id } } }")
     ).to match_array [context_module.id.to_s]
   end
+
+  describe "placements object" do
+    %i[
+      assignment_selection
+      course_assignments_menu
+      editor_button
+      link_selection
+      module_index_menu_modal
+      module_menu_modal
+      resource_selection
+    ].each do |placement_type|
+      context "placements for #{placement_type}" do
+        before do
+          external_tool.context_external_tool_placements.create(placement_type:)
+        end
+
+        it "has title" do
+          title = module_item_type.resolve("content { ... on ExternalTool { placements { #{placement_type.to_s.camelize(:lower)} { title }} } }")
+          expect(title).to eq external_tool.label_for(placement_type, I18n.locale)
+        end
+
+        it "has url" do
+          url = module_item_type.resolve("content { ... on ExternalTool { placements { #{placement_type.to_s.camelize(:lower)} { url }} } }")
+          expected_url = external_tool.extension_setting(placement_type, :url) ||
+                         external_tool.extension_default_value(placement_type, :url) ||
+                         external_tool.extension_default_value(placement_type, :target_link_uri)
+          expect(url).to eq expected_url
+        end
+      end
+    end
+  end
 end

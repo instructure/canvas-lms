@@ -27,8 +27,8 @@ import * as tz from '@instructure/moment-utils'
 
 const I18n = createI18nScope('assignments_2')
 
-jest.mock('@canvas/util/jquery/apiUserContent')
-apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
+vi.mock('@canvas/util/jquery/apiUserContent')
+apiUserContent.convert = vi.fn(arg => `converted ${arg}`)
 
 function displayedTime(datetimeStr) {
   return `${tz.format(datetimeStr, I18n.t('#date.formats.full'))}`

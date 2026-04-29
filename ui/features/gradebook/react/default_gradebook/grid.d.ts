@@ -31,7 +31,7 @@ export type GridColumnObject = Partial<{
   due_at: string | null
   name: string
   position: number
-  points_possible: number
+  points_possible: number | null
   module_ids: string[]
   module_positions: number[]
   assignment_group: {
@@ -157,10 +157,11 @@ export type GridDisplaySettings = {
   }
   viewUngradedAsZero: boolean
   showUnpublishedAssignments: boolean
+  showSuppressedAssignments: boolean
   showSeparateFirstLastNames: boolean
   hideAssignmentGroupTotals: boolean
-  hideAssignmentGroupTotals: boolean
-  hideTotal: boolean
+  viewHiddenGradesIndicator: boolean
+  viewStatusForColorblindness: boolean
 }
 
 export type GridLocation = {

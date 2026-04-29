@@ -25,8 +25,14 @@ interface LtiUsage {
   rootAccountId: number
   rootAccountUuid: string
   isPremiumAccount: boolean
+  flags: Record<string, boolean>
 }
 
 export interface EnvLtiRegistrations {
   LTI_USAGE: LtiUsage
+  LTI_REGISTRATIONS_HISTORY: boolean
+  LTI_EDIT_JSON: boolean
+  LTI_DR_REGISTRATIONS_UPDATE: boolean
+  ACCOUNT_GLOBAL_ID: string
+  ACCOUNT_IS_SITE_ADMIN: boolean
 }

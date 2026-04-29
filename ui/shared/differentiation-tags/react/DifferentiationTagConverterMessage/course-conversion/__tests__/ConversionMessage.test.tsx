@@ -23,7 +23,7 @@ import userEvent from '@testing-library/user-event'
 describe('ConversionMessage', () => {
   const renderComponent = (props = {}) => {
     const defaultProps = {
-      onCourseConvertTags: jest.fn(),
+      onCourseConvertTags: vi.fn(),
       ...props,
     }
 
@@ -37,7 +37,7 @@ describe('ConversionMessage', () => {
   })
 
   it('calls onCourseConvertTags when button is clicked', async () => {
-    const onCourseConvertTagsMock = jest.fn()
+    const onCourseConvertTagsMock = vi.fn()
     renderComponent({onCourseConvertTags: onCourseConvertTagsMock})
     const button = screen.getByTestId('course-tag-conversion-button')
     await userEvent.click(button)

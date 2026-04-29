@@ -21,7 +21,7 @@ import {Portal} from '@instructure/ui-portal'
 import TopNav, {type ITopNavProps} from './TopNav'
 import type {ItemChild} from '@instructure/ui-top-nav-bar/types/TopNavBar/props'
 import type {EnvCommon} from '@canvas/global/env/EnvCommon'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 export type Crumb = Exclude<EnvCommon['breadcrumbs'], undefined>[number]
@@ -33,14 +33,13 @@ export interface WithProps extends ITopNavProps {
   courseId?: number
 }
 
-export const getMountPoint = (): HTMLElement | null =>
-  document.getElementById('react-instui-topnav')
+export function getMountPoint() {
+  return document.getElementById('react-instui-topnav')
+}
 
-export const TopNavPortalBase: React.FC<ITopNavProps> = props => {
+export function TopNavPortalBase(props: ITopNavProps): React.ReactElement | null {
   const mountPoint = getMountPoint()
-  if (!mountPoint) {
-    return null
-  }
+  if (!mountPoint) return null
 
   return (
     <Portal open={true} mountNode={mountPoint}>

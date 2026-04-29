@@ -42,7 +42,7 @@ describe "quizzes stats" do
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-      expect(f(".icon-stats")).to be
+      expect(f(".icon-stats")).not_to be_nil
 
       expect(fj("ul.page-action-list")).to include_text("Quiz Statistics")
     end
@@ -77,24 +77,6 @@ describe "quizzes stats" do
           driver.action.move_to(f("#header")).perform
           wait_for_ajaximations
           expect(fj(".report-generator:contains('#{report_type}')")).to include_text("Generate #{report_type.downcase} report")
-        end
-
-        it "downloads a csv when pressing #{report_type} button", priority: "1" do
-          skip("QUIZ-5120")
-          button = fj(".generate-report:contains('#{report_type}')")
-          button.click
-          wait_for_ajaximations
-
-          # our env never creates a csv so the best we can do is check for it attempting to download it
-
-          # move away so the tooltip can be recreated
-          driver.action.move_to(f("#header")).perform
-          wait_for_ajaximations
-
-          # move mouse back over button
-          driver.action.move_to(button).perform
-          wait_for_ajaximations
-          expect(fj('.quiz-report-status:contains("Report is being generated")')).to be_present
         end
       end
     end

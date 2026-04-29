@@ -154,7 +154,7 @@ class CoursePacing::BulkStudentEnrollmentPacesApiController < CoursePacing::Pace
                   .where(assignment_id: assignments.map(&:id))
                   .where.not(workflow_state: ["unsubmitted", "deleted"])
                   .select("DISTINCT ON (user_id, assignment_id) *")
-                  .order("user_id, assignment_id, created_at DESC")
+                  .order(:user_id, :assignment_id, created_at: :desc)
                   .group_by { |s| [s.user_id, s.assignment_id] }
 
     students.map do |student|

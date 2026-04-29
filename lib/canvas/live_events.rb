@@ -58,6 +58,24 @@ module Canvas::LiveEvents
     )
   end
 
+  def self.scan_youtube_links(payload)
+    post_event_stringified("scan_youtube_links", {
+                             scan_id: payload.scan_id,
+                             canvas_id: payload.canvas_id,
+                             external_tool_id: payload.external_tool_id
+                           })
+  end
+
+  def self.convert_new_quiz_youtube_link(payload)
+    post_event_stringified("convert_new_quiz_youtube_link", {
+                             resource_id: payload.resource_id,
+                             resource_type: payload.resource_type,
+                             src: payload.src,
+                             field: payload.field,
+                             new_html: payload.new_html
+                           })
+  end
+
   def self.conversation_created(conversation)
     post_event_stringified("conversation_created", {
                              conversation_id: conversation.id,
@@ -118,6 +136,14 @@ module Canvas::LiveEvents
 
   def self.discussion_entry_created(entry)
     post_event_stringified("discussion_entry_created", get_discussion_entry_data(entry))
+  end
+
+  def self.discussion_entry_updated(entry)
+    post_event_stringified("discussion_entry_updated", get_discussion_entry_data(entry))
+  end
+
+  def self.discussion_entry_deleted(entry)
+    post_event_stringified("discussion_entry_deleted", get_discussion_entry_data(entry))
   end
 
   def self.discussion_entry_submitted(entry, assignment_id, submission_id)
@@ -293,6 +319,8 @@ module Canvas::LiveEvents
       workflow_state: assignment.workflow_state
     }
 
+    event[:anonymous_participants] = assignment.anonymous_participants?
+
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.environment_specific_domain
     event[:domain] = domain if domain
@@ -437,6 +465,7 @@ module Canvas::LiveEvents
       folder_id: attachment.global_folder_id,
       unlock_at: attachment.unlock_at,
       lock_at: attachment.lock_at,
+      locked: attachment.locked,
       updated_at: attachment.updated_at
     }
   end
@@ -589,7 +618,8 @@ module Canvas::LiveEvents
     payload = {
       wiki_page_id: page.global_id,
       title: LiveEvents.truncate(page.title),
-      body: LiveEvents.truncate(page.body)
+      body: LiveEvents.truncate(page.body),
+      workflow_state: page.workflow_state
     }
 
     if old_title
@@ -608,6 +638,30 @@ module Canvas::LiveEvents
                              wiki_page_id: page.global_id,
                              title: LiveEvents.truncate(page.title)
                            })
+  end
+
+  def self.get_lti_resource_link_data(resource_link)
+    {
+      resource_link_id: resource_link.global_id,
+      resource_link_uuid: resource_link.resource_link_uuid,
+      lookup_uuid: resource_link.lookup_uuid,
+      context_id: resource_link.global_context_id,
+      context_type: resource_link.context_type,
+      context_external_tool_id: resource_link.original_context_external_tool&.global_id,
+      url: resource_link.url,
+      title: resource_link.title,
+      workflow_state: resource_link.workflow_state
+    }
+  end
+
+  def self.lti_resource_link_created(resource_link)
+    post_event_stringified("lti_resource_link_created",
+                           get_lti_resource_link_data(resource_link))
+  end
+
+  def self.lti_resource_link_updated(resource_link)
+    post_event_stringified("lti_resource_link_updated",
+                           get_lti_resource_link_data(resource_link))
   end
 
   def self.attachment_created(attachment)
@@ -720,7 +774,7 @@ module Canvas::LiveEvents
     context = content_migration.context
     import_quizzes_next = content_migration.migration_settings&.[](:import_quizzes_next) == true
     quiz_next_imported = content_migration.migration_settings&.[](:quiz_next_imported) == true
-    link_migration_during_import = import_quizzes_next && content_migration.asset_map_v2?
+    link_migration_during_import = import_quizzes_next
     need_resource_map = content_migration.source_course&.has_new_quizzes? || link_migration_during_import || quiz_next_imported
 
     payload = {
@@ -825,11 +879,18 @@ module Canvas::LiveEvents
   end
 
   def self.course_completed(context_module_progression)
-    post_event_stringified("course_completed",
-                           get_course_completed_data(
-                             context_module_progression.context_module.course,
-                             context_module_progression.user
-                           ))
+    course = context_module_progression.context_module.course
+    user = context_module_progression.user
+
+    post_event_stringified("course_completed", get_course_completed_data(course, user))
+
+    Canvas::KafkaEvents.post_event(
+      Canvas::KafkaEvents::Events::COURSE_COMPLETED,
+      root_account: course.root_account,
+      user:,
+      payload: { course_id: course.global_id.to_s },
+      occurred_at: context_module_progression.completed_at
+    )
   end
 
   def self.course_progress(context_module_progression)

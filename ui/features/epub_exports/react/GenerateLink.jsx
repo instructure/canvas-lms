@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import classnames from 'classnames'
-import {isEmpty, isObject} from 'lodash'
+import {isObject, isEmpty} from 'es-toolkit/compat'
 import CourseEpubExportStore from './CourseStore'
 
 const I18n = createI18nScope('epub_exports')

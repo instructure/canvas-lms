@@ -73,7 +73,8 @@ export function outOfText(
     if (pointsBasedGradingScheme) {
       return I18n.t('(%{score} out of %{points})', {
         points: I18n.n(pointsPossible, {precision: 2}),
-        score: I18n.n(submission.enteredScore, {precision: 2}) ?? ' -',
+        score:
+          submission.enteredScore != null ? I18n.n(submission.enteredScore, {precision: 2}) : ' -',
       })
     } else {
       return I18n.t('(%{score} out of %{points})', {

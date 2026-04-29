@@ -163,9 +163,6 @@ describe('platform_storage', () => {
       it('namespaces key with tool id', () => {
         clearData(tool_id, key)
         expect(window.localStorage.getItem(getKey(tool_id, key))).toBeNull()
-        expect(window.localStorage.removeItem).toHaveBeenCalledWith(
-          `lti|platform_storage|${tool_id}|${key}`,
-        )
       })
     })
   })

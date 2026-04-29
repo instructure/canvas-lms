@@ -26,14 +26,14 @@ describe('HistoryApi', () => {
 
   beforeEach(() => {
     courseId = 123
-    getStub = jest.spyOn(axios, 'get').mockResolvedValue({
+    getStub = vi.spyOn(axios, 'get').mockResolvedValue({
       status: 200,
       response: Fixtures.historyResponse(),
     })
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   const defaultParams = {

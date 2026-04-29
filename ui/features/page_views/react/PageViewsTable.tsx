@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
+import React from 'react'
 import {useScope as i18nScope} from '@canvas/i18n'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {Text} from '@instructure/ui-text'
@@ -24,28 +24,18 @@ import {Alert} from '@instructure/ui-alerts'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useInfiniteQuery, type QueryFunctionContext, type InfiniteData} from '@tanstack/react-query'
-import {
-  type APIPageView,
-  type PageView,
-  formatURL,
-  formatInteractionTime,
-  formatParticipated,
-  formatUserAgent,
-} from './utils'
+import {Pagination} from '@instructure/ui-pagination'
+import {Flex} from '@instructure/ui-flex'
+import ConfusedPanda from '@instructure/platform-images/assets/ConfusedPanda.svg'
+import type {PageView} from './utils'
+import {useQueryPageViewsPaginated} from './hooks/useQueryPageViewsPaginated'
 
 export interface PageViewsTableProps {
   userId: string
   startDate?: Date
   endDate?: Date
-}
-
-type APIQueryParams = {
-  page: string
-  per_page: string
-  start_time?: string
-  end_time?: string
+  onEmpty?: () => void
+  pageSize?: number
 }
 
 const I18n = i18nScope('page_views')
@@ -58,87 +48,64 @@ function UserAgentCell({view}: {view: PageView}): React.JSX.Element {
   )
 }
 
+function EmptyState(): React.JSX.Element {
+  return (
+    <Flex
+      direction="column"
+      alignItems="center"
+      gap="small"
+      data-testid="page-views-empty-state"
+      as={'div'}
+    >
+      <img
+        src={ConfusedPanda}
+        alt={I18n.t('Nothing in the last 30 days')}
+        style={{maxWidth: '160px'}}
+      />
+      <Text size="large" weight="bold">
+        {I18n.t('Nothing in the last 30 days')}
+      </Text>
+      <Text>
+        {I18n.t(
+          "This page shows only the past 30 days of history. It looks like there hasn't been anything recent to show.",
+        )}
+      </Text>
+    </Flex>
+  )
+}
+
 export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
-  const observerRef = useRef<IntersectionObserver | null>(null)
-
   const formatDate = useDateTimeFormat('time.formats.short')
-  async function fetchPageViews({
-    pageParam = '1',
-  }: QueryFunctionContext<[string, string, Date?], string>): Promise<{
-    views: Array<PageView>
-    nextPage: string | null
-  }> {
-    const params: APIQueryParams = {
-      page: typeof pageParam === 'string' ? pageParam : '1',
-      per_page: '50',
-    }
-    if (props.startDate) {
-      if (!props.endDate) throw new RangeError('endDate must be set if startDate is set')
-      params.start_time = props.startDate.toISOString()
-      params.end_time = props.endDate.toISOString()
-    }
-    const path = `/api/v1/users/${props.userId}/page_views`
-    const {json, link} = await doFetchApi<Array<APIPageView>>({path, params})
-    if (typeof json === 'undefined') return {views: [], nextPage: null}
-    const views: Array<PageView> = json.map(v => ({
-      id: v.id,
-      url: formatURL(v),
-      createdAt: new Date(v.created_at),
-      participated: formatParticipated(v),
-      interactionSeconds: formatInteractionTime(v),
-      rawUserAgentString: v.user_agent,
-      userAgent: formatUserAgent(v),
-    }))
-    const nextPage = link?.next ? link.next.page : null
-    return {views, nextPage}
-  }
+  const pageSize = props.pageSize ?? 10
 
-  function clearPageLoadTrigger() {
-    if (observerRef.current === null) return
-    observerRef.current.disconnect()
-    observerRef.current = null
-  }
+  // Single hook for paginated data management
+  const {
+    views,
+    isFetching,
+    isSuccess,
+    error,
+    currentPage,
+    totalPages,
+    hasReachedEnd,
+    setCurrentPage,
+  } = useQueryPageViewsPaginated({
+    userId: props.userId,
+    startDate: props.startDate,
+    endDate: props.endDate,
+    pageSize,
+  })
 
-  function setPageLoadTrigger(ref: Element | null) {
-    if (ref === null) return
-    clearPageLoadTrigger()
-    observerRef.current = new IntersectionObserver(function (entries) {
-      if (entries[0].isIntersecting) {
-        fetchNextPage()
-        clearPageLoadTrigger()
-      }
-    })
-    observerRef.current.observe(ref)
-  }
+  // Loading state
+  if (isFetching) return <Spinner renderTitle={I18n.t('Loading')} />
 
-  const {data, fetchNextPage, isFetching, isFetchingNextPage, hasNextPage, isSuccess, error} =
-    useInfiniteQuery<
-      {views: Array<PageView>; nextPage: string | null},
-      Error,
-      InfiniteData<{views: Array<PageView>; nextPage: string | null}>,
-      [string, string, Date?],
-      string
-    >({
-      queryKey: ['page_views', props.userId, props.startDate],
-      queryFn: fetchPageViews,
-      staleTime: 10 * 60 * 1000, // 10 minutes
-      getNextPageParam: lastPage => lastPage.nextPage,
-      initialPageParam: '1',
-    })
-
-  if (isFetching && !isFetchingNextPage) return <Spinner renderTitle={I18n.t('Loading')} />
-
+  // Error handling
   if (!isSuccess) {
-    // if we have an error, then the query failed, display an alert
     if (error) {
-      let errorText: string
-      const {response} = error as any // a response means an error from doFetchApi
-      if (typeof response !== 'undefined')
-        errorText = `API error: ${response.status} ${response.statusText}, fetching ${response.url}`
-      else {
-        const err = error as Error
-        errorText = `Error formatting table: ${err.name}, ${err.message}`
-      }
+      const {response} = error as any
+      const errorText = response
+        ? `API error: ${response.status} ${response.statusText}, fetching ${response.url}`
+        : `Error formatting table: ${(error as Error).name}, ${(error as Error).message}`
+
       return (
         <Alert variant="error" margin="small">
           <p>
@@ -149,61 +116,75 @@ export function PageViewsTable(props: PageViewsTableProps): React.JSX.Element {
         </Alert>
       )
     }
-    // if there is no error, then the query is still loading / retrying / something else
-    // all we know is that an API fetch is not in progress but we still don't have data yet
-    else return <Spinner renderTitle={I18n.t('Loading')} />
+    return <Spinner renderTitle={I18n.t('Loading')} />
   }
 
-  const uniqueViews: Record<string, PageView> = {}
-  data.pages.forEach(page => {
-    page.views.forEach(view => {
-      uniqueViews[view.id] = view
-    })
-  })
-  const viewKeys = Object.keys(uniqueViews)
-  const isTriggerRow = (row: number) => row === viewKeys.length - 1 && !!hasNextPage && !isFetching
-  const setTrigger = (row: number) =>
-    isTriggerRow(row) ? (ref: Element | null) => setPageLoadTrigger(ref) : undefined
+  // Empty state
+  if (views.length === 0 && props.onEmpty) {
+    props.onEmpty()
+    return <EmptyState />
+  }
+
+  // UI handlers for pagination
+  const renderPageNumber = (page: number): string | number => {
+    // Only show '+' for the last page if we haven't reached the end (more pages might exist)
+    if (!hasReachedEnd && page === totalPages) return page + '+'
+    return page
+  }
 
   return (
-    <>
-      <Table caption={I18n.t('Page views for this user')}>
-        <Table.Head>
-          <Table.Row>
-            <Table.ColHeader id="page-view-url">{I18n.t('URL')}</Table.ColHeader>
-            <Table.ColHeader id="page-view-date">{I18n.t('Date')}</Table.ColHeader>
-            <Table.ColHeader id="page-view-participated" textAlign="center">
-              {I18n.t('Participated')}
-            </Table.ColHeader>
-            <Table.ColHeader id="page-view-interaction-time" textAlign="end">
-              {I18n.t('Time')}
-            </Table.ColHeader>
-            <Table.ColHeader id="page-view-user-agent">{I18n.t('User Agent')}</Table.ColHeader>
-          </Table.Row>
-        </Table.Head>
-        <Table.Body data-testid="page-views-table-body">
-          {viewKeys.map((id, idx) => {
-            const v = uniqueViews[id]
-            const url = (
-              <Text size="small" elementRef={setTrigger(idx)}>
-                {v.url}
-              </Text>
-            )
-            return (
-              <Table.Row data-testid="page-view-row" key={id}>
-                <Table.Cell>{url}</Table.Cell>
-                <Table.Cell>{formatDate(v.createdAt)}</Table.Cell>
-                <Table.Cell textAlign="center">{v.participated}</Table.Cell>
-                <Table.Cell textAlign="end">{v.interactionSeconds}</Table.Cell>
-                <Table.Cell>
-                  <UserAgentCell view={v} />
-                </Table.Cell>
+    <Flex direction="column" gap="large">
+      <Flex.Item>
+        <div style={{minHeight: '21rem'}}>
+          <Table caption={I18n.t('Page views for this user')}>
+            <Table.Head>
+              <Table.Row>
+                <Table.ColHeader id="page-view-url">{I18n.t('URL')}</Table.ColHeader>
+                <Table.ColHeader id="page-view-date">{I18n.t('Date')}</Table.ColHeader>
+                <Table.ColHeader id="page-view-participated" textAlign="center">
+                  {I18n.t('Participated')}
+                </Table.ColHeader>
+                <Table.ColHeader id="page-view-interaction-time" textAlign="end">
+                  {I18n.t('Time')}
+                </Table.ColHeader>
+                <Table.ColHeader id="page-view-user-agent">{I18n.t('User Agent')}</Table.ColHeader>
               </Table.Row>
-            )
-          })}
-        </Table.Body>
-      </Table>
-      {isFetchingNextPage && <Spinner size="small" renderTitle={I18n.t('Loading')} />}
-    </>
+            </Table.Head>
+            <Table.Body data-testid="page-views-table-body">
+              {views.map(view => (
+                <Table.Row data-testid="page-view-row" key={view.id}>
+                  <Table.Cell>
+                    <Text size="small">{view.url}</Text>
+                  </Table.Cell>
+                  <Table.Cell>{formatDate(view.createdAt)}</Table.Cell>
+                  <Table.Cell textAlign="center">{view.participated}</Table.Cell>
+                  <Table.Cell textAlign="end">{view.interactionSeconds}</Table.Cell>
+                  <Table.Cell>
+                    <UserAgentCell view={view} />
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table>
+        </div>
+      </Flex.Item>
+
+      <Flex.Item>
+        <Pagination
+          as="nav"
+          margin="small"
+          variant="compact"
+          labelNext={I18n.t('Next Page')}
+          labelPrev={I18n.t('Previous Page')}
+          currentPage={currentPage}
+          totalPageNumber={totalPages}
+          onPageChange={setCurrentPage}
+          withFirstAndLastButton
+          renderPageIndicator={renderPageNumber}
+          data-testid="page-views-pagination"
+          siblingCount={4}
+        />
+      </Flex.Item>
+    </Flex>
   )
 }

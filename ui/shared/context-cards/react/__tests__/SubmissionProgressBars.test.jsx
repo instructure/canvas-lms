@@ -46,7 +46,7 @@ describe('SubmissionProgressBars', () => {
         excused: false,
         assignment: {points_possible: 25},
       }
-      const spy = jest.spyOn(SubmissionProgressBars, 'renderIcon')
+      const spy = vi.spyOn(SubmissionProgressBars, 'renderIcon')
 
       SubmissionProgressBars.displayGrade({...submission, grade: 'complete'})
       expect(spy).toHaveBeenCalledTimes(1)

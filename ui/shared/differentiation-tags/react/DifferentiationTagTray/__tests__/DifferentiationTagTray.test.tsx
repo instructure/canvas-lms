@@ -24,10 +24,10 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 // Mocking the DifferentiationTagModalManager, then setting the props it is passed as data attributes that we can check
 // This way we can verify that the modal is opened with the correct mode and category ID
-jest.mock(
+vi.mock(
   '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager',
-  () =>
-    function DummyModalManager(props: any) {
+  () => ({
+    default: function DummyModalManager(props: any) {
       return (
         <div
           data-testid="dummy-modal-manager"
@@ -36,13 +36,14 @@ jest.mock(
         />
       )
     },
+  }),
 )
 
 describe('DifferentiationTagTray', () => {
   const defaultProps: DifferentiationTagTrayProps = {
     isOpen: true,
-    onClose: jest.fn(),
-    refetchDiffTags: jest.fn(),
+    onClose: vi.fn(),
+    refetchDiffTags: vi.fn(),
     differentiationTagCategories: [],
     isLoading: false,
     error: null,
@@ -57,7 +58,7 @@ describe('DifferentiationTagTray', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the tray when isOpen is true', () => {
@@ -128,29 +129,52 @@ describe('DifferentiationTagTray', () => {
   })
 
   describe('CSV upload interactions', () => {
-    it('opens CSV upload view when clicking "Upload CSV" button', async () => {
-      const mockCategories = [
-        {id: 1, name: 'Advanced', groups: []},
-        {id: 2, name: 'Remedial', groups: []},
-      ]
-      renderComponent({differentiationTagCategories: mockCategories})
-      const uploadButton = screen.getByText('Upload CSV').closest('button')
-      await userEvent.click(uploadButton!)
-      expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+    describe('initial view before differentiation tags are created', () => {
+      it('renders CSV Upload button and opens modal in upload CSV mode', async () => {
+        renderComponent({differentiationTagCategories: []})
+
+        const uploadButton = screen.getByText('Upload CSV').closest('button')
+        await userEvent.click(uploadButton!)
+        expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+      })
+
+      it('opens empty state view when clicking Cancel button', async () => {
+        renderComponent({differentiationTagCategories: []})
+
+        const uploadButton = screen.getByText('Upload CSV').closest('button')
+        await userEvent.click(uploadButton!)
+        expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+        const cancelButton = screen.getByText('Cancel').closest('button')
+        await userEvent.click(cancelButton!)
+        expect(screen.getByTestId('empty-state')).toBeInTheDocument()
+      })
     })
 
-    it('opens manage tags view when clicking Cancel button', async () => {
-      const mockCategories = [
-        {id: 1, name: 'Advanced', groups: []},
-        {id: 2, name: 'Remedial', groups: []},
-      ]
-      renderComponent({differentiationTagCategories: mockCategories})
-      const uploadButton = screen.getByText('Upload CSV').closest('button')
-      await userEvent.click(uploadButton!)
-      expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
-      const cancelButton = screen.getByText('Cancel').closest('button')
-      await userEvent.click(cancelButton!)
-      expect(screen.getByTestId('manage-tags-view')).toBeInTheDocument()
+    describe('differentiation tags exist', () => {
+      it('opens CSV upload view when clicking "Upload CSV" button', async () => {
+        const mockCategories = [
+          {id: 1, name: 'Advanced', groups: []},
+          {id: 2, name: 'Remedial', groups: []},
+        ]
+        renderComponent({differentiationTagCategories: mockCategories})
+        const uploadButton = screen.getByText('Upload CSV').closest('button')
+        await userEvent.click(uploadButton!)
+        expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+      })
+
+      it('opens manage tags view when clicking Cancel button', async () => {
+        const mockCategories = [
+          {id: 1, name: 'Advanced', groups: []},
+          {id: 2, name: 'Remedial', groups: []},
+        ]
+        renderComponent({differentiationTagCategories: mockCategories})
+        const uploadButton = screen.getByText('Upload CSV').closest('button')
+        await userEvent.click(uploadButton!)
+        expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+        const cancelButton = screen.getByText('Cancel').closest('button')
+        await userEvent.click(cancelButton!)
+        expect(screen.getByTestId('manage-tags-view')).toBeInTheDocument()
+      })
     })
   })
 
@@ -216,12 +240,12 @@ describe('DifferentiationTagTray', () => {
 
   describe('DifferentiationTagTray - search and filtering logic', () => {
     beforeEach(() => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
     })
 
     afterEach(() => {
-      jest.runOnlyPendingTimers()
-      jest.useRealTimers()
+      vi.runOnlyPendingTimers()
+      vi.useRealTimers()
     })
 
     it('displays all categories when search input is empty', () => {
@@ -248,7 +272,7 @@ describe('DifferentiationTagTray', () => {
       await user.type(searchInput, 'adv')
 
       act(() => {
-        jest.advanceTimersByTime(300)
+        vi.advanceTimersByTime(300)
       })
 
       expect(screen.getByText('Advanced')).toBeInTheDocument()
@@ -277,7 +301,7 @@ describe('DifferentiationTagTray', () => {
       await user.type(searchInput, 'sci')
 
       act(() => {
-        jest.advanceTimersByTime(300)
+        vi.advanceTimersByTime(300)
       })
 
       expect(screen.getByText('Remedial')).toBeInTheDocument()
@@ -297,7 +321,7 @@ describe('DifferentiationTagTray', () => {
       await user.type(searchInput, 'nonexistent')
 
       act(() => {
-        jest.advanceTimersByTime(300)
+        vi.advanceTimersByTime(300)
       })
 
       expect(screen.getByText('No matching tags found.')).toBeInTheDocument()
@@ -327,7 +351,7 @@ describe('DifferentiationTagTray', () => {
       await user.clear(searchInput)
       await user.type(searchInput, 'Category')
       act(() => {
-        jest.advanceTimersByTime(300)
+        vi.advanceTimersByTime(300)
       })
 
       // The pagination should reset to page 1 so that Category 1 is visible and Category 5 is not

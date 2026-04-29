@@ -24,7 +24,7 @@ import OutcomeGroupView from '../OutcomeGroupView'
 import {waitFor} from '@testing-library/dom'
 
 // Stub RCE initialization
-const readyForm = jest.fn()
+const readyForm = vi.fn()
 OutcomeContentBase.prototype.readyForm = readyForm
 
 const createView = opts => {

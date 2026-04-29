@@ -16,30 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {createDynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import {IconConfirmationWrapper} from '../components/IconConfirmationWrapper'
-import {render, screen} from '@testing-library/react'
+import {cleanup, render, screen} from '@testing-library/react'
 import * as ue from '@testing-library/user-event'
 import {LtiPlacements, LtiPlacementsWithIcons} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-const userEvent = ue.userEvent.setup({advanceTimers: jest.advanceTimersByTime})
+const userEvent = ue.userEvent.setup({advanceTimers: vi.advanceTimersByTime})
 
 describe('IconConfirmation', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
-    jest.resetAllMocks()
+    vi.useFakeTimers()
+    vi.resetAllMocks()
+    fakeENV.setup({
+      FEATURES: {
+        top_navigation_placement: true,
+        lti_asset_processor: true,
+        lti_asset_processor_discussions: true,
+      },
+    })
   })
 
   afterEach(() => {
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
+    cleanup()
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+    fakeENV.teardown()
   })
 
-  const mockTransitionToConfirmationState = jest.fn()
-  const mockTransitionToReviewingState = jest.fn()
+  const mockTransitionToConfirmationState = vi.fn()
+  const mockTransitionToReviewingState = vi.fn()
 
   it('should render', () => {
     const reg = mockRegistration()
@@ -50,12 +59,14 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
     )
 
-    expect(screen.getByText('Icon URLs')).toBeInTheDocument()
+    expect(screen.getByRole('heading', {name: 'Tool Icon URL'})).toBeInTheDocument()
+    expect(screen.getByText('Placement Icon URLs')).toBeInTheDocument()
   })
 
   it('should render inputs for all placements that support icons', () => {
@@ -71,6 +82,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -96,6 +108,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -115,8 +128,13 @@ describe('IconConfirmation', () => {
     expect(input).toHaveValue(iconUrl)
   })
 
-  it('should render the default generated icon if no icon url is provided for the EditorButton, TopNavigation placements', () => {
-    const defaultIconPlacements = [LtiPlacements.EditorButton, LtiPlacements.TopNavigation]
+  it('should render the default generated icon if no icon url is provided for the EditorButton, TopNavigation, and Asset Processor* placements', () => {
+    const defaultIconPlacements = [
+      LtiPlacements.EditorButton,
+      LtiPlacements.TopNavigation,
+      LtiPlacements.ActivityAssetProcessor,
+      LtiPlacements.ActivityAssetProcessorContribution,
+    ]
     const config = mockConfigWithPlacements([
       ...defaultIconPlacements,
       LtiPlacements.GlobalNavigation,
@@ -128,6 +146,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -164,6 +183,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -180,7 +200,8 @@ describe('IconConfirmation', () => {
       'src',
       'http://example.com/icon.png',
     )
-    expect(screen.getByText(/the tool's default icon/i)).toBeInTheDocument()
+    // Explainer text and message hint
+    expect(screen.getAllByText(/the tool's default icon/i)).toHaveLength(2)
   })
 
   it("should inform the user no icon is rendered if one isn't provided for non-EditorButton placements", async () => {
@@ -195,6 +216,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -226,6 +248,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -246,41 +269,6 @@ describe('IconConfirmation', () => {
     expect(screen.getByTitle('Global Navigation icon')).not.toHaveAttribute('src', 'invalid-url')
   })
 
-  it('should transition to reviewing state when all icons are valid and the next button is clicked', async () => {
-    const config = mockConfigWithPlacements([
-      LtiPlacements.GlobalNavigation,
-      LtiPlacements.FileIndexMenu,
-    ])
-    const reg = mockRegistration({}, config)
-    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
-    render(
-      <IconConfirmationWrapper
-        registration={reg}
-        overlayStore={overlayStore}
-        reviewing={false}
-        transitionToConfirmationState={mockTransitionToConfirmationState}
-        transitionToReviewingState={mockTransitionToReviewingState}
-      />,
-    )
-    const iconPlacement = LtiPlacements.GlobalNavigation
-    const input = screen.getByLabelText(new RegExp(i18nLtiPlacement(iconPlacement)), {
-      selector: 'input',
-    })
-    await userEvent.clear(input)
-    await userEvent.click(input)
-    await userEvent.paste('http://example.com/icon.png')
-    // Wait for debouncing
-    jest.runOnlyPendingTimers()
-    expect(input).toHaveValue('http://example.com/icon.png')
-    expect(screen.getByAltText('Global Navigation icon')).toHaveAttribute(
-      'src',
-      'http://example.com/icon.png',
-    )
-    const nextButton = screen.getByRole('button', {name: /next/i})
-    await userEvent.click(nextButton)
-    expect(mockTransitionToReviewingState).toHaveBeenCalledTimes(1)
-  })
-
   it("should render the image provided in the icon url if it's a valid URL", async () => {
     const config = mockConfigWithPlacements([
       LtiPlacements.GlobalNavigation,
@@ -294,6 +282,7 @@ describe('IconConfirmation', () => {
         registration={reg}
         overlayStore={overlayStore}
         reviewing={false}
+        hasSubmitted={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
       />,
@@ -308,7 +297,7 @@ describe('IconConfirmation', () => {
     await userEvent.click(input)
     await userEvent.paste('http://example.com/icon.png')
     // Wait for debouncing
-    jest.runOnlyPendingTimers()
+    vi.runOnlyPendingTimers()
 
     expect(input).toHaveValue('http://example.com/icon.png')
     expect(screen.getByAltText('Global Navigation icon')).toHaveAttribute(
@@ -317,26 +306,161 @@ describe('IconConfirmation', () => {
     )
   })
 
-  it('should render a Back to Review button when the user is reviewing', () => {
-    const config = mockConfigWithPlacements([
-      LtiPlacements.GlobalNavigation,
-      LtiPlacements.FileIndexMenu,
-    ])
+  describe('Tool Icon URL', () => {
+    it('should render a tool icon URL input section', () => {
+      const config = mockConfigWithPlacements([LtiPlacements.GlobalNavigation])
+      config.launch_settings = {icon_url: 'https://example.com/default-icon.png'}
+      const reg = mockRegistration({}, config)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
 
-    const reg = mockRegistration({}, config)
-    const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
+      render(
+        <IconConfirmationWrapper
+          registration={reg}
+          overlayStore={overlayStore}
+          reviewing={false}
+          hasSubmitted={false}
+          transitionToConfirmationState={mockTransitionToConfirmationState}
+          transitionToReviewingState={mockTransitionToReviewingState}
+        />,
+      )
 
-    render(
-      <IconConfirmationWrapper
-        overlayStore={overlayStore}
-        registration={reg}
-        reviewing={true}
-        transitionToConfirmationState={mockTransitionToConfirmationState}
-        transitionToReviewingState={mockTransitionToReviewingState}
-      />,
-    )
+      expect(screen.getAllByText('Tool Icon URL')).toHaveLength(2) // heading and label
+      expect(
+        screen.getByText(/Choose the tool's default icon and its icon on the Apps page/i),
+      ).toBeInTheDocument()
+    })
 
-    const backButton = screen.getByRole('button', {name: /back to review/i})
-    expect(backButton).toBeInTheDocument()
+    it('should allow users to change the tool icon URL', async () => {
+      const config = mockConfigWithPlacements([LtiPlacements.GlobalNavigation])
+      config.launch_settings = {icon_url: 'https://example.com/default-icon.png'}
+      const reg = mockRegistration({}, config)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
+
+      render(
+        <IconConfirmationWrapper
+          registration={reg}
+          overlayStore={overlayStore}
+          reviewing={false}
+          hasSubmitted={false}
+          transitionToConfirmationState={mockTransitionToConfirmationState}
+          transitionToReviewingState={mockTransitionToReviewingState}
+        />,
+      )
+
+      const input = screen.getByLabelText(/Tool Icon URL/i, {selector: 'input'})
+      await userEvent.clear(input)
+      await userEvent.click(input)
+      await userEvent.paste('https://example.com/new-default.png')
+      jest.runAllTimers()
+
+      expect(input).toHaveValue('https://example.com/new-default.png')
+      expect(screen.getByTestId('img-default-icon')).toHaveAttribute(
+        'src',
+        'https://example.com/new-default.png',
+      )
+    })
+
+    it('should display the existing tool icon URL', () => {
+      const config = mockConfigWithPlacements([LtiPlacements.GlobalNavigation])
+      config.launch_settings = {icon_url: 'https://example.com/default-icon.png'}
+      const reg = mockRegistration({}, config)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
+
+      render(
+        <IconConfirmationWrapper
+          registration={reg}
+          overlayStore={overlayStore}
+          reviewing={false}
+          hasSubmitted={false}
+          transitionToConfirmationState={mockTransitionToConfirmationState}
+          transitionToReviewingState={mockTransitionToReviewingState}
+        />,
+      )
+
+      const input = screen.getByLabelText(/Tool Icon URL/i, {selector: 'input'})
+      expect(input).toHaveValue('https://example.com/default-icon.png')
+      expect(screen.getByTestId('img-default-icon')).toHaveAttribute(
+        'src',
+        'https://example.com/default-icon.png',
+      )
+    })
+
+    it('should show an error for invalid tool icon URLs', async () => {
+      const config = mockConfigWithPlacements([LtiPlacements.GlobalNavigation])
+      const reg = mockRegistration({}, config)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
+
+      render(
+        <IconConfirmationWrapper
+          registration={reg}
+          overlayStore={overlayStore}
+          reviewing={false}
+          hasSubmitted={true}
+          transitionToConfirmationState={mockTransitionToConfirmationState}
+          transitionToReviewingState={mockTransitionToReviewingState}
+        />,
+      )
+
+      const input = screen.getByLabelText(/Tool Icon URL/i, {selector: 'input'})
+      await userEvent.click(input)
+      await userEvent.paste('invalid-url')
+      await userEvent.tab()
+
+      expect(screen.getByText('Invalid URL')).toBeInTheDocument()
+    })
+
+    it('should display the tool icon image when a valid URL is provided', async () => {
+      const config = mockConfigWithPlacements([LtiPlacements.GlobalNavigation])
+      const reg = mockRegistration({}, config)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
+
+      render(
+        <IconConfirmationWrapper
+          registration={reg}
+          overlayStore={overlayStore}
+          reviewing={false}
+          hasSubmitted={false}
+          transitionToConfirmationState={mockTransitionToConfirmationState}
+          transitionToReviewingState={mockTransitionToReviewingState}
+        />,
+      )
+
+      const input = screen.getByLabelText(/Tool Icon URL/i, {selector: 'input'})
+      await userEvent.click(input)
+      await userEvent.paste('https://example.com/default-icon.png')
+      jest.runAllTimers()
+
+      expect(screen.getByTestId('img-default-icon')).toHaveAttribute(
+        'src',
+        'https://example.com/default-icon.png',
+      )
+    })
+
+    it('should display the tool provided tool icon image when the input is cleared', async () => {
+      const config = mockConfigWithPlacements([LtiPlacements.GlobalNavigation])
+      config.launch_settings = {icon_url: 'https://example.com/default-icon.png'}
+      const reg = mockRegistration({}, config)
+      const overlayStore = createDynamicRegistrationOverlayStore('Foo', reg)
+
+      render(
+        <IconConfirmationWrapper
+          registration={reg}
+          overlayStore={overlayStore}
+          reviewing={false}
+          hasSubmitted={false}
+          transitionToConfirmationState={mockTransitionToConfirmationState}
+          transitionToReviewingState={mockTransitionToReviewingState}
+        />,
+      )
+
+      const input = screen.getByLabelText(/Tool Icon URL/i, {selector: 'input'})
+      await userEvent.clear(input)
+      jest.runAllTimers()
+
+      expect(screen.getByTestId('img-default-icon')).toHaveAttribute(
+        'src',
+        'https://example.com/default-icon.png',
+      )
+    })
   })
 })

@@ -116,7 +116,7 @@ module Types
       argument :target_context_id, ID, required: true
       argument :target_context_type, String, required: true
     end
-    def is_imported(**args) # rubocop:disable Naming/PredicateName
+    def is_imported(**args)
       ImportedLoader.for(args[:target_context_id], args[:target_context_type]).load(outcome)
     end
 

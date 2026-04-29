@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/client/testing'
 import {render, fireEvent} from '@testing-library/react'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import StudentContent from '../StudentContent'
-import {withSubmissionContext} from '../../test-utils/submission-context'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import store from '../stores'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 describe('Assignment Student Content View', () => {
   beforeAll(() => {
@@ -54,7 +54,13 @@ describe('Assignment Student Content View', () => {
       fakeENV.teardown()
     })
 
+    let setOnFailure
+    let setOnSuccess
+
     const renderComponent = async (assignmentOverrides = {}, isSubmitted = true) => {
+      setOnFailure = jest.fn()
+      setOnSuccess = jest.fn()
+
       const props = await mockAssignmentAndSubmission({
         Submission: {
           ...(isSubmitted
@@ -98,12 +104,11 @@ describe('Assignment Student Content View', () => {
       props.assignment = {...props.assignment, ...assignmentOverrides}
 
       return render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
+            <StudentContent {...props} />
+          </AlertManagerContext.Provider>
+        </MockedQueryProvider>,
       )
     }
 
@@ -199,6 +204,28 @@ describe('Assignment Student Content View', () => {
       expect(getByTestId('rubric-self-assessment-rating-button-1')).toBeDisabled()
       expect(getByTestId('rubric-self-assessment-rating-button-selected')).toBeInTheDocument()
       expect(getByTestId('rubric-self-assessment-rating-button-0')).toBeDisabled()
+    })
+
+    it('shows error alert when trying to submit incomplete rubric', async () => {
+      store.setState({
+        displayedAssessment: {
+          data: [],
+        },
+        isSavingRubricAssessment: false,
+        selfAssessment: null,
+      })
+
+      const {getByTestId} = await renderComponent()
+
+      fireEvent.click(getByTestId('self-assess-button'))
+
+      expect(getByTestId('enhanced-rubric-assessment-tray')).toBeInTheDocument()
+
+      // Submit without selecting any ratings
+      const submitButton = getByTestId('save-rubric-assessment-button')
+      fireEvent.click(submitButton)
+
+      expect(setOnFailure).toHaveBeenCalledWith('Incomplete Self Assessment')
     })
   })
 })

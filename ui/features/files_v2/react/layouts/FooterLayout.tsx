@@ -16,20 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Flex } from "@instructure/ui-flex"
+import {Flex} from '@instructure/ui-flex'
 
-export const FooterLayout = (props: {
-  usageBar?: React.ReactNode
-  pagination?: React.ReactNode
-}) => {
+export const FooterLayout = (props: {usageBar?: React.ReactNode; pagination?: React.ReactNode}) => {
   return (
-    <Flex as='div' justifyItems='space-between'>
-      <Flex.Item as='div'>
-        {props.usageBar}
-      </Flex.Item>
-      <Flex.Item as='div'>
-        {props.pagination}
-      </Flex.Item>
+    <Flex as="div" justifyItems="space-between">
+      <Flex.Item as="div">{props.usageBar}</Flex.Item>
+      <Flex.Item as="div">{props.pagination}</Flex.Item>
     </Flex>
   )
 }

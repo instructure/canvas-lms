@@ -18,7 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {isFunction} from 'lodash'
+import {isFunction} from 'es-toolkit/compat'
 import preventDefault from '@canvas/util/preventDefault'
 import ReactModal from '@canvas/react-modal'
 

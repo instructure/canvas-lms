@@ -37,13 +37,13 @@ describe('useOutcomeFormValidate', () => {
   })
 
   beforeEach(() => {
-    focusOnRatingsErrorMock = jest.fn()
-    clearRatingsFocusMock = jest.fn()
-    focusMock = jest.fn()
+    focusOnRatingsErrorMock = vi.fn()
+    clearRatingsFocusMock = vi.fn()
+    focusMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('creates custom hook with proper exports', () => {

@@ -17,17 +17,16 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import OfficialNotFoundGame from './frogger/OfficialNotFoundGame'
 import SpaceInvaders from './space_invaders/SpaceInvaders'
 import SlidePuzzle from './slide_puzzle/SlidePuzzle'
 
 export const renderGameApp = domElement => {
   const AppRootElement = document.getElementById(domElement)
-  const root = createRoot(AppRootElement)
   const gamePool = [<OfficialNotFoundGame />, <SpaceInvaders />, <SlidePuzzle />]
   const index = Math.floor(Math.random() * 3)
-  root.render(gamePool[index])
+  render(gamePool[index], AppRootElement)
 }
 
 export const renderGameIntoDom = domElement => {

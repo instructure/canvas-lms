@@ -37,8 +37,8 @@ module Qti
       get_calculated_property("unit_points_percent")
       @question[:unit_points_percent] = @question[:unit_points_percent].to_f if @question[:unit_points_percent]
       get_calculated_property("unit_value")
-      get_calculated_property("unit_required", true)
-      get_calculated_property("unit_case_sensitive", true)
+      get_calculated_property("unit_required", is_true_false: true)
+      get_calculated_property("unit_case_sensitive", is_true_false: true)
       get_calculated_property("partial_credit_points_percent")
       @question[:partial_credit_points_percent] = @question[:partial_credit_points_percent].to_f if @question[:partial_credit_points_percent]
       get_calculated_property("partial_credit_tolerance")
@@ -66,7 +66,7 @@ module Qti
       @question
     end
 
-    def get_calculated_property(prop_name, is_true_false = false)
+    def get_calculated_property(prop_name, is_true_false: false)
       @question[:"#{prop_name}"] = @doc.at_css("calculated #{prop_name}").text if @doc.at_css("calculated #{prop_name}")
       if is_true_false && @question[:"#{prop_name}"]
         @question[:"#{prop_name}"] = @question[:"#{prop_name}"] == "true"

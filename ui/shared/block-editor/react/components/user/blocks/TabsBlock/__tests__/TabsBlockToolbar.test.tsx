@@ -26,13 +26,13 @@ import {TabsBlockToolbar} from '../TabsBlockToolbar'
 
 let props = {...TabsBlock.craft.defaultProps}
 
-const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
+const mockSetProp = vi.fn((callback: (props: Record<string, any>) => void) => {
   callback(props)
 })
 
-jest.mock('@craftjs/core', () => {
+vi.mock('@craftjs/core', () => {
   return {
-    useNode: jest.fn(_node => {
+    useNode: vi.fn(_node => {
       return {
         actions: {setProp: mockSetProp},
         props: TabsBlock.craft.defaultProps,

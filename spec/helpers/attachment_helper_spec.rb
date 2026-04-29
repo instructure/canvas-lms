@@ -27,15 +27,6 @@ describe AttachmentHelper do
     @att = attachment_model(context: @user)
   end
 
-  it "returns a valid crocodoc session url" do
-    @current_user = @student
-    allow(@att).to receive(:crocodoc_available?).and_return(true)
-    attrs = doc_preview_attributes(@att)
-    expect(attrs).to match(/crocodoc_session/)
-    expect(attrs).to match(/#{@current_user.id}/)
-    expect(attrs).to match(/#{@att.id}/)
-  end
-
   it "returns a valid canvadoc session url" do
     @current_user = @student
     allow(@att).to receive(:canvadocable?).and_return(true)
@@ -43,6 +34,12 @@ describe AttachmentHelper do
     expect(attrs).to match(/canvadoc_session/)
     expect(attrs).to match(/#{@current_user.id}/)
     expect(attrs).to match(/#{@att.id}/)
+  end
+
+  it "includes attachment name for iframe's aria-label" do
+    @current_user = @student
+    attrs = doc_preview_attributes(@att)
+    expect(attrs).to match(/data-attachment_name="#{@att.name}"/)
   end
 
   it "includes anonymous_instructor_annotations in canvadoc url" do
@@ -76,6 +73,143 @@ describe AttachmentHelper do
     end
   end
 
+  describe "#access_via_location?" do
+    let(:attachment) { @att }
+    let(:user) { @student }
+    let(:access_type) { :read }
+
+    context "when location parameter is not present" do
+      it "returns false" do
+        expect(access_via_location?(attachment, user, access_type)).to be false
+      end
+    end
+
+    context "when location parameter is present but access_type is not :read or :download" do
+      before do
+        allow(self).to receive(:params).and_return({ location: "some_location" })
+      end
+
+      it "returns false for :update access type" do
+        expect(access_via_location?(attachment, user, :update)).to be false
+      end
+
+      it "returns false for :delete access type" do
+        expect(access_via_location?(attachment, user, :delete)).to be false
+      end
+    end
+
+    context "when location parameter is present and access_type is :read" do
+      let(:access_type) { :read }
+
+      context "with avatar_ location" do
+        let(:avatar_user) { user_factory }
+        let(:avatar_user_id) { Shard.short_id_for(avatar_user.global_id) }
+
+        before do
+          allow(self).to receive(:params).and_return({ location: "avatar_#{avatar_user_id}" })
+        end
+
+        it "returns true when user allows avatar access" do
+          allow(User).to receive(:find_by).and_return(avatar_user)
+          allow(avatar_user).to receive(:allow_avatar_access?).with(attachment).and_return(true)
+          expect(access_via_location?(attachment, user, access_type)).to be true
+        end
+
+        it "returns false when user does not allow avatar access" do
+          allow(User).to receive(:find_by).and_return(avatar_user)
+          allow(avatar_user).to receive(:allow_avatar_access?).with(attachment).and_return(false)
+          expect(access_via_location?(attachment, user, access_type)).to be false
+        end
+
+        it "returns false when user is not found" do
+          allow(self).to receive(:params).and_return({ location: "avatar_1~999999" })
+          expect(access_via_location?(attachment, user, access_type)).to be false
+        end
+
+        it "handles nil user gracefully" do
+          allow(User).to receive(:find_by).and_return(nil)
+          expect(access_via_location?(attachment, user, access_type)).to be false
+        end
+      end
+
+      context "with non-avatar location" do
+        let(:location) { "some_other_location" }
+        let(:session) { {} }
+
+        before do
+          allow(self).to receive_messages(params: { location: }, session:)
+        end
+
+        it "returns true when AttachmentAssociation.verify_access returns true" do
+          allow(AttachmentAssociation).to receive(:verify_access)
+            .with(location, attachment, user, session)
+            .and_return(true)
+          expect(access_via_location?(attachment, user, access_type)).to be true
+        end
+
+        it "returns false when AttachmentAssociation.verify_access returns false" do
+          allow(AttachmentAssociation).to receive(:verify_access)
+            .with(location, attachment, user, session)
+            .and_return(false)
+          expect(access_via_location?(attachment, user, access_type)).to be false
+        end
+      end
+    end
+
+    context "when location parameter is present and access_type is :download" do
+      let(:access_type) { :download }
+
+      context "with avatar_ location" do
+        let(:avatar_user) { user_factory }
+
+        before do
+          allow(self).to receive(:params).and_return({ location: "avatar_#{avatar_user.id}" })
+        end
+
+        it "returns true when user allows avatar access" do
+          allow(User).to receive(:find_by).with(id: avatar_user.id.to_s).and_return(avatar_user)
+          allow(avatar_user).to receive(:allow_avatar_access?).with(attachment).and_return(true)
+          expect(access_via_location?(attachment, user, access_type)).to be true
+        end
+
+        it "returns false when user does not allow avatar access" do
+          allow(avatar_user).to receive(:allow_avatar_access?).with(attachment).and_return(false)
+          expect(access_via_location?(attachment, user, access_type)).to be false
+        end
+      end
+
+      context "with non-avatar location" do
+        let(:location) { "submission_123" }
+        let(:session) { { user_id: user.id } }
+
+        before do
+          allow(self).to receive_messages(params: { location: }, session:)
+        end
+
+        it "delegates to AttachmentAssociation.verify_access with correct parameters" do
+          expect(AttachmentAssociation).to receive(:verify_access)
+            .with(location, attachment, user, session)
+            .and_return(true)
+          expect(access_via_location?(attachment, user, access_type)).to be true
+        end
+      end
+    end
+
+    context "edge cases" do
+      let(:access_type) { :read }
+
+      it "handles avatar location with non-numeric user id" do
+        allow(self).to receive(:params).and_return({ location: "avatar_abc" })
+        expect(access_via_location?(attachment, user, access_type)).to be false
+      end
+
+      it "handles avatar location with empty user id" do
+        allow(self).to receive(:params).and_return({ location: "avatar_" })
+        expect(access_via_location?(attachment, user, access_type)).to be false
+      end
+    end
+  end
+
   describe "#doc_preview_json" do
     subject { doc_preview_json(attachment, locked_for_user:) }
 
@@ -84,10 +218,6 @@ describe AttachmentHelper do
 
     shared_examples_for "scenarios when the file is not locked for the user" do
       let(:preview_json) { raise "set in examples" }
-
-      it "adds the crocodoc session url" do
-        expect(preview_json.keys).to include(:crocodoc_session_url)
-      end
 
       it "adds the canvadoc session url" do
         expect(preview_json.keys).to include(:canvadoc_session_url)
@@ -111,12 +241,187 @@ describe AttachmentHelper do
     context "when 'locked_for_user' is false" do
       let(:locked_for_user) { true }
 
-      it "does not add the crocodoc session url" do
-        expect(subject.keys).not_to include(:crocodoc_session_url)
-      end
-
       it "does not add the canvadoc session url" do
         expect(subject.keys).not_to include(:canvadoc_session_url)
+      end
+    end
+  end
+
+  describe "render_or_redirect_to_stored_file" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @attachment = attachment_model(context: @course)
+    end
+
+    before do
+      allow(self).to receive_messages(
+        cancel_cache_buster: nil,
+        set_cache_header: nil,
+        safer_domain_available?: false,
+        csp_enforced?: false,
+        file_location_mode?: false
+      )
+    end
+
+    context "with Kaltura media files" do
+      before do
+        kaltura_config = {
+          "domain" => "www.instructuremedia.com",
+          "partner_id" => "100"
+        }
+        allow(CanvasKaltura::ClientV3).to receive_messages(config: kaltura_config)
+        @media_object = @course.media_objects.create!(
+          media_id: "0_feedbeef",
+          attachment: attachment_model(context: @course)
+        )
+        @kaltura_attachment = attachment_model(
+          context: @course,
+          media_entry_id: @media_object.media_id,
+          display_name: "test_video.mp4"
+        )
+
+        kaltura_client = instance_double(CanvasKaltura::ClientV3)
+        allow(CanvasKaltura::ClientV3).to receive_messages(new: kaltura_client)
+        allow(kaltura_client).to receive(:media_download_url)
+          .with("0_feedbeef")
+          .and_return("https://kaltura.example.com/download/asset1")
+        allow(@kaltura_attachment).to receive(:kaltura_manifest_file?).and_return(true)
+      end
+
+      it "redirects to Kaltura URL when downloading Kaltura media" do
+        expect(self).to receive(:redirect_to)
+          .with(a_string_including("https://kaltura.example.com/download/asset1"))
+        render_or_redirect_to_stored_file(attachment: @kaltura_attachment, inline: false)
+      end
+
+      it "does not redirect for inline viewing of Kaltura media" do
+        allow(@kaltura_attachment).to receive(:stored_locally?).and_return(true)
+        expect(self).not_to receive(:redirect_to)
+          .with(a_string_including("kaltura.example.com"))
+        expect(self).to receive(:send_file)
+        render_or_redirect_to_stored_file(attachment: @kaltura_attachment, inline: true)
+      end
+
+      it "does not redirect to Kaltura URL when file is not a manifest" do
+        allow(@kaltura_attachment).to receive_messages(
+          kaltura_manifest_file?: false,
+          stored_locally?: true
+        )
+        expect(self).not_to receive(:redirect_to)
+          .with(a_string_including("kaltura.example.com"))
+        expect(self).to receive(:send_file)
+        render_or_redirect_to_stored_file(attachment: @kaltura_attachment, inline: false)
+      end
+    end
+
+    context "with non-Kaltura files" do
+      before do
+        allow(@attachment).to receive(:stored_locally?).and_return(true)
+      end
+
+      it "does not redirect to Kaltura for regular files" do
+        expect(self).not_to receive(:redirect_to)
+          .with(a_string_including("kaltura"))
+        expect(self).to receive(:send_file)
+        render_or_redirect_to_stored_file(attachment: @attachment, inline: false)
+      end
+
+      it "handles regular file downloads normally" do
+        expect(self).to receive(:send_file).with(
+          @attachment.full_filename,
+          type: @attachment.content_type_with_encoding,
+          disposition: "attachment",
+          filename: @attachment.display_name
+        )
+        render_or_redirect_to_stored_file(attachment: @attachment, inline: false)
+      end
+    end
+
+    context "with InstFS files" do
+      before do
+        allow(@attachment).to receive(:instfs_hosted?).and_return(true)
+        allow(self).to receive_messages(
+          file_location_mode?: true,
+          authenticated_download_url: "https://instfs.example.com/download"
+        )
+      end
+
+      it "handles InstFS files correctly without Kaltura redirect" do
+        expect(self).not_to receive(:redirect_to)
+          .with(a_string_including("kaltura"))
+        expect(self).to receive(:render_file_location)
+        render_or_redirect_to_stored_file(attachment: @attachment, inline: false)
+      end
+    end
+  end
+
+  describe "#access_allowed" do
+    before :once do
+      course_with_student(active_all: true)
+      @attachment = attachment_model(context: @course)
+    end
+
+    context "when location parameter is present" do
+      let(:user) { @student }
+
+      before do
+        @domain_root_account = @course.root_account
+      end
+
+      it "skips UUID verifier validation and uses location-based access instead" do
+        allow(self).to receive_messages(params: {
+                                          location: "course_syllabus_#{@course.id}",
+                                          verifier: @attachment.uuid
+                                        },
+                                        access_via_location?: true)
+
+        result = access_allowed(
+          attachment: @attachment,
+          user:,
+          access_type: :read,
+          no_error_on_failure: true
+        )
+
+        expect(result).to be_truthy
+      end
+
+      it "does not validate verifier when location is present" do
+        allow(self).to receive_messages(params: {
+                                          location: "course_syllabus_#{@course.id}",
+                                          verifier: @attachment.uuid
+                                        },
+                                        access_via_location?: false)
+
+        expect(Attachments::Verification).not_to receive(:new)
+
+        access_allowed(
+          attachment: @attachment,
+          user:,
+          access_type: :read,
+          no_error_on_failure: true
+        )
+      end
+    end
+
+    context "when location parameter is not present but verifier is" do
+      let(:user) { user_factory }
+
+      before do
+        @domain_root_account = @course.root_account
+        @course.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
+      end
+
+      it "validates verifier when location is not present" do
+        allow(self).to receive_messages(params: { verifier: @attachment.uuid }, access_via_location?: false)
+
+        result = access_allowed(
+          attachment: @attachment,
+          user:,
+          access_type: :read,
+          no_error_on_failure: true
+        )
+
+        expect(result).to be_truthy
       end
     end
   end

@@ -104,7 +104,7 @@ describe "course paces edit tray" do
       click_unpublished_changes_button
       click_edit_tray_close_button
 
-      expect(unpublished_changes_tray_exists?).to be_falsey
+      wait_for_no_such_element { f(unpublished_changes_tray_selector) }
     end
 
     it "resets the content when Reset All is selected" do
@@ -118,7 +118,7 @@ describe "course paces edit tray" do
       click_reset_all_button
       click_reset_all_reset_button
 
-      expect(unpublished_changes_tray_exists?).to be_falsey
+      wait_for_no_such_element { f(unpublished_changes_tray_selector) }
       expect(publish_status.text).to eq("No pending changes")
       expect(duration_field[0]).to have_value "2"
     end

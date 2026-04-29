@@ -26,7 +26,7 @@ type RubricStore = {
 const useStore = create(
   subscribeWithSelector<RubricStore>(() => ({
     rubricId: undefined,
-  }))
+  })),
 )
 
 export const updateState = (newState: Partial<RubricStore>) => {

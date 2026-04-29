@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
-import {compact} from 'lodash'
+import {compact} from 'es-toolkit/compat'
 import OutcomesDirectoryView from './OutcomesDirectoryView'
 import AccountDirectoryView from './AccountDirectoryView'
 import StateStandardsDirectoryView from './StateStandardsDirectoryView'

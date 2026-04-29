@@ -21,24 +21,24 @@ import 'jquery-migrate'
 import gradebook_uploads from '../index'
 
 // Mock jQuery UI components
-jest.mock('jquery-ui', () => {
+vi.mock('jquery-ui', () => {
   const $ = require('jquery')
-  $.widget = jest.fn()
+  $.widget = vi.fn()
   $.ui = {
     mouse: {
-      _mouseInit: jest.fn(),
-      _mouseDestroy: jest.fn(),
+      _mouseInit: vi.fn(),
+      _mouseDestroy: vi.fn(),
     },
-    sortable: jest.fn(),
+    sortable: vi.fn(),
   }
   return $
 })
 
-jest.mock('slickgrid', () => ({
-  Grid: jest.fn().mockImplementation(() => ({
-    init: jest.fn(),
-    setData: jest.fn(),
-    render: jest.fn(),
+vi.mock('slickgrid', () => ({
+  Grid: vi.fn().mockImplementation(() => ({
+    init: vi.fn(),
+    setData: vi.fn(),
+    render: vi.fn(),
   })),
 }))
 
@@ -143,7 +143,7 @@ describe('override score changes', () => {
       },
     }
 
-    gridStub = jest.spyOn(gradebook_uploads, 'createGrid')
+    gridStub = vi.spyOn(gradebook_uploads, 'createGrid')
 
     // Creation of the actual grid, including "From" and "To" headers
     gridStub.mockImplementationOnce((_, {data, columns, options}) => {

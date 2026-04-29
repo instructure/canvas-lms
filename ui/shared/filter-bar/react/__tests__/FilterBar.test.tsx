@@ -45,7 +45,7 @@ describe('FilterBar', () => {
 
   describe('when the filter dropdown changes', () => {
     it('calls onFilter', async () => {
-      const onFilter = jest.fn()
+      const onFilter = vi.fn()
       const {getByRole} = render(
         <FilterBar onFilter={onFilter} onSearch={() => {}} filterOptions={filterOptions} />,
       )
@@ -57,41 +57,41 @@ describe('FilterBar', () => {
 
   describe('when the search input changes', () => {
     beforeEach(() => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
     })
 
     afterEach(() => {
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('calls onSearch after debounce', async () => {
       const user = userEvent.setup({delay: null})
-      const onSearch = jest.fn()
+      const onSearch = vi.fn()
       const {getByRole} = render(
         <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />,
       )
       await user.click(getByRole('searchbox'))
       await user.keyboard('hello')
       expect(onSearch).not.toHaveBeenCalled()
-      jest.runOnlyPendingTimers()
+      vi.runOnlyPendingTimers()
       expect(onSearch).toHaveBeenCalledWith('hello')
     })
 
     it('ignores search queries with < 3 characters', async () => {
       const user = userEvent.setup({delay: null})
-      const onSearch = jest.fn()
+      const onSearch = vi.fn()
       const {getByRole} = render(
         <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />,
       )
       await user.type(getByRole('searchbox'), 'h')
-      jest.runOnlyPendingTimers()
+      vi.runOnlyPendingTimers()
       expect(onSearch).not.toHaveBeenCalled()
     })
   })
 
   describe('when cleared', () => {
     it('calls onFilter with "all"', async () => {
-      const onFilter = jest.fn()
+      const onFilter = vi.fn()
       const {getByRole} = render(
         <FilterBar onFilter={onFilter} onSearch={() => {}} filterOptions={filterOptions} />,
       )
@@ -100,7 +100,7 @@ describe('FilterBar', () => {
     })
 
     it('calls onSearch with ""', async () => {
-      const onSearch = jest.fn()
+      const onSearch = vi.fn()
       const {getByRole} = render(
         <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />,
       )

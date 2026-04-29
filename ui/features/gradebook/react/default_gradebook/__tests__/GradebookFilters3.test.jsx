@@ -19,7 +19,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import '@testing-library/jest-dom'
 import GradingPeriodFilter from '../components/content-filters/GradingPeriodFilter'
 
 describe('GradingPeriodFilter', () => {
@@ -29,12 +28,12 @@ describe('GradingPeriodFilter', () => {
       {id: '1', title: 'First Period', weight: 33},
       {id: '2', title: 'Second Period', weight: 25.75},
     ],
-    onSelect: jest.fn(),
+    onSelect: vi.fn(),
     selectedGradingPeriodId: '0',
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderFilter = (props = {}) => {
@@ -71,7 +70,7 @@ describe('GradingPeriodFilter', () => {
     })
 
     it('calls onSelect when a different grading period is selected', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const user = userEvent.setup()
       const {getByRole, getByText} = renderFilter({onSelect})
 
@@ -83,7 +82,7 @@ describe('GradingPeriodFilter', () => {
     })
 
     it('does not call onSelect when the same period is selected', async () => {
-      const onSelect = jest.fn()
+      const onSelect = vi.fn()
       const user = userEvent.setup()
       const {getByRole, getByText} = renderFilter({
         onSelect,

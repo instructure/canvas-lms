@@ -62,6 +62,7 @@ export const WordCountModal = ({headers, rows, onDismiss}: WordCountModalProps) 
       label={formatMessage('Word Count')}
       mountNode={instuiPopupMountNodeFn()}
       open={true}
+      onDismiss={onDismiss}
       data-mce-component={true}
     >
       <Modal.Header>

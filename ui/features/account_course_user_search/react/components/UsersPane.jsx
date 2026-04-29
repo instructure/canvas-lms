@@ -19,7 +19,7 @@
 import React from 'react'
 import {shape, func, string, arrayOf} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {debounce, isEmpty} from 'lodash'
+import {debounce, isEmpty} from 'es-toolkit/compat'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import UsersList from './UsersList'
 import UsersToolbar from './UsersToolbar'
@@ -31,6 +31,7 @@ const I18n = createI18nScope('account_course_user_search')
 
 const MIN_SEARCH_LENGTH = 2
 export const SEARCH_DEBOUNCE_TIME = 750
+export const SEARCH_DEBOUNCE_TIME_ON_SHORT_QUERIES = 3000
 
 export default class UsersPane extends React.Component {
   static propTypes = {
@@ -66,6 +67,10 @@ export default class UsersPane extends React.Component {
       this.handleApplyingSearchFilter,
       SEARCH_DEBOUNCE_TIME,
     )
+    this.debouncedDispatchApplySearchFilterShortQuery = debounce(
+      this.handleApplyingSearchFilter,
+      SEARCH_DEBOUNCE_TIME_ON_SHORT_QUERIES,
+    )
   }
 
   componentDidMount() {
@@ -97,6 +102,8 @@ export default class UsersPane extends React.Component {
 
   componentWillUnmount() {
     this.unsubscribe()
+    this.debouncedDispatchApplySearchFilter.cancel()
+    this.debouncedDispatchApplySearchFilterShortQuery.cancel()
   }
 
   handleStateChange = () => {
@@ -110,6 +117,8 @@ export default class UsersPane extends React.Component {
   }
 
   handleApplyingSearchFilter = (preserveLastPageValue = false) => {
+    this.debouncedDispatchApplySearchFilter.cancel()
+    this.debouncedDispatchApplySearchFilterShortQuery.cancel()
     this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH))
     this.updateQueryString()
     if (!preserveLastPageValue) this.setState({knownLastPage: undefined})
@@ -117,7 +126,15 @@ export default class UsersPane extends React.Component {
 
   handleUpdateSearchFilter = searchFilter => {
     this.props.store.dispatch(UserActions.updateSearchFilter({page: null, ...searchFilter}))
-    this.debouncedDispatchApplySearchFilter()
+    const termLength = searchFilter.search_term.length
+    const isShortQuery = termLength > 0 && termLength <= MIN_SEARCH_LENGTH
+    if (isShortQuery) {
+      this.debouncedDispatchApplySearchFilter.cancel()
+      this.debouncedDispatchApplySearchFilterShortQuery()
+    } else {
+      this.debouncedDispatchApplySearchFilterShortQuery.cancel()
+      this.debouncedDispatchApplySearchFilter()
+    }
   }
 
   handleSubmitEditUserForm = () => {
@@ -177,7 +194,7 @@ export default class UsersPane extends React.Component {
         )}
 
         <SearchMessage
-          collection={{data: users, loading: isLoading, links}}
+          collection={{data: users, loading: isLoading, error: errors.requestFailed, links}}
           setPage={this.handleSetPage}
           knownLastPage={this.state.knownLastPage}
           noneFoundMessage={I18n.t('No users found')}

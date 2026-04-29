@@ -16,11 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  STUDENT_ENROLLMENT,
-  ACTIVE_ENROLLMENT,
-  STUDENT_ROLE,
-} from '../util/constants'
+import {STUDENT_ENROLLMENT, ACTIVE_ENROLLMENT, STUDENT_ROLE} from '../util/constants'
 
 export const mockUser = ({
   userId = '1',
@@ -40,10 +36,7 @@ export const mockUser = ({
   loginId,
   avatarUrl,
   customLinks,
-  enrollments: [
-    firstEnrollment,
-    ...otherEnrollments
-  ],
+  enrollments: [firstEnrollment, ...otherEnrollments],
 })
 
 export const mockEnrollment = ({
@@ -61,29 +54,26 @@ export const mockEnrollment = ({
   associatedUserName = 'Jane Doe',
   isTemporaryEnrollment = false,
   temporaryEnrollmentSourceUserId = '5',
-  sectionId= '1',
-  sectionName = 'Section 1'
+  sectionId = '1',
+  sectionName = 'Section 1',
 } = {}) => ({
   _id: enrollmentId,
   type: enrollmentType,
   state: enrollmentState,
   lastActivityAt,
-  totalActivityTime:
-  totalActivityTime,
+  totalActivityTime: totalActivityTime,
   canBeRemoved,
   sisRole,
   htmlUrl,
-  temporaryEnrollmentSourceUserId: isTemporaryEnrollment
-    ? temporaryEnrollmentSourceUserId
-    : null,
+  temporaryEnrollmentSourceUserId: isTemporaryEnrollment ? temporaryEnrollmentSourceUserId : null,
   associatedUser: hasAssociatedUser
     ? {
         _id: associatedUserId,
-        name: associatedUserName
+        name: associatedUserName,
       }
     : null,
   section: {
     _id: sectionId,
-    name: sectionName
+    name: sectionName,
   },
 })

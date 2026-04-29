@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {pickBy as omitFalsyValues} from 'lodash'
+import {pickBy as omitFalsyValues} from 'es-toolkit/compat'
 import createStore from './createStore'
 
 const USERS_TO_FETCH_PER_PAGE = 15
 const defaultParms = {
-  include: ['last_login', 'avatar_url', 'pronouns', 'email', 'time_zone', 'ui_invoked'],
+  include: ['last_login', 'avatar_url', 'pronouns', 'email', 'time_zone'],
   per_page: USERS_TO_FETCH_PER_PAGE,
   no_avatar_fallback: '1',
 }

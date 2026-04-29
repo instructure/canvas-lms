@@ -33,7 +33,7 @@ describe Lti::ContextControlsController, type: :request do
       account:,
       created_by: admin,
       registration_params:,
-      configuration_params:
+      configuration_params:,
     }
   end
 
@@ -72,6 +72,70 @@ describe Lti::ContextControlsController, type: :request do
       Lti::ContextControl.create!(account: context, registration:, deployment:)
     else
       raise ArgumentError, "Context must be a Course or Account"
+    end
+  end
+
+  # Shared setup for cross-shard site admin template tests.
+  # Verifies that helper methods (control, root_account_deployment) route
+  # through app_id when lti_registrations_templates is ON, not registration_id.
+  shared_context "cross-shard SA template" do
+    specs_require_sharding
+
+    let_once(:xshard_account) { @shard2.activate { account_model } }
+    let_once(:xshard_admin) { @shard2.activate { account_admin_user(account: xshard_account) } }
+    let_once(:sa_registration) do
+      Account.site_admin.shard.activate { lti_registration_with_tool(account: Account.site_admin) }
+    end
+    let_once(:local_copy) do
+      @shard2.activate do
+        Lti::InstallTemplateRegistrationService.call(
+          account: xshard_account, user: xshard_admin, template: sa_registration
+        )[:local_copy]
+      end
+    end
+    let_once(:local_deployment) { local_copy.deployments.first }
+    let_once(:primary_control) { local_deployment.primary_context_control }
+
+    before do
+      @shard2.activate do
+        xshard_account.enable_feature!(:lti_registrations_next)
+        xshard_account.enable_feature!(:lti_registrations_templates)
+      end
+      user_session(xshard_admin)
+    end
+  end
+
+  shared_examples "navigation cache invalidation" do
+    context "when the tool has navigation placements" do
+      let(:configuration_params) do
+        internal_lti_configuration.deep_merge({
+                                                placements: [
+                                                  { placement: "course_navigation", message_type: "LtiResourceLinkRequest" }
+                                                ]
+                                              })
+      end
+
+      it "invalidates the navigation cache" do
+        nav_cache = instance_double(Lti::NavigationCache)
+        allow(Lti::NavigationCache).to receive(:new).with(account).and_return(nav_cache)
+        expect(nav_cache).to receive(:invalidate_cache_key)
+        subject
+      end
+    end
+
+    context "when the tool does not have navigation placements" do
+      let(:configuration_params) do
+        internal_lti_configuration.deep_merge({
+                                                placements: [
+                                                  { placement: "assignment_selection", message_type: "LtiDeepLinkingRequest" }
+                                                ]
+                                              })
+      end
+
+      it "does not invalidate the navigation cache" do
+        expect(Lti::NavigationCache).not_to receive(:new)
+        subject
+      end
     end
   end
 
@@ -157,7 +221,7 @@ describe Lti::ContextControlsController, type: :request do
 
     context "with deployments" do
       let(:deployment) { registration.deployments.first }
-      let(:control) { deployment.context_controls.first }
+      let(:control) { deployment.primary_context_control }
       let(:course) { course_model(account:) }
       let(:subaccount) { account_model(parent_account: account) }
       let(:course_deployment) { deployment_for(course) }
@@ -198,9 +262,19 @@ describe Lti::ContextControlsController, type: :request do
         )
       end
 
-      it "sorts deployments by account hierarchy" do
+      it "sorts deployments: root account first, then subaccounts, then courses" do
         subject
-        expect(response_json.map { |d| d["id"] }).to eq([deployment.id, course_deployment.id, subaccount_deployment.id])
+        expect(response_json.pluck("id")).to eq([deployment.id, subaccount_deployment.id, course_deployment.id])
+      end
+
+      it "sorts by context type, not by deployment id" do
+        # course_deployment has a lower id than subaccount_deployment
+        # (created first in the before block), so without explicit sorting
+        # it would appear before subaccount_deployment in the response
+        expect(course_deployment.id).to be < subaccount_deployment.id
+        subject
+        ids = response_json.pluck("id")
+        expect(ids.index(subaccount_deployment.id)).to be < ids.index(course_deployment.id)
       end
 
       context "when deployment has many controls" do
@@ -216,7 +290,7 @@ describe Lti::ContextControlsController, type: :request do
 
           deployment_json = response_json.find { |d| d["id"] == deployment.id }
           expect(deployment_json["context_controls"].length).to eq(2)
-          expect(deployment_json["context_controls"].map { |cc| cc["id"] }).to include(other_control.id)
+          expect(deployment_json["context_controls"].pluck("id")).to include(other_control.id)
         end
 
         it "includes calculated attributes for a top-level control" do
@@ -252,38 +326,206 @@ describe Lti::ContextControlsController, type: :request do
 
           subject
           controls = response_json.find { |d| d["id"] == deployment.id }["context_controls"]
-          expect(controls.map { |cc| cc["id"] }).not_to include(other_control.id)
+          expect(controls.pluck("id")).not_to include(other_control.id)
+        end
+
+        it "sorts child course exceptions before child sub-account exceptions at the same level" do
+          sub_sub_account = account_model(parent_account: subaccount)
+          another_sub_course = course_model(account: subaccount)
+
+          sub_sub_account_control = Lti::ContextControl.create!(account: sub_sub_account, registration:, deployment:)
+          course_control = Lti::ContextControl.create!(course: another_sub_course, registration:, deployment:)
+
+          subject
+
+          deployment_json = response_json.find { |d| d["id"] == deployment.id }
+          control_ids = deployment_json["context_controls"].pluck("id")
+
+          course_index = control_ids.index(course_control.id)
+          sub_account_index = control_ids.index(sub_sub_account_control.id)
+
+          expect(course_index).to be < sub_account_index
+        end
+
+        it "ensures exceptions are ordered by parent account, not just logical depth" do
+          sub_sub_account = account_model(parent_account: subaccount)
+          other_sub_sub_account = account_model(parent_account: subaccount)
+          another_sub_course = course_model(account: sub_sub_account)
+
+          sub_account_control = Lti::ContextControl.create!(account: subaccount, registration:, deployment:)
+          sub_sub_account_control = Lti::ContextControl.create!(account: sub_sub_account, registration:, deployment:)
+          course_control = Lti::ContextControl.create!(course: another_sub_course, registration:, deployment:)
+          sub_sub_account_control_2 = Lti::ContextControl.create!(account: other_sub_sub_account, registration:, deployment:)
+
+          subject
+
+          deployment_json = response_json.find { |d| d["id"] == deployment.id }
+          control_ids = deployment_json["context_controls"].pluck("id")
+
+          sub_account_index = control_ids.index(sub_account_control.id)
+          sub_sub_account_index = control_ids.index(sub_sub_account_control.id)
+          course_index = control_ids.index(course_control.id)
+          other_sub_sub_index = control_ids.index(sub_sub_account_control_2.id)
+
+          expect(sub_account_index).to be < sub_sub_account_index
+          expect(sub_sub_account_index).to be < course_index
+          expect(course_index).to be < other_sub_sub_index
+        end
+
+        it "paginates correctly with mixed courses and accounts at the same level" do
+          courses = []
+          accounts = []
+
+          5.times do |i|
+            courses << course_model(account: subaccount, name: "Course #{i}")
+            accounts << account_model(parent_account: subaccount, name: "Sub-Account #{i}")
+          end
+
+          course_controls = courses.map { |c| Lti::ContextControl.create!(course: c, registration:, deployment:) }
+          account_controls = accounts.map { |a| Lti::ContextControl.create!(account: a, registration:, deployment:) }
+
+          # Fetch with small page size to force pagination. 14 controls total at this point:
+          # 3 from each of the three deployments, one in the sub-course, then 10 we just made.
+          get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls", params: { per_page: 7 }
+          expect(response).to be_successful
+
+          all_controls = []
+          deployment_json = response.parsed_body.find { |d| d["id"] == deployment.id }
+          all_controls.concat(deployment_json["context_controls"]) if deployment_json
+
+          links = Api.parse_pagination_links(response.headers["Link"])
+          next_link = links.detect { |link| link[:rel] == "next" }
+
+          get next_link[:uri].to_s
+          expect(response).to be_successful
+
+          links = Api.parse_pagination_links(response.headers["Link"])
+
+          expect(links.detect { it[:rel] == "next" }).to be_nil
+          deployment_json = response.parsed_body.find { |d| d["id"] == deployment.id }
+          all_controls.concat(deployment_json["context_controls"]) if deployment_json
+          all_control_ids = all_controls.pluck("id")
+
+          expect(all_control_ids).to include(*(course_controls.map(&:id) + account_controls.map(&:id)))
+
+          course_control_ids = course_controls.map(&:id)
+          account_control_ids = account_controls.map(&:id)
+
+          last_course_index = all_control_ids.rindex { |id| course_control_ids.include?(id) }
+          first_account_index = all_control_ids.index { |id| account_control_ids.include?(id) }
+
+          expect(last_course_index).to be < first_account_index
+        end
+      end
+
+      context "when paginating across deployment types" do
+        let(:params) { { per_page: 3 } }
+
+        before do
+          # Add 2 extra controls to subaccount_deployment (3 total).
+          # With per_page=3, the page boundary will be in between
+          # the subaccount deployments, putting the course deployment on page 2.
+          2.times { control_for(subaccount_deployment, account_model(parent_account: subaccount)) }
+        end
+
+        it "returns root account, then subaccount, then course across page boundaries" do
+          # Make sure the course's deployment ID comes first, otherwise this test will still
+          # pass but not necessarily because the sorting logic is working.
+          expect(course_deployment.id).to be < subaccount_deployment.id
+
+          # Total is 1 root account + 3 subaccounts + 1 course = 5 deployments
+          # Page 1 has [ root_account[control], subaccount[control1, control2] ]
+          # Page 2 has [ subaccount[control3], course[control] ]
+          subject
+          expect(response_json.pluck("id")).to eq([deployment.id, subaccount_deployment.id])
+
+          links = Api.parse_pagination_links(response.headers["Link"])
+          next_link = links.detect { |link| link[:rel] == "next" }
+
+          get next_link[:uri].to_s
+          page2_json = response.parsed_body
+          expect(page2_json.pluck("id")).to eq([subaccount_deployment.id, course_deployment.id])
         end
       end
     end
 
-    context "with cross-shard registration" do
+    context "with site admin template registration" do
       specs_require_sharding
 
-      let(:registration) { @shard2.activate { lti_registration_with_tool(account: xshard_account) } }
-      let(:xshard_account) { @shard2.activate { account_model } }
-      let(:local_deployment) { deployment_for(account) }
-
-      before { local_deployment }
-
-      it "returns deployments and controls from current shard" do
-        subject
-        expect(response).to be_successful
-        expect(response_json.length).to eq(1)
-        expect(response_json[0]["id"]).to eq(local_deployment.id)
-        expect(response_json[0]["context_controls"].length).to eq(1)
+      subject do
+        get "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{local_copy.id}/controls", params:
       end
 
-      context "when registration's account has flag off" do
-        before { xshard_account.disable_feature!(:lti_registrations_next) }
+      let_once(:xshard_account) { @shard2.activate { account_model } }
+      let_once(:local_deployment) { local_copy.deployments.first }
+      let_once(:xshard_admin) { @shard2.activate { account_admin_user(account: xshard_account) } }
+      let_once(:sa_registration) { Account.site_admin.shard.activate { lti_registration_with_tool(account: Account.site_admin) } }
+      let_once(:local_copy) do
+        @shard2.activate do
+          Lti::InstallTemplateRegistrationService.call(
+            account: xshard_account, user: xshard_admin, template: sa_registration
+          )[:local_copy]
+        end
+      end
 
-        it "returns deployment and controls from current shard" do
+      before do
+        @shard2.activate do
+          xshard_account.enable_feature!(:lti_registrations_next)
+          xshard_account.enable_feature!(:lti_registrations_templates)
+        end
+        local_copy
+        user_session(xshard_admin)
+      end
+
+      it "returns deployments and controls from current shard" do
+        @shard2.activate do
           subject
           expect(response).to be_successful
           expect(response_json.length).to eq(1)
           expect(response_json[0]["id"]).to eq(local_deployment.id)
           expect(response_json[0]["context_controls"].length).to eq(1)
         end
+      end
+    end
+
+    context "with inherited registration shared across multiple root accounts" do
+      # Query via local_copy — with flag ON, routes through app_id = local_copy.id
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{local_copy.id}/controls", params: }
+
+      let(:site_admin_registration) { lti_registration_with_tool(account: Account.site_admin) }
+      let(:other_root_account) { account_model }
+      let(:local_copy) do
+        Lti::InstallTemplateRegistrationService.call(
+          account:, user: admin, template: site_admin_registration
+        )[:local_copy]
+      end
+      let(:other_local_copy) do
+        other_admin = account_admin_user(account: other_root_account)
+        other_root_account.enable_feature!(:lti_registrations_next)
+        Lti::InstallTemplateRegistrationService.call(
+          account: other_root_account, user: other_admin, template: site_admin_registration
+        )[:local_copy]
+      end
+      let(:account_deployment) { local_copy.app_deployments.first }
+      let(:other_deployment) { other_local_copy.app_deployments.first }
+      let(:account_control) { account_deployment.primary_context_control }
+      let(:other_control) { other_deployment.primary_context_control }
+
+      before do
+        local_copy
+        other_local_copy
+        account_control
+        other_control
+      end
+
+      it "only returns controls from the current root account" do
+        subject
+        expect(response).to be_successful
+
+        # Should only see controls from current account, not other_root_account
+        all_control_ids = response_json.flat_map { |d| d["context_controls"].pluck("id") }
+        expect(all_control_ids).to include(account_control.id)
+        expect(all_control_ids).not_to include(other_control.id)
       end
     end
 
@@ -335,7 +577,7 @@ describe Lti::ContextControlsController, type: :request do
     subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls/#{control.id}" }
 
     let(:deployment) { deployment_for(account) }
-    let(:control) { deployment.context_controls.first }
+    let(:control) { deployment.primary_context_control }
 
     it "is successful" do
       subject
@@ -394,6 +636,35 @@ describe Lti::ContextControlsController, type: :request do
         expect(response).to be_not_found
       end
     end
+
+    context "with site admin template registration (cross-shard app_id routing)" do
+      # The control's registration_id = sa_registration.id (cross-shard FK).
+      # The control's app_id = local_copy.id.
+      # We pass local_copy.id in the URL — the fixed `control` helper must
+      # use for_registration (app_id path) to find the control, not registration_id.
+      subject do
+        @shard2.activate do
+          get "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{local_copy.id}/controls/#{primary_control.id}"
+        end
+      end
+
+      include_context "cross-shard SA template"
+
+      it "finds the control via app_id and returns 200" do
+        subject
+        expect(response).to be_successful
+        # Compare inside shard2 so .id returns the local (not global) ID
+        @shard2.activate { expect(response.parsed_body["id"]).to eq(primary_control.id) }
+      end
+
+      it "does not find the control when the SA registration ID is passed instead" do
+        @shard2.activate do
+          get "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{sa_registration.id}/controls/#{primary_control.id}"
+        end
+        # SA reg is on a different shard — find raises RecordNotFound
+        expect(response).to be_not_found
+      end
+    end
   end
 
   describe "POST #create" do
@@ -408,6 +679,8 @@ describe Lti::ContextControlsController, type: :request do
     let(:root_deployment) { registration.deployments.first }
 
     before { root_deployment }
+
+    it_behaves_like "navigation cache invalidation"
 
     it "creates a new control" do
       expect { subject }.to change { Lti::ContextControl.count }.by(1)
@@ -433,6 +706,23 @@ describe Lti::ContextControlsController, type: :request do
       )
     end
 
+    it "tracks the changes" do
+      expect { subject }.to change { Lti::RegistrationHistoryEntry.count }.by(1)
+      history_entry = Lti::RegistrationHistoryEntry.last
+
+      expect(history_entry.diff["context_controls"]).to match_array(
+        [["+", [Lti::ContextControl.last.id], Lti::ContextControl.last.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)]]
+      )
+
+      # We created a bunch, so the old will just be an empty hash.
+      expect(history_entry.old_context_controls).to eq({})
+      expect(history_entry.new_context_controls).to be_present
+
+      new_control_id = Lti::ContextControl.last.id
+      expect(history_entry.new_context_controls[new_control_id.to_s])
+        .to eql(Lti::ContextControl.last.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES))
+    end
+
     context "with course_id" do
       let(:course) { course_model(account:) }
       let(:params) { { course_id: course.id } }
@@ -451,8 +741,8 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response_json.dig("errors", 0)).to eq("Context must have either an account or a course, not both")
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response_json.dig("errors", 0)).to eq("Exactly one context must be present")
       end
     end
 
@@ -461,14 +751,14 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0)).to eq("Either account_id or course_id must be present.")
       end
 
       context "with existing control" do
         it "returns 422" do
           subject
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(response_json["errors"]).to include(
             "Either account_id or course_id must be present."
           )
@@ -506,7 +796,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "No active deployment found for the root account."
         )
@@ -521,10 +811,34 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "Context must belong to the deployment's context"
         )
+      end
+    end
+
+    context "for context deep in deployment's hierarchy" do
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:subsubaccount) { account_model(parent_account: subaccount) }
+      let(:params) { { account_id: subsubaccount.id } }
+
+      it "also creates an anchor control" do
+        expect { subject }.to change { Lti::ContextControl.count }.by(2)
+      end
+
+      context "anchor control" do
+        let(:anchor_control) { Lti::ContextControl.find_by(deployment: root_deployment, account: subaccount) }
+
+        it "belongs to context right below deployment" do
+          subject
+          expect(anchor_control).to be_present
+        end
+
+        it "matches deployment control's availability" do
+          subject
+          expect(anchor_control.available).to eq(root_deployment.primary_context_control.available)
+        end
       end
     end
 
@@ -537,7 +851,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "A context control for this deployment and context already exists."
         )
@@ -614,6 +928,33 @@ describe Lti::ContextControlsController, type: :request do
         expect(response).to be_not_found
       end
     end
+
+    context "with site admin template registration (cross-shard app_id routing)" do
+      # Without a deployment_id param, create relies on root_account_deployment to
+      # find the deployment. The deployment has lti_registration_id=sa_registration.id
+      # and app_id=local_copy.id. The fixed root_account_deployment must use
+      # for_lti_registration (app_id path) — old code would return nil and 422.
+      subject do
+        @shard2.activate do
+          post "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{local_copy.id}/controls",
+               params: { course_id: course.id },
+               as: :json
+        end
+      end
+
+      include_context "cross-shard SA template"
+
+      let(:course) { @shard2.activate { course_model(account: xshard_account) } }
+
+      it "finds the deployment via app_id and creates the control" do
+        course
+        subject
+        expect(response).to have_http_status(:created)
+        created = response.parsed_body
+        # Compare inside shard2 so .id returns the local (not global) ID
+        @shard2.activate { expect(created["deployment_id"]).to eq(local_deployment.id) }
+      end
+    end
   end
 
   describe "POST #create_many" do
@@ -631,7 +972,7 @@ describe Lti::ContextControlsController, type: :request do
     context "with empty params" do
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include("Invalid parameters. Expected an array of context control parameters.")
       end
     end
@@ -641,7 +982,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include("Invalid parameters. Expected an array of context control parameters.")
       end
     end
@@ -659,8 +1000,11 @@ describe Lti::ContextControlsController, type: :request do
       let(:subaccount2) { account_model(parent_account: account) }
       let(:subdeployment) { registration.new_external_tool(subaccount).tap(&:save!) }
 
+      it_behaves_like "navigation cache invalidation"
+
       it "creates context controls" do
-        expect { subject }.to change { Lti::ContextControl.count }.by(3)
+        subdeployment
+        expect { subject }.to change { Lti::ContextControl.count }.by(2)
         expect(response).to be_successful
         expect(response_json.length).to eq(3)
         expect(response_json.map(&:with_indifferent_access)).to match_array(
@@ -670,6 +1014,233 @@ describe Lti::ContextControlsController, type: :request do
             hash_including(account_id: subaccount.id, deployment_id: subdeployment.id)
           ]
         )
+      end
+
+      it "tracks the changes properly" do
+        subdeployment
+        expect { subject }.to change { Lti::RegistrationHistoryEntry.count }.by(1)
+        expect(response).to be_successful
+
+        subaccount_control = Lti::ContextControl.find_by(account_id: subaccount2.id, registration:)
+        course_control = Lti::ContextControl.find_by(course_id: course.id, registration:)
+
+        # The subdeployment control isn't included because it doesn't actually get changed by this request
+        # and our history tracker notices that!
+        expected_diff = [
+          ["+", [subaccount_control.id], subaccount_control.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)],
+          ["+", [course_control.id], course_control.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)],
+        ]
+
+        history_entry = Lti::RegistrationHistoryEntry.last
+        expect(history_entry.diff["context_controls"]).to match_array(expected_diff)
+
+        expect(history_entry.old_context_controls).to be_present
+        expect(history_entry.new_context_controls).to be_present
+
+        expect(history_entry.new_context_controls[subaccount_control.id.to_s])
+          .to eql(subaccount_control.reload.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES))
+        expect(history_entry.new_context_controls[course_control.id.to_s])
+          .to eql(course_control.reload.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES))
+      end
+    end
+
+    context "when registration belongs to the request account (no template)" do
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:params) { [{ account_id: subaccount.id, available: true }] }
+
+      it "sets app_id to the registration's own id on created controls" do
+        subject
+        expect(response).to be_successful
+        control = Lti::ContextControl.find_by(account_id: subaccount.id, registration:)
+        expect(control.app_id).to eq(registration.id)
+      end
+    end
+
+    context "with site admin template registration (cross-shard app_id routing)" do
+      subject do
+        post "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{sa_registration.id}/controls/bulk",
+             params:,
+             as: :json
+      end
+
+      include_context "cross-shard SA template"
+
+      let(:subaccount) { @shard2.activate { account_model(parent_account: xshard_account) } }
+      let(:subsubaccount) { @shard2.activate { account_model(parent_account: subaccount) } }
+      let(:params) do
+        [{ account_id: subaccount.id, available: true, deployment_id: local_deployment.id }]
+      end
+
+      it "sets app_id to local_copy.id on created_controls" do
+        @shard2.activate do
+          subject
+          expect(response).to have_http_status(:created)
+          control = Lti::ContextControl.find_by(account_id: subaccount.id, deployment: local_deployment)
+          expect(control.app_id).to eq(local_copy.id)
+        end
+      end
+
+      context "with flag off" do
+        before { @shard2.activate { xshard_account.disable_feature!(:lti_registrations_templates) } }
+
+        it "sets app_id to local_copy.id on created controls" do
+          @shard2.activate do
+            subject
+            expect(response).to have_http_status(:created)
+            control = Lti::ContextControl.find_by(account_id: subaccount.id)
+            expect(control.app_id).to eq(local_copy.id)
+          end
+        end
+      end
+
+      context "with anchor controls needed" do
+        # subsubaccount is 2 levels below xshard_account (deployment level),
+        # so an anchor at subaccount level will be created
+        let(:params) { [{ account_id: subsubaccount.id, available: true, deployment_id: local_deployment.id }] }
+
+        it "sets app_id on both the control and its anchor" do
+          @shard2.activate do
+            subject
+            expect(response).to have_http_status(:created)
+            control = Lti::ContextControl.find_by(account_id: subsubaccount.id, deployment: local_deployment)
+            anchor  = Lti::ContextControl.find_by(account_id: subaccount.id, deployment: local_deployment)
+            expect(control.app_id).to eq(local_copy.id)
+            expect(anchor.app_id).to eq(local_copy.id)
+          end
+        end
+      end
+    end
+
+    describe "with controls that need anchors" do
+      # see Lti::ContextControlService.build_anchor_controls for what these mean
+      let(:params) do
+        [
+          { account_id: other_subsubaccount.id.to_s, available: true },
+          { course_id: course.id.to_s, available: false },
+        ]
+      end
+
+      let(:course) { course_model(account: subaccount) }
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:other_subaccount) { account_model(parent_account: account) }
+      let(:other_subsubaccount) { account_model(parent_account: other_subaccount) }
+
+      it "creates controls and anchor controls where needed" do
+        expect { subject }.to change { Lti::ContextControl.count }.by(4)
+        expect(response).to be_successful
+        expect(response_json.length).to eq(4)
+        expect(response_json.map(&:with_indifferent_access)).to match_array(
+          [
+            hash_including(account_id: other_subsubaccount.id, available: true),
+            hash_including(course_id: course.id, available: false),
+            hash_including(account_id: other_subaccount.id, available: root_deployment.primary_context_control.available), # anchor
+            hash_including(account_id: subaccount.id, available: root_deployment.primary_context_control.available) # anchor
+          ]
+        )
+      end
+
+      it "tracks the changes" do
+        subject
+
+        body = response.parsed_body
+
+        controls = Lti::ContextControl.where(id: body.pluck("id"))
+
+        expected = controls.map do |control|
+          ["+", [control.id], control.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)]
+        end
+        expect(Lti::RegistrationHistoryEntry.last.diff["context_controls"]).to match_array(
+          expected
+        )
+      end
+
+      context "and all of those controls need the same anchor control" do
+        let(:params) do
+          [
+            { course_id: course.id.to_s, available: false },
+            { course_id: other_course.id.to_s, available: true }
+          ]
+        end
+
+        let(:other_course) { course_model(account: subaccount) }
+
+        it "creates a single anchor control and doesn't error" do
+          subject
+          expect(response).to be_successful
+          expect(response_json.length).to eq(3)
+          expect(response_json.map(&:with_indifferent_access)).to match_array(
+            [
+              hash_including(course_id: other_course.id, available: true),
+              hash_including(course_id: course.id, available: false),
+              hash_including(account_id: subaccount.id, available: root_deployment.primary_context_control.available) # anchor
+            ]
+          )
+        end
+      end
+
+      context "when anchor control already exists" do
+        let(:anchor_control) { Lti::ContextControl.create!(account: other_subaccount, registration:, deployment: root_deployment, available: true) }
+
+        before do
+          anchor_control
+        end
+
+        it "does not create a new anchor control" do
+          expect { subject }.to change { Lti::ContextControl.count }.by(3)
+          expect(response).to be_successful
+          expect(response_json.length).to eq(3)
+          expect(response_json.map(&:with_indifferent_access)).to match_array(
+            [
+              hash_including(account_id: other_subsubaccount.id, available: true),
+              hash_including(course_id: course.id, available: false),
+              hash_including(account_id: subaccount.id, available: root_deployment.primary_context_control.available)
+            ]
+          )
+        end
+
+        it "does not modify the existing anchor control's availability" do
+          anchor_control
+          original_available = anchor_control.available
+          expect { subject }.not_to change { anchor_control.reload.available }.from(original_available)
+          expect(response).to be_successful
+        end
+
+        it "does not modify existing unavailable anchor control" do
+          separate_subaccount = account_model(parent_account: account)
+          unavailable_anchor = Lti::ContextControl.create!(
+            account: separate_subaccount,
+            registration:,
+            deployment: root_deployment,
+            available: false
+          )
+
+          deep_account = account_model(parent_account: account_model(parent_account: separate_subaccount))
+
+          post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls/bulk",
+               params: [{ account_id: deep_account.id, available: true }],
+               as: :json
+
+          expect(response).to be_successful
+          expect(unavailable_anchor.reload.available).to be(false)
+        end
+
+        it "tracks the changes" do
+          subject
+
+          body = response.parsed_body
+
+          controls = Lti::ContextControl.where(id: body.pluck("id"))
+
+          expected = controls.map do |control|
+            ["+", [control.id], control.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)]
+          end
+
+          expect(Lti::RegistrationHistoryEntry.last.diff["context_controls"]).to match_array(
+            expected
+          )
+
+          expect(anchor_control.reload.available).to be(true)
+        end
       end
     end
 
@@ -686,7 +1257,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         expect { subject }.not_to change { Lti::ContextControl.count }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Cannot create multiple context controls for the same context")
       end
     end
@@ -703,7 +1274,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         expect { subject }.not_to change { Lti::ContextControl.count }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Either account_id or course_id must be present for each context control")
       end
     end
@@ -720,7 +1291,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         expect { subject }.not_to change { Lti::ContextControl.count }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Either account_id or course_id must be present for each context control, but not both")
       end
     end
@@ -754,6 +1325,25 @@ describe Lti::ContextControlsController, type: :request do
           ]
         )
       end
+
+      it "tracks the changes" do
+        expect { subject }.to change { Lti::RegistrationHistoryEntry.count }.by(1)
+
+        history_entry = Lti::RegistrationHistoryEntry.last
+        expect(history_entry.diff["context_controls"]).to match_array(
+          [
+            ["~", [existing_control.id, "available"], false, true],
+            ["+", [Lti::ContextControl.last.id], Lti::ContextControl.last.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES)]
+          ]
+        )
+
+        expect(history_entry.old_context_controls[existing_control.id.to_s]["available"]).to be false
+        expect(history_entry.new_context_controls[existing_control.id.to_s]["available"]).to be true
+
+        new_control = Lti::ContextControl.last
+        expect(history_entry.new_context_controls[new_control.id.to_s])
+          .to eql(new_control.attributes.with_indifferent_access.slice(*Lti::ContextControl::TRACKED_ATTRIBUTES))
+      end
     end
 
     context "with a control referencing an existing control in a course" do
@@ -786,6 +1376,29 @@ describe Lti::ContextControlsController, type: :request do
           ]
         )
       end
+
+      it "does not create a history entry when re-setting the same values" do
+        # First create both controls
+        post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls/bulk",
+             params: [
+               { account_id: subaccount.id, available: true },
+               { course_id: course.id, available: false }
+             ],
+             as: :json
+        expect(response).to be_successful
+
+        # Now try to create them again with the same values - should not create a history entry
+        expect do
+          post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls/bulk",
+               params: [
+                 { account_id: subaccount.id, available: true },
+                 { course_id: course.id, available: false }
+               ],
+               as: :json
+        end.not_to change { Lti::RegistrationHistoryEntry.count }
+
+        expect(response).to be_successful
+      end
     end
 
     context "with too many controls" do
@@ -805,7 +1418,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include(
           "Cannot create more than #{max_size} context controls at once"
         )
@@ -824,14 +1437,14 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0, "message")).to eq(
           "Context must belong to the deployment's context"
         )
       end
     end
 
-    context "with control for a context outside the root acvcount" do
+    context "with control for a context outside the root account" do
       let(:other_account) { account_model }
       let(:params) do
         [
@@ -841,7 +1454,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json.dig("errors", 0, "message")).to eq(
           "Context must belong to the deployment's context"
         )
@@ -856,7 +1469,7 @@ describe Lti::ContextControlsController, type: :request do
 
       it "returns 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include(
           "No active deployment found for the root account."
         )
@@ -898,7 +1511,7 @@ describe Lti::ContextControlsController, type: :request do
     end
 
     let(:deployment) { deployment_for(account) }
-    let(:control) { deployment.context_controls.first }
+    let(:control) { deployment.primary_context_control }
     let(:params) { { available: false } }
     # control_id and registration_id are specified here so that it's easy to create
     # an id variable for a control or registration that doesn't exist.
@@ -906,10 +1519,39 @@ describe Lti::ContextControlsController, type: :request do
     let(:registration_id) { registration.id }
 
     context "with the lti_registrations_next feature flag enabled" do
+      it_behaves_like "navigation cache invalidation"
+
       it "updates the context control" do
         expect(control.available).to be true
         subject
         expect(control.reload.available).to be false
+      end
+
+      it "tracks the changes" do
+        subject
+        history_entry = Lti::RegistrationHistoryEntry.last
+
+        expect(history_entry.diff["context_controls"]).to match_array(
+          [["~", [control.id, "available"], true, false]]
+        )
+
+        expect(history_entry.old_context_controls[control.id.to_s]["available"]).to be true
+        expect(history_entry.new_context_controls[control.id.to_s]["available"]).to be false
+      end
+
+      it "does not create a history entry when no changes are made" do
+        # First update to set available to false
+        put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration_id}/controls/#{control_id}",
+            params: { available: false }
+        expect(control.reload.available).to be false
+
+        # Try to update with the same value - should not create a history entry
+        expect do
+          put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration_id}/controls/#{control_id}",
+              params: { available: false }
+        end.not_to change { Lti::RegistrationHistoryEntry.count }
+
+        expect(response).to be_successful
       end
 
       context "when missing the available param" do
@@ -954,6 +1596,23 @@ describe Lti::ContextControlsController, type: :request do
         expect(response).to be_not_found
       end
     end
+
+    context "with site admin template registration (cross-shard app_id routing)" do
+      subject do
+        @shard2.activate do
+          put "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{local_copy.id}/controls/#{primary_control.id}",
+              params: { available: false }
+        end
+      end
+
+      include_context "cross-shard SA template"
+
+      it "finds the control via app_id and updates it" do
+        subject
+        expect(response).to be_successful
+        expect(primary_control.reload.available).to be false
+      end
+    end
   end
 
   describe "DELETE #delete" do
@@ -965,18 +1624,27 @@ describe Lti::ContextControlsController, type: :request do
     let(:registration_id) { registration.id }
     let(:control_id) { control.id }
 
+    it_behaves_like "navigation cache invalidation"
+
     it "deletes and returns the context control" do
       subject
       expect(control.reload).to be_deleted
       expect(response).to be_successful
     end
 
+    it "tracks the changes" do
+      subject
+      expect(Lti::RegistrationHistoryEntry.last.diff["context_controls"]).to match_array(
+        [["~", [control.id, "workflow_state"], "active", "deleted"]]
+      )
+    end
+
     context "with the deployment's primary control" do
-      let(:control) { deployment.context_controls.first }
+      let(:control) { deployment.primary_context_control }
 
       it "returns a 422" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response_json["errors"]).to include("Cannot delete primary control for deployment")
       end
 
@@ -1017,6 +1685,42 @@ describe Lti::ContextControlsController, type: :request do
       it "returns a 404 if the lti_registrations_next feature flag is disabled" do
         subject
         expect(response).to be_not_found
+      end
+    end
+
+    context "with site admin template registration (cross-shard app_id routing)" do
+      # The course_control has registration_id=sa_registration.id, app_id=local_copy.id.
+      # The fixed `control` helper uses for_registration (app_id path) to find it.
+      # Old code used find_by(registration_id: local_copy.id) → 404.
+      subject do
+        @shard2.activate do
+          delete "/api/v1/accounts/#{xshard_account.id}/lti_registrations/#{local_copy.id}/controls/#{course_control.id}"
+        end
+      end
+
+      include_context "cross-shard SA template"
+
+      # We need a non-primary control to delete (primary deletion is blocked).
+      # Create a course-level control whose app_id=local_copy.id, registration_id=sa_registration.id.
+      let(:course) { @shard2.activate { course_model(account: xshard_account) } }
+      let(:course_control) do
+        @shard2.activate do
+          Lti::ContextControl.create!(
+            course:,
+            deployment: local_deployment,
+            registration: sa_registration,
+            root_account: xshard_account,
+            updated_by: xshard_admin,
+            created_by: xshard_admin
+          )
+        end
+      end
+
+      it "finds the control via app_id and deletes it" do
+        course_control
+        subject
+        expect(response).to be_successful
+        expect(course_control.reload).to be_deleted
       end
     end
   end

@@ -18,7 +18,7 @@
 import React from 'react'
 import {Pagination} from '@instructure/ui-pagination'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Pagination as PaginationType} from '../../types/rollup'
+import {Pagination as PaginationType} from '@canvas/outcomes/react/types/rollup'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 

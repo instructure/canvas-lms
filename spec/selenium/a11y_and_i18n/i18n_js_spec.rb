@@ -29,19 +29,6 @@ describe "i18n js" do
     driver.execute_script "require(['i18nObj'], function (I18n) { window.I18n = I18n });"
   end
 
-  context "strftime" do
-    it "formats just like ruby" do
-      skip("FOO-4268")
-      # everything except %N %6N %9N %U %V %W %Z
-      format = "%a %A %b %B %d %-d %D %e %F %h %H %I %j %k %l %L %m %M %n %3N %p %P %r %R %s %S %t %T %u %v %w %y %Y %z %%"
-      date = Time.zone.now
-      expect(driver.execute_script(<<~JS).upcase).to eq date.strftime(format).upcase
-        var date = new Date(#{date.strftime("%s")} * 1000 + #{date.strftime("%L").gsub(/^0+/, "")});
-        return I18n.strftime(date, '#{format}');
-      JS
-    end
-  end
-
   context "scoped" do
     it "uses the scoped translations" do
       skip("USE_OPTIMIZED_JS=true") unless ENV["USE_OPTIMIZED_JS"]

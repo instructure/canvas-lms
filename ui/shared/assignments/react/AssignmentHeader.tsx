@@ -33,10 +33,11 @@ import {View} from '@instructure/ui-view'
 import AssignmentPublishButton from './AssignmentPublishButton'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import OptionsMenu from './OptionsMenu'
-import {type Breakpoints} from '@canvas/with-breakpoints'
+import {type Breakpoints} from '@instructure/platform-with-breakpoints'
 import type {TeacherAssignmentType} from '../graphql/teacher/AssignmentTeacherTypes'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ASSIGNMENT_VIEW_TYPES} from './AssignmentTypes'
+import SubmissionGradingProgress from './SubmissionGradingProgress'
 
 const I18n = createI18nScope('assignment_teacher_header')
 
@@ -55,7 +56,7 @@ const AssignmentHeader: React.FC<HeaderProps> = ({type, assignment, breakpoints}
   const isSavedView = type === ASSIGNMENT_VIEW_TYPES.SAVED
 
   return (
-    <Flex alignItems="start" direction="column" width="100%">
+    <Flex alignItems="start" direction="column" width="100%" data-testid="assignment-header">
       <Flex
         direction={isMobile ? 'column' : 'row'}
         alignItems={isMobile ? 'center' : 'start'}
@@ -86,6 +87,14 @@ const AssignmentHeader: React.FC<HeaderProps> = ({type, assignment, breakpoints}
               </Pill>
             )}
           </Flex>
+          {isSavedView && (
+            <View data-testid="submission-grading-progress" margin="x-small none" tabIndex={0}>
+              <SubmissionGradingProgress
+                totalSubmissions={assignment.totalSubmissions || 0}
+                totalGradedSubmissions={assignment.totalGradedSubmissions || 0}
+              />
+            </View>
+          )}
         </Flex>
         <View
           display={isMobile ? 'block' : 'flex'}

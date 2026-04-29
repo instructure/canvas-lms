@@ -21,6 +21,7 @@ require_relative "../shared_examples_common"
 
 shared_examples_for "settings basic tests" do
   include SharedExamplesCommon
+
   include_context "in-process server selenium tests"
 
   before do

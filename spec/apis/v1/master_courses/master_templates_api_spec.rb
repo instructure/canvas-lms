@@ -880,6 +880,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                              "id" => @blueprint.id,
                              "name" => @blueprint.name,
                              "course_code" => @blueprint.course_code,
+                             "concluded" => @blueprint.concluded?,
                              "term_name" => @blueprint.enrollment_term.name
                            }
                          }])
@@ -900,6 +901,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                              "id" => @blueprint.id,
                              "name" => @blueprint.name,
                              "course_code" => @blueprint.course_code,
+                             "concluded" => @blueprint.concluded?,
                              "term_name" => @blueprint.enrollment_term.name,
                              "sis_course_id" => "sisid"
                            }

@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render } from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {MessageBody} from '../MessageBody'
-import { TranslationContext } from '../../../hooks/useTranslationContext'
+import {TranslationContext} from '../../../hooks/useTranslationContext'
 
 const createProps = overrides => {
   return {
-    onBodyChange: jest.fn(),
+    onBodyChange: vi.fn(),
     ...overrides,
   }
 }
@@ -37,7 +37,7 @@ describe('MessageBody', () => {
     const {getByTestId} = render(
       <TranslationContext.Provider value={mockTranslationContext}>
         <MessageBody {...props} />
-      </TranslationContext.Provider>
+      </TranslationContext.Provider>,
     )
     expect(getByTestId('message-body')).toBeInTheDocument()
   })
@@ -46,7 +46,7 @@ describe('MessageBody', () => {
     const props = createProps()
     const mockContext = {
       body: '',
-      setBody: jest.fn(),
+      setBody: vi.fn(),
       translating: false,
     }
 
@@ -73,7 +73,7 @@ describe('MessageBody', () => {
     const {getByText} = render(
       <TranslationContext.Provider value={{}}>
         <MessageBody {...props} />
-      </TranslationContext.Provider>
+      </TranslationContext.Provider>,
     )
     expect(getByText(props.messages[0].text)).toBeInTheDocument()
   })
@@ -87,7 +87,7 @@ describe('MessageBody', () => {
 
       const mockContext = {
         body: '',
-        setBody: jest.fn(),
+        setBody: vi.fn(),
         translating: false,
       }
       render(
@@ -107,11 +107,38 @@ describe('MessageBody', () => {
       render(
         <TranslationContext.Provider value={{}}>
           <MessageBody {...props} />
-        </TranslationContext.Provider>
+        </TranslationContext.Provider>,
       )
       const textArea = document.querySelectorAll('textarea')[0].value
       const signature = textArea.substring(textArea.length - props.signature.length)
       expect(signature).not.toBe(props.signature)
+    })
+
+    it('appends signature to body via useEffect when signature is provided', () => {
+      const props = createProps({
+        inboxSignatureBlock: true,
+        signature: 'Best regards, John',
+      })
+
+      const setBodyMock = vi.fn()
+      const mockContext = {
+        body: 'Initial message',
+        setBody: setBodyMock,
+        translating: false,
+      }
+
+      render(
+        <TranslationContext.Provider value={mockContext}>
+          <MessageBody {...props} />
+        </TranslationContext.Provider>,
+      )
+
+      // Verify useEffect (line 47-49) called setBody to append signature
+      expect(setBodyMock).toHaveBeenCalled()
+      // The setBody is called with a function that appends the signature to body
+      const setBodyCallback = setBodyMock.mock.calls[0][0]
+      const result = setBodyCallback('Initial message')
+      expect(result).toContain('Best regards, John')
     })
   })
 })

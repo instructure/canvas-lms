@@ -18,9 +18,11 @@
 
 import UniqueDropdownCollection from '../UniqueDropdownCollection'
 import Backbone from '@canvas/backbone'
-import _ from 'lodash'
+import {map} from 'es-toolkit/compat'
 
 describe('UniqueDropdownCollection', () => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - Backbone collection type not fully specified
   let records: Backbone.Model[], coll: UniqueDropdownCollection
 
   beforeEach(() => {
@@ -31,9 +33,11 @@ describe('UniqueDropdownCollection', () => {
       }
       return result
     })()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection constructor accepts initial models
     coll = new UniqueDropdownCollection(records, {
       propertyName: 'state',
-      possibleValues: _.map([1, 2, 3, 4], i => i.toString()),
+      possibleValues: map([1, 2, 3, 4], i => i.toString()),
     })
   })
 
@@ -44,40 +48,46 @@ describe('UniqueDropdownCollection', () => {
     expect(coll.availableValues instanceof Backbone.Collection).toBe(true)
   })
 
-  test('updates available/taken when models change', done => {
-    coll.availableValues.on('remove', (model: any) => {
-      expect(model.get('value')).toBe('4')
-    })
-    coll.availableValues.on('add', (model: any) => {
-      expect(model.get('value')).toBe('1')
-    })
+  test('updates available/taken when models change', () => {
+    return new Promise<void>(resolve => {
+      coll.availableValues.on('remove', (model: any) => {
+        expect(model.get('value')).toBe('4')
+      })
+      coll.availableValues.on('add', (model: any) => {
+        expect(model.get('value')).toBe('1')
+      })
 
-    coll.takenValues.on('remove', (model: any) => {
-      expect(model.get('value')).toBe('1')
-    })
-    coll.takenValues.on('add', (model: any) => {
-      expect(model.get('value')).toBe('4')
-      done()
-    })
+      coll.takenValues.on('remove', (model: any) => {
+        expect(model.get('value')).toBe('1')
+      })
+      coll.takenValues.on('add', (model: any) => {
+        expect(model.get('value')).toBe('4')
+        resolve()
+      })
 
-    records[0].set('state', '4')
+      records[0].set('state', '4')
+    })
   })
 
-  test('removing a model updates the available/taken values', done => {
-    coll.availableValues.on('add', (model: any) => {
-      expect(model.get('value')).toBe('1')
-    })
-    coll.takenValues.on('remove', (model: any) => {
-      expect(model.get('value')).toBe('1')
-      done()
-    })
+  test('removing a model updates the available/taken values', () => {
+    return new Promise<void>(resolve => {
+      coll.availableValues.on('add', (model: any) => {
+        expect(model.get('value')).toBe('1')
+      })
+      coll.takenValues.on('remove', (model: any) => {
+        expect(model.get('value')).toBe('1')
+        resolve()
+      })
 
-    // @ts-expect-error - Backbone collection method
-    coll.remove(coll.get(1))
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection methods
+      coll.remove(coll.get(1))
+    })
   })
 
   test('overrides add to munge params with an available value', () => {
-    // @ts-expect-error - Backbone collection property
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection property
     coll.model = Backbone.Model
 
     coll.add({})
@@ -85,28 +95,35 @@ describe('UniqueDropdownCollection', () => {
     expect(coll.availableValues).toHaveLength(0)
     expect(coll.takenValues).toHaveLength(4)
     expect(coll.takenValues.get('4') instanceof Backbone.Model).toBe(true)
-    // @ts-expect-error - Backbone collection methods
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection methods
     expect(coll.at(coll.length - 1).get('state')).toBe('4')
   })
 
-  test('add should take the value from the front of the available values collection', done => {
-    // @ts-expect-error - Backbone collection methods
-    coll.remove(coll.at(0))
+  test('add should take the value from the front of the available values collection', () => {
+    return new Promise<void>(resolve => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection methods
+      coll.remove(coll.at(0))
 
-    const first_avail = coll.availableValues.at(0).get('state')
-    coll.availableValues.on('remove', (model: any) => {
-      expect(model.get('state')).toBe(first_avail)
-      done()
+      const first_avail = coll.availableValues.at(0).get('state')
+      coll.availableValues.on('remove', (model: any) => {
+        expect(model.get('state')).toBe(first_avail)
+        resolve()
+      })
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone collection property
+      coll.model = Backbone.Model
+
+      coll.add({})
     })
-
-    // @ts-expect-error - Backbone collection property
-    coll.model = Backbone.Model
-
-    coll.add({})
   })
 })
 
 describe('UniqueDropdownCollection, lazy setup', () => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - Backbone collection type not fully specified
   let records: Backbone.Model[], coll: UniqueDropdownCollection
 
   beforeEach(() => {
@@ -117,15 +134,18 @@ describe('UniqueDropdownCollection, lazy setup', () => {
       }
       return result
     })()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection constructor accepts initial models
     coll = new UniqueDropdownCollection([], {
       propertyName: 'state',
-      possibleValues: _.map([1, 2, 3, 4], i => i.toString()),
+      possibleValues: map([1, 2, 3, 4], i => i.toString()),
     })
   })
 
   test('reset of collection recalculates availableValues', () => {
     expect(coll.availableValues).toHaveLength(4)
-    // @ts-expect-error - Backbone collection method
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone collection method
     coll.reset(records)
     expect(coll.availableValues).toHaveLength(1)
   })

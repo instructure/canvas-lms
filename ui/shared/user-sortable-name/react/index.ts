@@ -25,7 +25,7 @@ export const computeShortAndSortableNamesFromName = (names: {
   short_name: string
   sortable_name: string
 }) => {
-  const sortable_name_parts = nameParts(names.sortable_name)
+  const sortable_name_parts = nameParts(names.sortable_name, undefined)
 
   if (
     $.trim(names.sortable_name) === '' ||

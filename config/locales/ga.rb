@@ -30,7 +30,7 @@
                        case number
                        when 1 then "céad"
                        when 2 then "dara"
-                       else "#{ActiveSupport::Inflector.ordinal(number)}#{number}"
+                       else "#{number}#{ActiveSupport::Inflector.ordinal(number)}"
                        end
                      end
       }

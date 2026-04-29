@@ -16,18 +16,40 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AccessibilityIssue < ActiveRecord::Base
+class AccessibilityIssue < ApplicationRecord
+  include Accessibility::Concerns::ResourceResolvable
   extend RootAccountResolver
-  include Accessibility::HasContext
 
   resolves_root_account through: :course
 
   belongs_to :course
   belongs_to :updated_by, class_name: "User", optional: true
   belongs_to :accessibility_resource_scan
+  belongs_to :context, polymorphic: %i[assignment attachment wiki_page discussion_topic announcement], separate_columns: true, optional: true
 
-  enum :workflow_state, %i[active resolved dismissed], validate: true
+  enum :workflow_state, %i[active resolved dismissed closed], validate: true
+
+  scope :rescannable, -> { where(workflow_state: %i[active closed]) }
 
   validates :course, :workflow_state, presence: true
   validates :rule_type, presence: true, inclusion: { in: Accessibility::Rule.registry.keys }
+  validate :validate_syllabus_or_context
+
+  # For some rules, a nil param_value is acceptable (e.g., decorative images)
+  # We can extend this list as needed for other rules.
+  def allow_nil_param_value?
+    [
+      Accessibility::Rules::ImgAltRule.id,
+      Accessibility::Rules::ImgAltFilenameRule.id,
+      Accessibility::Rules::ImgAltLengthRule.id,
+    ].include? rule_type
+  end
+
+  private
+
+  def validate_syllabus_or_context
+    if is_syllabus == context.present?
+      errors.add(:base, "is_syllabus and context must be mutually exclusive")
+    end
+  end
 end

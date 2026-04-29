@@ -51,6 +51,28 @@ export const CONTENT_OPTIONS = [
   },
 ]
 
+export function hasDifferentUsageRights(items: (File | Folder)[]) {
+  if (items.length <= 1) return false
+
+  const allHaveNoRights = items.every(item => !item.usage_rights)
+  if (allHaveNoRights) return false
+
+  const someHaveNoRights = items.some(item => !item.usage_rights)
+  if (someHaveNoRights) return true
+
+  const firstItem = items[0]
+  const firstRights = firstItem.usage_rights!
+
+  return !items.every(item => {
+    const rights = item.usage_rights!
+    return (
+      rights.use_justification === firstRights.use_justification &&
+      rights.legal_copyright === firstRights.legal_copyright &&
+      rights.license === firstRights.license
+    )
+  })
+}
+
 export function defaultSelectedRight(items: (File | Folder)[]) {
   if (items.length === 0) return 'choose'
 

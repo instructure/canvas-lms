@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {confirm} from '@instructure/platform-instui-bindings'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -39,12 +39,10 @@ import {
   type UpdateContextControl,
 } from '../../../api/contextControls'
 import {type AccountId, ZAccountId} from '../../../model/AccountId'
-import {ZCourseId} from '../../../model/CourseId'
 import type {LtiContextControl, LtiContextControlId} from '../../../model/LtiContextControl'
 import type {LtiDeployment} from '../../../model/LtiDeployment'
 import type {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
 import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
-import {askForContextControl} from './AskForContextControl'
 import {ContextCard} from './ContextCard'
 import {
   DeleteExceptionModal,
@@ -56,10 +54,12 @@ import {ExceptionModal, type ExceptionModalOpenState} from './exception_modal/Ex
 import {renderExceptionCounts} from './renderExceptionCounts'
 import {buildControlsByPath, nearestParentControl} from './nearestParentControl'
 import {DeleteDeploymentModal} from './deployment_modal/DeleteDeploymentModal'
+import {refreshRegistrationHistory} from '../../../api/registrations'
 import type {DeleteDeployment} from '../../../api/deployments'
 
 import {Tag} from '@instructure/ui-tag'
 import {Grid} from '@instructure/ui-grid'
+import {Tooltip} from '@instructure/ui-tooltip'
 const I18n = createI18nScope('lti_registrations')
 
 export type DeploymentAvailabilityProps = {
@@ -70,7 +70,6 @@ export type DeploymentAvailabilityProps = {
   deleteDeployment: DeleteDeployment
   editControl: UpdateContextControl
   refetchControls: () => void
-  debug: boolean
 }
 
 export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
@@ -78,15 +77,15 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
     registration,
     deleteDeployment,
     deployment,
-    debug,
     refetchControls,
     deleteControl,
     editControl,
+    accountId,
   } = props
 
   const controls_with_ids = React.useMemo(
-    () => buildControlsByPath(deployment.context_controls),
-    [deployment.context_controls],
+    () => buildControlsByPath(deployment.context_controls || []),
+    [deployment.context_controls || []],
   )
 
   // Every deployment must have a root control.
@@ -149,49 +148,88 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         <Grid.Row>
           <Grid.Col>
             <Flex direction="row" gap="small" alignItems="center">
-              <Heading level="h3">
+              <Heading
+                level="h3"
+                aria-describedby={`deployment-availability-${deployment.id} deployment-exceptions-${deployment.id} deployment-placements-${deployment.id} deployment-id-${deployment.id} `}
+              >
                 {I18n.t('Installed in %{context_name}', {
                   context_name: deployment.context_name,
                 })}
               </Heading>
-              <Tag text={rootControl?.available ? I18n.t('Available') : I18n.t('Not Available')} />
+              <span id={`deployment-availability-${deployment.id}`} aria-hidden="true">
+                <Tag
+                  text={rootControl?.available ? I18n.t('Available') : I18n.t('Not Available')}
+                />
+              </span>
             </Flex>
           </Grid.Col>
 
           <Grid.Col width="auto">
             <Flex direction="row" gap="small">
-              <IconButton
-                id={`edit-exception-${rootControl.id}`}
-                data-pendo="lti-registrations-edit-root-control-availability"
-                size="medium"
-                screenReaderLabel={I18n.t('Modify availability for %{context_name}', {
-                  context_name: rootControl.context_name,
-                })}
-                renderIcon={IconEditLine}
-                onClick={() =>
-                  setEditControlInfo({control: rootControl, availableInParentContext: null})
+              <Tooltip
+                renderTip={
+                  <Text
+                    dangerouslySetInnerHTML={{
+                      __html: I18n.t('Modify availability for *%{context_name}*', {
+                        context_name: rootControl.context_name,
+                        wrapper: ['<strong>$1</strong>'],
+                      }),
+                    }}
+                  />
                 }
-              />
-              {!deployment.root_account_deployment && (
+                on={['hover', 'focus', 'click']}
+              >
                 <IconButton
-                  id={`delete-deployment-${deployment.id}`}
-                  data-pendo="lti-registrations-delete-deployment"
+                  id={`edit-exception-${rootControl.id}`}
+                  data-pendo="lti-registrations-edit-root-control-availability"
                   size="medium"
-                  screenReaderLabel={I18n.t('Delete Deployment for %{context_name}', {
+                  screenReaderLabel={I18n.t('Modify availability for %{context_name}', {
                     context_name: rootControl.context_name,
                   })}
-                  renderIcon={IconTrashLine}
-                  onClick={() => setOpenDeleteDeploymentModal(true)}
+                  renderIcon={IconEditLine}
+                  onClick={() =>
+                    setEditControlInfo({control: rootControl, availableInParentContext: null})
+                  }
                 />
+              </Tooltip>
+              {!deployment.root_account_deployment && (
+                <Tooltip
+                  renderTip={
+                    <Text
+                      dangerouslySetInnerHTML={{
+                        __html: I18n.t('Delete Deployment for *%{context_name}*', {
+                          context_name: rootControl.context_name,
+                          wrapper: ['<strong>$1</strong>'],
+                        }),
+                      }}
+                    />
+                  }
+                  on={['hover', 'focus', 'click']}
+                >
+                  <IconButton
+                    id={`delete-deployment-${deployment.id}`}
+                    data-pendo="lti-registrations-delete-deployment"
+                    size="medium"
+                    screenReaderLabel={I18n.t('Delete Deployment for %{context_name}', {
+                      context_name: rootControl.context_name,
+                    })}
+                    renderIcon={IconTrashLine}
+                    onClick={() => setOpenDeleteDeploymentModal(true)}
+                  />
+                </Tooltip>
               )}
               {deployment.context_type !== 'Course' ? (
                 <Button
+                  data-pendo="lti-registrations-open-add-exception-modal"
                   onClick={() => {
                     setExceptionModalOpenState({
                       open: true,
                       deployment,
                     })
                   }}
+                  aria-label={I18n.t('Add Exception for %{context_name}', {
+                    context_name: deployment.context_name,
+                  })}
                   color="primary"
                 >
                   {I18n.t('Add Exception')}
@@ -206,6 +244,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         registrationId={registration.id}
         openState={exceptionModalOpenState}
         onClose={() => setExceptionModalOpenState({open: false})}
+        onSettled={() => refreshRegistrationHistory(accountId, registration.id)}
         onConfirm={contextControls => {
           const onError = showFlashError(
             I18n.t('There was an error adding the exceptions. Please try again later.'),
@@ -216,11 +255,6 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
           })
             .then(result => {
               if (result._type === 'Success') {
-                showFlashSuccess(
-                  I18n.t('%{count} exception(s) were successfully added.', {
-                    count: contextControls.length,
-                  }),
-                )()
                 refetchControls()
               } else {
                 // handle error
@@ -231,17 +265,22 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
             .catch(onError)
         }}
       />
-      <div>
+      <div id={`deployment-id-${deployment.id}`} aria-hidden="true">
         <Text size="small">
           {I18n.t('Deployment ID: %{deployment_id}', {
             deployment_id: deployment.deployment_id,
           })}
         </Text>
       </div>
-      <div>
+      <div id={`deployment-exceptions-${deployment.id}`} aria-hidden="true">
         <Text size="small">{rootControl ? renderExceptionCounts(rootControl) : undefined}</Text>
       </div>
-      <View as="div" margin="0 0 small">
+      <View
+        as="div"
+        margin="0 0 small"
+        id={`deployment-placements-${deployment.id}`}
+        aria-hidden="true"
+      >
         <Text>
           <Link
             to={`/manage/${registration.id}/configuration#placements`}
@@ -263,7 +302,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         </Text>
       </View>
       <List itemSpacing="small" isUnstyled margin="0">
-        {deployment.context_controls
+        {(deployment.context_controls || [])
           .filter(cc => cc.id !== rootControl.id)
           .map(control => {
             // We know that we'll always find a parent control, because the root control is always present.
@@ -292,53 +331,81 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                   <Flex.Item>
                     <Flex gap="small">
                       <Flex.Item>
-                        <IconButton
-                          id={`edit-exception-${control.id}`}
-                          data-pendo="lti-registrations-edit-exception"
-                          size="medium"
-                          renderIcon={IconEditLine}
-                          screenReaderLabel={I18n.t('Edit Exception for %{contextName}', {
-                            contextName: control.context_name,
-                          })}
-                          onClick={() => {
-                            setEditControlInfo({
-                              control,
-                              availableInParentContext: closestParent?.available ?? false,
-                            })
-                          }}
-                        />
+                        <Tooltip
+                          renderTip={
+                            <Text
+                              dangerouslySetInnerHTML={{
+                                __html: I18n.t('Edit Exception for *%{context_name}*', {
+                                  context_name: control.context_name,
+                                  wrapper: ['<strong>$1</strong>'],
+                                }),
+                              }}
+                            />
+                          }
+                          on={['hover', 'focus', 'click']}
+                        >
+                          <IconButton
+                            id={`edit-exception-${control.id}`}
+                            data-pendo="lti-registrations-edit-exception"
+                            size="medium"
+                            renderIcon={IconEditLine}
+                            screenReaderLabel={I18n.t('Edit Exception for %{contextName}', {
+                              contextName: control.context_name,
+                            })}
+                            onClick={() => {
+                              setEditControlInfo({
+                                control,
+                                availableInParentContext: closestParent?.available ?? false,
+                              })
+                            }}
+                          />
+                        </Tooltip>
                       </Flex.Item>
                       <Flex.Item>
-                        <IconButton
-                          id={`delete-exception-${control.id}`}
-                          data-pendo="lti-registrations-delete-exception"
-                          size="medium"
-                          screenReaderLabel={I18n.t('Delete Exception for %{contextName}', {
-                            contextName: control.context_name,
-                          })}
-                          renderIcon={IconTrashLine}
-                          onClick={() => {
-                            if ('course_id' in control && control.course_id) {
-                              setDeleteExceptionModalOpenProps({
-                                open: true,
-                                availableInParentContext: closestParent.available,
-                                toolName: registration.name,
-                                courseControl: control,
-                              })
-                            } else {
-                              setDeleteExceptionModalOpenProps({
-                                ...props,
-                                open: true,
-                                availableInParentContext: closestParent.available,
-                                toolName: registration.name,
-                                accountControl: control,
-                                childControls: deployment.context_controls.filter(
-                                  c => c.path.startsWith(control.path) && c.path !== control.path,
-                                ),
-                              })
-                            }
-                          }}
-                        />
+                        <Tooltip
+                          renderTip={
+                            <Text
+                              dangerouslySetInnerHTML={{
+                                __html: I18n.t('Delete Exception for *%{context_name}*', {
+                                  context_name: control.context_name,
+                                  wrapper: ['<strong>$1</strong>'],
+                                }),
+                              }}
+                            />
+                          }
+                          on={['hover', 'focus', 'click']}
+                        >
+                          <IconButton
+                            id={`delete-exception-${control.id}`}
+                            data-pendo="lti-registrations-delete-exception"
+                            size="medium"
+                            screenReaderLabel={I18n.t('Delete Exception for %{contextName}', {
+                              contextName: control.context_name,
+                            })}
+                            renderIcon={IconTrashLine}
+                            onClick={() => {
+                              if ('course_id' in control && control.course_id) {
+                                setDeleteExceptionModalOpenProps({
+                                  open: true,
+                                  availableInParentContext: closestParent.available,
+                                  toolName: registration.name,
+                                  courseControl: control,
+                                })
+                              } else {
+                                setDeleteExceptionModalOpenProps({
+                                  ...props,
+                                  open: true,
+                                  availableInParentContext: closestParent.available,
+                                  toolName: registration.name,
+                                  accountControl: control,
+                                  childControls: (deployment.context_controls || []).filter(
+                                    c => c.path.startsWith(control.path) && c.path !== control.path,
+                                  ),
+                                })
+                              }
+                            }}
+                          />
+                        </Tooltip>
                       </Flex.Item>
                     </Flex>
                   </Flex.Item>
@@ -351,6 +418,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         <EditExceptionModal
           {...editControlInfo}
           onClose={() => setEditControlInfo(null)}
+          onSettled={() => refreshRegistrationHistory(accountId, registration.id)}
           onSave={async (...args) => {
             const result = await editControl(...args)
             if (isSuccessful(result)) {
@@ -362,10 +430,12 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
       )}
       {openDeleteDeploymentModal && (
         <DeleteDeploymentModal
+          accountId={accountId}
           deployment={deployment}
           registration={registration}
           controlsByPath={controls_with_ids}
           onClose={() => setOpenDeleteDeploymentModal(false)}
+          onSettled={() => refreshRegistrationHistory(accountId, registration.id)}
           onDelete={async (...args) => {
             const result = await deleteDeployment(...args)
             if (isSuccessful(result)) {
@@ -380,75 +450,6 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         onClose={() => setDeleteExceptionModalOpenProps({open: false})}
         onDelete={onDelete}
       />
-      {
-        /**
-         * These are debug buttons, and will be removed before release
-         */
-        debug && (
-          <>
-            <Button
-              onClick={() => {
-                askForContextControl({
-                  title: 'Create Control',
-                }).then(([contextId, isCourse]) => {
-                  createContextControls({
-                    registrationId: registration.id,
-                    contextControls: [
-                      Object.assign(
-                        {},
-                        {
-                          available: true,
-                          deployment_id: deployment.id,
-                        },
-                        isCourse
-                          ? {
-                              course_id: ZCourseId.parse(contextId),
-                            }
-                          : {
-                              account_id: ZAccountId.parse(contextId),
-                            },
-                      ),
-                    ],
-                  })
-                })
-              }}
-            >
-              Create Control
-            </Button>
-            <Button
-              onClick={() => {
-                confirm({
-                  title: 'Delete Deployment',
-                  message: 'Are you sure you want to delete this deployment?',
-                  confirmButtonLabel: 'Delete',
-                  cancelButtonLabel: 'Cancel',
-                }).then(confirmed => {
-                  if (confirmed) {
-                    // Call the API to delete the deployment
-                    deleteDeployment({
-                      registrationId: registration.id,
-                      accountId: registration.account_id,
-                      deploymentId: deployment.id,
-                    }).then(result => {
-                      if (result._type === 'Success') {
-                        // Handle success (e.g., show a success message or refresh the deployments)
-                        refetchControls()
-                      } else {
-                        showFlashAlert({
-                          type: 'error',
-                          message: I18n.t('There was an error when deleting the deployment.'),
-                        })
-                      }
-                    })
-                  }
-                })
-              }}
-            >
-              Delete Deployment
-            </Button>
-          </>
-        )
-      }
     </View>
   )
 }

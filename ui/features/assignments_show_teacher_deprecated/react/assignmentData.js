@@ -79,7 +79,7 @@ const assignmentOverridesNodes = gql`
   }
 `
 export const TEACHER_QUERY = gql`
-  query GetAssignment($assignmentLid: ID!) {
+  query GetTeacherAssignmentDeprecated($assignmentLid: ID!) {
     assignment(id: $assignmentLid) {
       __typename
       id
@@ -219,7 +219,7 @@ const assignmentModule = gql`
 
 // FYI, modules are areturned sorted by position
 export const COURSE_MODULES_QUERY = gql`
-  query GetCourseModules($courseId: ID!, $cursor: String) {
+  query GetCourseModulesDeprecated($courseId: ID!, $cursor: String) {
     course(id: $courseId) {
       lid: _id
       gid: id
@@ -236,7 +236,7 @@ export const COURSE_MODULES_QUERY = gql`
 `
 
 export const COURSE_MODULES_QUERY_LOCAL = gql`
-  query GetCourseModules($courseId: ID!) {
+  query GetCourseModulesDeprecatedLocal($courseId: ID!) {
     course(id: $courseId) @client {
       lid: _id
       gid: id

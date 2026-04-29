@@ -17,10 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
-# require 'canvas_stringex'
-
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: "spec/acts_as_url.sqlite3")
 
 ActiveRecord::Migration.verbose = false
@@ -100,7 +96,7 @@ describe "ActsAsUrl" do
   it "should_still_create_unique_if_in_same_scope" do
     @moc = Mocument.create!(title: "Mocumentary", other: "Suddenly, I care if I'm unique")
     @other_moc = Mocument.create!(title: "Mocumentary", other: "Suddenly, I care if I'm unique")
-    expect(@moc.url).to_not eq @other_moc.url
+    expect(@moc.url).not_to eq @other_moc.url
   end
 
   it "should_use_alternate_field_name" do
@@ -119,7 +115,7 @@ describe "ActsAsUrl" do
     @moc = Mocument.create!(title: "Original")
     @original_url = @moc.url
     @moc.update title: "New and Improved"
-    expect(@original_url).to_not eq @moc.url
+    expect(@original_url).not_to eq @moc.url
   end
 
   it "should_update_url_only_when_blank_if_asked" do

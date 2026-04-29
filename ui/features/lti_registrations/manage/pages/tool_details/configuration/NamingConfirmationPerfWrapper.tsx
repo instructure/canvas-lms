@@ -22,6 +22,7 @@ import {getDefaultPlacementTextFromConfig} from '../../../../manage/lti_1p3_regi
 import {NamingConfirmation} from '../../../../manage/registration_wizard_forms/NamingConfirmation'
 import {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
 import {Lti1p3RegistrationOverlayStore} from '../../../registration_overlay/Lti1p3RegistrationOverlayStore'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 type NamingConfirmationPerfWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
@@ -65,14 +66,19 @@ export const NamingConfirmationPerfWrapper = React.memo(
       descriptionPlaceholder: registration.configuration.description ?? undefined,
     }))
 
+    const filteredPlacements = React.useMemo(
+      () => filterPlacementsByFeatureFlags(selectedPlacements),
+      [selectedPlacements],
+    )
+
     const placements = React.useMemo(
       () =>
-        selectedPlacements.map(p => ({
+        filteredPlacements.map(p => ({
           placement: p,
           label: placementNames[p] ?? '',
           defaultValue: getDefaultPlacementTextFromConfig(p, registration.configuration),
         })),
-      [registration.configuration, selectedPlacements, placementNames],
+      [registration.configuration, filteredPlacements, placementNames],
     )
 
     return (

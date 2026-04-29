@@ -27,13 +27,29 @@ function generateProps(type, overrides = {}) {
     conditionalVariableThings.accept = 'image/*'
   }
 
+  // Provide appropriate defaults based on type to avoid NaN and invalid props
+  let defaultValue = 'default'
+  let brandConfigValue = 'bar'
+  let changedValue = 'baz'
+
+  if (type === 'percentage') {
+    defaultValue = '0.5'
+    brandConfigValue = '0.7'
+    changedValue = '0.8'
+  }
+
+  // For image types, ensure clean test data to avoid boolean attribute warnings
+  if (type === 'image') {
+    changedValue = null
+  }
+
   return {
     variableSchema: [
       {
         group_name: 'test',
         variables: [
           {
-            default: 'default',
+            default: defaultValue,
             human_name: 'Friendly Foo',
             variable_name: 'foo',
             type,
@@ -43,13 +59,15 @@ function generateProps(type, overrides = {}) {
       },
     ],
     brandConfigVariables: {
-      foo: 'bar',
+      foo: brandConfigValue,
     },
     changedValues: {
-      foo: {val: 'baz'},
+      foo: {val: changedValue},
     },
     changeSomething() {},
-    getDisplayValue: () => 'display_name',
+    getDisplayValue: () => (type === 'percentage' ? '0.6' : 'display_name'),
+    themeState: {},
+    handleThemeStateChange() {},
     ...overrides,
   }
 }
@@ -145,6 +163,11 @@ describe('ThemeEditorAccordion', () => {
 
     it('renders percentage rows', () => {
       const {getByLabelText} = render(<ThemeEditorAccordion {...generateProps('percentage')} />)
+      expect(getByLabelText('Friendly Foo')).toBeInTheDocument()
+    })
+
+    it('renders textarea rows', () => {
+      const {getByLabelText} = render(<ThemeEditorAccordion {...generateProps('textarea')} />)
       expect(getByLabelText('Friendly Foo')).toBeInTheDocument()
     })
   })

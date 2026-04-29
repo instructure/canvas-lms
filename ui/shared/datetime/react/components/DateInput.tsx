@@ -520,19 +520,26 @@ export default function CanvasDateInput({
   }, [])
 
   return (
-    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore InstUI DateInput component type issue
     <DateInput
       renderLabel={renderLabel}
       assistiveText={I18n.t('Type a date or use arrow keys to navigate date picker.')}
       value={inputValue}
       onChange={handleChange}
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore InstUI component prop type mismatch
       onPaste={trackPasteEvent}
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore InstUI component prop type mismatch
       onKeyUp={handleKey}
       isInline={true}
       placement={placement}
       messages={allMessages}
       isShowingCalendar={isShowingCalendar}
       onBlur={handleBlur}
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore InstUI component prop type mismatch
       onFocus={handleFocus}
       onRequestShowCalendar={handleShowCalendar}
       onRequestHideCalendar={handleHideCalendar}
@@ -540,6 +547,8 @@ export default function CanvasDateInput({
       onRequestSelectPrevDay={() => modifySelectedMoment(-1, 'day')}
       onRequestRenderNextMonth={() => modifyRenderedMoment(1, 'month')}
       onRequestRenderPrevMonth={() => modifyRenderedMoment(-1, 'month')}
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore InstUI component prop type mismatch
       onRequestValidateDate={onRequestValidateDate}
       renderNavigationLabel={
         <span>

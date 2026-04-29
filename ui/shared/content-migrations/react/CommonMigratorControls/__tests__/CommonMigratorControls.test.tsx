@@ -22,9 +22,9 @@ import userEvent from '@testing-library/user-event'
 import CommonMigratorControls from '../CommonMigratorControls'
 import {Text} from '@instructure/ui-text'
 
-const onSubmit = jest.fn()
-const onCancel = jest.fn()
-const setIsQuestionBankDisabled = jest.fn()
+const onSubmit = vi.fn()
+const onCancel = vi.fn()
+const setIsQuestionBankDisabled = vi.fn()
 
 const renderComponent = (overrideProps?: any) =>
   render(
@@ -43,7 +43,7 @@ const TextSubmittingLabel = () => <Text>Submitting test</Text>
 const TextCancelLabel = () => <Text>Clear</Text>
 
 describe('CommonMigratorControls', () => {
-  afterEach(() => jest.clearAllMocks())
+  afterEach(() => vi.clearAllMocks())
   beforeAll(() => {
     window.ENV.QUIZZES_NEXT_ENABLED = true
     window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = false
@@ -51,7 +51,7 @@ describe('CommonMigratorControls', () => {
     window.ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS = false
   })
 
-  afterEach(() => jest.clearAllMocks())
+  afterEach(() => vi.clearAllMocks())
 
   const expectNqCheckbox = (getByRole: (role: string, options?: object) => HTMLElement) => {
     // Look for either of the possible checkbox labels based on feature flag

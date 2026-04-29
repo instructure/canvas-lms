@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   TopNavigationTools,
@@ -27,7 +27,18 @@ import {
 import type {Tool} from '@canvas/global/env/EnvCommon'
 
 describe('TopNavigationTools', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
+  beforeEach(() => {
+    window.ENV = window.ENV || {}
+    window.ENV.FEATURES = {}
+  })
+
   it('renders pinned tools as icon buttons and unpinned tools in menu', async () => {
+    vi.useRealTimers()
+
     const tools = [
       {
         id: '1',
@@ -44,7 +55,7 @@ describe('TopNavigationTools', () => {
         pinned: false,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const user = userEvent.setup()
     const {getByRole, getByLabelText, getAllByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
@@ -66,11 +77,107 @@ describe('TopNavigationTools', () => {
     // Menu should contain one MenuItem for unpinned tool
     const menuItem = getByRole('menuitem', {name: /Tool 2/})
     expect(menuItem).toBeInTheDocument()
+
+    vi.useFakeTimers()
+  })
+
+  it('renders pinned tools before menu in DOM', () => {
+    const tools = [
+      {
+        id: '1',
+        title: 'Tool 1',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: true,
+      },
+      {
+        id: '2',
+        title: 'Tool 2',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: false,
+      },
+    ]
+    const handleToolLaunch = vi.fn()
+    const {getAllByRole} = render(
+      <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
+    )
+
+    const buttons = getAllByRole('button')
+    // Pinned tool should be first in DOM
+    expect(buttons[0]).toHaveAttribute('data-tool-id', '1')
+    expect(buttons[1]).not.toHaveAttribute('data-tool-id')
+    // Visual order matches DOM order
+  })
+
+  it('maintains logical DOM order (no row-reverse)', () => {
+    const tools = [
+      {
+        id: '1',
+        title: 'Tool 1',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: true,
+      },
+      {
+        id: '2',
+        title: 'Tool 2',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: false,
+      },
+    ]
+    const handleToolLaunch = vi.fn()
+    const {getAllByRole} = render(
+      <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
+    )
+
+    const buttons = getAllByRole('button')
+    // DOM order matches visual order (no row-reverse)
+    // Pinned tool first, menu button last
+    expect(buttons[0]).toHaveAttribute('data-tool-id', '1')
+    expect(buttons[1]).not.toHaveAttribute('data-tool-id')
+  })
+
+  it('maintains correct tab order with multiple pinned tools', () => {
+    const tools = [
+      {
+        id: '1',
+        title: 'Tool 1',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: true,
+      },
+      {
+        id: '2',
+        title: 'Tool 2',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: true,
+      },
+      {
+        id: '3',
+        title: 'Tool 3',
+        base_url: 'https://instructure.com',
+        icon_url: 'https://instructure.com',
+        pinned: false,
+      },
+    ]
+    const handleToolLaunch = vi.fn()
+    const {getAllByRole} = render(
+      <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
+    )
+
+    const buttons = getAllByRole('button')
+    // Pinned tools first (left-to-right), then menu
+    expect(buttons[0]).toHaveAttribute('data-tool-id', '1')
+    expect(buttons[1]).toHaveAttribute('data-tool-id', '2')
+    expect(buttons[2]).not.toHaveAttribute('data-tool-id') // menu button
   })
 
   it('renders empty container when no tools provided', () => {
     const tools: Tool[] = []
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const {container, queryByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
     )
@@ -81,6 +188,8 @@ describe('TopNavigationTools', () => {
   })
 
   it('renders all tools in menu when no tools are pinned', async () => {
+    vi.useRealTimers()
+
     const tools = [
       {
         id: '1',
@@ -97,7 +206,7 @@ describe('TopNavigationTools', () => {
         pinned: false,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const user = userEvent.setup()
     const {getByRole, queryByRole} = render(
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
@@ -117,11 +226,15 @@ describe('TopNavigationTools', () => {
     // Menu should contain MenuItems for both tools
     expect(getByRole('menuitem', {name: /Tool 1/})).toBeInTheDocument()
     expect(getByRole('menuitem', {name: /Tool 2/})).toBeInTheDocument()
+
+    vi.useFakeTimers()
   })
 })
 
 describe('MobileTopNavigationTools', () => {
   it('renders all tools in a single menu with pinned tools at top', async () => {
+    vi.useRealTimers()
+
     const tools = [
       {
         id: '1',
@@ -138,7 +251,7 @@ describe('MobileTopNavigationTools', () => {
         pinned: true,
       },
     ]
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const user = userEvent.setup()
     const {getByRole} = render(
       <MobileTopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />,
@@ -159,11 +272,15 @@ describe('MobileTopNavigationTools', () => {
 
     // Should have a separator between pinned and unpinned tools
     expect(getByRole('presentation')).toBeInTheDocument()
+
+    vi.useFakeTimers()
   })
 })
 
 describe('handleToolClick', () => {
   it('finds tool', async () => {
+    vi.useRealTimers()
+
     const tool = {
       id: '1',
       title: 'Tool 1',
@@ -171,7 +288,7 @@ describe('handleToolClick', () => {
       icon_url: 'https://instructure.com',
       pinned: true,
     }
-    const handleToolLaunch = jest.fn()
+    const handleToolLaunch = vi.fn()
     const user = userEvent.setup()
     const {getByRole} = render(
       <TopNavigationTools tools={[tool]} handleToolLaunch={handleToolLaunch} />,
@@ -180,6 +297,8 @@ describe('handleToolClick', () => {
     const toolButton = getByRole('button', {name: /Tool 1/})
     await user.click(toolButton)
     expect(handleToolLaunch).toHaveBeenCalledWith(tool)
+
+    vi.useFakeTimers()
   })
 })
 
@@ -200,6 +319,6 @@ describe('handleToolIconError', () => {
 
     handleToolIconError(tool)(event as unknown as Event & {target: {src: string}})
 
-    expect(event.target.src).toBe('/lti/tool_default_icon?name=T')
+    expect(event.target.src).toBe('/lti/tool_default_icon?name=Tool%201')
   })
 })

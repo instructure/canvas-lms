@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import page from 'page'
 import qs from 'qs'
 import DeveloperKeysApp from './App'
@@ -25,7 +25,7 @@ import actions from './actions/developerKeysActions'
 import storeCreator from './store/store'
 import {RegistrationSettings} from './RegistrationSettings/RegistrationSettings'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const store = storeCreator()
 
@@ -61,7 +61,7 @@ function renderShowDeveloperKeys(ctx) {
     const view = () => {
       const currentState = store.getState()
 
-      ReactDOM.render(
+      legacyRender(
         <DeveloperKeysApp
           applicationState={currentState}
           actions={actions}
@@ -79,7 +79,7 @@ function renderShowDeveloperKeys(ctx) {
 }
 
 const renderDeveloperKeySettings = ctx => {
-  ReactDOM.render(
+  legacyRender(
     <QueryClientProvider client={queryClient}>
       <RegistrationSettings ctx={ctx} />
     </QueryClientProvider>,
@@ -103,12 +103,12 @@ page('*', parseQueryString) // Middleware to parse querystring to object
 
 page('/accounts/:contextId/developer_keys', renderShowDeveloperKeys)
 page.exit('/accounts/:contextId/developer_keys', (_ctx, next) => {
-  ReactDOM.unmountComponentAtNode(reactRoot())
+  legacyUnmountComponentAtNode(reactRoot())
   next()
 })
 page('/accounts/:contextId/developer_keys/:developerKeyId', renderDeveloperKeySettings)
 page.exit('/accounts/:contextId/developer_keys/:developerKeyId', (_ctx, next) => {
-  ReactDOM.unmountComponentAtNode(reactRoot())
+  legacyUnmountComponentAtNode(reactRoot())
   next()
 })
 

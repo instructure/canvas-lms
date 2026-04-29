@@ -14,6 +14,12 @@
 .mutagen
 .swc
 .idea/
+.claude/settings.local.json
+.claude/worktrees/
+.claude/agents/*.local.md
+.claude/commands/*.local.md
+.claude/skills/*.local/
+CLAUDE.local.md
 /.yardoc/
 /.ruby-version
 /app/views/info/styleguide.html.erb
@@ -55,6 +61,7 @@ dump.rdb
 .eslintcache
 tsconfig.tsbuildinfo
 .sentryclirc
+.irbrc.local
 
 # canvas-gems
 /gems/*/coverage
@@ -81,10 +88,6 @@ docker-compose/api-gateway.override.yml
 /packages/*/coverage/
 /packages/*/coverage-js/
 
-# pact artifacts
-/reports/
-/pacts/
-
 # generated scopes
 /lib/api_scope_mapper.rb
 
@@ -93,6 +96,9 @@ docker-compose/api-gateway.override.yml
 
 # generated live events docs
 /doc/api/data_services/md/dynamic/*.md
+
+# generated permissions docs
+/doc/api/permissions/md/dynamic/*.md
 
 # js coverage stuff
 .nyc_output
@@ -105,3 +111,4 @@ coverage-karma
 # Allows devs to create their own devcontainer files
 /.devcontainer/*
 /!.devcontainer/.keep
+.claude/scheduled_tasks.lock

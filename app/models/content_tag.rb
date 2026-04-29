@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class ContentTag < ActiveRecord::Base
+class ContentTag < ApplicationRecord
   include Lti::Migratable
 
   class LastLinkToOutcomeNotDestroyed < StandardError
@@ -45,6 +45,7 @@ class ContentTag < ActiveRecord::Base
   include SearchTermHelper
 
   include MasterCourses::Restrictor
+
   restrict_columns :state, [:workflow_state]
   restrict_columns :content, %i[content_id url new_tab]
 
@@ -90,6 +91,7 @@ class ContentTag < ActiveRecord::Base
   after_create :update_outcome_contexts
 
   include CustomValidations
+
   validates_as_url :url
 
   validate :check_for_restricted_content_changes
@@ -309,7 +311,7 @@ class ContentTag < ActiveRecord::Base
     direct_share_type.pluralize
   end
 
-  def content_type_class(is_student = false)
+  def content_type_class(is_student: false)
     case content_type
     when "Assignment"
       if content && content.submission_types == "online_quiz"
@@ -411,16 +413,18 @@ class ContentTag < ActiveRecord::Base
     end
   end
 
-  def update_asset_workflow_state!
+  def update_asset_workflow_state!(user: nil)
     return unless sync_workflow_state_to_asset?
     return unless asset_context_matches?
     return unless content.respond_to?(:publish!)
 
     # update the asset and also update _other_ content tags that point at it
     if unpublished? && content.published? && content.can_unpublish?
+      content.user = user if user && content.is_a?(WikiPage)
       content.unpublish!
       self.class.update_for(content, exclude_tag: self)
     elsif active? && !content.published?
+      content.user = user if user && content.is_a?(WikiPage)
       content.publish!
       self.class.update_for(content, exclude_tag: self)
     end
@@ -618,7 +622,11 @@ class ContentTag < ActiveRecord::Base
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     differentiable_classes = ["Assignment", "DiscussionTopic", "Quiz", "Quizzes::Quiz", "WikiPage"]
+    visible_module_ids = ModuleVisibility::ModuleVisibilityService
+                         .modules_visible_to_students(user_ids:, course_ids:)
+                         .map(&:context_module_id)
     scope = for_non_differentiable_classes(course_ids, differentiable_classes)
+            .where(context_module_id: visible_module_ids)
 
     visible_page_ids = WikiPage.visible_to_students_in_course_with_da(user_ids, course_ids).select(:id)
     scope = scope.union(where(content_id: visible_page_ids, context_id: course_ids, context_type: "Course", content_type: "WikiPage"))
@@ -860,7 +868,7 @@ class ContentTag < ActiveRecord::Base
     end
   end
 
-  def trigger_publish!
+  def trigger_publish!(user: nil)
     enable_publish_at = context.root_account.feature_enabled?(:scheduled_page_publication)
     if unpublished? && (!content.respond_to?(:can_publish?) || content&.can_publish?)
       if content_type == "Attachment"
@@ -872,10 +880,10 @@ class ContentTag < ActiveRecord::Base
       end
     end
 
-    update_asset_workflow_state!
+    update_asset_workflow_state!(user:)
   end
 
-  def trigger_unpublish!
+  def trigger_unpublish!(user: nil)
     if published? && (!content.respond_to?(:can_unpublish?) || content&.can_unpublish?)
       if content_type == "Attachment"
         content.locked = true
@@ -884,6 +892,6 @@ class ContentTag < ActiveRecord::Base
       unpublish
     end
 
-    update_asset_workflow_state!
+    update_asset_workflow_state!(user:)
   end
 end

@@ -51,7 +51,9 @@
         <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
           <th><%= before_label(:current_score, "Current Score") %></th>
           <td><%= score_out_of_points_possible(@submission.score, params[:preview] ? @submission.points_possible_at_submission_time : @quiz.points_possible) %>
-                  <%= '*' if @submission.pending_review? %></td>
+                  <% if @submission.pending_review? %>
+                    <span aria-label="<%= t(:questions_not_graded, 'Some questions not yet graded') %>">*</span>
+                  <% end %></td>
         </tr>
         <tr style="<%= hidden if @quiz.quiz_type == 'survey' %>">
           <th><%= before_label(:kept_score, "Kept Score") %></th>

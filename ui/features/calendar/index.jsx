@@ -21,7 +21,7 @@
 import $ from 'jquery'
 import ready from '@instructure/ready'
 import Calendar from './jquery/index'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import React from 'react'
 import MiniCalendar from './jquery/MiniCalendar'
 import FindAppointment from './react/scheduler/components/FindAppointment'
@@ -70,7 +70,7 @@ ready(() => {
               agMap.hasOwnProperty(context.asset_string),
             )
             if (courses.length > 0) {
-              ReactDOM.render(
+              legacyRender(
                 <FindAppointment courses={courses} store={schedulerStore} />,
                 $('#select-course-component')[0],
               )

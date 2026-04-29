@@ -15,18 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {Component, useEffect, useState} from 'react'
-import {arrayOf, bool, func, objectOf, shape, string, element, oneOfType} from 'prop-types'
-import formatMessage from 'format-message'
 
 import {Alert} from '@instructure/ui-alerts'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
+import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
-
+import formatMessage from 'format-message'
+import {arrayOf, bool, element, func, objectOf, oneOfType, shape, string} from 'prop-types'
+import React, {Component, useEffect, useState} from 'react'
+import {sortedClosedCaptionLanguageList} from '../closedCaptionLanguages'
 import getTranslations from '../getTranslations'
 import ClosedCaptionCreatorRow from './ClosedCaptionCreatorRow'
-import {sortedClosedCaptionLanguageList} from '../closedCaptionLanguages'
 
 // TODO:
 //   - Limit file creation
@@ -207,24 +207,25 @@ export class ClosedCaptionPanel extends Component {
             {this.state.announcement}
           </Alert>
         )}
-        <View display="inline-block">
+        <List isUnstyled margin="0">
           {this.state.subtitles.map((cc, index) => (
-            <ClosedCaptionCreatorRow
-              ref={index === this.state.lastDeletedCCIndex ? this._nextCCRef : undefined}
-              key={cc.locale}
-              liveRegion={this.props.liveRegion}
-              uploadMediaTranslations={this.props.uploadMediaTranslations}
-              onDeleteRow={this.onRowDelete}
-              onLanguageSelected={this.onLanguageSelected}
-              onFileSelected={this.onFileSelected}
-              languages={this.closedCaptionLanguages}
-              selectedLanguage={this.closedCaptionLanguages.find(l => l.id === cc.locale)}
-              selectedFile={cc.file}
-              inheritedCaption={cc.inherited}
-              mountNode={this.props.mountNode}
-            />
+            <List.Item key={cc.locale}>
+              <ClosedCaptionCreatorRow
+                ref={index === this.state.lastDeletedCCIndex ? this._nextCCRef : undefined}
+                liveRegion={this.props.liveRegion}
+                uploadMediaTranslations={this.props.uploadMediaTranslations}
+                onDeleteRow={this.onRowDelete}
+                onLanguageSelected={this.onLanguageSelected}
+                onFileSelected={this.onFileSelected}
+                languages={this.closedCaptionLanguages}
+                selectedLanguage={this.closedCaptionLanguages.find(l => l.id === cc.locale)}
+                selectedFile={cc.file}
+                inheritedCaption={cc.inherited}
+                mountNode={this.props.mountNode}
+              />
+            </List.Item>
           ))}
-        </View>
+        </List>
         {this.state.addingNewClosedCaption ? (
           <View as="div">
             <ClosedCaptionCreatorRow

@@ -31,9 +31,11 @@ const mockedEditor = {
   },
 }
 
-jest.mock('../getPosition')
+vi.mock('../getPosition')
 
-jest.mock('@apollo/client', () => {
+let mockUseQuery = null
+
+vi.mock('@apollo/client', async () => {
   const data = {
     legacyNode: {
       id: 'Vxb',
@@ -106,12 +108,12 @@ jest.mock('@apollo/client', () => {
     },
   }
 
-  const originalGql = jest.requireActual('@apollo/client').gql
+  const actual = await vi.importActual('@apollo/client')
 
   return {
     __esModule: true,
-    gql: originalGql,
-    useQuery: () => ({data}),
+    gql: actual.gql,
+    useQuery: vi.fn(() => mockUseQuery || {data, loading: false, fetchMore: vi.fn()}),
   }
 })
 
@@ -124,6 +126,7 @@ describe('Mention Dropdown', () => {
 
   beforeEach(() => {
     getPosition.mockClear()
+    mockUseQuery = null
     const editor = new FakeEditor()
     editor.getParam = () => {
       return 'LTR'
@@ -132,7 +135,7 @@ describe('Mention Dropdown', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const setup = props => {
@@ -148,7 +151,7 @@ describe('Mention Dropdown', () => {
 
   describe('Events', () => {
     it('should attach resize event handler', () => {
-      global.addEventListener = jest.fn()
+      global.addEventListener = vi.fn()
       setup()
       const eventListenerList = global.addEventListener.mock.calls.map(el => {
         return el[0]
@@ -157,7 +160,7 @@ describe('Mention Dropdown', () => {
     })
 
     it('should attach scroll event handler', () => {
-      global.addEventListener = jest.fn()
+      global.addEventListener = vi.fn()
       setup()
       const eventListenerList = global.addEventListener.mock.calls.map(el => {
         return el[0]
@@ -175,7 +178,7 @@ describe('Mention Dropdown', () => {
 
   describe('Callbacks', () => {
     it('should call onFocusedUserChangeMock when user changes', () => {
-      const onFocusedUserChangeMock = jest.fn()
+      const onFocusedUserChangeMock = vi.fn()
       const {getAllByTestId} = setup({
         onFocusedUserChange: onFocusedUserChangeMock,
       })
@@ -195,8 +198,8 @@ describe('Mention Dropdown', () => {
 
   describe('accessibility', () => {
     it('should call ARIA_ID_TEMPLATES and pass to callback', async () => {
-      const onActiveDescendantChangeMock = jest.fn()
-      const spy = jest.spyOn(ARIA_ID_TEMPLATES, 'activeDescendant')
+      const onActiveDescendantChangeMock = vi.fn()
+      const spy = vi.spyOn(ARIA_ID_TEMPLATES, 'activeDescendant')
       const {getAllByTestId} = setup({
         onActiveDescendantChange: onActiveDescendantChangeMock,
       })
@@ -208,6 +211,176 @@ describe('Mention Dropdown', () => {
       fireEvent.click(menuItems[1].querySelector('li'))
 
       expect(spy).toHaveBeenCalled()
+    })
+  })
+
+  describe('Pagination', () => {
+    beforeEach(() => {
+      mockUseQuery = null
+    })
+
+    it('should show loading spinner when loading is true', () => {
+      mockUseQuery = {
+        data: {
+          legacyNode: {
+            id: 'Vxb',
+            mentionableUsersConnection: {
+              nodes: [],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: null,
+              },
+              __typename: 'MessageableUserConnection',
+            },
+            __typename: 'Discussion',
+          },
+        },
+        loading: true,
+        fetchMore: vi.fn(),
+      }
+
+      const {getAllByText} = setup()
+      const loadingTexts = getAllByText('Loading mentionable users')
+      expect(loadingTexts.length).toBeGreaterThan(0)
+    })
+
+    it('should display Load More button when hasNextPage is true', () => {
+      mockUseQuery = {
+        data: {
+          legacyNode: {
+            id: 'Vxb',
+            mentionableUsersConnection: {
+              nodes: [
+                {
+                  _id: 'Aa',
+                  id: 1,
+                  name: 'Jeffrey Johnson',
+                  __typename: 'MessageableUser',
+                },
+                {
+                  _id: 'Ab',
+                  id: 2,
+                  name: 'Matthew Lemon',
+                  __typename: 'MessageableUser',
+                },
+              ],
+              pageInfo: {
+                hasNextPage: true,
+                endCursor: 'cursor123',
+              },
+              __typename: 'MessageableUserConnection',
+            },
+            __typename: 'Discussion',
+          },
+        },
+        loading: false,
+        fetchMore: vi.fn(),
+      }
+
+      const {getByText} = setup()
+      expect(getByText('Load More Users...')).toBeInTheDocument()
+    })
+
+    it('should not display Load More button when hasNextPage is false', () => {
+      mockUseQuery = {
+        data: {
+          legacyNode: {
+            id: 'Vxb',
+            mentionableUsersConnection: {
+              nodes: [
+                {
+                  _id: 'Aa',
+                  id: 1,
+                  name: 'Jeffrey Johnson',
+                  __typename: 'MessageableUser',
+                },
+              ],
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: null,
+              },
+              __typename: 'MessageableUserConnection',
+            },
+            __typename: 'Discussion',
+          },
+        },
+        loading: false,
+        fetchMore: vi.fn(),
+      }
+
+      const {queryByText} = setup()
+      expect(queryByText('Load More Users...')).not.toBeInTheDocument()
+    })
+
+    it('should call fetchMore when Load More is clicked', () => {
+      const fetchMoreMock = vi.fn().mockResolvedValue({})
+
+      mockUseQuery = {
+        data: {
+          legacyNode: {
+            id: 'Vxb',
+            mentionableUsersConnection: {
+              nodes: [
+                {
+                  _id: 'Aa',
+                  id: 1,
+                  name: 'Jeffrey Johnson',
+                  __typename: 'MessageableUser',
+                },
+              ],
+              pageInfo: {
+                hasNextPage: true,
+                endCursor: 'cursor123',
+              },
+              __typename: 'MessageableUserConnection',
+            },
+            __typename: 'Discussion',
+          },
+        },
+        loading: false,
+        fetchMore: fetchMoreMock,
+      }
+
+      const {getByText} = setup()
+      const loadMoreButton = getByText('Load More Users...')
+      fireEvent.click(loadMoreButton)
+
+      expect(fetchMoreMock).toHaveBeenCalledWith({
+        variables: {
+          after: 'cursor123',
+        },
+      })
+    })
+
+    it('should not display Load More button while loading', () => {
+      mockUseQuery = {
+        data: {
+          legacyNode: {
+            id: 'Vxb',
+            mentionableUsersConnection: {
+              nodes: [
+                {
+                  _id: 'Aa',
+                  id: 1,
+                  name: 'Jeffrey Johnson',
+                  __typename: 'MessageableUser',
+                },
+              ],
+              pageInfo: {
+                hasNextPage: true,
+                endCursor: 'cursor123',
+              },
+              __typename: 'MessageableUserConnection',
+            },
+            __typename: 'Discussion',
+          },
+        },
+        loading: true,
+        fetchMore: vi.fn(),
+      }
+
+      const {queryByText} = setup()
+      expect(queryByText('Load More Users...')).not.toBeInTheDocument()
     })
   })
 })

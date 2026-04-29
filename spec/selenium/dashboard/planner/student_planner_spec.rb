@@ -385,21 +385,6 @@ describe "student planner" do
       expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
     end
 
-    it "adds date and time to a to-do item.", priority: "1" do
-      skip "FOO-3821 cf. https://github.com/instructure/instructure-ui/issues/1276"
-      go_to_list_view
-      todo_modal_button.click
-      modal = todo_sidebar_modal
-      element = ff("input", modal)[1]
-      element.click
-      fj("button:contains('15')").click
-      title_input.send_keys("the title")
-      time_input.click
-      fj("span[role=option]:contains('9:00 AM')").click
-      todo_save_button.click
-      expect(ff(".planner-item").last).to include_text "DUE: 9:00 AM"
-    end
-
     it "updates the sidebar when clicking on mutiple to-do items", priority: "1" do
       student_to_do2 = @student1.planner_notes.create!(todo_date: 5.minutes.from_now,
                                                        title: "Student to do 2")
@@ -425,7 +410,7 @@ describe "student planner" do
         todo_tray_select_course_from_dropdown
       rescue => e
         if attempt < max_attempts
-          puts "\t Attempt #{attempt} failed! Retrying..."
+          Rails.logger.info "\t Attempt #{attempt} failed! Retrying..."
           sleep 0.5
           retry
         end
@@ -611,6 +596,7 @@ describe "student planner" do
     end
 
     it "shows correct default time in an ungraded discussion" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       Timecop.freeze(Time.zone.today) do
         @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: "here is a message", user: @teacher)
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")

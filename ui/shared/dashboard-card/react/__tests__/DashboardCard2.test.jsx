@@ -16,19 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {act, render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import axe from 'axe-core'
-import {http, HttpResponse} from 'msw'
-import {setupServer} from 'msw/node'
 import React from 'react'
 import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
 import DashboardCard from '../DashboardCard'
+import axios from '@canvas/axios'
 
-jest.mock('../CourseActivitySummaryStore')
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(),
-}))
+vi.mock('../CourseActivitySummaryStore')
+vi.mock('@canvas/axios')
 
 describe('DashboardCard (Legacy Tests)', () => {
   const defaultProps = {
@@ -54,16 +51,14 @@ describe('DashboardCard (Legacy Tests)', () => {
     connectDropTarget: c => c,
   }
 
-  const server = setupServer()
-
-  beforeAll(() => server.listen())
-  afterEach(() => {
-    server.resetHandlers()
-    localStorage.clear()
-    jest.clearAllMocks()
+  beforeEach(() => {
     CourseActivitySummaryStore.getStateForCourse.mockReturnValue({})
   })
-  afterAll(() => server.close())
+
+  afterEach(() => {
+    vi.clearAllMocks()
+    localStorage.clear()
+  })
 
   it('obtains new course activity when course activity is updated', async () => {
     const stream = {
@@ -118,82 +113,40 @@ describe('DashboardCard (Legacy Tests)', () => {
   })
 
   it('handles success removing course from favorites', async () => {
-    const handleRerender = jest.fn()
+    axios.delete.mockResolvedValue({status: 200, data: []})
+    const user = userEvent.setup()
+    const handleRerender = vi.fn()
     const props = {...defaultProps, onConfirmUnfavorite: handleRerender}
 
-    const {getByText} = render(<DashboardCard {...props} />)
+    const {getByText, getByRole} = render(<DashboardCard {...props} />)
 
-    act(() => {
-      getByText(
-        `Choose a color or course nickname or move course card for ${props.shortName}`,
-      ).click()
+    const menuButton = getByRole('button', {
+      name: `Choose a color or course nickname or move course card for ${props.shortName}`,
     })
-    act(() => {
-      getByText('Move').click()
-    })
-    act(() => {
-      getByText('Unfavorite').click()
-    })
-    server.use(http.delete('*/users/self/favorites/courses/*', () => HttpResponse.json([])))
+    await user.click(menuButton)
 
-    act(() => {
-      getByText('Submit').click()
+    const moveButton = await waitFor(() => getByText('Move'))
+    await user.click(moveButton)
+
+    const unfavoriteButton = await waitFor(() => getByText('Unfavorite'))
+    await user.click(unfavoriteButton)
+
+    const submitButton = await waitFor(() => {
+      const btn = document.getElementById('confirm_unfavorite_course')
+      if (!btn) throw new Error('Button not found')
+      return btn
+    })
+
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(axios.delete).toHaveBeenCalled()
     })
 
     await waitFor(() => {
       expect(handleRerender).toHaveBeenCalledTimes(1)
     })
-  })
 
-  // fickle
-  it.skip('handles failure removing course from favorites', async () => {
-    const handleRerender = jest.fn()
-    const props = {...defaultProps, onConfirmUnfavorite: handleRerender}
-
-    const {getByText, getByRole} = render(<DashboardCard {...props} />)
-
-    // Click the menu button
-    const menuButton = getByRole('button', {
-      name: `Choose a color or course nickname or move course card for ${props.shortName}`,
-    })
-    await act(async () => {
-      menuButton.click()
-    })
-
-    // Wait for menu to be visible and click "Move"
-    const moveButton = await waitFor(() => getByText('Move'))
-    await act(async () => {
-      moveButton.click()
-    })
-
-    // Wait for submenu and click "Unfavorite"
-    const unfavoriteButton = await waitFor(() => getByText('Unfavorite'))
-    await act(async () => {
-      unfavoriteButton.click()
-    })
-
-    // Wait for confirmation dialog and click "Submit"
-    const submitButton = await waitFor(() => getByRole('button', {name: 'Submit'}))
-
-    server.use(
-      http.delete(
-        '*/users/self/favorites/courses/*',
-        () => new HttpResponse(JSON.stringify({error: 'Unauthorized'}), {status: 403}),
-      ),
-    )
-
-    await act(async () => {
-      submitButton.click()
-    })
-
-    // Wait for the error alert
-    await waitFor(
-      () => {
-        expect(showFlashError).toHaveBeenCalledWith(
-          'We were unable to remove this course from your favorites.',
-        )
-      },
-      {timeout: 3000},
-    )
+    document.querySelectorAll('.confirm-unfavorite-modal-container').forEach(el => el.remove())
   })
 })

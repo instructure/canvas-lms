@@ -133,19 +133,26 @@ describe "assignment groups" do
     # edit group grading rules
     f("#ag_#{assignment_group.id}_manage_link").click
     fj(".edit_group:visible:first").click
+    wait_for_ajaximations
     # change the name
-    f("#ag_#{assignment_group.id}_name").clear
-    f("#ag_#{assignment_group.id}_name").send_keys("name change")
+    replace_content(f("#ag_#{assignment_group.id}_name"), "name change")
     # set number of lowest scores to drop
-    f("#ag_#{assignment_group.id}_drop_lowest").clear
-    f("#ag_#{assignment_group.id}_drop_lowest").send_keys("1")
+    replace_content(f("#ag_#{assignment_group.id}_drop_lowest"), "1")
     # set number of highest scores to drop
-    f("#ag_#{assignment_group.id}_drop_highest").clear
-    f("#ag_#{assignment_group.id}_drop_highest").send_keys("2")
+    replace_content(f("#ag_#{assignment_group.id}_drop_highest"), "2")
     # set assignment to never drop
     fj(".add_never_drop:visible").click
-    expect(f(".never_drop_rule select")).to be
-    click_option(".never_drop_rule select", assignment.title)
+    select = f(".never_drop_rule select")
+    expect(select).not_to be_nil
+    # Use JavaScript to set the value and trigger change event for React controlled component
+    driver.execute_script(<<~JS, select, assignment.id.to_s)
+      var select = arguments[0];
+      var value = arguments[1];
+      select.value = value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    JS
+    # Wait for debounced re-render (100ms) to propagate the change through React/Backbone
+    sleep 0.15
     # save it
     fj(".create_group:visible").click
     wait_for_ajaximations
@@ -327,7 +334,7 @@ describe "assignment groups" do
     it "reflects the new assignment in the Assignments Index page", priority: "1" do
       assignment = assignment_group.reload.assignments.last
       expect(ff("#assignment_group_#{assignment_group.id} .ig-title").last.text).to match assignment_name.to_s
-      expect(ff("#assignment_group_#{assignment_group.id} .assignment-date-due").last.text).to match current_time
+      expect(ff("#assignment_group_#{assignment_group.id} .assignment-date-due").last).to include_text(format_time_for_view(time, :short).to_s)
       expect(f("#assignment_#{assignment.id} .non-screenreader").text).to match "#{assignment_points} pts"
     end
 

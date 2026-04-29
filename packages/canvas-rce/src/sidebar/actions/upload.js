@@ -134,9 +134,9 @@ export function allUploadCompleteActions(results, fileMetaProps, contextType) {
   return actions
 }
 
-export function embedUploadResult(results, selectedTabType) {
+export function embedUploadResult(results) {
   const embedData = fileEmbed(results)
-  if (selectedTabType === 'images' && isImage(embedData.type) && results.displayAs !== 'link') {
+  if (isImage(embedData.type) && results.displayAs !== 'link') {
     // embed the image after any current selection rather than link to it or replace it
     bridge.activeEditor()?.mceInstance()?.selection.collapse()
     const file_props = {
@@ -151,7 +151,7 @@ export function embedUploadResult(results, selectedTabType) {
       uuid: results.uuid,
     }
     return bridge.insertImage(file_props)
-  } else if (selectedTabType === 'media' && isAudioOrVideo(embedData.type)) {
+  } else if (isAudioOrVideo(embedData.type)) {
     // embed media after any current selection rather than link to it or replace it
     bridge.activeEditor()?.mceInstance()?.selection.collapse()
 
@@ -234,7 +234,7 @@ export function mediaUploadComplete(error, uploadData) {
         contextType: mediaObject.media_object.context_type,
       }
       dispatch(removePlaceholdersFor(uploadedFile.name))
-      embedUploadResult(embedData, 'media')
+      embedUploadResult(embedData)
       dispatch(mediaUploadSuccess())
     }
   }
@@ -282,7 +282,58 @@ export function uploadToIconMakerFolder(svg, uploadSettings = {}) {
   }
 }
 
-export function uploadToMediaFolder(tabContext, fileMetaProps) {
+export function uploadToMediaFolderWithoutEditor(fileMetaProps) {
+  return (_, getState) => {
+    const {source, jwt, host, contextId, contextType} = getState()
+    return source
+      .fetchMediaFolder({jwt, host, contextId, contextType})
+      .then(async ({folders}) => {
+        fileMetaProps.parentFolderId = folders[0].id
+        if (fileMetaProps.domObject) {
+          delete fileMetaProps.domObject.preview // don't need this anymore
+        }
+
+        const getCategory = async fileProps => {
+          const categoryObject = await CategoryProcessor.process(fileProps.domObject)
+          return categoryObject?.category
+        }
+
+        const category = await getCategory(fileMetaProps)
+
+        return source
+          .preflightUpload(fileMetaProps, {jwt, host, contextId, contextType, category})
+          .then(results => {
+            return source.uploadFRD(fileMetaProps.domObject, results)
+          })
+          .then(results => {
+            return setUsageRights(source, fileMetaProps, results)
+          })
+          .then(results => {
+            return getFileUrlIfMissing(source, results)
+          })
+          .then(results => {
+            return fixupFileUrl(contextType, contextId, results, source.canvasOrigin)
+          })
+          .then(results => {
+            return setAltText(fileMetaProps.altText, results)
+          })
+          .then(results => {
+            if (fileMetaProps.isDecorativeImage) {
+              results.isDecorativeImage = fileMetaProps.isDecorativeImage
+            }
+            if (fileMetaProps.displayAs) {
+              results.displayAs = fileMetaProps.displayAs
+            }
+            return results
+          })
+      })
+      .catch(e => {
+        console.error('Upload to the media folder failed.', e)
+      })
+  }
+}
+
+export function uploadToMediaFolder(fileMetaProps) {
   return (dispatch, getState) => {
     const editorComponent = bridge.activeEditor()
     const bookmark = editorComponent?.editor?.selection.getBookmark(undefined, true)
@@ -290,7 +341,7 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
     dispatch(activateMediaUpload(fileMetaProps))
     const {source, jwt, host, contextId, contextType} = getState()
 
-    if (tabContext === 'media' && fileMetaProps.domObject) {
+    if (isAudioOrVideo(fileMetaProps.contentType) && fileMetaProps.domObject) {
       return saveMediaRecording(
         fileMetaProps.domObject,
         {
@@ -312,14 +363,14 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
         if (fileMetaProps.domObject) {
           delete fileMetaProps.domObject.preview // don't need this anymore
         }
-        return dispatch(uploadPreflight(tabContext, {...fileMetaProps, bookmark})).then(results => {
+        return dispatch(uploadPreflight({...fileMetaProps, bookmark})).then(results => {
           return results
         })
       })
       .catch(e => {
         // Get rid of any placeholder that might be there.
         dispatch(removePlaceholdersFor(fileMetaProps.name))
-         
+
         console.error('Fetching the media folder failed.', e)
       })
   }
@@ -394,7 +445,7 @@ export function handleFailures(error, dispatch) {
   }
 }
 
-export function uploadPreflight(tabContext, fileMetaProps) {
+export function uploadPreflight(fileMetaProps) {
   return (dispatch, getState) => {
     const {source, jwt, host, contextId, contextType} = getState()
     const {fileReader} = fileMetaProps
@@ -445,7 +496,7 @@ export function uploadPreflight(tabContext, fileMetaProps) {
 
           const uploadResult = {contextType, contextId, ...results}
 
-          const embedResult = embedUploadResult(uploadResult, tabContext)
+          const embedResult = embedUploadResult(uploadResult)
 
           if (fileMetaProps.bookmark) {
             editorComponent.editor.selection.moveToBookmark(newBookmark)

@@ -412,7 +412,7 @@ describe ContentParticipation do
           @course2.offer!
           @course2_student = User.create!
           @course2.enroll_student(@course2_student, enrollment_state: "active")
-          @course2_assignment = @course2.assignments.create!(due_at: 2.days, points_possible: 10)
+          @course2_assignment = @course2.assignments.create!(due_at: 2.days.from_now, points_possible: 10)
           @course2_content = @course2_assignment.submit_homework(@course2_student)
 
           @course2_content.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)

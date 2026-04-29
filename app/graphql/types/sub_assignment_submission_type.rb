@@ -31,6 +31,7 @@ module Types
     end
 
     field :assignment_id, ID, null: false
+    field :cached_due_date, Types::DateTimeType, null: true
 
     field :custom_grade_status_id, ID, null: true
     field :seconds_late, Integer, null: true
@@ -88,6 +89,13 @@ module Types
     def entered_score
       protect_submission_grades(:entered_score)
     end
+
+    field :deducted_points, Float, "how many points are being deducted due to late policy", null: true
+    def deducted_points
+      protect_submission_grades(:points_deducted)
+    end
+
+    field :submitted_at, Types::DateTimeType, null: true
 
     def protect_submission_grades(attr)
       load_association(:assignment).then do

@@ -18,8 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# rubocop:disable Migration/AddIndex, Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
+# rubocop:disable Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
 # rubocop:disable Migration/PrimaryKey, Migration/RootAccountId, Rails/CreateTableWithTimestamps
+# rubocop:disable Migration/PolymorphicAssociations
 # rubocop:disable Rails/ThreeStateBooleanColumn
 class InitCanvasDb < ActiveRecord::Migration[7.0]
   prepend Canvas::ActiveRecord::Migration::DeferForeignKeys
@@ -38,8 +39,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
   end
 
   def up
-    connection.transaction(requires_new: true) do
+    trgm = connection.transaction(requires_new: true) do
       create_extension(:pg_trgm, schema: connection.shard.name, if_not_exists: true)
+      # the connection might be in a different schema if it already exists, so re-fetch
+      # its information rather than assuming it's where we (attempted to) create it
+      connection.extension(:pg_trgm).schema
     rescue ActiveRecord::StatementInvalid
       raise ActiveRecord::Rollback
     end
@@ -228,24 +232,42 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :deleted_at, precision: 6
       t.datetime :archived_at
       t.boolean :horizon_course, null: false, default: false
+      t.boolean :content_library, null: false, default: false
 
       t.replica_identity_index
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
       t.index :grading_standard_id, name: "index_courses_on_grading_standard"
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "(
-            coalesce(lower(name), '') || ' ' ||
-            coalesce(lower(sis_source_id), '') || ' ' ||
-            coalesce(lower(course_code), '')
-          ) #{trgm}.gin_trgm_ops",
-                name: "index_gin_trgm_courses_composite_search",
-                using: :gin
-        t.index [:integration_id, :root_account_id],
-                unique: true,
-                name: "index_courses_on_integration_id",
-                where: "integration_id IS NOT NULL"
-      end
+      t.index "(
+          coalesce(lower(name), '') || ' ' ||
+          coalesce(lower(sis_source_id), '') || ' ' ||
+          coalesce(lower(course_code), '')
+        ) #{trgm}.gin_trgm_ops",
+              name: "index_gin_trgm_courses_composite_search",
+              using: :gin
+      t.index [:integration_id, :root_account_id],
+              unique: true,
+              name: "index_courses_on_integration_id",
+              where: "integration_id IS NOT NULL"
       t.index :archived_at, where: "archived_at IS NOT NULL"
+    end
+
+    create_table :course_reports do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.references :course, foreign_key: true, null: false
+      t.references :user, foreign_key: true, null: false
+      t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL" }
+
+      t.string :workflow_state, default: "created", null: false
+      t.string :report_type, null: false
+      t.text :parameters
+      t.text :message
+      t.bigint :job_ids, array: true, default: [], null: false
+
+      t.timestamp :start_at
+      t.timestamp :end_at
+      t.timestamps
+
+      t.replica_identity_index
     end
 
     create_table :sis_batches do |t|
@@ -295,7 +317,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :short_name, limit: 255
       t.timestamp :deleted_at
       t.boolean :show_user_services, default: true
-      t.integer :page_views_count, default: 0
       t.integer :reminder_time_for_due_dates, default: 172_800
       t.integer :reminder_time_for_grading, default: 0
       t.bigint :storage_quota
@@ -327,14 +348,12 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.replica_identity_index :root_account_ids
       t.index [:avatar_state, :avatar_image_updated_at]
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "lower(name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_name", using: :gin
-        t.index "LOWER(short_name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_short_name", using: :gin
-        t.index "LOWER(name) #{trgm}.gin_trgm_ops",
-                name: "index_gin_trgm_users_name_active_only",
-                using: :gin,
-                where: "workflow_state IN ('registered', 'pre_registered')"
-      end
+      t.index "lower(name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_name", using: :gin
+      t.index "LOWER(short_name) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_users_short_name", using: :gin
+      t.index "LOWER(name) #{trgm}.gin_trgm_ops",
+              name: "index_gin_trgm_users_name_active_only",
+              using: :gin,
+              where: "workflow_state IN ('registered', 'pre_registered')"
       t.index "(sortable_name COLLATE public.\"und-u-kn-true\"), id",
               name: :index_users_on_sortable_name
       t.index :id, where: "workflow_state <> 'deleted'", name: "index_active_users_on_id"
@@ -379,6 +398,80 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:developer_key_id, :last_used_at]
     end
 
+    rule_types = Accessibility::Rule.registry.keys.map { |type| ActiveRecord::Base.connection.quote(type) }.join(", ")
+    create_table :accessibility_issues do |t|
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :course, null: false, foreign_key: true
+      t.references :context,
+                   polymorphic: %i[wiki_page assignment attachment],
+                   foreign_key: true,
+                   check_constraint: false
+      t.string :rule_type, null: false, index: true
+      t.text :node_path, limit: 1024
+      t.jsonb :metadata, null: false, default: {}
+      t.string :workflow_state, default: "active", null: false
+      t.references :updated_by, foreign_key: { to_table: :users }, index: { where: "updated_by_id IS NOT NULL" }
+      t.timestamps
+      t.references :accessibility_resource_scan, null: false, foreign_key: true
+      t.references :discussion_topic,
+                   foreign_key: true,
+                   index: { where: "discussion_topic_id IS NOT NULL" }
+      t.references :announcement,
+                   foreign_key: { to_table: :discussion_topics },
+                   index: { where: "announcement_id IS NOT NULL" }
+      t.boolean :is_syllabus, default: false, null: false
+
+      t.check_constraint "rule_type IN (#{rule_types})", name: "chk_rule_type_enum"
+      t.check_constraint "workflow_state IN ('active', 'resolved', 'dismissed')", name: "chk_workflow_state_enum"
+      t.polymorphic_check_constraint :context, %w[wiki_page assignment attachment discussion_topic announcement], sort: false
+
+      t.replica_identity_index
+    end
+
+    create_table :accessibility_course_statistics do |t|
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :course, null: false, foreign_key: true, index: { unique: true }
+      t.integer :active_issue_count
+      t.string :workflow_state, default: "initialized", null: false
+      t.timestamps
+
+      t.check_constraint "workflow_state IN ('initialized', 'queued', 'in_progress', 'active', 'failed', 'deleted')", name: "chk_workflow_state_enum"
+
+      t.replica_identity_index
+    end
+
+    create_table :accessibility_resource_scans do |t|
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :course, null: false, foreign_key: true
+      t.references :context,
+                   polymorphic: %i[wiki_page assignment attachment],
+                   foreign_key: true,
+                   index: { unique: true },
+                   check_constraint: false
+      t.string :error_message, limit: 255
+      t.string :workflow_state, default: "queued", null: false
+      t.timestamps
+      t.string :resource_name, limit: 255, index: true
+      t.string :resource_workflow_state, default: "unpublished", null: false, index: true
+      t.integer :issue_count, default: 0, null: false, index: true
+      t.timestamp :resource_updated_at, index: { where: "resource_updated_at IS NOT NULL" }
+      t.references :discussion_topic,
+                   foreign_key: true,
+                   index: { where: "discussion_topic_id IS NOT NULL" }
+      t.references :announcement,
+                   foreign_key: { to_table: :discussion_topics },
+                   index: { where: "announcement_id IS NOT NULL" }
+      t.boolean :is_syllabus, default: false, null: false
+
+      t.check_constraint "workflow_state IN ('queued', 'in_progress', 'completed', 'failed')",
+                         name: "chk_workflow_state_enum"
+      t.check_constraint "resource_workflow_state IN ('unpublished', 'published')",
+                         name: "chk_resource_workflow_state_enum"
+      t.polymorphic_check_constraint :context, %w[wiki_page assignment attachment discussion_topic announcement], sort: false
+
+      t.replica_identity_index
+    end
+
     create_table :account_notifications do |t|
       t.string :subject, limit: 255
       t.string :icon, default: "warning", limit: 255
@@ -393,6 +486,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :domain_specific, default: false, null: false
       t.boolean :send_message, default: false, null: false
       t.timestamp :messages_sent_at
+      t.string :workflow_state, default: "active", null: false, limit: 255
 
       t.index %i[account_id end_at start_at], name: "index_account_notifications_by_account_and_timespan"
     end
@@ -402,6 +496,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :role,
                    foreign_key: true,
                    index: { where: "role_id IS NOT NULL", name: "index_account_notification_roles_only_on_role_id" }
+      t.string :workflow_state, default: "active", null: false, limit: 255
 
       t.index [:account_notification_id, :role_id],
               unique: true,
@@ -462,6 +557,40 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.replica_identity_index
     end
 
+    create_table :ai_conversations do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.references :account, foreign_key: { to_table: :accounts }, null: false
+      t.references :course, null: false, foreign_key: true
+      t.references :user, null: false, foreign_key: true
+      t.references :ai_experience, null: false, foreign_key: true
+      t.string :llm_conversation_id, null: false, limit: 255
+      t.string :workflow_state, null: false, default: "active", limit: 255
+      t.timestamps
+
+      t.check_constraint "workflow_state IN ('active', 'completed', 'deleted')", name: "chk_workflow_state_enum"
+
+      t.replica_identity_index
+      t.index :llm_conversation_id, unique: true
+    end
+
+    create_table :ai_experiences do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.references :account, foreign_key: { to_table: :accounts }, null: false
+      t.references :course, null: false, foreign_key: true, index: false
+      t.string :title, null: false, limit: 255
+      t.text :description, limit: 65_536
+      t.text :facts, limit: 65_536
+      t.text :learning_objective, null: false, limit: 65_536
+      t.text :pedagogical_guidance, null: false, limit: 65_536
+      t.string :workflow_state, null: false, default: "unpublished", limit: 255
+      t.timestamps
+      t.string :llm_conversation_context_id, limit: 255, index: { where: "llm_conversation_context_id IS NOT NULL" }
+
+      t.replica_identity_index
+      t.index [:root_account_id, :workflow_state]
+      t.index [:course_id, :workflow_state]
+    end
+
     create_table :alerts do |t|
       t.bigint :context_id, null: false
       t.string :context_type, null: false, limit: 255
@@ -474,6 +603,25 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :alert, foreign_key: true, index: { where: "alert_id IS NOT NULL" }
       t.string :criterion_type, limit: 255
       t.float :threshold
+    end
+
+    create_table :allocation_rules do |t|
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :course, null: false, foreign_key: true
+      t.references :assignment, null: false, foreign_key: true, index: false
+      t.references :assessor, null: false, foreign_key: { to_table: :users }
+      t.references :assessee, null: false, foreign_key: { to_table: :users }
+      t.boolean :must_review, default: true, null: false
+      t.boolean :review_permitted, default: true, null: false
+      t.boolean :applies_to_assessor, default: true, null: false
+      t.string :workflow_state, default: "active", null: false
+      t.timestamps
+
+      t.check_constraint "workflow_state IN ('active', 'deleted')", name: "chk_workflow_state_enum"
+
+      t.replica_identity_index
+      t.index %i[assignment_id assessor_id must_review review_permitted],
+              name: "index_allocation_rules_on_asgnt_assr_must_review_permitted"
     end
 
     create_table :anonymous_or_moderation_events do |t|
@@ -575,9 +723,12 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :uuid, limit: 255
       t.references :rubric_association, foreign_key: true
       t.references :assessor, null: false, foreign_key: { to_table: :users }
+      t.references :peer_review_sub_assignment, foreign_key: { to_table: :assignments }
 
       t.index [:assessor_asset_id, :assessor_asset_type], name: "aa_id_and_aa_type"
       t.index [:asset_id, :asset_type]
+      t.index [:workflow_state, :asset_id],
+              name: "index_assessment_requests_on_workflow_state_and_asset_id"
     end
 
     create_table :asset_user_accesses do |t|
@@ -722,6 +873,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :sub_assignment_tag, limit: 255
       t.boolean :has_sub_assignments, null: false, default: false
       t.boolean :rubric_self_assessment_enabled, null: false, default: false
+      t.boolean :suppress_assignment, default: false, null: false
+      t.boolean :peer_review_submission_required, null: false, default: true
+      t.boolean :peer_review_across_sections, null: false, default: true
 
       t.index [:context_id, :context_type]
       t.index [:sis_source_id, :root_account_id], where: "sis_source_id IS NOT NULL", unique: true
@@ -730,6 +884,13 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               name: "index_assignments_duplicating_on_started_at"
       t.index %i[context_id grading_standard_id grading_type],
               name: "index_assignments_on_context_grading_standard_grading_type"
+      t.index :parent_assignment_id,
+              unique: true,
+              where: "type = 'PeerReviewSubAssignment' AND workflow_state != 'deleted'",
+              name: "index_assignments_on_parent_assignment_peer_review_unique"
+      t.index :type,
+              where: "type = 'SubAssignment' AND parent_assignment_id IS NULL AND workflow_state != 'deleted'",
+              name: "index_assignments_on_null_parent_for_subassignments"
     end
 
     create_table :assignment_configuration_tool_lookups do |t|
@@ -933,6 +1094,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :context_type, limit: 255
       t.references :root_account
       t.timestamps null: false, default: -> { "now()" }
+      t.references :user, foreign_key: true
+      t.string :context_concern, limit: 255
 
       t.index [:context_id, :context_type], name: "attachment_associations_a_id_a_type"
     end
@@ -941,6 +1104,20 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :attachment, null: false, foreign_key: true
       t.text :error, null: false
       t.timestamp :created_at, null: false
+    end
+
+    create_table :auditor_account_user_records do |t|
+      t.references :performing_user, foreign_key: { to_table: :users }
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.references :account_user, foreign_key: true, null: false
+      t.string :action, null: false, limit: 64
+      t.string :hostname, null: false, limit: 255
+      t.string :uuid, null: false, limit: 255, index: true
+      t.string :event_type, null: false, limit: 64
+      t.string :request_id, limit: 255
+      t.datetime :created_at, null: false
+
+      t.replica_identity_index
     end
 
     create_table :auditor_authentication_records do |t|
@@ -1052,10 +1229,23 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, default: "active", null: false, limit: 255, index: true
       t.boolean :jit_provisioning, default: false, null: false
       t.string :metadata_uri, limit: 255, index: { where: "metadata_uri IS NOT NULL" }
-      t.json :settings, default: {}, null: false
+      t.jsonb :settings, default: {}, null: false
       t.text :internal_ca
       # this field will be removed after VERIFY_NONE is removed entirely
       t.boolean :verify_tls_cert_opt_in, default: false, null: false
+    end
+
+    create_table :auto_grade_results do |t|
+      t.references :submission, null: false, foreign_key: true, index: false
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.integer :attempt, null: false, check: { constraint_name: "chk_attempt_positive", expression: "attempt > 0" }
+      t.jsonb :grade_data, null: false
+      t.string :error_message, limit: 255, default: nil
+      t.integer :grading_attempts, null: false, default: 0, check: { constraint_name: "chk_grading_attempts_positive", expression: "grading_attempts > 0" }
+      t.timestamps
+
+      t.replica_identity_index
+      t.index [:submission_id, :attempt], unique: true
     end
 
     create_table :blackout_dates do |t|
@@ -1183,16 +1373,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :canvadocs_submissions do |t|
       t.references :canvadoc
-      t.references :crocodoc_document, index: { where: "crocodoc_document_id IS NOT NULL" }
       t.references :submission, null: false
 
       t.index [:submission_id, :canvadoc_id],
               where: "canvadoc_id IS NOT NULL",
               name: "unique_submissions_and_canvadocs",
-              unique: true
-      t.index [:submission_id, :crocodoc_document_id],
-              where: "crocodoc_document_id IS NOT NULL",
-              name: "unique_submissions_and_crocodocs",
               unique: true
     end
 
@@ -1239,6 +1424,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :comment, null: false
       t.timestamps precision: 6
       t.string :workflow_state, null: false, default: "active"
+      t.references :assignment, foreign_key: true
 
       t.index :user_id,
               where: "workflow_state <> 'deleted'",
@@ -1274,12 +1460,10 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:pseudonym_id, :position]
       t.index [:user_id, :position]
       t.index "LOWER(path), path_type", name: "index_communication_channels_on_path_and_path_type"
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "lower(path) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_communication_channels_path", using: :gin
-        t.index "user_id, LOWER(path), path_type",
-                unique: true,
-                name: "index_communication_channels_on_user_id_and_path_and_path_type"
-      end
+      t.index "lower(path) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_communication_channels_path", using: :gin
+      t.index "user_id, LOWER(path), path_type",
+              unique: true,
+              name: "index_communication_channels_on_user_id_and_path_and_path_type"
     end
 
     create_table :conditional_release_rules do |t|
@@ -1531,6 +1715,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :unified_tool_id, limit: 255
       t.boolean :unified_tool_id_needs_update, default: false, null: false
       t.timestamp :unified_tool_id_last_updated_at, precision: 6
+      t.references :lti_registration, index: { where: "lti_registration_id IS NOT NULL" }
+      t.boolean :asset_processor_eula_required
 
       t.replica_identity_index
       t.index [:context_id, :context_type]
@@ -1673,6 +1859,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:user_id, :last_message_at]
       t.index [:conversation_id, :user_id], unique: true
       t.index [:private_hash, :user_id], where: "private_hash IS NOT NULL", unique: true
+      t.index :visible_last_authored_at, name: "index_conversation_participants_on_visible_last_authored_at"
     end
 
     create_table :course_account_associations do |t|
@@ -1701,6 +1888,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
       t.string :migration_id
       t.string :selected_days_to_skip, array: true, default: %w[sat sun], null: false
+      t.text :assignments_weighting
+      t.integer :time_to_complete_calendar_days
 
       t.replica_identity_index
       t.index :course_id, unique: true, where: "course_section_id IS NULL AND user_id IS NULL AND workflow_state='active'", name: "course_paces_unique_primary_plan_index"
@@ -1760,13 +1949,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
               name: "index_course_sections_unique_default_section"
     end
 
-    create_table :crocodoc_documents do |t|
-      t.string :uuid, limit: 255, index: true
-      t.string :process_state, limit: 255, index: true
-      t.references :attachment
-      t.timestamps null: true, precision: nil
-    end
-
     create_table :csp_domains do |t|
       t.references :account, null: false, foreign_key: true, index: false
       t.string :domain, null: false, limit: 255
@@ -1778,10 +1960,10 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :custom_data do |t|
-      t.text :data
       t.string :namespace, limit: 255
       t.references :user, index: false
       t.timestamps precision: nil
+      t.jsonb :data_json, null: false, default: {}
 
       t.index [:user_id, :namespace], unique: true
     end
@@ -1896,6 +2078,10 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                    null: true
       t.string :client_type, null: false, default: "confidential"
       t.string :allowed_audiences, array: true, default: [], null: false, limit: 4096
+      t.string :authorized_flows, array: true, default: [], null: false, limit: 255
+      t.string :unified_tool_id, limit: 255
+
+      t.check_constraint "authorized_flows <@ ARRAY['service_user_client_credentials']::varchar[]", name: "chk_authorized_flows_enum"
 
       t.replica_identity_index
     end
@@ -1932,6 +2118,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :is_anonymous_author, default: false, null: false
       t.references :quoted_entry, foreign_key: { to_table: :discussion_entries }
       t.datetime :edited_at, precision: 6
+      t.string :pin_type
+      t.references :pinned_by, foreign_key: { to_table: :users }
+      t.string :lti_id, limit: 255
 
       t.replica_identity_index
       t.index %i[root_entry_id workflow_state created_at], name: "index_discussion_entries_root_entry"
@@ -1939,30 +2128,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:user_id, :discussion_topic_id],
               where: "workflow_state <> 'deleted'",
               name: "index_discussion_entries_active_on_user_id_and_topic"
-    end
-
-    create_table :discussion_entry_drafts do |t|
-      t.references :discussion_topic, null: false, foreign_key: true
-      t.references :discussion_entry, foreign_key: true, index: false
-      t.references :root_entry, foreign_key: { to_table: :discussion_entries }
-      t.references :parent, foreign_key: { to_table: :discussion_entries }
-      t.references :attachment, foreign_key: true
-      t.references :user, null: false, foreign_key: true
-      t.text :message
-      t.boolean :include_reply_preview, null: false, default: false
-      t.timestamps precision: 6
-
-      t.index %i[discussion_topic_id user_id],
-              name: "unique_index_on_topic_and_user",
-              where: "discussion_entry_id IS NULL AND root_entry_id IS NULL",
-              unique: true
-      t.index %i[root_entry_id user_id],
-              name: "unique_index_on_root_entry_and_user",
-              where: "discussion_entry_id IS NULL",
-              unique: true
-      t.index %i[discussion_entry_id user_id],
-              name: "unique_index_on_entry_and_user",
-              unique: true
     end
 
     create_table :discussion_entry_participants do |t|
@@ -2042,15 +2207,49 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :sort_order_locked, null: false, default: false
       t.boolean :expanded, null: false, default: false
       t.boolean :expanded_locked, null: false, default: false
+      t.integer :ordered_pinned_posts, array: true, default: []
 
       t.replica_identity_index
       t.index [:context_id, :position]
       t.index [:id, :type]
       t.index %i[context_id context_type root_topic_id], unique: true, name: "index_discussion_topics_unique_subtopic_per_context"
       t.index [:context_id, :last_reply_at], name: "index_discussion_topics_on_context_and_last_reply_at"
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "LOWER(title) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_discussion_topics_title", using: :gin
-      end
+      t.index "LOWER(title) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_discussion_topics_title", using: :gin
+    end
+
+    create_table :discussion_topic_insights do |t|
+      t.references :discussion_topic, foreign_key: true, index: false, null: false
+      t.references :user, foreign_key: true, null: false
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.string :workflow_state, null: false, default: "created"
+      t.timestamps
+
+      t.replica_identity_index
+      t.index %i[discussion_topic_id created_at], order: { created_at: :desc }, name: "index_discussion_topic_insights_latest"
+    end
+
+    create_table :discussion_topic_insight_entries do |t|
+      t.references :discussion_topic_insight, foreign_key: true, null: false, index: { name: "idx_on_discussion_topic_insight_id_d7375ce0ba" }
+      t.references :discussion_topic, foreign_key: true, index: false, null: false
+      t.references :discussion_entry, foreign_key: true, null: false
+      t.references :discussion_entry_version, foreign_key: true, null: false, index: { name: "idx_on_discussion_entry_version_id_7c6cf01a1b" }
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.string :locale, null: false, limit: 255
+      t.string :dynamic_content_hash, null: false, limit: 64
+
+      t.jsonb :ai_evaluation, null: false, default: {}
+
+      t.references :ai_evaluation_human_reviewer, foreign_key: { to_table: :users }, index: { name: "idx_on_ai_evaluation_human_reviewer_id_51e74ff825" }
+      t.boolean :ai_evaluation_human_feedback_liked, null: false, default: false
+      t.boolean :ai_evaluation_human_feedback_disliked, null: false, default: false
+      t.string :ai_evaluation_human_feedback_notes, null: false, default: "", limit: 1024
+
+      t.timestamps
+
+      t.replica_identity_index
+      t.index %i[discussion_topic_id discussion_entry_id dynamic_content_hash], unique: true, name: "index_discussion_topic_insight_entries_lookup"
+      t.index %i[discussion_topic_id locale discussion_entry_id created_at], order: { created_at: :desc }, name: "index_discussion_topic_insight_entries_latest"
     end
 
     create_table :discussion_topic_materialized_views, id: false do |t|
@@ -2073,8 +2272,12 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :subscribed
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.timestamps null: false, default: -> { "now()" }
-      t.string :sort_order, null: false, default: DiscussionTopic::SortOrder::DESC
-      t.boolean :expanded, null: false, default: false
+      t.string :sort_order, null: false, default: DiscussionTopic::SortOrder::INHERIT
+      t.boolean :expanded
+      t.boolean :summary_enabled, null: false, default: false
+      t.string :preferred_language
+      t.boolean :show_pinned_entries, null: false, default: true
+      t.boolean :has_unread_pinned_entry, null: false, default: false
 
       t.replica_identity_index
       t.index [:discussion_topic_id, :user_id], name: "index_topic_participant_on_topic_id_and_user_id", unique: true
@@ -2291,11 +2494,38 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :subject
       t.string :request_context_id, limit: 255
       t.references :account, index: false
-      t.bigint :zendesk_ticket_id, index: true
+      t.bigint :zendesk_ticket_id
       t.text :data
       t.string :category, limit: 255, index: true
 
       t.index :created_at, name: "error_reports_created_at"
+    end
+
+    create_table :estimated_durations do |t|
+      t.interval :duration
+
+      t.references :context,
+                   polymorphic: %i[discussion_topic assignment attachment quiz wiki_page content_tag],
+                   foreign_key: true,
+                   index: { unique: true },
+                   null: false,
+                   check_constraint: false
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.timestamps
+      t.references :external_tool,
+                   foreign_key: { to_table: :context_external_tools },
+                   index: {
+                     where: "external_tool_id IS NOT NULL",
+                     unique: true
+                   }
+
+      # check constraint columns are in a different order than the columns themselves
+      t.polymorphic_check_constraint :context,
+                                     %i[assignment attachment content_tag discussion_topic wiki_page quiz external_tool],
+                                     null: false,
+                                     sort: false
+
+      t.replica_identity_index
     end
 
     create_table :event_stream_failures do |t|
@@ -2568,10 +2798,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :group_and_membership_importers do |t|
-      t.references :group_category, null: false, foreign_key: true
+      t.references :group_category, foreign_key: true
       t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL" }
       t.string :workflow_state, null: false, default: "active"
       t.timestamps precision: nil
+      t.references :course, foreign_key: true
     end
 
     create_table :inbox_settings do |t|
@@ -2630,7 +2861,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :vendor_guid_2, limit: 255, index: true
       t.string :migration_id_2, limit: 255
       t.references :outcome_import, index: false
-      t.bigint :root_account_ids, array: true, index: { using: :gin }
+      t.bigint :root_account_ids, array: true
       t.references :copied_from_outcome, index: { where: "copied_from_outcome_id IS NOT NULL" }
       t.timestamp :archived_at, precision: 6, default: nil
 
@@ -2652,7 +2883,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :vendor_guid, limit: 255, index: true
       t.string :low_grade, limit: 255
       t.string :high_grade, limit: 255
-      t.string :vendor_guid_2, limit: 255, index: true
+      t.string :vendor_guid_2, limit: 255
       t.string :migration_id_2, limit: 255
       t.references :outcome_import, index: false
       t.references :root_account, foreign_key: { to_table: :accounts }
@@ -2667,7 +2898,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :learning_outcome_question_results do |t|
       t.references :learning_outcome_result, index: { name: "index_LOQR_on_learning_outcome_result_id" }
-      t.references :learning_outcome
+      t.references :learning_outcome, index: false
       t.bigint :associated_asset_id
       t.string :associated_asset_type, limit: 255
       t.float :score
@@ -2753,16 +2984,58 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:assessment_id, :user_id], unique: true
     end
 
+    create_table :llm_responses do |t|
+      t.references :associated_assignment, foreign_key: { to_table: :assignments }, null: false
+      t.references :user, null: false, foreign_key: true
+      t.string :prompt_name, null: false, limit: 255
+      t.string :prompt_model_id, null: false, limit: 255
+      t.jsonb :prompt_dynamic_content
+      t.text :raw_response, null: false
+      t.integer :input_tokens, null: false
+      t.integer :output_tokens, null: false
+      t.float :response_time, null: false
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.timestamps
+
+      t.replica_identity_index
+      t.index [:prompt_name, :prompt_model_id]
+    end
+
     create_table :lti_assets do |t|
       t.uuid :uuid, null: false, index: { unique: true }
-      t.references :attachment, null: false, foreign_key: true
-      t.references :submission, null: false, foreign_key: true
-      t.index %i[attachment_id submission_id], unique: true
+      t.references :attachment
+      t.references :submission, foreign_key: true
       t.string :workflow_state, limit: 255, null: false, default: "active"
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.string :sha256_checksum, limit: 64
+      t.integer :submission_attempt
+      t.references :discussion_entry_version,
+                   foreign_key: { on_delete: :nullify },
+                   index: {
+                     unique: true,
+                     where: "discussion_entry_version_id IS NOT NULL",
+                     name: "index_lti_assets_unique_discussion_entry_version_id"
+                   }
+
+      t.check_constraint <<~SQL.squish, name: "chk_one_asset_locator_present"
+        (
+          (attachment_id IS NOT NULL)::int +
+          (submission_attempt IS NOT NULL)::int +
+          (discussion_entry_version_id IS NOT NULL)::int
+        ) <= 1
+      SQL
 
       t.replica_identity_index
+      t.index %i[submission_id attachment_id],
+              unique: true,
+              where: "submission_id IS NOT NULL and attachment_id IS NOT NULL",
+              name: "index_lti_assets_unique_submission_id_and_attachment_id"
+
+      t.index %i[submission_id submission_attempt],
+              unique: true,
+              where: "submission_id IS NOT NULL and submission_attempt IS NOT NULL",
+              name: "index_lti_assets_unique_submission_id_and_submission_attempt"
     end
 
     create_table :lti_asset_processors do |t|
@@ -2779,8 +3052,27 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, limit: 255, null: false
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.string :migration_id, limit: 255
 
       t.replica_identity_index
+      t.index [:assignment_id, :migration_id],
+              where: "(migration_id IS NOT NULL)",
+              name: "index_lti_asset_processors_on_assignment_and_migration_id"
+    end
+
+    create_table :lti_asset_processor_eula_acceptances do |t|
+      t.references :user, null: false, foreign_key: true
+      t.boolean :accepted, default: false, null: false
+      t.timestamp :timestamp, null: false
+      t.references :context_external_tool, null: false, foreign_key: true, index: { name: "idx_on_context_external_tool_id_236cb0425a" }
+
+      t.string :workflow_state, limit: 255, null: false, default: "active"
+      t.timestamps
+
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.replica_identity_index
+      t.index %i[user_id context_external_tool_id], where: "workflow_state = 'active'", name: "idx_on_user_id_context_external_tool_id_bee0622bb7"
     end
 
     create_table :lti_asset_reports do |t|
@@ -2788,8 +3080,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :timestamp, null: false
       t.string :title
       t.string :comment
-      t.float :score_given
-      t.float :score_maximum
       t.string :indication_color, limit: 255
       t.string :indication_alt, limit: 255
       t.string :processing_progress, null: false
@@ -2801,16 +3091,47 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, limit: 255, null: false
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
-
-      t.check_constraint <<~SQL.squish, name: "score_maximum_present_if_score_given_present"
-        (score_maximum IS NOT NULL) OR (score_given IS NULL)
-      SQL
+      t.string :result, limit: 255, default: nil
+      t.boolean :visible_to_owner, null: false, default: false
 
       t.replica_identity_index
       t.index %i[lti_asset_id lti_asset_processor_id report_type],
               unique: true,
               where: "workflow_state = 'active'",
               name: "idx_on_lti_asset_id_lti_asset_processor_id_report_t_a649bf83c5"
+    end
+
+    create_table :lti_context_controls do |t|
+      t.boolean :available, null: false, default: true
+      t.string :path, null: false, limit: 4096, index: true
+      t.references :deployment, foreign_key: { to_table: :context_external_tools }, null: false
+      t.references :registration, null: false
+      t.references :context, polymorphic: %i[account course], foreign_key: true, null: false
+      t.references :created_by, foreign_key: { to_table: :users }, index: { where: "created_by_id IS NOT NULL" }
+      t.references :updated_by, foreign_key: { to_table: :users }, index: { where: "updated_by_id IS NOT NULL" }
+      t.string :workflow_state, limit: 48, null: false, default: "active"
+      t.timestamps
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.replica_identity_index
+      t.index [:account_id, :deployment_id],
+              unique: true,
+              name: "index_lti_context_controls_on_account_and_deployment",
+              where: "account_id IS NOT NULL"
+      t.index [:course_id, :deployment_id],
+              unique: true,
+              name: "index_lti_context_controls_on_course_and_deployment",
+              where: "course_id IS NOT NULL"
+    end
+
+    create_table :lti_import_histories do |t|
+      t.string :target_lti_id, null: false, limit: 255
+      t.string :source_lti_id, null: false, limit: 255
+      t.timestamps
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.replica_identity_index
+      t.index %i[target_lti_id source_lti_id], unique: true, name: "index_lti_import_histories_on_target_source"
     end
 
     create_table :lti_ims_registrations do |t|
@@ -2921,10 +3242,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :lti_overlay_versions do |t|
       t.belongs_to :account, null: false, foreign_key: true
       t.belongs_to :lti_overlay, null: false, foreign_key: { to_table: :lti_overlays }
-      t.belongs_to :created_by, null: false, foreign_key: { to_table: :users }
+      t.belongs_to :created_by, foreign_key: { to_table: :users }
       t.jsonb :diff, null: false
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.boolean :caused_by_reset, default: false, null: false
 
       t.replica_identity_index
     end
@@ -2938,7 +3260,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :vendor_email, limit: 255
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }
       t.timestamps precision: nil
-      t.references :developer_key
+      t.references :developer_key, index: false
 
       t.index %i[product_code vendor_code root_account_id developer_key_id],
               unique: true,
@@ -2954,11 +3276,14 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :name, null: false, index: true, limit: 255
       t.string :admin_nickname, limit: 255
       t.string :vendor, limit: 255
-
       t.string :workflow_state, default: "active", null: false, limit: 255
-      t.replica_identity_index
-
       t.timestamps
+      t.text :description, limit: 2048, default: nil
+      t.references :template_registration,
+                   foreign_key: false, # this is almost always cross-shard
+                   index: { where: "template_registration_id IS NOT NULL" }
+
+      t.replica_identity_index
     end
 
     create_table :lti_registration_account_bindings do |t|
@@ -2974,6 +3299,44 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps
 
       t.index %i[account_id registration_id], name: "index_lti_reg_bindings_on_account_id_and_registration_id", unique: true
+    end
+
+    create_table :lti_registration_history_entries do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.references :lti_registration, null: false
+      t.references :created_by, foreign_key: { to_table: :users }
+      t.jsonb :diff, null: false
+      t.text :update_type, null: false
+      t.text :comment
+      t.timestamps
+      t.jsonb :old_configuration
+      t.jsonb :new_configuration
+      t.jsonb :old_context_controls
+      t.jsonb :new_context_controls
+
+      t.replica_identity_index
+    end
+
+    create_table :lti_registration_update_requests do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.timestamps
+      t.uuid :uuid
+      t.references :lti_registration, null: false, foreign_key: false
+      t.jsonb :lti_ims_registration
+      t.jsonb :canvas_lti_configuration
+      t.references :created_by, foreign_key: { to_table: :users }
+      t.references :updated_by, foreign_key: { to_table: :users }
+      t.date :accepted_at
+      t.date :rejected_at
+      t.boolean :reinstall, null: false, default: false
+      t.boolean :tool_initiated, null: false, default: false
+      t.string :comment, limit: 500
+
+      t.check_constraint "(lti_ims_registration IS NOT NULL AND canvas_lti_configuration IS NULL) OR " \
+                         "(lti_ims_registration IS NULL AND canvas_lti_configuration IS NOT NULL)",
+                         name: "registration_config_mutually_exclusive"
+
+      t.replica_identity_index
     end
 
     create_table :lti_resource_handlers do |t|
@@ -3047,7 +3410,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :lti_tool_configurations do |t|
       t.references :developer_key, null: false, foreign_key: true, index: { unique: true }
-      t.jsonb :settings, null: false
       t.timestamps precision: nil
       t.string :disabled_placements, array: true, default: []
       t.string :privacy_level
@@ -3095,6 +3457,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :update_payload
       t.text :registration_url
       t.string :subscription_id
+      t.references :migrated_to_context_external_tool,
+                   foreign_key: { to_table: :context_external_tools, on_delete: :nullify },
+                   index: {
+                     where: "migrated_to_context_external_tool_id IS NOT NULL"
+                   }
     end
 
     create_table :lti_tool_proxy_bindings do |t|
@@ -3451,6 +3818,29 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :priority, default: false, null: false
     end
 
+    create_table :oauth_client_configs do |t|
+      t.string :type, null: false
+      t.string :identifier, null: false, limit: 255
+      t.string :client_name, limit: 255
+      t.string :comment, limit: 1024
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.integer :throttle_maximum
+      t.integer :throttle_high_water_mark
+      t.integer :throttle_outflow
+      t.integer :throttle_upfront_cost
+      t.references :updated_by, null: false, foreign_key: { to_table: :users }
+      t.string :workflow_state, default: "active", null: false
+      t.timestamps
+
+      t.check_constraint "type IN ('custom', 'product', 'client_id', 'lti_advantage', 'service_user_key', 'token', 'user', 'tool', 'session', 'ip')", name: "chk_type_enum"
+      t.check_constraint "workflow_state IN ('active', 'deleted')", name: "chk_workflow_state_enum"
+
+      t.index %i[type identifier], name: "index_on_client_identifier"
+      t.index %i[root_account_id type identifier], unique: true, name: "index_on_root_account_client_identifier"
+
+      t.replica_identity_index
+    end
+
     create_table :notification_policies do |t|
       t.references :notification
       t.references :communication_channel, null: false, foreign_key: true, index: false
@@ -3466,7 +3856,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
                    null: false,
                    index: { name: "index_notification_policy_overrides_on_context" }
       t.references :communication_channel, null: false, foreign_key: true
-      t.references :notification
+      t.references :notification, index: false
       t.string :workflow_state, default: "active", null: false
       t.string :frequency
       t.timestamps precision: nil
@@ -3510,7 +3900,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :observer_alert_threshold, null: false, foreign_key: true
       t.references :context, polymorphic: true, index: { name: "index_observer_alerts_on_context_type_and_context_id" }
       t.string :alert_type, null: false
-      t.string :workflow_state, default: "unread", null: false, index: true
+      t.string :workflow_state, default: "unread", null: false
       t.timestamp :action_date, null: false
       t.string :title, null: false
       t.timestamps precision: nil
@@ -3538,12 +3928,12 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     create_table :originality_reports do |t|
       t.references :attachment
       t.float :originality_score
-      t.references :originality_report_attachment
+      t.references :originality_report_attachment, index: false
       t.text :originality_report_url
       t.text :originality_report_lti_url
       t.timestamps precision: nil
       t.references :submission, null: false, foreign_key: true
-      t.string :workflow_state, null: false, default: "pending", index: true
+      t.string :workflow_state, null: false, default: "pending"
       t.text :link_id
       t.text :error_message
       t.timestamp :submission_time, index: true
@@ -3585,7 +3975,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :ended_at
       t.timestamps precision: nil
       t.json :data
-      t.references :learning_outcome_group
+      t.references :learning_outcome_group, index: false
 
       t.index %i[context_type context_id]
     end
@@ -3622,6 +4012,24 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.index [:outcome_proficiency_id, :points],
               name: "index_outcome_proficiency_ratings_on_proficiency_and_points"
+    end
+
+    create_table :outcome_rollups do |t|
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :course, null: false, foreign_key: true, index: false
+      t.references :user, null: false, foreign_key: true
+      t.references :outcome, null: false, foreign_key: { to_table: :learning_outcomes }
+      t.string :calculation_method, null: false
+      t.float :aggregate_score, null: false
+      t.timestamp :last_calculated_at, null: false
+      t.string :workflow_state, default: "active", null: false
+      t.timestamps
+
+      t.check_constraint "calculation_method IN ('average', 'decaying_average', 'highest', 'latest', 'n_mastery', 'standard_decaying_average', 'weighted_average')", name: "chk_calculation_method_enum"
+      t.check_constraint "workflow_state IN ('active', 'deleted')", name: "chk_workflow_state_enum"
+
+      t.replica_identity_index
+      t.index %i[course_id user_id outcome_id], unique: true, name: "index_outcome_rollups_on_course_user_outcome"
     end
 
     create_table :page_comments do |t|
@@ -3787,6 +4195,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.text :results
 
       t.index [:context_id, :context_type]
+      t.index :delayed_job_id,
+              where: "workflow_state='queued'",
+              name: "index_queued_progresses_on_delayed_job_id"
     end
 
     create_table :pseudonyms do |t|
@@ -3820,43 +4231,93 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :integration_id, limit: 255
       t.references :authentication_provider, foreign_key: true, index: { where: "authentication_provider_id IS NOT NULL" }
       t.string :declared_user_type, limit: 255
-      # the login_attribute the unique_id came from
-      t.string :login_attribute, limit: 255, if_not_exists: true
-      # a hash of all login attribute names to their value; allows migrating to
-      # different login attributes in the future
       t.jsonb :unique_ids, null: false, default: {}, if_not_exists: true
-      t.string :verification_token, limit: 255
-
-      # login_attribute can only be set if authentication_provider_id is set
-      # conversely, if authentication_provider_id IS NULL, login_attribute MUST be NULL
-      t.check_constraint <<~SQL.squish, name: "chk_login_attribute_authentication_provider_id"
-        authentication_provider_id IS NOT NULL OR login_attribute IS NULL
-      SQL
+      t.string :unique_id_normalized, limit: 255, null: false
 
       t.replica_identity_index :account_id
-      if (trgm = connection.extension(:pg_trgm)&.schema)
-        t.index "lower(sis_user_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_sis_user_id", using: :gin
-        t.index "lower(unique_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_unique_id", using: :gin
-      end
+      t.index "lower(sis_user_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_sis_user_id", using: :gin
+      t.index "lower(unique_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_unique_id", using: :gin
+      t.index "lower(integration_id) #{trgm}.gin_trgm_ops", name: "index_gin_trgm_pseudonyms_integration_id", using: :gin
       t.index [:sis_user_id, :account_id], where: "sis_user_id IS NOT NULL", unique: true
       t.index [:integration_id, :account_id],
               unique: true,
               name: "index_pseudonyms_on_integration_id",
               where: "integration_id IS NOT NULL"
-      t.index "LOWER(unique_id), account_id, authentication_provider_id",
-              name: "index_pseudonyms_unique_without_login_attribute",
-              unique: true,
-              where: "workflow_state IN ('active', 'suspended') AND login_attribute IS NULL"
-      t.index "LOWER(unique_id), account_id",
+      t.index "LOWER(unique_id), account_id", name: "index_pseudonyms_on_unique_id_and_account_id_old"
+      t.index [:unique_id_normalized, :account_id], name: "index_pseudonyms_on_unique_id_and_account_id"
+      t.index %i[unique_id_normalized account_id],
               name: "index_pseudonyms_unique_without_auth_provider",
               unique: true,
               where: "workflow_state IN ('active', 'suspended') AND authentication_provider_id IS NULL"
-      t.index "LOWER(unique_id), account_id, authentication_provider_id, login_attribute",
-              name: "index_pseudonyms_unique_with_login_attribute",
+      t.index %i[unique_id_normalized account_id authentication_provider_id],
               unique: true,
-              where: "workflow_state IN ('active', 'suspended')"
-      t.index "LOWER(unique_id), account_id", name: "index_pseudonyms_on_unique_id_and_account_id"
+              where: "workflow_state IN ('active', 'suspended')",
+              name: "index_pseudonyms_unique"
     end
+
+    execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+      CREATE FUNCTION #{connection.quote_table_name("pseudonyms_before_insert_or_update_enforce_unique_across_auth_providers__tr_fn")}()
+      RETURNS trigger AS $$
+      DECLARE
+        auth_type TEXT;
+      BEGIN
+        IF (OLD.authentication_provider_id IS DISTINCT FROM NEW.authentication_provider_id OR
+            OLD.unique_id_normalized IS DISTINCT FROM NEW.unique_id_normalized OR
+            OLD.account_id IS DISTINCT FROM NEW.account_id OR
+            OLD.workflow_state IS DISTINCT FROM NEW.workflow_state) AND
+            NEW.workflow_state <> 'deleted' THEN
+          IF NEW.authentication_provider_id IS NOT NULL THEN
+            SELECT ap.auth_type
+            INTO auth_type
+            FROM authentication_providers ap
+            WHERE ap.id = NEW.authentication_provider_id;
+          ELSE
+            auth_type := NULL;
+          END IF;
+
+          IF auth_type IN ('cas', 'saml', 'canvas', 'ldap') THEN
+            IF EXISTS (
+              SELECT 1
+              FROM pseudonyms p
+              WHERE p.unique_id_normalized = NEW.unique_id_normalized
+                AND p.account_id = NEW.account_id
+                AND p.workflow_state <> 'deleted'
+                AND p.authentication_provider_id IS NULL
+                AND p.id <> NEW.id
+            ) THEN
+              RAISE EXCEPTION 'duplicate unique_id_normalized found against unassociated pseudonyms'
+              USING ERRCODE = '23505',
+              DETAIL = format('Key (unique_id_normalized, account_id)=(%s, %s) already exists.', NEW.unique_id_normalized, NEW.account_id);
+            END IF;
+          ELSIF auth_type IS NULL THEN
+            IF EXISTS (
+              SELECT 1
+              FROM pseudonyms p
+              JOIN authentication_providers ap ON ap.id = p.authentication_provider_id
+              WHERE p.unique_id_normalized = NEW.unique_id_normalized
+                AND p.account_id = NEW.account_id
+                AND p.workflow_state <> 'deleted'
+                AND ap.auth_type IN ('cas', 'saml', 'canvas', 'ldap')
+                AND p.id <> NEW.id
+            ) THEN
+              RAISE EXCEPTION 'duplicate unique_id_normalized found for unassociated pseudonym'
+              USING ERRCODE = '23505',
+              DETAIL = format('Key (unique_id_normalized, account_id)=(%s, %s) already exists.', NEW.unique_id_normalized, NEW.account_id);
+            END IF;
+          END IF;
+        END IF;
+
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql SET search_path TO #{Shard.current.name};
+    SQL
+
+    execute(<<~SQL.squish)
+      CREATE TRIGGER pseudonyms_before_insert_or_update_enforce_unique_across_auth_providers__tr
+        BEFORE INSERT OR UPDATE ON #{Pseudonym.quoted_table_name}
+        FOR EACH ROW
+        EXECUTE PROCEDURE #{connection.quote_table_name("pseudonyms_before_insert_or_update_enforce_unique_across_auth_providers__tr_fn")}()
+    SQL
 
     create_table :purgatories do |t|
       t.references :attachment, null: false, foreign_key: true, index: { unique: true }
@@ -3934,7 +4395,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     create_table :quiz_migration_alerts do |t|
-      t.references :migration, polymorphic: true, index: { name: "index_quiz_migration_alerts_on_migration_type_and_migration_id" }
+      t.references :migration, polymorphic: true, index: false
       t.references :user, null: false, foreign_key: true
       t.references :course, null: false, foreign_key: true
       t.timestamps precision: 6
@@ -4117,7 +4578,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :rubric_imports, foreign_key: true
 
       t.check_constraint "rating_order IN ('descending', 'ascending')", name: "chk_rating_order_enum"
-      t.check_constraint "button_display IN ('numeric', 'emoji', 'letter')", name: "chk_button_display_enum"
+      t.check_constraint "button_display IN ('numeric', 'emoji', 'letter', 'points')", name: "chk_button_display_enum"
 
       t.index [:context_id, :context_type]
     end
@@ -4208,16 +4669,24 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.integer :error_count, default: 0, null: false
       t.json :error_data
       t.timestamps
-      t.references :account, foreign_key: true, index: { where: "account_id IS NOT NULL" }
-      t.references :course, foreign_key: true, index: { where: "course_id IS NOT NULL" }
-
-      t.check_constraint <<~SQL.squish, name: "chk_require_association"
-        (account_id IS NOT NULL OR
-        course_id IS NOT NULL) AND NOT
-        (account_id IS NOT NULL AND course_id IS NOT NULL)
-      SQL
+      t.references :context, polymorphic: %i[account course], foreign_key: true, null: false
 
       t.replica_identity_index
+    end
+
+    create_table :scheduled_posts do |t|
+      t.timestamp :post_comments_at, null: false
+      t.timestamp :post_comments_ran_at
+      t.timestamp :post_grades_at, null: false
+      t.timestamp :post_grades_ran_at
+      t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
+      t.references :post_policy, null: false, foreign_key: { to_table: :post_policies, on_delete: :cascade }, index: { unique: true }
+      t.references :assignment, null: false, foreign_key: { to_table: :assignments, on_delete: :cascade }, index: { unique: true }
+      t.timestamps
+
+      t.replica_identity_index
+      t.index [:post_comments_at, :post_comments_ran_at], name: "index_scheduled_posts_on_pending_comments"
+      t.index [:post_grades_at, :post_grades_ran_at], name: "index_scheduled_posts_on_pending_grades"
     end
 
     create_table :scheduled_smart_alerts do |t|
@@ -4279,14 +4748,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.float :lower_q
       t.float :median
       t.float :upper_q
-    end
-
-    create_table :sessions do |t|
-      t.string :session_id, null: false, limit: 255, index: true
-      t.text :data
-      t.timestamps precision: nil
-
-      t.index :updated_at
     end
 
     create_table :session_persistence_tokens do |t|
@@ -4379,6 +4840,9 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
       t.index %i[user_id hidden id stream_item_id], name: "index_stream_item_instances_global"
       t.index [:stream_item_id, :user_id], unique: true
+      t.index [:user_id, :context_id],
+              name: "index_stream_item_instances_on_user_and_context",
+              where: "NOT hidden"
     end
 
     create_table :submissions do |t|
@@ -4421,7 +4885,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamp :last_comment_at
       t.integer :extra_attempts
       t.timestamp :posted_at
-      t.boolean :cached_quiz_lti, default: false, null: false, index: true
+      t.boolean :cached_quiz_lti, default: false, null: false
       t.string :cached_tardiness, limit: 16
       t.references :course, foreign_key: true, index: false, null: false
       t.references :root_account, foreign_key: { to_table: :accounts }
@@ -4431,6 +4895,11 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :custom_grade_status, foreign_key: true, index: { where: "custom_grade_status_id IS NOT NULL" }
       t.string :sticker, limit: 255
       t.integer :body_word_count
+      t.string :lti_id, limit: 255
+      t.references :real_submitter,
+                   foreign_key: { to_table: :users, on_delete: :nullify },
+                   index: { where: "real_submitter_id IS NOT NULL" }
+      t.datetime :posted_comments_at
 
       t.index [:assignment_id, :submission_type]
       t.index [:user_id, :assignment_id], unique: true
@@ -4516,6 +4985,28 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index [:submission_draft_id, :attachment_id],
               name: "index_submission_draft_and_attachment_unique",
               unique: true
+    end
+
+    create_table :submission_texts do |t|
+      t.references :submission, null: false, foreign_key: true
+      t.references :attachment, foreign_key: true
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.text :text, null: false, limit: 16_777_215
+      t.integer :attempt, null: false, check: { constraint_name: "chk_attempt_positive", expression: "attempt > 0" }
+      t.boolean :contains_images, null: false, default: false
+      t.timestamps
+      t.string :submission_type
+
+      t.replica_identity_index
+      t.index %i[submission_id attachment_id attempt],
+              unique: true,
+              name: "index_on_sub_attempt_attach",
+              where: "attachment_id IS NOT NULL"
+      t.index %I[submission_id attempt],
+              unique: true,
+              name: "index_on_sub_attempt",
+              where: "attachment_id IS NULL"
     end
 
     create_table :submission_versions do |t|
@@ -4914,143 +5405,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     change_column :schema_migrations, :version, :string, limit: 255
-
-    execute(<<~SQL.squish)
-      CREATE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
-      SELECT DISTINCT a.id as assignment_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Assignment.quoted_table_name} a
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = a.context_id
-        AND a.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      WHERE a.workflow_state NOT IN ('deleted','unpublished')
-        AND COALESCE(a.only_visible_to_overrides, 'false') = 'false'
-
-      UNION
-
-      SELECT DISTINCT a.id as assignment_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Assignment.quoted_table_name} a
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = a.context_id
-        AND a.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON a.id = ao.assignment_id
-        AND ao.set_type = 'ADHOC'
-      INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
-        ON ao.id = aos.assignment_override_id
-        AND aos.user_id = e.user_id
-      WHERE ao.workflow_state = 'active'
-        AND aos.workflow_state <> 'deleted'
-        AND a.workflow_state NOT IN ('deleted','unpublished')
-        AND a.only_visible_to_overrides = 'true'
-
-      UNION
-
-      SELECT DISTINCT a.id as assignment_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Assignment.quoted_table_name} a
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = a.context_id
-        AND a.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON a.id = ao.assignment_id
-        AND ao.set_type = 'Group'
-      INNER JOIN #{Group.quoted_table_name} g
-        ON g.id = ao.set_id
-      INNER JOIN #{GroupMembership.quoted_table_name} gm
-        ON gm.group_id = g.id
-        AND gm.user_id = e.user_id
-      WHERE gm.workflow_state <> 'deleted'
-        AND g.workflow_state <> 'deleted'
-        AND ao.workflow_state = 'active'
-        AND a.workflow_state NOT IN ('deleted','unpublished')
-        AND a.only_visible_to_overrides = 'true'
-
-      UNION
-
-      SELECT DISTINCT a.id as assignment_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Assignment.quoted_table_name} a
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = a.context_id
-        AND a.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON e.course_section_id = ao.set_id
-        AND ao.set_type = 'CourseSection'
-        AND ao.assignment_id = a.id
-      WHERE a.workflow_state NOT IN ('deleted','unpublished')
-        AND a.only_visible_to_overrides = 'true'
-        AND ao.workflow_state = 'active'
-    SQL
-
-    execute(<<~SQL.squish)
-      CREATE VIEW #{connection.quote_table_name("quiz_student_visibilities")} AS
-      SELECT DISTINCT q.id as quiz_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Quizzes::Quiz.quoted_table_name} q
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = q.context_id
-        AND q.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      WHERE q.workflow_state NOT IN ('deleted','unpublished')
-        AND COALESCE(q.only_visible_to_overrides, 'false') = 'false'
-
-      UNION
-
-      SELECT DISTINCT q.id as quiz_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Quizzes::Quiz.quoted_table_name} q
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = q.context_id
-        AND q.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON q.id = ao.quiz_id
-        AND ao.set_type = 'ADHOC'
-      INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
-        ON ao.id = aos.assignment_override_id
-        AND aos.user_id = e.user_id
-      WHERE ao.workflow_state = 'active'
-        AND aos.workflow_state <> 'deleted'
-        AND q.workflow_state NOT IN ('deleted','unpublished')
-        AND q.only_visible_to_overrides = 'true'
-
-      UNION
-
-      SELECT DISTINCT q.id as quiz_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Quizzes::Quiz.quoted_table_name} q
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = q.context_id
-        AND q.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON e.course_section_id = ao.set_id
-        AND ao.set_type = 'CourseSection'
-        AND ao.quiz_id = q.id
-      WHERE q.workflow_state NOT IN ('deleted','unpublished')
-        AND q.only_visible_to_overrides = 'true'
-        AND ao.workflow_state = 'active'
-    SQL
   end
 
   def readonly_user_exists?
@@ -5061,6 +5415,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     raise ActiveRecord::IrreversibleMigration
   end
 end
-# rubocop:enable Migration/AddIndex, Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
+# rubocop:enable Migration/ChangeColumn, Migration/Execute, Migration/IdColumn
 # rubocop:enable Migration/PrimaryKey, Migration/RootAccountId, Rails/CreateTableWithTimestamps
+# rubocop:enable Migration/PolymorphicAssociations
 # rubocop:enable Rails/ThreeStateBooleanColumn

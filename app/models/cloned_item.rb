@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ClonedItem < ActiveRecord::Base
+class ClonedItem < ApplicationRecord
   belongs_to :original_item, polymorphic:
       [:attachment,
        :content_tag,

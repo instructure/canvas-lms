@@ -19,11 +19,11 @@
 #
 
 require "oauth"
-require "oauth/request_proxy/action_controller_request"
+require "oauth/client/action_controller_request"
 require "nokogiri"
 
 class LtiApiController < ApplicationController
-  skip_before_action :load_user
+  skip_before_action :load_user, :require_user
   skip_before_action :verify_authenticity_token
 
   # these exceptions will happen on bad external requests,
@@ -41,6 +41,19 @@ class LtiApiController < ApplicationController
     @xml = Nokogiri::XML.parse(request.body)
 
     lti_response, status = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
+
+    # Log asset access for participation tracking
+    if lti_response && lti_response.operation_ref_identifier == "replaceResult" && lti_response.code_major == "success"
+      begin
+        assignment = lti_response.assignment
+        user = lti_response.user
+        @context = assignment.context
+        @current_user = user
+        log_asset_access(assignment, "assignments", assignment.assignment_group, "participate")
+      rescue
+        # Don't fail the grade passback if asset logging fails
+      end
+    end
 
     # Data around New Quizzes submissions are not being propagated to the Apache logs.
     # Adding this sourced_id and quiz submission time to header so that they can be

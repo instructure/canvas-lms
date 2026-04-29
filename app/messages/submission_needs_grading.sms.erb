@@ -1,9 +1,15 @@
-<%= t :body_sms, "Your grade for %{title}, %{context} just changed.", :title => asset.assignment.title, :context => asset.assignment.context.name %>
+<%
+  # For discussion checkpoints, use the parent assignment instead of the sub-assignment
+  # to ensure correct assignment IDs and URLs in notifications
+  assignment = asset.assignment
+  assignment = assignment.parent_assignment if assignment.checkpoint? && assignment.parent_assignment
+%>
+<%= t :body_sms, "Your grade for %{title}, %{context} just changed.", :title => assignment.title, :context => assignment.context.name %>
 
 <%= t :regraded_date, "re-graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
-<% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context) %>
-  <%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>
+<% if asset.score && user.try(:send_scores_in_emails?, assignment.context) %>
+  <%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (assignment.points_possible || t(:not_applicable, "N/A")) %>
 <% end %>
 <%= t(:score_pending, "score pending review by the teacher") if asset.pending_review? %>
 
-<%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(asset.assignment.context) %>
+<%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(assignment.context) %>

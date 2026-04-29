@@ -19,10 +19,10 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import '@testing-library/jest-dom'
+import {vi} from 'vitest'
 import TruncateTextWithTooltip from '../TruncateTextWithTooltip'
 
-jest.mock('@instructure/ui-truncate-text', () => ({
+vi.mock('@instructure/ui-truncate-text', () => ({
   TruncateText: ({
     children,
     onUpdate,
@@ -48,7 +48,7 @@ jest.mock('@instructure/ui-truncate-text', () => ({
   },
 }))
 
-jest.mock('@instructure/ui-tooltip', () => ({
+vi.mock('@instructure/ui-tooltip', () => ({
   Tooltip: ({
     children,
     renderTip,

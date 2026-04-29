@@ -192,11 +192,11 @@ describe "self enrollment" do
     end
 
     context "with open registration" do
-      include_examples "open registration"
+      it_behaves_like "open registration"
     end
 
     context "without open registration" do
-      include_examples "closed registration"
+      it_behaves_like "closed registration"
     end
   end
 
@@ -216,11 +216,11 @@ describe "self enrollment" do
     end
 
     context "with open registration" do
-      include_examples "open registration"
+      it_behaves_like "open registration"
     end
 
     context "without open registration" do
-      include_examples "closed registration"
+      it_behaves_like "closed registration"
     end
   end
 
@@ -236,11 +236,11 @@ describe "self enrollment" do
     end
 
     context "with open registration" do
-      include_examples "open registration"
+      it_behaves_like "open registration"
     end
 
     context "without open registration" do
-      include_examples "closed registration"
+      it_behaves_like "closed registration"
     end
   end
 end

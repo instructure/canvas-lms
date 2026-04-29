@@ -22,10 +22,13 @@ class ContextModulesController < ApplicationController
   include Api::V1::ContextModule
   include WebZipExportHelper
   include ContextExternalToolsHelper
+  include ObserverModuleInfo
 
   before_action :require_context
+  skip_before_action :require_user, only: %i[content_tag_assignment_data index item_redirect module_redirect progressions]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   add_crumb(proc { t("#crumbs.modules", "Modules") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_context_modules_url }
@@ -40,13 +43,14 @@ class ContextModulesController < ApplicationController
 
     def load_module_file_details
       attachment_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).where(content_type: "Attachment").preload(content: :folder).to_a }
-      attachment_tags.each_with_object({}) do |file_tag, items|
-        items[file_tag.id] = {
-          id: file_tag.id,
-          content_id: file_tag.content_id,
-          content_details: content_details(file_tag, @current_user, for_admin: true),
-          module_id: file_tag.context_module_id
-        }
+      attachment_tags.to_h do |file_tag|
+        [file_tag.id,
+         {
+           id: file_tag.id,
+           content_id: file_tag.content_id,
+           content_details: content_details(file_tag, @current_user, for_admin: true),
+           module_id: file_tag.context_module_id
+         }]
       end
     end
 
@@ -104,10 +108,13 @@ class ContextModulesController < ApplicationController
       @allow_menu_tools = @context.grants_right?(@current_user, session, :manage_course_content_add) &&
                           (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?)
 
-      assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
+
+      new_quizzes_enabled = NewQuizzesFeaturesHelper.new_quizzes_enabled?(@context)
 
       hash = {
         course_id: @context.id,
+        CONTEXT_IS_AVAILABLE: @context.available?,
         CONTEXT_URL_ROOT: polymorphic_path([@context]),
         FILES_CONTEXTS: [{ asset_string: @context.asset_string }],
         MODULE_FILE_DETAILS: module_file_details,
@@ -117,10 +124,13 @@ class ContextModulesController < ApplicationController
         },
         ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
         CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS) && assign_to_tags,
+        PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading),
         MODULE_TOOLS: module_tool_definitions,
         DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
         PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?,
-        restrict_quantitative_data: @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false
+        restrict_quantitative_data: @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false,
+        NEW_QUIZZES_ENABLED: new_quizzes_enabled,
+        NEW_QUIZZES_BY_DEFAULT: new_quizzes_enabled && @context.feature_enabled?(:new_quizzes_by_default)
       }
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
@@ -141,11 +151,24 @@ class ContextModulesController < ApplicationController
 
       @feature_student_module_selection = @context.account.feature_enabled?(:modules_student_module_selection)
       @feature_teacher_module_selection = @context.account.feature_enabled?(:modules_teacher_module_selection)
-
+      hash[:MODULE_FEATURES] = {}
       if @can_edit && (@feature_student_module_selection || @feature_teacher_module_selection)
-        hash[:MODULE_FEATURES] = {}
         hash[:MODULE_FEATURES][:STUDENT_MODULE_SELECTION] = true if @feature_student_module_selection
         hash[:MODULE_FEATURES][:TEACHER_MODULE_SELECTION] = true if @feature_teacher_module_selection
+      end
+      if Account.site_admin.feature_enabled?(:module_external_url_seamless_redirect)
+        hash[:MODULE_FEATURES][:SEAMLESS_EXTERNAL_URL_REDIRECT] = true
+      end
+
+      if @context.use_modules_rewrite_view?(@current_user, session)
+        tags_count = GuardRail.activate(:secondary) { context.module_items_visible_to(@current_user).count }
+        module_perf_threshold = Setting.get("module_perf_threshold", 100).to_i
+        module_perf_page_size = Setting.get("module_perf_page_size", 10).to_i
+        modules_are_paginated = tags_count > module_perf_threshold
+        page_size = modules_are_paginated ? module_perf_page_size : module_perf_threshold
+
+        hash[:MODULE_FEATURES][:PAGE_SIZE] = page_size
+        hash[:MODULE_FEATURES][:MODULES_ARE_PAGINATED] = modules_are_paginated
       end
 
       append_default_due_time_js_env(@context, hash)
@@ -263,13 +286,25 @@ class ContextModulesController < ApplicationController
       if @is_student
         return unless tab_enabled?(@context.class::TAB_MODULES)
 
-        @modules.each { |m| m.evaluate_for(@current_user) }
+        progressions_by_module_id = ContextModule.preload_progressions_for_user(@modules, @current_user)
+        @modules.each do |m|
+          existing_progression = progressions_by_module_id[m.id]
+          if existing_progression
+            existing_progression.context_module = m
+            existing_progression.user = @current_user
+            existing_progression.evaluate!
+          else
+            m.evaluate_for(@current_user)
+          end
+        end
         session[:module_progressions_initialized] = true
       end
       add_body_class("padless-content")
 
-      js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
-      js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
+      js_env({
+               CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
+               CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url)
+             })
 
       if @context.use_modules_rewrite_view?(@current_user, session)
         # Load new modules page assets
@@ -309,18 +344,40 @@ class ContextModulesController < ApplicationController
             visible: !@last_web_export.nil?
           },
         }
-        js_env(CONTEXT_MODULES_HEADER_PROPS: context_modules_header_props)
+        js_env({ CONTEXT_MODULES_HEADER_PROPS: context_modules_header_props })
 
         modules_permissions = {
           canAdd: @can_add,
           canEdit: @can_edit,
           canDelete: @can_delete,
+          canView: @can_view,
           canViewUnpublished: @can_view_unpublished,
           canDirectShare: can_do(@context, @current_user, :direct_share),
-          readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin)
+          readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin),
+          canManageSpeedGrader: @context.allows_speed_grader? && @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
         }
 
-        js_env(MODULES_PERMISSIONS: modules_permissions)
+        # Only set observer options if user has observer data
+        if @current_user
+          observed_users_list = observed_users(@current_user, session, @context.id)
+          if observed_users_list.present?
+            js_env({
+                     OBSERVER_OPTIONS: {
+                       OBSERVED_USERS_LIST: observed_users_list,
+                       CAN_ADD_OBSERVEE: @current_user
+                                         .profile
+                                         .tabs_available(@current_user, root_account: @domain_root_account)
+                                         .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                     }
+                   })
+          end
+        end
+
+        js_env({
+                 MODULES_PERMISSIONS: modules_permissions,
+                 MODULES_OBSERVER_INFO: observer_module_info,
+                 PAGE_TITLE: "#{t("titles.course_modules", "Course Modules")}: #{@context.name}"
+               })
 
         js_bundle :context_modules_v2
         css_bundle :content_next, :context_modules2, :context_modules_v2
@@ -406,6 +463,69 @@ class ContextModulesController < ApplicationController
       load_permissions
 
       render template: "context_modules/items_html", layout: false
+    end
+  end
+
+  def bulk_items_html
+    unless @context.account.feature_enabled?(:modules_perf)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    if authorized_action(@context, @current_user, :read)
+      module_ids = params[:module_ids] || []
+      return render json: {}, status: :bad_request if module_ids.empty?
+
+      unless module_ids.all? { |id| id.to_s.match?(/^\d+$/) }
+        return render json: { error: "All module_ids must be numeric" }, status: :bad_request
+      end
+
+      # Limit to 40 modules per request (matches frontend MAX_BATCH_SIZE)
+      max_modules = 40
+      if module_ids.length > max_modules
+        return render json: { error: "Cannot request more than #{max_modules} modules at once" }, status: :bad_request
+      end
+
+      modules = @context.modules_visible_to(@current_user)
+                        .where(id: module_ids)
+                        .preload(content_tags: :content)
+                        .index_by(&:id)
+
+      load_menu_tools
+      load_permissions
+
+      result = {}
+      module_ids.each do |module_id|
+        @module = modules[module_id.to_i]
+        next unless @module
+
+        @items = load_content_tags(@module, @current_user)
+        @items_count = @items.count
+
+        pagination_info = nil
+        unless params[:no_pagination]
+          per_page = params[:per_page]&.to_i || 10
+          total_pages = (@items_count.to_f / per_page).ceil
+          @items = @items.take(per_page)
+
+          # Include pagination info if there are multiple pages
+          if total_pages > 1
+            pagination_info = {
+              current_page: 1,
+              total_pages:,
+              per_page:
+            }
+          end
+        end
+
+        # Render the template for this module (force HTML format)
+        html = render_to_string(template: "context_modules/items_html", layout: false, formats: [:html])
+        result[module_id] = {
+          html:,
+          pagination: pagination_info
+        }
+      end
+
+      render json: result
     end
   end
 
@@ -573,7 +693,7 @@ class ContextModulesController < ApplicationController
         ActiveRecord::Associations.preload(tags, content: [:context, :external_tool_tag])
       end
 
-      preload_assignments_and_quizzes(all_tags, user_is_admin)
+      preload_assignments_quizzes_and_peer_reviews(all_tags, user_is_admin)
 
       assignment_ids = []
       quiz_ids = []
@@ -600,12 +720,52 @@ class ContextModulesController < ApplicationController
       end
       submitted_assignment_ids ||= []
       submitted_quiz_ids ||= []
+
+      # Preload peer review submissions and excused status
+      submitted_peer_review_ids = []
+      excused_peer_review_ids = []
+      if @context.feature_enabled?(:peer_review_allocation_and_grading) && @current_user
+        peer_review_sub_ids = []
+        all_tags.each do |tag|
+          if tag.can_have_assignment? && tag.assignment&.peer_reviews? && tag.assignment.peer_review_sub_assignment
+            peer_review_sub_ids << tag.assignment.peer_review_sub_assignment.id
+          end
+        end
+
+        if peer_review_sub_ids.any?
+          peer_review_key = Digest::SHA256.hexdigest(peer_review_sub_ids.sort.join(","))
+          submitted_peer_review_ids = Rails.cache.fetch_with_batched_keys(
+            "submitted_peer_review_ids/#{peer_review_key}",
+            batch_object: @current_user,
+            batched_keys: :submissions
+          ) do
+            @current_user.submissions.shard(@context.shard)
+                         .having_submission.where(assignment_id: peer_review_sub_ids).pluck(:assignment_id)
+          end
+
+          excused_peer_review_ids = Rails.cache.fetch_with_batched_keys(
+            "excused_peer_review_ids/#{peer_review_key}",
+            batch_object: @current_user,
+            batched_keys: :submissions
+          ) do
+            @current_user.submissions.shard(@context.shard)
+                         .where(assignment_id: peer_review_sub_ids, excused: true).pluck(:assignment_id)
+          end
+        end
+      end
+
       all_tags.each do |tag|
         info[tag.id] = if tag.can_have_assignment? && tag.assignment
+                         peer_review_sub = tag.assignment.peer_review_sub_assignment
+                         peer_review_has_submission = peer_review_sub && submitted_peer_review_ids.include?(peer_review_sub.id)
+                         peer_review_is_excused = peer_review_sub && excused_peer_review_ids.include?(peer_review_sub.id)
+
                          tag.assignment.context_module_tag_info(@current_user,
                                                                 @context,
                                                                 user_is_admin:,
-                                                                has_submission: submitted_assignment_ids.include?(tag.assignment.id))
+                                                                has_submission: submitted_assignment_ids.include?(tag.assignment.id),
+                                                                peer_review_has_submission:,
+                                                                peer_review_is_excused:)
                        elsif tag.content_type_quiz?
                          tag.content.context_module_tag_info(@current_user,
                                                              @context,
@@ -894,11 +1054,19 @@ class ContextModulesController < ApplicationController
   end
 
   include ContextModulesHelper
+
   def add_item
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
 
     if authorized_action(@context, @current_user, %i[manage_course_content_add manage_course_content_edit])
       params[:item][:link_settings] = launch_dimensions
+
+      # Resolve position conflicts by finding the next available slot
+      if params[:item][:position].present? && params[:item][:position].to_i.positive?
+        resolved_position = @module.find_next_available_position(params[:item][:position].to_i)
+        params[:item] = params[:item].merge(position: resolved_position)
+      end
+
       @tag = @module.add_item(params[:item])
       unless @tag&.valid?
         body = @tag.nil? ? { error: "Could not find item to tag" } : @tag.errors
@@ -1049,7 +1217,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       if params[:publish]
         @module.publish
-        @module.publish_items!
+        @module.publish_items!(user: @current_user)
       elsif params[:unpublish]
         @module.unpublish
       end
@@ -1076,7 +1244,7 @@ class ContextModulesController < ApplicationController
 
   private
 
-  def preload_assignments_and_quizzes(tags, user_is_admin)
+  def preload_assignments_quizzes_and_peer_reviews(tags, user_is_admin)
     assignment_tags = tags.select(&:can_have_assignment?)
     return unless assignment_tags.any?
 
@@ -1086,6 +1254,19 @@ class ContextModulesController < ApplicationController
     DatesOverridable.preload_override_data_for_objects(content_with_assignments.map(&:assignment))
     override_preload_types = %w[Assignment Quizzes::Quiz WikiPage DiscussionTopic].freeze
     DatesOverridable.preload_override_data_for_objects(tags.select { |ct| override_preload_types.include?(ct.content_type) }.map(&:content))
+
+    peer_review_subs = []
+    if @context.feature_enabled?(:peer_review_allocation_and_grading)
+      assignment_tags_with_peer_reviews = assignment_tags.select { |tag| tag.assignment&.peer_reviews? }
+
+      if assignment_tags_with_peer_reviews.any?
+        assignments_with_peer_reviews = assignment_tags_with_peer_reviews.map(&:assignment)
+        ActiveRecord::Associations.preload(assignments_with_peer_reviews, :peer_review_sub_assignment)
+
+        peer_review_subs = assignments_with_peer_reviews.filter_map(&:peer_review_sub_assignment)
+        DatesOverridable.preload_override_data_for_objects(peer_review_subs) if peer_review_subs.any?
+      end
+    end
 
     if user_is_admin && should_preload_override_data?
       assignments = assignment_tags.filter_map(&:assignment)
@@ -1100,7 +1281,9 @@ class ContextModulesController < ApplicationController
         preload_has_too_many_overrides(sub_assignments, :assignment_id)
       end
 
-      overrideables = (assignments + plain_quizzes + sub_assignments).reject(&:has_too_many_overrides)
+      preload_has_too_many_overrides(peer_review_subs, :assignment_id) if peer_review_subs.any?
+
+      overrideables = (assignments + plain_quizzes + sub_assignments + peer_review_subs).reject(&:has_too_many_overrides)
 
       if overrideables.any?
         ActiveRecord::Associations.preload(overrideables, :assignment_overrides)

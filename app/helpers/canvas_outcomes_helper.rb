@@ -182,16 +182,16 @@ module CanvasOutcomesHelper
 
     host_url = "#{protocol}://#{domain}" if domain.present?
 
-    js_env(
-      canvas_outcomes: {
-        artifact_type:,
-        artifact_id: artifact.id,
-        context_uuid: context.uuid,
-        host: host_url,
-        jwt:,
-        **props
-      }
-    )
+    js_env({
+             canvas_outcomes: {
+               artifact_type:,
+               artifact_id: artifact.id,
+               context_uuid: context.uuid,
+               host: host_url,
+               jwt:,
+               **props
+             }
+           })
   end
 
   def extract_domain_jwt(account, scope, **props)
@@ -235,6 +235,22 @@ module CanvasOutcomesHelper
       url += "?" + params.to_query
     end
     url
+  end
+
+  def enqueue_rollup_calculation(course_id: nil, student_id: nil, outcome_id: nil)
+    raise ArgumentError, "Must provide at least course_id" unless course_id
+    return unless Account.site_admin.feature_enabled?(:outcomes_rollup_propagation)
+
+    if course_id && student_id
+      Outcomes::StudentOutcomeRollupCalculationService.calculate_for_student(
+        course_id:,
+        student_id:
+      )
+    else
+      Outcomes::StudentOutcomeRollupCalculationService.calculate_for_course(
+        course_id:
+      )
+    end
   end
 
   private

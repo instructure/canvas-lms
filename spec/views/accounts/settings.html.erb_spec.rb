@@ -139,13 +139,13 @@ describe "accounts/settings" do
     describe "Root Account Announcements" do
       let(:account) { Account.create!(name: "reading_rainbow") }
 
-      include_examples "account notifications", "This is a message from <b>reading_rainbow</b>"
+      it_behaves_like "account notifications", "This is an announcement from <b>reading_rainbow</b>"
     end
 
     describe "Site Admin Announcements" do
       let(:account) { Account.site_admin }
 
-      include_examples "account notifications", "This is a message from <b>Canvas Administration</b>"
+      it_behaves_like "account notifications", "This is an announcement from <b>Canvas Administration</b>"
     end
   end
 
@@ -167,37 +167,14 @@ describe "accounts/settings" do
         Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+        expect(response).not_to have_tag("input#account_settings_allow_gradebook_show_first_last_names")
       end
 
       it "does not show the setting when the gradebook_show_first_last_names feature is disabled" do
         Account.site_admin.disable_feature!(:gradebook_show_first_last_names)
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
-      end
-    end
-
-    describe "allow_observers_in_appointment_groups setting" do
-      before do
-        account = Account.default
-        admin = account_admin_user
-        view_context(account, admin)
-        assign(:account, account)
-        assign(:announcements, AccountNotification.none.paginate)
-      end
-
-      let(:setting_label) { "Allow observers to sign-up for appointments when enabled by the teacher" }
-
-      it "renders the setting when the observer_appointment_groups feature is enabled" do
-        render
-        expect(rendered).to include(setting_label)
-      end
-
-      it "does not render the setting when the observer_appointment_groups feature is disabled" do
-        Account.site_admin.disable_feature!(:observer_appointment_groups)
-        render
-        expect(rendered).not_to include(setting_label)
+        expect(response).not_to have_tag("input#account_settings_allow_gradebook_show_first_last_names")
       end
     end
 
@@ -224,14 +201,14 @@ describe "accounts/settings" do
       it "does not show the setting by default" do
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
+        expect(response).not_to have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
       end
 
       it "does not show the setting when the gradebook_show_first_last_names feature is disabled" do
         Account.site_admin.disable_feature!(:gradebook_show_first_last_names)
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
+        expect(response).not_to have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
       end
     end
   end
@@ -250,22 +227,12 @@ describe "accounts/settings" do
         assign(:announcements, AccountNotification.none.paginate)
       end
 
-      it "shows differentiation tags section when differentiation tags and assign to different tags FF are enabled" do
+      it "shows differentiation tags section" do
         account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         account.save!
         account.reload
-        account.enable_feature!(:assign_to_differentiation_tags)
         render
         expect(response.body).to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
-      end
-
-      it "hides differentiation tags section when assign to differentiation tags FF is disabled" do
-        account.settings[:allow_assign_to_differentiation_tags] = { value: true }
-        account.save!
-        account.reload
-        account.disable_feature!(:assign_to_differentiation_tags)
-        render
-        expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
       end
     end
 
@@ -282,11 +249,10 @@ describe "accounts/settings" do
         assign(:announcements, AccountNotification.none.paginate)
       end
 
-      it "shows differentiation tags section when differentiation tags and assign to different tags FF are enabled" do
+      it "shows differentiation tags section" do
         sub_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         sub_account.save!
         sub_account.reload
-        sub_account.enable_feature!(:assign_to_differentiation_tags)
         render
         expect(response.body).to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
         expect(response.body).to include("Lock this setting for sub-accounts and courses")
@@ -296,7 +262,6 @@ describe "accounts/settings" do
         sub_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         sub_account.save!
         sub_account.reload
-        sub_account.enable_feature!(:assign_to_differentiation_tags)
         allow(sub_account).to receive(:allow_assign_to_differentiation_tags).and_return({
                                                                                           value: true,
                                                                                           locked: true,
@@ -304,15 +269,6 @@ describe "accounts/settings" do
                                                                                         })
         render
         expect(response.body).to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]'][disabled]")
-      end
-
-      it "hides differentiation tags section when assign to differentiation tags FF is disabled" do
-        sub_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
-        sub_account.save!
-        sub_account.reload
-        sub_account.disable_feature!(:assign_to_differentiation_tags)
-        render
-        expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
       end
     end
 
@@ -335,15 +291,60 @@ describe "accounts/settings" do
         expect(response.body).not_to include("Lock this setting for sub-accounts and courses")
       end
 
-      it "hides differentiation tags section when differentiation tags and assign to different tags are enabled" do
+      it "hides differentiation tags section when differentiation tags are enabled" do
         site_admin_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         site_admin_account.save!
         site_admin_account.reload
-        site_admin_account.enable_feature!(:assign_to_differentiation_tags)
         render
         expect(response.body).not_to have_tag("input[name='account[settings][allow_assign_to_differentiation_tags][value]']")
         expect(response.body).not_to include("Lock this setting for sub-accounts and courses")
       end
+    end
+  end
+
+  describe "allow_observers_in_appointment_groups setting" do
+    before do
+      account = Account.default
+      admin = account_admin_user
+      view_context(account, admin)
+      assign(:account, account)
+      assign(:announcements, AccountNotification.none.paginate)
+    end
+
+    let(:setting_label) { "Allow observers to sign-up for appointments when enabled by the teacher" }
+
+    it "renders the setting when the observer_appointment_groups feature is enabled" do
+      render
+      expect(rendered).to include(setting_label)
+    end
+
+    it "does not render the setting when the observer_appointment_groups feature is disabled" do
+      Account.site_admin.disable_feature!(:observer_appointment_groups)
+      render
+      expect(rendered).not_to include(setting_label)
+    end
+  end
+
+  describe "default_allow_observer_signup setting" do
+    before do
+      account = Account.default
+      admin = account_admin_user
+      view_context(account, admin)
+      assign(:account, account)
+      assign(:announcements, AccountNotification.none.paginate)
+    end
+
+    let(:setting_label) { "by default when creating new appointment groups" }
+
+    it "renders the setting when the observer_appointment_groups feature is enabled" do
+      render
+      expect(rendered).to include(setting_label)
+    end
+
+    it "does not render the setting when the observer_appointment_groups feature is disabled" do
+      Account.site_admin.disable_feature!(:observer_appointment_groups)
+      render
+      expect(rendered).not_to include(setting_label)
     end
   end
 
@@ -540,7 +541,7 @@ describe "accounts/settings" do
       Account.site_admin.disable_feature!(:new_quizzes_separators)
       render
 
-      expect(response).to_not have_tag("select#account_settings_decimal_separator_value")
+      expect(response).not_to have_tag("select#account_settings_decimal_separator_value")
     end
 
     it "does not show up if new quizzes is not provisioned" do
@@ -548,7 +549,7 @@ describe "accounts/settings" do
       account.save!
       render
 
-      expect(response).to_not have_tag("select#account_settings_decimal_separator_value")
+      expect(response).not_to have_tag("select#account_settings_decimal_separator_value")
     end
   end
 
@@ -796,7 +797,7 @@ describe "accounts/settings" do
       render
       doc = Nokogiri::HTML5(response.body)
       options = doc.css("#account_course_template_id option[selected]")
-      expect(options.map(&:text)).to_not include("Unnamed Course")
+      expect(options.map(&:text)).not_to include("Unnamed Course")
       expect(options.count).to eq 1
     end
 

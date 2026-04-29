@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe "Exporters::ZipExporter" do
   describe "#export" do
     let(:course) { Course.create!(workflow_state: "available") }
@@ -56,7 +54,7 @@ describe "Exporters::ZipExporter" do
         let(:settings) { { time_zone: "America/Denver" } }
 
         it "uses the time zone to calculate the user's local time using TZInfo::Timezone" do
-          expect(TZInfo::Timezone).to receive(:get).with("America/Denver").and_return(double("LocalTime", now: Time.zone.now))
+          expect(TZInfo::Timezone).to receive(:get).with("America/Denver").and_return(instance_double(TZInfo::Timezone, now: Time.zone.now))
           subject
         end
       end

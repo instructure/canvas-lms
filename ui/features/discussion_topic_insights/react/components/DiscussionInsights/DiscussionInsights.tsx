@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import {Text} from '@instructure/ui-text'
 import InsightsTable from '../InsightsTable/InsightsTable'
 import {View} from '@instructure/ui-view'
@@ -28,8 +28,12 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {InsightEntry, useInsight} from '../../hooks/useFetchInsights'
 import {formatDate} from '../../utils'
 import useInsightStore from '../../hooks/useInsightStore'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import NewActivityInfo from '../NewActivityInfo/NewActivityInfo'
+import {IconEyeLine, IconMoveDownBottomLine, IconSpeedGraderLine} from '@instructure/ui-icons'
+import {Flex} from '@instructure/ui-flex'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('discussion_insights')
 
@@ -80,10 +84,14 @@ const filterEntriesbyRelevance = (relevanceFilterType: string, entries: InsightE
 
 const DiscussionInsights: React.FC = () => {
   const [query, setQuery] = useState('')
+  const [screenReader, setScreenReader] = useState('')
+  const [previousInsightState, setPreviousInsightState] = useState<string | undefined>()
+  const [previousLoadingState, setPreviousLoadingState] = useState(false)
 
   const context = useInsightStore(state => state.context)
   const contextId = useInsightStore(state => state.contextId)
   const discussionId = useInsightStore(state => state.discussionId)
+  const SPEEDGRADER_URL_TEMPLATE = useInsightStore(state => state.SPEEDGRADER_URL_TEMPLATE)
 
   const setEntries = useInsightStore(state => state.setEntries)
   const openEvaluationModal = useInsightStore(state => state.openEvaluationModal)
@@ -146,20 +154,25 @@ const DiscussionInsights: React.FC = () => {
     if (!entries) return []
 
     const relevanceFilteredValues = filterEntriesbyRelevance(relevanceFilterType, entries)
-    if (relevanceFilteredValues != entries) {
-      setIsFilteredTable(true)
-    }
+
     if (!query) {
-      setEntries(relevanceFilteredValues)
       return relevanceFilteredValues
     }
-    const filteredValues = relevanceFilteredValues.filter(row =>
+    return relevanceFilteredValues.filter(row =>
       row.student_name.toLowerCase().includes(query.toLowerCase()),
     )
-    setIsFilteredTable(true)
-    setEntries(filteredValues)
-    return filteredValues
-  }, [entries, query, setEntries, relevanceFilterType, setIsFilteredTable])
+  }, [entries, query, relevanceFilterType])
+
+  useEffect(() => {
+    if (!entries) return
+
+    const relevanceFilteredValues = filterEntriesbyRelevance(relevanceFilterType, entries)
+    const hasRelevanceFilter = relevanceFilteredValues !== entries
+    const hasSearchFilter = !!query
+
+    setIsFilteredTable(hasRelevanceFilter || hasSearchFilter)
+    setEntries(filteredEntries)
+  }, [filteredEntries, entries, query, relevanceFilterType, setEntries, setIsFilteredTable])
 
   const searchResultsText = I18n.t(
     {
@@ -169,15 +182,109 @@ const DiscussionInsights: React.FC = () => {
     {count: filteredEntries.length},
   )
 
+  useEffect(() => {
+    const isCurrentlyLoading =
+      loading || ['created', 'in_progress'].includes(insight?.workflow_state as string)
+
+    if (isCurrentlyLoading && !previousLoadingState) {
+      setScreenReader(I18n.t('Insights loading'))
+    }
+
+    setPreviousLoadingState(isCurrentlyLoading)
+  }, [loading, insight?.workflow_state])
+
+  useEffect(() => {
+    if (
+      loading ||
+      insight?.workflow_state !== 'completed' ||
+      previousInsightState === 'completed' ||
+      entries?.length === 0
+    ) {
+      setPreviousInsightState(insight?.workflow_state ?? undefined)
+      return
+    }
+
+    setScreenReader(I18n.t('Insights generated'))
+    setPreviousInsightState(insight?.workflow_state ?? undefined)
+  }, [loading, insight?.workflow_state, entries, previousInsightState])
+
+  useEffect(() => {
+    if (!query || loading || !entries) {
+      return
+    }
+
+    const resultCount = filteredEntries.length
+    const message =
+      resultCount === 0
+        ? I18n.t('No results found for "%{searchTerm}"', {searchTerm: query})
+        : I18n.t(
+            {
+              one: '1 result for "%{searchTerm}"',
+              other: '%{count} results for "%{searchTerm}"',
+            },
+            {count: resultCount, searchTerm: query},
+          )
+    setScreenReader(message)
+  }, [query, filteredEntries.length, loading, entries])
+
   const tableRows: Row[] = filteredEntries.map(item => ({
     relevance: item.relevance_ai_classification,
     name: item.student_name,
     notes: item.relevance_ai_evaluation_notes,
     date: formatDate(new Date(item.entry_updated_at)),
     actions: (
-      <Button size="small" data-testid="viewOriginalReply" onClick={() => handleSeeReply(item)}>
-        {I18n.t('See Reply')}
-      </Button>
+      <Flex gap="x-small" justifyItems="center">
+        <Tooltip renderTip={I18n.t('See reply')}>
+          <IconButton
+            size="small"
+            data-testid="viewOriginalReply"
+            screenReaderLabel={I18n.t('See reply from %{user} on %{date}', {
+              user: item.student_name,
+              date: formatDate(new Date(item.entry_updated_at)),
+            })}
+            onClick={() => handleSeeReply(item)}
+            withBackground={false}
+            withBorder={false}
+            color="primary"
+          >
+            <IconEyeLine />
+          </IconButton>
+        </Tooltip>
+        {SPEEDGRADER_URL_TEMPLATE != null && (
+          <Tooltip renderTip={I18n.t('See in SpeedGrader')}>
+            <IconButton
+              size="small"
+              data-testid="viewSpeedGraderReply"
+              screenReaderLabel={I18n.t('See in SpeedGrader')}
+              href={SPEEDGRADER_URL_TEMPLATE?.replace(
+                /%3Astudent_id/,
+                String(item.student_id),
+              ).concat(`&entry_id=${item.entry_id}&insight_entry_id=${item.id}`)}
+              target="_blank"
+              withBackground={false}
+              withBorder={false}
+              color="primary"
+            >
+              <IconSpeedGraderLine />
+            </IconButton>
+          </Tooltip>
+        )}
+        <Tooltip renderTip={I18n.t('See reply in context')}>
+          <IconButton
+            size="small"
+            data-testid="goToOriginalReply"
+            screenReaderLabel={I18n.t('Go to original reply')}
+            href={`/courses/${contextId}/discussion_topics/${discussionId}?entry_id=${item.entry_id}`}
+            target="_blank"
+            withBackground={false}
+            withBorder={false}
+            color="primary"
+            as="a"
+          >
+            <IconMoveDownBottomLine />
+          </IconButton>
+        </Tooltip>
+      </Flex>
     ),
   }))
 
@@ -187,6 +294,9 @@ const DiscussionInsights: React.FC = () => {
 
   return (
     <>
+      <div aria-live="polite" aria-atomic="true">
+        <ScreenReaderContent>{screenReader}</ScreenReaderContent>
+      </div>
       <InsightsHeader />
       {insight?.needs_processing && <NewActivityInfo />}
       <InsightsActionBar

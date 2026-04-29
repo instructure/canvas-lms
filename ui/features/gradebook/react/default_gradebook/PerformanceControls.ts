@@ -24,25 +24,24 @@
 
 import type {PerformanceControlValues} from './gradebook.d'
 
-const DEFAULTS = {
+const DEFAULTS: Record<string, number> = {
   activeRequestLimit: 12,
   apiMaxPerPage: 100,
   submissionsChunkSize: 10,
 }
 
-const MINIMUMS = {
+const MINIMUMS: Record<string, number> = {
   activeRequestLimit: 1,
   perPage: 1,
 }
 
-const MAXIMUMS = {
+const MAXIMUMS: Record<string, number> = {
   activeRequestLimit: 100,
   apiMaxPerPage: 500,
 }
 
-// @ts-expect-error
-function integerBetween(value, min: number, max: number, defaultValue: number) {
-  const integer = Number.parseInt(value, 10)
+function integerBetween(value: unknown, min: number, max: number, defaultValue: number) {
+  const integer = Number.parseInt(String(value), 10)
   const assuredValue = Number.isNaN(integer) ? defaultValue : integer
   const atMostMax = Math.min(max, assuredValue)
   return Math.max(min, atMostMax)
@@ -96,15 +95,11 @@ export default class PerformanceControls {
 
   // PRIVATE
 
-  __getInteger(name: string): number {
+  __getInteger(name: keyof PerformanceControlValues): number {
     return integerBetween(
-      // @ts-expect-error
       this._values[name],
-      // @ts-expect-error
       MINIMUMS[name] || MINIMUMS.perPage,
-      // @ts-expect-error
       MAXIMUMS[name] || this.apiMaxPerPage,
-      // @ts-expect-error
       DEFAULTS[name] || DEFAULTS.apiMaxPerPage,
     )
   }

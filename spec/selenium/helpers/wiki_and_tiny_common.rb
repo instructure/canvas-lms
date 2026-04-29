@@ -20,6 +20,7 @@ require_relative "../common"
 require_relative "../rcs/pages/rce_next_page"
 module WikiAndTinyCommon
   include RCENextPage
+
   def wiki_page_body
     f("textarea.body")
   end
@@ -46,27 +47,6 @@ module WikiAndTinyCommon
     element = wiki_page_body
     switch_editor_views
     element.send_keys(html)
-  end
-
-  def wiki_page_tools_file_tree_setup(skip_tree = false, skip_image_list = false)
-    @root_folder = Folder.root_folders(@course).first
-    @sub_folder = @root_folder.sub_folders.create!(name: "subfolder", context: @course)
-    @sub_sub_folder = @sub_folder.sub_folders.create!(name: "subsubfolder", context: @course)
-    @text_file =
-      @root_folder
-      .attachments
-      .create!(filename: "text_file.txt", context: @course) { |a| a.content_type = "text/plain" }
-    @image1 = @root_folder.attachments.build(context: @course)
-    path = File.expand_path(File.dirname(__FILE__) + "/../../../public/images/email.png")
-    @image1.uploaded_data = Canvas::UploadedFile.new(path, Attachment.mimetype(path))
-    @image1.save!
-    @image2 = @root_folder.attachments.build(context: @course)
-    path = File.expand_path(File.dirname(__FILE__) + "/../../../public/images/graded.png")
-    @image2.uploaded_data = Canvas::UploadedFile.new(path, Attachment.mimetype(path))
-    @image2.save!
-    get "/courses/#{@course.id}/pages/front-page/edit"
-    @tree1 = driver.find_element(:id, :tree1) unless skip_tree
-    @image_list = f("#editor_tabs_4 .image_list") unless skip_image_list
   end
 
   def add_text_to_tiny(text)
@@ -178,20 +158,6 @@ module WikiAndTinyCommon
     end
     force_click("form.edit-form button.submit")
     wait_for_ajax_requests
-  end
-
-  def upload_to_files_in_rce(image = false)
-    fj('button:contains("Upload a new file")').click
-    if image == true
-      _name, path, _data = get_file({ image: "graded.png" }[:image])
-    else
-      _name, path, _data = get_file({ text: "foo.txt" }[:text])
-    end
-    f("input[type='file']").send_keys(path)
-    button = f("button[type='submit']")
-    keep_trying_until { button.displayed? }
-    button.click
-    wait_for_ajaximations
   end
 
   def add_file_to_rce

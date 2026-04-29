@@ -23,6 +23,7 @@ module AcademicBenchmarks
   module Standards
     class Publication
       include Common
+
       def build_outcomes(ratings = {}, _parent = nil)
         build_common_outcomes(ratings).merge!({
                                                 title: description,

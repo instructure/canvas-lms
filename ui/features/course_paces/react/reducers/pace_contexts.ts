@@ -25,7 +25,7 @@ import type {
   PaceContextProgress,
 } from '../types'
 import {Constants as PaceContextsConstants} from '../actions/pace_contexts'
-import uniqBy from 'lodash/uniqBy'
+import {uniqBy} from 'es-toolkit/compat'
 
 const pacesPublishing: PaceContextProgress[] = window.ENV.PACES_PUBLISHING || []
 const uniqPaces = uniqBy(pacesPublishing, 'progress_context_id').map(paceProgress => ({
@@ -55,8 +55,10 @@ export const paceContextsInitialState: PaceContextsState = {
   contextsPublishing: uniqPaces,
 }
 
-export const isBulkEnrollment = (state: StoreState) => state.paceContexts.selectedContext?.type === 'BulkEnrollment'
-export const getSelectedBulkStudents = (state: StoreState) => state.paceContexts.selectedContext?.item_id.split(",") || []
+export const isBulkEnrollment = (state: StoreState) =>
+  state.paceContexts.selectedContext?.type === 'BulkEnrollment'
+export const getSelectedBulkStudents = (state: StoreState) =>
+  state.paceContexts.selectedContext?.item_id.split(',') || []
 
 export const getSelectedPaceContext = (state: StoreState): PaceContext | null =>
   state.paceContexts.selectedContext

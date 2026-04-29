@@ -14,20 +14,20 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {replaceLocation} from '@canvas/util/globalUtils'
 import {fireEvent, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import React from 'react'
 import HelpLinks from '../HelpLinks'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  replaceLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  replaceLocation: vi.fn(),
 }))
 
-// Mock the API call
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const render = children =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
@@ -79,13 +79,18 @@ describe('HelpLinks', () => {
     onClick() {},
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    doFetchApi.mockResolvedValueOnce({response: {status: 200, ok: true}})
+    // Default handler for any help links API calls
+    server.use(http.get('/api/v1/accounts/*/help_links', () => HttpResponse.json([])))
     queryClient.setQueryData(['helpLinks'], [featuredLink, newLink, regularLink])
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
   })
 
   it('renders all the links', () => {
@@ -121,9 +126,22 @@ describe('HelpLinks', () => {
   })
 
   it('renders a "NEW" pill when a link is tagged with is_new', () => {
+    const expectedPillId = `help-link-${newLink.id}`
     queryClient.setQueryData(['helpLinks'], [newLink])
-    const {queryByText} = render(<HelpLinks {...props} />)
-    expect(queryByText('NEW')).toBeInTheDocument()
+    const {queryByText, getByText} = render(<HelpLinks {...props} />)
+
+    // Verify the "NEW" pill is rendered
+    const pillElement = queryByText('NEW')?.closest('span')
+    expect(pillElement).toBeInTheDocument()
+    expect(pillElement).toHaveTextContent('NEW')
+
+    // Verify that the pill has the right id
+    const pillId = pillElement?.getAttribute('id')
+    expect(pillId).toBe(expectedPillId)
+
+    // Verify the Link has the corresponding aria-describedby attribute
+    const linkElement = getByText('Google')
+    expect(linkElement).toHaveAttribute('aria-describedby', expectedPillId)
   })
 
   it('does not render a "NEW" pill if there is no link tagged with is_new', () => {

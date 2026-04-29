@@ -19,11 +19,14 @@
 import actions from '../actions'
 import {deleteAnnouncements, lockAnnouncements} from '../apiClient'
 
-jest.mock('../apiClient', () => ({
-  ...jest.requireActual('../apiClient'),
-  lockAnnouncements: jest.fn(),
-  deleteAnnouncements: jest.fn(),
-}))
+vi.mock('../apiClient', async () => {
+  const actual = await vi.importActual('../apiClient')
+  return {
+    ...actual,
+    lockAnnouncements: vi.fn(),
+    deleteAnnouncements: vi.fn(),
+  }
+})
 
 beforeEach(() => {
   lockAnnouncements.mockImplementation(() => Promise.resolve({successes: [], failures: []}))
@@ -31,12 +34,12 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 test('searchAnnouncements dispatches UPDATE_ANNOUNCEMENTS_SEARCH with search term', () => {
   const state = {announcementsSearch: {}}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   actions.searchAnnouncements({term: 'test'})(dispatchSpy, () => state)
   expect(dispatchSpy).toHaveBeenCalledWith({
     type: 'UPDATE_ANNOUNCEMENTS_SEARCH',
@@ -49,8 +52,8 @@ test('searchAnnouncements calls actions.clearAnnouncementsPage when search term 
     announcementsSearch: {term: Math.random().toString()},
     announcements: {lastPage: 5},
   })
-  const dispatchSpy = jest.fn()
-  const clearAnnouncementsSpy = jest.spyOn(actions, 'clearAnnouncementsPage')
+  const dispatchSpy = vi.fn()
+  const clearAnnouncementsSpy = vi.spyOn(actions, 'clearAnnouncementsPage')
   actions.searchAnnouncements({term: 'test'})(dispatchSpy, getState)
   expect(clearAnnouncementsSpy).toHaveBeenCalledWith({
     pages: [1, 2, 3, 4, 5],
@@ -62,8 +65,8 @@ test('searchAnnouncements calls actions.clearAnnouncements when search term upda
     announcementsSearch: {term: Math.random().toString()},
     announcements: {lastPage: 1},
   })
-  const dispatchSpy = jest.fn()
-  const getAnnouncementsSpy = jest.spyOn(actions, 'getAnnouncements')
+  const dispatchSpy = vi.fn()
+  const getAnnouncementsSpy = vi.spyOn(actions, 'getAnnouncements')
   actions.searchAnnouncements({term: 'test'})(dispatchSpy, getState)
   expect(getAnnouncementsSpy).toHaveBeenCalledWith({
     page: 1,
@@ -73,16 +76,16 @@ test('searchAnnouncements calls actions.clearAnnouncements when search term upda
 
 test('searchAnnouncements does not call actions.getAnnouncements when search term stays the same', () => {
   const getState = () => ({announcementsSearch: {term: 'test'}})
-  const dispatchSpy = jest.fn()
-  const getAnnouncementsSpy = jest.spyOn(actions, 'getAnnouncements')
+  const dispatchSpy = vi.fn()
+  const getAnnouncementsSpy = vi.spyOn(actions, 'getAnnouncements')
   actions.searchAnnouncements({term: 'test'})(dispatchSpy, getState)
   expect(getAnnouncementsSpy).not.toHaveBeenCalled()
 })
 
 test('searchAnnouncements does not call actions.getAnnouncements when filter stays the same', () => {
   const getState = () => ({announcementsSearch: {filter: 'all'}})
-  const dispatchSpy = jest.fn()
-  const getAnnouncementsSpy = jest.spyOn(actions, 'getAnnouncements')
+  const dispatchSpy = vi.fn()
+  const getAnnouncementsSpy = vi.spyOn(actions, 'getAnnouncements')
   actions.searchAnnouncements({term: 'all'})(dispatchSpy, getState)
   expect(getAnnouncementsSpy).not.toHaveBeenCalled()
 })
@@ -92,8 +95,8 @@ test('searchAnnouncements calls actions.getAnnouncements when filter updates', (
     announcementsSearch: {filter: Math.random().toString()},
     announcements: {lastPage: 1},
   })
-  const dispatchSpy = jest.fn()
-  const getAnnouncementsSpy = jest.spyOn(actions, 'getAnnouncements')
+  const dispatchSpy = vi.fn()
+  const getAnnouncementsSpy = vi.spyOn(actions, 'getAnnouncements')
   actions.searchAnnouncements({filter: 'unread'})(dispatchSpy, getState)
   expect(getAnnouncementsSpy).toHaveBeenCalledWith({
     page: 1,
@@ -103,7 +106,7 @@ test('searchAnnouncements calls actions.getAnnouncements when filter updates', (
 
 test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_START', () => {
   const state = {announcements: {pages: {1: {items: []}}, currentPage: 1}}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   actions.toggleAnnouncementsLock()(dispatchSpy, () => state)
   expect(dispatchSpy).toHaveBeenCalledWith({type: 'LOCK_ANNOUNCEMENTS_START'})
 })
@@ -125,7 +128,7 @@ test(`toggleSelectedAnnouncementsLock calls apiClient.lockAnnouncements with sel
       },
     },
   }
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
 
   await actions.toggleSelectedAnnouncementsLock()(dispatchSpy, () => state)
   expect(lockAnnouncements).toHaveBeenCalledWith(
@@ -165,7 +168,7 @@ test('toggleAnnouncementsLock calls apiClient.lockAnnouncements with passed in a
       },
     },
   }
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   await actions.toggleAnnouncementsLock(announcements, true)(dispatchSpy, () => state)
   expect(lockAnnouncements).toHaveBeenCalledWith(
     {
@@ -204,7 +207,7 @@ test(`toggleSelectedAnnouncementsLock calls apiClient.lockAnnouncements with sel
       },
     },
   }
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   await actions.toggleSelectedAnnouncementsLock()(dispatchSpy, () => state)
   expect(lockAnnouncements).toHaveBeenCalledWith(
     {
@@ -229,7 +232,7 @@ test(`toggleSelectedAnnouncementsLock calls apiClient.lockAnnouncements with sel
 
 test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_FAIL if promise fails', async () => {
   const state = {announcements: {pages: {1: {items: []}}, currentPage: 1}}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
 
   lockAnnouncements.mockResolvedValue({successes: [], failures: [{err: 'something bad happened'}]})
   await actions.toggleAnnouncementsLock()(dispatchSpy, () => state)
@@ -244,7 +247,7 @@ test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_FAIL if promise fail
 
 test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_SUCCESS if promise succeeds and successes is at least 1', async () => {
   const state = {announcements: {pages: {1: {items: [{id: 1}]}}, selectedAnnouncements: []}}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   lockAnnouncements.mockResolvedValue({successes: [{data: 1}], failures: []})
   await actions.toggleAnnouncementsLock()(dispatchSpy, () => state)
   expect(dispatchSpy).toHaveBeenNthCalledWith(2, {
@@ -258,7 +261,7 @@ test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_SUCCESS if promise s
 
 test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_FAIL if promise succeeds and successes is 0, and failures is > 0', async () => {
   const state = {announcements: {pages: {1: {items: [{id: 1}]}}, selectedAnnouncements: []}}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   lockAnnouncements.mockResolvedValue({
     successes: [],
     failures: [{data: 1, err: 'something bad happened'}],
@@ -275,14 +278,14 @@ test('toggleAnnouncementsLock dispatches LOCK_ANNOUNCEMENTS_FAIL if promise succ
 
 test('deleteAnnouncements dispatches DELETE_ANNOUNCEMENTS_START', () => {
   const state = {}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   actions.deleteAnnouncements()(dispatchSpy, () => state)
   expect(dispatchSpy).toHaveBeenCalledWith({type: 'DELETE_ANNOUNCEMENTS_START'})
 })
 
 test('deleteAnnouncements calls apiClient.deleteAnnouncements with passed in announcements', async () => {
   const announcements = [1, 2, 3]
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   deleteAnnouncements.mockResolvedValue({successes: [], failures: []})
   await actions.deleteAnnouncements(announcements)(dispatchSpy, () => {})
   expect(deleteAnnouncements).toHaveBeenCalledWith(undefined, announcements)
@@ -290,7 +293,7 @@ test('deleteAnnouncements calls apiClient.deleteAnnouncements with passed in ann
 
 test('deleteSelectedAnnouncements calls apiClient.deleteAnnouncements with state selectedAnnouncements', async () => {
   const state = {selectedAnnouncements: [1, 2, 3, 5, 8]}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   deleteAnnouncements.mockResolvedValue({successes: [], failures: []})
   await actions.deleteSelectedAnnouncements()(dispatchSpy, () => state)
   expect(deleteAnnouncements).toHaveBeenCalledWith(
@@ -303,7 +306,7 @@ test('deleteSelectedAnnouncements calls apiClient.deleteAnnouncements with state
 
 test('deleteAnnouncements dispatches DELETE_ANNOUNCEMENTS_FAIL if promise fails', async () => {
   const state = {}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   deleteAnnouncements.mockResolvedValue({
     successes: [],
     failures: [{err: 'something bad happened'}],
@@ -320,7 +323,7 @@ test('deleteAnnouncements dispatches DELETE_ANNOUNCEMENTS_FAIL if promise fails'
 
 test('deleteAnnouncements dispatches DELETE_ANNOUNCEMENTS_SUCCESS if promise succeeds and successes is at least 1', async () => {
   const state = {}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   deleteAnnouncements.mockResolvedValue({successes: [{data: 1}], failures: []})
   await actions.deleteAnnouncements()(dispatchSpy, () => state)
   expect(dispatchSpy).toHaveBeenNthCalledWith(2, {
@@ -334,7 +337,7 @@ test('deleteAnnouncements dispatches DELETE_ANNOUNCEMENTS_SUCCESS if promise suc
 
 test('deleteAnnouncements dispatches DELETE_ANNOUNCEMENTS_FAIL if promise succeeds and successes is less than 1 but failures is at least 1', async () => {
   const state = {}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   deleteAnnouncements.mockResolvedValue({successes: [], failures: [{data: 1}]})
   await actions.deleteAnnouncements()(dispatchSpy, () => state)
   expect(dispatchSpy).toHaveBeenNthCalledWith(2, {
@@ -348,7 +351,7 @@ test('deleteAnnouncements dispatches DELETE_ANNOUNCEMENTS_FAIL if promise succee
 
 test('deleteAnnouncements clears page cache from current page to last page if request succeeds', async () => {
   const state = {announcements: {currentPage: 3, lastPage: 7}}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   deleteAnnouncements.mockResolvedValue({successes: [{data: 1}], failures: []})
   await actions.deleteAnnouncements()(dispatchSpy, () => state)
   expect(dispatchSpy).toHaveBeenNthCalledWith(3, {
@@ -359,11 +362,11 @@ test('deleteAnnouncements clears page cache from current page to last page if re
 
 test('deleteAnnouncements re-selects the current page if request succeeds', async () => {
   const state = {announcements: {currentPage: 3, lastPage: 7}}
-  const dispatchSpy = jest.fn()
+  const dispatchSpy = vi.fn()
   deleteAnnouncements.mockResolvedValue({successes: [{data: 1}], failures: []})
   await actions.deleteAnnouncements()(dispatchSpy, () => state)
 
-  // unfortunately, since moving to jest, the deepest we can expect is that
+  // unfortunately, since moving to vi, the deepest we can expect is that
   // we passed in an anonymous function.
   expect(dispatchSpy).toHaveBeenNthCalledWith(5, expect.any(Function))
 })

@@ -24,8 +24,8 @@ import {Discussion} from '../../../../graphql/Discussion'
 import {Assignment} from '../../../../graphql/Assignment'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
+vi.mock('../../../utils', async (importOriginal) => ({
+  ...(await importOriginal()),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
@@ -36,6 +36,7 @@ const setup = props => {
 describe('DiscussionTopicAlertManager', () => {
   it('should render post required alert', () => {
     const container = setup({
+      userHasEntry: false,
       discussionTopic: Discussion.mock({
         initialPostRequiredForCurrentUser: true,
       }),
@@ -63,8 +64,58 @@ describe('DiscussionTopicAlertManager', () => {
     expect(container.queryByTestId('post-required-for-peer-review')).not.toBeInTheDocument()
   })
 
+  describe('Checkpointed discussions with peer review', () => {
+    it('should render alert when reply to topic is not submitted', () => {
+      const container = setup({
+        userHasEntry: false,
+        discussionTopic: Discussion.mock({
+          assignment: Assignment.mock({
+            assessmentRequestsForCurrentUser: [{}],
+            checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+          }),
+        }),
+        replyToTopicSubmission: {},
+        replyToEntrySubmission: {submissionStatus: 'submitted'},
+      })
+      expect(container.getByTestId('post-required-for-peer-review')).toBeTruthy()
+      expect(container.getByText(/You must complete all discussion requirements/i)).toBeTruthy()
+    })
+
+    it('should render alert when reply to entry is not submitted', () => {
+      const container = setup({
+        userHasEntry: true,
+        discussionTopic: Discussion.mock({
+          assignment: Assignment.mock({
+            assessmentRequestsForCurrentUser: [{}],
+            checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+          }),
+        }),
+        replyToTopicSubmission: {submissionStatus: 'submitted'},
+        replyToEntrySubmission: {},
+      })
+      expect(container.getByTestId('post-required-for-peer-review')).toBeTruthy()
+      expect(container.getByText(/You must complete all discussion requirements/i)).toBeTruthy()
+    })
+
+    it('should NOT render alert when both checkpoints are submitted', () => {
+      const container = setup({
+        userHasEntry: true,
+        discussionTopic: Discussion.mock({
+          assignment: Assignment.mock({
+            assessmentRequestsForCurrentUser: [{}],
+            checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+          }),
+        }),
+        replyToTopicSubmission: {submissionStatus: 'submitted'},
+        replyToEntrySubmission: {submissionStatus: 'submitted'},
+      })
+      expect(container.queryByTestId('post-required-for-peer-review')).not.toBeInTheDocument()
+    })
+  })
+
   it('should render differentiated group topics alert', () => {
     const container = setup({
+      userHasEntry: false,
       discussionTopic: Discussion.mock({
         assignment: Assignment.mock({onlyVisibleToOverrides: true}),
       }),
@@ -74,6 +125,7 @@ describe('DiscussionTopicAlertManager', () => {
 
   it('should render delayed until alert', () => {
     const container = setup({
+      userHasEntry: false,
       discussionTopic: Discussion.mock({
         delayedPostAt: '3020-11-23T11:40:44-07:00',
         isAnnouncement: true,
@@ -84,6 +136,7 @@ describe('DiscussionTopicAlertManager', () => {
 
   it('should render not avalable for user alert', () => {
     const container = setup({
+      userHasEntry: false,
       discussionTopic: Discussion.mock({
         availableForUser: false,
       }),
@@ -105,6 +158,7 @@ describe('DiscussionTopicAlertManager', () => {
 
     it('should render anon alert when status is present', async () => {
       const {findByTestId} = setup({
+        userHasEntry: false,
         discussionTopic: Discussion.mock({
           anonymousState: 'full_anonymity',
           canReplyAnonymously: true,
@@ -123,6 +177,7 @@ describe('DiscussionTopicAlertManager', () => {
       })
 
       const {findByTestId} = setup({
+        userHasEntry: false,
         discussionTopic: Discussion.mock({
           anonymousState: 'full_anonymity',
           canReplyAnonymously: false,
@@ -138,6 +193,7 @@ describe('DiscussionTopicAlertManager', () => {
     it('should render correct alert when user is an observer', async () => {
       window.ENV.current_user_roles = ['User', 'observer']
       const {findByTestId} = setup({
+        userHasEntry: false,
         discussionTopic: Discussion.mock({
           anonymousState: 'full_anonymity',
           canReplyAnonymously: false,
@@ -164,6 +220,7 @@ describe('DiscussionTopicAlertManager', () => {
 
     it('should render partial anon alert when status is present', async () => {
       const {findByTestId} = setup({
+        userHasEntry: false,
         discussionTopic: Discussion.mock({
           anonymousState: 'partial_anonymity',
           canReplyAnonymously: true,
@@ -180,6 +237,7 @@ describe('DiscussionTopicAlertManager', () => {
         current_user_roles: ['User', 'teacher'],
       })
       const {findByTestId} = setup({
+        userHasEntry: false,
         discussionTopic: Discussion.mock({
           anonymousState: 'partial_anonymity',
           canReplyAnonymously: false,
@@ -194,6 +252,7 @@ describe('DiscussionTopicAlertManager', () => {
     it('should render correct alert when user is an observer', async () => {
       window.ENV.current_user_roles = ['User', 'observer']
       const {findByTestId} = setup({
+        userHasEntry: false,
         discussionTopic: Discussion.mock({
           anonymousState: 'partial_anonymity',
           canReplyAnonymously: false,

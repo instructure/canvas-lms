@@ -23,6 +23,7 @@ class Mutations::CreateAssignment < Mutations::AssignmentBase::Mutation
 
   argument :course_id, ID, required: true
   argument :name, String, required: true
+  argument :secure_params, String, required: false
   # most arguments inherited from AssignmentBase
 
   def resolve(input:, submittable: nil)
@@ -52,7 +53,7 @@ class Mutations::CreateAssignment < Mutations::AssignmentBase::Mutation
       submittable.assignment = @working_assignment
     end
 
-    api_proxy = ApiProxy.new(context[:request], @working_assignment, context[:session], current_user)
+    api_proxy = ApiProxy.new(context[:request], @working_assignment, context[:session], current_user, in_app: context[:in_app])
 
     validate_for_checkpoints(input_hash)
     if input_hash[:for_checkpoints]

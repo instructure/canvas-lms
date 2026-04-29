@@ -61,7 +61,7 @@
 #
 class BlackoutDatesController < ApplicationController
   before_action :require_context
-  before_action :load_blackout_date, only: %i[show edit update destroy]
+  before_action :load_blackout_date, only: %i[show update destroy]
 
   # @API List blackout dates
   # Returns the list of blackout dates for the current context.
@@ -72,10 +72,7 @@ class BlackoutDatesController < ApplicationController
     return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
     @blackout_dates = @context.blackout_dates.order(:start_date)
-    respond_to do |format|
-      format.html
-      format.json { render json: @blackout_dates.as_json(include_root: false) }
-    end
+    render json: @blackout_dates.as_json(include_root: false)
   end
 
   # @API Get a single blackout date
@@ -120,7 +117,7 @@ class BlackoutDatesController < ApplicationController
     if @blackout_date.save
       render json: @blackout_date.as_json, status: :created
     else
-      render json: { success: false, errors: @blackout_date.errors.full_messages }, status: :unprocessable_entity
+      render json: { success: false, errors: @blackout_date.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -142,7 +139,7 @@ class BlackoutDatesController < ApplicationController
     if @blackout_date.update(blackout_date_params)
       render json: @blackout_date.as_json
     else
-      render json: @blackout_date.errors.full_messages, status: :unprocessable_entity
+      render json: @blackout_date.errors.full_messages, status: :unprocessable_content
     end
   end
 

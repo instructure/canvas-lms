@@ -64,32 +64,32 @@ export const Discussion = {
       sortOrderLocked
       expandedLocked
       editor {
-        ...User
+        ...DiscussionPostUser
       }
       author {
-        ...User
+        ...DiscussionPostUser
       }
       entryCounts {
         unreadCount
         repliesCount
       }
       attachment {
-        ...Attachment
+        ...DiscussionPostAttachment
       }
       assignment {
-        ...Assignment
+        ...DiscussionPostAssignment
       }
       permissions {
         ...DiscussionPermissions
       }
       courseSections {
-        ...Section
+        ...DiscussionPostSection
       }
       childTopics {
         ...ChildTopic
       }
       groupSet {
-        ...GroupSet
+        ...DiscussionPostGroupSet
       }
       rootTopic {
         ...RootTopic
@@ -99,6 +99,8 @@ export const Discussion = {
         sortOrder
         expanded
         summaryEnabled
+        preferredLanguage
+        posted
       }
     }
     ${User.fragment}
@@ -163,7 +165,7 @@ export const Discussion = {
       id: string,
       sortOrder: string,
       expanded: bool,
-      summaryEnabled: bool
+      summaryEnabled: bool,
     }),
   }),
 
@@ -222,6 +224,8 @@ export const Discussion = {
       sortOrder: 'desc',
       expanded: false,
       summaryEnabled: false,
+      preferredLanguage: null,
+      posted: false,
       __typename: 'DiscussionParticipant',
     },
     sortOrderLocked = false,

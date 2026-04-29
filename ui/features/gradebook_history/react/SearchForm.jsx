@@ -22,22 +22,28 @@ import {arrayOf, func, shape, string} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import moment from 'moment'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import {Checkbox} from '@instructure/ui-checkbox'
-import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
+import {CanvasAsyncSelect} from '@instructure/platform-instui-bindings'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import SearchFormActions from './actions/SearchFormActions'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import environment from './environment'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 
 const I18n = createI18nScope('gradebook_history')
 
 const DEBOUNCE_DELAY = 500 // milliseconds
+const MIN_SEARCH_LENGTH = {assignments: 1, graders: 2, students: 2}
+const SEARCH_MESSAGES = {
+  assignments: () => I18n.t('Type to start searching'),
+  graders: () => I18n.t('Type at least 2 characters to start searching'),
+  students: () => I18n.t('Type at least 2 characters to start searching'),
+}
 
 const recordShape = shape({
   fetchStatus: string.isRequired,
@@ -76,9 +82,9 @@ class SearchFormComponent extends Component {
         showFinalGradeOverridesOnly: false,
       },
       messages: {
-        assignments: I18n.t('Type a few letters to start searching'),
-        graders: I18n.t('Type a few letters to start searching'),
-        students: I18n.t('Type a few letters to start searching'),
+        assignments: SEARCH_MESSAGES.assignments(),
+        graders: SEARCH_MESSAGES.graders(),
+        students: SEARCH_MESSAGES.students(),
       },
     }
     this.debouncedGetSearchOptions = debounce(props.getSearchOptions, DEBOUNCE_DELAY)
@@ -101,7 +107,7 @@ class SearchFormComponent extends Component {
         },
       }))
     }
-    if (graders.fetchStatus === 'success' && !graders.items.length) {
+    if (graders.fetchStatus === 'success' && graders.items.length === 0) {
       this.setState(prevState => ({
         messages: {
           ...prevState.messages,
@@ -109,22 +115,13 @@ class SearchFormComponent extends Component {
         },
       }))
     }
-    if (students.fetchStatus === 'success' && !students.items.length) {
+    if (students.fetchStatus === 'success' && students.items.length === 0) {
       this.setState(prevState => ({
         messages: {
           ...prevState.messages,
           students: I18n.t('No students with that name found'),
         },
       }))
-    }
-    if (assignments.nextPage) {
-      this.props.getSearchOptionsNextPage('assignments', assignments.nextPage)
-    }
-    if (graders.nextPage) {
-      this.props.getSearchOptionsNextPage('graders', graders.nextPage)
-    }
-    if (students.nextPage) {
-      this.props.getSearchOptionsNextPage('students', students.nextPage)
     }
   }
 
@@ -218,12 +215,11 @@ class SearchFormComponent extends Component {
   }
 
   promptUserEntry = () => {
-    const emptyMessage = I18n.t('Type a few letters to start searching')
     this.setState({
       messages: {
-        assignments: emptyMessage,
-        graders: emptyMessage,
-        students: emptyMessage,
+        assignments: SEARCH_MESSAGES.assignments(),
+        graders: SEARCH_MESSAGES.graders(),
+        students: SEARCH_MESSAGES.students(),
       },
     })
   }
@@ -258,7 +254,7 @@ class SearchFormComponent extends Component {
   }
 
   handleSearchEntry = (target, searchTerm) => {
-    if (searchTerm.length <= 2) {
+    if (searchTerm.length < MIN_SEARCH_LENGTH[target]) {
       if (this.props[target].items.length > 0) {
         this.props.clearSearchOptions(target)
         this.promptUserEntry()

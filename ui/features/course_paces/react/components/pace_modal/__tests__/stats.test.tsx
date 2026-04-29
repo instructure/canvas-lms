@@ -39,8 +39,8 @@ const defaultProps = {
   weekendsDisabled: false,
   compression: 0,
   setStartDate: () => {},
-  compressDates: jest.fn(),
-  uncompressDates: jest.fn(),
+  compressDates: vi.fn(),
+  uncompressDates: vi.fn(),
   responsiveSize: 'large' as ResponsiveSizes,
   appliedPace: PACE_CONTEXTS_DEFAULT_STATE.selectedContext?.applied_pace!,
 }
@@ -56,7 +56,11 @@ describe('pace modal stats', () => {
       ),
     ).toBeInTheDocument()
     expect(getByText('End Date')).toBeInTheDocument()
-    expect(getByText('Determined by course end date')).toBeInTheDocument()
+    expect(
+      getByText(
+        'Determined by course end date. Changing this date will not save, but you can view the effects of a new end date by changing the date here.',
+      ),
+    ).toBeInTheDocument()
 
     expect(getByTestId('colored-assignments-section').textContent).toBe(
       `Assignments${defaultProps.assignments}`,
@@ -81,7 +85,11 @@ describe('pace modal stats', () => {
       ),
     ).toBeInTheDocument()
     expect(getByText('End Date')).toBeInTheDocument()
-    expect(getByText('Determined by course end date')).toBeInTheDocument()
+    expect(
+      getByText(
+        'Determined by course end date. Changing this date will not save, but you can view the effects of a new end date by changing the date here.',
+      ),
+    ).toBeInTheDocument()
 
     expect(getByTestId('colored-assignments-section').textContent).toBe(
       `Assignments${defaultProps.assignments}`,

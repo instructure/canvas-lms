@@ -19,9 +19,8 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
-import AvatarWidget from '@canvas/avatar-dialog-view'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
@@ -161,10 +160,9 @@ $('#unregistered_services li.service').click(function (event) {
   event.preventDefault()
 
   const mountPoint = document.getElementById('register_service_mount_point')
-  const root = createRoot(mountPoint)
   const serviceName = $(this).attr('id').replace('unregistered_service_', '')
 
-  root.render(
+  const root = render(
     <RegisterService
       serviceName={serviceName}
       onSubmit={() => {
@@ -174,6 +172,7 @@ $('#unregistered_services li.service').click(function (event) {
       }}
       onClose={() => root.unmount()}
     />,
+    mountPoint,
   )
 })
 $('#registered_services li.service .delete_service_link').click(function (event) {
@@ -284,9 +283,8 @@ $('.show_token_link').click(function (event) {
   const token = tokenElement.data('token')
   const userCanUpdateTokens = ENV.PERMISSIONS.can_update_tokens ?? false
   const mountPoint = document.getElementById('access_token_details_mount_point')
-  const root = createRoot(mountPoint)
 
-  root.render(
+  const root = render(
     <AccessTokenDetails
       url={url}
       loadedToken={token}
@@ -304,6 +302,7 @@ $('.show_token_link').click(function (event) {
       }}
       onClose={() => root.unmount()}
     />,
+    mountPoint,
   )
 })
 
@@ -311,9 +310,8 @@ $('.add_access_token_link').click(function (event) {
   event.preventDefault()
 
   const mountPoint = document.getElementById('new_access_token_mount_point')
-  const root = createRoot(mountPoint)
 
-  root.render(
+  const root = render(
     <NewAccessToken
       onSubmit={data => {
         root.unmount()
@@ -337,6 +335,7 @@ $('.add_access_token_link').click(function (event) {
       }}
       onClose={() => root.unmount()}
     />,
+    mountPoint,
   )
 })
 $(document)
@@ -350,8 +349,6 @@ $(document)
     }
   })
   .fragmentChange()
-
-new AvatarWidget('.profile_pic_link')
 
 $('#disable_mfa_link').click(function (event) {
   const $disable_mfa_link = $(this)

@@ -21,7 +21,10 @@ import {render, screen, waitFor} from '@testing-library/react'
 import DefaultAccountQuotas from '../DefaultAccountQuotas'
 import {AccountWithQuotas} from '../common'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 describe('DefaultAccountQuotas', () => {
   const accountWithQuotas: AccountWithQuotas = {
@@ -34,9 +37,12 @@ describe('DefaultAccountQuotas', () => {
   }
   const ACCOUNT_API_URI = `/api/v1/accounts/${accountWithQuotas.id}`
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   describe('when the account is a root account', () => {
     afterEach(() => {
-      fetchMock.restore()
+      server.resetHandlers()
     })
 
     it('should show the user quota input', () => {
@@ -105,7 +111,14 @@ describe('DefaultAccountQuotas', () => {
     })
 
     it('should send the correct request when the form is submitted', async () => {
-      fetchMock.put(ACCOUNT_API_URI, 200, {overwriteRoutes: true})
+      const requestBodyCapture = vi.fn()
+      server.use(
+        http.put(ACCOUNT_API_URI, async ({request}) => {
+          const body = await request.json()
+          requestBodyCapture(body)
+          return new HttpResponse(null, {status: 200})
+        }),
+      )
       render(<DefaultAccountQuotas accountWithQuotas={accountWithQuotas} />)
       const courseQuota = screen.getByLabelText(/course quota \*/i)
       const submit = screen.getByLabelText('Update')
@@ -118,25 +131,24 @@ describe('DefaultAccountQuotas', () => {
       await waitFor(() => {
         const {id, default_group_storage_quota_mb, default_user_storage_quota_mb} =
           accountWithQuotas
-        expect(
-          fetchMock.called(ACCOUNT_API_URI, {
-            method: 'PUT',
-            body: {
-              id,
-              account: {
-                default_group_storage_quota_mb: `${default_group_storage_quota_mb}`,
-                default_user_storage_quota_mb: `${default_user_storage_quota_mb}`,
-                default_storage_quota_mb: courseQuotaValue,
-              },
-            },
-          }),
-        ).toBe(true)
+        expect(requestBodyCapture).toHaveBeenCalledWith({
+          id,
+          account: {
+            default_group_storage_quota_mb: `${default_group_storage_quota_mb}`,
+            default_user_storage_quota_mb: `${default_user_storage_quota_mb}`,
+            default_storage_quota_mb: courseQuotaValue,
+          },
+        })
       })
     })
   })
 
   describe('when account is not a root account', () => {
     const nonRootAccountWithQuotas: AccountWithQuotas = {...accountWithQuotas, root_account: false}
+
+    afterEach(() => {
+      server.resetHandlers()
+    })
 
     it('should not show the user quota input', () => {
       render(<DefaultAccountQuotas accountWithQuotas={nonRootAccountWithQuotas} />)
@@ -146,7 +158,14 @@ describe('DefaultAccountQuotas', () => {
     })
 
     it('should send the correct request when the form is submitted', async () => {
-      fetchMock.put(ACCOUNT_API_URI, 200, {overwriteRoutes: true})
+      const requestBodyCapture = vi.fn()
+      server.use(
+        http.put(ACCOUNT_API_URI, async ({request}) => {
+          const body = await request.json()
+          requestBodyCapture(body)
+          return new HttpResponse(null, {status: 200})
+        }),
+      )
       render(<DefaultAccountQuotas accountWithQuotas={nonRootAccountWithQuotas} />)
       const courseQuota = screen.getByLabelText(/course quota \*/i)
       const submit = screen.getByLabelText('Update')
@@ -158,18 +177,13 @@ describe('DefaultAccountQuotas', () => {
 
       await waitFor(() => {
         const {id, default_group_storage_quota_mb} = accountWithQuotas
-        expect(
-          fetchMock.called(ACCOUNT_API_URI, {
-            method: 'PUT',
-            body: {
-              id,
-              account: {
-                default_group_storage_quota_mb: `${default_group_storage_quota_mb}`,
-                default_storage_quota_mb: courseQuotaValue,
-              },
-            },
-          }),
-        ).toBe(true)
+        expect(requestBodyCapture).toHaveBeenCalledWith({
+          id,
+          account: {
+            default_group_storage_quota_mb: `${default_group_storage_quota_mb}`,
+            default_storage_quota_mb: courseQuotaValue,
+          },
+        })
       })
     })
   })

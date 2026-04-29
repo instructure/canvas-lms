@@ -16,23 +16,56 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Lti::ContextControl < ActiveRecord::Base
+class Lti::ContextControl < ApplicationRecord
+  # While id, account_id, course_id, and deployment_id are tracked, they don't really change
+  # (deployment_id & id literally can't), but it makes it easier in the UI to associate a
+  # changed control with a specific context and deployment.
+  TRACKED_ATTRIBUTES = %i[id account_id course_id deployment_id available workflow_state].freeze
+
   extend RootAccountResolver
+
   resolves_root_account through: ->(cc) { cc.account&.resolved_root_account_id || cc.course&.root_account_id }
 
   include Canvas::SoftDeletable
 
   belongs_to :deployment, class_name: "ContextExternalTool", inverse_of: :context_controls, optional: false
+  # Points to a cross-shard registration, is slowly being phased out for app
   belongs_to :registration, class_name: "Lti::Registration", inverse_of: :context_controls, optional: false
+  alias_method :old_registration, :registration
+  alias_attribute :old_registration_id, :registration_id
+  # Always points to a local registration
+  belongs_to :app, class_name: "Lti::Registration", optional: true
+
+  def registration
+    if deployment&.root_account&.feature_enabled?(:lti_registrations_templates)
+      app
+    else
+      old_registration
+    end
+  end
+
+  def registration_id
+    if deployment&.root_account&.feature_enabled?(:lti_registrations_templates)
+      app_id
+    else
+      old_registration_id
+    end
+  end
+
+  def registration=(value)
+    super
+    sync_app_id
+  end
+
+  def registration_id=(value)
+    super
+    sync_app_id
+  end
+
   belongs_to :created_by, class_name: "User"
   belongs_to :updated_by, class_name: "User"
 
-  belongs_to :course, optional: true
-  belongs_to :account, optional: true
-
-  validate :only_one_context?
-  validates :course, presence: true, if: -> { account.blank? }
-  validates :account, presence: true, if: -> { course.blank? }
+  belongs_to :context, polymorphic: %i[account course], separate_columns: true, optional: false
 
   validates :deployment_id, uniqueness: { scope: %i[account_id course_id] }
 
@@ -42,11 +75,28 @@ class Lti::ContextControl < ActiveRecord::Base
 
   validate :context_belongs_to_deployment
 
+  before_validation :set_registration_id, :sync_app_id
   before_create :set_path
   before_destroy :prevent_primary_deletion
   after_destroy :soft_delete_child_controls
 
-  scope :active, -> { where.not(workflow_state: :deleted) }
+  scope :active, -> { where.not(workflow_state: [:deleted, :deleted_with_context]) }
+  scope :for_registration, lambda { |registration, root_account|
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      where(app: registration)
+    else
+      where(registration:)
+    end
+  }
+
+  # This model has a special "deleted_with_context" workflow state, so its
+  # states need to be defined manually instead of just by including
+  # Canvas::SoftDeletable.
+  workflow do
+    state :active
+    state :deleted
+    state :deleted_with_context
+  end
 
   class << self
     # Generate a path string based on the given account chain.
@@ -139,7 +189,8 @@ class Lti::ContextControl < ActiveRecord::Base
     end
 
     # Get the path for a context (account or course) and the paths of all of
-    # its parent accounts.
+    # its parent accounts. If given a string, will simply return the string itself
+    # and all of its possible ancestral paths.
     #
     # Note: this does not return paths for context controls that necessarily
     # exist; it does not query to see if there is a control at each path.
@@ -148,7 +199,7 @@ class Lti::ContextControl < ActiveRecord::Base
     #
     # E.g. with a root account 1, subaccount 3, and course 1, for
     # context = course 1 this will return:
-    # [ "a1", "a1.a3", "a1.a3.c1" ]
+    # [ "a1.", "a1.a3.", "a1.a3.c1." ]
     #
     # This method should be used when searching for context controls by path, to
     # get all context controls that could affect the provided context.
@@ -156,9 +207,15 @@ class Lti::ContextControl < ActiveRecord::Base
     # @returns An array of strings, with each string being a path like what is
     #          returned from calculate_path.
     #
-    # @param context [Account|Course] the account or course to find paths for
-    def self_and_all_parent_paths(context)
-      path = calculate_path(context)
+    # @param context_or_path [Account|Course|String] the context to find paths for, or
+    # an already computed path
+    def self_and_all_parent_paths(context_or_path)
+      path = if context_or_path.is_a?(String)
+               context_or_path
+             else
+               calculate_path(context_or_path)
+             end
+
       path_parts = path.split(".")
       path_parts.reduce([]) do |all_paths, segment|
         appended_path = (all_paths.last || "") + "#{segment}."
@@ -166,17 +223,46 @@ class Lti::ContextControl < ActiveRecord::Base
       end
     end
 
+    # Given one-to-many deployments, return the primary control for each.
+    # Similar to ContextExternalTool#primary_control, but for multiple deployments.
+    # `deployments` is an array of ContextExternalTool objects or their IDs.
+    def primary_controls_for(deployments:)
+      lcc = quoted_table_name
+      join_sql = <<~SQL.squish
+        INNER JOIN #{ContextExternalTool.quoted_table_name} cet
+        ON cet.id = #{lcc}.deployment_id
+        AND (
+          (cet.context_id = #{lcc}.account_id AND cet.context_type = 'Account')
+          OR
+          (cet.context_id = #{lcc}.course_id AND cet.context_type = 'Course')
+        )
+      SQL
+
+      where(deployment_id: deployments).active.joins(join_sql)
+    end
+
     private
 
     def query_by_paths(context:, registration: nil, deployment: nil)
       paths = self_and_all_parent_paths(context)
       query = active.where(path: paths)
-      query = query.where(registration:) if registration.present?
+      if registration.present?
+        use_local = deployment&.root_account&.feature_enabled?(:lti_registrations_templates)
+        query = use_local ? query.where(app: registration) : query.where(registration:)
+      end
       query = query.where(deployment:) if deployment.present?
       # Because all ancestors will have the same prefix path, we can safely order by path length instead
       # of splitting on segments and worrying about that.
       query.order("deployment_id, LENGTH(path) DESC").select("DISTINCT ON (deployment_id) *")
     end
+  end
+
+  def deleted?
+    %w[deleted deleted_with_context].include?(workflow_state)
+  end
+
+  def self_and_all_parent_paths
+    Lti::ContextControl.self_and_all_parent_paths(path)
   end
 
   def context_name
@@ -217,10 +303,13 @@ class Lti::ContextControl < ActiveRecord::Base
   private
 
   def soft_delete_child_controls
+    use_real = deployment&.root_account&.feature_enabled?(:lti_registrations_templates)
+    reg_condition = use_real ? { app_id: } : { registration_id: }
     Lti::ContextControl
       .active
       .where("path LIKE ?", "#{path}%")
-      .where(deployment_id:, registration_id:)
+      .where(deployment_id:)
+      .where(reg_condition)
       .where.not(id:)
       .in_batches do |batch|
       batch.update_all(workflow_state: "deleted", updated_at: Time.current, updated_by_id:)
@@ -242,14 +331,46 @@ class Lti::ContextControl < ActiveRecord::Base
   end
 
   def set_path
-    self.path = self.class.calculate_path(account || course)
+    self.path = self.class.calculate_path(context)
   end
 
-  def only_one_context?
-    if account.present? && course.present?
-      errors.add(:context, I18n.t("must have either an account or a course, not both"))
-    elsif account.blank? && course.blank?
-      errors.add(:context, I18n.t("must have either an account or a course"))
+  def set_registration_id
+    # Use raw column reads to bypass getter overrides, so that
+    # registration_id always stores the original cross-shard FK value
+    # (not the resolved local-copy app_id).
+    raw = self[:registration_id] || deployment.read_attribute(:lti_registration_id)
+    self[:registration_id] = raw
+  end
+
+  def sync_app_id
+    return if old_registration_id.blank?
+    return unless old_registration_id_changed?
+    return if app_id_changed? && !app_id.nil?
+
+    resolved_root_account = deployment&.root_account
+    cross_shard = shard != Shard.shard_for(old_registration_id)
+    same_shard_inherited = !cross_shard &&
+                           resolved_root_account != Account.site_admin &&
+                           shard == Account.site_admin.shard &&
+                           old_registration&.root_account == Account.site_admin
+
+    if cross_shard || same_shard_inherited
+      local = Lti::Registration.active.find_by(
+        template_registration_id: old_registration_id,
+        account: resolved_root_account
+      )
+      if local
+        self.app_id = local.id
+      else
+        msg = "No local App/Lti::Registration found for registration_id=#{old_registration_id}"
+        if resolved_root_account&.feature_enabled?(:lti_registrations_templates)
+          raise Lti::LocalAppNotFound, msg
+        else
+          Canvas::Errors.capture_exception(:lti_registration_sync, msg, :warn)
+        end
+      end
+    else
+      self.app_id = old_registration_id
     end
   end
 

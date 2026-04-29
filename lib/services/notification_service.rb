@@ -22,7 +22,7 @@ require "aws-sdk-sqs"
 
 module Services
   class NotificationService
-    def self.process(global_id, body, type, to, priority = false)
+    def self.process(global_id, body, type, to, priority: false)
       queue_url = choose_queue_url(priority)
       return unless queue_url.present?
 
@@ -75,9 +75,7 @@ module Services
       end
 
       def config
-        config_file = ConfigFile.load("notification_service") || {}
-
-        config_file.dup
+        (Canvas.load_config_file_or_consul("notification_service", failsafe_cache: true) || {}).dup
       end
     end
   end

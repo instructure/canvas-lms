@@ -34,8 +34,8 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Spinner} from '@instructure/ui-spinner'
 
 import {readableRoleName, sendMessage} from './utils'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('staff_info')
 

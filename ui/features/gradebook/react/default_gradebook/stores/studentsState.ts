@@ -16,11 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {difference, chunk, keyBy, groupBy, cloneDeep, setWith as lodashSetWith} from 'lodash'
+import {
+  chunk,
+  cloneDeep,
+  difference,
+  groupBy,
+  keyBy,
+  setWith as lodashSetWith,
+} from 'es-toolkit/compat'
 import type {StoreApi} from 'zustand'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {GradebookStore} from './index'
-import {getContentForStudentIdChunk} from './studentsState.utils'
+import {
+  flashStudentLoadError,
+  flashSubmissionLoadError,
+  getContentForStudentIdChunk,
+  smartStudentsPerSubmissionRequest,
+} from './studentsState.utils'
 import {asJson, consumePrefetchedXHR} from '@canvas/util/xhr'
 import type {
   AssignmentUserSubmissionMap,
@@ -223,6 +235,7 @@ export default (
             performanceControls.submissionsPerPage,
             gotChunkOfStudents,
             gotSubmissionsChunk,
+            get().correlationId,
           )
 
           // when the current chunk requests are all enqueued
@@ -320,15 +333,15 @@ export default (
       })
 
       // fetch submissions for userIds
-      const userIdChunks = chunk(
-        userIds,
-        GRADEBOOK_GRAPHQL_CONFIG.initialNumberOfStudentsPerSubmissionRequest,
-      )
+      const userIdChunks = chunk(userIds, smartStudentsPerSubmissionRequest(userIds.length))
 
       const promises = userIdChunks.map(userIdChunk =>
         limit(async () => {
           const {data} = await getAllSubmissions({
             queryParams: {userIds: userIdChunk, courseId},
+            headers: {'Correlation-Id': get().correlationId},
+            onError: flashSubmissionLoadError,
+            queue: get().returnQueueIfDefined(),
           })
           const submissionsByUserId = groupBy(data.map(transformSubmission), 'user_id')
 
@@ -349,6 +362,9 @@ export default (
       const userIds = users.course.usersConnection.nodes.map(it => it._id)
       const {data: enrollments} = await getAllEnrollments({
         queryParams: {userIds: userIds, courseId},
+        headers: {'Correlation-Id': get().correlationId},
+        onError: flashStudentLoadError,
+        queue: get().returnQueueIfDefined(),
       })
       await onEnrollmentSuccess(users.course.usersConnection.nodes, enrollments)
     }
@@ -359,7 +375,10 @@ export default (
         courseId,
         first: GRADEBOOK_GRAPHQL_CONFIG.usersPageSize,
       },
+      headers: {'Correlation-Id': get().correlationId},
       onSuccess: onUserPageSuccess,
+      onError: flashStudentLoadError,
+      queue: get().returnQueueIfDefined(),
     })
     await Promise.all([...onSuccessCallbacks, ...onErrorCallbacks])
 

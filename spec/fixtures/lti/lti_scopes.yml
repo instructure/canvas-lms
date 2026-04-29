@@ -5,6 +5,13 @@
 # ensure it is added to the correct places in TS, Ruby, and the docs (if
 # applicable)
 
+### 1EdTech LTI Registrations ###
+- scope: https://purl.imsglobal.org/spec/lti-reg/scope/registration.readonly
+  description: Can view LTI registrations associated with the tool
+
+- scope: https://purl.imsglobal.org/spec/lti-reg/scope/registration
+  description: Can send automatic updates to be approved by an Administrator
+
 ### 1EdTech Names and Role Provisioning Services (AGS) ###
 - scope: https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
   description: Can create and view assignment data in the gradebook associated with the tool
@@ -27,19 +34,19 @@
 
 ### 1EdTech PNS, Asset Processor and associated services ###
 - scope: https://purl.imsglobal.org/spec/lti/scope/noticehandlers
-  description: Can register event notice handlers using the Platform Notification Service
+  description: Can register to receive asynchronous notifications from Canvas
 
 - scope: https://purl.imsglobal.org/spec/lti/scope/asset.readonly
-  description: Can fetch assets from the platform using the Asset Service
+  description: Can retrieve submissions from Document Processor Assignments
 
 - scope: https://purl.imsglobal.org/spec/lti/scope/report
-  description: Can create reports using the Asset Report Service
+  description: Can send reports for Document Processor Assignments
 
 - scope: https://purl.imsglobal.org/spec/lti/scope/eula/user
-  description: Can update or remove the tool's EULA accepted flag
+  description: Can track if EULA has been accepted
 
 - scope: https://purl.imsglobal.org/spec/lti/scope/eula/deployment
-  description: Can update or remove the tool's EULA requirement flag
+  description: Can reset EULA acceptance status
 
 ### Documented Canvas extensions ###
 - scope: https://canvas.instructure.com/lti/page_content/show

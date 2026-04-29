@@ -27,7 +27,7 @@ class CalendarEventsController < ApplicationController
   add_crumb(proc { t(:"#crumbs.calendar_events", "Calendar Events") }, only: %i[show new edit]) { |c| c.send :calendar_url_for, c.instance_variable_get(:@context) }
 
   def show
-    @event = @context.calendar_events.find(params[:id])
+    @event = CalendarEvent.find(params[:id])
     add_crumb(@event.title, named_context_url(@context, :context_calendar_event_url, @event))
     if @event.deleted?
       flash[:notice] = t "notices.deleted", "This event has been deleted"
@@ -108,7 +108,7 @@ class CalendarEventsController < ApplicationController
   end
 
   def destroy
-    @event = @context.calendar_events.find(params[:id])
+    @event = CalendarEvent.find(params[:id])
     if authorized_action(@event, @current_user, :delete)
       @event.cancel_reason = params[:cancel_reason]
       @event.destroy

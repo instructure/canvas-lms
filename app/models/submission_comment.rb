@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class SubmissionComment < ActiveRecord::Base
+class SubmissionComment < ApplicationRecord
   include SendToStream
   include HtmlTextHelper
   include Workflow
@@ -62,6 +62,8 @@ class SubmissionComment < ActiveRecord::Base
     end
   end
   validates :workflow_state, inclusion: { in: ["active"] }, allow_nil: true
+
+  sanitize_field :comment, CanvasSanitize::SANITIZE
 
   after_destroy :refresh_submission_comment_read_state
   before_save :infer_details
@@ -247,7 +249,7 @@ class SubmissionComment < ActiveRecord::Base
         record.provisional_grade_id.nil? &&
         record.submission.assignment &&
         record.submission.assignment.context.available? &&
-        record.submission.posted? &&
+        record.submission.comments_posted? &&
         record.submission.assignment.context.grants_right?(record.submission.user, :read) &&
         (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
     end
@@ -303,6 +305,8 @@ class SubmissionComment < ActiveRecord::Base
     # generally, any instructor comments if the assignment is muted); the same
     # holds for anyone observing the student
     if submission.user_id == user.id || User.observing_students_in_course(submission.user, assignment.context).include?(user)
+      # For scheduled comment releases, return true if they have been posted
+      return true if submission.posted_comments_at.present?
       return false if draft? || hidden? || !submission.posted?
 
       # Generally the student should see only non-provisional comments--but they should
@@ -329,12 +333,52 @@ class SubmissionComment < ActiveRecord::Base
 
   def can_read_author?(user, session)
     RequestCache.cache("user_can_read_author", self, user, session) do
-      return false if user.nil? || (author_id != user.id && submission.assignment.anonymize_students?)
+      return false if user.nil? || (author_id != user.id && author_id == submission.user.id && submission.assignment.anonymize_students?)
 
       author_id == user.id ||
         (!anonymous? && !submission.assignment.anonymous_peer_reviews?) ||
         submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
         submission.assignment.context.grants_right?(author, session, :view_all_grades)
+    end
+  end
+
+  # Returns the visible name for the comment author based on anonymity settings and user permissions
+  def author_visible_name(viewing_user)
+    return I18n.t("Someone") if author.nil?
+    return author.short_name if author_id == viewing_user.id
+
+    if submission.assignment.moderated_grading?
+      if author.id == submission.user_id
+        return author.short_name unless submission.assignment.anonymize_students?
+
+        get_anonymous_student_name(author, submission.assignment)
+      else
+        return author.short_name if submission.assignment.can_view_other_grader_identities?(viewing_user)
+
+        get_anonymous_grader_name(author, submission.assignment)
+      end
+    else
+      return author.short_name if grants_right?(viewing_user, :read_author)
+
+      get_anonymous_student_name(author, submission.assignment)
+    end
+  end
+
+  # Returns the anonymous identity for a student
+  def get_anonymous_student_name(author, assignment)
+    student_identity = assignment.anonymous_student_identities[author.id]
+    student_identity&.dig(:name) || I18n.t("Anonymous Student")
+  end
+
+  # Returns the anonymous name for a grader
+  def get_anonymous_grader_name(author, assignment)
+    if assignment.moderated_grading?
+      grader_identities = assignment.grader_identities
+      grader_identity = grader_identities.find { |grader| grader[:user_id] == author.id }
+      anonymous_identity = Assignments::GraderIdentities.anonymize_grader_identity(grader_identity)
+      anonymous_identity&.dig(:name) || I18n.t("Anonymous Grader")
+    else
+      I18n.t("Anonymous Instructor")
     end
   end
 
@@ -481,6 +525,8 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def publishable_for?(user)
+    return false unless user
+
     draft? && author_id == user.id
   end
 

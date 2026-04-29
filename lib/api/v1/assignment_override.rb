@@ -23,8 +23,9 @@ module Api::V1::AssignmentOverride
 
   OVERRIDABLE_ID_FIELDS = %i[assignment_id quiz_id context_module_id discussion_topic_id wiki_page_id attachment_id].freeze
 
-  def assignment_override_json(override, visible_users = nil, student_names: nil, module_names: nil, include_child_override_due_dates: nil)
+  def assignment_override_json(override, visible_users = nil, student_names: nil, module_names: nil, include_child_override_due_dates: nil, include_child_peer_review_override_dates: nil, peer_review_override: nil)
     fields = %i[id title unassign_item]
+    fields << :parent_override_id if override.parent_override_id.present?
     OVERRIDABLE_ID_FIELDS.each { |f| fields << f if override.send(f).present? }
     fields.push(:due_at, :all_day, :all_day_date) if override.due_at_overridden
     fields << :unlock_at if override.unlock_at_overridden
@@ -63,6 +64,18 @@ module Api::V1::AssignmentOverride
       if include_child_override_due_dates
         json[:sub_assignment_due_dates] = override.sub_assignment_due_dates
       end
+      if include_child_peer_review_override_dates
+        json[:peer_review_dates] = if peer_review_override
+                                     {
+                                       id: peer_review_override.id,
+                                       due_at: peer_review_override.due_at,
+                                       unlock_at: peer_review_override.unlock_at,
+                                       lock_at: peer_review_override.lock_at
+                                     }
+                                   else
+                                     nil
+                                   end
+      end
     end
   end
 
@@ -81,7 +94,7 @@ module Api::V1::AssignmentOverride
     end
   end
 
-  def assignment_overrides_json(overrides, user = nil, include_names: false, include_child_override_due_dates: false)
+  def assignment_overrides_json(overrides, user = nil, include_names: false, include_child_override_due_dates: false, include_child_peer_review_override_dates: false)
     visible_users_ids = ::AssignmentOverride.visible_enrollments_for(overrides.compact, user).select(:user_id)
     # we most likely already have the student_ids preloaded here because of overridden_for, but just in case
     if overrides.any? { |ov| ov.present? && ov.set_type == "ADHOC" && !ov.preloaded_student_ids }
@@ -93,7 +106,29 @@ module Api::V1::AssignmentOverride
       module_ids = overrides.select { |ov| ov.present? && ov.context_module_id.present? }.map(&:context_module_id).uniq
       module_names = ContextModule.where(id: module_ids).pluck(:id, :name).to_h
     end
-    overrides.map { |override| assignment_override_json(override, visible_users_ids, student_names:, module_names:, include_child_override_due_dates:) if override }
+
+    # Eager load peer review overrides to avoid N+1 queries
+    peer_review_overrides_by_parent_id = if include_child_peer_review_override_dates && overrides.any?(&:present?)
+                                           override_ids = overrides.compact.map(&:id)
+                                           AssignmentOverride
+                                             .active
+                                             .where(parent_override_id: override_ids)
+                                             .index_by(&:parent_override_id)
+                                         else
+                                           {}
+                                         end
+
+    overrides.map do |override|
+      next unless override
+
+      peer_review_override = if include_child_peer_review_override_dates
+                               peer_review_overrides_by_parent_id[override.id]
+                             else
+                               nil
+                             end
+
+      assignment_override_json(override, visible_users_ids, student_names:, module_names:, include_child_override_due_dates:, include_child_peer_review_override_dates:, peer_review_override:)
+    end
   end
 
   def assignment_override_collection(learning_object, include_students: false)

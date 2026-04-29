@@ -31,7 +31,7 @@ import ConfigureExternalToolButton from './ConfigureExternalToolButton'
 import ReregisterExternalToolButton from './ReregisterExternalToolButton'
 import store from '../lib/ExternalAppsStore'
 import classMunger from '../lib/classMunger'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import ExternalToolMigrationInfo from './ExternalToolMigrationInfo'
 
@@ -267,9 +267,7 @@ export default class ExternalToolsTableRow extends React.Component {
         >
           <div style={{display: 'flex', alignItems: 'center'}}>
             {tool.name} {this.disabledFlag()}
-            {tool.migration_running ? (
-              <ExternalToolMigrationInfo tool={tool} />
-            ) : null}
+            {tool.migration_running ? <ExternalToolMigrationInfo tool={tool} /> : null}
           </div>
         </td>
         {this.props.showLTIFavoriteToggles && show_top_nav_toggles && (

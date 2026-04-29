@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {map, find, filter} from 'lodash'
+import {map, find, filter} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
@@ -384,7 +384,10 @@ export default class Quiz extends Backbone.Model {
   nonBaseDates() {
     const dateGroups = this.get('all_dates')
     if (!dateGroups) return false
-    const withouBase = filter(dateGroups, dateGroup => dateGroup && !dateGroup.get('base'))
+    const withouBase = filter(
+      dateGroups.models || [],
+      dateGroup => dateGroup && !dateGroup.get('base'),
+    )
     return withouBase.length > 0
   }
 

@@ -20,7 +20,6 @@
   provide :page_title, t(:page_title, "Statistics for %{account}", :account => @account.name)
   set_active_tab "statistics"
   css_bundle :statistics
-  js_bundle :account_statistics
 %>
 <% @customLinks = account_custom_links; if @customLinks %>
   <% provide :right_side do %>
@@ -182,14 +181,7 @@
   <% end %>
 </ul>
 <% end %>
-
-<div id="over_time_dialog" style="display: none;">
-  <div id='over_time' style='width: 600px; height: 240px;'></div>
-  <div style="text-align: <%= direction('right') %>;">
-    <a href="#" class="csv_url xls"><%= t(:download_csv_link, "Download csv") %></a>
-  </div>
-  <a href="<%= context_url(@context, :context_statistics_graph_url, '{{ attribute }}') %>" class="over_time_url" style="display: none;">&nbsp;</a>
-</div>
+<div id="over-time-modal"></div>
 
 <script type="text/javascript" src="//www.google.com/jsapi"></script>
 <script> google.load('visualization', '1', {'packages':['annotatedtimeline']}); </script>

@@ -88,6 +88,18 @@ describe Lti::ResourceLinksController, type: :request do
       end
     end
 
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+    end
+
     it "is successful" do
       subject
       expect(response).to be_successful
@@ -185,6 +197,18 @@ describe Lti::ResourceLinksController, type: :request do
       end
     end
 
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+    end
+
     it "is successful" do
       subject
       expect(response).to be_successful
@@ -269,6 +293,18 @@ describe Lti::ResourceLinksController, type: :request do
 
     context "with non-admin user" do
       before { user_session(student_in_course(account:).user) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
 
       it "returns 403" do
         subject
@@ -422,6 +458,18 @@ describe Lti::ResourceLinksController, type: :request do
       end
     end
 
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
     it "is successful" do
       subject
       expect(response).to be_successful
@@ -485,6 +533,18 @@ describe Lti::ResourceLinksController, type: :request do
 
     context "with non-admin user" do
       before { user_session(student_in_course(account:).user) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
 
       it "returns 403" do
         subject
@@ -566,6 +626,36 @@ describe Lti::ResourceLinksController, type: :request do
     end
   end
 
+  describe "the scope of resource links that should be searched" do
+    context "when teacher tries to access resource links from a different course" do
+      # Teacher has enrollment in "course"
+      let!(:teacher) { teacher_in_course(course:, account:).user }
+      let!(:other_course) { course_model(account:) }
+      let!(:resource_link_in_other_course) { resource_link_model(context: other_course) }
+
+      before do
+        user_session(teacher)
+      end
+
+      it "cannot get a resource link in different course (should return 404)" do
+        # URL here is using "course" for the course ID, but the resource link ID
+        # of a resource link in "other_course."
+        get "/api/v1/courses/#{course.id}/lti_resource_links/#{resource_link_in_other_course.id}"
+        expect(response).to be_not_found
+      end
+
+      it "cannot modify a resource link in different course (should return 404)" do
+        put "/api/v1/courses/#{course.id}/lti_resource_links/#{resource_link_in_other_course.id}", params: { custom: { "test" => "value" } }
+        expect(response).to be_not_found
+      end
+
+      it "cannot delete a resource link in different course (should return 404)" do
+        delete "/api/v1/courses/#{course.id}/lti_resource_links/#{resource_link_in_other_course.id}"
+        expect(response).to be_not_found
+      end
+    end
+  end
+
   describe "DELETE #destroy" do
     subject { delete "/api/v1/courses/#{course.id}/lti_resource_links/#{id}" }
 
@@ -584,6 +674,18 @@ describe Lti::ResourceLinksController, type: :request do
 
     context "with non-admin user" do
       before { user_session(student_in_course(account:).user) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with teacher lacking manage_lti_add permission" do
+      before do
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
+        user_session(teacher_in_course(course:, active_all: true).user)
+      end
 
       it "returns 403" do
         subject

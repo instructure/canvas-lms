@@ -20,7 +20,6 @@ import * as z from 'zod'
 import {ZLtiPrivacyLevel} from '../LtiPrivacyLevel'
 import {ZLtiScope} from '@canvas/lti/model/LtiScope'
 import {ZInternalPlacementConfiguration} from './placement_configuration/InternalPlacementConfiguration'
-import {ZPublicJwk} from './PublicJwk'
 import {ZInternalBaseLaunchSettings} from './InternalBaseLaunchSettings'
 import {ZContentMigrationSettings} from '../lti_tool_configuration/ContentMigrationSettings'
 

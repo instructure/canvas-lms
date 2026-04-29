@@ -107,4 +107,36 @@ describe CC::Importer::Canvas::CourseSettings do
       end
     end
   end
+
+  describe "#convert_nav_menu_links" do
+    subject(:converter) { CourseSettingConverterTestClass.new }
+
+    it "returns empty array when doc is nil" do
+      expect(converter.convert_nav_menu_links(nil)).to eq []
+    end
+
+    it "parses nav menu link nodes into hashes" do
+      doc = Nokogiri::XML(<<~XML)
+        <navMenuLinks>
+          <navMenuLink identifier="abc123">
+            <label>My Link</label>
+            <url>https://example.com</url>
+          </navMenuLink>
+          <navMenuLink identifier="linktwo">
+            <label>My Link2</label>
+            <url>https://example.com/2</url>
+          </navMenuLink>
+        </navMenuLinks>
+      XML
+
+      result = converter.convert_nav_menu_links(doc)
+      expect(result.length).to eq 2
+      expect(result.first).to eq(
+        "migration_id" => "abc123",
+        "label" => "My Link",
+        "url" => "https://example.com"
+      )
+      expect(result.pluck("migration_id")).to eq %w[abc123 linktwo]
+    end
+  end
 end

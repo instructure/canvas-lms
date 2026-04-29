@@ -20,10 +20,11 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import ModuleProgressionStatusBar from '../ModuleProgressionStatusBar'
 import {CompletionRequirement, ModuleProgression} from '../../utils/types'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 
 interface TestPropsOverrides {
   completionRequirements?: CompletionRequirement[] | []
-  progression?: Partial<ModuleProgression>
+  progression?: Partial<ModuleProgression> | undefined
   requirementCount?: number
 }
 
@@ -45,12 +46,15 @@ const buildDefaultProps = (overrides: TestPropsOverrides = {}) => {
     completionRequirements: Array.isArray(overrides.completionRequirements)
       ? overrides.completionRequirements
       : defaultCompletionRequirements,
-    progression: overrides.progression
-      ? {
-          ...defaultProgression,
-          ...overrides.progression,
-        }
-      : defaultProgression,
+    progression:
+      overrides.progression === undefined
+        ? undefined
+        : overrides.progression
+          ? {
+              ...defaultProgression,
+              ...overrides.progression,
+            }
+          : defaultProgression,
     requirementCount: overrides.requirementCount || undefined,
   }
 }
@@ -58,12 +62,36 @@ const buildDefaultProps = (overrides: TestPropsOverrides = {}) => {
 const setUp = (props: TestPropsOverrides = {}) => {
   const {completionRequirements, progression, requirementCount} = buildDefaultProps(props)
   return render(
-    <ModuleProgressionStatusBar
-      completionRequirements={completionRequirements}
-      progression={progression}
-      requirementCount={requirementCount}
-      smallScreen={false}
-    />,
+    <ContextModuleProvider {...contextModuleDefaultProps} courseId="1">
+      <ModuleProgressionStatusBar
+        completionRequirements={completionRequirements}
+        progression={progression}
+        requirementCount={requirementCount}
+        smallScreen={false}
+      />
+    </ContextModuleProvider>,
+  )
+}
+
+const setUpObserver = (
+  props: TestPropsOverrides = {},
+  observedStudent: {id: string; name: string} | null = {id: '101', name: 'Alice Student'},
+) => {
+  const {completionRequirements, progression, requirementCount} = buildDefaultProps(props)
+  return render(
+    <ContextModuleProvider
+      {...contextModuleDefaultProps}
+      courseId="1"
+      isObserver={true}
+      observedStudent={observedStudent}
+    >
+      <ModuleProgressionStatusBar
+        completionRequirements={completionRequirements}
+        progression={progression}
+        requirementCount={requirementCount}
+        smallScreen={false}
+      />
+    </ContextModuleProvider>,
   )
 }
 
@@ -246,5 +274,104 @@ describe('ModuleProgressionStatusBar', () => {
     })
     expect(container.container).toBeInTheDocument()
     expect(container.getByText('1 of 2 Required Items')).toBeInTheDocument()
+  })
+
+  describe('Observer functionality', () => {
+    it('should show observer text for single observed student', () => {
+      const container = setUpObserver(
+        {
+          completionRequirements: [
+            {
+              id: '1',
+              type: 'must_view',
+              minScore: undefined,
+              minPercentage: undefined,
+            },
+            {
+              id: '2',
+              type: 'must_view',
+              minScore: undefined,
+              minPercentage: undefined,
+            },
+          ],
+          progression: {
+            requirementsMet: [
+              {
+                id: '1',
+                type: 'must_view',
+                minScore: undefined,
+                minPercentage: undefined,
+              },
+            ],
+          },
+        },
+        {id: '101', name: 'Alice Student'},
+      )
+
+      expect(container.getByText('1 of 2 Required Items')).toBeInTheDocument()
+    })
+
+    it('should show 100% completion for observer', () => {
+      const container = setUpObserver(
+        {
+          completionRequirements: baseReqs.slice(0, 2),
+          progression: {
+            requirementsMet: baseReqs.slice(0, 2),
+          },
+        },
+        {id: '101', name: 'Alice Student'},
+      )
+
+      expect(container.getByText('100%')).toBeInTheDocument()
+      expect(container.getByText('2 of 2 Required Items')).toBeInTheDocument()
+    })
+
+    it('should show 0% completion for observer', () => {
+      const container = setUpObserver(
+        {
+          completionRequirements: baseReqs.slice(0, 2),
+          progression: {
+            requirementsMet: [],
+          },
+        },
+        {id: '101', name: 'Alice Student'},
+      )
+
+      expect(container.getByText('0%')).toBeInTheDocument()
+      expect(container.getByText('0 of 2 Required Items')).toBeInTheDocument()
+    })
+
+    it('should handle observer with requirement count set to 1', () => {
+      const container = setUpObserver(
+        {
+          completionRequirements: baseReqs,
+          requirementCount: 1,
+          progression: {
+            requirementsMet: baseReqs.slice(0, 1),
+          },
+        },
+        {id: '101', name: 'Alice Student'},
+      )
+
+      expect(container.getByText('100%')).toBeInTheDocument()
+      expect(container.getByText('1 of 1 Required Items')).toBeInTheDocument()
+    })
+
+    it('should not render when no progression for observer', () => {
+      const container = setUpObserver({
+        completionRequirements: baseReqs,
+        progression: undefined,
+      })
+
+      expect(container.container.firstChild).toBeNull()
+    })
+
+    it('should not render when no completion requirements for observer', () => {
+      const container = setUpObserver({
+        completionRequirements: [],
+      })
+
+      expect(container.container.firstChild).toBeNull()
+    })
   })
 })

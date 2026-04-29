@@ -20,10 +20,10 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import TruncateWithTooltip from '../TruncateWithTooltip'
 
-jest.mock('@instructure/ui-truncate-text', () => ({
+vi.mock('@instructure/ui-truncate-text', () => ({
   TruncateText: ({children}) => <span data-testid="truncate-text">{children}</span>,
 }))
-jest.mock('@instructure/ui-tooltip', () => ({
+vi.mock('@instructure/ui-tooltip', () => ({
   Tooltip: ({renderTip}) => <div role="tooltip">{renderTip}</div>,
 }))
 

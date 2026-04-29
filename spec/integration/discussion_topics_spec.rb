@@ -40,10 +40,10 @@ describe "discussion_topics" do
     student_enrollment = course_with_student(course: @course, active_all: true)
     @topic = DiscussionTopic.new(context: @course, title: "will this work?", user: @user)
     @topic.save!
-    expect(@topic.grants_right?(@user, :update)).to be
+    expect(@topic.grants_right?(@user, :update)).to be true
     student_enrollment.send(:conclude)
     AdheresToPolicy::Cache.clear
-    expect(@topic.grants_right?(@user, :update)).not_to be
+    expect(@topic.grants_right?(@user, :update)).to be false
   end
 
   it "allows teachers to edit concluded students topics" do
@@ -51,10 +51,10 @@ describe "discussion_topics" do
     student_enrollment = course_with_student(course: @course, user: @student, active_enrollment: true)
     @topic = DiscussionTopic.new(context: @course, title: "will this work?", user: @student)
     @topic.save!
-    expect(@topic.grants_right?(@teacher, :update)).to be
+    expect(@topic.grants_right?(@teacher, :update)).to be true
     student_enrollment.send(:conclude)
     AdheresToPolicy::Cache.clear
-    expect(@topic.grants_right?(@teacher, :update)).to be
+    expect(@topic.grants_right?(@teacher, :update)).to be true
   end
 
   context "posting first to view setting" do
@@ -82,23 +82,23 @@ describe "discussion_topics" do
 
     it "allows admins to see posts without posting" do
       @topic.reply_from(user: @student, text: "hai")
-      session = user_session(@teacher)
+      user_session(@teacher)
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      expect(@topic.initial_post_required?(@teacher, session)).to be_falsey
+      expect(@topic.initial_post_required?(@teacher)).to be_falsey
     end
 
     it "does not allow student who hasn't posted to see" do
       @topic.reply_from(user: @teacher, text: "hai")
-      session = user_session(@student)
+      user_session(@student)
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      expect(@topic.initial_post_required?(@student, session)).to be_truthy
+      expect(@topic.initial_post_required?(@student)).to be_truthy
     end
 
     it "does not allow student's observer who hasn't posted to see" do
       @topic.reply_from(user: @teacher, text: "hai")
-      session = user_session(@observer)
+      user_session(@observer)
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-      expect(@topic.initial_post_required?(@observer, session)).to be_truthy
+      expect(@topic.initial_post_required?(@observer)).to be_truthy
     end
   end
 
@@ -116,7 +116,7 @@ describe "discussion_topics" do
       topic = Announcement.create!(context: @course, title: "Test Announcement", message: "hello world")
 
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
-      expect(topic.grants_right?(@teacher, user_session(@teacher), :reply) && !topic.homeroom_announcement?(@course)).to be_falsey
+      expect(topic.grants_right?(@teacher, :reply) && !topic.homeroom_announcement?(@course)).to be_falsey
       expect(topic.grants_right?(@teacher, :read_replies) && !topic.homeroom_announcement?(@course)).to be_falsey
     end
   end

@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 4.1.0 - 2025-10-16
+
+### Changed
+- Upgraded to InstUI 10.26.2
+
+## 4.0.0 - 2025-10-13
+
+### Added
+- Immersive view for Canvas media
+
+### Changed
+- Upgraded to InstUI 10.25.0
+- Upgraded studio-player package to 1.3.5
+- Upgraded Biome from 1.9.4 to 2.2.4
+- Unified image upload buttons
+- Simplified canvas-media format-message configuration
+
+### Fixed
+- RCE studio embed improvements to work on Course level
+- Predictable Value Range from Previous Values vulnerability
+- Snyk canvas-rce/canvas-media CSRF vulnerability (axios)
+
 ## 3.0.0 - 2025-03-31
 
 ## Changed

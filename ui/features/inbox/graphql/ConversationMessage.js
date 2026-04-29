@@ -24,22 +24,22 @@ import {User} from './User'
 
 export const ConversationMessage = {
   fragment: gql`
-    fragment ConversationMessage on ConversationMessage {
+    fragment InboxConversationMessage on ConversationMessage {
       _id
       id
       createdAt
       body
       attachments {
-        ...Attachment
+        ...InboxAttachment
       }
       author {
-        ...User
+        ...InboxUser
       }
       mediaComment {
-        ...MediaComment
+        ...InboxMediaComment
       }
       recipients {
-        ...User
+        ...InboxUser
       }
     }
     ${Attachment.fragment}

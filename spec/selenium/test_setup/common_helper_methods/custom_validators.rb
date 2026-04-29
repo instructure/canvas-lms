@@ -78,6 +78,11 @@ module CustomValidators
     end
   end
 
+  def wait_for_instui_flash_message(message = nil)
+    text = ":contains(#{message.inspect})" if message
+    keep_trying_until { disable_implicit_wait { expect(f("#flashalert_message_holder")).to contain_jqcss(text) } }
+  end
+
   def expect_instui_flash_message(message = nil)
     text = ":contains(#{message.inspect})" if message
     expect(f("#flashalert_message_holder")).to contain_jqcss(text)
@@ -91,6 +96,20 @@ module CustomValidators
 
   def expect_no_instui_flash_message
     expect(f("body")).not_to contain_css("#flashalert_message_holder")
+  end
+
+  def expect_element_in_viewport(selector)
+    in_viewport = driver.execute_script <<~JS, selector
+      var $box = $(arguments[0])[0].getBoundingClientRect()
+      return (
+        $box.bottom >= 0 &&
+        $box.right >= 0 &&
+        $box.top <= (window.innerHeight || document.documentElement.clientHeight) &&
+        $box.left <= (window.innerWidth || document.documentElement.clientWidth)
+      )
+    JS
+
+    expect(in_viewport).to be true
   end
 
   def assert_flash_notice_message(okay_message)
@@ -114,7 +133,7 @@ module CustomValidators
     expect(box[0]).to be_displayed
   end
 
-  def wait_for_new_page_load(accept_alert = false)
+  def wait_for_new_page_load(accept_alert: false)
     driver.execute_script("window.INST = window.INST || {}; INST.still_on_old_page = true;")
     yield if block_given?
     wait_for(method: :wait_for_new_page_load) do
@@ -133,8 +152,8 @@ module CustomValidators
     true
   end
 
-  def expect_new_page_load(accept_alert = false, &)
-    success = wait_for_new_page_load(accept_alert, &)
+  def expect_new_page_load(accept_alert: false, &)
+    success = wait_for_new_page_load(accept_alert:, &)
     expect(success).to be, "expected new page load, none happened"
   end
 end

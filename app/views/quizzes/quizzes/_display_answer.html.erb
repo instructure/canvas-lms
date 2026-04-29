@@ -23,6 +23,7 @@
   assessment_results ||= false
   question_type ||= QuizzesHelper::QuestionType.new
   question ||= nil
+  question_bank_id ||= nil
   answer_type = question_type ? question_type.answer_type : "select_answer"
   user_answer ||= nil
   matched_answer ||= nil
@@ -52,6 +53,13 @@
     (hash_get(question, :question_type) == 'fill_in_multiple_blanks_question' &&
       answer.respond_to?(:[]) && answer['text'].blank? && answer['html'].blank?) ||
     (hash_get(question, :question_type) == 'multiple_dropdowns_question' && !correct_answer && (selected_answer.nil? ? false : !selected_answer ))
+  asset_string = if question_bank_id
+                   "assessment_question_#{hash_get(question, :id)}"
+                 elsif @submission
+                   "quiz_submission_#{@submission.id}"
+                 else
+                   "quiz_question_#{hash_get(question, :id)}"
+                 end
 %>
 <% unless question && [ "short_answer_question", "fill_in_multiple_blanks_question" ].include?(question[:question_type]) && !show_correct_answers %>
   <% if false %>
@@ -87,7 +95,7 @@
       <% end %>
       <label for="answer-<%= answer_id %>">
         <div class="answer_text" <%= hidden(include_style: true) if hash_get(answer, :html).present? %>><%= hash_get(answer, :text) %></div>
-        <div class="answer_html"><%= user_content(hash_get(answer, :html).to_s) %></div>
+        <div class="answer_html"><%= user_content(hash_get(answer, :html).to_s, location: asset_string) %></div>
       </label>
     </div>
     <div class="answer_type short_answer" <%= hidden(include_style: true) unless answer_type == "short_answer" %>>
@@ -95,7 +103,7 @@
     </div>
     <div class="answer_match matching_answer answer_type" <%= hidden(include_style: true) unless answer_type == "matching_answer" %>>
       <div class="answer_match_left" <%= hidden(include_style: true) if (hash_get(answer, :left_html) || hash_get(answer, :html)).present? %>><%= (hash_get(answer, :left) || hash_get(answer, :text)) %></div>
-      <div class="answer_match_left_html" <%= hidden(include_style: true) unless (hash_get(answer, :left_html) || hash_get(answer, :html)).present? %>><%= user_content((hash_get(answer, :left_html) || hash_get(answer, :html)).to_s) %></div>
+      <div class="answer_match_left_html" <%= hidden(include_style: true) unless (hash_get(answer, :left_html) || hash_get(answer, :html)).present? %>><%= user_content((hash_get(answer, :left_html) || hash_get(answer, :html)).to_s, location: asset_string) %></div>
       <div class="answer_match_middle">&nbsp;</div>
       <div class="answer_match_right">
         <% if user_answer %>
@@ -171,7 +179,7 @@
     <% if show_comment %>
       <div class="quiz_comment <%= "empty" unless has_answer_comment %>">
         <div class="answer_comment" <%= hidden(include_style: true) if hash_get(answer, :comments_html).present? %>><%= comment_get(answer, :comments) %></div>
-        <div class="answer_comment_html"><%= user_content(Sanitize.clean(hash_get(answer, :comments_html) || "", CanvasSanitize::SANITIZE).to_s) %></div>
+        <div class="answer_comment_html"><%= user_content(Sanitize.clean(hash_get(answer, :comments_html) || "", CanvasSanitize::SANITIZE).to_s, location: asset_string) %></div>
       </div>
     <% end %>
 

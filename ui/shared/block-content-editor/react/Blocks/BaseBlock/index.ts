@@ -17,4 +17,3 @@
  */
 
 export * from './BaseBlock'
-export * from './useGetRenderMode'

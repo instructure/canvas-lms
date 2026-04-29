@@ -19,7 +19,7 @@
 import React from 'react'
 import TimeZoneSelect from '../TimeZoneSelect'
 import {render} from '@testing-library/react'
-import isEqual from 'lodash/isEqual'
+import {isEqual} from 'es-toolkit/compat'
 
 let liveRegion = null
 beforeAll(() => {
@@ -111,7 +111,7 @@ describe('TimeZoneSelect', () => {
   })
 
   it('calls onChange on a selection', () => {
-    const onChangeTZ = jest.fn()
+    const onChangeTZ = vi.fn()
     const {getByText} = render(
       <TimeZoneSelect
         label="the label"

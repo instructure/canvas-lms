@@ -42,9 +42,9 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   include Api::V1::ExternalTools
 
   before_action :require_context, only: [:create, :show]
-  before_action :require_user
   before_action :require_settings_or_url, only: :create
   before_action :require_manage_developer_keys, except: :show
+  before_action :require_modify_site_admin_developer_keys, except: :show
   before_action :require_key_in_context, only: :show
   before_action :require_manage_lti, only: :show
   before_action :require_tool_configuration, only: %i[show update destroy]
@@ -89,20 +89,29 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def create
+    # Instead of creating an overlay with disabled_placements, we directly modify the placements
+    # to set enabled: false for disabled placements.
     configuration_params = {
       redirect_uris: tool_configuration_redirect_uris.presence || [@settings[:target_link_uri]],
       privacy_level: tool_configuration_params[:privacy_level],
       **Schemas::InternalLtiConfiguration.from_lti_configuration(@settings)
     }.compact
 
+    # Handle disabled_placements by setting enabled: false on those placements
+    disabled_placements = tool_configuration_params[:disabled_placements]
+    if disabled_placements.present? && configuration_params[:placements].present?
+      configuration_params[:placements].each do |placement|
+        if disabled_placements.include?(placement[:placement])
+          placement[:enabled] = false
+        end
+      end
+    end
+
     create_params = {
       account: @context,
       created_by: @current_user,
       registration_params: {
         name: developer_key_params[:name] || "Unnamed tool",
-      },
-      overlay_params: {
-        disabled_placements: tool_configuration_params[:disabled_placements]
       },
       configuration_params:,
       developer_key_params:
@@ -139,15 +148,30 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #   to be used as custom fields in the LTI launch.
   #   Example: foo=bar\ncourse=$Canvas.course.id
   #
+  # @argument comment [String | nil]
+  #   A comment explaining why this change was made, to be recorded in the change-log.
+  #   Must not exceed 2000 characters. Optional.
+  #
   # @returns ToolConfiguration
   def update
+    # Instead of creating an overlay with disabled_placements, we directly modify the placements
+    # to set enabled: false for disabled placements.
     settings = tool_configuration_params[:settings]&.to_unsafe_hash&.deep_merge(manual_custom_fields)
     configuration_params = {
-      disabled_placements: tool_configuration_params[:disabled_placements],
       redirect_uris: tool_configuration_redirect_uris,
       privacy_level: tool_configuration_params[:privacy_level],
       **Schemas::InternalLtiConfiguration.from_lti_configuration(settings)
     }.compact
+
+    # Handle disabled_placements by setting enabled: false on those placements
+    disabled_placements = tool_configuration_params[:disabled_placements]
+    if disabled_placements.present? && configuration_params[:placements].present?
+      configuration_params[:placements].each do |placement|
+        if disabled_placements.include?(placement[:placement])
+          placement[:enabled] = false
+        end
+      end
+    end
 
     update_params = {
       id: developer_key.lti_registration_id,
@@ -158,6 +182,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
       developer_key_params:,
       configuration_params:,
       account:,
+      comment: params[:comment]&.to_s
     }
     registration = Lti::UpdateRegistrationService.call(**update_params)
 
@@ -215,7 +240,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   def require_tool_configuration
-    return if developer_key.tool_configuration.present?
+    return if developer_key.tool_configuration&.active?
 
     head :not_found
   end
@@ -228,6 +253,16 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   def require_manage_developer_keys
     authorized_action(account, @current_user, :manage_developer_keys)
+  end
+
+  def require_modify_site_admin_developer_keys
+    return unless account.site_admin?
+    return unless Account.site_admin.feature_enabled?(:modify_site_admin_developer_keys_permission)
+
+    unless Account.site_admin.grants_right?(@current_user, :modify_site_admin_developer_keys)
+      render json: { errors: [{ message: "You don't have permission to modify Site Admin developer keys" }] },
+             status: :forbidden
+    end
   end
 
   def require_settings_or_url

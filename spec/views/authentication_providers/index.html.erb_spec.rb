@@ -66,4 +66,93 @@ describe "authentication_providers/index" do
     doc = Nokogiri::HTML5(response.body)
     expect(doc.css("#delete-aac-#{aac.id}")).to be_blank
   end
+
+  describe "Discovery Page section" do
+    it "renders when discovery page is allowed" do
+      allow(account).to receive(:discovery_page_allowed?).and_return(true)
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.css("#discovery-page-root")).to be_present
+      expect(doc.css("input#discovery_page_active_field")).to be_present
+      expect(response.body).to include("Discovery Page")
+    end
+
+    it "does not render when discovery page is not allowed" do
+      allow(account).to receive(:discovery_page_allowed?).and_return(false)
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.css("#discovery-page-root")).to be_blank
+    end
+  end
+
+  context "when MFA is required" do
+    before do
+      account.settings[:mfa_settings] = :required
+      account.save!
+    end
+
+    it "does not display MFA panel for canvas provider" do
+      account.authentication_providers.scope.delete_all
+      provider = account.authentication_providers.create!(auth_type: "canvas")
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      canvas_form = doc.css("form#edit_canvas_#{provider.id}").first
+      expect(canvas_form).not_to be_nil, "Should find the Canvas auth provider form"
+      mfa_spans = canvas_form.css("span").select { |span| span.text.include?("MFA Required") }
+      expect(mfa_spans).to be_blank
+    end
+
+    it "displays MFA panel for SAML auth provider" do
+      account.authentication_providers.scope.delete_all
+      account.authentication_providers.create!(auth_type: "saml")
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      mfa_spans = doc.css("span").select { |span| span.text.include?("MFA Required") }
+      expect(mfa_spans).not_to be_blank
+    end
+
+    it "displays MFA panel for LDAP auth provider" do
+      account.authentication_providers.scope.delete_all
+      account.authentication_providers.create!(auth_type: "ldap")
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      mfa_spans = doc.css("span").select { |span| span.text.include?("MFA Required") }
+      expect(mfa_spans).not_to be_blank
+    end
+  end
+
+  context "when MFA is required for admins" do
+    before do
+      account.settings[:mfa_settings] = :required_for_admins
+      account.save!
+    end
+
+    it "displays MFA panel for canvas provider" do
+      account.authentication_providers.scope.delete_all
+      provider = account.authentication_providers.create!(auth_type: "canvas")
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      canvas_form = doc.css("form#edit_canvas_#{provider.id}").first
+      expect(canvas_form).not_to be_nil, "Should find the Canvas auth provider form"
+      mfa_spans = canvas_form.css("span").select { |span| span.text.include?("MFA Required") }
+      expect(mfa_spans).not_to be_blank
+    end
+  end
+
+  context "when MFA is disabled" do
+    before do
+      account.settings[:mfa_settings] = :disabled
+      account.save!
+    end
+
+    it "does not display MFA panel for any auth provider" do
+      account.authentication_providers.scope.delete_all
+      account.authentication_providers.create!(auth_type: "canvas")
+      account.authentication_providers.create!(auth_type: "ldap")
+      render "authentication_providers/index"
+      doc = Nokogiri::HTML5(response.body)
+      mfa_spans = doc.css("span").select { |span| span.text.include?("MFA Required") }
+      expect(mfa_spans).to be_blank
+    end
+  end
 end

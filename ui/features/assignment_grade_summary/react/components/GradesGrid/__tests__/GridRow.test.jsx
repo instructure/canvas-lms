@@ -52,7 +52,7 @@ describe('GradeSummary GridRow', () => {
           studentId: '1111',
         },
       },
-      onGradeSelect: jest.fn(),
+      onGradeSelect: vi.fn(),
       row: {
         speedGraderUrl: 'http://example.com/speedGrader/1111',
         studentId: '1111',

@@ -1389,7 +1389,6 @@ describe Course do
 
         context "differentiation tag groups (aka non collaborative groups)" do
           before do
-            @assignment1.context.account.enable_feature!(:assign_to_differentiation_tags)
             @assignment1.context.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
             @assignment1.context.account.save!
             @assignment1.context.account.reload
@@ -1404,7 +1403,6 @@ describe Course do
           end
 
           it "applies group overrides for differentiation tag groups" do
-            Account.site_admin.enable_feature! :assign_to_differentiation_tags
             @differentiation_tag_group_1.add_user(@student3)
             @differentiation_tag_group_1.add_user(@student2)
 
@@ -1434,24 +1432,6 @@ describe Course do
                 }
               }
             }
-            expect(result).to eq expected
-          end
-
-          it "does not apply group overrides for differentiation tag groups when the feature is off" do
-            @differentiation_tag_group_1.add_user(@student3)
-            @differentiation_tag_group_1.add_user(@student2)
-
-            @assignment1.assignment_overrides.create!(
-              due_at: 4.days.from_now(@now),
-              due_at_overridden: true,
-              set: @differentiation_tag_group_1
-            )
-
-            @test_course.account.disable_feature!(:assign_to_differentiation_tags)
-
-            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-            result = edd.to_hash
-            expected = {}
             expect(result).to eq expected
           end
 

@@ -19,8 +19,10 @@
 #
 
 require "nokogiri"
+require "feature_flag_helper"
 
 describe ApplicationHelper do
+  include FeatureFlagHelper
   include ERB::Util
 
   alias_method :content_tag_without_nil_return, :content_tag
@@ -105,17 +107,17 @@ describe ApplicationHelper do
 
     describe "#context_sensitive_datetime_title" do
       it "produces a string showing the local time and the course time" do
-        context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context = instance_double(Course, time_zone: ActiveSupport::TimeZone["America/Denver"])
         expect(context_sensitive_datetime_title(Time.zone.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 13 at 1:12am<br>Course: Mar 13 at 3:12am\""
       end
 
       it "only prints the text if just_text option passed" do
-        context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context = instance_double(Course, time_zone: ActiveSupport::TimeZone["America/Denver"])
         expect(context_sensitive_datetime_title(Time.zone.now, context, just_text: true)).to eq "Local: Mar 13 at 1:12am<br>Course: Mar 13 at 3:12am"
       end
 
       it "uses the simple title if theres no timezone difference" do
-        context = double(time_zone: ActiveSupport::TimeZone["America/Anchorage"])
+        context = instance_double(Course, time_zone: ActiveSupport::TimeZone["America/Anchorage"])
         expect(context_sensitive_datetime_title(Time.zone.now, context, just_text: true)).to eq "Mar 13 at 1:12am"
         expect(context_sensitive_datetime_title(Time.zone.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Mar 13 at 1:12am\""
       end
@@ -126,14 +128,14 @@ describe ApplicationHelper do
 
       it "crosses date boundaries appropriately" do
         Timecop.freeze(Time.utc(2013, 3, 13, 7, 12)) do
-          context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
+          context = instance_double(Course, time_zone: ActiveSupport::TimeZone["America/Denver"])
           expect(context_sensitive_datetime_title(Time.zone.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at 1:12am\""
         end
       end
     end
 
     describe "#friendly_datetime" do
-      let(:context) { double(time_zone: ActiveSupport::TimeZone["America/Denver"]) }
+      let(:context) { instance_double(Course, time_zone: ActiveSupport::TimeZone["America/Denver"]) }
 
       it "spits out a friendly time tag" do
         tag = friendly_datetime(Time.zone.now)
@@ -176,12 +178,12 @@ describe ApplicationHelper do
     it "produces a date-only format" do
       format = accessible_date_format("date")
       expect(format).to match(/YYYY/)
-      expect(format).to_not match(/hh:mm/)
+      expect(format).not_to match(/hh:mm/)
     end
 
     it "produces a time-only format" do
       format = accessible_date_format("time")
-      expect(format).to_not match(/YYYY/)
+      expect(format).not_to match(/YYYY/)
       expect(format).to match(/hh:mm/)
     end
 
@@ -424,7 +426,7 @@ describe ApplicationHelper do
             group = course.groups.create!
             [@grandchild_account, course, group].each do |context|
               @context = context
-              expect(helper.include_account_js).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script>\n  <script src=\"https://example.com/child/account.js\" defer=\"defer\"></script>\n  <script src=\"https://example.com/grandchild/account.js\" defer=\"defer\"></script>")
+              expect(helper.include_account_js).to eq("<script src=\"https://example.com/root/account.js\" defer=\"defer\"></script><script src=\"https://example.com/child/account.js\" defer=\"defer\"></script><script src=\"https://example.com/grandchild/account.js\" defer=\"defer\"></script>")
             end
           end
         end
@@ -635,7 +637,7 @@ describe ApplicationHelper do
   describe "UI path checking" do
     describe "#active_path?" do
       context "when the request path is the course show page" do
-        let(:request) { double("request", fullpath: "/courses/2") }
+        let(:request) { instance_double(ActionDispatch::Request, fullpath: "/courses/2") }
 
         it "returns true for paths that match" do
           expect(active_path?("/courses")).to be_truthy
@@ -651,7 +653,7 @@ describe ApplicationHelper do
       end
 
       context "when the request path is the account external tools path" do
-        let(:request) { double("request", fullpath: "/accounts/2/external_tools/27") }
+        let(:request) { instance_double(ActionDispatch::Request, fullpath: "/accounts/2/external_tools/27") }
 
         before do
           @context = Account.default
@@ -664,7 +666,7 @@ describe ApplicationHelper do
       end
 
       context "when the request path is the course external tools path" do
-        let(:request) { double("request", fullpath: "/courses/2/external_tools/27") }
+        let(:request) { instance_double(ActionDispatch::Request, fullpath: "/courses/2/external_tools/27") }
 
         before do
           @context = Account.default.courses.create!
@@ -751,6 +753,18 @@ describe ApplicationHelper do
       it "returns false if the user has the flag disabled" do
         @current_user.disable_feature!(:new_user_tutorial_on_off)
         expect(tutorials_enabled?).to be false
+      end
+
+      it "returns true if the user has no explicit feature setting" do
+        expect(tutorials_enabled?).to be true
+      end
+
+      it "returns false if the user predates the tutorial feature flag, unless there is an explicit setting" do
+        @current_user.update_column(:created_at, Date.new(2017, 1, 1))
+        expect(tutorials_enabled?).to be false
+
+        @current_user.enable_feature!(:new_user_tutorial_on_off)
+        expect(tutorials_enabled?).to be true
       end
     end
   end
@@ -919,7 +933,7 @@ describe ApplicationHelper do
 
       it "returns token's developer_key with @access_token set" do
         user = user_model
-        developer_key = DeveloperKey.create!
+        developer_key = DeveloperKey.create!(name: "Test Developer Key")
         @access_token = user.access_tokens.where(developer_key_id: developer_key).create!
         expect(file_access_developer_key).to eql developer_key
       end
@@ -978,7 +992,7 @@ describe ApplicationHelper do
     let(:host) { "test.host" }
 
     context "not on the files domain" do
-      let(:request) { double("request", host_with_port: host) }
+      let(:request) { instance_double(ActionDispatch::Request, host_with_port: host) }
       let(:logged_in_user) { user_model }
 
       before do
@@ -1021,7 +1035,7 @@ describe ApplicationHelper do
 
       let(:logged_in_user) { user_model }
       let(:current_host) { "non-files-domain" }
-      let(:request) { double("request", host_with_port: current_host) }
+      let(:request) { instance_double(ActionDispatch::Request, host_with_port: current_host) }
 
       it "creates an authenticator for the logged in user" do
         expect(file_authenticator.user).to eql logged_in_user
@@ -1036,7 +1050,7 @@ describe ApplicationHelper do
       end
 
       it "creates an authenticator aware of the access token if present" do
-        @access_token = logged_in_user.access_tokens.create!
+        @access_token = logged_in_user.access_tokens.create!(purpose: "Test Access Token")
         expect(file_authenticator.access_token).to eql @access_token
       end
 
@@ -1053,7 +1067,7 @@ describe ApplicationHelper do
 
       let(:logged_in_user) { nil }
       let(:current_host) { "non-files-domain" }
-      let(:request) { double("request", host_with_port: current_host) }
+      let(:request) { instance_double(ActionDispatch::Request, host_with_port: current_host) }
 
       it "creates a public authenticator" do
         expect(file_authenticator.user).to be_nil
@@ -1079,7 +1093,7 @@ describe ApplicationHelper do
 
       let(:logged_in_user) { nil }
       let(:current_host) { "files-domain" }
-      let(:request) { double("request", host_with_port: current_host) }
+      let(:request) { instance_double(ActionDispatch::Request, host_with_port: current_host) }
 
       it "creates an authenticator for the real access user" do
         expect(file_authenticator.user).to eql real_access_user
@@ -1112,7 +1126,7 @@ describe ApplicationHelper do
 
       let(:logged_in_user) { nil }
       let(:current_host) { "files-domain" }
-      let(:request) { double("request", host_with_port: current_host) }
+      let(:request) { instance_double(ActionDispatch::Request, host_with_port: current_host) }
 
       it "creates a public authenticator" do
         authenticator = file_authenticator
@@ -1180,8 +1194,8 @@ describe ApplicationHelper do
         response.content_type = "application/json"
         account.enable_csp!
         helper.add_csp_for_root
-        expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        expect(headers).to_not have_key("Content-Security-Policy")
+        expect(headers).not_to have_key("Content-Security-Policy-Report-Only")
+        expect(headers).not_to have_key("Content-Security-Policy")
       end
 
       it "sets the CSP full header when active" do
@@ -1189,9 +1203,9 @@ describe ApplicationHelper do
 
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
-        expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: localhost root_account.test root_account2.test; "
+        expect(headers).not_to have_key("Content-Security-Policy-Report-Only")
+        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob: rldb:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
       end
 
       it "does not include the report URI when active" do
@@ -1199,7 +1213,7 @@ describe ApplicationHelper do
         account.enable_csp!
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: localhost root_account.test root_account2.test; "
       end
 
       it "includes canvadocs domain if enabled" do
@@ -1210,7 +1224,7 @@ describe ApplicationHelper do
           config: { "base_url" => "https://canvadocs.instructure.com/1" }
         )
         helper.add_csp_for_root
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: canvadocs.instructure.com localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: canvadocs.instructure.com localhost root_account.test root_account2.test; "
       end
 
       it "includes inst_fs domain if enabled" do
@@ -1221,7 +1235,7 @@ describe ApplicationHelper do
           app_host: "https://inst_fs.instructure.com"
         )
         helper.add_csp_for_root
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: *.inst_fs.instructure.com inst_fs.instructure.com localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: *.inst_fs.instructure.com inst_fs.instructure.com localhost root_account.test root_account2.test; "
       end
 
       context "with default source CSP directives" do
@@ -1235,7 +1249,7 @@ describe ApplicationHelper do
           allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
           helper.add_csp_for_root
           expect(headers["Content-Security-Policy"])
-            .to eq "frame-src 'self' blob: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
+            .to eq "frame-src 'self' blob: rldb: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
         end
 
         it "sets header for files" do
@@ -1252,16 +1266,23 @@ describe ApplicationHelper do
           expect(headers["Content-Security-Policy"]).to eq helper.default_csp_logging_directives
         end
 
-        it "sets header without default source CSP directives if :default_source_csp_logging feature is disabled" do
-          account.disable_feature!(:default_source_csp_logging)
-          helper.add_csp_for_root
-          expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: #{helper.allow_list_domains}; "
-          headers.clear
-          helper.add_csp_for_file
-          expect(headers["Content-Security-Policy"]).to eq helper.csp_iframe_attribute
-          headers.clear
-          helper.set_default_source_csp_directive_if_enabled
-          expect(headers["Content-Security-Policy"]).not_to eq helper.default_csp_logging_directives
+        context "when :default_source_csp_logging feature is disabled" do
+          before { account.disable_feature!(:default_source_csp_logging) }
+
+          it "sets frame-src without logging directives for root" do
+            helper.add_csp_for_root
+            expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: rldb: #{helper.allow_list_domains}; "
+          end
+
+          it "sets iframe attribute without logging directives for files" do
+            helper.add_csp_for_file
+            expect(headers["Content-Security-Policy"]).to eq helper.csp_iframe_attribute
+          end
+
+          it "does not set the default logging CSP directive" do
+            helper.set_default_source_csp_directive_if_enabled
+            expect(headers).not_to have_key("Content-Security-Policy")
+          end
         end
 
         it "doesn't set the header if :javascript_csp feature is enabled but not enforced" do
@@ -1269,24 +1290,101 @@ describe ApplicationHelper do
           account.disable_csp!
           allow_any_instance_of(DynamicSettings).to receive(:find).with("csp-logging").and_return({ host: "mocked_host_value" })
           helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy")
+          expect(headers).not_to have_key("Content-Security-Policy")
         end
 
         it "doesn't set the header if javascript_csp feature is disabled" do
           account.disable_feature!(:javascript_csp)
           allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
           helper.add_csp_for_root
-          expect(headers).to_not have_key("Content-Security-Policy")
+          expect(headers).not_to have_key("Content-Security-Policy")
         end
 
         it "won't override existing header" do
           allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
           directives =
-            "frame-src 'self' blob: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
+            "frame-src 'self' blob: rldb: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
           helper.add_csp_for_root
           expect(headers["Content-Security-Policy"]).to eq directives
           helper.set_default_source_csp_directive_if_enabled
           expect(headers["Content-Security-Policy"]).to eq directives
+        end
+
+        describe "default_csp_logging_directives" do
+          it "returns empty string when feature is disabled" do
+            account.disable_feature!(:default_source_csp_logging)
+            expect(helper.default_csp_logging_directives).to eq ""
+          end
+
+          it "includes default-src directive with self, unsafe-inline, and data sources" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives
+            expect(result).to include("default-src 'self' 'unsafe-inline' data:")
+          end
+
+          it "includes allow_list_domains in default-src" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives
+            domains = helper.allow_list_domains
+            expect(result).to include("default-src 'self' 'unsafe-inline' data: blob: #{domains};")
+          end
+
+          it "includes script-src when include_script_src is true" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives(include_script_src: true)
+            expect(result).to include("script-src 'self' 'unsafe-inline' 'unsafe-eval'")
+          end
+
+          it "does not include script-src when include_script_src is false" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives(include_script_src: false)
+            expect(result).not_to include("script-src")
+          end
+
+          it "includes allow_list_domains in script-src" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives(include_script_src: true)
+            domains = helper.allow_list_domains
+            expect(result).to include("script-src 'self' 'unsafe-inline' 'unsafe-eval' #{domains};")
+          end
+
+          it "appends csp_report_uri when present" do
+            allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+            result = helper.default_csp_logging_directives
+            expect(result).to include("report-uri https://somewhere/;")
+          end
+
+          it "does not append csp_report_uri when empty" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives
+            expect(result).not_to include("report-uri")
+          end
+
+          it "returns complete directive with all sources when include_script_src is true" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives(include_script_src: true)
+            expect(result).to match(/default-src 'self' 'unsafe-inline' data: .+;/)
+            expect(result).to match(/script-src 'self' 'unsafe-inline' 'unsafe-eval' .+;/)
+          end
+
+          it "returns only default-src when include_script_src is false" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives(include_script_src: false)
+            expect(result).to match(/default-src 'self' 'unsafe-inline' data: .+;/)
+            expect(result).not_to include("script-src")
+          end
+
+          it "handles report URI with multiple values correctly" do
+            allow(helper).to receive(:csp_report_uri).and_return("report-uri https://one.test/; report-uri https://two.test/; ")
+            result = helper.default_csp_logging_directives
+            expect(result).to include("report-uri https://one.test/; report-uri https://two.test/;")
+          end
+
+          it "includes blob: in default-src directive" do
+            allow(helper).to receive(:csp_report_uri).and_return("")
+            result = helper.default_csp_logging_directives
+            expect(result).to include("default-src 'self' 'unsafe-inline' data: blob:")
+          end
         end
       end
     end
@@ -1445,7 +1543,7 @@ describe ApplicationHelper do
 
     context "when improved_outcomes_management FF is disabled" do
       it "sets improved_outcomes_management key in js_env to false" do
-        @course.root_account.disable_feature! :improved_outcomes_management
+        mock_feature_flag_on_account(:improved_outcomes_management, false)
         helper.improved_outcomes_management_js_env
         expect(js_env).to have_key :IMPROVED_OUTCOMES_MANAGEMENT
         expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(false)
@@ -1506,8 +1604,8 @@ describe ApplicationHelper do
   end
 
   describe "#thumbnail_image_url" do
-    let(:root_account) { double("Account") }
-    let(:attachment) { double("Attachment", root_account:, uuid: "abc123") }
+    let(:root_account) { instance_double(Account) }
+    let(:attachment) { instance_double(Attachment, root_account:, uuid: "abc123") }
 
     context "when :file_association_access feature is enabled" do
       before do
@@ -1522,6 +1620,146 @@ describe ApplicationHelper do
       it "passes url_options to thumbnail_image_plain_url" do
         expect(helper).to receive(:thumbnail_image_plain_url).with(attachment, { foo: "bar" }).and_return("plain_url")
         expect(helper.thumbnail_image_url(attachment, nil, { foo: "bar" })).to eq("plain_url")
+      end
+    end
+  end
+
+  describe "include_masquerade_stylesheets" do
+    it "returns a stylesheet link tag for user_masquerade" do
+      expect(include_masquerade_stylesheets).to include("user_masquerade")
+      expect(include_masquerade_stylesheets).to include("stylesheet")
+    end
+  end
+
+  describe "microfrontend_overrides" do
+    let(:test_session) { {} }
+
+    before do
+      allow(helper).to receive(:session).and_return(test_session)
+    end
+
+    context "when feature is disabled" do
+      before do
+        Setting.set("allow_microfrontend_release_tag_override", "false")
+      end
+
+      it "returns nil even if overrides are set in session" do
+        service = MicrofrontendsReleaseTagOverrideService.new(test_session)
+        service.set_override(app: "canvas_career_learner", assets_url: "https://assets.instructure.com/test")
+
+        expect(helper.microfrontend_overrides).to be_nil
+      end
+    end
+
+    context "when feature is enabled" do
+      before do
+        Setting.set("allow_microfrontend_release_tag_override", "true")
+      end
+
+      it "returns nil when no overrides are set" do
+        expect(helper.microfrontend_overrides).to be_nil
+      end
+
+      it "returns overrides hash when overrides are active" do
+        service = MicrofrontendsReleaseTagOverrideService.new(test_session)
+        service.set_override(app: "canvas_career_learner", assets_url: "https://assets.instructure.com/test")
+
+        overrides = helper.microfrontend_overrides
+        expect(overrides).to eq({ "canvas_career_learner" => "https://assets.instructure.com/test" })
+      end
+
+      it "returns multiple overrides" do
+        service = MicrofrontendsReleaseTagOverrideService.new(test_session)
+        service.set_override(app: "canvas_career_learner", assets_url: "https://assets.instructure.com/test1")
+        service.set_override(app: "canvas_career_learning_provider", assets_url: "https://assets.instructure.com/test2")
+
+        overrides = helper.microfrontend_overrides
+        expect(overrides).to eq({
+                                  "canvas_career_learner" => "https://assets.instructure.com/test1",
+                                  "canvas_career_learning_provider" => "https://assets.instructure.com/test2"
+                                })
+      end
+    end
+  end
+
+  describe "csp_context" do
+    describe "when attachment context_type is User" do
+      before(:once) do
+        @course = course_factory(active_all: true)
+        @student = user_factory(active_all: true)
+        @course.enroll_student(@student, enrollment_state: "active")
+        @assignment = @course.assignments.create!(title: "Test Assignment", submission_types: "online_upload")
+      end
+
+      let(:attachment) do
+        Attachment.create!(
+          filename: "test.txt",
+          context: @student,
+          uploaded_data: StringIO.new("test content")
+        )
+      end
+
+      it "returns the course when attachment has one submission association" do
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to eq(@course)
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(true)
+      end
+
+      it "returns nil when attachment has no submission associations" do
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to be_nil
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(false)
+      end
+
+      it "returns nil when attachment has submissions from multiple courses" do
+        course2 = course_factory(active_all: true)
+        course2.enroll_student(@student, enrollment_state: "active")
+        assignment2 = course2.assignments.create!(title: "Test Assignment 2", submission_types: "online_upload")
+
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+        assignment2.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to be_nil
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(false)
+      end
+
+      it "returns the course when attachment has multiple submissions from the same course" do
+        assignment2 = @course.assignments.create!(title: "Test Assignment 2", submission_types: "online_upload")
+
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+        assignment2.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to eq(@course)
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(true)
+      end
+
+      it "does not return courses where the attachment is only referenced in past, but not current, submission attempts" do
+        attachment2 = Attachment.create!(
+          filename: "file2.txt",
+          context: @student,
+          uploaded_data: StringIO.new("second attempt")
+        )
+
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment2])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to be_nil
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(false)
       end
     end
   end

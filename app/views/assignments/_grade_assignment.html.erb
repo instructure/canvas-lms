@@ -65,7 +65,7 @@
     </li>
   <% end %>
 
-  <% if @can_grade && @assignment.has_peer_reviews? %>
+  <% if show_legacy_peer_reviews_link? %>
     <li>
       <a href="<%= context_url(@context, :context_assignment_peer_reviews_url, @assignment.id) %>"
         class="assignment_peer_reviews_link icon-peer-review"><%= t 'links.peer_reviews', "Peer Reviews" %></a>

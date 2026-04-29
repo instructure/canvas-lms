@@ -22,7 +22,7 @@ import {render, fireEvent} from '@testing-library/react'
 import type {SubmissionAttemptsComments} from '../../../../api.d'
 
 // EVAL-3907 - remove or rewrite to remove spies on imports
-describe.skip('SubmissionCommentsTray', () => {
+describe('SubmissionCommentsTray', () => {
   const attempts: SubmissionAttemptsComments = {
     attempts: {
       1: [
@@ -46,7 +46,7 @@ describe.skip('SubmissionCommentsTray', () => {
   }
 
   it('renders the tray when open is set to true', () => {
-    jest.spyOn(useState, 'default').mockReturnValueOnce(attempts).mockReturnValueOnce(true)
+    vi.spyOn(useState, 'default').mockReturnValueOnce(attempts).mockReturnValueOnce(true)
     const {getByTestId, queryByText} = render(<SubmissionCommentsTray />)
     expect(getByTestId('submission-tray-details')).toBeInTheDocument()
     expect(getByTestId('submission-tray-dismiss')).toBeInTheDocument()
@@ -54,7 +54,7 @@ describe.skip('SubmissionCommentsTray', () => {
     expect(queryByText('this is a comment')).toBeInTheDocument()
   })
   it('does not render the tray when open is set to false', () => {
-    jest.spyOn(useState, 'default').mockReturnValueOnce(attempts).mockReturnValueOnce(false)
+    vi.spyOn(useState, 'default').mockReturnValueOnce(attempts).mockReturnValueOnce(false)
     const {queryByText, queryByTestId} = render(<SubmissionCommentsTray />)
     expect(queryByTestId('submission-tray-details')).not.toBeInTheDocument()
     expect(queryByTestId('submission-tray-dismiss')).not.toBeInTheDocument()
@@ -62,8 +62,8 @@ describe.skip('SubmissionCommentsTray', () => {
     expect(queryByText('this is a comment')).not.toBeInTheDocument()
   })
   it('sets state to closed when CloseButton is clicked', () => {
-    jest.spyOn(useState, 'default').mockReturnValueOnce(attempts).mockReturnValueOnce(true)
-    jest.spyOn(useState, 'updateState')
+    vi.spyOn(useState, 'default').mockReturnValueOnce(attempts).mockReturnValueOnce(true)
+    vi.spyOn(useState, 'updateState')
     const {getByTestId} = render(<SubmissionCommentsTray />)
     fireEvent.click(getByTestId('submission-tray-dismiss').childNodes[0])
     expect(useState.updateState).toHaveBeenLastCalledWith({submissionTrayOpen: false})

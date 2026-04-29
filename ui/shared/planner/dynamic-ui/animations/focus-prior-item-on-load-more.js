@@ -32,7 +32,6 @@ export class FocusPriorItemOnLoadMore extends Animation {
     )
     const indexOfPriorItemComponent = indexOfFirstNewItemComponent - 1
     if (indexOfPriorItemComponent < 0) {
-       
       console.error('FocusPriorItemOnLoadMore could not find the item that should receive focus')
       return
     }

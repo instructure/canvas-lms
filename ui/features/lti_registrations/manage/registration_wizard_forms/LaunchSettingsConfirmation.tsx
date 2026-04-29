@@ -144,7 +144,8 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
           onChange={e => setRedirectURIs(e.target.value)}
           aria-describedby="redirect_uris_hint"
           messages={
-            redirectUrisMessages && (blurStatus.redirectURIs || hasSubmitted)
+            redirectUrisMessages &&
+            (blurStatus.redirectURIs || hasSubmitted || props.hasClickedNext)
               ? redirectUrisMessages
               : []
           }
@@ -162,7 +163,8 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
         placeholder={config.target_link_uri}
         onChange={e => setDefaultTargetLinkURI(e.target.value)}
         messages={
-          targetLinkURIMessages && (blurStatus.targetLinkURI || hasSubmitted)
+          targetLinkURIMessages &&
+          (blurStatus.targetLinkURI || hasSubmitted || props.hasClickedNext)
             ? targetLinkURIMessages
             : []
         }
@@ -177,7 +179,7 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
         isRequired={true}
         messages={
           openIDConnectInitiationURLMessages &&
-          (blurStatus.openIDConnectInitiationURL || hasSubmitted)
+          (blurStatus.openIDConnectInitiationURL || hasSubmitted || props.hasClickedNext)
             ? openIDConnectInitiationURLMessages
             : []
         }
@@ -200,7 +202,11 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
           maxHeight="10rem"
           value={launchSettings.Jwk || ''}
           onChange={e => setJwk(e.target.value)}
-          messages={jwkMessages && (blurStatus.Jwk || hasSubmitted) ? jwkMessages : []}
+          messages={
+            jwkMessages && (blurStatus.Jwk || hasSubmitted || props.hasClickedNext)
+              ? jwkMessages
+              : []
+          }
           themeOverride={{fontFamily: 'monospace'}}
           // TextArea's onBlur prop is typed incorrectly
           onBlur={handleBlur('Jwk', true) as unknown as any}
@@ -212,7 +218,11 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
           renderLabel={I18n.t('JWK URL')}
           value={launchSettings.JwkURL || ''}
           onChange={e => setJwkURL(e.target.value)}
-          messages={jwkMessages && (blurStatus.JwkURL || hasSubmitted) ? jwkMessages : []}
+          messages={
+            jwkMessages && (blurStatus.JwkURL || hasSubmitted || props.hasClickedNext)
+              ? jwkMessages
+              : []
+          }
           onBlur={handleBlur('JwkURL', true)}
           id={getInputIdForField('JwkURL')}
           data-testid={getInputIdForField('JwkURL')}
@@ -224,7 +234,11 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
         value={launchSettings.domain || ''}
         placeholder={toUndefined(config.domain)}
         onChange={e => setDomain(e.target.value)}
-        messages={domainMessages && (blurStatus.domain || hasSubmitted) ? domainMessages : []}
+        messages={
+          domainMessages && (blurStatus.domain || hasSubmitted || props.hasClickedNext)
+            ? domainMessages
+            : []
+        }
         onBlur={handleBlur('domain')}
         id={getInputIdForField('domain')}
       />
@@ -278,7 +292,8 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
           aria-describedby="custom_fields_hint"
           placeholder={config.custom_fields ? formatCustomFields(config.custom_fields) : undefined}
           messages={
-            customFieldsMessages && (blurStatus.customFields || hasSubmitted)
+            customFieldsMessages &&
+            (blurStatus.customFields || hasSubmitted || props.hasClickedNext)
               ? customFieldsMessages
               : []
           }

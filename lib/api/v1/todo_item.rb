@@ -26,6 +26,7 @@ module Api::V1::TodoItem
   def todo_item_json(assignment_or_quiz, user, session, todo_type)
     context_data(assignment_or_quiz).merge({
                                              context_name: assignment_or_quiz&.context&.name,
+                                             context_short_name: assignment_or_quiz&.context&.short_name,
                                              type: todo_type,
                                              ignore: api_v1_users_todo_ignore_url(assignment_or_quiz.asset_string, todo_type, permanent: "0"),
                                              ignore_permanently: api_v1_users_todo_ignore_url(assignment_or_quiz.asset_string, todo_type, permanent: "1"),
@@ -37,6 +38,13 @@ module Api::V1::TodoItem
       else
         assignment = assignment_or_quiz
         hash[:assignment] = assignment_json(assignment, user, session, include_all_dates: true)
+
+        # Add checkpoint-specific data for SubAssignments
+        if assignment.is_a?(SubAssignment)
+          hash[:checkpoint_label] = assignment.sub_assignment_tag
+          hash[:parent_assignment_id] = assignment.parent_assignment_id
+        end
+
         hash[:html_url] = if todo_type == "grading"
                             speed_grader_course_gradebook_url(assignment.context_id, assignment_id: assignment.id)
                           else
@@ -44,7 +52,7 @@ module Api::V1::TodoItem
                           end
 
         if todo_type == "grading"
-          hash["needs_grading_count"] = Assignments::NeedsGradingCountQuery.new(assignment, user).count
+          hash["needs_grading_count"] = Assignments::NeedsGradingCountQuery.new([assignment], user).count[assignment.global_id]
         end
       end
     end

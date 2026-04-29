@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import possibleTypes from '@canvas/apollo-v3/possibleTypes.json'
 import {
   ApolloClient,
@@ -102,8 +102,64 @@ function createCache() {
       Query: {
         fields: {
           node: {
-            merge(existing = {}, incoming, { mergeObjects }) {
-              return mergeObjects(existing, incoming);
+            merge(existing = {}, incoming, {mergeObjects}) {
+              return mergeObjects(existing, incoming)
+            },
+          },
+          legacyNode: {
+            merge(existing = {}, incoming, {mergeObjects}) {
+              return mergeObjects(existing, incoming)
+            },
+          },
+        },
+      },
+      User: {
+        fields: {
+          commentBankItemsConnection: {
+            keyArgs: ['query'],
+            merge(existing, incoming, {args}) {
+              // If we're paginating (have an 'after' cursor), merge the nodes
+              if (args?.after && existing) {
+                return {
+                  ...incoming,
+                  nodes: [...existing.nodes, ...incoming.nodes],
+                }
+              }
+              // Otherwise, replace with new data (e.g., new search query)
+              return incoming
+            },
+          },
+          recipientsObservers: {
+            keyArgs: ['contextCode', 'recipientIds'],
+            merge(existing, incoming, {args}) {
+              // If we're paginating (have an 'after' cursor), merge the nodes
+              if (args?.after && existing) {
+                return {
+                  ...incoming,
+                  nodes: [...existing.nodes, ...incoming.nodes],
+                }
+              }
+              // Otherwise, replace with new data (e.g., new query)
+              return incoming
+            },
+          },
+        },
+      },
+      Discussion: {
+        fields: {
+          mentionableUsersConnection: {
+            keyArgs: ['searchTerm'],
+            merge(existing, incoming, {args}) {
+              // Reset on new search (no cursor) or first page
+              if (!args?.after || !existing) {
+                return incoming
+              }
+
+              // Append new page to existing nodes
+              return {
+                ...incoming,
+                nodes: [...(existing.nodes || []), ...(incoming.nodes || [])],
+              }
             },
           },
         },

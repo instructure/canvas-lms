@@ -31,7 +31,7 @@ describe('MicrosoftSyncTitle', () => {
   })
 
   it('calls the specified callback when clicked', () => {
-    const clickMock = jest.fn()
+    const clickMock = vi.fn()
     const container = setup({handleClick: clickMock})
 
     fireEvent.click(
@@ -44,7 +44,7 @@ describe('MicrosoftSyncTitle', () => {
   })
 
   it('renders as checked or unchecked based on props', () => {
-    const container = setup({syncEnabled: true, handleClick: jest.fn()})
+    const container = setup({syncEnabled: true, handleClick: vi.fn()})
 
     expect(
       container.getByRole('checkbox', {

@@ -18,6 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module CaptchaValidation
+  protected
+
+  def valid_hostname?(parsed)
+    parsed["hostname"] == request.host
+  end
+
   private
 
   def validate_captcha
@@ -30,7 +36,7 @@ module CaptchaValidation
     if http_response && http_response.code == "200"
       parsed = JSON.parse(http_response.body)
       return parsed["error-codes"] unless parsed["success"]
-      return ["invalid-hostname"] unless parsed["hostname"] == request.host
+      return ["invalid-hostname"] unless valid_hostname?(parsed)
 
       nil
     else
@@ -45,7 +51,7 @@ module CaptchaValidation
     respond_to do |format|
       format.html do
         flash[:error] = t "Try again"
-        redirect_back fallback_location: root_url
+        redirect_back_or_to root_url
       end
       format.json do
         render json: { errors: }, status: :bad_request
@@ -54,6 +60,6 @@ module CaptchaValidation
   end
 
   def captcha_server_key
-    DynamicSettings.find(tree: :private)["recaptcha_server_key"]
+    Rails.application.credentials.dig(:recaptcha_keys, :server_key)
   end
 end

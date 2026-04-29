@@ -76,6 +76,8 @@ export function CurveGradesModal({assignment, contextUrl, submissions, handleGra
       students: studentAssignmentMap,
       context_url: contextUrl,
     }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore Legacy dialog class not typed
     const dialog = new CurveGradesDialog(dialogProps)
     dialog.show(() => {})
   }

@@ -73,7 +73,7 @@ describe('.load', () => {
   })
 
   it('emits change', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
 
     server.use(
       http.get('http://localhost/reports*', () => {
@@ -282,6 +282,7 @@ describe('quizReports:generate', function () {
         {
           id: '1',
           report_type: 'student_analysis',
+          includes_all_versions: true,
           progress: {
             id: '1',
             workflow_state: K.PROGRESS_ACTIVE,

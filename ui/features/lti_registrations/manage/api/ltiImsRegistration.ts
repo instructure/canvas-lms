@@ -15,16 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import type {RegistrationOverlay} from '../model/RegistrationOverlay'
 import {parseFetchResult} from '../../common/lib/apiResult/ApiResult'
 import {ZDynamicRegistrationToken} from '../model/DynamicRegistrationToken'
-import {ZLtiImsRegistration} from '../model/lti_ims_registration/LtiImsRegistration'
 import type {AccountId} from '../model/AccountId'
+import {useQuery} from '@tanstack/react-query'
+import {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
 import type {DynamicRegistrationTokenUUID} from '../model/DynamicRegistrationTokenUUID'
-import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
 import {ZLtiRegistrationWithConfiguration} from '../model/LtiRegistration'
+import {LtiRegistrationId} from '../model/LtiRegistrationId'
+import {
+  LtiRegistrationUpdateRequest,
+  ZLtiRegistrationUpdateRequest,
+} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
+import {ZLtiImsRegistration} from '../model/lti_ims_registration/LtiImsRegistration'
+import {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
+import {RegistrationOverlay} from '../model/RegistrationOverlay'
+import {LtiRegistrationUpdateRequestId} from '../model/lti_ims_registration/LtiRegistrationUpdateRequestId'
+import {z} from 'zod'
+import {LtiOverlay} from '../model/LtiOverlay'
+import {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
 
 /**
  * Fetch a newly generated registration token which will
@@ -40,12 +51,17 @@ export const fetchRegistrationToken = (
   accountId: AccountId,
   registrationUrl: string,
   unifiedToolId?: UnifiedToolId,
+  /**
+   * The existing registration to update
+   */
+  registrationId?: LtiRegistrationId,
 ) =>
   parseFetchResult(ZDynamicRegistrationToken)(
     fetch(
       `/api/lti/accounts/${accountId}/registration_token?unified_tool_id=${
         unifiedToolId || ''
-      }&registration_url=${registrationUrl}`,
+      }&registration_url=${registrationUrl.trim()}
+      ${registrationId ? `&registration_id=${registrationId}` : ''}`,
       defaultFetchOptions(),
     ),
   )
@@ -71,6 +87,102 @@ export const getLtiRegistrationByUUID = (
       defaultFetchOptions(),
     ),
   )
+
+/**
+ * Retrieve a newly created registration update request
+ * by its UUID.
+ *
+ * This is used in the dynamic registration flow for after
+ * the tool has gone through the registration update process
+ * and returned the flow to the platform.
+ *
+ * @param accountId
+ * @param registrationUuid uuid of the registration update request
+ * @returns
+ */
+export const getLtiRegistrationUpdateRequestByUUID = (
+  accountId: AccountId,
+  registrationUuid: DynamicRegistrationTokenUUID,
+) =>
+  parseFetchResult(ZLtiRegistrationUpdateRequest)(
+    fetch(
+      `/api/lti/accounts/${accountId}/lti_registration_update_request/uuid/${registrationUuid}`,
+      defaultFetchOptions(),
+    ),
+  )
+
+/**
+ * Retrieve a registration update request by its ID.
+ *
+ * @param accountId
+ * @param registrationUpdateRequestId ID of the registration update request
+ * @returns
+ */
+export const getLtiRegistrationUpdateRequestById = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+  registrationUpdateRequestId: LtiRegistrationUpdateRequestId,
+) =>
+  parseFetchResult(ZLtiRegistrationUpdateRequest)(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/update_requests/${registrationUpdateRequestId}`,
+      defaultFetchOptions(),
+    ),
+  )
+
+/**
+ * React Query hook to fetch a registration update request by its ID
+ * @param accountId
+ * @param registrationId
+ * @param registrationUpdateRequestId
+ * @returns React Query result
+ */
+export const useRegistrationUpdateRequest = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+  registrationUpdateRequestId: LtiRegistrationUpdateRequestId,
+) => {
+  return useQuery({
+    queryKey: [
+      accountId,
+      'lti_registration_update_request',
+      registrationId,
+      registrationUpdateRequestId,
+    ],
+    queryFn: () =>
+      doFetchWithSchema(
+        {
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/update_requests/${registrationUpdateRequestId}`,
+        },
+        ZLtiRegistrationUpdateRequest,
+      ),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+/**
+ * React Query hook to fetch the latest registration update request for a registration
+ * @param accountId
+ * @param registrationId
+ * @returns React Query result
+ */
+export const useLatestRegistrationUpdateRequest = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+) => {
+  return useQuery({
+    queryKey: [accountId, 'latest_lti_registration_update_request', registrationId],
+    queryFn: () =>
+      doFetchWithSchema(
+        {
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/latest_update_request`,
+        },
+        ZLtiRegistrationUpdateRequest,
+      ),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: false, // Don't retry if no update request exists (404)
+  })
+}
 
 /**
  * Retrieve a registration by its ID. Useful for managing a registration
@@ -110,4 +222,25 @@ export const updateRegistrationOverlay = (
       },
       body: JSON.stringify(overlay),
     }),
+  )
+
+export const applyLtiRegistrationUpdateRequest = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+  registrationUpdateRequestId: LtiRegistrationUpdateRequestId,
+  ltiOverlay: LtiConfigurationOverlay,
+) =>
+  parseFetchResult(z.unknown())(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/update_requests/${registrationUpdateRequestId}/apply`,
+      {
+        method: 'PUT',
+        ...defaultFetchOptions({
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+        body: JSON.stringify({overlay: ltiOverlay, accepted: true}),
+      },
+    ),
   )

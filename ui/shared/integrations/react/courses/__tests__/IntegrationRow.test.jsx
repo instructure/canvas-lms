@@ -22,7 +22,7 @@ import IntegrationRow from '../IntegrationRow'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('IntegrationRow', () => {
-  const onChange = jest.fn()
+  const onChange = vi.fn()
   const props = overrides => ({
     name: 'Microsoft Sync',
     enabled: true,
@@ -36,7 +36,7 @@ describe('IntegrationRow', () => {
 
   beforeEach(() => {
     fakeENV.setup()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

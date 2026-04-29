@@ -20,6 +20,7 @@
 module CC::Importer::Standard
   module WeblinkConverter
     include CC::Importer
+
     def get_weblink_title_and_url(resource)
       title = ""
       url = ""

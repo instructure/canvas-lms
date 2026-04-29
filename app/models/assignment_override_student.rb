@@ -18,8 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssignmentOverrideStudent < ActiveRecord::Base
+class AssignmentOverrideStudent < ApplicationRecord
   include Canvas::SoftDeletable
+
   belongs_to :assignment, class_name: "AbstractAssignment"
   belongs_to :assignment_override
   belongs_to :user
@@ -141,7 +142,14 @@ class AssignmentOverrideStudent < ActiveRecord::Base
 
     return false unless record.user_id && record.context_id
 
-    @no_enrollment = !record.user.student_enrollments.shard(record.shard).where(course_id: record.context_id).exists?
+    # Use preloaded enrollments if available to avoid N+1 queries
+    @no_enrollment = if record.user.association(:student_enrollments).loaded?
+                       record.user.student_enrollments.none? { |e| e.course_id == record.context_id }
+                     else
+                       !record.user.student_enrollments.shard(record.shard).where(course_id: record.context_id).exists?
+                     end
+
+    @no_enrollment
   end
 
   def update_cached_due_dates

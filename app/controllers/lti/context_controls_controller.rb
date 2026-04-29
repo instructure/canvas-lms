@@ -20,9 +20,6 @@
 module Lti
   # @API LTI ContextControls
   #
-  # @beta
-  # @internal
-  #
   # Configure the availability of an LTI Registration in a specific context.
   # Used by the Canvas Apps page UI.
   #
@@ -130,35 +127,83 @@ module Lti
     include Api::V1::Lti::ContextControl
 
     module ContextControlsBookmarker
-      def self.bookmark_for(context_controls)
-        [context_controls.deployment_id, context_controls.path]
+      # Orders deployments by context type: root account (0), subaccount (1), course (2).
+      # Uses lti_context_controls.root_account_id to identify the root account without
+      # needing to add the account ID in ruby. Requires eager_load(:deployment).
+      # If this query is changed, make sure the deployment_sort function is changed to
+      # match it.
+      # Sorts courses before their associated parent accounts within a deployment. Example:
+      # [a1.a3.a4, a1.a3.c22] becomes [11.13.14, 11.13.022], which when ordered naturally
+      # becomes [11.13.022, 11.13.14]
+      CONTEXT_ORDERING_SQL = Arel.sql("REPLACE(REPLACE(path, 'a', '1'), 'c', '0')")
+
+      def self.deployment_context_ordering_sql
+        Arel.sql(<<~SQL.squish)
+          CASE
+            WHEN #{ContextExternalTool.quoted_table_name}.context_type = 'Account'
+              AND #{ContextExternalTool.quoted_table_name}.context_id = #{Lti::ContextControl.quoted_table_name}.root_account_id THEN 0
+            WHEN #{ContextExternalTool.quoted_table_name}.context_type = 'Account' THEN 1
+            ELSE 2
+          END
+        SQL
+      end
+
+      def self.order_clause
+        [deployment_context_ordering_sql, :deployment_id, CONTEXT_ORDERING_SQL, :path].freeze
+      end
+
+      # This function needs to match the logic in DEPLOYMENT_CONTEXT_ORDERING_SQL.
+      # That is, DEPLOYMENT_CONTEXT_ORDERING_SQL should be the SQL version of this
+      # ruby function.
+      def self.deployment_sort(context_control)
+        deployment = context_control.deployment
+        if deployment.context_type == "Account" && deployment.context_id == context_control.root_account_id
+          0
+        elsif deployment.context_type == "Account"
+          1
+        else
+          2
+        end
+      end
+
+      def self.bookmark_for(context_control)
+        [
+          deployment_sort(context_control),
+          context_control.deployment_id,
+          context_control.path.tr("c", "0").tr("a", "1"),
+        ]
       end
 
       def self.validate(bookmark)
-        return false unless bookmark.is_a?(Array) && bookmark.length == 2
+        return false unless bookmark.is_a?(Array) && bookmark.length == 3
 
-        bookmark.first.is_a?(Integer) && bookmark.second.is_a?(String)
+        deployment_sort, deployment_id, ordered_path = bookmark
+
+        deployment_id.is_a?(Integer) &&
+          [0, 1, 2].include?(deployment_sort) &&
+          ordered_path.is_a?(String)
       end
 
       def self.restrict_scope(scope, pager)
         if pager.current_bookmark
           comparison = (pager.include_bookmark ? ">=" : ">")
-          deployment_id, path = pager.current_bookmark
-          scope = scope.where(
-            "(deployment_id > ?) OR (deployment_id = ? AND path #{comparison} ?)",
-            deployment_id,
-            deployment_id,
-            path
-          )
+          deployment_sort, deployment_id, ordered_path = pager.current_bookmark
+
+          sql = <<~SQL.squish
+            (#{deployment_context_ordering_sql} > :deployment_sort) OR
+            (#{deployment_context_ordering_sql} = :deployment_sort AND deployment_id > :deployment_id) OR
+            (#{deployment_context_ordering_sql} = :deployment_sort AND deployment_id = :deployment_id AND #{CONTEXT_ORDERING_SQL} #{comparison} :ordered_path)
+          SQL
+
+          scope = scope.where(sql, deployment_sort:, deployment_id:, ordered_path:)
         end
-        scope.order(:deployment_id, :path)
+        scope.order(*order_clause)
       end
     end
 
     before_action :require_account_context, except: [:create]
     before_action :require_current_account_context, only: [:create]
     before_action :require_root_account
-    before_action :require_user
     before_action :require_feature_flag
     before_action :require_manage_lti_registrations
     before_action :validate_bulk_params, only: [:create_many]
@@ -190,12 +235,17 @@ module Lti
         Lti::ContextControl
                .eager_load(:deployment)
                .active
-               .where(registration:)
-               .where.not(context_external_tools: { workflow_state: ["deleted", "disabled"] })
-               .order(:deployment_id, :path)
+               .for_registration(registration, @account)
+               .where(root_account: @account)
+               .where.not(context_external_tools: { workflow_state: ["deleted"] })
+               .order(*ContextControlsBookmarker.order_clause)
       )
 
-      paginated = Api.paginate(bookmarked, self, api_v1_lti_context_controls_index_url, per_page: controls_page_size)
+      paginated = Api.paginate(bookmarked,
+                               self,
+                               api_v1_lti_context_controls_index_url,
+                               per_page: Api.per_page_for(self,
+                                                          default: CONTROLS_DEFAULT_LIST_PAGE_SIZE))
 
       render json: (
         paginated
@@ -208,15 +258,6 @@ module Lti
     rescue => e
       report_error(e)
       raise e
-    end
-
-    def controls_page_size
-      per_page = params[:per_page].to_i
-      if per_page <= 0
-        CONTROLS_DEFAULT_LIST_PAGE_SIZE
-      else
-        [per_page, CONTROLS_MAX_LIST_PAGE_SIZE].min
-      end
     end
 
     # @API Show LTI Context Control
@@ -246,6 +287,7 @@ module Lti
     #   If that is not present, this request will fail.
     # @argument available [boolean] The state of this tool in this context. `true` shows the tool in this context and all contexts
     #   below it. `false` disables the tool for this context and all contexts below it. Defaults to true.
+    # @argument comment [Optional, String] A comment to add the to the change-log entry explaining why the changes were made.
     #
     # @returns Lti::ContextControl
     #
@@ -271,11 +313,13 @@ module Lti
       end
 
       unique_checks = control_params.slice(*Lti::ContextControlService.unique_check_attrs).compact
-      if registration.context_controls.active.exists?(unique_checks)
+      if Lti::ContextControl.for_registration(registration, @account).active.exists?(unique_checks)
         return render_errors("A context control for this deployment and context already exists.")
       end
 
-      control = Lti::ContextControlService.create_or_update(control_params)
+      control = Lti::ContextControlService.create_or_update(control_params, comment: params[:comment])
+
+      invalidate_navigation_cache_for_deployments(control.deployment)
 
       render json: lti_context_control_json(control, @current_user, session, @account, include_users: true), status: :created
     rescue Lti::ContextControlErrors => e
@@ -291,6 +335,7 @@ module Lti
     # Control parameters are sent as a JSON array of objects, each with the same parameters as the Create LTI Context Control endpoint.
     # Note that if a control already exists for the specified context and deployment, it will be updated instead of created.
     #
+    # @argument comment [Optional, String] A comment to add the to the change-log entry explaining why the changes were made.
     # @argument []account_id [integer] The Canvas ID of the Account that owns this. One of account_id or course_id must be present. Can also be a string.
     # @argument []course_id [integer] The Canvas ID of the Course that owns this. One of account_id or course_id must be present. Can also be a string.
     # @argument []deployment_id [integer] The Canvas ID of the ContextExternalTool that owns this, representing an LTI deployment.
@@ -333,6 +378,8 @@ module Lti
                                         .calculate_path_for_course_id(course.id, chains[course.account_id])
       end
 
+      app_id = registration.local_copy_for(@account)&.id
+
       controls = create_many_params.map do |control_params|
         key = if control_params[:account_id]
                 "a#{control_params[:account_id]}"
@@ -341,11 +388,12 @@ module Lti
               end
         control_params.permit(:account_id, :course_id, :deployment_id, :available).to_h.tap do |p|
           # insert_all requires that all hashes have the same keys
-          p[:account_id] = nil unless p.key?(:account_id)
-          p[:course_id] = nil unless p.key?(:course_id)
-          p[:deployment_id] ||= root_account_deployment&.id
+          p[:account_id] = p.key?(:account_id) ? p[:account_id].to_i : nil
+          p[:course_id] = p.key?(:course_id) ? p[:course_id].to_i : nil
+          p[:deployment_id] = p.key?(:deployment_id) ? p[:deployment_id].to_i : root_account_deployment&.id
           p[:available] = true unless p.key?(:available)
           p[:registration_id] = registration.id
+          p[:app_id] = app_id
           p[:workflow_state] = :active
           p[:created_by_id] = @current_user.id
           p[:updated_by_id] = @current_user.id
@@ -363,17 +411,17 @@ module Lti
       deployment_course_ids = ContextExternalTool.where(id: deployments, context_type: "Course").pluck(:id, :context_id).to_h
       course_account_ids = Course.where(id: controls.pluck(:course_id).uniq).pluck(:id, :account_id).to_h
       deployment_account_ids = ContextExternalTool.where(id: deployments, context_type: "Account").pluck(:id, :context_id).to_h
-      account_chains = Account.partitioned_sub_account_ids_recursive(deployment_account_ids.values)
+      deployment_account_chains = Account.partitioned_sub_account_ids_recursive(deployment_account_ids.values)
 
       invalid_controls = controls.reject do |control_params|
-        deployment_id = control_params[:deployment_id].to_i
+        deployment_id = control_params[:deployment_id]
 
         if deployment_course_ids.key?(deployment_id)
-          deployment_course_ids[deployment_id] == control_params[:course_id].to_i
+          deployment_course_ids[deployment_id] == control_params[:course_id]
         else
-          account_id = control_params[:account_id]&.to_i || course_account_ids[control_params[:course_id].to_i]
+          account_id = control_params[:account_id] || course_account_ids[control_params[:course_id]]
           deployment_account_ids[deployment_id] == account_id ||
-            account_chains[deployment_account_ids[deployment_id]]&.include?(account_id)
+            deployment_account_chains[deployment_account_ids[deployment_id]]&.include?(account_id)
         end
       end
 
@@ -391,15 +439,39 @@ module Lti
         )
       end
 
+      anchor_controls = Lti::ContextControlService.build_anchor_controls(
+        controls:,
+        account_chains: chains,
+        course_account_ids:,
+        deployments:,
+        deployment_account_ids:,
+        deployment_course_ids:,
+        cached_paths:
+      )
+      controls += anchor_controls
+
       ids = Lti::ContextControl.transaction do
-        # Postgres's ON CONFLICT <conflict_target> can only handle a single unique index at a time,
-        # hence the split
-        control_ids = Lti::ContextControl.upsert_all(controls.filter { |c| c[:course_id].present? }, unique_by: [:course_id, :deployment_id], returning: :id).rows.flatten
-        control_ids + Lti::ContextControl.upsert_all(controls.filter { |c| c[:account_id].present? }, unique_by: [:account_id, :deployment_id], returning: :id).rows.flatten
+        Lti::RegistrationHistoryEntry
+          .track_bulk_control_changes(control_params: controls,
+                                      lti_registration: registration,
+                                      root_account: @account,
+                                      current_user: @current_user,
+                                      comment: params[:comment]) do
+          # Postgres's ON CONFLICT <conflict_target> can only handle a single unique index at a time, hence the split
+          # upsert needed here to restore any previously deleted controls
+          control_ids = Lti::ContextControl.upsert_all(controls.filter { |c| c[:course_id].present? }, unique_by: [:course_id, :deployment_id], returning: :id).rows.flatten
+          control_ids + Lti::ContextControl.upsert_all(controls.filter { |c| c[:account_id].present? }, unique_by: [:account_id, :deployment_id], returning: :id).rows.flatten
+        end
       end
 
-      controls = Lti::ContextControl.where(id: ids).preload(:account, :course, :created_by, :updated_by).order(id: :asc)
+      controls = Lti::ContextControl.where(id: ids)
+                                    # Used by serializer for users' names.
+                                    .preload(:created_by, :updated_by).order(id: :asc)
       calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(controls)
+
+      invalidate_navigation_cache_for_deployments(
+        ContextExternalTool.where(id: deployments).preload(:context_external_tool_placements)
+      )
 
       json = controls.map do |control|
         lti_context_control_json(control, @current_user, session, @account, include_users: true, calculated_attrs: calculated_attrs[control.id])
@@ -419,6 +491,7 @@ module Lti
     # Returns the context control with its new availability value applied.
     #
     # @argument available [Required, boolean] the new value for this control's availability
+    # @argument comment [Optional, String] A comment to add the to the change-log entry explaining why the changes were made.
     # @returns Lti::ContextControl
     #
     # @example_request
@@ -429,7 +502,12 @@ module Lti
     #        -H "Authorization: Bearer <token>"
     def update
       available = value_to_boolean(params.require(:available))
-      control.update!(available:)
+      Lti::RegistrationHistoryEntry
+        .track_control_changes(control:, current_user: @current_user, comment: params[:comment]) do
+        control.update!(available:)
+      end
+
+      invalidate_navigation_cache_for_deployments(control.deployment)
 
       render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
     rescue => e
@@ -453,10 +531,14 @@ module Lti
     #        -X DELETE \
     #        -H "Authorization: Bearer <token>"
     def delete
-      if control.destroy
-        render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
-      else
-        render_errors(control.errors.full_messages, status: :unprocessable_entity)
+      Lti::RegistrationHistoryEntry
+        .track_control_changes(control:, current_user: @current_user, comment: params[:comment]) do
+        if control.destroy
+          invalidate_navigation_cache_for_deployments(control.deployment)
+          render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
+        else
+          render_errors(control.errors.full_messages, status: :unprocessable_entity)
+        end
       end
     rescue => e
       report_error(e)
@@ -482,11 +564,15 @@ module Lti
     end
 
     def root_account_deployment
-      @root_account_deployment ||= ContextExternalTool.active.find_by(context: @account, lti_registration: registration)
+      @root_account_deployment ||= ContextExternalTool.active
+                                                      .for_lti_registration(registration, @account)
+                                                      .find_by(context: @account)
     end
 
     def control
-      @control ||= Lti::ContextControl.active.find_by(id: params[:id], registration:, root_account_id: @account.id)
+      @control ||= Lti::ContextControl.active
+                                      .for_registration(registration, @account)
+                                      .find_by(id: params[:id], root_account_id: @account.id)
       raise ActiveRecord::RecordNotFound unless @control
 
       @control
@@ -553,6 +639,12 @@ module Lti
       unless @account.feature_enabled?(:lti_registrations_next)
         render json: { error: "The specified resource does not exist." }, status: :not_found
       end
+    end
+
+    def invalidate_navigation_cache_for_deployments(deployments)
+      return unless Array.wrap(deployments).any?(&:uses_cached_placements?)
+
+      Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
     end
   end
 end

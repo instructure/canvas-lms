@@ -59,9 +59,18 @@ describe Accessibility::Rules::TableHeaderRule do
 
     it "fixes tables by adding headers to the first column" do
       input_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
-      expected_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><th scope=\"row\">Data 1</th><td>Data 2</td></tr></table>"
+      expected_html = "<table><tr><th scope=\"row\">Cell 1</th><td>Cell 2</td></tr><tr><th scope=\"row\">Data 1</th><td>Data 2</td></tr></table>"
 
-      fixed_html = fix_issue(:table_header, input_html, "./*", "The left column")
+      fixed_html = fix_issue(:table_header, input_html, "./*", "The first column")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "fixes tables by adding headers to first column including first row" do
+      input_html = "<table><tr><td>A</td><td>B</td><td>C</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>4</td><td>5</td><td>6</td></tr></table>"
+      expected_html = "<table><tr><th scope=\"row\">A</th><td>B</td><td>C</td></tr><tr><th scope=\"row\">1</th><td>2</td><td>3</td></tr><tr><th scope=\"row\">4</th><td>5</td><td>6</td></tr></table>"
+
+      fixed_html = fix_issue(:table_header, input_html, "./*", "The first column")
 
       expect(fixed_html.delete("\n")).to eq(expected_html)
     end
@@ -74,28 +83,14 @@ describe Accessibility::Rules::TableHeaderRule do
 
       expect(fixed_html.delete("\n")).to eq(expected_html)
     end
-  end
 
-  describe ".display_name" do
-    it "returns the correct display name" do
-      expect(described_class.display_name).to eq(I18n.t("Table headers aren’t set up"))
-    end
-  end
+    it "fixes tables by adding headers to both first row and column with multiple rows" do
+      input_html = "<table><tr><td>A</td><td>B</td><td>C</td></tr><tr><td>1</td><td>2</td><td>3</td></tr><tr><td>4</td><td>5</td><td>6</td></tr></table>"
+      expected_html = "<table><tr><th scope=\"col\">A</th><th scope=\"col\">B</th><th scope=\"col\">C</th></tr><tr><th scope=\"row\">1</th><td>2</td><td>3</td></tr><tr><th scope=\"row\">4</th><td>5</td><td>6</td></tr></table>"
 
-  describe ".message" do
-    it "returns the correct message" do
-      expect(described_class.message).to eq(I18n.t("Table headers aren't set up correctly for screen readers to know which headers apply to which cells."))
-    end
-  end
+      fixed_html = fix_issue(:table_header, input_html, "./*", "Both")
 
-  describe ".why" do
-    it "returns the correct explanation" do
-      expected_message = I18n.t(
-        "Screen readers use table headers to help students understand what each cell means. " \
-        "Without headers, the data can be confusing or meaningless to someone who can’t see the full layout. " \
-        "Setting row and column headers makes your table clear and accessible for all learners." \
-      )
-      expect(described_class.why).to eq(expected_message)
+      expect(fixed_html.delete("\n")).to eq(expected_html)
     end
   end
 end

@@ -23,9 +23,10 @@ import axios from '@canvas/axios'
 import {Button} from '@instructure/ui-buttons'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {FormField} from '@instructure/ui-form-field'
 import {Alert} from '@instructure/ui-alerts'
+import {htmlDecode} from '@canvas/util/TextHelper'
 
 const I18n = createI18nScope('shared_message_students')
 
@@ -94,7 +95,7 @@ class MessageStudents extends React.Component {
       ? [
           {
             text: this.state.errors[field],
-            type: 'error',
+            type: 'newError',
           },
         ]
       : null
@@ -122,7 +123,7 @@ class MessageStudents extends React.Component {
     const fields = ['subject', 'body']
     const errors = {}
     fields.forEach(field => {
-      if (data[field].length === 0) {
+      if (data[field].trim().length === 0) {
         errors[field] = I18n.t('Please provide a %{field}', {
           field,
         })
@@ -174,10 +175,20 @@ class MessageStudents extends React.Component {
     const data = this.composeRequestData()
     const errors = this.validationErrors(data)
     if (Object.keys(errors).length > 0) {
-      this.setState({
-        errors,
-        hideAlert: false,
-      })
+      this.setState(
+        {
+          errors,
+          hideAlert: false,
+        },
+        () => {
+          // Focus the topmost errored input for screen reader users
+          if (errors.subject && this._subjectInput) {
+            this._subjectInput.focus()
+          } else if (errors.body && this._bodyInput) {
+            this._bodyInput.focus()
+          }
+        },
+      )
     } else {
       this.sendMessage(data)
     }
@@ -203,10 +214,15 @@ class MessageStudents extends React.Component {
 
   handleResponseSuccess = () => {
     setTimeout(() => {
-      this.setState({
-        ...this.initialState,
-        open: false,
-      })
+      this.setState(
+        {
+          ...this.initialState,
+          open: false,
+        },
+        () => {
+          this.props.onRequestClose()
+        },
+      )
     }, 2500)
     this.setState({
       hideAlert: false,
@@ -247,7 +263,7 @@ class MessageStudents extends React.Component {
       const displayName = recipient.displayName || recipient.email
       return (
         <li key={recipient.id} className="ac-token">
-          {displayName}
+          {htmlDecode(displayName)}
         </li>
       )
     })
@@ -274,11 +290,6 @@ class MessageStudents extends React.Component {
               'info',
               () => this.state.sending,
             )}
-            {this.renderAlert(
-              I18n.t('There was a problem sending your message.'),
-              'error',
-              () => Object.keys(this.state.errors).length > 0,
-            )}
             <form onSubmit={this.handleSubmit} className="MessageStudents__Form">
               <div className="MessageStudents__FormField">
                 <div className="ac">
@@ -289,20 +300,28 @@ class MessageStudents extends React.Component {
               </div>
               <div className="MessageStudents__FormField">
                 <TextInput
+                  isRequired={true}
                   renderLabel={I18n.t('Subject')}
                   defaultValue={this.props.subject}
                   onChange={onTextChange('subject')}
                   messages={this.errorMessagesFor('subject')}
                   interaction={this.state.sending || this.state.success ? 'disabled' : 'enabled'}
+                  ref={el => {
+                    this._subjectInput = el
+                  }}
                 />
               </div>
               <div className="MessageStudents__FormField">
                 <TextArea
+                  required={true}
                   label={I18n.t('Body')}
                   defaultValue={this.props.body}
                   onChange={onTextChange('body')}
                   messages={this.errorMessagesFor('body')}
                   disabled={this.state.sending || this.state.success}
+                  ref={el => {
+                    this._bodyInput = el
+                  }}
                 />
               </div>
             </form>

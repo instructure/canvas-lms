@@ -32,7 +32,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('conditional_release')
 
-const {object, func} = PropTypes
+const {object, func, bool} = PropTypes
 
 class EditorView extends React.Component {
   static get propTypes() {
@@ -40,6 +40,7 @@ class EditorView extends React.Component {
       state: object.isRequired,
       setScoreAtIndex: func.isRequired,
       appElement: object,
+      readOnly: bool,
 
       // action props
       setAssignmentPickerTarget: func.isRequired,
@@ -125,6 +126,7 @@ class EditorView extends React.Component {
             onAddItems={this.setAssignmentPickerTarget}
             triggerAssignment={this.props.state.get('trigger_assignment')}
             assignments={this.props.state.get('assignments', Immutable.List())}
+            readOnly={this.props.readOnly}
           />
         ))}
       </div>

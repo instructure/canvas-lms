@@ -3,12 +3,6 @@ smart_search:
   state: allowed
   root_opt_in: true
   applies_to: Course
-  display_name: Smart Search
-  description: AI driven smart search feature.
-  beta: true
-smart_search_enhanced_ui:
-  state: hidden
-  display_name: Smart Search Enhanced UI
-  description: Uses the enhanced Smart Search UI. Smart Search must be enabled for this to take effect.
-  applies_to: RootAccount
-  shadow: true
+  display_name: IgniteAI Search for Courses
+  description: IgniteAI Search for Courses allows users to find course content quickly through context-aware, multilingual search results.
+  visible_on: tier_1_visible_on_hook

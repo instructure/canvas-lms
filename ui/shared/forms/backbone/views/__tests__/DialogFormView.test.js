@@ -31,7 +31,10 @@ describe('DialogFormView', () => {
   let closeSpy
   let $dialog
 
-  const openDialog = () => view.$trigger.simulate('click')
+  const openDialog = () => {
+    // Use native DOM click instead of simulate
+    view.$trigger[0].click()
+  }
   const closeDialog = () => view.$el.dialog('close')
 
   const sendResponse = (method, json) =>
@@ -44,10 +47,10 @@ describe('DialogFormView', () => {
   beforeEach(() => {
     // Reset variables for each test
     $dialog = null
-    closeSpy = jest.spyOn(DialogFormView.prototype, 'close')
+    closeSpy = vi.spyOn(DialogFormView.prototype, 'close')
     server = {
-      respond: jest.fn(),
-      restore: jest.fn(),
+      respond: vi.fn(),
+      restore: vi.fn(),
     }
     model = new Backbone.Model({
       id: 1,
@@ -188,13 +191,13 @@ describe('DialogFormView', () => {
   })
 
   it('submits the form', async () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     openDialog()
     expect(view.model.get('is_awesome')).toBe(true)
 
-    // Simulate checkbox click and form submission
-    view.$('label').simulate('click')
-    view.$('button[type=submit]').simulate('click')
+    // Use native DOM click instead of simulate
+    view.$('label')[0].click()
+    view.$('button[type=submit]')[0].click()
 
     // Mock the server response
     model.set('is_awesome', false)
@@ -203,9 +206,9 @@ describe('DialogFormView', () => {
       is_awesome: false,
     })
 
-    jest.advanceTimersByTime(1)
+    vi.advanceTimersByTime(1)
     expect(view.model.get('is_awesome')).toBe(false)
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it('gets dialog title from trigger title', () => {
@@ -250,7 +253,7 @@ describe('DialogFormView', () => {
     expect(closeSpy).toHaveBeenCalled()
   })
 
-  // Skipping this test as it was skipped in the original
+  // This test needs focus behavior to be fully mocked - keeping it skipped for now
   it.skip('focuses close button when opened', () => {
     openDialog()
     expect(document.activeElement).toBe($('.ui-dialog-titlebar-close')[0])

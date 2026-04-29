@@ -23,6 +23,7 @@ module Lti
     describe GradebookServices do
       controller(ApplicationController) do
         include Lti::IMS::Concerns::GradebookServices
+
         before_action :prepare_line_item_for_ags!, :verify_user_in_context, :verify_line_item_in_context
         skip_before_action(
           :verify_access_token,
@@ -81,22 +82,70 @@ module Lti
         end
 
         context "with user not active in context" do
+          before { user.enrollments.first.update!(workflow_state: "inactive") }
+
           it "fails to process the request" do
             get :index, params: valid_params
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
+          end
+        end
+
+        context "with course term ended, but not for teachers" do
+          it "processes the request" do
+            term = context.enrollment_term
+            term.update!(end_at: 1.day.ago)
+            section = context.course_sections.create!(
+              name: "Active Section",
+              start_at: 2.days.ago,
+              end_at: 1.day.from_now,
+              restrict_enrollments_to_section_dates: true
+            )
+            student_in_section(section, { user: })
+
+            get :index, params: valid_params
+            expect(response).to be_successful
+          end
+        end
+
+        context "with course term ended, but not for TAs" do
+          it "processes the request" do
+            term = context.enrollment_term
+            term.update!(end_at: 1.day.ago)
+            term.set_overrides(
+              context.account,
+              "TaEnrollment" => { end_at: 1.day.from_now }
+            )
+
+            get :index, params: valid_params
+            expect(response).to be_successful
+          end
+        end
+
+        context "with course term ended for both teachers and TAs" do
+          it "fails to process the request" do
+            term = context.enrollment_term
+            term.update!(end_at: 1.day.ago)
+            term.set_overrides(
+              context.account,
+              "TeacherEnrollment" => { end_at: 1.day.ago },
+              "TaEnrollment" => { end_at: 1.day.ago }
+            )
+
+            get :index, params: valid_params
+            expect(response).to have_http_status(:unprocessable_content)
           end
         end
 
         it "responds with 422 if course is hard concluded" do
           context.update!(workflow_state: "completed")
           get :index, params: valid_params
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it "responds with 422 if course end date has passed" do
           context.update!(start_at: 2.days.ago, conclude_at: 1.day.ago, restrict_enrollments_to_course_dates: true)
           get :index, params: valid_params
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it "still responds with a 404 if an invalid course_id is passed" do
@@ -109,7 +158,7 @@ module Lti
 
           it "fails to process the request" do
             get :index, params: valid_params
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
           end
         end
 
@@ -123,7 +172,7 @@ module Lti
 
           it "fails to find user" do
             get :index, params: valid_params
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
             expect(response.parsed_body["errors"]["message"]).to eq("User not found in course or is not a student")
           end
 
@@ -186,7 +235,7 @@ module Lti
 
           it "fails to find user" do
             get :index, params: valid_params
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
             expect(response.parsed_body["errors"]["message"]).to eq("User not found in course or is not a student")
           end
         end
@@ -225,7 +274,7 @@ module Lti
 
           it "fails to match assignment tool" do
             get :index, params: valid_params
-            expect(response).to have_http_status :unprocessable_entity
+            expect(response).to have_http_status :unprocessable_content
             expect(parsed_response_body["errors"]["message"]).to eq("Resource link id points to Tool not associated with this Context")
           end
         end

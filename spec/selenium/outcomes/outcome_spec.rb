@@ -19,9 +19,11 @@
 
 require_relative "../helpers/outcome_common"
 require_relative "pages/improved_outcome_management_page"
+require "feature_flag_helper"
 
 describe "outcomes" do
   include_context "in-process server selenium tests"
+  include FeatureFlagHelper
   include OutcomeCommon
   include ImprovedOutcomeManagementPage
 
@@ -30,6 +32,7 @@ describe "outcomes" do
 
   describe "course outcomes" do
     before do
+      mock_feature_flag_on_account(:improved_outcomes_management, false)
       course_with_teacher_logged_in
     end
 
@@ -67,26 +70,27 @@ describe "outcomes" do
         end
 
         it "validates default values", priority: "1" do
-          expect(f("#calculation_method")).to have_value("decaying_average")
+          click_option("#calculation_method", "Decaying Average")
+          expect(f("#calculation_method")).to have_value("standard_decaying_average")
           expect(f("#calculation_int")).to have_value("65")
-          expect(f("#calculation_int_example")).to include_text("Most recent result counts as 65% " \
-                                                                "of mastery weight, average of all other results count " \
-                                                                "as 35% of weight. If there is only one result, the single score " \
-                                                                "will be returned.")
+          expect(f("#calculation_int_example")).to include_text("For each additional assessment, " \
+                                                                "the sum of the previous score " \
+                                                                "calculations decay by an additional")
         end
 
         it "validates decaying average_range", priority: "2" do
-          should_validate_decaying_average_range
+          should_validate_decaying_average_range "The value must be between '50' and '99'"
         end
 
-        it "validates calculation int accepatble values", priority: "1" do
+        it "validates calculation int acceptable values", priority: "1" do
           save_without_error(1)
           f(".edit_button").click
-          save_without_error(99)
+          save_without_error(65)
         end
 
         it "retains the settings after saving", priority: "1" do
-          save_without_error(rand(1..99), "Decaying Average")
+          click_option("#calculation_method", "Decaying Average")
+          save_without_error(rand(50..99), "Decaying Average")
           expect(f("#calculation_method").text).to include("Decaying Average")
         end
       end
@@ -214,8 +218,7 @@ describe "outcomes" do
 
     describe "with improved_outcome_management enabled" do
       before do
-        enable_improved_outcomes_management(Account.default)
-        enable_account_level_mastery_scales(Account.default)
+        mock_feature_flag_on_account(:improved_outcomes_management, true)
       end
 
       it "creates an initial outcome in the course level as a teacher" do
@@ -270,9 +273,11 @@ describe "outcomes" do
         select_drilldown_outcome_group_with_text("New group").click
         force_click(confirm_move_button)
         # Verify through AR to save time
-        new_group_children = LearningOutcomeGroup.find_by(title: "New group").child_outcome_links
-        expect(new_group_children.count).to eq(1)
-        expect(new_group_children.first.title).to eq("outcome 0")
+        keep_trying_until do
+          new_group_children = LearningOutcomeGroup.find_by(title: "New group").child_outcome_links
+          expect(new_group_children.count).to eq(1)
+          expect(new_group_children.first.title).to eq("outcome 0")
+        end
       end
 
       it "bulk removes outcomes at the course level as a teacher" do
@@ -329,73 +334,64 @@ describe "outcomes" do
       end
 
       describe "with account_level_mastery_scales disabled" do
-        before do
-          enable_improved_outcomes_management(Account.default)
-          disable_account_level_mastery_scales(Account.default)
+        it "creates an outcome with a friendly description present" do
+          get outcome_url
+          create_outcome_with_friendly_desc("Outcome", "Standard Desc", "Friendly Desc")
+          # Have to verify model creation with AR to save time since the creation => appearance flow is a little slow
+          # Small delay between button click and model population in db
+          keep_trying_until do
+            outcome = LearningOutcome.find_by(context: @course, short_description: "Outcome", description: "<p>Standard Desc</p>")
+            fd = OutcomeFriendlyDescription.find_by(context: @course, learning_outcome: outcome, description: "Friendly Desc")
+            expect(fd).to be_truthy
+          end
         end
 
-        describe "with friendly_description enabled" do
-          before do
-            enable_friendly_description
-          end
-
-          it "creates an outcome with a friendly description present" do
-            get outcome_url
-            create_outcome_with_friendly_desc("Outcome", "Standard Desc", "Friendly Desc")
-            # Have to verify model creation with AR to save time since the creation => appearance flow is a little slow
-            outcome = LearningOutcome.find_by(context: @course, short_description: "Outcome", description: "<p>Standard Desc</p>")
-            # Small delay between button click and model population in db
-            keep_trying_until do
-              fd = OutcomeFriendlyDescription.find_by(context: @course, learning_outcome: outcome, description: "Friendly Desc")
-              expect(fd).to be_truthy
-            end
-          end
-
-          it "edits an outcome's friendly description" do
-            # disable_account_level_mastery_scales(Account.default)
-            create_bulk_outcomes_groups(@course, 1, 1)
-            outcome_title = "outcome 0"
-            outcome = LearningOutcome.find_by(context: @course, short_description: outcome_title)
-            outcome.update!(description: "long description")
-            OutcomeFriendlyDescription.find_or_create_by!(learning_outcome_id: outcome, context: @course, description: "FD")
-            get outcome_url
-            select_outcome_group_with_text(@course.name).click
-            expect(nth_individual_outcome_title(0)).to eq(outcome_title)
-            individual_outcome_kabob_menu(0).click
-            edit_outcome_button.click
-            insert_friendly_description("FD - Edited")
-            click_save_edit_modal
-            expect(nth_individual_outcome_title(0)).to eq(outcome_title)
-            expect(nth_individual_outcome_text(0)).not_to match(/Friendly Description.*FD/m)
-            expand_outcome_description_button(0).click
-            expect(nth_individual_outcome_text(0)).to match(/Friendly Description.*FD - Edited/m)
-          end
+        it "edits an outcome's friendly description" do
+          # disable_account_level_mastery_scales(Account.default)
+          create_bulk_outcomes_groups(@course, 1, 1)
+          outcome_title = "outcome 0"
+          outcome = LearningOutcome.find_by(context: @course, short_description: outcome_title)
+          outcome.update!(description: "long description")
+          OutcomeFriendlyDescription.find_or_create_by!(learning_outcome_id: outcome, context: @course, description: "FD")
+          get outcome_url
+          select_outcome_group_with_text(@course.name).click
+          expect(nth_individual_outcome_title(0)).to eq(outcome_title)
+          individual_outcome_kabob_menu(0).click
+          edit_outcome_button.click
+          insert_friendly_description("FD - Edited")
+          click_save_edit_modal
+          expect(nth_individual_outcome_title(0)).to eq(outcome_title)
+          expect(nth_individual_outcome_text(0)).not_to match(/Friendly Description.*FD/m)
+          expand_outcome_description_button(0).click
+          expect(nth_individual_outcome_text(0)).to match(/Friendly Description.*FD - Edited/m)
         end
 
         it "creates an outcome with default ratings and calculation method" do
           get outcome_url
           create_outcome("Outcome with Individual Ratings")
           # Verify through AR to save time
-          outcome = LearningOutcome.find_by(context: @course, short_description: "Outcome with Individual Ratings")
-          ratings = outcome.data[:rubric_criterion][:ratings]
-          mastery_points = outcome.data[:rubric_criterion][:mastery_points]
-          points_possible = outcome.data[:rubric_criterion][:points_possible]
-          expect(outcome.nil?).to be(false)
-          expect(ratings.length).to eq(5)
-          expect(ratings[0][:description]).to eq("Exceeds Mastery")
-          expect(ratings[0][:points]).to eq(4)
-          expect(ratings[1][:description]).to eq("Mastery")
-          expect(ratings[1][:points]).to eq(3)
-          expect(ratings[2][:description]).to eq("Near Mastery")
-          expect(ratings[2][:points]).to eq(2)
-          expect(ratings[3][:description]).to eq("Below Mastery")
-          expect(ratings[3][:points]).to eq(1)
-          expect(ratings[4][:description]).to eq("No Evidence")
-          expect(ratings[4][:points]).to eq(0)
-          expect(mastery_points).to eq(3)
-          expect(points_possible).to eq(4)
-          expect(outcome.calculation_method).to eq("decaying_average")
-          expect(outcome.calculation_int).to eq(65)
+          keep_trying_until do
+            outcome = LearningOutcome.find_by(context: @course, short_description: "Outcome with Individual Ratings")
+            ratings = outcome.data[:rubric_criterion][:ratings]
+            mastery_points = outcome.data[:rubric_criterion][:mastery_points]
+            points_possible = outcome.data[:rubric_criterion][:points_possible]
+            expect(outcome.nil?).to be(false)
+            expect(ratings.length).to eq(5)
+            expect(ratings[0][:description]).to eq("Exceeds Mastery")
+            expect(ratings[0][:points]).to eq(4)
+            expect(ratings[1][:description]).to eq("Mastery")
+            expect(ratings[1][:points]).to eq(3)
+            expect(ratings[2][:description]).to eq("Near Mastery")
+            expect(ratings[2][:points]).to eq(2)
+            expect(ratings[3][:description]).to eq("Below Mastery")
+            expect(ratings[3][:points]).to eq(1)
+            expect(ratings[4][:description]).to eq("No Evidence")
+            expect(ratings[4][:points]).to eq(0)
+            expect(mastery_points).to eq(3)
+            expect(points_possible).to eq(4)
+            expect(outcome.calculation_method).to eq("decaying_average")
+            expect(outcome.calculation_int).to eq(65)
+          end
         end
 
         it "edits an outcome and changes calculation method" do

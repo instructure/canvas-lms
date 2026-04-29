@@ -28,13 +28,14 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {showFlashSuccess} from '@instructure/platform-alerts'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {captureException} from '@sentry/react'
 import StudentMultiSelect from './components/StudentMultiSelect'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('student_groups')
 
@@ -155,6 +156,8 @@ export default function NewStudentGroupModal({onSave, ...modalProps}) {
         size="medium"
         shouldCloseOnDocumentClick={false}
         footer={<Footer />}
+        closeButtonLabel={I18n.t('Close')}
+        errorComponent={canvasErrorComponent()}
         {...modalProps}
       >
         <FormFieldGroup

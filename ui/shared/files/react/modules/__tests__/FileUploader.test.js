@@ -65,7 +65,7 @@ describe('FileUploader', () => {
 
   test('posts to the files endpoint to kick off upload', async () => {
     const fuploader = new FileUploader(mockFileOptions(), folder)
-    jest.spyOn(fuploader, 'onPreflightComplete').mockImplementation()
+    vi.spyOn(fuploader, 'onPreflightComplete').mockImplementation(() => Promise.resolve())
 
     await fuploader.upload()
     // The request is handled by MSW, so we just verify the method was called
@@ -74,7 +74,7 @@ describe('FileUploader', () => {
 
   test('stores params from preflight for actual upload', async () => {
     const fuploader = new FileUploader(mockFileOptions(), folder)
-    jest.spyOn(fuploader, '_actualUpload').mockImplementation()
+    vi.spyOn(fuploader, '_actualUpload').mockImplementation(() => Promise.resolve())
 
     await fuploader.upload()
     expect(fuploader.uploadData.upload_url).toBe('/upload/url')
@@ -83,11 +83,11 @@ describe('FileUploader', () => {
 
   test('completes upload after preflight', async () => {
     const fuploader = new FileUploader(mockFileOptions(), folder)
-    jest.spyOn(fuploader, 'addFileToCollection').mockImplementation()
+    vi.spyOn(fuploader, 'addFileToCollection').mockImplementation()
 
     // Mock the actual upload to return a promise that resolves with the file data
     // The promise resolution will trigger onUploadPosted
-    jest.spyOn(fuploader, '_actualUpload').mockImplementation(() => {
+    vi.spyOn(fuploader, '_actualUpload').mockImplementation(() => {
       // Simulate the promise chain that calls onUploadPosted
       return Promise.resolve({
         id: '17',
@@ -108,13 +108,13 @@ describe('FileUploader', () => {
 
   test('roundProgress returns back rounded values', () => {
     const fuploader = new FileUploader(mockFileOptions(), folder)
-    jest.spyOn(fuploader, 'getProgress').mockReturnValue(0.18) // progress is [0 .. 1]
+    vi.spyOn(fuploader, 'getProgress').mockReturnValue(0.18) // progress is [0 .. 1]
     expect(fuploader.roundProgress()).toBe(18)
   })
 
   test('roundProgress returns back values no greater than 100', () => {
     const fuploader = new FileUploader(mockFileOptions(), folder)
-    jest.spyOn(fuploader, 'getProgress').mockReturnValue(1.1) // something greater than 100%
+    vi.spyOn(fuploader, 'getProgress').mockReturnValue(1.1) // something greater than 100%
     expect(fuploader.roundProgress()).toBe(100)
   })
 

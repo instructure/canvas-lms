@@ -46,7 +46,7 @@ describe('LinkModal', () => {
   })
 
   it('calls onSubmit with text and url', async () => {
-    const onSubmit = jest.fn()
+    const onSubmit = vi.fn()
     const {getByLabelText, getByText} = render(
       <LinkModal open={true} onClose={() => {}} onSubmit={onSubmit} />,
     )

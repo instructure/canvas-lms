@@ -17,9 +17,9 @@
  */
 
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from './MasteryScale/index'
 import MasteryCalculation from './MasteryCalculation/index'
@@ -28,6 +28,7 @@ import OutcomesContext, {getContext} from '@canvas/outcomes/react/contexts/Outco
 import ManagementHeader from './ManagementHeader'
 import OutcomeManagementPanel from './Management/index'
 import AlignmentSummary from './Alignments/index'
+import Reporting from './Reporting/index'
 import {
   showOutcomesImporter,
   showOutcomesImporterIfInProgress,
@@ -35,11 +36,15 @@ import {
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {windowConfirm} from '@canvas/util/globalUtils'
 import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const I18n = createI18nScope('OutcomeManagement')
 
-const unmount = mount => ReactDOM.unmountComponentAtNode(mount)
+const unmount = mount => {
+  if (mount && mount.nodeType === Node.ELEMENT_NODE) {
+    legacyUnmountComponentAtNode(mount)
+  }
+}
 
 export const OutcomePanel = () => {
   useEffect(() => {
@@ -64,17 +69,26 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const [isImporting, setIsImporting] = useState(false)
   const [createdOutcomeGroupIds, setCreatedOutcomeGroupIds] = useState([])
   const [lhsGroupId, setLhsGroupId] = useState(null)
-  const [selectedIndex, setSelectedIndex] = useState(() => {
-    const tabs = {'#mastery_scale': 1, '#mastery_calculation': 2}
-    return window.location.hash in tabs ? tabs[window.location.hash] : 0
-  })
   const [targetGroupIdsToRefetch, setTargetGroupIdsToRefetch] = useState([])
   const [importsTargetGroup, setImportsTargetGroup] = useState({})
   const isMobileView = !breakpoints?.tablet
   const contextValues = getContext(isMobileView)
-  const {accountLevelMasteryScalesFF, canManage, contextType} = contextValues.env
+  const {accountLevelMasteryScalesFF, lmgbStudentReportingFF, canManage, contextType} =
+    contextValues.env
   const shouldDisplayAlignmentsTab = improvedManagement && canManage && contextType === 'Course'
   const alignmentTabIndex = accountLevelMasteryScalesFF ? 3 : 1
+  const shouldDisplayReportingTab = lmgbStudentReportingFF && canManage && contextType === 'Course'
+  const reportingTabIndex = accountLevelMasteryScalesFF ? 4 : 2
+  const [selectedIndex, setSelectedIndex] = useState(() => {
+    const tabs = {
+      '#mastery_scale': 1,
+      '#mastery_calculation': 2,
+      '#alignments': shouldDisplayAlignmentsTab ? alignmentTabIndex : null,
+      '#reporting': shouldDisplayReportingTab ? reportingTabIndex : null,
+    }
+    const hash = window.location.hash
+    return hash in tabs && tabs[hash] !== null ? tabs[hash] : 0
+  })
 
   const onSetImportRef = useCallback(node => {
     setImportRef(node)
@@ -241,8 +255,19 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
             id="alignments"
             padding={isMobileView ? 'small none none' : 'small'}
           >
-            <ScreenReaderContent as="h2">Alignments Tab Content“</ScreenReaderContent>
+            <ScreenReaderContent as="h2">{I18n.t('Alignments Tab Content')}</ScreenReaderContent>
             <AlignmentSummary />
+          </Tabs.Panel>
+        )}
+        {shouldDisplayReportingTab && (
+          <Tabs.Panel
+            renderTitle={I18n.t('Reporting')}
+            isSelected={selectedIndex === reportingTabIndex}
+            id="reporting"
+            padding="0"
+          >
+            <ScreenReaderContent as="h2">{I18n.t('Reporting Tab Content')}</ScreenReaderContent>
+            <Reporting />
           </Tabs.Panel>
         )}
       </Tabs>
@@ -261,14 +286,6 @@ const OutcomeManagement = ({breakpoints}) => {
       </QueryClientProvider>
     </ApolloProvider>
   )
-}
-
-OutcomeManagement.propTypes = {
-  breakpoints: breakpointsShape,
-}
-
-OutcomeManagementWithoutGraphql.propTypes = {
-  breakpoints: breakpointsShape,
 }
 
 export default WithBreakpoints(OutcomeManagement)

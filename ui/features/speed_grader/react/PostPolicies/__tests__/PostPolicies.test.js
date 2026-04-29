@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {unmountComponentAtNode} from 'react-dom'
+import * as canvasReact from '@canvas/react'
 import PostPolicies from '../index'
 import SpeedGraderHelpers from '../../../jquery/speed_grader_helpers'
 
@@ -53,8 +53,8 @@ describe('SpeedGrader PostPolicies', () => {
       {id: '2001', name: 'Hogwarts'},
       {id: '2002', name: 'Freshmen'},
     ]
-    afterUpdateSubmission = jest.fn()
-    updateSubmission = jest.fn()
+    afterUpdateSubmission = vi.fn()
+    updateSubmission = vi.fn()
     postPolicies = new PostPolicies({
       afterUpdateSubmission,
       assignment: expectedAssignment(),
@@ -70,30 +70,24 @@ describe('SpeedGrader PostPolicies', () => {
   })
 
   test('renders the "Hide Assignment Grades" tray', () => {
-    const $trayContainer = document.getElementById('hide-assignment-grades-tray')
-    const unmounted = unmountComponentAtNode($trayContainer)
-    strictEqual(unmounted, true)
+    ok(postPolicies._hideAssignmentGradesTray)
   })
 
   test('renders the "Post Assignment Grades" tray', () => {
-    const $trayContainer = document.getElementById('post-assignment-grades-tray')
-    const unmounted = unmountComponentAtNode($trayContainer)
-    strictEqual(unmounted, true)
+    ok(postPolicies._postAssignmentGradesTray)
   })
 
   describe('#destroy', () => {
     test('unmounts the "Hide Assignment Grades" tray', () => {
+      const spy = vi.spyOn(canvasReact, 'legacyUnmountComponentAtNode')
       postPolicies.destroy()
-      const $trayContainer = document.getElementById('hide-assignment-grades-tray')
-      const unmounted = unmountComponentAtNode($trayContainer)
-      strictEqual(unmounted, false)
+      expect(spy).toHaveBeenCalledWith($hideTrayMountPoint)
     })
 
     test('unmounts the "Post Assignment Grades" tray', () => {
+      const spy = vi.spyOn(canvasReact, 'legacyUnmountComponentAtNode')
       postPolicies.destroy()
-      const $trayContainer = document.getElementById('post-assignment-grades-tray')
-      const unmounted = unmountComponentAtNode($trayContainer)
-      strictEqual(unmounted, false)
+      expect(spy).toHaveBeenCalledWith($postTrayMountPoint)
     })
   })
 
@@ -103,7 +97,7 @@ describe('SpeedGrader PostPolicies', () => {
     }
 
     beforeEach(() => {
-      jest.spyOn(postPolicies._hideAssignmentGradesTray, 'show').mockImplementation(() => {})
+      vi.spyOn(postPolicies._hideAssignmentGradesTray, 'show').mockImplementation(() => {})
     })
 
     test('calls "show" for the "Hide Assignment Grades" tray', () => {
@@ -157,7 +151,7 @@ describe('SpeedGrader PostPolicies', () => {
     })
 
     test('onHidden does not reload the page when assignment anonymousGrading is false', () => {
-      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
+      const reloadStub = vi.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: new Date().toISOString()},
       }
@@ -169,7 +163,7 @@ describe('SpeedGrader PostPolicies', () => {
     })
 
     test('onHidden reloads the page when assignment anonymousGrading is true', () => {
-      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
+      const reloadStub = vi.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: new Date().toISOString()},
       }
@@ -198,7 +192,7 @@ describe('SpeedGrader PostPolicies', () => {
     }
 
     beforeEach(() => {
-      jest.spyOn(postPolicies._postAssignmentGradesTray, 'show').mockImplementation(() => {})
+      vi.spyOn(postPolicies._postAssignmentGradesTray, 'show').mockImplementation(() => {})
     })
 
     test('calls "show" for the "Post Assignment Grades" tray', () => {
@@ -269,7 +263,7 @@ describe('SpeedGrader PostPolicies', () => {
     })
 
     test('onPosted does not reload the page when assignment anonymousGrading is false', () => {
-      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
+      const reloadStub = vi.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: null},
       }
@@ -282,7 +276,7 @@ describe('SpeedGrader PostPolicies', () => {
     })
 
     test('onPosted reloads the page when assignment anonymousGrading is true', () => {
-      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
+      const reloadStub = vi.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: null},
       }

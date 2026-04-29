@@ -21,7 +21,7 @@ import DifferentiationTagModalForm from './DifferentiationTagModalForm'
 import {useDifferentiationTagCategoriesIndex} from '../hooks/useDifferentiationTagCategoriesIndex'
 import type {Course, DifferentiationTagCategory} from '../types.d'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 declare const ENV: GlobalEnv & Course
@@ -31,12 +31,17 @@ export interface DifferentiationTagModalManagerProps {
   onClose: () => void
   mode: 'create' | 'edit'
   differentiationTagCategoryId?: number
+  onCreationSuccess?: (newCategoryID: number) => void
+  courseId?: number
 }
 
 function DifferentiationTagModalContainer(props: DifferentiationTagModalManagerProps) {
-  const {isOpen, onClose, mode, differentiationTagCategoryId} = props
+  const {isOpen, onClose, mode, differentiationTagCategoryId, onCreationSuccess, courseId} = props
 
-  const courseID = Number(ENV?.course?.id)
+  // People Page gets it from the course object,
+  // Improved LMGB passes the courseId prop to the modal directly,
+  // so we need to check both places to get the course ID
+  const courseID = Number(courseId ?? ENV?.course?.id)
   const hasValidCourseID = typeof courseID === 'number' && !isNaN(courseID)
 
   const {data} = useDifferentiationTagCategoriesIndex(courseID, {
@@ -57,6 +62,7 @@ function DifferentiationTagModalContainer(props: DifferentiationTagModalManagerP
       differentiationTagSet={tagSet}
       categories={categories}
       courseId={courseID}
+      onCreationSuccess={onCreationSuccess}
     />
   )
 }

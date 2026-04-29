@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {last, without} from 'lodash'
+import {without, last} from 'es-toolkit/compat'
 import $ from 'jquery'
 
 // To use this, your view must implement a `selectables` method that

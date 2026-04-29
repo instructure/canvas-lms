@@ -20,12 +20,14 @@
 
 class Login::CanvasController < ApplicationController
   include Login::Shared
+
   helper NewLoginHelper
 
   before_action :validate_auth_type
   before_action :forbid_on_files_domain
   before_action :run_login_hooks, only: [:new, :create]
   before_action :fix_ms_office_redirects, only: :new
+  skip_before_action :require_user, only: %i[new create]
 
   protect_from_forgery except: :create, with: :exception
 
@@ -159,7 +161,8 @@ class Login::CanvasController < ApplicationController
       session[:login_aac] ||= ap.id
       successful_login(user, pseudonym)
     else
-      link_url = Setting.get("invalid_login_faq_url", nil)
+      link_url = @domain_root_account.login_help_url.presence ||
+                 Setting.get("invalid_login_faq_url", nil)
       if link_url
         unsuccessful_login t(
           "Please verify your username or password and try again. Trouble logging in? *Check out our Login FAQs*.",

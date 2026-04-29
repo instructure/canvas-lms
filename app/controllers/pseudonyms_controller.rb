@@ -22,7 +22,7 @@
 # API for creating and viewing user logins under an account
 class PseudonymsController < ApplicationController
   before_action :get_context, only: [:index, :create]
-  before_action :require_user, only: %i[create show edit update migrate_login_attribute]
+  skip_before_action :require_user, only: %i[change_password confirm_change_password forgot_password]
   before_action :reject_student_view_student, only: %i[create show edit update]
   protect_from_forgery except: %i[registration_confirmation change_password forgot_password], with: :exception
 
@@ -188,16 +188,18 @@ class PseudonymsController < ApplicationController
       password_policies = @password_pseudonyms.to_h do |p|
         [p.id, { pseudonym: { unique_id: p.unique_id, account_display_name: p.account.display_name }, policy: p.account.password_policy }]
       end
-      js_env PASSWORD_POLICY: @domain_root_account.password_policy,
-             PASSWORD_POLICIES: password_policies,
-             CC: {
-               confirmation_code: @cc.confirmation_code,
-               path: @cc.path,
-             },
-             PSEUDONYM: {
-               id: @pseudonym.id,
-               user_name: @pseudonym.user.name,
-             }
+      js_env({
+               PASSWORD_POLICY: @domain_root_account.password_policy,
+               PASSWORD_POLICIES: password_policies,
+               CC: {
+                 confirmation_code: @cc.confirmation_code,
+                 path: @cc.path,
+               },
+               PSEUDONYM: {
+                 id: @pseudonym.id,
+                 user_name: @pseudonym.user.name,
+               }
+             })
     end
   end
 
@@ -215,7 +217,7 @@ class PseudonymsController < ApplicationController
           # If they changed the password (and we subsequently log them in) then
           # we're pretty confident this is the right user, and the communication
           # channel is valid, so register the user and approve the channel.
-          @cc.set_confirmation_code(true)
+          @cc.set_confirmation_code(reset: true)
           @cc.confirm
           @cc.save
           @pseudonym.user.register
@@ -230,7 +232,7 @@ class PseudonymsController < ApplicationController
         @pseudonym_session = PseudonymSession.new(@pseudonym, true)
         render json: @pseudonym, status: :ok # -> dashboard
       else
-        render json: { pseudonym: @pseudonym.errors.as_json[:errors] }, status: :bad_request
+        render json: { pseudonym: ::Api::Errors::Reporter.to_json(@pseudonym.errors)[:errors] }, status: :bad_request
       end
     else
       render json: { errors: { nonce: "expired" } }, status: :bad_request # -> login url
@@ -526,15 +528,6 @@ class PseudonymsController < ApplicationController
     end
   end
 
-  def migrate_login_attribute
-    return unless get_user
-
-    @pseudonym = @user.pseudonyms.find(params[:id])
-    return render_unauthorized_action unless @pseudonym.migrate_login_attribute(admin_user: @current_user)
-
-    render json: pseudonym_json(@pseudonym, @current_user, session)
-  end
-
   protected
 
   def context_is_root_account?
@@ -633,6 +626,7 @@ class PseudonymsController < ApplicationController
 
     authorized_if_requested_change?(:workflow_state, :delete) do
       if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :workflow_state)
+        @pseudonym.current_user = @current_user # performing user for audit logging
         @pseudonym.workflow_state = params[:pseudonym][:workflow_state]
       end
     end or return false

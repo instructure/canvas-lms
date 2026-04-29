@@ -16,22 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global vi */
+
+// Mock modules with inline factory functions that create mocks inside
+// This works in both Jest and Vitest since mocks are created in the factory
+if (typeof vi !== 'undefined') {
+  vi.mock('@canvas/planner', () => ({
+    initializePlanner: vi.fn(options => Promise.resolve(options)),
+  }))
+  vi.mock('@instructure/platform-alerts', async () => {
+    const actual = await vi.importActual('@instructure/platform-alerts')
+    return {
+      ...actual,
+      showFlashAlert: vi.fn(),
+      showFlashError: vi.fn(() => () => {}),
+    }
+  })
+}
+vi.mock('@canvas/planner', () => ({
+  initializePlanner: vi.fn(options => Promise.resolve(options)),
+}))
+vi.mock('@instructure/platform-alerts', () => ({
+  showFlashAlert: vi.fn(),
+  showFlashError: vi.fn(() => () => {}),
+}))
+
 import React from 'react'
 import PropTypes from 'prop-types'
 import {render, waitFor} from '@testing-library/react'
 import usePlanner from '../usePlanner'
-
-jest.mock('@canvas/planner')
- 
-const plannerExports = require('@canvas/planner')
-
-plannerExports.initializePlanner = jest.fn(options => Promise.resolve(options))
-
-jest.mock('@canvas/alerts/react/FlashAlert')
- 
-const flashAlerts = require('@canvas/alerts/react/FlashAlert')
-
-flashAlerts.showFlashError = jest.fn(() => () => {})
+import {initializePlanner} from '@canvas/planner'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const PLANNER_CONFIG_KEYS = [
   'getActiveApp',
@@ -65,18 +80,18 @@ const renderHook = defaults => {
 const defaults = {plannerEnabled: true, isPlannerActive: () => {}}
 
 afterEach(() => {
-  plannerExports.initializePlanner.mockClear()
+  initializePlanner.mockClear()
 })
 
 describe('usePlanner hook', () => {
   it('Calls initializePlanner when plannerEnabled is true', async () => {
     renderHook(defaults)
-    await waitFor(() => expect(plannerExports.initializePlanner).toHaveBeenCalled())
+    await waitFor(() => expect(initializePlanner).toHaveBeenCalled())
   })
 
   it('Does not call initializePlanner when plannerEnabled is false', () => {
     renderHook({...defaults, plannerEnabled: false})
-    expect(plannerExports.initializePlanner).not.toHaveBeenCalled()
+    expect(initializePlanner).not.toHaveBeenCalled()
   })
 
   it('returns planner configuration once initialization has completed', async () => {
@@ -92,12 +107,12 @@ describe('usePlanner hook', () => {
   })
 
   it('shows a flash error message and returns false if initialization fails', async () => {
-    plannerExports.initializePlanner.mockClear()
-    plannerExports.initializePlanner.mockImplementationOnce(() =>
+    initializePlanner.mockClear()
+    initializePlanner.mockImplementationOnce(() =>
       Promise.reject(new Error('something went wrong')),
     )
     renderHook(defaults, result => {
-      expect(flashAlerts.showFlashError).toHaveBeenCalledWith('Failed to load the schedule tab')
+      expect(showFlashError).toHaveBeenCalledWith('Failed to load the schedule tab')
       expect(result).toBe(false)
     })
   })

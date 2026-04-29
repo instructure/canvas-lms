@@ -24,7 +24,6 @@ class GradingSchemesJsonController < ApplicationController
   GRADING_SCHEMES_LIMIT = 100
   USED_LOCATIONS_PER_PAGE = 50
   before_action :require_context
-  before_action :require_user
   before_action :validate_read_permission, only: %i[grouped_list detail_list summary_list show]
 
   def grouped_list
@@ -98,7 +97,7 @@ class GradingSchemesJsonController < ApplicationController
 
     respond_to do |format|
       if @context.save
-        @context.recompute_assignments_using_account_default(grading_standard || GradingStandard.default_instance)
+        @context.delay_if_production(priority: Delayed::LOWER_PRIORITY, strand: ["recompute_account_default", @context.global_id]).recompute_assignments_using_account_default(grading_standard&.id)
         format.json { render json: response }
       else
         format.json { render json: @context.errors, status: :bad_request }
@@ -125,7 +124,7 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def create
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, :manage_grading_schemes)
       grading_standard = @context.grading_standards.build(grading_scheme_payload)
 
       respond_to do |format|

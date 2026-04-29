@@ -27,5 +27,5 @@ describe "assignment_submitted" do
   let(:asset) { @submission }
   let(:notification_name) { :assignment_submitted }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

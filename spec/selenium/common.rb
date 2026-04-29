@@ -76,15 +76,19 @@ shared_context "in-process server selenium tests" do
   include Rails.application.routes.url_helpers
 
   prepend_before do
-    resize_screen_to_standard
+    # If the Selenium Grid killed the session due to inactivity while
+    # non-Selenium spec files ran between two Selenium spec files in the
+    # same worker process, reset and start a fresh session before the
+    # test body runs.
+    begin
+      close_modal_if_present { resize_screen_to_standard }
+    rescue Selenium::WebDriver::Error::InvalidSessionIdError,
+           Selenium::WebDriver::Error::NoSuchWindowError
+      SeleniumDriverSetup.reset!
+      resize_screen_to_standard
+    end
     SeleniumDriverSetup.allow_requests!
     driver.ready_for_interaction = false # need to `get` before we do anything selenium-y in a spec
-  end
-
-  around :all do |group|
-    GreatExpectations.with_config(MISSING: :raise) do
-      group.run_examples
-    end
   end
 
   append_before :all do
@@ -122,9 +126,9 @@ shared_context "in-process server selenium tests" do
   after do |example|
     if example.exception&.message&.include?("disconnected: not connected to DevTools")
       # exit this process to avoid further exceptions
-      puts "Exiting due to browser crash!"
-      puts example.exception.full_message
-      exit!
+      Rails.logger.error "Exiting due to browser crash!"
+      Rails.logger.error example.exception.full_message
+      raise SystemExit
     end
   end
 
@@ -179,7 +183,7 @@ shared_context "in-process server selenium tests" do
       deprecations = browser_logs.select { |l| l.message =~ /\[.*deprecated./ }.map do |l|
         ">>> #{spec_file}: \"#{example.description}\": #{driver.current_url}: #{l.message.gsub(/.*Warning/, "Warning")}"
       end
-      puts "\n", deprecations.uniq
+      Rails.logger.warn deprecations.uniq.join("\n")
     end
 
     if !example.metadata[:ignore_js_errors] && browser_logs.present?
@@ -198,7 +202,6 @@ shared_context "in-process server selenium tests" do
         "elements with non-unique id #",
         "Failed to load http://www.example.com/",
         "Failed to load http://example.com/",
-        "Uncaught Error: cannot call methods on timeoutTooltip prior to initialization; attempted to call method 'close'",
         "Failed to load resource",
         "Deprecated use of magic jQueryUI widget markup detected",
         "Uncaught SG: Did not receive drive#about kind when fetching import",
@@ -238,10 +241,14 @@ shared_context "in-process server selenium tests" do
         "Found a 'popup' attribute. If you are testing the popup API, you must enable Experimental Web Platform Features.",
         "Uncaught DOMException: play() failed because the user didn't interact with the document first.",
         "security - Refused to frame 'https://drive.google.com/' because an ancestor violates the following Content Security Policy directive: \"frame-ancestors https://docs.google.com\".",
+        "security - [Report Only] Refused to frame 'https://drive.google.com/' because an ancestor violates the following Content Security Policy directive: \"frame-ancestors 'self'\".",
         "This file should be served over HTTPS.", # tests are not run over https, this error is expected
         "Uncaught DOMException: signal is aborted without reason", # Investigate as part of LX-2075
         "Support for string refs",
-        "DEV_HOST is not defined" # Federated Modules aren't configured to work in Selenium
+        "DEV_HOST is not defined", # Federated Modules aren't configured to work in Selenium
+        "NoSuchFrameException", # upgrading chrome version is throwing this for some testcases only in pipeline build
+        "Uncaught Error: More value is provided", # upgrading chrome version is throwing this for some testcases only in pipeline build
+        "Support for this event type has been removed" # Mutation events removed from Chrome from July 2024
       ].freeze
 
       javascript_errors = browser_logs.select do |e|

@@ -16,7 +16,7 @@
   * Resources
     <% options[:resources].each do |(resource, controllers)|
       next if resource.include?('Plagiarism')
-      link = url_for("#{topicize resource}.md") %>
+      link = url_for("#{DocumentationHelpers.topicize resource}.md") %>
     * [<%= resource %>](<%= link %>)
     <% end %>
   * Outcomes
@@ -38,6 +38,7 @@
       * [Provisioning](file.provisioning.md)
       * [PostMessage](file.lti_window_post_message.md)
       * [Platform Notification Service](file.pns.md)
+      * [Document Processor](file.document_processor.md)
       * [Legacy 1.1 Configuration](file.tools_xml.md)
       * Placements
         * [Placements Overview](file.placements_overview.md)
@@ -60,7 +61,7 @@
       <% end %>
       * [Overview](file.plagiarism_platform.md)
       <% @plagiarism_file_list.each do |resource| %>
-      <% link = url_for("#{topicize resource}.md") %>
+      <% link = url_for("#{DocumentationHelpers.topicize resource}.md") %>
       * [<%= resource %>](<%= link %>)
       <% end %>
       * [JWT Access Tokens](file.jwt_access_tokens.md)
@@ -80,3 +81,9 @@
           <% DataServicesCaliperLoader.data.each do |content| %>
           * [<%= content[:page_title] %>](file.data_service_caliper_<%= content[:event_category] %>.md)
           <% end %>
+  * Permissions
+    * [List of Permissions](file.permissions.md)
+    * Details
+      <% PermissionsMarkdownCreator.details.each do |key, info| %>
+      * [<%= info[:label] %>](file.permissions_<%= key %>.md)
+      <% end %>

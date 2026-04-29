@@ -25,13 +25,13 @@ import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
-import type {UsedLocation} from '@canvas/grading_scheme/gradingSchemeApiModel'
+import type {UsedLocation} from '@canvas/grading-scheme/gradingSchemeApiModel'
 import {List} from '@instructure/ui-list'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
 import {Spinner} from '@instructure/ui-spinner'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('UsedLocationsModal')
 

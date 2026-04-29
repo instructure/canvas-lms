@@ -69,6 +69,40 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "lti_resource_link" do
+    let(:course) { Course.create!(name: "Course") }
+    let(:tool) { external_tool_model(context: course) }
+
+    it "posts lti_resource_link_created when a resource link is created" do
+      expect(Canvas::LiveEvents).to receive(:lti_resource_link_created).once
+      Lti::ResourceLink.create!(
+        context: course,
+        context_external_tool: tool,
+        url: "http://example.com/launch"
+      )
+    end
+
+    it "posts lti_resource_link_updated when a resource link is updated" do
+      resource_link = Lti::ResourceLink.create!(
+        context: course,
+        context_external_tool: tool,
+        url: "http://example.com/launch"
+      )
+      expect(Canvas::LiveEvents).to receive(:lti_resource_link_updated).once
+      resource_link.update!(title: "New Title")
+    end
+
+    it "posts lti_resource_link_updated (not deleted) when a resource link is soft deleted" do
+      resource_link = Lti::ResourceLink.create!(
+        context: course,
+        context_external_tool: tool,
+        url: "http://example.com/launch"
+      )
+      expect(Canvas::LiveEvents).to receive(:lti_resource_link_updated).once
+      resource_link.destroy
+    end
+  end
+
   describe "wiki" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:wiki_page_created).once
@@ -106,6 +140,18 @@ describe LiveEventsObserver do
       expect(Canvas::LiveEvents).to receive(:wiki_page_deleted).once
       @page.destroy_permanently!
     end
+
+    it "posts update event when page is published" do
+      wiki_page_model(workflow_state: "unpublished")
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil).once
+      @page.publish!
+    end
+
+    it "posts update event when page is unpublished" do
+      wiki_page_model
+      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).with(@page, nil, nil).once
+      @page.unpublish!
+    end
   end
 
   describe "attachment" do
@@ -135,6 +181,21 @@ describe LiveEventsObserver do
       it "does not post an attachment_updated event" do
         expect(Canvas::LiveEvents).not_to receive(:attachment_updated)
         attachment.touch
+      end
+    end
+
+    context "if the attachment is published" do
+      it "posts attachment_updated event" do
+        attachment.update(locked: true)
+        expect(Canvas::LiveEvents).to receive(:attachment_updated)
+        attachment.publish!
+      end
+    end
+
+    context "if the attachment is unpublished" do
+      it "posts attachment_updated event" do
+        expect(Canvas::LiveEvents).to receive(:attachment_updated)
+        attachment.update(locked: true)
       end
     end
   end
@@ -186,6 +247,23 @@ describe LiveEventsObserver do
       expect(Canvas::LiveEvents).to receive(:discussion_entry_created).once
       discussion_topic_model(context: @course)
       @topic.discussion_entries.create!(message: "entry")
+    end
+
+    it "posts update events" do
+      course_model
+      discussion_topic_model(context: @course)
+      entry = @topic.discussion_entries.create!(message: "entry")
+      expect(Canvas::LiveEvents).to receive(:discussion_entry_updated).once
+      entry.message = "edited"
+      entry.save
+    end
+
+    it "posts delete events when soft deleted" do
+      course_model
+      discussion_topic_model(context: @course)
+      entry = @topic.discussion_entries.create!(message: "entry")
+      expect(Canvas::LiveEvents).to receive(:discussion_entry_deleted).once
+      entry.destroy
     end
   end
 
@@ -268,7 +346,7 @@ describe LiveEventsObserver do
     end
 
     it "does not post a create event when a submission is first created in an unsubmitted state" do
-      expect(Canvas::LiveEvents).to_not receive(:submission_created)
+      expect(Canvas::LiveEvents).not_to receive(:submission_created)
       Submission.create!(assignment: assignment_model, user: user_model, workflow_state: "unsubmitted", submitted_at: Time.zone.now)
     end
 

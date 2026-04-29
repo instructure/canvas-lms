@@ -19,7 +19,10 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentExternalTools from '../AssignmentExternalTools'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 var toolDefinitions = [
   {
@@ -64,23 +67,32 @@ var toolDefinitions = [
   },
 ]
 
-jest.mock('jquery', () => {
-  const originalModule = jest.requireActual('jquery')
+vi.mock('jquery', async () => {
+  const originalModule = await vi.importActual('jquery')
   return {
     ...originalModule,
     ajax: {status: 200, data: toolDefinitions},
   }
 })
-fetchMock.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
 
 describe('AssignmentExternalTools', () => {
   let wrapper
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
+    server.use(
+      http.get('/api/v1/courses/1/lti_apps/launch_definitions', () => {
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
   })
 
   afterEach(() => {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
+    server.resetHandlers()
   })
 
   test('it renders', () => {
@@ -190,6 +202,22 @@ describe('AssignmentExternalTools', () => {
     ref.current.setState({tools: toolDefinitions})
     wrapper.container.querySelectorAll('.tool_launch').forEach(iframe => {
       expect(iframe.getAttribute('data-lti-launch')).toEqual('true')
+    })
+  })
+
+  test('it sets iframe allow attribute at render time for microphone and camera permissions', () => {
+    const ref = React.createRef()
+    wrapper = render(
+      <AssignmentExternalTools.configTools
+        ref={ref}
+        placement="assignment_view"
+        courseId={1}
+        assignmentId={1}
+      />,
+    )
+    ref.current.setState({tools: toolDefinitions})
+    wrapper.container.querySelectorAll('.tool_launch').forEach(iframe => {
+      expect(iframe.getAttribute('allow')).toEqual(ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
     })
   })
 })

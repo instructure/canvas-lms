@@ -225,31 +225,38 @@ describe "SpeedGrader submissions" do
       student_submission(username: "student1@example.com")
       student_submission(username: "student2@example.com")
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_dom_ready
+      wait_for_initializers
 
       expect(f(".toggle_full_rubric")).to be_displayed
       f(".toggle_full_rubric").click
-      wait_for_ajaximations
+      wait_for_dom_ready
+
       rubric = f("#rubric_full")
       expect(rubric).to be_displayed
       ff(".rating-description").find { |elt| elt.displayed? && elt.text == "Rockin'" }.click
       ff(".rating-description").find { |elt| elt.displayed? && elt.text == "Amazing" }.click
       expect(f("span[data-selenium='rubric_total']")).to include_text("8")
       f("#rubric_full .save_rubric_button").click
-      wait_for_ajaximations
+      wait_for_dom_ready
+
       f(".toggle_full_rubric").click
-      wait_for_ajaximations
+      wait_for_dom_ready
 
       expect(ff('td[data-testid="criterion-points"] input').first).to have_value("3")
       expect(ff('td[data-testid="criterion-points"] input').second).to have_value("5")
+
       f("#gradebook_header .next").click
-      wait_for_ajaximations
+      wait_for_dom_ready
+      wait_for_initializers
 
       expect(f("#rubric_full")).to be_displayed
       expect(ffj('td[data-testid="criterion-points"] input:visible').first).to have_attribute("value", "")
       expect(ffj('td[data-testid="criterion-points"] input:visible').second).to have_attribute("value", "")
 
       f("#gradebook_header .prev").click
-      wait_for_ajaximations
+      wait_for_dom_ready
+      wait_for_initializers
 
       expect(f("#rubric_full")).to be_displayed
       expect(ffj('td[data-testid="criterion-points"] input:visible').first).to have_attribute("value", "3")

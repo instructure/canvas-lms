@@ -388,7 +388,7 @@ describe ContentMigrationsController, type: :request do
       cm.attachment = file
       cm.save!
       cm.queue_migration
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123))
       run_jobs
       expect(cm.reload.workflow_state).to eq "exported"
       expect(cm.migration_settings["job_ids"]).to eq([123])
@@ -399,7 +399,7 @@ describe ContentMigrationsController, type: :request do
                       @params.merge(action: "update", id: cm.to_param),
                       { copy: { "everything" => "1" } })
       expect(json["workflow_state"]).to eq "running"
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 456))
+      allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 456))
       run_jobs
       expect(cm.reload.workflow_state).to eq "imported"
       expect(cm.migration_settings["job_ids"]).to match_array([123, 456])
@@ -1145,53 +1145,32 @@ describe ContentMigrationsController, type: :request do
         @dst.root_account.enable_feature!(:file_verifiers_for_quiz_links)
       end
 
-      context "with the :content_migration_asset_map_v2 flag on" do
-        it "maps migration_ids to a hash containing the destination id" do
-          Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
-          json = api_call(:get,
-                          "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
-                          { controller: "content_migrations",
-                            action: "asset_id_mapping",
-                            format: "json",
-                            course_id: @dst.to_param,
-                            id: @migration.to_param })
-          test_asset_migration_id_mapping(json) do |asset|
-            migration_id(asset)
-          end
-          Account.site_admin.disable_feature!(:content_migration_asset_map_v2)
-        end
-
-        it "doesn't add verifiers to migration_ids hash if the file_verifiers_for_quiz_links flag is off" do
-          @dst.root_account.disable_feature!(:file_verifiers_for_quiz_links)
-          Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
-          json = api_call(:get,
-                          "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
-                          { controller: "content_migrations",
-                            action: "asset_id_mapping",
-                            format: "json",
-                            course_id: @dst.to_param,
-                            id: @migration.to_param })
-          test_asset_migration_id_mapping(json, verifiers: false) do |asset|
-            migration_id(asset)
-          end
-          Account.site_admin.disable_feature!(:content_migration_asset_map_v2)
-          @dst.root_account.enable_feature!(:file_verifiers_for_quiz_links)
+      it "maps migration_ids to a hash containing the destination id" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
+                        { controller: "content_migrations",
+                          action: "asset_id_mapping",
+                          format: "json",
+                          course_id: @dst.to_param,
+                          id: @migration.to_param })
+        test_asset_migration_id_mapping(json) do |asset|
+          migration_id(asset)
         end
       end
 
-      context "with the :content_migration_asset_map_v2 flag off" do
-        it "does not map migration_ids to a hash containing the destination id" do
-          json = api_call(:get,
-                          "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
-                          { controller: "content_migrations",
-                            action: "asset_id_mapping",
-                            format: "json",
-                            course_id: @dst.to_param,
-                            id: @migration.to_param })
-          test_asset_migration_id_mapping_nil(json) do |asset|
-            migration_id(asset)
-          end
+      it "doesn't add verifiers to migration_ids hash if the file_verifiers_for_quiz_links flag is off" do
+        @dst.root_account.disable_feature!(:file_verifiers_for_quiz_links)
+        json = api_call(:get,
+                        "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
+                        { controller: "content_migrations",
+                          action: "asset_id_mapping",
+                          format: "json",
+                          course_id: @dst.to_param,
+                          id: @migration.to_param })
+        test_asset_migration_id_mapping(json, verifiers: false) do |asset|
+          migration_id(asset)
         end
+        @dst.root_account.enable_feature!(:file_verifiers_for_quiz_links)
       end
     end
 
@@ -1253,35 +1232,16 @@ describe ContentMigrationsController, type: :request do
         @dst.root_account.enable_feature!(:file_verifiers_for_quiz_links)
       end
 
-      context "with the :content_migration_asset_map_v2 on" do
-        it "maps migration_ids to a hash containing the destination id" do
-          Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
-          json = api_call(:get,
-                          "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
-                          { controller: "content_migrations",
-                            action: "asset_id_mapping",
-                            format: "json",
-                            course_id: @dst.to_param,
-                            id: @migration.to_param })
-          test_asset_migration_id_mapping(json) do |asset|
-            migration_id(asset)
-          end
-          Account.site_admin.disable_feature!(:content_migration_asset_map_v2)
-        end
-      end
-
-      context "with the :content_migration_asset_map_v2 off" do
-        it "does not map migration_ids to a hash containing the destination id" do
-          json = api_call(:get,
-                          "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
-                          { controller: "content_migrations",
-                            action: "asset_id_mapping",
-                            format: "json",
-                            course_id: @dst.to_param,
-                            id: @migration.to_param })
-          test_asset_migration_id_mapping_nil(json) do |asset|
-            migration_id(asset)
-          end
+      it "maps migration_ids to a hash containing the destination id" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@dst.to_param}/content_migrations/#{@migration.to_param}/asset_id_mapping",
+                        { controller: "content_migrations",
+                          action: "asset_id_mapping",
+                          format: "json",
+                          course_id: @dst.to_param,
+                          id: @migration.to_param })
+        test_asset_migration_id_mapping(json) do |asset|
+          migration_id(asset)
         end
       end
 

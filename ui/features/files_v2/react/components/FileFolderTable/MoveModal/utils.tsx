@@ -21,7 +21,7 @@ import {ApiFolderItem, MultiPageResponse} from '../../../queries/folders'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import {FileOptions, ResolvedName} from '../../FilesHeader/UploadButton/FileOptions'
-import {showFlashSuccess, showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError, showFlashAlert} from '@instructure/platform-alerts'
 import {getName, isFile} from '../../../../utils/fileFolderUtils'
 import {type Folder, type File} from '../../../../interfaces/File'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -99,7 +99,7 @@ export const sendMoveRequests = (
           )()
         })
         .catch(error => {
-          console.log('Error moving item:', error)
+          console.error('Error moving item:', error)
           if (error.response.status === 409 && isFile(item)) {
             nameCollisions.push({
               ...options,

@@ -35,7 +35,7 @@ module Factories
     }
   end
 
-  def quiz_with_submission(complete_quiz = true, skip_submission = false)
+  def quiz_with_submission(complete_quiz: true, skip_submission: false)
     @course ||= course_model(reusable: true)
     @student ||= user_model
     @course.enroll_student(@student).accept
@@ -58,7 +58,7 @@ module Factories
     else
       @qsub.submission_data = {}
     end
-    @qsub.with_versioning(true) do
+    @qsub.with_versioning do
       @qsub.save!
     end
     @qsub
@@ -447,7 +447,7 @@ module Factories
     user = opts[:user] || user_factory(active_user: true)
     course.enroll_student(user, enrollment_state: "active") unless user.enrollments.any? { |e| e.course_id == course.id }
     late_policy_factory(course:, deduct: 10, every: :day) if opts[:late]
-    @assignment = course.assignments.create(title: opts.fetch(:title, "Test Assignment"))
+    @assignment = course.assignments.build(valid_quiz_attributes.merge(allow_valid_assignment_attributes(opts)))
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
@@ -512,19 +512,20 @@ module Factories
     @qsub.score = 0
     @qsub.finished_at = Time.now.utc
     @qsub.workflow_state = "complete"
-    @qsub.with_versioning(true) do
+    @qsub.with_versioning do
       @qsub.save!
     end
   end
 
-  def course_quiz(active = false)
+  def course_quiz(active: false)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active
+    @quiz.saving_user = @teacher
     @quiz.save!
     @quiz
   end
 
-  def question_data(reset = false, data = {})
+  def question_data(data = {}, reset: false)
     @qdc = (reset || !@qdc) ? 1 : @qdc + 1
     {
       :name => "question #{@qdc}",
@@ -555,8 +556,8 @@ module Factories
     scoring_policy = opts[:scoring_policy] || "keep_highest"
     course_with_student(active_all: true)
     @quiz = @course.quizzes.create!(title: "new quiz", shuffle_answers: true, quiz_type: "assignment", scoring_policy:)
-    @q1 = @quiz.quiz_questions.create!(question_data: question_data(true, data[:q1] || data))
-    @q2 = @quiz.quiz_questions.create!(question_data: question_data(false, data[:q2] || data))
+    @q1 = @quiz.quiz_questions.create!(question_data: question_data(data[:q1] || data, reset: true))
+    @q2 = @quiz.quiz_questions.create!(question_data: question_data(data[:q2] || data))
     @outcome = @course.created_learning_outcomes.create!(short_description: "new outcome")
     @bank = @q1.assessment_question.assessment_question_bank
     @outcome.align(@bank, @bank.context, mastery_score: 0.7)

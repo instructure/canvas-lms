@@ -86,7 +86,7 @@ describe('PreviewModal', () => {
   })
 
   it('calls onDismiss on Escape key', async () => {
-    const onDismiss = jest.fn()
+    const onDismiss = vi.fn()
     render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={onDismiss} />)
@@ -99,7 +99,7 @@ describe('PreviewModal', () => {
   })
 
   it('calls OnDismiss on Close button click', async () => {
-    const onDismiss = jest.fn()
+    const onDismiss = vi.fn()
     const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={onDismiss} />)

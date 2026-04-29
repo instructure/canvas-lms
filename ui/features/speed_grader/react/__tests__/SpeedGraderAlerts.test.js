@@ -28,7 +28,7 @@ describe('SpeedGraderAlerts', () => {
     let showAlert
 
     beforeEach(() => {
-      flashStub = jest.spyOn($, 'flashMessage').mockImplementation(() => {})
+      flashStub = vi.spyOn($, 'flashMessage').mockImplementation(() => {})
       selectedStudentGroup = {name: 'Some Group or Other'}
       reasonForChange = null
 

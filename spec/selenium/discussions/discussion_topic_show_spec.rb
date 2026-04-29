@@ -524,10 +524,10 @@ describe "Discussion Topic Show" do
         update_reply_to_topic_time(1, format_date_for_view(new_dates[:student][:reply_to_topic], "%l:%M %p"))
         update_required_replies_date(1, format_date_for_view(new_dates[:student][:required_replies], "%b %-d, %Y"))
         update_required_replies_time(1, format_date_for_view(new_dates[:student][:required_replies], "%l:%M %p"))
-        update_available_date(1, format_date_for_view(new_dates[:student][:available_from], "%b %-d, %Y"), false, false)
-        update_available_time(1, format_date_for_view(new_dates[:student][:available_from], "%l:%M %p"), false, false)
-        update_until_date(1, format_date_for_view(new_dates[:student][:until], "%b %-d, %Y"), false, false)
-        update_until_time(1, format_date_for_view(new_dates[:student][:until], "%l:%M %p"), false, false)
+        update_available_date(1, format_date_for_view(new_dates[:student][:available_from], "%b %-d, %Y"), exclude_checkpoints: false)
+        update_available_time(1, format_date_for_view(new_dates[:student][:available_from], "%l:%M %p"), exclude_checkpoints: false)
+        update_until_date(1, format_date_for_view(new_dates[:student][:until], "%b %-d, %Y"), exclude_checkpoints: false)
+        update_until_time(1, format_date_for_view(new_dates[:student][:until], "%l:%M %p"), exclude_checkpoints: false)
 
         update_reply_to_topic_date(2, format_date_for_view(new_dates[:section][:reply_to_topic], "%b %-d, %Y"))
         update_reply_to_topic_time(2, format_date_for_view(new_dates[:section][:reply_to_topic], "%l:%M %p"))
@@ -704,6 +704,24 @@ describe "Discussion Topic Show" do
       expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
     end
 
+    it "does not honor unlock dates if course paces is enabled" do
+      @course.enable_course_paces = true
+      @course.save!
+      @topic.update!(unlock_at: 1.day.from_now)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      expect(Discussion.discussion_page_body).not_to include_text("This topic is locked until")
+      expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+    end
+
+    it "does not honor lock dates if course paces is enabled" do
+      @course.enable_course_paces = true
+      @course.save!
+      @topic.update!(lock_at: 1.day.ago)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      expect(Discussion.discussion_page_body).not_to include_text("This topic is closed for comments")
+      expect(Discussion.discussion_page_body).to include_text("a very cool discussion")
+    end
+
     context "discussion checkpoints" do
       before do
         Account.site_admin.enable_feature! :discussion_checkpoints
@@ -712,7 +730,7 @@ describe "Discussion Topic Show" do
       end
 
       it "shows lock indication for discussions locked by discussion's unlock_at date" do
-        skip("EGG-73")
+        skip("EGG-73 2025-07-15")
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @topic,
           checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
@@ -733,7 +751,7 @@ describe "Discussion Topic Show" do
       end
 
       it "shows lock indication for discussions locked by discussion's lock_at date" do
-        skip("EGG-73")
+        skip("EGG-73 2025-07-15")
         @topic.update!(lock_at: 1.day.ago)
         Checkpoints::DiscussionCheckpointCreatorService.call(
           discussion_topic: @topic,
@@ -812,9 +830,10 @@ describe "Discussion Topic Show" do
 
   context "when Discussion Summary feature flag is ON" do
     before do
+      allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
       Account.default.enable_feature!(:discussion_summary)
 
-      @inst_llm = double("InstLLM::Client")
+      @inst_llm = instance_double(InstLLM::Client)
       allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -930,6 +949,58 @@ describe "Discussion Topic Show" do
       Discussion.click_summary_generate_button
 
       expect(Discussion.summary_error).to include_text("Sorry, the service is currently busy. Please try again later.")
+    end
+  end
+
+  context "sort order functionality" do
+    before :once do
+      @entry1 = @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "First",
+        created_at: 1.hour.ago
+      )
+      @entry2 = @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "Second",
+        created_at: 30.minutes.ago
+      )
+      @entry3 = @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "Third",
+        created_at: 10.minutes.ago
+      )
+    end
+
+    it "has default sort order as desc and toggles to asc when clicked" do
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajaximations
+
+      entries_before = Discussion.discussion_entries
+      first_entry_text = entries_before.first.text
+      expect(first_entry_text).to include("Third")
+
+      Discussion.click_sort_dropdown
+      wait_for_ajaximations
+      Discussion.select_sort_option("asc")
+      wait_for_ajaximations
+
+      entries_after = Discussion.discussion_entries
+      first_entry_text_after = entries_after.first.text
+      expect(first_entry_text_after).to include("First")
+    end
+  end
+
+  context "nutrition facts functionality" do
+    before do
+      allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
+      @course.enable_feature!(:translation)
+      allow(Translation).to receive(:available?).and_return(true)
+    end
+
+    it "loads nutrition facts element with content in the DOM" do
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajaximations
+      expect(element_exists?("[data-testid='nutrition-facts-trigger']")).to be_truthy
     end
   end
 end

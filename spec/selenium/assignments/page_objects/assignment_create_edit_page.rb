@@ -163,6 +163,14 @@ class AssignmentCreateEditPage
       f("[data-testid='MasteryPathToggle'] svg[name='IconCheck'], [data-testid='MasteryPathToggle'] svg[name='IconX']")
     end
 
+    def add_asset_processor_button
+      f("#asset-processor-add-button")
+    end
+
+    def lti_tool_iframe
+      f('iframe[src^="/courses/"]')
+    end
+
     # Moderated Grading Options
     def select_grader_dropdown
       f("select[name='final_grader_id']")

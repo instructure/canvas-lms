@@ -44,7 +44,7 @@ describe('ColorModal', () => {
   //   })
 })
 
-// I cannot run jest tests on components that use the instui ColorPicker
+// I cannot run vi tests on components that use the instui ColorPicker
 // due to "ReferenceError: colorToHex8 is not defined" in the instui code.
 // For some reason the cjs version of instui's ColorPicker is being imported from lib
 // and it is missing the require for colorToHex8.

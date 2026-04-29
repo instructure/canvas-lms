@@ -17,8 +17,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DiscussionTopicSectionVisibility < ActiveRecord::Base
+class DiscussionTopicSectionVisibility < ApplicationRecord
   include Canvas::SoftDeletable
+
   belongs_to :course_section
   belongs_to :discussion_topic
 

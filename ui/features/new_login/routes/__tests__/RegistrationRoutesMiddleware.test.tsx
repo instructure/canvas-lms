@@ -16,22 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {NewLoginDataProvider} from '../../context'
 import RegistrationRoutesMiddleware from '../RegistrationRoutesMiddleware'
 
-jest.mock('../../context/NewLoginDataContext', () => {
-  const actualContext = jest.requireActual('../../context/NewLoginDataContext')
+vi.mock('../../context/NewLoginDataContext', async (importOriginal) => {
+  const actualContext = await importOriginal<typeof import('../../context/NewLoginDataContext')>()
   return {
     ...actualContext,
     useNewLoginData: () => ({
-      ...actualContext.useNewLoginData(),
+      isDataLoading: false,
       // mock the data attribute default values that would normally be provided by the back-end
       selfRegistrationType: 'all',
     }),
   }
+})
+
+afterEach(() => {
+  cleanup()
 })
 
 describe('RegistrationRoutesMiddleware', () => {

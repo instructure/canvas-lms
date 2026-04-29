@@ -17,15 +17,17 @@
  */
 
 import {gql} from '@apollo/client'
-import {arrayOf, float, string, bool, number} from 'prop-types'
+import {arrayOf, float, string, bool, object} from 'prop-types'
 
 import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
 import {SubmissionComment} from './SubmissionComment'
+import {LTI_ASSET_REPORT_FOR_STUDENT_FRAGMENT} from '@canvas/lti-asset-processor/shared-with-sg/replicated/queries/getLtiAssetReports'
 
 export const Submission = {
   fragment: gql`
     fragment Submission on Submission {
       _id
+      autoGradeResultPresent
       customGradeStatus
       gradingStatus
       grade
@@ -39,6 +41,7 @@ export const Submission = {
       excused
       studentEnteredScore
       state
+      submissionType
       commentsConnection {
         nodes {
           ...SubmissionComment
@@ -49,34 +52,19 @@ export const Submission = {
           ...RubricAssessment
         }
       }
-      ltiAssetReportsConnection(first: 10) {
+      ltiAssetReportsConnection(first: 10, latest: true) {
         nodes {
-          _id
-          asset {
-            _id
-            attachmentId
-            submissionAttempt
-          }
-          comment
-          errorCode
-          indicationAlt
-          indicationColor
-          launchUrlPath
-          priority
-          processingProgress
-          processorId
-          reportType
-          result
-          resultTruncated
-          title
+          ...LtiAssetReportForStudent
         }
       }
     }
     ${RubricAssessment.fragment}
     ${SubmissionComment.fragment}
+    ${LTI_ASSET_REPORT_FOR_STUDENT_FRAGMENT}
   `,
   shape: {
     _id: string,
+    autoGradeResultPresent: bool,
     customGradeStatus: string,
     gradingStatus: string,
     grade: string,
@@ -90,6 +78,7 @@ export const Submission = {
     excused: bool,
     studentEnteredScore: string,
     state: string,
+    submissionType: string,
     commentsConnection: arrayOf({
       nodes: arrayOf({
         comment: string,
@@ -102,30 +91,14 @@ export const Submission = {
     }),
     rubricAssessmentsConnection: {nods: arrayOf(RubricAssessment.shape)},
     ltiAssetReportsConnection: {
-      nodes: arrayOf({
-        _id: string,
-        asset: {
-          _id: string,
-          attachmentId: string,
-          submissionAttempt: number,
-        },
-        comment: string,
-        errorCode: string,
-        indicationAlt: string,
-        indicationColor: string,
-        launchUrlPath: string,
-        priority: number,
-        processingProgress: string,
-        processorId: string,
-        reportType: string,
-        result: string,
-        resultTruncated: string,
-        title: string,
-      }),
+      // Lti Asset Processor types use Zod schemas, so there's not really a
+      // need to replicate the full shape here.
+      nodes: arrayOf(object),
     },
   },
   mock: ({
     _id = '1',
+    autoGradeResultPresent = false,
     customGradeStatus = null,
     gradingStatus = 'graded',
     grade = 'A-',
@@ -140,6 +113,7 @@ export const Submission = {
     studentEnteredScore = '8',
     state = 'graded',
     submittedAt = null,
+    submissionType = 'online_text_entry',
     commentsConnection = {
       nodes: [
         {
@@ -160,6 +134,7 @@ export const Submission = {
     },
   } = {}) => ({
     _id,
+    autoGradeResultPresent,
     customGradeStatus,
     gradingStatus,
     grade,
@@ -174,6 +149,7 @@ export const Submission = {
     studentEnteredScore,
     state,
     submittedAt,
+    submissionType,
     commentsConnection,
     rubricAssessmentsConnection,
     ltiAssetReportsConnection,

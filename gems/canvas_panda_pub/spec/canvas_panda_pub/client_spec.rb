@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require "json/jwt"
 
 describe CanvasPandaPub::Client do
@@ -65,7 +64,7 @@ describe CanvasPandaPub::Client do
   describe "generate_token" do
     it "generates a token" do
       expires = 1.minute.from_now
-      token = @client.generate_token "/foo", true, true, expires
+      token = @client.generate_token("/foo", read: true, write: true, expires:)
       payload, _ = JSON::JWT.decode(token, "secret")
       expect(payload["keyId"]).to eq("key")
       expect(payload["channel"]).to eq("/qwerty/foo")

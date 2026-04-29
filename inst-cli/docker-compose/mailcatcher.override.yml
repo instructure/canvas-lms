@@ -1,7 +1,6 @@
-# to use this add docker-compose/mailcatcher.override.yml
+# to use this add inst-cli/docker-compose/mailcatcher.override.yml
 # to your COMPOSE_FILE var in .env
 
-version: '3.2'
 services:
   mailcatcher:
     image: instructure/mailcatcher

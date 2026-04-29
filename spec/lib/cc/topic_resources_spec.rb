@@ -47,6 +47,10 @@ describe CC::TopicResources do
     Nokogiri::XML(doc.target!)
   end
 
+  before do
+    allow_any_instance_of(Course).to receive(:a11y_checker_enabled?).and_return(false)
+  end
+
   let(:ccc_schema) { get_ccc_schema }
   let(:mock_course) { course_model }
   let(:mock_user) { user_model }
@@ -56,7 +60,7 @@ describe CC::TopicResources do
   let(:reply_to_entry_required_count) { "5" }
   let(:parent_assignment) { mock_course.assignments.create! }
   let(:discussion_type) { DiscussionTopic::DiscussionTypes::THREADED }
-  let(:topic) { mock_course.discussion_topics.create!(message: "hi", title: "discussion title", discussion_type:) }
+  let(:topic) { mock_course.discussion_topics.create!(message: "hi", title: "discussion title", discussion_type:, user: mock_user) }
   let(:discussion_checkpoints_enabled) do
     allow(mock_course.root_account).to receive(:feature_enabled?).with(:discussion_checkpoints)
   end
@@ -65,13 +69,12 @@ describe CC::TopicResources do
     allow(mock_course).to receive_messages(root_account: Account.create!)
     allow(mock_course.root_account).to receive(:feature_enabled?).with(:horizon_course_setting)
     allow(mock_course.root_account).to receive(:feature_enabled?).with(:file_association_access)
+    allow(mock_course.root_account).to receive(:feature_enabled?).with(:allow_attachment_association_creation)
+    allow(mock_course.root_account).to receive(:feature_enabled?).with(:accessibility_automatic_scanning).and_return(false)
+    allow(mock_course.root_account).to receive(:feature_enabled?).with(:lti_asset_processor).and_return(false)
   end
 
   describe "#create_canvas_topic" do
-    before do
-      allow(mock_course.account).to receive(:feature_enabled?).with(:assign_to_differentiation_tags).and_return(false)
-    end
-
     context "reply_to_entry_required_count" do
       context "when discussion_checkpoints is enabled" do
         before do
@@ -105,7 +108,7 @@ describe CC::TopicResources do
 
         context "when discussion is not checkpoint discussion" do
           before do
-            topic.update!(assignment: parent_assignment)
+            topic.update!(assignment: parent_assignment, user: mock_user)
             topic.assignment.update!(has_sub_assignments: false)
           end
 
@@ -191,6 +194,26 @@ describe CC::TopicResources do
             it "should skip sub_assignments attribute from xml" do
               expect(subject.css("sub_assignments").count).to eq 0
               expect(subject.css("sub_assignment").count).to eq 0
+            end
+
+            it("should validate the xml output by xsd") { expect(ccc_schema.validate(subject)).to be_empty }
+          end
+
+          context "when sub_assignments are deleted" do
+            before do
+              # Soft-delete the checkpoints but keep has_sub_assignments=true
+              topic.assignment.sub_assignments.unscoped.update_all(workflow_state: "deleted")
+            end
+
+            it "should include deleted sub_assignments in export (uses unscoped)" do
+              sub_assignments = subject.css("sub_assignments")
+              expect(sub_assignments.count).to eq 1
+              expect(sub_assignments.css("sub_assignment").count).to eq 2
+            end
+
+            it "should include workflow_state=deleted in export" do
+              # The workflow_state should be exported as part of the assignment data
+              expect(subject.css("sub_assignment workflow_state").map(&:text)).to all(eq("deleted"))
             end
 
             it("should validate the xml output by xsd") { expect(ccc_schema.validate(subject)).to be_empty }

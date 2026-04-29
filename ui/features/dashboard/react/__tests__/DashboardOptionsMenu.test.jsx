@@ -23,7 +23,7 @@ import userEvent from '@testing-library/user-event'
 import DashboardOptionsMenu from '../DashboardOptionsMenu'
 import axios from '@canvas/axios'
 
-jest.mock('@canvas/axios')
+vi.mock('@canvas/axios')
 
 const FakeDashboard = function ({
   menuRef,
@@ -82,7 +82,7 @@ describe('Dashboard Options Menu', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the menu button', () => {
@@ -91,7 +91,7 @@ describe('Dashboard Options Menu', () => {
   })
 
   it('calls onDashboardChange when new view is selected', async () => {
-    const onDashboardChange = jest.fn()
+    const onDashboardChange = vi.fn()
     const {getByTestId} = render(
       <DashboardOptionsMenu view="planner" onDashboardChange={onDashboardChange} />,
     )
@@ -103,7 +103,7 @@ describe('Dashboard Options Menu', () => {
   })
 
   it('does not call onDashboardChange when current view is selected', async () => {
-    const onDashboardChange = jest.fn()
+    const onDashboardChange = vi.fn()
     const {getByTestId} = render(
       <DashboardOptionsMenu view="activity" onDashboardChange={onDashboardChange} />,
     )

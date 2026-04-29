@@ -19,8 +19,11 @@
 #
 
 require_relative "../api_spec_helper"
+require "feature_flag_helper"
 
 describe "Outcome Groups API", type: :request do
+  include FeatureFlagHelper
+
   before :once do
     user_with_pseudonym(active_all: true)
   end
@@ -497,10 +500,10 @@ describe "Outcome Groups API", type: :request do
         expect(json.map { |j| j["outcome"]["friendly_description"] }).to eq expected_outcome_descriptions
       end
 
-      it "returns nil for friendly description if friendly description is set on outcome for the given context and improved outcome management feature flag is off" do
+      it "returns friendly description if friendly description is set on outcome for the given context and improved outcome management feature flag is on" do
         Account.site_admin.enable_feature! :outcomes_friendly_description
         json = exec_call
-        expect(json.filter_map { |j| j["outcome"]["friendly_description"] }).to eql([])
+        expect(json.filter_map { |j| j["outcome"]["friendly_description"] }).to eql(["a friendly description"])
       end
     end
 
@@ -1244,7 +1247,6 @@ describe "Outcome Groups API", type: :request do
 
       context "both enabled" do
         before do
-          Account.site_admin.enable_feature!(:outcomes_friendly_description)
           @account.enable_feature!(:improved_outcomes_management)
         end
 
@@ -1255,19 +1257,7 @@ describe "Outcome Groups API", type: :request do
 
       context "outcomes_friendly_description on, improved_outcomes_management off" do
         before do
-          Account.site_admin.enable_feature!(:outcomes_friendly_description)
-          @account.disable_feature!(:improved_outcomes_management)
-        end
-
-        it "returns outcomes without friendly_description" do
-          expect(outcome_groups_outcomes_api_call[0]["outcome"]["friendly_description"]).to be_nil
-        end
-      end
-
-      context "outcomes_friendly_description off, improved_outcomes_management on" do
-        before do
-          Account.site_admin.disable_feature!(:outcomes_friendly_description)
-          @account.enable_feature!(:improved_outcomes_management)
+          mock_feature_flag_on_account(:improved_outcomes_management, false)
         end
 
         it "returns outcomes without friendly_description" do
@@ -1602,7 +1592,7 @@ describe "Outcome Groups API", type: :request do
                                                          { points: 0, description: "Does Not Meet Expectations" }
                                                        ]
                                                      })
-      expect(@outcome.calculation_method).to eq("decaying_average")
+      expect(@outcome.calculation_method).to eq("standard_decaying_average")
       expect(@outcome.calculation_int).to be 65
     end
 

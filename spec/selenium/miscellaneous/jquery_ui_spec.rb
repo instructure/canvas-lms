@@ -83,19 +83,6 @@ describe "jquery ui" do
     expect(active.tag_name).to eq "select"
   end
 
-  it "captures shift-tabbing" do
-    skip_if_chrome("fragile")
-    create_simple_modal
-    active.click # sometimes the viewport doesn't have focus
-    expect(active.tag_name).to eq "select"
-    shift_tab
-    expect(active.tag_name).to eq "button"
-    shift_tab
-    expect(active.tag_name).to eq "input"
-    shift_tab
-    expect(active.tag_name).to eq "select"
-  end
-
   # We need to find alternate test case for calendar since the
   # calender widget has been replaced with InstUI in the assignments modal
 
@@ -190,35 +177,6 @@ describe "jquery ui" do
           .parent('.ui-dialog')
           .find('.ui-dialog-title')
           .text();
-      JS
-    end
-
-    it "accepts jquery object dialog titles" do
-      skip("FOO-4258, might be able to re-enable this test after jquery-ui upgrade")
-      title = "<i>i want formatting <b>for realz</b></i>"
-      expect(driver.execute_script(<<~JS)).to eq title
-        return $('<div id="jqueryui_test">here we go</div>')
-          .dialog({
-            title: $(#{title.inspect}),
-            modal: true,
-            zIndex: 1000
-          })
-          .parent('.ui-dialog')
-          .find('.ui-dialog-title')
-          .html();
-      JS
-
-      new_title = "<i>i <b>still</b> want formatting</i>"
-      expect(driver.execute_script(<<~JS)).to eq new_title
-        return $('#jqueryui_test')
-          .dialog({
-            modal: true,
-            zIndex: 1000
-          })
-          .dialog('option', 'title', $(#{new_title.inspect}))
-          .parent('.ui-dialog')
-          .find('.ui-dialog-title')
-          .html();
       JS
     end
   end

@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {
   doUpdateSettings,
   sliceSyncSettings,
@@ -24,9 +26,14 @@ import {
   SYNC_SETTINGS,
 } from '../lib/settingsHelper'
 import {defaultState} from '../lib/settingsReducer'
-import fetchMock from 'fetch-mock'
+
+const server = setupServer()
 
 describe('MicrosoftSyncAccountSettings settingsHelper', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
+
   describe('doUpdateSettings', () => {
     const expectedBody = {
       microsoft_sync_tenant: 'testtenant.com',
@@ -37,29 +44,36 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
     }
 
     let oldEnv
+    let lastRequestUrl = ''
+    let lastRequestBody = null
+
     beforeAll(() => {
       oldEnv = ENV
       ENV = {
         CONTEXT_BASE_URL: '/accounts/4',
       }
-      fetchMock.mock('*', 200)
     })
-    beforeEach(() => {})
 
-    afterEach(() => {
-      fetchMock.resetHistory()
+    beforeEach(() => {
+      lastRequestUrl = ''
+      lastRequestBody = null
+      server.use(
+        http.put('/api/v1/accounts/4', async ({request}) => {
+          lastRequestUrl = request.url
+          lastRequestBody = await request.json()
+          return HttpResponse.json({}, {status: 200})
+        }),
+      )
     })
 
     afterAll(() => {
       ENV = oldEnv
-      fetchMock.reset()
     })
 
     it('calls to the correct URL', async () => {
       await doUpdateSettings(expectedBody)
 
-      expect(fetchMock.called()).toBeTruthy()
-      expect(fetchMock.lastCall()[0]).toBe(`/api/v1${ENV.CONTEXT_BASE_URL}`)
+      expect(lastRequestUrl).toContain(`/api/v1${ENV.CONTEXT_BASE_URL}`)
     })
 
     it('calls with the correct body format', async () => {
@@ -67,8 +81,7 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
         ...expectedBody,
       })
 
-      expect(fetchMock.called()).toBeTruthy()
-      expect(JSON.parse(fetchMock.lastCall()[1].body)).toStrictEqual({
+      expect(lastRequestBody).toStrictEqual({
         account: {
           settings: {
             ...expectedBody,

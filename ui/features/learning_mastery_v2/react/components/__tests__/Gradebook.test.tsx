@@ -17,51 +17,90 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {Gradebook, GradebookProps} from '../Gradebook'
-import {SortOrder, SortBy} from '../../utils/constants'
+import {SortBy} from '@canvas/outcomes/react/utils/constants'
+import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../__fixtures__/rollups'
+import {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
+import {SortOrder} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
+
+vi.mock('../charts/BarChart', () => ({
+  BarChart: () => null,
+  default: () => null,
+}))
+
+// Helper to render with MockedQueryClientProvider
+const renderWithQueryClient = (ui: React.ReactElement) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  })
+  return render(<MockedQueryClientProvider client={queryClient}>{ui}</MockedQueryClientProvider>)
+}
 
 describe('Gradebook', () => {
+  const MOCK_ALIGNMENTS_TWO = [
+    {
+      alignment_id: 'D_5',
+      associated_asset_id: '2',
+      associated_asset_name: 'Test Assignment 1',
+      associated_asset_type: 'Assignment',
+      html_url: 'http://test.com/assignments/2',
+    },
+    {
+      alignment_id: 'D_6',
+      associated_asset_id: '3',
+      associated_asset_name: 'Test Assignment 2',
+      associated_asset_type: 'Assignment',
+      html_url: 'http://test.com/assignments/3',
+    },
+  ]
+
+  const MOCK_ALIGNMENTS_THREE = [
+    {
+      alignment_id: 'D_5',
+      associated_asset_id: '2',
+      associated_asset_name: 'Assignment 1',
+      associated_asset_type: 'Assignment',
+      html_url: 'http://test.com/assignments/2',
+    },
+    {
+      alignment_id: 'D_6',
+      associated_asset_id: '3',
+      associated_asset_name: 'Assignment 2',
+      associated_asset_type: 'Assignment',
+      html_url: 'http://test.com/assignments/3',
+    },
+    {
+      alignment_id: 'D_7',
+      associated_asset_id: '4',
+      associated_asset_name: 'Assignment 3',
+      associated_asset_type: 'Assignment',
+      html_url: 'http://test.com/assignments/4',
+    },
+  ]
+
+  const mockContributingScores: ContributingScoresManager = {
+    forOutcome: vi.fn(() => ({
+      isVisible: () => false,
+      toggleVisibility: vi.fn(),
+      data: undefined,
+      alignments: undefined,
+      scoresForUser: vi.fn(() => []),
+      isLoading: false,
+      error: undefined,
+    })),
+  }
+
   const defaultProps = (props = {}): GradebookProps => {
     return {
-      students: [
-        {
-          status: 'active',
-          name: 'Student Test',
-          display_name: 'Student Test',
-          avatar_url: '/avatar-url',
-          id: '1',
-        },
-        {
-          status: 'active',
-          name: 'Student Test 2',
-          display_name: 'Student Test 2',
-          avatar_url: '/avatar-url-2',
-          id: '2',
-        },
-      ],
-      outcomes: [
-        {
-          id: '1',
-          title: 'outcome 1',
-          description: 'Outcome description',
-          display_name: 'Friendly outcome name',
-          calculation_method: 'decaying_average',
-          calculation_int: 65,
-          mastery_points: 5,
-          ratings: [],
-        },
-        {
-          id: '2',
-          title: 'outcome 2',
-          description: 'Outcome description',
-          display_name: 'Friendly outcome name',
-          calculation_method: 'decaying_average',
-          calculation_int: 65,
-          mastery_points: 5,
-          ratings: [],
-        },
-      ],
+      students: MOCK_STUDENTS,
+      outcomes: MOCK_OUTCOMES,
       rollups: [
         {
           studentId: '1',
@@ -73,15 +112,19 @@ describe('Gradebook', () => {
         },
       ],
       courseId: '100',
-      gradebookFilters: [],
-      gradebookFilterHandler: jest.fn(),
-      setCurrentPage: jest.fn(),
+      setCurrentPage: vi.fn(),
       sorting: {
         sortOrder: SortOrder.ASC,
-        setSortOrder: jest.fn(),
+        setSortOrder: vi.fn(),
         sortBy: SortBy.SortableName,
-        setSortBy: jest.fn(),
+        setSortBy: vi.fn(),
+        sortOutcomeId: null,
+        setSortOutcomeId: vi.fn(),
+        sortAlignmentId: null,
+        setSortAlignmentId: vi.fn(),
       },
+      onChangeNameDisplayFormat: vi.fn(),
+      contributingScores: mockContributingScores,
       ...props,
     }
   }
@@ -93,7 +136,7 @@ describe('Gradebook', () => {
 
   it('renders each student', () => {
     const props = defaultProps()
-    const {getByText} = render(<Gradebook {...props} />)
+    const {getByText} = renderWithQueryClient(<Gradebook {...props} />)
     props.students.forEach(student => {
       expect(getByText(student.display_name)).toBeInTheDocument()
     })
@@ -101,37 +144,250 @@ describe('Gradebook', () => {
 
   it('renders each outcome', () => {
     const props = defaultProps()
-    const {getByText} = render(<Gradebook {...props} />)
+    renderWithQueryClient(<Gradebook {...props} />)
     props.outcomes.forEach(outcome => {
-      expect(getByText(outcome.title)).toBeInTheDocument()
+      expect(screen.getAllByText(outcome.title)[0]).toBeInTheDocument()
     })
+  })
+
+  it('renders outcomes in the order they are provided', () => {
+    const customOutcomes = [
+      {...MOCK_OUTCOMES[0], id: '1', title: 'First Outcome'},
+      {...MOCK_OUTCOMES[0], id: '2', title: 'Second Outcome'},
+      {...MOCK_OUTCOMES[0], id: '4', title: 'Fourth Outcome'},
+      {...MOCK_OUTCOMES[0], id: '3', title: 'Third Outcome'},
+    ]
+    const props = defaultProps({outcomes: customOutcomes})
+    const {container} = renderWithQueryClient(<Gradebook {...props} />)
+    const outcomeHeaders = container.querySelectorAll('[data-testid^="outcome-header"]')
+
+    expect(outcomeHeaders).toHaveLength(4)
+    expect(outcomeHeaders[0]).toHaveTextContent('First Outcome')
+    expect(outcomeHeaders[1]).toHaveTextContent('Second Outcome')
+    expect(outcomeHeaders[2]).toHaveTextContent('Fourth Outcome')
+    expect(outcomeHeaders[3]).toHaveTextContent('Third Outcome')
   })
 
   describe('pagination', () => {
     it('does not render pagination controls when there is only one page', () => {
       const props = defaultProps({pagination: {currentPage: 1, perPage: 10, totalPages: 1}})
-      const {queryByTestId} = render(<Gradebook {...props} />)
+      const {queryByTestId} = renderWithQueryClient(<Gradebook {...props} />)
       expect(queryByTestId('gradebook-pagination')).not.toBeInTheDocument()
     })
 
     it('does not render pagination controls when pagination is not provided', () => {
       const props = defaultProps({pagination: undefined})
-      const {queryByTestId} = render(<Gradebook {...props} />)
+      const {queryByTestId} = renderWithQueryClient(<Gradebook {...props} />)
       expect(queryByTestId('gradebook-pagination')).not.toBeInTheDocument()
     })
 
     it('renders pagination controls when there are multiple pages', () => {
       const props = defaultProps({pagination: {currentPage: 1, perPage: 10, totalPages: 2}})
-      const {queryByTestId} = render(<Gradebook {...props} />)
+      const {queryByTestId} = renderWithQueryClient(<Gradebook {...props} />)
       expect(queryByTestId('gradebook-pagination')).toBeInTheDocument()
     })
 
     it('calls setCurrentPage when page number button is clicked', () => {
       const props = defaultProps({pagination: {currentPage: 1, perPage: 10, totalPages: 3}})
-      const {getByText} = render(<Gradebook {...props} />)
+      const {getByText} = renderWithQueryClient(<Gradebook {...props} />)
       const page2Button = getByText('2')
       page2Button.click()
       expect(props.setCurrentPage).toHaveBeenCalledWith(2)
+    })
+  })
+
+  describe('contributing scores headers', () => {
+    it('does not render contributing score headers when outcome is not visible', () => {
+      const mockContributingScoresNotVisible: ContributingScoresManager = {
+        forOutcome: vi.fn(() => ({
+          isVisible: () => false,
+          toggleVisibility: vi.fn(),
+          data: undefined,
+          alignments: [
+            {
+              alignment_id: 'D_5',
+              associated_asset_id: '2',
+              associated_asset_name: 'Test Assignment',
+              associated_asset_type: 'Assignment',
+              html_url: 'http://test.com/assignments/2',
+            },
+          ],
+          scoresForUser: vi.fn(() => []),
+          isLoading: false,
+          error: undefined,
+        })),
+      }
+
+      const props = defaultProps({contributingScores: mockContributingScoresNotVisible})
+      const {queryByText} = renderWithQueryClient(<Gradebook {...props} />)
+      expect(queryByText('Test Assignment')).not.toBeInTheDocument()
+    })
+
+    it('renders contributing score headers when outcome is visible', () => {
+      const mockContributingScoresVisible: ContributingScoresManager = {
+        forOutcome: vi.fn(outcomeId => {
+          if (outcomeId === '1') {
+            return {
+              isVisible: () => true,
+              toggleVisibility: vi.fn(),
+              data: {
+                outcome: {id: '1', title: 'Test Outcome'},
+                alignments: MOCK_ALIGNMENTS_TWO,
+                scores: [],
+              },
+              alignments: MOCK_ALIGNMENTS_TWO,
+              scoresForUser: vi.fn(() => []),
+              isLoading: false,
+              error: undefined,
+            }
+          }
+          return {
+            isVisible: () => false,
+            toggleVisibility: vi.fn(),
+            data: undefined,
+            alignments: undefined,
+            scoresForUser: vi.fn(() => []),
+            isLoading: false,
+            error: undefined,
+          }
+        }),
+      }
+
+      const props = defaultProps({
+        contributingScores: mockContributingScoresVisible,
+        outcomes: [{...MOCK_OUTCOMES[0], id: '1'}],
+      })
+      renderWithQueryClient(<Gradebook {...props} />)
+
+      expect(screen.getAllByText('Test Assignment 1')[0]).toBeInTheDocument()
+      expect(screen.getAllByText('Test Assignment 2')[0]).toBeInTheDocument()
+    })
+
+    it('renders correct number of contributing score headers based on alignments', () => {
+      const mockContributingScoresMultiple: ContributingScoresManager = {
+        forOutcome: vi.fn(outcomeId => {
+          if (outcomeId === '1') {
+            return {
+              isVisible: () => true,
+              toggleVisibility: vi.fn(),
+              data: {
+                outcome: {id: '1', title: 'Test Outcome'},
+                alignments: MOCK_ALIGNMENTS_THREE,
+                scores: [],
+              },
+              alignments: MOCK_ALIGNMENTS_THREE,
+              scoresForUser: vi.fn(() => []),
+              isLoading: false,
+              error: undefined,
+            }
+          }
+          return {
+            isVisible: () => false,
+            toggleVisibility: vi.fn(),
+            data: undefined,
+            alignments: undefined,
+            scoresForUser: vi.fn(() => []),
+            isLoading: false,
+            error: undefined,
+          }
+        }),
+      }
+
+      const props = defaultProps({
+        contributingScores: mockContributingScoresMultiple,
+        outcomes: [{...MOCK_OUTCOMES[0], id: '1'}],
+      })
+      renderWithQueryClient(<Gradebook {...props} />)
+
+      expect(screen.getAllByText('Assignment 1')[0]).toBeInTheDocument()
+      expect(screen.getAllByText('Assignment 2')[0]).toBeInTheDocument()
+      expect(screen.getAllByText('Assignment 3')[0]).toBeInTheDocument()
+    })
+
+    it('does not render contributing score headers when alignments is undefined', () => {
+      const mockContributingScoresNoAlignments: ContributingScoresManager = {
+        forOutcome: vi.fn(() => ({
+          isVisible: () => true,
+          toggleVisibility: vi.fn(),
+          data: undefined,
+          alignments: undefined,
+          scoresForUser: vi.fn(() => []),
+          isLoading: false,
+          error: undefined,
+        })),
+      }
+
+      const props = defaultProps({contributingScores: mockContributingScoresNoAlignments})
+      const {container} = renderWithQueryClient(<Gradebook {...props} />)
+
+      const allHeaders = container.querySelectorAll('[data-testid^="outcome-header"]')
+      expect(allHeaders).toHaveLength(2)
+    })
+
+    it('does not render contributing score headers when alignments is empty array', () => {
+      const mockContributingScoresEmptyAlignments: ContributingScoresManager = {
+        forOutcome: vi.fn(() => ({
+          isVisible: () => true,
+          toggleVisibility: vi.fn(),
+          data: {
+            outcome: {id: '1', title: 'Test Outcome'},
+            alignments: [],
+            scores: [],
+          },
+          alignments: [],
+          scoresForUser: vi.fn(() => []),
+          isLoading: false,
+          error: undefined,
+        })),
+      }
+
+      const props = defaultProps({contributingScores: mockContributingScoresEmptyAlignments})
+      const {container} = renderWithQueryClient(<Gradebook {...props} />)
+
+      const allHeaders = container.querySelectorAll('[data-testid^="outcome-header"]')
+      expect(allHeaders).toHaveLength(2)
+    })
+
+    it('renders contributing score headers for multiple visible outcomes', () => {
+      const mockContributingScoresMultipleOutcomes: ContributingScoresManager = {
+        forOutcome: vi.fn(outcomeId => ({
+          isVisible: () => true,
+          toggleVisibility: vi.fn(),
+          data: {
+            outcome: {id: outcomeId.toString(), title: `Outcome ${outcomeId}`},
+            alignments: [
+              {
+                alignment_id: `D_${outcomeId}`,
+                associated_asset_id: outcomeId.toString(),
+                associated_asset_name: `Assignment for Outcome ${outcomeId}`,
+                associated_asset_type: 'Assignment',
+                html_url: `http://test.com/assignments/${outcomeId}`,
+              },
+            ],
+            scores: [],
+          },
+          alignments: [
+            {
+              alignment_id: `D_${outcomeId}`,
+              associated_asset_id: outcomeId.toString(),
+              associated_asset_name: `Assignment for Outcome ${outcomeId}`,
+              associated_asset_type: 'Assignment',
+              html_url: `http://test.com/assignments/${outcomeId}`,
+            },
+          ],
+          scoresForUser: vi.fn(() => []),
+          isLoading: false,
+          error: undefined,
+        })),
+      }
+
+      const props = defaultProps({contributingScores: mockContributingScoresMultipleOutcomes})
+      renderWithQueryClient(<Gradebook {...props} />)
+
+      // Should render headers for both outcomes (MOCK_OUTCOMES has 2 outcomes)
+      props.outcomes.forEach(outcome => {
+        expect(screen.getAllByText(`Assignment for Outcome ${outcome.id}`)[0]).toBeInTheDocument()
+      })
     })
   })
 })

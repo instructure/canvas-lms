@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./backbone/views/DueDateOverride.jsx"
+  "main": "./backbone/views/DueDateOverride.jsx",
+  "owner": "EGG"
 }

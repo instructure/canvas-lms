@@ -148,27 +148,30 @@ class ContentMigrationsController < ApplicationController
 
     if Account.site_admin.feature_enabled?(:instui_for_import_page) && !api_request?
       # Only js_env used for the redesign code
-      js_env COURSE_ID: @context.id
-      js_env UPLOAD_LIMIT: Attachment.quota_available(@context)
-      js_env QUESTION_BANKS: @context.assessment_question_banks.except(:preload).select([:title, :id]).active
-      js_env(SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
-        @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses))
+      js_env({
+               COURSE_ID: @context.id,
+               UPLOAD_LIMIT: Attachment.quota_available(@context),
+               QUESTION_BANKS: @context.assessment_question_banks.except(:preload).select([:title, :id]).active,
+               SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
+                 @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses),
 
-      # These values are used based on the same logic as ui/features/content_migrations/setup.js do.
-      js_env(QUIZZES_NEXT_ENABLED: new_quizzes_enabled?)
-      js_env(NEW_QUIZZES_IMPORT: new_quizzes_import_enabled?)
-      js_env(NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?)
-      js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
-      js_env(NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?)
-      js_env(NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?)
+               # These values are used based on the same logic as ui/features/content_migrations/setup.js do.
+               QUIZZES_NEXT_ENABLED: new_quizzes_enabled?,
+               NEW_QUIZZES_IMPORT: new_quizzes_import_enabled?,
+               NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?,
+               NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default,
+               NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?,
+               NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?,
 
-      js_env(CONTENT_MIGRATIONS_EXPIRE_DAYS: ContentMigration.expire_days)
-      js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))
-      js_env(OLD_END_DATE: datetime_string(@context.conclude_at, :verbose))
-      js_env(SHOW_SELECT: should_show_course_copy_dropdown)
+               CONTENT_MIGRATIONS_EXPIRE_DAYS: ContentMigration.expire_days,
+               OLD_START_DATE: datetime_string(@context.start_at, :verbose),
+               OLD_END_DATE: datetime_string(@context.conclude_at, :verbose),
+               SHOW_SELECT: should_show_course_copy_dropdown,
+               MISSING_POLICY_ENABLED: @context.late_policy&.missing_submission_deduction_enabled || false
+             })
       set_tutorial_js_env
     else
-      scope = @context.content_migrations.where(child_subscription_id: nil).order("id DESC")
+      scope = @context.content_migrations.where(child_subscription_id: nil).order(id: :desc)
       @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
       @migrations.each(&:check_for_pre_processing_timeout)
       content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
@@ -176,7 +179,7 @@ class ContentMigrationsController < ApplicationController
       if api_request?
         render json: content_migration_json_hash
       else # Block below should be removed when instui_for_import_page FF stops begin a thing
-        @plugins = ContentMigration.migration_plugins(true).sort_by { |p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)] }
+        @plugins = ContentMigration.migration_plugins(exclude_hidden: true).sort_by { |p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)] }
 
         options = @plugins.map { |p| { label: p.metadata(:select_text), id: p.id } }
 
@@ -188,26 +191,29 @@ class ContentMigrationsController < ApplicationController
           }
         end)
 
-        js_env EXTERNAL_TOOLS: external_tools_json(external_tools, @context, @current_user, session)
-        js_env UPLOAD_LIMIT: Attachment.quota_available(@context)
-        js_env SELECT_OPTIONS: options
-        js_env QUESTION_BANKS: @context.assessment_question_banks.except(:preload).select([:title, :id]).active
-        js_env COURSE_ID: @context.id
-        js_env CONTENT_MIGRATIONS: content_migration_json_hash
-        js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))
-        js_env(OLD_END_DATE: datetime_string(@context.conclude_at, :verbose))
+        js_env({
+                 EXTERNAL_TOOLS: external_tools_json(external_tools, @context, @current_user, session),
+                 UPLOAD_LIMIT: Attachment.quota_available(@context),
+                 SELECT_OPTIONS: options,
+                 QUESTION_BANKS: @context.assessment_question_banks.except(:preload).select([:title, :id]).active,
+                 COURSE_ID: @context.id,
+                 CONTENT_MIGRATIONS: content_migration_json_hash,
+                 OLD_START_DATE: datetime_string(@context.start_at, :verbose),
+                 OLD_END_DATE: datetime_string(@context.conclude_at, :verbose),
 
-        js_env(SHOW_SELECT: should_show_course_copy_dropdown)
-        js_env(CONTENT_MIGRATIONS_EXPIRE_DAYS: ContentMigration.expire_days)
-        js_env(QUIZZES_NEXT_ENABLED: new_quizzes_enabled?)
-        js_env(NEW_QUIZZES_IMPORT: new_quizzes_import_enabled?)
-        js_env(NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?)
-        js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
-        js_env(NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?)
-        js_env(NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?)
-        js_env(BLUEPRINT_ELIGIBLE_IMPORT: MasterCourses::MasterTemplate.blueprint_eligible?(@context))
-        js_env(SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
-          @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses))
+                 SHOW_SELECT: should_show_course_copy_dropdown,
+                 CONTENT_MIGRATIONS_EXPIRE_DAYS: ContentMigration.expire_days,
+                 QUIZZES_NEXT_ENABLED: new_quizzes_enabled?,
+                 NEW_QUIZZES_IMPORT: new_quizzes_import_enabled?,
+                 NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?,
+                 NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default,
+                 NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?,
+                 NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?,
+                 BLUEPRINT_ELIGIBLE_IMPORT: MasterCourses::MasterTemplate.blueprint_eligible?(@context),
+                 SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
+                   @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses),
+                 MISSING_POLICY_ENABLED: @context.late_policy&.missing_submission_deduction_enabled || false
+               })
         set_tutorial_js_env
       end
     end
@@ -469,7 +475,7 @@ class ContentMigrationsController < ApplicationController
   def available_migrators
     return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
-    systems = ContentMigration.migration_plugins(true).select { |sys| migration_plugin_supported?(sys) }
+    systems = ContentMigration.migration_plugins(exclude_hidden: true).select { |sys| migration_plugin_supported?(sys) }
     json = systems.map do |p|
       {
         type: p.id,
@@ -681,7 +687,7 @@ class ContentMigrationsController < ApplicationController
     if @current_user.adminable_accounts.any?
       false # assume that if they're an account admin they're probably managing so many courses it's not worth it to even try the count
     else
-      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses(true).count }.sum
+      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses(include_concluded: true).count }.sum
       course_count <= 100
     end
   end

@@ -23,19 +23,19 @@ module Alerts
     describe "scoped to unit" do
       before do
         @mock_notification = Notification.new
-        allow(BroadcastPolicy).to receive(:notification_finder).and_return(double(by_name: @mock_notification))
+        allow(BroadcastPolicy).to receive(:notification_finder).and_return(instance_double(NotificationFinder, by_name: @mock_notification))
       end
 
       context "basic evaluation" do
         it "does not trigger any alerts for unpublished courses" do
-          course = double("Course", available?: false)
+          course = instance_double(Course, available?: false)
           expect_any_instance_of(Notification).not_to receive(:create_message)
 
           DelayedAlertSender.evaluate_for_course(course, nil)
         end
 
         it "does not trigger any alerts for courses with no alerts" do
-          course = double("Course", available?: true, alerts: [])
+          course = instance_double(Course, available?: true, alerts: [])
           expect_any_instance_of(Notification).not_to receive(:create_message)
 
           DelayedAlertSender.evaluate_for_course(course, nil)
@@ -177,7 +177,7 @@ module Alerts
         alert.save!
         @course.start_at = 30.days.ago
 
-        mock_interaction = double(should_not_receive_message?: true)
+        mock_interaction = instance_double(Alerts::Interaction, should_not_receive_message?: true)
         expect(Alerts::Interaction).to receive(:new).once.and_return(mock_interaction)
 
         DelayedAlertSender.evaluate_for_course(@course, [alert])
@@ -239,7 +239,7 @@ module Alerts
         end
 
         before do
-          @pseudonym = double("Pseudonym")
+          @pseudonym = instance_double(Pseudonym)
           allow(@pseudonym).to receive(:destroyed?).and_return(false)
           allow(Pseudonym).to receive(:find_by_user_id).and_return(@pseudonym)
         end

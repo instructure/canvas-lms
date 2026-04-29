@@ -18,7 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "feature_flag_helper"
+
 describe Loaders::OutcomeFriendlyDescriptionLoader do
+  include FeatureFlagHelper
+
   before do
     course_with_student(active_all: true)
     outcome_model(context: @course)
@@ -27,7 +31,6 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
     @course_account.parent_account = @parent_account
     @course_account.save!
 
-    Account.site_admin.enable_feature!(:outcomes_friendly_description)
     @parent_account.enable_feature!(:improved_outcomes_management)
     @course_account.enable_feature!(:improved_outcomes_management)
   end
@@ -180,23 +183,8 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
     end
   end
 
-  it "resolves to nil if OFD FF disabled" do
-    Account.site_admin.disable_feature!(:outcomes_friendly_description)
-
-    create_course_fd
-
-    GraphQL::Batch.batch do
-      fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
-        @course.id, "Course"
-      )
-      fd_loader.load(@outcome.id).then do |fd|
-        expect(fd).to be_nil
-      end
-    end
-  end
-
   it "resolves to nil if IOM FF disabled" do
-    @parent_account.disable_feature!(:improved_outcomes_management)
+    mock_feature_flag_on_account(:improved_outcomes_management, false)
 
     create_course_fd
     create_account_fd

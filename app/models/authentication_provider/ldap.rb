@@ -268,6 +268,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     ldap_account_ids_to_send_to_statsd.include? Shard.global_id_for(account_id)
   end
 
+  # rubocop:disable Lint/NoHighCardinalityStatsdTags -- sufficient protections exist via #ldap_account_ids_to_send_to_statsd
   def ldap_bind_result(unique_id, password_plaintext)
     return nil if password_plaintext.blank?
 
@@ -277,7 +278,10 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     result = ::Canvas.timeout_protection("ldap:#{global_id}", timeout_options) do
       ldap = ldap_connection
       filter = ldap_filter(unique_id)
-      ldap.bind_as(base: ldap.base, filter:, password: password_plaintext)
+      Utils::InstStatsdUtils::Timing.track("canvas.ldap.bind_as") do |meta|
+        meta.tags = Utils::InstStatsdUtils::Tags.tags_for(account.shard)
+        ldap.bind_as(base: ldap.base, filter:, password: password_plaintext)
+      end
     end
 
     if should_send_to_statsd?
@@ -303,6 +307,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     end
     nil
   end
+  # rubocop:enable Lint/NoHighCardinalityStatsdTags
 
   def slo?
     false

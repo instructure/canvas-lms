@@ -46,34 +46,34 @@ describe('progressable', () => {
 
   describe('with fake timers', () => {
     beforeEach(() => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       model = new Progress()
       model.url = () => `/steve/${Date.now()}`
     })
 
     afterEach(() => {
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     // Skip this test due to complex timing issues with MSW and fake timers
     test.skip('polls the progress api until the job is finished', async () => {
-      const spy = jest.fn()
+      const spy = vi.fn()
       model.on('complete', spy)
 
       respond({workflow_state: 'queued'})
       model.poll()
       await new Promise(resolve => setTimeout(resolve, 10))
-      jest.advanceTimersByTime(1000)
+      vi.advanceTimersByTime(1000)
       expect(model.get('workflow_state')).toBe('queued')
 
       respond({workflow_state: 'running'})
       await new Promise(resolve => setTimeout(resolve, 10))
-      jest.advanceTimersByTime(1000)
+      vi.advanceTimersByTime(1000)
       expect(model.get('workflow_state')).toBe('running')
 
       respond({workflow_state: 'completed'})
       await new Promise(resolve => setTimeout(resolve, 10))
-      jest.advanceTimersByTime(1000)
+      vi.advanceTimersByTime(1000)
       expect(model.get('workflow_state')).toBe('completed')
 
       expect(spy).toHaveBeenCalledTimes(1)

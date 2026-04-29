@@ -43,7 +43,9 @@ module Api::V1::Outcome
         calculation_int: method&.calculation_int,
         points_possible: mastery_scale&.points_possible,
         mastery_points: mastery_scale&.mastery_points,
-        ratings: mastery_scale&.ratings_hash
+        ratings: mastery_scale&.ratings_hash,
+        proficiency_context_type: mastery_scale&.context_type,
+        proficiency_context_id: mastery_scale&.context_id&.to_s
       }
     end
   end
@@ -74,9 +76,9 @@ module Api::V1::Outcome
         hash["description"] = outcome.description
         hash["friendly_description"] = opts.dig(:friendly_descriptions, outcome.id.to_s)
         context = opts[:context]
-        mastery_scale_opts = mastery_scale_opts(context)
-        if mastery_scale_opts.any?
-          hash.merge!(mastery_scale_opts)
+        scale_opts = mastery_scale_opts(context)
+        if scale_opts.any?
+          hash.merge!(scale_opts)
         elsif !mastery_scales_flag_enabled(context)
           hash["points_possible"] = outcome.rubric_criterion[:points_possible]
           hash["mastery_points"] = outcome.rubric_criterion[:mastery_points]

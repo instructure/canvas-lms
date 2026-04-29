@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ConversationParticipant < ActiveRecord::Base
+class ConversationParticipant < ApplicationRecord
   include Workflow
   include TextHelper
   include SimpleTags
@@ -37,7 +37,7 @@ class ConversationParticipant < ActiveRecord::Base
   scope :unread, -> { where(workflow_state: "unread") }
   scope :archived, -> { where(workflow_state: "archived") }
   scope :starred, -> { where(label: "starred") }
-  scope :sent, -> { where.not(visible_last_authored_at: nil).order("visible_last_authored_at DESC, conversation_id DESC") }
+  scope :sent, -> { where.not(visible_last_authored_at: nil).order(visible_last_authored_at: :desc, conversation_id: :desc) }
   scope :for_masquerading_user, lambda { |masquerading_user, user_being_viewed|
     # site admins can see everything
     next all if masquerading_user.account_users.active.map(&:account_id).include?(Account.site_admin.id)
@@ -227,7 +227,7 @@ class ConversationParticipant < ActiveRecord::Base
                          .select("conversation_messages.*, conversation_message_participants.tags")
                          .joins(:conversation_message_participants)
                          .where("conversation_id=? AND user_id=?", conversation_id, user_id)
-                         .order("created_at DESC, id DESC")
+                         .order(created_at: :desc, id: :desc)
     end
   end
 
@@ -503,9 +503,21 @@ class ConversationParticipant < ActiveRecord::Base
           ConversationMessageParticipant.joins(:conversation_message)
                                         .where(conversation_messages: { conversation_id: }, user_id:)
                                         .update_all(user_id: new_user.id)
-          update_attribute :user, new_user
-          clear_participants_cache
-          existing = self
+          begin
+            update_attribute :user, new_user
+            clear_participants_cache
+            existing = self
+          rescue ActiveRecord::RecordNotUnique
+            # the target user already has a CP for this conversation on self's shard,
+            # but the check above queried the conversation's shard and didn't find it
+            existing = conversation.conversation_participants.where(user_id: new_user).first
+            existing ||= shard.activate { self.class.where(conversation_id: self[:conversation_id], user_id: new_user.id).first }
+            if existing && existing != self
+              existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
+              existing.clear_participants_cache
+            end
+            destroy
+          end
         end
         # replicate ConversationParticipant record to the new user's shard
         if old_shard != new_user.shard && new_user.shard != conversation.shard && !new_user.all_conversations.where(conversation_id: conversation).exists?

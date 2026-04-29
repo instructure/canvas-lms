@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {Img} from '@instructure/ui-img'
-import svg from '@canvas/images/ScreenCaptureIcon.svg'
+import svg from '@instructure/platform-images/assets/ScreenCaptureIcon.svg'
 
 export default function ScreenCaptureIcon() {
   return <Img src={svg} alt="screen capture" height={21} width={21} />

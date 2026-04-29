@@ -18,9 +18,9 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {queryClient, useAllPages} from '@canvas/query'
+import {queryClient, useAllPages} from '@instructure/platform-query'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
@@ -45,7 +45,7 @@ import {
   downloadRubrics,
 } from '../../queries/ViewRubricQueries'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {type FetchUsedLocationResponse, UsedLocationsModal} from './UsedLocationsModal'
 import {ImportRubric} from './ImportRubric'
 import {colors} from '@instructure/canvas-theme'
@@ -62,7 +62,6 @@ export const TABS = {
 
 export type ViewRubricsProps = {
   canManageRubrics?: boolean
-  canImportExportRubrics?: boolean
   showHeader?: boolean
 }
 
@@ -70,11 +69,7 @@ const rubricsFromPage = (page: RubricQueryResponse) => (page ? page.rubricsConne
 const rubricsFromPages = (resp: InfiniteData<RubricQueryResponse>) =>
   resp?.pages.flatMap(rubricsFromPage)
 
-export const ViewRubrics = ({
-  canManageRubrics = false,
-  canImportExportRubrics = false,
-  showHeader = true,
-}: ViewRubricsProps) => {
+export const ViewRubrics = ({canManageRubrics = false, showHeader = true}: ViewRubricsProps) => {
   const navigate = useNavigate()
   const {accountId, courseId} = useParams()
   const isAccount = !!accountId
@@ -99,7 +94,11 @@ export const ViewRubrics = ({
   }
 
   const handleDownloadRubrics = async () => {
-    await downloadRubrics(courseId, accountId, selectedRubricIds)
+    try {
+      await downloadRubrics(courseId, accountId, selectedRubricIds)
+    } catch (error) {
+      showFlashError(I18n.t('Error Downloading Rubrics'))()
+    }
   }
 
   const path = useRef<string | undefined>(undefined)
@@ -326,10 +325,9 @@ export const ViewRubrics = ({
                 />
               </FlexItem>
               <FlexItem>
-                {canManageRubrics && canImportExportRubrics && (
+                {canManageRubrics && (
                   <Button
-                    // @ts-expect-error
-                    renderIcon={IconImportLine}
+                    renderIcon={<IconImportLine />}
                     color="secondary"
                     data-testid="import-rubric-button"
                     onClick={() => setImportTrayIsOpen(true)}
@@ -341,8 +339,7 @@ export const ViewRubrics = ({
               <FlexItem>
                 {canManageRubrics && (
                   <Button
-                    // @ts-expect-error
-                    renderIcon={IconAddLine}
+                    renderIcon={<IconAddLine />}
                     color="primary"
                     onClick={() => navigate('./create')}
                     data-testid="create-new-rubric-button"
@@ -367,7 +364,6 @@ export const ViewRubrics = ({
               >
                 <View as="div" margin="medium 0" data-testid="saved-rubrics-table">
                   <RubricTable
-                    canImportExportRubrics={canImportExportRubrics}
                     handleCheckboxChange={handleCheckboxChange}
                     selectedRubricIds={selectedRubricIds}
                     canManageRubrics={canManageRubrics}
@@ -388,7 +384,6 @@ export const ViewRubrics = ({
               >
                 <View as="div" margin="medium 0" data-testid="archived-rubrics-table">
                   <RubricTable
-                    canImportExportRubrics={canImportExportRubrics}
                     selectedRubricIds={selectedRubricIds}
                     handleCheckboxChange={handleCheckboxChange}
                     canManageRubrics={canManageRubrics}
@@ -402,44 +397,42 @@ export const ViewRubrics = ({
               </Tabs.Panel>
             </Tabs>
 
-            {canImportExportRubrics && (
-              <div
-                id="enhanced-rubric-builder-footer"
-                style={{backgroundColor: colors.contrasts.white1010}}
+            <div
+              id="enhanced-rubric-builder-footer"
+              style={{backgroundColor: colors.contrasts.white1010}}
+            >
+              <View
+                as="div"
+                margin="small large"
+                themeOverride={{marginLarge: '48px', marginSmall: '12px'}}
               >
-                <View
-                  as="div"
-                  margin="small large"
-                  themeOverride={{marginLarge: '48px', marginSmall: '12px'}}
-                >
-                  <Flex justifyItems="end">
-                    <Flex.Item margin="0 medium 0 0">
-                      <Button
-                        onClick={() => setSelectedRubricIds([])}
-                        data-testid="cancel-select-mode-button"
-                      >
-                        {I18n.t('Cancel')}
-                      </Button>
-                    </Flex.Item>
+                <Flex justifyItems="end">
+                  <Flex.Item margin="0 medium 0 0">
+                    <Button
+                      onClick={() => setSelectedRubricIds([])}
+                      data-testid="cancel-select-mode-button"
+                    >
+                      {I18n.t('Cancel')}
+                    </Button>
+                  </Flex.Item>
 
-                    <Flex.Item margin="0 medium 0 0">
-                      <Button
-                        color="primary"
-                        // @ts-expect-error
-                        renderIcon={IconDownloadLine}
-                        data-testid="download-rubrics"
-                        disabled={selectedRubricIds.length === 0}
-                        onClick={handleDownloadRubrics}
-                      >
-                        {I18n.t('Download Selected Rubrics')}
-                      </Button>
-                    </Flex.Item>
-                  </Flex>
-                </View>
-              </div>
-            )}
+                  <Flex.Item margin="0 medium 0 0">
+                    <Button
+                      color="primary"
+                      renderIcon={<IconDownloadLine />}
+                      data-testid="download-rubrics"
+                      disabled={selectedRubricIds.length === 0}
+                      onClick={handleDownloadRubrics}
+                    >
+                      {I18n.t('Download Selected Rubrics')}
+                    </Button>
+                  </Flex.Item>
+                </Flex>
+              </View>
+            </div>
 
             <RubricAssessmentTray
+              currentUserId={ENV.current_user_id ?? ''}
               isLoading={isLoadingPreview}
               isOpen={isPreviewTrayOpen}
               isPreviewMode={false}
@@ -460,15 +453,13 @@ export const ViewRubrics = ({
               onClose={handleLocationsUsedModalClose}
             />
 
-            {canImportExportRubrics && (
-              <ImportRubric
-                accountId={accountId}
-                courseId={courseId}
-                isTrayOpen={importTrayIsOpen}
-                handleImportSuccess={handleImportSuccess}
-                handleTrayClose={() => setImportTrayIsOpen(false)}
-              />
-            )}
+            <ImportRubric
+              accountId={accountId}
+              courseId={courseId}
+              isTrayOpen={importTrayIsOpen}
+              handleImportSuccess={handleImportSuccess}
+              handleTrayClose={() => setImportTrayIsOpen(false)}
+            />
           </View>
         )
       }}

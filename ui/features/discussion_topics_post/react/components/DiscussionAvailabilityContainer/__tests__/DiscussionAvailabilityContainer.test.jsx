@@ -22,7 +22,9 @@ import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {DiscussionAvailabilityContainer} from '../DiscussionAvailabilityContainer'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils/index', () => ({
+  responsiveQuerySizes: vi.fn(),
+}))
 
 const mockSections = [
   {
@@ -56,21 +58,21 @@ const mockLockAt = '2022-01-19T23:59:59-07:00'
 const mockDelayedPost = '2022-01-12T00:00:00-07:00'
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
 
 beforeEach(() => {
-  responsiveQuerySizes.mockImplementation(() => ({
+  vi.mocked(responsiveQuerySizes).mockReturnValue({
     desktop: {maxWidth: '1000px'},
-  }))
+  })
 })
 
 const setup = props => {
@@ -214,9 +216,9 @@ describe('DiscussionAvailabilityContainer', () => {
 
   describe('mobile', () => {
     beforeEach(() => {
-      responsiveQuerySizes.mockImplementation(() => ({
+      vi.mocked(responsiveQuerySizes).mockReturnValue({
         tablet: {maxWidth: '767px'},
-      }))
+      })
     })
 
     it('displays View Availability', () => {

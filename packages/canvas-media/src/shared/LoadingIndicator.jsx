@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
-import {oneOf, string} from 'prop-types'
+
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
+import {oneOf, string} from 'prop-types'
+import React from 'react'
 
 export default function LoadingIndicator({translatedTitle, size}) {
   return (
@@ -30,8 +31,8 @@ export default function LoadingIndicator({translatedTitle, size}) {
 
 LoadingIndicator.propTypes = {
   translatedTitle: string.isRequired,
-  size: oneOf(['x-small', 'small', 'medium', 'large'])
+  size: oneOf(['x-small', 'small', 'medium', 'large']),
 }
 LoadingIndicator.defaultProps = {
-  size: 'large'
+  size: 'large',
 }

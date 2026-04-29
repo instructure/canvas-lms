@@ -29,15 +29,13 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.tree'
 import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONPreparedFiles, getFormData */
-import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */
 import '@canvas/util/templateData'
 import '@canvas/media-comments'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/tabs'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {createRoot} from 'react-dom/client'
+import {legacyRender, render, rerender} from '@canvas/react'
 import FileBrowser from '@canvas/rce/FileBrowser'
 import {ProgressCircle} from '@instructure/ui-progress'
 import {Alert} from '@instructure/ui-alerts'
@@ -71,7 +69,7 @@ ready(function () {
   // variables for turnitin pledge validation
   const PLEDGE_TYPES = {
     TEXT: 'text_entry',
-    UPLOAD: 'online_upload'
+    UPLOAD: 'online_upload',
   }
   let shouldShowTextPledgeError = false
   let shouldShowUploadPledgeError = false
@@ -90,7 +88,7 @@ ready(function () {
     }
   }
 
-  const getShouldShowPledgeError = (type) => {
+  const getShouldShowPledgeError = type => {
     switch (type) {
       case PLEDGE_TYPES.TEXT:
         return shouldShowTextPledgeError
@@ -114,7 +112,7 @@ ready(function () {
   const uploadPledgeMount = document.getElementById('turnitin_pledge_container_online_upload')
 
   if (alertMount()) {
-    ReactDOM.render(
+    legacyRender(
       <Alert screenReaderOnly={true} liveRegion={alertMount} liveRegionPoliteness="assertive">
         {accessibilityAlert}
       </Alert>,
@@ -123,16 +121,9 @@ ready(function () {
   }
 
   const renderPledge = (mount, type) => {
-    let pledgeRoot = null
-    if (pledgeRoots[type]) {
-      pledgeRoot = pledgeRoots[type]
-    } else {
-      pledgeRoot = createRoot(mount)
-      pledgeRoots[type] = pledgeRoot
-    }
     const eulaUrl = mount.dataset.eulaurl
     const pledgeText = mount.dataset.pledge
-    pledgeRoot.render(
+    const element = (
       <SimilarityPledge
         setShouldShowPledgeError={setShouldShowPledgeError}
         getShouldShowPledgeError={getShouldShowPledgeError}
@@ -141,6 +132,11 @@ ready(function () {
         type={type}
       />
     )
+    if (pledgeRoots[type]) {
+      rerender(pledgeRoots[type], element)
+    } else {
+      pledgeRoots[type] = render(element, mount)
+    }
   }
 
   const checkPledgeCheck = (checkbox, type) => {
@@ -193,8 +189,7 @@ ready(function () {
       const onlineUrlHiddenInput = document.getElementById('submission_url')
       onlineUrlHiddenInput.value = url
     }
-    const root = createRoot(urlInput)
-    root.render(
+    render(
       <Flex as="div" margin="small 0">
         <Flex.Item width="100%">
           <OnlineUrlSubmission
@@ -203,7 +198,8 @@ ready(function () {
             setShouldShowUrlError={setShouldShowUrlError}
           />
         </Flex.Item>
-      </Flex>
+      </Flex>,
+      urlInput,
     )
   }
 
@@ -219,13 +215,13 @@ ready(function () {
 
       const $emojiPicker = $container.find('.emoji-picker-container')
       if ($emojiPicker.length) {
-        ReactDOM.render(<EmojiPicker insertEmoji={insertEmoji.bind(this)} />, $emojiPicker[0])
+        legacyRender(<EmojiPicker insertEmoji={insertEmoji.bind(this)} />, $emojiPicker[0])
         $emojiPicker.show()
       }
 
       const $emojiQuickPicker = $container.find('.emoji-quick-picker-container')
       if ($emojiQuickPicker.length) {
-        ReactDOM.render(
+        legacyRender(
           <EmojiQuickPicker insertEmoji={insertEmoji.bind(this)} />,
           $emojiQuickPicker[0],
         )
@@ -234,12 +230,13 @@ ready(function () {
     }
   })
 
-  submissionForm.on('change', 'textarea[name="submission[body]"]', function(e) {
-    $('iframe#submission_body_ifr.tox-edit-area__iframe, #submission_body').css({
-      border: '',
-      borderRadius: '',
-    })
-    .removeAttr('aria-label')
+  submissionForm.on('change', 'textarea[name="submission[body]"]', function (e) {
+    $('iframe#submission_body_ifr.tox-edit-area__iframe, #submission_body')
+      .css({
+        border: '',
+        borderRadius: '',
+      })
+      .removeAttr('aria-label')
     errorRoot?.unmount()
     errorRoot = null
   })
@@ -247,7 +244,7 @@ ready(function () {
   const tabList = document.getElementById('submit_assignment_tabs')
   let submitting_online_url_form = false
 
-  const handleTabSelection = (mutationsList) => {
+  const handleTabSelection = mutationsList => {
     mutationsList.forEach(mutation => {
       if (mutation.type === 'attributes' && mutation.attributeName === 'aria-selected') {
         const li = mutation.target
@@ -264,14 +261,14 @@ ready(function () {
     })
   }
 
-  const disableSubmitButton = (form) => {
+  const disableSubmitButton = form => {
     $(form)
       .find("button[type='submit']")
       .text(I18n.t('messages.submitting', 'Submitting...'))
       .prop('disabled', true)
   }
 
-  const reenableSubmitButton = (form) => {
+  const reenableSubmitButton = form => {
     $(form)
       .find('button[type=submit]')
       .text(I18n.t('#button.submit_assignment', 'Submit Assignment'))
@@ -282,8 +279,8 @@ ready(function () {
     submitting_online_url_form = true
     submissionForm.formSubmit({
       formErrors: false,
-      processData: data => ({ ...data, should_redirect_to_assignment: true }),
-      beforeSubmit: (data) => {
+      processData: data => ({...data, should_redirect_to_assignment: true}),
+      beforeSubmit: data => {
         if (data['submission[url]']) {
           submitting = true
           disableSubmitButton(submissionForm)
@@ -292,13 +289,13 @@ ready(function () {
           return false
         }
       },
-      success: (data) => {
+      success: data => {
         const location = data['redirect_url']
         if (location) {
           window.location.href = location
         }
       },
-      error: (_data) => {
+      error: _data => {
         reenableSubmitButton(submissionForm)
         handleOnlineUrlSubmissionError()
       },
@@ -312,48 +309,59 @@ ready(function () {
       const self = this
       const parser = new DOMParser()
 
-      if($(this).is('#submit_online_text_entry_form')){
-        const textPledgeCheckbox = document.querySelector('#turnitin_pledge_container_text_entry [name="turnitin_pledge"]')
+      if ($(this).is('#submit_online_text_entry_form')) {
+        const textPledgeCheckbox = document.querySelector(
+          '#turnitin_pledge_container_text_entry [name="turnitin_pledge"]',
+        )
         const textEntryFormData = $(this).getFormData()
-        const doc = parser.parseFromString(textEntryFormData['submission[body]'], 'text/html');
+        const doc = parser.parseFromString(textEntryFormData['submission[body]'], 'text/html')
         const otherTags = doc.querySelectorAll('*:not(p):not(html):not(head):not(body)')
         const pTags = doc.querySelectorAll('p')
         let error = null
 
-        if(otherTags.length === 0 && ![...pTags].some(p => p.children.length > 0 || p.textContent.trim()))
+        if (
+          otherTags.length === 0 &&
+          ![...pTags].some(p => p.children.length > 0 || p.textContent.trim())
+        )
           error = I18n.t('Text entry must not be empty')
-        else if(textEntryFormData['submission[body]'].includes('data-placeholder-for'))
+        else if (textEntryFormData['submission[body]'].includes('data-placeholder-for'))
           error = I18n.t('File has not finished uploading')
         if (error) {
           $.screenReaderFlashMessage(error)
           const container = $('iframe#submission_body_ifr.tox-edit-area__iframe, #submission_body')
           const errorsContainer = document.getElementById('body_errors')
           if (container) {
-            container.css({
-              border: '1.9px solid red',
-              borderRadius: '3px',
-            })
-            .attr('aria-label', error)
+            container
+              .css({
+                border: '1.9px solid red',
+                borderRadius: '3px',
+              })
+              .attr('aria-label', error)
           }
           setTimeout(() => {
             // changing css property sometimes trigger internal textarea change event
             // which causes error message to disappear, wrapping in a setTimeout helps
             // to solve that
-            const root = errorRoot ?? createRoot(errorsContainer)
-            errorRoot = root
-            root.render(
+            const errorElement = (
               <FormattedErrorMessage
-                message= {I18n.t('%{errorText}',{errorText: error})}
+                message={I18n.t('%{errorText}', {errorText: error})}
                 margin="0 0 xx-small 0"
                 iconMargin="0 xx-small xxx-small 0"
               />
             )
+            if (errorRoot) {
+              rerender(errorRoot, errorElement)
+            } else {
+              errorRoot = render(errorElement, errorsContainer)
+            }
           })
           checkPledgeCheck(textPledgeCheckbox, PLEDGE_TYPES.TEXT)
-          document.querySelectorAll('iframe#submission_body_ifr.tox-edit-area__iframe').forEach(function(iframe) {
-            const iframeBody = iframe.contentWindow.document.querySelector('body')
-            iframeBody.focus()
-          })
+          document
+            .querySelectorAll('iframe#submission_body_ifr.tox-edit-area__iframe')
+            .forEach(function (iframe) {
+              const iframeBody = iframe.contentWindow.document.querySelector('body')
+              iframeBody.focus()
+            })
           return false
         } else {
           if (!checkPledgeCheck(textPledgeCheckbox, PLEDGE_TYPES.TEXT)) return false
@@ -389,7 +397,7 @@ ready(function () {
             const mountPoint = document.getElementById('progress_indicator')
 
             if (mountPoint) {
-              ReactDOM.render(
+              legacyRender(
                 <ProgressCircle
                   screenReaderLabel={I18n.t('Uploading Progress')}
                   size="x-small"
@@ -397,7 +405,9 @@ ready(function () {
                   valueNow={event.loaded}
                   meterColor="info"
                   formatScreenReaderValue={({valueNow, valueMax}) =>
-                    I18n.t('%{percent}% complete', {percent: Math.round((valueNow * 100) / valueMax)})
+                    I18n.t('%{percent}% complete', {
+                      percent: Math.round((valueNow * 100) / valueMax),
+                    })
                   }
                 />,
                 mountPoint,
@@ -407,7 +417,9 @@ ready(function () {
         }
 
         const fileDrop = findEmptyFileDrop()
-        const uploadPledgeCheckbox = document.querySelector('#turnitin_pledge_container_online_upload [name="turnitin_pledge"]')
+        const uploadPledgeCheckbox = document.querySelector(
+          '#turnitin_pledge_container_online_upload [name="turnitin_pledge"]',
+        )
         // warn user if they haven't uploaded any files
         if (fileElements.length === 0 && uploadedAttachmentIds === '') {
           setShouldShowFileRequiredError(true)
@@ -454,7 +466,9 @@ ready(function () {
         }
         $.ajaxJSONPreparedFiles.call(this, {
           handle_files(attachments, data) {
-            const ids = (data['submission[attachment_ids]'] || '').split(',').filter(id => id !== '')
+            const ids = (data['submission[attachment_ids]'] || '')
+              .split(',')
+              .filter(id => id !== '')
             for (const idx in attachments) {
               ids.push(attachments[idx].id)
             }
@@ -493,10 +507,10 @@ ready(function () {
 
   if (tabList) {
     const observer = new MutationObserver(handleTabSelection)
-    const config = { attributes: true, subtree: true, attributeFilter: ['aria-selected'] }
+    const config = {attributes: true, subtree: true, attributeFilter: ['aria-selected']}
 
     const tabItems = tabList.querySelectorAll('li')
-    tabItems.forEach((li) => observer.observe(li, config))
+    tabItems.forEach(li => observer.observe(li, config))
 
     window.addEventListener('unload', () => {
       observer.disconnect()
@@ -640,7 +654,7 @@ ready(function () {
     if (fileEl.is(':hidden')) {
       $.screenReaderFlashMessage(I18n.t('File tree expanded'))
 
-      ReactDOM.render(fileBrowser, document.getElementById('uploaded_files'))
+      legacyRender(fileBrowser, document.getElementById('uploaded_files'))
     } else {
       $.screenReaderFlashMessage(I18n.t('File tree collapsed'))
     }
@@ -668,7 +682,7 @@ ready(function () {
         if (wrapperDom) {
           const index = ++submissionAttachmentIndex
 
-          ReactDOM.render(
+          legacyRender(
             <Attachment
               id={`file_attachment_${index}`}
               index={index}
@@ -795,7 +809,9 @@ ready(() => {
       $('#media_media_recording_ready').show()
       $('#media_comment_submit_button').show()
       // Hide the record button
-      const recordMediaButton = document.querySelector('.button-container .record_media_comment_link')
+      const recordMediaButton = document.querySelector(
+        '.button-container .record_media_comment_link',
+      )
       recordMediaButton.style.display = 'none'
       // Show the submit button
       const submitMediaButton = document.getElementById('media_comment_submit_button')

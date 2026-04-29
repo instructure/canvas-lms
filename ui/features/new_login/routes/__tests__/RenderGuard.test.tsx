@@ -22,10 +22,16 @@ import RenderGuard from '../RenderGuard'
 
 describe('RenderGuard', () => {
   const markerId = 'new_login_safe_to_mount'
+  const originalWarn = console.warn
+
+  beforeEach(() => {
+    console.warn = vi.fn()
+  })
 
   afterEach(() => {
     document.getElementById(markerId)?.remove()
-    jest.restoreAllMocks()
+    console.warn = originalWarn
+    vi.restoreAllMocks()
   })
 
   it('renders children when marker is present', () => {
@@ -38,6 +44,7 @@ describe('RenderGuard', () => {
       </RenderGuard>,
     )
     expect(screen.getByText('App Content')).toBeInTheDocument()
+    expect(console.warn).not.toHaveBeenCalled()
   })
 
   it('renders nothing when marker is missing', () => {
@@ -47,6 +54,9 @@ describe('RenderGuard', () => {
       </RenderGuard>,
     )
     expect(screen.queryByText('Should Not Appear')).not.toBeInTheDocument()
+    expect(console.warn).toHaveBeenCalledWith(
+      'RenderGuard blocked mount: #new_login_safe_to_mount not found',
+    )
   })
 
   it('renders nothing when blocked', () => {
@@ -56,5 +66,8 @@ describe('RenderGuard', () => {
       </RenderGuard>,
     )
     expect(screen.queryByText('Blocked')).not.toBeInTheDocument()
+    expect(console.warn).toHaveBeenCalledWith(
+      'RenderGuard blocked mount: #new_login_safe_to_mount not found',
+    )
   })
 })

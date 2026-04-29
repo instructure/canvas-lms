@@ -17,14 +17,17 @@
     "add_alt_text_for_the_image_48cd88aa": {
         "message": "Legg til alternativ tekst for bildet"
     },
-    "add_another_f4e50d57": {
-        "message": "Legg til en annen"
-    },
     "add_cc_subtitles_55f0394e": {
         "message": "Legg til CC/Undertekst"
     },
     "add_image_60b2de07": {
         "message": "Legg til bilde"
+    },
+    "add_new_a9226085": {
+        "message": "Legg til ny"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Legg til ny bildetekst"
     },
     "add_one_9e34a6f8": {
         "message": "Legg til en!"
@@ -44,12 +47,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
     },
-    "ai_response_9624e8e8": {
-        "message": "AI-respons"
-    },
-    "ai_tools_fda01177": {
-        "message": "AI-verktøy"
-    },
     "albanian_21ed929e": {
         "message": "Albansk"
     },
@@ -67,6 +64,12 @@
     },
     "all_apps_a50dea49": {
         "message": "Alle apper"
+    },
+    "allow_media_download_16dcf2bd": {
+        "message": "Tillat nedlasting av media"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Tillat nedlasting av transkripsjon"
     },
     "alpha_15d59033": {
         "message": "Alfa"
@@ -88,9 +91,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Det oppsto en feil ved utførelse av en nettverksforespørsel"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "Det oppsto en feil ved behandling av forespørselen"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Det oppsto en feil ved opplasting av media."
@@ -170,6 +170,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Automatisk lagret innhold finnes. Ønsker du å laste det automatisk lagrede innholdet i stedet?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Automatisk bildetekst"
+    },
     "available_folders_694d0436": {
         "message": "Tilgjengelige mapper"
     },
@@ -242,6 +245,27 @@
     "cap_product_3a5265a6": {
         "message": "Capsprodukt"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "Generering av bildetekst mislyktes"
+    },
+    "caption_manager_aae0906f": {
+        "message": "Bildetekstadministrator"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "{ captionName } sletting av bildetekst mislyktes"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "{ captionName } generering av bildetekst mislyktes"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "{ captionName } opplasting av bildetekst mislyktes"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "Bildetekster ble lagt til for { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "Bildetekster ble slettet for { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Bildetekster som er arvet fra et overordnet fag, kan ikke fjernes."
     },
@@ -268,6 +292,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Endre tekstfarge"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Endringene gjelder dersom du lagrer denne siden."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Det kan hende at endringene dine ikke ble lagret."
@@ -299,6 +326,12 @@
     "choose_caption_file_9c45bc4e": {
         "message": "Velg undertekst-fil"
     },
+    "choose_file_8d89ccab": {
+        "message": "Velg fil"
+    },
+    "choose_file_required_61f0d716": {
+        "message": "Velg fil (påkrevd)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Velg bruksrettigheter…"
     },
@@ -313,12 +346,6 @@
     },
     "clear_image_3213fe62": {
         "message": "Fjern bilde"
-    },
-    "clear_selected_file_82388e50": {
-        "message": "Fjern valgt fil"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "Fjern valgt fil: { filename }"
     },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "Klikk eller skift-klikk for html-redigeringsprogrammet."
@@ -344,6 +371,9 @@
     "close_d634289d": {
         "message": "Lukk"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Lukk Tastatursnarveier-modalen"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Fil med teksting må være mindre enn { maxKb } kb"
     },
@@ -352,6 +382,9 @@
     },
     "clubs_suit_c1ffedff": {
         "message": "Kløver (type)"
+    },
+    "collab_575ac7bc": {
+        "message": "Samarbeid"
     },
     "collaborations_5c56c15f": {
         "message": "Samarbeid"
@@ -386,9 +419,6 @@
     "complex_numbers_a543d004": {
         "message": "Komplekse tall"
     },
-    "compose_44c904f4": {
-        "message": "Opprett"
-    },
     "computer_1d7dfa6f": {
         "message": "Datamaskin"
     },
@@ -413,11 +443,11 @@
     "content_type_2cf90d95": {
         "message": "Innholdstype"
     },
+    "continue_to_youtube_content_a34f0f85": {
+        "message": "Fortsett til YouTube-innhold"
+    },
     "coproduct_e7838082": {
         "message": "Biprodukt"
-    },
-    "copy_9748f9f": {
-        "message": "Kopier"
     },
     "copyright_holder_66ee111": {
         "message": "Rettighetshaver:"
@@ -491,9 +521,6 @@
     "custom_6979cd81": {
         "message": "Tilpasset"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Egendefinert bredde og høyde (piksler)"
-    },
     "cyan_c1d5f68a": {
         "message": "Cyan"
     },
@@ -542,6 +569,9 @@
     "degree_symbol_4a823d5f": {
         "message": "Gradsymbol"
     },
+    "delete_failed_6529e336": {
+        "message": "Sletting mislyktes"
+    },
     "delimiters_4db4840d": {
         "message": "Avgrensninger"
     },
@@ -553,9 +583,6 @@
     },
     "describe_the_type_ff448da5": {
         "message": "(Beskriv { TYPE })"
-    },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Beskriv videoen)"
     },
     "description_436c48d7": {
         "message": "Beskrivelse"
@@ -578,9 +605,6 @@
     "dimension_type_f5fa9170": {
         "message": "Dimensjonstype"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Dimensjoner"
-    },
     "directionality_26ae9e08": {
         "message": "Retning"
     },
@@ -601,9 +625,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Usammenhengende union"
-    },
-    "dislike_14befc48": {
-        "message": "Liker ikke"
     },
     "display_options_315aba85": {
         "message": "Vis alternativer"
@@ -640,6 +661,9 @@
     },
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Diagonal pil ned til høyre"
+    },
+    "download_captionname_2e5eea35": {
+        "message": "Last ned { captionName }"
     },
     "download_filename_2baae924": {
         "message": "Last ned { filename }"
@@ -746,6 +770,9 @@
     "english_united_kingdom_a613f831": {
         "message": "Engelsk (Storbritannia)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "Skriv inn en medietittel"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Skriv inn minst tre tegn for å søke"
     },
@@ -754,9 +781,6 @@
     },
     "enter_search_text_26cb4459": {
         "message": "skriv inn søketekst"
-    },
-    "enter_text_8b35c65b": {
-        "message": "Skriv inn tekst"
     },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
@@ -812,6 +836,9 @@
     "extra_large_b6cdf1ff": {
         "message": "Ekstra stor"
     },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "Ekstra stor ({ width } x { height }px)"
+    },
     "extra_small_9ae33252": {
         "message": "Ekstra liten"
     },
@@ -827,14 +854,20 @@
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Kunne ikke hente filinnhold"
     },
-    "failed_to_copy_response_d3def551": {
-        "message": "Kunne ikke kopiere svar"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Kunne ikke hente innhold fra eksternt verktøy"
     },
+    "file_d1b70050": {
+        "message": "Fil*"
+    },
     "file_name_8fd421ff": {
         "message": "Filnavn"
+    },
+    "file_preview_21667a6e": {
+        "message": "Forhåndsvisning av fil"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Forhåndsvisning av fil for { fileName }"
     },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "Tilgjengelig fillagringsplass er overskredet"
@@ -1040,12 +1073,6 @@
     "height_69b03e15": {
         "message": "Høyde"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Hei. Beskriv endringene du ønsker å gjøre i komposisjonen din."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Hei. Beskriv endringene du ønsker å gjøre i utvalget ditt."
-    },
     "hexagon_d8468e0d": {
         "message": "Sekskant"
     },
@@ -1064,6 +1091,9 @@
     "home_351838cd": {
         "message": "Hjem"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Hvordan be om og redigere teksting?"
+    },
     "html_code_editor_fd967a44": {
         "message": "html koderedigeringsprogram"
     },
@@ -1078,9 +1108,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Jeg har opphavsretten"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Beklager, men jeg finner ikke svar fra AI"
     },
     "icelandic_9d6d35de": {
         "message": "Islandsk"
@@ -1259,8 +1286,17 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
+    "language_91effaa0": {
+        "message": "Språk*"
+    },
     "language_arts_icon_a798b0f8": {
         "message": "Språkkunst-ikon"
+    },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Språk som snakkes i dette mediet*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (automatisk)"
     },
     "languages_icon_9d20539": {
         "message": "Språk-ikon"
@@ -1271,8 +1307,14 @@
     "large_text_e7ba08cd": {
         "message": "Stor tekst"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "Stor ({ width } x { height }px)"
+    },
     "latvian_2bbb6aab": {
         "message": "Latvisk"
+    },
+    "learn_ad3b3505": {
+        "message": "Lær"
     },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "Lær mer om lenker ved siden av"
@@ -1376,6 +1418,12 @@
     "links_to_an_external_site_de74145d": {
         "message": "Lenker til en ekstern side."
     },
+    "list_collapsed_9ac35920": {
+        "message": "Liste sammenfoldet."
+    },
+    "list_expanded_efec2d0": {
+        "message": "Liste utvidet."
+    },
     "lists_cd1336fc": {
         "message": "Lister"
     },
@@ -1417,6 +1465,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "Laster forhåndsvisning"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Lås hastighet til x1"
     },
     "locked_762f138b": {
         "message": "Låst"
@@ -1463,11 +1514,17 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "Mediefilen behandles. Prøv igjen senere."
     },
+    "media_options_saved_560c4ec8": {
+        "message": "Mediealternativer lagret."
+    },
     "media_title_2112243b": {
         "message": "Medietittel"
     },
     "medium_5a8e9ead": {
         "message": "Medium"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "Middels ({ width } x { height }px)"
     },
     "merge_links_2478df96": {
         "message": "Slå sammen lenker"
@@ -1498,9 +1555,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "Diverse"
-    },
-    "modify_6b0b13e3": {
-        "message": "Modifiser"
     },
     "module_90d9fd32": {
         "message": "Modul"
@@ -1700,6 +1754,9 @@
     "operators_a2ef9a93": {
         "message": "Operatører"
     },
+    "options_3ab0ea65": {
+        "message": "Valg"
+    },
     "or_9b70ccaa": {
         "message": "Eller"
     },
@@ -1711,6 +1768,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Andre redigeringssnarveier kan sees på"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Vår teknologi genererer ~ 85 % nøyaktige bildetekster."
     },
     "outline_color_3ef2cea7": {
         "message": "Farge omriss"
@@ -1814,20 +1874,32 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Spill mediainnhold av { name } fra { createdAt }."
     },
+    "player_layout_14e09a29": {
+        "message": "Spilleroppsett"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Gi Canvas tilgang til mikrofonen og webkameraet ditt."
     },
     "please_choose_a_file_c2449cc": {
         "message": "Velg en fil"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Beskriv hva du ønsker å komponere."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Skriv inn et filnavn"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "Angi en gyldig video-URL fra en støttet plattform."
+    },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Velg en fil før du laster opp."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Velg en fil av støttet filtype"
+    },
+    "please_select_a_language_d90256fb": {
+        "message": "Velg et språk"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Velg en .vtt- eller .srt-file"
     },
     "plus_d43cd4ec": {
         "message": "Pluss"
@@ -1889,6 +1961,9 @@
     "prime_numbers_13464f61": {
         "message": "Primtall"
     },
+    "processing_8c569014": {
+        "message": "Behandler…"
+    },
     "product_39cf144f": {
         "message": "Produkt"
     },
@@ -1949,6 +2024,12 @@
     "religion_icon_246e0be1": {
         "message": "Religion-ikon"
     },
+    "remove_f47dc62a": {
+        "message": "Fjern"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "Fjern { filename }"
+    },
     "remove_heading_style_5fdc8855": {
         "message": "Fjern tittelstil"
     },
@@ -1976,14 +2057,14 @@
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "Erstattet alle { alertFindText } med { alertReplaceText }"
     },
+    "request_d1129f7d": {
+        "message": "Forespørsel"
+    },
     "reset_95a81614": {
         "message": "Tilbakestill"
     },
     "resize_ec83d538": {
         "message": "Endre størrelse"
-    },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "Svar kopiert til utklippstavlen"
     },
     "restore_auto_save_deccd84b": {
         "message": "Gjenopprette automatisk lagring?"
@@ -1991,8 +2072,8 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Resultat { index } av { max }."
     },
-    "retry_ebd5f8ba": {
-        "message": "Forsøk igjen"
+    "retry_captionname_5ed0a12f": {
+        "message": "Prøv { captionName } på nytt"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Omvendt turnstile (gir ikke etter)"
@@ -2123,6 +2204,9 @@
     "selected_274ce24f": {
         "message": "Valgt"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Valgt fil: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Valgt { linkFileName }"
     },
@@ -2153,23 +2237,17 @@
     "shortcut_911d6255": {
         "message": "Snarvei"
     },
-    "show_all_967a90f0": {
-        "message": "Vis alle"
-    },
-    "show_audio_options_b489926b": {
-        "message": "Vis lydalternativer"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Vis bildemuligheter"
     },
     "show_link_options_545338fd": {
         "message": "Vis lenkevalg"
     },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Vis Studio-mediealternativer"
+    "show_rolling_transcript_c1481744": {
+        "message": "Vis rullende transkripsjon"
     },
-    "show_video_options_6ed3721a": {
-        "message": "Vis videovalg"
+    "show_rolling_transcript_d353aca4": {
+        "message": "Vis rullende transkripsjon"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Seende brukere surfer nettsider kjapt, og ser etter store eller uthevede titler. Brukere av skjermlesere er avhengige av titler for å forstå konteksten. Titler bør bruke korrekt struktur."
@@ -2203,6 +2281,9 @@
     },
     "small_b070434a": {
         "message": "Liten"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "Liten ({ width } x { height }px)"
     },
     "solid_circle_9f061dfc": {
         "message": "Solid sirkel"
@@ -2471,11 +2552,20 @@
     "this_image_is_currently_unavailable_25c68857": {
         "message": "Dette bildet er utilgjengelig for øyeblikket"
     },
+    "this_video_may_display_youtube_ads_4d19d590": {
+        "message": "Denne videoen kan vise YouTube-annonser."
+    },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Selv om videoen din har riktig titten i nettleseren kunne vi ikke oppdatere den i databasen."
     },
+    "thumbnail_e0de666f": {
+        "message": "Miniatyrbilde"
+    },
     "timebar_a4d18443": {
         "message": "Tidsbar"
+    },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "Tittelen kan ikke være tom"
     },
     "title_ee03d132": {
         "message": "Tittel"
@@ -2497,6 +2587,9 @@
     },
     "top_66e0adb6": {
         "message": "Topp"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "Transkripsjonspanelet er tilgjengelig i bredder over 720 piksler."
     },
     "tray_839df38a": {
         "message": "Brett"
@@ -2537,6 +2630,9 @@
     "unpublished_dfd8801": {
         "message": "upublisert"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "Alle ulagrede endringer vil gå tapt."
+    },
     "untitled_16aa4f2b": {
         "message": "Uten navn"
     },
@@ -2555,8 +2651,17 @@
     "updated_link_a827e441": {
         "message": "Oppdatert lenke"
     },
+    "upload_8b403d05": {
+        "message": "Last opp"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Last opp et undertekstspor i SRT- eller WebVTT-format."
+    },
     "upload_document_253f0478": {
         "message": "Last opp dokument"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "Opplasting mislyktes"
     },
     "upload_file_fd2361b8": {
         "message": "Last opp fil"
@@ -2660,9 +2765,6 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Brukt av skjermlesere for å beskrive innholdet til et bilde"
     },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Brukt av skjermlesere for å beskrive videoen"
-    },
     "user_documents_c206e61f": {
         "message": "Brukerdokumenter"
     },
@@ -2699,6 +2801,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Video avspiller for { title }"
     },
+    "video_url_889d3263": {
+        "message": "Video-URL"
+    },
     "vietnamese_e7a76583": {
         "message": "Viatnemesisk"
     },
@@ -2720,8 +2825,8 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "Vis antall ord og tegn"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "Venter på svar"
+    "viewer_restrictions_e14274c9": {
+        "message": "Seerbegrensninger"
     },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Vi kunne ikke oppdage en fungerende mikrofon som er koblet til enheten din."
@@ -2743,9 +2848,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Walisisk"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Hva ønsker du å gjøre?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Når det brukes markering som visuelt formaterer elementer som en liste men ikke indikerer et listeforhold kan brukere finne det vanskelig å navigere informasjonen."
@@ -2776,9 +2878,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Kransprodukt"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Skriveassistent"
     },
     "xi_149681d0": {
         "message": "Xi"
@@ -2824,6 +2923,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Webkameraet ditt kan allerede være i bruk."
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "YouTube-innebygd URL"
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

@@ -19,9 +19,10 @@
 import 'jquery-migrate'
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import SlickGridSpecHelper from '../GradebookGrid/GridSupport/__tests__/SlickGridSpecHelper'
+import GradebookGrid from '../GradebookGrid'
 
 // Mock GradebookGrid
-jest.mock('../GradebookGrid', () => {
+vi.mock('../GradebookGrid', () => {
   let columns = [
     {id: 'assignment_2302'}, // Quizzes (position 1)
     {id: 'assignment_2304'}, // Quizzes (position 1)
@@ -30,48 +31,48 @@ jest.mock('../GradebookGrid', () => {
   ]
 
   const gridInstance = {
-    initialize: jest.fn(),
-    destroy: jest.fn(),
+    initialize: vi.fn(),
+    destroy: vi.fn(),
     events: {
       onColumnsReordered: {
-        subscribe: jest.fn(),
-        trigger: jest.fn(),
+        subscribe: vi.fn(),
+        trigger: vi.fn(),
       },
       onColumnsResized: {
-        subscribe: jest.fn(),
-        trigger: jest.fn(),
+        subscribe: vi.fn(),
+        trigger: vi.fn(),
       },
     },
     grid: {
-      getColumns: jest.fn().mockImplementation(() => columns),
-      setColumns: jest.fn().mockImplementation(newColumns => {
+      getColumns: vi.fn().mockImplementation(() => columns),
+      setColumns: vi.fn().mockImplementation(newColumns => {
         columns = newColumns
       }),
-      invalidate: jest.fn(),
-      render: jest.fn(),
-      getHeaderRow: jest.fn().mockReturnValue({
-        querySelector: jest.fn().mockReturnValue({
+      invalidate: vi.fn(),
+      render: vi.fn(),
+      getHeaderRow: vi.fn().mockReturnValue({
+        querySelector: vi.fn().mockReturnValue({
           offsetWidth: 150,
           classList: {
-            contains: jest.fn().mockReturnValue(false),
-            add: jest.fn(),
-            remove: jest.fn(),
+            contains: vi.fn().mockReturnValue(false),
+            add: vi.fn(),
+            remove: vi.fn(),
           },
         }),
       }),
-      getCellNode: jest.fn().mockReturnValue({
+      getCellNode: vi.fn().mockReturnValue({
         offsetWidth: 150,
         classList: {
-          contains: jest.fn().mockReturnValue(false),
-          add: jest.fn(),
-          remove: jest.fn(),
+          contains: vi.fn().mockReturnValue(false),
+          add: vi.fn(),
+          remove: vi.fn(),
         },
       }),
     },
     gridSupport: {
       events: {
         onColumnsResized: {
-          subscribe: jest.fn(),
+          subscribe: vi.fn(),
         },
       },
     },
@@ -79,12 +80,12 @@ jest.mock('../GradebookGrid', () => {
 
   return {
     __esModule: true,
-    default: jest.fn().mockImplementation(() => gridInstance),
+    default: vi.fn().mockImplementation(() => gridInstance),
   }
 })
 
 // Mock Gradebook class
-jest.mock('../Gradebook', () => {
+vi.mock('../Gradebook', () => {
   const contextModules = {
     2601: {id: '2601', position: 3, name: 'Final Module'},
     2602: {id: '2602', position: 2, name: 'Second Module'},
@@ -129,12 +130,12 @@ jest.mock('../Gradebook', () => {
 
   return {
     __esModule: true,
-    default: jest.fn().mockImplementation(function (props) {
+    default: vi.fn().mockImplementation(function (props) {
       const instance = {
-        initialize: jest.fn(),
-        destroy: jest.fn(),
-        setAssignmentVisibility: jest.fn(),
-        finishRenderingUI: jest.fn(),
+        initialize: vi.fn(),
+        destroy: vi.fn(),
+        setAssignmentVisibility: vi.fn(),
+        finishRenderingUI: vi.fn(),
         gradebookGrid: null,
         courseContent: {
           contextModules: [],
@@ -142,30 +143,30 @@ jest.mock('../Gradebook', () => {
           assignments,
           assignmentGroups,
         },
-        getAssignment: jest
+        getAssignment: vi
           .fn()
           .mockImplementation(id => assignments[id.replace('assignment_', '')]),
-        getAssignmentGroup: jest.fn().mockImplementation(id => assignmentGroups[id]),
-        getEnterGradesAsSetting: jest.fn(),
-        getAssignmentGradingScheme: jest.fn(),
-        getPendingGradeInfo: jest.fn(),
-        student: jest.fn(),
+        getAssignmentGroup: vi.fn().mockImplementation(id => assignmentGroups[id]),
+        getEnterGradesAsSetting: vi.fn(),
+        getAssignmentGradingScheme: vi.fn(),
+        getPendingGradeInfo: vi.fn(),
+        student: vi.fn(),
         submissionStateMap: {
-          getSubmissionState: jest.fn(),
+          getSubmissionState: vi.fn(),
         },
-        getTotalPointsPossible: jest.fn(),
-        weightedGrades: jest.fn(),
-        getCourseGradingScheme: jest.fn(),
-        listInvalidAssignmentGroups: jest.fn(),
-        listHiddenAssignments: jest.fn(),
-        bindGridEvents: jest.fn(),
-        saveColumnWidthPreference: jest.fn(),
-        updateStudentIds: jest.fn(),
-        updateGradingPeriodAssignments: jest.fn(),
-        updateContextModules: jest.fn(),
-        gotCustomColumns: jest.fn(),
-        updateAssignmentGroups: jest.fn(),
-        arrangeColumnsBy: jest.fn().mockImplementation(function ({sortType, direction}) {
+        getTotalPointsPossible: vi.fn(),
+        weightedGrades: vi.fn(),
+        getCourseGradingScheme: vi.fn(),
+        listInvalidAssignmentGroups: vi.fn(),
+        listHiddenAssignments: vi.fn(),
+        bindGridEvents: vi.fn(),
+        saveColumnWidthPreference: vi.fn(),
+        updateStudentIds: vi.fn(),
+        updateGradingPeriodAssignments: vi.fn(),
+        updateContextModules: vi.fn(),
+        gotCustomColumns: vi.fn(),
+        updateAssignmentGroups: vi.fn(),
+        arrangeColumnsBy: vi.fn().mockImplementation(function ({sortType, direction}) {
           const columns = instance.gradebookGrid.grid.getColumns()
           let sortedColumns
 
@@ -198,9 +199,10 @@ jest.mock('../Gradebook', () => {
           instance.gradebookGrid.grid.setColumns(sortedColumns)
         }),
         options: {
-          custom_grade_statuses_enabled: false,
-          show_similarity_score: false,
-          show_total_grade_as_points: false,
+          custom_grade_statuses_enabled:
+            props.gradebookEnv?.custom_grade_statuses_enabled ?? false,
+          show_similarity_score: props.gradebookEnv?.show_similarity_score ?? false,
+          show_total_grade_as_points: props.gradebookEnv?.show_total_grade_as_points ?? false,
         },
         props,
       }
@@ -339,7 +341,6 @@ describe('Gradebook Grid Column Ordering', () => {
 
   function createGradebookAndAddData(options = {}) {
     gradebook = createGradebook(options)
-    const GradebookGrid = require('../GradebookGrid').default
     gradebook.gradebookGrid = new GradebookGrid()
     addGridData()
     new SlickGridSpecHelper(gradebook.gradebookGrid)

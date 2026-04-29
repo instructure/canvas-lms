@@ -20,7 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import ValidatedMixin from './ValidatedMixin'
 import $ from 'jquery'
-import {map, forEach, isEqual, includes, clone, isObject, chain, keys} from 'lodash'
+import {map, forEach, includes, clone, isObject, keys, isEqual} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -161,11 +161,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
         }
       })(this),
     )
-    assignmentFieldErrors = chain(keys(errors))
-      .reject(function (err) {
-        return includes(dateOverrideErrors, err)
-      })
-      .value()
+    assignmentFieldErrors = keys(errors).filter(err => !includes(dateOverrideErrors, err))
     first_error = assignmentFieldErrors[0] || dateOverrideErrors[0]
     this.findField(first_error).focus()
     // short timeout to ensure alerts are properly read after focus change

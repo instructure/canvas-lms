@@ -92,7 +92,7 @@ const PublishIconButton = ({
       return (
         <PublishTooltipButton
           icon={<IconCalendarMonthLine />}
-          tooltip={getRestrictedText(item)}
+          tooltip={getRestrictedText(item) ?? ''}
           screenReaderLabel={screenReaderLabel}
           onClick={onClick}
           permissionType="restricted"

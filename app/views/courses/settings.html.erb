@@ -23,6 +23,17 @@
   set_active_tab "settings"
 
   can_manage = can_do(@context, @current_user, :manage)
+  can_edit_course_content = can_do(@context, @current_user, :manage_course_content_edit)
+  can_set_grading_scheme = can_do(@context, @current_user, :set_grading_scheme)
+
+  if @context&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions)
+    can_edit_course_details = can_do(@context, @current_user, :manage_course_details)
+    can_manage &&= can_edit_course_details
+    can_set_grading_scheme &&= can_edit_course_details
+  else
+    can_manage &&= can_edit_course_content
+    can_set_grading_scheme &&= can_edit_course_content
+  end
 
   can_manage_courses = can_do(@context.account, @current_user, :manage_courses_admin)
   can_rename_course = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_renaming_by_teachers])
@@ -36,14 +47,6 @@
   master_course = blueprint_subscription&.master_template&.course
 
   can_see_restrict_quantitative_setting = ((@context&.restrict_quantitative_data || @context&.account&.restrict_quantitative_data[:value]) && @context&.root_account&.feature_enabled?(:restrict_quantitative_data))
-
-  if @context.elementary_subject_course?
-    navigation_help_text = t("help.edit_navigation_k5", "Drag and drop items to reorder them in the subject navigation.")
-    disabled_tab_text = t("tab_hidden_if_disabled_k5", "Tab disabled, won't appear in subject navigation")
-  else
-    navigation_help_text = t("help.edit_navigation", "Drag and drop items to reorder them in the course navigation.")
-    disabled_tab_text = t("tab_hidden_if_disabled", "Page disabled, won't appear in navigation")
-  end
 %>
 
 <% provide :right_side do %>
@@ -82,6 +85,12 @@
 <% end %>
 <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
   <% tabs << { id: "integrations", title: t('tabs.integrations', default: "Integrations"), contentMount: "tab-integrations-mount" } %>
+<% end %>
+<% if @context.feature_enabled?(:ams_course_integration) %>
+  <% tabs << { id: "quiz_settings", title: t('tabs.quiz_settings', default: "Quiz Settings"), contentMount: "tab-quiz-settings-mount" } %>
+<% end %>
+<% if @context.account.feature_enabled?(:intelligent_insights_modernisation) %>
+  <% tabs << { id: "criteria",   title: t('tabs.criteria',    default: "Course Criteria"),       contentMount: "tab-criteria-mount" } %>
 <% end %>
 <%= tag.div id: "course_settings_tabs_mount",
             data: {
@@ -431,11 +440,11 @@
         </div>
         <div id="course_grading_scheme">
           <div class="checkbox-flex-container">
-            <%= f.check_box :course_grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_manage %>
+            <%= f.check_box :course_grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_set_grading_scheme %>
             <%= f.label :course_grading_standard_enabled, :en => "Enable course grading scheme" %>
           </div>
           <% if Account.site_admin.feature_enabled?(:grading_scheme_updates) %>
-            <input type="hidden" name="course[grading_standard_id]" id="grading_standard_id" value="<%= @context.grading_standard_id %>" />
+            <input type="hidden" name="course[grading_standard_id]" id="grading_standard_id" value="<%= @context.grading_standard_id || @context.default_grading_standard&.id || '' %>" />
             <div id="grading_scheme_selector" class="grading_scheme_selector"></div>
           <% else %>
             <div class="grading_standard_link" style="margin-<%= direction('left') %>: 20px;">
@@ -453,8 +462,7 @@
               <%= options_for_select(non_cc, @context.license) %>
               <%= grouped_options_for_select([[t("Creative Commons Licenses"), cc]], @context.license) %>
             </select>
-            <%= license_help_link %>
-            <div id="license_mount"></div>
+            <span id="license_mount"></span>
           <% else %>
             <%= @context.readable_license %>
           <% end %>
@@ -468,10 +476,10 @@
       </div><div class="form-row course-visibility-row">
         <div class="form-label"><label for="course_visibility"><%= before_label('course_visibility', %{Visibility}) %></label></div>
         <div colspan="3" id="course_visibility">
-          <% if can_do(@context, @current_user, :manage_course_visibility) %>
+          <% if can_manage && can_do(@context, @current_user, :manage_course_visibility) %>
             <span>
               <%= f.select :course_visibility, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], id] }, {}, {"aria-label" => t("Course Visibility Options")} %>
-              <%= visibility_help_link %>
+              <span id="visibility_mount"></span>
             </span>
             <div class="panel-border">
               <%= f.check_box :custom_course_visibility %>
@@ -506,7 +514,7 @@
             <span>
               <% vis_value = @context.course_visibility_options[@context.course_visibility][:setting] %>
               <%= f.select :course_visibility, [[vis_value, @context.course_visibility]], {}, {"disabled" => true, "aria-label" => t("Course Visibility Options")} %>
-              <%= visibility_help_link %>
+              <span id="visibility_mount"></span>
             </span>
             <div class="public_options checkbox-flex-container">
               <%= f.check_box :indexed, disabled: true %>
@@ -586,20 +594,22 @@
           </div>
         </div>
       <% end %>
-      <div class="form-row course-paces-row">
-        <div class="form-label nobr"><%= f.blabel :course_paces, :en => "Course Pacing" %></div>
-        <div class="tall-row">
-          <div class="nobr">
-            <%= f.check_box :enable_course_paces, :disabled => !can_manage || @context.homeroom_course%>
-            <%= f.label :enable_course_paces, :en => "Enable Course Pacing" %>
-            <a class="icon-question disabled-warning"
-              id="pacing_disabled_tooltip"
-              data-tooltip
-              title= "<%= t("Course Pacing cannot be used with Homeroom Course")%>">
-            </a><br/>
+      <% if !@context.root_account.feature_enabled?(:course_pace_enable_from_account_setting) || @context.account.enable_course_paces? || @context.enable_course_paces %>
+        <div class="form-row course-paces-row">
+          <div class="form-label nobr"><%= f.blabel :course_paces, :en => "Course Pacing" %></div>
+          <div class="tall-row">
+            <div class="nobr">
+              <%= f.check_box :enable_course_paces, :disabled => !can_manage || @context.homeroom_course%>
+              <%= f.label :enable_course_paces, :en => "Enable Course Pacing" %>
+              <a class="icon-question disabled-warning"
+                id="pacing_disabled_tooltip"
+                data-tooltip
+                title= "<%= t("Course Pacing cannot be used with Homeroom Course")%>">
+              </a><br/>
+            </div>
           </div>
         </div>
-      </div>
+      <% end %>
       <div class="form-row">
         <div class="form-label"><label for="course_public_description"><%= before_label('course_description', %{Description}) %></label></div>
         <div colspan="3">
@@ -675,6 +685,12 @@
                 <%= f.check_box :hide_final_grades, :disabled => !can_manage %>
                 <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
                 </div>
+              <% if @context.feature_enabled?(:outcome_gradebook) && @context.feature_enabled?(:student_outcome_gradebook) && @context.feature_enabled?(:default_to_learning_mastery_gradebook) %>
+                <div class="checkbox-flex-container">
+                  <%= f.check_box :default_student_gradebook_view, disabled: !can_manage %>
+                  <%= f.label :default_student_gradebook_view, t('Default students to Learning Mastery tab') %><br/>
+                </div>
+              <% end %>
               <% unless @context.elementary_subject_course? || (@context.restrict_quantitative_data && @context.root_account.feature_enabled?(:restrict_quantitative_data)) %>
                 <div class="checkbox-flex-container">
                 <%= f.check_box :hide_distribution_graphs, :disabled => !can_manage %>
@@ -712,9 +728,11 @@
                 <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
                 <label for="update_default_pages"><%= t 'wiki_editing_roles_change_existing', %{Change pages currently editable by "%{current_setting}" to "%{new_setting}".}, :current_setting => content_tag('span', @context.readable_default_wiki_editing_roles), :new_setting => content_tag('span', nbsp, :class => 'default_wiki_editing_roles_change') %></label>
               </div>
-              <% if @context.root_account.feature_enabled?(:javascript_csp) %>
-                <hr />
-                <div id="csp_options"></div>
+              <% if @context.can_view_csp_settings? %>
+                <div class="checkbox-flex-container">
+                  <%= f.check_box :disable_csp, :checked => @context.csp_disabled?, :disabled => !@context.can_update_csp_settings?(@current_user, session) %>
+                  <%= f.label :disable_csp, :en => 'Disable Content Security Policy' %>
+                </div>
               <% end %>
             </div>
           <% end %>
@@ -862,6 +880,9 @@
       <%= f.text_field :name, :id => "course_section_name_edit", :'aria-label' => t('buttons.edit_section_name', "Edit section name") %>
     <% end %>
   </div>
+  <% if @context.account.feature_enabled?(:intelligent_insights_modernisation) %>
+    <div id="tab-criteria-mount"></div>
+  <% end %>
   <% if can_do(@context, @current_user, :update) && !@context.elementary_homeroom_course? %>
   <div id="tab-navigation-mount">
     <h2 class="screenreader-only"><%= t('headings.navigation', %{Course Navigation}) %></h2>
@@ -870,110 +891,22 @@
       'Warning: For improved accessibility in reordering Course Navigation elements, please use the Move To Dialog option found in the menu.') %>
     </div>
 
-    <%= form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
-      <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
-      <% tabs = sortable_tabs %>
-      <div style="width: 400px; padding-top: 10px">
-        <p style="margin: 0">
-          <%= navigation_help_text %>
-        </p>
-        <% if @context.elementary_subject_course? %>
-          <p style="font-size: 0.8em; margin: 6px 0 0">
-            <%= t("help.edit_navigation_info_k5", "If enabled, LTI tools will always appear last under the Resources tab in the order you choose.") %>
-          </p>
-        <% end %>
-      </div>
-      <% tabs.each do |tab|
-        tab[:disabled_message] = [Course::TAB_GRADES, Course::TAB_DISCUSSIONS].include?(tab[:id]) ? t('tab_cant_disable', "This page can't be disabled, only hidden") : t('tab_disabled', "Page disabled, will redirect to course home page")
-        tab[:disabled_message] = disabled_tab_text if tab[:external] || @context.elementary_subject_course?
-      end %>
-      <h3 class="screenreader-only"><%= t('Enabled Links') %></h3>
-      <ul id="nav_enabled_list" class="nav_list connectedSortable">
-        <li class="disabled" aria-hidden="true" style="height: 1px">
-          <%# This item is just here to serve as an anchor for dragging/dropping if all tabs are disabled %>
-        </li>
-        <% tabs.select {|t| !t[:hidden] }.each do |tab|  %>
-          <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if @context.tab_enabled?(tab) %>"
-              id="nav_edit_tab_id_<%= tab[:id] %>"
-          >
-            <div class="draggable_handle">
-              <% if @context.tab_enabled?(tab) %>
-                  <i class="icon-drag-handle"></i>
-              <% else %>
-                &nbsp;
-              <% end %>
-            </div>
-            <div class="navitem_content">
-              <%= tab[:label] %>
-              <span class="disabled_message"><%= tab[:disabled_message] %></span>
-            </div>
-            <% if @context.tab_enabled?(tab) %>
-              <div class="admin-links">
-                <a class="al-trigger al-trigger-gray" role="button" href="#">
-                  <i class="icon-more" aria-hidden="true"></i>
-                  <span class="screenreader-only">
-                    <%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
-                  </span>
-                </a>
-                <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
-                  <li role="presentation">
-                    <a href="#" class="icon-x disable_nav_item_link" id="disable_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Disable this item"><%= t("Disable") %></a>
-                  </li>
-                  <li role="presentation">
-                    <a href="#" class="icon-updown move_nav_item_link" id="move_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Move this item"><%= t("Move") %></a>
-                  </li>
-                </ul>
-              </div>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-
-      <h3 class="screenreader-only"><%= t('Disabled Links') %></h3>
-      <ul id="nav_disabled_list" class="nav_list connectedSortable">
-        <li class="disabled">
-          <%= t('drag_to_hide', %{Drag items here to hide them from students.}) %>
-          <div style="font-size: 0.8em;">
-            <% unless @context.elementary_subject_course? %>
-              <%= t('drag_details', %{Disabling most pages will cause students who visit those pages to be redirected to the course home page.}) %>
-            <% end %>
-          </div>
-        </li>
-        <% tabs.select {|t| t[:hidden] }.each do |tab|  %>
-          <li aria-label="<%= tab[:label] %>"
-              class="navitem enabled"
-              id="nav_edit_tab_id_<%= tab[:id] %>"
-          >
-            <div class="draggable_handle">
-              <i class="icon-drag-handle"></i>
-            </div>
-            <div class="navitem_content">
-              <%= tab[:label] %>
-              <span class="disabled_message"><%= tab[:disabled_message] %></span>
-            </div>
-            <div class="admin-links">
-                <a class="al-trigger al-trigger-gray" role="button" href="#">
-                  <i class="icon-more" aria-hidden="true"></i>
-                  <span class="screenreader-only"><%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
-                  </span>
-                </a>
-
-                <ul id="content-2" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-3">
-                  <li role="presentation">
-                    <a href="#" class="icon-plus enable_nav_item_link" id="enable_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Enable this item"><%= t("Enable") %></a>
-                  </li>
-                  <li role="presentation">
-                    <a href="#" class="icon-updown move_nav_item_link" id="move_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Move this item"><%= t("Move") %></a>
-                  </li>
-                </ul>
-              </div>
-          </li>
-        <% end %>
-      </ul>
-
-      <p>
-        <button type="submit" class="btn btn-primary"><%= t('#buttons.save', %{Save}) %></button>
-      </p>
+    <%
+      if @context.root_account.feature_enabled?(:course_settings_navigation_react)
+    %>
+      <% js_env({ COURSE_SETTINGS_NAVIGATION_TABS: sortable_tabs }) %>
+      <%=
+        form_tag(
+          context_url(@context, :context_update_nav_url),
+          id: "course_navigation_settings_form",
+          title: t('titles.edit_navigation', "Edit Course Navigation")
+        ) do
+      %>
+        <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
+      <% end %>
+      <div id="course_navigation_settings_container"></div>
+    <% else %>
+      <%= render :partial => 'navigation_form' %>
     <% end %>
   </div>
   <% end %>
@@ -1009,6 +942,9 @@
 
   <% if @context.grants_right?(@current_user, session, :update) && @context.root_account.feature_enabled?(:microsoft_group_enrollments_syncing) && !@context.elementary_homeroom_course? %>
     <div id="tab-integrations-mount"></div>
+  <% end %>
+  <% if @context.feature_enabled?(:ams_course_integration) %>
+    <div id="tab-quiz-settings-mount"></div>
   <% end %>
   <% if @context.account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
     <% js_bundle :horizon_toggle %>

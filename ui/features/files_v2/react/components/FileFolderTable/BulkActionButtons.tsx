@@ -40,6 +40,7 @@ import MoveModal from './MoveModal'
 import UsageRightsModal from './UsageRightsModal'
 import PermissionsModal from './PermissionsModal'
 import {DisabledActionsInfoButton} from './DisabledActionsInfoButton'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -97,6 +98,7 @@ const BulkActionButtons = ({
   const handleDownload = useCallback(() => downloadZip(selectedRows), [selectedRows])
 
   const selectedItems = rows.filter(row => selectedRows.has(getUniqueId(row)))
+  const isAccessRestricted = getFilesEnv().userFileAccessRestricted
 
   const buildModals = useCallback(
     () => (
@@ -159,22 +161,23 @@ const BulkActionButtons = ({
           {ENV.BLUEPRINT_COURSES_DATA?.isChildCourse && <DisabledActionsInfoButton size={size} />}
         </Flex>
         <Flex gap="small" direction={direction}>
-          {renderTooltip(
-            <Button
-              data-testid="bulk-actions-download-button"
-              disabled={!isEnabled}
-              renderIcon={<IconDownloadLine />}
-              onClick={handleDownload}
-              display={buttonDisplay}
-            >
-              {isSmallScreen ? (
-                I18n.t('Download')
-              ) : (
-                <ScreenReaderContent>{I18n.t('Download')}</ScreenReaderContent>
-              )}
-            </Button>,
-            !isEnabled,
-          )}
+          {!isAccessRestricted &&
+            renderTooltip(
+              <Button
+                data-testid="bulk-actions-download-button"
+                disabled={!isEnabled}
+                renderIcon={<IconDownloadLine />}
+                onClick={handleDownload}
+                display={buttonDisplay}
+              >
+                {isSmallScreen ? (
+                  I18n.t('Download')
+                ) : (
+                  <ScreenReaderContent>{I18n.t('Download')}</ScreenReaderContent>
+                )}
+              </Button>,
+              !isEnabled,
+            )}
           {userCanDeleteFilesForContext &&
             renderTooltip(
               <Button
@@ -244,7 +247,7 @@ const BulkActionButtons = ({
                       </Flex>
                     </Menu.Item>
                   )}
-                  {userCanEditFilesForContext && (
+                  {userCanEditFilesForContext && !isAccessRestricted && (
                     <Menu.Item
                       disabled={containsLockedBPItems}
                       data-testid="bulk-actions-move-button"

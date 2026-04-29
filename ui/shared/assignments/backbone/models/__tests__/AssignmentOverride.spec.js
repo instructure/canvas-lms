@@ -23,8 +23,8 @@ describe('AssignmentOverride', () => {
   let clock
 
   beforeEach(() => {
-    clock = jest.spyOn(global, 'Date').mockImplementation(() => ({
-      toISOString: jest.fn(() => '2022-01-01T00:00:00.000Z'),
+    clock = vi.spyOn(global, 'Date').mockImplementation(() => ({
+      toISOString: vi.fn(() => '2022-01-01T00:00:00.000Z'),
     }))
   })
 

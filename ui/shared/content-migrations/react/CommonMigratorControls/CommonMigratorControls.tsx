@@ -283,7 +283,7 @@ export const CommonMigratorControls = ({
         <Flex.Item margin="small none">
           <Text size="small" color="primary">
             {I18n.t(
-              "Feature Options (like New Quizzes) aren't imported and must be enabled manually in the new course's Settings.",
+              "Feature Options aren't imported and must be enabled manually in the new course's Settings.",
             )}
           </Text>
         </Flex.Item>

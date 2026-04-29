@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import ProgressStatusView from '../ProgressStatusView'
 import ProgressingModel from '../../models/ProgressingContentMigration'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toBe(y)
@@ -43,8 +43,8 @@ describe('ProgressStatusViewSpec', () => {
     psv.remove()
   })
 
-  test('it should be accessible', function (done) {
-    isAccessible($fixtures, done, {a11yReport: true})
+  test('it should be accessible', async () => {
+    await isAccessible($fixtures, {a11yReport: true})
   })
 
   test('displays progress workflow_state when migrations workflow_state is running', function () {

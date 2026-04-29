@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ConditionalRelease
-  class Rule < ActiveRecord::Base
+  class Rule < ApplicationRecord
     include Deletion
 
     validates :course_id, presence: true
@@ -69,8 +69,24 @@ module ConditionalRelease
       }
     end
 
+    def top_matching_range(score, preloaded: false)
+      ranges = preloaded ? scoring_ranges.select { |sr| sr.contains_score(score) } : scoring_ranges.for_score(score).to_a
+      ranges.min_by { |sr| [sr.lower_bound.nil? ? 1 : 0, -sr.lower_bound.to_f, sr.position] }
+    end
+
+    def matching_scoring_ranges(score, preloaded: false)
+      if ScoringRange.score_at_100_percent?(score)
+        top = top_matching_range(score, preloaded:)
+        top ? [top] : []
+      elsif preloaded
+        scoring_ranges.select { |sr| sr.contains_score(score) }
+      else
+        scoring_ranges.for_score(score).to_a
+      end
+    end
+
     def assignment_sets_for_score(score)
-      AssignmentSet.active.where(scoring_range: scoring_ranges.for_score(score))
+      AssignmentSet.active.where(scoring_range: matching_scoring_ranges(score))
     end
 
     def clear_caches

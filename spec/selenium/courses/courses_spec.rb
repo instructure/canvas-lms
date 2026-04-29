@@ -65,7 +65,6 @@ describe "courses" do
     context "differentiation tag rollback plan" do
       before :once do
         @course = course_model(name: "Tag Conversion Course")
-        @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
 

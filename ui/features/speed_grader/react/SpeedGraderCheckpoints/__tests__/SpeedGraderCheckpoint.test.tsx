@@ -101,9 +101,9 @@ const getDefaultProps = (
     getCustomGradeStatus('2', 'Custom Grade Status 2'),
   ],
   lateSubmissionInterval: lateSubmissionInterval,
-  updateSubmissionGrade: jest.fn(),
-  updateSubmissionStatus: jest.fn(),
-  setLastSubmission: jest.fn(),
+  updateSubmissionGrade: vi.fn(),
+  updateSubmissionStatus: vi.fn(),
+  setLastSubmission: vi.fn(),
 })
 
 const setup = (props: {
@@ -327,18 +327,35 @@ describe('SpeedGraderCheckpoint', () => {
 
   it('renders the Late days rounded up if the submission is late', () => {
     const SECONDS_IN_A_DAY = 24 * 3600
-    const props = getDefaultProps('reply_to_topic', 3, 'points', true, false, true, SECONDS_IN_A_DAY * 6 + 1)
+    const props = getDefaultProps(
+      'reply_to_topic',
+      3,
+      'points',
+      true,
+      false,
+      true,
+      SECONDS_IN_A_DAY * 6 + 1,
+    )
     setup(props)
     const relyToTopicLateInput = screen.getByLabelText('Days Late')
-    expect(relyToTopicLateInput).toHaveValue("7")
+    expect(relyToTopicLateInput).toHaveValue('7')
   })
 
   it('renders the Late hours rounded up if the submission is late', () => {
     const SECONDS_IN_AN_HOUR = 3600
-    const props = getDefaultProps('reply_to_topic', 3, 'points', true, false, true, SECONDS_IN_AN_HOUR * 6 + 1, 'hour')
+    const props = getDefaultProps(
+      'reply_to_topic',
+      3,
+      'points',
+      true,
+      false,
+      true,
+      SECONDS_IN_AN_HOUR * 6 + 1,
+      'hour',
+    )
     setup(props)
     const relyToTopicLateInput = screen.getByLabelText('Hours Late')
-    expect(relyToTopicLateInput).toHaveValue("7")
+    expect(relyToTopicLateInput).toHaveValue('7')
   })
 
   describe('UseSameGrade', () => {

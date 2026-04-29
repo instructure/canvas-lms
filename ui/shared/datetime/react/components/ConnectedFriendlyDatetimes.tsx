@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as tz from '@instructure/moment-utils'
-import _ from 'lodash'
+import {isDate} from 'es-toolkit/compat'
 import {
   fudgeDateForProfileTimezone,
   datetimeString,
@@ -38,17 +38,14 @@ type Props = {
 }
 
 function timeFormatting(dateTime: string | Date, format: string | undefined, showTime: boolean) {
-  if (!_.isDate(dateTime)) {
-    // @ts-expect-error
-    dateTime = tz.parse(dateTime)
-  }
+  const parsedDateTime: Date | null = isDate(dateTime) ? dateTime : tz.parse(dateTime)
 
-  const fudged = fudgeDateForProfileTimezone(dateTime)
+  const fudged = fudgeDateForProfileTimezone(parsedDateTime)
   let friendly
   if (format) {
-    friendly = tz.format(dateTime, format)
+    friendly = tz.format(parsedDateTime, format, ENV.TIMEZONE)
   } else if (showTime) {
-    friendly = datetimeString(dateTime)
+    friendly = datetimeString(parsedDateTime)
   } else {
     friendly = friendlyDatetime(fudged)
   }

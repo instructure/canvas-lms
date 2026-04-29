@@ -86,7 +86,7 @@ describe('SectionBrowser', () => {
   })
 
   it('calls onClose on Close button click', async () => {
-    const onClose = jest.fn()
+    const onClose = vi.fn()
     renderComponent({onClose})
 
     const modal = getModal()

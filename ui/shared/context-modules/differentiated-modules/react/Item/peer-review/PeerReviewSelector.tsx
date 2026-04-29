@@ -1,0 +1,183 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {useEffect, useState, useRef} from 'react'
+import PeerReviewDueDateTimeInput from './PeerReviewDueDateTimeInput'
+import type {DateLockTypes, CustomDateTimeInputProps} from '../types'
+import {
+  useSettingDependency,
+  SETTING_MESSAGES,
+} from '@canvas/assignments/react/hooks/useSettingDependency'
+
+type PeerReviewSelectorProps = CustomDateTimeInputProps & {
+  peerReviewsEnabled?: boolean
+  assignmentDueDate: string | null
+  assignmentUntilDate: string | null
+  setPeerReviewAvailableToDate: (date: string | null) => void
+  setPeerReviewAvailableFromDate: (date: string | null) => void
+  peerReviewDueDate: string | null
+  setPeerReviewDueDate: (date: string | null) => void
+  handlePeerReviewDueDateChange: (_event: React.SyntheticEvent, value: string | undefined) => void
+  validationErrors?: Record<string, string>
+  unparsedFieldKeys?: Set<string>
+  blueprintDateLocks?: DateLockTypes[] | undefined
+  dateInputRefs?: Record<string, HTMLInputElement | null>
+  timeInputRefs?: Record<string, HTMLInputElement | null>
+  handleBlur: (key: string) => (event: React.FocusEvent<HTMLInputElement>) => void
+  clearButtonAltLabel: string
+}
+
+const PeerReviewSelector = ({
+  peerReviewsEnabled: peerReviewsEnabledProp,
+  assignmentDueDate,
+  assignmentUntilDate,
+  setPeerReviewAvailableToDate,
+  setPeerReviewAvailableFromDate,
+  peerReviewDueDate,
+  setPeerReviewDueDate,
+  handlePeerReviewDueDateChange,
+  clearButtonAltLabel,
+  ...rest
+}: PeerReviewSelectorProps) => {
+  const [peerReviewEnabled, setPeerReviewEnabled] = useState(false)
+
+  const checkPeerReviewState = () => {
+    // Check if the "Require Peer Reviews" checkbox is actually checked
+    const checkbox = document.getElementById(
+      'assignment_peer_reviews_checkbox',
+    ) as HTMLInputElement | null
+    const isChecked = checkbox?.checked ?? false
+
+    // If checkbox exists, use its checked state
+    // If checkbox doesn't exist (e.g., in Assign To modal),
+    // use the peerReviewsEnabledProp which indicates if peer reviews are enabled on the assignment
+    const enabledFromProp = checkbox === null && (peerReviewsEnabledProp ?? false)
+
+    setPeerReviewEnabled(isChecked || enabledFromProp)
+  }
+
+  useEffect(() => {
+    checkPeerReviewState()
+
+    const handleCheckboxChange = () => {
+      checkPeerReviewState()
+    }
+
+    const checkbox = document.getElementById('assignment_peer_reviews_checkbox')
+    checkbox?.addEventListener('change', handleCheckboxChange)
+
+    return () => {
+      checkbox?.removeEventListener('change', handleCheckboxChange)
+    }
+  }, [peerReviewsEnabledProp])
+
+  useSettingDependency(SETTING_MESSAGES.TOGGLE_PEER_REVIEWS, {
+    onDisabled: () => {
+      setPeerReviewEnabled(false)
+    },
+    onEnabled: () => {
+      // Ensure DOM state is settled before checking
+      requestAnimationFrame(checkPeerReviewState)
+    },
+  })
+
+  // Clear peer review dates when assignment due date is cleared
+  const prevAssignmentDueDateRef = useRef(assignmentDueDate)
+  useEffect(() => {
+    // Only clear if peer review is actually enabled and visible
+    if (!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED || !peerReviewEnabled) {
+      return
+    }
+
+    // Only clear if assignment due date changed from something to null
+    const dueDateWasCleared =
+      prevAssignmentDueDateRef.current !== null && assignmentDueDate === null
+    prevAssignmentDueDateRef.current = assignmentDueDate
+
+    if (dueDateWasCleared) {
+      setPeerReviewDueDate(null)
+      setPeerReviewAvailableFromDate(null)
+    }
+  }, [
+    assignmentDueDate,
+    peerReviewEnabled,
+    setPeerReviewDueDate,
+    setPeerReviewAvailableFromDate,
+    setPeerReviewAvailableToDate,
+  ])
+
+  // Clear peer review dates when peer review is disabled
+  const prevPeerReviewEnabledRef = useRef(peerReviewEnabled)
+  useEffect(() => {
+    // Only clear if peer review feature is enabled globally
+    if (!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+      return
+    }
+
+    // Only clear if peer review was disabled (changed from true to false)
+    const peerReviewWasDisabled =
+      prevPeerReviewEnabledRef.current === true && peerReviewEnabled === false
+    prevPeerReviewEnabledRef.current = peerReviewEnabled
+
+    if (peerReviewWasDisabled) {
+      setPeerReviewDueDate(null)
+      setPeerReviewAvailableFromDate(null)
+      setPeerReviewAvailableToDate(null)
+    }
+  }, [
+    peerReviewEnabled,
+    setPeerReviewDueDate,
+    setPeerReviewAvailableFromDate,
+    setPeerReviewAvailableToDate,
+  ])
+
+  // Auto-sync peer review available from date to assignment due date
+  useEffect(() => {
+    if (!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED || !peerReviewEnabled) {
+      return
+    }
+    setPeerReviewAvailableFromDate(assignmentDueDate)
+  }, [assignmentDueDate, peerReviewEnabled, setPeerReviewAvailableFromDate])
+
+  // Auto-sync peer review available to date to assignment until date
+  useEffect(() => {
+    if (!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED || !peerReviewEnabled) {
+      return
+    }
+    setPeerReviewAvailableToDate(assignmentUntilDate)
+  }, [assignmentUntilDate, peerReviewEnabled, setPeerReviewAvailableToDate])
+
+  if (!ENV?.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED || !peerReviewEnabled) {
+    return null
+  }
+
+  const isPeerReviewDisabled = assignmentDueDate === null
+
+  return (
+    <PeerReviewDueDateTimeInput
+      peerReviewDueDate={peerReviewDueDate}
+      setPeerReviewDueDate={setPeerReviewDueDate}
+      handlePeerReviewDueDateChange={handlePeerReviewDueDateChange}
+      clearButtonAltLabel={clearButtonAltLabel}
+      disabled={isPeerReviewDisabled}
+      {...rest}
+    />
+  )
+}
+
+export default PeerReviewSelector

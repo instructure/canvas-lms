@@ -24,7 +24,14 @@ import {
   SVG_TYPE,
 } from '@instructure/canvas-rce/src/rce/plugins/instructure_icon_maker/svg/constants'
 
-jest.mock('../UploadQueue')
+import {vi} from 'vitest'
+
+vi.mock('../UploadQueue', () => ({
+  __esModule: true,
+  default: {
+    enqueue: vi.fn(),
+  },
+}))
 
 interface FileOption {
   file: {
@@ -52,7 +59,7 @@ describe('FileOptionsCollection', () => {
   ]
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     FileOptionsCollection.folder = {id: '1'}
   })
 

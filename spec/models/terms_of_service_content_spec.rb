@@ -26,7 +26,7 @@ describe TermsOfServiceContent do
     it "adds location param to file URLs when file_association_access feature flag is enabled" do
       attachment = attachment_model(context: @user)
       content = "<p>Here is a link to a file: <a href='/users/#{@user.id}/files/#{attachment.id}/download'>file</a></p>"
-      terms_of_service_content = TermsOfServiceContent.create!(content:, account: @ac)
+      terms_of_service_content = TermsOfServiceContent.create!(content:, account: @ac, saving_user: @user)
       terms_of_service_content.root_account.enable_feature!(:file_association_access)
       terms_of_service_content.reload
       expect(terms_of_service_content.content).to include("location=#{terms_of_service_content.asset_string}")
@@ -35,7 +35,7 @@ describe TermsOfServiceContent do
     it "does not add location param to file URLs when file_association_access feature flag is disabled" do
       attachment = attachment_model(context: @user)
       content = "<p>Here is a link to a file: <a href='/users/#{@user.id}/files/#{attachment.id}/download'>file</a></p>"
-      terms_of_service_content = TermsOfServiceContent.create!(content:, account: @ac)
+      terms_of_service_content = TermsOfServiceContent.create!(content:, account: @ac, saving_user: @user)
       terms_of_service_content.reload
       expect(terms_of_service_content.content).not_to include("location=#{terms_of_service_content.asset_string}")
     end
@@ -43,7 +43,7 @@ describe TermsOfServiceContent do
     it "adds location tag for media attachments when file_association_access feature flag is enabled" do
       attachment = attachment_model(context: @user)
       content = "<p>Here is a link to a media file: <iframe src='/media_attachments_iframe/#{attachment.id}'></iframe> </p>"
-      terms_of_service_content = TermsOfServiceContent.create!(content:, account: @ac)
+      terms_of_service_content = TermsOfServiceContent.create!(content:, account: @ac, saving_user: @user)
       terms_of_service_content.root_account.enable_feature!(:file_association_access)
       terms_of_service_content.reload
       expect(terms_of_service_content.content).to include("location=#{terms_of_service_content.asset_string}")
@@ -52,7 +52,7 @@ describe TermsOfServiceContent do
     it "doesn't add location tag to non-relative URLs" do
       attachment = attachment_model(context: @user)
       content = "<p>Here is a link to a file: <a href='https://www.test.com/users/#{@user.id}/files/#{attachment.id}/download'>file</a></p>"
-      terms_of_service_content = TermsOfServiceContent.create!(content:, account: @ac)
+      terms_of_service_content = TermsOfServiceContent.create!(content:, account: @ac, saving_user: @user)
       terms_of_service_content.root_account.enable_feature!(:file_association_access)
       terms_of_service_content.reload
       expect(terms_of_service_content.content).not_to include("location=#{terms_of_service_content.asset_string}")

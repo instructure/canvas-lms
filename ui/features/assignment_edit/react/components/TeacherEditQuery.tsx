@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
-import GenericErrorPage from '@canvas/generic-error-page'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import TeacherCreateEditView from './TeacherCreateEditView'
 import {TEACHER_EDIT_QUERY} from '@canvas/assignments/graphql/teacher/Queries'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {useQuery} from '@apollo/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 const I18n = createI18nScope('assignment_edit')
 
@@ -42,6 +43,8 @@ const TeacherEditQuery: React.FC<TeacherEditQueryProps> = ({assignmentLid}) => {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Edit Assignments 2 Teacher initial query error')}
         errorCategory={I18n.t('Edit Assignments 2 Teacher Error Page')}
         errorMessage={error.message}

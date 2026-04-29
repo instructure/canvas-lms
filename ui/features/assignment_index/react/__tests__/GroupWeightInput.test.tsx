@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import GroupWeightInput from '../GroupWeightInput'
 
 const setup = (props = {}) => {
@@ -25,7 +25,7 @@ const setup = (props = {}) => {
     groupId: 1,
     name: 'test',
     canChangeWeights: true,
-    initialValue: '5'
+    initialValue: '5',
   }
   return render(<GroupWeightInput {...defaultProps} {...props} />)
 }
@@ -40,14 +40,14 @@ test('renders the input field with the correct initial value', () => {
 test('allows changing input value', () => {
   setup()
   const input = screen.getByTestId('ag_1_weight_input')
-  fireEvent.change(input, { target: { value: '10' } })
+  fireEvent.change(input, {target: {value: '10'}})
   expect(input).toHaveValue('10')
 })
 
 test('shows an error when entering an invalid number', () => {
   setup()
   const input = screen.getByTestId('ag_1_weight_input')
-  fireEvent.change(input, { target: { value: 'abc' } })
+  fireEvent.change(input, {target: {value: 'abc'}})
   fireEvent.blur(input)
   expect(screen.getByText('Must be a valid number')).toBeInTheDocument()
 })
@@ -55,13 +55,13 @@ test('shows an error when entering an invalid number', () => {
 test('rounds the number on blur', () => {
   setup()
   const input = screen.getByTestId('ag_1_weight_input')
-  fireEvent.change(input, { target: { value: '5.678' } })
+  fireEvent.change(input, {target: {value: '5.678'}})
   fireEvent.blur(input)
   expect(input).toHaveValue('5.68')
 })
 
 test('disables interaction when canChangeWeights is false', () => {
-  setup({ canChangeWeights: false })
+  setup({canChangeWeights: false})
   const input = screen.getByTestId('ag_1_weight_input')
   expect(input).toHaveAttribute('readonly')
 })

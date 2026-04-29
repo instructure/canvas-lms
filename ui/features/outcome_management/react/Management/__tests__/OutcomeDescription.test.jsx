@@ -45,7 +45,7 @@ describe('OutcomeDescription', () => {
   })
 
   beforeEach(() => {
-    setShouldExpandMock = jest.fn()
+    setShouldExpandMock = vi.fn()
   })
 
   const render = (

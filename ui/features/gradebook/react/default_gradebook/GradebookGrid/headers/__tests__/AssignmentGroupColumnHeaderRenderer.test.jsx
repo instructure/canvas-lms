@@ -56,7 +56,7 @@ describe('GradebookGrid AssignmentGroupColumnHeaderRenderer', () => {
       show_message_students_with_observers_dialog: true,
     })
     ENV.SETTINGS = {}
-    jest.spyOn(gradebook, 'saveSettings')
+    vi.spyOn(gradebook, 'saveSettings')
 
     assignmentGroup = {
       id: '2201',
@@ -75,25 +75,25 @@ describe('GradebookGrid AssignmentGroupColumnHeaderRenderer', () => {
 
     // Setup keyboardNav mock
     gradebook.keyboardNav = {
-      addGradebookElement: jest.fn(),
-      removeGradebookElement: jest.fn(),
-      handleMenuOrDialogClose: jest.fn(),
+      addGradebookElement: vi.fn(),
+      removeGradebookElement: vi.fn(),
+      handleMenuOrDialogClose: vi.fn(),
     }
 
     // Setup gridSupport mock
     gradebook.gradebookGrid = {
       gridSupport: {
         columns: {
-          updateColumnHeaders: jest.fn(),
+          updateColumnHeaders: vi.fn(),
         },
         navigation: {
-          handleHeaderKeyDown: jest.fn(),
+          handleHeaderKeyDown: vi.fn(),
         },
       },
       grid: {
-        getColumnIndex: jest.fn(),
+        getColumnIndex: vi.fn(),
       },
-      invalidate: jest.fn(),
+      invalidate: vi.fn(),
     }
 
     // Setup grid display settings
@@ -116,7 +116,7 @@ describe('GradebookGrid AssignmentGroupColumnHeaderRenderer', () => {
 
   afterEach(() => {
     container.remove()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   const render = () => {
@@ -175,20 +175,20 @@ describe('GradebookGrid AssignmentGroupColumnHeaderRenderer', () => {
     })
 
     it('includes a callback for closing the column header menu', () => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       render()
       component.props.onMenuDismiss()
-      jest.runAllTimers()
+      vi.runAllTimers()
       expect(gradebook.keyboardNav.handleMenuOrDialogClose).toHaveBeenCalledTimes(1)
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('does not call the menu close handler synchronously', () => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       render()
       component.props.onMenuDismiss()
       expect(gradebook.keyboardNav.handleMenuOrDialogClose).not.toHaveBeenCalled()
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('includes a callback for removing elements from the Gradebook KeyboardNav', () => {
@@ -258,7 +258,7 @@ describe('GradebookGrid AssignmentGroupColumnHeaderRenderer', () => {
   describe('#destroy()', () => {
     it('unmounts the component', () => {
       render()
-      const unmountSpy = jest.spyOn(renderer, 'destroy')
+      const unmountSpy = vi.spyOn(renderer, 'destroy')
       renderer.destroy(column, container, {})
       expect(unmountSpy).toHaveBeenCalled()
     })

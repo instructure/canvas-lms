@@ -43,7 +43,7 @@ describe('Notification Preferences Table - Reported Reply - Teacher', () => {
     const container = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 

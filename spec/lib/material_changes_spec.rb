@@ -20,6 +20,7 @@
 
 class MockModel
   include MaterialChanges
+
   attr_accessor :saved_changes
 
   def initialize(fake_changes)

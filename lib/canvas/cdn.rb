@@ -17,16 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "base/canvas"
+require "base/canvas/reloader"
 require "canvas/cdn/registry"
 
 module Canvas
   module Cdn
     class << self
+      Canvas::Reloader.on_reload do
+        @config = nil
+      end
+
       def config
         @config ||= begin
           config = ActiveSupport::OrderedOptions.new
           config.enabled = false
-          yml = ConfigFile.load("canvas_cdn")
+          yml = Canvas.load_config_file_or_consul("canvas_cdn", failsafe_cache: true)
           creds = Rails.application.credentials.canvas_cdn_creds
           config.merge!(yml.symbolize_keys) if yml
           config.merge!(creds) if creds

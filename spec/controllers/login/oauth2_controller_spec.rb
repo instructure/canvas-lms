@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Login::OAuth2Controller do
   let(:aac) { Account.default.authentication_providers.create!(auth_type: "facebook") }
 
@@ -33,7 +31,7 @@ describe Login::OAuth2Controller do
       get :new, params: { auth_type: "facebook" }
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://www.facebook.com/dialog/oauth\?})
-      expect(session[:oauth2_nonce]).to_not be_blank
+      expect(session[:oauth2_nonce]).not_to be_blank
     end
   end
 
@@ -60,17 +58,19 @@ describe Login::OAuth2Controller do
     it "checks the OAuth2 CSRF token" do
       session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "different")
+      allow(controller.logger).to receive(:error).and_call_original
       get :create, params: { code: "abc", state: jwt }
       # it could be a 422, or 0 if error handling isn't enabled properly in specs
-      expect(response).to_not be_successful
-      expect(response).to_not be_redirect
+      expect(response).not_to be_successful
+      expect(response).not_to be_redirect
+      expect(controller.logger).to have_received(:error).with("Nonce mismatch - JWT nonce: 'different', Session nonce(s): [\"bob\"]")
     end
 
     it "rejects logins that take more than 10 minutes" do
       get :new, params: { auth_type: "facebook" }
       expect(response).to be_redirect
       state = CGI.parse(URI.parse(response.location).query)["state"].first
-      expect(state).to_not be_nil
+      expect(state).not_to be_nil
 
       expect_any_instantiation_of(aac).not_to receive(:get_token)
       Timecop.travel(15.minutes) do
@@ -238,7 +238,7 @@ describe Login::OAuth2Controller do
       session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
 
-      expect(Account.default.pseudonyms.active.by_unique_id("user")).to_not be_exists
+      expect(Account.default.pseudonyms.active.by_unique_id("user")).not_to be_exists
       get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       p = Account.default.pseudonyms.active.by_unique_id("user").first!
@@ -258,9 +258,71 @@ describe Login::OAuth2Controller do
       expect(flash[:delegated_message]).to include "took too long"
     end
 
-    it "redirects to login any time an external timeout is noticed" do
+    it "redirects to login when an _actual_ external timeout occurs" do
       session[:oauth2_nonce] = ["fred"]
-      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::TimeoutCutoff.new(1))
+      allow(Setting).to receive(:get).and_call_original
+      allow(Setting).to receive(:get).with("service_oauth:#{aac.global_id}_timeout", nil).and_return(0.01)
+      aac.client_id = "invalid"
+      allow_any_instance_of(Net::HTTP).to receive(:start) { sleep 1 } # rubocop:disable Lint/NoSleep
+      user_with_pseudonym(username: "user", active_all: 1)
+      @pseudonym.authentication_provider = aac
+      @pseudonym.save!
+      session[:sentinel] = true
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "fred")
+      get :create, params: { code: "abc", state: jwt }
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to include "timeout occurred"
+    end
+
+    it "redirects to login when an external timeout occurs" do
+      session[:oauth2_nonce] = ["fred"]
+      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Timeout::Error.new)
+      user_with_pseudonym(username: "user", active_all: 1)
+      @pseudonym.authentication_provider = aac
+      @pseudonym.save!
+      session[:sentinel] = true
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "fred")
+      get :create, params: { code: "abc", state: jwt }
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to include "timeout occurred"
+    end
+
+    it "redirects to login when a circuit breaker timeout occurs" do
+      session[:oauth2_nonce] = ["fred"]
+      expect(Canvas).to receive(:timeout_protection).and_raise(Canvas::TimeoutCutoff.new(1))
+      expect(Canvas::Errors).not_to receive(:capture)
+      user_with_pseudonym(username: "user", active_all: 1)
+      @pseudonym.authentication_provider = aac
+      @pseudonym.save!
+      session[:sentinel] = true
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "fred")
+      get :create, params: { code: "abc", state: jwt }
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to include "timeout occurred"
+    end
+
+    it "retries when an external timeout occurs" do
+      session[:oauth2_nonce] = ["fred"]
+      aac.settings["oauth2_timeout_retries"] = 1
+      aac.save!
+      aac.reload
+      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Timeout::Error.new).twice
+      user_with_pseudonym(username: "user", active_all: 1)
+      @pseudonym.authentication_provider = aac
+      @pseudonym.save!
+      session[:sentinel] = true
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "fred")
+      get :create, params: { code: "abc", state: jwt }
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to include "timeout occurred"
+    end
+
+    it "does not retry for circuit breaker timeouts" do
+      session[:oauth2_nonce] = ["fred"]
+      aac.settings["oauth2_timeout_retries"] = 1
+      aac.save!
+      aac.reload
+      allow(Canvas).to receive(:timeout_protection).and_raise(Canvas::TimeoutCutoff.new(1))
       user_with_pseudonym(username: "user", active_all: 1)
       @pseudonym.authentication_provider = aac
       @pseudonym.save!

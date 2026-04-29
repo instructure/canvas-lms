@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {vi} from 'vitest'
 import $ from 'jquery'
 import * as uploadFileModule from '@canvas/upload-file'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import FileUpload from '../FileUpload'
 import {fireEvent, render, waitFor} from '@testing-library/react'
@@ -26,10 +27,10 @@ import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphq
 import {MockedProvider} from '@apollo/client/testing'
 import React, {createRef} from 'react'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
-import StudentViewContext from '../../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 
-jest.mock('@canvas/upload-file', () => ({
-  uploadFile: jest.fn().mockImplementation(file => {
+vi.mock('@canvas/upload-file', () => ({
+  uploadFile: vi.fn().mockImplementation(file => {
     return Promise.resolve({id: 'mock-id', name: file.name})
   }),
 }))
@@ -71,8 +72,8 @@ async function makeProps(overrides) {
     ...assignmentAndSubmission,
 
     // Make these return a promise that will resolve
-    onCanvasFileRequested: jest.fn(),
-    onUploadRequested: jest.fn(),
+    onCanvasFileRequested: vi.fn(),
+    onUploadRequested: vi.fn(),
     filesToUpload: [],
     uploadingFiles: false,
     focusOnInit: false,
@@ -213,7 +214,7 @@ describe('FileUpload', () => {
 
   it('allows uploading multiple files at a time', async () => {
     const mocks = await createGraphqlMocks()
-    const setOnSuccess = jest.fn()
+    const setOnSuccess = vi.fn()
     const props = await makeProps()
     uploadFileModule.uploadFile
       .mockResolvedValueOnce({id: '1', name: 'file1.jpg'})
@@ -248,8 +249,8 @@ describe('FileUpload', () => {
 
   it('creates an error alert when the API fails to upload files', async () => {
     const mocks = await createGraphqlMocks()
-    const setOnFailure = jest.fn()
-    const setOnSuccess = jest.fn()
+    const setOnFailure = vi.fn()
+    const setOnSuccess = vi.fn()
     const props = await makeProps()
     props.onUploadRequested.mockImplementation(({onError}) => {
       onError(new Error('no'))
@@ -274,7 +275,7 @@ describe('FileUpload', () => {
 
   it('uploads files received through the LtiDeepLinkingResponse message event', async () => {
     const mocks = await createGraphqlMocks()
-    const setOnSuccess = jest.fn()
+    const setOnSuccess = vi.fn()
     const props = await makeProps({
       Submission: {attempt: 0},
     })
@@ -321,7 +322,7 @@ describe('FileUpload', () => {
 
   it('clears mediaType on files received through the A2ExternalContentReady message event', async () => {
     const mocks = await createGraphqlMocks()
-    const setOnSuccess = jest.fn()
+    const setOnSuccess = vi.fn()
     const props = await makeProps({
       Submission: {attempt: 0},
     })
@@ -368,7 +369,7 @@ describe('FileUpload', () => {
 
   it('creates an error alert when given no file id through the Lti response', async () => {
     const mocks = await createGraphqlMocks()
-    const setOnFailure = jest.fn()
+    const setOnFailure = vi.fn()
     const props = await makeProps()
     render(
       <MockedProvider mocks={mocks}>
@@ -393,7 +394,7 @@ describe('FileUpload', () => {
 
   it('creates an error alert when an error message is present in the Lti response', async () => {
     const mocks = await createGraphqlMocks()
-    const setOnFailure = jest.fn()
+    const setOnFailure = vi.fn()
     const props = await makeProps()
     render(
       <MockedProvider mocks={mocks}>
@@ -419,7 +420,7 @@ describe('FileUpload', () => {
 
   it('does not call onUploadRequested when there is an error message present in the Lti response', async () => {
     const mocks = await createGraphqlMocks()
-    const setOnFailure = jest.fn()
+    const setOnFailure = vi.fn()
     const props = await makeProps()
     render(
       <MockedProvider mocks={mocks}>
@@ -587,7 +588,7 @@ describe('FileUpload', () => {
 
   it('does not render an error when adding a file that is an allowed extension', async () => {
     const mocks = await createGraphqlMocks()
-    const setOnSuccess = jest.fn()
+    const setOnSuccess = vi.fn()
     const props = await makeProps({
       Assignment: {allowedExtensions: ['jpg']},
     })
@@ -639,7 +640,7 @@ describe('FileUpload', () => {
 
   it('shows a checkmark icon for uploaded files', async () => {
     const mocks = await createGraphqlMocks()
-    const setOnSuccess = jest.fn()
+    const setOnSuccess = vi.fn()
     const attachmentOverrides = [{_id: '1', displayName: 'just a file'}]
     const props = await makeProps({
       Submission: {
@@ -658,10 +659,7 @@ describe('FileUpload', () => {
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconComplete"]'))
   })
 
-  // Fails at InstUI 10 for an unknown reason (possibly asynchronous rendering, possibly
-  // some DOM issue with InstUI 10's ProgressBar component). Seems low risk
-  // FOO-5276 is the JIRA ticket for this issue
-  it.skip('FOO-5276 skipped: renders a loading indicator for each file in the process of uploading', async () => {
+  it('renders a loading indicator for each file in the process of uploading', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps()
     props.filesToUpload = [
@@ -678,21 +676,15 @@ describe('FileUpload', () => {
     const progressBars = getAllByRole('progressbar')
     expect(progressBars).toHaveLength(2)
 
-    expect(progressBars[0]).toHaveAttribute('aria-valuenow', '10')
-    expect(progressBars[0]).toHaveAttribute('aria-valuemax', '100')
+    expect(progressBars[0].value).toBe(10)
+    expect(progressBars[0].max).toBe(100)
     expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
-    expect(progressBars[0]).toHaveAttribute(
-      'aria-label',
-      'Upload progress for file1.pdf 10 percent',
-    )
+    expect(progressBars[0]).toHaveAttribute('aria-label', 'Upload progress for file1.pdf')
 
-    expect(progressBars[1]).toHaveAttribute('aria-valuenow', '50')
-    expect(progressBars[1]).toHaveAttribute('aria-valuemax', '250')
+    expect(progressBars[1].value).toBe(50)
+    expect(progressBars[1].max).toBe(250)
     expect(progressBars[1]).toHaveAttribute('aria-valuetext', '20 percent')
-    expect(progressBars[1]).toHaveAttribute(
-      'aria-label',
-      'Upload progress for file2.pdf 20 percent',
-    )
+    expect(progressBars[1]).toHaveAttribute('aria-label', 'Upload progress for file2.pdf')
   })
 
   describe('webcam photo upload', () => {

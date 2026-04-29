@@ -27,7 +27,7 @@ describe Quizzes::OutstandingQuizSubmissionManager do
       @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       @quiz.generate_quiz_data
       @quiz.save
-      @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, false)
+      @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, temporary: false)
       @submission.end_at = 20.minutes.ago
       @submission.save!
       @outstanding = Quizzes::OutstandingQuizSubmissionManager.new(@quiz)
@@ -56,7 +56,7 @@ describe Quizzes::OutstandingQuizSubmissionManager do
       student_count = 2
       students = Array.new(student_count) { student_in_course(active_all: true).user }
       students.each do |student|
-        submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(student, false)
+        submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(student, temporary: false)
         submission.end_at = 20.minutes.ago
         submission.save
       end

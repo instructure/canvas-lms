@@ -22,6 +22,7 @@ require "nokogiri"
 module Qti
   class ChoiceInteraction < AssessmentItemConverter
     extend Canvas::Migration::XMLHelper
+
     TEST_FILE = "/home/bracken/projects/QTIMigrationTool/assessments/out/assessmentItems/ID_4388459047391.xml"
     DEFAULT_ANSWER_TEXT = "No answer text provided."
 
@@ -122,7 +123,7 @@ module Qti
             if choice.at_css("div[class=text]")
               answer[:text] = choice.text.strip
             else
-              sanitized = sanitize_html!(choice.at_css("div[class=html]") ? Nokogiri::HTML5.fragment(choice.text) : choice, true)
+              sanitized = sanitize_html!(choice.at_css("div[class=html]") ? Nokogiri::HTML5.fragment(choice.text) : choice, remove_extraneous_nodes: true)
               if sanitized.present? && sanitized != CGI.escapeHTML(answer[:text])
                 answer[:html] = sanitized
               end

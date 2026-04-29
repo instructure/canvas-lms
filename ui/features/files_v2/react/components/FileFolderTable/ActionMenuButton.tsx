@@ -31,6 +31,7 @@ import {DeleteModal} from './DeleteModal'
 import {downloadFile, downloadZip} from '../../../utils/downloadUtils'
 import {getName, isFile, isLockedBlueprintItem} from '../../../utils/fileFolderUtils'
 import {externalToolEnabled} from '../../../utils/fileUtils'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 import {
   IconMoreLine,
@@ -84,7 +85,7 @@ const ActionMenuButton = ({
   const name = getName(row)
   const actionLabel = I18n.t('Actions for "%{name}"', {name})
   const {contextType, fileMenuTools} = useFileManagement()
-  const {handleActionButtonRef} = useRowFocus()
+  const {handleActionButtonRef, setRowToFocus} = useRowFocus()
 
   const iconForTrayTool = useCallback((tool: {canvas_icon_class?: string; icon_url?: string}) => {
     if (tool.canvas_icon_class) {
@@ -171,6 +172,7 @@ const ActionMenuButton = ({
   const send_copy_permissions = contextType === 'course' && userCanEditFilesForContext
   const rename_move_permissions = userCanEditFilesForContext && !blueprint_locked
   const delete_permissions = userCanDeleteFilesForContext && !blueprint_locked
+  const isAccessRestricted = getFilesEnv().userFileAccessRestricted
 
   const filteredItems = useMemo(
     () =>
@@ -186,6 +188,7 @@ const ActionMenuButton = ({
             {
               icon: IconDownloadLine,
               text: I18n.t('Download'),
+              visible: !isAccessRestricted,
               onClick: () => downloadFile(row.url),
             },
             {
@@ -215,7 +218,7 @@ const ActionMenuButton = ({
             {
               icon: IconExpandItemsLine,
               text: I18n.t('Move To...'),
-              visible: rename_move_permissions,
+              visible: rename_move_permissions && !isAccessRestricted,
               onClick: createSetModalOrTrayCallback('move-to'),
             },
             ...fileMenuTools.map(tool => {
@@ -246,7 +249,8 @@ const ActionMenuButton = ({
             {
               icon: IconDownloadLine,
               text: I18n.t('Download'),
-              onClick: () => downloadZip(new Set([`folder-${row.id}`])),
+              visible: !isAccessRestricted,
+              onClick: () => downloadZip(new Set([`folder-${row.id.toString()}`])),
             },
             {
               icon: IconPermissionsLine,
@@ -263,7 +267,7 @@ const ActionMenuButton = ({
             {
               icon: IconExpandItemsLine,
               text: I18n.t('Move To...'),
-              visible: rename_move_permissions,
+              visible: rename_move_permissions && !isAccessRestricted,
               onClick: createSetModalOrTrayCallback('move-to'),
             },
             {separator: true, visible: delete_permissions},
@@ -285,6 +289,7 @@ const ActionMenuButton = ({
       fileMenuTools,
       delete_permissions,
       iconForTrayTool,
+      isAccessRestricted,
     ],
   )
 
@@ -319,7 +324,10 @@ const ActionMenuButton = ({
         <RenameModal
           renamingItem={row}
           isOpen={modalOrTray === 'rename'}
-          onClose={onDismissModalOrTray}
+          onClose={() => {
+            onDismissModalOrTray()
+            setRowToFocus(rowIndex)
+          }}
         />
         <DeleteModal
           open={modalOrTray === 'delete'}
@@ -349,9 +357,11 @@ const ActionMenuButton = ({
 
   return (
     <div ref={el => handleActionButtonRef(el, rowIndex)}>
-      <Menu placement="bottom" trigger={triggerButton()}>
-        {filteredItems.map((item, i) => renderMenuItem(i, item))}
-      </Menu>
+      {filteredItems.length > 0 && (
+        <Menu placement="bottom" trigger={triggerButton()}>
+          {filteredItems.map((item, i) => renderMenuItem(i, item))}
+        </Menu>
+      )}
       {buildTrays()}
       {buildModals()}
     </div>

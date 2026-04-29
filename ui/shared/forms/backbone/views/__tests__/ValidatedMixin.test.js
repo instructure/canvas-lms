@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 
-jest.mock('@canvas/rce/RichContentEditor', () => ({
+vi.mock('@canvas/rce/RichContentEditor', () => ({
   loadNewEditor: (textarea, _options, callback) => {
     textarea.addClass('tinymce-active')
     callback?.()

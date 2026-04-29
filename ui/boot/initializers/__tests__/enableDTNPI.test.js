@@ -31,9 +31,9 @@ describe('enableDTNPI', () => {
   afterAll(() => server.close())
 
   beforeEach(() => {
-    consoleLog = jest.spyOn(console, 'log').mockImplementation(() => {})
+    consoleLog = vi.spyOn(console, 'log').mockImplementation(() => {})
     // Mock jQuery's flashError function
-    $.flashError = jest.fn()
+    $.flashError = vi.fn()
   })
 
   afterEach(async () => {

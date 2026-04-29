@@ -50,7 +50,7 @@ describe Types::CourseProgressionType do
   end
 
   let(:course_progress_helper) do
-    course_progress_helper = double(CourseProgress.name)
+    course_progress_helper = instance_double(CourseProgress)
     allow(course_progress_helper).to receive_messages(
       can_evaluate_progression?: true,
       normalized_requirement_completed_count:,

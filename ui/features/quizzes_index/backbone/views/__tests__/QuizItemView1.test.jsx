@@ -24,18 +24,18 @@ import {assignLocation} from '@canvas/util/globalUtils'
 import $ from 'jquery'
 import QuizItemView from '../QuizItemView'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock jQuery methods
-$.fn.tooltip = jest.fn()
-$.fn.simulate = jest.fn()
+$.fn.tooltip = vi.fn()
+$.fn.simulate = vi.fn()
 
 // Mock window.confirm
 const originalConfirm = window.confirm
 beforeAll(() => {
-  window.confirm = jest.fn(() => true)
+  window.confirm = vi.fn(() => true)
 })
 
 afterAll(() => {
@@ -66,6 +66,7 @@ const createView = (quiz, options = {}) => {
   ENV.PERMISSIONS = {
     manage: options.canManage,
     create: options.canCreate || options.canManage,
+    manage_assign_to: options.canManage,
   }
   ENV.FEATURES = ENV.FEATURES || {}
 
@@ -179,7 +180,7 @@ describe('QuizItemView', () => {
     )
   })
 
-  it.skip('can assign assignment when flag is on and has edit permissions', () => {
+  it('can assign assignment when flag is on and has edit permissions', () => {
     const quiz = createQuiz({id: 1, title: 'Foo'})
     const view = createView(quiz, {
       canManage: true,

@@ -27,12 +27,12 @@ describe('RangeInput Component', () => {
     defaultValue: 5,
     labelText: 'Input Label',
     name: 'input_name',
-    formatValue: jest.fn(value => `${value}%`),
-    onChange: jest.fn(),
+    formatValue: vi.fn(value => `${value}%`),
+    onChange: vi.fn(),
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders with default props', () => {

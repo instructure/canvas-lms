@@ -75,6 +75,54 @@ describe Quizzes::QuizQuestion do
       @question = @quiz.quiz_questions.create(question_data: @data)
     end
 
+    describe "attachment handling" do
+      before do
+        @aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+        @data = { question_name: "test question",
+                  points_possible: "1",
+                  question_type: "multiple_choice_question",
+                  question_text: @aa_test_data.base_html,
+                  answers: [{ "answer_text" => "1", "id" => 1 },
+                            { "answer_html" => @aa_test_data.replaced_html, "id" => 2 },
+                            { "answer_text" => "3", "id" => 3 },
+                            { "answer_text" => "4", "id" => 4 }] }
+
+        @question = @quiz.quiz_questions.create(question_data: @data, saving_user: @teacher)
+      end
+
+      it "creates associations on quiz question creation" do
+        expect(@question.attachment_associations.count).to eq(2)
+        expect(@question.attachment_associations.pluck(:attachment_id)).to match_array [@aa_test_data.attachment1.id, @aa_test_data.attachment2.id]
+      end
+
+      it "updates associations on quiz update" do
+        data = { question_name: "test question",
+                 points_possible: "1",
+                 question_type: "multiple_choice_question",
+                 question_text: "no attachments here",
+                 answers: [{ "answer_text" => "1", "id" => 1 },
+                           { "answer_html" => @aa_test_data.removed_html, "id" => 2 },
+                           { "answer_text" => "3", "id" => 3 },
+                           { "answer_text" => "4", "id" => 4 }] }
+        @question.update!(question_data: data, saving_user: @teacher)
+        expect(@question.attachment_associations.count).to eq(0)
+      end
+
+      it "does not update associations when workflow_state is deleted" do
+        data = { question_name: "test question",
+                 points_possible: "1",
+                 question_type: "multiple_choice_question",
+                 question_text: "no attachments here",
+                 answers: [{ "answer_text" => "1", "id" => 1 },
+                           { "answer_html" => @aa_test_data.base_html, "id" => 2 },
+                           { "answer_text" => "3", "id" => 3 },
+                           { "answer_text" => "4", "id" => 4 }] }
+        @question.attachment_associations.destroy_all
+        @question.update!(question_data: data, workflow_state: "deleted")
+        expect(@question.attachment_associations.count).to eq(0)
+      end
+    end
+
     it "saves regrade if passed in regrade option in data hash" do
       expect(Quizzes::QuizQuestionRegrade.first).to be_nil
 
@@ -84,7 +132,7 @@ describe Quizzes::QuizQuestion do
       @question.save
 
       question_regrade = Quizzes::QuizQuestionRegrade.first
-      expect(question_regrade).to be
+      expect(question_regrade).not_to be_nil
       expect(question_regrade.regrade_option).to eq "full_credit"
     end
 
@@ -204,6 +252,91 @@ describe Quizzes::QuizQuestion do
     it "uses root_account value from account" do
       question = @quiz.quiz_questions.create!
       expect(question.root_account_id).to eq Account.default.id
+    end
+  end
+
+  describe ".without_assessment_question_association" do
+    before do
+      course_with_teacher
+      @quiz = @course.quizzes.create!
+      @data = { question_name: "test question" }
+    end
+
+    it "returns questions without assessment_question_id" do
+      standalone_question = @quiz.quiz_questions.create!(question_data: @data.merge(question_type: "text_only_question"))
+
+      bank = @course.assessment_question_banks.create!
+      assessment_question = bank.assessment_questions.create!
+      linked_question = @quiz.quiz_questions.create!(question_data: @data.merge(question_type: "multiple_choice_question"), assessment_question:)
+
+      results = Quizzes::QuizQuestion.without_assessment_question_association
+
+      expect(results).to include(standalone_question)
+      expect(results).not_to include(linked_question)
+    end
+  end
+
+  describe "#create_assessment_question" do
+    before do
+      course_with_teacher
+      @quiz = @course.quizzes.create!
+    end
+
+    it "passes updating_user to assessment_question when creating" do
+      question_data = {
+        question_name: "Test Question",
+        question_type: "multiple_choice_question",
+        points_possible: 1,
+        answers: [
+          { answer_text: "Answer 1", weight: 100 },
+          { answer_text: "Answer 2", weight: 0 }
+        ]
+      }
+
+      quiz_question = @quiz.quiz_questions.create!(
+        question_data:,
+        updating_user: @teacher
+      )
+
+      expect(quiz_question.assessment_question).not_to be_nil
+      expect(quiz_question.assessment_question.updating_user).to eq(@teacher)
+    end
+
+    it "does not create assessment_question for text_only questions" do
+      question_data = {
+        question_name: "Text Only",
+        question_type: "text_only_question"
+      }
+
+      quiz_question = @quiz.quiz_questions.create!(
+        question_data:,
+        updating_user: @teacher
+      )
+
+      expect(quiz_question.assessment_question).to be_nil
+    end
+
+    it "updates assessment_question with updating_user on save" do
+      @attachment = attachment_with_context(@course)
+      question_data = {
+        question_name: "Test Question",
+        question_type: "multiple_choice_question",
+        points_possible: 1,
+        question_text: "<p>File ref:<img src='/courses/#{@course.id}/files/#{@attachment.id}'></p>",
+        answers: [
+          { answer_text: "Answer 1", weight: 100 }
+        ]
+      }
+
+      quiz_question = @quiz.quiz_questions.create!(question_data:, updating_user: @teacher)
+      assessment_question = quiz_question.assessment_question
+
+      quiz_question.updating_user = @teacher
+      quiz_question.question_data = question_data.merge(question_name: "Updated Question")
+      quiz_question.save!
+
+      expect(quiz_question.assessment_question).to eq(assessment_question)
+      expect(quiz_question.assessment_question.attachments).not_to be_empty
     end
   end
 end

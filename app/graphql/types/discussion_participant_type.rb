@@ -22,17 +22,46 @@ module Types
   class DiscussionParticipantType < ApplicationObjectType
     graphql_name "DiscussionParticipant"
 
+    connection_type_class TotalCountConnection
+
     global_id_field :id
-    field :summary_enabled, Boolean, null: true
 
     field :expanded, Boolean, null: true
     def expanded
       object.discussion_topic.expanded_for_user(current_user)
     end
 
+    field :posted, Boolean, null: false
+    def posted
+      object.posted?
+    end
+
+    field :read, Boolean, null: false
+    def read_status
+      object.workflow_state == "read"
+    end
+    alias_method :read, :read_status
+
     field :sort_order, Types::DiscussionSortOrderType, null: true
     def sort_order
       object.discussion_topic.sort_order_for_user(current_user).to_sym
+    end
+
+    field :preferred_language, Types::PreferredLanguageType, null: true
+    def preferred_language
+      return nil unless Translation.languages.pluck(:id).include?(object.preferred_language)
+
+      object.preferred_language
+    end
+
+    field :has_unread_pinned_entry, Boolean, null: true
+    field :show_pinned_entries, Boolean, null: true
+    field :summary_enabled, Boolean, null: true
+    field :workflow_state, String, null: false
+
+    field :discussion_topic, Types::DiscussionType, null: false
+    def discussion_topic
+      load_association(:discussion_topic)
     end
   end
 end

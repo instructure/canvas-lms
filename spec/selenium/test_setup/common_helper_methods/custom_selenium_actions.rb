@@ -28,10 +28,6 @@ module CustomSeleniumActions
     skip("skipping test, fails in Firefox: #{additional_error_text}") if driver.browser == :firefox
   end
 
-  def skip_if_chrome(additional_error_text)
-    skip("skipping test, fails in Chrome: #{additional_error_text}") if driver.browser == :chrome
-  end
-
   def skip_if_safari(additional_error_text)
     return unless driver.browser == :safari
 
@@ -39,7 +35,7 @@ module CustomSeleniumActions
     when :alert
       additional_error_text = "SafariDriver doesn't support alerts"
     end
-    skip("skipping test, fails in Safari: #{additional_error_text}")
+    skip("skipping test, fails in Safari: #{additional_error_text}") # rubocop:disable Specs/NoSkipWithoutDate,Specs/NoSkipWithoutTicket
   end
 
   def find_radio_button_by_value(value, scope = nil)
@@ -262,7 +258,7 @@ module CustomSeleniumActions
 
   # conditionally doing stuff based on what elements are on the page
   # is a smell; you should know what's on the page you're testing.
-  def element_exists?(selector, xpath = false)
+  def element_exists?(selector, xpath: false)
     disable_implicit_wait { xpath ? fxpath(selector) : f(selector) }
     true
   rescue Selenium::WebDriver::Error::NoSuchElementError
@@ -719,14 +715,15 @@ module CustomSeleniumActions
     "#flash_message_holder .flash-message-container"
   end
 
-  def dismiss_flash_messages
-    ff(flash_message_selector).each(&:click)
+  def flash_message_close_selector
+    "#flash_message_holder .flash-message-container > button"
   end
 
-  def dismiss_flash_messages_if_present
-    unless find_all_with_jquery(flash_message_selector).empty?
-      find_all_with_jquery(flash_message_selector).each(&:click)
-    end
+  def dismiss_flash_messages
+    ff(flash_message_close_selector).each(&:click)
+  # sometimes flash messages are removed from the DOM before we can click the close button especially when running individual tests in local
+  rescue Selenium::WebDriver::Error::NoSuchElementError # rubocop:disable Specs/NoNoSuchElementError
+    nil
   end
 
   # Scroll To Element (without executing Javascript)

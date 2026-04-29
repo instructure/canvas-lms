@@ -17,7 +17,7 @@
  */
 import React, {Component} from 'react'
 import classnames from 'classnames'
-import {partition} from 'lodash'
+import {partition} from 'es-toolkit/compat'
 import {arrayOf, bool, string, number, shape, func} from 'prop-types'
 import moment from 'moment-timezone'
 import {userShape, itemShape, sizeShape} from '../plannerPropTypes'

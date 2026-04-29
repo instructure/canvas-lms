@@ -31,9 +31,9 @@ const defaultProps = () => ({
   onSelectFilter: () => {},
 })
 
-jest.mock('lodash', () => ({
+vi.mock('lodash', () => ({
   debounce: fn => {
-    fn.cancel = jest.fn()
+    fn.cancel = vi.fn()
     return fn
   },
 }))
@@ -46,7 +46,7 @@ describe('Heading Menu', () => {
   })
 
   it('calls onSelectFilter when a filter is clicked', async () => {
-    const onSelectFilterMock = jest.fn()
+    const onSelectFilterMock = vi.fn()
 
     const {queryByTestId, getByTestId} = render(
       <HeadingMenu {...defaultProps()} onSelectFilter={onSelectFilterMock} />,

@@ -26,12 +26,12 @@ describe('UnassignedGroupUserCollection', () => {
   })
 
   test('aborts active requests before fetching new ones', () => {
-    const fakeRequest1 = {abort: jest.fn()}
-    const fakeRequest2 = {abort: jest.fn()}
+    const fakeRequest1 = {abort: vi.fn()}
+    const fakeRequest2 = {abort: vi.fn()}
     collection = new UnassignedGroupUserCollection()
     collection.lastRequests = [fakeRequest1, fakeRequest2]
 
-    const fetchSpy = jest.spyOn(collection, 'fetch').mockResolvedValue()
+    const fetchSpy = vi.spyOn(collection, 'fetch').mockResolvedValue()
 
     collection.search('abcde')
     expect(fakeRequest1.abort).toHaveBeenCalledTimes(1)

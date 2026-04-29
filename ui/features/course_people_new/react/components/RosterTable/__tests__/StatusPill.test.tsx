@@ -22,12 +22,12 @@ import StatusPill from '../StatusPill'
 import {
   ACTIVE_ENROLLMENT,
   PENDING_ENROLLMENT,
-  INACTIVE_ENROLLMENT
+  INACTIVE_ENROLLMENT,
 } from '../../../../util/constants'
 
 describe('StatusPill', () => {
   it('renders nothing when neither isPending nor isInactive', () => {
-    const {container} = render(<StatusPill state={ACTIVE_ENROLLMENT}/>)
+    const {container} = render(<StatusPill state={ACTIVE_ENROLLMENT} />)
     expect(container).toBeEmptyDOMElement()
   })
 

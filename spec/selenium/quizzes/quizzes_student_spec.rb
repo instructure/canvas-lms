@@ -53,7 +53,7 @@ describe "quizzes" do
 
     context "with a quiz started" do
       before(:once) do
-        @qsub = quiz_with_submission(false)
+        @qsub = quiz_with_submission(complete_quiz: false)
       end
 
       context "when attempting to resume a quiz" do
@@ -160,10 +160,6 @@ describe "quizzes" do
       answer_array = answer_fields.map { |element| driver.execute_script("return $(arguments[0]).val()", element) }
       expect(answer_array).to eq response_array
     end
-  end
-
-  context "when a student closes the session without submitting" do
-    it "automatically grades the submission when it becomes overdue", priority: "1"
   end
 
   context "when the 'show correct answers' setting is on" do

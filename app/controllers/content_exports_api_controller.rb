@@ -50,7 +50,7 @@
 #         },
 #         "attachment": {
 #           "description": "attachment api object for the export package (not present before the export completes or after it becomes unavailable for download.)",
-#           "example": {"url": "https://example.com/api/v1/attachments/789?download_frd=1&verifier=bG9sY2F0cyEh"},
+#           "example": {"url": "https://example.com/api/v1/attachments/789?download_frd=1"},
 #           "$ref": "File"
 #         },
 #         "progress_url": {
@@ -80,9 +80,11 @@
 #     }
 #
 class ContentExportsApiController < ApplicationController
+  skip_before_action :require_user, only: %i[create index show]
   include ContentExportApiHelper
   include SupportHelpers::ControllerHelpers
   include Api::V1::ContentExport
+
   before_action :require_context
   before_action :require_site_admin, only: :update
 
@@ -95,7 +97,7 @@ class ContentExportsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       scope = @context.content_exports_visible_to(@current_user).active.not_for_copy
-      scope = scope.order("id DESC")
+      scope = scope.order(id: :desc)
       route = polymorphic_url([:api_v1, @context, :content_exports])
       exports = Api.paginate(scope, self, route)
       render json: exports.map { |export| content_export_json(export, @current_user, session) }

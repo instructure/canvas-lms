@@ -116,8 +116,10 @@
 
 <% if @domain_root_account && @domain_root_account.self_registration? %>
   <% if @domain_root_account.self_registration_type == 'observer' %>
-    <% js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
-              :PASSWORD_POLICY => @domain_root_account.password_policy %>
+    <% js_env({
+         ACCOUNT: account_json(@domain_root_account, nil, session, ['registration_settings']),
+         PASSWORD_POLICY: @domain_root_account.password_policy
+       }) %>
     <div id='coenrollment_link' class='enrollment_link'>
       <div class="ic-Login__banner-title">
         <%= t('Parent of a Canvas User?') %>

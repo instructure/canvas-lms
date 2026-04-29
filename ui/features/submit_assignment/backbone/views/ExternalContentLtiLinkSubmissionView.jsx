@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import template from '../../jst/ExternalContentHomeworkUrlSubmissionView.handlebars'
 import ExternalContentHomeworkSubmissionView from './ExternalContentHomeworkSubmissionView'
 import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
@@ -29,27 +29,32 @@ class ExternalContentLtiLinkSubmissionView extends ExternalContentHomeworkSubmis
     this.submitHomework = this.submitHomework.bind(this)
     this.redirectSuccessfulAssignment = this.redirectSuccessfulAssignment.bind(this)
     this.shouldShowPledgeError = false
-    this.pledgeRoot = null
   }
 
   render() {
     super.render()
-    const mountPoints = document.querySelectorAll('.turnitin_pledge_container_external_homework_url')
+    const mountPoints = document.querySelectorAll(
+      '.turnitin_pledge_container_external_homework_url',
+    )
     if (mountPoints.length > 0) {
       const pledgeMount = mountPoints[mountPoints.length - 1]
       if (pledgeMount) {
-        const pledgeRoot = this.pledgeRoot ?? createRoot(pledgeMount)
         const pledgeText = pledgeMount.dataset.pledge
-        const setShouldShowPledgeError = (shouldShow) => this.shouldShowPledgeError = shouldShow
+        const setShouldShowPledgeError = shouldShow => (this.shouldShowPledgeError = shouldShow)
         const getShouldShowFileRequiredError = () => this.shouldShowPledgeError
-        pledgeRoot.render(
+        const element = (
           <SimilarityPledge
-            inputId='turnitin_pledge_external_content'
+            inputId="turnitin_pledge_external_content"
             setShouldShowPledgeError={setShouldShowPledgeError}
             getShouldShowPledgeError={getShouldShowFileRequiredError}
             pledgeText={pledgeText}
           />
         )
+        if (this.pledgeRoot) {
+          rerender(this.pledgeRoot, element)
+        } else {
+          this.pledgeRoot = render(element, pledgeMount)
+        }
       }
     }
   }

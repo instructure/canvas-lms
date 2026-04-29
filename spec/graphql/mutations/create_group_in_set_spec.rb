@@ -82,7 +82,7 @@ describe Mutations::CreateGroupInSet do
       validation_errors = result.dig(*%w[data createGroupInSet errors])
       expect(validation_errors.size).to eq 1
       expect(validation_errors[0]["attribute"]).to eq "name"
-      expect(validation_errors[0]["message"]).to_not be_nil
+      expect(validation_errors[0]["message"]).not_to be_nil
 
       expect(result.dig("data", "createGroupInSet", "group")).to be_nil
     end
@@ -90,7 +90,6 @@ describe Mutations::CreateGroupInSet do
 
   context "non_collaborative groups" do
     before do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload

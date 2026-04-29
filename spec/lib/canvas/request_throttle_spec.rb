@@ -20,12 +20,17 @@
 
 describe RequestThrottle do
   let(:site_admin_service_user) { site_admin_user }
-  let(:developer_key_sasu) { DeveloperKey.create!(account: Account.site_admin, user: site_admin_service_user) }
-  let(:base_req) { { "QUERY_STRING" => "", "PATH_INFO" => "/", "REQUEST_METHOD" => "GET" } }
+  let(:developer_key_sasu) { DeveloperKey.create!(name: "sasu", account: Account.site_admin, user: site_admin_service_user) }
+  let(:base_req) { { "QUERY_STRING" => "", "PATH_INFO" => "/", "REQUEST_METHOD" => "GET", "canvas.domain_root_account" => root_account } }
+  let(:root_account) { account_model }
   let(:request_user_1) { base_req.merge({ "REMOTE_ADDR" => "1.2.3.4", "rack.session" => { user_id: 1 } }) }
   let(:request_user_2) { base_req.merge({ "REMOTE_ADDR" => "4.3.2.1", "rack.session" => { user_id: 2 } }) }
-  let(:token1) { AccessToken.create!(user: user_factory) }
-  let(:token2) { AccessToken.create!(user: user_factory) }
+  let(:token1) do
+    AccessToken.create!(user: user_factory, purpose: "token1").tap do |token|
+      token.developer_key.update(unified_tool_id: "sample_utid")
+    end
+  end
+  let(:token2) { AccessToken.create!(user: user_factory, purpose: "token2") }
   let(:token_sasu) { AccessToken.create!(developer_key: developer_key_sasu, user: site_admin_service_user) }
   let(:request_query_token) { request_user_1.merge({ "REMOTE_ADDR" => "1.2.3.4", "QUERY_STRING" => "access_token=#{token1.full_token}" }) }
   let(:request_header_token) { request_user_2.merge({ "REMOTE_ADDR" => "4.3.2.1", "HTTP_AUTHORIZATION" => "Bearer #{token2.full_token}" }) }
@@ -52,6 +57,15 @@ describe RequestThrottle do
   # not a let so that actual and expected aren't the same object that get modified together
   def response
     [200, { "Content-Type" => "text/plain" }, ["Hello"]]
+  end
+
+  def req(hash)
+    r = ActionDispatch::Request.new(hash).tap(&:fullpath)
+    throttler.inst_access_token_authentication = AuthenticationMethods::InstAccessToken::Authentication.new(r)
+    token_string = AuthenticationMethods.access_token(r, :GET)
+    throttler.access_token = token_string ? AccessToken.authenticate(token_string, load_pseudonym_from_access_token: true) : nil
+    allow(r).to receive(:user_agent).and_return(hash["USER_AGENT"]) if hash.key?("USER_AGENT")
+    r
   end
 
   before { RequestThrottle.reload! }
@@ -111,15 +125,11 @@ describe RequestThrottle do
       end
     end
 
-    def req(hash)
-      r = ActionDispatch::Request.new(hash).tap(&:fullpath)
-      throttler.inst_access_token_authentication = AuthenticationMethods::InstAccessToken::Authentication.new(r)
-      allow(r).to receive(:user_agent).and_return(hash["USER_AGENT"]) if hash.key?("USER_AGENT")
-      r
-    end
-
     it "uses site admin service user id" do
       expect(throttler.client_identifier(req(request_sasu_query_token))).to eq "service_user_key:#{developer_key_sasu.global_id}"
+
+      # make sure we only look up the token once
+      allow(AccessToken).to receive(:authenticate).and_call_original
       expect(throttler.client_identifier(req(request_sasu_header_token))).to eq "service_user_key:#{developer_key_sasu.global_id}"
     end
 
@@ -184,6 +194,92 @@ describe RequestThrottle do
 
       result = throttler.client_identifier(request)
       expect(result).to eq "lti_advantage:10000000000007-cluster123"
+    end
+  end
+
+  describe "#client_identifiers_for_overrides" do
+    subject { throttler.client_identifiers_for_overrides(req(request_hash)) }
+
+    let(:request_hash) { request_query_token }
+
+    it "includes product identifier when unified_tool_id is present" do
+      # token1 has unified_tool_id set to "sample_utid" in the let block
+      expect(subject).to include("product:sample_utid")
+    end
+
+    it "includes client id" do
+      expect(subject).to include("client_id:#{token1.global_developer_key_id}")
+    end
+
+    context "when unified_tool_id is not present" do
+      # token2 does not have unified_tool_id set
+      let(:request_hash) { request_header_token }
+
+      it "does not use product identifier when unified_tool_id is not present" do
+        product_identifiers = subject.select { |id| id.start_with?("product:") }
+        expect(product_identifiers).to be_empty
+      end
+    end
+
+    context "when no access token present" do
+      let(:request_hash) { request_user_2 }
+
+      it "does not use product or developer key identifiers when no access token present" do
+        identifiers = subject
+        product_identifiers = identifiers.select { |id| id.start_with?("product:") }
+        developer_key_identifiers = identifiers.select { |id| id.start_with?("client_id:") }
+        expect(product_identifiers).to be_empty
+        expect(developer_key_identifiers).to be_empty
+        expect(identifiers).to eq(throttler.client_identifiers(req(request_hash)))
+      end
+    end
+  end
+
+  describe "#client_overrides" do
+    subject { throttler.client_overrides(req(request_query_token)) }
+
+    let(:updated_by) { user_model }
+    let(:product_override) { OAuthClientConfig.create!(root_account:, type: :product, identifier: "sample_utid", throttle_high_water_mark: 300, updated_by:) }
+    let(:client_id_override) { OAuthClientConfig.create!(root_account:, type: :client_id, identifier: token1.global_developer_key_id, throttle_high_water_mark: 200, updated_by:) }
+
+    before do
+      product_override
+      client_id_override
+    end
+
+    context "when enabled" do
+      before { Setting.set("request_throttle.use_custom_overrides", "true") }
+
+      it "uses the identifier with the highest priority" do
+        expect(subject).to eq product_override.as_throttle_config
+      end
+
+      context "with only lower priority override" do
+        before do
+          product_override.destroy
+        end
+
+        it "uses the lower priority override" do
+          expect(subject).to eq client_id_override.as_throttle_config
+        end
+      end
+    end
+
+    context "when disabled" do
+      it "ignores overrides" do
+        expect(subject).to eq({})
+      end
+    end
+
+    context "with deleted overrides" do
+      before do
+        product_override.destroy
+        client_id_override.destroy
+      end
+
+      it "ignores overrides" do
+        expect(subject).to eq({})
+      end
     end
   end
 
@@ -252,6 +348,35 @@ describe RequestThrottle do
       set_blocklist("user:2")
       expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
     end
+
+    describe "rate limit status codes" do
+      it "returns a 429 when request_throttle.send_429_response is enabled" do
+        Setting.set("request_throttle.send_429_response", "true")
+        set_blocklist("user:1")
+
+        result = throttler.call(request_user_1)
+        expect(result[0]).to eq 429
+        expect(result[2]).to eq ["429 Too Many Requests (Rate Limit Exceeded)\n"]
+      end
+
+      it "returns a 403 when request_throttle.send_429_response is disabled" do
+        Setting.set("request_throttle.send_429_response", "false")
+        set_blocklist("user:1")
+
+        result = throttler.call(request_user_1)
+        expect(result[0]).to eq 403
+        expect(result[2]).to eq ["403 Forbidden (Rate Limit Exceeded)\n"]
+      end
+
+      it "returns a 403 when request_throttle.send_429_response is not set" do
+        Setting.remove("request_throttle.send_429_response")
+        set_blocklist("user:1")
+
+        result = throttler.call(request_user_1)
+        expect(result[0]).to eq 403
+        expect(result[2]).to eq ["403 Forbidden (Rate Limit Exceeded)\n"]
+      end
+    end
   end
 
   describe ".list_from_setting" do
@@ -267,6 +392,8 @@ describe RequestThrottle do
   end
 
   describe "cost throttling" do
+    let(:client_overrides) { {} }
+
     describe "#calculate_cost" do
       let(:throttle) { RequestThrottle.new(nil) }
 
@@ -324,11 +451,11 @@ describe RequestThrottle do
       end
     end
 
-    def throttled_request
+    def throttled_request(client_identifier = "user:1")
       allow(RequestThrottle).to receive(:enabled?).and_return(true)
       allow(Canvas).to receive(:redis_enabled?).and_return(true)
-      bucket = double("Bucket")
-      expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
+      bucket = instance_double(RequestThrottle::LeakyBucket)
+      expect(RequestThrottle::LeakyBucket).to receive(:new).with(client_identifier, client_overrides).and_return(bucket)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
       expect(bucket).to receive(:full?).and_return(true)
       expect(bucket).to receive(:to_json) # in the logger.info line
@@ -344,12 +471,28 @@ describe RequestThrottle do
       expect(throttler.call(request_user_1)).to eq expected
     end
 
+    it "logs the access token when a request is throttled" do
+      request = req(request_query_token)
+      client_identifier = throttler.client_identifier(request)
+      bucket = throttled_request(client_identifier)
+      expect(bucket).to receive(:get_up_front_cost_for_path).and_return(1)
+      expect(bucket).to receive(:remaining).and_return(-2)
+
+      allow(RequestContext::Generator).to receive(:add_meta_header).with(any_args)
+      expect(RequestContext::Generator).to receive(:add_meta_header).with("at", token1.global_id)
+      expect(RequestContext::Generator).to receive(:add_meta_header).with("dk", token1.global_developer_key_id)
+      expect(RequestContext::Generator).to receive(:add_meta_header).with("utid", token1.developer_key.unified_tool_id)
+
+      throttler.call(request_query_token)
+    end
+
     it "does not throttle if disabled" do
       allow(RequestThrottle).to receive(:enabled?).and_return(false)
-      bucket = double("Bucket")
-      expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
+      bucket = instance_double(RequestThrottle::LeakyBucket)
+      expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1", client_overrides).and_return(bucket)
       expect(bucket).to receive(:get_up_front_cost_for_path).with(base_req["PATH_INFO"]).and_return(1)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
+      expect(bucket).to receive(:full?).and_return(false)
       expect(bucket).to receive(:remaining).and_return(1)
       # the cost is still returned anyway
       expected = response
@@ -360,8 +503,8 @@ describe RequestThrottle do
     end
 
     it "does not throttle, but update, if bucket is not full" do
-      bucket = double("Bucket")
-      expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
+      bucket = instance_double(RequestThrottle::LeakyBucket)
+      expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1", client_overrides).and_return(bucket)
       expect(bucket).to receive(:get_up_front_cost_for_path).with(base_req["PATH_INFO"]).and_return(1)
       expect(bucket).to receive(:reserve_capacity).and_yield.and_return(1)
       expect(bucket).to receive(:full?).and_return(false)
@@ -388,15 +531,40 @@ describe RequestThrottle do
       before do
         @outflow = 15.5
         Setting.set("request_throttle.outflow", @outflow.to_s)
-        @bucket = RequestThrottle::LeakyBucket.new("test", 150.0, 15.0)
+        @bucket = RequestThrottle::LeakyBucket.new("test", {}, 150.0, 15.0)
         @current_time = 20.2
         # this magic number is @bucket.count - ((@current_time - @bucket.last_touched) * @outflow)
         @expected = 69.4
       end
 
+      describe "with client_overrides" do
+        let(:config) do
+          OAuthClientConfig.new(
+            type: :user,
+            identifier: "test",
+            throttle_high_water_mark: 200,
+            throttle_maximum: 300,
+            throttle_outflow: 20,
+            throttle_upfront_cost: nil
+          )
+        end
+        let(:client_overrides) { config.as_throttle_config }
+        let(:bucket) { RequestThrottle::LeakyBucket.new("user:test", client_overrides) }
+
+        it "uses overrides from client config" do
+          expect(bucket.hwm).to eq config.throttle_high_water_mark
+          expect(bucket.maximum).to eq config.throttle_maximum
+          expect(bucket.outflow).to eq config.throttle_outflow
+        end
+
+        it "falls back to defaults if client overrides does not have setting" do
+          expect(bucket.up_front_cost).to eq 50.0
+        end
+      end
+
       describe "#full?" do
         it "compares to the hwm setting" do
-          bucket = RequestThrottle::LeakyBucket.new("test", 5.0)
+          bucket = RequestThrottle::LeakyBucket.new("test", {}, 5.0)
           Setting.set("request_throttle.hwm", "6.0")
           expect(bucket.full?).to be false
           Setting.set("request_throttle.hwm", "4.0")
@@ -404,7 +572,7 @@ describe RequestThrottle do
         end
 
         it "compares to a customized hwm setting if set" do
-          bucket = RequestThrottle::LeakyBucket.new("test", 5.0)
+          bucket = RequestThrottle::LeakyBucket.new("test", {}, 5.0)
           Setting.set("request_throttle.hwm", "4.0")
           expect(bucket.full?).to be true
           Setting.set("request_throttle.custom_settings",

@@ -20,7 +20,7 @@ import {useState, useCallback} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {DELETE_OUTCOME_LINKS} from '../../graphql/Management'
 import {useMutation} from '@apollo/client'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('OutcomeManagement')
 

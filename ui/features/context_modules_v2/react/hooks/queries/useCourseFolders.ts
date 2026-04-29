@@ -18,7 +18,7 @@
 
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Folder} from '../../utils/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useQuery} from '@tanstack/react-query'
@@ -92,6 +92,7 @@ export const useCourseFolders = (courseId: string) => {
     queryKey: ['courseFolders', courseId],
     queryFn: getFolders,
     staleTime: 5 * 60 * 1000,
+    enabled: !!courseId,
   })
 
   return {

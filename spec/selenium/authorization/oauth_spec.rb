@@ -122,7 +122,7 @@ describe "oauth2 flow" do
       redirect_uri = "http://www.example.com&scopes=/auth/userinfo"
       get "/login/oauth2/auth?response_type=code&client_id=#{expiring_key.id}&redirect_uri=#{redirect_uri}"
       f("#remember_access").click
-      f("input[type=submit]").click
+      f("input[type=submit].Button--primary").click
       f("body") # wait until the redirect page loads
 
       code = driver.current_url.match(/code=([^?&]+)/)[1]
@@ -162,7 +162,7 @@ describe "oauth2 flow" do
 
       it "does not show a data residency message" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com&scopes=url%3AGET%7C%2Fapi%2Fv1%2Faccounts"
-        expect(f("#content")).to_not include_text("Instructure hosts Canvas Commons in the region chosen by your institution")
+        expect(f("#content")).not_to include_text("Instructure hosts Canvas Commons in the region chosen by your institution")
       end
     end
   end

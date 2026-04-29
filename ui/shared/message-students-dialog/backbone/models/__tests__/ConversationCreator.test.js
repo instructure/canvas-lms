@@ -25,7 +25,7 @@ const equal = (value, expected) => expect(value).toEqual(expected)
 const strictEqual = (value, expected) => expect(value).toEqual(expected)
 
 let cc
-const mockHandler = jest.fn()
+const mockHandler = vi.fn()
 
 const server = setupServer(
   http.post('/api/v1/conversations', () => {

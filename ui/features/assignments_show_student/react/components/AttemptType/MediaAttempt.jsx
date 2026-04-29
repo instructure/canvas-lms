@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {getAutoTrack} from '@canvas/canvas-media-player'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func, string, object} from 'prop-types'
 import elideString from '../../helpers/elideString'
@@ -25,11 +24,11 @@ import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconTrashLine, IconUploadLine, IconAttachMediaSolid} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import PhotographerPandaSVG from '../../../images/PhotographerPanda.svg'
 import UploadFileSVG from '../../../images/UploadFile.svg'
 import UploadMedia from '@instructure/canvas-media'
@@ -39,11 +38,10 @@ import {
   MediaCaptureStrings,
   SelectStrings,
 } from '@canvas/upload-media-translations'
-import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {WithBreakpoints} from '@instructure/platform-with-breakpoints'
 
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {MediaPlayer} from '@instructure/ui-media-player'
 import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
@@ -56,7 +54,6 @@ export const VIDEO_SIZE_OPTIONS = {height: '400px', width: '768px'}
 class MediaAttempt extends React.Component {
   static propTypes = {
     assignment: Assignment.shape.isRequired,
-    breakpoints: breakpointsShape,
     createSubmissionDraft: func.isRequired,
     focusOnInit: bool.isRequired,
     submission: Submission.shape.isRequired,
@@ -152,37 +149,13 @@ class MediaAttempt extends React.Component {
     })
   }
 
-  renderMediaComponent = (mediaId, mediaTracks, mediaSources, autoCCTrack) => {
-    return ENV.FEATURES?.consolidated_media_player ? (
-      <CanvasStudioPlayer media_id={mediaId} explicitSize={{width: '100%', height: '100%'}} />
-    ) : (
-      <MediaPlayer
-        tracks={mediaTracks}
-        sources={mediaSources}
-        captionPosition="bottom"
-        autoShowCaption={autoCCTrack}
-      />
-    )
-  }
-
   renderMediaPlayer = (mediaObject, renderTrashIcon) => {
     if (!mediaObject) {
       return null
     }
-    const mediaSources = mediaObject.mediaSources.map(mediaSource => ({
-      ...mediaSource,
-      label: `${mediaSource.width}x${mediaSource.height}`,
-    }))
 
     const mediaId = mediaObject._id
-    const mediaTracks = mediaObject.mediaTracks.map(track => ({
-      src: `/media_objects/${mediaObject._id}/media_tracks/${track._id}`,
-      label: track.locale,
-      type: track.kind,
-      language: track.locale,
-    }))
     const shouldRenderWithIframeURL = mediaObject.mediaSources.length === 0 && this.props.iframeURL
-    const autoCCTrack = getAutoTrack(mediaObject.mediaTracks)
     const {height, width} = mediaObject.mediaSources[0] || {}
     const ratio = Math.max(height && width ? (height / width) * 100 - 15 : 40, 30)
 
@@ -210,7 +183,7 @@ class MediaAttempt extends React.Component {
               />
             </div>
           ) : (
-            this.renderMediaComponent(mediaId, mediaTracks, mediaSources, autoCCTrack)
+            <CanvasStudioPlayer media_id={mediaId} explicitSize={{width: '100%', height: '100%'}} />
           )}
         </Flex.Item>
         <Flex.Item overflowY="visible" margin="medium 0">
@@ -263,7 +236,6 @@ class MediaAttempt extends React.Component {
           uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
           liveRegion={() => document.getElementById('flash_screenreader_holder')}
           userLocale={ENV.LOCALE}
-          useStudioPlayer={ENV.FEATURES?.consolidated_media_player}
         />
         <StudentViewContext.Consumer>
           {context => (
@@ -292,8 +264,9 @@ class MediaAttempt extends React.Component {
                       <Flex.Item>
                         <Img
                           src={PhotographerPandaSVG}
-                          alt={I18n.t('panda taking photograph')}
+                          alt=""
                           height="180px"
+                          data-testid="record-media-image"
                         />
                       </Flex.Item>
                       <Flex.Item overflowY="visible">
@@ -360,8 +333,9 @@ class MediaAttempt extends React.Component {
                       <Flex.Item>
                         <Img
                           src={UploadFileSVG}
-                          alt={I18n.t('rocketship on launchpad')}
+                          alt=""
                           height="180px"
+                          data-testid="upload-media-image"
                         />
                       </Flex.Item>
                       <Flex.Item overflowY="visible">

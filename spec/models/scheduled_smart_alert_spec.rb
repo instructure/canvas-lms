@@ -32,7 +32,7 @@ describe "ScheduledSmartAlert" do
         # AssignmentOverride was due in 24 hours, is now within the offset window
         expect(runnable).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: @override.id))
         # Assignment was due in 72 hours, is not yet within the offset window
-        expect(runnable).to_not include(an_object_having_attributes(context_type: "Assignment", context_id: @a.id))
+        expect(runnable).not_to include(an_object_having_attributes(context_type: "Assignment", context_id: @a.id))
       end
     end
 

@@ -25,36 +25,81 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
     "application/x-docx"
   ].freeze
 
-  NO_SUBMISSION_MSG       = I18n.t("No essay submission found.")
-  IMAGE_UPLOAD_MSG        = I18n.t("There are images embedded in the file that can not be parsed.")
-  INVALID_FILE_MSG        = I18n.t("Only PDF and DOCX files are supported.")
-  INVALID_TYPE_MSG        = I18n.t("Submission must be a text entry type or file upload.")
-  SHORT_ESSAY_MSG         = I18n.t("Submission must be at least 5 words.")
-  MISSING_RATING_MSG      = I18n.t("Rubric is missing rating description.")
-  FILE_UPLOADS_DISABLED_MSG = I18n.t("Grading assistance is disabled for file uploads.")
+  MAX_ASSIGNMENT_DESCRIPTION_LENGTH = 13_500
+  MAX_ESSAY_LENGTH = 13_500
+  MAX_RUBRIC_CRITERION_DESCRIPTION_LENGTH = 1_000
+  MAX_RUBRIC_CATEGORY_NAME_LENGTH = 1_000
+
+  NO_SUBMISSION_MSG               = -> { I18n.t("No essay submission found.") }
+  INVALID_FILE_MSG                = -> { I18n.t("Only PDF and DOCX files are supported.") }
+  INVALID_TYPE_MSG                = -> { I18n.t("Submission must be a text entry type or file upload.") }
+  SHORT_ESSAY_MSG                 = -> { I18n.t("Submission must be at least 5 words.") }
+  FILE_UPLOADS_DISABLED_MSG       = -> { I18n.t("Grading assistance is disabled for file uploads.") }
+  GRADING_ASSISTANCE_DISABLED_MSG = -> { I18n.t("Grading assistance is not available right now.") }
+  NO_RUBRIC_MSG                   = -> { I18n.t("No rubric is attached to this assignment.") }
+  RATING_DESCRIPTION_MISSING_MSG  = -> { I18n.t("Rubric is missing rating description.") }
+  ASSIGNMENT_DESCRIPTION_TOO_LONG_MSG = -> { I18n.t("Assignment description exceeds maximum length of %{max} characters.", max: MAX_ASSIGNMENT_DESCRIPTION_LENGTH) }
+  RUBRIC_CATEGORY_NAME_TOO_LONG_MSG = -> { I18n.t("Rubric category name exceeds maximum length of %{max} characters.", max: MAX_RUBRIC_CATEGORY_NAME_LENGTH) }
+  RUBRIC_CRITERION_DESCRIPTION_TOO_LONG_MSG = -> { I18n.t("Rubric criterion description exceeds maximum length of %{max} characters.", max: MAX_RUBRIC_CRITERION_DESCRIPTION_LENGTH) }
+  ESSAY_TOO_LONG_MSG = -> { I18n.t("Submission text exceeds maximum length of %{max} characters.", max: MAX_ESSAY_LENGTH) }
+
+  def self.missing_rubric?(assignment)
+    assignment&.rubric.nil?
+  end
+
+  def self.rubric_missing_ratings?(assignment)
+    rubric = assignment&.rubric
+    return false unless rubric
+
+    rubric.data.any? do |criterion|
+      criterion[:ratings].any? do |rating|
+        effective_description = GradeService.rating_description_for(criterion, rating)
+        effective_description.blank?
+      end
+    end
+  end
+
+  def self.grading_assistance_disabled?
+    !CedarClient.enabled?
+  end
+
+  def self.assignment_description_too_long?(assignment)
+    return false if assignment&.description.blank?
+
+    assignment.description.length > MAX_ASSIGNMENT_DESCRIPTION_LENGTH
+  end
+
+  def self.rubric_category_name_too_long?(assignment)
+    rubric = assignment&.rubric
+    return false unless rubric
+
+    rubric.data.any? do |criterion|
+      criterion[:description].to_s.length > MAX_RUBRIC_CATEGORY_NAME_LENGTH
+    end
+  end
+
+  def self.rubric_criterion_description_too_long?(assignment)
+    rubric = assignment&.rubric
+    return false unless rubric
+
+    rubric.data.any? do |criterion|
+      criterion[:ratings]&.any? { |rating| rating[:long_description].to_s.length > MAX_RUBRIC_CRITERION_DESCRIPTION_LENGTH }
+    end
+  end
+
+  ASSIGNMENT_CHECKS = [
+    { level: "error", message: GRADING_ASSISTANCE_DISABLED_MSG,                 check: ->(_) { grading_assistance_disabled? } },
+    { level: "error", message: NO_RUBRIC_MSG,                                   check: ->(a) { missing_rubric?(a) } },
+    { level: "error", message: RATING_DESCRIPTION_MISSING_MSG,                  check: ->(a) { rubric_missing_ratings?(a) } },
+    { level: "error", message: ASSIGNMENT_DESCRIPTION_TOO_LONG_MSG,             check: ->(a) { assignment_description_too_long?(a) } },
+    { level: "error", message: RUBRIC_CATEGORY_NAME_TOO_LONG_MSG,               check: ->(a) { rubric_category_name_too_long?(a) } },
+    { level: "error", message: RUBRIC_CRITERION_DESCRIPTION_TOO_LONG_MSG,       check: ->(a) { rubric_criterion_description_too_long?(a) } }
+  ].freeze
 
   def self.validate_assignment(assignment:)
-    assignment_issues = []
-    rubric = assignment&.rubric_association&.rubric
-
-    unless CedarClient.enabled?
-      assignment_issues << I18n.t("Grading Assistance is not available right now.")
+    ASSIGNMENT_CHECKS.filter_map do |entry|
+      { level: entry[:level], message: entry[:message].call } if entry[:check].call(assignment)
     end
-
-    if rubric.nil?
-      assignment_issues << I18n.t("No rubric is attached to this assignment.")
-    else
-      all_present = rubric.data.all? do |data_entry|
-        data_entry[:ratings].all? do |rating|
-          rating[:long_description].present?
-        end
-      end
-      unless all_present
-        assignment_issues << I18n.t("Rubric is missing rating description.")
-      end
-    end
-
-    assignment_issues
   end
 
   def self.no_submission?(submission)
@@ -62,10 +107,6 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
       submission.attempt.to_i < 1 ||
       (submission.submission_type == "online_text_entry" && submission.body.blank?) ||
       (submission.submission_type == "online_upload" && submission.attachments.none?)
-  end
-
-  def self.contains_images?(submission)
-    submission.submission_type == "online_upload" && submission.attachment_contains_images
   end
 
   def self.invalid_file?(submission)
@@ -88,26 +129,26 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
       !Account.site_admin.feature_enabled?(:grading_assistance_file_uploads)
   end
 
-  CHECKS = {
-    NO_SUBMISSION_MSG => ->(s) { no_submission?(s) },
-    INVALID_TYPE_MSG => ->(s) { invalid_type?(s) },
-    FILE_UPLOADS_DISABLED_MSG => ->(s) { file_uploads_feature_disabled?(s) },
-    INVALID_FILE_MSG => ->(s) { invalid_file?(s) },
-    IMAGE_UPLOAD_MSG => ->(s) { contains_images?(s) },
-    SHORT_ESSAY_MSG => ->(s) { short_essay?(s) }
-  }.freeze
+  def self.essay_too_long?(submission)
+    return false if submission.blank?
 
-  def self.validate_submission(submission:)
-    CHECKS.each do |msg, check|
-      return [msg] if check.call(submission)
-    end
-    []
+    text = AutoGradeOrchestrationService.extract_essay_text(submission)
+    text.length > MAX_ESSAY_LENGTH
   end
 
-  def self.contains_rce_file_link?(html_body)
-    return false if html_body.blank?
+  SUBMISSION_CHECKS = [
+    { level: "error", message: INVALID_TYPE_MSG,           check: ->(s) { invalid_type?(s) } },
+    { level: "error", message: FILE_UPLOADS_DISABLED_MSG,  check: ->(s) { file_uploads_feature_disabled?(s) } },
+    { level: "error", message: INVALID_FILE_MSG,           check: ->(s) { invalid_file?(s) } },
+    { level: "error", message: SHORT_ESSAY_MSG,            check: ->(s) { short_essay?(s) } },
+    { level: "error", message: ESSAY_TOO_LONG_MSG,         check: ->(s) { essay_too_long?(s) } }
+  ].freeze
 
-    doc = Nokogiri::HTML.fragment(html_body)
-    doc.css("a.instructure_file_link").any? || doc.css("a[data-api-returntype=\"File\"]").any?
+  def self.validate_submission(submission:)
+    return [{ level: "error", message: NO_SUBMISSION_MSG.call }] if no_submission?(submission)
+
+    SUBMISSION_CHECKS.filter_map do |entry|
+      { level: entry[:level], message: entry[:message].call } if entry[:check].call(submission)
+    end
   end
 end

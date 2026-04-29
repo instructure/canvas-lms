@@ -335,27 +335,64 @@ class GradebookExporter
     end
   end
 
-  def sort_assignments(assignments)
-    assignment_order = @options[:assignment_order]
-    if assignment_order.present?
-      id_to_index = assignment_order.each_with_object({}).with_index { |(id, hash), index| hash[id] = index }
-      assignments.sort! do |a1, a2|
-        index1 = id_to_index[a1.id]
-        index2 = id_to_index[a2.id]
+  # Generic method to sort a collection by a provided ID order
+  # @param collection [Array] The collection to sort
+  # @param id_order [Array<Integer|String>] Array of IDs defining the desired order
+  # @param id_accessor [Symbol|Proc] Method name or proc to extract ID from items
+  # @param fallback_sort [Proc] Block defining default sort when no order provided
+  # @return [Array] Sorted collection
+  def sort_by_id_order(collection, id_order:, id_accessor:, fallback_sort:)
+    if id_order.present?
+      # Convert to integers for comparison
+      id_order_ints = id_order.map(&:to_i)
+
+      # Build hash: {id => index}
+      id_to_index = id_order_ints.each_with_object({}).with_index { |(id, hash), index| hash[id] = index }
+
+      # Sort with custom comparator
+      collection.sort! do |item1, item2|
+        # Extract IDs using provided accessor
+        id1 = id_accessor.is_a?(Proc) ? id_accessor.call(item1) : item1.public_send(id_accessor)
+        id2 = id_accessor.is_a?(Proc) ? id_accessor.call(item2) : item2.public_send(id_accessor)
+
+        index1 = id_to_index[id1]
+        index2 = id_to_index[id2]
 
         if index1 == index2
-          a1.id <=> a2.id
+          # Tie-breaker: use ID for stability
+          id1 <=> id2
         elsif !index1 || !index2
+          # Items in order come first
           index1 ? -1 : 1
         else
+          # Compare by index position
           index1 <=> index2
         end
       end
     else
-      assignments.sort_by! do |a|
-        [a.assignment_group.position, a.position || 0, a.due_at || CanvasSort::Last, a.title]
-      end
+      # Use fallback sort when no custom order provided
+      collection.sort_by!(&fallback_sort)
     end
+
+    collection
+  end
+
+  def sort_assignments(assignments)
+    sort_by_id_order(
+      assignments,
+      id_order: @options[:assignment_order],
+      id_accessor: :id,
+      fallback_sort: ->(a) { [a.assignment_group.position, a.position || 0, a.due_at || CanvasSort::Last, a.title] }
+    )
+  end
+
+  def sort_enrollments(enrollments)
+    sort_by_id_order(
+      enrollments,
+      id_order: @options[:student_order],
+      id_accessor: :user_id,
+      fallback_sort: ->(e) { [e.user.sortable_name.downcase, e.user_id] }
+    )
   end
 
   def show_integration_id?
@@ -369,9 +406,19 @@ class GradebookExporter
     # user > pseudonyms > account: used in SisPseudonym > works_for_account
     includes = { user: { pseudonyms: :account }, course_section: [], scores: [] }
 
-    enrollments = scope.preload(includes).eager_load(:user).order_by_sortable_name.to_a
+    # Load enrollments WITHOUT sorting (remove order_by_sortable_name)
+    enrollments = scope.preload(includes).eager_load(:user).to_a
     enrollments.each { |e| e.course = @course }
-    enrollments.partition { |e| e.type != "StudentViewEnrollment" }.flatten
+
+    # Partition first (real students, then test students)
+    real_students, test_students = enrollments.partition { |e| e.type != "StudentViewEnrollment" }
+
+    # Sort each group separately
+    real_students = sort_enrollments(real_students)
+    test_students = sort_enrollments(test_students)
+
+    # Return combined array
+    real_students + test_students
   end
 
   def format_numbers(number)

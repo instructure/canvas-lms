@@ -22,6 +22,8 @@ module Api::V1::Section
   include Api::V1::Json
   include Api::V1::PostGradesStatus
 
+  STUDENTS_LIMIT = 1000
+
   def section_json(section, user, session, includes, options = {})
     res = section.as_json(include_root: false,
                           only: %w[id name course_id nonxlist_course_id start_at end_at restrict_enrollments_to_section_dates created_at])
@@ -35,7 +37,7 @@ module Api::V1::Section
       proxy = section.enrollments.preload(:root_account, :sis_pseudonym, user: :pseudonyms)
       include_enrollments = includes.include?("enrollments")
       res["students"] = []
-      proxy.where(type: "StudentEnrollment").find_each do |e|
+      proxy.where(type: "StudentEnrollment").limit(STUDENTS_LIMIT).find_each do |e|
         enrollments = include_enrollments ? [e] : nil
         res["students"] << user_json(e.user, user, session, includes, @context, enrollments, [], e)
       end
@@ -48,7 +50,11 @@ module Api::V1::Section
     end
 
     if includes.include?("user_count")
-      res["user_count"] = GuardRail.activate(:secondary) { section.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
+      res["user_count"] = if options[:section_user_counts]
+                            options[:section_user_counts][section.id] || 0
+                          else
+                            GuardRail.activate(:secondary) { section.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
+                          end
     end
 
     if includes.include?("permissions")

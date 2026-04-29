@@ -25,7 +25,7 @@ import formatMessage from '../../../format-message'
 const uploadMediaTranslations = {
   UploadMediaStrings: {
     ADD_CLOSED_CAPTIONS_OR_SUBTITLES: formatMessage('Add CC/Subtitles'),
-    CLEAR_FILE_TEXT: formatMessage('Clear selected file'),
+    CLEAR_FILE_TEXT: formatMessage('Remove'),
     CLOSE_TEXT: formatMessage('Close'),
     CLOSED_CAPTIONS_CHOOSE_FILE: formatMessage('Choose caption file'),
     CLOSED_CAPTIONS_SELECT_LANGUAGE: formatMessage('Select Language'),
@@ -46,7 +46,7 @@ const uploadMediaTranslations = {
     SUPPORTED_FILE_TYPES: formatMessage('Supported file types: SRT or WebVTT'),
     NO_FILE_CHOSEN: formatMessage('No file chosen'),
     REMOVE_FILE: 'Remove {lang} closed captions',
-    ADD_NEW_CAPTION_OR_SUBTITLE: formatMessage('Add another'),
+    ADD_NEW_CAPTION_OR_SUBTITLE: formatMessage('Add another closed caption or subtitle'),
     ADDED_CAPTION: 'Captions for {lang} added',
     DELETED_CAPTION: 'Deleted captions for {lang}',
     PROGRESS_LABEL: formatMessage('Uploading'),

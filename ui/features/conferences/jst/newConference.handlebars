@@ -73,20 +73,6 @@
 
           {{#if permissions.update}}
           <li role="presentation">
-            <a class="icon-reset sync_conference_link" id="{{id}}-content-2" role="menuitem" title="{{#t " sync"}}Sync
-              Attendees{{/t}}">{{#t "sync"}}Sync Attendees{{/t}}</a>
-            <form action="{{url}}" id="sync_attendees_{{id}}" style="margin:0;padding:0;display:inline" method="POST">
-              <input type="hidden" name="_method" value="PUT">
-              <input type="hidden" id="web_conference_sync_attendees" name="web_conference[sync_attendees]"
-                value="1">
-              <input type="hidden" id="web_conference_title" name="web_conference[title]" value="{{title}}">
-              <div style="margin:0;padding:0;display:inline">
-                <input name="authenticity_token" type="hidden" value="{{auth_token}}">
-              </div>
-            </form>
-          </li>
-
-          <li role="presentation">
             <a href="#conference_{{ id }}" class="icon-edit edit_conference_link" id="{{id}}-content-3" role="menuitem"
               title="{{#t " edit"}}Edit{{/t}}">{{#t "edit"}}Edit{{/t}}</a>
           </li>

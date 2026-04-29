@@ -17,20 +17,400 @@
  */
 
 import '@testing-library/jest-dom'
-import {vi} from 'vitest'
+import {cleanup} from '@testing-library/react'
+import {vi, afterEach, beforeEach} from 'vitest'
+import $ from 'jquery'
+import axios from 'axios'
+
+// In CI there is no dev server. Axios XHR requests to Canvas API endpoints fail
+// immediately with ECONNREFUSED, causing optimistic Redux store updates to revert
+// before waitFor can check them. jsdom logs the ECONNREFUSED error via console.error
+// (at xhr-utils.js:63) BEFORE the XHR error event fires and axios processes it.
+// We intercept console.error to count pending ECONNREFUSED errors, then absorb the
+// matching ERR_NETWORK from axios. MSW's HttpResponse.error() never goes through the
+// jsdom TCP layer so it does NOT trigger console.error — those errors propagate normally.
+let pendingEconnrefusedCount = 0
+const _originalConsoleError = console.error.bind(console)
+console.error = (...args: unknown[]) => {
+  const first = args[0]
+  const msg = first instanceof Error ? first.message : String(first ?? '')
+  if (msg.includes('ECONNREFUSED')) {
+    pendingEconnrefusedCount++
+  }
+  _originalConsoleError(...args)
+}
+
+axios.interceptors.response.use(
+  response => response,
+  (error: {code?: string}) => {
+    if (error?.code === 'ERR_NETWORK' && pendingEconnrefusedCount > 0) {
+      pendingEconnrefusedCount--
+      return new Promise(() => {})
+    }
+    return Promise.reject(error)
+  },
+)
+
+// Track all timers created during tests so we can clean them up
+// This prevents memory leaks from InstUI transitions and other timer-based code
+const pendingTimeouts = new Set<ReturnType<typeof setTimeout>>()
+const pendingIntervals = new Set<ReturnType<typeof setInterval>>()
+
+// Track all MutationObservers so we can disconnect them in afterEach.
+// InstUI v11 ScreenReaderFocusRegion uses a MutationObserver that fires
+// asynchronously. If it fires after jsdom tears down the environment, it
+// throws "ReferenceError: Element is not defined" because the observer
+// callback checks `elem instanceof Element`. Disconnecting all observers
+// before the environment tears down prevents this.
+const activeMutationObservers = new Set<MutationObserver>()
+const OriginalMutationObserver = globalThis.MutationObserver
+class TrackedMutationObserver extends OriginalMutationObserver {
+  constructor(callback: MutationCallback) {
+    super(callback)
+    activeMutationObservers.add(this)
+  }
+
+  disconnect() {
+    activeMutationObservers.delete(this)
+    super.disconnect()
+  }
+}
+globalThis.MutationObserver = TrackedMutationObserver as unknown as typeof MutationObserver
+
+const originalSetTimeout = globalThis.setTimeout
+const originalSetInterval = globalThis.setInterval
+const originalClearTimeout = globalThis.clearTimeout
+const originalClearInterval = globalThis.clearInterval
+// setImmediate is a Node.js global used by React's scheduler. We wrap it
+// here so that scheduler callbacks that fire after jsdom environment
+// teardown are dropped instead of crashing with "ReferenceError: window is not defined".
+const originalSetImmediate = typeof setImmediate !== 'undefined' ? setImmediate : undefined
+const originalClearImmediate = typeof clearImmediate !== 'undefined' ? clearImmediate : undefined
+const pendingImmediates = new Set<NodeJS.Immediate>()
+
+// Wrap setTimeout to track pending timers.
+// The document guard prevents InstUI BaseTransition callbacks from throwing
+// "ReferenceError: document is not defined" when a timer fires after the
+// jsdom environment has been torn down at the end of the test run.
+globalThis.setTimeout = ((
+  callback: (...args: unknown[]) => void,
+  ms?: number,
+  ...args: unknown[]
+) => {
+  const id = originalSetTimeout(() => {
+    pendingTimeouts.delete(id)
+
+    if (typeof (globalThis as any).document === 'undefined') return
+    callback(...args)
+  }, ms)
+  pendingTimeouts.add(id)
+  return id
+}) as typeof setTimeout
+
+// Wrap setImmediate to guard against React scheduler callbacks firing after
+// jsdom tears down the environment. React's scheduler (scheduler.development.js)
+// captures setImmediate at module-load time and uses it to schedule concurrent
+// work. If that work fires after jsdom removes window/document from scope,
+// react-dom throws "ReferenceError: window is not defined" in getActiveElementDeep.
+if (originalSetImmediate) {
+  globalThis.setImmediate = ((callback: (...args: unknown[]) => void, ...args: unknown[]) => {
+    const id: NodeJS.Immediate = originalSetImmediate(() => {
+      pendingImmediates.delete(id)
+      if (typeof document === 'undefined') return
+      callback(...args)
+    })
+    pendingImmediates.add(id)
+    return id
+  }) as typeof setImmediate
+}
+
+// Wrap setInterval to track pending intervals
+globalThis.setInterval = ((
+  callback: (...args: unknown[]) => void,
+  ms?: number,
+  ...args: unknown[]
+) => {
+  const id = originalSetInterval(callback, ms, ...args)
+  pendingIntervals.add(id)
+  return id
+}) as typeof setInterval
+
+// Wrap clearTimeout to remove from tracking
+globalThis.clearTimeout = ((id?: ReturnType<typeof setTimeout>) => {
+  if (id !== undefined) {
+    pendingTimeouts.delete(id)
+    originalClearTimeout(id)
+  }
+}) as typeof clearTimeout
+
+// Wrap clearInterval to remove from tracking
+globalThis.clearInterval = ((id?: ReturnType<typeof setInterval>) => {
+  if (id !== undefined) {
+    pendingIntervals.delete(id)
+    originalClearInterval(id)
+  }
+}) as typeof clearInterval
+
+// Wrap clearImmediate to remove from tracking
+if (originalClearImmediate) {
+  globalThis.clearImmediate = (id?: NodeJS.Immediate) => {
+    if (id !== undefined) {
+      pendingImmediates.delete(id!)
+      originalClearImmediate(id)
+    }
+  }
+}
+
+// Reset ECONNREFUSED counter before each test to prevent test interference
+beforeEach(() => {
+  pendingEconnrefusedCount = 0
+})
+
+// Global cleanup after each test to prevent memory leaks and timer issues
+// This is especially important for InstUI components that use transitions with setTimeout
+afterEach(() => {
+  // Clean up any rendered React components that weren't explicitly unmounted.
+  // This must run BEFORE clearing timers because cleanup() can trigger InstUI
+  // Transition animations that create new timers via setTimeout.
+  cleanup()
+
+  // Clear all pending timers from InstUI transitions, animations, etc.
+  // These can cause "document is not defined" errors when they fire after jsdom teardown
+  for (const id of pendingTimeouts) {
+    originalClearTimeout(id)
+  }
+  pendingTimeouts.clear()
+
+  for (const id of pendingIntervals) {
+    originalClearInterval(id)
+  }
+  pendingIntervals.clear()
+
+  // Clear pending setImmediate callbacks — React's scheduler uses setImmediate
+  // in Node/jsdom and any uncleared callbacks can fire after environment teardown
+  if (originalClearImmediate) {
+    for (const id of pendingImmediates) {
+      originalClearImmediate(id)
+    }
+    pendingImmediates.clear()
+  }
+
+  // Disconnect all MutationObservers to prevent InstUI ScreenReaderFocusRegion
+  // callbacks from firing after jsdom tears down the environment globals.
+  for (const observer of activeMutationObservers) {
+    observer.disconnect()
+  }
+  activeMutationObservers.clear()
+})
+
+// jQuery plugins (toJSON, dialog, droppable, etc.) are added via the jquery-with-plugins.ts wrapper
+// which is aliased in vitest.config.ts. All imports of 'jquery' get the pre-configured instance.
+
+// Mock brandable CSS globally to prevent stylesheet loading errors
+// This prevents errors when handlebars templates try to load stylesheets during import
+vi.mock('@canvas/brandable-css', () => ({
+  __esModule: true,
+  default: {
+    loadStylesheetForJST: vi.fn(),
+    loadStylesheet: vi.fn(),
+    getCssVariant: vi.fn(() => 'new_styles_normal_contrast'),
+    getHandlebarsIndex: vi.fn(() => [[], {}]),
+    urlFor: vi.fn(() => ''),
+  },
+}))
+
+// Mock grading-scheme module to prevent resolution errors
+vi.mock('@canvas/grading-scheme', () => ({
+  __esModule: true,
+  GradingSchemesSelector: () => null,
+  GradingSchemesManagement: () => null,
+  UsedLocationsModal: () => null,
+}))
+
+// Mock fcUtil to avoid fullCalendar dependency issues in tests
+// fullCalendar doesn't properly attach to jQuery in Vitest environment
+vi.mock('@canvas/calendar/jquery/fcUtil', async () => {
+  const moment = await import('moment')
+  const tz = await import('@instructure/moment-utils')
+
+  return {
+    default: {
+      wrap(date: Date | string | null | undefined) {
+        if (!date) return null
+        try {
+          // fudgeDateForProfileTimezone may not be available, so just use moment directly
+          return moment.default(date)
+        } catch (e) {
+          console.error('Error in fcUtil.wrap:', e)
+          return moment.default(date)
+        }
+      },
+      unwrap(date: any) {
+        if (!date) return null
+        if (date.hasZone && date.hasZone()) {
+          return date.toDate()
+        } else {
+          return tz.parse(date.format())
+        }
+      },
+      now() {
+        return moment.default()
+      },
+      clone(momentObj: any) {
+        return moment.default(momentObj)
+      },
+      addMinuteDelta(momentObj: any, minuteDelta: number) {
+        const dayDelta = (minuteDelta / 1440) | 0
+        minuteDelta %= 1440
+        const result = moment.default(momentObj)
+        result.add(dayDelta, 'days')
+        result.add(minuteDelta, 'minutes')
+        return result
+      },
+    },
+  }
+})
+
+// Make jQuery available globally BEFORE importing plugins
+// This is needed for jqueryui plugins to attach to the correct jQuery instance
+vi.stubGlobal('$', $)
+vi.stubGlobal('jQuery', $)
+
+// Make moment available globally for fullCalendar
+import moment from 'moment'
+vi.stubGlobal('moment', moment)
+
+// Import jqueryui modules in dependency order
+// 1. core.js defines $.ui namespace and $.ui.plugin (used by draggable/resizable)
+// 2. widget.js defines $.widget() factory used by all other jqueryui modules
+// 3. mouse.js defines $.ui.mouse (base for draggable, sortable, etc.)
+// 4. Then the rest can be loaded
+import 'jqueryui/core'
+import 'jqueryui/widget'
+import 'jqueryui/mouse'
+import 'jqueryui/position'
+import 'jqueryui/draggable'
+import 'jqueryui/droppable'
+import 'jqueryui/resizable'
+import 'jqueryui/button'
+import 'jqueryui/dialog'
+import 'jqueryui/tabs'
+import 'jqueryui/sortable'
+import 'jqueryui/menu'
+import 'jqueryui/autocomplete'
+import 'jqueryui/tooltip'
+import 'jqueryui/datepicker'
+import 'jqueryui/progressbar'
+
+// jQuery UI plugins are now stubbed in the vi.mock('jquery') factory above
+// This ensures ALL imports of jquery get the same instance with plugins attached
+
+// Import Canvas jQuery plugins - these extend $.fn with custom methods
+import '@canvas/serialize-form'
+
+// Import Canvas jQuery plugins that extend $ with custom methods
+// These are normally loaded via webpack entry points in Jest
+import '@canvas/rails-flash-notifications/jquery'
+
+// Import initialization from jest-setup.js that's framework-agnostic
+import {loadDevMessages, loadErrorMessages} from '@apollo/client/dev'
+import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
+import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'
+import {registerTranslations} from '@canvas/i18n'
+import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
+import filterUselessConsoleMessages from '@instructure/filter-console-messages'
+import CoreTranslations from '../public/javascripts/translations/en.json'
+import {up as installNodeDecorations} from './boot/initializers/installNodeDecorations'
+
+// Load Apollo Client dev messages for better error reporting
+loadDevMessages()
+loadErrorMessages()
+
+// Make vi available as jest for compatibility with existing tests
+vi.stubGlobal('jest', vi)
+
+// Add Jest-style skip functions for Vitest compatibility
+vi.stubGlobal('xit', vi.fn())
+vi.stubGlobal('xdescribe', vi.fn())
+vi.stubGlobal('xtest', vi.fn())
+
+// Make mocked() available globally for safe mock casting
+// This is equivalent to jest.mocked() / vi.mocked() but works in both runners
+// Usage: mocked(myFunction).mockReturnValue('value')
+// Instead of: (myFunction as jest.Mock).mockReturnValue('value')
+import {mocked} from '@canvas/test-utils/mocked'
+vi.stubGlobal('mocked', mocked)
+
+// Register translations like jest-setup does
+registerTranslations('en', CoreTranslations)
+
+// Configure RCE format-message
+rceFormatMessage.setup({
+  locale: 'en',
+  missingTranslation: 'ignore',
+})
+
+// Filter console noise to match Jest behavior
+// This helps focus on real errors rather than expected React warnings
+const ignoredErrors = [
+  /An update to %s inside a test was not wrapped in act/,
+  /Can't perform a React state update on an unmounted component/,
+  /Function components cannot be given refs/,
+  /The above error occurred in the <.*> component/,
+  /You seem to have overlapping act\(\) calls/,
+  /Warning: `ReactDOMTestUtils.act` is deprecated/,
+  /Warning: unmountComponentAtNode is deprecated/,
+  /Warning: findDOMNode is deprecated/,
+  /Warning: ReactDOM.render is no longer supported in React 18/,
+  /Warning: ReactDOMTestUtils is deprecated/,
+  /Warning: %s: Support for defaultProps will be removed/,
+  /`ref` is not a prop\. Trying to access it will result in `undefined` being returned/,
+]
+const ignoredWarnings = [
+  /JQMIGRATE:/,
+  /componentWillReceiveProps/,
+  /Found @client directives in a query but no ApolloClient resolvers/,
+  /No more mocked responses for the query/,
+  /Consumer uses the legacy contextTypes API/,
+  /Warning: ReactDOM.render is no longer supported in React 18/,
+  /`ref` is not a prop\. Trying to access it will result in `undefined` being returned/,
+]
+const ignoredLogs = [/JQMIGRATE:/]
+const originalError = console.error
+const originalWarn = console.warn
+const originalLog = console.log
+console.error = (msg: unknown, ...args: unknown[]) => {
+  const msgStr = String(msg)
+  if (ignoredErrors.some(regex => regex.test(msgStr))) return
+  if (args.some(arg => ignoredErrors.some(regex => regex.test(String(arg))))) return
+  originalError(msg, ...args)
+}
+console.warn = (msg: unknown, ...args: unknown[]) => {
+  if (ignoredWarnings.some(regex => regex.test(String(msg)))) return
+  originalWarn(msg, ...args)
+}
+console.log = (msg: unknown, ...args: unknown[]) => {
+  if (ignoredLogs.some(regex => regex.test(String(msg)))) return
+  originalLog(msg, ...args)
+}
+filterUselessConsoleMessages(console)
 
 vi.stubGlobal('ENV', {
-  FEATURES: {},
+  use_rce_enhancements: true,
+  FEATURES: {
+    extended_submission_state: true,
+  },
 })
 
 vi.stubGlobal(
   'IntersectionObserver',
   class IntersectionObserver {
     observe() {}
-
     unobserve() {}
-
     disconnect() {}
+    takeRecords() {
+      return []
+    }
   },
 )
 
@@ -38,9 +418,7 @@ vi.stubGlobal(
   'ResizeObserver',
   class ResizeObserver {
     observe() {}
-
     unobserve() {}
-
     disconnect() {}
   },
 )
@@ -55,8 +433,159 @@ vi.stubGlobal('matchMedia', () => ({
   media: '',
 }))
 
-vi.stubGlobal('jest', vi)
+vi.stubGlobal(
+  'BroadcastChannel',
+  vi.fn().mockImplementation(() => ({
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    postMessage: vi.fn(),
+    close: vi.fn(),
+  })),
+)
 
+// Mock performance API - needed for wasPageReloaded.ts
+if (!globalThis.performance?.getEntriesByType) {
+  vi.stubGlobal('performance', {
+    ...globalThis.performance,
+    getEntriesByType: vi.fn(() => [{type: 'navigate'}]),
+  })
+}
+
+// because InstUI themeable components need an explicit "dir" attribute on the <html> element
+document.documentElement.setAttribute('dir', 'ltr')
+
+// Initialize datetime configuration
+configureDateTime()
+configureDateTimeMomentParser()
+installNodeDecorations()
+
+// Window/document polyfills matching jest-setup.js
+window.scroll = () => {}
+window.scrollTo = () => {}
+
+if (!window.alert) {
+  window.alert = () => {}
+}
+
+if (!window.HTMLElement.prototype.scrollIntoView) {
+  window.HTMLElement.prototype.scrollIntoView = () => {}
+}
+
+// Fullscreen API mock - needed for media player tests
+// jsdom doesn't implement the Fullscreen API
+if (!document.fullscreenEnabled) {
+  Object.defineProperty(document, 'fullscreenEnabled', {
+    value: true,
+    writable: true,
+    configurable: true,
+  })
+}
+if (!document.fullscreenElement) {
+  Object.defineProperty(document, 'fullscreenElement', {
+    value: null,
+    writable: true,
+    configurable: true,
+  })
+}
+if (!document.exitFullscreen) {
+  document.exitFullscreen = vi.fn().mockResolvedValue(undefined)
+}
+if (!HTMLElement.prototype.requestFullscreen) {
+  HTMLElement.prototype.requestFullscreen = vi.fn().mockResolvedValue(undefined)
+}
+// Safari-specific fullscreen API
+if (!(document as any).webkitFullscreenEnabled) {
+  Object.defineProperty(document, 'webkitFullscreenEnabled', {
+    value: true,
+    writable: true,
+    configurable: true,
+  })
+}
+if (!(HTMLVideoElement.prototype as any).webkitEnterFullscreen) {
+  ;(HTMLVideoElement.prototype as any).webkitEnterFullscreen = vi.fn()
+}
+if (!(HTMLVideoElement.prototype as any).webkitExitFullscreen) {
+  ;(HTMLVideoElement.prototype as any).webkitExitFullscreen = vi.fn()
+}
+
+if (!window.structuredClone) {
+  ;(window as unknown as Record<string, unknown>).structuredClone = (obj: unknown) =>
+    JSON.parse(JSON.stringify(obj))
+}
+
+if (typeof window.URL.createObjectURL === 'undefined') {
+  // Return blob: URLs to match real behavior expected by tests (e.g., FileUpload.test.jsx)
+  let blobCounter = 0
+  Object.defineProperty(window.URL, 'createObjectURL', {
+    value: () => `blob:http://localhost/test-blob-${blobCounter++}`,
+  })
+}
+
+if (typeof window.URL.revokeObjectURL === 'undefined') {
+  Object.defineProperty(window.URL, 'revokeObjectURL', {value: () => undefined})
+}
+
+if (!Document.prototype.createRange) {
+  Document.prototype.createRange = () =>
+    ({
+      setEnd() {},
+      setStart() {},
+      getBoundingClientRect() {
+        return {right: 0}
+      },
+      getClientRects() {
+        return {length: 0, left: 0, right: 0}
+      },
+    }) as unknown as Range
+}
+
+if (!Range.prototype.getBoundingClientRect) {
+  Range.prototype.getBoundingClientRect = () => ({
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  })
+  Range.prototype.getClientRects = () =>
+    ({
+      item: () => null,
+      length: 0,
+      [Symbol.iterator]: vi.fn(),
+    }) as unknown as DOMRectList
+}
+
+// Load InstUI themes
+import '@instructure/ui-themes'
+
+// Worker mock
+if (!('Worker' in window)) {
+  Object.defineProperty(window, 'Worker', {
+    value: class Worker {
+      postMessage() {}
+      terminate() {}
+      addEventListener() {}
+      removeEventListener() {}
+      dispatchEvent() {
+        return true
+      }
+    },
+  })
+}
+
+// Fetch mock fallback
+if (!globalThis.fetch) {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockImplementation(() => Promise.resolve({json: () => ({})})),
+  )
+}
+
+// Canvas context mock
 HTMLCanvasElement.prototype.getContext = vi.fn().mockImplementation(() => ({
   fillRect: vi.fn(),
   clearRect: vi.fn(),

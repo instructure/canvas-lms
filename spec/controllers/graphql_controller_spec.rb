@@ -67,6 +67,30 @@ describe GraphQLController do
       expect(response.parsed_body["data"]).not_to be_blank
     end
 
+    describe "#graphql_operation_name" do
+      it "returns the operationName param" do
+        post :execute,
+             params: { query: '{ course(id: "1") { id } }', operationName: "GetCourse" },
+             format: :json
+        expect(controller.graphql_operation_name).to eq("GetCourse")
+      end
+
+      it "returns nil when no operationName is provided" do
+        post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
+        expect(controller.graphql_operation_name).to be_nil
+      end
+
+      it "is used by the marginalia operation_name tagging" do
+        tagging = ActiveRecord::QueryLogs.taggings[:operation_name]
+        skip "marginalia not configured" unless tagging
+
+        post :execute,
+             params: { query: '{ course(id: "1") { id } }', operationName: "MyOperation" },
+             format: :json
+        expect(tagging.call({ controller: })).to eq("MyOperation")
+      end
+    end
+
     context "CreateSubmission" do
       before do
         Setting.set("enable_page_views", "db")
@@ -342,7 +366,7 @@ describe GraphQLController do
 
       context "on invalid context objects" do
         before do
-          allow(subject).to receive(:subject) { double("dummy subject", pick: ["User", 1]) }
+          allow(subject).to receive(:subject) { instance_double(ActiveRecord::Relation, pick: ["User", 1]) }
         end
 
         it "raises an exception" do
@@ -370,17 +394,6 @@ describe GraphQLController do
         3,
         tags: { operation_name: "MyQuery" }
       )
-    end
-  end
-
-  context "with feature flag disable_graphql_authentication enabled" do
-    context "graphql, without a session" do
-      it "works" do
-        Account.site_admin.enable_feature!(:disable_graphql_authentication)
-        post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
-        expect(response.parsed_body["errors"]).to be_blank
-        expect(response.parsed_body["data"]).not_to be_blank
-      end
     end
   end
 

@@ -28,10 +28,10 @@ describe('BackoffPoller', () => {
   beforeEach(() => {
     ran_callback = false
     callback = () => (ran_callback = true)
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     // Mock jQuery.ajaxJSON
-    jest.spyOn(jQuery, 'ajaxJSON').mockImplementation((url, method, data, success, error) => {
+    vi.spyOn(jQuery, 'ajaxJSON').mockImplementation((url, method, data, success, error) => {
       // Simulate async behavior
       setTimeout(() => {
         success({status: 'ok'})
@@ -41,9 +41,9 @@ describe('BackoffPoller', () => {
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
-    jest.clearAllTimers()
-    jest.useRealTimers()
+    vi.restoreAllMocks()
+    vi.clearAllTimers()
+    vi.useRealTimers()
   })
 
   test('should keep polling when it gets a "continue"', function () {
@@ -55,8 +55,8 @@ describe('BackoffPoller', () => {
     poller.start().then(callback)
 
     // let the first interval expire and process the ajax call
-    jest.advanceTimersByTime(10)
-    jest.runOnlyPendingTimers()
+    vi.advanceTimersByTime(10)
+    vi.runOnlyPendingTimers()
     expect(!!poller.running).toBeTruthy() // 'poller should be running'
     poller.stop(false)
   })
@@ -70,8 +70,8 @@ describe('BackoffPoller', () => {
     poller.start().then(callback)
 
     // let the first interval expire and process the ajax call
-    jest.advanceTimersByTime(10)
-    jest.runOnlyPendingTimers()
+    vi.advanceTimersByTime(10)
+    vi.runOnlyPendingTimers()
     expect(!!poller.running).toBeTruthy() // 'poller should be running'
     ok(poller.attempts <= 1, 'counter should be reset') // either zero or one, depending on whether we're waiting for a timeout or an ajax call
     poller.stop(false)
@@ -91,13 +91,13 @@ describe('BackoffPoller', () => {
 
     // let the four 'continue' intervals expire
     for (let i = 0; i < 4; i++) {
-      jest.advanceTimersByTime(10)
-      jest.runOnlyPendingTimers()
+      vi.advanceTimersByTime(10)
+      vi.runOnlyPendingTimers()
     }
     expect(!!poller.running).toBeTruthy() // 'poller should be running'
 
-    jest.advanceTimersByTime(10)
-    jest.runOnlyPendingTimers()
+    vi.advanceTimersByTime(10)
+    vi.runOnlyPendingTimers()
     expect(!poller.running).toBeTruthy() // 'poller should be stopped'
     ok(ran_callback, 'poller should have run callbacks')
   })
@@ -112,14 +112,14 @@ describe('BackoffPoller', () => {
 
     // let the first two intervals expire
     for (let i = 0; i < 2; i++) {
-      jest.advanceTimersByTime(10)
-      jest.runOnlyPendingTimers()
+      vi.advanceTimersByTime(10)
+      vi.runOnlyPendingTimers()
     }
     expect(!!poller.running).toBeTruthy() // 'poller should be running'
 
     // let the final interval expire
-    jest.advanceTimersByTime(10)
-    jest.runOnlyPendingTimers()
+    vi.advanceTimersByTime(10)
+    vi.runOnlyPendingTimers()
     expect(!poller.running).toBeTruthy() // 'poller should be stopped'
     ok(!ran_callback, 'poller should not have run callbacks')
   })
@@ -129,8 +129,8 @@ describe('BackoffPoller', () => {
     poller.start().then(callback)
 
     // let the interval expire
-    jest.advanceTimersByTime(10)
-    jest.runOnlyPendingTimers()
+    vi.advanceTimersByTime(10)
+    vi.runOnlyPendingTimers()
     expect(!poller.running).toBeTruthy() // 'poller should be stopped'
     ok(!ran_callback, 'poller should not have run callbacks')
   })

@@ -34,6 +34,26 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq [@announcement]
   end
 
+  describe "#clear_cache" do
+    subject { announcement.clear_cache }
+
+    let(:announcement) { @announcement }
+
+    it "clears the cache for the root account" do
+      enable_cache do
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to be_nil
+        AccountNotification.for_account(@account, include_all: true)
+        AccountNotification.for_account(@account, include_all: false)
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now, include_all: true))).not_to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now, include_all: false))).not_to be_nil
+
+        subject
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now, include_all: true))).to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now, include_all: false))).to be_nil
+      end
+    end
+  end
+
   context "for announcement access" do
     before do
       @announcement.destroy
@@ -50,7 +70,7 @@ describe AccountNotification do
       @teacher = @user
       account_admin_user(account: @account)
       @admin = @user
-      course_with_student(course: @course).accept(true)
+      course_with_student(course: @course).accept(force: true)
       @student = @user
     end
 
@@ -93,9 +113,9 @@ describe AccountNotification do
         [@unenrolled, @a3, true]
       ].each do |user, announcement, expected|
         if expected
-          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc, nil)).to be true
+          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc)).to be true
         else
-          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc, nil)).to be false
+          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc)).to be false
         end
       end
     end
@@ -153,7 +173,7 @@ describe AccountNotification do
     @teacher = @user
     account_admin_user(account: @account)
     @admin = @user
-    course_with_student(course: @course).accept(true)
+    course_with_student(course: @course).accept(force: true)
     @student = @user
 
     expect(AccountNotification.for_user_and_account(@teacher, @account)).to eq [@a3, @a1]
@@ -183,8 +203,8 @@ describe AccountNotification do
 
         expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
 
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to_not be_nil
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to_not be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).not_to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).not_to be_nil
 
         # no more calls to `where`; this _must_ be returned from cache
         expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
@@ -224,7 +244,7 @@ describe AccountNotification do
       enrollment.complete!
       students_notifications = AccountNotification.for_user_and_account(@student, Account.default)
       expect(students_notifications).to include(@announcement)
-      expect(students_notifications).to_not include(sub_account_announcement)
+      expect(students_notifications).not_to include(sub_account_announcement)
     end
 
     it "finds announcements from parent accounts to sub-accounts where user is enrolled" do
@@ -289,16 +309,66 @@ describe AccountNotification do
       end
     end
 
+    context "with account notification for the default account" do
+      subject {  ->(local_args, local_kwargs) { AccountNotification.for_account(*local_args, **local_kwargs) } }
+
+      let(:args) do
+        [
+          Account.default,
+        ]
+      end
+      let(:kwargs) do
+        {
+          include_all: true
+        }
+      end
+
+      let(:root_account) { Account.default }
+      let(:account_notification_args) do
+        {
+          subject: "sub account notification",
+          account: root_account,
+          start_at: 30.days.ago,
+          end_at: 29.days.ago
+        }
+      end
+      let!(:account_notification) { sub_account_notification(account_notification_args) }
+
+      context "when the first request ran with include all = 'false'" do
+        it "respects include_all when creating the account level cache" do
+          enable_cache do
+            second_request_result = subject.call(args, kwargs.merge(include_all: false))
+            expect(second_request_result.count).to eq 1
+
+            first_request_result = subject.call(args, kwargs)
+            expect(first_request_result.count).to eq 2
+          end
+        end
+      end
+
+      context "when the first request ran with include all = 'true'" do
+        it "respects include_all when creating the account level cache" do
+          enable_cache do
+            first_request_result = subject.call(args, kwargs)
+            expect(first_request_result.count).to eq 2
+
+            second_request_result = subject.call(args, kwargs.merge(include_all: false))
+            expect(second_request_result.count).to eq 1
+          end
+        end
+      end
+    end
+
     it "scopes to active enrollment accounts" do
       sub_announcement = sub_account_notification(subject: "blah", account: @sub_account)
-      course_with_student(user: @user, account: @sub_account, active_all: true).accept(true)
+      course_with_student(user: @user, account: @sub_account, active_all: true).accept(force: true)
       other_root_account = Account.create!
       other_announcement = account_notification(account: other_root_account)
-      course_with_student(user: @user, account: other_root_account, active_all: true).accept(true)
+      course_with_student(user: @user, account: other_root_account, active_all: true).accept(force: true)
       nother_root_account = Account.create!(name: "nother account")
       nother_announcement = account_notification(account: nother_root_account)
       # not an active course and will be excluded
-      course_with_student(user: @user, account: nother_root_account).accept(true)
+      course_with_student(user: @user, account: nother_root_account).accept(force: true)
 
       notes = AccountNotification.for_user_and_account(@user, Account.default)
       expect(notes).to include sub_announcement
@@ -319,7 +389,7 @@ describe AccountNotification do
     it "still show sub-account announcements even if the course is unpublished" do
       # because that makes sense i guess?
       unpub_sub_announcement = sub_account_notification(subject: "blah", account: @sub_account)
-      course_with_student(user: @user, account: @sub_account).accept(true)
+      course_with_student(user: @user, account: @sub_account).accept(force: true)
 
       notes = AccountNotification.for_user_and_account(@user, Account.default)
       expect(notes).to include unpub_sub_announcement
@@ -335,7 +405,7 @@ describe AccountNotification do
                                                         role_ids: [teacher_role.id])
       # should not show to user because they're not a teacher in this subaccount
 
-      expect(AccountNotification.for_user_and_account(@user, Account.default)).to_not include(other_sub_announcement)
+      expect(AccountNotification.for_user_and_account(@user, Account.default)).not_to include(other_sub_announcement)
     end
 
     it "still shows to roles nested within the sub-accounts" do
@@ -394,12 +464,12 @@ describe AccountNotification do
         @unenrolled = @user
         course_with_teacher(account: @a1)
         @student_teacher = @user
-        course_with_student(course: @course, user: @student_teacher).accept(true)
+        course_with_student(course: @course, user: @student_teacher).accept(force: true)
         course_with_teacher(course: @course, account: @a1)
         @teacher = @user
         account_admin_user(account: @a1)
         @admin = @user
-        course_with_student(course: @course).accept(true)
+        course_with_student(course: @course).accept(force: true)
         @student = @user
       end
 
@@ -582,7 +652,7 @@ describe AccountNotification do
       it "does not let site admin account notifications even try" do
         an = account_notification(account: Account.site_admin)
         an.send_message = true
-        expect(an).to_not be_valid
+        expect(an).not_to be_valid
         expect(an.errors[:send_message]).to eq ["Cannot send messages for site admin accounts"]
       end
 
@@ -851,8 +921,8 @@ describe AccountNotification do
 
           expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
 
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to_not be_nil
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to_not be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).not_to be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).not_to be_nil
 
           # no more calls to `where`; this _must_ be returned from cache
           expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]

@@ -17,25 +17,68 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {render, fireEvent, act, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import useContentShareUserSearchApi from '../../effects/useContentShareUserSearchApi'
 import DirectShareUserModal from '../DirectShareUserModal'
 
-jest.mock('../../effects/useContentShareUserSearchApi')
+const server = setupServer()
 
-const flushAllTimersAndPromises = async () => {
-  while (jest.getTimerCount() > 0) {
-    await act(async () => {
-      jest.runAllTimers()
-    })
-  }
+vi.mock('../../effects/useContentShareUserSearchApi')
+
+// Mock the lazy-loaded component to avoid issues with React.lazy
+function MockDirectShareUserPanel({
+  selectedUsers,
+  onUserSelected,
+  onUserRemoved,
+  selectedUsersError,
+  userSelectInputRef,
+}) {
+  const inputRef = React.useRef(null)
+
+  React.useEffect(() => {
+    if (userSelectInputRef && inputRef.current) {
+      userSelectInputRef(inputRef.current)
+    }
+  }, [userSelectInputRef])
+
+  return (
+    <div data-testid="mock-user-panel">
+      <label>
+        Send to:
+        <input
+          ref={inputRef}
+          data-testid="user-search-input"
+          onChange={e => {
+            if (e.target.value === 'abc') {
+              onUserSelected({id: 'abc', name: 'abc'})
+            } else if (e.target.value === 'cde') {
+              onUserSelected({id: 'cde', name: 'cde'})
+            }
+          }}
+        />
+      </label>
+      {selectedUsersError && <div>You must select at least one user</div>}
+      {selectedUsers.map(user => (
+        <button type="button" key={user.id} onClick={() => onUserRemoved(user)}>
+          {user.name}
+        </button>
+      ))}
+    </div>
+  )
 }
+
+vi.mock('../DirectShareUserPanel', () => ({
+  default: MockDirectShareUserPanel,
+}))
 
 describe('DirectShareUserModal', () => {
   let ariaLive
+  let lastRequestBody
 
   beforeAll(() => {
+    server.listen()
     window.ENV = {COURSE_ID: '42'}
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
@@ -44,35 +87,38 @@ describe('DirectShareUserModal', () => {
   })
 
   afterAll(() => {
+    server.close()
     delete window.ENV
     if (ariaLive) ariaLive.remove()
   })
 
   beforeEach(() => {
-    jest.useFakeTimers()
-
-    useContentShareUserSearchApi.mockImplementationOnce(({success}) => {
-      success([
-        {id: 'abc', name: 'abc'},
-        {id: 'cde', name: 'cde'},
-      ])
+    lastRequestBody = undefined
+    useContentShareUserSearchApi.mockImplementation(() => {
+      // Mock implementation - not used with the mocked DirectShareUserPanel
     })
   })
 
-  afterEach(async () => {
-    await flushAllTimersAndPromises()
-    fetchMock.restore()
+  afterEach(() => {
+    server.resetHandlers()
+    vi.clearAllMocks()
   })
 
   async function selectUser(getByText, findByLabelText, name = 'abc') {
-    fireEvent.change(await findByLabelText(/send to:/i), {target: {value: name}})
-    await act(async () => jest.runAllTimers()) // let the debounce happen
-    fireEvent.click(getByText(name))
+    const input = await findByLabelText(/send to:/i)
+    fireEvent.change(input, {target: {value: name}})
+    // Wait for the user to be selected and appear as a tag
+    await waitFor(() => getByText(name))
   }
 
-  it('starts a share operation and reports status UNDER TEST', async () => {
-    fetchMock.postOnce('path:/api/v1/users/self/content_shares', 200)
-    const onDismiss = jest.fn()
+  it('starts a share operation and reports status', async () => {
+    server.use(
+      http.post('/api/v1/users/self/content_shares', async ({request}) => {
+        lastRequestBody = await request.json()
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
+    const onDismiss = vi.fn()
     const {getByText, getAllByText, findByLabelText} = render(
       <DirectShareUserModal
         open={true}
@@ -83,21 +129,26 @@ describe('DirectShareUserModal', () => {
     )
     await selectUser(getByText, findByLabelText)
     fireEvent.click(getByText('Send'))
-    const [, fetchOptions] = fetchMock.lastCall()
-    expect(fetchOptions.method).toBe('POST')
-    expect(JSON.parse(fetchOptions.body)).toMatchObject({
-      receiver_ids: ['abc'],
-      content_type: 'discussion_topic',
-      content_id: '42',
+    await waitFor(() => {
+      expect(lastRequestBody).toMatchObject({
+        receiver_ids: ['abc'],
+        content_type: 'discussion_topic',
+        content_id: '42',
+      })
     })
     expect(getAllByText(/start/i)).not.toHaveLength(0)
-    await act(() => fetchMock.flush(true))
-    expect(getAllByText(/success/i)).toHaveLength(2) // visible and sr alert
+    await waitFor(() => {
+      expect(getAllByText(/success/i)).toHaveLength(2) // visible and sr alert
+    })
     expect(onDismiss).toHaveBeenCalled()
   })
 
   it('clears user selection when the modal is closed', async () => {
-    fetchMock.get('*', [{id: 'abc', name: 'abc'}])
+    server.use(
+      http.get('*', () => {
+        return HttpResponse.json([{id: 'abc', name: 'abc'}])
+      }),
+    )
     const {queryByText, getByText, findByLabelText, rerender} = render(
       <DirectShareUserModal open={true} courseId="1" />,
     )
@@ -109,7 +160,7 @@ describe('DirectShareUserModal', () => {
 
   describe('errors', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation()
+      vi.spyOn(console, 'error').mockImplementation()
     })
 
     afterEach(() => {
@@ -117,7 +168,11 @@ describe('DirectShareUserModal', () => {
     })
 
     it('reports an error if the fetch fails', async () => {
-      fetchMock.postOnce('path:/api/v1/users/self/content_shares', 400)
+      server.use(
+        http.post('/api/v1/users/self/content_shares', () => {
+          return new HttpResponse(null, {status: 400})
+        }),
+      )
       const {getByText, findByLabelText} = render(
         <DirectShareUserModal
           open={true}
@@ -127,8 +182,9 @@ describe('DirectShareUserModal', () => {
       )
       await selectUser(getByText, findByLabelText)
       fireEvent.click(getByText('Send'))
-      await act(() => fetchMock.flush(true))
-      expect(getByText(/error/i)).toBeInTheDocument()
+      await waitFor(() => {
+        expect(getByText(/error/i)).toBeInTheDocument()
+      })
       expect(getByText('Send').closest('button').getAttribute('disabled')).toBeNull()
     })
   })

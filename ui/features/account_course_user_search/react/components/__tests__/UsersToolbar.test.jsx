@@ -23,7 +23,7 @@ import {render} from '@testing-library/react'
 const props = {
   toggleSRMessage: () => {},
   onApplyFilters: () => {},
-  onUpdateFilters: jest.fn(),
+  onUpdateFilters: vi.fn(),
   isLoading: true,
   errors: {search_term: ''},
   search_term: '',

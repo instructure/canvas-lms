@@ -114,7 +114,9 @@ export interface CourseSettings {
 
 export const getCourseSettings = async ({
   queryKey,
-}: {queryKey: readonly unknown[]}): Promise<CourseSettings> => {
+}: {
+  queryKey: readonly unknown[]
+}): Promise<CourseSettings> => {
   const [, currentCourseId] = queryKey
   if (!currentCourseId) {
     return {}

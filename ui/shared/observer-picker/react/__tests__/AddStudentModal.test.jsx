@@ -75,7 +75,7 @@ describe('Add Student Modal', () => {
 
   it('calls onStudentPaired when a new student is paired successfully', async () => {
     let requestMade = false
-    const onStudentPaired = jest.fn()
+    const onStudentPaired = vi.fn()
     server.use(
       http.post(LINK_STUDENT_URL, () => {
         requestMade = true
@@ -97,7 +97,7 @@ describe('Add Student Modal', () => {
 
   it('does not call onStudentPaired and shows invalid code error if something goes wrong', async () => {
     let requestMade = false
-    const onStudentPaired = jest.fn()
+    const onStudentPaired = vi.fn()
     server.use(
       http.post(LINK_STUDENT_URL, () => {
         requestMade = true
@@ -120,7 +120,7 @@ describe('Add Student Modal', () => {
 
   it('clears the error message once the user starts editing the pairing code', async () => {
     let requestMade = false
-    const onStudentPaired = jest.fn()
+    const onStudentPaired = vi.fn()
     server.use(
       http.post(LINK_STUDENT_URL, () => {
         requestMade = true
@@ -145,7 +145,7 @@ describe('Add Student Modal', () => {
   })
 
   it('calls handleClose when close is clicked', () => {
-    const handleClose = jest.fn()
+    const handleClose = vi.fn()
     const {getByTestId} = render(<AddStudentModal {...defaultProps} handleClose={handleClose} />)
     const closeBtn = getByTestId('close-modal')
     act(() => closeBtn.click())

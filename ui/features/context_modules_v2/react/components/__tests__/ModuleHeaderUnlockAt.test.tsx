@@ -23,6 +23,7 @@ import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useM
 import ModuleHeaderUnlockAt, {ModuleHeaderUnlockAtProps} from '../ModuleHeaderUnlockAt'
 import {format} from '@instructure/moment-utils'
 import moment from 'moment'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 const unlockAtFormat = '%b %-d at %l:%M%P'
 
@@ -53,10 +54,13 @@ const buildDefaultProps = (
 })
 
 beforeEach(() => {
-  // @ts-expect-error
-  window.ENV = {
+  fakeEnv.setup({
     TIMEZONE: 'UTC',
-  }
+  })
+})
+
+afterEach(() => {
+  fakeEnv.teardown()
 })
 
 describe('ModuleHeaderUnlockAt', () => {
@@ -67,7 +71,7 @@ describe('ModuleHeaderUnlockAt', () => {
     const futureDate = moment().add(1, 'day').toISOString()
     setUp(buildDefaultProps({unlockAt: futureDate}))
 
-    const formattedDate = format(futureDate, unlockAtFormat)
+    const formattedDate = format(futureDate, unlockAtFormat, undefined)
     const {container} = render(<ModuleHeaderUnlockAt unlockAt={futureDate} />)
 
     const desktopElement = container.querySelector(

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::ImportOutcomes do
@@ -584,8 +583,6 @@ describe Mutations::ImportOutcomes do
       # force the creation of root outcome group in the course
       @course.root_outcome_group
 
-      # rubocop:disable Layout/MultilineMethodCallIndentation
-      # see https://github.com/rubocop/rubocop/issues/12261
       expect do
         exec(outcome_id: get_outcome_id("Root group outcome"))
       end.to not_change(LearningOutcomeGroup, :count)
@@ -593,7 +590,6 @@ describe Mutations::ImportOutcomes do
         .and(change do
                @course.root_outcome_group.child_outcome_links.map { |link| link.content.title }
              end.from([]).to(["Root group outcome"]))
-      # rubocop:enable Layout/MultilineMethodCallIndentation
     end
   end
 

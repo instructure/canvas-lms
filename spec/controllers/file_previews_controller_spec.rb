@@ -102,16 +102,7 @@ describe FilePreviewsController do
     expect(assigns["show_left_side"]).to be false
   end
 
-  it "redirects to crododoc_url if available and params[:annotate] is given" do
-    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return("http://example.com/fake_crocodoc_url")
-    allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return("http://example.com/fake_canvadoc_url")
-    attachment_model content_type: "application/msword"
-    get :show, params: { course_id: @course.id, file_id: @attachment.id, annotate: 1 }
-    expect(response).to redirect_to @attachment.crocodoc_url
-  end
-
   it "redirects to canvadocs_url if available" do
-    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return("http://example.com/fake_crocodoc_url")
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return("http://example.com/fake_canvadoc_url")
     attachment_model content_type: "application/msword"
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
@@ -119,7 +110,6 @@ describe FilePreviewsController do
   end
 
   it "redirects to a google doc preview if available" do
-    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     attachment_model content_type: "application/msword"
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
@@ -128,7 +118,6 @@ describe FilePreviewsController do
   end
 
   it "redirects to file if it's html" do
-    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     attachment_model content_type: "text/html"
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
@@ -137,7 +126,6 @@ describe FilePreviewsController do
   end
 
   it "renders a download link if no previews are available" do
-    allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     @account.disable_service(:google_docs_previews)
     @account.save!
@@ -207,6 +195,32 @@ describe FilePreviewsController do
       attachment_model
       get :show, params: { course_id: @course.id, file_id: @attachment.id, verifier: @attachment.uuid }
       expect(response).to have_http_status :ok
+    end
+  end
+
+  context "unauthenticated access" do
+    before do
+      remove_user_session
+    end
+
+    it "allows unauthenticated access with valid course syllabus location parameter" do
+      @account.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      @account.root_account.enable_feature!(:file_association_access)
+      course_factory(account: @account, active_all: true, is_public: true)
+      @attachment = attachment_model(context: @course, content_type: "image/png")
+
+      html = "<p><img src='/courses/#{@course.id}/files/#{@attachment.id}/preview' alt='test'></p>"
+      @course.syllabus_body = html
+      @course.updating_user = @user
+      @course.save!
+
+      get :show, params: {
+        course_id: @course.id,
+        file_id: @attachment.id,
+        location: "course_syllabus_#{@course.id}"
+      }
+      expect(response).to have_http_status :ok
+      expect(response).to render_template "img_preview"
     end
   end
 end

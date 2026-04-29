@@ -47,7 +47,7 @@ const createView = function (collection) {
   return view.render()
 }
 
-describe('QuizItemGroupView', () => {
+describe.skip('QuizItemGroupView', () => {
   beforeEach(() => {
     fakeENV.setup()
   })

@@ -31,7 +31,7 @@ describe('FindUserToMerge', () => {
   const props: FindUserToMergeProps = {
     sourceUserId: sourceUser.id,
     accountSelectOptions,
-    onFind: jest.fn(),
+    onFind: vi.fn(),
   }
   const createUserForMergeUrl = (userId: string) => `/users/${userId}/user_for_merge`
   const queryClient = new QueryClient({

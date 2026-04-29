@@ -21,7 +21,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {hasGradeChanged, parseTextValue} from '@canvas/grading/GradeInputHelper'
 import type {PendingGradeInfo} from '../../../gradebook.d'
-import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
+import type {GradingStandard} from '@instructure/grading-utils'
 
 function formatGrade(
   // @ts-expect-error
@@ -72,7 +72,7 @@ type Props = {
   }
   disabled: boolean
   enterGradesAs: 'gradingScheme' | 'passFail' | 'percent' | 'points'
-  gradingScheme: DeprecatedGradingScheme[]
+  gradingScheme: GradingStandard[]
   pointsBasedGradingScheme: boolean
   label: React.ReactElement
   messages: Array<{

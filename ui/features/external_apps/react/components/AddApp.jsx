@@ -17,12 +17,12 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {map, each, isEmpty, compact} from 'lodash'
+import {map, each, isEmpty, compact} from 'es-toolkit/compat'
 import $ from 'jquery'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import ConfigOptionField from './ConfigOptionField'
 import ExternalTool from '@canvas/external-tools/backbone/models/ExternalTool'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -48,7 +48,7 @@ export default createReactClass({
     }
   },
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.addToolRef = React.createRef()
     this.addButtonRef = React.createRef()
   },
@@ -168,7 +168,6 @@ export default createReactClass({
       })
       return
     }
-
     if (this.props.app.requires_secret) {
       newTool.set('consumer_key', this.state.fields.consumer_key.value)
       newTool.set('shared_secret', this.state.fields.shared_secret.value)

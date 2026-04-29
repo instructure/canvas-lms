@@ -28,13 +28,7 @@ type ZipFileOptionsFormProps = {
   open: boolean
   onClose: () => void
   fileOptions: FileOptions
-  onZipOptionsResolved: ({
-    file,
-    expandZip,
-  }: {
-    file: File
-    expandZip: boolean
-  }) => void
+  onZipOptionsResolved: ({file, expandZip}: {file: File; expandZip: boolean}) => void
 }
 
 const I18n = createI18nScope('files_v2')

@@ -45,17 +45,19 @@ const mockRatings: RubricRating[] = [
 
 describe('HorizontalButtonDisplay', () => {
   const defaultProps = {
+    buttonDisplay: 'numeric',
+    criterionId: 'criterion-1',
     isPreviewMode: false,
     ratings: mockRatings,
     ratingOrder: 'descending',
-    onSelectRating: jest.fn(),
+    onSelectRating: vi.fn(),
     criterionUseRange: false,
     isSelfAssessment: false,
     hidePoints: false,
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders all rating buttons', () => {
@@ -89,9 +91,9 @@ describe('HorizontalButtonDisplay', () => {
   it('renders ratings in ascending order when specified', () => {
     render(<HorizontalButtonDisplay {...defaultProps} ratingOrder="ascending" />)
 
-    const ratingButtons = screen.getAllByTestId(/^rating-button-/)
-    expect(ratingButtons[ratingButtons.length - 1].getAttribute('aria-label')).toContain('No Marks')
-    expect(ratingButtons[0].getAttribute('aria-label')).toContain('Full Marks')
+    const buttons = screen.getAllByTestId(/^rubric-rating-button-\d+$/)
+    expect(buttons[0]).toHaveAccessibleName(/Full Marks/)
+    expect(buttons[buttons.length - 1]).toHaveAccessibleName(/No Marks/)
   })
 
   it('shows point range when criterionUseRange is true', () => {
@@ -100,7 +102,7 @@ describe('HorizontalButtonDisplay', () => {
     )
 
     const ratingDetails = screen.getByTestId('rating-details-2')
-    expect(ratingDetails).toHaveTextContent('0.1 to 3 pts')
+    expect(ratingDetails).toHaveTextContent('3 to >0 pts')
   })
 
   it('shows exact points when criterionUseRange is false', () => {
@@ -120,5 +122,21 @@ describe('HorizontalButtonDisplay', () => {
     expect(ratingDetails).toHaveTextContent('Full Marks')
     expect(ratingDetails).toHaveTextContent('Student demonstrates excellent understanding')
     expect(ratingDetails).not.toHaveTextContent('5 pts')
+  })
+
+  it('rating buttons have correct accessible name with rating description', () => {
+    render(<HorizontalButtonDisplay {...defaultProps} />)
+
+    // With 3 ratings, buttonLabel is (length - index - 1): Full Marks=2, Partial Marks=1
+    expect(screen.getByTestId('rubric-rating-button-2')).toHaveAccessibleName(/Full Marks/)
+    expect(screen.getByTestId('rubric-rating-button-1')).toHaveAccessibleName(/Partial Marks/)
+  })
+
+  it('accessible name has no double spaces when longDescription is empty', () => {
+    const ratingsWithEmptyDesc = [{...mockRatings[0], longDescription: ''}]
+    render(<HorizontalButtonDisplay {...defaultProps} ratings={ratingsWithEmptyDesc} />)
+
+    // With 1 rating, buttonLabel is (1 - 0 - 1) = 0
+    expect(screen.getByTestId('rubric-rating-button-0')).toHaveAccessibleName(/^Full Marks 5 pts/)
   })
 })

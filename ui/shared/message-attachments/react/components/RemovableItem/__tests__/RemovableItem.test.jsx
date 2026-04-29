@@ -35,7 +35,7 @@ const setup = props => {
 
 describe('RemovableItem', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   it('renders remove icon while hovered', () => {
@@ -45,7 +45,7 @@ describe('RemovableItem', () => {
     fireEvent.mouseOver(item)
     expect(getByTestId('remove-button')).toBeTruthy()
     fireEvent.mouseOut(item)
-    act(() => jest.advanceTimersByTime(1))
+    act(() => vi.advanceTimersByTime(1))
     expect(queryByTestId('remove-button')).toBeFalsy()
   })
 
@@ -56,12 +56,12 @@ describe('RemovableItem', () => {
     fireEvent.focus(item)
     expect(getByTestId('remove-button')).toBeTruthy()
     fireEvent.blur(item)
-    act(() => jest.advanceTimersByTime(1))
+    act(() => vi.advanceTimersByTime(1))
     expect(queryByTestId('remove-button')).toBeFalsy()
   })
 
   it('calls onRemove when clicked', () => {
-    const onRemoveMock = jest.fn()
+    const onRemoveMock = vi.fn()
     const {getByTestId} = setup({onRemove: onRemoveMock})
     const item = getByTestId('removable-item')
     fireEvent.mouseOver(item)

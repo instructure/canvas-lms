@@ -28,15 +28,21 @@ export type Rubric = {
   title: string
   workflowState?: string
   unassessed?: boolean
+  canUpdateRubric?: boolean
   hasRubricAssociations?: boolean
+  public?: boolean
 }
 
 export type RubricAssociation = {
+  associationType: 'Assignment' | 'Account' | 'Course'
+  associationId: string
   hidePoints: boolean
   hideScoreTotal: boolean
   useForGrading: boolean
   hideOutcomeResults: boolean
   id: string
+  canUpdate?: boolean
+  canDelete?: boolean
 }
 
 export type RubricCriterion = {

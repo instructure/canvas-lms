@@ -35,8 +35,7 @@ const ColorPicker = ({label, disabled, value, onChange}: ColorPickerProps) => {
   const [messages, setMessages] = useState<FormMessage[]>([])
 
   const setValidColor = useCallback(
-    // @ts-expect-error
-    newcolor => {
+    (newcolor: string) => {
       setTypedColor(newcolor)
       setHexColor(newcolor)
       setMessages([])

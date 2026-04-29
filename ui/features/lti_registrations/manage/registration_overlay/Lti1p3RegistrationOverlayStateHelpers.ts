@@ -42,6 +42,10 @@ export const initialOverlayStateFromInternalConfig = (
     ? existingOverlay.placements.course_navigation.default === 'disabled'
     : internalConfig.placements.find(p => p.placement === 'course_navigation')?.default ===
       'disabled'
+  const topNavigationAllowFullscreen =
+    existingOverlay?.placements?.top_navigation?.allow_fullscreen !== undefined
+      ? existingOverlay.placements.top_navigation.allow_fullscreen
+      : internalConfig.placements.find(p => p.placement === 'top_navigation')?.allow_fullscreen
 
   return {
     dirty: false,
@@ -59,6 +63,7 @@ export const initialOverlayStateFromInternalConfig = (
       customFields: formatCustomFields(
         existingOverlay?.custom_fields || internalConfig.custom_fields,
       ),
+      message_settings: internalConfig.launch_settings?.message_settings || [],
     },
     permissions: {
       scopes: internalConfig.scopes.filter(s => !existingOverlay?.disabled_scopes?.includes(s)),
@@ -69,6 +74,7 @@ export const initialOverlayStateFromInternalConfig = (
     placements: {
       placements,
       courseNavigationDefaultDisabled,
+      topNavigationAllowFullscreen,
     },
     override_uris: {
       placements: placements.reduce(
@@ -113,6 +119,7 @@ export const initialOverlayStateFromInternalConfig = (
         },
         {} as Partial<Record<LtiPlacementWithIcon, string | undefined>>,
       ),
+      defaultIconUrl: existingOverlay?.icon_url || internalConfig.launch_settings?.icon_url,
     },
   }
 }
@@ -131,11 +138,15 @@ export const convertToLtiConfigurationOverlay = (
   state: Lti1p3RegistrationOverlayState,
   internalConfig: InternalLtiConfiguration,
 ): {overlay: LtiConfigurationOverlay; config: InternalLtiConfiguration} => {
-  const placements = state.placements.placements?.reduce((acc, placement) => {
+  const placements = state.placements.placements.reduce((acc, placement) => {
     const internalPlacement = internalConfig.placements.find(p => p.placement === placement)
     const courseNavDefaultValue =
       placement === 'course_navigation'
         ? computeCourseNavDefaultValue(state, internalConfig)
+        : undefined
+    const topNavAllowFullscreenValue =
+      placement === 'top_navigation'
+        ? computeTopNavAllowFullscreenValue(state, internalConfig)
         : undefined
 
     const placementConfig = compact({
@@ -157,6 +168,10 @@ export const convertToLtiConfigurationOverlay = (
           : state.icons.placements[placement as LtiPlacementWithIcon],
       default:
         courseNavDefaultValue === internalPlacement?.default ? undefined : courseNavDefaultValue,
+      allow_fullscreen:
+        topNavAllowFullscreenValue === internalPlacement?.allow_fullscreen
+          ? undefined
+          : topNavAllowFullscreenValue,
     })
     return {
       ...acc,
@@ -184,6 +199,10 @@ export const convertToLtiConfigurationOverlay = (
       state.launchSettings.JwkMethod === 'public_jwk_url' ? state.launchSettings.JwkURL : null,
     oidc_initiation_url:
       state.launchSettings.openIDConnectInitiationURL || internalConfig.oidc_initiation_url,
+    launch_settings: {
+      ...internalConfig.launch_settings,
+      message_settings: state.launchSettings.message_settings,
+    },
   }
 
   return {
@@ -204,11 +223,15 @@ export const convertToLtiConfigurationOverlay = (
           ? undefined
           : state.data_sharing.privacy_level,
       disabled_placements,
-      placements,
+      placements: Object.keys(placements).length === 0 ? undefined : placements,
       domain:
         state.launchSettings.domain === internalConfig.domain
           ? undefined
           : state.launchSettings.domain,
+      icon_url:
+        state.icons.defaultIconUrl === internalConfig.launch_settings?.icon_url
+          ? undefined
+          : state.icons.defaultIconUrl,
       // todo: these undefined fields will all be removed
       oidc_initiation_url: undefined,
       redirect_uris: undefined,
@@ -272,6 +295,19 @@ export const computeCourseNavDefaultValue = (
   if (typeof state.placements.courseNavigationDefaultDisabled !== 'undefined') {
     const overlayState = state.placements.courseNavigationDefaultDisabled ? 'disabled' : 'enabled'
     return courseNavConfig?.default === overlayState ? undefined : overlayState
+  } else {
+    return undefined
+  }
+}
+
+export const computeTopNavAllowFullscreenValue = (
+  state: Lti1p3RegistrationOverlayState,
+  internalConfig?: InternalLtiConfiguration,
+): true | false | undefined => {
+  const topNavConfig = internalConfig?.placements.find(p => p.placement === 'top_navigation')
+  if (typeof state.placements.topNavigationAllowFullscreen !== 'undefined') {
+    const overlayState = state.placements.topNavigationAllowFullscreen
+    return topNavConfig?.allow_fullscreen === overlayState ? undefined : overlayState
   } else {
     return undefined
   }

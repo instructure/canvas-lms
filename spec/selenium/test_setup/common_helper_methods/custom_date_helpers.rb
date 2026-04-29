@@ -47,6 +47,12 @@ module CustomDateHelpers
     end.squeeze(" ")
   end
 
+  # formatted output matching the DateDue/DateAvailable React components,
+  # which use the date_at_time locale format, e.g. 'Jan 1 at 1:01pm'
+  def format_time_for_view_date_at_time(time)
+    I18n.l(time, format: "%b %-d at %l:%M%P").squeeze(" ")
+  end
+
   def calendar_time_string(time)
     time_string(time).delete_suffix("m").strip
   end

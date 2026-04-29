@@ -67,7 +67,8 @@ describe "conversations new" do
       expect(convos[0].text).to include  "Course 2 - assignment 2"
       expect(convos[1].text).to include  "Course 1 - assignment 1"
       wait_for_ajaximations
-      f("input[placeholder='All Courses']").click
+      # Click on the course select input (value is "All Courses" by default)
+      f("[data-testid='course-select']").click
       wait_for_ajaximations
       fj("li:contains('Course 1')").click
       expect(ff("[data-testid='conversation']").count).to eq 1

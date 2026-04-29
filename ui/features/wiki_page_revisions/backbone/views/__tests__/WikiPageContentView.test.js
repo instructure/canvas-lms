@@ -30,27 +30,27 @@ describe('WikiPageContentView', () => {
   })
 
   test('setModel causes a re-render', () => {
-    const renderSpy = jest.spyOn(contentView, 'render')
+    const renderSpy = vi.spyOn(contentView, 'render')
     contentView.setModel(wikiPage)
     expect(renderSpy).toHaveBeenCalled()
   })
 
   test('setModel binds to the model change:title trigger', () => {
-    jest.spyOn(contentView, 'render')
+    vi.spyOn(contentView, 'render')
     contentView.setModel(wikiPage)
     wikiPage.set('title', 'A New Title')
     expect(contentView.render).toHaveBeenCalled()
   })
 
   test('setModel binds to the model change:body trigger', () => {
-    jest.spyOn(contentView, 'render')
+    vi.spyOn(contentView, 'render')
     contentView.setModel(wikiPage)
     wikiPage.set('body', 'A New Body')
     expect(contentView.render).toHaveBeenCalled()
   })
 
   test('render publishes a "userContent/change" (to enhance user content)', () => {
-    const mockSubscriber = jest.fn()
+    const mockSubscriber = vi.fn()
     subscribe('userContent/change', mockSubscriber)
     contentView.render()
     expect(mockSubscriber).toHaveBeenCalled()

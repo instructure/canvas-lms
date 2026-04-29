@@ -15,9 +15,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative "../common"
 require_relative "../helpers/quizzes_common"
-require_relative "../../spec_helper"
 require_relative "page_objects/quizzes_index_page"
 require_relative "page_objects/quizzes_landing_page"
 require_relative "../helpers/items_assign_to_tray"
@@ -192,8 +192,8 @@ describe "quizzes selective_release assign to tray" do
     update_until_date(1, "1/7/2023")
     update_until_time(1, "9:00 PM")
     click_cancel_button
+    keep_trying_until { expect(item_tray_exists?).to be_falsey }
 
-    expect(element_exists?(module_item_edit_tray_selector)).to be_falsey
     expect(@classic_quiz.assignment_overrides.first.assignment_override_students.count).to eq(1)
   end
 

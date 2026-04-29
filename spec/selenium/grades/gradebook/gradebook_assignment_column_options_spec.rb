@@ -61,7 +61,12 @@ shared_examples "Gradebook - Assignment Column" do |ff_enabled|
     end
   end
 
-  before { user_session(@teacher) }
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+    user_session(@teacher)
+  end
 
   context "with Sorting" do
     it "sorts by Missing", priority: "1" do

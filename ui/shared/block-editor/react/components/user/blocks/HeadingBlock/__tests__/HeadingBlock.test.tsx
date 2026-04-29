@@ -24,17 +24,17 @@ import {HeadingBlock, type HeadingBlockProps} from '..'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock the useNode hook to avoid 404 errors
-jest.mock('@craftjs/core', () => {
-  const originalModule = jest.requireActual('@craftjs/core')
+vi.mock('@craftjs/core', async () => {
+  const originalModule = await vi.importActual('@craftjs/core')
   return {
     ...originalModule,
-    useNode: jest.fn().mockImplementation(() => ({
+    useNode: vi.fn().mockImplementation(() => ({
       connectors: {
-        connect: jest.fn(),
-        drag: jest.fn(),
+        connect: vi.fn(),
+        drag: vi.fn(),
       },
       actions: {
-        setProp: jest.fn(),
+        setProp: vi.fn(),
       },
       selected: false,
       node: {
@@ -73,7 +73,7 @@ describe('HeadingBlock', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     document.body.innerHTML = ''
   })
 

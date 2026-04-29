@@ -198,7 +198,7 @@ module AssignmentsCommon
     )
   end
 
-  def create_assignment_for_group(submission_type, grade_group_students_individually = false)
+  def create_assignment_for_group(submission_type, grade_group_students_individually: false)
     group_test_setup(2, 1, 2)
     add_user_to_group(@students.first, @testgroup[0])
     @assignment = @course.assignments.create!(
@@ -284,5 +284,14 @@ module AssignmentsCommon
   def create_assignment_with_type(type, title = "My Title")
     @assignment = @course.assignments.create!(title:, grading_type: type, points_possible: 20)
     @assignment
+  end
+
+  def create_module_with_many_files(course:, module_name: "Multi File Module", file_name: "a_file.txt", count: 150)
+    mod = course.context_modules.create!(name: module_name)
+    file = create_file(file_name)
+    count.times do
+      mod.add_item(type: "File", id: file.id)
+    end
+    mod
   end
 end

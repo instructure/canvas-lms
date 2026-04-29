@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe Loaders::CourseSubmissionDataLoader do
   before :once do
     course_with_student(active_all: true)
@@ -133,6 +131,73 @@ describe Loaders::CourseSubmissionDataLoader do
 
         submissions = with_batch_loader { |loader| loader.load(@course) }
         expect(submissions.map(&:assignment_id)).not_to include(sub_assignment.id)
+      end
+    end
+
+    context "with assignment overrides" do
+      it "returns submission with cached_due_date populated from section override" do
+        assignment = @course.assignments.create!(
+          title: "Section Override Assignment",
+          workflow_state: "published",
+          submission_types: "online_text_entry",
+          due_at: 2.weeks.from_now
+        )
+
+        override_due = 1.week.from_now
+        submission = @student.submissions.find_by(assignment:)
+        submission.update!(cached_due_date: override_due)
+
+        submissions = with_batch_loader { |loader| loader.load(@course) }
+        target = submissions.find { |s| s.assignment_id == assignment.id }
+
+        expect(target).not_to be_nil
+        expect(target.cached_due_date.to_i).to eq(override_due.to_i)
+      end
+
+      it "excludes submission when student is not in the assignment's assigned section" do
+        section_a = @course.course_sections.create!(name: "Section A")
+        section_b = @course.course_sections.create!(name: "Section B")
+
+        unassigned_student = user_factory(name: "Unassigned Student")
+        @course.enroll_student(unassigned_student, section: section_b, enrollment_state: "active")
+
+        assignment = @course.assignments.create!(
+          title: "Section A Only",
+          workflow_state: "published",
+          submission_types: "online_text_entry",
+          only_visible_to_overrides: true
+        )
+        assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set: section_a,
+          due_at: 1.week.from_now,
+          due_at_overridden: true
+        )
+
+        result = GraphQL::Batch.batch do
+          loader = Loaders::CourseSubmissionDataLoader.for(current_user: unassigned_student)
+          loader.load(@course)
+        end
+
+        expect(result.map(&:assignment_id)).not_to include(assignment.id)
+      end
+
+      it "returns submission with cached_due_date from ADHOC student override" do
+        assignment = @course.assignments.create!(
+          title: "ADHOC Override Assignment",
+          workflow_state: "published",
+          submission_types: "online_text_entry",
+          due_at: 2.weeks.from_now
+        )
+
+        adhoc_due = 3.days.from_now
+        submission = @student.submissions.find_by(assignment:)
+        submission.update!(cached_due_date: adhoc_due)
+
+        submissions = with_batch_loader { |loader| loader.load(@course) }
+        target = submissions.find { |s| s.assignment_id == assignment.id }
+
+        expect(target.cached_due_date.to_i).to eq(adhoc_due.to_i)
       end
     end
 

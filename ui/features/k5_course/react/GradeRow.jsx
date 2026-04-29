@@ -26,7 +26,11 @@ import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-conte
 import {Badge} from '@instructure/ui-badge'
 import {getK5ThemeVars} from '@canvas/k5/react/k5-theme'
 
-const k5ThemeVariables = getK5ThemeVars()
+const k5ThemeVariables = getK5ThemeVars(
+  Boolean(ENV.use_high_contrast),
+  Boolean(ENV.USE_CLASSIC_FONT),
+  Boolean(ENV.use_dyslexic_font),
+)
 
 const I18n = createI18nScope('grade_row')
 
@@ -109,12 +113,20 @@ export const GradeRow = ({
     const gradeString = notGraded ? '—' : grade
 
     switch (gradingType) {
-      case 'points':
-        return notGraded ? (
-          notGradedContent(I18n.t('— pts'))
-        ) : (
-          <Text data-testid="assignment-score">{I18n.t('%{score} pts', {score: gradeString})}</Text>
+      case 'points': {
+        if (notGraded) {
+          return notGradedContent(I18n.t('— pts'))
+        }
+        const roundedScore = I18n.n(parseFloat(gradeString), {
+          precision: 2,
+          strip_insignificant_zeros: true,
+        })
+        return (
+          <Text data-testid="assignment-score">
+            {I18n.t('%{score} pts', {score: roundedScore})}
+          </Text>
         )
+      }
       case 'gpa_scale':
         return notGraded ? (
           notGradedContent(I18n.t('— GPA'))

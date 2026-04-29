@@ -22,11 +22,7 @@ module Outcomes
   #
   # Usage:
   #   Outcomes::StudentOutcomeRollupCalculationService.call(course_id: course.id, student_id: student.id)
-  class StudentOutcomeRollupCalculationService < ApplicationService
-    include Outcomes::ResultAnalytics
-    include OutcomesServiceAuthoritativeResultsHelper
-    include CanvasOutcomesHelper
-
+  class StudentOutcomeRollupCalculationService < RollupCommonService
     attr_reader :course, :student
 
     class << self
@@ -44,8 +40,6 @@ module Outcomes
           .call(course_id:, student_id:)
       end
 
-      # Schedule outcome rollup calculations for all students in a course
-      #
       # @param course_id [Integer] the ID of the course to calculate rollups for
       def calculate_for_course(course_id:)
         course = Course.find(course_id)
@@ -62,105 +56,59 @@ module Outcomes
     # @param student_id [Integer] the student_id for whom to calculate rollups
     def initialize(course_id:, student_id:)
       super()
-      @course  = Course.find(course_id)
-      @student = User.find(student_id)
+      @course = Course.find(course_id)
+      @student = @course.students.find(student_id)
+    rescue ActiveRecord::RecordNotFound => e
+      raise ArgumentError, "Invalid course_id (#{course_id}) or student_id (#{student_id}): #{e.message}"
     end
 
-    # Runs the full calculation and returns student outcome rollups.
     # @return [Array<Rollup>]
     def call
-      # Fetch both Canvas and Outcomes Service results
-      canvas_results = fetch_canvas_results
-      os_results     = fetch_outcomes_service_results
+      execute_with_instrumentation do
+        combined_results = gather_results
+        return handle_empty_results if combined_results.empty?
 
-      combined_results = combine_results(canvas_results, os_results)
-      return OutcomeRollup.none if combined_results.empty?
-
-      student_rollups = generate_student_rollups(combined_results)
-      store_rollups(student_rollups)
+        rollups = generate_rollups(combined_results, [student], course)
+        store_rollups(rollups)
+      end
     end
 
     private
 
-    # Generates student outcome rollups from the provided results
-    # @param combined_results [Array<LearningOutcomeResult>]
-    # @return [Array<Rollup>]
-    def generate_student_rollups(combined_results)
-      return [] if combined_results.empty?
+    def execute_with_instrumentation
+      Utils::InstStatsdUtils::Timing.track("rollup.student.runtime") do |timing_meta|
+        rollups_created = 0
 
-      ActiveRecord::Associations.preload(combined_results, :learning_outcome)
-      outcome_results_rollups(
-        results: combined_results,
-        users: [student],
-        context: course
-      )
-    end
+        begin
+          result = yield
 
-    # @return [ActiveRecord::Relation<LearningOutcomeResult>]
-    def fetch_canvas_results
-      find_outcome_results(
-        student,
-        users: [student],
-        context: course,
-        outcomes: course.linked_learning_outcomes
-      )
+          rollups_created = result.is_a?(ActiveRecord::Relation) ? result.count : 0
+          timing_meta.tags = { course_id: course.id, records_processed: rollups_created }
+          Rails.logger.info("[OutcomeRollup] Successfully created/updated #{rollups_created} rollups for student #{student&.id} in course #{course&.id}")
+
+          InstStatsd::Statsd.distributed_increment("rollup.student.success", tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
+          InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
+
+          result
+        rescue => e
+          Rails.logger.error("[OutcomeRollup] Error calculating rollups for student #{student&.id} in course #{course&.id}: #{e.message}")
+          timing_meta.tags = { course_id: course.id, error: true }
+          InstStatsd::Statsd.distributed_increment("rollup.student.error", tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
+          InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
+          raise e
+        end
+      end
     end
 
     # @return [Array<LearningOutcomeResult>]
-    def fetch_outcomes_service_results
-      # May be Array (in tests stub) or Relation
-      new_quiz_assignments = Assignment.active.where(context: course).quiz_lti
-      return [] if new_quiz_assignments.blank?
-
-      outcomes = course.linked_learning_outcomes
-      return [] if outcomes.blank?
-
-      begin
-        os_results_json = find_outcomes_service_outcome_results(
-          users: [student],
-          context: course,
-          outcomes:,
-          assignments: new_quiz_assignments
-        )
-        return [] if os_results_json.blank?
-      rescue => e
-        Rails.logger.error("Failed to fetch outcomes service results: #{e.message}")
-        raise e
-      end
-
-      handle_outcomes_service_results(
-        os_results_json,
-        course,
-        outcomes,
-        [student],
-        new_quiz_assignments
-      )
-    end
-
-    # Combines and deduplicates results from two sources
-    # @param canvas_results [ActiveRecord::Relation<LearningOutcomeResult>, Array<LearningOutcomeResult>]
-    # @param outcomes_service_results [Array<LearningOutcomeResult>]
-    # @return [Array<LearningOutcomeResult>]
-    def combine_results(canvas_results = [], outcomes_results = [])
-      return canvas_results.to_a if outcomes_results.blank?
-      return outcomes_results if canvas_results.blank?
-
-      # Merge into one array
-      all_results = canvas_results.to_a + outcomes_results
-
-      # Deduplicate
-      all_results.uniq do |result|
-        [
-          result.learning_outcome_id,
-          result.user_uuid || result.user_id,
-          result.associated_asset_id || result.artifact_id
-        ]
-      end
+    def gather_results
+      canvas_results = fetch_canvas_results(course:, users: [student])
+      os_results = fetch_outcomes_service_results(course:, users: [student])
+      combine_results(canvas_results, os_results)
     end
 
     # @param rollups [Array<Rollup>]
     def store_rollups(rollups)
-      # Validate that we have exactly one student's rollups
       case rollups.size
       when 0
         # Student has been removed from all outcomes, mark all as deleted
@@ -177,7 +125,7 @@ module Outcomes
         raise ArgumentError, "Expected rollups for exactly one student, got #{rollups.size} students"
       end
 
-      rows = build_rollup_rows(student_rollup)
+      rows = build_rollup_rows(student_rollup, course, student)
       outcome_ids = student_rollup.scores.map { |s| s.outcome.id }
 
       upserted_ids = []
@@ -193,43 +141,30 @@ module Outcomes
                        .update_all(workflow_state: "deleted")
         end
 
-        # Upsert in batches to avoid oversized statements
         rows.each_slice(500) do |batch|
           result = OutcomeRollup.upsert_all(
             batch,
             unique_by: %i[course_id user_id outcome_id],
-            update_only: %i[calculation_method aggregate_score last_calculated_at workflow_state],
+            update_only: %i[calculation_method aggregate_score submitted_at title hide_points results_count last_calculated_at workflow_state],
             returning: %w[id]
           )
-          # Collect generated or updated ids
           batch_ids = result.map { |row| row["id"] }
           upserted_ids.concat(batch_ids)
         end
       end
 
-      # Reload persisted records to ensure ActiveRecord objects
       OutcomeRollup.where(id: upserted_ids)
     end
 
-    def build_rollup_rows(rollup)
-      rollup.scores.filter_map do |score|
-        # Skip scores that are nil (e.g., from n_mastery calculations with insufficient attempts)
-        next if score.score.nil?
+    # @return [ActiveRecord::Relation<OutcomeRollup>]
+    def handle_empty_results
+      Rails.logger.info("[OutcomeRollup] No results found for student #{student&.id} in course #{course&.id}, skipping rollup")
+      InstStatsd::Statsd.distributed_increment("rollup.student.success", tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
+      InstStatsd::Statsd.count("rollup.student.records_processed", 0, tags: Utils::InstStatsdUtils::Tags.tags_for(course.shard))
 
-        {
-          root_account_id: course.root_account_id,
-          course_id: course.id,
-          user_id: student.id,
-          outcome_id: score.outcome.id,
-          calculation_method: score.outcome.calculation_method,
-          aggregate_score: score.score,
-          workflow_state: "active",
-          last_calculated_at: Time.current,
-        }
-      end
+      OutcomeRollup.none
     end
 
-    # Helper method to delete all active rollups for the student
     def delete_all_student_rollups
       OutcomeRollup.where(
         course_id: course.id,

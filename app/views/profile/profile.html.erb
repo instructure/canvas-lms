@@ -25,6 +25,9 @@
   <div>
     <hr />
     <a href="#" class="edit_settings_link btn button-sidebar-wide"><i class="icon-edit" aria-hidden="true"></i> <%= t('links.edit_settings', "Edit Settings") %></a>
+    <% if @js_env && @js_env[:ONETRUST_CONSENT_DOMAIN_ID].present? %>
+    <a id="ot-sdk-link" class="ot-sdk-show-settings btn button-sidebar-wide" href="#"><%= t('cookie_consent_settings', 'Consent Settings') %></a>
+    <% end %>
       <% if current_mfa_settings != :disabled %>
       <a href="<%= otp_login_path %>" class="btn button-sidebar-wide"><i class="icon-lock" aria-hidden="true"></i> <%= @user.otp_secret_key ? t('links.reconfigure_mfa', "Reconfigure Multi-Factor Authentication") : t('links.configure_mfa', "Set Up Multi-Factor Authentication") %></a>
       <% end %>
@@ -47,11 +50,12 @@
   <% end %>
 <% end %>
 
-<% js_env folder_id: @user.profile_pics_folder.id,
-          PASSWORD_POLICY: @domain_root_account.password_policy,
-          PASSWORD_POLICIES: Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}],
-          PROFILE: @user_data,
-          INTERNATIONAL_SMS_ENABLED: @user.account.feature_enabled?(:international_sms)
+<% js_env({
+     folder_id: @user.profile_pics_folder.id,
+     PASSWORD_POLICY: @domain_root_account.password_policy,
+     PASSWORD_POLICIES: Hash[@password_pseudonyms.map{ |p| [p.id, p.account.password_policy]}],
+     PROFILE: @user_data
+   })
 %>
 <% deferred_js_bundle :profile %>
 <% css_bundle :profile_edit, :pairing_code %>
@@ -60,6 +64,7 @@
   <% if @user_data[:can_edit_avatar] %>
     <%= avatar(@user, url: '#', edit: true, class: "profile_pic_link #{@user.avatar_state}",
         sr_content: t('Click to change profile picture for %{display_name}', :display_name => @user.short_name)) %>
+    <div id="avatar-modal-mount"></div>
   <% else %>
     <%= avatar(@user, url: nil, edit: false, class: "profile_pic") %>
   <% end %>
@@ -360,14 +365,11 @@ TEXT
       <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_and_service_enabled?(:google_drive) || services.include?("google_drive") %>">
         <a href="#" class="btn btn-small"><%= image_tag "google_drive_icon.png", :alt => '' %> <%= t('links.google_drive', "Google Drive") %></a>
       </li>
-      <li id="unregistered_service_skype" class="service" style="<%= hidden if services.include?("skype") || !service_enabled?(:skype) %>">
-        <a href="#" class="btn btn-small"><%= image_tag "skype_icon.png", :alt => '' %> <%= t('links.skype', "Skype") %></a>
-      </li>
       <li id="unregistered_service_diigo" class="service" style="<%= hidden if services.include?("diigo") || !feature_and_service_enabled?(:diigo) %>">
         <a href="#" class="btn btn-small"><%= image_tag "diigo_icon.png", :alt => '' %> <%= t('links.diigo', "Diigo") %></a>
       </li>
-      <div id="register_service_mount_point"></div>
     </ul>
+    <div id="register_service_mount_point"></div>
     </div>
   </td>
 </tr></table>
@@ -392,9 +394,7 @@ TEXT
       <thead>
         <tr>
           <th scope="col"><%= t('headers.application_abbrev', "App") %></th>
-          <% if @current_user&.account.feature_enabled?(:admin_manage_access_tokens) %>
-            <th scope="col"><%= t('headers.state', "Status") %></th>
-          <% end %>
+          <th scope="col"><%= t('headers.state', "Status") %></th>
           <th scope="col"><%= t('headers.purpose', "Purpose") %></th>
           <th scope="col"><%= t('headers.dates', "Dates") %></th>
           <th scope="col"><%= t('headers.action', "Details") %></th>
@@ -407,12 +407,20 @@ TEXT
       </tbody>
     </table>
   </div>
-  <% allow_token_creation = @current_user.access_tokens.temp_record.grants_right?(logged_in_user, :create) %>
+  <% allow_token_creation = @current_user.access_tokens.temp_record.grants_right?(logged_in_user, AccessToken.account_session_for_permissions(@domain_root_account), :create) %>
   <% prohibit_info_text = t("Your Canvas administrators have chosen to limit your ability to generate your own access token. Please reach out to your Canvas administrators to have them generate an access token on your behalf.") %>
-  <div style="margin-top: 10px;" title="<%= prohibit_info_text unless allow_token_creation || @real_current_user %>" >
+  <div style="margin-top: 10px;">
     <a href="#" class="btn btn-primary add_access_token_link" <%= "disabled" unless allow_token_creation %> >
       <i class="icon-plus" aria-hidden="true"></i> <%= t('buttons.new_access_token', "New Access Token") %>
     </a>
+    <% unless allow_token_creation %>
+      <a class="icon-info"
+          tabindex="0"
+          data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'
+          title="<%= prohibit_info_text %>">
+          <span class="screenreader-only"><%= t "Why can't I create an access token?" %></span>
+      </a>
+    <% end %>
   </div>
   <div id='access_token_details_mount_point'></div>
   <div id='new_access_token_mount_point'></div>

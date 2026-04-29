@@ -21,9 +21,8 @@
 import React from 'react'
 import FilterNavFilter from '../FilterTrayFilter'
 import type {FilterNavFilterProps} from '../FilterTrayFilter'
-import {render, fireEvent} from '@testing-library/react'
+import {cleanup, render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import '@testing-library/jest-dom/extend-expect'
 
 const defaultProps: FilterNavFilterProps = {
   modules: [],
@@ -31,7 +30,7 @@ const defaultProps: FilterNavFilterProps = {
   assignmentGroups: [],
   sections: [],
   studentGroupCategories: {},
-  onChange: jest.fn(),
+  onChange: vi.fn(),
   filter: {
     id: '123',
     type: 'submissions',
@@ -42,6 +41,11 @@ const defaultProps: FilterNavFilterProps = {
 
 const dateTests = (testType: string) => {
   let props, filter, onChange, onDelete
+
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
     filter = {
       id: '456',
@@ -53,8 +57,8 @@ const dateTests = (testType: string) => {
       ...defaultProps,
       filter,
     }
-    onChange = jest.fn()
-    onDelete = jest.fn()
+    onChange = vi.fn()
+    onDelete = vi.fn()
   })
 
   it('renders a date field', () => {
@@ -109,8 +113,8 @@ describe('FilterNavFilter', () => {
         ...defaultProps,
         filter,
       }
-      onChange = jest.fn()
-      onDelete = jest.fn()
+      onChange = vi.fn()
+      onDelete = vi.fn()
     })
 
     it('renders filters for submissions', () => {
@@ -162,8 +166,8 @@ describe('FilterNavFilter', () => {
           {id: '2', name: 'Section 2'},
         ],
       }
-      onChange = jest.fn()
-      onDelete = jest.fn()
+      onChange = vi.fn()
+      onDelete = vi.fn()
     })
 
     it('sets the sections field if value is present', () => {
@@ -209,8 +213,8 @@ describe('FilterNavFilter', () => {
           {id: '3', title: 'Grading Period 3', startDate: 3},
         ],
       }
-      onChange = jest.fn()
-      onDelete = jest.fn()
+      onChange = vi.fn()
+      onDelete = vi.fn()
     })
 
     it('sets the grading periods field if value is present', () => {
@@ -269,8 +273,8 @@ describe('FilterNavFilter', () => {
           },
         },
       }
-      onChange = jest.fn()
-      onDelete = jest.fn()
+      onChange = vi.fn()
+      onDelete = vi.fn()
     })
 
     it('sets the student group field if value is present', () => {

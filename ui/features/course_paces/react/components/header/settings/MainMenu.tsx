@@ -17,17 +17,17 @@
  */
 
 import React from 'react'
-import { useScope as createI18nScope } from '@canvas/i18n'
-import { Menu } from '@instructure/ui-menu'
-import { IconSettingsLine } from '@instructure/ui-icons'
-import { Button, IconButton } from '@instructure/ui-buttons'
-import type { ResponsiveSizes } from 'features/course_paces/react/types'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Menu} from '@instructure/ui-menu'
+import {IconSettingsLine} from '@instructure/ui-icons'
+import {Button, IconButton} from '@instructure/ui-buttons'
+import type {ResponsiveSizes} from 'features/course_paces/react/types'
 import {actions} from './../../../actions/ui'
-import { getShowWeightedAssignmentsTray } from './../../../reducers/ui'
-import { connect } from 'react-redux'
-import { StoreState } from '../../../types'
+import {getShowWeightedAssignmentsTray} from './../../../reducers/ui'
+import {connect} from 'react-redux'
+import {StoreState} from '../../../types'
 
-import type { ButtonProps } from '@instructure/ui-buttons'
+import type {ButtonProps} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('course_paces_settings')
 
@@ -56,7 +56,8 @@ interface DispatchProps {
 type MainMenuProps = PassedProps & StoreProps & DispatchProps
 
 const MainMenu = (props: MainMenuProps) => {
-  const showWeightedAssignments = props.isPrincipal && window.ENV.FEATURES.course_pace_weighted_assignments
+  const showWeightedAssignments =
+    props.isPrincipal && window.ENV.FEATURES.course_pace_weighted_assignments
 
   const menuButton = () => {
     if (props.responsiveSize !== 'small') {
@@ -84,7 +85,6 @@ const MainMenu = (props: MainMenuProps) => {
     toggleShowSettingsPopover: (show: boolean) => void,
     context_type: string,
   ) => {
-
     if (!props.isPrincipal) return null
 
     if (context_type === 'Course') {
@@ -105,7 +105,6 @@ const MainMenu = (props: MainMenuProps) => {
 
   const renderWeightedAssignmentSettings = () => {
     if (showWeightedAssignments) {
-
       return (
         <Menu.Item
           type="button"
@@ -156,5 +155,5 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 }
 
 export default connect(mapStateToProps, {
-  showWeightedAssignmentsTray: actions.showWeightedAssignmentsTray
+  showWeightedAssignmentsTray: actions.showWeightedAssignmentsTray,
 })(MainMenu)

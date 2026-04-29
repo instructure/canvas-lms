@@ -23,6 +23,8 @@ const fileContexts = ENV.FILES_CONTEXTS || []
 
 const filesEnv = {
   contexts: fileContexts,
+  userFileAccessRestricted:
+    ENV?.FEATURES?.restrict_student_access && (ENV?.current_user_roles || []).includes('student'),
   contextsDictionary: fileContexts.reduce((dict, context) => {
     const [contextType, contextId] = Array.from(splitAssetString(context.asset_string))
     context.contextType = contextType

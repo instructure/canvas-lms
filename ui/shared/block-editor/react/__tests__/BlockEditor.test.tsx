@@ -52,7 +52,7 @@ describe('BlockEditor', () => {
     '/api/v1/courses/1/block_editor_templates?include[]=node_tree&include[]=thumbnail&sort=name'
   const template_url = '/api/v1/courses/1/block_editor_templates'
   beforeAll(() => {
-    window.alert = jest.fn()
+    window.alert = vi.fn()
 
     fetchMock.get(can_edit_url, {
       can_edit: false,
@@ -63,7 +63,7 @@ describe('BlockEditor', () => {
     fetchMock.delete(`${template_url}/1`, 200)
   })
 
-  afterEach(() => jest.clearAllMocks())
+  afterEach(() => vi.clearAllMocks())
 
   it('renders', async () => {
     const {getByText, getByLabelText} = renderEditor()
@@ -149,7 +149,7 @@ describe('BlockEditor', () => {
     })
 
     it('deletes a template', async () => {
-      window.confirm = jest.fn(() => true)
+      window.confirm = vi.fn(() => true)
       renderEditor({
         content: {id: '1', version: '0.2', blocks: blank_page},
       })

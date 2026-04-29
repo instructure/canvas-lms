@@ -268,11 +268,11 @@ describe('AuthorInfo', () => {
 
     it('renders the last reply at date', () => {
       const container = setup()
-      expect(
-        container.getByText(
-          `Last reply ${new Date('2025-01-16T18:42:00').toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true})}`,
-        ),
-      ).toBeInTheDocument()
+
+      const lastReplyContainer = container.getByTestId('last-reply-at-text')
+      expect(lastReplyContainer.textContent).toContain(
+        `Last reply ${new Date('2025-01-16T18:42:00').toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true})}`,
+      )
     })
 
     it('render the last edited date if it is in the past for teachers', () => {
@@ -507,6 +507,61 @@ describe('AuthorInfo', () => {
       })
 
       expect(container.queryByText('View History')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('SpeedGrader link behavior', () => {
+    const originalWindowTop = window.top
+
+    beforeEach(() => {
+      delete window.top
+      window.top = {location: {href: ''}}
+    })
+
+    afterEach(() => {
+      window.top = originalWindowTop
+    })
+
+    it('opens non-student author links in new tab when in SpeedGrader', () => {
+      window.top.location.href = 'http://test.host/courses/1/gradebook/speed_grader'
+      const container = setup({
+        author: User.mock({
+          _id: '2',
+          displayName: 'Teacher Name',
+          courseRoles: ['TeacherEnrollment'],
+          htmlUrl: 'http://test.host/courses/1/users/2',
+        }),
+      })
+      const link = container.getByRole('link', {name: 'Teacher Name'})
+      expect(link).toHaveAttribute('target', '_blank')
+    })
+
+    it('does not open student links in new tab in SpeedGrader (keeps context card behavior)', () => {
+      window.top.location.href = 'http://test.host/courses/1/gradebook/speed_grader'
+      const container = setup({
+        author: User.mock({
+          _id: '2',
+          displayName: 'Student Name',
+          courseRoles: ['StudentEnrollment'],
+          htmlUrl: 'http://test.host/courses/1/users/2',
+        }),
+      })
+      const link = container.getByRole('link', {name: 'Student Name'})
+      expect(link).not.toHaveAttribute('target')
+    })
+
+    it('opens non-student links in new tab for users without StudentEnrollment', () => {
+      window.top.location.href = 'http://test.host/courses/1/gradebook/speed_grader'
+      const container = setup({
+        author: User.mock({
+          _id: '2',
+          displayName: 'Designer Name',
+          courseRoles: ['DesignerEnrollment', 'ObserverEnrollment'],
+          htmlUrl: 'http://test.host/courses/1/users/2',
+        }),
+      })
+      const link = container.getByRole('link', {name: 'Designer Name'})
+      expect(link).toHaveAttribute('target', '_blank')
     })
   })
 })

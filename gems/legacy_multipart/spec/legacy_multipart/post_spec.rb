@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe LegacyMultipart::Post do
   def parse_params(query, header)
     Rack::Multipart.parse_multipart({ "CONTENT_TYPE" => header["Content-type"], "CONTENT_LENGTH" => query.size, "rack.input" => StringIO.new(query) })

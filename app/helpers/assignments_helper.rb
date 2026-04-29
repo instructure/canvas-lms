@@ -43,10 +43,7 @@ module AssignmentsHelper
   def student_peer_review_link_for(context, assignment, assessment)
     options = assessment.completed? ? completed_link_options : in_progress_link_options
     icon_class = assessment.completed? ? "icon-check" : "icon-warning"
-    text = safe_join [
-      "<i class='#{icon_class}' aria-hidden='true'></i>".html_safe,
-      submission_author_name_for(assessment)
-    ]
+    text = tag.i(class: icon_class, aria: { hidden: true }) + submission_author_name_for(assessment)
     href = if assignment.anonymous_peer_reviews?
              context_url(context, :context_assignment_anonymous_submission_url, assignment.id, assessment.asset.anonymous_id)
            else
@@ -74,8 +71,7 @@ module AssignmentsHelper
 
   def due_at(assignment, user)
     if assignment.multiple_due_dates_apply_to?(user)
-      overrides = assignment.formatted_dates_hash_visible_to(user, assignment.context)
-      overrides = assignment.merge_overrides_by_date(overrides) unless Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting)
+      overrides = assignment.dates_hash_visible_to(user)
       if overrides.length > 1
         multiple_due_dates
       else
@@ -152,5 +148,24 @@ module AssignmentsHelper
     return replace_dash_with_minus(grade) if grading_type == "letter_grade"
 
     grade
+  end
+
+  def show_peer_review_widget?
+    !@context.horizon_course? &&
+      @can_grade &&
+      @context.feature_enabled?(:peer_review_allocation_and_grading) &&
+      @assignment.has_peer_reviews? &&
+      @assignment.peer_review_sub_assignment.present?
+  end
+
+  def show_rubric_section?
+    !@context.horizon_course? && can_do(@assignment, @current_user, :update)
+  end
+
+  def show_legacy_peer_reviews_link?
+    @can_grade &&
+      @assignment.has_peer_reviews? &&
+      (!@assignment.context.feature_enabled?(:peer_review_allocation_and_grading) ||
+        @assignment.peer_review_sub_assignment.blank?)
   end
 end

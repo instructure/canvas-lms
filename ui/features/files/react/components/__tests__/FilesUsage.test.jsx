@@ -31,11 +31,11 @@ describe('FilesUsage', () => {
       contextId: 4,
     }
 
-    mockGet = jest.spyOn($, 'get')
+    mockGet = vi.spyOn($, 'get')
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('requests quota information from the correct API endpoint', async () => {

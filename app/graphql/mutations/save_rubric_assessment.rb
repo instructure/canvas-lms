@@ -28,6 +28,7 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
   argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
 
   field :rubric_assessment, Types::RubricAssessmentType, null: true
+  field :rubric_association, Types::RubricAssociationType, null: true
   field :submission, Types::SubmissionType, null: true
   def resolve(input:)
     root_account = context[:domain_root_account]
@@ -39,12 +40,10 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
 
     assessment = association.rubric_assessments.find(input[:rubric_assessment_id]) if input[:rubric_assessment_id].present?
 
-    verify_authorized_action!(assessment, :update) if assessment.present?
-
     # only check if there's no assessment object, since that's the only time
     # this param matters (find_asset_for_assessment)
     user_id = assessment.present? ? assessment.user_id : submission.user_id
-    raise ActiveRecord::RecordNotFound if user_id.blank?
+    raise GraphQL::ExecutionError, "User ID blank - unable to determine user for assessment" if user_id.blank?
 
     # For a moderated assignment, submitting an assessment claims a grading
     # slot for the submitting provisional grader (or throws an error if no
@@ -77,7 +76,7 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
         )
 
         submission.reload
-        return { submission:, rubric_assessment: }
+        return { submission:, rubric_assessment:, rubric_association: association }
       end
     rescue Assignment::MaxGradersReachedError => e
       raise GraphQL::ExecutionError, e.message

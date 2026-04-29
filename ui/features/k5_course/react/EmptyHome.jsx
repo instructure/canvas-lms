@@ -43,7 +43,7 @@ const EmptyHome = ({pagesPath, hasWikiPages, courseName, canManage}) => (
   >
     <Img src={emptyHomeUrl} data-testid="empty-home-panda" />
     <View width="25rem" margin="x-large none small none">
-      <Text size="large">{I18n.t('This is where you’ll land when your home is complete.')}</Text>
+      <Text size="large">{I18n.t("This is where you'll land when your home is complete.")}</Text>
     </View>
     {canManage && (
       <Button

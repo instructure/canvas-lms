@@ -20,10 +20,11 @@ import {render, screen, within, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {AddBlockModal} from '../AddBlockModal'
+import {type Mock} from 'vitest'
 
 describe('AddBlockModal', () => {
-  let onDismissMock: jest.Mock
-  let onAddBlockMock: jest.Mock
+  let onDismissMock: Mock
+  let onAddBlockMock: Mock
 
   const renderModal = (props: Partial<React.ComponentProps<typeof AddBlockModal>>) => {
     render(
@@ -38,8 +39,8 @@ describe('AddBlockModal', () => {
 
   beforeEach(() => {
     fakeENV.setup()
-    onDismissMock = jest.fn()
-    onAddBlockMock = jest.fn()
+    onDismissMock = vi.fn()
+    onAddBlockMock = vi.fn()
   })
 
   afterEach(() => {
@@ -48,13 +49,13 @@ describe('AddBlockModal', () => {
 
   it('does not renders when open is false', () => {
     renderModal({open: false})
-    expect(screen.queryByText('Add new block')).not.toBeInTheDocument()
+    expect(screen.queryByText('Add a block')).not.toBeInTheDocument()
     expect(screen.queryByText('Add to page')).not.toBeInTheDocument()
   })
 
   it('renders', async () => {
     renderModal({})
-    expect(await screen.findByText('Add new block')).toBeInTheDocument()
+    expect(await screen.findByText('Add a block')).toBeInTheDocument()
     expect(await screen.findByText('Add to page')).toBeInTheDocument()
   })
 

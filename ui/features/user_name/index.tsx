@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import ready from '@instructure/ready'
 import UserSuspendLink from './react/UserSuspendLink'
 import './jquery/index'
@@ -25,5 +25,5 @@ import './jquery/index'
 ready(() => {
   const suspendPlaceholder = document.getElementById('suspend-reactivate-link')
 
-  if (suspendPlaceholder) ReactDOM.render(<UserSuspendLink />, suspendPlaceholder)
+  if (suspendPlaceholder) legacyRender(<UserSuspendLink />, suspendPlaceholder)
 })

@@ -21,22 +21,22 @@ require_relative "support/answer_serializers_specs"
 require_relative "support/textual_answer_serializers_specs"
 
 describe Quizzes::QuizQuestion::AnswerSerializers::Essay do
-  let :output do
-    {
-      question_5: "Hello World!"
-    }.with_indifferent_access
-  end
-  let :input do
-    "Hello World!"
-  end
+  it_behaves_like "Answer Serializers" do
+    let :output do
+      {
+        question_5: "Hello World!"
+      }.with_indifferent_access
+    end
+    let :input do
+      "Hello World!"
+    end
 
-  include_examples "Answer Serializers"
+    it "returns nil when un-answered" do
+      expect(subject.deserialize({})).to be_nil
+    end
 
-  it "returns nil when un-answered" do
-    expect(subject.deserialize({})).to be_nil
-  end
-
-  context "validations" do
-    include_examples "Textual Answer Serializers"
+    context "validations" do
+      it_behaves_like "Textual Answer Serializers"
+    end
   end
 end

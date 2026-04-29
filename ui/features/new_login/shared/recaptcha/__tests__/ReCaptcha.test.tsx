@@ -16,15 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import React from 'react'
 import {ReCaptcha} from '..'
 
 beforeAll(() => {
   window.grecaptcha = {
-    ready: jest.fn(callback => callback()),
-    render: jest.fn(() => 1),
+    ready: vi.fn(callback => callback()),
+    render: vi.fn(() => 1),
   }
+})
+
+afterEach(() => {
+  cleanup()
+  vi.clearAllMocks()
 })
 
 afterAll(() => {
@@ -34,7 +39,7 @@ afterAll(() => {
 describe('ReCaptcha', () => {
   it('mounts without crashing and renders with the correct size', () => {
     const siteKey = 'test-site-key'
-    const onVerify = jest.fn()
+    const onVerify = vi.fn()
     const {container} = render(<ReCaptcha siteKey={siteKey} onVerify={onVerify} />)
     expect(container).toBeInTheDocument()
     expect(window.grecaptcha.ready).toHaveBeenCalled()

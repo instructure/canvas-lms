@@ -21,14 +21,14 @@ import generateId from 'format-message-generate-id/underscored_crc32'
 
 const ns = formatMessage.namespace()
 
+// Configure to ignore missing translations to prevent warnings
+ns.setup({
+  generateId,
+  missingTranslation: 'ignore',
+})
+
 ns.addLocale = translations => {
-  const locale = Object.keys(translations)[0]
-  ns.setup({
-    translations: {...ns.setup().translations, ...translations},
-    locale,
-    generateId,
-    missingTranslation: 'ignore',
-  })
+  ns.setup({translations: {...ns.setup().translations, ...translations}})
 }
 
 export default ns

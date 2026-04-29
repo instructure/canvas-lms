@@ -49,6 +49,6 @@ describe Quizzes::QuizQuestion::AnswerParsers::MultipleDropdowns do
     let(:question_params) { {} }
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::MultipleDropdowns }
 
-    include_examples "All answer parsers"
+    it_behaves_like "All answer parsers"
   end
 end

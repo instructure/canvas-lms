@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import {debounce, uniqueId} from 'lodash'
+import {debounce, uniqueId} from 'es-toolkit/compat'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import TreeItemView from './TreeItemView'
 import collectionTemplate from '../../jst/TreeCollection.handlebars'

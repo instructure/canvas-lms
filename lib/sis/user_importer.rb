@@ -129,18 +129,24 @@ module SIS
         until @batched_users.empty?
           user_row = @batched_users.shift
           pseudo = @root_account.pseudonyms.find_by(sis_user_id: user_row.user_id.to_s)
-          if user_row.authentication_provider_id.present?
-            unless @authentication_providers.key?(user_row.authentication_provider_id)
-              begin
-                @authentication_providers[user_row.authentication_provider_id] =
-                  @root_account.authentication_providers.active.find(user_row.authentication_provider_id)
-              rescue ActiveRecord::RecordNotFound
-                @authentication_providers[user_row.authentication_provider_id] = nil
+          pseudo_by_login = begin
+            if user_row.authentication_provider_id.present?
+              unless @authentication_providers.key?(user_row.authentication_provider_id)
+                begin
+                  @authentication_providers[user_row.authentication_provider_id] =
+                    @root_account.authentication_providers.active.find(user_row.authentication_provider_id)
+                rescue ActiveRecord::RecordNotFound
+                  @authentication_providers[user_row.authentication_provider_id] = nil
+                end
               end
+              @root_account.pseudonyms.active.by_unique_id(user_row.login_id).find_by(authentication_provider_id: @authentication_providers[user_row.authentication_provider_id])
+            else
+              @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
             end
-            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).find_by(authentication_provider_id: @authentication_providers[user_row.authentication_provider_id])
-          else
-            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
+          rescue Net::IMAP::StringPrep::ProhibitedCodepoint
+            message = I18n.t("Invalid Unicode characters in login_id '%{login_id}'; skipping", login_id: user_row.login_id)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+            next
           end
           pseudo_by_integration = nil
           pseudo_by_integration = @root_account.pseudonyms.find_by(integration_id: user_row.integration_id.to_s) if user_row.integration_id.present?
@@ -265,6 +271,12 @@ module SIS
               next
             end
 
+            # In some scenarios, the user may have had a SIS import to delete them attempted
+            # when the user sync flag was in an off state.
+            #
+            # Re-sync the deleted users to ensure retrying that SIS import succeeds.
+            record_sync_for(user)
+
             # if the pseudonym is already deleted, we're done.
             next if pseudo.workflow_state == "deleted"
 
@@ -324,9 +336,10 @@ module SIS
               if user.changed? || (sticky_opts[:override_sis_stickiness] && sticky_opts[:clear_sis_stickiness] &&
                  user["stuck_sis_fields"].present?)
                 user_touched = true
+                user_changed = user.changed?
                 user_saved = user.save
                 # need to call save first so we can get the user id
-                record_sync_for(user) if user_saved && user.changed?
+                record_sync_for(user) if user_saved && user_changed
                 if !user_saved && !user.errors.empty?
                   message = generate_user_warning(user.errors.first.join(" "), user_row.user_id, user_row.login_id)
                   raise ImportError, message
@@ -521,8 +534,12 @@ module SIS
         end
       end
 
+      def user_can_still_log_in?(to:, user:, sis_user_id:)
+        to.pseudonyms.active.where(user_id: user).where("sis_user_id != ? OR sis_user_id IS NULL", sis_user_id).exists?
+      end
+
       def remove_enrollments_if_last_login(user, user_id)
-        return false if @root_account.pseudonyms.active.where(user_id: user).where("sis_user_id != ? OR sis_user_id IS NULL", user_id).exists?
+        return false if user_can_still_log_in?(to: @root_account, user:, sis_user_id: user_id)
 
         enrollments = @root_account.enrollments.active.where(user_id: user)
                                    .select(:id, :type, :course_id, :course_section_id, :user_id, :workflow_state).to_a

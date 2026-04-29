@@ -32,7 +32,8 @@ describe "files index page", :ignore_js_errors do
 
   context("for a course") do
     context("as a teacher") do
-      base_file_name = "example.pdf"
+      let(:base_file_name) { "example.pdf" }
+
       before(:once) do
         course_with_teacher(active_all: true)
       end
@@ -149,8 +150,9 @@ describe "files index page", :ignore_js_errors do
       end
 
       context "from cog icon" do
-        a_txt_file_name = "a_file.txt"
-        b_txt_file_name = "b_file.txt"
+        let(:a_txt_file_name) { "a_file.txt" }
+        let(:b_txt_file_name) { "b_file.txt" }
+
         before do
           add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
                    @course,
@@ -190,22 +192,22 @@ describe "files index page", :ignore_js_errors do
         it "unpublishes and publish a file", priority: "1" do
           published_status_button.click
           edit_item_permissions(:unpublished)
-          expect(unpublished_status_button).to be_present
+          expect(f(all_files_table_row)).to contain_css("[data-testid='unpublished-button-icon']")
           unpublished_status_button.click
           edit_item_permissions(:published)
-          expect(published_status_button).to be_present
+          expect(f(all_files_table_row)).to contain_css("[data-testid='published-button-icon']")
         end
 
         it "makes file available to student with link", priority: "1" do
           published_status_button.click
           edit_item_permissions(:available_with_link)
-          expect(link_only_status_button).to be_present
+          expect(f(all_files_table_row)).to contain_css("[data-testid='link-only-button-icon']")
         end
 
         it "makes file available to student within given timeframe", priority: "1" do
           published_status_button.click
           edit_item_permissions(:available_with_timeline)
-          expect(restricted_status_button).to be_displayed
+          expect(f(all_files_table_row)).to contain_css("[data-testid='restricted-button-icon']")
         end
 
         it "sets focus to the close button when opening the permission edit dialog", priority: "1" do
@@ -218,8 +220,9 @@ describe "files index page", :ignore_js_errors do
       end
 
       context "from toolbar menu" do
-        a_txt_file_name = "a_file.txt"
-        b_txt_file_name = "b_file.txt"
+        let(:a_txt_file_name) { "a_file.txt" }
+        let(:b_txt_file_name) { "b_file.txt" }
+
         before do
           add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
                    @course,
@@ -247,14 +250,14 @@ describe "files index page", :ignore_js_errors do
           select_item_to_edit_from_kebab_menu(1)
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:available_with_link)
-          expect(link_only_status_button).to be_present
+          expect(f(all_files_table_row)).to contain_css("[data-testid='link-only-button-icon']")
         end
 
         it "makes file available to student within given timeframe from toolbar", priority: "1" do
           select_item_to_edit_from_kebab_menu(1)
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:available_with_timeline)
-          expect(restricted_status_button).to be_displayed
+          expect(f(all_files_table_row)).to contain_css("[data-testid='restricted-button-icon']")
           expect(permission_tooltip.attribute("innerText")).to include(/Available from [A-Za-z]{3} 15 at 12am until [A-Za-z]{3} 25 at 12am/)
         end
 
@@ -302,16 +305,17 @@ describe "files index page", :ignore_js_errors do
       end
 
       context "File Preview" do
-        a_txt_file_name = "a_file.txt"
-        b_txt_file_name = "b_file.txt"
-        mp3_file_name = "292.mp3"
+        let(:a_txt_file_name) { "a_file.txt" }
+        let(:b_txt_file_name) { "b_file.txt" }
+        let(:mp3_file_name) { "292.mp3" }
+
         before do
-          add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
-                   @course,
-                   a_txt_file_name)
-          add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
-                   @course,
-                   b_txt_file_name)
+          @file_a = add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
+                             @course,
+                             a_txt_file_name)
+          @file_b = add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
+                             @course,
+                             b_txt_file_name)
           add_file(fixture_file_upload(mp3_file_name, "audio/mpeg"),
                    @course,
                    mp3_file_name)
@@ -337,28 +341,66 @@ describe "files index page", :ignore_js_errors do
           expect(breadcrumb).to contain_css("li", text: "Sub")
         end
 
+        context "URL-based preview" do
+          it "opens preview modal when URL contains preview parameter" do
+            get "/courses/#{@course.id}/files?preview=#{@file_a.id}"
+            wait_for_ajaximations
+
+            expect(preview_modal).to be_displayed
+            expect(driver.current_url).to include("preview=#{@file_a.id}")
+          end
+
+          it "updates URL when navigating between files in preview" do
+            # First load the files page to ensure files are in the collection
+            get "/courses/#{@course.id}/files"
+            wait_for_ajaximations
+
+            # Then navigate to the preview
+            get "/courses/#{@course.id}/files?preview=#{@file_a.id}"
+            wait_for_ajaximations
+
+            preview_next_button.click
+            wait_for_ajaximations
+
+            expect(driver.current_url).to include("preview=#{@file_b.id}")
+            expect(preview_file_header).to include_text("b_file.txt")
+
+            preview_previous_button.click
+            wait_for_ajaximations
+
+            expect(driver.current_url).to include("preview=#{@file_a.id}")
+            expect(preview_file_header).to include_text("a_file.txt")
+          end
+
+          it "shows error state for file from different course context" do
+            current_course = @course
+            other_course = course_factory(active_all: true)
+            other_file = add_file(fixture_file_upload("a_file.txt", "text/plain"), other_course, "a_file.txt")
+
+            get "/courses/#{current_course.id}/files?preview=#{other_file.id}"
+
+            expect(preview_modal).to be_displayed
+            expect(file_not_found).to be_displayed
+            expect(file_not_found).to include_text("File Not Found")
+          end
+        end
+
         context "with media file" do
           before do
             stub_kaltura
           end
 
-          context "when consolidated_media_player feature is enabled" do
-            before do
-              Account.site_admin.enable_feature! :consolidated_media_player
-            end
+          it "works in the user's files page" do
+            get "/files/folder/courses_#{@course.id}/"
+            get_item_files_table(1, 1).click
+            wait_for_ajaximations
+            expect(preview_file_preview_modal_alert).to include_text("Your media has been uploaded and will appear here after processing.")
+          end
 
-            it "works in the user's files page" do
-              get "/files/folder/courses_#{@course.id}/"
-              get_item_files_table(1, 1).click
-              wait_for_ajaximations
-              expect(preview_file_preview_modal_alert).to include_text("Your media has been uploaded and will appear here after processing.")
-            end
-
-            it "works in the course's files page" do
-              get_item_files_table(1, 1).click
-              wait_for_ajaximations
-              expect(preview_file_preview_modal_alert).to include_text("Your media has been uploaded and will appear here after processing.")
-            end
+          it "works in the course's files page" do
+            get_item_files_table(1, 1).click
+            wait_for_ajaximations
+            expect(preview_file_preview_modal_alert).to include_text("Your media has been uploaded and will appear here after processing.")
           end
         end
       end
@@ -471,7 +513,8 @@ describe "files index page", :ignore_js_errors do
       end
 
       context "When Require Usage Rights is turned-off" do
-        a_txt_file_name = "a_file.txt"
+        let(:a_txt_file_name) { "a_file.txt" }
+
         before do
           course_with_teacher_logged_in
           @course.usage_rights_required = false
@@ -498,9 +541,10 @@ describe "files index page", :ignore_js_errors do
       end
 
       context "Move dialog" do
-        folder_name = "base folder"
-        file_to_move = "a_file.txt"
-        txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
+        let(:folder_name) { "base folder" }
+        let(:file_to_move) { "a_file.txt" }
+        let(:txt_files) { %w[a_file.txt b_file.txt c_file.txt].freeze }
+
         before do
           @base_folder = Folder.create!(name: folder_name, context: @course)
           txt_files.map do |text_file|
@@ -618,6 +662,17 @@ describe "files index page", :ignore_js_errors do
         file_attachment.publish!
         get "/courses/#{@course.id}/files"
         expect(content).not_to contain_css(files_usage_text_selector)
+      end
+
+      it "can open file preview via URL parameter" do
+        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "student_file.pdf")
+        file_attachment.publish!
+
+        get "/courses/#{@course.id}/files?preview=#{file_attachment.id}"
+        wait_for_ajaximations
+
+        expect(preview_file_header).to include_text("student_file.pdf")
+        expect(preview_modal).to be_displayed
       end
     end
   end

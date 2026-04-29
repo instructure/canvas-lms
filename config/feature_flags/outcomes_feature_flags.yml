@@ -18,6 +18,10 @@ limit_section_visibility_in_lmgb:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 outcome_alignments_course_migration:
   state: hidden
   applies_to: RootAccount
@@ -42,24 +46,48 @@ improved_outcomes_management:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 assignment_comment_library:
   type: setting
   state: hidden
   applies_to: RootAccount
   display_name: Comment Library
   description: Allows users to save and search frequently used feedback in a library of comments to be used in SpeedGrader.
+  environments:
+    development:
+      state: on
+    test:
+      state: on
+    ci:
+      state: on
 improved_lmgb:
   type: setting
   state: hidden
-  applies_to: RootAccount
-  display_name: Learning Mastery Gradebook Redesign
+  applies_to: Course
+  display_name: Learning Mastery Gradebook Enhancements
   description: Improvements made to enhance the user experience within the Learning Mastery Gradebook.
   beta: true
   environments:
-    production:
-      state: disabled
-    beta:
-      state: disabled
+    ci:
+      state: allowed
+    development:
+      state: allowed
+lmgb_student_reporting:
+  type: setting
+  state: hidden
+  applies_to: Course
+  shadow: true
+  display_name: Learning Mastery Gradebook Student Reporting
+  description: Enables student reporting features in the Learning Mastery Gradebook.
+  beta: true
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
 menu_option_for_outcome_details_page:
   type: setting
   state: hidden
@@ -68,6 +96,10 @@ menu_option_for_outcome_details_page:
   description: Adds menu option for accessing alignments at the outcome level with Improved Outcomes Management
   environments:
     development:
+      state: on
+    test:
+      state: on
+    ci:
       state: on
 outcomes_friendly_description:
   state: hidden
@@ -79,6 +111,10 @@ outcomes_friendly_description:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 outcome_service_results_to_canvas:
   state: hidden
   applies_to: Course
@@ -86,6 +122,10 @@ outcome_service_results_to_canvas:
   description: Allows result data stored in the Outcomes Service to display in Canvas reporting (LMGB, sLMGB and outcome related admin reporting).
   environments:
     development:
+      state: on
+    test:
+      state: on
+    ci:
       state: on
 outcome_average_calculation:
   state: allowed_on
@@ -103,6 +143,10 @@ outcome_alignment_summary_with_new_quizzes:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 outcomes_new_decaying_average_calculation:
   state: hidden
   applies_to: RootAccount
@@ -110,6 +154,10 @@ outcomes_new_decaying_average_calculation:
   description: Allows users to use new decaying average as a calculation method for a given outcome.
   environments:
     development:
+      state: on
+    test:
+      state: on
+    ci:
       state: on
 archive_outcomes:
   state: hidden
@@ -121,7 +169,8 @@ course_copy_alignments:
   state: hidden
   applies_to: RootAccount
   display_name: Course Copy Alignments Clone
-  description: Allow to clone alignments after the course copy process
+  description: Allow to clone alignments after the course copy process. This is related to new quizzes alignments.
+  after_state_change_proc: rollback_assignments_state
 prevent_deletion_outcomes_with_os_alignments:
   state: hidden
   applies_to: SiteAdmin
@@ -136,3 +185,43 @@ improved_outcome_report_generation:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
+outcomes_rollup_propagation:
+  state: hidden
+  display_name: Outcomes Rollup Propagation
+  description: Controls whether background jobs populate the rollup table. Only Site Admins can toggle.
+  applies_to: SiteAdmin
+  shadow: true
+outcomes_rollup_read:
+  state: hidden
+  display_name: Outcomes Rollup Read
+  description: When enabled, LMGB reads from rollup table instead of calculating. Only Site Admins can toggle.
+  applies_to: SiteAdmin
+  shadow: true
+account_outcome_rollup_orchestrator:
+  state: hidden
+  display_name: Account Outcome Rollup Orchestrator
+  description: Uses batch processing orchestrator when account-level outcomes are updated to recalculate rollups for affected courses.
+  applies_to: SiteAdmin
+  shadow: true
+default_to_learning_mastery_gradebook:
+  state: hidden
+  applies_to: Course
+  display_name: Student Grades Page Learning Mastery Default
+  description: Student Grades Page Learning Mastery Default sets the Learning Mastery tab as the default view when students access their Grades page. This option helps students focus on progress toward course learning outcomes using both numerical scores and mastery levels.
+  environments:
+    development:
+      state: allowed
+    test:
+      state: allowed
+    ci:
+      state: allowed
+outcomes_service_api_write:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Outcomes Service Api Write
+  description:
+    When enabled, Canvas performs CRUD operations via API to the Outcomes Service.

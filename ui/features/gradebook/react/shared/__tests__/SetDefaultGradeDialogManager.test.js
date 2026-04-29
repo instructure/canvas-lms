@@ -21,11 +21,11 @@ import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog'
 import SetDefaultGradeDialogManager from '../SetDefaultGradeDialogManager'
 import AsyncComponents from '../../default_gradebook/AsyncComponents'
 
-jest.mock('@canvas/grading/jquery/SetDefaultGradeDialog', () => {
-  return jest.fn().mockImplementation(() => ({
-    show: jest.fn(),
-  }))
-})
+vi.mock('@canvas/grading/jquery/SetDefaultGradeDialog', () => ({
+  default: vi.fn().mockImplementation(() => ({
+    show: vi.fn(),
+  })),
+}))
 
 const createAssignmentProp = () => ({
   id: '1',
@@ -136,13 +136,13 @@ describe('SetDefaultGradeDialogManager#showDialog', () => {
   }
 
   beforeEach(() => {
-    flashErrorMock = jest.spyOn($, 'flashError')
-    loadSetDefaultGradeDialogMock = jest.spyOn(AsyncComponents, 'loadSetDefaultGradeDialog')
+    flashErrorMock = vi.spyOn($, 'flashError')
+    loadSetDefaultGradeDialogMock = vi.spyOn(AsyncComponents, 'loadSetDefaultGradeDialog')
     loadSetDefaultGradeDialogMock.mockResolvedValue(SetDefaultGradeDialog)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('shows the SetDefaultGradeDialog when assignment is not in a closed grading period', async () => {

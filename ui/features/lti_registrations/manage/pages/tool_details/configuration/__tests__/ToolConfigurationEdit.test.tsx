@@ -15,42 +15,36 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {getByTestId, queryAllByText, render} from '@testing-library/react'
-import React from 'react'
-import {MemoryRouter, Outlet, Route, Routes} from 'react-router-dom'
 import {ZLtiImsRegistrationId} from '../../../../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZLtiToolConfigurationId} from '../../../../model/lti_tool_configuration/LtiToolConfigurationId'
+import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
 import {ToolConfigurationEdit} from '../ToolConfigurationEdit'
 import {mockConfiguration, mockOverlay, renderApp} from './helpers'
-import {i18nLtiPlacement} from '../../../../model/i18nLtiPlacement'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {i18nLtiPrivacyLevel} from '../../../../model/i18nLtiPrivacyLevel'
-import {screen} from '@testing-library/dom'
-import {
-  getInputIdForField,
-  Lti1p3RegistrationOverlayStateErrorField,
-} from '../../../../registration_overlay/validateLti1p3RegistrationOverlayState'
+import {getInputIdForField} from '../../../../registration_overlay/validateLti1p3RegistrationOverlayState'
 import * as ue from '@testing-library/user-event'
 import {Lti1p3RegistrationOverlayState} from 'features/lti_registrations/manage/registration_overlay/Lti1p3RegistrationOverlayState'
-import {LtiPlacement} from 'features/developer_keys_v2/model/LtiPlacements'
+import {LtiScopes} from '@canvas/lti/model/LtiScope'
+import {LtiPlacements} from '../../../../model/LtiPlacement'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {fireEvent} from '@testing-library/react'
 
-const userEvent = ue.userEvent.setup({advanceTimers: jest.advanceTimersByTime})
+// Mock use-debounce to provide a flush method
+vi.mock('use-debounce', () => ({
+  useDebouncedCallback: (callback: any) => {
+    const debouncedFn = (...args: any[]) => callback(...args)
+    debouncedFn.flush = vi.fn()
+    return debouncedFn
+  },
+}))
+
+const userEvent = ue.userEvent.setup()
 
 describe('ToolConfigurationEdit', () => {
-  beforeEach(() => {
-    jest.resetAllMocks()
-    jest.useFakeTimers()
-  })
-
-  afterEach(() => {
-    jest.runAllTimers()
-    jest.useRealTimers()
-  })
-
   describe('Manual Registrations', () => {
     it('should render the Launch Settings', () => {
-      const updateLtiRegistration = jest.fn()
-      const {getByText, getByTestId, container} = renderApp({
+      const {getByText, container} = renderApp({
         n: 'Test App',
         i: 1,
         configuration: {
@@ -65,7 +59,7 @@ describe('ToolConfigurationEdit', () => {
           overlay: mockOverlay({}, {}),
           manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
         },
-      })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+      })(<ToolConfigurationEdit />)
 
       expect(getByText('Launch Settings')).toBeInTheDocument()
       getInputIdForField(`redirectURIs`)
@@ -80,8 +74,7 @@ describe('ToolConfigurationEdit', () => {
       ['customFields', 'invalid-custom-fields'],
     ] satisfies [keyof Lti1p3RegistrationOverlayState['launchSettings'], string][])(
       'should focus on the %s field when the form is submitted with an invalid value',
-      async (field, value) => {
-        const updateLtiRegistration = jest.fn()
+      async (field, _) => {
         const {getByText, container} = renderApp({
           n: 'Test App',
           i: 1,
@@ -99,7 +92,7 @@ describe('ToolConfigurationEdit', () => {
             overlay: mockOverlay({}, {}),
             manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
           },
-        })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+        })(<ToolConfigurationEdit />)
 
         const element = container.querySelector(`#${getInputIdForField('redirectURIs')}`)
         if (element) {
@@ -121,8 +114,7 @@ describe('ToolConfigurationEdit', () => {
 
   describe('Non-Manual Registrations', () => {
     it('should not render the Launch Settings', () => {
-      const updateLtiRegistration = jest.fn()
-      const {getByText, queryAllByText, container} = renderApp({
+      const {getByText, queryAllByText} = renderApp({
         n: 'Test App',
         i: 1,
         configuration: {},
@@ -130,15 +122,14 @@ describe('ToolConfigurationEdit', () => {
           ims_registration_id: ZLtiImsRegistrationId.parse('1'),
           overlaid_configuration: mockConfiguration({}),
         },
-      })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+      })(<ToolConfigurationEdit />)
 
       expect(getByText('Permissions')).toBeInTheDocument()
       expect(queryAllByText('Launch Settings')).toHaveLength(0)
     })
 
     it("should only render the registration's scopes", () => {
-      const updateLtiRegistration = jest.fn()
-      const {getByText, getAllByText, queryAllByText} = renderApp({
+      const {getByText, queryAllByText} = renderApp({
         n: 'Test App',
         i: 1,
         configuration: {
@@ -156,7 +147,7 @@ describe('ToolConfigurationEdit', () => {
             ],
           }),
         },
-      })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+      })(<ToolConfigurationEdit />)
 
       expect(
         getByText(i18nLtiScope('https://canvas.instructure.com/lti-ags/progress/scope/show')),
@@ -175,8 +166,7 @@ describe('ToolConfigurationEdit', () => {
     })
 
     it("should only render the registration's placements", () => {
-      const updateLtiRegistration = jest.fn()
-      const {getByText, queryAllByTestId, getByTestId} = renderApp({
+      const {queryAllByTestId, getByTestId} = renderApp({
         n: 'Test App',
         i: 1,
         configuration: {
@@ -222,7 +212,7 @@ describe('ToolConfigurationEdit', () => {
             ],
           }),
         },
-      })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+      })(<ToolConfigurationEdit />)
 
       expect(getByTestId(`placement-checkbox-course_navigation`)).toBeInTheDocument()
       expect(getByTestId(`placement-checkbox-account_navigation`)).toBeInTheDocument()
@@ -231,8 +221,7 @@ describe('ToolConfigurationEdit', () => {
     })
 
     it('should not render the override URIs', () => {
-      const updateLtiRegistration = jest.fn()
-      const {getByText, queryAllByText} = renderApp({
+      const {queryAllByText} = renderApp({
         n: 'Test App',
         i: 1,
         configuration: {},
@@ -259,14 +248,169 @@ describe('ToolConfigurationEdit', () => {
             ],
           }),
         },
-      })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+      })(<ToolConfigurationEdit />)
 
       expect(queryAllByText('Override URIs')).toHaveLength(0)
+    })
+
+    describe('when the top_navigation_placement ff is disabled', () => {
+      beforeEach(() => {
+        fakeENV.setup({
+          FEATURES: {
+            top_navigation_placement: false,
+          },
+        })
+      })
+
+      afterEach(() => {
+        fakeENV.teardown()
+      })
+
+      it('should not render top_navigation placement in placements list', () => {
+        const {queryAllByTestId} = renderApp({
+          n: 'Test App',
+          i: 1,
+          configuration: {
+            placements: [
+              {
+                placement: 'top_navigation',
+                enabled: true,
+                icon_url: 'http://example.com/icon.png',
+                text: 'Top Nav',
+              },
+              {
+                placement: 'course_navigation',
+                enabled: true,
+                icon_url: 'http://example.com/icon.png',
+                text: 'Course Nav',
+              },
+            ],
+          },
+          registration: {
+            ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+            overlaid_configuration: mockConfiguration({
+              placements: [
+                {
+                  placement: 'top_navigation',
+                  enabled: true,
+                  icon_url: 'http://example.com/icon.png',
+                  text: 'Top Nav',
+                },
+                {
+                  placement: 'course_navigation',
+                  enabled: true,
+                  icon_url: 'http://example.com/icon.png',
+                  text: 'Course Nav',
+                },
+              ],
+            }),
+          },
+        })(<ToolConfigurationEdit />)
+
+        expect(queryAllByTestId(`placement-checkbox-top_navigation`)).toHaveLength(0)
+        expect(queryAllByTestId(`placement-checkbox-course_navigation`)).toHaveLength(1)
+      })
+
+      it('should not render top_navigation in icon URLs section', () => {
+        const {container} = renderApp({
+          n: 'Test App',
+          i: 1,
+          configuration: {
+            placements: [
+              {
+                placement: 'top_navigation',
+                enabled: true,
+                icon_url: 'http://example.com/icon.png',
+                text: 'Top Nav',
+              },
+              {
+                placement: 'global_navigation',
+                enabled: true,
+                icon_url: 'http://example.com/icon.png',
+                text: 'Global Nav',
+              },
+            ],
+          },
+          registration: {
+            ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+            overlaid_configuration: mockConfiguration({
+              placements: [
+                {
+                  placement: 'top_navigation',
+                  enabled: true,
+                  icon_url: 'http://example.com/icon.png',
+                  text: 'Top Nav',
+                },
+                {
+                  placement: 'global_navigation',
+                  enabled: true,
+                  icon_url: 'http://example.com/icon.png',
+                  text: 'Global Nav',
+                },
+              ],
+            }),
+          },
+        })(<ToolConfigurationEdit />)
+
+        // Top navigation should not have an icon input field
+        expect(
+          container.querySelector(`#${getInputIdForField('icon_uri_top_navigation')}`),
+        ).not.toBeInTheDocument()
+        // Global navigation should have an icon input field
+        expect(
+          container.querySelector(`#${getInputIdForField('icon_uri_global_navigation')}`),
+        ).toBeInTheDocument()
+      })
+
+      it('should not render top_navigation in placement names section', () => {
+        const {getAllByLabelText} = renderApp({
+          n: 'Test App',
+          i: 1,
+          configuration: {
+            placements: [
+              {
+                placement: 'top_navigation',
+                enabled: true,
+                text: 'Top Nav',
+              },
+              {
+                placement: 'global_navigation',
+                enabled: true,
+                icon_url: 'http://example.com/icon.png',
+                text: 'Global Nav',
+              },
+            ],
+          },
+          registration: {
+            ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+            overlaid_configuration: mockConfiguration({
+              placements: [
+                {
+                  placement: 'top_navigation',
+                  enabled: true,
+                  text: 'Top Nav',
+                },
+                {
+                  placement: 'global_navigation',
+                  enabled: true,
+                  icon_url: 'http://example.com/icon.png',
+                  text: 'Global Nav',
+                },
+              ],
+            }),
+          },
+        })(<ToolConfigurationEdit />)
+
+        // Global Navigation appears in: checkbox, placement name input, and icon input
+        const globalNavInputs = getAllByLabelText('Global Navigation')
+        expect(globalNavInputs).toHaveLength(3)
+
+        expect(() => getAllByLabelText('Top Navigation')).toThrow()
+      })
     })
   })
 
   it("should render the registration's data sharing setting", () => {
-    const updateLtiRegistration = jest.fn()
     const {getByText, getByDisplayValue} = renderApp({
       n: 'Test App',
       i: 1,
@@ -279,9 +423,334 @@ describe('ToolConfigurationEdit', () => {
           privacy_level: 'email_only',
         }),
       },
-    })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+    })(<ToolConfigurationEdit />)
 
     expect(getByText('Data Sharing')).toBeInTheDocument()
     expect(getByDisplayValue(i18nLtiPrivacyLevel('email_only'))).toBeInTheDocument()
+  })
+
+  describe('EULA Settings', () => {
+    const mockEulaMessageSettings = [
+      {
+        type: 'LtiEulaRequest' as const,
+        enabled: true,
+        target_link_uri: 'https://example.com/eula',
+        custom_fields: {
+          eula_field1: 'value1',
+          eula_field2: 'value2',
+        },
+      },
+    ]
+
+    beforeEach(() => {
+      fakeENV.setup({
+        FEATURES: {},
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('should render EULA settings for manual registrations when feature flag is enabled', () => {
+      window.ENV.FEATURES!.lti_asset_processor = true
+
+      const {getByText, getByLabelText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          launch_settings: {
+            message_settings: mockEulaMessageSettings,
+          },
+        },
+        registration: {
+          configuration: mockConfiguration({
+            launch_settings: {
+              message_settings: mockEulaMessageSettings,
+            },
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(getByText('EULA Settings')).toBeInTheDocument()
+      expect(getByLabelText('Enable EULA Request')).toBeInTheDocument()
+      expect(getByLabelText('EULA Target Link URI')).toBeInTheDocument()
+      expect(getByLabelText('EULA Custom Fields')).toBeInTheDocument()
+    })
+
+    it('should render EULA settings when message settings contain LtiEulaRequest', () => {
+      const {getByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          launch_settings: {
+            message_settings: mockEulaMessageSettings,
+          },
+        },
+        registration: {
+          configuration: mockConfiguration({
+            launch_settings: {
+              message_settings: mockEulaMessageSettings,
+            },
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(getByText('EULA Settings')).toBeInTheDocument()
+      expect(getByText('Enable EULA Request')).toBeInTheDocument()
+    })
+
+    it('should render EULA settings when tool has EulaUser scope and asset processor placements', () => {
+      const {getByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          scopes: [LtiScopes.EulaUser],
+          placements: [
+            {
+              placement: LtiPlacements.ActivityAssetProcessor,
+              enabled: true,
+              text: 'Activity Asset Processor',
+            },
+          ],
+        },
+        registration: {
+          configuration: mockConfiguration({
+            scopes: [LtiScopes.EulaUser],
+            placements: [
+              {
+                placement: LtiPlacements.ActivityAssetProcessor,
+                enabled: true,
+                text: 'Activity Asset Processor',
+              },
+            ],
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(getByText('EULA Settings')).toBeInTheDocument()
+    })
+
+    it('should not render EULA settings for non-manual registrations', () => {
+      const {queryByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          launch_settings: {
+            message_settings: mockEulaMessageSettings,
+          },
+        },
+        registration: {
+          ims_registration_id: ZLtiImsRegistrationId.parse('1'),
+          overlaid_configuration: mockConfiguration({
+            launch_settings: {
+              message_settings: mockEulaMessageSettings,
+            },
+          }),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(queryByText('EULA Settings')).not.toBeInTheDocument()
+    })
+
+    it('should not render EULA settings when no message settings and no EULA scope/placements', () => {
+      const {queryByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          // No launch_settings with EULA message settings
+          // No scopes that include EulaUser
+          // No placements that include ActivityAssetProcessor
+        },
+        registration: {
+          configuration: mockConfiguration({
+            // No launch_settings, no EULA-related scopes or placements
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(queryByText('EULA Settings')).not.toBeInTheDocument()
+    })
+
+    it('should show EULA settings in the correct order after Placements', () => {
+      const {container} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          target_link_uri: 'https://example.com/target_link_uri',
+          redirect_uris: ['https://example.com/target_link_uri'],
+          launch_settings: {
+            message_settings: mockEulaMessageSettings,
+          },
+        },
+        registration: {
+          configuration: mockConfiguration({
+            target_link_uri: 'https://example.com/target_link_uri',
+            redirect_uris: ['https://example.com/target_link_uri'],
+            launch_settings: {
+              message_settings: mockEulaMessageSettings,
+            },
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const sections = container.querySelectorAll('h3')
+      const sectionTexts = Array.from(sections).map(section => section.textContent)
+
+      const placementsIndex = sectionTexts.indexOf('Placements')
+      const eulaSettingsIndex = sectionTexts.indexOf('EULA Settings')
+      const overrideURIsIndex = sectionTexts.indexOf('Override URIs')
+
+      expect(placementsIndex).not.toBe(-1)
+      expect(eulaSettingsIndex).not.toBe(-1)
+      expect(overrideURIsIndex).not.toBe(-1)
+      expect(eulaSettingsIndex).toBeGreaterThan(placementsIndex)
+      expect(overrideURIsIndex).toBeGreaterThan(eulaSettingsIndex)
+    })
+  })
+
+  describe('Local Template Registrations', () => {
+    it('should not render the Launch Settings for local template registrations', () => {
+      const {getByText, queryAllByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          target_link_uri: 'https://example.com/target_link_uri',
+          redirect_uris: ['https://example.com/target_link_uri'],
+        },
+        registration: {
+          configuration: mockConfiguration({
+            target_link_uri: 'https://example.com/target_link_uri',
+            redirect_uris: ['https://example.com/target_link_uri'],
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+          template_registration_id: ZLtiRegistrationId.parse('999'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(getByText('Permissions')).toBeInTheDocument()
+      expect(queryAllByText('Launch Settings')).toHaveLength(0)
+    })
+
+    it('should not validate launch settings when submitting local template registration', async () => {
+      const {getByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          target_link_uri: '',
+          redirect_uris: [],
+        },
+        registration: {
+          configuration: mockConfiguration({
+            target_link_uri: '',
+            redirect_uris: [],
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+          template_registration_id: ZLtiRegistrationId.parse('999'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const submitBtn = getByText('Update Configuration')
+      submitBtn.click()
+
+      // Should not focus on redirect URIs field since we're not validating launch settings
+      const redirectUrisElement = document.querySelector(`#${getInputIdForField('redirectURIs')}`)
+      expect(redirectUrisElement).not.toBeInTheDocument()
+    })
+
+    it('should enable the Update Configuration button for local template registrations', () => {
+      const {getByRole} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          inherited: true,
+          overlaid_configuration: mockConfiguration({}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+          template_registration_id: ZLtiRegistrationId.parse('999'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const updateButton = getByRole('button', {name: 'Update Configuration'})
+      expect(updateButton).not.toHaveAttribute('disabled')
+    })
+  })
+
+  describe('inherited registration', () => {
+    it('should disable the Update Configuration button when registration is inherited', () => {
+      const {getByRole} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          inherited: true,
+          overlaid_configuration: mockConfiguration({}),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const updateButton = getByRole('button', {name: 'Update Configuration'})
+      expect(updateButton).toHaveAttribute('disabled')
+    })
+
+    it('should show a tooltip on the Update Configuration button when registration is inherited', async () => {
+      const {getByRole, findByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          inherited: true,
+          overlaid_configuration: mockConfiguration({}),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const updateButton = getByRole('button', {name: 'Update Configuration'})
+      fireEvent.focus(updateButton)
+
+      expect(
+        await findByText(
+          "This account does not own this app and therefore can't edit its configuration.",
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('should enable the Update Configuration button when registration is not inherited', () => {
+      const {getByRole} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          overlaid_configuration: mockConfiguration({}),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const updateButton = getByRole('button', {name: 'Update Configuration'})
+      expect(updateButton).not.toHaveAttribute('disabled')
+    })
+
+    it('should not show the tooltip on the Update Configuration button when registration is not inherited', () => {
+      const {getByRole} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          overlaid_configuration: mockConfiguration({}),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const updateButton = getByRole('button', {name: 'Update Configuration'})
+      fireEvent.focus(updateButton)
+
+      const tooltip = updateButton
+        .closest('[data-position-target]')
+        ?.parentElement?.querySelector('[role="tooltip"]')
+      expect(tooltip).toBeNull()
+    })
   })
 })

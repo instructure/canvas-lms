@@ -58,11 +58,12 @@ function setFile(getByTestId) {
 describe('Files UploadForm', () => {
   beforeEach(() => {
     // we don't want any files actually queued for upload
-    const spy = jest.spyOn(UploadForm.prototype, '_actualQueueUploads')
+    const spy = vi.spyOn(UploadForm.prototype, '_actualQueueUploads')
     spy.mockReturnValue(null)
   })
 
   afterEach(() => {
+    vi.restoreAllMocks()
     FileOptionsCollection.resetState()
     FileOptionsCollection.setFolder(null)
   })

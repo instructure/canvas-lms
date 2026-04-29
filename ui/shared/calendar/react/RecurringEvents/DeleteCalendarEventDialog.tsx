@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -19,11 +17,12 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import authenticity_token from '@canvas/authenticity-token'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {checkStatus, defaultFetchOptions} from '@canvas/util/xhr'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
@@ -41,13 +40,14 @@ type Props = {
   readonly isOpen: boolean
   readonly onCancel: () => void
   readonly onDeleting: (which: Which) => void
-  readonly onDeleted: (deletedEvents: [Event]) => void
-  readonly onUpdated: (updatedEvents: [Event]) => void
+  readonly onDeleted: (deletedEvents: Event[]) => void
+  readonly onUpdated: (updatedEvents: Event[]) => void
   readonly delUrl: string
   readonly isRepeating: boolean
   readonly isSeriesHead: boolean
   readonly eventType: string
   readonly testIdPrefix?: string
+  readonly isAppointmentGroup?: boolean
 }
 
 const DeleteCalendarEventDialog = ({
@@ -61,13 +61,17 @@ const DeleteCalendarEventDialog = ({
   isSeriesHead,
   eventType,
   testIdPrefix,
+  isAppointmentGroup,
 }: Props) => {
   const [which, setWhich] = useState<Which>('one')
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
 
   const handleCancel = useCallback(
-    (e = null) => {
-      if (e?.code !== 'Escape' && e?.target.type === 'radio') {
+    (e: React.KeyboardEvent | React.MouseEvent | null = null) => {
+      if (
+        (e as React.KeyboardEvent)?.code !== 'Escape' &&
+        (e?.target as HTMLInputElement)?.type === 'radio'
+      ) {
         return
       }
       onCancel()
@@ -92,7 +96,7 @@ const DeleteCalendarEventDialog = ({
       .then(res => res.json())
       .then(result => {
         setIsDeleting(false)
-        const sortedEvents = {
+        const sortedEvents: {deleted: Event[]; updated: Event[]} = {
           deleted: [],
           updated: [],
         }
@@ -155,8 +159,8 @@ const DeleteCalendarEventDialog = ({
         name="which"
         defaultValue="one"
         description={I18n.t('Delete:')}
-        onChange={(_event, value) => {
-          setWhich(value)
+        onChange={(_event, value: string) => {
+          setWhich(value as Which)
         }}
       >
         <RadioInput
@@ -181,19 +185,25 @@ const DeleteCalendarEventDialog = ({
   }
 
   const renderOne = (): JSX.Element => {
-    return (
-      <Text>
-        {eventType === 'assignment'
-          ? I18n.t(
-              'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.',
-            )
-          : subAssignmentOrOverride(eventType)
-            ? I18n.t(
-                'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment and other checkpoints associated with the assignment.',
-              )
-            : I18n.t('Are you sure you want to delete this event?')}
-      </Text>
-    )
+    let message: string
+
+    if (isAppointmentGroup) {
+      message = I18n.t(
+        'If you delete this appointment, all course teachers will lose access, and all student signups will be permanently deleted.',
+      )
+    } else if (eventType === 'assignment') {
+      message = I18n.t(
+        'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.',
+      )
+    } else if (subAssignmentOrOverride(eventType)) {
+      message = I18n.t(
+        'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment and other checkpoints associated with the assignment.',
+      )
+    } else {
+      message = I18n.t('Are you sure you want to delete this event?')
+    }
+
+    return <Text>{message}</Text>
   }
 
   return (
@@ -202,9 +212,11 @@ const DeleteCalendarEventDialog = ({
       onDismiss={handleCancel}
       onSubmit={handleDelete}
       size="small"
-      label={I18n.t('Confirm Deletion')}
+      label={isAppointmentGroup ? I18n.t('Delete for everyone?') : I18n.t('Confirm Deletion')}
       footer={renderFooter}
       data-testid={`${testIdPrefix || ''}dialog`}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <View as="div" margin="0 small" data-testid={`${testIdPrefix || ''}dialog-content`}>
         {isRepeating ? renderRepeating() : renderOne()}
@@ -214,7 +226,7 @@ const DeleteCalendarEventDialog = ({
 }
 
 function renderDeleteCalendarEventDialog(element: Element, props: Props): void {
-  ReactDOM.render(<DeleteCalendarEventDialog {...props} />, element)
+  legacyRender(<DeleteCalendarEventDialog {...props} />, element)
 }
 
 export {DeleteCalendarEventDialog, renderDeleteCalendarEventDialog}

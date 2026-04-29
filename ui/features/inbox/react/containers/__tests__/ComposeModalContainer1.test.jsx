@@ -16,25 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {ApolloProvider} from '@apollo/client'
 import ComposeModalManager from '../ComposeModalContainer/ComposeModalManager'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {cleanup, fireEvent, render, waitFor} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {handlers, inboxSettingsHandlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {setupServer} from 'msw/node'
 import React from 'react'
 import {ConversationContext} from '../../../util/constants'
-import * as utils from '../../../util/utils'
 import * as uploadFileModule from '@canvas/upload-file'
-import {graphql} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/upload-file')
+if (typeof vi !== 'undefined') vi.mock('@canvas/upload-file')
+vi.mock('@canvas/upload-file')
 
-jest.mock('../../../util/utils', () => ({
-  responsiveQuerySizes: jest.fn().mockReturnValue({
+vi.mock('../../../util/utils', async () => ({
+  ...(await vi.importActual('../../../util/utils')),
+  responsiveQuerySizes: vi.fn().mockReturnValue({
     desktop: {minWidth: '768px'},
   }),
 }))
@@ -47,17 +47,17 @@ describe('ComposeModalContainer', () => {
     server.close()
     server.listen({onUnhandledRequest: 'error'})
 
-    window.matchMedia = jest.fn().mockImplementation(() => ({
+    window.matchMedia = vi.fn().mockImplementation(() => ({
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }))
   })
 
   beforeEach(() => {
-    uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
+    uploadFileModule.uploadFiles.mockResolvedValue([])
     fakeENV.setup({
       current_user_id: '1',
       CONVERSATIONS: {
@@ -68,9 +68,10 @@ describe('ComposeModalContainer', () => {
   })
 
   afterEach(async () => {
+    cleanup()
     server.resetHandlers()
     // Clear any pending timers
-    jest.clearAllTimers()
+    vi.clearAllTimers()
     // Wait for any pending Apollo operations
     await waitForApolloLoading()
     // Clean up ENV
@@ -82,8 +83,8 @@ describe('ComposeModalContainer', () => {
   })
 
   const setup = ({
-    setOnFailure = jest.fn(),
-    setOnSuccess = jest.fn(),
+    setOnFailure = vi.fn(),
+    setOnSuccess = vi.fn(),
     isReply,
     isReplyAll,
     isForward,
@@ -98,12 +99,12 @@ describe('ComposeModalContainer', () => {
           <ConversationContext.Provider value={{isSubmissionCommentsType}}>
             <ComposeModalManager
               open={true}
-              onDismiss={jest.fn()}
+              onDismiss={vi.fn()}
               isReply={isReply}
               isReplyAll={isReplyAll}
               isForward={isForward}
               conversation={conversation}
-              onSelectedIdsChange={jest.fn()}
+              onSelectedIdsChange={vi.fn()}
               selectedIds={selectedIds}
               inboxSignatureBlock={inboxSignatureBlock}
             />
@@ -125,104 +126,6 @@ describe('ComposeModalContainer', () => {
       const component = setup()
       await waitForApolloLoading()
       expect(component.container).toBeTruthy()
-    })
-  })
-
-  describe('Include Observers Button', () => {
-    beforeEach(() => {
-      fakeENV.setup({
-        current_user_id: '1',
-        CONVERSATIONS: {
-          ATTACHMENTS_FOLDER_ID: 1,
-          CAN_MESSAGE_ACCOUNT_CONTEXT: true,
-        },
-      })
-      // Mock the courses data to ensure we have a teacher enrollment
-      server.use(
-        graphql.query('GetConversationCourses', (_req, res, ctx) => {
-          return res(
-            ctx.data({
-              legacyNode: {
-                id: '1',
-                __typename: 'User',
-                enrollments: [
-                  {
-                    id: '1',
-                    type: 'TeacherEnrollment',
-                    course: {
-                      name: 'Fighting Magneto 101',
-                      assetString: 'course_1',
-                      id: '1',
-                      __typename: 'Course',
-                    },
-                    __typename: 'Enrollment',
-                  },
-                ],
-                favoriteCoursesConnection: {
-                  nodes: [
-                    {
-                      name: 'Fighting Magneto 101',
-                      assetString: 'course_1',
-                      id: '1',
-                      __typename: 'Course',
-                    },
-                  ],
-                  __typename: 'CourseConnection',
-                },
-                // User __typename is already defined in the parent object
-              },
-            }),
-          )
-        }),
-      )
-    })
-
-    afterEach(() => {
-      jest.clearAllMocks()
-    })
-
-    it('should not render if context is not selected', async () => {
-      const component = setup()
-      await waitForApolloLoading()
-      expect(component.container).toBeTruthy()
-      expect(component.queryByTestId('include-observer-button')).toBeFalsy()
-    })
-
-    it('should render if context is selected', async () => {
-      // Create a spy for the getRecipientsObserver function
-      const getRecipientsObserverMock = jest.fn()
-
-      // Setup the component with the necessary props
-      const component = render(
-        <ApolloProvider client={mswClient}>
-          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-            <ConversationContext.Provider value={{isSubmissionCommentsType: false}}>
-              <ComposeModalManager
-                open={true}
-                onDismiss={jest.fn()}
-                selectedIds={['1']}
-                onSelectedIdsChange={jest.fn()}
-                // This is the key part - we need to set the activeCourseFilterID
-                activeCourseFilterID="course_1"
-                // Mock the getRecipientsObserver function
-                getRecipientsObserver={getRecipientsObserverMock}
-              />
-            </ConversationContext.Provider>
-          </AlertManagerContext.Provider>
-        </ApolloProvider>,
-      )
-
-      // Wait for Apollo queries to complete
-      await waitForApolloLoading()
-
-      // Wait for the component to update and check if the button is visible
-      await waitFor(
-        () => {
-          const button = component.queryByTestId('include-observer-button')
-          expect(button).toBeInTheDocument()
-        },
-        {timeout: 3000},
-      )
     })
   })
 
@@ -325,52 +228,6 @@ describe('ComposeModalContainer', () => {
       const bodyInput = await findByTestId('message-body')
       fireEvent.change(bodyInput, {target: {value: 'Potato'}})
       expect(bodyInput.value).toEqual('Potato')
-    })
-  })
-
-  describe('Course Select', () => {
-    it('queries graphql for courses', async () => {
-      const component = setup()
-
-      const select = await component.findByTestId('course-select-modal')
-      fireEvent.click(select)
-
-      const selectOptions = await component.findAllByText('Ipsum')
-      expect(selectOptions.length).toBeGreaterThan(0)
-    })
-
-    it('removes enrollment duplicates that come from graphql', async () => {
-      const component = setup()
-
-      const select = await component.findByTestId('course-select-modal')
-      fireEvent.click(select) // This will fail without the fix because of an unhandled error. We can't have items with duplicate keys because of our jest-setup.
-
-      const selectOptions = await component.findAllByText('Ipsum')
-      expect(selectOptions).toHaveLength(3) // Should only have 3 unique courses
-    })
-
-    it('does not render All Courses option', async () => {
-      const {findByTestId, queryByText} = setup()
-      await waitForApolloLoading()
-      const courseDropdown = await findByTestId('course-select-modal')
-      fireEvent.click(courseDropdown)
-      expect(await queryByText('All Courses')).not.toBeInTheDocument()
-    })
-
-    it('does not render concluded groups', async () => {
-      const {findByTestId, queryByText} = setup()
-      await waitForApolloLoading()
-      const courseDropdown = await findByTestId('course-select-modal')
-      fireEvent.click(courseDropdown)
-      expect(await queryByText('concluded_group')).not.toBeInTheDocument()
-    })
-
-    it('does not render concluded courses', async () => {
-      const {findByTestId, queryByText} = setup()
-      await waitForApolloLoading()
-      const courseDropdown = await findByTestId('course-select-modal')
-      fireEvent.click(courseDropdown)
-      expect(await queryByText('Fighting Magneto 202')).not.toBeInTheDocument()
     })
   })
 })

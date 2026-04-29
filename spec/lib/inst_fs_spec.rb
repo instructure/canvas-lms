@@ -181,18 +181,10 @@ describe InstFS do
           expect(Canvas::Security.decode_jwt(token, [secret])).to have_key(:jti)
         end
 
-        it "includes the original_url claim with the redirect and no_cache param" do
-          original_url = "https://example.test/preview"
-          url = InstFS.authenticated_url(@attachment, original_url:)
+        it "does not include a jti in the token if instructed to" do
+          url = InstFS.authenticated_url(@attachment, expires_in: 1.hour, no_jti: true)
           token = url.split("token=").last
-          expect(Canvas::Security.decode_jwt(token, [secret])[:original_url]).to eq(original_url + "?no_cache=true&redirect=true")
-        end
-
-        it "doesn't include the original_url claim if already redirected" do
-          original_url = "https://example.test/preview?redirect=true"
-          url = InstFS.authenticated_url(@attachment, original_url:)
-          token = url.split("token=").last
-          expect(Canvas::Security.decode_jwt(token, [secret])).not_to have_key(:original_url)
+          expect(Canvas::Security.decode_jwt(token, [secret])).not_to have_key(:jti)
         end
 
         describe "legacy api claims" do
@@ -550,6 +542,63 @@ describe InstFS do
         new_uuid = InstFS.direct_upload(file_name: "foo.txt", file_object: StringIO.new("a" * 1000))
         expect(new_uuid).to eq "new uuid"
         expect(uploaded_data.size).to eq 1000
+      end
+
+      it "retries 504 responses from Inst-FS" do
+        call_count = 0
+        allow(CanvasHttp).to receive(:post) do
+          call_count += 1
+          if call_count == 1
+            instance_double(Net::HTTPGatewayTimeout, code: "504", body: "")
+          else
+            instance_double(Net::HTTPCreated,
+                            code: "201",
+                            body: { instfs_uuid: "new uuid" }.to_json)
+          end
+        end
+        new_uuid = InstFS.direct_upload(file_name: "foo.txt", file_object: StringIO.new("a" * 1000))
+        expect(new_uuid).to eq "new uuid"
+        expect(call_count).to eq 2
+      end
+
+      it "doesn't retry 504s repeatedly" do
+        allow(CanvasHttp).to receive(:post) do
+          instance_double(Net::HTTPGatewayTimeout, code: "504", body: "gateway timeout")
+        end
+        expect do
+          InstFS.direct_upload(file_name: "foo.txt", file_object: StringIO.new("a" * 1000))
+        end.to raise_error(InstFS::ServiceError, "received code \"504\" from service, with message \"gateway timeout\"")
+      end
+
+      it "does a third try when running in a delayed job" do
+        allow(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123))
+        call_count = 0
+        allow(CanvasHttp).to receive(:post) do
+          call_count += 1
+          if call_count <= 2
+            instance_double(Net::HTTPGatewayTimeout, code: "504", body: "")
+          else
+            instance_double(Net::HTTPCreated,
+                            code: "201",
+                            body: { instfs_uuid: "new uuid" }.to_json)
+          end
+        end
+        new_uuid = InstFS.direct_upload(file_name: "foo.txt", file_object: StringIO.new("a" * 1000))
+        expect(new_uuid).to eq "new uuid"
+        expect(call_count).to eq 3
+      end
+
+      it "doesn't retry 5xx when file object isn't rewindable" do
+        file_object = instance_double(IO, read: "some data")
+        call_count = 0
+        allow(CanvasHttp).to receive(:post) do
+          call_count += 1
+          instance_double(Net::HTTPGatewayTimeout, code: "504", body: "gateway timeout")
+        end
+        expect do
+          InstFS.direct_upload(file_name: "foo.txt", file_object:)
+        end.to raise_error(InstFS::ServiceError, "received code \"504\" from service, with message \"gateway timeout\"")
+        expect(call_count).to eq 1
       end
 
       context "filesize" do

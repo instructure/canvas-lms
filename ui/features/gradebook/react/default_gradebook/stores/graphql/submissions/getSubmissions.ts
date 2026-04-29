@@ -19,7 +19,7 @@ import {z} from 'zod'
 import {ZNextPageInfo} from '../PaginatedResult'
 import {executeQuery} from '@canvas/graphql'
 import {ZSubmissionType} from '../assignments/getAssignments'
-import {buildGraphQLQuery, numberToLetters} from '../buildGraphQLQuery'
+import {buildGraphQLQuery, encode} from '../buildGraphQLQuery'
 
 const ZLatePolicyStatus = z.enum(['late', 'missing', 'extended', 'none'])
 
@@ -103,6 +103,7 @@ const ZSubmission = z
     secondsLate: z.number().nullable(),
     state: ZSubmissionState,
     sticker: z.string().nullable(),
+    hasSubAssignmentSubmissions: z.boolean(),
     subAssignmentSubmissions: z.array(ZSubAssignmentSubmission).nullable(),
     submissionType: ZSubmissionType.nullable(),
     submittedAt: z.string().nullable(),
@@ -140,6 +141,7 @@ const nodeFields = [
   'gradingPeriodId',
   'hasOriginalityReport',
   'hasPostableComments',
+  'hasSubAssignmentSubmissions',
   'late',
   'latePolicyStatus',
   'missing',
@@ -222,12 +224,15 @@ export type GetSubmissionsParams = {
   after?: Record<string, string | null>
 }
 
-export const getSubmissions = async ({courseId, userIds, after}: GetSubmissionsParams) => {
+export const getSubmissions = async (
+  {courseId, userIds, after}: GetSubmissionsParams,
+  headers?: Record<string, string>,
+) => {
   const courseNode = {
     name: 'course',
     args: {id: '$courseId'},
     fields: userIds.map(id => {
-      const alias = numberToLetters(parseInt(id, 10))
+      const alias = encode(id)
       const cursor = after?.[alias]
       if (cursor === null) return ''
       return submissionsConnectionNode({alias, after: cursor ?? '', studentIds: [id]})
@@ -236,13 +241,17 @@ export const getSubmissions = async ({courseId, userIds, after}: GetSubmissionsP
   const query = buildGraphQLQuery(
     [courseNode],
     'query',
-    'getSubmissions',
+    'Gradebook__GetSubmissions',
     '$courseId: ID!, $states: [SubmissionState!]',
   )
-  const data = await executeQuery<GetSubmissionsResult>(query, {
-    courseId,
-    states: ['graded', 'pending_review', 'submitted', 'ungraded', 'unsubmitted'],
-  })
+  const data = await executeQuery<GetSubmissionsResult>(
+    query,
+    {
+      courseId,
+      states: ['graded', 'pending_review', 'submitted', 'ungraded', 'unsubmitted'],
+    },
+    headers,
+  )
 
   const validation = ZGetSubmissionsResult.safeParse(data)
   if (!validation.success) {

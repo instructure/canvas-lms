@@ -37,10 +37,18 @@ module Account::Settings
         end
       end
       account_settings_options[setting.to_sym] = opts || {}
+
+      define_change_method(setting)
     end
 
     def inheritable_settings
       account_settings_options.select { |_k, v| v[:inheritable] }.keys
+    end
+
+    def define_change_method(setting)
+      define_method("#{setting}_changed?") do
+        setting_changed?(setting)
+      end
     end
   end
 
@@ -50,10 +58,17 @@ module Account::Settings
     klass.account_settings_options ||= {}
   end
 
+  def setting_changed?(setting)
+    settings_key = setting.to_sym
+    raise ArgumentError, "Unknown setting #{setting}" unless self.class.account_settings_options.key?(settings_key)
+
+    settings_changed? && settings[settings_key] != settings_was[settings_key]
+  end
+
   def cached_inherited_setting(setting)
     shard.activate do
       RequestCache.cache("inherited_settings", self, setting) do
-        Rails.cache.fetch([setting, global_id].cache_key) do
+        Rails.cache.fetch([setting, global_id].cache_key, expires_in: 1.day) do
           calculate_inherited_setting(setting)
         end
       end

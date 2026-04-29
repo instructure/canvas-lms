@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useRef} from 'react'
 import {Form} from 'react-final-form'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {Flex} from '@instructure/ui-flex'
 import {Mask} from '@instructure/ui-overlays'
@@ -74,15 +74,15 @@ const GroupEditForm = ({initialValues, onSubmit, isOpen, onCloseHandler}) => {
                       type="text"
                       size="medium"
                       validate={titleValidator}
-                      elementRef={ref => titleRef.current = ref}
+                      elementRef={ref => (titleRef.current = ref)}
                       data-testid="group-name-input"
                     />
                   </Flex.Item>
                 </Flex>
                 <View as="div" padding="medium 0">
-                  <LabeledRceField 
-                    name="description" 
-                    label={I18n.t('Group Description')} 
+                  <LabeledRceField
+                    name="description"
+                    label={I18n.t('Group Description')}
                     data-testid="group-description-input"
                   />
                 </View>

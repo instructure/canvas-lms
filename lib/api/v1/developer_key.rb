@@ -22,9 +22,9 @@ module Api::V1::DeveloperKey
   include Api::V1::Json
 
   DEVELOPER_KEY_JSON_ATTRS = %w[
-    name created_at email user_id user_name icon_url notes workflow_state scopes require_scopes client_credentials_audience
+    name created_at email user_id user_name icon_url notes workflow_state scopes require_scopes client_credentials_audience lti_registration_id
   ].freeze
-  INHERITED_DEVELOPER_KEY_JSON_ATTRS = %w[name created_at icon_url workflow_state].freeze
+  INHERITED_DEVELOPER_KEY_JSON_ATTRS = %w[name created_at icon_url workflow_state lti_registration_id].freeze
 
   def developer_keys_json(keys, user, session, context, inherited: false, include_tool_config: false)
     keys.map { |k| developer_key_json(k, user, session, context, inherited:, include_tool_config:) }
@@ -49,14 +49,16 @@ module Api::V1::DeveloperKey
         hash["notes"] = key.notes
         hash["access_token_count"] = key.access_token_count
         hash["last_used_at"] = key.last_used_at
+        hash["unified_tool_id"] = key.unified_tool_id
         hash["vendor_code"] = key.vendor_code
         hash["public_jwk"] = key.public_jwk
         hash["public_jwk_url"] = key.public_jwk_url
         hash["allow_includes"] = key.allow_includes
       end
 
-      if account_binding.present?
-        hash["developer_key_account_binding"] = DeveloperKeyAccountBindingSerializer.new(account_binding, context)
+      hash["developer_key_account_binding"] = DeveloperKeyAccountBindingSerializer.new(account_binding, context) if account_binding.present?
+      if context.root_account.feature_enabled?(:lti_deactivate_registrations) && key.is_lti_key
+        hash["lti_registration_workflow_state"] = key.lti_registration&.workflow_state
       end
 
       if inherited

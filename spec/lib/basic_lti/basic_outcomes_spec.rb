@@ -124,6 +124,20 @@ describe BasicLTI::BasicOutcomes do
         it { is_expected.to be false }
       end
     end
+
+    describe "#grade_passback_allowed?" do
+      let(:lti_response) { BasicLTI::BasicOutcomes::LtiResponse.new(xml) }
+      let(:student) { user_model }
+
+      before do
+        @course.enroll_student(student, enrollment_state: "active")
+      end
+
+      it "calls grade_passback_allowed? with correct parameters" do
+        expect(lti_response).to receive(:grade_passback_allowed?).with(@course, student).and_return(true)
+        lti_response.grade_passback_allowed?(@course, student)
+      end
+    end
   end
 
   context "Exceptions" do
@@ -378,6 +392,32 @@ describe BasicLTI::BasicOutcomes do
 
         expect(request.code_major).to eq "success"
         expect(request.handle_request(tool)).to be_truthy
+      end
+
+      context "when teachers have extended access after course conclusion" do
+        before do
+          @course.start_at = 1.month.ago
+          @course.conclude_at = 1.day.ago
+          @course.restrict_enrollments_to_course_dates = false
+          @course.save
+          # Set up enrollment term with extended end date for teachers
+          @course.enrollment_term.enrollment_dates_overrides.create!(
+            enrollment_type: "TeacherEnrollment",
+            enrollment_term: @course.enrollment_term,
+            start_at: 1.month.ago,
+            end_at: 1.day.from_now,
+            context: @course.account
+          )
+        end
+
+        it "allows replace_result when course_concluded? returns false" do
+          xml.css("resultData").remove
+          request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+          expect(request.code_major).to eq "success"
+          expect(request.body).to eq "<replaceResultResponse />"
+          expect(request.handle_request(tool)).to be_truthy
+        end
       end
     end
   end

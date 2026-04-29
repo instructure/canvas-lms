@@ -23,11 +23,11 @@ import Assignment from '../Assignment'
 
 describe('Assignment', () => {
   beforeEach(() => {
-    $.ajaxJSON = jest.fn()
+    $.ajaxJSON = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('#retry_migration', () => {
@@ -58,33 +58,33 @@ describe('Assignment', () => {
     let clock
 
     beforeEach(() => {
-      clock = jest.useFakeTimers()
+      clock = vi.useFakeTimers()
       assignment = new Assignment({workflow_state: 'duplicating'})
       const dfd = $.Deferred()
       dfd.resolve()
-      jest.spyOn(assignment, 'fetch').mockReturnValue(dfd)
+      vi.spyOn(assignment, 'fetch').mockReturnValue(dfd)
     })
 
     afterEach(() => {
       clock.clearAllTimers()
-      jest.useRealTimers()
-      jest.restoreAllMocks()
+      vi.useRealTimers()
+      vi.restoreAllMocks()
     })
 
     it('polls for updates', () => {
       assignment.pollUntilFinishedDuplicating()
-      jest.advanceTimersByTime(2000)
+      vi.advanceTimersByTime(2000)
       expect(assignment.fetch).not.toHaveBeenCalled()
-      jest.advanceTimersByTime(2000)
+      vi.advanceTimersByTime(2000)
       expect(assignment.fetch).toHaveBeenCalled()
     })
 
     it('stops polling when the assignment has finished duplicating', () => {
       assignment.pollUntilFinishedDuplicating()
       assignment.set({workflow_state: 'unpublished'})
-      jest.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(3000)
       expect(assignment.fetch).toHaveBeenCalledTimes(1)
-      jest.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(3000)
       expect(assignment.fetch).toHaveBeenCalledTimes(1)
     })
   })
@@ -94,33 +94,33 @@ describe('Assignment', () => {
     let clock
 
     beforeEach(() => {
-      clock = jest.useFakeTimers()
+      clock = vi.useFakeTimers()
       assignment = new Assignment({workflow_state: 'importing'})
       const dfd = $.Deferred()
       dfd.resolve()
-      jest.spyOn(assignment, 'fetch').mockReturnValue(dfd)
+      vi.spyOn(assignment, 'fetch').mockReturnValue(dfd)
     })
 
     afterEach(() => {
       clock.clearAllTimers()
-      jest.useRealTimers()
-      jest.restoreAllMocks()
+      vi.useRealTimers()
+      vi.restoreAllMocks()
     })
 
     it('polls for updates', () => {
       assignment.pollUntilFinishedImporting()
-      jest.advanceTimersByTime(2000)
+      vi.advanceTimersByTime(2000)
       expect(assignment.fetch).not.toHaveBeenCalled()
-      jest.advanceTimersByTime(2000)
+      vi.advanceTimersByTime(2000)
       expect(assignment.fetch).toHaveBeenCalled()
     })
 
     it('stops polling when the assignment has finished importing', () => {
       assignment.pollUntilFinishedImporting()
       assignment.set({workflow_state: 'unpublished'})
-      jest.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(3000)
       expect(assignment.fetch).toHaveBeenCalledTimes(1)
-      jest.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(3000)
       expect(assignment.fetch).toHaveBeenCalledTimes(1)
     })
   })
@@ -130,33 +130,33 @@ describe('Assignment', () => {
     let clock
 
     beforeEach(() => {
-      clock = jest.useFakeTimers()
+      clock = vi.useFakeTimers()
       assignment = new Assignment({workflow_state: 'migrating'})
       const dfd = $.Deferred()
       dfd.resolve()
-      jest.spyOn(assignment, 'fetch').mockReturnValue(dfd)
+      vi.spyOn(assignment, 'fetch').mockReturnValue(dfd)
     })
 
     afterEach(() => {
       clock.clearAllTimers()
-      jest.useRealTimers()
-      jest.restoreAllMocks()
+      vi.useRealTimers()
+      vi.restoreAllMocks()
     })
 
     it('polls for updates', () => {
       assignment.pollUntilFinishedMigrating()
-      jest.advanceTimersByTime(2000)
+      vi.advanceTimersByTime(2000)
       expect(assignment.fetch).not.toHaveBeenCalled()
-      jest.advanceTimersByTime(2000)
+      vi.advanceTimersByTime(2000)
       expect(assignment.fetch).toHaveBeenCalled()
     })
 
     it('stops polling when the assignment has finished migrating', () => {
       assignment.pollUntilFinishedMigrating()
       assignment.set({workflow_state: 'unpublished'})
-      jest.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(3000)
       expect(assignment.fetch).toHaveBeenCalledTimes(1)
-      jest.advanceTimersByTime(3000)
+      vi.advanceTimersByTime(3000)
       expect(assignment.fetch).toHaveBeenCalledTimes(1)
     })
   })

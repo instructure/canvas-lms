@@ -19,6 +19,8 @@
 #
 
 class Login::OAuthController < Login::OAuthBaseController
+  skip_before_action :require_user, only: %i[new create]
+
   def new
     timeout_protection do
       request_token = aac.consumer.get_request_token(oauth_callback: callback_uri)

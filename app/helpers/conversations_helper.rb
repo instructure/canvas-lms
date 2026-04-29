@@ -79,14 +79,59 @@ module ConversationsHelper
       automated:
     )
 
-    if conversation.should_process_immediately?
+    force_individual_messages = context.is_a?(Course) &&
+                                context.root_account.feature_enabled?(:restrict_student_access) &&
+                                context.user_is_instructor?(current_user)
+
+    if force_individual_messages && recipients && !recipients.empty?
+      existing_participant_ids = conversation.conversation.participants.reject { |p| p.id == current_user.id }.map(&:id)
+
+      new_recipient_ids = recipients.map(&:id) - existing_participant_ids
+
+      if new_recipient_ids.any?
+        messages = []
+        recipients_count = 0
+
+        recipients.each do |recipient|
+          individual_conversation = current_user.initiate_conversation([recipient])
+          individual_conversation.conversation.update(context:) if context
+
+          individual_tags = infer_tags(
+            recipients: individual_conversation.conversation.participants.pluck(:id),
+            context_code:
+          )
+
+          if individual_conversation.should_process_immediately?
+            message = individual_conversation.process_new_message(message_args, nil, message_ids, individual_tags)
+          else
+            individual_conversation.delay(strand: "add_message_#{individual_conversation.global_conversation_id}").process_new_message(message_args, nil, message_ids, individual_tags)
+            message = Conversation.build_message(*message_args)
+            message.id = 0
+            message.conversation_id = individual_conversation.conversation_id
+            message.created_at = Time.now.utc
+          end
+          messages << message
+
+          recipients_count += 1
+        end
+
+        { message: messages.first, recipients_count:, status: :ok }
+      elsif conversation.should_process_immediately?
+        message = conversation.process_new_message(message_args, nil, message_ids, tags)
+        { message:, recipients_count: existing_participant_ids.size, status: :ok }
+      else
+        conversation.delay(strand: "add_message_#{conversation.global_conversation_id}").process_new_message(message_args, nil, message_ids, tags)
+        message = Conversation.build_message(*message_args)
+        message.id = 0
+        message.conversation_id = conversation.conversation_id
+        message.created_at = Time.now.utc
+        { message:, recipients_count: existing_participant_ids.size, status: :accepted }
+      end
+    elsif conversation.should_process_immediately?
       message = conversation.process_new_message(message_args, recipients, message_ids, tags)
       { message:, recipients_count: recipients ? recipients.count : 0, status: :ok }
     else
       conversation.delay(strand: "add_message_#{conversation.global_conversation_id}").process_new_message(message_args, recipients, message_ids, tags)
-      # The message is delayed and will be processed later so there is nothing to return
-      # right now. If there is no error, success can be assumed.
-      # for displaying purposed, a preview of the processed message is created
       message = Conversation.build_message(*message_args)
       message.id = 0
       message.conversation_id = conversation.conversation_id
@@ -147,6 +192,8 @@ module ConversationsHelper
       params[:recipients] = recipients if defined?(params)
     end
 
+    recipients = convert_uuid_recipients_to_regular_recipients(recipients)
+
     # unrecognized context codes are ignored
     if AddressBook.valid_context?(context_code)
       context = AddressBook.load_context(context_code)
@@ -183,8 +230,28 @@ module ConversationsHelper
       known.concat(current_user.address_book.known_in_context(ctxt, include_concluded: false))
     end
     @recipients = known.uniq(&:id)
-    @recipients.reject! { |u| u.id == current_user.id } unless @recipients == [current_user] && recipients.count == 1
+    @recipients.reject! { |u| u.id == current_user.id } unless @recipients == [current_user] && recipients.one?
     @recipients
+  end
+
+  def convert_uuid_recipients_to_regular_recipients(recipients)
+    uuids = uuids_for(recipients)
+    return recipients if uuids.empty?
+
+    uuid_to_id = User.where(uuid: uuids).pluck(:uuid, :id).to_h
+    recipients.map do |r|
+      if r.is_a?(String) && r.start_with?("uuid:")
+        uuid = r.sub("uuid:", "")
+        uuid_to_id[uuid] || r
+      else
+        r
+      end
+    end
+  end
+
+  def uuids_for(recipients)
+    recipients
+      .filter_map { |r| (r.is_a?(String) && r.start_with?("uuid:")) ? r.sub("uuid:", "") : nil }
   end
 
   def get_invalid_recipients(context, recipients, current_user)
@@ -192,26 +259,6 @@ module ConversationsHelper
       valid_student_recipients = context.current_users.pluck(:id, :name)
       recipients.map { |recipient| [recipient.id, recipient.name] } - valid_student_recipients
     end
-  end
-
-  def all_recipients_are_instructors?(context, recipients)
-    if context.is_a?(Course)
-      return recipients.inject(true) do |all_recipients_are_instructors, recipient|
-        all_recipients_are_instructors && context.user_is_instructor?(recipient)
-      end
-    end
-    false
-  end
-
-  def observer_to_linked_students(recipients)
-    observee_ids = @current_user.enrollments.where(type: "ObserverEnrollment").distinct.pluck(:associated_user_id)
-    return false if observee_ids.empty?
-
-    recipients.each do |recipient|
-      return false if observee_ids.exclude?(recipient.id)
-    end
-
-    true
   end
 
   def valid_context?(context)
@@ -318,11 +365,8 @@ module ConversationsHelper
   end
 
   def validate_context(context, recipients)
-    recipients_are_instructors = all_recipients_are_instructors?(context, recipients)
-
     if context.is_a?(Course) &&
-       !recipients_are_instructors &&
-       !observer_to_linked_students(recipients) &&
+       missing_right_to_send_any_recipient(recipients, context) &&
        !context.grants_right?(@current_user, session, :send_messages)
 
       raise InvalidContextPermissionsError
@@ -332,6 +376,14 @@ module ConversationsHelper
 
     if context.is_a?(Course) && (context.workflow_state == "completed" || soft_concluded_course_for_user?(context, @current_user))
       raise CourseConcludedError
+    end
+
+    if context.is_a?(Course) && recipients.present?
+      # Is there anyone in my recipient list that is not enrolled in this course?
+      enrolled_count = context.enrollments.active.where(user: recipients).select(:user_id).distinct.count
+      if enrolled_count != recipients.size
+        raise InvalidRecipientsError
+      end
     end
   end
 
@@ -381,7 +433,7 @@ module ConversationsHelper
                                       author_id: ooo_message_author.id,
                                       user_id: ooo_message_recipient.id,
                                       root_account_ids: root_account_ids.map(&:to_s),
-                                      start: settings.out_of_office_first_date).order("created_at DESC").first
+                                      start: settings.out_of_office_first_date).order(created_at: :desc).first
 
       should_send = should_send_auto_response?(ooo_message_author, last_sent_ooo_response)
       next unless should_send
@@ -442,6 +494,22 @@ module ConversationsHelper
     # - User with active Teacher, TA or Designer Enrollments
     # - Admin user without active Student, StudentView or Observer Enrollments
     !(active_non_student || (admin_user && !active_student))
+  end
+
+  private
+
+  def missing_right_to_send_any_recipient(recipients, context)
+    recipients.find do |recipient|
+      !context.user_is_instructor?(recipient) && !recipient_is_observed_by_user(recipient)
+    end
+  end
+
+  def recipient_is_observed_by_user(recipient)
+    observee_ids_for_current_user.include?(recipient.id)
+  end
+
+  def observee_ids_for_current_user
+    @observee_ids_for_current_user ||= @current_user.enrollments.where(type: "ObserverEnrollment").distinct.pluck(:associated_user_id)
   end
 
   class Error < StandardError

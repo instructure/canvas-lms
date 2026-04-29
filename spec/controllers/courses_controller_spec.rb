@@ -54,6 +54,7 @@ describe CoursesController do
       expect(assigns[:future_enrollments]).not_to be_nil
       expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be_nil
       expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_truthy
+      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:VIEWABLE_ACCOUNT_IDS]).to be_nil
     end
 
     it "does not duplicate enrollments in variables" do
@@ -76,7 +77,6 @@ describe CoursesController do
       toggle_k5_setting(@course.account)
 
       get_index(user: @student)
-      expect(assigns[:js_bundles].flatten).to include :k5_theme
       expect(assigns[:css_bundles].flatten).to include :k5_theme, :k5_font
     end
 
@@ -84,7 +84,6 @@ describe CoursesController do
       course_with_student_logged_in
 
       get_index(user: @student)
-      expect(assigns[:js_bundles].flatten).not_to include :k5_theme
       expect(assigns[:css_bundles].flatten).not_to include :k5_theme, :k5_font
     end
 
@@ -150,6 +149,82 @@ describe CoursesController do
         controller.instance_variable_set(:@current_user, @student1)
         controller.load_enrollments_for_index
         expect(assigns[:current_enrollments].length).to be 3
+      end
+    end
+
+    describe "_load_enrollments_for_index" do
+      before do
+        course_with_student_logged_in(active_all: true)
+        controller.instance_variable_set(:@current_user, @student)
+      end
+
+      context "with optimized_load_enrollments_for_index feature flag enabled" do
+        before { Account.site_admin.enable_feature!(:optimized_load_enrollments_for_index) }
+
+        it "preloads role on enrollments" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.association(:role).loaded?).to be true
+        end
+
+        it "preloads enrollment_state on enrollments" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.association(:enrollment_state).loaded?).to be true
+        end
+
+        it "preloads course_section on enrollments" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.association(:course_section).loaded?).to be true
+        end
+
+        it "preloads course on enrollments" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.association(:course).loaded?).to be true
+        end
+
+        it "preloads enrollment_term through course" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.course.association(:enrollment_term).loaded?).to be true
+        end
+
+        it "produces the same enrollment classification as the old path" do
+          Account.site_admin.disable_feature!(:optimized_load_enrollments_for_index)
+          controller.load_enrollments_for_index
+          old_current = assigns[:current_enrollments].map(&:id).sort
+
+          Account.site_admin.enable_feature!(:optimized_load_enrollments_for_index)
+          controller.load_enrollments_for_index
+          new_current = assigns[:current_enrollments].map(&:id).sort
+
+          expect(new_current).to eq old_current
+        end
+      end
+
+      context "without optimized_load_enrollments_for_index feature flag" do
+        before { Account.site_admin.disable_feature!(:optimized_load_enrollments_for_index) }
+
+        it "does not preload role" do
+          enrollments = controller.send(:_load_enrollments_for_index)
+          expect(enrollments.first.association(:role).loaded?).to be false
+        end
+      end
+    end
+
+    describe "sort_enrollments" do
+      it "only calls courses_with_primary_enrollment once when sorting by favorite" do
+        course_with_student_logged_in(active_all: true)
+        course_factory(active_all: true).enroll_student(@student).accept!
+
+        expect(@student).to receive(:courses_with_primary_enrollment).once.and_call_original
+
+        get_index(index_params: { cc_sort: "favorite" })
+      end
+
+      it "does not call courses_with_primary_enrollment when not sorting by favorite" do
+        course_with_student_logged_in(active_all: true)
+
+        expect(@student).not_to receive(:courses_with_primary_enrollment)
+
+        get_index(index_params: { cc_sort: "course" })
       end
     end
 
@@ -276,6 +351,50 @@ describe CoursesController do
           else
             expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
           end
+        end
+      end
+
+      context "on accessibility column" do
+        before do
+          account = Account.default
+          account.enable_feature!(:a11y_checker)
+          @course1.enable_feature!(:a11y_checker_eap)
+          @course2.enable_feature!(:a11y_checker_eap)
+
+          # Disable scan callbacks to avoid interference
+          allow_any_instance_of(Course).to receive(:a11y_checker_enabled?).and_return(false)
+
+          wiki_page = wiki_page_model(course: @course1, title: "Wiki Page", body: "<div><h1>Document Title</h1></div>")
+          scan = AccessibilityResourceScan.create!(
+            context: wiki_page,
+            course: @course1,
+            workflow_state: "completed",
+            resource_name: wiki_page.title,
+            resource_workflow_state: "published",
+            resource_updated_at: wiki_page.updated_at,
+            issue_count: 1
+          )
+          accessibility_issue_model(
+            course: @course1,
+            accessibility_resource_scan: scan,
+            rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+            node_path: "./div/h1"
+          )
+
+          # Re-enable for the actual test
+          allow_any_instance_of(Course).to receive(:a11y_checker_enabled?).and_call_original
+        end
+
+        it "lists courses with less accessibility issues first" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "accessibility" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+        end
+
+        it "lists courses with less accessibility issues last when descending order" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "accessibility", order_column => "desc" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
         end
       end
     end
@@ -477,7 +596,7 @@ describe CoursesController do
       end
 
       describe "sorting" do
-        include_examples "sorting" do
+        it_behaves_like "sorting" do
           let(:type) { "current" }
           let(:sort_column) { "cc_sort" }
           let(:order_column) { "cc_order" }
@@ -666,7 +785,7 @@ describe CoursesController do
         enrollment.reload
 
         expect(enrollment.workflow_state).to eq "invited"
-        expect(enrollment).to_not be_invited # state_based_on_date
+        expect(enrollment).not_to be_invited # state_based_on_date
 
         user_session(@student)
         get_index
@@ -757,7 +876,7 @@ describe CoursesController do
       end
 
       describe "sorting" do
-        include_examples "sorting" do
+        it_behaves_like "sorting" do
           let(:type) { "past" }
           let(:sort_column) { "pc_sort" }
           let(:order_column) { "pc_order" }
@@ -898,7 +1017,7 @@ describe CoursesController do
       end
 
       describe "sorting" do
-        include_examples "sorting" do
+        it_behaves_like "sorting" do
           let(:type) { "future" }
           let(:sort_column) { "fc_sort" }
           let(:order_column) { "fc_order" }
@@ -1075,6 +1194,11 @@ describe CoursesController do
       expect(controller.js_env[:MSFT_SYNC_CAN_BYPASS_COOLDOWN]).to be false
     end
 
+    it "sets ams remote settings in the remote env" do
+      subject
+      expect(controller.remote_env[:ams]).not_to be_nil
+    end
+
     it "sets the external tools create url" do
       user_session(@teacher)
       get "settings", params: { course_id: @course.id }
@@ -1122,6 +1246,43 @@ describe CoursesController do
       get "settings", params: { course_id: @course.id }
       expect(controller.js_env[:COURSE_COLOR]).to be_falsy
       expect(controller.js_env[:COURSE_COLORS_ENABLED]).to be false
+    end
+
+    describe "PERMISSIONS[:manage_course_details] in js_env" do
+      context "when course_navigation_and_feature_options_permissions is disabled" do
+        it "is true when teacher has manage_course_content_edit" do
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(true)
+        end
+
+        it "is false when manage_course_content_edit is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(false)
+        end
+      end
+
+      context "when course_navigation_and_feature_options_permissions is enabled" do
+        before do
+          @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        end
+
+        it "is true when teacher has manage_course_details even when manage_course_content_edit is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(true)
+        end
+
+        it "is false when manage_course_details is revoked" do
+          @course.root_account.role_overrides.create!(permission: :manage_course_details, role: teacher_role, enabled: false)
+          user_session(@teacher)
+          get "settings", params: { course_id: @course.id }
+          expect(controller.js_env[:PERMISSIONS][:manage_course_details]).to be(false)
+        end
+      end
     end
 
     it "requires authorization" do
@@ -1189,6 +1350,56 @@ describe CoursesController do
       expect(assigns[:course_settings_sub_navigation_tools].size).to eq 1
       assigned_tool = assigns[:course_settings_sub_navigation_tools].first
       expect(assigned_tool.id).to eq active_tool.id
+    end
+
+    it "sets COURSE_DEFAULT_GRADING_SCHEME_ID when grading_scheme_updates feature is enabled" do
+      Account.site_admin.enable_feature!(:grading_scheme_updates)
+      grading_standard_data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.6], ["F", 0.0]]
+      grading_standard = GradingStandard.create!(
+        context: @course.account,
+        workflow_state: "active",
+        data: grading_standard_data,
+        title: "Test Grading Standard"
+      )
+      @course.update!(grading_standard_id: grading_standard.id)
+
+      user_session(@teacher)
+      get "settings", params: { course_id: @course.id }
+      expect(controller.js_env[:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq grading_standard.id
+    end
+
+    it "sets COURSE_DEFAULT_GRADING_SCHEME_ID from account default when course has no grading standard" do
+      Account.site_admin.enable_feature!(:grading_scheme_updates)
+      grading_standard_data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.6], ["F", 0.0]]
+      account_grading_standard = GradingStandard.create!(
+        context: @course.account,
+        workflow_state: "active",
+        data: grading_standard_data,
+        title: "Account Default Grading Standard"
+      )
+      @course.account.update!(grading_standard_id: account_grading_standard.id)
+
+      # Explicitly verify course has no grading_standard_id
+      expect(@course.grading_standard_id).to be_nil
+
+      user_session(@teacher)
+      get "settings", params: { course_id: @course.id }
+      expect(controller.js_env[:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq account_grading_standard.id
+    end
+
+    it "does not set COURSE_DEFAULT_GRADING_SCHEME_ID when grading_scheme_updates feature is disabled" do
+      grading_standard_data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.6], ["F", 0.0]]
+      grading_standard = GradingStandard.create!(
+        context: @course.account,
+        workflow_state: "active",
+        data: grading_standard_data,
+        title: "Test Grading Standard"
+      )
+      @course.update!(grading_standard_id: grading_standard.id)
+
+      user_session(@teacher)
+      get "settings", params: { course_id: @course.id }
+      expect(controller.js_env[:COURSE_DEFAULT_GRADING_SCHEME_ID]).to be_nil
     end
   end
 
@@ -1350,25 +1561,6 @@ describe CoursesController do
       user_session(@teacher)
       get "show", params: { id: @course.id, for_reload: 1 }
       expect(flash[:notice]).to match(/Course was successfully updated./)
-    end
-
-    it "allows test student to leave student view from a Canvas Career course" do
-      user_session(@teacher)
-      @fake_student = @course.student_view_student
-      session[:become_user_id] = @fake_student.id
-
-      get "show", params: { id: @course.id, leave_student_view: "/courses/#{@course.id}/modules" }
-      expect(response).to redirect_to("#{course_url(@course)}/modules")
-      expect(session[:become_user_id]).to be_nil
-    end
-
-    it "allows admin to stop acting as user from a Canvas Career course" do
-      user_session(@teacher)
-      @user = @course.student_view_student
-      session[:become_user_id] = @user.id
-
-      get "show", params: { id: @course.id, stop_acting_as_user: "/courses/#{@course.id}/modules" }
-      expect(response).to redirect_to(user_masquerade_url(@teacher.id, stop_acting_as_user: true))
     end
 
     it "does not redirect to modules page for horizon courses when invitation param is present" do
@@ -1859,6 +2051,27 @@ describe CoursesController do
         expect(response).to be_successful
         expect(assigns[:pending_enrollment]).to eq @enrollment
       end
+
+      it "doesn't sticky `workflow_state` when changing from `created` to `claimed`" do
+        @course.update workflow_state: "created", stuck_sis_fields: []
+        user_session(@teacher)
+        get "show", params: { id: @course.id }
+        expect(response).to be_successful
+        @course.reload
+        expect(@course.workflow_state).to eq "claimed"
+        expect(@course.stuck_sis_fields).to be_empty
+      end
+
+      it "accepts all section invites on opening the course page" do
+        Account.default.settings[:allow_invitation_previews] = false
+        Account.default.save!
+
+        second_section = @course.course_sections.create!
+        course_with_student course: @course, section: second_section, user: @student, allow_multiple_enrollments: true
+        user_session(@student)
+
+        expect { get "show", params: { id: @course.id } }.to change { @student.enrollments.invited.count }.from(2).to(0)
+      end
     end
 
     it "sets ENV.COURSE_ID for assignments view" do
@@ -2047,7 +2260,6 @@ describe CoursesController do
 
         get "show", params: { id: @course.id }
         expect(assigns[:js_bundles].flatten).to include :k5_course
-        expect(assigns[:js_bundles].flatten).to include :k5_theme
         expect(assigns[:css_bundles].flatten).to include :k5_common
         expect(assigns[:css_bundles].flatten).to include :k5_course
         expect(assigns[:css_bundles].flatten).to include :k5_theme
@@ -2224,6 +2436,20 @@ describe CoursesController do
         end
       end
 
+      it "includes args in ENV.TABS for nav_menu_link tabs" do
+        # Important because args is used in K5Course.jsx for nav_menu_link_* tabs
+        link = NavMenuLink.create!(context: @course, course_nav: true, url: "https://example.com", label: "My Link")
+        user_session(@teacher)
+
+        get "show", params: { id: @course.id }
+
+        tabs = assigns[:js_env][:TABS]
+        nav_tab = tabs.find { |t| t[:id] == NavMenuLinkTabs.numeric_id_to_tab_json_id(link.id) }
+        expect(nav_tab).not_to be_nil
+        expect(nav_tab[:args]).to eql(["https://example.com"])
+        expect(nav_tab[:href]).to be(NavMenuLinkTabs::TAB_HREF_VALUE)
+      end
+
       describe "update" do
         before :once do
           @subject = @course
@@ -2233,7 +2459,7 @@ describe CoursesController do
         end
 
         it "syncs enrollments if setting is set" do
-          progress = double("Progress").as_null_object
+          progress = instance_double(Progress).as_null_object
           allow(Progress).to receive(:new).and_return(progress)
           expect(progress).to receive(:process_job)
 
@@ -2249,7 +2475,7 @@ describe CoursesController do
         end
 
         it "does not sync if course is a sis import" do
-          progress = double("Progress").as_null_object
+          progress = instance_double(Progress).as_null_object
           allow(Progress).to receive(:new).and_return(progress)
           expect(progress).not_to receive(:process_job)
 
@@ -2396,7 +2622,6 @@ describe CoursesController do
 
     context "differentiation tag rollback" do
       before do
-        @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
 
@@ -2416,6 +2641,66 @@ describe CoursesController do
         get "show", params: { id: @course.id }
 
         expect(assigns[:js_env][:ACTIVE_TAG_CONVERSION_JOB]).to be_truthy
+      end
+    end
+
+    context "intelligent_insights_modernisation feature flag" do
+      let(:launch_url) { "https://example.com/canvas_course_criteria" }
+
+      before do
+        allow(Services::CanvasCourseCriteria).to receive(:launch_url).and_return(launch_url)
+        user_session(@teacher)
+      end
+
+      context "when feature is enabled" do
+        before do
+          @course.account.enable_feature!(:intelligent_insights_modernisation)
+        end
+
+        it "sets canvas_course_criteria launch_url in remote_env" do
+          get "show", params: { id: @course.id }
+          expect(controller.remote_env[:canvas_course_criteria]).to eq({ launch_url: })
+        end
+
+        it "sets CANVAS_COURSE_CRITERIA.COURSE_ID in js_env" do
+          get "show", params: { id: @course.id }
+          expect(assigns[:js_env][:CANVAS_COURSE_CRITERIA][:COURSE_ID]).to eq(@course.id)
+        end
+
+        it "sets CANVAS_COURSE_CRITERIA.ACCOUNT_ID in js_env" do
+          get "show", params: { id: @course.id }
+          expect(assigns[:js_env][:CANVAS_COURSE_CRITERIA][:ACCOUNT_ID]).to eq(@course.account.id.to_s)
+        end
+      end
+
+      context "when feature is disabled" do
+        it "does not set canvas_course_criteria in remote_env" do
+          get "show", params: { id: @course.id }
+          expect(controller.remote_env[:canvas_course_criteria]).to be_nil
+        end
+
+        it "does not set CANVAS_COURSE_CRITERIA in js_env" do
+          get "show", params: { id: @course.id }
+          expect(assigns[:js_env][:CANVAS_COURSE_CRITERIA]).to be_nil
+        end
+      end
+    end
+
+    context "accessibility_scan_enabled" do
+      before do
+        Account.default.enable_feature!(:a11y_checker_ga1)
+      end
+
+      it "is true for teachers" do
+        user_session(@teacher)
+        get "show", params: { id: @course.id }
+        expect(assigns(:accessibility_scan_enabled)).to be true
+      end
+
+      it "is false for students" do
+        user_session(@student)
+        get "show", params: { id: @course.id }
+        expect(assigns(:accessibility_scan_enabled)).to be false
       end
     end
   end
@@ -2530,7 +2815,7 @@ describe CoursesController do
       expect(response).to be_successful
       @course.reload
       expect(@course.students.map(&:name)).to include("Sam")
-      expect(@course.student_enrollments.find_by(role_id: role.id)).to_not be_nil
+      expect(@course.student_enrollments.find_by(role_id: role.id)).not_to be_nil
     end
 
     it "allows TAs to enroll Observers (by default)" do
@@ -2721,28 +3006,12 @@ describe CoursesController do
 
       it "creates attachment_associations when files are linked in the syllabus" do
         attachment_model(context: @user)
-        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
+        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/users/#{@user.id}/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
 
         expect(response).to be_successful
         json = response.parsed_body
         course = Course.find(json["id"])
         expect(course.attachment_associations.pluck(:context_concern, :attachment_id)).to eq([["syllabus_body", @attachment.id]])
-      end
-    end
-
-    context "with disable_file_verifiers_in_public_syllabus disabled" do
-      before do
-        @account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
-      end
-
-      it "does not create attachment_associations when files are linked in the syllabus" do
-        attachment_model(context: @user)
-        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
-
-        expect(response).to be_successful
-        json = response.parsed_body
-        course = Course.find(json["id"])
-        expect(course.attachment_associations).to be_empty
       end
     end
 
@@ -2838,6 +3107,34 @@ describe CoursesController do
       put "update", params: { id: @course.id, course: { name: "new course name" } }
       expect(assigns[:course]).not_to be_nil
       expect(assigns[:course]).to eql(@course)
+    end
+
+    context "when course_navigation_and_feature_options_permissions is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+      end
+
+      it "allows update via manage_course_details even when manage_course_content_edit is revoked" do
+        @course.root_account.role_overrides.create!(permission: :manage_course_content_edit, role: teacher_role, enabled: false)
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { name: "new name" } }
+        expect(response).to be_redirect
+      end
+
+      it "denies update when manage_course_details is revoked" do
+        @course.root_account.role_overrides.create!(permission: :manage_course_details, role: teacher_role, enabled: false)
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { name: "new name" } }
+        assert_unauthorized
+      end
+    end
+
+    it "returns a 400 if the start_at date is a unix timestamp" do
+      user_session(@teacher)
+      put "update", params: { id: @course.id, course: { start_at: 1.day.from_now.to_i, name: "Updated" } }, as: :json
+      expect(response).to have_http_status :bad_request
+      json = response.parsed_body
+      expect(json["errors"]["start_at"][0]["message"]).to eq "must be in ISO8601 format"
     end
 
     it "updates some settings and stuff" do
@@ -3031,6 +3328,30 @@ describe CoursesController do
       expect(@course.workflow_state).to eq "deleted"
     end
 
+    it "soft-deletes associated LTI context controls when course is deleted" do
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: "manage_courses_delete",
+        enabled: true
+      )
+      user_session(@teacher)
+
+      registration = lti_registration_with_tool(account: @course.account)
+      deployment = registration.deployments.first
+
+      control = Lti::ContextControl.create!(
+        context: @course,
+        registration:,
+        deployment:
+      )
+
+      expect(control.workflow_state).to eq("active")
+
+      put "update", params: { id: @course.id, course: { event: "delete" }, format: :json }
+
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+    end
+
     it "doesn't delete course if :manage_courses_delete is not enabled" do
       @course.root_account.role_overrides.create!(
         role: teacher_role,
@@ -3060,6 +3381,79 @@ describe CoursesController do
       expect(json["course"]["workflow_state"]).to eq "claimed"
       @course.reload
       expect(@course.workflow_state).to eq "claimed"
+    end
+
+    it "restores LTI context controls when course is undeleted" do
+      @course.root_account.role_overrides.create!(
+        role: admin_role,
+        permission: "manage_courses_delete",
+        enabled: true
+      )
+      admin = account_admin_user
+      user_session(admin)
+
+      registration = lti_registration_with_tool(account: @course.account)
+      deployment = registration.deployments.first
+
+      control = Lti::ContextControl.create!(
+        context: @course,
+        registration:,
+        deployment:
+      )
+
+      # Delete the course
+      put "update", params: { id: @course.id, course: { event: "delete" }, format: :json }
+      expect(control.reload.workflow_state).to eq("deleted_with_context")
+
+      # Undelete the course
+      put "update", params: { id: @course.id, course: { event: "undelete" }, format: :json }
+
+      expect(control.reload.workflow_state).to eq("active")
+    end
+
+    it "does not restore context controls that were independently deleted before course deletion" do
+      @course.root_account.role_overrides.create!(
+        role: admin_role,
+        permission: "manage_courses_delete",
+        enabled: true
+      )
+      admin = account_admin_user
+      user_session(admin)
+
+      registration1 = lti_registration_with_tool(account: @course.account)
+      deployment1 = registration1.deployments.first
+      registration2 = lti_registration_with_tool(account: @course.account)
+      deployment2 = registration2.deployments.first
+
+      control1 = Lti::ContextControl.create!(
+        context: @course,
+        registration: registration1,
+        deployment: deployment1
+      )
+      control2 = Lti::ContextControl.create!(
+        context: @course,
+        registration: registration2,
+        deployment: deployment2
+      )
+
+      # Delete control1 as though it was deleted in the Apps UI,
+      # not via course deletion.
+      control1.update!(workflow_state: "deleted")
+
+      # Delete the course (which will delete control2)
+      put "update", params: { id: @course.id, course: { event: "delete" }, format: :json }
+      # control1 is in normal "deleted" state
+      expect(control1.reload.workflow_state).to eq("deleted")
+      # control1 is "deleted_with_context" because it was deleted along with a course
+      expect(control2.reload.workflow_state).to eq("deleted_with_context")
+
+      # Undelete the course
+      put "update", params: { id: @course.id, course: { event: "undelete" }, format: :json }
+
+      # control1 should remain deleted
+      expect(control1.reload.workflow_state).to eq("deleted")
+      # control2 should be restored
+      expect(control2.reload.workflow_state).to eq("active")
     end
 
     it "returns an error if a bad event is given" do
@@ -3200,14 +3594,14 @@ describe CoursesController do
         put "update", params: { id: @course.id, course: { is_public: true } }
 
         @assignment.reload
-        expect(@assignment.updated_at).to_not eq @time
+        expect(@assignment.updated_at).not_to eq @time
       end
 
       it "touches content when is_public_to_auth_users is updated" do
         put "update", params: { id: @course.id, course: { is_public_to_auth_users: true } }
 
         @assignment.reload
-        expect(@assignment.updated_at).to_not eq @time
+        expect(@assignment.updated_at).not_to eq @time
       end
 
       it "does not touch content when neither is updated" do
@@ -3231,7 +3625,7 @@ describe CoursesController do
       put "update", params: { id: @course.id, course: { name:, syllabus_body: body } }
 
       @course.reload
-      expect(@course.name).to_not eq name
+      expect(@course.name).not_to eq name
       expect(@course.syllabus_body).to eq body
     end
 
@@ -3360,14 +3754,14 @@ describe CoursesController do
       it "adds attachment_associations when new files are linked in the syllabus" do
         media = attachment_model(context: @course, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"), instfs_uuid: "media")
         new_body = <<~HTML
-          <p><a href="/files/#{@image.id}">#{@image.display_name}</a></p>
+          <p><a href="/courses/#{@course.id}/files/#{@image.id}">#{@image.display_name}</a></p>
           <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true"></iframe></p>
         HTML
         put "update", params: { id: @course.id, course: { syllabus_body: new_body }, format: :json }
 
         expected_associations = [["syllabus_body", @image.id],
                                  ["syllabus_body", media.id]]
-        expect(@course.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array(expected_associations)
+        expect(@course.reload.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array(expected_associations)
       end
 
       it "removes attachment_associations when files are removed from the syllabus" do
@@ -3377,7 +3771,7 @@ describe CoursesController do
         HTML
         put "update", params: { id: @course.id, course: { syllabus_body: new_body }, format: :json }
 
-        expect(@course.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array([["syllabus_body", media.id]])
+        expect(@course.reload.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array([["syllabus_body", media.id]])
       end
 
       it "does not call update_associations when the syllabus body doesn't change" do
@@ -3563,7 +3957,7 @@ describe CoursesController do
                       course: { blueprint: "1",
                                 blueprint_restrictions: { "content" => "1", "doo_dates" => "1" } } },
             format: "json"
-        expect(response).to_not be_successful
+        expect(response).not_to be_successful
         expect(response.body).to include "Invalid restrictions"
       end
 
@@ -3598,7 +3992,7 @@ describe CoursesController do
                       course: { blueprint: "1",
                                 blueprint_restrictions_by_object_type: { "notarealtype" => { "content" => "1", "due_dates" => "1" } } } },
             format: "json"
-        expect(response).to_not be_successful
+        expect(response).not_to be_successful
         expect(response.body).to include "Invalid restrictions"
       end
 
@@ -3651,7 +4045,7 @@ describe CoursesController do
     it "does not attempt to sync k5 homeroom to course if sync_enrollments_from_homeroom is falsey" do
       teacher = @teacher
       subject = @course
-      toggle_k5_setting(subject.account, true)
+      toggle_k5_setting(subject.account)
       homeroom = course_factory(active_all: true, account: subject.account)
       homeroom.enroll_teacher(teacher, enrollment_state: :active)
       homeroom.homeroom_course = true
@@ -3709,7 +4103,7 @@ describe CoursesController do
     end
 
     it "does not allow homeroom course to enable course pacing" do
-      toggle_k5_setting(@course.account, true)
+      toggle_k5_setting(@course.account)
       homeroom = course_factory(active_all: true, account: @course.account)
       homeroom.homeroom_course = true
       homeroom.save!
@@ -3872,6 +4266,50 @@ describe CoursesController do
           put "update", params: { id: @course.id, course: { start_at: start_at + 1.day } }
           expect(response).to be_unauthorized
         end
+      end
+    end
+
+    context "csp setting" do
+      before :once do
+        @account = Account.default
+        @account.enable_feature!(:javascript_csp)
+        @account.enable_csp!
+      end
+
+      it "updates the csp setting when admin" do
+        account_admin_user(active_all: true, account: @account)
+        user_session(@admin)
+        # default is enabled
+        expect(@course.csp_enabled?).to be_truthy
+        put "update", params: { id: @course.id, course: { disable_csp: "1" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_falsey
+        put "update", params: { id: @course.id, course: { disable_csp: "0" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
+      end
+
+      it "does not update the csp setting when csp is locked" do
+        @account.lock_csp!
+        account_admin_user(active_all: true, account: @account)
+        user_session(@admin)
+
+        put "update", params: { id: @course.id, course: { disable_csp: "1" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
+        @account.unlock_csp!
+      end
+
+      it "does not update the csp setting when not admin" do
+        user_session(@teacher)
+        # test for nil param
+        put "update", params: { id: @course.id, course: { name: "New Course Name" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
+        # test for false param
+        put "update", params: { id: @course.id, course: { disable_csp: "0" } }
+        @course.reload
+        expect(@course.csp_enabled?).to be_truthy
       end
     end
   end
@@ -4443,8 +4881,10 @@ describe CoursesController do
       expect(test_student.submissions.size).not_to be_zero
       submission = test_student.submissions.first
       auditor_rec = submission.auditor_grade_change_records.first
-      expect(auditor_rec).to_not be_nil
+      expect(auditor_rec).not_to be_nil
       attachment = attachment_model
+      attachment.create_canvadoc
+      canvadocs_submission = attachment.canvadoc.canvadocs_submissions.find_or_create_by(submission_id: submission.id)
       OriginalityReport.create!(attachment:, originality_score: "1", submission: test_student.submissions.first)
       submission.canvadocs_annotation_contexts.create!(
         root_account: @course.root_account,
@@ -4454,6 +4894,7 @@ describe CoursesController do
       delete "reset_test_student", params: { course_id: @course.id }
       test_student.reload
       expect(test_student.submissions.size).to be_zero
+      expect { canvadocs_submission.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(Auditors::ActiveRecord::GradeChangeRecord.where(id: auditor_rec.id).count).to be_zero
     end
 
@@ -4620,7 +5061,7 @@ describe CoursesController do
         per_page: 1
       }
       expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).to_not include("last")
+      expect(response.headers.to_a.find { |a| a.first.downcase == "link" }.last).not_to include("last")
     end
 
     it "only returns group_ids for active group memberships when requested" do
@@ -4693,6 +5134,204 @@ describe CoursesController do
           section5.id
         ]
       )
+    end
+
+    describe "filters by enrollment types" do
+      it "when requested with a string" do
+        user_session(teacher)
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          enrollment_type: "Student"
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(2)
+      end
+
+      it "when requested with an array of strings" do
+        user_session(teacher)
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          enrollment_type: ["Student", "Teacher"]
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(3)
+      end
+    end
+
+    describe "filters by section ids" do
+      it "when requested with a string" do
+        user_session(teacher)
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: section1.id.to_s
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(1)
+        expect(json[0]).to include({ "id" => student1.id })
+      end
+
+      it "when requested with an array of strings" do
+        user_session(teacher)
+
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student_in_course(course:, active_all: true).user, section: section3, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: [section1.id.to_s, section2.id.to_s]
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(2)
+      end
+
+      it "doesn't duplicate users enrolled in multiple sections" do
+        user_session(teacher)
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section3, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: [section1.id.to_s, section2.id.to_s, section3.id.to_s]
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(2)
+      end
+
+      it "filters by section with search term" do
+        user_session(teacher)
+        student1.update(name: "Bob Johnson")
+        student2.update(name: "Bob Smith")
+        course.enroll_student(student1, section: section1, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(student2, section: section2, enrollment_state: "active", allow_multiple_enrollments: true)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          section_ids: section1.id.to_s,
+          search_term: "bob"
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(1)
+        expect(json[0]).to include({ "id" => student1.id })
+      end
+    end
+
+    describe "has_non_collaborative_groups" do
+      before :once do
+        course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        course.account.save!
+      end
+
+      let(:diff_tag_category) { course.group_categories.create!(name: "Tag Category", non_collaborative: true) }
+
+      let(:diff_tag) do
+        diff_tag_category.groups.create!(context: course, name: "Tag Group", non_collaborative: true)
+      end
+
+      it "includes has_non_collaborative_groups for users with the manage_tags_manage permission" do
+        diff_tag.add_user(student1)
+        user_session(teacher)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          enrollment_role: "StudentEnrollment"
+        }
+        json = json_parse(response.body)
+        tagged_user = json.find { |u| u["id"] == student1.id }
+        untagged_user = json.find { |u| u["id"] == student2.id }
+
+        expect(tagged_user["has_non_collaborative_groups"]).to be true
+        expect(untagged_user["has_non_collaborative_groups"]).to be false
+      end
+
+      it "does not include has_non_collaborative_groups for users without the manage_tags_manage permission" do
+        course.account.role_overrides.create!(permission: :manage_tags_manage, role: teacher_role, enabled: false)
+        user_session(teacher)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          enrollment_role: "StudentEnrollment"
+        }
+        json = json_parse(response.body)
+
+        json.each do |user|
+          expect(user).not_to have_key("has_non_collaborative_groups")
+        end
+      end
+
+      it "ignores deleted group memberships" do
+        diff_tag.add_user(student1)
+        diff_tag.group_memberships.find_by(user_id: student1.id).update!(workflow_state: "deleted")
+        user_session(teacher)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          enrollment_role: "StudentEnrollment"
+        }
+        json = json_parse(response.body)
+        tagged_user = json.find { |u| u["id"] == student1.id }
+
+        expect(tagged_user["has_non_collaborative_groups"]).to be false
+      end
+
+      it "ignores deleted groups" do
+        diff_tag.add_user(student1)
+        diff_tag.update!(workflow_state: "deleted")
+        user_session(teacher)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          enrollment_role: "StudentEnrollment"
+        }
+        json = json_parse(response.body)
+        tagged_user = json.find { |u| u["id"] == student1.id }
+
+        expect(tagged_user["has_non_collaborative_groups"]).to be false
+      end
+
+      it "ignores non-collaborative groups from other courses" do
+        other_course = Course.create!
+        other_category = other_course.group_categories.create!(name: "Other Tags", non_collaborative: true)
+        other_tag = other_category.groups.create!(context: other_course, name: "Other Tag", non_collaborative: true)
+        other_tag.add_user(student1)
+        user_session(teacher)
+
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          enrollment_role: "StudentEnrollment"
+        }
+        json = json_parse(response.body)
+        tagged_user = json.find { |u| u["id"] == student1.id }
+
+        expect(tagged_user["has_non_collaborative_groups"]).to be false
+      end
     end
   end
 
@@ -4883,7 +5522,7 @@ describe CoursesController do
         end
 
         get "content_share_users", params: { course_id: @course.id, search_term: "hiyo" }
-        expect(sql).to_not include(@shard1.name) # can't just check for success since the query can still work depending on test shard setup
+        expect(sql).not_to include(@shard1.name) # can't just check for success since the query can still work depending on test shard setup
       end
     end
   end
@@ -5111,6 +5750,26 @@ describe CoursesController do
     end
   end
 
+  describe "#re_send_invitations" do
+    before :once do
+      @notification = Notification.create!(name: "Enrollment Invitation")
+      course_factory(active_all: true)
+      @user1 = user_with_pseudonym(active_all: true)
+      @course.enroll_student(@user1)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "only creates one job per course at a time" do
+      post "re_send_invitations", params: { course_id: @course.id }
+      post "re_send_invitations", params: { course_id: @course.id }
+
+      expect(Delayed::Job.where(tag: "Course#re_send_invitations!").count).to eq 1
+    end
+  end
+
   context "accept_enrollment" do
     before do
       allow(RequestCache).to receive(:clear).and_call_original
@@ -5140,7 +5799,7 @@ describe CoursesController do
 
       context "when ff is on" do
         before do
-          @course.root_account.enable_feature!(:youtube_migration)
+          @course.enable_feature!(:youtube_migration)
         end
 
         it "should return ok status" do
@@ -5162,7 +5821,7 @@ describe CoursesController do
 
       context "when ff is off" do
         before do
-          @course.root_account.disable_feature!(:youtube_migration)
+          @course.disable_feature!(:youtube_migration)
         end
 
         it "should return not_found status" do
@@ -5175,19 +5834,124 @@ describe CoursesController do
     describe "render ui" do
       subject { get :youtube_migration, params: { course_id: @course.id } }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
     end
 
     describe "get last scan" do
       subject { get :youtube_migration_scan, params: { course_id: @course.id } }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
+
+      context "when ff is on" do
+        before do
+          @course.enable_feature!(:youtube_migration)
+          user_session(@user)
+        end
+
+        context "with no existing progress" do
+          it "returns empty results with default pagination" do
+            allow(YoutubeMigrationService).to receive(:last_youtube_embed_scan_progress_by_course).with(@course).and_return(nil)
+
+            subject
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["id"]).to be_nil
+            expect(json["resources"]).to eq([])
+            expect(json["total_count"]).to eq(0)
+            expect(json["total_pages"]).to eq(0)
+          end
+        end
+
+        context "with existing progress" do
+          let(:progress) do
+            instance_double(Progress,
+                            id: 123,
+                            workflow_state: "completed",
+                            results: {
+                              resources: {
+                                "WikiPage|1" => { name: "Page 1", type: "WikiPage", embeds: [], count: 1 },
+                                "WikiPage|2" => { name: "Page 2", type: "WikiPage", embeds: [], count: 2 },
+                                "WikiPage|3" => { name: "Page 3", type: "WikiPage", embeds: [], count: 1 },
+                                "WikiPage|4" => { name: "Page 4", type: "WikiPage", embeds: [], count: 3 },
+                                "WikiPage|5" => { name: "Page 5", type: "WikiPage", embeds: [], count: 1 }
+                              },
+                              total_count: 8
+                            })
+          end
+
+          before do
+            allow(YoutubeMigrationService).to receive(:last_youtube_embed_scan_progress_by_course).with(@course).and_return(progress)
+          end
+
+          it "returns first page with default pagination" do
+            subject
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["id"]).to eq(123)
+            expect(json["resources"].length).to eq(5)
+            expect(json["total_count"]).to eq(8)
+            expect(json["total_pages"]).to eq(1)
+          end
+
+          it "handles pagination parameters" do
+            get :youtube_migration_scan, params: { course_id: @course.id, page: 1, per_page: 2 }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["resources"].length).to eq(2)
+            expect(json["page"]).to eq(1)
+            expect(json["per_page"]).to eq(2)
+            expect(json["total_pages"]).to eq(3)
+          end
+
+          it "handles second page" do
+            get :youtube_migration_scan, params: { course_id: @course.id, page: 2, per_page: 2 }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["resources"].length).to eq(2)
+            expect(json["page"]).to eq(2)
+            expect(json["per_page"]).to eq(2)
+            expect(json["total_pages"]).to eq(3)
+          end
+
+          it "handles last page with remaining items" do
+            get :youtube_migration_scan, params: { course_id: @course.id, page: 3, per_page: 2 }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["resources"].length).to eq(1)
+            expect(json["page"]).to eq(3)
+            expect(json["per_page"]).to eq(2)
+            expect(json["total_pages"]).to eq(3)
+          end
+
+          it "validates pagination parameters" do
+            get :youtube_migration_scan, params: { course_id: @course.id, page: 0, per_page: -1 }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["page"]).to eq(1)
+            expect(json["per_page"]).to eq(1)
+          end
+
+          it "limits per_page to maximum 100" do
+            get :youtube_migration_scan, params: { course_id: @course.id, per_page: 200 }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["per_page"]).to eq(100)
+          end
+        end
+      end
     end
 
     describe "post a new scan" do
       subject { post :start_youtube_migration_scan, params: { course_id: @course.id } }
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
     end
 
     describe "post a new convert" do
@@ -5205,14 +5969,432 @@ describe CoursesController do
           resource_group_key: "key"
         }
       end
-      let(:progress) { double("Progress", id: 1) }
+      let(:progress) { instance_double(Progress, id: 1) }
 
       before do
         allow(YoutubeMigrationService).to receive(:new).with(@course).and_return(service)
-        allow(service).to receive(:convert_embed).with(scan_id, embed).and_return(progress)
+        allow(service).to receive(:convert_embed).and_return(progress)
       end
 
-      include_examples "youtube migration protection"
+      it_behaves_like "youtube migration protection"
+
+      context "when authorized" do
+        before do
+          @course.enable_feature!(:youtube_migration)
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        it "permits width parameter" do
+          embed_with_width = embed.merge(width: "640")
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_width.stringify_keys, user_uuid: @teacher.uuid).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed: embed_with_width
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_width.stringify_keys, user_uuid: @teacher.uuid)
+        end
+
+        it "permits height parameter" do
+          embed_with_height = embed.merge(height: "480")
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_height.stringify_keys, user_uuid: @teacher.uuid).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed: embed_with_height
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_height.stringify_keys, user_uuid: @teacher.uuid)
+        end
+
+        it "permits both width and height parameters" do
+          embed_with_dimensions = embed.merge(width: "1280", height: "720")
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys, user_uuid: @teacher.uuid).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed: embed_with_dimensions
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys, user_uuid: @teacher.uuid)
+        end
+
+        it "converts numeric width and height to strings" do
+          embed_with_numeric_dimensions = embed.merge(width: 1920, height: 1080)
+          expected_embed = embed.merge(width: "1920", height: "1080").stringify_keys
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed: embed_with_numeric_dimensions
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid)
+        end
+
+        it "filters out unpermitted parameters but keeps width and height" do
+          embed_with_extra_params = embed.merge(
+            width: "800",
+            height: "600",
+            invalid_param: "should_be_filtered",
+            another_bad_param: "also_filtered"
+          )
+          expected_embed = embed.merge(width: "800", height: "600").stringify_keys
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed: embed_with_extra_params
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid)
+        end
+
+        it "passes user_uuid to convert_embed method" do
+          expected_embed = embed.stringify_keys
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed:
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed, user_uuid: @teacher.uuid)
+        end
+      end
+    end
+
+    describe "get conversion status" do
+      subject { get :youtube_migration_conversion_status, params: { course_id: @course.id, resource_type:, resource_id: } }
+
+      let(:resource_type) { "WikiPage" }
+      let(:resource_id) { 123 }
+
+      before do
+        @course.account.enable_feature!(:youtube_migration)
+      end
+
+      context "when not authorized" do
+        before do
+          user_session(user_factory)
+        end
+
+        it "returns unauthorized" do
+          subject
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
+      context "when authorized" do
+        before do
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        context "with no active conversions" do
+          it "returns empty conversions array" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+
+        context "with active conversions" do
+          let(:embed_data) do
+            {
+              "field" => "body",
+              "id" => 123,
+              "path" => "/videos/123",
+              "resource_type" => "WikiPage",
+              "src" => "https://youtube.com/video123"
+            }
+          end
+          let!(:progress) do
+            Progress.create!(
+              tag: "youtube_embed_convert",
+              context: @course,
+              message: "WikiPage|123",
+              workflow_state: "running",
+              results: { "original_embed" => embed_data }
+            )
+          end
+
+          it "returns active conversions for the resource" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"].length).to eq(1)
+            expect(json["conversions"][0]["id"]).to eq(progress.id)
+            expect(json["conversions"][0]["workflow_state"]).to eq("running")
+            expect(json["conversions"][0]["original_embed"]).to eq(embed_data)
+          end
+        end
+
+        context "with completed conversions" do
+          before do
+            Progress.create!(
+              tag: "youtube_embed_convert",
+              context: @course,
+              message: "WikiPage|123",
+              workflow_state: "completed",
+              results: { "original_embed" => {} }
+            )
+          end
+
+          it "does not return completed conversions" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+
+        context "with conversions for different resources" do
+          before do
+            Progress.create!(
+              tag: "youtube_embed_convert",
+              context: @course,
+              message: "Assignment|456",
+              workflow_state: "running",
+              results: { "original_embed" => {} }
+            )
+          end
+
+          it "only returns conversions for the requested resource" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+
+        context "without resource parameters" do
+          subject { get :youtube_migration_conversion_status, params: { course_id: @course.id } }
+
+          it "returns empty conversions array" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before do
+          @course.account.disable_feature!(:youtube_migration)
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        it "returns not found" do
+          subject
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+
+    describe "update youtube migration scan" do
+      subject do
+        put :update_youtube_migration_scan, params: {
+          course_id: @course.id,
+          scan_id: defined?(scan_progress) ? scan_progress.id : default_scan_progress.id,
+          new_quizzes_scan_results: defined?(new_quizzes_scan_results) ? new_quizzes_scan_results : default_new_quizzes_scan_results,
+          new_quizzes_scan_status: defined?(new_quizzes_scan_status) ? new_quizzes_scan_status : "completed"
+        }
+      end
+
+      let(:default_scan_progress) do
+        Progress.create!(
+          tag: "youtube_embed_scan",
+          context: @course,
+          workflow_state: "waiting_for_external_tool",
+          results: {
+            resources: {},
+            total_count: 0,
+          }
+        )
+      end
+
+      let(:default_new_quizzes_scan_results) do
+        { resources: [], total_count: 0 }
+      end
+
+      let(:scan_progress) do
+        Progress.create!(
+          tag: "youtube_embed_scan",
+          context: @course,
+          workflow_state: "waiting_for_external_tool",
+          results: {
+            resources: {
+              "WikiPage|123" => {
+                name: "Test Page",
+                id: 123,
+                type: "WikiPage",
+                content_url: "/courses/#{@course.id}/pages/test-page",
+                count: 1,
+                embeds: [
+                  {
+                    path: "//iframe[@src='https://www.youtube.com/embed/abc123']",
+                    id: 123,
+                    resource_type: "WikiPage",
+                    field: "body",
+                    src: "https://www.youtube.com/embed/abc123"
+                  }
+                ]
+              }
+            },
+            total_count: 1,
+            canvas_scan_completed_at: 2.hours.ago.utc,
+            completed_at: 2.hours.ago.utc
+          }
+        )
+      end
+
+      let(:new_quizzes_scan_results) do
+        {
+          resources: [
+            {
+              name: "New Quiz",
+              id: 456,
+              type: "Quiz",
+              content_url: "/courses/#{@course.id}/quizzes/456",
+              count: 2,
+              embeds: [
+                {
+                  path: "//iframe[@src='https://www.youtube.com/embed/xyz789']",
+                  id: 456,
+                  resource_type: "Quiz",
+                  field: "instructions",
+                  src: "https://www.youtube.com/embed/xyz789"
+                },
+                {
+                  path: "//iframe[@src='https://www.youtube.com/embed/def456']",
+                  id: 456,
+                  resource_type: "Quiz",
+                  field: "instructions",
+                  src: "https://www.youtube.com/embed/def456"
+                }
+              ]
+            }
+          ],
+          total_count: 2,
+        }
+      end
+
+      let(:new_quizzes_scan_status) { "completed" }
+
+      it_behaves_like "youtube migration protection"
+
+      context "when feature flag is disabled" do
+        before do
+          @course.disable_feature!(:youtube_migration)
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        it "returns not found" do
+          subject
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+
+      context "when authorized" do
+        before do
+          @course.enable_feature!(:youtube_migration)
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        it "successfully updates scan with new quizzes results when status is completed" do
+          expect(scan_progress.results[:total_count]).to eq(1)
+          expect(scan_progress.results[:resources].keys).to eq(["WikiPage|123"])
+          expect(scan_progress.workflow_state).to eq("waiting_for_external_tool")
+
+          subject
+
+          expect(response).to have_http_status(:ok)
+          json = response.parsed_body
+          expect(json["success"]).to be true
+
+          scan_progress.reload
+          expect(scan_progress.workflow_state).to eq("completed")
+          expect(scan_progress.results[:total_count]).to eq(3)
+          expect(scan_progress.results[:resources].keys).to include("WikiPage|123", "Quiz|456")
+          expect(scan_progress.results[:resources]["Quiz|456"][:name]).to eq("New Quiz")
+          expect(scan_progress.results[:resources]["Quiz|456"][:count]).to eq("2")
+          expect(scan_progress.results[:new_quizzes_scan_status]).to eq("completed")
+        end
+
+        it "handles scan not found" do
+          put :update_youtube_migration_scan, params: {
+            course_id: @course.id,
+            scan_id: 99_999,
+            new_quizzes_scan_results:,
+            new_quizzes_scan_status: "completed"
+          }
+
+          expect(response).to have_http_status(:not_found)
+          json = response.parsed_body
+          expect(json["error"]).to eq("Youtube Scan not found")
+        end
+
+        it "handles failed new quizzes scan status but still completes" do
+          put :update_youtube_migration_scan, params: {
+            course_id: @course.id,
+            scan_id: scan_progress.id,
+            new_quizzes_scan_results: {},
+            new_quizzes_scan_status: "failed"
+          }
+
+          expect(response).to have_http_status(:ok)
+          scan_progress.reload
+          expect(scan_progress.workflow_state).to eq("completed")
+          expect(scan_progress.results[:new_quizzes_scan_status]).to eq("failed")
+          expect(scan_progress.results[:completed_at]).to be_present
+        end
+
+        it "handles service errors gracefully" do
+          allow_any_instance_of(YoutubeMigrationService).to receive(:process_new_quizzes_scan_update).and_raise(StandardError, "Test error")
+          subject
+
+          expect(response).to have_http_status(:internal_server_error)
+          json = response.parsed_body
+          expect(json["error"]).to eq("An Error occured during updating the youtube scan results")
+        end
+
+        it "handles nil new_quizzes_scan_results gracefully" do
+          put :update_youtube_migration_scan, params: {
+            course_id: @course.id,
+            scan_id: scan_progress.id,
+            new_quizzes_scan_status: "failed"
+          }
+
+          expect(response).to have_http_status(:ok)
+          scan_progress.reload
+          expect(scan_progress.results[:new_quizzes_scan_status]).to eq("failed")
+        end
+      end
     end
   end
 
@@ -5309,6 +6491,509 @@ describe CoursesController do
           get "show", params: file_params(@aa_test_data.attachment2), format: "json"
           expect(response).to have_http_status(:unauthorized)
         end
+      end
+    end
+  end
+
+  describe "#restore_version" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @account = @course.account
+      @account.enable_feature!(:syllabus_versioning)
+      @account.enable_feature!(:allow_attachment_association_creation)
+      @account.enable_feature!(:file_association_access)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "requires syllabus_versioning feature flag" do
+      @account.disable_feature!(:syllabus_versioning)
+      post "restore_version", params: { course_id: @course.id, version_id: 1 }
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "requires manage_course_content_edit permission" do
+      student_in_course(course: @course, active_all: true)
+      user_session(@student)
+      post "restore_version", params: { course_id: @course.id, version_id: 1 }
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "restores a previous syllabus version" do
+      @course.update!(syllabus_body: "<p>Original content</p>")
+      version_1 = @course.versions.last.number
+
+      @course.update!(syllabus_body: "<p>Updated content</p>")
+
+      post "restore_version", params: { course_id: @course.id, version_id: version_1 }, format: :json
+      expect(response).to be_successful
+
+      @course.reload
+      expect(@course.syllabus_body).to include("Original content")
+    end
+
+    it "restores syllabus with images and creates attachment associations" do
+      attachment_model(context: @course)
+      syllabus_with_image = "<p><img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\"></p>"
+
+      @course.saving_user = @teacher
+      @course.update!(syllabus_body: syllabus_with_image)
+      version_with_image = @course.versions.last.number
+
+      @course.saving_user = @teacher
+      @course.update!(syllabus_body: "<p>No images here</p>")
+
+      expect do
+        post "restore_version", params: { course_id: @course.id, version_id: version_with_image }, format: :json
+      end.not_to raise_error
+
+      expect(response).to be_successful
+      @course.reload
+      expect(@course.syllabus_body).to include("files/#{@attachment.id}")
+      expect(@course.attachment_associations.where(context_concern: "syllabus_body").pluck(:attachment_id)).to include(@attachment.id)
+    end
+
+    it "sets the saving_user for attachment association tracking" do
+      attachment_model(context: @course)
+      syllabus_with_image = "<p><img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\"></p>"
+
+      @course.saving_user = @teacher
+      @course.update!(syllabus_body: syllabus_with_image)
+      version_with_image = @course.versions.last.number
+
+      @course.saving_user = @teacher
+      @course.update!(syllabus_body: "<p>No images</p>")
+
+      post "restore_version", params: { course_id: @course.id, version_id: version_with_image }, format: :json
+
+      expect(response).to be_successful
+      association = @course.attachment_associations.where(context_concern: "syllabus_body", attachment_id: @attachment.id).first
+      expect(association).not_to be_nil
+      expect(association.user_id).to eq(@teacher.id)
+    end
+
+    it "returns error for non-existent version" do
+      post "restore_version", params: { course_id: @course.id, version_id: 999 }, format: :json
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "POST #create" do
+    let(:root_account) { Account.default }
+    let(:mcc_account) { root_account.manually_created_courses_account }
+    let(:other_subaccount) { root_account.sub_accounts.create!(name: "Other Subaccount") }
+    let(:admin_user) { account_admin_user(account: root_account) }
+    let(:teacher_user) { user_factory(active_all: true) }
+    let(:designer_user) { user_factory(active_all: true) }
+    let(:student_user) { user_factory(active_all: true) }
+
+    before do
+      root_course = course_factory(account: root_account)
+      root_course.enroll_teacher(teacher_user, enrollment_state: "active")
+      root_course.enroll_designer(designer_user, enrollment_state: "active")
+      root_course.enroll_student(student_user, enrollment_state: "active")
+
+      mcc_course = course_factory(account: mcc_account)
+      mcc_course.enroll_teacher(teacher_user, enrollment_state: "active")
+      mcc_course.enroll_designer(designer_user, enrollment_state: "active")
+      mcc_course.enroll_student(student_user, enrollment_state: "active")
+
+      other_course = course_factory(account: other_subaccount)
+      other_course.enroll_teacher(teacher_user, enrollment_state: "active")
+      other_course.enroll_designer(designer_user, enrollment_state: "active")
+      other_course.enroll_student(student_user, enrollment_state: "active")
+    end
+
+    context "when teachers_can_create_courses is disabled" do
+      before do
+        root_account.settings[:teachers_can_create_courses] = false
+        root_account.save!
+      end
+
+      context "creating in root account" do
+        it "allows admin to create course" do
+          user_session(admin_user)
+          post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "does not allow teacher to create course" do
+          user_session(teacher_user)
+          post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+
+        it "does not allow designer to create course" do
+          user_session(designer_user)
+          post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+
+        it "does not allow student to create course" do
+          user_session(student_user)
+          post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+      end
+
+      context "creating in other subaccount" do
+        it "allows admin to create course" do
+          user_session(admin_user)
+          post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "does not allow teacher to create course" do
+          user_session(teacher_user)
+          post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+
+        it "does not allow designer to create course" do
+          user_session(designer_user)
+          post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+
+        it "does not allow student to create course" do
+          user_session(student_user)
+          post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+      end
+    end
+
+    context "when teachers_can_create_courses is enabled and they can create anywhere" do
+      before do
+        root_account.settings[:teachers_can_create_courses] = true
+        root_account.settings[:teachers_can_create_courses_anywhere] = true
+        root_account.save!
+      end
+
+      context "creating in root account" do
+        it "allows admin to create course" do
+          user_session(admin_user)
+          post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "allows teacher to create course" do
+          user_session(teacher_user)
+          post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "allows designer to create course" do
+          user_session(designer_user)
+          post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "does not allow student to create course" do
+          user_session(student_user)
+          post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+      end
+
+      context "creating in other subaccount" do
+        it "allows admin to create course" do
+          user_session(admin_user)
+          post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "allows teacher to create course" do
+          user_session(teacher_user)
+          post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "allows designer to create course" do
+          user_session(designer_user)
+          post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "does not allow student to create course" do
+          user_session(student_user)
+          post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+      end
+    end
+
+    context "when teachers_can_create_courses is enabled but restricted to manually created courses subaccount" do
+      before do
+        root_account.settings[:teachers_can_create_courses] = true
+        root_account.settings[:teachers_can_create_courses_anywhere] = false
+        root_account.save!
+      end
+
+      context "creating in root account" do
+        it "allows admin to create course" do
+          user_session(admin_user)
+          post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        context "with mcc_specific_error_message feature flag enabled" do
+          before do
+            Account.site_admin.enable_feature!(:mcc_specific_error_message)
+          end
+
+          it "does not allow teacher to create course and returns manually_created_courses_subaccount_error" do
+            user_session(teacher_user)
+            post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+            expect(response).to be_unauthorized
+            json = response.parsed_body
+            expect(json["error"]).to eq("manually_created_courses_subaccount_error")
+          end
+
+          it "does not allow designer to create course and returns manually_created_courses_subaccount_error" do
+            user_session(designer_user)
+            post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+            expect(response).to be_unauthorized
+            json = response.parsed_body
+            expect(json["error"]).to eq("manually_created_courses_subaccount_error")
+          end
+        end
+
+        context "with mcc_specific_error_message feature flag disabled" do
+          it "does not allow teacher to create course" do
+            user_session(teacher_user)
+            post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+            expect(response).to be_unauthorized
+          end
+
+          it "does not allow designer to create course" do
+            user_session(designer_user)
+            post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+            expect(response).to be_unauthorized
+          end
+        end
+
+        it "does not allow student to create course" do
+          user_session(student_user)
+          post :create, params: { account_id: root_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+      end
+
+      context "creating in non-manually created courses subaccount" do
+        it "allows admin to create course" do
+          user_session(admin_user)
+          post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        context "with mcc_specific_error_message feature flag enabled" do
+          before do
+            Account.site_admin.enable_feature!(:mcc_specific_error_message)
+          end
+
+          it "does not allow teacher to create course and returns manually_created_courses_subaccount_error" do
+            user_session(teacher_user)
+            post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+            expect(response).to be_unauthorized
+            json = response.parsed_body
+            expect(json["error"]).to eq("manually_created_courses_subaccount_error")
+          end
+
+          it "does not allow designer to create course and returns manually_created_courses_subaccount_error" do
+            user_session(designer_user)
+            post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+            expect(response).to be_unauthorized
+            json = response.parsed_body
+            expect(json["error"]).to eq("manually_created_courses_subaccount_error")
+          end
+        end
+
+        context "with mcc_specific_error_message feature flag disabled" do
+          it "does not allow teacher to create course and returns unauthorized" do
+            user_session(teacher_user)
+            post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+            expect(response).to be_unauthorized
+          end
+
+          it "does not allow designer to create course and returns unauthorized" do
+            user_session(designer_user)
+            post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+            expect(response).to be_unauthorized
+          end
+        end
+
+        it "does not allow student to create course" do
+          user_session(student_user)
+          post :create, params: { account_id: other_subaccount.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+      end
+
+      context "creating in manually created courses subaccount" do
+        it "allows admin to create course" do
+          user_session(admin_user)
+          post :create, params: { account_id: mcc_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "allows teacher to create course" do
+          user_session(teacher_user)
+          post :create, params: { account_id: mcc_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "allows designer to create course" do
+          user_session(designer_user)
+          post :create, params: { account_id: mcc_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_successful
+        end
+
+        it "does not allow student to create course" do
+          user_session(student_user)
+          post :create, params: { account_id: mcc_account.id, course: { name: "Test Course" }, format: :json }
+          expect(response).to be_forbidden
+        end
+      end
+    end
+  end
+
+  describe "PUT update_nav" do
+    before :once do
+      course_with_teacher(active_all: true)
+    end
+
+    it "calls NavMenuLinkTabs.sync_course_links_with_tabs and saves course" do
+      user_session(@teacher)
+      tabs_json = [
+        { id: "assignments", label: "Assignments" },
+        { id: "announcements", label: "Announcements", hidden: true }
+      ].to_json
+
+      processed_tabs = [
+        { "id" => "assignments", "label" => "Assignments" },
+        { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+      ]
+
+      expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+        .with(
+          course: @course,
+          tabs: [
+            { "id" => "assignments", "label" => "Assignments" },
+            { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+          ],
+          can_manage_links: false,
+          request_host: "test.host",
+          request_port: 80
+        )
+        .and_return(processed_tabs)
+
+      put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+      expect(response).to be_redirect
+      @course.reload
+      expect(@course.tab_configuration).to eq(processed_tabs)
+    end
+
+    it "requires update permission" do
+      student_in_course(active_all: true)
+      user_session(@student)
+
+      tabs_json = [{ id: "assignments", label: "Assignments" }].to_json
+
+      put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+      expect(response).to be_unauthorized
+    end
+
+    context "with manage_nav_menu_links permission" do
+      it "passes can_manage_links: true when user has permission" do
+        user_session(@teacher)
+        @course.root_account.enable_feature!(:nav_menu_links)
+
+        # Grant the permission
+        role = @teacher.enrollments.first.role
+        @course.root_account.role_overrides.create!(permission: :manage_nav_menu_links, role:, enabled: true)
+
+        tabs_json = [
+          { id: "assignments" },
+          { href: "nav_menu_link_url", args: ["https://example.com"], label: "New Link" }
+        ].to_json
+
+        expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+          .with(hash_including(can_manage_links: true))
+          .and_call_original
+
+        put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+        expect(response).to be_redirect
+      end
+
+      it "passes can_manage_links: false when user lacks permission" do
+        user_session(@teacher)
+        @course.root_account.enable_feature!(:nav_menu_links)
+
+        # Permission is not granted (default is false)
+
+        tabs_json = [{ id: "assignments" }].to_json
+
+        expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+          .with(hash_including(can_manage_links: false))
+          .and_call_original
+
+        put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+        expect(response).to be_redirect
+      end
+    end
+
+    context "the course_navigation_and_feature_options_permissions feature flag is enabled" do
+      before :once do
+        @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        course_with_teacher(active_all: true)
+      end
+
+      it "calls NavMenuLinkTabs.sync_course_links_with_tabs and saves course" do
+        user_session(@teacher)
+        @course.root_account.role_overrides.create!(permission: :manage_course_navigation, enabled: true, role: teacher_role)
+
+        tabs_json = [
+          { id: "assignments", label: "Assignments" },
+          { id: "announcements", label: "Announcements", hidden: true }
+        ].to_json
+
+        processed_tabs = [
+          { "id" => "assignments", "label" => "Assignments" },
+          { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+        ]
+
+        expect(NavMenuLinkTabs).to receive(:sync_course_links_with_tabs)
+          .with(
+            course: @course,
+            tabs: [
+              { "id" => "assignments", "label" => "Assignments" },
+              { "id" => "announcements", "label" => "Announcements", "hidden" => true }
+            ],
+            can_manage_links: false,
+            request_host: "test.host",
+            request_port: 80
+          )
+          .and_return(processed_tabs)
+
+        put :update_nav, params: { course_id: @course.id, tabs_json: }
+
+        expect(response).to be_redirect
+        @course.reload
+        expect(@course.tab_configuration).to eq(processed_tabs)
+      end
+
+      it "returns a 401 unauthorized when the permission is disabled" do
+        user_session(@teacher)
+        @course.root_account.role_overrides.create!(permission: :manage_course_navigation, enabled: false, role: teacher_role)
+        put :update_nav, params: { course_id: @course.id, tabs_json: {} }
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

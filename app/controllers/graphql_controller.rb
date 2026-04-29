@@ -21,9 +21,13 @@
 class GraphQLController < ApplicationController
   include Api::V1
 
-  before_action :require_user, if: :require_auth?
+  skip_before_action :require_user, unless: :require_auth?
   # This makes sure that the liveEvents context is set up for graphql requests
   before_action :get_context
+
+  def graphql_operation_name
+    params[:operationName]
+  end
 
   def execute
     result = execute_on(CanvasSchema)
@@ -36,7 +40,7 @@ class GraphQLController < ApplicationController
     query_errors = result.to_h["data"]&.values&.map { |res| (res.is_a?(Hash) && res["errors"].present?) ? res["errors"] : "" }&.reject(&:blank?)
 
     any_error_occured = graphql_errors.present? || query_errors.present?
-    RequestContext::Generator.add_meta_header("ge", any_error_occured ? "f" : "t")
+    RequestContext::Generator.add_meta_header("ge", any_error_occured ? "t" : "f")
     if any_error_occured
       disable_page_views
       Rails.logger.info "There are GraphQL errors: #{safe_to_json({ graphql_errors:, query_errors: }.compact)}"
@@ -99,11 +103,8 @@ class GraphQLController < ApplicationController
   end
 
   def require_auth?
-    if action_name == "execute"
-      return false if ::Account.site_admin.feature_enabled?(:disable_graphql_authentication)
-      if persisted_query
-        return !persisted_query["anonymous_access_allowed"]
-      end
+    if (action_name == "execute") && persisted_query
+      return !persisted_query["anonymous_access_allowed"]
     end
 
     true

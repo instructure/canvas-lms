@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CourseSection < ActiveRecord::Base
+class CourseSection < ApplicationRecord
   include Workflow
   include MaterialChanges
   include SearchTermHelper
@@ -62,9 +62,10 @@ class CourseSection < ActiveRecord::Base
   after_save :republish_course_pace_if_needed
 
   include StickySisFields
+
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
 
-  delegate :account, to: :course
+  delegate :account, :short_name, :nickname_for, to: :course
 
   def validate_section_dates
     if start_at.present? && end_at.present? && end_at < start_at
@@ -229,7 +230,7 @@ class CourseSection < ActiveRecord::Base
 
     return true unless scope.exists?
 
-    errors.add(:integration_id, t("integration_id_taken", "INTEGRATRION ID \"%{integration_id}\" is already in use", integration_id:))
+    errors.add(:integration_id, t("integration_id_taken", "INTEGRATION ID \"%{integration_id}\" is already in use", integration_id:))
     throw :abort
   end
 
@@ -295,6 +296,7 @@ class CourseSection < ActiveRecord::Base
 
     if enrollment_ids.any?
       all_enrollments.update_all all_attrs
+      CourseSection.delay_if_production.carry_over_course_favorites(user_ids, old_course.id, course.id)
       Enrollment.delay_if_production.batch_add_to_favorites(enrollment_ids)
     end
 
@@ -325,6 +327,19 @@ class CourseSection < ActiveRecord::Base
 
   def ensure_enrollments_in_correct_section
     enrollments.where.not(course_id:).each { |e| e.update_attribute(:course_id, course_id) }
+  end
+
+  # If affected users had favorited the old course, carry that favoriting over to the
+  # new course; otherwise they'd lose their favorite since the old course is no longer
+  # accessible via the moved section. Favorites live on the user's shard, which may
+  # differ from the course's shard for cross-shard users.
+  def self.carry_over_course_favorites(user_ids, old_course_id, new_course_id)
+    new_course = Course.find(new_course_id)
+    Shard.partition_by_shard(user_ids) do |sharded_user_ids|
+      Favorite.where(user_id: sharded_user_ids, context_type: "Course", context_id: old_course_id).find_each do |fav|
+        Favorite.create_or_find_by(user: fav.user, context: new_course)
+      end
+    end
   end
 
   def crosslist_to_course(course, **)
@@ -432,6 +447,18 @@ class CourseSection < ActiveRecord::Base
     return unless course.enable_course_paces?
 
     course_paces.published.find_each(&:create_publish_progress)
+  end
+
+  def users_visible_to(user, opts = {})
+    return users.none unless grants_right?(user, :read)
+
+    if opts[:include_inactive]
+      users
+    else
+      users.joins(enrollments: :enrollment_state)
+           .where(enrollment_states: { restricted_access: false })
+           .where("enrollment_states.state IN ('active', 'invited', 'completed', 'pending_invited', 'pending_active')")
+    end
   end
 
   private

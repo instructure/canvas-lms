@@ -43,7 +43,7 @@ describe "quizzes with draft state" do
       end
 
       it "shows an error", priority: "1" do
-        open_quiz_edit_form(false)
+        open_quiz_edit_form(should_wait_for_rce: false)
         wait_for_ajaximations
         expect(f("#unauthorized_message")).to include_text "Access Denied"
       end

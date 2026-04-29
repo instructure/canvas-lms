@@ -17,7 +17,7 @@
  */
 
 import {AccountId} from '@canvas/lti-apps/models/AccountId'
-import {queryify} from '@canvas/query/queryify'
+import {queryify} from '@instructure/platform-query/queryify'
 import {IconButton} from '@instructure/ui-buttons'
 import {
   IconAdminLine,
@@ -289,7 +289,7 @@ const ContextOptions = (props: ContextOptionsProps) => {
           context: a,
         }) as const,
     )
-  const contexts = [...courses, ...accounts]
+  const contexts = [...accounts, ...courses]
 
   if (contexts.length === 0) {
     return (

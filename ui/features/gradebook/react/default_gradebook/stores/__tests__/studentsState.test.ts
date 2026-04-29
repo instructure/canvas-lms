@@ -28,7 +28,8 @@ import {
   GetSubmissionsParams,
   Submission,
 } from '../graphql/submissions/getSubmissions'
-import {numberToLetters} from '../graphql/buildGraphQLQuery'
+import {encode} from '../graphql/buildGraphQLQuery'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Helper function to validate student data loading
 const verifyStudentDataLoaded = () => {
@@ -75,19 +76,19 @@ const verifyStudentDataLoaded = () => {
   })
 }
 
-jest.mock('../graphql/users/getUsers', () => {
-  const actual = jest.requireActual('../graphql/users/getUsers')
+vi.mock('../graphql/users/getUsers', async () => {
+  const actual = await vi.importActual('../graphql/users/getUsers')
   return {
     ...actual,
-    getUsers: jest.fn(),
+    getUsers: vi.fn(),
   }
 })
 
-jest.mock('../graphql/enrollments/getEnrollments', () => {
-  const actual = jest.requireActual('../graphql/enrollments/getEnrollments')
+vi.mock('../graphql/enrollments/getEnrollments', async () => {
+  const actual = await vi.importActual('../graphql/enrollments/getEnrollments')
   return {
     ...actual,
-    getEnrollments: jest.fn().mockResolvedValue({
+    getEnrollments: vi.fn().mockResolvedValue({
       course: {
         enrollmentsConnection: {
           nodes: [],
@@ -101,20 +102,20 @@ jest.mock('../graphql/enrollments/getEnrollments', () => {
   }
 })
 
-jest.mock('../graphql/users/transformUser', () => ({
-  transformUser: jest.fn(user => ({id: user._id})),
+vi.mock('../graphql/users/transformUser', () => ({
+  transformUser: vi.fn(user => ({id: user._id})),
 }))
 
-jest.mock('../graphql/submissions/getSubmissions', () => {
-  const actual = jest.requireActual('../graphql/submissions/getSubmissions')
+vi.mock('../graphql/submissions/getSubmissions', async () => {
+  const actual = await vi.importActual('../graphql/submissions/getSubmissions')
   return {
     ...actual,
-    getSubmissions: jest.fn(),
+    getSubmissions: vi.fn(),
   }
 })
 
-jest.mock('../graphql/submissions/transformSubmission', () => ({
-  transformSubmission: jest.fn(submission => ({
+vi.mock('../graphql/submissions/transformSubmission', () => ({
+  transformSubmission: vi.fn(submission => ({
     assignment_id: submission.assignmentId,
     score: submission.score,
     user_id: submission.userId,
@@ -168,6 +169,8 @@ describe('Gradebook > fetchStudentIds', () => {
   })
 
   beforeEach(() => {
+    fakeENV.setup()
+    vi.useRealTimers()
     capturedRequests.length = 0
     exampleData_ = {
       studentIds: ['1101', '1102', '1103'],
@@ -177,6 +180,8 @@ describe('Gradebook > fetchStudentIds', () => {
   afterEach(() => {
     server.resetHandlers()
     store.setState(initialState, true)
+    vi.useFakeTimers()
+    fakeENV.teardown()
   })
 
   afterAll(() => {
@@ -205,6 +210,8 @@ describe('Gradebook > fetchStudentIds', () => {
 
     describe('when student ids have been prefetched', () => {
       beforeEach(() => {
+        fakeENV.setup()
+        vi.useRealTimers()
         const jsonString = JSON.stringify({user_ids: exampleData_.studentIds})
         const response = new Response(jsonString)
         setPrefetchedXHR('user_ids', Promise.resolve(response))
@@ -212,6 +219,8 @@ describe('Gradebook > fetchStudentIds', () => {
 
       afterEach(() => {
         clearPrefetchedXHRs()
+        vi.useFakeTimers()
+        fakeENV.teardown()
       })
 
       test('does not send a request for student ids', async () => {
@@ -237,11 +246,15 @@ describe('Gradebook > fetchStudentIds', () => {
 
 describe('#loadStudentData()', () => {
   beforeEach(() => {
-    store.setState({loadCompositeStudentData: jest.fn(), loadGraphqlStudentData: jest.fn()})
+    fakeENV.setup()
+    vi.useRealTimers()
+    store.setState({loadCompositeStudentData: vi.fn(), loadGraphqlStudentData: vi.fn()})
   })
 
   afterEach(() => {
     store.setState(initialState, true)
+    vi.useFakeTimers()
+    fakeENV.teardown()
   })
 
   it('calls loadCompositeStudentData if useGraphQL is false', async () => {
@@ -265,6 +278,8 @@ describe('#loadCompositeStudentData()', () => {
   })
 
   beforeEach(() => {
+    fakeENV.setup()
+    vi.useRealTimers()
     const performanceControls = new PerformanceControls({
       studentsChunkSize: 2,
       submissionsChunkSize: 2,
@@ -306,6 +321,8 @@ describe('#loadCompositeStudentData()', () => {
   afterEach(() => {
     server.resetHandlers()
     store.setState(initialState, true)
+    vi.useFakeTimers()
+    fakeENV.teardown()
   })
 
   afterAll(() => {
@@ -327,7 +344,9 @@ describe('#loadGraphqlStudentData()', () => {
   })
 
   beforeEach(() => {
-    ;(getUsers as jest.Mock).mockImplementation((params: {after?: string}) => {
+    fakeENV.setup()
+    vi.useRealTimers()
+    ;(getUsers as any).mockImplementation((params: {after?: string}) => {
       const firstPage = mockUsers.slice(0, 2)
       const secondPage = mockUsers.slice(2, 3)
       let res = null
@@ -353,7 +372,7 @@ describe('#loadGraphqlStudentData()', () => {
       }
       return Promise.resolve(res)
     })
-    ;(getSubmissions as jest.Mock).mockImplementation(({userIds}: GetSubmissionsParams) => {
+    ;(getSubmissions as any).mockImplementation(({userIds}: GetSubmissionsParams) => {
       const res: Awaited<ReturnType<typeof getSubmissions>> = {course: {}}
 
       userIds.forEach(userId => {
@@ -365,7 +384,7 @@ describe('#loadGraphqlStudentData()', () => {
           userId: it.user_id,
         })) as unknown as Submission[]
         if (nodes) {
-          const alias = numberToLetters(parseInt(userId, 10))
+          const alias = encode(userId)
           res.course[alias] = {
             nodes,
             pageInfo: {
@@ -397,9 +416,11 @@ describe('#loadGraphqlStudentData()', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
     server.resetHandlers()
     store.setState(initialState, true)
+    vi.useFakeTimers()
+    fakeENV.teardown()
   })
 
   afterAll(() => {

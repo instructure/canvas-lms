@@ -19,7 +19,7 @@
 import React, {Suspense} from 'react'
 import page from 'page'
 import $ from 'jquery'
-import {each, find} from 'lodash'
+import {each, find} from 'es-toolkit/compat'
 import classnames from 'classnames'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 import FilePreviewInfoPanel from './FilePreviewInfoPanel'
@@ -33,6 +33,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import File from '../../backbone/models/File'
 import FilesystemObject from '../../backbone/models/FilesystemObject'
 import '@canvas/rails-flash-notifications'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('file_preview')
 const FLAMEGRAPH_FOLDER_REGEX = /^users_.+\/flamegraphs$/
@@ -262,10 +263,15 @@ export default class FilePreview extends React.PureComponent {
     const sandbox = classnames('allow-same-origin', 'allow-downloads', {
       'allow-scripts': !html || FLAMEGRAPH_FOLDER_REGEX.test(this.props.splat),
     })
+    const ariaLabel = item.get('display_name')
+      ? I18n.t('File Preview for %{fileName}', {fileName: item.get('display_name')})
+      : I18n.t('File Preview')
+
     return (
       <iframe
         allowFullScreen={true}
         title={I18n.t('File Preview')}
+        aria-label={ariaLabel}
         src={item.get('preview_url')}
         className={iFrameClasses}
         {...(disableSandboxing ? {} : {sandbox})}
@@ -276,10 +282,9 @@ export default class FilePreview extends React.PureComponent {
   renderPreview = () => {
     const item = this.state.displayedItem
     if (item && item.get('preview_url')) {
-      const isNewStudioPlayer = ENV.FEATURES?.consolidated_media_player
-      return isNewStudioPlayer && ['video', 'audio'].includes(item.get('mime_class'))
+      return ['video', 'audio'].includes(item.get('mime_class'))
         ? this.renderStudioPlayer(item)
-        : this.renderCanvasPlayer(item)
+        : this.renderCanvasPlayer(item) // check what extra files it supports
     } else {
       return (
         <div className="ef-file-not-found ef-file-preview-frame">
@@ -296,6 +301,7 @@ export default class FilePreview extends React.PureComponent {
       'ef-file-preview-button': true,
       'ef-file-preview-button--active': this.state.showInfoPanel,
     })
+    const isAccessRestricted = filesEnv.userFileAccessRestricted
 
     return (
       <Overlay
@@ -316,16 +322,18 @@ export default class FilePreview extends React.PureComponent {
                 {this.state.initialItem ? this.state.initialItem.displayName() : ''}
               </h1>
               <div className="ef-file-preview-header-buttons">
-                {this.state.displayedItem && !this.state.displayedItem.get('locked_for_user') && (
-                  <a
-                    href={this.state.displayedItem.get('url')}
-                    download={true}
-                    className="ef-file-preview-header-download ef-file-preview-button"
-                  >
-                    <i className="icon-download" />
-                    <span className="hidden-phone">{` ${I18n.t('Download')}`}</span>
-                  </a>
-                )}
+                {this.state.displayedItem &&
+                  !this.state.displayedItem.get('locked_for_user') &&
+                  !isAccessRestricted && (
+                    <a
+                      href={this.state.displayedItem.get('url')}
+                      download={true}
+                      className="ef-file-preview-header-download ef-file-preview-button"
+                    >
+                      <i className="icon-download" />
+                      <span className="hidden-phone">{` ${I18n.t('Download')}`}</span>
+                    </a>
+                  )}
                 <button
                   type="button"
                   className={showInfoPanelClasses}

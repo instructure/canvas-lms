@@ -123,13 +123,14 @@ export const AssessmentGradeInput = ({
   setLastSubmission,
 }: AssessmentGradeInputProps) => {
   const gradeToUse = useCallback(
-    (gradeToUseSubmission: SubAssignmentSubmission) => {
-      return (isDisabled ? gradeToUseSubmission?.grade : gradeToUseSubmission?.entered_grade) || ''
+    (gradeToUseSubmission: SubAssignmentSubmission): string => {
+      const grade = isDisabled ? gradeToUseSubmission?.grade : gradeToUseSubmission?.entered_grade
+      if (grade === null || grade === undefined) return ''
+      return String(grade)
     },
     [isDisabled],
   )
 
-  // @ts-expect-error
   const [gradeValue, setGradeValue] = useState<string>(gradeToUse(submission))
 
   const formatGradeForSubmission = useCallback(
@@ -156,7 +157,6 @@ export const AssessmentGradeInput = ({
   )
 
   useEffect(() => {
-    // @ts-expect-error
     setGradeValue(formatGradeForSubmission(gradeToUse(submission), submission?.excused || false))
   }, [formatGradeForSubmission, gradeToUse, submission, submission.excused, submission.grade])
 
@@ -179,13 +179,7 @@ export const AssessmentGradeInput = ({
 
     const formattedGrade = formatGradeForSubmission(grade, excuse)
     if (!isValidPreliminaryGrade(formattedGrade)) {
-      setGradeValue(
-        formatGradeForSubmission(
-          // @ts-expect-error
-          gradeToUse(submission),
-          submission?.excused || false,
-        ),
-      )
+      setGradeValue(formatGradeForSubmission(gradeToUse(submission), submission?.excused || false))
       showAlert(I18n.t('Invalid grade value'), 'error')
       return
     }

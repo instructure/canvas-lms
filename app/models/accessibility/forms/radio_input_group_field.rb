@@ -20,21 +20,24 @@
 module Accessibility
   module Forms
     class RadioInputGroupField < FormField
-      attr_accessor :options
+      attr_accessor :options, :action
 
       # @param label [String] Human-readable label displayed to the user
       # @param options [Array<String>] Array of options for the radio input group
       # @param value [String] Optional default value for the radio input group
+      # @param action [String] Optional default value for the fix button
       def initialize(label:,
                      undo_text:,
                      options:,
-                     value:)
+                     value: nil,
+                     action: nil)
         super(
           label:,
           undo_text:
         )
         @options = options
         @value = value
+        @action = action
       end
 
       def field_type
@@ -44,7 +47,8 @@ module Accessibility
       def to_h
         super.merge({
           options: @options,
-          value: @value
+          value: @value,
+          action: @action
         }.compact)
       end
     end

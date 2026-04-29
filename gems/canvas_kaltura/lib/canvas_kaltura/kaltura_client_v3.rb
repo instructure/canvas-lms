@@ -25,6 +25,12 @@ require "uri"
 require "nokogiri"
 require "legacy_multipart"
 
+require "canvas_kaltura/client_v3/caption_asset_methods"
+
+require "canvas_kaltura/client_v3/enums/kaltura_caption_asset_status"
+require "canvas_kaltura/client_v3/enums/kaltura_entry_status"
+require "canvas_kaltura/client_v3/enums/kaltura_flavor_asset_status"
+
 # Test Console and API Documentation at:
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
 module CanvasKaltura
@@ -34,6 +40,8 @@ module CanvasKaltura
   end
 
   class ClientV3
+    include CanvasKaltura::ClientV3::CaptionAssetMethods
+
     attr_accessor :endpoint, :ks
 
     def initialize
@@ -49,6 +57,7 @@ module CanvasKaltura
       @endpoint ||= "/api_v3"
       @cache_play_list_seconds = config["cache_play_list_seconds"]&.to_i
       @kaltura_sis = config["kaltura_sis"]
+      @ks = nil
     end
 
     def self.config
@@ -73,21 +82,6 @@ module CanvasKaltura
     # fill the screen when you enter fullscreen mode
     PREFERENCE = ["mp4", "mp3", "flv", ""].freeze
 
-    # see http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaFlavorAssetStatus
-    ASSET_STATUSES = {
-      "1" => :CONVERTING,
-      "3" => :DELETED,
-      "-1" => :ERROR,
-      "9" => :EXPORTING,
-      "7" => :IMPORTING,
-      "4" => :NOT_APPLICABLE,
-      "0" => :QUEUED,
-      "2" => :READY,
-      "5" => :TEMP,
-      "8" => :VALIDATING,
-      "6" => :WAIT_FOR_CONVERT
-    }.freeze
-
     def media_sources(entryId)
       cache_key = ["media_sources2", entryId, @cache_play_list_seconds].join("/")
       sources = CanvasKaltura.cache.read(cache_key)
@@ -98,7 +92,7 @@ module CanvasKaltura
         sources = []
         all_assets_are_done_converting = true
         assets&.each do |asset|
-          if ASSET_STATUSES[asset[:status]] == :READY
+          if Enums::KalturaFlavorAssetStatus[asset[:status]] == :READY
             keys = %i[containerFormat width fileExt size bitrate height isOriginal]
             hash = asset.select { |k| keys.member?(k) }
 
@@ -119,7 +113,7 @@ module CanvasKaltura
             # if it was deleted or if it did not convert because it did not need to
             # (e.g, a high quality flavor for a file low quality original, like a webcam recording),
             # don't mark it as needing conversion.
-            all_assets_are_done_converting = false unless [:NOT_APPLICABLE, :DELETED].include? ASSET_STATUSES[asset[:status]]
+            all_assets_are_done_converting = false unless [:NOT_APPLICABLE, :DELETED].include? Enums::KalturaFlavorAssetStatus[asset[:status]]
           end
         end
         sources = sort_source_list(sources)
@@ -196,11 +190,7 @@ module CanvasKaltura
                           entryId:)
       return nil unless result
 
-      item = {}
-      result.children.each do |child|
-        item[child.name.to_sym] = child.content
-      end
-      item
+      node_to_hash(result)
     end
 
     def mediaUpdate(entryId, attributes)
@@ -214,11 +204,7 @@ module CanvasKaltura
       result = getRequest(:media, :update, hash)
       return nil unless result
 
-      item = {}
-      result.children.each do |child|
-        item[child.name.to_sym] = child.content
-      end
-      item
+      node_to_hash(result)
     end
 
     def mediaDelete(entryId)
@@ -227,6 +213,31 @@ module CanvasKaltura
         entryId:
       }
       getRequest(:media, :delete, hash)
+    end
+
+    def media_download_url(entry_id)
+      cache_key = ["media_download_url", entry_id].join("/")
+      if (download_url = CanvasKaltura.cache.read(cache_key))
+        return download_url
+      end
+
+      startSession(CanvasKaltura::SessionType::ADMIN)
+      assets = flavorAssetGetByEntryId(entry_id)
+      return nil unless assets.present?
+
+      highest_quality_asset =
+        assets
+        .select { |asset| Enums::KalturaFlavorAssetStatus[asset[:status]] == :READY }
+        .max_by { |asset| asset[:bitrate].to_i }
+      return nil unless highest_quality_asset
+
+      download_url = flavorAssetGetDownloadUrl(
+        highest_quality_asset[:id],
+        use: "download"
+      )&.strip&.presence
+
+      CanvasKaltura.cache.write(cache_key, download_url, expires_in: 43_200) if download_url
+      download_url
     end
 
     # See the method of the same name in saveMediaRecording.js
@@ -311,15 +322,7 @@ module CanvasKaltura
                           entryId:)
       return nil unless result
 
-      items = []
-      result.css("item").each do |node|
-        item = {}
-        node.children.each do |child|
-          item[child.name.to_sym] = child.content
-        end
-        items << item
-      end
-      items
+      result.css("item").map { node_to_hash(it) }
     end
 
     # returns the original flavor of the asset, or the first flavor if for some
@@ -329,11 +332,12 @@ module CanvasKaltura
       flavors.find { |f| f[:isOriginal] == 1 } || flavors.first
     end
 
-    def flavorAssetGetDownloadUrl(assetId)
+    def flavorAssetGetDownloadUrl(asset_id, use: nil)
+      params = { ks: @ks, id: asset_id }
+      params[:use] = use if use.present?
       result = getRequest(:flavorAsset,
                           :getDownloadUrl,
-                          ks: @ks,
-                          id: assetId)
+                          params)
       result&.content
     end
 
@@ -406,6 +410,16 @@ module CanvasKaltura
       end
 
       response
+    end
+
+    def node_to_hash(node)
+      item = {}
+
+      node.children.each do |child|
+        item[child.name.to_sym] = child.content
+      end
+
+      item
     end
   end
 end

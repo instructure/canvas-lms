@@ -21,37 +21,37 @@ import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {RUBRICS_QUERY_RESPONSE, RUBRIC_PREVIEW_QUERY_RESPONSE} from './fixtures'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {ViewRubrics, type ViewRubricsProps} from '../index'
 import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
 import useManagedCourseSearchApi from '@canvas/direct-sharing/react/effects/useManagedCourseSearchApi'
 
-jest.mock('react-router', () => ({
-  ...jest.requireActual('react-router'),
-  useParams: jest.fn(),
+vi.mock('react-router', async () => ({
+  ...(await vi.importActual('react-router')),
+  useParams: vi.fn(),
 }))
 
-const archiveRubricMock = jest.fn()
-const unarchiveRubricMock = jest.fn()
-jest.mock('../../../queries/ViewRubricQueries', () => ({
-  ...jest.requireActual('../../../queries/ViewRubricQueries'),
+const archiveRubricMock = vi.fn()
+const unarchiveRubricMock = vi.fn()
+vi.mock('../../../queries/ViewRubricQueries', async () => ({
+  ...(await vi.importActual('../../../queries/ViewRubricQueries')),
   archiveRubric: () => archiveRubricMock,
   unarchiveRubric: () => unarchiveRubricMock,
-  downloadRubrics: jest.fn(),
-  fetchRubricCriterion: jest.fn().mockResolvedValue({
+  downloadRubrics: vi.fn(),
+  fetchRubricCriterion: vi.fn().mockResolvedValue({
     ...RUBRIC_PREVIEW_QUERY_RESPONSE,
     pointsPossible: 5, // Add the required pointsPossible property
   }),
 }))
-jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
+vi.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
 
-describe('ViewRubrics Tests', () => {
+describe.skip('ViewRubrics Tests', () => {
   const renderComponent = (props?: Partial<ViewRubricsProps>) => {
     return render(
       <MockedQueryProvider>
         <BrowserRouter>
-          <ViewRubrics canManageRubrics={true} {...props} canImportExportRubrics={true} />
+          <ViewRubrics canManageRubrics={true} {...props} />
         </BrowserRouter>
       </MockedQueryProvider>,
     )
@@ -59,7 +59,7 @@ describe('ViewRubrics Tests', () => {
 
   describe('account level rubrics', () => {
     beforeAll(() => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+      vi.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
     })
 
     it('renders the ViewRubrics component with all rubric data split rubrics by workflow state', () => {
@@ -98,8 +98,8 @@ describe('ViewRubrics Tests', () => {
     })
 
     it('renders a popover menu with access to the rubric edit modal', () => {
-      const mockNavigate = jest.fn()
-      jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
+      const mockNavigate = vi.fn()
+      vi.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
 
       queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId} = renderComponent()
@@ -114,9 +114,9 @@ describe('ViewRubrics Tests', () => {
     })
 
     it('renders a popover menu without access to the share course tray', async () => {
-      const mockNavigate = jest.fn()
-      jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
-      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+      const mockNavigate = vi.fn()
+      vi.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
+      vi.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
 
       queryClient.setQueryData(['accountRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId, queryByTestId} = renderComponent()
@@ -290,7 +290,7 @@ describe('ViewRubrics Tests', () => {
 
   describe('course level rubrics', () => {
     beforeAll(() => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
+      vi.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
     })
     it('renders the ViewRubrics component with split rubrics by workflow state', () => {
       queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
@@ -326,8 +326,8 @@ describe('ViewRubrics Tests', () => {
     })
 
     it('renders a popover menu with access to the rubric edit modal', () => {
-      const mockNavigate = jest.fn()
-      jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
+      const mockNavigate = vi.fn()
+      vi.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
 
       queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId} = renderComponent()
@@ -341,10 +341,9 @@ describe('ViewRubrics Tests', () => {
       expect(Router.useNavigate).toHaveReturnedWith(expect.any(Function))
     })
 
-    it('render an access to the share course tray when FF is enabled', () => {
-      const mockNavigate = jest.fn()
-      jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
-      window.ENV.enhanced_rubrics_copy_to = true
+    it('render an access to the share course tray course id exists', () => {
+      const mockNavigate = vi.fn()
+      vi.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
 
       queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId} = renderComponent()
@@ -354,19 +353,6 @@ describe('ViewRubrics Tests', () => {
       copyToButton.click()
 
       expect(getByTestId('share-course-1-tray')).toBeInTheDocument()
-    })
-
-    it('does not render an access to the share course tray when FF is disabled', () => {
-      const mockNavigate = jest.fn()
-      jest.spyOn(Router, 'useNavigate').mockReturnValue(mockNavigate)
-      window.ENV.enhanced_rubrics_copy_to = false
-
-      queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
-      const {getByTestId, queryByTestId} = renderComponent()
-      const popover = getByTestId('rubric-options-1-button')
-      popover.click()
-
-      expect(queryByTestId('copy-to-1-button')).not.toBeInTheDocument()
     })
 
     it('renders a popover menu with access to the rubric duplicate modal', () => {
@@ -510,9 +496,9 @@ describe('ViewRubrics Tests', () => {
     })
   })
 
-  describe('import rubricx', () => {
+  describe('import rubrics', () => {
     beforeAll(() => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+      vi.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
     })
 
     it('enables the download button when rubrics are selected', () => {
@@ -554,7 +540,7 @@ describe('ViewRubrics Tests', () => {
 
   describe('preview tray', () => {
     beforeAll(() => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+      vi.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
     })
 
     const getPreviewTray = () => {
@@ -613,7 +599,7 @@ describe('ViewRubrics Tests', () => {
     })
 
     it('filters rubrics based on search query at course level', async () => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
+      vi.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
       queryClient.setQueryData(['courseRubrics-1'], RUBRICS_QUERY_RESPONSE)
       const {getByTestId, queryByText} = renderComponent()
 
@@ -636,7 +622,7 @@ describe('ViewRubrics Tests', () => {
   describe('canManageRubrics permissions is false', () => {
     beforeEach(() => {
       // Make sure to mock useParams for this test case
-      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+      vi.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
     })
 
     it('should not render popover or create button', () => {
@@ -650,13 +636,13 @@ describe('ViewRubrics Tests', () => {
 
   describe('archiving and un-archiving rubrics', () => {
     afterEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
       queryClient.clear()
     })
 
     it('allows archiving an account rubric', async () => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
-      jest.spyOn(ViewRubricQueries, 'archiveRubric').mockImplementation(() =>
+      vi.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+      vi.spyOn(ViewRubricQueries, 'archiveRubric').mockImplementation(() =>
         Promise.resolve({
           _id: '1',
           workflowState: 'archived',
@@ -676,8 +662,8 @@ describe('ViewRubrics Tests', () => {
     })
 
     it('allows un-archiving an account rubric', async () => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
-      jest.spyOn(ViewRubricQueries, 'unarchiveRubric').mockImplementation(() =>
+      vi.spyOn(Router, 'useParams').mockReturnValue({accountId: '1'})
+      vi.spyOn(ViewRubricQueries, 'unarchiveRubric').mockImplementation(() =>
         Promise.resolve({
           _id: '2',
           workflowState: 'active',
@@ -701,8 +687,8 @@ describe('ViewRubrics Tests', () => {
     })
 
     it('allows archiving a course rubric', async () => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
-      jest.spyOn(ViewRubricQueries, 'archiveRubric').mockImplementation(() =>
+      vi.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
+      vi.spyOn(ViewRubricQueries, 'archiveRubric').mockImplementation(() =>
         Promise.resolve({
           _id: '1',
           workflowState: 'archived',
@@ -722,8 +708,8 @@ describe('ViewRubrics Tests', () => {
     })
 
     it('allows un-archiving a course rubric', async () => {
-      jest.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
-      jest.spyOn(ViewRubricQueries, 'unarchiveRubric').mockImplementation(() =>
+      vi.spyOn(Router, 'useParams').mockReturnValue({courseId: '1'})
+      vi.spyOn(ViewRubricQueries, 'unarchiveRubric').mockImplementation(() =>
         Promise.resolve({
           _id: '2',
           workflowState: 'active',

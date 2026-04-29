@@ -35,7 +35,7 @@ import {MAX_IMAGE_SIZE_BYTES} from '../../../../shared/compressionUtils'
 import {createCroppedImageSvg} from '../../../../shared/ImageCropper/imageCropUtils'
 import {convertFileToBase64} from '../../../../shared/fileUtils'
 import {ImageSettingsPropTypes} from './propTypes'
-import _ from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 
 const getCompressionMessage = () =>
   formatMessage(
@@ -115,7 +115,7 @@ export const ImageOptions = ({state, settings, dispatch, mountNode, trayDispatch
     if (
       state.cropperSettings &&
       settings.imageSettings &&
-      !_.isEqual(state.cropperSettings, settings.imageSettings?.cropperSettings)
+      !isEqual(state.cropperSettings, settings.imageSettings?.cropperSettings)
     ) {
       if (state.cropperSettings.shape !== settings.shape) {
         trayDispatch({shape: state.cropperSettings.shape})
@@ -130,7 +130,7 @@ export const ImageOptions = ({state, settings, dispatch, mountNode, trayDispatch
             payload: base64Image,
           })
         })
-         
+
         .catch(error => console.error(error))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

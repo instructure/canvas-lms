@@ -18,45 +18,46 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlock} from '../Blocks/TextBlock'
-import {ReactElement} from 'react'
 import {ImageBlock} from '../Blocks/ImageBlock'
+import {MediaBlock} from '../Blocks/MediaBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
+import {ButtonBlock} from '../Blocks/ButtonBlock'
+import {HighlightBlock} from '../Blocks/HighlightBlock'
+import {ImageTextBlock} from '../Blocks/ImageTextBlock'
+import {GroupedSelectData} from '../GroupedSelect'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
-type BlockFactory = {[key: string]: () => ReactElement}
-
-export const blockFactory = {
-  simpleText: () => <TextBlock title="" content="" />,
-  imageText: () => <p>image_text</p>,
-  image: () => <ImageBlock url="" altText="" />,
-  separatorLine: () => <SeparatorLineBlock thickness="small" />,
-} as const satisfies BlockFactory
-
-export type BlockTypes = keyof typeof blockFactory
-
-export type BlockData = {
-  groupName: string
-  items: {
-    itemName: string
-    id: BlockTypes
-  }[]
-}
-
-export const blockData: BlockData[] = [
+export const blockData: GroupedSelectData[] = [
   {
     groupName: I18n.t('Text'),
     items: [
-      {itemName: I18n.t('Text Block'), id: 'simpleText'},
-      {itemName: I18n.t('Image + text'), id: 'imageText'},
+      {itemName: TextBlock.craft.displayName, id: TextBlock.name},
+      {itemName: HighlightBlock.craft.displayName, id: HighlightBlock.name},
+      {itemName: ImageTextBlock.craft.displayName, id: ImageTextBlock.name},
     ],
   },
   {
     groupName: I18n.t('Image'),
-    items: [{itemName: I18n.t('Image'), id: 'image'}],
+    items: [
+      {itemName: ImageBlock.craft.displayName, id: ImageBlock.name},
+      {itemName: ImageTextBlock.craft.displayName, id: ImageTextBlock.name},
+    ],
+  },
+  {
+    groupName: I18n.t('Highlight'),
+    items: [{itemName: HighlightBlock.craft.displayName, id: HighlightBlock.name}],
+  },
+  {
+    groupName: I18n.t('Multimedia'),
+    items: [{itemName: MediaBlock.craft.displayName, id: MediaBlock.name}],
+  },
+  {
+    groupName: I18n.t('Interactive element'),
+    items: [{itemName: ButtonBlock.craft.displayName, id: ButtonBlock.name}],
   },
   {
     groupName: I18n.t('Divider'),
-    items: [{itemName: I18n.t('Separator line'), id: 'separatorLine'}],
+    items: [{itemName: SeparatorLineBlock.craft.displayName, id: SeparatorLineBlock.name}],
   },
 ]

@@ -17,12 +17,14 @@
  */
 
 import $ from 'jquery'
-import {reduce, pick} from 'lodash'
+import {reduce, pick} from 'es-toolkit/compat'
 import editorOptions from './editorOptions'
-import loadEventListeners from './loadEventListeners'
 import polyfill from './polyfill'
 import getRCSProps from './getRCSProps'
 import shouldUseFeature, {Feature} from './shouldUseFeature'
+import {getTypography} from '@instructure/platform-instui-bindings'
+
+window.INST = window.INST || {}
 
 const RCELoader = {
   loadingPromise: null,
@@ -58,21 +60,13 @@ const RCELoader = {
    * of the load/cache cycle.
    *
    * @return {Promise}
-   * @private
    */
-  loadRCE(cb = () => {}) {
-    return import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce')
-      .then(RCE => {
-        this.RCE = RCE
-        loadEventListeners()
-        return RCE
-      })
-      .then(() => {
-        this.loadingCallbacks.forEach(loadingCallback => loadingCallback(this.RCE))
-        this.loadingCallbacks = []
-        // eslint-disable-next-line promise/no-callback-in-promise
-        cb(this.RCE)
-      })
+  async loadRCE(cb) {
+    const RCE = await import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce')
+    this.RCE = RCE
+    this.loadingCallbacks.forEach(loadingCallback => loadingCallback(this.RCE))
+    this.loadingCallbacks = []
+    if (typeof cb === 'function') cb(this.RCE)
   },
 
   /**
@@ -81,9 +75,9 @@ const RCELoader = {
    * just using whatever textarea is going to be bound to
    * the editor
    *
-   * @private
    * @return {Element} the textarea
    */
+  // @ts-expect-error - JS file with object method syntax not recognized by TS
   getTargetTextarea(initialTarget) {
     return $(initialTarget).get(0).type === 'textarea'
       ? $(initialTarget).get(0)
@@ -95,9 +89,9 @@ const RCELoader = {
    * we want to render the remote react component inside, so it's
    * a sibiling with the actual form element being populated.
    *
-   * @private
    * @return {Element} container element for rendering remote editor
    */
+  // @ts-expect-error - JS file with object method syntax not recognized by TS
   getRenderingTarget(textarea, getTargetFn = undefined) {
     let renderingTarget
 
@@ -116,9 +110,9 @@ const RCELoader = {
    * editor/textarea should be mirrored here so we
    * dont have to change too much canvas code
    *
-   * @private
    * @return {Hash}
    */
+  // @ts-expect-error - JS file with object method syntax not recognized by TS
   _attrsToMirror(textarea) {
     const validAttrs = ['name']
     const attrs = reduce(
@@ -138,9 +132,9 @@ const RCELoader = {
    * intelligent defaults so that simple use cases can not
    * worry about providing repetitive options hashes.
    *
-   * @private
    * @return {Hash} ready-to-use options hash to use as react props
    */
+  // @ts-expect-error - JS file with object method syntax not recognized by TS
   createRCEProps(textarea, tinyMCEInitOptions) {
     const width = textarea.offsetWidth
     const height = textarea.offsetHeight || 400
@@ -178,6 +172,12 @@ const RCELoader = {
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
       maxInitRenderedRCEs: tinyMCEInitOptions.maxInitRenderedRCEs,
       highContrastCSS: window.ENV?.url_for_high_contrast_tinymce_editor_css,
+      useHighContrast: window.ENV?.use_high_contrast ?? false,
+      fontFamily: getTypography(
+        Boolean(ENV.K5_USER),
+        Boolean(ENV.USE_CLASSIC_FONT),
+        Boolean(ENV.use_dyslexic_font),
+      ).fontFamily,
       use_rce_icon_maker: shouldUseFeature(Feature.IconMaker, window.ENV),
       features: ENV?.FEATURES || {},
       flashAlertTimeout: ENV?.flashAlertTimeout || 10000,
@@ -186,7 +186,6 @@ const RCELoader = {
       canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin || '',
       resourceType: tinyMCEInitOptions.resourceType,
       resourceId: tinyMCEInitOptions.resourceId,
-      ai_text_tools: ENV?.RICH_CONTENT_AI_TEXT_TOOLS,
       externalToolsConfig: {
         ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,
         isA2StudentView: window.ENV?.a2_student_view,

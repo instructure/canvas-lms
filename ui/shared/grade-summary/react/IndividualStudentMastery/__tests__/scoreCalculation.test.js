@@ -18,66 +18,62 @@
 
 import {scoreFromPercent, scaleScore} from '../scoreCalculation'
 
-describe ('scoreCalculation', () => {
+describe('scoreCalculation', () => {
+  describe('scoreFromPercent', () => {
+    it('uses outcome.mastery_points when outcome.points_possible <= 0', () => {
+      const result = scoreFromPercent(0.5, {mastery_points: 10, points_possible: 0}, 0)
+      expect(result).toBe(5)
+    })
 
-    describe ('scoreFromPercent', () => {
+    it('uses outcome.points_possible when outcome.points_possible > 0', () => {
+      const result = scoreFromPercent(0.5, {mastery_points: 10, points_possible: 20}, 0)
+      expect(result).toBe(10)
+    })
 
-        it('uses outcome.mastery_points when outcome.points_possible <= 0', () => {
-            const result = scoreFromPercent(0.5, {mastery_points: 10, points_possible: 0}, 0)
-            expect(result).toBe(5)
-        })
-
-        it('uses outcome.points_possible when outcome.points_possible > 0', () => {
-            const result = scoreFromPercent(0.5, {mastery_points: 10, points_possible: 20}, 0)
-            expect(result).toBe(10)
-        })
-
-        it(`uses
+    it(`uses
             pointsPossibleFromOutcomeRatingsFromRubric
             when pointsPossibleFromOutcomeRatingsFromRubric is a number
             and is > 0`, () => {
-            const result = scoreFromPercent(0.5, {mastery_points: 10, points_possible: 20}, 8)
-            expect(result).toBe(4)
-        })
+      const result = scoreFromPercent(0.5, {mastery_points: 10, points_possible: 20}, 8)
+      expect(result).toBe(4)
+    })
 
-        it(`does not use
+    it(`does not use
             pointsPossibleFromOutcomeRatingsFromRubric
             when pointsPossibleFromOutcomeRatingsFromRubric is not a number`, () => {
-            const result = scoreFromPercent(0.5, {mastery_points: 10, points_possible: 20}, 'a')
-            expect(result).toBe(10)
-        })
+      const result = scoreFromPercent(0.5, {mastery_points: 10, points_possible: 20}, 'a')
+      expect(result).toBe(10)
+    })
 
-        it(`does not use
+    it(`does not use
             pointsPossibleFromOutcomeRatingsFromRubric
             when pointsPossibleFromOutcomeRatingsFromRubric is <= 0`, () => {
-            const result = scoreFromPercent(0.5, {mastery_points: 10, points_possible: 20}, 0)
-            expect(result).toBe(10)
-        })
+      const result = scoreFromPercent(0.5, {mastery_points: 10, points_possible: 20}, 0)
+      expect(result).toBe(10)
+    })
+  })
 
+  describe('scaleScore', () => {
+    it('uses outcome.mastery_points when outcome.points_possible <= 0', () => {
+      const result = scaleScore(5, 10, {mastery_points: 10, points_possible: 0}, 0)
+      expect(result).toBe(5)
     })
 
-    describe ('scaleScore', () => {
+    it('uses outcome.points_possible when outcome.points_possible > 0', () => {
+      const result = scaleScore(5, 10, {mastery_points: 10, points_possible: 4}, 0)
+      expect(result).toBe(2)
+    })
 
-        it('uses outcome.mastery_points when outcome.points_possible <= 0', () => {
-            const result = scaleScore(5, 10, {mastery_points: 10, points_possible: 0}, 0)
-            expect(result).toBe(5)
-        })
-
-        it('uses outcome.points_possible when outcome.points_possible > 0', () => {
-            const result = scaleScore(5, 10, {mastery_points: 10, points_possible: 4}, 0)
-            expect(result).toBe(2)
-        })
-
-        it(`uses pointsPossibleFromOutcomeRatingsFromRubric
+    it(`uses pointsPossibleFromOutcomeRatingsFromRubric
             when pointsPossibleFromOutcomeRatingsFromRubric is a number > 0`, () => {
-            const result = scaleScore(6, 2, {mastery_points: 10, points_possible: 4}, 2)
-            expect(result).toBe(6)
-        })
-
-        it(`does not use pointsPossibleFromOutcomeRatingsFromRubric
-            when pointsPossibleFromOutcomeRatingsFromRubric is not a number`, () => {
-            const result = scaleScore(6, 2, {mastery_points: 10, points_possible: 2}, 's')
-            expect(result).toBe(6)
-        })
+      const result = scaleScore(6, 2, {mastery_points: 10, points_possible: 4}, 2)
+      expect(result).toBe(6)
     })
+
+    it(`does not use pointsPossibleFromOutcomeRatingsFromRubric
+            when pointsPossibleFromOutcomeRatingsFromRubric is not a number`, () => {
+      const result = scaleScore(6, 2, {mastery_points: 10, points_possible: 2}, 's')
+      expect(result).toBe(6)
+    })
+  })
 })

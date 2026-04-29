@@ -90,6 +90,13 @@ module Types
       object
     end
 
+    field :group_category, GroupSetType, null: true
+    def group_category
+      Loaders::AssociationLoader.for(Group, :group_category).load(object).then do |group_category|
+        group_category if group_category&.grants_any_right?(current_user, :read, :manage)
+      end
+    end
+
     private :members_scope
   end
 end

@@ -24,20 +24,20 @@ import axios from '@canvas/axios'
 import MessageParticipantsDialog from '@canvas/calendar/jquery/MessageParticipantsDialog'
 import {assignLocation} from '@canvas/util/globalUtils'
 
-jest.mock('@canvas/axios')
-jest.mock('@canvas/calendar/jquery/MessageParticipantsDialog')
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/axios')
+vi.mock('@canvas/calendar/jquery/MessageParticipantsDialog')
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock jQuery dialog and form methods
-$.fn.dialog = jest.fn()
-$.fn.errorBox = jest.fn()
+$.fn.dialog = vi.fn()
+$.fn.errorBox = vi.fn()
 $.fn.getClientRects = () => [{top: 0, left: 0}]
 $.fn.offset = () => ({top: 0, left: 0})
 $.fn.position = () => ({top: 0, left: 0})
-$.fn.val = jest.fn().mockReturnValue('')
-$.flashError = jest.fn()
+$.fn.val = vi.fn().mockReturnValue('')
+$.flashError = vi.fn()
 
 const defaultProps = {
   appointment_group_id: '1',
@@ -73,10 +73,10 @@ const mockContexts = {
 
 describe('AppointmentGroup EditPage', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     MessageParticipantsDialog.mockImplementation(function () {
       return {
-        show: jest.fn(),
+        show: vi.fn(),
       }
     })
     axios.get.mockImplementation(url => {
@@ -91,7 +91,7 @@ describe('AppointmentGroup EditPage', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the EditPage component', async () => {
@@ -141,11 +141,41 @@ describe('AppointmentGroup EditPage', () => {
   })
 
   describe('Delete Group', () => {
-    it('sends delete request with correct id and redirects', async () => {
+    it('shows confirmation modal when delete button is clicked', async () => {
+      render(<EditPage {...defaultProps} />)
+      const deleteButton = await testScreen.findByText('Delete Group')
+      fireEvent.click(deleteButton)
+      await waitFor(() => {
+        expect(testScreen.getByTestId('delete-appointment-group-modal')).toBeInTheDocument()
+      })
+    })
+
+    it('closes modal when "Never mind" is clicked', async () => {
+      render(<EditPage {...defaultProps} />)
+      const deleteButton = await testScreen.findByText('Delete Group')
+      fireEvent.click(deleteButton)
+      await waitFor(() => {
+        expect(testScreen.getByTestId('delete-appointment-group-modal')).toBeInTheDocument()
+      }, {timeout: 10000})
+      const cancelButton = testScreen.getByTestId('cancel-delete-button')
+      fireEvent.click(cancelButton)
+      await waitFor(() => {
+        expect(testScreen.queryByTestId('delete-appointment-group-modal')).not.toBeInTheDocument()
+      }, {timeout: 10000})
+
+      expect(axios.delete).not.toHaveBeenCalled()
+    })
+
+    it('sends delete request with correct id and redirects when confirmed', async () => {
       axios.delete.mockResolvedValueOnce({})
       render(<EditPage {...defaultProps} />)
       const deleteButton = await testScreen.findByText('Delete Group')
       fireEvent.click(deleteButton)
+      await waitFor(() => {
+        expect(testScreen.getByTestId('delete-appointment-group-modal')).toBeInTheDocument()
+      })
+      const confirmButton = testScreen.getByTestId('confirm-delete-button')
+      fireEvent.click(confirmButton)
       await waitFor(() => {
         expect(axios.delete).toHaveBeenCalledWith('/api/v1/appointment_groups/1')
         expect(assignLocation).toHaveBeenCalledWith('/calendar')
@@ -157,6 +187,11 @@ describe('AppointmentGroup EditPage', () => {
       render(<EditPage {...defaultProps} />)
       const deleteButton = await testScreen.findByText('Delete Group')
       fireEvent.click(deleteButton)
+      await waitFor(() => {
+        expect(testScreen.getByTestId('delete-appointment-group-modal')).toBeInTheDocument()
+      })
+      const confirmButton = testScreen.getByTestId('confirm-delete-button')
+      fireEvent.click(confirmButton)
       await waitFor(() => {
         expect($.flashError).toHaveBeenCalledWith(
           'An error occurred while deleting the appointment group',
@@ -222,7 +257,7 @@ describe('AppointmentGroup EditPage', () => {
       fireEvent.change(input, {target: {value: '0'}})
 
       // Mock the jQuery val() call to return 0
-      $.fn.val = jest.fn().mockReturnValue('0')
+      $.fn.val = vi.fn().mockReturnValue('0')
 
       const saveButton = testScreen.getByText('Save')
       fireEvent.click(saveButton)
@@ -251,7 +286,7 @@ describe('AppointmentGroup EditPage', () => {
       fireEvent.change(input, {target: {name: 'limitUsersPerSlot', value: '1'}})
 
       // Mock the jQuery val() call to return 1
-      $.fn.val = jest.fn().mockReturnValue('1')
+      $.fn.val = vi.fn().mockReturnValue('1')
 
       const saveButton = testScreen.getByText('Save')
       fireEvent.click(saveButton)

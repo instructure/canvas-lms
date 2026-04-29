@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -28,9 +28,10 @@ import React, {useRef, useState} from 'react'
 import {useNewLogin, useNewLoginData} from '../../context'
 import {usePasswordValidator, useSafeBackNavigation, useServerErrorsMap} from '../../hooks'
 import {createParentAccount} from '../../services'
-import {SignInPrompt, TermsAndPolicyCheckbox} from '../../shared'
+import {MessageAlert, SignInPrompt, TermsAndPolicyCheckbox} from '../../shared'
 import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
 import {ReCaptchaSection, ReCaptchaSectionRef} from '../../shared/recaptcha'
+import {ROUTES} from '../../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
@@ -45,8 +46,14 @@ const ERROR_MESSAGES = {
 
 const Parent = () => {
   const {isUiActionPending, setIsUiActionPending} = useNewLogin()
-  const {passwordPolicy, privacyPolicyUrl, recaptchaKey, termsOfUseUrl, termsRequired} =
-    useNewLoginData()
+  const {
+    passwordPolicy,
+    privacyPolicyUrl,
+    recaptchaKey,
+    termsOfUseUrl,
+    termsRequired,
+    customMessageRegistrationParent,
+  } = useNewLoginData()
   const validatePassword = usePasswordValidator(passwordPolicy)
   const serverErrorsMap = useServerErrorsMap()
 
@@ -283,7 +290,7 @@ const Parent = () => {
   }
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setEmail(value.trim())
+    setEmail(value)
   }
 
   const handlePasswordChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
@@ -295,14 +302,14 @@ const Parent = () => {
   }
 
   const handlePairingCodeChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setPairingCode(value.trim())
+    setPairingCode(value)
   }
 
   const handleTermsChange = (checked: boolean) => {
     setTermsAccepted(checked)
   }
 
-  const handleCancel = useSafeBackNavigation()
+  const handleCancel = useSafeBackNavigation(ROUTES.SIGN_IN)
 
   const handleReCaptchaVerify = (token: string | null) => {
     if (!token) console.error('Failed to get a valid reCAPTCHA token')
@@ -320,6 +327,10 @@ const Parent = () => {
           <SignInPrompt />
         </Flex.Item>
       </Flex>
+
+      {customMessageRegistrationParent && (
+        <MessageAlert message={customMessageRegistrationParent} />
+      )}
 
       <form onSubmit={handleCreateParent} noValidate={true}>
         <Flex direction="column" gap="large">
@@ -391,9 +402,10 @@ const Parent = () => {
 
             <Text>
               <Link
+                data-testid="pairing-code-link"
+                forceButtonRole={false}
                 href="https://community.canvaslms.com/t5/Canvas-Resource-Documents/Pairing-Codes-FAQ/ta-p/388738"
                 target="_blank"
-                data-testid="pairing-code-link"
               >
                 {I18n.t('What is a pairing code?')}
               </Link>

@@ -43,7 +43,7 @@ export default class ToolLaunchResizer {
 
     // disabling b/c eslint fails, saying 'MessageEventSource' is not defined, but it's
     // defined in lib.dom.d.ts
-     
+
     container: JQuery<HTMLElement>,
     force_height = false,
   ) {

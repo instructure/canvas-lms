@@ -25,6 +25,15 @@ class Loaders::OverrideAssignmentLoader < GraphQL::Batch::Loader
   end
 
   def perform(assignments)
+    # Bulk preload all override data to prevent N+1 queries
+    DatesOverridable.preload_override_data_for_objects(assignments)
+
+    # Conditionally preload assignment override students if needed
+    if AssignmentOverrideApplicator.should_preload_override_students?(assignments, @current_user, "graphql_override_assignment_loader")
+      AssignmentOverrideApplicator.preload_assignment_override_students(assignments, @current_user)
+    end
+
+    # Now call overridden_for on each assignment - this will use preloaded data
     assignments.each { |assignment| fulfill(assignment, assignment.overridden_for(@current_user)) }
   end
 end

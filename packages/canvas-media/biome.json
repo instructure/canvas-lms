@@ -1,8 +1,10 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.8.0/schema.json",
-  "organizeImports": {
-    "enabled": true
+  "root": false,
+  "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+  "files": {
+    "includes": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx", "!src/translations/locales/**"]
   },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "formatter": {
     "enabled": true,
     "indentWidth": 2,

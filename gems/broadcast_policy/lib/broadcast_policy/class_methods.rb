@@ -22,6 +22,7 @@ module BroadcastPolicy
     def has_a_broadcast_policy
       extend BroadcastPolicy::SingletonMethods
       include BroadcastPolicy::InstanceMethods
+
       after_save :broadcast_notifications
     end
   end

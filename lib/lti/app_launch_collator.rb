@@ -46,8 +46,13 @@ module Lti
       end
 
       def message_handlers_for(context, placements)
-        MessageHandler.for_context(context).has_placements(*placements)
-                      .by_message_types("basic-lti-launch-request")
+        handlers_scope = MessageHandler.for_context(context).has_placements(*placements)
+                                       .by_message_types("basic-lti-launch-request")
+        if context.root_account.feature_enabled?(:lti_asset_processor_tii_migration)
+          handlers_scope.for_non_migrated_tool_proxies
+        else
+          handlers_scope
+        end
       end
 
       def bookmarked_collection(context, placements, options = {})
@@ -69,11 +74,13 @@ module Lti
         external_tools.exists? || message_handlers.exists?
       end
 
-      def launch_definitions(collection, placements)
+      def launch_definitions(collection, placements, include_context_name: false)
+        context_names = include_context_name ? batch_load_context_names(collection) : {}
+
         collection.map do |o|
           case o
           when ContextExternalTool
-            lti1_launch_definition(o, placements)
+            lti1_launch_definition(o, placements, context_names:)
           when MessageHandler
             lti2_launch_definition(o, placements)
           end
@@ -92,7 +99,7 @@ module Lti
         tool.extension_setting(:resource_selection, property) || tool.extension_setting(placement, property)
       end
 
-      def lti1_launch_definition(tool, placements)
+      def lti1_launch_definition(tool, placements, context_names:)
         definition = {
           definition_type: tool.class.name,
           definition_id: tool.id,
@@ -102,6 +109,9 @@ module Lti
           domain: tool.domain,
           placements: {}
         }
+        if context_names.present?
+          definition[:context_name] = context_names[[tool.context_type, tool.context_id]]
+        end
         placements.each do |p|
           next unless tool.has_placement?(p)
 
@@ -111,7 +121,7 @@ module Lti
             title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
           }
           definition[:placements][p.to_sym].merge!(global_nav_info(tool)) if p == "global_navigation"
-          definition[:placements][p.to_sym].merge!(asset_processor_info(tool)) if p == Lti::ResourcePlacement::ASSET_PROCESSOR
+          definition[:placements][p.to_sym].merge!(asset_processor_info(tool, p)) if p == Lti::ResourcePlacement::ASSET_PROCESSOR || p == Lti::ResourcePlacement::ASSET_PROCESSOR_CONTRIBUTION
 
           # Overwrite the URL with the target_link_uri if it is set
           # and the placement is assignment_edit or assignment_view
@@ -159,7 +169,7 @@ module Lti
           else
             ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS
           end
-        valid_placements.each_with_object({}) { |p, hsh| hsh[p.to_sym] = lti2_placement(message_handler) }
+        valid_placements.to_h { |p| [p.to_sym, lti2_placement(message_handler)] }
       end
 
       def lti2_placement(message_handler)
@@ -170,10 +180,10 @@ module Lti
         }
       end
 
-      def asset_processor_info(tool)
+      def asset_processor_info(tool, placement)
         {
           icon_url:
-            tool.extension_setting(Lti::ResourcePlacement::ASSET_PROCESSOR, :icon_url),
+            tool.extension_setting(placement, :icon_url),
 
           # TODO: use this for global nav too, for consistent default icons
           tool_name_for_default_icon: tool.name,
@@ -189,6 +199,30 @@ module Lti
         tool_path = account_external_tool_path(tool.context, tool, launch_type: "global_navigation", display: tool_display)
         h[:html_url] = tool_path
         h
+      end
+
+      def batch_load_context_names(collection)
+        tools = collection.grep(ContextExternalTool)
+        return {} if tools.empty?
+
+        account_ids = tools.select { |t| t.context_type == "Account" }.map(&:context_id)
+        course_ids = tools.select { |t| t.context_type == "Course" }.map(&:context_id)
+
+        names = {}
+
+        if account_ids.present?
+          Account.where(id: account_ids).pluck(:id, :name).each do |id, name|
+            names[["Account", id]] = name
+          end
+        end
+
+        if course_ids.present?
+          Course.where(id: course_ids).pluck(:id, :name).each do |id, name|
+            names[["Course", id]] = name
+          end
+        end
+
+        names
       end
     end
   end

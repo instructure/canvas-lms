@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {uniq, filter, groupBy, chain, keys, sample, difference, each} from 'lodash'
+import {groupBy, difference, filter, keys, sample, each, uniq, max} from 'es-toolkit/compat'
 import createStore, {type CanvasStore} from '@canvas/backbone/createStore'
 import ContextColorer from '@canvas/util/contextColorer'
 
@@ -113,9 +113,8 @@ DashboardCardBackgroundStore.leastUsedDefaults = function () {
     (x: string) => filter(usedDefaults, (y: string) => x === y).length,
   )
 
-  const mostCommonColors = uniq(
-    usedColorsByFrequency[chain(usedColorsByFrequency).keys().max().value()],
-  )
+  const maxFrequency = max(keys(usedColorsByFrequency))
+  const mostCommonColors = uniq(usedColorsByFrequency[maxFrequency as string])
 
   return difference(DEFAULT_COLOR_OPTIONS, mostCommonColors).length === 0
     ? mostCommonColors

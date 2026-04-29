@@ -19,9 +19,9 @@
 import {assignLocation, openWindow} from '@canvas/util/globalUtils'
 import handler from '../requestFullWindowLaunch'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
-  openWindow: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
+  openWindow: vi.fn(),
 }))
 
 describe('requestFullWindowLaunch', () => {
@@ -31,7 +31,7 @@ describe('requestFullWindowLaunch', () => {
       origin: 'http://localhost',
       toString: () => 'http://localhost/',
     }
-    window.open = jest.fn()
+    window.open = vi.fn()
   })
 
   describe('with string provided', () => {

@@ -46,22 +46,22 @@ describe('Rce Abstraction - integration', () => {
               on() {},
             }
           },
+          tinymceOn() {},
         }
         return renderCallback(fakeEditor)
       },
     }
-    jest.spyOn(RCELoader, 'loadRCE').mockImplementation(callback => callback(fakeRceModule))
+    vi.spyOn(RCELoader, 'loadRCE').mockImplementation(callback => callback(fakeRceModule))
   })
 
   afterEach(() => {
     fakeENV.teardown()
     $('#fixtures').empty()
     editorUtils.resetRCE()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
-  // fails in Jest, passes in QUnit
-  it.skip('instatiating a remote editor', async () => {
+  it('instatiating a remote editor', async () => {
     RichContentEditor.preloadRemoteModule()
     const target = $('#big_rce_text')
     loadNewEditor()

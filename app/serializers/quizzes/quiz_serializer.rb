@@ -224,7 +224,7 @@ module Quizzes
     end
 
     def all_dates
-      Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting) ? quiz.dates_hash_visible_to_v2(user, include_all_dates: true) : quiz.formatted_dates_hash(quiz.all_due_dates)
+      quiz.dates_hash_visible_to(user, include_all_dates: true)
     end
 
     def section_count
@@ -270,6 +270,8 @@ module Quizzes
           accepts_jsonapi? && user_may_grade? && user_may_manage?
         when :locked_for_user, :lock_info, :lock_explanation
           !serializer_option(:skip_lock_tests)
+        when :description
+          !serializer_option(:skip_description)
         when :anonymous_submissions
           quiz.survey?
         when :permissions

@@ -42,7 +42,7 @@ describe "ApplicationController Token Scoping", type: :request do
       ]
     end
     let(:account) { course.account }
-    let(:developer_key) { account.developer_keys.create!(require_scopes: true, scopes: valid_scopes) }
+    let(:developer_key) { account.developer_keys.create!(require_scopes: true, scopes: valid_scopes, name: "Test Developer Key") }
 
     before(:once) do
       course_with_teacher(user: user_with_pseudonym, active_all: true)

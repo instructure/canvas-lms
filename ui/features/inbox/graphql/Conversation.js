@@ -25,7 +25,7 @@ import {User} from './User'
 
 export const Conversation = {
   fragment: gql`
-    fragment Conversation on Conversation {
+    fragment InboxConversation on Conversation {
       _id
       id
       contextId
@@ -37,7 +37,7 @@ export const Conversation = {
       isPrivate
       conversationParticipantsConnection {
         nodes {
-          ...ConversationParticipant
+          ...InboxConversationParticipant
         }
       }
     }

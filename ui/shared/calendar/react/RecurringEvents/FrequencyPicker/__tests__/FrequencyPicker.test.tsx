@@ -36,22 +36,14 @@ const defaultProps = (overrides: UnknownSubset<FrequencyPickerProps> = {}) => {
     initialFrequency: 'weekly-day' as FrequencyOptionValue,
     locale: 'en',
     timezone: tz,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
     ...overrides,
   }
 }
 
-const selectOption = async (buttonName: RegExp, optionName: RegExp) => {
-  await userEvent.click(
-    screen.getByRole('combobox', {
-      name: buttonName,
-    }),
-  )
-  await userEvent.click(
-    screen.getByRole('option', {
-      name: optionName,
-    }),
-  )
+const selectOption = async (_buttonName: RegExp, optionName: RegExp) => {
+  await userEvent.click(screen.getByTestId('frequency-picker'))
+  await userEvent.click(screen.getByText(optionName))
 }
 
 describe('FrequencyPicker', () => {
@@ -60,7 +52,7 @@ describe('FrequencyPicker', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('renders', () => {
@@ -138,12 +130,12 @@ describe('FrequencyPicker', () => {
     it('returns focus to the frequency picker button when the modal is closed', async () => {
       const user = userEvent.setup({delay: null})
       const props = defaultProps()
-      const {getByText, getByRole, getByLabelText} = render(<FrequencyPicker {...props} />)
+      const {getByText, getByTestId} = render(<FrequencyPicker {...props} />)
       await selectOption(/frequency/i, /custom/i)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
-      await user.click(getByRole('button', {name: /cancel/i}))
-      await waitFor(() => expect(getByLabelText('Frequency')).toHaveFocus())
+      await user.click(getByTestId('custom-recurrence-modal-cancel'))
+      await waitFor(() => expect(getByTestId('frequency-picker')).toHaveFocus())
     })
 
     it('sets width to auto', () => {
@@ -160,36 +152,30 @@ describe('FrequencyPicker', () => {
 
     it('retains auto width after selecting a custom frequency', async () => {
       const props = defaultProps({width: 'auto'})
-      const {container, getByText, getByRole} = render(<FrequencyPicker {...props} />)
+      const {container, getByText, getByTestId} = render(<FrequencyPicker {...props} />)
       await selectOption(/frequency/i, /custom/i)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
-      await userEvent.click(getByRole('button', {name: /done/i}))
+      await userEvent.click(getByTestId('custom-recurrence-modal-done'))
       expect(container.querySelector('label')).toHaveStyle({width: 'auto'})
     })
 
     // Test error boundary cases by mocking console.error to prevent test output pollution
     describe('with errors', () => {
-      // Save original console.error
-      const originalConsoleError = console.error
-
-      beforeEach(() => {
-        // Mock console.error to prevent error output in test results
-        console.error = jest.fn()
-      })
-
-      afterEach(() => {
-        // Restore original console.error
-        console.error = originalConsoleError
-      })
-
       it('the error boundary fallback when enabled with no date', () => {
+        // Suppress JSDOM VirtualConsole errors for this specific test
+        const originalConsoleError = global.console.error
+        global.console.error = vi.fn()
+
         const props = defaultProps({date: undefined})
         const {getByText} = render(
           <FrequencyPickerErrorBoundary>
             <FrequencyPicker {...props} />
           </FrequencyPickerErrorBoundary>,
         )
+
+        global.console.error = originalConsoleError
+
         expect(getByText('There was an error rendering.')).toBeInTheDocument()
         expect(
           getByText('FrequencyPicker: date is required when interaction is enabled'),
@@ -197,6 +183,10 @@ describe('FrequencyPicker', () => {
       })
 
       it('the error boundary fallback with no date and a recurring frequency', () => {
+        // Suppress JSDOM VirtualConsole errors for this specific test
+        const originalConsoleError = global.console.error
+        global.console.error = vi.fn()
+
         const props = defaultProps({
           date: undefined,
           interaction: 'disabled',
@@ -207,6 +197,9 @@ describe('FrequencyPicker', () => {
             <FrequencyPicker {...props} />
           </FrequencyPickerErrorBoundary>,
         )
+
+        global.console.error = originalConsoleError
+
         expect(getByText('There was an error rendering.')).toBeInTheDocument()
         expect(
           getByText('FrequencyPicker: date is required when initialFrequency is not not-repeat'),

@@ -18,17 +18,16 @@
 
 import React from 'react'
 import {arrayOf, string, bool, func, shape, oneOf} from 'prop-types'
-import {isEqual, groupBy, map, compact} from 'lodash'
+import {compact, groupBy, isEqual, map} from 'es-toolkit/compat'
 import {IconPlusLine, IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Grid} from '@instructure/ui-grid'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
 import SearchableSelect from './SearchableSelect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import preventDefault from '@canvas/util/preventDefault'
 import {propType as termsPropType, termType} from '../store/TermsStore'
 import NewCourseModal from './NewCourseModal'
 
@@ -113,7 +112,13 @@ export default function CoursesToolbar({
 
   return (
     <div>
-      <form onSubmit={preventDefault(onApplyFilters)} disabled={isLoading}>
+      <form
+        onSubmit={event => {
+          event.preventDefault()
+          onApplyFilters()
+        }}
+        disabled={isLoading}
+      >
         <Grid vAlign="top" startAt="medium">
           <Grid.Row>
             <Grid.Col>
@@ -122,7 +127,7 @@ export default function CoursesToolbar({
                   <Grid.Col width={4}>
                     <SearchableSelect
                       id="termFilter"
-                      placeholder="Filter by term"
+                      placeholder={I18n.t('Filter by term')}
                       isLoading={terms.loading}
                       label={<ScreenReaderContent>{I18n.t('Filter by term')}</ScreenReaderContent>}
                       value={draftFilters.enrollment_term_id}

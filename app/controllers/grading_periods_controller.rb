@@ -68,7 +68,6 @@
 #    }
 #
 class GradingPeriodsController < ApplicationController
-  before_action :require_user
   before_action :get_context
 
   # @API List grading periods
@@ -93,8 +92,8 @@ class GradingPeriodsController < ApplicationController
       respond_to do |format|
         format.json do
           render json: serialize_json_api(paginated_grading_periods, meta)
-            .merge(index_permissions)
-            .merge(grading_periods_read_only: read_only)
+                       .merge(index_permissions)
+                       .merge(grading_periods_read_only: read_only)
         end
       end
     end
@@ -144,7 +143,7 @@ class GradingPeriodsController < ApplicationController
             format.json { render json: serialize_json_api(grading_period(inherit: false)) }
           else
             format.json do
-              render json: grading_period(inherit: false).errors, status: :unprocessable_entity
+              render json: grading_period(inherit: false).errors, status: :unprocessable_content
             end
           end
         end
@@ -235,7 +234,7 @@ class GradingPeriodsController < ApplicationController
       respond_to do |format|
         if errors.present?
           format.json do
-            render json: { errors: }, status: :unprocessable_entity
+            render json: { errors: }, status: :unprocessable_content
           end
         else
           periods.each(&:save!)
@@ -264,7 +263,7 @@ class GradingPeriodsController < ApplicationController
       respond_to do |format|
         if errors.present?
           format.json do
-            render json: { errors: }, status: :unprocessable_entity
+            render json: { errors: }, status: :unprocessable_content
           end
         else
           periods.each(&:save!)
@@ -335,7 +334,7 @@ class GradingPeriodsController < ApplicationController
   end
 
   def paginate_for(grading_periods)
-    paginated_grading_periods, meta = Api.jsonapi_paginate(grading_periods, self, named_context_url(@context, :api_v1_context_grading_periods_url))
+    paginated_grading_periods, meta = Api.jsonapi_paginate(grading_periods, self, named_context_url(@context, :api_v1_context_grading_periods_url, include_host: true))
     meta[:primaryCollection] = "grading_periods"
     [paginated_grading_periods, meta]
   end

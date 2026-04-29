@@ -1,25 +1,25 @@
 ---
+peer_reviewer_locked_file_access:
+  state: allowed_on
+  applies_to: SiteAdmin
+  display_name: Peer Reviewer Access to Locked Submission Files
+  description: |-
+    Allows peer reviewers with :read permission on a submission to
+    download its attachments even when the file is otherwise locked.
+    When disabled, locked files fall back to the standard
+    locked_for? check.
 assignment_enhancements_teacher_view:
   state: hidden
-  applies_to: RootAccount
+  applies_to: Course
+  shadow: true
   display_name: Assignment Enhancements Teacher View (Saved)
   description: Updates to the Teacher saved view of assignments.
 assignment_edit_enhancements_teacher_view:
   state: hidden
   applies_to: RootAccount
+  shadow: true
   display_name: Assignment Enhancements Teacher View (Create/Edit)
   description: Updates to the Teacher create/edit view of assignments.
-assign_to_differentiation_tags:
-  state: hidden
-  applies_to: Account
-  beta: true
-  display_name: Differentiation Tags
-  description: Let instructors tag enrolled users and assign course content based on those tags, supporting more personalized learning experiences.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
 self_signup_deadline:
   state: hidden
   applies_to: Account
@@ -28,6 +28,7 @@ self_signup_deadline:
 people_page_modernization:
   state: hidden
   applies_to: Account
+  shadow: true
   display_name: People Page Modernization
   description: People page modernization
 deprecate_context_groups_old_view:
@@ -35,9 +36,24 @@ deprecate_context_groups_old_view:
   applies_to: SiteAdmin
   display_name: Deprecate Legacy View of Context Groups
   description: Removes dead code from the context groups view that is no longer used.
+educator_dashboard:
+  state: hidden
+  display_name: Educator Dashboard
+  description: |-
+    When enabled, teachers with active enrollments see an Educator Dashboard
+    with cross-course task management, content quality insights, and student
+    activity summaries.
+  applies_to: RootAccount
 peer_review_allocation_and_grading:
   state: hidden
   applies_to: Course
   shadow: true
   display_name: Peer Review Allocation and Grading
-  description: Enable dynamic peer review allocation and separate due dates and grading for a streamlined, flexible review experience.
+  description: |-
+    Enable dynamic peer review allocation and separate due dates and grading for a streamlined, flexible review experience.
+    Note: the following three other feature options must be enabled for this feature to work correctly: 1) Assignment Enhancements - Student, 2) Enhanced Rubrics, and 3) Performance and Usability Upgrades for SpeedGrader.
+slm_read_from_primary_db:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Submission Lifecycle Manager - Read from primary db after recent write
+  description: Ensures that Submission Lifecycle Manager reads from the primary database after a recent write to maintain data consistency.

@@ -20,7 +20,8 @@ import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import {filter, uniq, reject, range, extend as lodashExtend} from 'lodash'
+import {filter, reject, range, extend as lodashExtend} from 'es-toolkit/compat'
+import {uniq} from 'es-toolkit'
 import ReactDOM from 'react-dom'
 import {View} from '@canvas/backbone'
 import Slick from 'slickgrid'
@@ -472,7 +473,7 @@ OutcomeGradebookView.prototype._rollupsUrl = function (course, exclude, page) {
   return (
     '/api/v1/courses/' +
     course +
-    '/outcome_rollups?rating_percents=true&per_page=20&include[]=outcomes&include[]=users&include[]=outcome_paths' +
+    '/outcome_rollups?per_page=20&include[]=outcomes&include[]=users&include[]=outcome_paths' +
     excluding +
     '&page=' +
     page +

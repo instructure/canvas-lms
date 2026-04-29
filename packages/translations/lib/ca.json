@@ -17,14 +17,17 @@
     "add_alt_text_for_the_image_48cd88aa": {
         "message": "Afegiu text alternatiu per a la imatge"
     },
-    "add_another_f4e50d57": {
-        "message": "Afegeix-ne un altre"
-    },
     "add_cc_subtitles_55f0394e": {
         "message": "Afegeix CC/subtítols"
     },
     "add_image_60b2de07": {
         "message": "Afegeix la imatge"
+    },
+    "add_new_a9226085": {
+        "message": "Afegeix elements nous"
+    },
+    "add_new_caption_79b870c7": {
+        "message": "Afegiu-hi un subtítol nou"
     },
     "add_one_9e34a6f8": {
         "message": "Afegiu-ne una!"
@@ -44,12 +47,6 @@
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
     },
-    "ai_response_9624e8e8": {
-        "message": "Resposta d’IA"
-    },
-    "ai_tools_fda01177": {
-        "message": "Eines d’IA"
-    },
     "albanian_21ed929e": {
         "message": "Albanès"
     },
@@ -67,6 +64,12 @@
     },
     "all_apps_a50dea49": {
         "message": "Totes les aplicacions"
+    },
+    "allow_media_download_16dcf2bd": {
+        "message": "Permeteu la baixada d''elements multimèdia"
+    },
+    "allow_transcript_download_3fa239f0": {
+        "message": "Permeteu la baixada d''expedients acadèmics"
     },
     "alpha_15d59033": {
         "message": "Alfa"
@@ -88,9 +91,6 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "S''ha produït un error en realitzar una sol·licitud de xarxa"
-    },
-    "an_error_occurred_processing_your_request_a3a38d84": {
-        "message": "S''ha produït un error en processar la vostra sol·licitud"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "S''ha produït un error en carregar l''element multimèdia."
@@ -170,6 +170,9 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Existeix contingut desat automàticament. Voleu carregar el contingut desat automàticament al seu lloc?"
     },
+    "automatic_captioning_ece5b5e0": {
+        "message": "Subtitulació automàtica"
+    },
     "available_folders_694d0436": {
         "message": "Carpetes disponibles"
     },
@@ -242,6 +245,27 @@
     "cap_product_3a5265a6": {
         "message": "Producte amb tapa"
     },
+    "caption_generation_failed_7312f917": {
+        "message": "No s''ha pogut generar el subtítol"
+    },
+    "caption_manager_aae0906f": {
+        "message": "Gestor de subtítols"
+    },
+    "captionname_caption_delete_failed_3afa617e": {
+        "message": "No s''ha pogut suprimir el subtítol { captionName }"
+    },
+    "captionname_caption_generation_failed_6fd29bfe": {
+        "message": "No s''ha pogut generar el subtítol { captionName }"
+    },
+    "captionname_caption_upload_failed_fa0f13a4": {
+        "message": "No s''ha pogut penjar el subtítol { captionName }"
+    },
+    "captions_have_been_added_for_lang_cd126cd": {
+        "message": "S’han afegit els subtítols en { lang }"
+    },
+    "captions_have_been_deleted_for_lang_63906076": {
+        "message": "S’han suprimit els subtítols en { lang }"
+    },
     "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
         "message": "Els subtítols heretats d’una assignatura principal no es poden suprimir."
     },
@@ -268,6 +292,9 @@
     },
     "change_text_color_1aecb912": {
         "message": "Canvieu el color del text"
+    },
+    "changes_will_apply_after_you_save_this_page_fb324e9d": {
+        "message": "Els canvis s''aplicaran un cop hàgiu desat aquesta pàgina."
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Pot ser que els canvis que heu fet no es desin."
@@ -299,6 +326,12 @@
     "choose_caption_file_9c45bc4e": {
         "message": "Tria un fitxer de subtítols"
     },
+    "choose_file_8d89ccab": {
+        "message": "Trieu un fitxer"
+    },
+    "choose_file_required_61f0d716": {
+        "message": "Trieu un fitxer (obligatori)"
+    },
     "choose_usage_rights_33683854": {
         "message": "Tria els drets d''ús..."
     },
@@ -313,12 +346,6 @@
     },
     "clear_image_3213fe62": {
         "message": "Esborra la imatge"
-    },
-    "clear_selected_file_82388e50": {
-        "message": "Esborra el fitxer seleccionat"
-    },
-    "clear_selected_file_filename_2fe8a58e": {
-        "message": "Esborra el fitxer seleccionat: { filename }"
     },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
         "message": "Feu clic aquí o feu-hi clic mentre premeu la tecla Maj per obrir l’editor d’HTML."
@@ -344,6 +371,9 @@
     "close_d634289d": {
         "message": "Tanca"
     },
+    "close_keyboard_shortcuts_modal_291ce074": {
+        "message": "Tanqueu el modal de dreceres del teclat"
+    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "El fitxer de subtítols tancats ha de tenir menys de { maxKb } kB"
     },
@@ -352,6 +382,9 @@
     },
     "clubs_suit_c1ffedff": {
         "message": "Trèvols (coll de cartes)"
+    },
+    "collab_575ac7bc": {
+        "message": "Col·labora"
     },
     "collaborations_5c56c15f": {
         "message": "Col·laboracions"
@@ -386,9 +419,6 @@
     "complex_numbers_a543d004": {
         "message": "Números complexos"
     },
-    "compose_44c904f4": {
-        "message": "Redacta"
-    },
     "computer_1d7dfa6f": {
         "message": "Ordinador"
     },
@@ -413,11 +443,11 @@
     "content_type_2cf90d95": {
         "message": "Tipus de contingut"
     },
+    "continue_to_youtube_content_a34f0f85": {
+        "message": "Continueu cap al contingut de YouTube"
+    },
     "coproduct_e7838082": {
         "message": "Coproducte"
-    },
-    "copy_9748f9f": {
-        "message": "Copia"
     },
     "copyright_holder_66ee111": {
         "message": "Titular del copyright:"
@@ -491,9 +521,6 @@
     "custom_6979cd81": {
         "message": "Personalitzat"
     },
-    "custom_width_and_height_pixels_946eea7c": {
-        "message": "Amplada i altura personalitzades (píxels)"
-    },
     "cyan_c1d5f68a": {
         "message": "Cian"
     },
@@ -542,6 +569,9 @@
     "degree_symbol_4a823d5f": {
         "message": "Símbol de grau"
     },
+    "delete_failed_6529e336": {
+        "message": "No s''ha pogut fer la supressió"
+    },
     "delimiters_4db4840d": {
         "message": "Delimitadors"
     },
@@ -553,9 +583,6 @@
     },
     "describe_the_type_ff448da5": {
         "message": "(Descriviu el { TYPE })"
-    },
-    "describe_the_video_2fe8f46a": {
-        "message": "(Descriu el vídeo)"
     },
     "description_436c48d7": {
         "message": "Descripció"
@@ -578,9 +605,6 @@
     "dimension_type_f5fa9170": {
         "message": "Tipus de dimensió"
     },
-    "dimensions_45ddb7b7": {
-        "message": "Mides"
-    },
     "directionality_26ae9e08": {
         "message": "Direccionalitat"
     },
@@ -601,9 +625,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Unió desarticulada"
-    },
-    "dislike_14befc48": {
-        "message": "No m’agrada"
     },
     "display_options_315aba85": {
         "message": "Mostra les opcions"
@@ -640,6 +661,9 @@
     },
     "down_and_right_diagonal_arrow_6ea0f460": {
         "message": "Fletxa descendent dreta en diagonal"
+    },
+    "download_captionname_2e5eea35": {
+        "message": "Baixeu { captionName }"
     },
     "download_filename_2baae924": {
         "message": "Baixa { filename }"
@@ -746,6 +770,9 @@
     "english_united_kingdom_a613f831": {
         "message": "Anglès (Regne Unit)"
     },
+    "enter_a_media_title_81b490ec": {
+        "message": "Introduïu el títol d’un element multimèdia"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Introduïu com a mínim 3 caràcters per cercar"
     },
@@ -754,9 +781,6 @@
     },
     "enter_search_text_26cb4459": {
         "message": "introdueix el text de cerca"
-    },
-    "enter_text_8b35c65b": {
-        "message": "Introdueix el text"
     },
     "epsilon_54bb8afa": {
         "message": "Èpsilon"
@@ -812,6 +836,9 @@
     "extra_large_b6cdf1ff": {
         "message": "Extragran"
     },
+    "extra_large_width_x_height_px_915571fa": {
+        "message": "Extragran ({ width } píxels × { height } píxels)"
+    },
     "extra_small_9ae33252": {
         "message": "Molt petit"
     },
@@ -827,14 +854,20 @@
     "failed_getting_file_contents_e9ea19f4": {
         "message": "No s''ha pogut obtenir el contingut del fitxer"
     },
-    "failed_to_copy_response_d3def551": {
-        "message": "No s''ha pogut copiar la resposta"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "No s’ha pogut recuperant el contingut de l''eina externa"
     },
+    "file_d1b70050": {
+        "message": "Fitxer*"
+    },
     "file_name_8fd421ff": {
         "message": "Nom del fitxer"
+    },
+    "file_preview_21667a6e": {
+        "message": "Visualització prèvia del fitxer"
+    },
+    "file_preview_for_filename_ab314195": {
+        "message": "Visualització prèvia de { fileName }"
     },
     "file_storage_quota_exceeded_b7846cd1": {
         "message": "S''ha superat la quota d''emmagatzematge de fitxers"
@@ -1040,12 +1073,6 @@
     "height_69b03e15": {
         "message": "Altura"
     },
-    "hello_please_describe_the_modifications_you_would__49b19837": {
-        "message": "Hola. Descriviu les modificacions que voldríeu fer a la vostra redacció."
-    },
-    "hello_please_describe_the_modifications_you_would__600dbbf0": {
-        "message": "Hola. Descriviu les modificacions que voldríeu fer a la vostra selecció."
-    },
     "hexagon_d8468e0d": {
         "message": "Hexàgon"
     },
@@ -1064,6 +1091,9 @@
     "home_351838cd": {
         "message": "Inici"
     },
+    "how_to_request_and_edit_captions_a49a9c6b": {
+        "message": "Com se sol·liciten i s’editen els subtítols?"
+    },
     "html_code_editor_fd967a44": {
         "message": "Editor de codi HTML"
     },
@@ -1078,9 +1108,6 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Soc el titular dels drets d''autor"
-    },
-    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
-        "message": "Ho sento, però no puc trobar la resposta d’IA"
     },
     "icelandic_9d6d35de": {
         "message": "Islandès"
@@ -1259,8 +1286,17 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
+    "language_91effaa0": {
+        "message": "Idioma*"
+    },
     "language_arts_icon_a798b0f8": {
         "message": "Icona d''arts lingüístiques"
+    },
+    "language_spoken_in_this_media_869b3eef": {
+        "message": "Idioma que es parla en aquest element multimèdia*"
+    },
+    "languagelabel_automatic_5dc74538": {
+        "message": "{ languageLabel } (automàtic)"
     },
     "languages_icon_9d20539": {
         "message": "Icona d’idiomes"
@@ -1271,8 +1307,14 @@
     "large_text_e7ba08cd": {
         "message": "Text gran"
     },
+    "large_width_x_height_px_c61c2fd": {
+        "message": "Gran ({ width } píxels × { height } píxels)"
+    },
     "latvian_2bbb6aab": {
         "message": "Letó"
+    },
+    "learn_ad3b3505": {
+        "message": "Aprèn"
     },
     "learn_more_about_adjacent_links_2cb9762c": {
         "message": "Obteniu més informació sobre els enllaços adjacents"
@@ -1376,6 +1418,12 @@
     "links_to_an_external_site_de74145d": {
         "message": "Enllaça a un lloc extern."
     },
+    "list_collapsed_9ac35920": {
+        "message": "S’ha contret la llista."
+    },
+    "list_expanded_efec2d0": {
+        "message": "S’ha desplegat la llista."
+    },
     "lists_cd1336fc": {
         "message": "Llistes"
     },
@@ -1417,6 +1465,9 @@
     },
     "loading_preview_9f077aa1": {
         "message": "S’està carregant la visualització prèvia"
+    },
+    "lock_speed_at_1x_57d4f815": {
+        "message": "Bloquegeu la velocitat a 1×"
     },
     "locked_762f138b": {
         "message": "Bloquejat"
@@ -1463,11 +1514,17 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "S’està processant el fitxer multimèdia. Torneu a provar-ho més endavant."
     },
+    "media_options_saved_560c4ec8": {
+        "message": "S’han desat les opcions dels elements multimèdia."
+    },
     "media_title_2112243b": {
         "message": "Títol de l''element multimèdia"
     },
     "medium_5a8e9ead": {
         "message": "Mitjà"
+    },
+    "medium_width_x_height_px_b076f6b6": {
+        "message": "Mitjà ({ width } píxels × { height } píxels)"
     },
     "merge_links_2478df96": {
         "message": "Fusiona els enllaços"
@@ -1498,9 +1555,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "Diversos"
-    },
-    "modify_6b0b13e3": {
-        "message": "Modifica"
     },
     "module_90d9fd32": {
         "message": "Contingut"
@@ -1700,6 +1754,9 @@
     "operators_a2ef9a93": {
         "message": "Operadors"
     },
+    "options_3ab0ea65": {
+        "message": "Opcions"
+    },
     "or_9b70ccaa": {
         "message": "O"
     },
@@ -1711,6 +1768,9 @@
     },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Podeu trobar altres dreceres d''editor a"
+    },
+    "our_technology_generates_85_accurate_captions_6959d750": {
+        "message": "Amb la nostra tecnologia es genera al voltant d’un 85 % de subtítols correctes."
     },
     "outline_color_3ef2cea7": {
         "message": "Color del contorn"
@@ -1814,20 +1874,32 @@
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Reprodueix el comentari multimèdia de { name } enviat el { createdAt }."
     },
+    "player_layout_14e09a29": {
+        "message": "Disseny del reproductor"
+    },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Permeteu que el Canvas accedeixi al micròfon i a la càmera web."
     },
     "please_choose_a_file_c2449cc": {
         "message": "Trieu un fitxer"
     },
-    "please_decribe_what_you_would_like_to_compose_27a51be5": {
-        "message": "Descriviu què voldríeu redactar."
-    },
     "please_enter_a_file_name_f159edc1": {
         "message": "Introduïu un nom de fitxer"
     },
+    "please_enter_a_valid_video_url_from_a_supported_pl_30dc0596": {
+        "message": "Introduïu un URL de vídeo vàlid des d’una plataforma admesa."
+    },
+    "please_select_a_file_before_uploading_4cd6e2db": {
+        "message": "Seleccioneu un fitxer abans de penjar-lo."
+    },
     "please_select_a_file_of_a_supported_type_1fc578f2": {
         "message": "Seleccioneu un fitxer d’un tipus admès"
+    },
+    "please_select_a_language_d90256fb": {
+        "message": "Seleccioneu un idioma"
+    },
+    "please_select_a_vtt_or_srt_file_4b7aeaf0": {
+        "message": "Seleccioneu un fitxer .vtt o .srt"
     },
     "plus_d43cd4ec": {
         "message": "Més"
@@ -1889,6 +1961,9 @@
     "prime_numbers_13464f61": {
         "message": "Números primers"
     },
+    "processing_8c569014": {
+        "message": "S''està processant..."
+    },
     "product_39cf144f": {
         "message": "Producte"
     },
@@ -1949,6 +2024,12 @@
     "religion_icon_246e0be1": {
         "message": "Icona de religió"
     },
+    "remove_f47dc62a": {
+        "message": "Suprimeix-ho"
+    },
+    "remove_filename_3ea029f6": {
+        "message": "Suprimiu { filename }"
+    },
     "remove_heading_style_5fdc8855": {
         "message": "Suprimeix l''estil de la capçalera"
     },
@@ -1976,14 +2057,14 @@
     "replaced_all_alertfindtext_with_alertreplacetext_83fdfe59": {
         "message": "S’ha substituït tot { alertFindText } amb { alertReplaceText }"
     },
+    "request_d1129f7d": {
+        "message": "Sol·licita-ho"
+    },
     "reset_95a81614": {
         "message": "Restableix"
     },
     "resize_ec83d538": {
         "message": "Canvia la mida"
-    },
-    "response_copied_to_clipboard_130d66cd": {
-        "message": "S’ha copiat la resposta al porta-retalls."
     },
     "restore_auto_save_deccd84b": {
         "message": "Voleu restaurar el contingut desat automàticament?"
@@ -1991,8 +2072,8 @@
     "result_index_of_max_7db5ad8b": {
         "message": "Resultat { index } de { max }."
     },
-    "retry_ebd5f8ba": {
-        "message": "Torna-ho a provar"
+    "retry_captionname_5ed0a12f": {
+        "message": "Torneu a provar { captionName }"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Trinquet invers (no produeix)"
@@ -2123,6 +2204,9 @@
     "selected_274ce24f": {
         "message": "Seleccionat"
     },
+    "selected_file_name_93fa1a14": {
+        "message": "Fitxer seleccionat: { name }"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "{ linkFileName } seleccionat"
     },
@@ -2153,23 +2237,17 @@
     "shortcut_911d6255": {
         "message": "Drecera"
     },
-    "show_all_967a90f0": {
-        "message": "Mostra-ho tot"
-    },
-    "show_audio_options_b489926b": {
-        "message": "Mostra les opcions de so"
-    },
     "show_image_options_1e2ecc6b": {
         "message": "Mostra les opcions d''imatge"
     },
     "show_link_options_545338fd": {
         "message": "Mostra les opcions d''enllaç"
     },
-    "show_studio_media_options_a0c748c6": {
-        "message": "Mostra les opcions d’elements multimèdia de l’Studio"
+    "show_rolling_transcript_c1481744": {
+        "message": "Mostreu l’expedient acadèmic de manera escalonada"
     },
-    "show_video_options_6ed3721a": {
-        "message": "Mostra les opcions de vídeo"
+    "show_rolling_transcript_d353aca4": {
+        "message": "Mostreu l’expedient acadèmic de manera escalonada"
     },
     "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
         "message": "Els usuaris vistos naveguen ràpidament per les pàgines web i hi cerquen capçaleres grans o en negreta. Els usuaris del lector de pantalla es basen en les capçaleres per obtenir-ne el significat contextual. Les capçaleres han de tenir l''estructura adequada."
@@ -2203,6 +2281,9 @@
     },
     "small_b070434a": {
         "message": "Petita"
+    },
+    "small_width_x_height_px_359acd38": {
+        "message": "Petit ({ width } píxels × { height } píxels)"
     },
     "solid_circle_9f061dfc": {
         "message": "Cercle sòlid"
@@ -2471,11 +2552,20 @@
     "this_image_is_currently_unavailable_25c68857": {
         "message": "En aquest moment, aquesta imatge no està disponible."
     },
+    "this_video_may_display_youtube_ads_4d19d590": {
+        "message": "Pot ser que en aquest vídeo es mostrin anuncis de YouTube."
+    },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Tot i que el títol del vídeo que es mostra al explorador és el correcte, no hem pogut actualitzar-lo a la base de dades."
     },
+    "thumbnail_e0de666f": {
+        "message": "Miniatura"
+    },
     "timebar_a4d18443": {
         "message": "Barra temporal"
+    },
+    "title_can_t_be_blank_eb4021d7": {
+        "message": "El títol no pot quedar en blanc"
     },
     "title_ee03d132": {
         "message": "Títol"
@@ -2497,6 +2587,9 @@
     },
     "top_66e0adb6": {
         "message": "Superior"
+    },
+    "transcript_panel_is_available_at_widths_above_720p_1cf94c0d": {
+        "message": "El tauler de l’expedient acadèmic està disponible en amplades superiors a 720 píxels."
     },
     "tray_839df38a": {
         "message": "Safata"
@@ -2537,6 +2630,9 @@
     "unpublished_dfd8801": {
         "message": "no publicat"
     },
+    "unsaved_changes_will_be_lost_f977252a": {
+        "message": "Es perdran els canvis que no s’hagin desat."
+    },
     "untitled_16aa4f2b": {
         "message": "Sense títol"
     },
@@ -2555,8 +2651,17 @@
     "updated_link_a827e441": {
         "message": "S’ha actualitzat l''enllaç"
     },
+    "upload_8b403d05": {
+        "message": "Penja-ho"
+    },
+    "upload_a_subtitle_track_in_either_the_srt_or_webvt_ad1aa3c1": {
+        "message": "Pengeu una pista de subtítols en format SRT o WebVTT."
+    },
     "upload_document_253f0478": {
         "message": "Penja un document"
+    },
+    "upload_failed_a5dc91ec": {
+        "message": "No s’ha pogut fer la penjada"
     },
     "upload_file_fd2361b8": {
         "message": "Penja el fitxer"
@@ -2660,9 +2765,6 @@
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Els lectors de pantalla l''utilitzen per descriure el contingut d''una imatge"
     },
-    "used_by_screen_readers_to_describe_the_video_37ebad25": {
-        "message": "Els lectors de pantalla l''utilitzen per descriure el vídeo"
-    },
     "user_documents_c206e61f": {
         "message": "Documents de l''usuari"
     },
@@ -2699,6 +2801,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Reproductor de vídeo per a { title }"
     },
+    "video_url_889d3263": {
+        "message": "URL de vídeo"
+    },
     "vietnamese_e7a76583": {
         "message": "Vietnamita"
     },
@@ -2720,8 +2825,8 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "Mostra els recomptes de paraules i caràcters"
     },
-    "waiting_for_response_1efd0c50": {
-        "message": "S''està esperant una resposta"
+    "viewer_restrictions_e14274c9": {
+        "message": "Restriccions del visualitzador"
     },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "No hem pogut detectar cap micròfon actiu connectat al vostre dispositiu."
@@ -2743,9 +2848,6 @@
     },
     "welsh_42ab94b1": {
         "message": "Gal·lès"
-    },
-    "what_would_you_like_to_do_6dc0d541": {
-        "message": "Què voldríeu fer?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Quan s’utilitza un marcatge que formata visualment els elements com una llista, però no indica la relació de la llista, és possible que els usuaris tinguin dificultats per navegar a través de la informació."
@@ -2776,9 +2878,6 @@
     },
     "wreath_product_200b38ef": {
         "message": "Producte en espiral"
-    },
-    "writing_assistant_a30ac16a": {
-        "message": "Assistent de redacció"
     },
     "xi_149681d0": {
         "message": "Ksi"
@@ -2824,6 +2923,9 @@
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "És possible que la càmera web ja s''estigui utilitzant."
+    },
+    "youtube_embed_url_5c1018d4": {
+        "message": "URL integrat de YouTube"
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

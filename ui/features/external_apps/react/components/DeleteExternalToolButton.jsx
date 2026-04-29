@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import store from '../lib/ExternalAppsStore'
 
 const I18n = createI18nScope('external_tools')

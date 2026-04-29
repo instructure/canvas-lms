@@ -97,23 +97,23 @@ describe('batchUpdate', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('calls the resolved endpoint with serialized grading periods', () => {
-    const apiSpy = jest.spyOn(axios, 'patch').mockReturnValue(new Promise(() => {}))
+    const apiSpy = vi.spyOn(axios, 'patch').mockReturnValue(new Promise(() => {}))
     api.batchUpdate(123, deserializedPeriods)
     expect(axios.patch).toHaveBeenCalledWith('api/123/batch_update', serializedPeriods)
   })
 
   it('deserializes returned grading periods', async () => {
-    jest.spyOn(axios, 'patch').mockResolvedValue({data: periodsData})
+    vi.spyOn(axios, 'patch').mockResolvedValue({data: periodsData})
     const periods = await api.batchUpdate(123, deserializedPeriods)
     expect(periods).toEqual(deserializedPeriods)
   })
 
   it('rejects the promise upon errors', async () => {
-    jest.spyOn(axios, 'patch').mockRejectedValue('FAIL')
+    vi.spyOn(axios, 'patch').mockRejectedValue('FAIL')
     await expect(api.batchUpdate(123, deserializedPeriods)).rejects.toEqual('FAIL')
   })
 })

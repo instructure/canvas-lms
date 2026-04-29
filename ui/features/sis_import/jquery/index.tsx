@@ -1,0 +1,452 @@
+/*
+ * Copyright (C) 2011 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {useScope as createI18nScope} from '@canvas/i18n'
+import $ from 'jquery'
+import htmlEscape, {raw} from '@instructure/html-escape'
+import '@canvas/jquery/jquery.ajaxJSON'
+import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf, disableIf */
+import 'jqueryui/progressbar'
+
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
+import SisImportForm from '../react/SisImportForm'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@instructure/platform-query'
+import type {SisImport} from 'api'
+
+const I18n = createI18nScope('sis_import')
+
+// @ts-expect-error TS2430 - SisBatch extends SisImport with additional canvas-specific fields
+interface SisBatch extends SisImport {
+  processing_errors?: Array<[string, string]>
+  processing_warnings?: Array<[string, string]>
+  data?: {
+    import_type?: string
+    counts?: {
+      accounts: number
+      terms: number
+      courses: number
+      sections: number
+      users: number
+      logins: number
+      enrollments: number
+      xlists: number
+      admins: number
+      group_categories: number
+      groups: number
+      group_memberships: number
+      differentiation_tag_sets: number
+      differentiation_tags: number
+      differentiation_tag_memberships: number
+      institutional_tag_categories: number
+      institutional_tags: number
+      institutional_tag_associations: number
+      user_observers: number
+      change_sis_ids: number
+    }
+  }
+}
+
+interface OnSuccessData {
+  id?: string
+  error_message?: string
+  batch_in_progress?: boolean
+}
+
+$(document).ready(function (_event) {
+  const mountNode = document.getElementById('attachment_mount')
+  if (!mountNode) return
+
+  legacyRender(
+    <QueryClientProvider client={queryClient}>
+      <SisImportForm onSuccess={onSuccess} />
+    </QueryClientProvider>,
+    mountNode,
+  )
+  let state: 'nothing' | 'updating' | 'checking' = 'nothing'
+
+  function createMessageHtml(batch: SisBatch): string {
+    let output = ''
+    if (batch.processing_errors && batch.processing_errors.length > 0) {
+      output +=
+        '<li>' +
+        htmlEscape(I18n.t('headers.import_errors', 'Errors that prevent importing')) +
+        '\n<ul>'
+      for (const i in batch.processing_errors) {
+        const message = batch.processing_errors[i]
+        output += '<li>' + htmlEscape(message[0]) + ' - ' + htmlEscape(message[1]) + '</li>'
+      }
+      output += '</ul>\n</li>'
+    }
+    if (batch.processing_warnings && batch.processing_warnings.length > 0) {
+      output += '<li>' + htmlEscape(I18n.t('headers.import_warnings', 'Warnings')) + '\n<ul>'
+      for (const i in batch.processing_warnings) {
+        const message = batch.processing_warnings[i]
+        output += '<li>' + htmlEscape(message[0]) + ' - ' + htmlEscape(message[1]) + '</li>'
+      }
+      output += '</ul>\n</li>'
+    }
+    output += '</ul>'
+    return output
+  }
+
+  function createCountsHtml(batch: SisBatch): string {
+    if (!(batch.data && batch.data.counts)) {
+      return ''
+    }
+    let output =
+      '<ul><li>' + htmlEscape(I18n.t('headers.imported_items', 'Imported Items')) + '<ul>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.accounts', 'Accounts: %{account_count}', {
+          account_count: batch.data.counts.accounts,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.terms', 'Terms: %{term_count}', {
+          term_count: batch.data.counts.terms,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.courses', 'Courses: %{course_count}', {
+          course_count: batch.data.counts.courses,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.sections', 'Sections: %{section_count}', {
+          section_count: batch.data.counts.sections,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.users', 'Users: %{user_count}', {
+          user_count: batch.data.counts.users,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.logins', 'Logins: %{login_count}', {
+          login_count: batch.data.counts.logins,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.enrollments', 'Enrollments: %{enrollment_count}', {
+          enrollment_count: batch.data.counts.enrollments,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.crosslists', 'Crosslists: %{crosslist_count}', {
+          crosslist_count: batch.data.counts.xlists,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.admins', 'Admins: %{admin_count}', {
+          admin_count: batch.data.counts.admins,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.group_categories', 'Group Categories: %{group_categories_count}', {
+          group_categories_count: batch.data.counts.group_categories,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.groups', 'Groups: %{group_count}', {
+          group_count: batch.data.counts.groups,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.group_enrollments', 'Group Enrollments: %{group_enrollments_count}', {
+          group_enrollments_count: batch.data.counts.group_memberships,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t(
+          'import_counts.differentiation_tag_sets',
+          'Differentiation Tag Sets: %{group_categories_count}',
+          {
+            group_categories_count: batch.data.counts.differentiation_tag_sets,
+          },
+        ),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.differentiation_tags', 'Differentiation Tags: %{group_count}', {
+          group_count: batch.data.counts.differentiation_tags,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t(
+          'import_counts.differentiation_tag_enrollments',
+          'Differentiation Tag Enrollments: %{group_enrollments_count}',
+          {
+            group_enrollments_count: batch.data.counts.differentiation_tag_memberships,
+          },
+        ),
+      ) +
+      '</li>'
+    if (ENV.INSTITUTIONAL_TAGS_ENABLED) {
+      output +=
+        '<li>' +
+        htmlEscape(
+          I18n.t(
+            'import_counts.institutional_tag_categories',
+            'Institutional Tag Categories: %{institutional_tag_categories_count}',
+            {
+              institutional_tag_categories_count: batch.data.counts.institutional_tag_categories,
+            },
+          ),
+        ) +
+        '</li>'
+      output +=
+        '<li>' +
+        htmlEscape(
+          I18n.t(
+            'import_counts.institutional_tags',
+            'Institutional Tags: %{institutional_tags_count}',
+            {
+              institutional_tags_count: batch.data.counts.institutional_tags,
+            },
+          ),
+        ) +
+        '</li>'
+      output +=
+        '<li>' +
+        htmlEscape(
+          I18n.t(
+            'import_counts.institutional_tag_associations',
+            'Institutional Tag Associations: %{institutional_tag_associations_count}',
+            {
+              institutional_tag_associations_count:
+                batch.data.counts.institutional_tag_associations,
+            },
+          ),
+        ) +
+        '</li>'
+    }
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.user_observers', 'User Observers: %{user_observers_count}', {
+          user_observers_count: batch.data.counts.user_observers,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.change_sis_ids', 'Change SIS IDs: %{change_sis_ids_count}', {
+          change_sis_ids_count: batch.data.counts.change_sis_ids,
+        }),
+      ) +
+      '</li>'
+    output += '</ul></li></ul>'
+
+    return output
+  }
+
+  function startPoll(): void {
+    $('#sis_importer')
+      .html(
+        htmlEscape(I18n.t('status.processing', 'Processing')) +
+          " <div style='font-size: 0.6em;'>" +
+          htmlEscape(I18n.t('notices.processing_takes_awhile', 'this may take a bit...')) +
+          '</div>',
+      )
+      .prop('disabled', true)
+    $('.instruction').hide()
+    $('.progress_bar_holder').slideDown()
+    $('.copy_progress').progressbar()
+    state = 'nothing'
+    let fakeTickCount = 0
+    const tick = function (): void {
+      if (state === 'nothing') {
+        fakeTickCount++
+        const progress =
+          (($('.copy_progress').progressbar('option', 'value') as number) || 0) + 0.25
+        if (fakeTickCount < 10) {
+          $('.copy_progress').progressbar('option', 'value', progress)
+        }
+        setTimeout(tick, 2000)
+      } else {
+        state = 'nothing'
+        fakeTickCount = 0
+        setTimeout(tick, 10000)
+      }
+    }
+    const checkup = function (): void {
+      let lastProgress: number | null = null
+      let waitTime = 1500
+      $.ajaxJSON(
+        window.location.href,
+        'GET',
+        {},
+        (data: SisBatch) => {
+          state = 'updating'
+          const sis_batch = data
+          let progress = 0
+          if (sis_batch) {
+            progress = Math.max(
+              ($('.copy_progress').progressbar('option', 'value') as number) || 0,
+              sis_batch.progress,
+            )
+            $('.copy_progress').progressbar('option', 'value', progress)
+            $('#import_log').empty()
+          }
+          if (!sis_batch || sis_batch.workflow_state === 'imported') {
+            $('#sis_importer').hide()
+            $('.copy_progress').progressbar('option', 'value', 100)
+            $('.progress_message').html(
+              raw(
+                htmlEscape(
+                  I18n.t(
+                    'messages.import_complete_success',
+                    'The import is complete and all records were successfully imported.',
+                  ),
+                ) + createCountsHtml(sis_batch),
+              ) as unknown as string,
+            )
+          } else if (sis_batch.workflow_state === 'failed') {
+            const code = 'sis_batch_' + sis_batch.id
+            $('.progress_bar_holder').hide()
+            $('#sis_importer').hide()
+            {
+              const message = I18n.t(
+                'errors.import_failed_code',
+                'There was an error importing your SIS data. Please notify your system administrator and give them the following code: "%{code}"',
+                {code},
+              )
+              $('.sis_messages .sis_error_message').text(message)
+            }
+            $('.sis_messages').show()
+          } else if (sis_batch.workflow_state === 'failed_with_messages') {
+            $('.progress_bar_holder').hide()
+            $('#sis_importer').hide()
+            {
+              let message = htmlEscape(
+                I18n.t('errors.import_failed_messages', 'The import failed with these messages:'),
+              )
+              message += createMessageHtml(sis_batch)
+              $('.sis_messages .sis_error_message').html(raw(message) as unknown as string)
+            }
+            $('.sis_messages').show()
+          } else if (sis_batch.workflow_state === 'imported_with_messages') {
+            $('.progress_bar_holder').hide()
+            $('#sis_importer').hide()
+            {
+              let message = htmlEscape(
+                I18n.t(
+                  'messages.import_complete_warnings',
+                  'The SIS data was imported but with these messages:',
+                ),
+              )
+              message += createMessageHtml(sis_batch)
+              message += createCountsHtml(sis_batch)
+              $('.sis_messages')
+                .show()
+                .html(raw(message) as unknown as string)
+            }
+          } else {
+            if (progress === lastProgress) {
+              waitTime = Math.max(waitTime + 500, 30000)
+            } else {
+              waitTime = 1500
+            }
+            lastProgress = progress
+            setTimeout(checkup, 1500)
+          }
+        },
+        () => {
+          setTimeout(checkup, 3000)
+        },
+      )
+    }
+    setTimeout(checkup, 2000)
+    setTimeout(tick, 1000)
+  }
+
+  function onSuccess(data: OnSuccessData): void {
+    legacyUnmountComponentAtNode(mountNode)
+    if (data && data.id) {
+      startPoll()
+    } else {
+      // show error message
+      $('.sis_messages .sis_error_message').text(data.error_message || '')
+      $('.sis_messages').show()
+      if (data.batch_in_progress) {
+        startPoll()
+      }
+    }
+  }
+
+  function check_if_importing(): void {
+    state = 'checking'
+    $.ajaxJSON(window.location.href, 'GET', {}, (data: SisBatch) => {
+      state = 'nothing'
+      const sis_batch = data
+      if (
+        sis_batch &&
+        (sis_batch.workflow_state === 'importing' || sis_batch.workflow_state === 'created')
+      ) {
+        state = 'nothing'
+        startPoll()
+      }
+    })
+  }
+  check_if_importing()
+})

@@ -18,12 +18,12 @@
 
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // We can't call the wrapped component because a lot of these tests are depending
@@ -190,7 +190,7 @@ describe('DiscussionRow', () => {
   })
 
   it('opens the copyTo tray when menu item is selected', async () => {
-    const copyMock = jest.fn()
+    const copyMock = vi.fn()
     const props = makeProps({
       displayManageMenu: true,
       DIRECT_SHARE_ENABLED: true,
@@ -211,7 +211,7 @@ describe('DiscussionRow', () => {
   })
 
   it('opens the sendTo tray when menu item is selected', async () => {
-    const sendMock = jest.fn()
+    const sendMock = vi.fn()
     const props = makeProps({
       displayManageMenu: true,
       DIRECT_SHARE_ENABLED: true,
@@ -419,6 +419,7 @@ describe('DiscussionRow', () => {
               lock_at: '2018-07-01T05:59:00Z',
               unlock_at: '2018-06-21T06:00:00Z',
               id: '50',
+              speed_grader_url: '/courses/1/gradebook/speed_grader?assignment_id=50',
             },
           },
         })}

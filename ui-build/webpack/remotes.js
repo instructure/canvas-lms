@@ -88,6 +88,48 @@ function fetchAnalyticsHub(resolve, reject) {
 
 exports.fetchAnalyticsHub = fetchAnalyticsHub
 
+function fetchIgniteAgentLibrary(resolve, reject) {
+  const remoteUrl = window.REMOTES?.ignite_agent?.launch_url
+
+  if (!remoteUrl) {
+    const errorMessage = '[Ignite Agent] Remote not configured, agent can not be loaded'
+    console.error(errorMessage)
+    if (typeof reject === 'function') {
+      reject(new Error(errorMessage))
+    }
+    return
+  }
+
+  const script = document.createElement('script')
+
+  script.src = remoteUrl
+  script.onload = () => {
+    const module = {
+      get: request => window.IgniteAgentLibrary.get(request),
+      init: arg => {
+        try {
+          return window.IgniteAgentLibrary.init(arg)
+        } catch (e) {
+          console.warn('Remote Ignite Agent has already been loaded')
+        }
+      },
+    }
+    resolve(module)
+  }
+
+  script.onerror = errorEvent => {
+    const errorMessage = `Failed to load the script: ${script.src}`
+    console.error(errorMessage, errorEvent)
+    if (typeof reject === 'function') {
+      reject(new Error(errorMessage, errorEvent))
+    }
+  }
+
+  document.head.appendChild(script)
+}
+
+exports.fetchIgniteAgentLibrary = fetchIgniteAgentLibrary
+
 function fetchLtiUsage(resolve, reject) {
   const remoteUrl = window.REMOTES?.ltiUsage
 
@@ -196,3 +238,80 @@ function fetchCanvasCareerLearnerApp(resolve, reject) {
 }
 
 exports.fetchCanvasCareerLearnerApp = fetchCanvasCareerLearnerApp
+
+function fetchNewQuizzesApp(resolve, reject) {
+  const remoteUrl = window.REMOTES?.new_quizzes?.launch_url
+
+  if (!remoteUrl) {
+    console.debug(`new_quizzes remote not configured; using ${DEV_HOST}`)
+  }
+
+  const script = document.createElement('script')
+
+  script.src = remoteUrl || DEV_HOST
+  script.onload = () => {
+    if (!window.NewQuizzes) {
+      reject(new Error('NewQuizzes failed to load.'))
+      return
+    }
+
+    const module = {
+      get: request => window.NewQuizzes.get(request),
+      init: arg => {
+        try {
+          return window.NewQuizzes.init(arg)
+        } catch (e) {
+          console.warn('Remote new_quizzes has already been loaded')
+        }
+      },
+    }
+    resolve(module)
+  }
+
+  script.onerror = errorEvent => {
+    const errorMessage = `Failed to load the script: ${script.src}`
+    console.error(errorMessage, errorEvent)
+    if (typeof reject === 'function') {
+      reject(new Error(errorMessage, errorEvent))
+    }
+  }
+
+  document.head.appendChild(script)
+}
+
+exports.fetchNewQuizzesApp = fetchNewQuizzesApp
+
+function fetchCanvasCourseCriteria(resolve, reject) {
+  const script = document.createElement('script')
+
+  if (!window.REMOTES?.canvas_course_criteria?.launch_url) {
+    console.debug(`Canvas Criteria remote not configured; using ${DEV_HOST}`)
+  }
+
+  script.src = window.REMOTES?.canvas_course_criteria?.launch_url || DEV_HOST
+  script.onload = () => {
+    const module = {
+      get: request => window.CanvasCourseCriteria.get(request),
+      init: arg => {
+        try {
+          return window.CanvasCourseCriteria.init(arg)
+        } catch (e) {
+          console.warn('Remote Canvas Criteria has already been loaded')
+        }
+      },
+    }
+    resolve(module)
+  }
+
+  script.onerror = errorEvent => {
+    const errorMessage = `Failed to load the script: ${script.src}`
+    console.error(errorMessage, errorEvent)
+    if (typeof reject === 'function') {
+      reject(new Error(errorMessage, errorEvent))
+    }
+  }
+
+  document.head.appendChild(script)
+}
+
+exports.fetchCanvasCourseCriteria = fetchCanvasCourseCriteria

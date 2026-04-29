@@ -95,6 +95,7 @@
 #
 class AssignmentGroupsController < ApplicationController
   before_action :require_context
+  skip_before_action :require_user, only: :index
 
   include Api::V1::AssignmentGroup
 
@@ -103,12 +104,13 @@ class AssignmentGroupsController < ApplicationController
   # Returns the paginated list of assignment groups for the current context.
   # The returned groups are sorted by their position field.
   #
-  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"|"observed_users"|"can_edit"|"score_statistics"]
+  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"|"overrides"|"submission"|"observed_users"|"can_edit"|"score_statistics"|"peer_review"]
   #  Associations to include with the group. "discussion_topic", "all_dates", "can_edit",
   #  "assignment_visibility" & "submission" are only valid if "assignments" is also included.
   #  "score_statistics" requires that the "assignments" and "submission" options are included.
   #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #  If "observed_users" is passed along with "assignments" and "submission", submissions for observed users will also be included as an array.
+  #  The "peer_review" option requires that the Peer Review Grading course feature be turned on and that "assignments" is included.
   #
   # @argument assignment_ids[] [String]
   #  If "assignments" are included, optionally return only assignments having their ID in this array. This argument may also be passed as
@@ -348,6 +350,7 @@ class AssignmentGroupsController < ApplicationController
 
   def assignment_visibilities(course, assignments)
     if include_visibility?
+      DatesOverridable.preload_override_data_for_objects(assignments)
       AssignmentVisibility::AssignmentVisibilityService.assignments_with_user_visibilities(course, assignments)
     else
       params.fetch(:include, []).delete("assignment_visibility")
@@ -357,7 +360,7 @@ class AssignmentGroupsController < ApplicationController
 
   def index_groups_json(context, current_user, groups, assignments, submissions = {})
     current_user_is_student = context.respond_to?(:user_is_student?) && context.user_is_student?(current_user)
-    can_include_assessment_requests = current_user_is_student && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:peer_reviews_for_a2)
+    can_include_assessment_requests = current_user_is_student && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:assignments_2_student)
     all_submissions = submissions&.values&.flatten || []
     unless all_submissions.empty?
       preloaded_enrollments_by_user_id = context.enrollments
@@ -456,7 +459,7 @@ class AssignmentGroupsController < ApplicationController
       groups,
       includes: assignment_includes,
       assignment_ids:
-    )
+    ).where("COALESCE(settings->'new_quizzes'->>'type', '') != 'ungraded_survey'")
 
     if value_to_boolean(params[:hide_zero_point_quizzes])
       assignments = assignments.not_hidden_in_gradebook

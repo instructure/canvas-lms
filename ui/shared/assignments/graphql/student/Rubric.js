@@ -32,6 +32,7 @@ export const Rubric = {
       points_possible: pointsPossible
       ratingOrder
       title
+      button_display: buttonDisplay
     }
     ${RubricCriterion.fragment}
   `,

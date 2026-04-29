@@ -5,7 +5,5 @@
   "author": "neme",
   "main": "./index.js",
   "owner": "EVAL",
-  "dependencies": {
-    "lodash": "^4.17.21"
-  }
+  "dependencies": {}
 }

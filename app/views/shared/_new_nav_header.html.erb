@@ -59,9 +59,13 @@
   <% else %>
     <span class="mobile-header-title"><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></span>
   <% end %>
+
+  <div id="nutrition_facts_mobile_container"></div>
+
   <% if show_immersive_reader? %>
     <div id="immersive_reader_mobile_mount_point"></div>
   <% end %>
+
   <% if show_student_view_button? %>
     <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "Button Button--icon-action-rev Button--large mobile-header-student-view", :id => "mobile-student-view", :"aria-label" => student_view_label, :role => "button", :method => :post do %>
       <i class="icon-student-view"></i>
@@ -69,8 +73,20 @@
   <% else %>
     <div class="mobile-header-space"></div>
   <% end %>
+  <% if @show_notebook %>
+    <div id="notebook_mobile_mount_point"></div>
+  <% end %>
+  <% if @show_study_assist %>
+    <div id="study_assist_mobile_mount_point"></div>
+  <% end %>
+  <% if @show_learning_agent %>
+    <div id="learning_agent_mobile_mount_point"></div>
+  <% end %>
   <% if !!@domain_root_account&.feature_enabled?(:top_navigation_placement) %>
     <div id="mobile-top-nav-tools-mount-point"></div>
+  <% end %>
+  <% if add_oak_bundle? %>
+    <div id="oak-mobile-mount-point"></div>
   <% end %>
   <% if show_blueprint_button? %>
     <button class="mobile-header-blueprint-button Button Button--icon-action-rev Button--large" aria-label="<%= t "Open Blueprint Sidebar" %>">
@@ -208,7 +224,7 @@
         <%= render(partial: 'external_tools/global_nav_menu_items') %>
       <% end %>
       <li class="ic-app-header__menu-list-item">
-        <%= link_to help_link_url,
+        <%= link_to "#",  # gets overridden by JS to this anyway, and also there is a click action to slide out the help tray
                     :id => 'global_nav_help_link',
                     :role => 'button',
                     :class => "ic-app-header__menu-list-link",

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe GoogleDrive::Connection do
   let(:connection) { GoogleDrive::Connection.new(token, secret, retries: 1) }
   let(:token) { "token" }
@@ -59,7 +57,7 @@ describe GoogleDrive::Connection do
         allow(connection).to receive(:force_token_update)
         stub_request(:post, "https://www.googleapis.com/drive/v3/files?fields=id,webViewLink")
           .to_return do
-            raise HTTPClient::ReceiveTimeoutError
+            raise Faraday::TimeoutError
           end
         expect { connection.create_doc("Docname") }.to(
           raise_error(GoogleDrive::ConnectionException) do |e|

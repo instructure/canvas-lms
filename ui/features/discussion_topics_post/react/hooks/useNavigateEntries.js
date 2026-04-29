@@ -31,7 +31,7 @@ export default function useNavigateEntries({
   perPage = 20,
   sort = '',
 } = {}) {
-  const {isInSpeedGrader} = useSpeedGrader()
+  const {isInSpeedGrader, postMessageEntryIds} = useSpeedGrader()
   const [currentStudentId, setCurrentStudentId] = useState(null)
   const STUDENT_ENTRIES_PER_PAGE = 100
 
@@ -53,9 +53,9 @@ export default function useNavigateEntries({
 
   useEffect(() => {
     if (!studentEntriesQuery.isLoading && sort) {
-      studentEntriesQuery.refetch();
+      studentEntriesQuery.refetch()
     }
-  }, [sort, studentEntriesQuery]);
+  }, [sort, studentEntriesQuery])
 
   // Combine pages from your query and sort them based on `sort` ("asc"/"desc").
   const sortedStudentEntries = useMemo(() => {
@@ -71,6 +71,12 @@ export default function useNavigateEntries({
       return sort === 'desc' ? bNum - aNum : aNum - bNum
     })
   }, [currentStudentId, studentEntriesQuery.data, studentEntriesQuery.isLoading, sort])
+
+  useEffect(() => {
+    if (sortedStudentEntries.length > 0) {
+      postMessageEntryIds(sortedStudentEntries.map(entry => entry._id))
+    }
+  }, [sortedStudentEntries, postMessageEntryIds])
 
   const navigateToEntry = useCallback(
     newEntry => {
@@ -166,6 +172,9 @@ export default function useNavigateEntries({
   // if highlightEntryId isn't in the list, pick the "first" item (per sorted order).
   useEffect(() => {
     if (!isInSpeedGrader || studentEntriesQuery.isLoading) return
+
+    // Don't auto-navigate if highlight was explicitly cleared (null/undefined/empty)
+    if (!highlightEntryId) return
 
     const currentEntryIndex = sortedStudentEntries.findIndex(e => e._id === highlightEntryId)
     if (currentEntryIndex < 0 && sortedStudentEntries.length > 0) {

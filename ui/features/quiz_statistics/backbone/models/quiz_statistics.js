@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {find} from 'lodash'
+import {find} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import K from '../../constants'

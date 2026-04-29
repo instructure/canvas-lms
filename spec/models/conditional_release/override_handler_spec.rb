@@ -29,7 +29,7 @@ module ConditionalRelease
     context "handle_grade_change" do
       it "checks that the assignment is actually a trigger assignment" do
         @rule.destroy!
-        expect(ConditionalRelease::OverrideHandler).to_not receive(:handle_grade_change)
+        expect(ConditionalRelease::OverrideHandler).not_to receive(:handle_grade_change)
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
         run_jobs
       end
@@ -39,7 +39,7 @@ module ConditionalRelease
         run_jobs
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to include(@set1_assmt1)
-        expect(visible_assmts).to_not include(@set2_assmt1) # and only the top set
+        expect(visible_assmts).not_to include(@set2_assmt1) # and only the top set
       end
 
       it "automatically unassigns if the grade changes" do
@@ -53,7 +53,7 @@ module ConditionalRelease
         run_jobs
 
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
-        expect(visible_assmts).to_not include(@set1_assmt1)
+        expect(visible_assmts).not_to include(@set1_assmt1)
         expect(visible_assmts).to include(@set2_assmt1)
         expect(visible_assmts).to include(@set2_assmt2) # assign to both
       end
@@ -70,7 +70,7 @@ module ConditionalRelease
 
         @trigger_assmt.grade_student(@student, grade: 5, grader: @teacher) # now unassign
         run_jobs
-        expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).to_not include(@set1_assmt1)
+        expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).not_to include(@set1_assmt1)
         expect(DifferentiableAssignment.scope_filter(@course.assignments, old_student, @course).to_a).to include(@set1_assmt1)
       end
 
@@ -78,8 +78,8 @@ module ConditionalRelease
         @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher)
         run_jobs
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
-        expect(visible_assmts).to_not include(@set3a_assmt)
-        expect(visible_assmts).to_not include(@set3b_assmt)
+        expect(visible_assmts).not_to include(@set3a_assmt)
+        expect(visible_assmts).not_to include(@set3b_assmt)
       end
 
       it "does not accidentally relock an assignment if the same item is in two ranges we're switching between" do
@@ -95,6 +95,280 @@ module ConditionalRelease
         run_jobs
         visible_assmts2 = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts2).to include(@set1_assmt1) # should stay unlocked even though we technically dropped set1
+      end
+
+      it "reuses existing override when manually edited due dates exist without course pacing" do
+        old_student = @student
+        student_in_course(course: @course, active_all: true)
+
+        @trigger_assmt.grade_student(old_student, grade: 9, grader: @teacher)
+        run_jobs
+
+        override = @set1_assmt1.assignment_overrides.first
+        manual_due_date = 3.days.from_now
+        override.update!(due_at: manual_due_date)
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        expect(@set1_assmt1.assignment_overrides.count).to eq 1
+        final_override = @set1_assmt1.assignment_overrides.first
+        expect(final_override.assignment_override_students.count).to eq 2
+        expect(final_override.due_at.to_i).to eq manual_due_date.to_i
+      end
+
+      it "inherits due date from Mastery Paths Noop override when creating ADHOC overrides" do
+        noop_due_date = 5.days.from_now
+        @set1_assmt1.assignment_overrides.create!(set_type: "Noop", title: "Mastery Paths", due_at: noop_due_date)
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        adhoc_override = @set1_assmt1.assignment_overrides.where(set_type: "ADHOC").first
+        expect(adhoc_override).to be_present
+        expect(adhoc_override.due_at.to_i).to eq noop_due_date.to_i
+      end
+
+      it "groups students in same override when course pacing gives them the same due date" do
+        old_student = @student
+        student_in_course(course: @course, active_all: true)
+
+        module1 = @course.context_modules.create!(name: "Module 1")
+        module1.add_item(type: "assignment", id: @set1_assmt1.id)
+
+        course_pace = course_pace_model(course: @course)
+        course_pace.course_pace_module_items.create!(
+          duration: 5,
+          module_item: @set1_assmt1.context_module_tags.first,
+          root_account_id: @course.root_account_id
+        )
+        course_pace.publish
+
+        @trigger_assmt.grade_student(old_student, grade: 9, grader: @teacher)
+        run_jobs
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        expect(@set1_assmt1.assignment_overrides.where(set_type: "ADHOC").count).to eq 1
+        override = @set1_assmt1.assignment_overrides.where(set_type: "ADHOC").first
+        expect(override.assignment_override_students.count).to eq 2
+        expect(override.assignment_override_students.pluck(:user_id)).to contain_exactly(old_student.id, @student.id)
+      end
+
+      it "assigns students with 100% score to the correct mastery path" do
+        @rule.scoring_ranges.first.update!(lower_bound: 0.8, upper_bound: 1.0)
+
+        @trigger_assmt.grade_student(@student, grade: 10, grader: @teacher)
+        run_jobs
+
+        visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
+        expect(visible_assmts).to include(@set1_assmt1)
+      end
+
+      it "auto-assigns top range when overlapping ranges share a boundary at 100%" do
+        top_range = @rule.scoring_ranges.find_by(lower_bound: 0.7)
+        top_range.update!(lower_bound: 1.0)
+        middle_range = @rule.scoring_ranges.find_by(lower_bound: 0.4)
+        middle_range.update!(lower_bound: 0.0, upper_bound: 1.0)
+
+        @trigger_assmt.grade_student(@student, grade: 10, grader: @teacher)
+        run_jobs
+
+        visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
+        expect(visible_assmts).to include(@set1_assmt1)
+        expect(visible_assmts).not_to include(@set2_assmt1)
+      end
+
+      it "does not auto-assign when ranges intentionally overlap below 100%" do
+        middle_range = @rule.scoring_ranges.find_by(lower_bound: 0.4)
+        middle_range.update!(upper_bound: 0.9)
+
+        @trigger_assmt.grade_student(@student, grade: 8, grader: @teacher)
+        run_jobs
+
+        visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
+        expect(visible_assmts).not_to include(@set1_assmt1)
+        expect(visible_assmts).not_to include(@set2_assmt1)
+      end
+
+      it "evaluates sequential module requirements after mastery paths assignment" do
+        module_with_sequential = @course.context_modules.create!(
+          name: "Sequential Module",
+          require_sequential_progress: true
+        )
+
+        # Add mastery path assignment to the sequential module with completion requirement
+        tag = module_with_sequential.add_item(type: "assignment", id: @set1_assmt1.id)
+        module_with_sequential.completion_requirements = [
+          { id: tag.id, type: "must_submit" }
+        ]
+        module_with_sequential.save!
+
+        @trigger_assmt.grade_student(@student, grade: 0, grader: @teacher)
+        run_jobs
+
+        progression = module_with_sequential.evaluate_for(@student)
+        expect(progression.current_position).to be_nil
+
+        # Grade trigger to assign student to mastery path
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        # Verify module progression current_position is now set correctly
+        progression.reload
+        expect(progression.current_position).to eq(1)
+        expect(progression.workflow_state).to eq("unlocked")
+      end
+
+      it "evaluates module progressions when mastery path assignment is added as a wiki page" do
+        assignment = @course.assignments.create!(
+          title: "Graded Page",
+          submission_types: "wiki_page",
+          only_visible_to_overrides: true
+        )
+        wiki_page = @course.wiki_pages.create!(title: "Graded Page", assignment:)
+
+        @set1_assmt1.destroy!
+        @rule.scoring_ranges.first.assignment_sets.first.assignment_set_associations.create!(
+          assignment:,
+          root_account_id: @course.root_account_id
+        )
+
+        module_with_sequential = @course.context_modules.create!(
+          name: "Sequential Module",
+          require_sequential_progress: true
+        )
+        tag = module_with_sequential.add_item(type: "wiki_page", id: wiki_page.id)
+        module_with_sequential.completion_requirements = [{ id: tag.id, type: "must_view" }]
+        module_with_sequential.save!
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        progression = module_with_sequential.evaluate_for(@student)
+        expect(progression.current_position).to eq(1)
+        expect(progression.workflow_state).to eq("unlocked")
+      end
+
+      it "evaluates module progressions when mastery path assignment is added as a discussion topic" do
+        discussion = @course.discussion_topics.create!(
+          title: "Graded Discussion",
+          assignment: @course.assignments.create!(
+            title: "Graded Discussion",
+            submission_types: "discussion_topic",
+            only_visible_to_overrides: true
+          )
+        )
+
+        @set1_assmt1.destroy!
+        @rule.scoring_ranges.first.assignment_sets.first.assignment_set_associations.create!(
+          assignment: discussion.assignment,
+          root_account_id: @course.root_account_id
+        )
+
+        module_with_sequential = @course.context_modules.create!(
+          name: "Sequential Module",
+          require_sequential_progress: true
+        )
+        tag = module_with_sequential.add_item(type: "discussion_topic", id: discussion.id)
+        module_with_sequential.completion_requirements = [{ id: tag.id, type: "must_submit" }]
+        module_with_sequential.save!
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        progression = module_with_sequential.evaluate_for(@student)
+        expect(progression.current_position).to eq(1)
+        expect(progression.workflow_state).to eq("unlocked")
+      end
+
+      it "evaluates module progressions when mastery path assignment is added as a quiz" do
+        quiz = @course.quizzes.create!(title: "Quiz 1", quiz_type: "assignment", only_visible_to_overrides: true)
+        quiz.workflow_state = "available"
+        quiz.save!
+        quiz.assignment.update!(only_visible_to_overrides: true)
+
+        @set1_assmt1.destroy!
+        @rule.scoring_ranges.first.assignment_sets.first.assignment_set_associations.create!(
+          assignment: quiz.assignment,
+          root_account_id: @course.root_account_id
+        )
+
+        module_with_sequential = @course.context_modules.create!(
+          name: "Sequential Module",
+          require_sequential_progress: true
+        )
+        tag = module_with_sequential.add_item(type: "quiz", id: quiz.id)
+        module_with_sequential.completion_requirements = [{ id: tag.id, type: "must_submit" }]
+        module_with_sequential.save!
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        progression = module_with_sequential.evaluate_for(@student)
+        expect(progression.current_position).to eq(1)
+        expect(progression.workflow_state).to eq("unlocked")
+      end
+
+      it "assigns due dates to quizzes with course pacing enabled" do
+        quiz = @course.quizzes.create!(title: "Quiz 1", quiz_type: "assignment")
+        quiz.workflow_state = "available"
+        quiz.save!
+
+        @set1_assmt1.destroy!
+        @rule.scoring_ranges.first.assignment_sets.first.assignment_set_associations.create!(
+          assignment: quiz.assignment,
+          root_account_id: @course.root_account_id
+        )
+
+        module1 = @course.context_modules.create!(name: "Module 1")
+        module1.add_item(type: "quiz", id: quiz.id)
+
+        course_pace = course_pace_model(course: @course)
+        course_pace.course_pace_module_items.create!(
+          duration: 5,
+          module_item: quiz.context_module_tags.first,
+          root_account_id: @course.root_account_id
+        )
+        course_pace.publish
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        adhoc_override = quiz.assignment_overrides.where(set_type: "ADHOC").first
+        expect(adhoc_override).to be_present
+        expect(adhoc_override.due_at).to be_present
+      end
+
+      it "assigns due dates to graded discussions with course pacing enabled" do
+        discussion = @course.discussion_topics.create!(
+          title: "Discussion 1",
+          assignment: @course.assignments.create!(title: "Discussion 1", submission_types: "discussion_topic")
+        )
+
+        @set1_assmt1.destroy!
+        @rule.scoring_ranges.first.assignment_sets.first.assignment_set_associations.create!(
+          assignment: discussion.assignment,
+          root_account_id: @course.root_account_id
+        )
+
+        module1 = @course.context_modules.create!(name: "Module 1")
+        module1.add_item(type: "discussion_topic", id: discussion.id)
+
+        course_pace = course_pace_model(course: @course)
+        course_pace.course_pace_module_items.create!(
+          duration: 5,
+          module_item: discussion.context_module_tags.first,
+          root_account_id: @course.root_account_id
+        )
+        course_pace.publish
+
+        @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+        run_jobs
+
+        adhoc_override = discussion.assignment.assignment_overrides.where(set_type: "ADHOC").first
+        expect(adhoc_override).to be_present
+        expect(adhoc_override.due_at).to be_present
       end
     end
 
@@ -132,7 +406,7 @@ module ConditionalRelease
         expect(assignment_ids).to eq [@set3a_assmt.id]
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to include(@set3a_assmt)
-        expect(visible_assmts).to_not include(@set3b_assmt)
+        expect(visible_assmts).not_to include(@set3b_assmt)
       end
 
       it "is able to switch" do
@@ -140,7 +414,7 @@ module ConditionalRelease
         ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_b.id)
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
         expect(visible_assmts).to include(@set3b_assmt)
-        expect(visible_assmts).to_not include(@set3a_assmt)
+        expect(visible_assmts).not_to include(@set3a_assmt)
       end
 
       it "reuses an existing override when assigning (and leave it be when unassigning)" do
@@ -155,7 +429,7 @@ module ConditionalRelease
         expect(@set3a_assmt.assignment_overrides.first.assignment_override_students.count).to eq 2
 
         ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_b.id) # now unassign
-        expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).to_not include(@set3a_assmt)
+        expect(DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a).not_to include(@set3a_assmt)
         expect(DifferentiableAssignment.scope_filter(@course.assignments, old_student, @course).to_a).to include(@set3a_assmt)
       end
 

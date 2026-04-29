@@ -34,6 +34,7 @@ export default {
     closeDialog: PropTypes.func.isRequired,
     models: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
     usageRightsRequiredForContext: PropTypes.bool.isRequired,
+    onPublishChange: PropTypes.func,
   },
 
   getInitialState() {
@@ -116,7 +117,12 @@ export default {
     )
 
     const dfd = $.when(...Array.from(promises || []))
-    dfd.done(() => this.props.closeDialog())
+    dfd.done(() => {
+      if (this.props.onPublishChange) {
+        this.props.onPublishChange()
+      }
+      this.props.closeDialog()
+    })
     $(this.dialogForm).disableWhileLoading(dfd)
   },
 

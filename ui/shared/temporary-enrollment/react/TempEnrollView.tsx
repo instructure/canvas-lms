@@ -29,14 +29,14 @@ import type {Bookmark, Enrollment, EnrollmentType, User, ModifyPermissions} from
 import {MODULE_NAME, PROVIDER, RECIPIENT} from './types'
 import {deleteEnrollment, fetchTemporaryEnrollments} from './api/enrollment'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
 import {TempEnrollNavigation} from './TempEnrollNavigation'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {captureException} from '@sentry/browser'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {useMutation, useQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('temporary_enrollment')
@@ -327,8 +327,7 @@ export function TempEnrollView(props: Props) {
                     onClick={handleAddNewClick}
                     aria-label={I18n.t('Create temporary enrollment')}
                     {...analyticProps('Create')}
-                    // @ts-expect-error
-                    renderIcon={IconPlusLine}
+                    renderIcon={<IconPlusLine />}
                   >
                     {I18n.t('Recipient')}
                   </Button>

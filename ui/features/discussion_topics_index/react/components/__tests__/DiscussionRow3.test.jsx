@@ -18,12 +18,12 @@
 
 import {render, screen} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // We can't call the wrapped component because a lot of these tests are depending
@@ -183,7 +183,7 @@ describe('DiscussionRow', () => {
   })
 
   it('renders checkpoint information without crashing when only one checkpoint exists', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     const props = makeProps({
       discussion: {

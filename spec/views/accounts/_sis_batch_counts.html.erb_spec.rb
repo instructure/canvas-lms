@@ -36,7 +36,9 @@ describe "accounts/_sis_batch_counts" do
                        user_observers: 3,
                        change_sis_ids: 3,
                        logins: 0 } }
-    report = double
+    root_account = instance_double(Account, feature_enabled?: false)
+    account = instance_double(Account, root_account:)
+    report = instance_double(SisBatch, account:)
     expect(report).to receive(:data).and_return(data)
     render partial: "accounts/sis_batch_counts", object: report
 

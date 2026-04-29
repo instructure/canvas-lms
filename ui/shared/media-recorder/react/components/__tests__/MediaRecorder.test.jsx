@@ -38,7 +38,7 @@ describe('MediaRecorder', () => {
 
       document.body.appendChild(mockDialog)
 
-      mockOnSaveFile = jest.fn()
+      mockOnSaveFile = vi.fn()
       mediaRecorder = new MediaRecorderComponent({
         onSaveFile: mockOnSaveFile,
       })
@@ -46,7 +46,7 @@ describe('MediaRecorder', () => {
 
     afterEach(() => {
       document.body.removeChild(mockDialog)
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     it('displays a spinner in the dialog when saving a file', () => {

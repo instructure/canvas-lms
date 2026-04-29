@@ -20,11 +20,13 @@ import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ReactDOM from 'react-dom'
 import React from 'react'
+import {legacyUnmountComponentAtNode} from '@canvas/react'
 import BackboneMixin from '@canvas/files/react/mixins/BackboneMixin'
 import Folder from '@canvas/files/backbone/models/Folder'
 import FocusStore from '../modules/FocusStore'
 import classnames from 'classnames'
 import '@canvas/rails-flash-notifications'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('react_files')
 
@@ -120,22 +122,30 @@ export default {
       activeDragTarget: this.state.isActiveDragTarget,
     })
 
+    const isAccessRestricted = filesEnv.userFileAccessRestricted
+
     const attrs = {
       onClick: this.props.toggleSelected,
       className: classNameString,
       role: 'row',
       'aria-selected': this.props.isSelected,
-      draggable: !this.state.editing,
+      draggable: !this.state.editing && !isAccessRestricted,
       ref: this.folderChildRef,
       onDragStart: event => {
         if (!this.props.isSelected) {
           this.props.toggleSelected()
         }
-        return this.props.dndOptions.onItemDragStart(event)
+        if (!isAccessRestricted) {
+          return this.props.dndOptions.onItemDragStart(event)
+        }
       },
     }
 
-    if (this.props.model instanceof Folder && !this.props.model.get('for_submissions')) {
+    if (
+      this.props.model instanceof Folder &&
+      !this.props.model.get('for_submissions') &&
+      !isAccessRestricted
+    ) {
       const toggleActive = setActive => {
         if (this.state.isActiveDragTarget !== setActive)
           this.setState({isActiveDragTarget: setActive})
@@ -150,7 +160,7 @@ export default {
         this.props.dndOptions.onItemDrop(event, this.props.model, ({success}) => {
           toggleActive(false)
           if (success)
-            ReactDOM.unmountComponentAtNode(
+            legacyUnmountComponentAtNode(
               ReactDOM.findDOMNode(this.folderChildRef.current).parentNode,
             )
         })

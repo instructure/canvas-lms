@@ -263,7 +263,6 @@ class RubricsApiController < ApplicationController
   include Api::V1::RubricAssessment
   include Api::V1::Attachment
 
-  before_action :require_user
   before_action :require_context, except: [:upload_template]
   before_action :validate_args
 
@@ -310,12 +309,14 @@ class RubricsApiController < ApplicationController
     end
   end
 
-  # @API Get the courses and assignments for
-  # Returns the rubric with the given id.
+  # @API Get the courses and assignments for a rubric
+  # Returns the courses and assignments where a rubric is being used
   # @returns UsedLocations
   def used_locations
-    rubric = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])&.rubric
     return unless authorized_action(@context, @current_user, :manage_rubrics)
+
+    rubric = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])&.rubric
+    return render json: { message: "Rubric not found" }, status: :not_found unless rubric.present? && !rubric.deleted?
 
     render json: used_locations_for(rubric)
   end
@@ -344,6 +345,7 @@ class RubricsApiController < ApplicationController
   end
 
   # @API Templated file for importing a rubric
+  # Returns a CSV template file that can be used to import rubrics into Canvas.
   # @returns a CSV file in the format that can be imported
   def upload_template
     send_data(
@@ -383,7 +385,7 @@ class RubricsApiController < ApplicationController
   end
 
   def download_rubrics
-    return unless authorized_action(@context, @current_user, :manage_rubrics)
+    return unless authorized_action(@context, @current_user, [:read_rubrics, :manage_rubrics])
 
     rubric_ids = params[:rubric_ids]
     if rubric_ids.blank?

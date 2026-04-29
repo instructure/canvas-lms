@@ -19,6 +19,14 @@
 
 Rails.application.config.active_support.use_sha1_digests = true
 
+# Clear the Canvas execution context cache in `ActionDispatch::Executor` middleware
+# to prevent stale requeset data being present for downstream middlewares
+Rails.application.executor.to_run { Canvas::ExecutionContext.clear_cache }
+
+# Piggy-back on ActiveSupport::ExecutionContext to clear the Canvas cache whenever
+# ActiveSupport::ExecutionContext content changes
+ActiveSupport::ExecutionContext.after_change { Canvas::ExecutionContext.rebuild_cache }
+
 ActiveSupport::TimeWithZone.delegate :to_yaml, to: :utc
 ActiveSupport::SafeBuffer.class_eval do
   def encode_with(coder)
@@ -48,7 +56,6 @@ end
 module IgnoreMonkeyPatchesInDeprecations
   def extract_callstack(callstack)
     return [] if callstack.empty?
-    return _extract_callstack(callstack) if callstack.first.is_a?(String)
 
     offending_line = callstack.find do |frame|
       # pass the whole frame to the filter function, so we can ignore specific methods

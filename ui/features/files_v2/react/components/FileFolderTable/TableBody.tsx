@@ -33,11 +33,13 @@ import {
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import FileRenameForm from '../FilesHeader/UploadButton/FileRenameForm'
 import {sendMoveRequests} from './MoveModal/utils'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import $ from 'jquery'
-import {createRoot, Root} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
+import type {Root} from 'react-dom/client'
 import DragFeedback from '@canvas/files/react/components/DragFeedback'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 // Need to render in this manner to satisfy TypeScript and make sure headers are rendered in stacked view
 interface TableBodyProps {
@@ -53,6 +55,7 @@ interface TableBodyProps {
   userCanRestrictFilesForContext: boolean
   usageRightsRequiredForContext: boolean
   setModalOrTrayOptions: (modalOrTray: ModalOrTrayOptions | null) => () => void
+  onPreviewFile?: (file: File) => void
 }
 
 const TableBody: React.FC<TableBodyProps> = ({
@@ -68,6 +71,7 @@ const TableBody: React.FC<TableBodyProps> = ({
   userCanRestrictFilesForContext,
   usageRightsRequiredForContext,
   setModalOrTrayOptions,
+  onPreviewFile,
 }) => {
   const [unresolvedCollisions, setUnresolvedCollisions] = useState<FileOptions[]>([])
   const [fixingNameCollisions, setFixingNameCollisions] = useState<boolean>(false)
@@ -78,8 +82,12 @@ const TableBody: React.FC<TableBodyProps> = ({
 
   const itemsToDrag = useCallback(() => {
     if (selectedRows.size == 0) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore Legacy class constructor not typed
       return [new FilesystemObject()]
     }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore Legacy class constructor not typed
     return Array.from({length: selectedRows.size}, () => new FilesystemObject())
   }, [selectedRows])
 
@@ -88,12 +96,12 @@ const TableBody: React.FC<TableBodyProps> = ({
     if (!dragHolderRef.current) {
       dragHolderRef.current = $('<div>').appendTo(document.body)
     }
+    const feedback = <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={itemsToDrag()} />
     if (!dragRootRef.current) {
-      dragRootRef.current = createRoot(dragHolderRef.current[0])
+      dragRootRef.current = render(feedback, dragHolderRef.current[0])
+    } else {
+      rerender(dragRootRef.current, feedback)
     }
-    dragRootRef.current.render(
-      <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={itemsToDrag()} />,
-    )
   }
 
   const removeDragFeedback = () => {
@@ -249,6 +257,8 @@ const TableBody: React.FC<TableBodyProps> = ({
     )
   }
 
+  const isAccessRestricted = getFilesEnv().userFileAccessRestricted
+
   return (
     <>
       {rows.map((row, index) => {
@@ -309,6 +319,7 @@ const TableBody: React.FC<TableBodyProps> = ({
                 toggleSelect: () => toggleRowSelection(getUniqueId(row)),
                 setModalOrTrayOptions,
                 rowIndex: index,
+                onPreviewFile,
               })}
             </Table.Cell>
           )),
@@ -316,7 +327,7 @@ const TableBody: React.FC<TableBodyProps> = ({
         return (
           <Table.Row
             draggable
-            onDragStart={e => handleDragStart(e, row)}
+            onDragStart={e => !isAccessRestricted && handleDragStart(e, row)}
             onDrop={e => handleDrop(e, row)}
             onDragEnd={handleDragEnd}
             onDragEnter={e => handleDragEnter(e, index, row)}

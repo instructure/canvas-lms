@@ -17,21 +17,20 @@
  */
 
 import React, {useCallback} from 'react'
-import {queryClient} from '@canvas/query'
-import {handleOpeningModuleUpdateTray} from '../handlers/modulePageActionHandlers'
+import {queryClient} from '@instructure/platform-query'
 import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
 import {useContextModule} from '../hooks/useModuleContext'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../utils/constants'
+import {handleAddModule} from '../handlers/moduleActionHandlers'
+import {ModulesPageLegend} from '../components/ModulesPageLegend'
 import {useModules} from '../hooks/queries/useModules'
-
-declare const ENV: {
-  CONTEXT_MODULES_HEADER_PROPS: any
-}
 
 interface ModulePageActionHeaderProps {
   onCollapseAll: () => void
   onExpandAll: () => void
   anyModuleExpanded?: boolean
   disabled?: boolean
+  hasModules?: boolean
 }
 
 const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
@@ -39,6 +38,7 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   onExpandAll,
   anyModuleExpanded = true,
   disabled = false,
+  hasModules = false,
 }) => {
   const {courseId} = useContextModule()
   const {data} = useModules(courseId)
@@ -52,19 +52,17 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   }, [anyModuleExpanded, onCollapseAll, onExpandAll])
 
   const handlePublishComplete = useCallback(() => {
-    queryClient.invalidateQueries({queryKey: ['modules', courseId]})
+    queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
     // invalidate all queries that start with 'moduleItems' in their query key
-    queryClient.invalidateQueries({queryKey: ['moduleItems']})
+    queryClient.invalidateQueries({queryKey: [MODULE_ITEMS]})
+    queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL]})
   }, [courseId])
-
-  const handleAddModule = useCallback(() => {
-    handleOpeningModuleUpdateTray(data, courseId, undefined)
-  }, [data, courseId])
 
   return (
     <ContextModulesHeader
       {...ENV.CONTEXT_MODULES_HEADER_PROPS}
       overrides={{
+        hasModules: hasModules,
         publishMenu: {
           onPublishComplete: handlePublishComplete,
         },
@@ -73,7 +71,13 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
           anyModuleExpanded,
           disabled,
         },
-        handleAddModule: handleAddModule,
+        handleAddModule: () => handleAddModule(courseId, data),
+        renderIconLegend: () => (
+          <ModulesPageLegend
+            is_student={false}
+            is_blueprint_course={!!ENV.MASTER_COURSE_SETTINGS}
+          />
+        ),
       }}
     />
   )

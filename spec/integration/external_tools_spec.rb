@@ -193,12 +193,12 @@ describe "External Tools" do
 
       menu_link1 = doc.at_css("##{@admin_tool.asset_string}_menu_item a")
       expect(menu_link1).not_to be_nil
-      expect(menu_link1["href"]).to eq account_external_tool_path(Account.default, @admin_tool, launch_type: "global_navigation")
+      expect(menu_link1["href"]).to eq account_external_tool_path(Account.default, @admin_tool, launch_type: "global_navigation", toolId: "example-url-#{@admin_tool.id}")
       expect(menu_link1.text).to match_ignoring_whitespace(@admin_tool.label_for(:global_navigation))
 
       menu_link2 = doc.at_css("##{@member_tool.asset_string}_menu_item a")
       expect(menu_link2).not_to be_nil
-      expect(menu_link2["href"]).to eq account_external_tool_path(Account.default, @member_tool, launch_type: "global_navigation")
+      expect(menu_link2["href"]).to eq account_external_tool_path(Account.default, @member_tool, launch_type: "global_navigation", toolId: "example-url-2-#{@member_tool.id}")
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
 
@@ -213,7 +213,7 @@ describe "External Tools" do
 
       menu_link2 = doc.at_css("##{@member_tool.asset_string}_menu_item a")
       expect(menu_link2).not_to be_nil
-      expect(menu_link2["href"]).to eq account_external_tool_path(Account.default, @member_tool, launch_type: "global_navigation")
+      expect(menu_link2["href"]).to eq account_external_tool_path(Account.default, @member_tool, launch_type: "global_navigation", toolId: "example-url-2-#{@member_tool.id}")
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
 
@@ -260,7 +260,7 @@ describe "External Tools" do
         course_with_student_logged_in(account: @account, active_all: true)
         get "/courses"
         doc = Nokogiri::HTML5(response.body)
-        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to_not be_present
+        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).not_to be_present
       end
 
       it "caches the template over courses if permissions are same" do
@@ -291,7 +291,7 @@ describe "External Tools" do
         expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).at_least(:once).and_call_original
         get "/courses/#{c2.id}" # viewing different course but permissions are the same - should remain cached
         doc = Nokogiri::HTML5(response.body)
-        expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to_not be_present
+        expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).not_to be_present
       end
 
       it "does not cache the template if permission overrides change" do
@@ -308,13 +308,13 @@ describe "External Tools" do
         expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).at_least(:once).and_call_original
         get "/courses/#{@course.id}" # viewing different course but permissions are the same - should remain cached
         doc = Nokogiri::HTML5(response.body)
-        expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to_not be_present
+        expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).not_to be_present
       end
 
       it "doesn't highlight the tool if the tool is no longer the current page" do
         admin = account_admin_user(account: @account)
         user_session(admin)
-        get "/accounts/#{Account.default.id}/external_tools/#{@admin_tool.id}?launch_type=global_navigation"
+        get "/accounts/#{Account.default.id}/external_tools/#{@admin_tool.id}?launch_type=global_navigation&toolId=example-url-#{@admin_tool.id}"
         doc = Nokogiri::HTML5(response.body)
         external_tool_link = doc.at_css("##{@admin_tool.asset_string}_menu_item")
         # Expect the tool to be highlighted
@@ -349,13 +349,13 @@ describe "External Tools" do
         get "/courses/#{@course.id}"
         doc = Nokogiri::HTML5(response.body)
         # should still have the old text cached (because we didn't detect a global nav tool change)
-        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).to_not include("new text")
+        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).not_to include("new text")
 
         # now update it but it still shouldn't take effect because the callback hasn't hit
         ContextExternalTool.where(id: @admin_tool).update_all(updated_at: 1.minute.from_now)
         get "/courses/#{@course.id}"
         doc = Nokogiri::HTML5(response.body)
-        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).to_not include("new text")
+        expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a").text).not_to include("new text")
 
         @admin_tool.save! # trigger the callback - now it should rebuild
         get "/courses/#{@course.id}"

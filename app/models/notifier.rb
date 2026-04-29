@@ -20,7 +20,7 @@
 class Notifier
   def send_notification(record, dispatch, messages, to_list, data = nil)
     recipient_keys = (to_list || []).compact.map { |o| o.is_a?(String) ? o : o.asset_string }
-    messages = DelayedNotification.delay_if_production(priority: 30)
+    messages = DelayedNotification.delay_if_production(**job_attributes(record, dispatch))
                                   .process(record, messages, recipient_keys, data)
 
     messages ||= DelayedNotification.new(
@@ -36,5 +36,17 @@ class Notifier
     end
 
     messages
+  end
+
+  private
+
+  def job_attributes(record, dispatch)
+    job_attributes = { priority: 30 }
+    # This safe gourd is temporary until we are able to measure the parallelism  precisely
+    if record.is_a?(AccountUser) && dispatch == "New Account User"
+      job_attributes[:n_strand] = ["delayed_notification", record.root_account.global_id]
+    end
+
+    job_attributes
   end
 end

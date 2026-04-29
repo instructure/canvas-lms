@@ -1,0 +1,78 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import getRCSProps from '@canvas/rce/getRCSProps'
+import {UploadFile} from '@instructure/canvas-rce'
+import {useState} from 'react'
+import {
+  handleImageSubmit,
+  loadFileMetaData,
+  panels,
+  StoreProp,
+  UploadData,
+  UploadFilePanelIds,
+} from './handle-image'
+import {ModalImageData} from './types'
+
+export const ImageBlockUploadModal = (props: {
+  open: boolean
+  onSelected: (modalImageData: ModalImageData) => void
+  onDismiss: () => void
+}) => {
+  const [isUploading, setIsUploading] = useState(false)
+
+  const handleSubmit = async (
+    _editor: unknown,
+    _accept: unknown,
+    selectedPanel: UploadFilePanelIds,
+    uploadData: UploadData,
+    storeProps: StoreProp,
+  ) => {
+    setIsUploading(true)
+    const {url, altText, decorativeImage} = await handleImageSubmit(
+      selectedPanel,
+      uploadData,
+      storeProps,
+    )
+    let fileName = undefined
+    let attachmentId = undefined
+    if (selectedPanel !== 'URL') {
+      const metaData = await loadFileMetaData(url)
+      fileName = metaData?.attachment.display_name
+      attachmentId = metaData?.attachment.id
+    }
+    const finalAltText = !decorativeImage && !altText && fileName ? fileName : altText
+    setIsUploading(false)
+    props.onSelected({url, altText: finalAltText, decorativeImage, fileName, attachmentId})
+  }
+
+  return props.open ? (
+    <UploadFile
+      accept={'image/*'}
+      trayProps={getRCSProps()!}
+      editor={undefined}
+      label={'Upload Image'}
+      panels={panels as any}
+      onDismiss={props.onDismiss}
+      onSubmit={handleSubmit}
+      canvasOrigin={window.location?.origin}
+      uploading={isUploading}
+      forBlockEditorUse
+    />
+  ) : null
+}

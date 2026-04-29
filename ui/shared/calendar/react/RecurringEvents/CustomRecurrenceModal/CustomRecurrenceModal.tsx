@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import React, {useCallback, useEffect, useState, type PropsWithChildren} from 'react'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import CustomRecurrence from '../CustomRecurrence/CustomRecurrence'
@@ -39,10 +40,13 @@ type CustomRecurrenceErrorState = {
   errorMessage: string
 }
 
-class CustomRecurrenceErrorBoundary extends React.Component {
+class CustomRecurrenceErrorBoundary extends React.Component<
+  PropsWithChildren,
+  CustomRecurrenceErrorState
+> {
   state: CustomRecurrenceErrorState
 
-  constructor(props: any) {
+  constructor(props: PropsWithChildren) {
     super(props)
     this.state = {
       hasError: false,
@@ -66,7 +70,6 @@ class CustomRecurrenceErrorBoundary extends React.Component {
         </div>
       )
     }
-    // @ts-expect-error
     return this.props.children
   }
 }
@@ -80,8 +83,11 @@ type FooterProps = {
 const Footer = ({canSave, onDismiss, onSave}: FooterProps) => {
   return (
     <>
-      <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
+      <Button data-testid="custom-recurrence-modal-cancel" onClick={onDismiss}>
+        {I18n.t('Cancel')}
+      </Button>
       <Button
+        data-testid="custom-recurrence-modal-done"
         interaction={canSave ? 'enabled' : 'disabled'}
         type="submit"
         color="primary"
@@ -148,6 +154,8 @@ export default function CustomRecurrenceModal({
       padding="small medium"
       footer={<Footer canSave={isValidState} onDismiss={onDismiss} onSave={handleSave} />}
       shouldCloseOnDocumentClick={false}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <div style={{minWidth: '28rem', minHeight: '21rem'}}>
         <CustomRecurrenceErrorBoundary>

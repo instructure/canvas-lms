@@ -59,6 +59,11 @@ module Lti
   #         "description": "Placement-specific config for given placements",
   #         "example": { "assignment_selection": { "type": "Lti::PlacementLaunchDefinition" } },
   #         "type": "object"
+  #       },
+  #       "context_name": {
+  #         "description": "The name of the account or course where the tool is deployed. Only included if requested via include_context_name parameter.",
+  #         "example": "My Institution",
+  #         "type": "string"
   #       }
   #     }
   #   }
@@ -87,7 +92,7 @@ module Lti
   #   }
   class LtiAppsController < ApplicationController
     before_action :require_context
-    before_action :require_user, except: [:launch_definitions]
+    skip_before_action :require_user, only: [:launch_definitions]
 
     def index
       if authorized_action(@context, @current_user, :read_as_admin)
@@ -96,7 +101,7 @@ module Lti
         respond_to do |format|
           app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
 
-          mc_status = setup_master_course_restrictions(app_defs.select { |o| o.is_a?(ContextExternalTool) }, @context)
+          mc_status = setup_master_course_restrictions(app_defs.grep(ContextExternalTool), @context)
           format.json { render json: app_collator.app_definitions(app_defs, master_course_status: mc_status) }
         end
       end
@@ -110,6 +115,7 @@ module Lti
     #
     # @argument placements[Array] The placements to return launch definitions for. If not provided, an empty list will be returned.
     # @argument only_visible[Boolean] If true, only return launch definitions that are visible to the current user. Defaults to true.
+    # @argument include_context_name[Boolean] If true, includes the deployment context name (account or course) of the tool definition in the response. This helps distinguish between tools with identical names deployed at different levels of the context hierarchy. Defaults to false.
     def launch_definitions
       placements = params["placements"] || []
       if authorized_for_launch_definitions(@context, @current_user, placements)
@@ -131,10 +137,21 @@ module Lti
               pagination_args
             )
           end
+
           format.json do
             cancel_cache_buster
             expires_in 10.minutes
-            render json: AppLaunchCollator.launch_definitions(launch_defs, placements)
+
+            # Filter out Quizzes 2 if new quizzes feature is disabled
+            filtered_launch_defs = if @context.is_a?(Course) && !NewQuizzesFeaturesHelper.new_quizzes_enabled?(@context)
+                                     launch_defs.reject do |tool|
+                                       tool.respond_to?(:tool_id) && tool.tool_id == "Quizzes 2"
+                                     end
+                                   else
+                                     launch_defs
+                                   end
+
+            render json: AppLaunchCollator.launch_definitions(filtered_launch_defs, placements, include_context_name: value_to_boolean(params[:include_context_name]))
           end
         end
       end

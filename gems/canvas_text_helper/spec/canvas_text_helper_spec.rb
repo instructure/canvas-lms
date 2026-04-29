@@ -17,8 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper" # File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe CanvasTextHelper do
   describe "#truncate_text" do
     it "does not split if max_length is exact text length" do

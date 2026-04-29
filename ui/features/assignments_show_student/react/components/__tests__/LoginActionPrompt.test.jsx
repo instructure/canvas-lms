@@ -21,8 +21,8 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import React from 'react'
 import LoginActionPrompt from '../LoginActionPrompt'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 describe('LoginActionPrompt', () => {

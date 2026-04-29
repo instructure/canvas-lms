@@ -21,30 +21,31 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DifferentiationTagModalForm from '../DifferentiationTagModalForm'
 import type {DifferentiationTagModalFormProps} from '../DifferentiationTagModalForm'
-import '@testing-library/jest-dom'
 import {CREATE_MODE, EDIT_MODE} from '../../util/constants'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import {multipleTagsCategory, singleTagCategory} from '../../util/tagCategoryCardMocks'
+import {
+  multipleTagsCategory,
+  singleTagCategory,
+  multipleTagsCategoryLimit,
+} from '../../util/tagCategoryCardMocks'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect', () => ({
-  __esModule: true,
-  default: jest.fn(() =>
-    Promise.resolve({
-      response: {ok: true},
-      json: {
-        created: [],
-        updated: [],
-        deleted: [],
-        group_category: {id: 1, name: 'Mock Tag Set'},
-      },
-    }),
-  ),
-}))
+const server = setupServer(
+  http.post('*/group_categories/bulk_manage_differentiation_tag', () => {
+    return HttpResponse.json({
+      created: [],
+      updated: [],
+      deleted: [],
+      group_category: {id: 1, name: 'Mock Tag Set'},
+    })
+  }),
+)
 
 describe('DifferentiationTagModalForm', () => {
   const user = userEvent.setup({delay: 0})
 
-  const onCloseMock = jest.fn()
+  const onCloseMock = vi.fn()
   const mockTagSet = multipleTagsCategory
 
   const renderComponent = (props: Partial<DifferentiationTagModalFormProps> = {}) => {
@@ -56,15 +57,27 @@ describe('DifferentiationTagModalForm', () => {
       ...props,
     } as DifferentiationTagModalFormProps
 
-    render(
+    return render(
       <MockedQueryProvider>
         <DifferentiationTagModalForm {...defaultProps} />
       </MockedQueryProvider>,
     )
   }
 
+  beforeAll(() => {
+    server.listen()
+    const globalEnv = global as any
+    globalEnv.ENV = {course: {id: '456', max_variants_per_tag_category: 10}}
+  })
+
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   it('renders the modal when isOpen is true', () => {
@@ -136,7 +149,7 @@ describe('DifferentiationTagModalForm', () => {
     })
 
     it('updates category to "Add as a single tag" when removing a tag leaves one input (create mode)', async () => {
-      renderComponent({mode: CREATE_MODE})
+      const {findByTitle} = renderComponent({mode: CREATE_MODE})
 
       // Initially one tag → option is "Add as a single tag"
       expect(screen.getByTitle('Add as a single tag')).toBeInTheDocument()
@@ -150,11 +163,14 @@ describe('DifferentiationTagModalForm', () => {
       const removeButtons = screen.getAllByRole('button', {name: /remove tag/i, hidden: true})
       await user.click(removeButtons[0])
 
-      // With one tag left, the option should revert to "Add as a single tag".
-      expect(screen.getByTitle('Add as a single tag')).toBeInTheDocument()
+      const confirmButton = screen.getByTestId('continue-warning-modal')
+      await user.click(confirmButton)
+
+      const singleTagOption = await findByTitle('Add as a single tag')
+      expect(singleTagOption).toBeInTheDocument()
     })
 
-    it('moves focus to previous row remove button when a tag input row is deleted', async () => {
+    it('moves focus to previous row remove button when a tag input row is deleted after confirming', async () => {
       renderComponent({mode: CREATE_MODE})
 
       await user.click(screen.getByLabelText('Add another tag'))
@@ -166,8 +182,13 @@ describe('DifferentiationTagModalForm', () => {
         .reverse()
       await user.click(removeButtons[0])
 
-      // Verify that focus has moved to the previous row's remove button
-      expect(removeButtons[1]).toHaveFocus()
+      const confirmButton = screen.getByTestId('continue-warning-modal')
+      await user.click(confirmButton)
+
+      await waitFor(() => {
+        // Verify that focus has moved to the previous row's remove button
+        expect(removeButtons[1]).toHaveFocus()
+      })
     })
 
     it('moves focus to the first tag input row if the second tag input row is deleted', async () => {
@@ -180,8 +201,13 @@ describe('DifferentiationTagModalForm', () => {
       // Remove the second tag input row (first one is the default one)
       await user.click(removeButtons[0])
 
-      // Verify that focus has moved to the first tag input row
-      expect(screen.getAllByLabelText(/Tag Name/i)[0]).toHaveFocus()
+      const confirmButton = screen.getByTestId('continue-warning-modal')
+      await user.click(confirmButton)
+
+      await waitFor(() => {
+        // Verify that focus has moved to the first tag input row
+        expect(screen.getAllByLabelText(/Tag Name/i)[0]).toHaveFocus()
+      })
     })
   })
 
@@ -388,5 +414,11 @@ describe('DifferentiationTagModalForm', () => {
     const tagInput = screen.getByLabelText(/Tag Name/i)
     await user.type(tagInput, 'Valid Tag')
     expect(screen.queryByText('Tag Name is required')).not.toBeInTheDocument()
+  })
+
+  it('does not render the "+ Add another tag" button when reached limit in multiple tag mode', () => {
+    renderComponent({mode: EDIT_MODE, differentiationTagSet: multipleTagsCategoryLimit})
+    expect(screen.queryByText('Add another tag')).not.toBeInTheDocument()
+    expect(screen.queryByText('Variant limit reached. Current limit is 10')).toBeInTheDocument()
   })
 })

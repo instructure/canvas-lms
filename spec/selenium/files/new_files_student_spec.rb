@@ -126,15 +126,6 @@ describe "better_file_browsing" do
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("example")
       end
-
-      it "lets student access files in restricted folder hidden by link", priority: "1", upgrade_files_v2: "waiting for deployment" do
-        skip "LF-999"
-        @folder.update_attribute :hidden, true
-
-        get "/courses/#{@course.id}/files/folder/restricted_folder?preview=#{@file.id}"
-        refresh_page # the header seriously doesn't show up until you refres ¯\_(ツ)_/¯
-        expect(f(".ef-file-preview-header")).to be_present
-      end
     end
   end
 end

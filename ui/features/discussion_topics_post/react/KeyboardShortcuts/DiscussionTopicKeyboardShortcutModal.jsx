@@ -20,7 +20,7 @@ import React from 'react'
 import KeyboardShortcutModal from './KeyboardShortcutModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const DiscussionTopicKeyboardShortcutModal = (props) => {
+const DiscussionTopicKeyboardShortcutModal = props => {
   const I18n = useI18nScope('discussionTopicKeyboradShortcutModal')
   const SHORTCUTS = [
     {keycode: 'e', description: I18n.t('Edit Current Message')},

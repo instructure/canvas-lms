@@ -7,6 +7,7 @@ For placement settings, go to the <a href="file.lti_dev_key_config.html#placemen
 ## List of Supported Placements
 
 - [Account Navigation](#account-navigation)
+- [Assignment Document Processor](#assignment-document-processor)
 - [Assignment Edit](#assignment-edit)
 - [Assignment Group Menu](#assignment-group-menu)
 - [Assignment Index Menu](#assignment-index-menu)
@@ -49,6 +50,12 @@ For placement settings, go to the <a href="file.lti_dev_key_config.html#placemen
 name: account_navigation
 
 <img class="lti-placement-image" src="./images/placements/account_navigation.png" alt="Account Navigation Screenshot">
+
+# Assignment Document Processor
+
+name: ActivityAssetProcessor
+
+<img class="lti-placement-image" src="./images/placements/ActivityAssetProcessor.png" alt="Assignment Document Processor Screenshot">
 
 # Assignment Edit
 
@@ -242,8 +249,6 @@ name: student_context_card
 
 name: submission_type_selection
 
-This is a restricted placement, contact your CSM (Customers) or [Developer Relations](mailto:dev-relations@instructure.com) (Partners) for more information.
-
 <img class="lti-placement-image" src="./images/placements/submission_type_selection.png" alt="Submission Type Selection Screenshot">
 
 # Sync Grades
@@ -261,8 +266,6 @@ name: tool_configuration
 # Top Navigation
 
 name: top_navigation
-
-This is a restricted placement, contact your CSM (Customers) or [Developer Relations](mailto:dev-relations@instructure.com) (Partners) for more information.
 
 <img class="lti-placement-image" src="./images/placements/top_navigation.png" alt="Top Navigation Screenshot">
 

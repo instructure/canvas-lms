@@ -38,12 +38,19 @@ import {
   IconDiscussionLine,
   IconDocumentLine,
 } from '@instructure/ui-icons'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {showFlashAlert} from '@instructure/platform-alerts'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 import {lockLabels} from '@canvas/blueprint-courses/react/labels'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {DateDetails, DateLockTypes, exportedOverride, ItemAssignToCardSpec} from './types'
+import type {
+  DateDetails,
+  DateDetailsOverride,
+  DateDetailsPayload,
+  DateLockTypes,
+  exportedOverride,
+  ItemAssignToCardSpec,
+} from './types'
 import {
   type ItemAssignToCardCustomValidationArgs,
   type ItemAssignToCardRef,
@@ -105,7 +112,7 @@ export const updateModuleItem = ({
   moduleItemType: ItemType
   moduleItemName: string
   moduleItemContentId: string
-  payload: DateDetails
+  payload: DateDetailsPayload
   onLoading: (flag: boolean) => void
   onSuccess: () => void
 }) => {
@@ -213,9 +220,10 @@ export default function ItemAssignToTray({
   isTray = true,
   setOverrides,
 }: ItemAssignToTrayProps) {
-  const isPacedCourse = ENV.IN_PACED_COURSE
+  const isPacedCourse = ENV?.IN_PACED_COURSE ?? false
   const isMasteryPathCourse =
-    !!ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.FEATURES.course_pace_pacing_with_mastery_paths
+    !!ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+    ENV?.FEATURES?.course_pace_pacing_with_mastery_paths
   const initialLoadRef = useRef(false)
   const cardsRefs = useRef<{[cardId: string]: RefObject<ItemAssignToCardRef>}>({})
   const [isLoading, setIsLoading] = useState(false)
@@ -232,16 +240,18 @@ export default function ItemAssignToTray({
   const [hasModuleOverrides, setHasModuleOverrides] = useState(false)
   const [hasDifferentiationTagOverrides, setHasDifferentiationTagOverrides] = useState(false)
   const [moduleAssignees, setModuleAssignees] = useState<string[]>([])
+  const [unassignedOverrides, setUnassignedOverrides] = useState<DateDetailsOverride[]>([])
   const [groupCategoryId, setGroupCategoryId] = useState<string | null>(defaultGroupCategoryId)
+  const [showGroupCategoryDeletedAlert, setShowGroupCategoryDeletedAlert] = useState(false)
   const [overridesFetched, setOverridesFetched] = useState(
     defaultCards !== undefined && defaultCards.length > 0,
   )
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     // On the edit pages, the ENV will contain this data, so we can initialize the lock info here. We'll fall back to
     // fetching it via the date details API in other cases.
-    ENV.MASTER_COURSE_DATA?.is_master_course_child_content &&
-      ENV.MASTER_COURSE_DATA?.restricted_by_master_course
-      ? (Object.entries(ENV.MASTER_COURSE_DATA?.master_course_restrictions ?? {})
+    ENV?.MASTER_COURSE_DATA?.is_master_course_child_content &&
+      ENV?.MASTER_COURSE_DATA?.restricted_by_master_course
+      ? (Object.entries(ENV?.MASTER_COURSE_DATA?.master_course_restrictions ?? {})
           .filter(([_lockType, locked]) => locked)
           .filter(([lockType]) => ['due_dates', 'availability_dates'].includes(lockType))
           .map(([lockType]) => lockType) as DateLockTypes[])
@@ -257,7 +267,7 @@ export default function ItemAssignToTray({
   }
 
   const mustConvertTags = useCallback(() => {
-    return !ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides
+    return !ENV?.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides
   }, [hasDifferentiationTagOverrides])
 
   useEffect(() => {
@@ -330,28 +340,34 @@ export default function ItemAssignToTray({
     checkMasteryPaths: masteryPathsAllowed,
     defaultValues: [],
     onError: handleDismiss,
+    onGroupCategoryNotFound: () => {
+      setGroupCategoryId(null)
+      setShowGroupCategoryDeletedAlert(true)
+    },
   })
 
   const focusErrors = useCallback(() => {
-    if (mustConvertTags()) {
-      const button = document.getElementById(CONVERT_DIFF_TAGS_BUTTON)
-      button?.setAttribute('aria-describedby', CONVERT_DIFF_TAGS_MESSAGE)
-      button?.focus()
-      return true
-    }
+    let isError = false
 
     const hasErrors = assignToCards.some(card => !card.isValid)
     // If a card has errors it should not save and the respective card should be focused
     if (hasErrors) {
       const firstCardWithError = assignToCards.find(card => !card.isValid)
-      if (!firstCardWithError) return false
-      const firstCardWithErrorRef = cardsRefs.current[firstCardWithError.key]
+      if (firstCardWithError) {
+        const firstCardWithErrorRef = cardsRefs.current[firstCardWithError.key]
 
-      Object.values(cardsRefs.current).forEach(c => c.current?.showValidations())
-      firstCardWithErrorRef?.current?.focusInputs()
-      return true
+        Object.values(cardsRefs.current).forEach(c => c.current?.showValidations())
+        if (!mustConvertTags()) firstCardWithErrorRef?.current?.focusInputs()
+        isError = true
+      }
     }
-    return false
+    if (mustConvertTags()) {
+      const button = document.getElementById(CONVERT_DIFF_TAGS_BUTTON)
+      button?.setAttribute('aria-describedby', CONVERT_DIFF_TAGS_MESSAGE)
+      button?.focus()
+      isError = true
+    }
+    return isError
   }, [assignToCards])
 
   const handleUpdate = useCallback(() => {
@@ -383,6 +399,7 @@ export default function ItemAssignToTray({
       filteredCards,
       hasModuleOverrides,
       deletedModuleAssignees,
+      unassignedOverrides,
     )
     if (itemContentId !== undefined) {
       updateModuleItem({
@@ -572,6 +589,8 @@ export default function ItemAssignToTray({
               onAddCard={onAddCard}
               onAssigneesChange={onAssigneesChange}
               onDatesChange={onDatesChange}
+              showGroupCategoryDeletedAlert={showGroupCategoryDeletedAlert}
+              setShowGroupCategoryDeletedAlert={setShowGroupCategoryDeletedAlert}
               onCardRemove={onCardRemove}
               setAssignToCards={setAssignToCards}
               blueprintDateLocks={blueprintDateLocks}
@@ -583,6 +602,7 @@ export default function ItemAssignToTray({
               setHasDifferentiationTagOverrides={setHasDifferentiationTagOverrides}
               cardsRefs={cardsRefs}
               setModuleAssignees={setModuleAssignees}
+              setUnassignedOverrides={setUnassignedOverrides}
               defaultGroupCategoryId={defaultGroupCategoryId}
               allOptions={allOptions}
               isLoadingAssignees={isLoadingAssignees}
@@ -651,6 +671,7 @@ export default function ItemAssignToTray({
           setHasDifferentiationTagOverrides={setHasDifferentiationTagOverrides}
           cardsRefs={cardsRefs}
           setModuleAssignees={setModuleAssignees}
+          setUnassignedOverrides={setUnassignedOverrides}
           defaultGroupCategoryId={defaultGroupCategoryId}
           allOptions={allOptions}
           isLoadingAssignees={isLoadingAssignees}
@@ -665,6 +686,8 @@ export default function ItemAssignToTray({
           disabledOptionIdsRef={disabledOptionIdsRef}
           isTray={isTray}
           setOverrides={setOverrides}
+          showGroupCategoryDeletedAlert={showGroupCategoryDeletedAlert}
+          setShowGroupCategoryDeletedAlert={setShowGroupCategoryDeletedAlert}
         />
       )}
     </View>

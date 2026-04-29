@@ -23,14 +23,14 @@ import Footer, {type FooterProps} from '../Footer'
 describe('Footer', () => {
   const props: FooterProps = {
     saveButtonLabel: 'Save',
-    onDismiss: jest.fn(),
-    onUpdate: jest.fn(),
+    onDismiss: vi.fn(),
+    onUpdate: vi.fn(),
   }
 
   const renderComponent = (overrides = {}) => render(<Footer {...props} {...overrides} />)
 
   beforeEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders', () => {

@@ -131,8 +131,7 @@ export default class GradeOverrideEntry extends GradeEntry {
 
   // @ts-expect-error
   parseValue(value, inputByUser: boolean = true): GradeOverrideInfo {
-    // @ts-expect-error
-    const gradingScheme: string | {data: DeprecatedGradingScheme[]} = this.options.gradingScheme
+    const gradingScheme = this.options.gradingScheme
     const parseResult = parseEntryValue(value, gradingScheme)
 
     let enteredAs: null | GradeType = null
@@ -142,7 +141,7 @@ export default class GradeOverrideEntry extends GradeEntry {
     } = null
     let valid = parseResult.isCleared
 
-    if (parseResult.isSchemeKey && typeof gradingScheme === 'object') {
+    if (parseResult.isSchemeKey && gradingScheme !== null && typeof gradingScheme === 'object') {
       enteredAs = EnterGradesAs.GRADING_SCHEME
       grade = {
         percentage: gradeToScoreLowerBound(parseResult.value, gradingScheme.data),
@@ -150,14 +149,12 @@ export default class GradeOverrideEntry extends GradeEntry {
       }
       valid = true
       // points based grading scheme
-      // @ts-expect-error
     } else if (gradingScheme?.pointsBased) {
       // entered percentage or is from backend which should be treated as percentage
       if (parseResult.isPercentage || !inputByUser) {
         enteredAs = EnterGradesAs.PERCENTAGE
         grade = {
           percentage: parseResult.value,
-          // @ts-expect-error
           schemeKey: schemeKeyForPercentage(parseResult.value, gradingScheme),
         }
         valid = true
@@ -180,7 +177,6 @@ export default class GradeOverrideEntry extends GradeEntry {
         schemeKey: schemeKeyForPercentage(parseResult.value, gradingScheme),
       }
       valid = true
-      // @ts-expect-error
       if (gradingScheme && gradingScheme.pointsBased) {
         // points based scheme
         if (inputByUser) {

@@ -1,7 +1,7 @@
-/* eslint-disable eslint-comments/no-unlimited-disable */
+/* eslint-disable @eslint-community/eslint-comments/no-unlimited-disable */
 /* eslint-disable */
 import $ from 'jquery'
-import {isFunction} from 'lodash'
+import {isFunction} from 'es-toolkit/compat'
 
 /*!
  * jquery.event.drag - v 2.2

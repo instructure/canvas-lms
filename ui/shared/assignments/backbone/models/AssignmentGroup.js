@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import {intersection, isEmpty, has} from 'lodash'
+import {intersection, isEmpty, has} from 'es-toolkit/compat'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import AssignmentCollection from '../collections/AssignmentCollection'
 

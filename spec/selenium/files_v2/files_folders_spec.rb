@@ -30,7 +30,8 @@ describe "files index page" do
 
   context "Folders" do
     context("as a teacher") do
-      folder_name = "base folder"
+      let(:folder_name) { "base folder" }
+
       before(:once) do
         course_with_teacher(active_all: true)
       end
@@ -104,7 +105,7 @@ describe "files index page" do
         create_folder_input.send_keys(test_folder_name)
         create_folder_input.send_keys(:return)
         folder = @course.folders.where(name: test_folder_name).first
-        expect(folder).to_not be_nil
+        expect(folder).not_to be_nil
         file_name = "some silly file"
         @course.attachments.create!(display_name: file_name, uploaded_data: default_uploaded_data, folder:)
         folder_link = flnpt(test_folder_name, content)

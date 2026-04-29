@@ -18,14 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe LiveEvents::AsyncWorker do
   let(:put_records_return) { [] }
-  let(:stream_client) { double(stream_name:) }
+  let(:stream_client) { instance_double(Aws::Kinesis::Client) }
   let(:stream_name) { "stream_name_x" }
   let(:event_name) { "event_name" }
-  let(:statsd_double) { double(increment: nil) }
+  let(:statsd_double) { class_double(InstStatsd::Statsd, increment: nil) }
   let(:event) do
     {
       event_name:,
@@ -50,10 +48,10 @@ describe LiveEvents::AsyncWorker do
     LiveEvents.max_queue_size = -> { 100 }
     LiveEvents.retry_throttled_events = -> { true }
     LiveEvents.statsd = nil
-    allow(LiveEvents).to receive(:logger).and_return(double(info: nil, error: nil, debug: nil))
-    @worker = LiveEvents::AsyncWorker.new(false, stream_client:, stream_name:, retry_throttled_events: true)
+    allow(LiveEvents).to receive(:logger).and_return(instance_double(Logger, info: nil, error: nil, debug: nil))
+    @worker = LiveEvents::AsyncWorker.new(start_thread: false, stream_client:, stream_name:, retry_throttled_events: true)
     allow(@worker).to receive(:at_exit)
-    expect(LiveEvents.logger).to_not receive(:error).with(/Exception making LiveEvents async call/)
+    expect(LiveEvents.logger).not_to receive(:error).with(/Exception making LiveEvents async call/)
     LiveEvents.statsd = statsd_double
     allow(statsd_double).to receive(:time).and_yield
   end
@@ -64,9 +62,7 @@ describe LiveEvents::AsyncWorker do
 
   describe "push" do
     it "executes stuff pushed on the queue" do
-      results_double = double
-      results = Aws::Kinesis::Types::PutRecordsOutput.new(records: results_double)
-      expect(results_double).to receive(:each_with_index).and_return([])
+      results = Aws::Kinesis::Types::PutRecordsOutput.new(records: [Aws::Kinesis::Types::PutRecordsResultEntry.new(error_code: nil)])
       allow(stream_client).to receive(:put_records).and_return(results)
 
       @worker.push event, partition_key
@@ -76,9 +72,7 @@ describe LiveEvents::AsyncWorker do
     end
 
     it "batches write" do
-      results_double = double
-      results = Aws::Kinesis::Types::PutRecordsOutput.new(records: results_double)
-      expect(results_double).to receive(:each_with_index).and_return([])
+      results = Aws::Kinesis::Types::PutRecordsOutput.new(records: [Aws::Kinesis::Types::PutRecordsResultEntry.new(error_code: nil)])
       allow(stream_client).to receive(:put_records).once.and_return(results)
       @worker.start!
 
@@ -88,9 +82,7 @@ describe LiveEvents::AsyncWorker do
     end
 
     it "times batch write" do
-      results_double = double
-      results = Aws::Kinesis::Types::PutRecordsOutput.new(records: results_double)
-      allow(results_double).to receive(:each_with_index).and_return([])
+      results = Aws::Kinesis::Types::PutRecordsOutput.new(records: [Aws::Kinesis::Types::PutRecordsResultEntry.new(error_code: nil)])
       allow(stream_client).to receive(:put_records).once.and_return(results)
 
       expect(statsd_double).to receive(:time).once.and_yield
@@ -113,8 +105,8 @@ describe LiveEvents::AsyncWorker do
       let(:expected_batch) { { records: [{ data: /1234/, partition_key: instance_of(String) }], stream_name: "stream_name_x" } }
 
       it "puts 'InternalFailure' records back in the queue for 1 extra retry that passes" do
-        results1 = double(records: [double(error_code: "InternalFailure", error_message: "internal failure message")])
-        results2 = double(records: [double(error_code: nil)])
+        results1 = Aws::Kinesis::Types::PutRecordsOutput.new(records: [Aws::Kinesis::Types::PutRecordsResultEntry.new(error_code: "InternalFailure", error_message: "internal failure message")])
+        results2 = Aws::Kinesis::Types::PutRecordsOutput.new(records: [Aws::Kinesis::Types::PutRecordsResultEntry.new(error_code: nil)])
 
         expect(stream_client).to receive(:put_records).with(expected_batch).and_return(results1, results2)
         expect(statsd_double).to receive(:time).and_yield.twice
@@ -128,7 +120,7 @@ describe LiveEvents::AsyncWorker do
       end
 
       it "puts 'InternalFailure' records back in the queue for 3 retries that fail" do
-        results = double(records: [double(error_code: "InternalFailure", error_message: "internal failure message")])
+        results = Aws::Kinesis::Types::PutRecordsOutput.new(records: [Aws::Kinesis::Types::PutRecordsResultEntry.new(error_code: "InternalFailure", error_message: "internal failure message")])
 
         expect(stream_client).to receive(:put_records).exactly(4).times.and_return(results)
         expect(statsd_double).to receive(:time).and_yield.exactly(4).times
@@ -142,7 +134,7 @@ describe LiveEvents::AsyncWorker do
       end
 
       it "puts 'ProvisionedThroughputExceeded' records back in the queue for 3 retries that fail" do
-        results = double(records: [double(error_code: "ProvisionedThroughputExceededException", error_message: "provisioned throughput exceeded")])
+        results = Aws::Kinesis::Types::PutRecordsOutput.new(records: [Aws::Kinesis::Types::PutRecordsResultEntry.new(error_code: "ProvisionedThroughputExceededException", error_message: "provisioned throughput exceeded")])
 
         expect(stream_client).to receive(:put_records).exactly(4).times.and_return(results)
         expect(statsd_double).to receive(:time).and_yield.exactly(4).times
@@ -155,17 +147,6 @@ describe LiveEvents::AsyncWorker do
         @worker.push event, partition_key
         @worker.stop!
       end
-    end
-  end
-
-  describe "exit handling" do
-    it "drains the queue" do
-      skip("flaky spec needs fixed in PLAT-5106")
-      @worker.push(event, partition_key)
-      expect(@worker).to receive(:at_exit).and_yield
-      expect(LiveEvents.logger).not_to receive(:error)
-      @worker.start!
-      @worker.send(:at_exit)
     end
   end
 end

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe GoogleDrive::Client do
   let(:client_secrets) do
     {
@@ -66,6 +64,6 @@ describe GoogleDrive::Client do
 
     auth_uri = described_class.auth_uri(client, "scope")
     expect(auth_uri).to include "state=scope"
-    expect(auth_uri).to_not include "login_hint"
+    expect(auth_uri).not_to include "login_hint"
   end
 end

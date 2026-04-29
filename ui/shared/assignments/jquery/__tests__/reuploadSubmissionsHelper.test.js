@@ -26,7 +26,7 @@ describe('setupSubmitHandler', () => {
   let fixture
 
   beforeEach(() => {
-    jest.spyOn($.fn, 'formSubmit').mockImplementation()
+    vi.spyOn($.fn, 'formSubmit').mockImplementation()
     fixture = document.createElement('div')
     document.body.appendChild(fixture)
     fixture.innerHTML = `<form id="${formId}" enctype="multipart/form-data">
@@ -42,13 +42,13 @@ describe('setupSubmitHandler', () => {
       event.preventDefault()
       event.stopPropagation()
     }
-    formSubmit = jest.fn(dummySubmit)
+    formSubmit = vi.fn(dummySubmit)
     document.getElementById(formId).addEventListener('submit', formSubmit)
   })
 
   afterEach(() => {
     fixture.remove()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('sets up the handler by calling $.fn.formSubmit', () => {
@@ -142,7 +142,7 @@ describe('setupSubmitHandler', () => {
       attachment = {id: '729'}
       success = setupSubmitHandler(formId, 'user_1').success
       formElement = document.getElementById(formId)
-      formElement.submit = jest.fn()
+      formElement.submit = vi.fn()
     })
 
     it('adds the attachment ID to the form', () => {

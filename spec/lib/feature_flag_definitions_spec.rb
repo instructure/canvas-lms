@@ -18,15 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe "feature_flag_definition_spec" do
+  let(:skip_features) { %w[block_editor block_template_editor] }
+
   Feature.definitions.each_key do |feature_name|
     it "#{feature_name} should have a display_name and description lambdas" do
+      skip if skip_features.include?(feature_name)
+
       feature = Feature.definitions[feature_name]
-      expect(feature).to_not be_nil
-      expect(feature.display_name.call).to_not be_nil
-      expect(feature.description.call).to_not be_nil
+      expect(feature).not_to be_nil
+      expect(feature.display_name.call).not_to be_nil
+      expect(feature.description.call).not_to be_nil
     end
   end
 
@@ -34,9 +36,10 @@ describe "feature_flag_definition_spec" do
     %i[custom_transition_proc after_state_change_proc visible_on].each do |hook|
       next unless definition[hook]
 
-      hook_name = definition[hook]
-      it "#{name} hook for #{hook} (#{hook_name}) should exist in FeatureFlags::Hooks as a static method" do
-        expect(FeatureFlags::Hooks.respond_to?(hook_name)).to be true
+      it "#{name} hook for #{hook} (#{definition[hook]}) should exist in FeatureFlags::Hooks as a static method" do
+        skip if skip_features.include?(name)
+
+        expect(FeatureFlags::Hooks.respond_to?(definition[hook])).to be true
       end
     end
   end

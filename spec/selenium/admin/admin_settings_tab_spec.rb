@@ -47,7 +47,7 @@ describe "admin settings tab" do
     end
   end
 
-  def check_box_verifier(css_selectors, features, checker = true)
+  def check_box_verifier(css_selectors, features, checker: true)
     is_symbol = false
 
     css_selectors = [css_selectors] unless css_selectors.is_a? Array
@@ -163,7 +163,7 @@ describe "admin settings tab" do
     end
 
     it "unchecks 'students can opt-in to receiving scores in email notifications'" do
-      check_box_verifier("#account_settings_allow_sending_scores_in_emails", :allow_sending_scores_in_emails, false)
+      check_box_verifier("#account_settings_allow_sending_scores_in_emails", :allow_sending_scores_in_emails, checker: false)
     end
 
     it "sets trusted referers for account" do
@@ -250,66 +250,18 @@ describe "admin settings tab" do
     end
 
     it "unchecks users can edit display name' and check it again" do
-      check_box_verifier("#account_settings_users_can_edit_name", :users_can_edit_name, false)
+      check_box_verifier("#account_settings_users_can_edit_name", :users_can_edit_name, checker: false)
       check_box_verifier("#account_settings_users_can_edit_name", :users_can_edit_name)
     end
 
     it "unchecks users_can_edit_profile and check it again" do
-      check_box_verifier("#account_settings_users_can_edit_profile", :users_can_edit_profile, false)
+      check_box_verifier("#account_settings_users_can_edit_profile", :users_can_edit_profile, checker: false)
       check_box_verifier("#account_settings_users_can_edit_profile", :users_can_edit_profile)
     end
 
     it "unchecks users_can_edit_comm_channels and check it again" do
-      check_box_verifier("#account_settings_users_can_edit_comm_channels", :users_can_edit_comm_channels, false)
+      check_box_verifier("#account_settings_users_can_edit_comm_channels", :users_can_edit_comm_channels, checker: false)
       check_box_verifier("#account_settings_users_can_edit_comm_channels", :users_can_edit_comm_channels)
-    end
-
-    describe "equella settings" do
-      def add_equella_feature
-        equella_url = "http://oer.equella.com/signon.do"
-        f("#account_settings_equella_endpoint").send_keys(equella_url)
-        f("#account_settings_equella_teaser").send_keys("equella feature")
-        click_submit
-        expect(Account.default.settings[:equella_endpoint]).to eq equella_url
-        expect(Account.default.settings[:equella_teaser]).to eq "equella feature"
-        expect(f("#account_settings_equella_endpoint")).to have_value equella_url
-        expect(f("#account_settings_equella_teaser")).to have_value "equella feature"
-      end
-
-      before do
-        equella = f("#enable_equella")
-        scroll_into_view(equella)
-        equella.click
-      end
-
-      it "adds an equella feature" do
-        add_equella_feature
-      end
-
-      it "edits an equella feature" do
-        add_equella_feature
-        new_equella_url = "http://oer.equella.com/signon.be"
-        replace_content(f("#account_settings_equella_endpoint"), new_equella_url)
-        replace_content(f("#account_settings_equella_teaser"), "new equella feature")
-        click_submit
-        expect(Account.default.settings[:equella_endpoint]).to eq new_equella_url
-        expect(Account.default.settings[:equella_teaser]).to eq "new equella feature"
-        expect(f("#account_settings_equella_endpoint")).to have_value new_equella_url
-        expect(f("#account_settings_equella_teaser")).to have_value "new equella feature"
-      end
-
-      it "deletes an equella feature" do
-        add_equella_feature
-        expect(fj("#account_settings_equella_endpoint:visible")).to be_displayed
-        expect(fj("#account_settings_equella_teaser:visible")).to be_displayed
-        replace_content(f("#account_settings_equella_endpoint"), "")
-        replace_content(f("#account_settings_equella_teaser"), "")
-        click_submit
-        expect(Account.default.settings[:equella_endpoint]).to be_nil
-        expect(Account.default.settings[:equella_teaser]).to be_nil
-        expect(f("#account_settings")).not_to contain_jqcss("#account_settings_equella_endpoint:visible")
-        expect(f("#account_settings")).not_to contain_jqcss("#account_settings_equella_teaser:visible")
-      end
     end
   end
 
@@ -325,23 +277,18 @@ describe "admin settings tab" do
       expect(f("[data-testid='about-google-docs']")).to include_text("About Google Docs Previews")
     end
 
-    it "unclicks and then click on skype" do
-      check_box_verifier("#account_services_skype", { allowed_services: :skype }, false)
-      check_box_verifier("#account_services_skype", { allowed_services: :skype })
-    end
-
     it "unclicks and click on google docs previews" do
-      check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews }, false)
+      check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews }, checker: false)
       check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews })
     end
 
     it "clicks on user avatars" do
       check_box_verifier("#account_services_avatars", { allowed_services: :avatars })
-      check_box_verifier("#account_services_avatars", { allowed_services: :avatars }, false)
+      check_box_verifier("#account_services_avatars", { allowed_services: :avatars }, checker: false)
     end
 
     it "disables all web services" do
-      check_box_verifier(nil, :all_selectors, false)
+      check_box_verifier(nil, :all_selectors, checker: false)
     end
 
     it "enables all web services" do
@@ -352,14 +299,14 @@ describe "admin settings tab" do
       AccountServices.register_service(:myplugin, { name: "My Plugin", description: "", expose_to_ui: :setting, default: false })
       get "/accounts/#{Account.default.id}/settings"
       check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin })
-      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, false)
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, checker: false)
     end
 
     it "enables and disable a plugin service (service)" do
       AccountServices.register_service(:myplugin, { name: "My Plugin", description: "", expose_to_ui: :service, default: false })
       get "/accounts/#{Account.default.id}/settings"
       check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin })
-      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, false)
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, checker: false)
     end
   end
 
@@ -449,7 +396,7 @@ describe "admin settings tab" do
 
       click_submit
       new_help_links = Account.default.help_links
-      expect(new_help_links.pluck(:id)).to_not include(Account.default.help_links_builder.filtered_links(default_links).first[:id].to_s)
+      expect(new_help_links.pluck(:id)).not_to include(Account.default.help_links_builder.filtered_links(default_links).first[:id].to_s)
       expect(new_help_links.pluck(:id)).to include(Account.default.help_links_builder.filtered_links(default_links).last[:id].to_s)
       expect(new_help_links.last).to include(help_link)
     end
@@ -541,7 +488,7 @@ describe "admin settings tab" do
       scroll_into_view(link)
       link.click
       url = f("#admin_settings_custom_link_url")
-      expect(url).to be_disabled
+      expect(url.attribute("readonly")).to eq "true"
       teachers_label = fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible')
       scroll_into_view(teachers_label)
       teachers_label.click

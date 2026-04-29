@@ -44,6 +44,9 @@ shared_examples "Gradebook" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
     extra_setup
     user_session(@teacher)
   end

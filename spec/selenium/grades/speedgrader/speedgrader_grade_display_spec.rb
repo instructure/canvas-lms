@@ -25,6 +25,7 @@ require_relative "../pages/speedgrader_page"
 describe "SpeedGrader - grade display" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
+
   include_context "late_policy_course_setup"
   include GradebookCommon
 
@@ -112,7 +113,7 @@ describe "SpeedGrader - grade display" do
     end
   end
 
-  context "keyboard shortcuts", skip: "EGG-1031" do
+  context "keyboard shortcuts", skip: "EGG-1031 2025-04-24" do
     let(:first_grade) { 5 }
     let(:last_grade) { 10 }
 

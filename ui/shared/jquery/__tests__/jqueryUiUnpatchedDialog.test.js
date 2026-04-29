@@ -33,8 +33,8 @@ describe('Dialog Widget', () => {
 
   it('does not auto-execute button click functions on init', () => {
     const $dialog = $('#test-dialog')
-    const openHandler = jest.fn()
-    const clickHandler = jest.fn()
+    const openHandler = vi.fn()
+    const clickHandler = vi.fn()
 
     $dialog.dialog({
       open: openHandler,
@@ -75,8 +75,8 @@ describe('Dialog Widget', () => {
 
   it('triggers open and close events in correct order', () => {
     const $dialog = $('#test-dialog')
-    const openHandler = jest.fn()
-    const closeHandler = jest.fn(() => {
+    const openHandler = vi.fn()
+    const closeHandler = vi.fn(() => {
       expect(openHandler).toHaveBeenCalled()
     })
 

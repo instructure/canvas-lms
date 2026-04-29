@@ -16,4 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default ['vitest.config.ts', 'packages/*/vitest.config.ts']
+// eslint-disable-next-line import/no-unresolved
+import {defineWorkspace} from 'vitest/config'
+
+// Explicitly define workspace to prevent auto-detection of package configs
+// Only run tests from the root vitest.config.ts (ui/ directory tests)
+export default defineWorkspace([
+  {
+    extends: './vitest.config.ts',
+    test: {
+      name: 'canvas-ui',
+      // Ensure we only run tests from ui/ directory
+      include: ['ui/**/__tests__/**/*.test.?(c|m)[jt]s?(x)'],
+      // Explicitly exclude packages, gems, and node_modules
+      exclude: ['**/node_modules/**', 'packages/**', 'gems/**'],
+    },
+  },
+])

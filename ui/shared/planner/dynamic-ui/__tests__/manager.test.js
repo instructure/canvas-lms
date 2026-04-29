@@ -35,13 +35,13 @@ const newActivityId = 'newactivityid'
 class MockAnimator {
   animationOrder = []
 
-  isAboveScreen = jest.fn()
+  isAboveScreen = vi.fn()
 
-  recordFixedElement = jest.fn()
+  recordFixedElement = vi.fn()
 
   constructor() {
     ;['focusElement'].forEach(fnName => {
-      this[fnName] = jest.fn(() => {
+      this[fnName] = vi.fn(() => {
         this.animationOrder.push(fnName)
       })
     })
@@ -71,9 +71,9 @@ class MockDocument {
 }
 
 class MockStore {
-  dispatch = jest.fn()
+  dispatch = vi.fn()
 
-  getState = jest.fn(() => ({}))
+  getState = vi.fn(() => ({}))
 }
 
 function mockAnimationClass(callback) {
@@ -84,15 +84,15 @@ function mockAnimationClass(callback) {
       callback(this)
     }
 
-    isReady = jest.fn()
+    isReady = vi.fn()
 
-    acceptAction = jest.fn()
+    acceptAction = vi.fn()
 
-    invokeUiWillUpdate = jest.fn()
+    invokeUiWillUpdate = vi.fn()
 
-    invokeUiDidUpdate = jest.fn()
+    invokeUiDidUpdate = vi.fn()
 
-    reset = jest.fn()
+    reset = vi.fn()
   }
 }
 
@@ -137,7 +137,7 @@ describe('registerAnimatable', () => {
 describe('action handling', () => {
   it('translates actions into specific handlers', () => {
     const {manager} = createManagerWithMocks()
-    manager.handleSomeAction = jest.fn()
+    manager.handleSomeAction = vi.fn()
     const action = {type: 'SOME_ACTION'}
     manager.handleAction(action)
     expect(manager.handleSomeAction).toHaveBeenCalledWith(action)
@@ -153,9 +153,9 @@ describe('action handling', () => {
     let alertMocks = null
     beforeEach(() => {
       alertMocks = {
-        visualSuccessCallback: jest.fn(),
-        visualErrorCallback: jest.fn(),
-        srAlertCallback: jest.fn(),
+        visualSuccessCallback: vi.fn(),
+        visualErrorCallback: vi.fn(),
+        srAlertCallback: vi.fn(),
       }
       alertInitialize(alertMocks)
       return alertMocks
@@ -180,7 +180,7 @@ describe('action handling', () => {
     })
 
     it('performs an srAlert when days are loaded', () => {
-      const srAlertMock = jest.fn()
+      const srAlertMock = vi.fn()
       alertInitialize({
         srAlertCallback: srAlertMock,
       })
@@ -312,7 +312,7 @@ describe('managing nai scroll position', () => {
   function naiFixture(naiAboveScreen) {
     const {manager, store} = createManagerWithMocks()
     store.getState.mockReturnValue({ui: {naiAboveScreen}})
-    const gbcr = jest.fn()
+    const gbcr = vi.fn()
     const nai = {
       getScrollable() {
         return {getBoundingClientRect: gbcr}

@@ -20,7 +20,16 @@ if ! git diff --exit-code yarn.lock; then
   # Put yarn.lock diff into the Gergich message
   #
   diff="$(git diff yarn.lock)"
-  diff="\n\n\`\`\`\n$diff\n\`\`\`"
+  # Truncate diff if it's too large for Gerrit (16KB limit)
+  # Count lines and truncate to first 200 lines if needed
+  line_count=$(echo "$diff" | wc -l)
+  if [ "$line_count" -gt 200 ]; then
+      diff_truncated="$(echo "$diff" | head -n 200)"
+      diff_suffix="\n\n... (diff truncated after 200 lines, see build logs for full diff)"
+      diff="\n\n\`\`\`\n$diff_truncated\n\`\`\`$diff_suffix"
+  else
+      diff="\n\n\`\`\`\n$diff\n\`\`\`"
+  fi
   diff=${diff//$'\n'/'\n'}
   diff=${diff//$'"'/'\"'}
 
@@ -32,6 +41,14 @@ else
   if ! git diff --exit-code yarn.lock; then
     message="yarn.lock changes need to be de-duplicated. Make sure you run 'yarn dedupe-yarn'."
     gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
+  fi
+fi
+
+# Check if @swc/core is updated without swc-plugin-coverage-instrument
+if git diff HEAD^ package.json | grep -q '@swc/core'; then
+  if ! git diff HEAD^ package.json | grep -q 'swc-plugin-coverage-instrument'; then
+    message="@swc/core was updated without updating swc-plugin-coverage-instrument. These packages must be compatible or the Crystalball build will fail. Verify compatibility at https://plugins.swc.rs/ or update swc-plugin-coverage-instrument to a compatible version."
+    gergich comment "{\"path\":\"package.json\",\"position\":1,\"severity\":\"warn\",\"message\":\"$message\"}"
   fi
 fi
 

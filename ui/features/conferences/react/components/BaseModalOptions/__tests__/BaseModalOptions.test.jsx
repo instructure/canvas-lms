@@ -21,12 +21,12 @@ import {render} from '@testing-library/react'
 import BaseModalOptions from '../BaseModalOptions'
 
 describe('BaseModalOptions', () => {
-  const setName = jest.fn()
-  const setDuration = jest.fn()
-  const setOptions = jest.fn()
-  const setDescription = jest.fn()
-  const setInvitationOptions = jest.fn()
-  const setAttendeesOptions = jest.fn()
+  const setName = vi.fn()
+  const setDuration = vi.fn()
+  const setOptions = vi.fn()
+  const setDescription = vi.fn()
+  const setInvitationOptions = vi.fn()
+  const setAttendeesOptions = vi.fn()
 
   const defaultProps = {
     name: 'Conference 1',

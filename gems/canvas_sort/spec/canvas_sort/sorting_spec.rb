@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe CanvasSort do
   it "is less than any string" do
     expect(CanvasSort::First).to be < ""

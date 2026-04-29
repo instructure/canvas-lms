@@ -40,6 +40,7 @@ export const getContext = isMobileView => {
   const outcomeAllowAverageCalculationFF = ENV.OUTCOME_AVERAGE_CALCULATION
   const menuOptionForOutcomeDetailsPageFF = ENV.MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE
   const archiveOutcomesFF = ENV.ARCHIVE_OUTCOMES
+  const lmgbStudentReportingFF = ENV.LMGB_STUDENT_REPORTING
 
   return {
     env: {
@@ -60,6 +61,7 @@ export const getContext = isMobileView => {
       outcomeAllowAverageCalculationFF,
       menuOptionForOutcomeDetailsPageFF,
       archiveOutcomesFF,
+      lmgbStudentReportingFF,
     },
   }
 }

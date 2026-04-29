@@ -1,0 +1,126 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+navigation_help_text =
+  if @context.elementary_subject_course?
+    t("help.edit_navigation_k5", "Drag and drop items to reorder them in the subject navigation.")
+  else
+    t("help.edit_navigation", "Drag and drop items to reorder them in the course navigation.")
+  end
+%>
+
+<%= form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
+  <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
+  <% tabs = sortable_tabs %>
+  <div style="width: 400px; padding-top: 10px">
+    <p style="margin: 0">
+      <%= navigation_help_text %>
+    </p>
+    <% if @context.elementary_subject_course? %>
+      <p style="font-size: 0.8em; margin: 6px 0 0">
+        <%= t("help.edit_navigation_info_k5", "If enabled, LTI tools will always appear last under the Resources tab in the order you choose.") %>
+      </p>
+    <% end %>
+  </div>
+  <h3 class="screenreader-only"><%= t('Enabled Links') %></h3>
+  <ul id="nav_enabled_list" class="nav_list connectedSortable">
+    <li class="disabled" aria-hidden="true" style="height: 1px">
+      <%# This item is just here to serve as an anchor for dragging/dropping if all tabs are disabled %>
+    </li>
+    <% tabs.select {|t| !t[:hidden] }.each do |tab|  %>
+      <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if @context.tab_enabled?(tab) %>"
+          id="nav_edit_tab_id_<%= tab[:id] %>"
+      >
+        <div class="draggable_handle">
+          <% if @context.tab_enabled?(tab) %>
+              <i class="icon-drag-handle"></i>
+          <% else %>
+            &nbsp;
+          <% end %>
+        </div>
+        <div class="navitem_content">
+          <%= tab[:label] %>
+          <span class="disabled_message"><%= tab[:disabled_message] %></span>
+        </div>
+        <% if @context.tab_enabled?(tab) %>
+          <div class="admin-links">
+            <a class="al-trigger al-trigger-gray" role="button" href="#">
+              <i class="icon-more" aria-hidden="true"></i>
+              <span class="screenreader-only">
+                <%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
+              </span>
+            </a>
+            <ul class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+              <li role="presentation">
+                <a href="#" class="icon-x disable_nav_item_link" id="disable_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Disable this item"><%= t("Disable") %></a>
+              </li>
+              <li role="presentation">
+                <a href="#" class="icon-updown move_nav_item_link" id="move_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Move this item"><%= t("Move") %></a>
+              </li>
+            </ul>
+          </div>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+
+  <h3 class="screenreader-only"><%= t('Disabled Links') %></h3>
+  <ul id="nav_disabled_list" class="nav_list connectedSortable">
+    <li class="disabled">
+      <%= t('drag_to_hide', %{Drag items here to hide them from students.}) %>
+      <div style="font-size: 0.8em;">
+        <% unless @context.elementary_subject_course? %>
+          <%= t('drag_details', %{Disabling most pages will cause students who visit those pages to be redirected to the course home page.}) %>
+        <% end %>
+      </div>
+    </li>
+    <% tabs.select {|t| t[:hidden] }.each do |tab|  %>
+      <li aria-label="<%= tab[:label] %>"
+          class="navitem enabled"
+          id="nav_edit_tab_id_<%= tab[:id] %>"
+      >
+        <div class="draggable_handle">
+          <i class="icon-drag-handle"></i>
+        </div>
+        <div class="navitem_content">
+          <%= tab[:label] %>
+          <span class="disabled_message"><%= tab[:disabled_message] %></span>
+        </div>
+        <div class="admin-links">
+            <a class="al-trigger al-trigger-gray" role="button" href="#">
+              <i class="icon-more" aria-hidden="true"></i>
+              <span class="screenreader-only"><%= t('Settings for %{tab_label}', { tab_label: tab[:label]}) %>
+              </span>
+            </a>
+
+            <ul id="content-2" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-3">
+              <li role="presentation">
+                <a href="#" class="icon-plus enable_nav_item_link" id="enable_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Enable this item"><%= t("Enable") %></a>
+              </li>
+              <li role="presentation">
+                <a href="#" class="icon-updown move_nav_item_link" id="move_nav_item_link_<%= tab[:id] %>" role="menuitem" title="Move this item"><%= t("Move") %></a>
+              </li>
+            </ul>
+          </div>
+      </li>
+    <% end %>
+  </ul>
+
+  <p>
+    <button type="submit" class="btn btn-primary"><%= t('#buttons.save', %{Save}) %></button>
+  </p>
+<% end %>

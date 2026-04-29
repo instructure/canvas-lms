@@ -55,7 +55,7 @@ describe('Files UploadButton', () => {
 
     expect(getByText('Upload').closest('button')).not.toBeDisabled()
     act(() => {
-      UploadQueue.pendingUploads = jest.fn().mockReturnValue(1)
+      UploadQueue.pendingUploads = vi.fn().mockReturnValue(1)
       UploadQueue.onChange()
     })
     expect(getByText('Upload').closest('button')).toBeDisabled()

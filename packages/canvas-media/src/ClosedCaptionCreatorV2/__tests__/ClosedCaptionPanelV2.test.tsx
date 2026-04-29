@@ -1,0 +1,1095 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {HttpResponse, http} from 'msw'
+import {setupServer} from 'msw/node'
+import {vi} from 'vitest'
+import {ClosedCaptionPanelV2} from '../ClosedCaptionPanelV2'
+import type {Subtitle} from '../types'
+
+const server = setupServer()
+
+const LIVE_REGION_ID = 'flash_screenreader_holder'
+
+const TEST_UPLOAD_CONFIG = {
+  mediaObjectId: 'media123',
+  origin: 'http://localhost:3000',
+  headers: {Authorization: 'Bearer token'},
+}
+
+function createValidFile(name = 'captions.vtt', size = 1000): File {
+  const content = new Array(size).fill('a').join('')
+  return new File([content], name, {type: 'text/vtt'})
+}
+
+function renderComponent(overrideProps = {}) {
+  const defaultProps = {
+    liveRegion: () => document.getElementById(LIVE_REGION_ID),
+    onUpdateSubtitles: vi.fn(),
+    subtitles: [],
+    userLocale: 'en',
+  }
+
+  return {
+    ...render(<ClosedCaptionPanelV2 {...defaultProps} {...overrideProps} />),
+    props: {...defaultProps, ...overrideProps},
+  }
+}
+
+describe('<ClosedCaptionPanelV2 />', () => {
+  beforeAll(() => server.listen({onUnhandledRequest: 'warn'}))
+
+  beforeEach(() => {
+    const liveRegion = document.createElement('div')
+    liveRegion.id = LIVE_REGION_ID
+    liveRegion.setAttribute('role', 'alert')
+    document.body.appendChild(liveRegion)
+    server.use(http.post('**/asr', () => new HttpResponse(null, {status: 202})))
+  })
+
+  const ADD_NEW_BUTTON_TEXT = 'Add New'
+  const REQUEST_BUTTON_TEXT = 'Request'
+
+  afterEach(() => {
+    const liveRegion = document.getElementById(LIVE_REGION_ID)
+    if (liveRegion) {
+      document.body.removeChild(liveRegion)
+    }
+    server.resetHandlers()
+    vi.clearAllMocks()
+  })
+
+  afterAll(() => server.close())
+
+  it('shows add new and request buttons by default', () => {
+    renderComponent()
+
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.getByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
+  })
+
+  it('hides request button when auto-caption already exists', () => {
+    const subtitlesWithAsr: Subtitle[] = [
+      {locale: 'en', file: {name: 'auto-generated-en.vtt'}, asr: true},
+    ]
+
+    renderComponent({subtitles: subtitlesWithAsr})
+
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.queryByText(REQUEST_BUTTON_TEXT)).not.toBeInTheDocument()
+  })
+
+  it('hides request button when inherited auto-caption exists', () => {
+    const subtitlesWithInheritedAsr: Subtitle[] = [
+      {locale: 'en', file: {name: 'auto-generated-en.vtt'}, asr: true, inherited: true},
+    ]
+
+    renderComponent({subtitles: subtitlesWithInheritedAsr})
+
+    // Request button should be hidden even for inherited ASR
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.queryByText(REQUEST_BUTTON_TEXT)).not.toBeInTheDocument()
+  })
+
+  it('shows request button when only manual captions exist', () => {
+    const subtitlesManualOnly: Subtitle[] = [{locale: 'en', file: {name: 'english.vtt'}}]
+
+    renderComponent({subtitles: subtitlesManualOnly})
+
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.getByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
+  })
+
+  it('clicking add new shows manual caption creator', () => {
+    renderComponent()
+
+    const addNewButton = screen.getByText(ADD_NEW_BUTTON_TEXT)
+    fireEvent.click(addNewButton)
+
+    // Manual caption creator should be visible
+    expect(screen.getByPlaceholderText('Select Language')).toBeInTheDocument()
+    expect(screen.getByText(/choose file/i)).toBeInTheDocument()
+    expect(screen.getByText('Upload')).toBeInTheDocument()
+    expect(screen.getByText('Cancel')).toBeInTheDocument()
+  })
+
+  it('clicking cancel in manual caption creator hides it and shows the picker again', () => {
+    renderComponent()
+
+    // Open manual caption creator
+    fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+
+    // Manual creator should be visible
+    expect(
+      screen.getByText('Upload a subtitle track in either the SRT or WebVTT format.'),
+    ).toBeInTheDocument()
+
+    // Click cancel
+    const cancelButton = screen.getByText('Cancel')
+    fireEvent.click(cancelButton)
+
+    // Should go back to showing picker buttons
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.getByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
+  })
+
+  it('if language and file selected it uploads and shows the language in the list', async () => {
+    // Mock successful upload
+    server.use(
+      http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+    )
+
+    renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+    // Open manual caption creator
+    const addNewButton = screen.getByText(ADD_NEW_BUTTON_TEXT)
+    fireEvent.click(addNewButton)
+
+    // Select a language
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
+    fireEvent.click(selectPlaceholder)
+    fireEvent.click(screen.getByText('English'))
+
+    // Select a file
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    const validFile = createValidFile()
+    fireEvent.change(fileInput, {target: {files: [validFile]}})
+
+    // Click Upload
+    const uploadButton = screen.getByText('Upload')
+    fireEvent.click(uploadButton)
+
+    // Wait for English to appear in the list (uploaded)
+    expect(await screen.findByText('English')).toBeInTheDocument()
+  })
+
+  it('filters asr languages from manual upload dropdown', () => {
+    const subtitlesWithAsr: Subtitle[] = [
+      {locale: 'en', file: {name: 'auto-generated-en.vtt'}, asr: true},
+    ]
+
+    renderComponent({subtitles: subtitlesWithAsr})
+
+    // Verify the ASR caption shows with "(Automatic)" label
+    expect(screen.getByText('English (Automatic)')).toBeInTheDocument()
+
+    // Open manual caption creator
+    fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+
+    // Open the language dropdown
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
+    fireEvent.click(selectPlaceholder)
+
+    // English should not be in the dropdown (filtered out)
+    expect(screen.queryByText('English')).not.toBeInTheDocument()
+  })
+
+  it('filters manual languages from asr request dropdown', () => {
+    const subtitlesManualOnly: Subtitle[] = [{locale: 'en', file: {name: 'english.vtt'}}]
+
+    renderComponent({subtitles: subtitlesManualOnly})
+
+    // Open auto-caption request form
+    fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+
+    // Open the language dropdown
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
+    fireEvent.click(selectPlaceholder)
+
+    // English should not be in the ASR dropdown (filtered out)
+    const dropdownOptions = screen.queryAllByText('English')
+    // Should only find 1 instance (the caption row)
+    expect(dropdownOptions).toHaveLength(1)
+  })
+
+  it('once a language is added and uploaded, it is removed from the available options dropdown', async () => {
+    // Mock successful upload
+    server.use(
+      http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+    )
+
+    renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+    // Open manual caption creator
+    const addNewButton = screen.getByText(ADD_NEW_BUTTON_TEXT)
+    fireEvent.click(addNewButton)
+
+    // Select English and upload
+    let selectPlaceholder = screen.getByPlaceholderText('Select Language')
+    fireEvent.click(selectPlaceholder)
+    fireEvent.click(screen.getByText('English'))
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+    fireEvent.change(fileInput, {target: {files: [createValidFile()]}})
+
+    const uploadButton = screen.getByText('Upload')
+    fireEvent.click(uploadButton)
+
+    // Wait for English caption to be in the list (uploaded)
+    expect(await screen.findByText('English')).toBeInTheDocument()
+
+    // Open manual creator again to add another caption
+    const addNewButtonAgain = screen.getByText(ADD_NEW_BUTTON_TEXT)
+    fireEvent.click(addNewButtonAgain)
+
+    // Open the language dropdown
+    selectPlaceholder = screen.getByPlaceholderText('Select Language')
+    fireEvent.click(selectPlaceholder)
+
+    // English should not be in the dropdown anymore
+    const dropdownOptions = screen.queryAllByText('English')
+    // Should only find 1 instance (the caption row), not in dropdown
+    expect(dropdownOptions).toHaveLength(1)
+  })
+
+  it('canceling auto-caption request returns to button picker without creating caption', () => {
+    renderComponent()
+
+    // Click Request button
+    fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+
+    // Form should be visible
+    expect(screen.getAllByText('Language Spoken in This Media*').length).toBeGreaterThan(0)
+
+    // Select a language
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
+    fireEvent.click(selectPlaceholder)
+    fireEvent.click(screen.getByText('German'))
+
+    // Click Cancel
+    const cancelButton = screen.getByText('Cancel')
+    fireEvent.click(cancelButton)
+
+    // Both buttons should be visible again
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.getByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
+
+    // No caption should have been created (no "(Automatic)" label)
+    expect(screen.queryByText('German (Automatic)')).not.toBeInTheDocument()
+  })
+
+  it('auto-caption request creates caption with asr flag', () => {
+    renderComponent()
+
+    // Click Request button
+    fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+
+    // Select a language from ASR dropdown
+    const selectPlaceholder = screen.getByPlaceholderText('Select Language')
+    fireEvent.click(selectPlaceholder)
+    fireEvent.click(screen.getByText('Spanish'))
+
+    // Click Request in the form
+    const requestButtonInForm = screen.getByText('Request')
+    fireEvent.click(requestButtonInForm)
+
+    // Caption should appear with "(Automatic)" label
+
+    expect(screen.getByText('Spanish (Automatic)')).toBeInTheDocument()
+
+    // Buttons should be visible again (but not Request since ASR exists)
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.queryByText(REQUEST_BUTTON_TEXT)).not.toBeInTheDocument()
+  })
+
+  it('if captions are provided as props, they are rendered with delete icon', () => {
+    const initialSubtitles: Subtitle[] = [
+      {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+      {locale: 'es', file: {name: 'spanish.vtt', url: '/url/es'}},
+    ]
+
+    renderComponent({subtitles: initialSubtitles})
+
+    // Both captions should be rendered
+    expect(screen.getByText('English')).toBeInTheDocument()
+    expect(screen.getByText('Spanish')).toBeInTheDocument()
+
+    // Delete buttons should be present (look for trash icon buttons)
+    expect(screen.getByText('Delete English')).toBeInTheDocument()
+    expect(screen.getByText('Delete Spanish')).toBeInTheDocument()
+  })
+
+  it('delete icon works and that language is removed from the list', async () => {
+    server.use(
+      http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+    )
+
+    const onUpdateSubtitles = vi.fn()
+    const initialSubtitles: Subtitle[] = [
+      {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+      {locale: 'es', file: {name: 'spanish.vtt', url: '/url/es'}},
+    ]
+
+    renderComponent({
+      subtitles: initialSubtitles,
+      onUpdateSubtitles,
+      uploadConfig: TEST_UPLOAD_CONFIG,
+    })
+
+    // Both captions should be rendered
+    expect(screen.getByText('English')).toBeInTheDocument()
+    expect(screen.getByText('Spanish')).toBeInTheDocument()
+
+    // Click the first delete button (English)
+    fireEvent.click(screen.getByText('Delete English'))
+
+    // English should be removed from the list
+    await waitFor(() => {
+      expect(screen.queryByText('English')).not.toBeInTheDocument()
+    })
+
+    // Spanish should still be there
+    expect(screen.getByText('Spanish')).toBeInTheDocument()
+  })
+
+  describe('a11y', () => {
+    it('a11y: renders captions as a semantic list', () => {
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+        {locale: 'es', file: {name: 'spanish.vtt', url: '/url/es'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      const list = screen.getByLabelText('Captions')
+      expect(list.tagName).toBe('UL')
+
+      const items = list.querySelectorAll('li')
+      expect(items).toHaveLength(2)
+    })
+
+    it('a11y: focuses Add New button after canceling manual caption creation', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Cancel'))
+
+      expect(screen.getByText(ADD_NEW_BUTTON_TEXT).closest('button')).toHaveFocus()
+    })
+
+    it('a11y: focuses Add New button after canceling auto-caption request', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+      fireEvent.click(screen.getByText('Cancel'))
+
+      expect(screen.getByText(ADD_NEW_BUTTON_TEXT).closest('button')).toHaveFocus()
+    })
+
+    it('a11y: focuses Add New button after uploading a caption', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      fireEvent.change(fileInput, {target: {files: [createValidFile()]}})
+      fireEvent.click(screen.getByText('Upload'))
+
+      await screen.findByText('English')
+      expect(screen.getByText(ADD_NEW_BUTTON_TEXT).closest('button')).toHaveFocus()
+    })
+
+    it('a11y: focuses next row delete button after deleting a caption', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+        {locale: 'es', file: {name: 'spanish.vtt', url: '/url/es'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText('Delete English'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('English')).not.toBeInTheDocument()
+      })
+
+      expect(screen.getByText('Delete Spanish').closest('button')).toHaveFocus()
+    })
+
+    it('a11y: focuses creation form when deleting a caption while creation form is open', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Open the manual creation form
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      expect(screen.getByPlaceholderText('Select Language')).toBeInTheDocument()
+
+      // Delete the caption while creation form is open
+      fireEvent.click(screen.getByText('Delete English'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('English')).not.toBeInTheDocument()
+      })
+
+      // Focus should land on the creation form container (not lost)
+      const creationForm = screen.getByText('Add New Caption').closest('[tabindex="-1"]')
+      expect(creationForm).toHaveFocus()
+    })
+
+    it('a11y: focuses Add New button after deleting the last caption', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText('Delete English'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('English')).not.toBeInTheDocument()
+      })
+
+      expect(screen.getByText(ADD_NEW_BUTTON_TEXT).closest('button')).toHaveFocus()
+    })
+
+    it('a11y: announces file selection in the manual caption creator', () => {
+      renderComponent()
+
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+
+      const fileStatus = document.getElementById('cc-file-status')
+      expect(fileStatus).toHaveAttribute('role', 'status')
+      expect(fileStatus).toHaveTextContent('No file chosen')
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      fireEvent.change(fileInput, {target: {files: [createValidFile('my-captions.vtt')]}})
+
+      expect(fileStatus).toHaveTextContent('my-captions.vtt')
+    })
+
+    it('a11y: announces when upload starts', () => {
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      fireEvent.change(fileInput, {target: {files: [createValidFile()]}})
+      fireEvent.click(screen.getByText('Upload'))
+
+      expect(screen.getByText('Uploading English caption')).toBeInTheDocument()
+    })
+
+    it('a11y: announces when ASR request starts', () => {
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('Spanish'))
+      fireEvent.click(screen.getByText('Request'))
+
+      expect(screen.getByText('Requesting Spanish caption')).toBeInTheDocument()
+    })
+
+    it('a11y: announces when delete starts', () => {
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText('Delete English'))
+
+      expect(screen.getByText('Deleting English')).toBeInTheDocument()
+    })
+
+    it('a11y: announces when a caption is added', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      renderComponent({
+        uploadConfig: TEST_UPLOAD_CONFIG,
+      })
+
+      // Open manual caption creator
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+
+      // Select a language and file
+      const selectPlaceholder = screen.getByPlaceholderText('Select Language')
+      fireEvent.click(selectPlaceholder)
+      fireEvent.click(screen.getByText('Spanish'))
+
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      fireEvent.change(fileInput, {target: {files: [createValidFile()]}})
+
+      // Click Upload
+      const uploadButton = screen.getByText('Upload')
+      fireEvent.click(uploadButton)
+
+      // Wait for a11y announcement for upload to complete
+      await screen.findByText('Captions have been added for Spanish')
+    })
+
+    it('a11y: announces when a caption is deleted', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+        {locale: 'fr', file: {name: 'french.vtt', url: '/url/fr'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Click the first delete button (English)
+      fireEvent.click(screen.getByText('Delete English'))
+
+      await screen.findByText('Captions have been deleted for English')
+    })
+
+    it('a11y: announces when a caption upload fails', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Anything'}, {status: 400}),
+        ),
+      )
+
+      renderComponent({
+        uploadConfig: TEST_UPLOAD_CONFIG,
+      })
+
+      // Open manual caption creator
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+
+      // Select a language and file
+      const selectPlaceholder = screen.getByPlaceholderText('Select Language')
+      fireEvent.click(selectPlaceholder)
+      fireEvent.click(screen.getByText('German'))
+
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+
+      // Click Upload
+      const uploadButton = screen.getByText('Upload')
+      fireEvent.click(uploadButton)
+
+      expect(await screen.findByText('Upload Failed')).toBeInTheDocument()
+
+      await screen.findByText('German caption upload failed')
+    })
+
+    it('a11y: announces when a caption delete fails', async () => {
+      server.use(
+        http.put('/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Delete Failed'}, {status: 400}),
+        ),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'fr', file: {name: 'french.vtt', url: '/url/fr'}},
+      ]
+
+      renderComponent({
+        subtitles: initialSubtitles,
+        uploadConfig: TEST_UPLOAD_CONFIG,
+      })
+
+      // Click delete button
+      fireEvent.click(screen.getByText('Delete French'))
+
+      // Wait for a11y announcement with formatted error message (using template)
+      await screen.findByText('French caption delete failed')
+
+      // Caption should still be visible with error message
+      expect(screen.getByText('French')).toBeInTheDocument()
+      expect(screen.getByText('Delete Failed')).toBeInTheDocument()
+    })
+
+    it('a11y: retry upload re-announces and succeeds on retry', async () => {
+      // Phase 1: first upload attempt always fails
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Server error'}, {status: 500}),
+        ),
+      )
+
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Open manual caption creator
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+
+      const selectPlaceholder = screen.getByPlaceholderText('Select Language')
+      fireEvent.click(selectPlaceholder)
+      fireEvent.click(screen.getByText('German'))
+
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+
+      fireEvent.click(screen.getByText('Upload'))
+
+      // Wait for upload failure — the upload path involves FileReader +
+      // nested promises + axios, so give it extra time under CI load.
+      await waitFor(
+        () => {
+          expect(screen.getByText('Upload Failed')).toBeInTheDocument()
+          expect(screen.getByText('Retry German')).toBeInTheDocument()
+        },
+        {timeout: 10000},
+      )
+
+      // Phase 2: switch to success handler before retrying
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      // Click retry
+      fireEvent.click(screen.getByText('Retry German'))
+
+      // Should succeed on second attempt — use waitFor so both conditions
+      // must be true simultaneously, avoiding races where the live region
+      // is briefly cleared between the old and new announcement.
+      await waitFor(
+        () => {
+          expect(screen.queryByText('Captions have been added for German')).toBeInTheDocument()
+          expect(screen.queryByText('Upload Failed')).not.toBeInTheDocument()
+        },
+        {timeout: 10000},
+      )
+    })
+
+    it('retrying one caption does not clear the failed state of another caption', async () => {
+      // Phase 1: French delete fails
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Server error'}, {status: 500}),
+        ),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'fr', file: {name: 'french.vtt', url: '/url/fr'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Delete French → fails
+      fireEvent.click(screen.getByText('Delete French'))
+      await screen.findByText('Delete Failed')
+
+      // Now upload German → also fails
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Server error'}, {status: 500}),
+        ),
+      )
+
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('German'))
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+      fireEvent.click(screen.getByText('Upload'))
+
+      await screen.findByText('Upload Failed')
+
+      // Both failures should be visible simultaneously
+      expect(screen.getByText('French')).toBeInTheDocument()
+      expect(screen.getByText('Delete Failed')).toBeInTheDocument()
+      expect(screen.getByText('German')).toBeInTheDocument()
+      expect(screen.getByText('Upload Failed')).toBeInTheDocument()
+
+      // Retry German upload (succeeds)
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+      fireEvent.click(screen.getByText('Retry German'))
+
+      await screen.findByText('Captions have been added for German')
+
+      // French should still show its delete-failed state
+      expect(screen.getByText('French')).toBeInTheDocument()
+      expect(screen.getByText('Delete Failed')).toBeInTheDocument()
+    })
+
+    it('server-side failed caption shows delete but not retry', () => {
+      const initialSubtitles: Subtitle[] = [{locale: 'en', workflow_state: 'failed', asr: true}]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      expect(screen.getByText('English (Automatic)')).toBeInTheDocument()
+      expect(screen.getByText('Delete English (Automatic)')).toBeInTheDocument()
+      expect(screen.queryByText(/retry/i)).not.toBeInTheDocument()
+    })
+
+    it('deleting a server-side failed ASR caption re-enables the Request button', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      const initialSubtitles: Subtitle[] = [{locale: 'en', workflow_state: 'failed', asr: true}]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Request button should be hidden (asr caption exists)
+      expect(screen.queryByText(REQUEST_BUTTON_TEXT)).not.toBeInTheDocument()
+
+      // Delete the failed ASR caption
+      fireEvent.click(screen.getByText('Delete English (Automatic)'))
+
+      // Caption should be removed and Request button should reappear
+      expect(await screen.findByText(REQUEST_BUTTON_TEXT)).toBeInTheDocument()
+      expect(screen.queryByText('English (Automatic)')).not.toBeInTheDocument()
+    })
+
+    it('a11y: announces when ASR caption generation fails', async () => {
+      server.use(
+        http.post('/api/v1/media_objects/*/asr', () =>
+          HttpResponse.json({error: 'ASR failed'}, {status: 500}),
+        ),
+      )
+
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('Spanish'))
+      fireEvent.click(screen.getByText('Request'))
+
+      expect(await screen.findByText('Caption generation failed')).toBeInTheDocument()
+      await screen.findByText('Spanish caption generation failed')
+      expect(screen.getByText('Retry Spanish (Automatic)')).toBeInTheDocument()
+    })
+
+    it('a11y: retry ASR request goes back to processing on success', async () => {
+      // Phase 1: first ASR request fails
+      server.use(
+        http.post('/api/v1/media_objects/*/asr', () =>
+          HttpResponse.json({error: 'Server error'}, {status: 500}),
+        ),
+      )
+
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+
+      fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('Spanish'))
+      fireEvent.click(screen.getByText('Request'))
+
+      await screen.findByText(/Spanish Caption generation failed/i)
+
+      // Phase 2: retry succeeds
+      server.use(
+        http.post('/api/v1/media_objects/*/asr', () => new HttpResponse(null, {status: 202})),
+      )
+
+      fireEvent.click(screen.getByText('Retry Spanish (Automatic)'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('Caption generation failed')).not.toBeInTheDocument()
+      })
+      expect(screen.getByText('Spanish (Automatic)')).toBeInTheDocument()
+    })
+
+    it('a11y: retry delete re-announces and succeeds on retry', async () => {
+      // Phase 1: first delete attempt fails
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'Server error'}, {status: 500}),
+        ),
+      )
+
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'fr', file: {name: 'french.vtt', url: '/url/fr'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+
+      // Click delete (fails on first attempt)
+      fireEvent.click(screen.getByText('Delete French'))
+
+      await screen.findByText('Delete Failed')
+      expect(screen.getByText('Retry French')).toBeInTheDocument()
+
+      // Phase 2: retry succeeds
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+
+      // Click retry (succeeds on second attempt)
+      fireEvent.click(screen.getByText('Retry French'))
+
+      await waitFor(() => {
+        expect(screen.queryByText('French')).not.toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('Pendo tracking', () => {
+    const mockTrack = vi.fn()
+
+    beforeEach(() => {
+      ;(window as any).canvasUsageMetrics = {track: mockTrack}
+    })
+
+    afterEach(() => {
+      delete (window as any).canvasUsageMetrics
+    })
+
+    it('fires canvas_caption_submitted when manual caption upload is confirmed', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
+      fireEvent.change(fileInput, {target: {files: [createValidFile()]}})
+      fireEvent.click(screen.getByText('Upload'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_submitted', {
+          type: 'track',
+          flow_type: 'upload_file',
+          language: 'en',
+        })
+      })
+    })
+
+    it('fires canvas_caption_submitted when ASR request is confirmed', async () => {
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText(REQUEST_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('Spanish'))
+      fireEvent.click(screen.getByText('Request'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_submitted', {
+          type: 'track',
+          flow_type: 'request_auto',
+          language: 'es',
+        })
+      })
+    })
+
+    it('fires canvas_caption_result success when upload succeeds', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('English'))
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+      fireEvent.click(screen.getByText('Upload'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_result', {
+          type: 'track',
+          flow_type: 'upload_file',
+          result: 'success',
+          language: 'en',
+        })
+      })
+    })
+
+    it('fires canvas_caption_result failed when upload fails', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'fail'}, {status: 400}),
+        ),
+      )
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('German'))
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+      fireEvent.click(screen.getByText('Upload'))
+      await screen.findByText(/German Caption Upload Failed/i)
+      expect(mockTrack).toHaveBeenCalledWith('canvas_caption_result', {
+        type: 'track',
+        flow_type: 'upload_file',
+        result: 'failed',
+      })
+    })
+
+    it('fires canvas_caption_retry_clicked when retry is clicked after upload failure', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => {
+          return HttpResponse.json({error: 'fail'}, {status: 500})
+        }),
+      )
+      renderComponent({uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText(ADD_NEW_BUTTON_TEXT))
+      fireEvent.click(screen.getByPlaceholderText('Select Language'))
+      fireEvent.click(screen.getByText('German'))
+      fireEvent.change(document.querySelector('input[type="file"]') as HTMLInputElement, {
+        target: {files: [createValidFile()]},
+      })
+      fireEvent.click(screen.getByText('Upload'))
+      await waitFor(() => expect(screen.getByText('Retry German')).toBeInTheDocument(), {
+        timeout: 10000,
+      })
+      fireEvent.click(screen.getByText('Retry German'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_retry_clicked', {
+          type: 'track',
+          flow_type: 'upload_file',
+        })
+      })
+      // Drain the in-flight retry PUT so it doesn't leak into subsequent tests.
+      await screen.findByText('Upload Failed')
+    })
+
+    it('fires canvas_caption_item_action delete when delete button clicked', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () => HttpResponse.json({data: 'success'})),
+      )
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', file: {name: 'english.vtt', url: '/url/en'}},
+      ]
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText('Delete English'))
+      await waitFor(() => {
+        expect(mockTrack).toHaveBeenCalledWith('canvas_caption_item_action', {
+          type: 'track',
+          action: 'delete',
+          caption_source: 'uploaded',
+          language: 'en',
+        })
+      })
+    })
+
+    it('fires canvas_caption_validation_error with delete_failed on delete error', async () => {
+      server.use(
+        http.put('**/api/media_objects/*/media_tracks', () =>
+          HttpResponse.json({error: 'fail'}, {status: 400}),
+        ),
+      )
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'fr', file: {name: 'french.vtt', url: '/url/fr'}},
+      ]
+      renderComponent({subtitles: initialSubtitles, uploadConfig: TEST_UPLOAD_CONFIG})
+      fireEvent.click(screen.getByText('Delete French'))
+      await screen.findByText('Delete Failed')
+      expect(mockTrack).toHaveBeenCalledWith('canvas_caption_validation_error', {
+        type: 'track',
+        flow_type: 'upload_file',
+        error_type: 'delete_failed',
+      })
+    })
+  })
+
+  describe('caption download', () => {
+    it('shows download button for each existing caption row', () => {
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', url: 'https://example.com/en.srt', file: {name: 'english.vtt'}},
+        {locale: 'es', url: 'https://example.com/es.srt', file: {name: 'spanish.vtt'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      expect(screen.getByText('Download English')).toBeInTheDocument()
+      expect(screen.getByText('Download Spanish')).toBeInTheDocument()
+    })
+
+    it('download button is a link with href when subtitle has url', () => {
+      const initialSubtitles: Subtitle[] = [
+        {locale: 'en', url: 'https://example.com/en.srt', file: {name: 'english.vtt'}},
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      const downloadLink = screen.getByText('Download English').closest('a')
+      expect(downloadLink).toBeInTheDocument()
+      expect(downloadLink).toHaveAttribute('href', 'https://example.com/en.srt')
+    })
+
+    it('download button has no href when subtitle has no url', () => {
+      const initialSubtitles: Subtitle[] = [{locale: 'en', file: {name: 'english.vtt'}}]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      expect(screen.getByText('Download English')).toBeInTheDocument()
+      expect(screen.getByText('Download English').closest('a')).toBeNull()
+    })
+
+    it('sets href and filename on the download link', () => {
+      const initialSubtitles: Subtitle[] = [
+        {
+          locale: 'fr',
+          url: 'https://example.com/fr.srt',
+          filename: 'french_fr.srt',
+          file: {name: 'french.vtt'},
+        },
+      ]
+
+      renderComponent({subtitles: initialSubtitles})
+
+      const downloadLink = screen.getByText('Download French').closest('a')
+      expect(downloadLink).toHaveAttribute('href', 'https://example.com/fr.srt')
+      expect(downloadLink).toHaveAttribute('download', 'french_fr.srt')
+    })
+  })
+
+  // Skipped: ARC-11427
+  it.skip('updates displayed subtitles when prop changes after mount', async () => {
+    const onUpdateSubtitles = vi.fn()
+
+    // Start with empty subtitles
+    const {rerender, props} = renderComponent({
+      subtitles: [],
+      onUpdateSubtitles,
+    })
+
+    // Should show "Add New" button (no subtitles yet)
+    expect(screen.getByText(ADD_NEW_BUTTON_TEXT)).toBeInTheDocument()
+    expect(screen.queryByText('English')).not.toBeInTheDocument()
+
+    // Simulate async subtitle loading (like iframe response)
+    const newSubtitles: Subtitle[] = [
+      {locale: 'en', file: {name: 'English'}},
+      {locale: 'es', file: {name: 'Spanish'}},
+    ]
+
+    rerender(<ClosedCaptionPanelV2 {...props} subtitles={newSubtitles} />)
+
+    // Should now show both captions
+    await waitFor(() => {
+      expect(screen.getByText('English')).toBeInTheDocument()
+      expect(screen.getByText('Spanish')).toBeInTheDocument()
+    })
+  })
+})

@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import ConversationStatusFilter from '../ConversationStatusFilter'
 import React from 'react'
 import {render} from '@testing-library/react'
 
 const makeProps = (props = {}) =>
-  _.merge(
+  merge(
     {
       router: {
         on: () => {},

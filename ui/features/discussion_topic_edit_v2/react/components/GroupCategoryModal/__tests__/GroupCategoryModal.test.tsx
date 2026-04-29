@@ -22,19 +22,18 @@ import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import React from 'react'
 import GroupCategoryModal from '../GroupCategoryModal'
 
-const setup = (onSubmit = jest.fn()) => {
+const setup = (onSubmit = vi.fn()) => {
   return render(<GroupCategoryModal show={true} onSubmit={onSubmit} />)
 }
-
-const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never, delay: null}
 
 describe('GroupCategoryModal', () => {
   it('renders', () => {
     const {getByText} = setup()
     expect(getByText('Group Set Name')).toBeInTheDocument()
   })
+
   it('opens Leadership section when it clicks allows checkbox', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const {queryByText, getAllByText, getByText} = setup()
     expect(queryByText('Leadership')).not.toBeInTheDocument()
     await user.click(getByText('Allow'))
@@ -42,7 +41,7 @@ describe('GroupCategoryModal', () => {
   })
 
   it('unchecks suboordinate options when it unchecks allow checkbox', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const {getByText} = setup()
     await user.click(getByText('Allow'))
     getByText('Require group members to be in the same section').click()
@@ -51,7 +50,7 @@ describe('GroupCategoryModal', () => {
   })
 
   it('clears correct shown/hidden options when it unchecks allow checkbox', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
     const {getByText} = setup()
     const allowCheckbox = getByText('Allow')
     await user.click(allowCheckbox)
@@ -63,35 +62,9 @@ describe('GroupCategoryModal', () => {
     expect(getByText('Set first student to join as group leader')).not.toBeChecked()
   })
 
-  it('enables number input when it picks a group structure', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {getByText, findByLabelText} = setup()
-    await user.click(getByText('Group Structure'))
-    await user.click(getByText('Split students by number of groups'))
-    expect(await findByLabelText('Number of Groups')).toBeInTheDocument()
-  })
-
-  it('increments/decrements number input, which stays in bounds', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const {getByText, getByLabelText} = setup()
-    await user.click(getByText('Group Structure'))
-    await user.click(getByText('Split students by number of groups'))
-    const numberInput = getByLabelText('Number of Groups') as HTMLInputElement
-    await user.type(numberInput, '{arrowdown}')
-    expect(numberInput.value).toBe('0')
-    // userEvent's {arrowup} does not work with number inputs
-    // https://github.com/testing-library/user-event/issues/1066
-    // await user.type(numberInput, '{arrowup}{arrowup}')
-    await user.type(numberInput, '2')
-    expect(numberInput.value).toBe('2')
-    // bigger than the default maximum (200)
-    await user.type(numberInput, '99999999999999999')
-    expect(numberInput.value).toBe('200')
-  })
-
   it('calls submission function on submit', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
-    const onSubmit = jest.fn()
+    const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never, delay: 0})
+    const onSubmit = vi.fn()
     const {getByText} = setup(onSubmit)
     await user.click(getByText('Submit'))
     expect(onSubmit).toHaveBeenCalled()

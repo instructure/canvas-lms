@@ -18,7 +18,7 @@
 
 import hex2Rgb from '@canvas/util/hex2rgb'
 import assetFactory from './assetFactory'
-import {sample} from 'lodash'
+import {sample} from 'es-toolkit/compat'
 import type {ConfettiObject, Particle} from '../types'
 
 const confettiFlavors = [

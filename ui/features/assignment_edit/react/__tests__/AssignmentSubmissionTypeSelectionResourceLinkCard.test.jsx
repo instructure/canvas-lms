@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import {AssignmentSubmissionTypeSelectionResourceLinkCard} from '../AssignmentSubmissionTypeSelectionResourceLinkCard'
 
-const onCloseFn = jest.fn()
+const onCloseFn = vi.fn()
 const tool = {
   id: '1',
   title: 'Tool Title',

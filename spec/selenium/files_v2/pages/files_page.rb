@@ -240,12 +240,12 @@ module FilesPage
   end
 
   def all_item_published?
-    expect(published_status_button).to be_present
+    expect(f(all_files_table_row)).to contain_css("[data-testid='published-button-icon']")
     expect(f(all_files_table_row)).not_to contain_css("[data-testid='unpublished-button-icon']")
   end
 
   def all_item_unpublished?
-    expect(unpublished_status_button).to be_present
+    expect(f(all_files_table_row)).to contain_css("[data-testid='unpublished-button-icon']")
     expect(f(all_files_table_row)).not_to contain_css("[data-testid='published-button-icon']")
   end
 
@@ -270,11 +270,11 @@ module FilesPage
   end
 
   def date_input_available_from
-    ff("span[aria-label='Edit Permissions'] input[aria-haspopup='listbox']")[2]
+    f("[data-testid='permissions-unlock-at'] input")
   end
 
   def date_input_until
-    ff("span[aria-label='Edit Permissions'] input[aria-haspopup='listbox']")[4]
+    f("[data-testid='permissions-lock-at'] input")
   end
 
   def permission_save_button
@@ -309,6 +309,7 @@ module FilesPage
       date_input_until.send_keys(:enter)
     end
     permission_save_button.click
+    wait_for_ajaximations
   end
 
   def select_item_to_edit_from_kebab_menu(item)
@@ -333,6 +334,7 @@ module FilesPage
     file_name_textbox_el = rename_folder_component("input-folder-name")
     replace_content(file_name_textbox_el, file_name_new)
     file_name_textbox_el.send_keys(:return)
+    wait_for_ajaximations
   end
 
   def delete_file_from(item = 1, way = :kebab_menu)
@@ -410,6 +412,14 @@ module FilesPage
 
   def preview_file_preview_modal_alert
     f("#file-preview-modal-alert")
+  end
+
+  def preview_modal
+    f("[data-testid='file-preview-modal']")
+  end
+
+  def file_not_found
+    f("#file-not-found")
   end
 
   def usage_rights_manage_modal

@@ -20,7 +20,6 @@ import React from 'react'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
 import {render} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import {PlannerApp, mapStateToProps} from '../index'
 
 const TZ = 'Asia/Tokyo'
@@ -65,7 +64,7 @@ beforeAll(() => {
 
 afterAll(() => {
   MockDate.reset()
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('Weekly PlannerApp', () => {
@@ -129,7 +128,7 @@ describe('Weekly PlannerApp', () => {
   })
 
   it('notifies the UI to perform dynamic updates', () => {
-    const mockUpdate = jest.fn()
+    const mockUpdate = vi.fn()
     const {rerender} = render(
       <PlannerApp {...getDefaultValues({isLoading: true})} triggerDynamicUiUpdates={mockUpdate} />,
     )

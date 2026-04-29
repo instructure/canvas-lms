@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {ReleaseNote} from '../../../../api.d'
@@ -26,13 +26,15 @@ const RELEASE_NOTES_PATH = '/api/v1/release_notes/latest'
 async function releaseNotesQuery({signal}: QueryFunctionContext): Promise<ReleaseNote[]> {
   const data: Array<ReleaseNote> = []
   const fetchOpts = {signal}
-  let path = RELEASE_NOTES_PATH
+  let path: string | null = RELEASE_NOTES_PATH
 
   while (path) {
-    const {json, link} = await doFetchApi<ReleaseNote[]>({path, fetchOpts})
-    if (json) data.push(...json)
-    // @ts-expect-error
-    path = link?.next?.url || null
+    const result: DoFetchApiResults<ReleaseNote[]> = await doFetchApi<ReleaseNote[]>({
+      path,
+      fetchOpts,
+    })
+    if (result.json) data.push(...result.json)
+    path = result.link?.next?.url ?? null
   }
   return data
 }

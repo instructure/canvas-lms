@@ -61,14 +61,14 @@ it('renders balloons and different text when weekly', () => {
 })
 
 it('does not changeDashboardView on mount', () => {
-  const changeDashboardView = jest.fn()
+  const changeDashboardView = vi.fn()
   render(<PlannerEmptyState {...defaultProps({changeDashboardView})} />)
   expect(changeDashboardView).not.toHaveBeenCalled()
 })
 
 it('calls changeDashboardView on link click', async () => {
   const user = userEvent.setup()
-  const changeDashboardView = jest.fn()
+  const changeDashboardView = vi.fn()
   const {getByText} = render(
     <PlannerEmptyState {...defaultProps({changeDashboardView, isCompletelyEmpty: true})} />,
   )

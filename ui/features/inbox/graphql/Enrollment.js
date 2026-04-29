@@ -22,10 +22,10 @@ import {shape, string, bool} from 'prop-types'
 
 export const Enrollment = {
   fragment: gql`
-    fragment Enrollment on Enrollment {
+    fragment InboxEnrollment on Enrollment {
       type
       course {
-        ...Course
+        ...InboxCourse
       }
       concluded
     }

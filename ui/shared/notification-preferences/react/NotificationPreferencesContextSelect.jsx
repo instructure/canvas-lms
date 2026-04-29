@@ -22,7 +22,8 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import {EnrollmentShape} from './Shape'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {groupBy, sortBy, sortedUniqBy} from 'lodash'
+import {groupBy, sortBy} from 'es-toolkit/compat'
+import {sortedUniqBy} from '@canvas/util/sortedUniqBy'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('notification_preferences')

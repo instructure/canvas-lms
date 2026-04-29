@@ -68,7 +68,8 @@ export default function WeekdayPicker({locale, selectedDays = [], onChange}: Wee
       I18n.t('Saturday'),
     ],
     dayAbbreviations:
-      I18n.lookup('date.datepicker.column_headings', {locale}) || defaultWeekDayAbbreviations,
+      (I18n.lookup('date.datepicker.column_headings', {locale}) as WeekArray | null) ||
+      (defaultWeekDayAbbreviations as WeekArray),
     dayRRULEValues: ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'],
   })
   const localeRef = useRef<string>(locale)

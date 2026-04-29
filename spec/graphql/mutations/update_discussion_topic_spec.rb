@@ -264,13 +264,14 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     "{ #{args.join(", ")} }"
   end
 
-  def run_mutation(opts = {}, current_user = @teacher)
+  def run_mutation(current_user: @teacher, in_app: true, **)
     result = CanvasSchema.execute(
-      mutation_str(**opts),
+      mutation_str(**),
       context: {
         current_user:,
         domain_root_account: @course.account.root_account,
-        request: ActionDispatch::TestRequest.create
+        request: ActionDispatch::TestRequest.create,
+        in_app:
       }
     )
     result.to_h.with_indifferent_access
@@ -285,22 +286,23 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
   it "updates the discussion topic" do
     delayed_post_at = 5.days.from_now.iso8601
     lock_at = 10.days.from_now.iso8601
+    aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
 
     updated_params = {
       id: @topic.id,
       title: "Updated Title",
-      message: "Updated Message",
+      message: aa_test_data.replaced_html.gsub('"', '\"'),
       require_initial_post: true,
       specific_sections: "all",
       delayed_post_at: delayed_post_at.to_s,
       lock_at: lock_at.to_s
     }
-    result = run_mutation(updated_params)
+    result = run_mutation(**updated_params)
 
     expect(result["errors"]).to be_nil
     @topic.reload
     expect(@topic.title).to eq "Updated Title"
-    expect(@topic.message).to eq "Updated Message"
+    expect(@topic.message).to include "<p>Here is a link to the audio:"
     expect(@topic.require_initial_post).to be true
     expect(@topic.is_section_specific).to be false
     expect(@topic.delayed_post_at).to eq delayed_post_at
@@ -311,7 +313,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
   context "attachments" do
     it "removes a discussion topic attachment" do
       expect(@topic.attachment).to eq(@attachment)
-      result = run_mutation({ id: @topic.id, remove_attachment: true })
+      result = run_mutation(id: @topic.id, remove_attachment: true)
 
       expect(result["errors"]).to be_nil
       expect(@topic.reload.attachment).to be_nil
@@ -320,7 +322,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     it "replaces a discussion topic attachment" do
       attachment = attachment_with_context(@teacher)
       attachment.update!(user: @teacher)
-      result = run_mutation({ id: @topic.id, file_id: attachment.id })
+      result = run_mutation(id: @topic.id, file_id: attachment.id)
 
       expect(result["errors"]).to be_nil
       expect(@topic.reload.attachment_id).to eq attachment.id
@@ -330,7 +332,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       teacher2 = teacher_in_course.user
 
       # The frontend sends the file_id always, as a string
-      result = run_mutation({ id: @topic.id, title: "Updated Title", file_id: @attachment.id.to_s }, teacher2)
+      result = run_mutation(id: @topic.id, title: "Updated Title", file_id: @attachment.id.to_s, current_user: teacher2)
 
       expect(result["errors"]).to be_nil
       expect(@topic.reload.title).to eq "Updated Title"
@@ -341,7 +343,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     it "allow to update the anonymous state if there is no reply" do
       @topic.anonymous_state = nil
       @topic.save!
-      result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity" })
+      result = run_mutation(id: @topic.id, anonymous_state: "full_anonymity")
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to eq "full_anonymity"
       @topic.reload
@@ -351,7 +353,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     it "should save the anonymous state as NULL when the input value is 'off'" do
       @topic.anonymous_state = "full_anonymity"
       @topic.save!
-      result = run_mutation({ id: @topic.id, anonymous_state: "off" })
+      result = run_mutation(id: @topic.id, anonymous_state: "off")
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to be_nil
       @topic.reload
@@ -361,7 +363,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     it "should keep the previous anonymous state if the input value is nil" do
       @topic.anonymous_state = "full_anonymity"
       @topic.save!
-      result = run_mutation({ id: @topic.id, anonymous_state: nil })
+      result = run_mutation(id: @topic.id, anonymous_state: nil)
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "anonymousState")).to eq "full_anonymity"
       @topic.reload
@@ -372,7 +374,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       create_valid_discussion_entry
       @topic.anonymous_state = nil
       @topic.save!
-      result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity" })
+      result = run_mutation(id: @topic.id, anonymous_state: "full_anonymity")
       expect(result.dig("data", "updateDiscussionTopic", "discussionTopic")).to be_nil
       expect(@topic.anonymous_state).to be_nil
     end
@@ -380,7 +382,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     context "group discussion" do
       it "does not allow to set the anonymous state to 'full_anonymity' if the discussion is changed to group" do
         gc = @course.group_categories.create!(name: "My Group Category")
-        result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity", group_category_id: gc.id })[:data][:updateDiscussionTopic]
+        result = run_mutation(id: @topic.id, anonymous_state: "full_anonymity", group_category_id: gc.id)[:data][:updateDiscussionTopic]
         expect(result["discussionTopic"]).to be_nil
         expect(result["errors"][0]["message"]).to eq "Anonymity settings are locked for group and/or graded discussions"
       end
@@ -388,7 +390,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       it "allows to set the anonymous state to 'full_anonymity' if the discussion is changed to ungrouped" do
         gc = @course.group_categories.create!(name: "My Group Category")
         @topic.update!(group_category: gc)
-        result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity", group_category_id: nil })[:data][:updateDiscussionTopic]
+        result = run_mutation(id: @topic.id, anonymous_state: "full_anonymity", group_category_id: nil)[:data][:updateDiscussionTopic]
         expect(result["errors"]).to be_nil
         expect(result.dig("discussionTopic", "anonymousState")).to eq "full_anonymity"
         @topic.reload
@@ -398,13 +400,11 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
     context "graded discussion" do
       it "does not allow to set the anonymous state to 'full_anonymity' if the discussion is graded" do
-        result = run_mutation({
-                                id: @topic.id,
-                                anonymous_state: "full_anonymity",
-                                assignment: {
-                                  title: "Graded Topic 1",
-                                  setAssignment: true,
-                                }
+        result = run_mutation(id: @topic.id,
+                              anonymous_state: "full_anonymity",
+                              assignment: {
+                                title: "Graded Topic 1",
+                                setAssignment: true,
                               })[:data][:updateDiscussionTopic]
         expect(result["discussionTopic"]).to be_nil
         expect(result["errors"][0]["message"]).to eq "Anonymity settings are locked for group and/or graded discussions"
@@ -417,7 +417,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         )
         @topic = @discussion_assignment.discussion_topic
 
-        result = run_mutation({ id: @topic.id, anonymous_state: "full_anonymity", assignment: { setAssignment: false } })[:data][:updateDiscussionTopic]
+        result = run_mutation(id: @topic.id, anonymous_state: "full_anonymity", assignment: { setAssignment: false })[:data][:updateDiscussionTopic]
         expect(result["errors"]).to be_nil
         expect(result.dig("discussionTopic", "anonymousState")).to eq "full_anonymity"
         @topic.reload
@@ -431,7 +431,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     expect(@topic.published?).to be false
     expected_title = @topic.title
 
-    result = run_mutation({ id: @topic.id, published: true })
+    result = run_mutation(id: @topic.id, published: true)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
     @topic.reload
@@ -443,7 +443,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     @topic.publish!
     expect(@topic.published?).to be true
 
-    result = run_mutation({ id: @topic.id, published: false })
+    result = run_mutation(id: @topic.id, published: false)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be false
     @topic.reload
@@ -454,7 +454,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     @topic.unpublish!
     expect(@topic.published?).to be false
 
-    result = run_mutation({ id: @topic.id, published: true })
+    result = run_mutation(id: @topic.id, published: true)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
     @topic.reload
@@ -469,7 +469,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     original_posted_at = @topic.posted_at
 
     sleep 2 # Ensure there is a noticeable time difference
-    result = run_mutation({ id: @topic.id, published: true })
+    result = run_mutation(id: @topic.id, published: true)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
     @topic.reload
@@ -806,9 +806,30 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(@topic.reload.assignment.lti_asset_processors.count).to eq 2
       asset_processors = @topic.assignment.lti_asset_processors
       expect(asset_processors.map(&:id)).to include(ap2.id)
-      expect(asset_processors.map(&:id)).to_not include(ap1.id)
+      expect(asset_processors.map(&:id)).not_to include(ap1.id)
       expect(asset_processors.map(&:title)).to include("Episode IV: A New AP", ap2.title)
       expect(ap1.reload.workflow_state).to eq "deleted"
+    end
+
+    it "prevents adding new asset processors via API token authentication" do
+      tool = lti_registration_with_tool(account: @course.account).deployments.first
+      expect do
+        run_mutation(
+          id: @topic.id,
+          assignment: {
+            assetProcessors: [
+              {
+                newContentItem: {
+                  contextExternalToolId: tool.id,
+                  title: "New AP",
+                }
+              },
+            ]
+          },
+          current_user: @teacher,
+          in_app: false
+        )
+      end.to raise_error(RequestError, /LTI Deep Linking/)
     end
 
     it "updates the group category id" do
@@ -939,6 +960,14 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
         expect(reply_to_entry_checkpoint["pointsPossible"]).to eq 8
         expect(discussion_topic["replyToEntryRequiredCount"]).to eq 5
       end
+    end
+
+    it "successfully updates a discussion topic with checkpoints with a html content message with attachments" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+
+      run_mutation(id: @graded_topic.id, message: aa_test_data.replaced_html.gsub('"', '\"'))
+      @graded_topic.reload
+      expect(@graded_topic.message).to include "<p>Here is a link to the audio:"
     end
 
     it "successfully updates a discussion topic with checkpoints" do
@@ -1168,7 +1197,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(@checkpoint2.reload.published?).to be false
 
       # check publish topic,
-      result = run_mutation({ id: @graded_topic.id, published: true })
+      result = run_mutation(id: @graded_topic.id, published: true)
       expect(result["errors"]).to be_nil
       expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
       @graded_topic.reload
@@ -1180,7 +1209,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(@checkpoint2.published?).to be true
 
       # check unpublish topic
-      result = run_mutation({ id: @graded_topic.id, published: false })
+      result = run_mutation(id: @graded_topic.id, published: false)
 
       @graded_topic.reload
       @checkpoint1.reload
@@ -1376,12 +1405,13 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
                               { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
                             ])
 
-      expect_error(result, "If there are replies, checkpoints cannot be enabled.")
+      expect_error(result, "Checkpoints cannot be enabled after replies have been made.")
     end
 
     it "returns an error when attemting to add checkpoints to an ungraded discussion with replies" do
       my_topic = discussion_topic_model({ context: @course, attachment: @attachment })
-      my_topic.discussion_entries.create!(message: "first message", user: @teacher)
+      student = student_in_course.user
+      my_topic.discussion_entries.create!(message: "first message", user: student)
 
       result = run_mutation(id: my_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
                               { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
@@ -1389,7 +1419,51 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
                             ])
       expect(my_topic.assignment).to be_nil
       expect(my_topic.reply_to_entry_required_count).to eq 0
-      expect_error(result, "If there are replies, checkpoints cannot be enabled.")
+      expect_error(result, "Checkpoints cannot be enabled after replies have been made.")
+    end
+
+    it "returns an error when attempting to disable checkpoints on a discussion with submissions" do
+      graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+      result = run_mutation(id: graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+      expect(result["errors"]).to be_nil
+
+      # Create a submission
+      student = student_in_course.user
+      graded_topic.ensure_particular_submission(graded_topic.assignment, student, Time.zone.now)
+
+      # Try to disable checkpoints
+      result = run_mutation(id: graded_topic.id, set_checkpoints: false)
+      expect_error(result, "Checkpoints cannot be disabled after replies have been made.")
+    end
+
+    it "returns an error when attempting to enable checkpoints on a group discussion with child topic replies" do
+      group_category = @course.group_categories.create!(name: "Test Group Category")
+      group = @course.groups.create!(name: "Test Group", group_category:)
+      graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Group Discussion")
+      graded_topic.group_category = group_category
+      graded_topic.save!
+
+      # Child topics are automatically created when group_category is set
+      # Find the child topic for our group
+      child_topic = graded_topic.child_topics.where(context: group).first
+
+      # Add a student to the group and create a submission (not just an entry)
+      student = student_in_course.user
+      group.add_user(student, "accepted")
+      child_topic.discussion_entries.create!(message: "Reply in group", user: student)
+
+      # For graded discussions, we need a submission to trigger the validation
+      graded_topic.assignment.submit_homework(student, submission_type: "online_text_entry", body: "test")
+
+      # Try to enable checkpoints - should be blocked because of submission
+      result = run_mutation(id: graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
+                            ])
+      expect_error(result, "Checkpoints cannot be enabled after replies have been made.")
     end
 
     it "graded discussions with only deleted replies can still become checkpointed" do
@@ -1430,7 +1504,6 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
     context "with differentiation tag overrides" do
       before do
-        @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -1528,26 +1601,467 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
   context "discussion_default_expand and discussion_default_sort" do
     it "updates the default sort order" do
-      result = run_mutation({ id: @topic.id, sort_order: :asc })[:data][:updateDiscussionTopic]
+      result = run_mutation(id: @topic.id, sort_order: :asc)[:data][:updateDiscussionTopic]
       expect(result["errors"]).to be_nil
       expect(result[:discussionTopic][:sortOrder]).to eq("asc")
-      result = run_mutation({ id: @topic.id, sort_order_locked: true })[:data][:updateDiscussionTopic]
+      result = run_mutation(id: @topic.id, sort_order_locked: true)[:data][:updateDiscussionTopic]
       expect(result["errors"]).to be_nil
       expect(result[:discussionTopic][:sortOrderLocked]).to be true
     end
 
     it "updates the default expand fields" do
-      result = run_mutation({ id: @topic.id, expanded: true })[:data][:updateDiscussionTopic]
+      result = run_mutation(id: @topic.id, expanded: true)[:data][:updateDiscussionTopic]
       expect(result["errors"]).to be_nil
       expect(@topic.reload.expanded).to be true
-      result = run_mutation({ id: @topic.id, expanded_locked: true })[:data][:updateDiscussionTopic]
+      result = run_mutation(id: @topic.id, expanded_locked: true)[:data][:updateDiscussionTopic]
       expect(result["errors"]).to be_nil
       expect(@topic.reload.expanded_locked).to be true
     end
 
     it "fails to update, if default_expand = false and default_expand_locked = true" do
-      result = run_mutation({ id: @topic.id, expanded: false, expanded_locked: true })[:data][:updateDiscussionTopic]
+      result = run_mutation(id: @topic.id, expanded: false, expanded_locked: true)[:data][:updateDiscussionTopic]
       expect(result["errors"][0]["message"]).to match(/Cannot set default thread state locked, when threads are collapsed/)
+    end
+  end
+
+  context "delayed_post_at workflow state" do
+    it "updates workflow_state to post_delayed when editing active announcement with future delayed_post_at" do
+      announcement = @course.announcements.create!(
+        title: "Test Announcement",
+        message: "Test message",
+        user: @teacher,
+        posted_at: Time.zone.now,
+        workflow_state: "active"
+      )
+      expect(announcement.workflow_state).to eq("active")
+
+      future_date = 1.hour.from_now
+      result = run_mutation(id: announcement.id, published: true, delayed_post_at: future_date.iso8601)
+
+      expect(result["errors"]).to be_nil
+      announcement.reload
+      expect(announcement.workflow_state).to eq("post_delayed")
+      expect(announcement.delayed_post_at).to be_within(1.second).of(future_date)
+    end
+
+    it "sends notification when delayed_post event is triggered from post_delayed state" do
+      announcement = @course.announcements.create!(
+        title: "Test Announcement",
+        message: "Test message",
+        user: @teacher,
+        posted_at: Time.zone.now,
+        workflow_state: "active"
+      )
+
+      future_date = 1.hour.from_now
+      run_mutation(id: announcement.id, published: true, delayed_post_at: future_date.iso8601)
+
+      announcement.reload
+      expect(announcement.workflow_state).to eq("post_delayed")
+
+      Timecop.freeze(future_date + 1.minute) do
+        announcement.update_based_on_date
+        announcement.reload
+        expect(announcement.workflow_state).to eq("active")
+        expect(announcement.notify_users).to be true
+      end
+    end
+  end
+
+  context "accessibility scanning" do
+    before do
+      Account.site_admin.enable_feature!(:a11y_checker_additional_resources)
+      @course.root_account.enable_feature!(:accessibility_automatic_scanning)
+      @course.account.enable_feature!(:a11y_checker)
+      @course.enable_feature!(:a11y_checker_eap)
+      @course.reload
+      Progress.create!(tag: Accessibility::CourseScanService::SCAN_TAG, context: @course, workflow_state: "completed")
+    end
+
+    context "with multiple saves in a transaction" do
+      # When a DiscussionTopic is saved multiple times within a single transaction,
+      # the after_commit callback fires only once (per Rails behavior). This is important
+      # because:
+      #
+      # 1. GraphQL mutations automatically wrap operations in a transaction for timeout handling
+      # 2. Complex operations may save the same record multiple times (e.g., updating different
+      #    attributes in sequence)
+      # 3. We want to trigger accessibility scanning exactly once per transaction, not per save
+      # 4. The scan should fire regardless of which save modified the content (message/title)
+      #
+      # These specs verify that the after_commit callback correctly triggers the accessibility
+      # scan once, whether content changes happen in the first save or a later save within
+      # the transaction.
+
+      it "triggers accessibility scan once when unrelated column is saved first, then message" do
+        topic = DiscussionTopic.create!(title: "Test Topic", message: "Original message", course: @course)
+
+        expect(Accessibility::ResourceScannerService).to receive(:call).once
+
+        DiscussionTopic.transaction do
+          topic.pinned = true
+          topic.save!
+          topic.message = "Updated message"
+          topic.save!
+        end
+      end
+
+      it "triggers accessibility scan once when message is saved first, then unrelated column" do
+        topic = DiscussionTopic.create!(title: "Test Topic", message: "Original message", course: @course)
+
+        expect(Accessibility::ResourceScannerService).to receive(:call).once
+
+        DiscussionTopic.transaction do
+          topic.message = "Updated message"
+          topic.save!
+          topic.pinned = true
+          topic.save!
+        end
+      end
+
+      it "does not trigger accessibility scan when only unrelated columns are saved" do
+        topic = DiscussionTopic.create!(title: "Test Topic", message: "Original message", course: @course)
+
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        DiscussionTopic.transaction do
+          topic.sort_order = "asc"
+          topic.save!
+          topic.pinned = true
+          topic.save!
+        end
+      end
+    end
+
+    it "triggers accessibility scan when message content changes" do
+      expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @topic)
+
+      result = run_mutation(id: @topic.id, message: "Updated message with new content")
+
+      expect(result["errors"]).to be_nil
+      @topic.reload
+      expect(@topic.message).to include "Updated message with new content"
+    end
+
+    it "triggers accessibility scan when title changes" do
+      expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @topic)
+
+      result = run_mutation(id: @topic.id, title: "Updated Title")
+
+      expect(result["errors"]).to be_nil
+      @topic.reload
+      expect(@topic.title).to eq "Updated Title"
+    end
+
+    it "triggers accessibility scan when workflow_state changes via published param" do
+      @topic.update!(workflow_state: "unpublished")
+      expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @topic)
+
+      result = run_mutation(id: @topic.id, published: true)
+
+      expect(result["errors"]).to be_nil
+      @topic.reload
+      expect(@topic.workflow_state).to eq "active"
+    end
+
+    it "does not trigger accessibility scan when only non-scannable attributes change" do
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(
+        id: @topic.id,
+        require_initial_post: true,
+        lock_at: 10.days.from_now.iso8601
+      )
+
+      expect(result["errors"]).to be_nil
+      @topic.reload
+      expect(@topic.require_initial_post).to be true
+    end
+
+    it "does not trigger accessibility scan when a11y_checker_additional_resources feature is disabled" do
+      Account.site_admin.disable_feature!(:a11y_checker_additional_resources)
+
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(id: @topic.id, message: "Updated message")
+
+      expect(result["errors"]).to be_nil
+    end
+
+    it "does not trigger accessibility scan when a11y_checker feature is disabled" do
+      @course.account.disable_feature!(:a11y_checker)
+      @course.reload
+
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(id: @topic.id, message: "Updated message")
+
+      expect(result["errors"]).to be_nil
+    end
+
+    it "does not trigger accessibility scan when a11y_checker_eap feature is disabled" do
+      @course.disable_feature!(:a11y_checker_eap)
+      @course.reload
+
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(id: @topic.id, message: "Updated message")
+
+      expect(result["errors"]).to be_nil
+    end
+
+    it "does not trigger accessibility scan when no completed course scan exists" do
+      Progress.where(tag: Accessibility::CourseScanService::SCAN_TAG, context: @course).destroy_all
+
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(id: @topic.id, message: "Updated message")
+
+      expect(result["errors"]).to be_nil
+    end
+
+    it "triggers accessibility scan exactly once even when multiple attributes change" do
+      expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @topic)
+
+      result = run_mutation(
+        id: @topic.id,
+        title: "Updated Title",
+        message: "Updated message"
+      )
+
+      expect(result["errors"]).to be_nil
+      @topic.reload
+      expect(@topic.title).to eq "Updated Title"
+      expect(@topic.message).to include "Updated message"
+    end
+
+    context "with graded discussion" do
+      before do
+        @assignment = @course.assignments.create!(title: "Graded Discussion")
+        @topic.update!(assignment: @assignment)
+      end
+
+      it "triggers scan once for assignment but not for discussion topic when title is updated" do
+        # When a graded discussion's title is updated, it syncs to the assignment,
+        # so both the discussion topic and assignment should be scanned
+        @assignment.reload
+        expect(Accessibility::ResourceScannerService).not_to receive(:call).with(resource: @topic)
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: @assignment).once
+
+        result = run_mutation(
+          id: @topic.id,
+          title: "Updated Graded Discussion",
+          assignment: {
+            pointsPossible: 15,
+            gradingType: "points"
+          }
+        )
+
+        expect(result["errors"]).to be_nil
+        @topic.reload
+        expect(@topic.title).to eq "Updated Graded Discussion"
+        expect(@topic.assignment.points_possible).to eq 15
+      end
+
+      it "triggers scan once for assignment but not for discussion topic when message is updated" do
+        # For graded discussions, message updates sync to the assignment's description,
+        # so both the discussion topic and assignment should be scanned
+        @assignment.reload
+        expect(Accessibility::ResourceScannerService).not_to receive(:call).with(resource: @topic)
+        expect(Accessibility::ResourceScannerService).to receive(:call).with(resource: @assignment).once
+
+        result = run_mutation(
+          id: @topic.id,
+          message: "Updated discussion message with new content"
+        )
+
+        expect(result["errors"]).to be_nil
+        @topic.reload
+        expect(@topic.message).to include "Updated discussion message with new content"
+      end
+
+      it "removes its own accessibility scan when the topic becomes graded but assignment scan is created" do
+        ungraded_topic = @course.discussion_topics.create!(
+          title: "Ungraded Topic",
+          message: "Test message",
+          user: @teacher
+        )
+
+        expect(AccessibilityResourceScan.where(context: ungraded_topic).count).to eq(1)
+
+        result = run_mutation(
+          id: ungraded_topic.id,
+          assignment: {
+            setAssignment: true,
+            pointsPossible: 10,
+            gradingType: "points"
+          }
+        )
+
+        expect(result["errors"]).to be_nil
+        ungraded_topic.reload
+        expect(ungraded_topic.assignment).not_to be_nil
+
+        expect(AccessibilityResourceScan.where(context: ungraded_topic.assignment).count).to eq(1)
+        expect(AccessibilityResourceScan.where(context: ungraded_topic).count).to eq(0)
+      end
+
+      it "triggers scan for itself when discussion topic becomes ungraded" do
+        assignment_ref = @assignment
+
+        expect(AccessibilityResourceScan.where(context: @topic).count).to eq(0)
+        expect(AccessibilityResourceScan.where(context: assignment_ref).count).to eq(1)
+
+        result = run_mutation(
+          id: @topic.id,
+          assignment: { setAssignment: false }
+        )
+
+        expect(result["errors"]).to be_nil
+        @topic.reload
+        expect(@topic.assignment).to be_nil
+
+        expect(AccessibilityResourceScan.where(context: @topic).count).to eq(1)
+        expect(AccessibilityResourceScan.where(context: assignment_ref).count).to eq(0)
+      end
+
+      context "when a11y_checker_additional_resources is disabled" do
+        before do
+          Account.site_admin.disable_feature!(:a11y_checker_additional_resources)
+        end
+
+        it "does not normalize when topic becomes graded" do
+          ungraded_topic = @course.discussion_topics.create!(
+            title: "Ungraded Topic",
+            message: "Test message",
+            user: @teacher
+          )
+
+          # Even if topic had a scan, it shouldn't be removed without the feature flag
+          AccessibilityResourceScan.where(context: ungraded_topic).delete_all
+          AccessibilityResourceScan.create!(context: ungraded_topic, course: @course)
+
+          expect(AccessibilityResourceScan.where(context: ungraded_topic).count).to eq(1)
+
+          result = run_mutation(
+            id: ungraded_topic.id,
+            assignment: {
+              setAssignment: true,
+              pointsPossible: 10,
+              gradingType: "points"
+            }
+          )
+
+          expect(result["errors"]).to be_nil
+          ungraded_topic.reload
+          expect(ungraded_topic.assignment).not_to be_nil
+
+          # Topic scan should NOT be removed (normalization disabled)
+          expect(AccessibilityResourceScan.where(context: ungraded_topic).count).to eq(1)
+        end
+
+        it "does not normalize when topic becomes ungraded" do
+          expect(AccessibilityResourceScan.where(context: @topic).count).to eq(0)
+
+          result = run_mutation(
+            id: @topic.id,
+            assignment: { setAssignment: false }
+          )
+
+          expect(result["errors"]).to be_nil
+          @topic.reload
+          expect(@topic.assignment).to be_nil
+
+          # Topic scan should NOT be created (normalization disabled)
+          expect(AccessibilityResourceScan.where(context: @topic).count).to eq(0)
+        end
+      end
+    end
+
+    context "with announcements" do
+      before do
+        @announcement = @course.announcements.create!(
+          title: "Test Announcement",
+          message: "Test message",
+          user: @teacher
+        )
+      end
+
+      it "triggers accessibility scan when announcement title is updated" do
+        expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @announcement)
+
+        result = run_mutation(
+          id: @announcement.id,
+          title: "Updated Announcement Title"
+        )
+
+        expect(result["errors"]).to be_nil
+        @announcement.reload
+        expect(@announcement.title).to eq "Updated Announcement Title"
+      end
+
+      it "triggers accessibility scan when announcement message is updated" do
+        expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @announcement)
+
+        result = run_mutation(
+          id: @announcement.id,
+          message: "Updated announcement message"
+        )
+
+        expect(result["errors"]).to be_nil
+        @announcement.reload
+        expect(@announcement.message).to include "Updated announcement message"
+      end
+
+      it "triggers accessibility scan when announcement workflow_state is updated" do
+        @announcement.update!(workflow_state: "post_delayed")
+        expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @announcement)
+
+        result = run_mutation(
+          id: @announcement.id,
+          published: true
+        )
+
+        expect(result["errors"]).to be_nil
+        @announcement.reload
+        expect(@announcement.workflow_state).to eq "active"
+      end
+    end
+
+    context "with group category changes" do
+      it "triggers scan once when group_category_id is changed along with content" do
+        gc = @course.group_categories.create!(name: "My Group Category")
+        expect(Accessibility::ResourceScannerService).to receive(:call).once.with(resource: @topic)
+
+        result = run_mutation(
+          id: @topic.id,
+          title: "Updated Group Discussion",
+          group_category_id: gc.id
+        )
+
+        expect(result["errors"]).to be_nil
+        @topic.reload
+        expect(@topic.title).to eq "Updated Group Discussion"
+        expect(@topic.group_category_id).to eq gc.id
+      end
+    end
+
+    it "does not trigger scan when save is called with skip_accessibility_scan flag" do
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      @topic.skip_accessibility_scan = true
+      @topic.title = "Updated title"
+      @topic.save!
+    end
+
+    it "does not trigger accessibility scan when accessibility_automatic_scanning feature is disabled" do
+      @course.root_account.disable_feature!(:accessibility_automatic_scanning)
+
+      expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+      result = run_mutation(id: @topic.id, message: "Updated message")
+
+      expect(result["errors"]).to be_nil
     end
   end
 end

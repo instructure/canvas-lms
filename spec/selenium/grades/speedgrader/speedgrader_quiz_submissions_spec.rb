@@ -46,25 +46,6 @@ describe "SpeedGrader - quiz submissions" do
     expect(uri.query).to eq "user_id=#{@student.id}"
   end
 
-  it "lets you view previous quiz submissions", priority: "1" do
-    skip_if_chrome("broken - needs research")
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-
-    submission_dropdown = f("#submission_to_view")
-    expect(submission_dropdown).to be_displayed
-
-    submissions = submission_dropdown.find_elements(:css, "option")
-    expect(submissions.size).to eq 2
-
-    submissions.each do |s|
-      s.click
-      submission_date = s.text
-      in_frame("speedgrader_iframe", ".quiz-header") do
-        expect(f(".quiz-submission")).to include_text submission_date
-      end
-    end
-  end
-
   it "hides student's name from quiz if hide student names is enabled", priority: "1" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 

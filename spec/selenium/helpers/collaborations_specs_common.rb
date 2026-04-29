@@ -30,7 +30,7 @@ module CollaborationsSpecsCommon
 
   def be_editable(type, title)
     create_collaboration!(type, title)
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     new_title = "Edited collaboration"
     move_to_click(".edit_collaboration_link")
@@ -41,12 +41,12 @@ module CollaborationsSpecsCommon
     end
 
     expect(f(".collaboration .title").text).to eq new_title
-    expect(Collaboration.order("id DESC").last.title).to eq new_title
+    expect(Collaboration.order(id: :desc).last.title).to eq new_title
   end
 
   def no_edit_if_no_access(type, title)
     create_collaboration!(type, title)
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     # Negative check
     expect(f("#content")).not_to contain_css(".edit_collaboration_link")
@@ -54,7 +54,7 @@ module CollaborationsSpecsCommon
 
   def be_deletable(type, title)
     create_collaboration!(type, title)
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     move_to_click(".delete_collaboration_link")
 
@@ -66,7 +66,7 @@ module CollaborationsSpecsCommon
     wait_for_ajaximations
 
     expect(f("#no_collaborations_message")).to be_displayed
-    expect(Collaboration.order("id DESC").last).to be_deleted
+    expect(Collaboration.order(id: :desc).last).to be_deleted
   end
 
   def display_available_collaborators(type)
@@ -88,9 +88,9 @@ module CollaborationsSpecsCommon
 
     get "/courses/#{@course.id}/collaborations"
     wait_for_ajaximations
-    f(".available-users a[data-id=\"#{@student.id}\"]").click
+    f(".available-users button[data-id=\"#{@student.id}\"]").click
     expect(ff(".members-list li")).to have_size(1)
-    expect(f(".members-list")).to contain_css("a[data-id=\"user_#{@student.id}\"]")
+    expect(f(".members-list")).to contain_css("button[data-id=\"user_#{@student.id}\"]")
     expect(f(".members-list")).to contain_css("input[value=\"#{@student.id}\"]")
   end
 
@@ -98,25 +98,25 @@ module CollaborationsSpecsCommon
     group_model(context: @course, name: "grup grup")
 
     create_collaboration!(type, title)
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     f(".edit_collaboration_link").click
     wait_for_ajaximations
     move_to_click("label[for=groups-filter-btn-#{@collaboration.id}]")
     wait_for_ajaximations
 
-    expect(ffj("ul[aria-label='Available groups']:visible a")).to have_size 1
-    f(".available-groups a[data-id=\"#{@group.id}\"]").click
+    expect(ffj("ul[aria-label='Available groups']:visible button")).to have_size 1
+    f(".available-groups button[data-id=\"#{@group.id}\"]").click
     wait_for_ajaximations
     expect(ff(".members-list li")).to have_size 2
-    expect(f(".members-list")).to contain_css("a[data-id=\"group_#{@group.id}\"]")
+    expect(f(".members-list")).to contain_css("button[data-id=\"group_#{@group.id}\"]")
     expect(f(".members-list")).to contain_css("input[value=\"#{@group.id}\"]")
     expect_new_page_load do
       submit_form(".edit_collaboration")
     end
     @collaboration.reload
     collaborator = @collaboration.collaborators.where(group_id: @group).first
-    expect(collaborator).to_not be_blank
+    expect(collaborator).not_to be_blank
   end
 
   def deselect_collaborators(type)
@@ -127,11 +127,11 @@ module CollaborationsSpecsCommon
 
     get "/courses/#{@course.id}/collaborations"
     wait_for_ajaximations
-    fj(".available-users:visible a").click
+    fj(".available-users:visible button").click
     wait_for_ajaximations
-    f(".members-list a").click
+    f(".members-list button").click
     expect(f(".members-list")).not_to contain_css("li")
-    expect(f(".available-users")).to contain_css("a[data-id=\"#{@student.id}\"]")
+    expect(f(".available-users")).to contain_css("button[data-id=\"#{@student.id}\"]")
   end
 
   def select_collaborators_and_look_for_start(type)
@@ -146,7 +146,7 @@ module CollaborationsSpecsCommon
 
   def no_edit_with_no_access
     create_collaboration!("google_docs", "Google Docs")
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     # Negative check
     expect(f("#content")).not_to contain_css(".edit_collaboration_link")
@@ -154,7 +154,7 @@ module CollaborationsSpecsCommon
 
   def no_delete_with_no_access
     create_collaboration!("google_docs", "Google Docs")
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
 
     # Negative check
     expect(f("#content")).not_to contain_css(".delete_collaboration_link")
@@ -162,26 +162,25 @@ module CollaborationsSpecsCommon
 
   def not_display_new_form_if_none_exist(type, title)
     create_collaboration!(type, title)
-    validate_collaborations(%W[/courses/#{@course.id}/collaborations], false)
+    validate_collaborations(%W[/courses/#{@course.id}/collaborations], form_visible: false)
   end
 
   def display_new_form_if_none_exist(type)
     ensure_plugin(type)
     validate_collaborations(%W[/courses/#{@course.id}/collaborations
-                               /courses/#{@course.id}/collaborations#add_collaboration],
-                            true)
+                               /courses/#{@course.id}/collaborations#add_collaboration])
   end
 
   def hide_new_form_if_exists(type, title)
     create_collaboration!(type, title)
     validate_collaborations(%W[/courses/#{@course.id}/collaborations
                                /courses/#{@course.id}/collaborations#add_collaboration],
-                            false)
+                            form_visible: false)
   end
 
   def open_form_if_last_was_deleted(type, title)
     create_collaboration!(type, title)
-    validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
+    validate_collaborations("/courses/#{@course.id}/collaborations/", form_visible: false, execute_script: true)
     delete_collaboration(@collaboration, type)
     expect_form_to_be_visible
   end
@@ -200,7 +199,7 @@ module CollaborationsSpecsCommon
     @collaboration2.user = @user
     @collaboration2.save!
 
-    validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
+    validate_collaborations("/courses/#{@course.id}/collaborations/", form_visible: false, execute_script: true)
     delete_collaboration(@collaboration1, type)
     expect_form_not_to_be_visible
     delete_collaboration(@collaboration2, type)
@@ -211,8 +210,8 @@ module CollaborationsSpecsCommon
     create_collaboration!(type, title)
     validate_collaborations(%W[/courses/#{@course.id}/collaborations
                                /courses/#{@course.id}/collaborations#add_collaboration],
-                            false,
-                            true)
+                            form_visible: false,
+                            execute_script: true)
     f(".add_collaboration_link").click
     delete_collaboration(@collaboration, type)
     expect_form_to_be_visible

@@ -17,8 +17,7 @@
  */
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {createRef} from 'react'
-import omit from 'lodash/omit'
-import omitBy from 'lodash/omitBy'
+import {omit, omitBy} from 'es-toolkit/compat'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'

@@ -87,7 +87,7 @@ describe('GraderCommentVisibilityCheckbox', () => {
   })
 
   test('checking the checkbox calls onChange', async () => {
-    props.onChange = jest.fn()
+    props.onChange = vi.fn()
     const user = userEvent.setup()
     mountComponent()
     await user.click(checkbox())
@@ -96,7 +96,7 @@ describe('GraderCommentVisibilityCheckbox', () => {
 
   test('unchecking the checkbox calls onChange', async () => {
     props.checked = true
-    props.onChange = jest.fn()
+    props.onChange = vi.fn()
     const user = userEvent.setup()
     mountComponent()
     await user.click(checkbox())

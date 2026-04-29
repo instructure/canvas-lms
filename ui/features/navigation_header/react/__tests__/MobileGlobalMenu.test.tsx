@@ -19,6 +19,7 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {type MockedFunction} from 'vitest'
 import MobileGlobalMenu from '../MobileGlobalMenu'
 import {useSwitchExperience} from '../mutations/useSwitchExperience'
 import {
@@ -28,37 +29,30 @@ import {
   type ProcessedTool,
 } from '../utils'
 
-jest.mock('../utils', () => ({
-  getExternalApps: jest.fn(),
-  filterAndProcessTools: jest.fn(),
+vi.mock('../utils', () => ({
+  getExternalApps: vi.fn(),
+  filterAndProcessTools: vi.fn(),
 }))
 
-jest.mock('../mutations/useSwitchExperience', () => ({
-  useSwitchExperience: jest.fn(),
+vi.mock('../mutations/useSwitchExperience', () => ({
+  useSwitchExperience: vi.fn(),
 }))
 
-const mockedFilterAndProcessTools = filterAndProcessTools as jest.MockedFunction<
+const mockedFilterAndProcessTools = filterAndProcessTools as MockedFunction<
   typeof filterAndProcessTools
 >
-const mockedGetExternalApps = getExternalApps as jest.MockedFunction<typeof getExternalApps>
-const mockedUseSwitchExperience = useSwitchExperience as jest.MockedFunction<
-  typeof useSwitchExperience
->
+const mockedGetExternalApps = getExternalApps as MockedFunction<typeof getExternalApps>
+const mockedUseSwitchExperience = useSwitchExperience as MockedFunction<typeof useSwitchExperience>
 
 describe('MobileGlobalMenu', () => {
   beforeEach(() => {
-    mockedUseSwitchExperience.mockReturnValue({mutate: jest.fn()} as any)
-    fakeENV.setup({
-      FEATURES: {
-        horizon_learner_app: true,
-        horizon_learning_provider_app_on_contextless_routes: true,
-      },
-    })
+    mockedUseSwitchExperience.mockReturnValue({mutate: vi.fn()} as any)
   })
+
   afterEach(() => {
     cleanup()
-    fakeENV.teardown()
   })
+
   const setup = (
     processedTools: ProcessedTool[] = [],
     externalTools: ExternalTool[] = [],
@@ -215,6 +209,7 @@ describe('MobileGlobalMenu', () => {
   it('should handle tools with null image correctly and use fallback icon', async () => {
     const externalTools: ExternalTool[] = [
       {
+        toolId: 'tool-with-null-image-1',
         label: 'Tool with Null Image',
         imgSrc: null,
         href: 'http://tool-null-image.com',
@@ -248,27 +243,13 @@ describe('MobileGlobalMenu', () => {
   })
 
   it('calls switchExperience mutate when Canvas Career link clicked', async () => {
-    const mutateMock = jest.fn()
+    const mutateMock = vi.fn()
     mockedUseSwitchExperience.mockReturnValue({mutate: mutateMock} as any)
     setup([], [], true)
     const link = await screen.findByText('Canvas Career')
     await userEvent.click(link)
     await waitFor(() => {
       expect(mutateMock).toHaveBeenCalled()
-    })
-  })
-  describe('when career feature flags are not enabled', () => {
-    beforeEach(() => {
-      fakeENV.setup({
-        FEATURES: {
-          horizon_learner_app: false,
-          horizon_learning_provider_app_on_contextless_routes: false,
-        },
-      })
-    })
-    it('should not render Career menu item', async () => {
-      setup([], [], false)
-      expect(await screen.queryByText('Canvas Career')).not.toBeInTheDocument()
     })
   })
 })

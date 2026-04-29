@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class WebConferenceParticipant < ActiveRecord::Base
+class WebConferenceParticipant < ApplicationRecord
   belongs_to :web_conference
   belongs_to :user
 

@@ -20,9 +20,16 @@ import DashboardCard, {DashboardCardHeaderHero} from '../DashboardCard'
 import React from 'react'
 import {render} from '@testing-library/react'
 import * as apiClient from '@canvas/courses/courseAPIClient'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import {vi} from 'vitest'
 
-jest.mock('@canvas/courses/courseAPIClient')
+vi.mock('@canvas/courses/courseAPIClient', () => ({
+  publishCourse: vi.fn(),
+  unpublishCourse: vi.fn(),
+}))
+
+const server = setupServer()
 
 function createMockProps(opts = {}) {
   return {
@@ -37,12 +44,21 @@ function createMockProps(opts = {}) {
   }
 }
 
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+
 beforeEach(() => {
-  fetchMock.mock('*', JSON.stringify({}), {status: 200})
+  // Mock all requests with an empty JSON response
+  server.use(
+    http.get('*', () => HttpResponse.json({})),
+    http.post('*', () => HttpResponse.json({})),
+    http.put('*', () => HttpResponse.json({})),
+    http.delete('*', () => HttpResponse.json({})),
+  )
 })
 
 afterEach(() => {
-  fetchMock.restore()
+  server.resetHandlers()
 })
 
 describe('DashboardCardHeaderHero', () => {
@@ -96,7 +112,7 @@ describe('PublishButton', () => {
 
   describe('.updatePublishedCourse', () => {
     it('calls onPublishedCourse callback when registered', () => {
-      const onPublishedCourse = jest.fn()
+      const onPublishedCourse = vi.fn()
       const props = createMockProps({
         id: '0',
         published: false,

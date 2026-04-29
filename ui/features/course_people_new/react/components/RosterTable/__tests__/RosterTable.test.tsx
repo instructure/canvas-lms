@@ -24,28 +24,29 @@ import {
   DEFAULT_SORT_DIRECTION,
   DEFAULT_SORT_FIELD,
   INACTIVE_ENROLLMENT,
-  PENDING_ENROLLMENT
+  PENDING_ENROLLMENT,
 } from '../../../../util/constants'
 import useCoursePeopleQuery from '../../../hooks/useCoursePeopleQuery'
+import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
 import {mockUser, mockEnrollment} from '../../../../graphql/Mocks'
 
-jest.mock('../../../hooks/useCoursePeopleQuery')
-jest.mock('../../../hooks/useCoursePeopleContext')
+vi.mock('../../../hooks/useCoursePeopleQuery')
+vi.mock('../../../hooks/useCoursePeopleContext')
 
 const mockUsers = [
   mockUser({
     userId: '1',
-    userName: 'Student One'
+    userName: 'Student One',
   }),
   mockUser({
     userId: '2',
     userName: 'Student Two',
-    firstEnrollment: mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT})
+    firstEnrollment: mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT}),
   }),
   mockUser({
     userId: '3',
     userName: 'Student Three',
-    firstEnrollment: mockEnrollment({enrollmentState: PENDING_ENROLLMENT})
+    firstEnrollment: mockEnrollment({enrollmentState: PENDING_ENROLLMENT}),
   }),
 ]
 
@@ -65,7 +66,7 @@ const defaultProps = {
   users: mockUsers,
   handleSort: () => {},
   sortField: DEFAULT_SORT_FIELD,
-  sortDirection: DEFAULT_SORT_DIRECTION
+  sortDirection: DEFAULT_SORT_DIRECTION,
 }
 
 describe('RosterTable', () => {
@@ -73,17 +74,17 @@ describe('RosterTable', () => {
   const renderComponent = () => render(<RosterTable {...defaultProps} />)
 
   beforeEach(() => {
-    (useCoursePeopleQuery as jest.Mock).mockReturnValue({
+    vi.mocked(useCoursePeopleQuery).mockReturnValue({
       data: mockUsers,
       isLoading: false,
-      error: null
-    })
-    require('../../../hooks/useCoursePeopleContext').default.mockReturnValue(useCoursePeopleContextMocks)
+      error: null,
+    } as any)
+    vi.mocked(useCoursePeopleContext).mockReturnValue(useCoursePeopleContextMocks as any)
     renderComponent()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the table with correct caption', () => {

@@ -22,7 +22,6 @@ import ValidatedFormView from './ValidatedFormView'
 import preventDefault from '@canvas/util/preventDefault'
 import wrapper from '../../jst/DialogFormWrapper.handlebars'
 import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 
 export const isSmallTablet = !window.matchMedia('(min-width: 550px)').matches
 

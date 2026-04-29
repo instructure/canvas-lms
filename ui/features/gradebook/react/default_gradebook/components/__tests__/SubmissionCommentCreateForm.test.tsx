@@ -82,10 +82,10 @@ describe('SubmissionCommentCreateForm', () => {
     })
 
     test('the default action is prevented when handlePublishComment runs', async () => {
-      props.createSubmissionComment = jest.fn()
+      props.createSubmissionComment = vi.fn()
       wrapper = mountComponent()
       fireEvent.change(await getTextarea(), {target: {value: 'some message'}})
-      const event = {preventDefault: jest.fn()} as unknown as React.MouseEvent<ViewProps>
+      const event = {preventDefault: vi.fn()} as unknown as React.MouseEvent<ViewProps>
       ref.current?.handlePublishComment(event)
       expect(event.preventDefault).toHaveBeenCalledTimes(1)
     })
@@ -104,8 +104,8 @@ describe('SubmissionCommentCreateForm', () => {
     })
 
     test('clicking the "Submit" button calls setProcessing (with true) and createSubmissionComment', async () => {
-      props.createSubmissionComment = jest.fn()
-      props.setProcessing = jest.fn()
+      props.createSubmissionComment = vi.fn()
+      props.setProcessing = vi.fn()
       wrapper = mountComponent()
       fireEvent.change(await getTextarea(), {target: {value: 'some message'}})
       fireEvent.click(getSubmitButton())
@@ -116,7 +116,7 @@ describe('SubmissionCommentCreateForm', () => {
     })
 
     test('clicking the "Submit" button clears the comment field', async () => {
-      props.createSubmissionComment = jest.fn()
+      props.createSubmissionComment = vi.fn()
       wrapper = mountComponent()
       const textarea = await getTextarea()
       fireEvent.change(textarea, {target: {value: 'some message'}})
@@ -125,7 +125,7 @@ describe('SubmissionCommentCreateForm', () => {
     })
 
     test('clicking the "Cancel" button calls createSubmissionComment', async () => {
-      props.cancelCommenting = jest.fn()
+      props.cancelCommenting = vi.fn()
       wrapper = mountComponent()
       fireEvent.change(await getTextarea(), {target: {value: 'some message'}})
       fireEvent.click(getCancelButton())
@@ -141,7 +141,7 @@ describe('SubmissionCommentCreateForm', () => {
     })
 
     test('clicking the "Cancel" button triggers cancelCommenting', async () => {
-      props.cancelCommenting = jest.fn()
+      props.cancelCommenting = vi.fn()
       wrapper = mountComponent()
       fireEvent.change(await getTextarea(), {target: {value: 'some message'}})
       fireEvent.click(getCancelButton())
@@ -187,7 +187,7 @@ describe('SubmissionCommentCreateForm', () => {
     })
 
     test('focuses on the textarea after a successful comment post', async () => {
-      props.createSubmissionComment = jest.fn()
+      props.createSubmissionComment = vi.fn()
       wrapper = mountComponent()
       fireEvent.change(await getTextarea(), {target: {value: 'some message'}})
       fireEvent.click(getSubmitButton())
@@ -226,9 +226,9 @@ describe('SubmissionCommentCreateForm', () => {
     })
 
     test('focuses on the textarea after a successful comment post', async () => {
-      props.createSubmissionComment = jest.fn()
+      props.createSubmissionComment = vi.fn()
       wrapper = mountComponent()
-      if (ref.current) jest.spyOn(ref.current, 'focusTextarea')
+      if (ref.current) vi.spyOn(ref.current, 'focusTextarea')
       const textarea = await getTextarea()
       fireEvent.change(textarea, {target: {value: 'some message'}})
       fireEvent.click(getSubmitButton())

@@ -19,31 +19,6 @@
 #
 
 module Types
-  class ExternalToolStateType < Types::BaseEnum
-    graphql_name "ExternalToolState"
-    description "States that an External Tool can be in"
-    value "anonymous"
-    value "name_only"
-    value "email_only"
-    value "public"
-  end
-
-  # We can add additional placements as they are needed.
-  class ExternalToolPlacementType < Types::BaseEnum
-    graphql_name "ExternalToolPlacement"
-    description "Placements that an External Tool can have"
-    value "homework_submission"
-    value "ActivityAssetProcessor"
-  end
-
-  class ExternalToolFilterInputType < Types::BaseInputObject
-    graphql_name "ExternalToolFilterInput"
-
-    argument :state, ExternalToolStateType, required: false, default_value: nil
-
-    argument :placement, ExternalToolPlacementType, required: false, default_value: nil
-  end
-
   # This is a little funky. External tools can either be backed by a `ContextExternalTool`
   # in the database, or directly by data in a `ContentTag`. Because there could
   # be conflicting legacy id for these, we are seperating them into two concrete
@@ -55,6 +30,7 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
     implements Interfaces::LegacyIDInterface
+    implements Interfaces::PlacementsInterface
 
     field :url, Types::UrlType, null: true
 
@@ -62,15 +38,16 @@ module Types
       object.login_or_launch_url
     end
 
-    field :name, String, null: true
+    field :name, String, null: false
 
     field :description, String, null: true
 
     field :published, Boolean, null: true
-
     def published
-      object.workflow_state != "deleted"
+      object.active?
     end
+
+    field :domain, String, null: true
 
     field :settings, ExternalToolSettingsType, null: true
 

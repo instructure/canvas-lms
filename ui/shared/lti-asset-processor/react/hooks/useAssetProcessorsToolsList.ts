@@ -22,15 +22,17 @@ import {useEffect} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
+import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
 const I18n = createI18nScope('asset_processors_selection')
 
-const queryFn = async ({queryKey}: {queryKey: [string, number]}) => {
+const queryFn = async ({queryKey}: {queryKey: [string, number, string]}) => {
   const courseId = queryKey[1]
+  const placement = queryKey[2]
   const {response, json} = await doFetchApi<LtiLaunchDefinition[]>({
     path: `/api/v1/courses/${courseId}/lti_apps/launch_definitions`,
-    params: {'placements[]': 'ActivityAssetProcessor'},
+    params: {'placements[]': placement, include_context_name: true},
   })
   if (!response.ok) {
     throw new Error(response.statusText)
@@ -40,9 +42,10 @@ const queryFn = async ({queryKey}: {queryKey: [string, number]}) => {
 
 export function useAssetProcessorsToolsList(
   courseId: number,
-): UseQueryResult<LtiLaunchDefinition[], Error> {
-  const res: UseQueryResult<LtiLaunchDefinition[], Error> = useQuery({
-    queryKey: ['assetProcessors', courseId],
+  type: AssetProcessorType,
+): UseQueryResult<LtiLaunchDefinition[] | undefined, Error> {
+  const res: UseQueryResult<LtiLaunchDefinition[] | undefined, Error> = useQuery({
+    queryKey: ['assetProcessors', courseId, type.toString()],
     queryFn,
   })
 

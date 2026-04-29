@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 
 import HideAssignmentGradesTray from '@canvas/hide-assignment-grades-tray'
 import PostAssignmentGradesTray from '@canvas/post-assignment-grades-tray'
@@ -49,14 +49,14 @@ export default class PostPolicies {
       this._hideAssignmentGradesTray = ref
     }
 
-    ReactDOM.render(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
+    legacyRender(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
 
     const $postContainer = document.getElementById('post-assignment-grades-tray')
     const bindPostTray = ref => {
       this._postAssignmentGradesTray = ref
     }
 
-    ReactDOM.render(<PostAssignmentGradesTray ref={bindPostTray} />, $postContainer)
+    legacyRender(<PostAssignmentGradesTray ref={bindPostTray} />, $postContainer)
   }
 
   destroy() {
@@ -64,11 +64,11 @@ export default class PostPolicies {
     const $postContainer = document.getElementById('post-assignment-grades-tray')
 
     if ($hideContainer) {
-      ReactDOM.unmountComponentAtNode($hideContainer)
+      legacyUnmountComponentAtNode($hideContainer)
     }
 
     if ($postContainer) {
-      ReactDOM.unmountComponentAtNode($postContainer)
+      legacyUnmountComponentAtNode($postContainer)
     }
   }
 

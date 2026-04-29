@@ -27,7 +27,7 @@ import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
 
 // Mock SpeedGraderSettingsMenu
-jest.mock('../../react/SpeedGraderSettingsMenu', () => ({
+vi.mock('../../react/SpeedGraderSettingsMenu', () => ({
   __esModule: true,
   default: () => null,
 }))
@@ -82,19 +82,19 @@ describe('SpeedGrader', () => {
 
     beforeEach(() => {
       history = {
-        back: jest.fn(),
+        back: vi.fn(),
         length: 1,
-        popState: jest.fn(),
-        pushState: jest.fn(),
-        replaceState: jest.fn(),
+        popState: vi.fn(),
+        pushState: vi.fn(),
+        replaceState: vi.fn(),
       }
 
-      jest.spyOn(SpeedGraderHelpers, 'getHistory').mockReturnValue(history)
-      jest.spyOn(SpeedGraderHelpers, 'setLocation').mockImplementation(_url => {})
-      jest.spyOn(SpeedGraderHelpers, 'getLocation').mockImplementation(() => '')
-      jest.spyOn(SpeedGraderHelpers, 'setLocationHash').mockImplementation(_hash => {})
-      jest.spyOn(SpeedGraderHelpers, 'getLocationHash').mockImplementation(() => '')
-      jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
+      vi.spyOn(SpeedGraderHelpers, 'getHistory').mockReturnValue(history)
+      vi.spyOn(SpeedGraderHelpers, 'setLocation').mockImplementation(_url => {})
+      vi.spyOn(SpeedGraderHelpers, 'getLocation').mockImplementation(() => '')
+      vi.spyOn(SpeedGraderHelpers, 'setLocationHash').mockImplementation(_hash => {})
+      vi.spyOn(SpeedGraderHelpers, 'getLocationHash').mockImplementation(() => '')
+      vi.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
 
       fakeENV.setup({
         assignment_id: '17',
@@ -125,10 +125,10 @@ describe('SpeedGrader', () => {
         }),
       )
 
-      jest.spyOn(SpeedGrader.EG, 'domReady')
+      vi.spyOn(SpeedGrader.EG, 'domReady')
 
       // Mock $.ajaxJSON.storeRequest
-      $.ajaxJSON.storeRequest = jest.fn()
+      $.ajaxJSON.storeRequest = vi.fn()
       $.ajaxJSON.unhandledXHRs = []
 
       SpeedGrader.setup()
@@ -139,14 +139,14 @@ describe('SpeedGrader', () => {
       SpeedGrader.teardown()
       fakeENV.teardown()
       fixtures.innerHTML = ''
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
       ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
     })
 
     it('contains iframe with the escaped student submission url', () => {
       const retrieveUrl = '/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
       const url = 'http://www.example.com/lti/launch/user/4'
-      const buildIframeStub = jest.spyOn(SpeedGraderHelpers, 'buildIframe')
+      const buildIframeStub = vi.spyOn(SpeedGraderHelpers, 'buildIframe')
       const submission = {
         external_tool_url: url,
         resource_link_lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2',
@@ -169,7 +169,7 @@ describe('SpeedGrader', () => {
 
       const retrieveUrl = '/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
       const url = 'http://www.example.com/lti/launch/user/4'
-      const buildIframeStub = jest.spyOn(SpeedGraderHelpers, 'buildIframe')
+      const buildIframeStub = vi.spyOn(SpeedGraderHelpers, 'buildIframe')
       const submission = {
         external_tool_url: url,
         resource_link_lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2',
@@ -188,7 +188,7 @@ describe('SpeedGrader', () => {
       const retrieveUrl =
         'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
       const url = 'http://www.example.com/lti/launch/user/4'
-      const buildIframeStub = jest.spyOn(SpeedGraderHelpers, 'buildIframe')
+      const buildIframeStub = vi.spyOn(SpeedGraderHelpers, 'buildIframe')
       const submission = {
         url,
         resource_link_lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2',
@@ -204,7 +204,7 @@ describe('SpeedGrader', () => {
       const retrieveUrl =
         'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
       const url = 'http://www.example.com/lti/launch/user/4'
-      const buildIframeStub = jest.spyOn(SpeedGraderHelpers, 'buildIframe')
+      const buildIframeStub = vi.spyOn(SpeedGraderHelpers, 'buildIframe')
       const submission = {
         url,
         resource_link_lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2',

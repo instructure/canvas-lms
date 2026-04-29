@@ -20,6 +20,7 @@ import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {LtiMessageType} from '../model/LtiMessageType'
 import type {LtiPlacement, LtiPlacementWithIcon} from '../model/LtiPlacement'
 import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
+import type {MessageSetting} from '../model/internal_lti_configuration/InternalBaseLaunchSettings'
 import {PlacementLabelOverride, IconUrlOverride} from './Lti1p3RegistrationOverlayStore'
 
 export type Lti1p3RegistrationOverlayState = {
@@ -32,6 +33,7 @@ export type Lti1p3RegistrationOverlayState = {
     Jwk: string
     domain: string
     customFields: string
+    message_settings: MessageSetting[]
   }>
   permissions: {
     scopes?: LtiScope[]
@@ -40,8 +42,9 @@ export type Lti1p3RegistrationOverlayState = {
     privacy_level?: LtiPrivacyLevel
   }
   placements: {
-    placements?: LtiPlacement[]
+    placements: LtiPlacement[]
     courseNavigationDefaultDisabled?: boolean
+    topNavigationAllowFullscreen?: boolean
   }
   override_uris: {
     placements: Partial<
@@ -62,6 +65,7 @@ export type Lti1p3RegistrationOverlayState = {
   }
   icons: {
     placements: Partial<Record<LtiPlacementWithIcon, IconUrlOverride>>
+    defaultIconUrl?: string
   }
   dirty: boolean
   hasSubmitted: boolean

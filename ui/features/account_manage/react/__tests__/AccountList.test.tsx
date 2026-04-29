@@ -20,7 +20,10 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import {AccountList} from '../AccountList'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 const accountFixture = {
   id: '1',
@@ -38,14 +41,24 @@ const accountFixture = {
 }
 
 describe('AccountLists', () => {
-  beforeEach(() => {
-    fetchMock.restore()
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   it('makes an API call when page loads', async () => {
-    fetchMock.get('/api/v1/accounts?include=course_count,sub_account_count&per_page=50&page=1', [
-      accountFixture,
-    ])
+    server.use(
+      http.get('/api/v1/accounts', ({request}) => {
+        const url = new URL(request.url)
+        if (
+          url.searchParams.get('include') === 'course_count,sub_account_count' &&
+          url.searchParams.get('per_page') === '50' &&
+          url.searchParams.get('page') === '1'
+        ) {
+          return HttpResponse.json([accountFixture])
+        }
+        return HttpResponse.json([])
+      }),
+    )
     const {queryByText} = render(
       <MockedQueryProvider>
         <AccountList />
@@ -54,29 +67,41 @@ describe('AccountLists', () => {
     await waitFor(() => expect(queryByText('acc1')).toBeTruthy())
   })
 
-  // FOO-4877: the mocked error is appearing in console, failing the test
-  it.skip('renders an error message when loading accounts fails', async () => {
-    fetchMock.get(
-      '/api/v1/accounts?include=course_count,sub_account_count&per_page=50&page=1',
-      () => {
-        throw Object.assign(new Error('mocked error'), {code: 402})
-      },
+  it('renders an error message when loading accounts fails', async () => {
+    server.use(
+      http.get('/api/v1/accounts', () => {
+        return HttpResponse.json({error: 'Internal Server Error'}, {status: 500})
+      }),
     )
-    const {queryByText} = render(
+    const {getByText} = render(
       <MockedQueryProvider>
         <AccountList />
       </MockedQueryProvider>,
     )
-    await waitFor(() => expect(queryByText('Accounts could not be found')).toBeTruthy())
+    await waitFor(() =>
+      expect(getByText('Help us improve by telling us what happened')).toBeInTheDocument(),
+    )
   })
 
   it('renders when the API does not return the last page', async () => {
-    fetchMock.get('/api/v1/accounts?include=course_count,sub_account_count&per_page=50&page=1', {
-      body: [accountFixture],
-      headers: {
-        link: '</api/v1/accounts?include=course_count,sub_account_countpage=1&per_page=50>; rel="current"',
-      },
-    })
+    server.use(
+      http.get('/api/v1/accounts', ({request}) => {
+        const url = new URL(request.url)
+        if (
+          url.searchParams.get('include') === 'course_count,sub_account_count' &&
+          url.searchParams.get('per_page') === '50' &&
+          url.searchParams.get('page') === '1'
+        ) {
+          return new HttpResponse(JSON.stringify([accountFixture]), {
+            headers: {
+              'Content-Type': 'application/json',
+              link: '</api/v1/accounts?include=course_count,sub_account_countpage=1&per_page=50>; rel="current"',
+            },
+          })
+        }
+        return HttpResponse.json([])
+      }),
+    )
     const {queryByText} = render(
       <MockedQueryProvider>
         <AccountList />

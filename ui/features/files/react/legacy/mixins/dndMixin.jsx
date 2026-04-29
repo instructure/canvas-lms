@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import DragFeedback from '@canvas/files/react/components/DragFeedback'
 import moveStuff from '../util/moveStuff'
 import $ from 'jquery'
-import {isArray} from 'lodash'
+import {isArray} from 'es-toolkit/compat'
 
 export default {
   itemsToDrag() {
@@ -33,7 +33,7 @@ export default {
     }
     // This should be in JSX, but /o\
 
-    ReactDOM.render(
+    legacyRender(
       <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={this.itemsToDrag()} />,
       this.dragHolder[0],
     )
@@ -42,7 +42,7 @@ export default {
   removeDragFeedback() {
     $(document).off('.MultiDraggableMixin')
     if (this.dragHolder) {
-      ReactDOM.unmountComponentAtNode(this.dragHolder[0])
+      legacyUnmountComponentAtNode(this.dragHolder[0])
     }
     this.dragHolder = null
   },

@@ -18,14 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe SmartSearchable do
   describe "#generate_embeddings" do
     before do
       skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
 
-      allow(SmartSearch).to receive_messages(generate_embedding: [1] * 1024, bedrock_client: double)
+      allow(SmartSearch).to receive_messages(generate_embedding: [1] * 1024, bedrock_client: instance_double(Aws::BedrockRuntime::Client))
     end
 
     before :once do
@@ -92,6 +90,30 @@ describe SmartSearchable do
       wiki_page_model(title: "test", body: "foo12345 " * 333)
       run_jobs
       expect(@page.reload.embeddings.count).to eq 3
+    end
+  end
+
+  describe "error handling" do
+    before do
+      skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
+    end
+
+    before :once do
+      course_factory
+      @course.enable_feature! :smart_search
+    end
+
+    it "raises an error for a 'successful' response with no embeddings" do
+      mock_resp = instance_double(Net::HTTPResponse,
+                                  body: StringIO.new('{"did_it_work_frd": "nope"}'))
+      mock_client = instance_double(Aws::BedrockRuntime::Client)
+      allow(SmartSearch).to receive(:bedrock_client).and_return(mock_client)
+      expect(mock_client).to receive(:invoke_model).and_return(mock_resp)
+
+      wiki_page_model(title: "test", body: "foo")
+      run_jobs
+
+      expect(Delayed::Job::Failed.last.last_error).to match(/bedrock response missing embeddings/)
     end
   end
 end

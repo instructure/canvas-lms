@@ -128,7 +128,7 @@ describe "master courses sidebar" do
     it "show mobile trigger button and hides trigger tab" do
       resize_screen_to_mobile_width
       get "/courses/#{@master.id}"
-      expect(blueprint_open_sidebar_button).to_not be_displayed
+      expect(blueprint_open_sidebar_button).not_to be_displayed
       expect(blueprint_mobile_open_sidebar_button).to be_displayed
     end
 
@@ -222,23 +222,6 @@ describe "master courses sidebar" do
       notification_message_text_box.send_keys(msg + msg + "A")
       expect(character_count).to include_text("(140/140)")
       expect(notification_message_text_box).not_to have_value("A")
-    end
-
-    it "updates screenreader character usage message with character count" do
-      skip("This needs to be skipped until ADMIN-793 is resolved")
-      inmsg = "1234567890123456789012345678901234567890"
-      open_blueprint_sidebar
-      # if the default ever changes in MigrationOptions, make sure our spec still works
-      driver.execute_script("ENV.MIGRATION_OPTIONS_SR_ALERT_TIMEOUT = 15")
-      send_notification_checkbox.click
-      add_message_checkbox.click
-      # we don't start adding the message until 90% full
-      notification_message_text_box.send_keys(inmsg + inmsg + inmsg + "abcdefg")
-      alert_text = "127 of 140 maximum characters"
-      # the screenreader message is displayed after a 600ms delay
-      # not waiting leads to a flakey spec
-      wait = Selenium::WebDriver::Wait.new(timeout: 0.7)
-      wait.until { expect(fj("#flash_screenreader_holder:contains(#{alert_text})")).to be_present }
     end
 
     it "issues screenreader alert when message is full" do

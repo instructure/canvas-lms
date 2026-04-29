@@ -24,7 +24,7 @@ import SubmissionTrayRadioInputGroup, {
 } from '../components/SubmissionTrayRadioInputGroup'
 
 describe('SubmissionTrayRadioInputGroup Tests', () => {
-  const updateSubmission: (arg0: PendingUpdateData) => void = jest.fn()
+  const updateSubmission: (arg0: PendingUpdateData) => void = vi.fn()
 
   const getComponent = (customProps: Partial<SubmissionTrayRadioInputGroupProps>) => {
     const props: SubmissionTrayRadioInputGroupProps = {
@@ -67,7 +67,7 @@ describe('SubmissionTrayRadioInputGroup Tests', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('radio input disabled tests', () => {

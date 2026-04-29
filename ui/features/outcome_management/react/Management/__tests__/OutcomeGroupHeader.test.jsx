@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import OutcomeGroupHeader from '../OutcomeGroupHeader'
 
@@ -37,12 +37,12 @@ describe('OutcomeGroupHeader', () => {
     )
 
   beforeEach(() => {
-    onMenuHandlerMock = jest.fn()
-    hideOutcomesViewMock = jest.fn()
+    onMenuHandlerMock = vi.fn()
+    hideOutcomesViewMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderWithContext = children => {

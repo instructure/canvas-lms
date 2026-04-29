@@ -68,6 +68,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "early_access_program": {
+#           "description": "Indicates the feature is part of the Early Access Program.",
+#           "example": false,
+#           "type": "boolean"
+#         },
 #         "autoexpand": {
 #           "description": "Whether the details of the feature are autoexpanded on page load vs. the user clicking to expand.",
 #            "example": true,
@@ -132,10 +137,15 @@ class FeatureFlagsController < ApplicationController
   include Api::V1::FeatureFlag
 
   before_action :get_context
+  skip_before_action :require_user, only: %i[environment]
 
   # @API List features
   #
   # A paginated list of all features that apply to a given Account, Course, or User.
+  #
+  # @argument hide_inherited_enabled [Boolean]
+  #   When true, feature flags that are enabled in a higher context and cannot
+  #   be overridden will be omitted.
   #
   # @example_request
   #
@@ -153,13 +163,13 @@ class FeatureFlagsController < ApplicationController
       @context.feature_flags.load if skip_cache
 
       flags = features.filter_map do |fd|
-        @context.lookup_feature_flag(fd.feature,
-                                     override_hidden: can_read_site_admin?,
-                                     include_shadowed: can_read_site_admin?,
-                                     skip_cache:,
-                                     # Hide flags that are forced ON at a higher level
-                                     # Undocumented flag for frontend use only
-                                     hide_inherited_enabled: params[:hide_inherited_enabled])
+        ff = @context.lookup_feature_flag(fd.feature,
+                                          override_hidden: can_read_site_admin?,
+                                          include_shadowed: can_read_site_admin?,
+                                          skip_cache:)
+
+        # Hide flags that are forced ON at a higher level
+        ff unless value_to_boolean(params[:hide_inherited_enabled]) && ff&.enabled? && ff.locked?(@context)
       end
 
       render json: flags.map { |flag| feature_with_flag_json(flag, @context, @current_user, session) }
@@ -182,7 +192,7 @@ class FeatureFlagsController < ApplicationController
   def enabled_features
     if authorized_action(@context, @current_user, :read)
       features = Feature.applicable_features(@context).filter_map { |fd| @context.lookup_feature_flag(fd.feature) }
-                        .select(&:enabled?).map(&:feature)
+                                                      .select(&:enabled?).map(&:feature)
       render json: features
     end
   end
@@ -203,6 +213,10 @@ class FeatureFlagsController < ApplicationController
   #   { "telepathic_navigation": true, "fancy_wickets": true, "automatic_essay_grading": false }
   #
   def environment
+    unless mobile_device?
+      return unless require_user
+    end
+
     render json: cached_js_env_account_features
   end
 
@@ -270,6 +284,15 @@ class FeatureFlagsController < ApplicationController
         prior_state = current_flag.state
       end
 
+      # check whether the feature is early access (and the EAP has not been accepted)
+      if feature_def.early_access_program &&
+         params[:state] != "off" &&
+         @context.respond_to?(:root_account) &&
+         !@context.root_account.early_access_program[:value] &&
+         !@context.root_account.grants_right?(@current_user, :manage_site_settings)
+        return render json: { message: "This feature requires acceptance of the terms of the Early Access Program. See #{account_settings_url(anchor: "tab-features")}" }, status: :forbidden
+      end
+
       # require site admin privileges to unhide a hidden feature
       if !current_flag && feature_def.hidden?
         return render json: { message: "invalid feature" }, status: :bad_request unless Account.site_admin.grants_right?(@current_user, session, :read)
@@ -301,6 +324,20 @@ class FeatureFlagsController < ApplicationController
     end
   end
 
+  # @{not an}API Accept Early Access Program Terms and Conditions
+  def accept_early_access_terms
+    raise ActiveRecord::RecordNotFound unless @context.is_a?(Account) && @context.root_account?
+
+    if authorized_action(@context, @current_user, :manage_feature_flags)
+      @context.settings[:early_access_program] = { value: true }
+      if @context.save
+        render json: { early_access_program: true }
+      else
+        render json: { errors: @context.errors }, status: :unprocessable_content
+      end
+    end
+  end
+
   # @API Remove feature flag
   #
   # Remove feature flag for a given Account, Course, or User.  (Note that the flag must
@@ -316,19 +353,30 @@ class FeatureFlagsController < ApplicationController
   # @returns FeatureFlag
   def delete
     if authorized_action(@context, @current_user, :manage_feature_flags)
-      return render json: { message: "must specify feature" }, status: :bad_request unless params[:feature].present?
+      feature_param = params[:feature]
+      return render json: { message: "must specify feature" }, status: :bad_request unless feature_param.present?
 
-      flag = @context.feature_flags.find_by!(feature: params[:feature])
+      feature_def = Feature.definitions[feature_param]
+      return render json: { message: "invalid feature" }, status: :bad_request unless feature_def&.applies_to_object(@context)
+
+      if feature_def.root_opt_in && @context.is_a?(Account) && @context.root_account?
+        # Root account flags with root_opt_in=true must not be deleted once the user opted in. Knowing that the flag once set is essential
+        # for the inheritance lookup logic to work correctly.
+        return render json: { message: "once a root account has opted in with root_opt_in: true, it cannot be deleted" }, status: :forbidden
+      end
+
+      flag = @context.feature_flags.find_by!(feature: feature_param)
       prior_state = flag.state
       return render json: { message: "flag is locked" }, status: :forbidden if flag.locked?(@context)
 
       flag.current_user = @current_user # necessary step for audit log
       if flag.destroy
-        feature_def = Feature.definitions[params[:feature]]
         if feature_def.after_state_change_proc
-          current_state = @context.lookup_feature_flag(params[:feature], skip_cache: true).state
+          current_state = @context.lookup_feature_flag(feature_param, skip_cache: true).state
           feature_def.after_state_change_proc.call(@current_user, @context, prior_state, current_state)
         end
+      else
+        render json: { errors: flag.errors.full_messages }, status: :unprocessable_content
       end
       render json: feature_flag_json(flag, @context, @current_user, session)
     end

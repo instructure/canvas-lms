@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GroupAndMembershipImporter < ActiveRecord::Base
+class GroupAndMembershipImporter < ApplicationRecord
   include Canvas::SoftDeletable
 
   belongs_to :group_category, inverse_of: :group_and_membership_importers, optional: true
@@ -175,18 +175,20 @@ class GroupAndMembershipImporter < ActiveRecord::Base
   end
 
   def create_new_group(name)
-    InstStatsd::Statsd.increment("groups.auto_create",
-                                 tags: { split_type: "csv",
-                                         root_account_id: group_category.root_account&.global_id,
-                                         root_account_name: group_category.root_account&.name })
+    InstStatsd::Statsd.increment(
+      "groups.auto_create",
+      tags: { split_type: "csv" }.merge(Utils::InstStatsdUtils::Tags.tags_for(group_category.root_account&.shard))
+    )
+
     group_category.groups.create!(name:, context: group_category.context)
   end
 
   def create_new_tag(name, tag_set)
-    InstStatsd::Statsd.increment("groups.auto_create",
-                                 tags: { split_type: "csv",
-                                         root_account_id: course.root_account&.global_id,
-                                         root_account_name: course.root_account&.name })
+    InstStatsd::Statsd.increment(
+      "groups.auto_create",
+      tags: { split_type: "csv" }.merge(Utils::InstStatsdUtils::Tags.tags_for(course.root_account&.shard))
+    )
+
     tag_set.groups.create!(name:, context: course, non_collaborative: true)
   end
 

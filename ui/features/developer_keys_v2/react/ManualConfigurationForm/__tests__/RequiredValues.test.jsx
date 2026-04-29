@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import get from 'lodash/get'
+import {get} from 'es-toolkit/compat'
 
 import RequiredValues from '../RequiredValues'
 

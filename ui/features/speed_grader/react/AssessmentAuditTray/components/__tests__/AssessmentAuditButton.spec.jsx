@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import '@testing-library/jest-dom'
 import AssessmentAuditButton from '../AssessmentAuditButton'
 
 describe('AssessmentAuditButton', () => {
@@ -26,7 +25,7 @@ describe('AssessmentAuditButton', () => {
 
   beforeEach(() => {
     props = {
-      onClick: jest.fn(),
+      onClick: vi.fn(),
     }
   })
 

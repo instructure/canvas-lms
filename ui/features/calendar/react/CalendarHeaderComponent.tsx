@@ -28,6 +28,14 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 
 const I18n = createI18nScope('calendar.header')
 
+const isUserStudent = () => {
+  return ENV.current_user_roles && ENV.current_user_roles.includes('student')
+}
+
+const shouldShowCreateEventButton = () => {
+  return !(ENV?.FEATURES?.restrict_student_access && isUserStudent())
+}
+
 const RenderAddEventButton = ({size}: {size: string}) => {
   if (size === 'large') {
     return (
@@ -42,8 +50,7 @@ const RenderAddEventButton = ({size}: {size: string}) => {
   }
 
   return (
-    // @ts-expect-error
-    <Button id="create_new_event_link" renderIcon={IconAddLine} display="block">
+    <Button id="create_new_event_link" renderIcon={<IconAddLine />} display="block">
       {I18n.t('Add Event')}
     </Button>
   )
@@ -197,11 +204,13 @@ const RenderContent = ({
                   />
                 </Flex.Item>
 
-                <Flex.Item overflowY="visible">
-                  <span className="add_event_button_responsive">
-                    <RenderAddEventButton size={size} />
-                  </span>
-                </Flex.Item>
+                {shouldShowCreateEventButton() && (
+                  <Flex.Item overflowY="visible">
+                    <span className="add_event_button_responsive">
+                      <RenderAddEventButton size={size} />
+                    </span>
+                  </Flex.Item>
+                )}
               </Flex>
             </Flex.Item>
           </Flex>

@@ -1,6 +1,6 @@
-# syntax = starlord.inscloudgate.net/jenkins/dockerfile:1.5.2
+# syntax = 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/docker/dockerfile:1.5.2
 
-FROM starlord.inscloudgate.net/jenkins/core:focal
+FROM 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/instructure/core:jammy
 SHELL ["/usr/bin/bash", "-c"]
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
@@ -65,6 +65,7 @@ RUN --mount=target=/tmp/src \
     lib/canvas_logger.rb \
     lib/logging_filter.rb \
     lib/canvas/cdn.rb \
+    lib/base/canvas.rb \
     lib/base/canvas/reloader.rb \
     .i18nignore \
     .i18nrc \
@@ -107,6 +108,7 @@ RUN --mount=target=/tmp/src \
         gems/plugins/**/app/stylesheets \
         gems/plugins/**/public \
         gems/plugins/**/spec_canvas/coffeescripts \
+        build/new-jenkins/js \
         jest \
         packages \
         public \
@@ -114,7 +116,10 @@ RUN --mount=target=/tmp/src \
         tmp \
         ui \
         ui-build \
-        jest.config.js \
+        eslint.config.js \
+        eslint.config.vitest.js \
+        vitest.config.ts \
+        vitest.workspace.ts \
         package.json \
         tsconfig.json \
         yarn.lock \

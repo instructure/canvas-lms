@@ -144,7 +144,11 @@ export default class ScopesGroup extends React.Component {
           </Flex.Item>
           <Flex.Item shouldGrow={true} padding="none small none none">
             <div data-automation="toggle-scope-group">
-              <ToggleDetails summary={this.groupSummary()} fluidWidth={true}>
+              <ToggleDetails
+                summary={this.groupSummary()}
+                fluidWidth={true}
+                defaultExpanded={!!this.props.expanded}
+              >
                 {this.props.scopes.map(scope => (
                   <DeveloperKeyScope
                     checked={this.props.selectedScopes.includes(scope.scope)}
@@ -172,4 +176,5 @@ ScopesGroup.propTypes = {
   ).isRequired,
   selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
   name: PropTypes.string.isRequired,
+  expanded: PropTypes.bool,
 }

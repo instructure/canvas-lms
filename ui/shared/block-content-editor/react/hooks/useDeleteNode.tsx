@@ -17,16 +17,13 @@
  */
 
 import {useEditor, useNode} from '@craftjs/core'
-import {useHandleNodesCountChange} from './useHandleNodesCountChange'
 
 export const useDeleteNode = () => {
   const {id} = useNode()
   const {actions} = useEditor()
-  const handleNodesCountChange = useHandleNodesCountChange()
 
   const deleteNode = () => {
     actions.delete(id)
-    handleNodesCountChange()
   }
 
   return deleteNode

@@ -59,7 +59,7 @@ end
 describe DiscussionTopic do
   let(:submittable_class) { DiscussionTopic }
 
-  include_examples "submittable" do
+  it_behaves_like "submittable" do
     def submittable_without_assignment
       discussion_topic_model(user: @teacher)
     end
@@ -77,7 +77,7 @@ end
 describe WikiPage do
   let(:submittable_class) { WikiPage }
 
-  include_examples "submittable" do
+  it_behaves_like "submittable" do
     def submittable_without_assignment
       wiki_page_model(course: @course)
     end

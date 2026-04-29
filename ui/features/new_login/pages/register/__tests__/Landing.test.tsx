@@ -16,30 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, screen} from '@testing-library/react'
+import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
-import {NewLoginDataProvider, NewLoginProvider} from '../../../context'
+import {
+  NewLoginDataProvider,
+  NewLoginProvider,
+  useNewLogin,
+  useNewLoginData,
+} from '../../../context'
 import Landing from '../Landing'
 
-const mockNavigate = jest.fn()
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-}))
-
-jest.mock('../../../context', () => {
-  const originalModule = jest.requireActual('../../../context')
+const mockNavigate = vi.fn()
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom')
   return {
-    ...originalModule,
-    useNewLogin: jest.fn(() => ({isUiActionPending: false})),
+    ...actual,
+    useNavigate: () => mockNavigate,
   }
 })
-const mockUseNewLogin = require('../../../context').useNewLogin
+
+vi.mock('../../../context', async () => {
+  const originalModule = await vi.importActual('../../../context')
+  return {
+    ...originalModule,
+    useNewLogin: vi.fn(() => ({isUiActionPending: false})),
+    useNewLoginData: vi.fn(() => ({customMessageRegistration: undefined})), // default
+  }
+})
+const mockUseNewLogin = vi.mocked(useNewLogin)
+const mockUseNewLoginData = vi.mocked(useNewLoginData)
 
 describe('Landing', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderLanding = () =>
@@ -88,11 +102,67 @@ describe('Landing', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/login/canvas/register/teacher')
   })
 
-  it('prevents navigation when a “ui action” is pending', () => {
-    mockUseNewLogin.mockReturnValueOnce({isUiActionPending: true})
+  it('prevents navigation when a "ui action" is pending', () => {
+    vi.mocked(mockUseNewLogin).mockReturnValueOnce({
+      isUiActionPending: true,
+      setIsUiActionPending: vi.fn(),
+      rememberMe: false,
+      setRememberMe: vi.fn(),
+      otpRequired: false,
+      setOtpRequired: vi.fn(),
+      showForgotPassword: false,
+      setShowForgotPassword: vi.fn(),
+      otpCommunicationChannelId: null,
+      setOtpCommunicationChannelId: vi.fn(),
+    })
     renderLanding()
     const teacherCard = screen.getByLabelText('Create Teacher Account')
     fireEvent.click(teacherCard)
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it('does not render custom message Alert when customMessageRegistration is undefined', () => {
+    mockUseNewLoginData.mockReturnValueOnce({
+      customMessageRegistration: undefined,
+      isDataLoading: false,
+    })
+    renderLanding()
+    expect(screen.queryByTestId('custom-message-alert')).not.toBeInTheDocument()
+  })
+
+  it('renders custom message Alert when customMessageRegistration is set', () => {
+    const customMsg = 'Welcome to your institution!'
+    mockUseNewLoginData.mockReturnValueOnce({
+      customMessageRegistration: customMsg,
+      isDataLoading: false,
+    })
+    renderLanding()
+    const alert = screen.getByTestId('custom-message-alert')
+    expect(alert).toBeInTheDocument()
+    expect(alert).toHaveTextContent(customMsg)
+  })
+
+  it('uses freeForTeacherRegistrationUrl as teacher card href when set', () => {
+    const fftData = {
+      freeForTeacherRegistrationUrl: 'https://fft.example.com/register',
+      isDataLoading: false,
+    }
+    mockUseNewLoginData.mockReturnValueOnce(fftData).mockReturnValueOnce(fftData)
+    renderLanding()
+    expect(screen.getByLabelText('Create Teacher Account')).toHaveAttribute(
+      'href',
+      'https://fft.example.com/register',
+    )
+  })
+
+  it('does not call navigate when teacher card is clicked and freeForTeacherRegistrationUrl is set', () => {
+    const fftData = {
+      freeForTeacherRegistrationUrl: 'https://fft.example.com/register',
+      isDataLoading: false,
+    }
+    mockUseNewLoginData.mockReturnValueOnce(fftData).mockReturnValueOnce(fftData)
+    renderLanding()
+    fireEvent.click(screen.getByLabelText('Create Teacher Account'))
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 })

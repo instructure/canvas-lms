@@ -1981,6 +1981,40 @@ describe "Default Account Reports" do
                                           nil,
                                           "false"]]
         end
+
+        context "when temporary enrollment with deleted ending enrollment state and include_deleted" do
+          before(:once) do
+            @enrollment.destroy
+            @report_params = {
+              "enrollments" => true,
+              "include_deleted" => true,
+              "enrollment_filter" => "TeacherEnrollment"
+            }
+          end
+
+          it "includes deleted temporary enrollment in provisioning report" do
+            parsed = read_report("provisioning_csv", { params: @report_params, order: [1, 0] })
+
+            deleted_enrollment_row = parsed.find { |row| row[2] == @user2.id.to_s && row[14] == @enrollment.id.to_s }
+            expect(deleted_enrollment_row).not_to be_nil
+            expect(deleted_enrollment_row[8]).to eq "deleted"
+          end
+
+          it "excludes deleted temporary enrollment from SIS export" do
+            parsed = read_report("sis_export_csv", { params: @report_params, order: [1, 0] })
+
+            deleted_enrollment_row = parsed.find { |row| row[1] == @user2.pseudonyms.first.sis_user_id }
+            expect(deleted_enrollment_row).to be_nil
+          end
+
+          it "excludes deleted temporary enrollment when feature flag is disabled" do
+            @account.disable_feature!(:temporary_enrollments)
+            parsed = read_report("provisioning_csv", { params: @report_params, order: [1, 0] })
+
+            deleted_enrollment_row = parsed.find { |row| row[2] == @user2.id.to_s && row[14] == @enrollment.id.to_s }
+            expect(deleted_enrollment_row).to be_nil
+          end
+        end
       end
 
       describe "sharding" do
@@ -2569,6 +2603,22 @@ describe "Default Account Reports" do
         expect(parsed).to match_array [%w[observer_id student_id status],
                                        %w[user_sis_id_02 user_sis_id_01 active]]
       end
+
+      it "does not duplicate user rows for instructure identity pseudonyms" do
+        skip unless Pseudonym.column_names.include?("is_inst_id")
+
+        @account.pseudonyms.create!(user: @user1, unique_id: "inst_id_student", is_inst_id: true)
+        @account.pseudonyms.create!(user: @user2, unique_id: "inst_id_observer", is_inst_id: true)
+
+        parameters = {}
+        parameters["user_observers"] = true
+        parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
+
+        # Should still only have one row per observer relationship, not duplicated for each pseudonym combination
+        student_rows = parsed.select { |row| row[3] == "user_sis_id_01" }
+        expect(student_rows.length).to eq 1
+        expect(student_rows[0][1]).to eq "user_sis_id_02" # should be the regular SIS ID, not the Identity ID
+      end
     end
 
     describe "admins" do
@@ -2680,6 +2730,236 @@ describe "Default Account Reports" do
                                           "active",
                                           HostUrl.context_host(@root)]]
         end
+      end
+    end
+
+    describe "institutional_tag_categories" do
+      before(:once) do
+        create_an_account
+        @account.enable_feature!(:institutional_tags)
+        @u1 = user_with_managed_pseudonym(account: @account, sis_user_id: "U001", name: "user 1")
+
+        @inst_category1 = InstitutionalTagCategory.create!(
+          account: @account,
+          name: "Category 1",
+          description: "Desc 1",
+          sis_source_id: "cat1",
+          sis_batch: @sis
+        )
+        @inst_category2 = InstitutionalTagCategory.create!(
+          account: @account, name: "Category 2", description: "Desc 2"
+        )
+      end
+
+      it "runs sis" do
+        parameters = { "institutional_tag_categories" => true }
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[category_id name description status],
+          ["cat1", "Category 1", "Desc 1", "active"]
+        ]
+      end
+
+      it "runs provisioning" do
+        parameters = { "institutional_tag_categories" => true }
+        parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[canvas_category_id category_id name description status created_by_sis],
+          [@inst_category1.id.to_s, "cat1", "Category 1", "Desc 1", "active", "true"],
+          [@inst_category2.id.to_s, nil, "Category 2", "Desc 2", "active", "false"]
+        ]
+      end
+
+      it "excludes non-SIS records with created_by_sis filter" do
+        parameters = { "institutional_tag_categories" => true, "created_by_sis" => true }
+        parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[canvas_category_id category_id name description status created_by_sis],
+          [@inst_category1.id.to_s, "cat1", "Category 1", "Desc 1", "active", "true"]
+        ]
+      end
+
+      it "includes deleted with sis_source_id when include_deleted" do
+        @inst_category1.destroy
+        parameters = { "institutional_tag_categories" => true, "include_deleted" => true }
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[category_id name description status],
+          ["cat1", "Category 1", "Desc 1", "deleted"]
+        ]
+      end
+
+      it "emits no rows when feature flag is disabled" do
+        @account.disable_feature!(:institutional_tags)
+        parameters = { "institutional_tag_categories" => true }
+        parsed = read_report("sis_export_csv", { params: parameters })
+        expect(parsed).to eql []
+      end
+    end
+
+    describe "institutional_tags" do
+      before(:once) do
+        create_an_account
+        @account.enable_feature!(:institutional_tags)
+        @u1 = user_with_managed_pseudonym(account: @account, sis_user_id: "U001", name: "user 1")
+
+        @inst_category1 = InstitutionalTagCategory.create!(
+          account: @account,
+          name: "Category 1",
+          sis_source_id: "cat1",
+          sis_batch: @sis
+        )
+        @inst_tag1 = InstitutionalTag.create!(
+          category: @inst_category1,
+          name: "Tag 1",
+          description: "Desc 1",
+          sis_source_id: "tag1",
+          sis_batch: @sis,
+          root_account: @account
+        )
+        @inst_tag2 = InstitutionalTag.create!(
+          category: @inst_category1,
+          name: "Tag 2",
+          description: "Desc 2",
+          root_account: @account
+        )
+      end
+
+      it "runs sis" do
+        parameters = { "institutional_tags" => true }
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[institutional_tag_id category_id name description status],
+          ["tag1", "cat1", "Tag 1", "Desc 1", "active"]
+        ]
+      end
+
+      it "runs provisioning" do
+        parameters = { "institutional_tags" => true }
+        parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[canvas_tag_id institutional_tag_id canvas_category_id category_id name description status created_by_sis],
+          [@inst_tag1.id.to_s, "tag1", @inst_category1.id.to_s, "cat1", "Tag 1", "Desc 1", "active", "true"],
+          [@inst_tag2.id.to_s, nil, @inst_category1.id.to_s, "cat1", "Tag 2", "Desc 2", "active", "false"]
+        ]
+      end
+
+      it "excludes non-SIS records with created_by_sis filter" do
+        parameters = { "institutional_tags" => true, "created_by_sis" => true }
+        parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[canvas_tag_id institutional_tag_id canvas_category_id category_id name description status created_by_sis],
+          [@inst_tag1.id.to_s, "tag1", @inst_category1.id.to_s, "cat1", "Tag 1", "Desc 1", "active", "true"]
+        ]
+      end
+
+      it "includes deleted with sis_source_id when include_deleted" do
+        @inst_tag1.destroy
+        parameters = { "institutional_tags" => true, "include_deleted" => true }
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[institutional_tag_id category_id name description status],
+          ["tag1", "cat1", "Tag 1", "Desc 1", "deleted"]
+        ]
+      end
+
+      it "emits no rows when feature flag is disabled" do
+        @account.disable_feature!(:institutional_tags)
+        parameters = { "institutional_tags" => true }
+        parsed = read_report("sis_export_csv", { params: parameters })
+        expect(parsed).to eql []
+      end
+    end
+
+    describe "institutional_tag_associations" do
+      before(:once) do
+        create_an_account
+        @account.enable_feature!(:institutional_tags)
+        @u1 = user_with_managed_pseudonym(account: @account, sis_user_id: "U001", name: "user 1")
+        @u2 = user_with_managed_pseudonym(account: @account, sis_user_id: "U002", name: "user 2")
+
+        @inst_category1 = InstitutionalTagCategory.create!(
+          account: @account,
+          name: "Category 1",
+          sis_source_id: "cat1",
+          sis_batch: @sis
+        )
+        @inst_tag1 = InstitutionalTag.create!(
+          category: @inst_category1,
+          name: "Tag 1",
+          description: "Desc 1",
+          sis_source_id: "tag1",
+          sis_batch: @sis,
+          root_account: @account
+        )
+        @inst_assoc1 = InstitutionalTagAssociation.create!(
+          institutional_tag: @inst_tag1,
+          context: @u1,
+          workflow_state: "active",
+          sis_batch: @sis,
+          root_account: @account
+        )
+        @inst_assoc2 = InstitutionalTagAssociation.create!(
+          institutional_tag: @inst_tag1,
+          context: @u2,
+          workflow_state: "active",
+          root_account: @account
+        )
+      end
+
+      it "runs sis" do
+        parameters = { "institutional_tag_associations" => true }
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[institutional_tag_id user_id status],
+          %w[tag1 U001 active]
+        ]
+      end
+
+      it "runs provisioning" do
+        parameters = { "institutional_tag_associations" => true }
+        parsed = read_report("provisioning_csv", { params: parameters, order: [0, 2], header: true })
+        expect(parsed).to match_array [
+          %w[canvas_tag_id institutional_tag_id canvas_user_id user_id status created_by_sis],
+          [@inst_tag1.id.to_s, "tag1", @u1.id.to_s, "U001", "active", "true"],
+          [@inst_tag1.id.to_s, "tag1", @u2.id.to_s, "U002", "active", "false"]
+        ]
+      end
+
+      it "excludes non-SIS records with created_by_sis filter" do
+        parameters = { "institutional_tag_associations" => true, "created_by_sis" => true }
+        parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[canvas_tag_id institutional_tag_id canvas_user_id user_id status created_by_sis],
+          [@inst_tag1.id.to_s, "tag1", @u1.id.to_s, "U001", "active", "true"]
+        ]
+      end
+
+      it "includes deleted with sis_batch_id when include_deleted" do
+        @inst_assoc1.destroy
+        parameters = { "institutional_tag_associations" => true, "include_deleted" => true }
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[institutional_tag_id user_id status],
+          %w[tag1 U001 deleted]
+        ]
+      end
+
+      it "skips associations where user has no pseudonym" do
+        @u2.pseudonyms.destroy_all
+        parameters = { "institutional_tag_associations" => true }
+        parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
+        expect(parsed).to match_array [
+          %w[canvas_tag_id institutional_tag_id canvas_user_id user_id status created_by_sis],
+          [@inst_tag1.id.to_s, "tag1", @u1.id.to_s, "U001", "active", "true"]
+        ]
+      end
+
+      it "emits no rows when feature flag is disabled" do
+        @account.disable_feature!(:institutional_tags)
+        parameters = { "institutional_tag_associations" => true }
+        parsed = read_report("sis_export_csv", { params: parameters })
+        expect(parsed).to eql []
       end
     end
 

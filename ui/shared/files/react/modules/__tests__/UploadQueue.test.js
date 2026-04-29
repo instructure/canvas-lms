@@ -74,17 +74,15 @@ describe('UploadQueue', () => {
     UploadQueue.attemptNextUpload = original
   })
 
-  test('processes one upload at a time', done => {
+  test('processes one upload at a time', async () => {
     const original = UploadQueue.createUploader
     UploadQueue.createUploader = mockFileUploader
     UploadQueue.enqueue('foo')
     UploadQueue.enqueue('bar')
     UploadQueue.enqueue('baz')
     expect(UploadQueue.length()).toBe(2) // first item starts, remainder are waiting
-    window.setTimeout(() => {
-      expect(UploadQueue.length()).toBe(1) // after two more ticks there is only one remaining
-      done()
-    }, 2)
+    await new Promise(resolve => window.setTimeout(resolve, 2))
+    expect(UploadQueue.length()).toBe(1) // after two more ticks there is only one remaining
     UploadQueue.createUploader = original
   })
 
@@ -119,8 +117,8 @@ describe('UploadQueue', () => {
   })
 
   test('calls onChange', () => {
-    const onChangeSpy = jest.spyOn(UploadQueue, 'onChange')
-    const callbackSpy = jest.fn()
+    const onChangeSpy = vi.spyOn(UploadQueue, 'onChange')
+    const callbackSpy = vi.fn()
     UploadQueue.addChangeListener(callbackSpy)
     const foo = mockFileOptions('foo', 'bar', true)
     const uploader = UploadQueue.createUploader(foo)

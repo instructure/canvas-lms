@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import React from 'react'
-import {act, render, fireEvent, waitFor, screen} from '@testing-library/react'
-import ComputerPanel from '../ComputerPanel'
-import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
 import {vi} from 'vitest'
+import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
+import ComputerPanel from '../ComputerPanel'
 
 const uploadMediaTranslations = {
   UploadMediaStrings: {
     ADD_CLOSED_CAPTIONS_OR_SUBTITLES: 'Add CC/Subtitles',
-    CLEAR_FILE_TEXT: 'Clear selected file',
+    CLEAR_FILE_TEXT: 'Remove',
     CLOSE_TEXT: 'Close',
     CLOSED_CAPTIONS_CHOOSE_FILE: 'Choose caption file',
     CLOSED_CAPTIONS_SELECT_LANGUAGE: 'Select Language',
@@ -80,7 +80,6 @@ function createPanel(overrideProps: Partial<ComputerPanelProps>, ref?: React.Ref
       userLocale="en"
       liveRegion={() => document.getElementById(LIVE_REGION_ID)}
       updateSubtitles={() => false}
-      useStudioPlayer={false}
       {...overrideProps}
     />
   )
@@ -144,8 +143,8 @@ describe('UploadMedia: ComputerPanel', () => {
   describe('validation', () => {
     describe('file', () => {
       it('shows an error if not defined', () => {
-        const ref = React.createRef<{ updateValidationMessages: () => void }>()
-        const { getByText } = render(createPanel({}, ref))
+        const ref = React.createRef<{updateValidationMessages: () => void}>()
+        const {getByText} = render(createPanel({}, ref))
         act(() => ref.current?.updateValidationMessages())
         expect(getByText('Please choose a file')).toBeVisible()
       })
@@ -165,14 +164,19 @@ describe('UploadMedia: ComputerPanel', () => {
 
     describe('file name', () => {
       it('shows an error if blank', () => {
-        const ref = React.createRef<{ updateValidationMessages: () => void }>()
+        const ref = React.createRef<{updateValidationMessages: () => void}>()
         const aFile = new File(['foo'], 'foo.mov', {
           type: 'video/quicktime',
         })
-        const { getByPlaceholderText, getByText } = render(createPanel({
-          theFile: aFile,
-          hasUploadedFile: true,
-        }, ref))
+        const {getByPlaceholderText, getByText} = render(
+          createPanel(
+            {
+              theFile: aFile,
+              hasUploadedFile: true,
+            },
+            ref,
+          ),
+        )
 
         const titleInput = getByPlaceholderText('File name')
         fireEvent.change(titleInput, {target: {value: ''}})
@@ -312,7 +316,7 @@ describe('UploadMedia: ComputerPanel', () => {
         setHasUploadedFile,
         hasUploadedFile: true,
       })
-      const clearButton = await waitFor(() => getByText('Clear selected file'))
+      const clearButton = await waitFor(() => getByText('Remove'))
       expect(clearButton).toBeInTheDocument()
       act(() => {
         fireEvent.click(clearButton)

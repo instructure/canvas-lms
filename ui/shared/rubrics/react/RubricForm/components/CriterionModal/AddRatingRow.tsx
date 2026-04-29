@@ -25,11 +25,10 @@ import {View} from '@instructure/ui-view'
 const I18n = createI18nScope('rubrics-criterion-modal')
 
 type AddRatingRowProps = {
-  unassessed: boolean
   onClick: () => void
   isDragging: boolean
 }
-export const AddRatingRow = ({unassessed, onClick, isDragging}: AddRatingRowProps) => {
+export const AddRatingRow = ({onClick, isDragging}: AddRatingRowProps) => {
   const [isHovered, setIsHovered] = useState(false)
 
   return (
@@ -54,7 +53,7 @@ export const AddRatingRow = ({unassessed, onClick, isDragging}: AddRatingRowProp
       onMouseOver={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {isHovered && unassessed && !isDragging && (
+      {isHovered && !isDragging && (
         <View as="div" cursor="pointer" onClick={onClick}>
           <IconButton
             tabIndex={-1}

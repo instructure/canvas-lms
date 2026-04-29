@@ -17,12 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe RootAccountResolver do
   let(:minimal_active_record) do
     Class.new do
       extend ActiveModel::Callbacks
+
       define_model_callbacks :save
 
       attr_accessor :root_account_id

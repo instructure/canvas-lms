@@ -21,25 +21,29 @@ import {render, screen, waitFor, act} from '@testing-library/react'
 import CurrentDownloads from '../CurrentDownloads'
 import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {performRequest} from '../../../../utils/downloadUtils'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(() => jest.fn()),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(() => vi.fn()),
+  }
+})
 
-jest.mock('jquery', () => {
-  const mockFlashError = jest.fn()
-  const jqueryMock = jest.fn() as jest.Mock & {flashError: jest.Mock}
+vi.mock('jquery', () => {
+  const mockFlashError = vi.fn()
+  const jqueryMock = vi.fn() as ReturnType<typeof vi.fn> & {flashError: ReturnType<typeof vi.fn>}
   jqueryMock.flashError = mockFlashError
   return jqueryMock
 })
 
-jest.mock('../../../../utils/downloadUtils', () => ({
-  addDownloadListener: jest.fn(fn => window.addEventListener('download_utils_event', fn)),
-  removeDownloadListener: jest.fn(fn => window.removeEventListener('download_utils_event', fn)),
-  performRequest: jest.fn(),
-  downloadFile: jest.fn(),
+vi.mock('../../../../utils/downloadUtils', () => ({
+  addDownloadListener: vi.fn(fn => window.addEventListener('download_utils_event', fn)),
+  removeDownloadListener: vi.fn(fn => window.removeEventListener('download_utils_event', fn)),
+  performRequest: vi.fn(),
+  downloadFile: vi.fn(),
 }))
 
 const renderComponent = () => {
@@ -52,7 +56,7 @@ const renderComponent = () => {
 
 describe('CurrentDownloads', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders null when not downloading', () => {
@@ -62,7 +66,7 @@ describe('CurrentDownloads', () => {
 
   it('does not render when downloading just one file', async () => {
     renderComponent()
-    ;(performRequest as jest.Mock).mockReturnValue(false)
+    ;(performRequest as ReturnType<typeof vi.fn>).mockReturnValue(false)
 
     act(() => {
       window.dispatchEvent(
@@ -78,7 +82,7 @@ describe('CurrentDownloads', () => {
 
   it('shows flash error if download already in progress', async () => {
     renderComponent()
-    ;(performRequest as jest.Mock).mockReturnValue(true)
+    ;(performRequest as ReturnType<typeof vi.fn>).mockReturnValue(true)
 
     act(() => {
       window.dispatchEvent(
@@ -101,7 +105,7 @@ describe('CurrentDownloads', () => {
 
   it('calls performRequest with correct parameters', async () => {
     renderComponent()
-    ;(performRequest as jest.Mock).mockReturnValue(true)
+    ;(performRequest as ReturnType<typeof vi.fn>).mockReturnValue(true)
 
     act(() => {
       window.dispatchEvent(
@@ -123,6 +127,34 @@ describe('CurrentDownloads', () => {
     await waitFor(() => {
       expect(screen.getByTestId('current-downloads')).toBeInTheDocument()
       expect(screen.getAllByText(/Preparing download: 0% complete/)).toHaveLength(2)
+    })
+  })
+
+  it('calls performRequest with correct parameters for groups', async () => {
+    render(
+      <FileManagementProvider
+        value={createMockFileManagementContext({contextType: 'group', contextId: '8168'})}
+      >
+        <CurrentDownloads rows={[]} />
+      </FileManagementProvider>,
+    )
+    ;(performRequest as ReturnType<typeof vi.fn>).mockReturnValue(true)
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent('download_utils_event', {detail: {items: new Set(['1'])}}),
+      )
+    })
+
+    await waitFor(() => {
+      expect(performRequest).toHaveBeenCalledWith({
+        contextType: 'groups',
+        contextId: '8168',
+        items: new Set(['1']),
+        rows: [],
+        onProgress: expect.any(Function),
+        onComplete: expect.any(Function),
+      })
     })
   })
 })

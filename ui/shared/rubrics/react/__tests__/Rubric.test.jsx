@@ -15,12 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {clone, setWith} from 'lodash'
+import {clone, setWith} from 'es-toolkit/compat'
 import React from 'react'
 import {render} from '@testing-library/react'
 import Rubric from '../Rubric'
 import {rubric, assessments} from './fixtures'
 import fakeENV from '@canvas/test-utils/fakeENV'
+
+// Mock the AiUsageButton component
+vi.mock('../components/AiUsageButton', () => {
+  return {
+    __esModule: true,
+    default: () => <button data-testid="ai-usage-button">AI Assisted</button>,
+  }
+})
 
 describe('the Rubric component', () => {
   it('renders as expected', () => {
@@ -70,7 +78,7 @@ describe('the Rubric component', () => {
   })
 
   it('updates the total score when an individual criterion point assessment changes', () => {
-    const onAssessmentChange = jest.fn()
+    const onAssessmentChange = vi.fn()
     const {container} = render(
       <Rubric
         onAssessmentChange={onAssessmentChange}
@@ -133,7 +141,7 @@ describe('the Rubric component', () => {
 
   it('ignores criteria scores when flagged as such', () => {
     const ignoreOutcomeScore = setCloned(rubric, 'criteria.1.ignore_for_scoring', true)
-    const onAssessmentChange = jest.fn()
+    const onAssessmentChange = vi.fn()
     const ignored = {
       ...assessments.points.data[1],
       points: {value: 2, valid: true},
@@ -183,6 +191,43 @@ describe('the Rubric component', () => {
       )
       expect(queryByTestId('rubric-total')).not.toBeInTheDocument()
       expect(queryAllByTestId('table-heading-points')).toHaveLength(0)
+    })
+  })
+
+  describe('AiUsageButton rendering', () => {
+    it('renders AiUsageButton when isAiEvaluated is true', () => {
+      const {getByTestId} = render(
+        <Rubric
+          rubric={rubric}
+          rubricAssessment={assessments.points}
+          rubricAssociation={assessments.points.rubric_association}
+          isAiEvaluated={true}
+        />,
+      )
+      expect(getByTestId('ai-usage-button')).toBeInTheDocument()
+    })
+
+    it('does not render AiUsageButton when isAiEvaluated is false', () => {
+      const {queryByTestId} = render(
+        <Rubric
+          rubric={rubric}
+          rubricAssessment={assessments.points}
+          rubricAssociation={assessments.points.rubric_association}
+          isAiEvaluated={false}
+        />,
+      )
+      expect(queryByTestId('ai-usage-button')).not.toBeInTheDocument()
+    })
+
+    it('does not render AiUsageButton when isAiEvaluated is not provided', () => {
+      const {queryByTestId} = render(
+        <Rubric
+          rubric={rubric}
+          rubricAssessment={assessments.points}
+          rubricAssociation={assessments.points.rubric_association}
+        />,
+      )
+      expect(queryByTestId('ai-usage-button')).not.toBeInTheDocument()
     })
   })
 })

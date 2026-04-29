@@ -18,9 +18,9 @@
 
 // TODO: if editing this file, please consider removing/resolving some of the "any" references
 
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import React from 'react'
 import {handleExternalContentMessages} from '../../messages'
 import ToolLaunchIframe from './ToolLaunchIframe'
@@ -115,7 +115,9 @@ export default class ExternalToolModalLauncher extends React.Component<
         this.props.launchType,
         this.props.contextModuleId && '&context_module_id=',
         this.props.contextModuleId,
-      ].join('')
+      ]
+        .filter(Boolean)
+        .join('')
     }
   }
 
@@ -143,10 +145,6 @@ export default class ExternalToolModalLauncher extends React.Component<
   }
 
   onAfterOpen = () => {
-    if (this.iframe) {
-      this.iframe.setAttribute('allow', iframeAllowances())
-    }
-
     const observer = new MutationObserver(() => {
       const closeButton = document.querySelector(
         '[role="dialog"] button[data-cid="BaseButton"]',
@@ -185,9 +183,10 @@ export default class ExternalToolModalLauncher extends React.Component<
         onDismiss={this.props.onRequestClose}
         onOpen={this.onAfterOpen}
         title={this.props.title}
-        appElement={this.props.appElement}
         shouldCloseOnDocumentClick={false}
         footer={null}
+        closeButtonLabel={I18n.t('Close')}
+        errorComponent={canvasErrorComponent()}
       >
         <ToolLaunchIframe
           src={this.getIframeSrc()}

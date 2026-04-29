@@ -27,12 +27,17 @@ import DueDateOverride from '@canvas/due-dates'
 import MasteryPathToggle from '@canvas/mastery-path-toggle'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
+import QuizTypeSelector from '@canvas/assignments/backbone/views/QuizTypeSelector'
+import AnonymousSubmissionSelector from '@canvas/assignments/backbone/views/AnonymousSubmissionSelector'
+import PointsTooltip from '@canvas/assignments/backbone/views/PointsTooltip'
 import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector'
 import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector'
 import '@canvas/grading-standards'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import renderEditAssignmentsApp from './react/index'
 import {renderEnhancedRubrics} from './react/AssignmentRubric'
+import {renderPeerReviewDetails} from './react/PeerReviewDetails'
+import {flattenPeerReviewDates} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 
 function loadBackboneComponents() {
   function maybeScrollToTarget() {
@@ -54,7 +59,19 @@ function loadBackboneComponents() {
     lockManager.init({itemType: 'assignment', page: 'edit'})
     const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
 
-    if (ENV.ASSIGNMENT) ENV.ASSIGNMENT.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
+    if (ENV.ASSIGNMENT) {
+      let assignmentOverrides = ENV.ASSIGNMENT_OVERRIDES
+      if (
+        ENV.ASSIGNMENT.peer_reviews &&
+        ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED &&
+        ENV.ASSIGNMENT.peer_review_sub_assignment
+      ) {
+        // Flatten nested peer_review_dates to flat fields at entry point
+        assignmentOverrides = flattenPeerReviewDates(ENV.ASSIGNMENT_OVERRIDES)
+      }
+
+      ENV.ASSIGNMENT.assignment_overrides = assignmentOverrides
+    }
 
     const userIsAdmin = ENV.current_user_is_admin
     const canEditGrades = ENV.PERMISSIONS?.can_edit_grades ?? false
@@ -80,6 +97,15 @@ function loadBackboneComponents() {
       lockedItems,
       canEditGrades,
     })
+    const quizTypeSelector = new QuizTypeSelector({
+      parentModel: assignment,
+    })
+    const anonymousSubmissionSelector = new AnonymousSubmissionSelector({
+      parentModel: assignment,
+    })
+    const pointsTooltip = new PointsTooltip({
+      parentModel: assignment,
+    })
     const groupCategorySelector = new GroupCategorySelector({
       parentModel: assignment,
       groupCategories:
@@ -96,6 +122,9 @@ function loadBackboneComponents() {
       model: assignment,
       assignmentGroupSelector,
       gradingTypeSelector,
+      quizTypeSelector,
+      anonymousSubmissionSelector,
+      pointsTooltip,
       ...(!ENV.horizon_course && {groupCategorySelector}),
       ...(!ENV.horizon_course && {peerReviewsSelector}),
       views: {
@@ -127,6 +156,7 @@ function loadBackboneComponents() {
       },
     })
     editHeaderView.render()
+    renderPeerReviewDetails(assignment)
     renderEnhancedRubrics()
   }
 }

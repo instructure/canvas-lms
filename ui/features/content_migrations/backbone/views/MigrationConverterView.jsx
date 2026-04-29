@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {extend as lodashExtend, defer} from 'lodash'
+import {defer, extend as lodashExtend} from 'es-toolkit/compat'
 import template from '../../jst/MigrationConverter.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -26,7 +26,7 @@ import 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {Alert} from '@instructure/ui-alerts'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 
 const I18n = createI18nScope('content_migrations')
 
@@ -184,7 +184,7 @@ MigrationConverterView.prototype.enterUploadingState = function () {
 MigrationConverterView.prototype.exitUploadingState = function () {
   $(window).off('beforeunload')
   $('#migration_upload_progress_container').hide()
-  ReactDOM.unmountComponentAtNode(document.getElementById('migration_upload_progress_bar'))
+  legacyUnmountComponentAtNode(document.getElementById('migration_upload_progress_bar'))
   return this.$submitBtn.val(this.btnText)
 }
 
@@ -199,8 +199,7 @@ MigrationConverterView.prototype.afterRender = function () {
     margin: '0 0 medium 0',
   })
   if (this.$overwriteWarning[0]) {
-    // eslint-disable-next-line react/no-render-return-value
-    return ReactDOM.render(alert, this.$overwriteWarning[0])
+    return legacyRender(alert, this.$overwriteWarning[0])
   }
 }
 

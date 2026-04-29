@@ -18,13 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ConversationMessage < ActiveRecord::Base
+class ConversationMessage < ApplicationRecord
   include HtmlTextHelper
   include ConversationHelper
   include ConversationsHelper
   include Rails.application.routes.url_helpers
   include SendToStream
   include SimpleTags::ReaderInstanceMethods
+  include LinkedAttachmentHandler
 
   belongs_to :conversation
   belongs_to :author, class_name: "User"
@@ -40,7 +41,6 @@ class ConversationMessage < ActiveRecord::Base
   before_create :set_root_account_ids
   after_create :log_conversation_message_metrics
   after_create :check_for_out_of_office_participants, unless: :automated_message?
-  after_save :update_attachment_associations
 
   scope :human, -> { where("NOT generated") }
   scope :with_attachments, -> { where("has_attachments") }
@@ -77,7 +77,7 @@ class ConversationMessage < ActiveRecord::Base
         ret = where(base_conditions)
               .joins("JOIN #{ConversationMessageParticipant.quoted_table_name} ON conversation_messages.id = conversation_message_id")
               .select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags")
-              .order("conversation_id DESC, user_id DESC, created_at DESC")
+              .order(conversation_id: :desc, user_id: :desc, created_at: :desc)
               .distinct_on(:conversation_id, :user_id).to_a
         map = ret.index_by { |m| [m.conversation_id, m.user_id] }
         backmap = ret.index_by(&:conversation_participant_id)
@@ -163,6 +163,12 @@ class ConversationMessage < ActiveRecord::Base
     end
   end
 
+  def attachment_associations_enabled?
+    Account.where(id: root_account_ids&.split(",")).any? do |acc|
+      acc.feature_enabled?(:file_association_access_conversation)
+    end
+  end
+
   def update_attachment_associations
     previous_attachment_ids = attachment_associations.pluck(:attachment_id)
     deleted_attachment_ids = previous_attachment_ids - attachment_ids
@@ -201,7 +207,8 @@ class ConversationMessage < ActiveRecord::Base
     subscribed = User.where(id: subscribed_ids)
     ActiveRecord::Associations.preload(conversation_message_participants, :user)
     participants = conversation_message_participants.map(&:user)
-    subscribed & participants
+    result = subscribed & participants
+    exclude_pending_temporary_enrollment_recipients(result)
   end
 
   def new_recipients
@@ -209,6 +216,32 @@ class ConversationMessage < ActiveRecord::Base
     return [] unless generated? && event_data[:event_type] == :users_added
 
     recipients.select { |u| event_data[:user_ids].include?(u.id) }
+  end
+
+  # Filters out users whose only enrollments in the conversation's course
+  # contexts are temporary enrollments that haven't started yet.
+  def exclude_pending_temporary_enrollment_recipients(users)
+    return users unless root_account_feature_enabled?(:temporary_enrollments)
+    return users if users.empty?
+
+    parsed_tags = ActiveRecord::Base.parse_asset_string_list(conversation.context_tags)
+    course_ids = parsed_tags["Course"]
+    return users if course_ids.blank?
+
+    user_ids = users.map(&:id)
+
+    # Exclude users who only have pending temporary enrollments in these courses
+    exclude_ids = Enrollment
+                  .where(course_id: course_ids, user_id: user_ids)
+                  .where.not(temporary_enrollment_source_user_id: nil)
+                  .where.not(user_id: Enrollment
+                                      .where(course_id: course_ids, user_id: user_ids)
+                                      .merge(Enrollment.excluding_pending_temporary_enrollments)
+                                      .select(:user_id))
+                  .distinct.pluck(:user_id).to_set
+    return users if exclude_ids.empty?
+
+    users.reject { |u| exclude_ids.include?(u.id) }
   end
 
   # for developer use on console only
@@ -263,8 +296,8 @@ class ConversationMessage < ActiveRecord::Base
     if conversation.context
       context_names = [conversation.context.name]
     else
-      shared_tags = author.conversation_context_codes(false)
-      shared_tags &= recipient.conversation_context_codes(false)
+      shared_tags = author.conversation_context_codes(include_concluded_codes: false)
+      shared_tags &= recipient.conversation_context_codes(include_concluded_codes: false)
       shared_tags &= conversation.tags if conversation.tags.any?
 
       context_components = shared_tags.map { |t| ActiveRecord::Base.parse_asset_string(t) }
@@ -305,7 +338,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def forwarded_messages
-    @forwarded_messages ||= (forwarded_message_ids && self.class.unscoped { self.class.where(id: forwarded_message_ids.split(",")).order("created_at DESC").to_a }) || []
+    @forwarded_messages ||= (forwarded_message_ids && self.class.unscoped { self.class.where(id: forwarded_message_ids.split(",")).order(created_at: :desc).to_a }) || []
   end
 
   def all_forwarded_messages
@@ -386,7 +419,7 @@ class ConversationMessage < ActiveRecord::Base
              },
              count: user_names.size,
              user: user_names.first,
-             list_of_users: user_names.all?(&:html_safe?) ? user_names.to_sentence.html_safe : user_names.to_sentence,
+             list_of_users: user_names.all?(&:html_safe?) ? user_names.to_sentence.html_safe : user_names.to_sentence, # rubocop:disable Rails/OutputSafety
              current_user: author_name
     end
   end

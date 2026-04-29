@@ -45,7 +45,7 @@ module Turnitin
 
       context "when the TII response is an error" do
         let(:response_mock) do
-          r_mock = double("response")
+          r_mock = instance_double(Faraday::Response)
           allow(r_mock).to receive_messages(headers: {}, body: "abcdef", status: 401)
           r_mock
         end

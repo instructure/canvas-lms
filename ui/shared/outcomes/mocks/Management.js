@@ -31,8 +31,7 @@ import {
   SEARCH_OUTCOME_ALIGNMENTS,
 } from '../graphql/Management'
 import {defaultRatings, defaultMasteryPoints} from '../react/hooks/useRatings'
-import {pick, uniq, flattenDeep} from 'lodash'
-import {jest} from '@jest/globals'
+import {flattenDeep, pick, uniq} from 'es-toolkit/compat'
 
 const testRatings = defaultRatings.map(rating => pick(rating, ['description', 'points']))
 
@@ -885,7 +884,7 @@ export const groupDetailMocks = ({
           targetGroupId,
         },
       },
-      newData: jest.fn(() => {
+      newData: () => {
         if (!wasFetchedOnce) {
           wasFetchedOnce = true
 
@@ -1025,7 +1024,7 @@ export const groupDetailMocks = ({
             },
           },
         }
-      }),
+      },
     },
     {
       request: {
@@ -1195,7 +1194,15 @@ export const groupDetailMocks = ({
             title,
             outcomesCount: 1,
             notImportedOutcomesCount,
-            outcomes: {},
+            outcomes: {
+              __typename: 'ContentTagConnection',
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: null,
+                __typename: 'PageInfo',
+              },
+              edges: [],
+            },
             __typename: 'LearningOutcomeGroup',
           },
         },

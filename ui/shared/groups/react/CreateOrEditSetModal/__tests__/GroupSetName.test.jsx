@@ -34,7 +34,7 @@ const state = {name: 'Satanaa!'}
 
 describe('CreateOrEditSetModal::GroupSetName::', () => {
   it('sets the ref', () => {
-    const elementRef = jest.fn()
+    const elementRef = vi.fn()
     render(<Wrapper state={state} props={{...defaultProps, elementRef}} />)
     expect(elementRef.mock.calls[0][0] instanceof HTMLSpanElement).toBe(true)
   })
@@ -52,7 +52,7 @@ describe('CreateOrEditSetModal::GroupSetName::', () => {
   })
 
   it('calls the callback if the input is changed', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {container} = render(<Wrapper state={state} props={{...defaultProps, onChange}} />)
     const input = container.getElementsByTagName('input')[0]
     fireEvent.input(input, {target: {value: 'Jumalauta!'}})

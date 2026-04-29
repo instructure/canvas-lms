@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require "webmock"
 require "tempfile"
 require "legacy_multipart"
@@ -139,10 +138,10 @@ describe "CanvasHttp" do
     end
 
     it "does not use ssl" do
-      http = double.as_null_object
+      http = instance_double(Net::HTTP).as_null_object
       allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(false)
-      response = double("Response")
+      response = instance_double(Net::HTTPResponse)
       expect(response).to receive(:body)
       expect(http).to receive(:request).and_yield(response)
 
@@ -150,16 +149,17 @@ describe "CanvasHttp" do
     end
 
     it "uses ssl" do
-      http = double
+      http = instance_double(Net::HTTP)
       allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(true)
-      expect(http).not_to receive(:verify_mode).with(OpenSSL::SSL::VERIFY_NONE)
+      expect(http).not_to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
       expect(http).to receive(:verify_hostname=).with(false) # temporary; until all offenders are fixed
       expect(http).to receive(:verify_callback=)             # temporary; until all offenders are fixed
-      expect(http).to receive(:request).and_yield(double(body: "Hello SSL"))
+      expect(http).to receive(:request).and_yield(instance_double(Net::HTTPResponse, body: "Hello SSL"))
       expect(http).to receive(:open_timeout=).with(5)
       expect(http).to receive(:ssl_timeout=).with(5)
       expect(http).to receive(:read_timeout=).with(30)
+      expect(http).to receive(:write_timeout=).with(10)
       expect(http).to receive(:max_retries=).with(0)
 
       expect(CanvasHttp.get("https://www.example.com/a/b").body).to eq("Hello SSL")
@@ -249,7 +249,7 @@ describe "CanvasHttp" do
 
   describe ".read_body_max_length" do
     context "when the response has multiple chunks" do
-      let(:mock_response) { double("response") }
+      let(:mock_response) { instance_double(Net::HTTPResponse) }
 
       before do
         allow(mock_response).to receive(:read_body) do |&blk|
@@ -298,7 +298,7 @@ describe "CanvasHttp" do
   end
 
   describe ".tempfile_for_url" do
-    let(:tempfile) { double("tempfile") }
+    let(:tempfile) { instance_double(Tempfile) }
 
     before do
       allow(tempfile).to receive(:binmode)
@@ -375,6 +375,56 @@ describe "CanvasHttp" do
       expect(CanvasHttp).to receive(:insecure_host?).with("127.0.0.1").and_return(true)
       expect { CanvasHttp.validate_url("http://127.0.0.1/嘊", check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
       expect { CanvasHttp.validate_url("http://example.com/whät", allowed_schemes: ["https"]) }.to raise_error(ArgumentError)
+    end
+
+    describe "nav_menu_link URL fixtures" do
+      # Shared with JS spec — see spec/fixtures/url_validation/nav_menu_link_cases.json
+      let(:cases) do
+        fixture_path = File.expand_path("../../../spec/fixtures/url_validation/nav_menu_link_cases.json", __dir__)
+        JSON.parse(File.read(fixture_path))
+      end
+
+      it "rejects all invalid URLs" do
+        aggregate_failures do
+          cases["invalid"].each do |url|
+            result = begin
+              CanvasHttp.validate_url(url, allowed_schemes: %w[http https])
+              :accepted
+            rescue CanvasHttp::Error, URI::Error, ArgumentError
+              :rejected
+            end
+            expect(result).to eq(:rejected), "expected #{url.inspect} to be invalid"
+          end
+        end
+      end
+
+      it "accepts all valid URLs" do
+        aggregate_failures do
+          cases["valid"].each do |url|
+            result = begin
+              CanvasHttp.validate_url(url, allowed_schemes: %w[http https])
+              :accepted
+            rescue CanvasHttp::Error, URI::Error, ArgumentError
+              :rejected
+            end
+            expect(result).to eq(:accepted), "expected #{url.inspect} to be valid"
+          end
+        end
+      end
+
+      it "accepts the normalized form of all normalizable URLs" do
+        aggregate_failures do
+          cases["normalizable"].each_value do |normalized|
+            result = begin
+              CanvasHttp.validate_url(normalized, allowed_schemes: %w[http https])
+              :accepted
+            rescue CanvasHttp::Error, URI::Error, ArgumentError
+              :rejected
+            end
+            expect(result).to eq(:accepted), "expected normalized #{normalized.inspect} to be valid"
+          end
+        end
+      end
     end
   end
 

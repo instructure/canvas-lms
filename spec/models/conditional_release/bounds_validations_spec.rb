@@ -18,14 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 module ConditionalRelease
   describe BoundsValidations do
     subject do
       Class.new do
         include ActiveModel::Validations
         include BoundsValidations
+
         attr_accessor :upper_bound, :lower_bound
       end.new
     end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {forEach, extend as lodashExtend} from 'lodash'
+import {forEach, extend as lodashExtend} from 'es-toolkit/compat'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
@@ -27,7 +27,7 @@ import '@canvas/media-comments' /* mediaComment */
 import axios from '@canvas/axios'
 import {camelizeProperties} from '@canvas/convert-case'
 import React from 'react'
-import ReactDOM from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import {htmlEscape} from '@instructure/html-escape'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -42,10 +42,16 @@ import GradeSummaryManager from '../react/GradeSummary/GradeSummaryManager'
 import SelectMenuGroup from '../react/SelectMenuGroup'
 import SubmissionCommentsTray from '../react/SubmissionCommentsTray'
 import ClearBadgeCountsButton from '../react/ClearBadgeCountsButton'
-import AssetProcessorCell from '../react/AssetProcessorCell'
+import {
+  LtiAssetProcessorCellWithData,
+  AssetProcessorHeaderForGrades,
+  ZLtiAssetProcessorCellWithDataProps,
+} from '../react/LtiAssetProcessorCellWithData'
+import {renderAPComponent} from '@canvas/lti-asset-processor/react/util/renderToElements'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import useStore from '../react/stores'
 import replaceTags from '@canvas/util/replaceTags'
+import {ZUseCourseAssignmentsAssetReportsParams} from '@canvas/lti-asset-processor/react/hooks/useCourseAssignmentsAssetReports'
 
 const I18n = createI18nScope('gradingGradeSummary')
 
@@ -383,7 +389,7 @@ function calculateSubtotals(byGradingPeriod, calculatedGrades, currentOrFinal) {
       elementIdPrefix: '#submission_group',
     }
   }
-  if (params.grades) {
+  if (params.grades && params.bins) {
     for (let i = 0; i < params.bins.length; i++) {
       const binId = params.bins[i].id
       let grade = params.grades[binId]
@@ -723,22 +729,24 @@ let selectMenuRoot = null
 let gradeSummaryRoot = null
 let submissionCommentsTrayRoot = null
 let clearBadgeCountsRoot = null
-const assetProcessorCellRoots = new Map()
 
 function renderSelectMenuGroup() {
   const container = document.getElementById('GradeSummarySelectMenuGroup')
+  const element = <SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />
   if (!selectMenuRoot) {
-    selectMenuRoot = ReactDOM.createRoot(container)
+    selectMenuRoot = render(element, container)
+  } else {
+    rerender(selectMenuRoot, element)
   }
-  selectMenuRoot.render(<SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />)
 }
 
 function renderGradeSummaryTable() {
   const container = document.getElementById('grade-summary-react')
   if (!gradeSummaryRoot) {
-    gradeSummaryRoot = ReactDOM.createRoot(container)
+    gradeSummaryRoot = render(<GradeSummaryManager />, container)
+  } else {
+    rerender(gradeSummaryRoot, <GradeSummaryManager />)
   }
-  gradeSummaryRoot.render(<GradeSummaryManager />)
 }
 
 function handleSubmissionsCommentTray(assignmentId) {
@@ -785,74 +793,62 @@ function getSubmissionCommentsTrayProps(assignmentId) {
 
 function renderSubmissionCommentsTray() {
   const container = document.getElementById('GradeSummarySubmissionCommentsTray')
-  if (!submissionCommentsTrayRoot) {
-    submissionCommentsTrayRoot = ReactDOM.createRoot(container)
-  }
-  submissionCommentsTrayRoot.render(
+  const trayElement = (
     <SubmissionCommentsTray
       onDismiss={() => {
         const {submissionTrayAssignmentId} = useStore.getState()
         $(`#comments_thread_${submissionTrayAssignmentId}`).removeClass('comment_thread_show_print')
         $(`#submission_${submissionTrayAssignmentId}`).removeClass('selected-assignment')
       }}
-    />,
+    />
   )
+  if (!submissionCommentsTrayRoot) {
+    submissionCommentsTrayRoot = render(trayElement, container)
+  } else {
+    rerender(submissionCommentsTrayRoot, trayElement)
+  }
 }
 
 function renderClearBadgeCountsButton() {
   const container = document.getElementById('ClearBadgeCountsButton')
-  if (!clearBadgeCountsRoot) {
-    clearBadgeCountsRoot = ReactDOM.createRoot(container)
-  }
   const userId = ENV.student_id
   const courseId = ENV.course_id ?? ENV.context_asset_string.replace('course_', '')
-  clearBadgeCountsRoot.render(<ClearBadgeCountsButton userId={userId} courseId={courseId} />)
+  const badgeElement = <ClearBadgeCountsButton userId={userId} courseId={courseId} />
+  if (!clearBadgeCountsRoot) {
+    clearBadgeCountsRoot = render(badgeElement, container)
+  } else {
+    rerender(clearBadgeCountsRoot, badgeElement)
+  }
 }
 
 function addAssetProcessorToLegacyTable() {
-  const tableHeader = document.getElementById('asset_processors_header')
-  if (!tableHeader) {
+  if (!ENV.FEATURES?.lti_asset_processor) {
     return
   }
 
-  const hasAssetReports = submission =>
-    submission.asset_reports !== null && submission.asset_reports !== undefined
-  const shouldShow = ENV.submissions?.some(hasAssetReports)
+  const fetchParams = {
+    courseId: ENV.course_id,
+    studentId: ENV.student_id,
+    gradingPeriodId: GradeSummary.getSelectedGradingPeriodId(),
+  }
 
-  if (!shouldShow) {
+  if (!fetchParams.courseId || !fetchParams.studentId) {
     return
   }
 
-  tableHeader.textContent = I18n.t('Document Processors')
+  renderAPComponent(
+    '#asset_processors_header',
+    AssetProcessorHeaderForGrades,
+    ZUseCourseAssignmentsAssetReportsParams,
+    _element => fetchParams,
+  )
 
-  // Render AssetProcessorCell component in each asset processor cell
-  const assetProcessorCells = document.querySelectorAll('.asset_processors_cell')
-  assetProcessorCells.forEach(cell => {
-    const assignmentId = cell.dataset.assignmentId
-    const submissionId = cell.dataset.submissionId
-
-    if (assignmentId && submissionId) {
-      const submission = ENV.submissions.find(
-        submission => assignmentId === submission.assignment_id,
-      )
-      if (!submission) {
-        return
-      }
-      if (hasAssetReports(submission) === false) {
-        return
-      }
-      if (!assetProcessorCellRoots.has(cell)) {
-        assetProcessorCellRoots.set(cell, ReactDOM.createRoot(cell))
-      }
-      const root = assetProcessorCellRoots.get(cell)
-      root.render(
-        <AssetProcessorCell
-          assetProcessors={submission.asset_processors}
-          assetReports={submission.asset_reports}
-        />,
-      )
-    }
-  })
+  renderAPComponent(
+    '.asset_processors_cell',
+    LtiAssetProcessorCellWithData,
+    ZLtiAssetProcessorCellWithDataProps,
+    element => ({...fetchParams, assignmentId: element.dataset.assignmentId}),
+  )
 }
 
 function setup() {

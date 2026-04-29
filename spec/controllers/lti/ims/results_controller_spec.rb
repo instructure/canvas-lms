@@ -23,6 +23,7 @@ require_relative "concerns/lti_services_shared_examples"
 
 describe Lti::IMS::ResultsController do
   include_context "advantage services context"
+  include AccountDomainSpecHelper
 
   let(:assignment) do
     opts = { course:, points_possible: 5 }
@@ -84,7 +85,7 @@ describe Lti::IMS::ResultsController do
     end
 
     it "uses the Account#domain in the line item id" do
-      expect_any_instance_of(Account).to receive(:environment_specific_domain).at_least(:once).and_return("canonical.host")
+      stub_host_for_environment_specific_domain("canonical.host")
       send_request
       expect(json.first["id"]).to start_with(
         "http://canonical.host/api/lti/courses/#{course.id}/line_items/"

@@ -33,6 +33,8 @@ export interface LMGBContextType {
     outcomeProficiency?: OutcomeProficiency
     accountLevelMasteryScalesFF?: boolean
     outcomesFriendlyDescriptionFF?: boolean
+    allowDifferentiationTags?: boolean
+    lmgbStudentReportingFF?: boolean
   }
 }
 
@@ -44,6 +46,9 @@ export const getLMGBContext = (): LMGBContextType => {
   const outcomeProficiency = gradebookOptions?.outcome_proficiency
   const accountLevelMasteryScalesFF = gradebookOptions?.ACCOUNT_LEVEL_MASTERY_SCALES
   const outcomesFriendlyDescriptionFF = gradebookOptions?.OUTCOMES_FRIENDLY_DESCRIPTION
+  const allowDifferentiationTags =
+    gradebookOptions?.permissions?.allow_assign_to_differentiation_tags
+  const lmgbStudentReportingFF = gradebookOptions?.LMGB_STUDENT_REPORTING
 
   return {
     env: {
@@ -51,6 +56,8 @@ export const getLMGBContext = (): LMGBContextType => {
       outcomeProficiency,
       accountLevelMasteryScalesFF,
       outcomesFriendlyDescriptionFF,
+      allowDifferentiationTags,
+      lmgbStudentReportingFF,
     },
   }
 }

@@ -85,7 +85,6 @@ owned_globs:
 - lib/data_fixup/turn_off_anonymous_grading_for_discussion_topics_and_quizzes.rb
 - spec/apis/v1/conversations_api_spec.rb
 - spec/apis/v1/discussion*_spec.rb
-- spec/contracts/service_consumers/api/provider_states_for_consumer/discussions_provider_states.rb
 - spec/controllers/conversations_controller_spec.rb
 - spec/controllers/discussion_entries_controller_spec.rb
 - spec/controllers/discussion_topics_api_controller_spec.rb
@@ -151,3 +150,5 @@ owned_globs:
 - spec/views/discussion_topics/show.html.erb_spec.rb
 - spec/views/shared/_discussion_entry.html.erb_spec.rb
 - ui/features/conversations/**/*
+github:
+  team: ''

@@ -17,7 +17,7 @@
  */
 
 import React, {useReducer, useState, useCallback} from 'react'
-import {cloneDeep} from 'lodash'
+import {cloneDeep} from 'es-toolkit/compat'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'

@@ -181,7 +181,8 @@ ul.user_list div.enrollment_type.pending {
 
 #sections {
   @include reset-list;
-  max-width: 500px;
+  max-width: fit-content;
+  min-width: 500px;
   list-style-type: none;
 }
 
@@ -235,6 +236,24 @@ ul.user_list div.enrollment_type.pending {
       .disabled_message {
         display: none;
       }
+    }
+    &:focus {
+      outline: 2px solid var(--ic-brand-primary);
+      outline-offset: -2px;
+      z-index: 1;
+    }
+    &.keyboard-focus {
+      background-color: $section_tabs_hover_background_color;
+    }
+    &.dragging {
+      background-color: color-mix(in srgb, var(--ic-brand-primary) 15%, white);
+      border-color: var(--ic-brand-primary);
+      border-width: 3px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transform: scale(1.02);
+      position: relative;
+      z-index: 10;
+      cursor: grabbing;
     }
     .draggable_handle {
       display: inline-block;
@@ -298,6 +317,21 @@ ul.user_list div.enrollment_type.pending {
     margin: 0;
     @include fontSize(13px);
     font-weight: bold;
+  }
+}
+
+#right-side .course-criteria {
+  margin-top: 20px;
+  h3 {
+    line-height: inherit;
+    margin: 0;
+    @include fontSize(13px);
+    padding: 6px;
+    font-weight: bold;
+    border-bottom: 1px solid #6A7883;
+  }
+  #criteria-mount {
+    padding: 6px;
   }
 }
 
@@ -513,4 +547,34 @@ td.center-text {
 
 #csp_options {
   margin-top: 10px;
+}
+
+
+/* New Course Navigation Settings Component - scoped to avoid global conflicts */
+
+.course-nav-tabs-list .course-nav-tab {
+  border: solid #ddd;
+  border-width: 0px 1px 1px 1px;
+}
+
+.course-nav-tabs-list .course-nav-tab.course-nav-tab-first {
+  border-width: 1px;
+}
+
+.course-nav-tabs-list .course-nav-tab:focus {
+  border-radius: 0.25rem;
+}
+
+.course-nav-tabs-list .course-nav-tab-dragging {
+  background-color: $ic-list-item-background--selected;
+  padding: 0rem 0.25rem 0rem 0.25rem;
+  border-radius: 0.25rem;
+  border: 2px solid var(--ic-brand-primary);
+  box-shadow: 2px 2px 4px;
+}
+
+.course-nav-tabs-list {
+  display: inline-block;
+  width: 400px;
+  max-width: calc(100vw - 22px);
 }

@@ -39,32 +39,34 @@ const server = setupServer(
   }),
 )
 
+// Helper to wait for the progressResolved event
+function waitForProgressResolved(model) {
+  return new Promise(resolve => {
+    model.on('progressResolved', resolve)
+  })
+}
+
 describe('progressable', () => {
   beforeAll(() => server.listen())
   afterEach(() => server.resetHandlers())
   afterAll(() => server.close())
 
   beforeEach(() => {
-    jest.useFakeTimers()
     quizModel = new QuizCSV()
     quizModel.url = '/quiz_csv'
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
+    // Set polling timeout to 0 for faster tests
+    quizModel.progressModel.set('timeout', 0)
   })
 
   test('set progress_url', async () => {
-    const spy = jest.fn()
+    const spy = vi.fn()
     quizModel.progressModel.on('complete', spy)
     quizModel.on('progressResolved', spy)
+
+    const progressPromise = waitForProgressResolved(quizModel)
     quizModel.set({progress_url: progressUrl})
 
-    // Wait for the progress request to complete
-    await jest.runOnlyPendingTimersAsync()
-
-    // Wait for the model fetch to complete
-    await jest.runOnlyPendingTimersAsync()
+    await progressPromise
 
     ok(spy.mock.calls.length === 2, 'complete and progressResolved handlers called')
     equal(quizModel.progressModel.get('workflow_state'), 'completed')
@@ -72,16 +74,14 @@ describe('progressable', () => {
   })
 
   test('set progress.url', async () => {
-    const spy = jest.fn()
+    const spy = vi.fn()
     quizModel.progressModel.on('complete', spy)
     quizModel.on('progressResolved', spy)
+
+    const progressPromise = waitForProgressResolved(quizModel)
     quizModel.progressModel.set({url: progressUrl, workflow_state: 'queued'})
 
-    // Wait for the progress request to complete
-    await jest.runOnlyPendingTimersAsync()
-
-    // Wait for the model fetch to complete
-    await jest.runOnlyPendingTimersAsync()
+    await progressPromise
 
     ok(spy.mock.calls.length === 2, 'complete and progressResolved handlers called')
     equal(quizModel.progressModel.get('workflow_state'), 'completed')

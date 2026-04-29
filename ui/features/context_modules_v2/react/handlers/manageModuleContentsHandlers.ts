@@ -18,6 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Module, ModuleAction, ModuleItem} from '../utils/types'
+import {MOVE_MODULE_ITEM, MOVE_MODULE, MOVE_MODULE_CONTENTS} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -206,11 +207,11 @@ export const createModuleOrder = (
 }
 
 export const getTrayTitle = (moduleAction: ModuleAction | null): string => {
-  if (moduleAction === 'move_module_contents') {
+  if (moduleAction === MOVE_MODULE_CONTENTS) {
     return I18n.t('Move Contents Into')
-  } else if (moduleAction === 'move_module_item') {
+  } else if (moduleAction === MOVE_MODULE_ITEM) {
     return I18n.t('Move Item')
-  } else if (moduleAction === 'move_module') {
+  } else if (moduleAction === MOVE_MODULE) {
     return I18n.t('Move Module')
   } else {
     return I18n.t('Move')
@@ -218,11 +219,11 @@ export const getTrayTitle = (moduleAction: ModuleAction | null): string => {
 }
 
 export const getErrorMessage = (moduleAction: ModuleAction | null): string => {
-  if (moduleAction === 'move_module_item') {
+  if (moduleAction === MOVE_MODULE_ITEM) {
     return I18n.t('Error moving item')
-  } else if (moduleAction === 'move_module_contents') {
+  } else if (moduleAction === MOVE_MODULE_CONTENTS) {
     return I18n.t('Error moving module contents')
-  } else if (moduleAction === 'move_module') {
+  } else if (moduleAction === MOVE_MODULE) {
     return I18n.t('Error moving module')
   }
   return I18n.t('Error moving')

@@ -16,44 +16,119 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, screen} from '@testing-library/react'
 import React from 'react'
 import {Pin} from '../Pin'
+import {responsiveQuerySizes} from '../../../utils'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
+vi.mock('@instructure/ui-icons', () => ({
+  IconPinSolid: (props: any) => <svg {...props} data-testid="icon-pin-solid" />,
+  IconPinLine: (props: any) => <svg {...props} data-testid="icon-pin-line" />,
+}))
+
+const mockResponsiveQuerySizes = responsiveQuerySizes as ReturnType<typeof vi.fn>
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
 
+beforeEach(() => {
+  mockResponsiveQuerySizes.mockImplementation(
+    () =>
+      ({
+        desktop: {maxWidth: '1000px'},
+      }) as any,
+  )
+})
+
 const setup = (props = {}) => {
   const defaultProps = {
-    onClick: jest.fn(),
+    onClick: vi.fn(),
+    isPinned: false,
   }
 
   return render(<Pin {...defaultProps} {...props} />)
 }
 
 describe('Pin', () => {
-  it('renders text', () => {
-    const {getAllByText} = setup()
-    expect(getAllByText('Pin')).toBeTruthy()
+  describe('Render desktop', () => {
+    it('renders correct elements when status is not pinned', () => {
+      const {getAllByText, queryByTestId} = setup()
+      const linePinIcon = screen.getByTestId('icon-pin-line')
+
+      expect(getAllByText('Pin')).toBeTruthy()
+      expect(linePinIcon).toBeInTheDocument()
+      expect(queryByTestId('threading-toolbar-pin')).toHaveAttribute(
+        'data-action-state',
+        'pinButton',
+      )
+    })
+
+    it('renders correct elements when status is pinned', () => {
+      const {getAllByText, queryByTestId} = setup({isPinned: true})
+      const solidPinIcon = screen.getByTestId('icon-pin-solid')
+
+      expect(getAllByText('Unpin')).toBeTruthy()
+      expect(solidPinIcon).toBeInTheDocument()
+      expect(queryByTestId('threading-toolbar-pin')).toHaveAttribute(
+        'data-action-state',
+        'unpinButton',
+      )
+    })
   })
 
-  it('calls provided callback when clicked', () => {
-    const onClickMock = jest.fn()
-    const {getAllByText} = setup({onClick: onClickMock})
+  describe('Render mobile', () => {
+    beforeEach(() => {
+      mockResponsiveQuerySizes.mockImplementation(
+        () =>
+          ({
+            mobile: {maxWidth: '1024px'},
+          }) as any,
+      )
+    })
 
-    expect(onClickMock.mock.calls).toHaveLength(0)
-    fireEvent.click(getAllByText('Pin')[0])
-    expect(onClickMock.mock.calls).toHaveLength(1)
+    it('does not render text when status is not pinned', () => {
+      const {queryByText, queryByTestId} = setup()
+      const linePinIcon = screen.getByTestId('icon-pin-line')
+
+      expect(queryByText('Pin')).toBeFalsy()
+      expect(linePinIcon).toBeInTheDocument()
+      expect(queryByTestId('threading-toolbar-pin')).toHaveAttribute(
+        'data-action-state',
+        'pinButton',
+      )
+    })
+
+    it('does not render text when status is pinned', () => {
+      const {queryByText, queryByTestId} = setup({isPinned: true})
+      const solidPinIcon = screen.getByTestId('icon-pin-solid')
+
+      expect(queryByText('Unpin')).toBeFalsy()
+      expect(solidPinIcon).toBeInTheDocument()
+      expect(queryByTestId('threading-toolbar-pin')).toHaveAttribute(
+        'data-action-state',
+        'unpinButton',
+      )
+    })
+  })
+
+  describe('onClick', () => {
+    it('calls provided callback when clicked', () => {
+      const onClickMock = vi.fn()
+      const {getAllByText} = setup({onClick: onClickMock})
+
+      expect(onClickMock.mock.calls).toHaveLength(0)
+      fireEvent.click(getAllByText('Pin')[0])
+      expect(onClickMock.mock.calls).toHaveLength(1)
+    })
   })
 })

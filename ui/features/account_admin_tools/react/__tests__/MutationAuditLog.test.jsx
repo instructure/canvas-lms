@@ -29,7 +29,7 @@ describe('AuditLogForm', () => {
   })
 
   it('shows error when asset string is blank', async () => {
-    const cb = jest.fn()
+    const cb = vi.fn()
     const {getByText} = render(<AuditLogForm onSubmit={cb} />)
 
     fireEvent.click(getByText(/Find/))
@@ -40,7 +40,7 @@ describe('AuditLogForm', () => {
   })
 
   it('calls onSubmit when clicked', async () => {
-    const cb = jest.fn()
+    const cb = vi.fn()
     const {getByLabelText, getByText} = render(<AuditLogForm onSubmit={cb} />)
 
     const assetStringInput = getByLabelText(/Asset/)

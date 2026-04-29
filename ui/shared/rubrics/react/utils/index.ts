@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {htmlEscape} from '@instructure/html-escape'
 import type {RubricAssessment} from '@canvas/grading/grading'
 import type {
   Rubric,
@@ -26,6 +27,7 @@ import type {
 
 export type RubricUnderscoreType = {
   title: string
+  button_display: string
   criteria: RubricUnderscoreCriteria[]
   data?: RubricUnderscoreCriteria[]
   hide_points: boolean
@@ -33,8 +35,10 @@ export type RubricUnderscoreType = {
   rating_order: string
   free_form_criterion_comments: boolean
   points_possible: number
+  public: boolean
   unassessed?: boolean
   workflow_state: string
+  can_update?: boolean
 }
 
 type RubricUnderscoreCriteria = {
@@ -46,6 +50,7 @@ type RubricUnderscoreCriteria = {
   ignore_for_scoring?: boolean
   mastery_points?: number
   points: number
+  generated?: boolean
   ratings: {
     criterion_id: string
     description: string
@@ -101,6 +106,7 @@ export const mapRubricUnderscoredKeysToCamelCase = (
         ignoreForScoring: criterion.ignore_for_scoring,
         points: criterion.points,
         masteryPoints: criterion.mastery_points,
+        isGenerated: criterion.generated,
         outcome: learning_outcome_id
           ? {
               displayName: rubricOutcomeMap[learning_outcome_id],
@@ -121,17 +127,48 @@ export const mapRubricUnderscoredKeysToCamelCase = (
     ratingOrder: rubric.rating_order,
     freeFormCriterionComments: rubric.free_form_criterion_comments,
     pointsPossible: rubric.points_possible,
+    public: rubric.public,
     criteriaCount: criteria.length,
     hidePoints: rubric.hide_points,
     id: rubric.id,
+    buttonDisplay: rubric.button_display,
     unassessed: rubric.unassessed,
     workflowState: rubric.workflow_state,
+    canUpdateRubric: rubric.can_update,
   }
+}
+
+/**
+ * Decodes all HTML entities (including &#39; from Ruby's html_escape)
+ * using the browser's own HTML parser. More complete than front end package htmlEscape
+ * unescape, which only handles entities it produces itself (e.g. &#x27; not &#39;).
+ */
+export const decodeHTML = (str: string): string => {
+  const el = document.createElement('textarea')
+  el.innerHTML = str
+  return el.value
+}
+
+/**
+ * Prepares a long description string for safe use in dangerouslySetInnerHTML.
+ * - Decodes all HTML entities from the backend (handles both &#39; and &#x27;)
+ * - Strips legacy <br/> tags (backend sanitization artifact)
+ * - Re-escapes for XSS safety
+ * - Converts \n to <br /> for proper line break rendering
+ */
+export const formatLongDescriptionHTML = (str: string): string => {
+  // Normalize <br/> to \n before decoding so behavior is consistent
+  // across real browsers and jsdom (textarea.value handles \n reliably
+  // but does not guarantee <br> → \n conversion)
+  const decoded = decodeHTML(str.replace(/<br\s*\/?>/gi, '\n'))
+  return htmlEscape(decoded).replace(/\n/g, '<br />')
 }
 
 export const mapRubricAssessmentDataUnderscoredKeysToCamelCase = (
   data: RubricAssessmentDataUnderscore[],
 ): RubricAssessmentData[] => {
+  if (!data) return []
+
   return data.map(assessment => {
     return {
       id: assessment.id,
@@ -146,22 +183,30 @@ export const mapRubricAssessmentDataUnderscoredKeysToCamelCase = (
 }
 
 export type RubricAssociationUnderscore = {
+  association_type: 'Assignment' | 'Account' | 'Course'
+  association_id: string
   id: string
   rubric_id: string
   use_for_grading: boolean
   hide_points: boolean
   hide_score_total: boolean
   hide_outcome_results: boolean
+  can_update?: boolean
+  can_delete?: boolean
 }
 export const mapRubricAssociationUnderscoredKeysToCamelCase = (
   underscoreAssociation: RubricAssociationUnderscore,
 ): RubricAssociation => {
   return {
+    associationType: underscoreAssociation.association_type,
+    associationId: underscoreAssociation.association_id,
     id: underscoreAssociation.id,
     hideOutcomeResults: underscoreAssociation.hide_outcome_results,
     hidePoints: underscoreAssociation.hide_points,
     hideScoreTotal: underscoreAssociation.hide_score_total,
     useForGrading: underscoreAssociation.use_for_grading,
+    canUpdate: underscoreAssociation.can_update,
+    canDelete: underscoreAssociation.can_delete,
   }
 }
 

@@ -194,8 +194,15 @@ const ProxyUploadModal = ({
     })
   }
 
-  // @ts-expect-error
-  const onUploadRequested = async ({files, onSuccess, onError}) => {
+  const onUploadRequested = async ({
+    files,
+    onSuccess,
+    onError,
+  }: {
+    files: File[]
+    onSuccess: () => void
+    onError: () => void
+  }) => {
     const newFiles = files.map((file: any, i: number) => {
       // "text" is filename in LTI Content Item
       const name = file.name || file.text || file.url
@@ -241,8 +248,8 @@ const ProxyUploadModal = ({
     // This is taken almost verbatim from the uploadFiles method in the
     // upload-file module.  Rather than calling that method, we call uploadFile
     // for each file to track progress for the individual uploads.
-    // @ts-expect-error
-    const assignmentCourseId = assignment.courseId || assignment.course_id
+    const assignmentObj: {courseId?: string; course_id?: string} = assignment
+    const assignmentCourseId = assignmentObj.courseId || assignmentObj.course_id
     const uploadUrl =
       assignment.groupSet?.currentGroup == null
         ? `/api/v1/courses/${assignmentCourseId}/assignments/${assignment.id}/submissions/${student.id}/files`
@@ -392,6 +399,8 @@ const ProxyUploadModal = ({
     display_name: string
     name: string
     isLoading: boolean
+    loaded?: number
+    total?: number
   }) => {
     // "file" is either a previously-uploaded file or one being uploaded right
     // now.  For the former, we can use the displayName property; files being
@@ -413,10 +422,10 @@ const ProxyUploadModal = ({
           )}
         </Table.Cell>
         <Table.Cell themeOverride={cellTheme}>
-          {
-            // @ts-expect-error
-            file.isLoading && renderFileProgress(file)
-          }
+          {file.isLoading &&
+            file.loaded !== undefined &&
+            file.total !== undefined &&
+            renderFileProgress({name: file.name, loaded: file.loaded, total: file.total})}
           <ScreenReaderContent>
             {file.isLoading
               ? I18n.t('%{displayName} loading in progress', {displayName})

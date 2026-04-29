@@ -22,12 +22,14 @@ import {
   ZLtiRegistrationWithLegacyConfiguration,
   type LtiRegistrationWithConfiguration,
   type LtiRegistrationWithLegacyConfiguration,
-  type LtiRegistration,
-  LtiRegistrationWithAllInformation,
   ZLtiRegistrationWithAllInformation,
 } from '../model/LtiRegistration'
-import {type ApiResult, parseFetchResult, mapApiResult} from '../../common/lib/apiResult/ApiResult'
-import {ZPaginatedList, type PaginatedList} from './PaginatedList'
+import {
+  type ApiResult,
+  parseFetchResult,
+  mapApiResult,
+  exception,
+} from '../../common/lib/apiResult/ApiResult'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import type {AccountId} from '../model/AccountId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
@@ -39,7 +41,15 @@ import {
 import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import {compact} from '../../common/lib/compact'
-import {LtiOverlayVersion, ZLtiOverlayVersion} from '../model/LtiOverlayVersion'
+import {type LtiOverlayVersion, ZLtiOverlayVersion} from '../model/LtiOverlayVersion'
+import {ZLtiRegistrationHistoryEntry} from '../model/LtiRegistrationHistoryEntry'
+import {useMutation, useQuery, type UseMutationOptions} from '@tanstack/react-query'
+import {doFetchWithSchema} from '@canvas/do-fetch-api-effect'
+import {getAccountId} from '../../common/lib/getAccountId'
+import {ZPaginatedList} from './PaginatedList'
+import {queryClient} from '@instructure/platform-query'
+import {diffHistoryEntries, LtiHistoryEntryWithDiff} from '../pages/tool_details/history/differ'
+import {ZLtiRegistrationAccountBinding} from '../model/LtiRegistrationAccountBinding'
 
 export type AppsSortProperty =
   | 'name'
@@ -50,58 +60,163 @@ export type AppsSortProperty =
   | 'installed_by'
   | 'updated_by'
   | 'on'
+  | 'status'
 
 export type AppsSortDirection = 'asc' | 'desc'
 
-export type FetchRegistrations = (options: {
+export const LIST_REGISTRATIONS_PAGE_LIMIT = 15
+
+export const constructListRegistrationsQueryKey = ({
+  accountId,
+  query,
+  sort,
+  dir,
+  page,
+}: UseAppsOptions) => [accountId, 'lti_registrations', {query, sort, dir, page}]
+
+export type UseAppsOptions = {
   accountId: AccountId
   query: string
   sort: AppsSortProperty
   dir: AppsSortDirection
   page: number
-  limit: number
-}) => Promise<ApiResult<PaginatedList<LtiRegistration>>>
+}
 
-export const fetchRegistrations: FetchRegistrations = options =>
-  parseFetchResult(ZPaginatedList(ZLtiRegistration))(
-    fetch(
-      `/api/v1/accounts/${options.accountId}/lti_registrations?` +
-        new URLSearchParams({
-          query: options.query,
-          sort: options.sort,
-          dir: options.dir,
-          page: options.page.toString(),
-          per_page: options.limit.toString(),
-        }),
-      defaultFetchOptions(),
-    ),
-  )
+/**
+ * useApps is a custom hook that fetches a list of LTI registrations for a given account, using the provided
+ * options to filter, sort, and paginate the results.
+ * @param The options to use when querying the back end for registrations
+ * @returns A standard TanStack Query object representing the list of registrations.
+ */
+export const useApps = ({accountId, query, sort, dir, page}: UseAppsOptions) => {
+  return useQuery({
+    placeholderData: prev => prev,
+    queryKey: constructListRegistrationsQueryKey({accountId, query, sort, dir, page}),
+    queryFn: () =>
+      doFetchWithSchema(
+        {
+          path:
+            `/api/v1/accounts/${accountId}/lti_registrations?` +
+            new URLSearchParams({
+              query,
+              sort,
+              dir,
+              page: page.toString(),
+              per_page: LIST_REGISTRATIONS_PAGE_LIMIT.toString(),
+            }),
+        },
+        ZPaginatedList(ZLtiRegistration),
+      ),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
 
-export type FetchRegistrationForId = (options: {
-  ltiRegistrationId: LtiRegistrationId
-  accountId: AccountId
-}) => Promise<ApiResult<LtiRegistration>>
+export const refreshRegistrations = (accountId?: AccountId) => {
+  if (!accountId) {
+    accountId = getAccountId()
+  }
+  queryClient.invalidateQueries({queryKey: [accountId, 'lti_registrations'], exact: false})
+}
 
-export const fetchRegistrationForId: FetchRegistrationForId = options =>
-  parseFetchResult(ZLtiRegistration)(
-    fetch(
-      `/api/v1/accounts/${options.accountId}/lti_registrations/${options.ltiRegistrationId}`,
-      defaultFetchOptions(),
-    ),
-  )
+const createRegistrationWithAllInfoQueryKey = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => [accountId, 'lti_registrations', ltiRegistrationId, 'allInfo']
 
-export type FetchRegistrationWithAllInfoForId = (options: {
-  ltiRegistrationId: LtiRegistrationId
-  accountId: AccountId
-}) => Promise<ApiResult<LtiRegistrationWithAllInformation>>
+export const useRegistrationWithAllInfo = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => {
+  return useQuery({
+    queryKey: createRegistrationWithAllInfoQueryKey(ltiRegistrationId, accountId),
+    queryFn: () => {
+      return doFetchWithSchema(
+        {
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}?include[]=overlaid_configuration&include[]=overlay&include[]=overlay_versions`,
+        },
+        ZLtiRegistrationWithAllInformation,
+      )
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
 
-export const fetchRegistrationWithAllInfoForId: FetchRegistrationWithAllInfoForId = options =>
-  parseFetchResult(ZLtiRegistrationWithAllInformation)(
-    fetch(
-      `/api/v1/accounts/${options.accountId}/lti_registrations/${options.ltiRegistrationId}?include[]=overlaid_configuration&include[]=overlay&include[]=overlay_versions`,
-      defaultFetchOptions(),
-    ),
-  )
+export const refreshRegistrationWithAllInfo = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => {
+  queryClient.invalidateQueries({
+    queryKey: createRegistrationWithAllInfoQueryKey(ltiRegistrationId, accountId),
+  })
+}
+
+export const refreshRegistrationHistory = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+) => {
+  queryClient.invalidateQueries({
+    queryKey: ['ltiRegistrationHistoryNew', accountId, registrationId],
+  })
+}
+
+/**
+ * A wrapper around useMutation that automatically invalidates the
+ * registration's allInfo and history queries on settled, so callers
+ * don't have to remember to do it manually.
+ *
+ * @param getRegistrationKey - Extracts { registrationId, accountId }
+ *   from the mutation variables. Use a closure when the IDs are in
+ *   component scope rather than the variables themselves.
+ */
+export const useRegistrationMutation = <
+  TData = unknown,
+  TError = Error,
+  TVariables = void,
+  TContext = unknown,
+>(
+  getRegistrationKey: (variables: TVariables) => {
+    registrationId: LtiRegistrationId
+    accountId: AccountId
+  },
+  options: UseMutationOptions<TData, TError, TVariables, TContext>,
+) => {
+  type SettledArgs = Parameters<
+    NonNullable<UseMutationOptions<TData, TError, TVariables, TContext>['onSettled']>
+  >
+  return useMutation({
+    ...options,
+    onSettled: (...args: SettledArgs) => {
+      const [, , variables] = args
+      const {registrationId, accountId} = getRegistrationKey(variables)
+      refreshRegistrationWithAllInfo(registrationId, accountId)
+      refreshRegistrationHistory(accountId, registrationId)
+      options.onSettled?.(...args)
+    },
+  })
+}
+
+const createRegistrationWithConfigQueryKey = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => [accountId, 'lti_registrations', ltiRegistrationId, 'withConfig']
+
+export const useRegistrationWithConfig = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => {
+  return useQuery({
+    queryKey: createRegistrationWithConfigQueryKey(ltiRegistrationId, accountId),
+    queryFn: () => {
+      return doFetchWithSchema(
+        {
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}?include[]=configuration&include[]=overlay`,
+        },
+        ZLtiRegistrationWithConfiguration,
+      )
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
 
 export type FetchLtiRegistrationWithLegacyConfiguration = (
   accountId: AccountId,
@@ -123,19 +238,24 @@ export const fetchLtiRegistrationWithLegacyConfig: FetchLtiRegistrationWithLegac
     ),
   )
 
-/**
- * Reset an LtiRegistration to its default configuration, removing overlays
- * @returns an LtiRegistration
- */
-export const resetLtiRegistration: FetchLtiRegistration = (
-  accountId: AccountId,
-  ltiRegistrationId: LtiRegistrationId,
-) =>
-  parseFetchResult(ZLtiRegistrationWithConfiguration)(
-    fetch(`/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/reset`, {
-      method: 'PUT',
-      ...defaultFetchOptions(),
-    }),
+export type ResetLtiRegistrationOptions = {
+  ltiRegistrationId: LtiRegistrationId
+  accountId: AccountId
+}
+
+export const useResetLtiRegistration = () =>
+  useRegistrationMutation(
+    ({ltiRegistrationId, accountId}) => ({registrationId: ltiRegistrationId, accountId}),
+    {
+      mutationFn: ({ltiRegistrationId, accountId}: ResetLtiRegistrationOptions) =>
+        doFetchWithSchema(
+          {
+            path: `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/reset`,
+            method: 'PUT',
+          },
+          z.unknown(),
+        ),
+    },
   )
 
 export type FetchThirdPartyToolConfiguration = (
@@ -181,6 +301,8 @@ export type DeleteRegistration = (
 
 /**
  * Deletes an LTI registration
+ * @deprecated Please use the `useDeleteRegistration` hook instead.
+ * @todo Remove this function once lti_registrations_next has been rolled out.
  * @param accountId
  * @param registrationId
  * @returns
@@ -193,13 +315,57 @@ export const deleteRegistration: DeleteRegistration = (accountId, registrationId
     }),
   )
 
+export const useDeleteRegistration = () => {
+  return useMutation({
+    mutationFn: ({
+      registrationId,
+      accountId,
+    }: {
+      registrationId: LtiRegistrationId
+      accountId: AccountId
+    }) =>
+      doFetchWithSchema(
+        {
+          method: 'DELETE',
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`,
+        },
+        z.unknown(),
+      ),
+    onSettled: (_, __, {accountId}) => {
+      refreshRegistrations(accountId)
+    },
+  })
+}
+
+export const useUnbindRegistration = () => {
+  return useMutation({
+    mutationFn: ({
+      registrationId,
+      accountId,
+    }: {
+      registrationId: LtiRegistrationId
+      accountId: AccountId
+    }) =>
+      doFetchWithSchema(
+        {
+          method: 'DELETE',
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/bind`,
+        },
+        z.unknown(),
+      ),
+    onSettled: (_, __, {accountId}) => {
+      refreshRegistrations(accountId)
+    },
+  })
+}
+
 export type CreateRegistration = (
   accountId: AccountId,
   internalConfig: InternalLtiConfiguration,
   overlay?: LtiConfigurationOverlay,
   unifiedToolId?: string,
   adminNickname?: string,
-) => Promise<ApiResult<unknown>>
+) => Promise<ApiResult<LtiRegistrationWithConfiguration>>
 
 /**
  * Creates an LTI registration
@@ -207,7 +373,7 @@ export type CreateRegistration = (
  * @param internalConfig The internal configuration to use
  * @param overlay An overlay to apply to the internal configuration
  * @param unifiedToolId The unified tool id for the registration
- * @returns An ApiResult with an unknown value. The value should be ignored.
+ * @returns An ApiResult with the created registration including its ID
  */
 export const createRegistration: CreateRegistration = (
   accountId,
@@ -216,7 +382,7 @@ export const createRegistration: CreateRegistration = (
   unifiedToolId,
   adminNickname,
 ) =>
-  parseFetchResult(z.unknown())(
+  parseFetchResult(ZLtiRegistrationWithConfiguration)(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations`, {
       ...defaultFetchOptions({
         headers: {
@@ -229,7 +395,7 @@ export const createRegistration: CreateRegistration = (
         configuration: internalConfig,
         overlay,
         unified_tool_id: unifiedToolId,
-        workflow_state: 'on',
+        workflow_state: 'active',
       }),
     }),
   )
@@ -240,10 +406,38 @@ type UpdateRegistrationParams = {
   internalConfig?: InternalLtiConfiguration
   overlay?: LtiConfigurationOverlay
   adminNickname?: string
-  workflowState?: 'on' | 'off' | 'allow'
+  workflowState?: 'active' | 'inactive'
+  lock_deploying?: boolean
 }
 
 export type UpdateRegistration = (params: UpdateRegistrationParams) => Promise<ApiResult<unknown>>
+
+export const useUpdateRegistration = () =>
+  useRegistrationMutation(({registrationId, accountId}) => ({registrationId, accountId}), {
+    mutationFn: ({
+      accountId,
+      registrationId,
+      internalConfig,
+      overlay,
+      adminNickname,
+      workflowState,
+      lock_deploying,
+    }: UpdateRegistrationParams) =>
+      doFetchWithSchema(
+        {
+          method: 'PUT',
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`,
+          body: compact({
+            configuration: internalConfig,
+            overlay,
+            admin_nickname: adminNickname,
+            workflow_state: workflowState,
+            lock_deploying,
+          }),
+        },
+        z.unknown(),
+      ),
+  })
 
 /**
  * Updates an LTI registration
@@ -261,6 +455,7 @@ export const updateRegistration: UpdateRegistration = ({
   overlay,
   adminNickname,
   workflowState,
+  lock_deploying,
 }) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
@@ -276,13 +471,14 @@ export const updateRegistration: UpdateRegistration = ({
           overlay,
           admin_nickname: adminNickname,
           workflow_state: workflowState,
+          lock_deploying,
         }),
       ),
     }),
   )
 
 export const fetchRegistrationByClientId = (accountId: AccountId, clientId: DeveloperKeyId) =>
-  parseFetchResult(ZLtiRegistrationWithConfiguration)(
+  parseFetchResult(ZLtiRegistrationWithAllInformation)(
     fetch(`/api/v1/accounts/${accountId}/lti_registration_by_client_id/${clientId}`, {
       ...defaultFetchOptions(),
     }),
@@ -293,7 +489,7 @@ export const setGlobalLtiRegistrationWorkflowState = (
   ltiRegistrationId: LtiRegistrationId,
   workflowState: 'on' | 'off',
 ) =>
-  parseFetchResult(z.unknown())(
+  parseFetchResult(ZLtiRegistrationAccountBinding)(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/bind`, {
       ...defaultFetchOptions(),
       method: 'POST',
@@ -354,3 +550,74 @@ export const fetchLtiRegistrationOverlayHistory = (
       defaultFetchOptions(),
     ),
   )
+
+export type FetchLtiRegistrationHistoryArgs =
+  | {
+      accountId: AccountId
+      ltiRegistrationId: LtiRegistrationId
+    }
+  | {
+      url: string
+    }
+
+export const fetchLtiRegistrationHistory = async (
+  args: FetchLtiRegistrationHistoryArgs,
+): Promise<ApiResult<LtiHistoryEntryWithDiff[]>> => {
+  let url: string
+  if ('url' in args) {
+    url = args.url
+  } else {
+    url = `/api/v1/accounts/${args.accountId}/lti_registrations/${args.ltiRegistrationId}/history`
+  }
+  return parseFetchResult(z.array(ZLtiRegistrationHistoryEntry))(fetch(url, defaultFetchOptions()))
+    .then(r => mapApiResult(r, diffHistoryEntries))
+    .catch(e => {
+      console.error('Error fetching LTI registration history:', e)
+      if (e instanceof Error) {
+        return exception(e)
+      } else {
+        return exception(new Error('Encountered an unknown error diffing history entries'))
+      }
+    })
+}
+
+/**
+ * Update LTI registration configuration from JSON
+ * @param accountId The account id to update the registration in
+ * @param registrationId The id of the registration to update
+ * @param jsonConfig The JSON configuration string to parse and apply
+ * @returns A promise that resolves when the update completes
+ */
+export const updateLtiRegistrationJson = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId,
+  jsonConfig: string,
+): Promise<unknown> => {
+  const parsedConfig = JSON.parse(jsonConfig) // Validate JSON - will throw if invalid
+
+  return doFetchWithSchema(
+    {
+      method: 'PUT',
+      path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`,
+      body: {
+        configuration: parsedConfig,
+      },
+    },
+    z.unknown(),
+  )
+}
+
+export type UpdateRegistrationJsonParams = {
+  accountId: AccountId
+  registrationId: LtiRegistrationId
+  jsonConfig: string
+}
+
+/**
+ * React Query hook for updating LTI registration configuration from JSON
+ */
+export const useUpdateRegistrationJson = () =>
+  useRegistrationMutation(({registrationId, accountId}) => ({registrationId, accountId}), {
+    mutationFn: ({accountId, registrationId, jsonConfig}: UpdateRegistrationJsonParams) =>
+      updateLtiRegistrationJson(accountId, registrationId, jsonConfig),
+  })

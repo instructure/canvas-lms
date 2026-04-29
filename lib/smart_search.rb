@@ -21,7 +21,13 @@ module SmartSearch
   EMBEDDING_VERSION = 2
   CHUNK_MAX_LENGTH = 1500
 
+  class EmbeddingError < StandardError; end
+
   class << self
+    Canvas::Reloader.on_reload do
+      @bedrock_client = nil
+    end
+
     def api_key
       Rails.application.credentials.dig(:smart_search, :openai_api_token)
     end
@@ -105,6 +111,10 @@ module SmartSearch
                                            }.to_json,
                                          })
       json = JSON.parse(resp.body.string)
+      unless json.dig("embeddings", 0).is_a?(Array)
+        raise EmbeddingError, "bedrock response missing embeddings: #{resp.body.string}"
+      end
+
       json["embeddings"][0]
     end
 

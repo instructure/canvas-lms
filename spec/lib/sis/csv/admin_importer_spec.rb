@@ -80,6 +80,42 @@ describe SIS::CSV::AdminImporter do
     expect(@account.account_users.where(user_id: u1).count).to eq 1
   end
 
+  it "sets performing_user on auditor record when deleting an admin" do
+    admin_user = user_with_managed_pseudonym(account: @account, sis_user_id: "ADM1")
+    performing_user = user_with_managed_pseudonym(account: @account, sis_user_id: "PERF1")
+
+    # first batch to create the admin (gives the AccountUser a sis_batch_id so it is eligible for deletion)
+    creation_batch = @account.sis_batches.create! { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "user_id,account_id,role,status",
+      "ADM1,sub1,AccountAdmin,active",
+      batch: creation_batch
+    )
+
+    account_user = @sub_account.account_users.find_by(user_id: admin_user.id)
+    expect(account_user).to be_present
+    expect(account_user.workflow_state).to eq "active"
+    expect(account_user.sis_batch_id).to eq creation_batch.id
+
+    # second batch (with a user) to delete the admin, triggering audit logging with current_user set
+    deletion_batch = @account.sis_batches.create!(user: performing_user) { |sb| sb.data = {} }
+    process_csv_data_cleanly(
+      "user_id,account_id,role,status",
+      "ADM1,sub1,AccountAdmin,deleted",
+      batch: deletion_batch
+    )
+
+    account_user.reload
+    expect(account_user.workflow_state).to eq "deleted"
+
+    audit_record = Auditors::ActiveRecord::AccountUserRecord.where(
+      account_user_id: account_user.id,
+      action: "deleted"
+    ).order(:created_at).last
+    expect(audit_record).to be_present
+    expect(audit_record.performing_user_id).to eq performing_user.id
+  end
+
   it "adds admins from other root_account" do
     account2 = Account.create!
     user_with_managed_pseudonym(account: account2, sis_user_id: "U001")
@@ -130,6 +166,39 @@ describe SIS::CSV::AdminImporter do
     user = @account.pseudonyms.find_by(sis_user_id: "U001").user
     admin = @account.account_users.find_by(user_id: user)
     expect(admin.workflow_state).to eq "active"
+  end
+
+  it "adds and then deletes every roles" do
+    blueprint_role = @sub_account.roles.create(name: "Blueprint", base_role_type: "AccountMembership")
+    masquerade_role = @sub_account.roles.create(name: "Masquerade", base_role_type: "AccountMembership")
+    account_admin_role = Role.find_by name: "AccountAdmin"
+    admin = user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
+
+    process_csv_data_cleanly(
+      "user_id,account_id,role,status",
+      "U001,sub1,AccountAdmin,active",
+      "U001,sub1,#{blueprint_role.name},active",
+      "U001,sub1,#{masquerade_role.name},active"
+    )
+
+    expect(admin.reload.account_users).to match_array([
+                                                        have_attributes(role_id: account_admin_role.id, workflow_state: "active"),
+                                                        have_attributes(role_id: blueprint_role.id, workflow_state: "active"),
+                                                        have_attributes(role_id: masquerade_role.id, workflow_state: "active")
+                                                      ])
+
+    process_csv_data_cleanly(
+      "user_id,account_id,role,status",
+      "U001,sub1,AccountAdmin,deleted",
+      "U001,sub1,#{blueprint_role.name},deleted",
+      "U001,sub1,#{masquerade_role.name},deleted"
+    )
+
+    expect(admin.reload.account_users).to match_array([
+                                                        have_attributes(role_id: account_admin_role.id, workflow_state: "deleted"),
+                                                        have_attributes(role_id: blueprint_role.id, workflow_state: "deleted"),
+                                                        have_attributes(role_id: masquerade_role.id, workflow_state: "deleted")
+                                                      ])
   end
 
   describe "SIS::AdminImporter::Work#process_admin" do

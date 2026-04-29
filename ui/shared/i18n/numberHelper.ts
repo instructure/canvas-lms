@@ -30,8 +30,8 @@ const helper = {
     }
 
     let num = helper._parseNumber(input.toString(), {
-      thousands: I18n.lookup('number.format.delimiter'),
-      decimal: I18n.lookup('number.format.separator'),
+      thousands: I18n.lookup('number.format.delimiter') ?? undefined,
+      decimal: I18n.lookup('number.format.separator') ?? undefined,
     })
 
     // fallback to default delimiters if invalid with locale specific ones

@@ -21,35 +21,35 @@ require_relative "support/answer_serializers_specs"
 
 describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
   context "English" do
-    let :inputs do
-      [25.3, 2.5e-5, "0.12", "3", "17,000", "6,200,000.13"]
-    end
+    it_behaves_like "Answer Serializers" do
+      let :inputs do
+        [25.3, 2.5e-5, "0.12", "3", "17,000", "6,200,000.13"]
+      end
 
-    let :outputs do
-      [
-        { question_5: 2.53e1 }.with_indifferent_access,
-        { question_5: 2.5e-5 }.with_indifferent_access,
-        { question_5: 0.12 }.with_indifferent_access,
-        { question_5: 3.0 }.with_indifferent_access,
-        { question_5: 17_000.0 }.with_indifferent_access,
-        { question_5: 6_200_000.13 }.with_indifferent_access
-      ]
-    end
+      let :outputs do
+        [
+          { question_5: 2.53e1 }.with_indifferent_access,
+          { question_5: 2.5e-5 }.with_indifferent_access,
+          { question_5: 0.12 }.with_indifferent_access,
+          { question_5: 3.0 }.with_indifferent_access,
+          { question_5: 17_000.0 }.with_indifferent_access,
+          { question_5: 6_200_000.13 }.with_indifferent_access
+        ]
+      end
 
-    include_examples "Answer Serializers"
+      it "returns nil when un-answered" do
+        expect(subject.deserialize({})).to be_nil
+      end
 
-    it "returns nil when un-answered" do
-      expect(subject.deserialize({})).to be_nil
-    end
-
-    context "validations" do
-      it "turns garbage into 0.0" do
-        ["foobar", nil, { foo: "bar" }, "25 00012"].each do |garbage|
-          rc = subject.serialize(garbage)
-          expect(rc.error).to be_nil
-          expect(rc.answer).to eq({
-            question_5: 0.0
-          }.with_indifferent_access)
+      context "validations" do
+        it "turns garbage into 0.0" do
+          ["foobar", nil, { foo: "bar" }, "25 00012"].each do |garbage|
+            rc = subject.serialize(garbage)
+            expect(rc.error).to be_nil
+            expect(rc.answer).to eq({
+              question_5: 0.0
+            }.with_indifferent_access)
+          end
         end
       end
     end
@@ -75,7 +75,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
       ]
     end
 
-    include_examples "Answer Serializers"
+    it_behaves_like "Answer Serializers"
   end
 
   context "French" do
@@ -98,7 +98,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
       ]
     end
 
-    include_examples "Answer Serializers"
+    it_behaves_like "Answer Serializers"
   end
 
   def sanitize(value)

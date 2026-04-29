@@ -23,16 +23,16 @@ import ReviewsPerUserInput from '../ReviewsPerUserInput'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock jQuery to prevent flashError errors from unrelated components
-jest.mock('jquery', () => {
+vi.mock('jquery', () => {
   const jQueryMock = {
-    flashError: jest.fn(),
-    Deferred: jest.fn(() => ({
-      resolve: jest.fn(),
-      reject: jest.fn(),
-      promise: jest.fn(),
+    flashError: vi.fn(),
+    Deferred: vi.fn(() => ({
+      resolve: vi.fn(),
+      reject: vi.fn(),
+      promise: vi.fn(),
     })),
   }
-  return jest.fn(() => jQueryMock)
+  return vi.fn(() => jQueryMock)
 })
 
 describe('ReviewsPerUserInput Tests', () => {
@@ -40,12 +40,12 @@ describe('ReviewsPerUserInput Tests', () => {
 
   beforeEach(() => {
     fakeENV.setup()
-    onChangeMock = jest.fn()
+    onChangeMock = vi.fn()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const props = (overrides = {}) => {

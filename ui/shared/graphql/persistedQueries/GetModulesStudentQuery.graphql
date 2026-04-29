@@ -54,6 +54,7 @@ query GetModulesStudentQuery($courseId: ID!, $cursor: String) {
               latestDueAt
               missingAssignmentCount
             }
+            moduleItemsTotalCount
           }
         }
         pageInfo {

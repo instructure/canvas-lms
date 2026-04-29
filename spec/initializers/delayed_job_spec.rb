@@ -39,11 +39,11 @@ describe "Delayed::Job" do
   end
 
   describe "current_shard" do
-    include_examples "delayed_jobs_shards"
+    it_behaves_like "delayed_jobs_shards"
 
     context "sharding" do
       specs_require_sharding
-      include_examples "delayed_jobs_shards"
+      it_behaves_like "delayed_jobs_shards"
     end
   end
 

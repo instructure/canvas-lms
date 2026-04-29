@@ -18,19 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe Canvadocs do
   describe ".user_session_params" do
     let(:course) { Course.create! }
     let(:student) { User.create!(name: "Severus Student", short_name: "Sev, the Student") }
     let(:teacher) { User.create!(name: "Giselle Grader", short_name: "Gise, the Grader") }
-    let(:assignment) { course.assignments.create!(title: "an assignment") }
+    let(:assignment) { course.assignments.create!(title: "an assignment", submission_types: "online_upload") }
     let(:submission) { assignment.submission_for_student(student) }
     let(:attachment) do
       Attachment.create!(
         content_type: "application/pdf",
-        context: course,
+        context: student,
         user: student,
         uploaded_data: stub_png_data,
         filename: "file.png"
@@ -40,14 +38,24 @@ describe Canvadocs do
     let(:user_filter) { session_params[:user_filter] }
 
     before do
-      course.enroll_student(student).accept(true)
-      course.enroll_teacher(teacher).accept(true)
-      attachment.associate_with(submission)
+      course.enroll_student(student).accept(force: true)
+      course.enroll_teacher(teacher).accept(force: true)
+      assignment.submit_homework(student, attachments: [attachment])
       @current_user = student
     end
 
     context "when passed an attachment" do
       let(:session_params) { Canvadocs.user_session_params(@current_user, attachment:) }
+
+      it "returns empty hash if provided an attachment linked to past, but not current, submission attempts" do
+        new_attachment = Attachment.create!(
+          uploaded_data: StringIO.new("attempt 2"),
+          context: student,
+          filename: "attempt2.txt"
+        )
+        assignment.submit_homework(student, attachments: [new_attachment])
+        expect(session_params).to be_empty
+      end
 
       # We don't really want this behaviour long term, but that's the
       # difference between sending an attachment and sending in the
@@ -132,7 +140,7 @@ describe Canvadocs do
 
         context "when an assignment posts manually and a submission is unposted" do
           before do
-            course.enroll_student(peer_reviewer).accept(true)
+            course.enroll_student(peer_reviewer).accept(force: true)
             assignment.post_policy.update!(post_manually: true)
             assignment.hide_submissions
           end
@@ -248,7 +256,7 @@ describe Canvadocs do
 
         context "when an assignment posts manually and a submission is posted" do
           before do
-            course.enroll_student(peer_reviewer).accept(true)
+            course.enroll_student(peer_reviewer).accept(force: true)
             assignment.post_policy.update!(post_manually: true)
             assignment.post_submissions
           end
@@ -394,7 +402,7 @@ describe Canvadocs do
           before do
             assignment.update!(moderated_grading: true, final_grader:, grader_count: 1)
             assignment.moderation_graders.create!(user: final_grader, anonymous_id: "qqqqq")
-            course.enroll_ta(provisional_grader).accept(true)
+            course.enroll_ta(provisional_grader).accept(force: true)
             assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: "wwwww")
           end
 
@@ -689,7 +697,7 @@ describe Canvadocs do
           before do
             assignment.update!(moderated_grading: true, final_grader:, grader_count: 1)
             assignment.moderation_graders.create!(user: final_grader, anonymous_id: "qqqqq")
-            course.enroll_ta(provisional_grader).accept(true)
+            course.enroll_ta(provisional_grader).accept(force: true)
             assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: "wwwww")
           end
 
@@ -817,7 +825,8 @@ describe Canvadocs do
 
         context "for a student annotation assignment" do
           before do
-            assignment.update!(submission_types: "student_annotation,online_text_entry", annotatable_attachment: attachment)
+            assignment.update!(submission_types: "student_annotation,online_text_entry,online_upload", annotatable_attachment: attachment)
+            # second attempt
             assignment.submit_homework(
               submission.user,
               submission_type: "student_annotation",
@@ -837,9 +846,10 @@ describe Canvadocs do
 
             it "sets the user_filter to empty for past student annotation attempts" do
               Timecop.freeze(10.minutes.from_now(submission.submitted_at)) do
+                # third attempt
                 assignment.submit_homework(submission.user, body: "hi", submission_type: "online_text_entry")
                 submission.reload
-                params = Canvadocs.user_session_params(@current_user, submission:, attempt: 1)
+                params = Canvadocs.user_session_params(@current_user, submission:, attempt: 2)
                 expect(params[:user_filter]).to be_empty
               end
             end

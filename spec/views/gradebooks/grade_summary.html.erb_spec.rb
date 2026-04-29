@@ -484,11 +484,6 @@ describe "gradebooks/grade_summary" do
           assign(:current_user, teacher)
         end
 
-        it "calls turnitin_enabled? and returns false" do
-          expect(presenter).to receive(:turnitin_enabled?).at_least(1).time.and_return(false)
-          render "gradebooks/grade_summary"
-        end
-
         context "when the assignment uses Turnitin" do
           before { allow(presenter).to receive(:turnitin_enabled?).and_return(true) }
 

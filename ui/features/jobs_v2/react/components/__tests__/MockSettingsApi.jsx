@@ -45,7 +45,7 @@ const settingsMocks = [
         value: '14',
       },
     },
-    result: jest.fn(() => {
+    result: vi.fn(() => {
       return {
         data: {
           updateInternalSetting: {

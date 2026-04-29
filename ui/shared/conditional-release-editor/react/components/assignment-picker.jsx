@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {List, Map} from 'immutable'
-import _ from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 
 import * as actions from '../assignment-picker-actions'
 
@@ -56,7 +56,7 @@ export class AssignmentPicker extends React.Component {
     super()
     this.filterByName = this.filterByName.bind(this)
     this.filterByCategory = this.filterByCategory.bind(this)
-    this.updateScreenReaderResultCount = _.debounce(this.updateScreenReaderResultCount, 1000)
+    this.updateScreenReaderResultCount = debounce(this.updateScreenReaderResultCount, 1000)
     this.state = {}
   }
 

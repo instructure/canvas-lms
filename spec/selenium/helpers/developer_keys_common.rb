@@ -58,7 +58,6 @@ module DeveloperKeysCommon
     get "/accounts/#{context_id}/developer_keys"
     find_button("Developer Key").click
     find_button("API Key").click
-    click_enforce_scopes
     filter_scopes_by_name(scope_group)
     fj("[data-automation='toggle-scope-group'] span:contains('#{scope_group}')").click
   end
@@ -66,6 +65,8 @@ module DeveloperKeysCommon
   def filter_scopes_by_name(scope)
     f("input[placeholder='Search endpoints']").clear
     f("input[placeholder='Search endpoints']").send_keys scope
+    # Wait for debounced filter to apply (400ms debounce delay)
+    sleep 1 # rubocop:disable Lint/NoSleep
   end
 
   def wait_for_dev_key_modal_to_close

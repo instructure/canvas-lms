@@ -34,11 +34,15 @@ import {renderConnected} from '../../../__tests__/utils'
 
 import {AssignmentRow, type ComponentProps} from '../assignment_row'
 
-const setPaceItemDuration = jest.fn()
-const setPaceItemDurationTimeToCompleteCalendarDays = jest.fn()
+const setPaceItemDuration = vi.fn()
+const setPaceItemDurationTimeToCompleteCalendarDays = vi.fn()
 
-jest.mock('@canvas/conditional-release-cyoe-helper', () => ({
-  getItemData: jest.fn(),
+vi.mock('@canvas/conditional-release-cyoe-helper', () => ({
+  default: {
+    getItemData: vi.fn(),
+    isEnabled: vi.fn(),
+    reloadEnv: vi.fn(),
+  },
 }))
 
 const defaultProps: ComponentProps = {
@@ -72,7 +76,7 @@ beforeAll(() => {
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('AssignmentRow', () => {
@@ -325,7 +329,7 @@ describe('AssignmentRow', () => {
   })
 
   it('returns null when isTrigger and releasedLabel are both false', () => {
-    ;(CyoeHelper.getItemData as jest.Mock).mockReturnValue({isTrigger: false, releasedLabel: ''})
+    ;(CyoeHelper.getItemData as ReturnType<typeof vi.fn>).mockReturnValue({isTrigger: false, releasedLabel: ''})
 
     const {queryByTestId} = renderConnected(
       renderRow(<AssignmentRow {...{...defaultProps, context_type: 'Section'}} />),
@@ -337,7 +341,7 @@ describe('AssignmentRow', () => {
   })
 
   it('renders Mastery Paths link when isTrigger is true and moduleItemId is provided', () => {
-    ;(CyoeHelper.getItemData as jest.Mock).mockReturnValue({isTrigger: true, releasedLabel: ''})
+    ;(CyoeHelper.getItemData as ReturnType<typeof vi.fn>).mockReturnValue({isTrigger: true, releasedLabel: ''})
     window.ENV.FEATURES.course_pace_pacing_with_mastery_paths = true
     const {getByText} = renderConnected(
       renderRow(<AssignmentRow {...{...defaultProps, context_type: 'Section'}} />),
@@ -351,7 +355,7 @@ describe('AssignmentRow', () => {
   })
 
   it('renders both Mastery Paths link and Pill when isTrigger is true and releasedLabel is provided', () => {
-    ;(CyoeHelper.getItemData as jest.Mock).mockReturnValue({
+    ;(CyoeHelper.getItemData as ReturnType<typeof vi.fn>).mockReturnValue({
       isTrigger: true,
       releasedLabel: '100 pts - 70 pts',
     })

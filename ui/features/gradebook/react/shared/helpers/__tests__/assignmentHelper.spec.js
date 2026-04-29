@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {defaults} from 'es-toolkit/compat'
 import assignmentHelper from '../assignmentHelper'
 
 describe('assignmentHelper#compareByDueDate', () => {
   const generateAssignment = options => {
     options = options || {}
-    return _.defaults(options, {
+    return defaults(options, {
       name: 'assignment',
       due_at: new Date('Mon May 11 2015'),
     })

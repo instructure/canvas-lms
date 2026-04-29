@@ -18,12 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssessmentQuestion < ActiveRecord::Base
+class AssessmentQuestion < ApplicationRecord
   extend RootAccountResolver
   include Workflow
 
   has_many :quiz_questions, class_name: "Quizzes::QuizQuestion"
   has_many :attachments, as: :context, inverse_of: :context
+
   delegate :context, :context_id, :context_type, to: :assessment_question_bank
   attr_accessor :initial_context
 
@@ -53,8 +54,13 @@ class AssessmentQuestion < ActiveRecord::Base
   serialize :question_data
 
   include MasterCourses::CollectionRestrictor
+
   self.collection_owner_association = :assessment_question_bank
   restrict_columns :content, [:name, :question_data]
+
+  include LinkedAttachmentHandler
+
+  def update_attachment_associations; end
 
   set_policy do
     given do |user, session|
@@ -114,52 +120,86 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def translate_link_regex
-    @regex ||= Regexp.new(%{/#{context_type.downcase.pluralize}/#{context_id}/(?:files/(\\d+)/(?:download|preview)|file_contents/(course%20files/[^'"?]*))(?:\\?([^'"]*))?})
+    @translate_link_regex ||= Regexp.new(%{/(courses/#{context_id}/(files/(?<course_attachment_id>\\d+~?\\d*)|file_contents/course%20files/(?<course_file_path>[A-Za-z0-9/_,.%+-]+))|users/(?<user_id>\\d+~?\\d*)/files/(?<user_attachment_id>\\d+~?\\d*)|media_attachments_iframe/(?<media_attachment_id>\\d+~?\\d*))(?<rest>[^"']+)?})
   end
 
   def file_substitutions
     @file_substitutions ||= {}
   end
 
-  def translate_file_link(link, match_data = nil)
+  def translate_file_link(link, match_data = nil, migration: nil)
     match_data ||= link.match(translate_link_regex)
     return link unless match_data
 
-    id = match_data[1]
-    path = match_data[2]
-    id_or_path = id || path
+    id_or_path = match_data[:media_attachment_id] || match_data[:course_attachment_id] || match_data[:user_attachment_id] || match_data[:course_file_path]
 
     unless file_substitutions[id_or_path]
-      if id
-        file = Attachment.where(context_type:, context_id:, id: id_or_path).first
-      elsif path
-        path = URI::DEFAULT_PARSER.unescape(id_or_path)
-        file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
-      end
+      file = find_file_for_translation(match_data, id_or_path)
+
       if file&.replacement_attachment_id
         file = file.replacement_attachment
       end
+
+      unless updating_user.present? || migration
+        error_message = "User is required for file translation in #{self.class}"
+        Sentry.with_scope do |scope|
+          scope.set_context("assessment_question_file_translation", {
+                              assessment_question_id: id
+                            })
+          Sentry.capture_message(error_message, level: :warning)
+        end
+        raise error_message if Rails.env.development?
+
+        return link
+      end
+
+      if updating_user && !file&.grants_right?(updating_user, nil, :create)
+        return link
+      end
+
       begin
         new_file = file.try(:clone_for, self)
       rescue => e
         new_file = nil
-        er_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
-        logger.error("Error while cloning attachment during " \
-                     "AssessmentQuestion#translate_links: " \
-                     "id: #{self.id} error_report: #{er_id}")
+        err_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
+        logger.error("Error while cloning attachment during AssessmentQuestion#translate_links: id: #{id} error_report: #{err_id}")
       end
       new_file&.save
       file_substitutions[id_or_path] = new_file
     end
+
     if (sub = file_substitutions[id_or_path])
-      query_rest = match_data[3] ? "&#{match_data[3]}" : ""
-      "/assessment_questions/#{self.id}/files/#{sub.id}/download?verifier=#{sub.uuid}#{query_rest}"
+      # Split rest into path part (e.g., /download) and query string
+      rest = match_data[:rest].to_s
+      _, query_rest = rest.split("?", 2)
+      query_rest ||= ""
+      # TODO: GROW-146
+      query_params = if context.root_account.feature_enabled?(:disable_file_verifier_access)
+                       query_rest.blank? ? "" : "?#{query_rest}"
+                     else
+                       query_rest.blank? ? "?verifier=#{sub.uuid}" : "?verifier=#{sub.uuid}&#{query_rest}"
+                     end
+
+      if match_data[:media_attachment_id]
+        "/media_attachments_iframe/#{sub.id}#{query_params}"
+      else
+        "/assessment_questions/#{id}/files/#{sub.id}/download#{query_params}"
+      end
     else
       link
     end
   end
 
-  def translate_links
+  def find_file_for_translation(match_data, id_or_path)
+    if match_data[:course_attachment_id] || match_data[:user_attachment_id] || match_data[:media_attachment_id]
+      Attachment.find_by(id: id_or_path)
+    elsif match_data[:course_file_path]
+      path = URI::DEFAULT_PARSER.unescape("course%20files/#{id_or_path}")
+      Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
+    end
+  end
+
+  def translate_links(migration: nil)
     # we can't translate links unless this question has a context (through a bank)
     return unless assessment_question_bank&.context
 
@@ -176,7 +216,7 @@ class AssessmentQuestion < ActiveRecord::Base
         obj.map { |v| deep_translate.call(v) }
       when String
         obj.gsub(translate_link_regex) do |match|
-          translate_file_link(match, $~)
+          translate_file_link(match, $~, migration:)
         end
       else
         obj
@@ -278,7 +318,7 @@ class AssessmentQuestion < ActiveRecord::Base
       aq.force_version_number(current_versions[aq.id] || 0)
       qq = existing_quiz_questions[aq.id].try(:first)
       if qq
-        qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
+        qq.update_from_assessment_question!(aq, quiz_group_id, duplicate_index)
       else
         begin
           Quizzes::QuizQuestion.transaction(requires_new: true) do
@@ -288,7 +328,7 @@ class AssessmentQuestion < ActiveRecord::Base
           qq = scope.where(assessment_question_id: aq,
                            quiz_group_id:,
                            duplicate_index:).take!
-          qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
+          qq.update_from_assessment_question!(aq, quiz_group_id, duplicate_index)
         end
       end
       qq
@@ -303,8 +343,9 @@ class AssessmentQuestion < ActiveRecord::Base
       qq.assessment_question = self
       qq.workflow_state = "generated"
       qq.duplicate_index = duplicate_index
-      Quizzes::QuizQuestion.suspend_callbacks(:validate_blank_questions, :infer_defaults, :update_quiz) do
+      Quizzes::QuizQuestion.suspend_callbacks(:validate_blank_questions, :infer_defaults, :update_quiz, :update_attachment_associations) do
         qq.save!
+        qq.copy_attachment_associations_from(self)
       end
     end
   end

@@ -25,6 +25,7 @@ class Feature
              applies_to
              state
              root_opt_in
+             early_access_program
              beta
              type
              shadow
@@ -45,7 +46,8 @@ class Feature
       instance_variable_set :"@#{key}", val
     end
     # for RootAccount features, "allowed" state is redundant; show "off" instead
-    @root_opt_in = true if @applies_to == "RootAccount"
+    # since a root account admin must accept Early Access Program terms, this also implies root_opt_in
+    @root_opt_in = true if @applies_to == "RootAccount" || @early_access_program
   end
 
   def clone_for_cache
@@ -108,6 +110,8 @@ class Feature
   #                               #   cannot be turned on. It is intended for use in environment state overrides.
   #     root_opt_in: false,       # if true, 'allowed' features in source or site admin
   #                               # will be inherited in "off" state by root accounts
+  #     early_access_program: false, # if true, a root account admin must accept Early Access Program terms to allow
+  #                                  # or enable the feature. implies root_opt_in
   #     beta: false,              # 'beta' tag shown in UI
   #     release_notes_url: 'http://example.com/',
   #

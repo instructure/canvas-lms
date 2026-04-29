@@ -28,7 +28,8 @@ module PlannerHelper
     "planner_note" => "PlannerNote",
     "calendar_event" => "CalendarEvent",
     "assessment_request" => "AssessmentRequest",
-    "sub_assignment" => "SubAssignment"
+    "sub_assignment" => "SubAssignment",
+    "peer_review_sub_assignment" => "PeerReviewSubAssignment"
   }.freeze
 
   class << self

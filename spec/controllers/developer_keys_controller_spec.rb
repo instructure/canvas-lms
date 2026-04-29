@@ -106,13 +106,6 @@ describe DeveloperKeysController do
             eq(sample_scopes_for_root_account)
         end
 
-        it "includes all valid LTI placements in js env" do
-          # enable conference placement
-          Account.site_admin.enable_feature! :conference_selection_lti_placement
-          get "index", params: { account_id: Account.site_admin.id }
-          expect(assigns.dig(:js_env, :validLtiPlacements)).to match_array Lti::ResourcePlacement.public_placements(Account.site_admin)
-        end
-
         describe "js bundles" do
           render_views
 
@@ -359,6 +352,51 @@ describe DeveloperKeysController do
         end
       end
 
+      context "redirect URIs" do
+        let(:developer_key) { DeveloperKey.create! }
+        let(:valid_uris) { ["https://example.com/callback", "https://another-url.org/redirect"] }
+
+        before do
+          user_session(@admin)
+        end
+
+        it "allows updating a list of redirect URIs" do
+          put :update, params: { id: developer_key.id, account_id: Account.site_admin.id, developer_key: { redirect_uris: valid_uris } }
+          expect(response).to be_successful
+          expect(developer_key.reload.redirect_uris).to match_array(valid_uris)
+        end
+
+        it "replaces existing URIs with the new array" do
+          developer_key.update!(redirect_uris: ["https://old-uri.com"])
+          put :update, params: { id: developer_key.id, account_id: Account.site_admin.id, developer_key: { redirect_uris: valid_uris } }
+          expect(response).to be_successful
+          expect(developer_key.reload.redirect_uris).to match_array(valid_uris)
+        end
+
+        it "ignores the deprecated redirect_uri when redirect_uris is present" do
+          initial_uri = "https://old-uri.com"
+          developer_key.update!(redirect_uris: [initial_uri])
+          put :update, params: { id: developer_key.id, account_id: Account.site_admin.id, developer_key: { redirect_uri: "http://deprecated.com", redirect_uris: valid_uris } }
+          expect(response).to be_successful
+          # Expect redirect_uris to be updated and redirect_uri to be ignored
+          expect(developer_key.reload.redirect_uris).to match_array(valid_uris)
+        end
+
+        it "accepts space-separated string of redirect URIs" do
+          space_separated_uris = "https://example.com/callback https://another-url.org/redirect"
+          put :update, params: { id: developer_key.id, account_id: Account.site_admin.id, developer_key: { redirect_uris: space_separated_uris } }
+          expect(response).to be_successful
+          expect(developer_key.reload.redirect_uris).to match_array(valid_uris)
+        end
+
+        it "accepts newline-separated string of redirect URIs" do
+          newline_separated_uris = "https://example.com/callback\nhttps://another-url.org/redirect"
+          put :update, params: { id: developer_key.id, account_id: Account.site_admin.id, developer_key: { redirect_uris: newline_separated_uris } }
+          expect(response).to be_successful
+          expect(developer_key.reload.redirect_uris).to match_array(valid_uris)
+        end
+      end
+
       describe "scopes" do
         let(:valid_scopes) do
           %w[url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
@@ -471,12 +509,11 @@ describe DeveloperKeysController do
         end
         let(:tool_config) { lti_registration.manual_configuration }
 
-        it "hard deletes the tool configuration and soft deletes the registration" do
-          # Ensure config is initialized before it's hard deleted
+        it "soft deletes the tool configuration and the registration" do
           tool_config
           delete :destroy, params: { id: dk.id, account_id: account.id }
           expect(lti_registration.reload).to be_deleted
-          expect(Lti::ToolConfiguration.where(id: tool_config.id)).to be_empty
+          expect(tool_config.reload).to be_deleted
         end
 
         context "tools were installed from that config" do
@@ -489,11 +526,10 @@ describe DeveloperKeysController do
           end
 
           it "deletes the tools in a job" do
-            # Ensure config is initialized before it's hard deleted
             tool_config
             expect { delete :destroy, params: { id: dk.id, account_id: account.id } }
               .to change { lti_registration.reload.workflow_state }.to "deleted"
-            expect(Lti::ToolConfiguration.where(id: tool_config.id)).to be_empty
+            expect(tool_config.reload).to be_deleted
             expect(dk.reload).to be_deleted
             run_jobs
             expect(tool.reload).to be_deleted
@@ -639,6 +675,61 @@ describe DeveloperKeysController do
         end
       end
 
+      context "when lti_deactivate_registrations is enabled" do
+        let(:lti_key) { registration.developer_key }
+        let(:registration) { lti_registration_with_tool(account: test_domain_root_account) }
+
+        before do
+          lti_key
+          allow_any_instance_of(Account).to receive(:feature_enabled?)
+            .with(:lti_deactivate_registrations)
+            .and_return(true)
+        end
+
+        it "includes the real binding in developer_key_account_binding" do
+          get "index", params: { account_id: test_domain_root_account.id }, format: :json
+          key_json = json_parse.find { |k| k["id"] == lti_key.global_id }
+          expect(key_json["developer_key_account_binding"]).to have_key("id")
+          expect(key_json["developer_key_account_binding"]).to have_key("account_id")
+        end
+
+        it "sets lti_registration_workflow_state to active when the registration is active" do
+          get "index", params: { account_id: test_domain_root_account.id }, format: :json
+          key_json = json_parse.find { |k| k["id"] == lti_key.global_id }
+          expect(key_json["lti_registration_workflow_state"]).to eq("active")
+        end
+
+        it "sets lti_registration_workflow_state to inactive when the registration is inactive" do
+          lti_key.lti_registration.deactivate!
+          get "index", params: { account_id: test_domain_root_account.id }, format: :json
+          key_json = json_parse.find { |k| k["id"] == lti_key.global_id }
+          expect(key_json["lti_registration_workflow_state"]).to eq("inactive")
+        end
+
+        it "sets lti_registration_workflow_state to nil when there is no lti_registration" do
+          lti_key.update_column(:lti_registration_id, nil)
+          get "index", params: { account_id: test_domain_root_account.id }, format: :json
+          key_json = json_parse.find { |k| k["id"] == lti_key.global_id }
+          expect(key_json["lti_registration_workflow_state"]).to be_nil
+        end
+
+        context "when the key is not an LTI key" do
+          let(:non_lti_key) do
+            DeveloperKey.create!(account: test_domain_root_account).tap do |key|
+              key.account_binding_for(test_domain_root_account).update!(workflow_state: "on")
+            end
+          end
+
+          before { non_lti_key }
+
+          it "does not include lti_registration_workflow_state" do
+            get "index", params: { account_id: test_domain_root_account.id }, format: :json
+            key_json = json_parse.find { |k| k["id"] == non_lti_key.global_id }
+            expect(key_json).not_to have_key("lti_registration_workflow_state")
+          end
+        end
+      end
+
       context "with sharding" do
         specs_require_sharding
 
@@ -774,6 +865,202 @@ describe DeveloperKeysController do
         post "update", params: { id: dk.id }
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
+      end
+    end
+
+    describe "POST 'lookup_utids'" do
+      let(:root_account) { account_model }
+      let(:admin_user) { account_admin_user(account: root_account) }
+      let(:redirect_uris) { ["https://example.com/redirect", "https://another.com/callback"] }
+      let(:api_registrations) do
+        [
+          {
+            unified_tool_id: "550e8400-e29b-41d4-a716-446655440000",
+            global_product_id: "e8f9a0b1-c2d3-4567-e890-123456789abc",
+            tool_name: "Math Learning Platform",
+            tool_id: 789,
+            company_id: 456,
+            company_name: "Educational Tech Solutions",
+            source: "partner_provided"
+          },
+          {
+            unified_tool_id: "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+            global_product_id: "d7e8f9a0-b1c2-4345-d678-90abcdef1234",
+            tool_name: "Science Lab Simulator",
+            tool_id: 321,
+            company_id: 654,
+            company_name: "STEM Education Corp",
+            source: "manual"
+          }
+        ]
+      end
+
+      before do
+        @controller.request.env["canvas.domain_root_account"] = root_account
+        user_session(admin_user)
+        allow(LearnPlatform::GlobalApi).to receive(:lookup_api_registrations).and_return(api_registrations)
+      end
+
+      it "returns matching UTIDs for given redirect URIs" do
+        post "lookup_utids", params: { account_id: root_account.id, redirect_uris: }, format: :json
+        expect(response).to be_successful
+        json_response = json_parse(response.body)
+        expect(json_response["api_registrations"]).to eq(JSON.parse(api_registrations.to_json))
+      end
+
+      it "calls LearnPlatform::GlobalApi.lookup_api_registrations with correct params" do
+        expect(LearnPlatform::GlobalApi).to receive(:lookup_api_registrations).with(redirect_uris, sources: nil)
+        post "lookup_utids", params: { account_id: root_account.id, redirect_uris: }, format: :json
+      end
+
+      it "passes sources parameter when provided" do
+        sources = ["partner_provided", "manual"]
+        expect(LearnPlatform::GlobalApi).to receive(:lookup_api_registrations).with(redirect_uris, sources:)
+        post "lookup_utids", params: { account_id: root_account.id, redirect_uris:, sources: }, format: :json
+      end
+
+      it "handles errors gracefully" do
+        allow(LearnPlatform::GlobalApi).to receive(:lookup_api_registrations).and_raise(StandardError, "API error")
+        post "lookup_utids", params: { account_id: root_account.id, redirect_uris: }, format: :json
+        expect(response).to have_http_status(:bad_request)
+        json_response = json_parse(response.body)
+        expect(json_response["error"]).to eq("Failed to match redirect URIs")
+      end
+
+      context "without proper permissions" do
+        it "requires authorization" do
+          user_model
+          user_session(@user)
+          post "lookup_utids", params: { account_id: root_account.id, redirect_uris: }, format: :json
+          expect(response).to be_forbidden
+        end
+      end
+
+      context "when redirect_uris is missing" do
+        it "returns bad request" do
+          post "lookup_utids", params: { account_id: root_account.id }, format: :json
+          expect(response).to have_http_status(:bad_request)
+        end
+      end
+    end
+
+    describe "modify_site_admin_developer_keys permission" do
+      let(:site_admin_admin) { account_admin_user(account: Account.site_admin) }
+      let(:site_admin_without_permission) do
+        user = user_model
+        role = custom_account_role("limited_admin", account: Account.site_admin)
+        # Grant manage_developer_keys but not modify_site_admin_developer_keys
+        Account.site_admin.role_overrides.create!(
+          permission: :manage_developer_keys,
+          role:,
+          enabled: true
+        )
+        Account.site_admin.account_users.create!(user:, role:)
+        user
+      end
+
+      describe "POST 'create'" do
+        let(:create_params) do
+          {
+            account_id: Account.site_admin.id,
+            developer_key: {
+              name: "Test Key",
+              redirect_uri: "http://example.com/redirect"
+            }
+          }
+        end
+
+        context "when user has modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_admin) }
+
+          it "allows creating a site admin developer key" do
+            post :create, params: create_params, format: :json
+            expect(response).to be_successful
+            key = DeveloperKey.find(json_parse(response.body)["id"])
+            expect(key.account).to be_nil
+          end
+        end
+
+        context "when user lacks modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_without_permission) }
+
+          it "returns forbidden" do
+            post :create, params: create_params, format: :json
+            expect(response).to be_forbidden
+            expect(json_parse(response.body)["errors"].first["message"]).to include("Site Admin developer keys")
+          end
+        end
+      end
+
+      describe "PUT 'update'" do
+        let(:site_admin_key) { DeveloperKey.create!(name: "Site Admin Key") }
+
+        context "when user has modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_admin) }
+
+          it "allows updating a site admin developer key" do
+            put :update, params: { id: site_admin_key.id, developer_key: { name: "Updated Name" }, account_id: Account.site_admin.id }, format: :json
+            expect(response).to be_successful
+            expect(site_admin_key.reload.name).to eq("Updated Name")
+          end
+        end
+
+        context "when user lacks modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_without_permission) }
+
+          it "returns forbidden" do
+            put :update, params: { id: site_admin_key.id, developer_key: { name: "Updated Name" }, account_id: Account.site_admin.id }, format: :json
+            expect(response).to be_forbidden
+            expect(json_parse(response.body)["errors"].first["message"]).to include("Site Admin developer keys")
+          end
+        end
+      end
+
+      describe "DELETE 'destroy'" do
+        let(:site_admin_key) { DeveloperKey.create!(name: "Site Admin Key") }
+
+        context "when user has modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_admin) }
+
+          it "allows deleting a site admin developer key" do
+            delete :destroy, params: { id: site_admin_key.id, account_id: Account.site_admin.id }, format: :json
+            expect(response).to be_successful
+            expect(site_admin_key.reload.state).to eq(:deleted)
+          end
+        end
+
+        context "when user lacks modify_site_admin_developer_keys permission" do
+          before { user_session(site_admin_without_permission) }
+
+          it "returns forbidden" do
+            delete :destroy, params: { id: site_admin_key.id, account_id: Account.site_admin.id }, format: :json
+            expect(response).to be_forbidden
+            expect(json_parse(response.body)["errors"].first["message"]).to include("Site Admin developer keys")
+          end
+        end
+      end
+
+      describe "account-level developer keys" do
+        let(:root_account) { account_model }
+        let(:account_key) { DeveloperKey.create!(name: "Account Key", account: root_account) }
+        let(:account_admin) do
+          user = user_model
+          role = custom_account_role("limited_admin", account: root_account)
+          root_account.role_overrides.create!(
+            permission: :manage_developer_keys,
+            role:,
+            enabled: true
+          )
+          root_account.account_users.create!(user:, role:)
+          user
+        end
+
+        before { user_session(account_admin) }
+
+        it "does not require modify_site_admin_developer_keys for account-level keys" do
+          put :update, params: { id: account_key.id, developer_key: { name: "Updated" }, account_id: root_account.id }, format: :json
+          expect(response).to be_successful
+        end
       end
     end
   end

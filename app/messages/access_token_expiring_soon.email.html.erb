@@ -1,0 +1,28 @@
+<% remove_profile_url_in_layout = true %>
+
+<% define_content :link do %>
+  <% if user&.account&.primary_domain&.host %>
+    <%= url_for({ controller: :profile, action: :settings, host: user.account.primary_domain.host }) %>
+  <% else %>
+    <%= settings_profile_url %>
+  <% end %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t "Your Canvas access token will expire in 7 days" %>
+<% end %>
+
+<p><%= t "Hello %{name},", name: asset.user.name %></p>
+
+<p>
+  <%= t "This is an automated message to inform you that your user-generated access token in Canvas is set to expire in 7 days on %{expiration_date}. The token with hint %{token_hint} is listed with Purpose: %{purpose}. The expiration date cannot be extended, but you can generate a new token by going to your user settings and clicking \"New Access Token\" under the Approved Integrations section if needed.",
+    expiration_date: datetime_string(asset.permanent_expires_at),
+    token_hint: asset.token_hint,
+    purpose: asset.purpose %>
+</p>
+
+<div>
+  <a href="<%= content(:link) %>">
+    <%= t "Manage User Settings" %>
+  </a>
+</div>

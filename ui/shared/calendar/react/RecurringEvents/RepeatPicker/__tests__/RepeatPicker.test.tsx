@@ -167,7 +167,7 @@ describe('RepeatPicker', () => {
     })
 
     it('calls onChange when interval changes', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByDisplayValue} = render(<RepeatPicker {...defaultProps({onChange})} />)
       const interval = getByDisplayValue('1')
       act(() => {
@@ -185,7 +185,7 @@ describe('RepeatPicker', () => {
     })
 
     it('calls onChange when freq changes', async () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       render(<RepeatPicker {...defaultProps({onChange})} />)
       changeFreq('Day', 'Week')
       expect(onChange).toHaveBeenCalledWith({
@@ -199,7 +199,7 @@ describe('RepeatPicker', () => {
     })
 
     it('calls onChange when weekdays changes', async () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByDisplayValue} = render(
         <RepeatPicker {...defaultProps({freq: 'WEEKLY', onChange})} />,
       )

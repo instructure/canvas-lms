@@ -18,6 +18,8 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
+import {http} from 'msw'
+import {setupServer} from 'msw/node'
 import '..'
 
 const moduleData = (args = {}) => ({
@@ -66,38 +68,40 @@ describe('ModuleSequenceFooter', () => {
   let $testEl
   let MSFClass
   let $fixtures
+  const server = setupServer(
+    // Default handler for all API calls
+    http.get('/api/v1/courses/*/module_item_sequence', () => {
+      return new Response(JSON.stringify(nullButtonData()), {
+        headers: {'Content-Type': 'application/json'},
+      })
+    }),
+  )
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     $fixtures = $('<div id="fixtures" />')
+    document.body.innerHTML = ''
     document.body.appendChild($fixtures[0])
     $testEl = $('<div>')
     $fixtures.append($testEl)
 
     MSFClass = $.fn.moduleSequenceFooter.MSFClass
-
-    // Use fake timers for React rendering
-    jest.useFakeTimers()
-
-    // Mock fetch to return a promise that resolves immediately
-    jest.spyOn(MSFClass.prototype, 'fetch').mockImplementation(function () {
-      return {
-        done: callback => {
-          callback()
-          return {fail: () => {}}
-        },
-      }
-    })
   })
 
   afterEach(() => {
     $fixtures.remove()
-    jest.restoreAllMocks()
-    jest.useRealTimers()
   })
 
   describe('initialization', () => {
     it('returns jquery object of itself', () => {
-      const jobj = $testEl.moduleSequenceFooter({assetType: 'Assignment', assetID: 42})
+      const jobj = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 42,
+      })
       expect(jobj).toBeInstanceOf($)
     })
 
@@ -117,16 +121,15 @@ describe('ModuleSequenceFooter', () => {
     })
 
     it('attaches msfAnimation function', () => {
-      $testEl.moduleSequenceFooter({assetType: 'Assignment', assetID: 42})
+      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 42})
       expect($testEl.msfAnimation).toBeDefined()
     })
 
-    it('accepts animation option', () => {
-      // Mock the success callback to simulate the server response
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success({
+    it('accepts animation option', async () => {
+      server.use(
+        http.get('/api/v1/courses/*/module_item_sequence', () => {
+          return new Response(
+            JSON.stringify({
               items: [
                 {
                   prev: null,
@@ -145,14 +148,21 @@ describe('ModuleSequenceFooter', () => {
                   name: 'A lonely module',
                 },
               ],
-            })
-            callback()
-            return {fail: () => {}}
-          },
-        }
+            }),
+            {headers: {'Content-Type': 'application/json'}},
+          )
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 42,
+        animation: false,
       })
 
-      $testEl.moduleSequenceFooter({assetType: 'Assignment', assetID: 42, animation: false})
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
       expect($testEl.find('.module-sequence-footer.no-animation')).toHaveLength(1)
       expect($testEl.find('.module-sequence-padding.no-animation')).toHaveLength(1)
@@ -165,27 +175,30 @@ describe('ModuleSequenceFooter', () => {
   })
 
   describe('rendering', () => {
-    it('shows no buttons when next and prev data are null', () => {
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success(nullButtonData())
-            callback()
-            return {fail: () => {}}
-          },
-        }
+    it('shows no buttons when next and prev data are null', async () => {
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', () => {
+          return new Response(JSON.stringify(nullButtonData()), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 123,
       })
 
-      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
-      // Wait for React to render
-      jest.runAllTimers()
 
       expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(0)
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(0)
     })
 
-    it('shows modules tooltip when current module id differs from next/prev module id', () => {
+    it('shows modules tooltip when current module id differs from next/prev module id', async () => {
       const moduleTooltipData = {
         items: [
           {
@@ -216,26 +229,28 @@ describe('ModuleSequenceFooter', () => {
         ],
       }
 
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success(moduleTooltipData)
-            callback()
-            return {fail: () => {}}
-          },
-        }
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', () => {
+          return new Response(JSON.stringify(moduleTooltipData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 123,
       })
 
-      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
-
-      // Wait for React to render
-      jest.runAllTimers()
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
       expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(1)
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
     })
 
-    it('shows item tooltip when current module id matches next/prev module id', () => {
+    it('shows item tooltip when current module id matches next/prev module id', async () => {
       const itemTooltipData = {
         items: [
           {
@@ -267,154 +282,182 @@ describe('ModuleSequenceFooter', () => {
         ],
       }
 
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success(itemTooltipData)
-            callback()
-            return {fail: () => {}}
-          },
-        }
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', () => {
+          return new Response(JSON.stringify(itemTooltipData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 123,
       })
 
-      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
-
-      // Wait for React to render
-      jest.runAllTimers()
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
       expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(1)
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
     })
 
-    it('uses module_item_id from URL as assetID with ModuleItem type', () => {
+    it('uses module_item_id from URL as assetID with ModuleItem type', async () => {
       let requestedUrl = ''
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        requestedUrl = this.url + '?asset_type=ModuleItem&asset_id=999'
-        return {
-          done: callback => {
-            callback()
-            return {fail: () => {}}
-          },
-        }
-      })
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', ({request}) => {
+          requestedUrl = request.url
+          return new Response(JSON.stringify(nullButtonData()), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
 
-      $testEl.moduleSequenceFooter({
+      const msf = $testEl.moduleSequenceFooter({
         courseID: 42,
         assetType: 'Assignment',
         assetID: 123,
         location: {search: '?module_item_id=999'},
       })
 
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
+
       expect(requestedUrl).toContain('asset_type=ModuleItem')
       expect(requestedUrl).toContain('asset_id=999')
     })
 
-    it('shows element when rendering', () => {
-      const showSpy = jest.spyOn($testEl, 'show')
+    it('shows element when rendering', async () => {
+      const showSpy = vi.spyOn($testEl, 'show')
 
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success({})
-            $testEl.show()
-            callback()
-            return {fail: () => {}}
-          },
-        }
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', () => {
+          return new Response(JSON.stringify(moduleData()), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 123,
       })
 
-      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
       expect(showSpy).toHaveBeenCalled()
     })
 
-    it('triggers resize event', done => {
-      $(window).on('resize', () => {
-        $(window).off('resize')
-        done()
+    it('triggers resize event', async () => {
+      const resizeHandler = vi.fn()
+      $(window).on('resize', resizeHandler)
+
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', () => {
+          return new Response(JSON.stringify(moduleData()), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 123,
       })
 
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success({})
-            $(window).trigger('resize')
-            callback()
-            return {fail: () => {}}
-          },
-        }
-      })
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
-      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
-    }, 15000)
+      expect(resizeHandler).toHaveBeenCalled()
+      $(window).off('resize', resizeHandler)
+    })
   })
 
   describe('mastery paths', () => {
-    it('shows correct tooltip when awaiting choice', () => {
+    it('shows correct tooltip when awaiting choice', async () => {
       const pathData = moduleData({mastery_path: basePathData({awaiting_choice: true})})
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success(pathData)
-            callback()
-            return {fail: () => {}}
-          },
-        }
+
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', () => {
+          return new Response(JSON.stringify(pathData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 123,
       })
 
-      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
-
-      // Wait for React to render
-      jest.runAllTimers()
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
       expect($testEl.find('a').attr('href')).toMatch('chew-z')
     })
 
-    it('shows correct tooltip when sequence is locked', () => {
+    it('shows correct tooltip when sequence is locked', async () => {
       const pathData = moduleData({mastery_path: basePathData({locked: true})})
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success(pathData)
-            callback()
-            return {fail: () => {}}
-          },
-        }
+
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', () => {
+          return new Response(JSON.stringify(pathData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 123,
       })
 
-      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
-
-      // Wait for React to render
-      jest.runAllTimers()
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
       expect($testEl.find('a').attr('href')).toMatch('mod.module.mod')
     })
 
-    it('disables next button when path is locked and modules tab is disabled', () => {
+    it('disables next button when path is locked and modules tab is disabled', async () => {
       const pathData = moduleData({
         mastery_path: basePathData({locked: true, modules_tab_disabled: true}),
       })
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success(pathData)
-            callback()
-            return {fail: () => {}}
-          },
-        }
+
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', () => {
+          return new Response(JSON.stringify(pathData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 123,
       })
 
-      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
-      // Wait for React to render
-      jest.runAllTimers()
+      const nextButton = $testEl.find('[aria-label="Next Module Item"][disabled]')
 
-      expect($testEl.find('[aria-label="Next Module Item"][disabled]')).toHaveLength(1)
+      expect(nextButton).toHaveLength(1)
+
+      // assert proper rendering of mouseover tooltip icon
+      nextButton.mouseover()
+      expect(document.querySelectorAll('i.icon-module')).toHaveLength(1)
     })
 
-    it('shows next button when no next items exist and paths are processing', () => {
+    it('shows next button when no next items exist and paths are processing', async () => {
       const pathData = moduleData({
         mastery_path: basePathData({
           is_student: true,
@@ -423,20 +466,23 @@ describe('ModuleSequenceFooter', () => {
         }),
         next: null,
       })
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success(pathData)
-            callback()
-            return {fail: () => {}}
-          },
-        }
+
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', () => {
+          return new Response(JSON.stringify(pathData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 123,
       })
 
-      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
-
-      // Wait for React to render
-      jest.runAllTimers()
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
       expect($testEl.find('[aria-label="Next Module Item"]')).toHaveLength(1)
       expect($testEl.find('a').attr('href')).toMatch('mod.module.mod')
@@ -444,7 +490,7 @@ describe('ModuleSequenceFooter', () => {
   })
 
   describe('external URLs', () => {
-    it('announces new window for external URL links', () => {
+    it('announces new window for external URL links', async () => {
       const externalUrlTypeData = {
         items: [
           {
@@ -477,20 +523,22 @@ describe('ModuleSequenceFooter', () => {
         ],
       }
 
-      MSFClass.prototype.fetch.mockImplementation(function () {
-        return {
-          done: callback => {
-            this.success(externalUrlTypeData)
-            callback()
-            return {fail: () => {}}
-          },
-        }
+      server.use(
+        http.get('/api/v1/courses/42/module_item_sequence', () => {
+          return new Response(JSON.stringify(externalUrlTypeData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const msf = $testEl.moduleSequenceFooter({
+        courseID: 42,
+        assetType: 'Assignment',
+        assetID: 123,
       })
 
-      $testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
-
-      // Wait for React to render
-      jest.runAllTimers()
+      // Wait for the fetch promise to resolve
+      await msf.data('msfInstance').fetch()
 
       expect($testEl.find('[aria-label="Previous Module Item"]')).toHaveLength(1)
       expect($testEl.find('[aria-label="Next Module Item - opens in new window"]')).toHaveLength(1)

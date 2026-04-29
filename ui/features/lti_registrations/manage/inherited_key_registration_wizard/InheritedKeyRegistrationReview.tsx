@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import * as React from 'react'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {htmlEscape} from '@instructure/html-escape'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
@@ -79,12 +80,12 @@ export const InheritedKeyRegistrationReview = (props: InheritedKeyRegistrationRe
 
     return (
       <>
-        <Alert variant="info" margin="0 0 medium 0">
+        <Alert variant="info" margin="0 0 small 0" hasShadow={false} transition="none">
           {I18n.t(
             "This app's configuration is managed by Instructure, so you cannot make changes.",
           )}
         </Alert>
-        <View margin="medium 0 medium 0">
+        <View display="block" margin="medium 0 medium 0">
           <Heading level="h3">{I18n.t('Review')}</Heading>
           <Text>
             {I18n.t('The settings displayed are the configurations currently in use for this app.')}
@@ -125,7 +126,7 @@ export const InheritedKeyRegistrationReview = (props: InheritedKeyRegistrationRe
         <ReviewSection>
           <View>
             <Heading level="h4">{I18n.t('Data Sharing')}</Heading>
-            <View margin="small 0 0 0">
+            <View display="block" margin="small 0 0 0">
               <Text size="small">
                 {i18nLtiPrivacyLevelDescription(toolConfiguration.privacy_level || 'public')}
               </Text>
@@ -220,6 +221,8 @@ export const InheritedKeyRegistrationReview = (props: InheritedKeyRegistrationRe
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Dynamic Registration error')}
         errorCategory="Dynamic Registration"
         errorMessage={

@@ -22,9 +22,9 @@ import {RCSPropsContext} from '../../../../Contexts'
 import {UploadRecordMediaModal} from '../UploadRecordMediaModal'
 import {mockTrayProps} from './fixtures/mockTrayProps'
 
-jest.mock('@instructure/canvas-media', () => ({
+vi.mock('@instructure/canvas-media', () => ({
   __esModule: true,
-  default: jest.fn(props => {
+  default: vi.fn(props => {
     return props.open && <div data-testid="upload-media-mock">UploadMedia Component</div>
   }),
 }))
@@ -32,8 +32,8 @@ jest.mock('@instructure/canvas-media', () => ({
 describe('UploadRecordMediaModal', () => {
   const defaultProps = {
     open: true,
-    onSubmit: jest.fn(),
-    onDismiss: jest.fn(),
+    onSubmit: vi.fn(),
+    onDismiss: vi.fn(),
     accept: 'video/*',
   }
 

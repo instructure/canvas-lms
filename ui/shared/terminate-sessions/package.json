@@ -1,0 +1,8 @@
+{
+  "name": "@canvas/terminate-sessions",
+  "private": true,
+  "version": "1.0.0",
+  "author": "neme",
+  "main": "./react/index.tsx",
+  "owner": "FOO"
+}

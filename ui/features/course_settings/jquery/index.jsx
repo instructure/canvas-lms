@@ -23,7 +23,6 @@ import {isMidnight} from '@instructure/moment-utils'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
 import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
@@ -350,22 +349,25 @@ $(document).ready(function () {
   const grading_scheme_selector = document.getElementById('grading_scheme_selector')
 
   function renderGradingSchemeSelector() {
+    const courseDefaultSchemeId = ENV.COURSE_DEFAULT_GRADING_SCHEME_ID
     let selectedGradingSchemeId = $('#grading_standard_id').val()
     if (grading_scheme_selector) {
       if (selectedGradingSchemeId === '0' || selectedGradingSchemeId === '') {
         // special value indicating the default grading scheme
-        selectedGradingSchemeId = undefined
+        selectedGradingSchemeId = courseDefaultSchemeId || undefined
       }
 
       ReactDOM.render(
         <GradingSchemesSelector
           canManage={ENV.PERMISSIONS.manage_grading_schemes}
+          canSet={ENV.PERMISSIONS.set_grading_scheme}
           contextId={ENV.COURSE_ID}
           contextType="Course"
           initiallySelectedGradingSchemeId={selectedGradingSchemeId}
           onChange={gradingSchemeId => handleSelectedGradingSchemeIdChanged(gradingSchemeId)}
           archivedGradingSchemesEnabled={ENV.ARCHIVED_GRADING_SCHEMES_ENABLED}
           shrinkSearchBar={true}
+          courseDefaultSchemeId={courseDefaultSchemeId || ''}
         />,
         grading_scheme_selector,
       )
@@ -387,8 +389,6 @@ $(document).ready(function () {
           $course_form.find('.grading_scheme_selector').show()
           renderGradingSchemeSelector($('#grading_standard_id').val())
         } else {
-          $('#grading_standard_id').val('')
-
           ReactDOM.render(<></>, grading_scheme_selector)
           $course_form.find('.grading_scheme_selector').hide()
         }

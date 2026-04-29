@@ -56,11 +56,12 @@ class AssignmentSet extends React.Component {
       setAssignments: object.isRequired,
       allAssignments: object.isRequired,
       removeAssignment: func.isRequired,
-      moveAssignment: func.isRequired  ,
+      moveAssignment: func.isRequired,
       toggleSetCondition: func.isRequired,
       showOrToggle: bool,
       disableSplit: bool,
       label: string.isRequired,
+      readOnly: bool,
 
       // injected by React DnD
       connectDropTarget: func.isRequired,
@@ -107,6 +108,7 @@ class AssignmentSet extends React.Component {
           isDisabled={isAnd && this.props.disableSplit}
           path={path}
           handleToggle={this.props.toggleSetCondition}
+          readOnly={this.props.readOnly}
         />
       )
     }
@@ -136,6 +138,7 @@ class AssignmentSet extends React.Component {
               removeAssignment={this.props.removeAssignment}
               onDragOver={this.setAssignmentDropTarget}
               onDragLeave={this.resetAssignmentDropTarget}
+              readOnly={this.props.readOnly}
             />
             {this.renderToggle(path)}
           </div>
@@ -150,18 +153,29 @@ class AssignmentSet extends React.Component {
     const setClasses = classNames({
       'cr-assignment-set': true,
       'cr-assignment-set__empty': this.props.setAssignments.size === 0,
-      'cr-assignment-set__drag-over': isOver,
-      'cr-assignment-set__can-drop': canDrop,
+      'cr-assignment-set__drag-over': isOver && !this.props.readOnly,
+      'cr-assignment-set__can-drop': canDrop && !this.props.readOnly,
+      'cr-assignment-set__read-only': this.props.readOnly,
     })
 
-    return connectDropTarget(
-      <div className={setClasses} onDragLeave={this.resetAssignmentDropTarget}>
+    const content = (
+      <div
+        className={setClasses}
+        onDragLeave={this.props.readOnly ? undefined : this.resetAssignmentDropTarget}
+      >
         <ScreenReaderContent>
           <h3>{this.props.label}</h3>
         </ScreenReaderContent>
         {this.renderAssignments()}
-      </div>,
+      </div>
     )
+
+    // Don't apply drop target wrapper when readOnly
+    if (this.props.readOnly) {
+      return content
+    }
+
+    return connectDropTarget(content)
   }
 }
 

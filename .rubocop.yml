@@ -37,6 +37,8 @@ Gemspec/RequiredRubyVersion:
   # maintenance pain when updating ruby versions
   Enabled: false
 
+GraphQL:
+  Severity: error
 GraphQL/ArgumentDescription:
   Enabled: false
 GraphQL/FieldDescription:
@@ -58,16 +60,16 @@ Lint/AmbiguousBlockAssociation:
     - change
     - not_change
     - raise_error
+Lint/MixedCaseRange:
+  # this error is usually due to a typo, not a misunderstanding of ranges, and the auto-correct may be worse
+  # for example, it will change `[a-fA-f]` to `[a-fA-Za-f]` instead of `[a-fA-F]`
+  AutoCorrect: false
 Lint/NoFileUtilsRmRf:
   Severity: warning # intended for specs; not enforced
 Lint/NoSleep:
   Severity: warning # intended for specs; not enforced
 Lint/NonLocalExitFromIterator:
   Enabled: false # SnR is too low because of how often this construct is used
-Lint/RedundantCopDisableDirective:
-  Enabled: false # can't have this enabled until https://github.com/rubocop/rubocop/issues/10263
-Lint/SafeNavigationConsistency:
-  Enabled: false # https://github.com/rubocop/rubocop/issues/9816
 
 Migration/Tagged:
   AllowedTags:
@@ -105,7 +107,9 @@ Rails:
 Rails/ActionControllerFlashBeforeRender:
   AutoCorrect: false # auto-correct just changes it to `flash.now`, when that may not be appropriate
 Rails/ApplicationRecord:
-  Enabled: false # we never bothered creating an ApplicationRecord
+  Include:
+    - "app/models/**/*.rb"
+    - "gems/plugins/*/app/models/**/*.rb"
 Rails/Blank:
   UnlessPresent: false # allow `unless foo.present?`
 Rails/ContentTag:
@@ -138,6 +142,12 @@ Rails/InverseOf:
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
 Rails/Output:
+  Exclude:
+    - gems/dr_diff/**/*.rb
+    - gems/i18n_tasks/**/*.rb
+    - gems/tatl_tael/**/*.rb
+    - spec/spec_helper.rb
+    - spec/support/test_database_utils.rb
   AutoCorrect: false # Force the developer to think about what to do; don't just silently convert it to a debug log
 Rails/Present:
   UnlessBlank: false # allow `unless foo.blank?`
@@ -166,11 +176,14 @@ RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MultipleMemoizedHelpers:
   Enabled: false # complicated setup is sometimes necessary
+RSpec/Output:
+  Exclude:
+    - "**/fixtures/**/*.rb"
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 
-#RSpec/Rails:
-#  Severity: error
+RSpecRails:
+  Severity: error
 
 Security:
   Severity: error
@@ -192,6 +205,9 @@ Style/Documentation:
   Enabled: false # most things don't need to be documented
 Style/DoubleNegation:
   Enabled: false # we use double negation, even outside of return context, to get an actual true/false for various API results
+Style/EmptyClassDefinition:
+  # see also https://github.com/rubocop/rubocop/issues/14961
+  Enabled: false # all of our usages are for defining error subclasses
 Style/FetchEnvVar:
   Enabled: false # ENV vars are generally all optional, and it's expected to return nil
 Style/FloatDivision:
@@ -235,13 +251,25 @@ Style/WordArray:
 # them to the section above)
 # auto-correct needs to be disabled for any that support it in the meantime
 
+GraphQL/ExtractInputType:
+  Severity: convention
+GraphQL/ExtractType:
+  Severity: convention
 GraphQL/FieldMethod:
+  Severity: convention
   AutoCorrect: false
 GraphQL/FieldName:
+  Severity: convention
   AutoCorrect: false
+GraphQL/GraphqlName:
+  Severity: convention
 GraphQL/MultipleFieldDefinitions:
+  Severity: convention
   AutoCorrect: false
+GraphQL/NotAuthorizedNodeType:
+  Severity: convention
 GraphQL/UnusedArgument:
+  Severity: convention
   AutoCorrect: false
 
 Layout/LineLength:
@@ -295,14 +323,18 @@ Rails/DeprecatedActiveModelErrorsMethods:
 Rails/EagerEvaluationLogMessage:
   Severity: convention
   AutoCorrect: false
+Rails/FindByOrAssignmentMemoization:
+  Severity: warning
+  # the autocorrect will check instance_variable_defined?, which might be right,
+  # but it might also be better to use find_by!
+  AutoCorrect: false
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
-Rails/LexicallyScopedActionFilter:
-  Severity: convention
-Rails/OutputSafety:
-  Severity: convention
 Rails/RakeEnvironment:
+  Severity: convention
+  AutoCorrect: false
+Rails/StrongParametersExpect:
   Severity: convention
   AutoCorrect: false
 Rails/TimeZoneAssignment:
@@ -315,8 +347,6 @@ Rake/MethodDefinitionInTask:
   Severity: convention
 
 RSpec/AroundBlock:
-  Severity: convention
-RSpec/Be:
   Severity: convention
 RSpec/BeforeAfterAll:
   Severity: convention
@@ -341,8 +371,6 @@ RSpec/ImplicitBlockExpectation:
 RSpec/ImplicitExpect:
   Severity: convention
   AutoCorrect: false
-RSpec/IteratedExpectation:
-  Severity: convention
 RSpec/LeakyConstantDeclaration:
   Severity: convention
 RSpec/LetSetup:
@@ -355,13 +383,10 @@ RSpec/MultipleDescribes:
   Severity: convention
 RSpec/NamedSubject:
   Enabled: false
-RSpec/NotToNot:
-  Enabled: false
-  AutoCorrect: false
 RSpec/OverwritingSetup:
   Severity: convention
 RSpec/PendingWithoutReason:
-  Severity: convention
+  Severity: error
 RSpec/PredicateMatcher:
   Enabled: false
   AutoCorrect: false
@@ -383,10 +408,6 @@ RSpec/SubjectDeclaration:
   Severity: convention
 RSpec/VariableName:
   Severity: convention
-RSpec/VerifiedDoubleReference:
-  Enabled: false
-RSpec/VerifiedDoubles:
-  Enabled: false
 
 Style/AccessorGrouping:
   Severity: convention
@@ -409,6 +430,8 @@ Style/CommentedKeyword:
   AutoCorrect: false
 Style/DocumentDynamicEvalDefinition:
   Severity: convention
+Style/FileOpen:
+  Severity: warning
 Style/FormatString:
   Severity: convention
   AutoCorrect: false
@@ -437,9 +460,9 @@ Style/ModuleFunction:
 Style/MultipleComparison:
   Severity: convention
   AutoCorrect: false
+Style/OneClassPerFile:
+  Severity: warning
 Style/OptionalArguments:
-  Severity: convention
-Style/OptionalBooleanParameter:
   Severity: convention
 Style/StringConcatenation:
   Enabled: false

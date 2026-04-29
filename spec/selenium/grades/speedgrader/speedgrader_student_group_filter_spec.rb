@@ -73,6 +73,12 @@ shared_examples "filter SpeedGrader by student group" do |ff_enabled|
     @course.update!(filter_speed_grader_by_student_group: true)
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
+  end
+
   context "on assignments page" do
     before do
       user_session(@teacher)
@@ -104,22 +110,6 @@ shared_examples "filter SpeedGrader by student group" do |ff_enabled|
       Gradebook::Cells.open_tray(@group2_students.second, @assignment)
       speedgrader_link_text = "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(Gradebook::GradeDetailTray.speedgrader_link.attribute("href")).to include(speedgrader_link_text)
-    end
-
-    it "loads speedgrader when group selected" do
-      skip("Unskip in EVAL-2501")
-      # select group from gradebook setting
-      @teacher.preferences[:gradebook_settings] = {
-        @course.id => {
-          filter_rows_by: {
-            student_group_id: @category.groups.second.id
-          }
-        }
-      }
-      Speedgrader.visit(@course.id, @assignment.id)
-      # verify
-      Speedgrader.click_students_dropdown
-      expect(Speedgrader.fetch_student_names).to contain_exactly(@group2_students)
     end
 
     it "disables speedgrader from tray" do

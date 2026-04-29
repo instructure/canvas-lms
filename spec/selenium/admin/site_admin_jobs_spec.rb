@@ -48,7 +48,7 @@ describe "site admin jobs ui" do
   def validate_all_jobs_selected
     f("#select-all-jobs").click
     all_jobs = ff("#jobs-grid .slick-cell")
-    all_jobs.each { |job| expect(job).to have_class("selected") }
+    expect(all_jobs).to all(have_class("selected"))
   end
 
   def load_jobs_page
@@ -89,7 +89,7 @@ describe "site admin jobs ui" do
     it "only actions the individual job when it has been searched for" do
       job = Delayed::Job.list_jobs(:current, 1).first
       get "/jobs_v1?flavor=id&q=#{job.id}"
-      expect(f("#jobs-grid .slick-cell")).to be
+      expect(f("#jobs-grid .slick-cell")).not_to be_nil
       f("#hold-jobs").click
       wait_for_ajax_requests
       expect(job.reload.locked_by).to eq "on hold"
@@ -104,19 +104,19 @@ describe "site admin jobs ui" do
         element.click if element.text == job.id.to_s
       end
       expect(f("#job-id").text).to eq job.id.to_s
-      f("#job-handler-show").click
+      f(%([data-testid="job-handler-show"])).click
       wait_for_ajax_requests
-      expect(get_value("#job-handler")).to eq job.handler
-      f(".ui-dialog-titlebar-close").click
+      expect(get_value(%([data-testid="job-handler-textarea"]))).to eq job.handler
+      f(%([data-testid="job-handler-close"])).click
 
       # also for failed job
       filter_jobs("Failed")
       wait_for_ajax_requests
       f("#jobs-grid .slick-row .b0.f0").click
       expect(f("#job-id").text).to eq @failed_job.id.to_s
-      f("#job-handler-show").click
+      f(%([data-testid="job-handler-show"])).click
       wait_for_ajax_requests
-      expect(get_value("#job-handler")).to eq @failed_job.handler
+      expect(get_value(%([data-testid="job-handler-textarea"]))).to eq @failed_job.handler
     end
 
     context "all jobs" do

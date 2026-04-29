@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 
-import SpacePandaUrl from '@canvas/images/SpacePanda.svg'
+import SpacePandaUrl from '@instructure/platform-images/assets/SpacePanda.svg'
 
 const I18n = createI18nScope('empty_course')
 

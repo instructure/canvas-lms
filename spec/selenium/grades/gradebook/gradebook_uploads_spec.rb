@@ -36,6 +36,9 @@ shared_examples "Gradebook - uploads" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
     course_with_teacher_logged_in(active_all: 1, username: "teacher@example.com")
     @student = user_factory(username: "student@example.com", active_all: 1)
     @course.enroll_student(@student).accept!
@@ -69,7 +72,7 @@ shared_examples "Gradebook - uploads" do |ff_enabled|
     wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
-    wait_for_new_page_load(true) { submit_form("#gradebook_grid_form") }
+    wait_for_new_page_load(accept_alert: true) { submit_form("#gradebook_grid_form") }
     run_jobs
     expect(assignment.submissions.last.grade).to eq "B-"
   end
@@ -134,7 +137,7 @@ shared_examples "Gradebook - uploads" do |ff_enabled|
     expect(f("#assignments_without_changes_alert")).not_to be_displayed
 
     assignment_count = @course.assignments.count
-    wait_for_new_page_load(true) { submit_form("#gradebook_grid_form") }
+    wait_for_new_page_load(accept_alert: true) { submit_form("#gradebook_grid_form") }
     run_jobs
     expect(@course.assignments.count).to eql(assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last

@@ -93,6 +93,7 @@ export default class PublishButton extends React.Component<Props> {
           onClick={this.handleClick}
           elementRef={(b: Element | null) => (this.publishButton = b)}
           color="secondary"
+          focusColor="inverse"
         >
           {I18n.t('Publish')}
           <ScreenReaderContent>{courseNickname}</ScreenReaderContent>
@@ -105,7 +106,6 @@ export default class PublishButton extends React.Component<Props> {
             wikiUrl={pagesUrl}
             wikiFrontPageTitle={frontPageTitle}
             onSubmit={() => {
-              // @ts-expect-error
               if (this.defaultViewStore?.getState().savedDefaultView !== 'modules') {
                 apiClient.publishCourse({courseId, onSuccess})
               }

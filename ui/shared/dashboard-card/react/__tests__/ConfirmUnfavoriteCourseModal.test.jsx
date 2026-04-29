@@ -24,9 +24,9 @@ import ConfirmUnfavoriteCourseModal from '../ConfirmUnfavoriteCourseModal'
 describe('ConfirmUnfavoriteCourseModal', () => {
   const defaultProps = {
     courseName: 'defense against the dark arts',
-    onConfirm: jest.fn(),
-    onClose: jest.fn(),
-    onEntered: jest.fn(),
+    onConfirm: vi.fn(),
+    onClose: vi.fn(),
+    onEntered: vi.fn(),
   }
 
   let modalRef

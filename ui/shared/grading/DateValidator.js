@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {find, forEach} from 'lodash'
+import {find, forEach} from 'es-toolkit/compat'
 import * as tz from '@instructure/moment-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
@@ -52,51 +52,66 @@ const DATE_RANGE_ERRORS = {
   unlock_at: {
     start_range: {
       get section() {
-        return I18n.t('Unlock date cannot be before section start')
+        return I18n.t('Available from date cannot be before section start')
       },
       get course() {
-        return I18n.t('Unlock date cannot be before course start')
+        return I18n.t('Available from date cannot be before course start')
       },
       get term() {
-        return I18n.t('Unlock date cannot be before term start')
+        return I18n.t('Available from date cannot be before term start')
       },
     },
     end_range: {
       get due() {
-        return I18n.t('Unlock date cannot be after due date')
+        return I18n.t('Available from date cannot be after due date')
       },
       get replyToTopicDue() {
-        return I18n.t('Unlock date cannot be after reply to topic due date')
+        return I18n.t('Available from date cannot be after reply to topic due date')
       },
       get replyToEntryDue() {
-        return I18n.t('Unlock date cannot be after required replies due date')
+        return I18n.t('Available from date cannot be after required replies due date')
       },
       get lock() {
-        return I18n.t('Unlock date cannot be after lock date')
+        return I18n.t('Available from date cannot be after until date')
       },
     },
   },
   lock_at: {
     start_range: {
       get due() {
-        return I18n.t('Lock date cannot be before due date')
+        return I18n.t('Until date cannot be before due date')
       },
       get replyToTopicDue() {
-        return I18n.t('Lock date cannot be before reply to topic due date')
+        return I18n.t('Until date cannot be before reply to topic due date')
       },
       get replyToEntryDue() {
-        return I18n.t('Lock date cannot be before required replies due date')
+        return I18n.t('Until date cannot be before required replies due date')
       },
     },
     end_range: {
       get section() {
-        return I18n.t('Lock date cannot be after section end')
+        return I18n.t('Until date cannot be after section end')
       },
       get course() {
-        return I18n.t('Lock date cannot be after course end')
+        return I18n.t('Until date cannot be after course end')
       },
       get term() {
-        return I18n.t('Lock date cannot be after term end')
+        return I18n.t('Until date cannot be after term end')
+      },
+    },
+  },
+  peer_review_due_at: {
+    start_range: {
+      get unlock() {
+        return I18n.t('Due date cannot be before assignment available from date')
+      },
+      get due() {
+        return I18n.t('Due date cannot be before assignment due date')
+      },
+    },
+    end_range: {
+      get lock() {
+        return I18n.t('Due date cannot be after assignment until date')
       },
     },
   },
@@ -122,6 +137,7 @@ export default class DateValidator {
     const currentDateRange = section ? this.getSectionRange(section) : this.dateRange
     const datetimesToValidate = []
     const forIndividualStudents = data.student_ids?.length || data.set_type === 'ADHOC'
+    const peerReviewDueAt = data.peer_review_due_at
 
     if (currentDateRange.start_at && currentDateRange.start_at.date && !forIndividualStudents) {
       datetimesToValidate.push({
@@ -231,6 +247,46 @@ export default class DateValidator {
         type: 'lock',
       })
     }
+
+    // Only validate peer review dates when feature flag is enabled
+    if (ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED) {
+      // Peer review due date must be >= assignment available from (unlock_at)
+      if (peerReviewDueAt && unlockAt) {
+        datetimesToValidate.push({
+          date: unlockAt,
+          validationDates: {
+            peer_review_due_at: peerReviewDueAt,
+          },
+          range: 'start_range',
+          type: 'unlock',
+        })
+      }
+
+      // Peer review due date must be >= assignment due date
+      if (peerReviewDueAt && dueAt) {
+        datetimesToValidate.push({
+          date: dueAt,
+          validationDates: {
+            peer_review_due_at: peerReviewDueAt,
+          },
+          range: 'start_range',
+          type: 'due',
+        })
+      }
+
+      // Peer review due date must be <= lock_at (assignment available to)
+      if (peerReviewDueAt && lockAt) {
+        datetimesToValidate.push({
+          date: lockAt,
+          validationDates: {
+            peer_review_due_at: peerReviewDueAt,
+          },
+          range: 'end_range',
+          type: 'lock',
+        })
+      }
+    }
+
     const errs = {}
     return this._validateDatetimeSequences(datetimesToValidate, errs)
   }
@@ -297,20 +353,24 @@ export default class DateValidator {
         switch (datetimeSet.range) {
           case 'start_range':
             forEach(datetimeSet.validationDates, (validationDate, dateType) => {
-              if (
-                validationDate &&
-                this._formatDatetime(datetimeSet.date) > this._formatDatetime(validationDate)
-              ) {
+              const dateFormatted = this._formatDatetime(datetimeSet.date)
+              const validationDateFormatted = this._formatDatetime(validationDate)
+              const isInvalid = datetimeSet.strict
+                ? dateFormatted >= validationDateFormatted
+                : dateFormatted > validationDateFormatted
+              if (validationDate && isInvalid) {
                 errs[dateType] = DATE_RANGE_ERRORS[dateType][datetimeSet.range][datetimeSet.type]
               }
             })
             break
           case 'end_range':
             forEach(datetimeSet.validationDates, (validationDate, dateType) => {
-              if (
-                validationDate &&
-                this._formatDatetime(datetimeSet.date) < this._formatDatetime(validationDate)
-              ) {
+              const dateFormatted = this._formatDatetime(datetimeSet.date)
+              const validationDateFormatted = this._formatDatetime(validationDate)
+              const isInvalid = datetimeSet.strict
+                ? dateFormatted <= validationDateFormatted
+                : dateFormatted < validationDateFormatted
+              if (validationDate && isInvalid) {
                 errs[dateType] = DATE_RANGE_ERRORS[dateType][datetimeSet.range][datetimeSet.type]
               }
             })

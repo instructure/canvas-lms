@@ -21,14 +21,14 @@ import Router from '../router'
 describe('Blueprint router', () => {
   test('registerRoutes calls registerRoute for each item', () => {
     const router = new Router()
-    const registerSpy = jest.spyOn(router, 'registerRoute')
+    const registerSpy = vi.spyOn(router, 'registerRoute')
     router.registerRoutes([{}, {}])
     expect(registerSpy.mock.calls).toHaveLength(2)
   })
 
   test('registerRoutes registers route onEnter and onExit handlers for each route', () => {
-    const pageSpy = jest.fn()
-    pageSpy.exit = jest.fn()
+    const pageSpy = vi.fn()
+    pageSpy.exit = vi.fn()
 
     const router = new Router(pageSpy)
     router.registerRoutes([
@@ -40,8 +40,8 @@ describe('Blueprint router', () => {
   })
 
   test('registerRoute does not register route onEnter and onExit handlers if not provided', () => {
-    const pageSpy = jest.fn()
-    pageSpy.exit = jest.fn()
+    const pageSpy = vi.fn()
+    pageSpy.exit = vi.fn()
 
     const router = new Router(pageSpy)
     router.registerRoute({onEnter: null, onExit: null})
@@ -50,8 +50,8 @@ describe('Blueprint router', () => {
   })
 
   test('registerRoute registers route onEnter and onExit handlers if provided', () => {
-    const pageSpy = jest.fn()
-    pageSpy.exit = jest.fn()
+    const pageSpy = vi.fn()
+    pageSpy.exit = vi.fn()
 
     const router = new Router(pageSpy)
     router.registerRoute({onEnter: () => {}, onExit: () => {}})
@@ -60,8 +60,8 @@ describe('Blueprint router', () => {
   })
 
   test('start sets base and starts pagejs', () => {
-    const pageSpy = jest.fn()
-    pageSpy.base = jest.fn()
+    const pageSpy = vi.fn()
+    pageSpy.base = vi.fn()
 
     const router = new Router(pageSpy)
     router.start()
@@ -71,9 +71,9 @@ describe('Blueprint router', () => {
 
   test('handleEnter returns a function that calls enter handler and next', () => {
     const ctx = {params: {id: '5'}}
-    const nextSpy = jest.fn()
+    const nextSpy = vi.fn()
     const route = {
-      onEnter: jest.fn(),
+      onEnter: vi.fn(),
     }
 
     const handler = Router.handleEnter(route)
@@ -86,9 +86,9 @@ describe('Blueprint router', () => {
 
   test('handleExit returns a function that calls exit handler and next', () => {
     const ctx = {params: {id: '5'}}
-    const nextSpy = jest.fn()
+    const nextSpy = vi.fn()
     const route = {
-      onExit: jest.fn(),
+      onExit: vi.fn(),
     }
 
     const handler = Router.handleExit(route)

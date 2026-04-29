@@ -39,6 +39,11 @@ interface NewLoginData {
   invalidLoginFaqUrl?: string
   helpLink?: HelpLink
   requireAup?: boolean
+  discoveryEnabled?: boolean
+  customMessageLogin?: string
+  customMessageRegistration?: string
+  customMessageRegistrationParent?: string
+  freeForTeacherRegistrationUrl?: string
 }
 
 interface NewLoginDataResult {
@@ -149,6 +154,20 @@ const fetchLoginDataFromAttributes = (): NewLoginData => {
         invalidLoginFaqUrl: getStringAttribute(container, 'data-invalid-login-faq-url'),
         helpLink: getObjectAttribute<HelpLink>(container, 'data-help-link', transformHelpLink),
         requireAup: getBooleanAttribute(container, 'data-require-aup'),
+        discoveryEnabled: getBooleanAttribute(container, 'data-discovery-enabled'),
+        customMessageLogin: getStringAttribute(container, 'data-custom-message-login'),
+        customMessageRegistration: getStringAttribute(
+          container,
+          'data-custom-message-registration',
+        ),
+        customMessageRegistrationParent: getStringAttribute(
+          container,
+          'data-custom-message-registration-parent',
+        ),
+        freeForTeacherRegistrationUrl: getStringAttribute(
+          container,
+          'data-free-for-teacher-registration-url',
+        ),
       }
     : {}
 }
@@ -175,6 +194,10 @@ export const useFetchNewLoginData = (): NewLoginDataResult => {
     invalidLoginFaqUrl: undefined,
     helpLink: undefined,
     requireAup: undefined,
+    discoveryEnabled: undefined,
+    customMessageLogin: undefined,
+    customMessageRegistration: undefined,
+    customMessageRegistrationParent: undefined,
   })
   const [isDataLoading, setIsDataLoading] = useState(true)
 

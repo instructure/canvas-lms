@@ -20,18 +20,27 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import SubmissionModal from '../SubmissionModal'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {generatePageListKey} from '../utils'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  ...jest.requireActual('@canvas/util/globalUtils'),
-  assignLocation: jest.fn(),
-}))
+vi.mock('@canvas/util/globalUtils', async () => {
+  const actual = await vi.importActual('@canvas/util/globalUtils')
+  return {
+    ...actual,
+    assignLocation: vi.fn(),
+  }
+})
 
 // Import the mocked module
 import * as globalUtils from '@canvas/util/globalUtils'
+
+const server = setupServer()
+
+// Track API calls
+let createCalled = false
 
 describe('SubmissionModal', () => {
   const submission = {
@@ -49,7 +58,7 @@ describe('SubmissionModal', () => {
   ]
   const defaultProps = {
     submission,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
     sections,
     sectionId: 11,
     portfolioId: 1,
@@ -65,28 +74,38 @@ describe('SubmissionModal', () => {
     {id: 114, name: 'Page 4', url: 'portfolio/1/page/4'},
   ]
 
-  const FIRST_SECTION_URI = `/eportfolios/1/categories/${sections[0].id}/pages?page=1&per_page=10`
-  const SECOND_SECTION_URI = `/eportfolios/1/categories/${sections[1].id}/pages?page=1&per_page=10`
-  const CREATE_URI = `/eportfolios/${defaultProps.portfolioId}/entries`
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     queryClient.clear()
-    fetchMock.restore()
-    jest.clearAllMocks()
+    server.resetHandlers()
+    createCalled = false
+    vi.clearAllMocks()
 
     queryClient.setQueryData(generatePageListKey(sections[0].id, defaultProps.portfolioId), {
       pages: [{json: firstPages, nextPage: null}],
       pageParams: [null],
     })
 
-    fetchMock.get(FIRST_SECTION_URI, firstPages)
-    fetchMock.get(SECOND_SECTION_URI, secondPages)
+    server.use(
+      http.get('/eportfolios/:portfolioId/categories/:sectionId/pages', ({params}) => {
+        const sectionId = params.sectionId
+        if (sectionId === String(sections[0].id)) {
+          return HttpResponse.json(firstPages)
+        }
+        return HttpResponse.json(secondPages)
+      }),
+      http.post('/eportfolios/:portfolioId/entries', () => {
+        createCalled = true
+        return HttpResponse.json({entry_url: 'path/to/new_entry'})
+      }),
+    )
   })
 
   afterEach(() => {
     queryClient.clear()
-    fetchMock.restore()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders a modal', async () => {
@@ -141,10 +160,6 @@ describe('SubmissionModal', () => {
       </MockedQueryClientProvider>,
     )
 
-    fetchMock.post(CREATE_URI, {
-      entry_url: 'path/to/new_entry',
-    })
-
     await waitFor(() => {
       expect(getByTestId('create-page-button')).toBeInTheDocument()
     })
@@ -152,7 +167,7 @@ describe('SubmissionModal', () => {
     await user.click(getByTestId('create-page-button'))
 
     await waitFor(() => {
-      expect(fetchMock.called(CREATE_URI)).toBe(true)
+      expect(createCalled).toBe(true)
       expect(globalUtils.assignLocation).toHaveBeenCalledWith('path/to/new_entry')
     })
   })

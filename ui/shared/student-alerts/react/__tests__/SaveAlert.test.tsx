@@ -29,9 +29,9 @@ describe('SaveAlert', () => {
       initialAlert: structuredClone(alert),
       uiMetadata: calculateUIMetadata([accountRole]),
       isOpen: true,
-      onClick: jest.fn(),
-      onClose: jest.fn(),
-      onSave: jest.fn(),
+      onClick: vi.fn(),
+      onClose: vi.fn(),
+      onSave: vi.fn(),
     }
   }
 

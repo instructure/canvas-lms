@@ -24,6 +24,7 @@ describe RubricAssessmentExport do
 
     before do
       course_with_teacher_logged_in(active_all: true)
+      student_in_course(active_all: true)
       rubric_assessment_model(user: @user, context: @course, purpose: "grading")
       @export = described_class.new(rubric_association: @rubric_association, user: @user, options:)
     end
@@ -34,6 +35,13 @@ describe RubricAssessmentExport do
         rows = CSV.parse(csv_content, headers: true)
 
         expect(rows.size).to eq(1)
+      end
+
+      it "uses sortable_name for the Student Name column" do
+        csv_content = @export.generate_file
+        rows = CSV.parse(csv_content, headers: true)
+
+        expect(rows[0]["Student Name"]).to eq(@student.sortable_name)
       end
     end
 
@@ -56,6 +64,18 @@ describe RubricAssessmentExport do
         rows = CSV.parse(csv_content, headers: true)
 
         expect(rows.size).to eq(0)
+      end
+    end
+
+    context "when filter non-completed is applied and a student has no assessment" do
+      let(:options) { { filter: "non-completed" } }
+      let!(:unassessed_student) { student_in_course(active_all: true, course: @course).user }
+
+      it "uses sortable_name for the Student Name column" do
+        csv_content = @export.generate_file
+        rows = CSV.parse(csv_content, headers: true)
+
+        expect(rows[0]["Student Name"]).to eq(unassessed_student.sortable_name)
       end
     end
 
@@ -95,6 +115,22 @@ describe RubricAssessmentExport do
         expect(rows[0]["New criterion - Rating"]).to eq("")
         expect(rows[0]["New criterion - Points"]).to eq("")
         expect(rows[0]["New criterion - Comments"]).to eq("")
+      end
+
+      it "does not return inactive student enrollments" do
+        @student.enrollments.first.update!(workflow_state: "inactive")
+        csv_content = @export.generate_file
+        rows = CSV.parse(csv_content, headers: true)
+
+        expect(rows.size).to eq(0)
+      end
+
+      it "returns completed student enrollments" do
+        @student.enrollments.first.update!(workflow_state: "completed")
+        csv_content = @export.generate_file
+        rows = CSV.parse(csv_content, headers: true)
+
+        expect(rows.size).to eq(1)
       end
     end
   end

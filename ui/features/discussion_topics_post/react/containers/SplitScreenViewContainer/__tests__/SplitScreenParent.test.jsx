@@ -16,53 +16,59 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render} from '@testing-library/react'
 import {SplitScreenParent} from '../SplitScreenParent'
 import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {updateDiscussionEntryParticipantMock} from '../../../../graphql/Mocks'
 import {waitFor} from '@testing-library/dom'
 import {AnonymousUser} from '../../../../graphql/AnonymousUser'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
+vi.mock('../../../utils', async () => ({
+  ...(await vi.importActual('../../../utils')),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
 
 describe('SplitScreenParent', () => {
-  const onFailureStub = jest.fn()
-  const onSuccessStub = jest.fn()
+  const onFailureStub = vi.fn()
+  const onSuccessStub = vi.fn()
 
   const defaultProps = ({discussionEntryOverrides = {}, overrides = {}} = {}) => ({
     discussionTopic: Discussion.mock(),
     discussionEntry: DiscussionEntry.mock(discussionEntryOverrides),
-    onToggleUnread: jest.fn(),
+    onToggleUnread: vi.fn(),
     ...overrides,
   })
 
   const setup = (props, mocks) => {
     return render(
       <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider
-          value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
+        <ObserverContext.Provider
+          value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
         >
-          <SplitScreenParent {...props} />
-        </AlertManagerContext.Provider>
+          <AlertManagerContext.Provider
+            value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
+          >
+            <SplitScreenParent {...props} />
+          </AlertManagerContext.Provider>
+        </ObserverContext.Provider>
       </MockedProvider>,
     )
   }
@@ -97,7 +103,7 @@ describe('SplitScreenParent', () => {
 
   describe('thread actions menu', () => {
     it('allows toggling the unread state of an entry', () => {
-      const onToggleUnread = jest.fn()
+      const onToggleUnread = vi.fn()
       const {getByTestId} = setup(defaultProps({overrides: {onToggleUnread}}))
 
       fireEvent.click(getByTestId('thread-actions-menu'))
@@ -107,7 +113,7 @@ describe('SplitScreenParent', () => {
     })
 
     it('only shows the delete option if you have permission', () => {
-      const props = defaultProps({overrides: {onDelete: jest.fn()}})
+      const props = defaultProps({overrides: {onDelete: vi.fn()}})
       props.discussionEntry.permissions.delete = false
       const {getByTestId, queryByTestId} = setup(props)
 
@@ -116,7 +122,7 @@ describe('SplitScreenParent', () => {
     })
 
     it('allows deleting an entry', () => {
-      const onDelete = jest.fn()
+      const onDelete = vi.fn()
       const {getByTestId} = setup(defaultProps({overrides: {onDelete}}))
 
       fireEvent.click(getByTestId('thread-actions-menu'))
@@ -126,7 +132,7 @@ describe('SplitScreenParent', () => {
     })
 
     it('only shows the SpeedGrader option if you have permission', () => {
-      const props = defaultProps({overrides: {onOpenInSpeedGrader: jest.fn()}})
+      const props = defaultProps({overrides: {onOpenInSpeedGrader: vi.fn()}})
       props.discussionTopic.permissions.speedGrader = false
       const {getByTestId, queryByTestId} = setup(props)
 
@@ -135,7 +141,7 @@ describe('SplitScreenParent', () => {
     })
 
     it('allows opening an entry in speedgrader', () => {
-      const onOpenInSpeedGrader = jest.fn()
+      const onOpenInSpeedGrader = vi.fn()
       const {getByTestId} = setup(defaultProps({overrides: {onOpenInSpeedGrader}}))
 
       fireEvent.click(getByTestId('thread-actions-menu'))
@@ -172,9 +178,9 @@ describe('SplitScreenParent', () => {
   })
 
   it('should render correct deeply nested alert at depth 4', () => {
-    window.ENV = {
+    fakeENV.setup({
       should_show_deeply_nested_alert: true,
-    }
+    })
     const {queryByText} = setup(
       defaultProps({
         discussionEntryOverrides: {
@@ -193,9 +199,9 @@ describe('SplitScreenParent', () => {
   })
 
   it('should render correct deeply nested alert at depth 3', () => {
-    window.ENV = {
+    fakeENV.setup({
       should_show_deeply_nested_alert: true,
-    }
+    })
     const {queryByText} = setup(
       defaultProps({
         discussionEntryOverrides: {
@@ -214,9 +220,9 @@ describe('SplitScreenParent', () => {
   })
 
   it('should not render deeply nested alert', () => {
-    window.ENV = {
+    fakeENV.setup({
       should_show_deeply_nested_alert: false,
-    }
+    })
     const {queryByText} = setup(defaultProps())
 
     expect(
@@ -305,7 +311,7 @@ describe('SplitScreenParent', () => {
 
   describe('rating', () => {
     it('should react on liked', async () => {
-      const onToggleRating = jest.fn()
+      const onToggleRating = vi.fn()
       const {queryByTestId} = setup(
         defaultProps({
           overrides: {onToggleRating},
@@ -318,7 +324,7 @@ describe('SplitScreenParent', () => {
     })
 
     it('should react on not_liked', async () => {
-      const onToggleRating = jest.fn()
+      const onToggleRating = vi.fn()
       const {queryByTestId} = setup(
         defaultProps({
           discussionEntryOverrides: {

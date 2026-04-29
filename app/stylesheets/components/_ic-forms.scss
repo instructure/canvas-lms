@@ -225,6 +225,7 @@ input[type="tel"], input[type="color"], .uneditable-input {
     padding: 8px 12px;
 
     // Remove the webkit gloss in iOS
+    appearance: none;
     -webkit-appearance: none;
 
     @include ic-input-variant($ic-Input-border, var(--ic-brand-primary), var(--ic-brand-primary-lightened-15));
@@ -897,6 +898,52 @@ form.ic-Form-group { margin: 0; }
   }
 
   .ic-Label { margin-bottom: 0; }
+
+}
+
+.ic-Search {
+  position: relative;
+  input.ic-Input.ic-Search-input {
+    border-color: darken($ic-Input-border, 25%);
+    padding-#{direction(left)}: calc(14px + #{$ic-sp*2});
+    font-size: 1rem;
+    &:focus {
+      border-color: var(--ic-brand-primary);
+    }
+    &[disabled], &[readonly] { background-color: lighten($ic-color-neutral, 5%); }
+    &::placeholder {
+      color: $ic-font-color--subdued;
+      opacity: .8;
+    }
+    &::-webkit-input-placeholder { color: $ic-font-color--subdued; opacity: .8; }
+    &::-moz-placeholder { color: $ic-font-color--subdued; opacity: .8; }
+    &:-ms-input-placeholder { color: $ic-font-color--subdued; opacity: .8; }
+  }
+
+  .ic-Search-icon-container {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    #{direction(left)}: ($ic-sp);
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+    
+    .ic-Search-icon {
+      width: 14px;
+      height: 14px;
+      color: $ic-font-color--subdued;
+      fill: currentColor;
+    }
+  }
+
+  &:focus-within {
+    .ic-Search-icon-container .ic-Search-icon { color: var(--ic-brand-primary); }
+  }
 
 }
 

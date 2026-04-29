@@ -19,11 +19,12 @@
 import React from 'react'
 import {render, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {Table} from '@instructure/ui-table'
 import RosterTableHeader from '../RosterTableHeader'
 import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
 import {DEFAULT_SORT_FIELD, DEFAULT_SORT_DIRECTION} from '../../../../util/constants'
 
-jest.mock('../../../hooks/useCoursePeopleContext')
+vi.mock('../../../hooks/useCoursePeopleContext')
 
 describe('RosterTableHeader', () => {
   const user = userEvent.setup()
@@ -33,8 +34,8 @@ describe('RosterTableHeader', () => {
     someSelected: false,
     sortField: DEFAULT_SORT_FIELD,
     sortDirection: DEFAULT_SORT_DIRECTION,
-    handleSelectAll: jest.fn(),
-    handleSort: jest.fn(),
+    handleSelectAll: vi.fn(),
+    handleSort: vi.fn(),
   }
 
   const defaultContextValues = {
@@ -47,16 +48,24 @@ describe('RosterTableHeader', () => {
   }
 
   beforeEach(() => {
-    ;(useCoursePeopleContext as jest.Mock).mockReturnValue(defaultContextValues)
+    ;(useCoursePeopleContext as any).mockReturnValue(defaultContextValues)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
+
+  const renderWithTable = (props = {}) => {
+    return render(
+      <Table caption="Test table">
+        <RosterTableHeader {...defaultProps} {...props} />
+      </Table>,
+    )
+  }
 
   describe('rendering', () => {
     it('renders all columns when user has all permissions', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {getByTestId} = renderWithTable()
       expect(getByTestId('header-select-all')).toBeInTheDocument()
       expect(getByTestId('header-name')).toHaveTextContent(/name/i)
       expect(getByTestId('header-sis_id')).toHaveTextContent(/sis id/i)
@@ -70,84 +79,84 @@ describe('RosterTableHeader', () => {
     })
 
     it('renders select all checkbox when canManageDifferentiationTags is true', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {getByTestId} = renderWithTable()
       expect(getByTestId('header-select-all')).toBeInTheDocument()
     })
   })
 
   describe('conditional rendering based on permissions', () => {
     it('hides login ID column when canViewLoginIdColumn is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canViewLoginIdColumn: false,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-login_id')).not.toBeInTheDocument()
     })
 
     it('hides SIS ID column when canViewSisIdColumn is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canViewSisIdColumn: false,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-sis_id')).not.toBeInTheDocument()
     })
 
     it('hides sections column when hideSectionsOnCourseUsersPage is true', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         hideSectionsOnCourseUsersPage: true,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-section')).not.toBeInTheDocument()
     })
 
     it('hides last and total activity columns when canReadReports is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canReadReports: false,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-lastActivity')).not.toBeInTheDocument()
       expect(queryByTestId('header-totalActivity')).not.toBeInTheDocument()
     })
 
     it('hides user select/checkboxes column when allowAssignToDifferentiationTags is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         allowAssignToDifferentiationTags: false,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-select-all')).not.toBeInTheDocument()
     })
 
     it('hides user select/checkboxes column when canManageDifferentiationTags is false', () => {
-      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as any).mockReturnValue({
         ...defaultContextValues,
         canManageDifferentiationTags: false,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-select-all')).not.toBeInTheDocument()
     })
   })
 
   describe('sorting', () => {
     it('calls handleSort when clicking a sortable column', async () => {
-      const handleSort = jest.fn()
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} handleSort={handleSort} />)
+      const handleSort = vi.fn()
+      const {getByTestId} = renderWithTable({handleSort})
       const nameHeader = getByTestId('header-name')
       await user.click(within(nameHeader).getByRole('button', {hidden: true}))
       expect(handleSort).toHaveBeenCalledWith(expect.any(Object), {id: 'name'})
     })
 
     it('shows correct sort direction for active column', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {getByTestId} = renderWithTable()
       expect(getByTestId('header-name')).toHaveAttribute('aria-sort', 'ascending')
     })
 
     it('shows no sort direction for inactive columns', () => {
-      const {getByRole} = render(<RosterTableHeader {...defaultProps} />)
+      const {getByRole} = renderWithTable()
       const roleHeader = Array.from(getByRole('row', {hidden: true}).querySelectorAll('th')).find(
         cell => cell.textContent?.includes('Role'),
       )
@@ -157,22 +166,20 @@ describe('RosterTableHeader', () => {
 
   describe('select all checkbox', () => {
     it('calls handleSelectAll when clicked', async () => {
-      const handleSelectAll = jest.fn()
-      const {getByTestId} = render(
-        <RosterTableHeader {...defaultProps} handleSelectAll={handleSelectAll} />,
-      )
+      const handleSelectAll = vi.fn()
+      const {getByTestId} = renderWithTable({handleSelectAll})
       await user.click(getByTestId('header-select-all'))
       expect(handleSelectAll).toHaveBeenCalledWith(false)
     })
 
     it('shows indeterminate state when someSelected is true', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} someSelected={true} />)
+      const {getByTestId} = renderWithTable({someSelected: true})
       const checkbox = getByTestId('header-select-all') as HTMLInputElement
       expect(checkbox.indeterminate).toBe(true)
     })
 
     it('shows checked state when allSelected is true', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} allSelected={true} />)
+      const {getByTestId} = renderWithTable({allSelected: true})
       const checkbox = getByTestId('header-select-all') as HTMLInputElement
       expect(checkbox.checked).toBe(true)
     })

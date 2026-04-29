@@ -21,9 +21,13 @@ import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import store from '../index'
 import type {CustomColumn} from '../../gradebook.d'
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashError: vi.fn(),
+  }
+})
 
 const exampleCustomColumns: CustomColumn[] = [
   {
@@ -46,7 +50,13 @@ const exampleCustomColumns: CustomColumn[] = [
 
 describe('customColumnsState', () => {
   const url = '/api/v1/courses/*/custom_gradebook_columns'
-  const server = setupServer()
+  const dataUrl = '/api/v1/courses/*/custom_gradebook_columns/*/data'
+  const server = setupServer(
+    // Default handler for custom column data requests
+    http.get(dataUrl, () => {
+      return HttpResponse.json([])
+    }),
+  )
   const capturedRequests: any[] = []
 
   function getRequests() {

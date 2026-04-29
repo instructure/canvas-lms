@@ -17,20 +17,33 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import moment from 'moment-timezone'
 import NewAccessToken, {PURPOSE_MAX_LENGTH} from '../NewAccessToken'
 
+const server = setupServer()
+
 describe('NewAccessToken', () => {
   const GENERATE_ACCESS_TOKEN_URI = '/api/v1/users/self/tokens'
-  const onClose = jest.fn()
-  const onSubmit = jest.fn()
+  const onClose = vi.fn()
+  const onSubmit = vi.fn()
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
+  afterEach(() => {
+    cleanup()
+    server.resetHandlers()
+  })
 
   beforeEach(() => {
     window.ENV = window.ENV || {}
     window.ENV.TIMEZONE = 'America/Denver'
+    window.ENV.FEATURES = window.ENV.FEATURES || {}
+    window.ENV.user_is_only_student = false
     moment.tz.setDefault(window.ENV.TIMEZONE)
   })
 
@@ -45,14 +58,14 @@ describe('NewAccessToken', () => {
     expect(errorText).toBeInTheDocument()
   })
 
-  // fickle
-  it.skip('should show an error if the purpose field is too long', async () => {
+  it('should show an error if the purpose field is too long', async () => {
     const user = userEvent.setup()
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
-    const purpose = screen.getByLabelText('Purpose')
+    const purpose = screen.getByLabelText(/Purpose/)
+    purpose.focus()
 
-    await user.type(purpose, 'a'.repeat(256))
+    await user.paste('a'.repeat(256))
     await user.click(submit)
 
     const errorText = await screen.findByText(
@@ -61,15 +74,19 @@ describe('NewAccessToken', () => {
     expect(errorText).toBeInTheDocument()
   })
 
-  // fickle
-  it.skip('should show an error if the network request fails', async () => {
+  it('should show an error if the network request fails', async () => {
     const user = userEvent.setup()
-    fetchMock.post(GENERATE_ACCESS_TOKEN_URI, 500, {overwriteRoutes: true})
+    server.use(
+      http.post(GENERATE_ACCESS_TOKEN_URI, () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
-    const purpose = screen.getByLabelText('Purpose')
+    const purpose = screen.getByLabelText(/Purpose/)
 
-    await user.type(purpose, 'a'.repeat(20))
+    purpose.focus()
+    await user.paste('a'.repeat(20))
     await user.click(submit)
 
     const errorAlert = await screen.findByRole('alert')
@@ -79,34 +96,30 @@ describe('NewAccessToken', () => {
   it('should be able to submit the form if only the purpose filed is provided', async () => {
     const user = userEvent.setup()
     const token = {purpose: 'Test purpose'}
-    fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
+    const requestBodyCapture = vi.fn()
+    server.use(
+      http.post(GENERATE_ACCESS_TOKEN_URI, async ({request}) => {
+        const body = await request.json()
+        requestBodyCapture(body)
+        return HttpResponse.json({token})
+      }),
+    )
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
-    const purpose = screen.getByLabelText('Purpose')
+    const purpose = screen.getByLabelText(/Purpose/)
 
     // Type the text and wait for it to be fully entered
     await user.clear(purpose)
-    await user.type(purpose, token.purpose)
+    purpose.focus()
+    await user.paste(token.purpose)
     expect(purpose).toHaveValue(token.purpose)
 
     await user.click(submit)
 
     await waitFor(
       () => {
-        const wasCalled = fetchMock.called(GENERATE_ACCESS_TOKEN_URI)
-        if (!wasCalled) {
-          console.log('Fetch not called yet')
-          return false
-        }
-        const lastCall = fetchMock.lastCall(GENERATE_ACCESS_TOKEN_URI)
-        if (!lastCall) {
-          console.log('No fetch call found')
-          return false
-        }
-        const body = JSON.parse(lastCall[1]?.body as string)
-        expect(body).toEqual({token})
+        expect(requestBodyCapture).toHaveBeenCalledWith({token})
         expect(onSubmit).toHaveBeenCalledWith({token})
-        return true
       },
       {timeout: 20000},
     )
@@ -121,40 +134,196 @@ describe('NewAccessToken', () => {
     }
     const expirationDateValue = 'November 14, 2024'
     const expirationTimeValue = '12:00 AM'
-    fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
+    const requestBodyCapture = vi.fn()
+    server.use(
+      http.post(GENERATE_ACCESS_TOKEN_URI, async ({request}) => {
+        const body = await request.json()
+        requestBodyCapture(body)
+        return HttpResponse.json({token})
+      }),
+    )
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
-    const purpose = screen.getByLabelText('Purpose')
+    const purpose = screen.getByLabelText(/Purpose/)
     const expirationDateInput = screen.getByLabelText('Expiration date')
     const expirationTimeInput = screen.getByLabelText('Expiration time')
 
     // Type the text and wait for it to be fully entered
     await user.clear(purpose)
-    await user.type(purpose, token.purpose)
+    purpose.focus()
+    await user.paste(token.purpose)
     expect(purpose).toHaveValue(token.purpose)
 
-    await user.type(expirationDateInput, expirationDateValue)
+    expirationDateInput.focus()
+    await user.paste(expirationDateValue)
     await user.tab() // blur the date field
-    await user.type(expirationTimeInput, expirationTimeValue)
+    expirationTimeInput.focus()
+    await user.paste(expirationTimeValue)
     await user.tab() // blur the time field
     await user.click(submit)
 
     await waitFor(
       () => {
-        const wasCalled = fetchMock.called(GENERATE_ACCESS_TOKEN_URI)
-        if (!wasCalled) {
-          return false
-        }
-        const lastCall = fetchMock.lastCall(GENERATE_ACCESS_TOKEN_URI)
-        if (!lastCall) {
-          return false
-        }
-        const body = JSON.parse(lastCall[1]?.body as string)
-        expect(body).toEqual({token})
+        expect(requestBodyCapture).toHaveBeenCalledWith({token})
         expect(onSubmit).toHaveBeenCalledWith({token})
-        return true
       },
       {timeout: 20000}, // Increase timeout for CI
     )
   }, 30000) // Add test timeout
+
+  describe('Student expiration enforcement', () => {
+    describe('when user is only a student', () => {
+      beforeEach(() => {
+        window.ENV.user_is_only_student = true
+      })
+
+      it('should require an expiration date', async () => {
+        const user = userEvent.setup()
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+        const submit = screen.getByLabelText('Generate Token')
+        const purpose = screen.getByLabelText(/Purpose/)
+        const expirationDateInput = screen.getByLabelText(/Expiration date/)
+
+        // Check that expiration is marked as required
+        expect(expirationDateInput).toBeRequired()
+
+        purpose.focus()
+        await user.paste('Test purpose')
+        await user.click(submit)
+
+        // Should show validation error for missing expiration date
+        await waitFor(() => {
+          expect(screen.getByText('Expiration date is required.')).toBeInTheDocument()
+        })
+      })
+
+      it('should show maximum expiration hint message', () => {
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+
+        expect(screen.getByText('Maximum expiration is 120 days.')).toBeInTheDocument()
+      })
+
+      it('should prevent selecting dates beyond 120 days', async () => {
+        const user = userEvent.setup()
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+        const purpose = screen.getByLabelText(/Purpose/)
+        const submit = screen.getByLabelText('Generate Token')
+
+        // Try to enter a date that's too far in the future (e.g., 150 days)
+        const futureDate = moment.tz(window.ENV.TIMEZONE).add(150, 'days').startOf('day')
+        const futureDateString = futureDate.format('MMMM D, YYYY')
+
+        const expirationDateInput = screen.getByLabelText(/Expiration date/)
+        const expirationTimeInput = screen.getByLabelText(/Expiration time/)
+
+        purpose.focus()
+        await user.paste('Test purpose')
+        expirationDateInput.focus()
+        await user.paste(futureDateString)
+        await user.tab() // blur the date field
+        expirationTimeInput.focus()
+        await user.paste('12:00 AM')
+        await user.tab() // blur the time field
+        await user.click(submit)
+
+        await waitFor(() => {
+          expect(
+            screen.getByText('Expiration date cannot be more than 120 days in the future.'),
+          ).toBeInTheDocument()
+        })
+      })
+
+      it('should accept a valid expiration date within 120 days', async () => {
+        const user = userEvent.setup()
+        const validDate = moment.tz(window.ENV.TIMEZONE).add(30, 'days').startOf('day')
+        const token = {
+          purpose: 'Test purpose',
+          expires_at: validDate.utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+        }
+        const validDateString = validDate.format('MMMM D, YYYY')
+        const validTimeString = '12:00 AM'
+
+        const requestReceived = vi.fn()
+        server.use(
+          http.post(GENERATE_ACCESS_TOKEN_URI, () => {
+            requestReceived()
+            return HttpResponse.json({token})
+          }),
+        )
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+
+        const submit = screen.getByLabelText('Generate Token')
+        const purpose = screen.getByLabelText(/Purpose/)
+        const expirationDateInput = screen.getByLabelText(/Expiration date/)
+        const expirationTimeInput = screen.getByLabelText(/Expiration time/)
+
+        purpose.focus()
+        await user.paste(token.purpose)
+        expirationDateInput.focus()
+        await user.paste(validDateString)
+        await user.tab() // blur the date field
+        expirationTimeInput.focus()
+        await user.paste(validTimeString)
+        await user.tab() // blur the time field
+        await user.click(submit)
+
+        await waitFor(
+          () => {
+            expect(requestReceived).toHaveBeenCalled()
+          },
+          {timeout: 10000},
+        )
+      })
+    })
+
+    describe('when user is not only a student', () => {
+      beforeEach(() => {
+        window.ENV.user_is_only_student = false
+      })
+
+      it('should not require an expiration date', () => {
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+        const expirationDateInput = screen.getByLabelText('Expiration date')
+
+        // Check that expiration is not marked as required
+        expect(expirationDateInput).not.toBeRequired()
+      })
+
+      it('should show no expiration hint message', () => {
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+
+        expect(
+          screen.getByText('Leave the expiration fields blank for no expiration.'),
+        ).toBeInTheDocument()
+      })
+
+      it('should allow submission without expiration date', async () => {
+        const user = userEvent.setup()
+        const token = {purpose: 'Test purpose'}
+        const requestReceived = vi.fn()
+        server.use(
+          http.post(GENERATE_ACCESS_TOKEN_URI, () => {
+            requestReceived()
+            return HttpResponse.json({token})
+          }),
+        )
+        render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
+
+        const submit = screen.getByLabelText('Generate Token')
+        const purpose = screen.getByLabelText(/Purpose/)
+
+        purpose.focus()
+        await user.paste(token.purpose)
+        await user.click(submit)
+
+        await waitFor(
+          () => {
+            expect(requestReceived).toHaveBeenCalled()
+          },
+          {timeout: 10000},
+        )
+      })
+    })
+
+  })
 })

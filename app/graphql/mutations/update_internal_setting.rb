@@ -29,7 +29,8 @@ class Mutations::UpdateInternalSetting < Mutations::BaseMutation
     end
 
     unless input[:value].nil?
-      internal_setting.update!(value: input[:value])
+      Setting.set(internal_setting.name, input[:value])
+      internal_setting.reload
     end
 
     {

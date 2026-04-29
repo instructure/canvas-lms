@@ -17,17 +17,24 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 import {renderGameIntoDom} from './react/gameEntry'
-import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
+import {NotFoundPage} from '@instructure/platform-generic-error-page'
+import {canvasNotFoundTranslations} from '@canvas/error-page-utils'
+import SVGWrapper from '@canvas/svg-wrapper'
 
 export const renderNotFoundApp = domElementId => {
   const AppRootElement = document.getElementById(domElementId)
   if (AppRootElement) {
-    const root = createRoot(AppRootElement)
-    root.render(<NotFoundArtwork />)
-    return root
+    return render(
+      <NotFoundPage
+        artwork={<SVGWrapper url="/images/not_found_page/empty-planet.svg" />}
+        title={canvasNotFoundTranslations.title()}
+        description={canvasNotFoundTranslations.description()}
+      />,
+      AppRootElement,
+    )
   }
   return null
 }

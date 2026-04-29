@@ -19,7 +19,8 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
+import {render as canvasRender} from '@canvas/react'
+import {flushSync} from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_forms'
 
@@ -33,6 +34,7 @@ class Editor extends React.Component {
   static propTypes = {
     env: PropTypes.object.isRequired,
     type: PropTypes.string.isRequired,
+    readOnly: PropTypes.bool,
   }
 
   state = {
@@ -128,6 +130,7 @@ class Editor extends React.Component {
       const editor = new ConditionalReleaseEditor({
         assignment: env.assignment,
         courseId: env.course_id,
+        readOnly: this.props.readOnly,
       })
       editor.attach(
         document.getElementById('canvas-conditional-release-editor'),
@@ -149,10 +152,11 @@ class Editor extends React.Component {
   }
 }
 
-const attach = function (element, type, env) {
-  const editor = <Editor env={env} type={type} />
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(editor, element)
+const attach = function (element, type, env, readOnly = false) {
+  const editor = <Editor env={env} type={type} readOnly={readOnly} />
+  const editorRef = React.createRef()
+  flushSync(() => canvasRender(React.cloneElement(editor, {ref: editorRef}), element))
+  return editorRef.current
 }
 
 const ConditionalRelease = {

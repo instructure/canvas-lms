@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ExternalFeed < ActiveRecord::Base
+class ExternalFeed < ApplicationRecord
   belongs_to :user
   belongs_to :context, polymorphic: [:course, :group]
 
@@ -29,6 +29,7 @@ class ExternalFeed < ActiveRecord::Base
   before_validation :infer_defaults
 
   include CustomValidations
+
   validates :url, :context_id, :context_type, presence: true
   validates_as_url :url
   validates :url,
@@ -48,7 +49,7 @@ class ExternalFeed < ActiveRecord::Base
   end
   protected :infer_defaults
 
-  def display_name(short = true)
+  def display_name(short: true)
     short_url = (url || "").split("/")[0, 3].join("/")
     title || (short ? t(:short_feed_title, "%{short_url} feed", short_url:) : url)
   end
@@ -90,6 +91,7 @@ class ExternalFeed < ActiveRecord::Base
       ""
     when "truncate"
       extend TextHelper
+
       truncate_html(desc, max_length: 250)
     else
       desc

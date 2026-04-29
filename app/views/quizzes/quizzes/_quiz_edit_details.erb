@@ -22,11 +22,11 @@ content_is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_co
                       js_env.dig(:MASTER_COURSE_DATA, "master_course_restrictions", :content)
 %>
 <div id="options_tab">
-  <%= form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :id => "quiz_options_form", :class => 'form-horizontal bootstrap-form'} do %>
+  <%= form_tag context_url(@context, :context_quiz_url, @quiz.id), {:method => :put, :id => "quiz_options_form", :class => 'form-horizontal-quiz'} do %>
     <div style="position: relative;">
       <div class="form-control title" id="quiz-title-container">
         <% if content_is_locked %>
-          <h1 id="quiz_title" class="title"><%= @quiz.title.html_safe %></h1>
+          <h1 id="quiz_title" class="title"><%= @quiz.title %></h1>
           <input type="hidden" name="quiz[title]" value="<%=@quiz.title%>"/>
         <% else %>
           <label for="quiz_title" class="bold form-control__label"><%= t('Quiz Title') %><span aria-hidden="true" class="asterisk"> *</span></label>

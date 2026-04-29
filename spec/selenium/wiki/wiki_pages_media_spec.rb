@@ -44,7 +44,6 @@ describe "CanvasStudioPlayer in Wiki Pages", :ignore_js_errors do
 
   context "teacher" do
     before(:once) do
-      Account.site_admin.enable_feature! :consolidated_media_player
       course_with_teacher(active_all: true)
 
       @root_folder = Folder.root_folders(@course).first
@@ -67,6 +66,7 @@ describe "CanvasStudioPlayer in Wiki Pages", :ignore_js_errors do
         @media_object.media_tracks.create!(kind: "subtitles", locale: "fr", media_object: @media_object, content: '0\n00:00:00,000 --> 00:00:05,000\nFrench sub …This is the first sentence n\n\n1\n00:00:05,000 --> 00:00:10,000\n French sub and a second...')
 
         @page.body = embedded_video_page_body_html(@attachment.id)
+        @page.saving_user = @teacher
         @page.save!
 
         user_session(@user)
@@ -105,7 +105,8 @@ describe "CanvasStudioPlayer in Wiki Pages", :ignore_js_errors do
         in_frame sample_video_for_test_iframe do
           expect(canvas_studio_player).to be_present
           expect(play_button).to be_present
-          expect(time_indicator[0].text).to eq("0:00")
+
+          expect(time_indicator_current.text).to eq("0:00")
           play_button.click
           wait_for_ajaximations
           expect(pause_button).to be_present
@@ -201,14 +202,13 @@ describe "CanvasStudioPlayer in Wiki Pages", :ignore_js_errors do
           expect(play_button).to be_present
           expect(mute_button).to be_present
           expect(volume_slider).to be_present
-          expect(time_indicator[0].attribute("data-type")).to eq("current")
-          expect(time_indicator[1].attribute("data-type")).to eq("duration")
-          expect(f('div._root_tqdlg_60[role="slider"]').attribute("aria-label")).to eq("Seek")
+          expect(time_indicator_current.attribute("data-type")).to eq("current")
+          expect(time_indicator_duration.attribute("data-type")).to eq("duration")
 
           # Verify right control buttons
-          expect(right_control_buttons[0].attribute("aria-label")).to eq("Enable Captions")
+          expect(right_control_buttons[0].attribute("aria-label")).to eq("Captions")
           expect(right_control_buttons[1].attribute("aria-label")).to eq("Settings")
-          expect(right_control_buttons[2].attribute("aria-label")).to eq("Enter Fullscreen")
+          expect(right_control_buttons[2].attribute("aria-label")).to eq("Fullscreen")
 
           settings_button.click
           wait_for_ajaximations
@@ -250,6 +250,7 @@ describe "CanvasStudioPlayer in Wiki Pages", :ignore_js_errors do
           # Verify captions settings and its default value
           video_setting_menu_buttons[1].click
           expect(setting_menu_heading_captions).to be_present
+
           expect(video_setting_menu_buttons[1].text).to eq("Language\nOff")
           expect(video_setting_menu_buttons[2].text).to eq("Font Size\n100%")
           expect(video_setting_menu_buttons[3].text).to eq("On Top")

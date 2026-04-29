@@ -18,13 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CedarAIGraderError < StandardError; end
-
 class AutoGradeOrchestrationService
   MAX_ATTEMPTS = 3
 
-  def initialize(course:)
+  def initialize(course:, current_user:)
     @course = course
+    @current_user = current_user
+  end
+
+  def self.extract_essay_text(submission)
+    essay_source = submission.extract_text_from_upload? ? submission.extracted_text : submission.body
+    ActionView::Base.full_sanitizer.sanitize(essay_source || "")
   end
 
   def auto_grade_in_background(submission:)
@@ -57,17 +61,15 @@ class AutoGradeOrchestrationService
     root_account_uuid = submission.course.account.root_account.uuid
 
     auto_grade_result = get_grade_data(assignment_text:, root_account_uuid:, submission:, progress:)
-    auto_grade_result = generate_comments(assignment_text:, root_account_uuid:, submission:, auto_grade_result:, progress:)
 
-    progress&.results = auto_grade_result.grade_data
-    progress&.message = nil
-    progress&.complete!
+    if auto_grade_result
+      progress&.results = auto_grade_result.grade_data
+      progress&.message = nil
+      progress&.complete!
+    end
   end
 
   def get_grade_data(assignment_text:, root_account_uuid:, submission:, progress:)
-    essay_source = submission.extract_text_from_upload? ? submission.attachment_text : submission.body
-    essay = ActionView::Base.full_sanitizer.sanitize(essay_source || "")
-
     rubric = submission.assignment.rubric_association&.rubric
     raise StandardError, "Missing rubric" unless rubric&.data
 
@@ -77,20 +79,24 @@ class AutoGradeOrchestrationService
     )
     missing_criteria = get_criteria_missing_grades(auto_grade_result.grade_data, rubric)
 
-    unless missing_criteria.empty?
+    if missing_criteria.any?
       # filter rubric to only include missing criteria
       relevant_rubric = rubric.data.select { |item| missing_criteria.include?(item[:description]) }
 
       grade_data = GradeService.new(
         assignment: assignment_text,
-        essay:,
+        essay: self.class.extract_essay_text(submission),
         rubric: relevant_rubric,
-        root_account_uuid:
+        root_account_uuid:,
+        current_user: @current_user
       ).call
 
-      # Merge new grade data with existing data
-      existing_data = auto_grade_result.grade_data || []
-      merged_data = existing_data + grade_data
+      merged_data = merge_new_grade_data_with_existing(grade_data, auto_grade_result.grade_data || [])
+
+      unless get_criteria_missing_grades(merged_data, rubric).empty?
+        Rails.logger.warn("[AutoGrade] Criteria count mismatch for submission #{submission.id}: got #{merged_data.length}, expected #{rubric.data.length}")
+        raise CedarAi::Errors::GraderError, I18n.t("Grading could not be completed. Please try again.")
+      end
 
       auto_grade_result.update!(
         root_account_id: submission.course.root_account_id,
@@ -98,59 +104,11 @@ class AutoGradeOrchestrationService
         error_message: nil,
         grading_attempts: auto_grade_result.grading_attempts + 1
       )
-
-      unless get_criteria_missing_grades(auto_grade_result.grade_data, rubric).empty?
-        raise CedarAIGraderError, "Number of graded criteria (#{merged_data.length}) is less than the number of rubric criteria (#{rubric.data.length})"
-      end
     end
 
-    auto_grade_result
+    auto_grade_result if auto_grade_result.persisted?
   rescue => e
-    Rails.logger.warn("[AutoGrade] Grading failed for submission #{submission.id}: #{e.message}")
-    retryable = e.is_a?(CedarAIGraderError)
-    handle_grading_failure(
-      error_message: "Grading failed: #{e.message}",
-      submission:,
-      auto_grade_result:,
-      progress:,
-      retryable:
-    )
-  end
-
-  def generate_comments(assignment_text:, root_account_uuid:, submission:, auto_grade_result:, progress:)
-    rubric = submission.assignment.rubric_association&.rubric
-    missing_criteria = get_criteria_missing_comments(auto_grade_result.grade_data, rubric)
-
-    unless missing_criteria.empty?
-      # filter grade_data to only include missing criteria
-      relevant_grade_data = auto_grade_result.grade_data.select { |item| missing_criteria.include?(item["description"]) }
-
-      grade_data_with_comments = CommentsService.new(
-        assignment: assignment_text,
-        grade_data: relevant_grade_data,
-        root_account_uuid:
-      ).call
-
-      # Merge new grade data with existing data
-      existing_data = auto_grade_result.grade_data.reject { |item| missing_criteria.include?(item["description"]) }
-      merged_data = existing_data + grade_data_with_comments
-
-      auto_grade_result.update!(
-        root_account_id: submission.course.root_account_id,
-        grade_data: merged_data,
-        error_message: nil,
-        grading_attempts: auto_grade_result.grading_attempts + 1
-      )
-
-      unless get_criteria_missing_comments(merged_data, rubric).empty?
-        raise CedarAIGraderError, "Number of comments (#{merged_data.length}) is less than the number of rubric criteria (#{rubric.data.length})"
-      end
-    end
-
-    auto_grade_result
-  rescue => e
-    Rails.logger.warn("[AutoGrade] Grading failed for submission #{submission.id}: #{e.message}")
-    retryable = e.is_a?(CedarAIGraderError)
+    retryable = e.is_a?(CedarAi::Errors::GraderError)
     handle_grading_failure(
       error_message: "Grading failed: #{e.message}",
       submission:,
@@ -161,37 +119,35 @@ class AutoGradeOrchestrationService
   end
 
   def handle_grading_failure(error_message:, submission:, auto_grade_result:, progress:, retryable: true)
-    autograde_error_handling(submission, auto_grade_result, progress, error_message)
-    current_attempts = progress&.delayed_job&.attempts&.+ 1
+    Rails.logger.warn("[AutoGrade] Grading failed for submission #{submission.id}: #{error_message}")
 
-    if retryable && current_attempts < MAX_ATTEMPTS
-      raise Delayed::RetriableError, error_message
-    end
+    # this sets the error_message field on the AutoGradeResult if one already exists, since
+    # we have the error message in the Progress object and AutoGradeResult cannot be saved
+    # with a `nil` grade_data, we explicitly don't save rather than simply letting the save fail.
+    record_grading_error(auto_grade_result, error_message, submission.id) if auto_grade_result&.persisted?
 
-    progress&.results = []
-    progress&.message = I18n.t("Grading failed. Please try again later or grade manually.")
-    progress&.complete!
+    current_attempts = progress&.delayed_job&.attempts&.next
+    raise Delayed::RetriableError, error_message if retryable && current_attempts && current_attempts < MAX_ATTEMPTS
+
+    progress_message = retryable ? error_message : I18n.t("An error occurred while grading. Please try again later.")
+    fail_progress(progress, progress_message)
   end
 
-  def autograde_error_handling(submission, auto_grade_result, progress, error_message)
-    auto_grade_result ||= AutoGradeResult.find_or_initialize_by(
-      submission:,
-      attempt: submission.attempt
-    )
+  private
 
-    auto_grade_result&.update!(
-      root_account_id: submission.course.root_account_id,
-      grade_data: auto_grade_result.grade_data,
-      error_message:,
-      grading_attempts: auto_grade_result.grading_attempts + 1
-    )
-
-    if progress
-      progress.results = []
-      progress.message = error_message
+  def record_grading_error(auto_grade_result, error_message, submission_id)
+    next_attempt = auto_grade_result.grading_attempts + 1
+    unless auto_grade_result.update(error_message:, grading_attempts: next_attempt)
+      Rails.logger.error("[AutoGrade] Failed to record grading error for submission #{submission_id}")
     end
-  rescue => e
-    Rails.logger.error("[AutoGrade] Failed to record grading error: #{e.message}")
+  end
+
+  def fail_progress(progress, error_message)
+    return unless progress
+
+    progress.results = []
+    progress.message = error_message
+    progress.fail!
   end
 
   def handle_existing_progress(progress, singleton_key)
@@ -211,18 +167,25 @@ class AutoGradeOrchestrationService
     progress
   end
 
+  def merge_new_grade_data_with_existing(new_data, existing_data = [])
+    (existing_data + new_data)
+      .group_by { |item| item["description"] }
+      .map do |_, items|
+        if items.size > 1
+          lowest = items.min_by { |i| i.dig("rating", "rating").to_f }
+          lowest["rating"]["reasoning"] = [lowest["rating"]["reasoning"], I18n.t("This work sits between two ratings for this criterion. The lower rating was applied for consistency.")].compact.join(" ")
+          lowest
+        else
+          items.first
+        end
+      end
+  end
+
   def get_criteria_missing_grades(grade_data, rubric)
     return rubric.data.pluck(:description) unless grade_data
 
-    graded_criteria = grade_data.pluck("description")
-    all_criteria = rubric.data.pluck(:description)
-    all_criteria - graded_criteria
-  end
-
-  def get_criteria_missing_comments(grade_data, rubric)
-    return rubric.data.pluck(:description) unless grade_data
-
-    grade_data.reject { |item| item["comments"] }
-              .pluck("description")
+    graded_norm = grade_data.pluck("description").map { |d| TextNormalizerHelper.normalize(d) }
+    rubric_desc = rubric.data.pluck(:description)
+    rubric_desc.reject { |d| graded_norm.include?(TextNormalizerHelper.normalize(d)) }
   end
 end

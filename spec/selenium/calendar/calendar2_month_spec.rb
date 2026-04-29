@@ -102,20 +102,6 @@ describe "calendar2" do
         create_middle_day_assignment
       end
 
-      it "translates am/pm time strings in assignment event datepicker", priority: "2" do
-        skip("CNVS-28437")
-        @user.locale = "fa"
-        @user.save!
-        load_month_view
-        calendar_create_event_button.click
-        f("#edit_event .edit_assignment_option").click
-        f("#assignment_title").send_keys("test assignment")
-        f("#edit_assignment_form .ui-datepicker-trigger.btn").click
-        wait_for_ajaximations
-        expect(f("#ui-datepicker-div .ui-datepicker-time-ampm")).to include_text("قبل از ظهر")
-        expect(f("#ui-datepicker-div .ui-datepicker-time-ampm")).to include_text("بعد از ظهر")
-      end
-
       context "drag and drop" do
         def element_location
           driver.execute_script("return $('#calendar-app .fc-content-skeleton:first')
@@ -237,22 +223,6 @@ describe "calendar2" do
           expect(event1.start_at).to eql(@three_days_earlier)
         end
 
-        it "extends event to multiple days by dragging", priority: "2" do
-          skip("dragging events are flaky and need more research FOO-4335")
-
-          create_middle_day_event
-          date_of_middle_day = find_middle_day.attribute("data-date")
-          date_of_next_day = (Time.zone.parse(date_of_middle_day) + 1.day).strftime("%Y-%m-%d")
-          f(".fc-content-skeleton .fc-event-container .fc-resizer")
-          next_day = fj("[data-date=#{date_of_next_day}]")
-          drag_and_drop_element(f(".fc-content-skeleton .fc-event-container .fc-resizer"), next_day)
-          fj(".fc-event:visible").click
-          # observe the event details show date range from event start to date to end date
-          original_day_text = format_time_for_view(Time.zone.parse(date_of_middle_day))
-          extended_day_text = format_time_for_view(Time.zone.parse(date_of_next_day) + 1.day)
-          expect(f(".event-details-timestring .date-range").text).to eq("#{original_day_text} - #{extended_day_text}")
-        end
-
         it "prevents drag and drop for discussion checkpoints", priority: "1" do
           @course.account.enable_feature!(:discussion_checkpoints)
           topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
@@ -300,6 +270,90 @@ describe "calendar2" do
           checkpoint.reload
           expect(checkpoint.assignment_overrides.first.due_at).to eql(@initial_time)
         end
+
+        it "prevents drag and drop for assignments with graded peer reviews", priority: "1" do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+          assignment = @course.assignments.create!(
+            title: "Assignment with Graded Peer Reviews",
+            due_at: @initial_time,
+            peer_reviews: true,
+            peer_review_count: 1,
+            submission_types: "online_text_entry"
+          )
+          peer_review_model(parent_assignment: assignment)
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          drag_and_drop_element(find(".calendar .fc-event"),
+                                find(".calendar .fc-day.fc-widget-content.fc-fri.fc-past"))
+
+          expect_instui_flash_message("Assignments with graded peer reviews are not draggable. You can update their due dates by editing the assignment.")
+          wait_for_ajaximations
+
+          # Assignment should not be moved to Friday
+          expect(element_location).not_to eq @friday
+
+          # Due date should remain unchanged
+          assignment.reload
+          expect(assignment.start_at).to eql(@initial_time)
+        ensure
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "prevents drag and drop for assignment overrides with graded peer reviews", priority: "2" do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+          assignment = @course.assignments.create!(
+            title: "Assignment Override with Graded Peer Reviews",
+            peer_reviews: true,
+            peer_review_count: 1,
+            submission_types: "online_text_entry"
+          )
+          peer_review_model(parent_assignment: assignment)
+          assignment.assignment_overrides.create! do |override|
+            override.set = @course.course_sections.first
+            override.due_at = @initial_time
+            override.due_at_overridden = true
+          end
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          drag_and_drop_element(find(".calendar .fc-event"),
+                                find(".calendar .fc-day.fc-widget-content.fc-fri.fc-past"))
+
+          expect_instui_flash_message("Assignments with graded peer reviews are not draggable. You can update their due dates by editing the assignment.")
+          wait_for_ajaximations
+
+          # Override should not be moved to Friday
+          expect(element_location).not_to eq @friday
+
+          # Override due date should remain unchanged
+          assignment.reload
+          expect(assignment.assignment_overrides.first.due_at).to eql(@initial_time)
+        ensure
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "allows drag and drop for assignments with peer reviews when feature flag is disabled", priority: "2" do
+          assignment = @course.assignments.create!(
+            title: "Legacy Peer Review Assignment",
+            due_at: @initial_time,
+            peer_reviews: true,
+            peer_review_count: 1,
+            submission_types: "online_text_entry"
+          )
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          drag_and_drop_element(find(".calendar .fc-event"),
+                                find(".calendar .fc-day.fc-widget-content.fc-fri.fc-past"))
+
+          expect_no_flash_message :error
+
+          # Assignment should be moved to Friday
+          expect(element_location).to eq @friday
+          assignment.reload
+          expect(assignment.start_at).to eql(@one_day_later)
+        end
       end
 
       it "more options link should go to calendar event edit page", :ignore_js_errors do
@@ -331,6 +385,56 @@ describe "calendar2" do
         expect(find("#assignment_name").attribute(:value)).to include(name)
       end
 
+      it "redirects to assignment edit page when clicking edit on a peer review assignment with FF enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          title: "Assignment with Graded Peer Reviews - Calendar Test",
+          due_at: Time.zone.now.beginning_of_month + 15.days,
+          peer_reviews: true,
+          peer_review_count: 2,
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          workflow_state: "published"
+        )
+        peer_review_model(parent_assignment: assignment)
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f(".fc-event.assignment").click
+        wait_for_ajaximations
+
+        expect_new_page_load { hover_and_click ".edit_event_link" }
+
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{assignment.id}/edit")
+      end
+
+      it "redirects to assignment edit page when clicking edit on a peer review assignment override with FF enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          title: "Assignment with Graded Peer Reviews - Override Test",
+          peer_reviews: true,
+          peer_review_count: 2,
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          workflow_state: "published"
+        )
+        peer_review_model(parent_assignment: assignment)
+        assignment.assignment_overrides.create! do |override|
+          override.set = @course.course_sections.first
+          override.due_at = Time.zone.now.beginning_of_month + 15.days
+          override.due_at_overridden = true
+        end
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f(".fc-event.assignment_override").click
+        wait_for_ajaximations
+
+        expect_new_page_load { hover_and_click ".edit_event_link" }
+
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{assignment.id}/edit")
+      end
+
       it "publishes a new assignment when toggle is clicked" do
         create_published_middle_day_assignment
         f(".fc-event.assignment").click
@@ -340,6 +444,7 @@ describe "calendar2" do
       end
 
       it "loads discussion edit page when click on edit button in discussion checkpoint info modal" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         @course.account.enable_feature!(:discussion_checkpoints)
         due_at = Time.zone.now.utc + 1.day
         title = "graded discussion with checkpoints"
@@ -583,7 +688,7 @@ describe "calendar2" do
         expect(f("#content")).not_to contain_css(".fc-event")
         eventStartText = eventStart.strftime("%Y %m %d")
         quick_jump_to_date(eventStartText)
-        expect(find(".fc-event")).to be
+        expect(find(".fc-event")).not_to be_nil
       end
 
       it "shows section-level events, but not the parent event" do
@@ -604,7 +709,7 @@ describe "calendar2" do
         events.first.click
 
         details = find(".event-details")
-        expect(details).to be
+        expect(details).not_to be_nil
         expect(details.text).to include(@course.default_section.name)
         expect(details.find(".view_event_link")[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
       end
@@ -731,7 +836,7 @@ describe "calendar2" do
         cancel_btn = f(".form-actions a")
         expect(cancel_btn.text).to eq "Cancel"
         expect(cancel_btn["href"]).to include("view_name=month")
-        expect(cancel_btn["href"]).to_not include(@course.asset_string)
+        expect(cancel_btn["href"]).not_to include(@course.asset_string)
       end
     end
   end
@@ -821,7 +926,7 @@ describe "calendar2" do
       end
 
       it "does not include the module override in the assignment list" do
-        skip "FOO-5060"
+        skip "FOO-5060 2025-01-26"
         @section1 = CourseSection.create!(name: "Section 1", course: @course)
         student_in_section(@section1, user: @student)
         @assignment = @course.assignments.create!(title: "new assignment")

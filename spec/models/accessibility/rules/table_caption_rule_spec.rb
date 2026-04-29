@@ -34,15 +34,63 @@ describe Accessibility::Rules::TableCaptionRule do
       end
     end
 
-    it "calls the correct method on caption" do
-      elem = double("Element", tag_name: "table")
-      caption = double("Caption", text: "Valid Caption")
-      allow(elem).to receive(:query_selector).with("caption").and_return(caption)
+    [
+      { name: "empty caption", caption: "" },
+      { name: "regular space", caption: " " },
+      { name: "unicode space character (&#32;)", caption: "&#32;" },
+      { name: "non-breaking space (&nbsp;)", caption: "&nbsp;" },
+      { name: "en space (&ensp;)", caption: "&ensp;" },
+      { name: "em space (&emsp;)", caption: "&emsp;" },
+      { name: "thin space (&thinsp;)", caption: "&thinsp;" },
+      { name: "Ogham Space Mark (&#5760;)", caption: "&#5760;" },
+      { name: "En Quad (&#8192;)", caption: "&#8192;" },
+      { name: "Em Quad (&#8193;)", caption: "&#8193;" },
+      { name: "Three-Per-Em Space (&#8196;)", caption: "&#8196;" },
+      { name: "Four-Per-Em Space (&#8197;)", caption: "&#8197;" },
+      { name: "Six-Per-Em Space (&#8198;)", caption: "&#8198;" },
+      { name: "Figure Space (&#8199;)", caption: "&#8199;" },
+      { name: "Punctuation Space (&#8200;)", caption: "&#8200;" },
+      { name: "Hair Space (&#8202;)", caption: "&#8202;" },
+      { name: "Narrow Non-breaking space (&#8239;)", caption: "&#8239;" },
+      { name: "Medium Mathematical Space (&#8287;)", caption: "&#8287;" },
+      { name: "Ideographic (CJK) Space (&#12288;)", caption: "&#12288;" },
+      { name: "Horizontal Tab (\\t)", caption: "\t" },
+      { name: "Line Feed (\\n)", caption: "\n" },
+      { name: "Vertical Tab (\\v)", caption: "\v" },
+      { name: "Form Feed (\\f)", caption: "\f" },
+      { name: "Carriage Return (\\r)", caption: "\r" },
+      { name: "Next Line (&#133;)", caption: "&#133;" },
+      { name: "Line Separator (&#8232;)", caption: "&#8232;" },
+      { name: "Paragraph Separator (&#8233;)", caption: "&#8233;" },
+      { name: "multiple whitespace types", caption: "  \n\t &nbsp; " }
+    ].each do |test_case|
+      it "identifies tables with #{test_case[:name]} captions" do
+        input_html = "<table><caption>#{test_case[:caption]}</caption><tr><th>Header 1</th><th>Header 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
 
-      expect(caption).to receive(:text).and_return("Valid Caption")
+        issues = find_issues(:table_caption, input_html, "page-123")
+
+        expect(issues).not_to be_empty, "Expected to find issue for #{test_case[:name]}"
+      end
+    end
+
+    it "does not flag tables with valid captions" do
+      input_html = "<table><caption>Valid Caption</caption><tr><th>Header 1</th><th>Header 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
+
+      issues = find_issues(:table_caption, input_html, "page-123")
+
+      expect(issues).to be_empty
+    end
+
+    it "calls the correct method on caption" do
+      doc = Nokogiri::HTML::DocumentFragment.parse("<table><caption>Valid Caption</caption><tr><td>Data</td></tr></table>")
+      extend_nokogiri_with_dom_adapter(doc)
+      elem = doc.at_css("table")
+      caption = elem.at_css("caption")
+
+      expect(caption).to receive(:text).and_call_original
       expect(caption).not_to receive(:text_content)
 
-      Accessibility::Rules::TableCaptionRule.test(elem)
+      Accessibility::Rules::TableCaptionRule.new.test(elem)
     end
 
     it "maintains resource-specific isolation between content types" do
@@ -78,11 +126,24 @@ describe Accessibility::Rules::TableCaptionRule do
 
       expect(updated_html.delete("\n")).to eq(expected_html)
     end
+
+    it "updates an empty caption with content and returns the table for preview" do
+      doc = Nokogiri::HTML::DocumentFragment.parse('<table border="1"><caption></caption><tbody><tr><th>Day</th><th>Mushroom</th></tr><tr><td>Monday</td><td>Morel</td></tr></tbody></table>')
+      table_element = doc.at_css("table")
+      rule = Accessibility::Rules::TableCaptionRule.new
+
+      result = rule.fix!(table_element, "Weekly Mushroom Schedule")
+
+      expect(result).not_to be_nil
+      expect(result).to be_a(Hash)
+      expect(result[:changed]).to eq(table_element)
+      expect(table_element.at_css("caption").content).to eq("Weekly Mushroom Schedule")
+    end
   end
 
   context "form" do
     it "returns the proper form" do
-      expect(Accessibility::Rules::TableCaptionRule.form(nil).label).to eq("Table caption")
+      expect(Accessibility::Rules::TableCaptionRule.new.form(nil).label).to eq("Table caption")
     end
   end
 end

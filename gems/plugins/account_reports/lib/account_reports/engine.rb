@@ -169,6 +169,15 @@ module AccountReports
               admins: {
                 description: "Get the Provisioning file for admins"
               },
+              institutional_tag_categories: {
+                description: "Get the Provisioning file for institutional tag categories"
+              },
+              institutional_tags: {
+                description: "Get the Provisioning file for institutional tags"
+              },
+              institutional_tag_associations: {
+                description: "Get the Provisioning file for institutional tag associations"
+              },
               created_by_sis: {
                 description: "Only include objects that were created by sis"
               },
@@ -240,6 +249,15 @@ module AccountReports
               },
               admins: {
                 description: "Get the SIS file for admins"
+              },
+              institutional_tag_categories: {
+                description: "Get the SIS file for institutional tag categories"
+              },
+              institutional_tags: {
+                description: "Get the SIS file for institutional tags"
+              },
+              institutional_tag_associations: {
+                description: "Get the SIS file for institutional tag associations"
               },
               created_by_sis: {
                 description: "Only include objects that were created by sis"
@@ -361,12 +379,16 @@ module AccountReports
           "user_access_tokens_csv" => {
             title: proc { I18n.t(:user_access_tokens_title, "User Access Tokens") },
             description_partial: true,
-            parameters_partial: "include_only_deleted_parameter",
+            parameters_partial: "user_access_tokens_csv_parameters",
             parameters: {
+              exclude_deleted_and_expired: {
+                required: false,
+                description: "Exclude deleted and expired access tokens"
+              },
               include_deleted: {
                 required: false,
-                description: "Include deleted objects"
-              }
+                description: "Include access tokens from deleted users"
+              },
             }
           },
           "lti_report_csv" => {

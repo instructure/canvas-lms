@@ -17,13 +17,20 @@
  */
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getItemType, renderItemAssignToManager} from '../utils/assignToUtils'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {QueryClient} from '@tanstack/react-query'
-import type {ModuleItemContent, MasteryPathsData, ModuleAction} from '../utils/types'
+import type {
+  ModuleItemContent,
+  ModuleAction,
+  PerModuleState,
+  MenuItemActionState,
+} from '../utils/types'
 import React from 'react'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES, MOVE_MODULE_ITEM} from '../utils/constants'
+import {dispatchCommandEvent} from './dispatchCommandEvent'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -33,14 +40,14 @@ export const handlePublishToggle = async (
   moduleId: string,
   itemId: string,
   title: string,
-  content: ModuleItemContent | null,
   canBeUnpublished: boolean,
   queryClient: QueryClient,
   courseId: string,
+  published?: boolean,
 ) => {
   if (!canBeUnpublished) return
 
-  const newPublishedState = !content?.published
+  const newPublishedState = !published
 
   try {
     await doFetchApi({
@@ -56,21 +63,22 @@ export const handlePublishToggle = async (
         title: title,
         publishState: newPublishedState ? I18n.t('published') : I18n.t('unpublished'),
       }),
-    )
+    )()
 
-    queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})
+    queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+    queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, moduleId || '']})
   } catch (error) {
     showFlashError(
       I18n.t('Failed to change published state for %{title}', {
         title: title,
       }),
-    )
+    )()
     console.error('Error updating published state:', error)
   }
 }
 
-export const handleEdit = (setIsEditItemOpen: (isOpen: boolean) => void) => {
-  setIsEditItemOpen(true)
+export const handleEdit = (courseId: string, itemId: string) => {
+  dispatchCommandEvent({action: 'edit', courseId, moduleItemId: itemId})
 }
 
 export const handleSpeedGrader = (
@@ -80,10 +88,13 @@ export const handleSpeedGrader = (
 ) => {
   if (
     content?.type?.toLowerCase().includes('assignment') ||
-    content?.type?.toLowerCase().includes('quiz') ||
-    content?.type?.toLowerCase().includes('discussion')
+    content?.type?.toLowerCase().includes('quiz')
   ) {
-    window.location.href = `/courses/${courseId}/gradebook/speed_grader?assignment_id=${content._id}`
+    window.open(
+      `/courses/${courseId}/gradebook/speed_grader?assignment_id=${content._id}`,
+      '_blank',
+      'noopener',
+    )
   }
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
@@ -94,6 +105,7 @@ export const handleAssignTo = (
   content: ModuleItemContent | null,
   courseId: string,
   title: string,
+  cursor: string | null,
   setIsMenuOpen?: (isOpen: boolean) => void,
   moduleId?: string,
 ) => {
@@ -117,6 +129,7 @@ export const handleAssignTo = (
     moduleId,
     isCheckpointed,
     isGraded: !!content?.graded,
+    cursor,
   })
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
@@ -128,19 +141,28 @@ export const handleDuplicate = (
   itemId: string,
   queryClient: QueryClient,
   courseId: string,
+  setMenuItemLoadingState: React.Dispatch<
+    React.SetStateAction<PerModuleState<MenuItemActionState>>
+  >,
   setIsMenuOpen?: (isOpen: boolean) => void,
 ) => {
+  setMenuItemLoadingState(prev => ({...prev, [id]: {type: 'duplicate', state: true}}))
+
   doFetchApi({
     path: `/api/v1/courses/${courseId}/modules/items/${itemId}/duplicate`,
     method: 'POST',
   })
     .then(() => {
       showFlashSuccess(I18n.t('Item duplicated successfully'))
-      queryClient.invalidateQueries({queryKey: ['moduleItems', id]})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, id]})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, id]})
+      queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
     })
     .catch(() => {
       showFlashError(I18n.t('Failed to duplicate item'))
     })
+    .finally(() => setMenuItemLoadingState(({[id]: _, ...rest}) => rest))
+
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }
@@ -162,7 +184,7 @@ export const handleMoveTo = (
     setIsMenuOpen(false)
   }
 
-  setModuleAction('move_module_item')
+  setModuleAction(MOVE_MODULE_ITEM)
 
   if (content && itemId) {
     setSelectedModuleItem({
@@ -203,7 +225,8 @@ export const updateIndent = async (
 
     showFlashSuccess(I18n.t('Item indentation updated'))
 
-    queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})
+    queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+    queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, moduleId || '']})
   } catch (error) {
     showFlashError(I18n.t('Failed to update item indentation'))
     console.error('Error updating indent:', error)
@@ -213,15 +236,10 @@ export const updateIndent = async (
 export const handleDecreaseIndent = async (
   itemId: string,
   moduleId: string,
-  indent: number,
   courseId: string,
-  queryClient: QueryClient,
   setIsMenuOpen?: (isOpen: boolean) => void,
 ) => {
-  if (indent > 0) {
-    const newIndent = Math.max(indent - 1, 0)
-    await updateIndent(itemId, moduleId, newIndent, courseId, queryClient)
-  }
+  dispatchCommandEvent({action: 'outdent', courseId, moduleId, moduleItemId: itemId})
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }
@@ -230,15 +248,10 @@ export const handleDecreaseIndent = async (
 export const handleIncreaseIndent = async (
   itemId: string,
   moduleId: string,
-  indent: number,
   courseId: string,
-  queryClient: QueryClient,
   setIsMenuOpen?: (isOpen: boolean) => void,
 ) => {
-  if (indent < 5) {
-    const newIndent = Math.min(indent + 1, 5)
-    await updateIndent(itemId, moduleId, newIndent, courseId, queryClient)
-  }
+  dispatchCommandEvent({action: 'indent', courseId, moduleId, moduleItemId: itemId})
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }
@@ -271,6 +284,7 @@ export const handleRemove = (
   queryClient: QueryClient,
   courseId: string,
   setIsMenuOpen?: (isOpen: boolean) => void,
+  onAfterSuccess?: () => void,
 ) => {
   if (window.confirm(I18n.t('Are you sure you want to remove this item from the module?'))) {
     doFetchApi({
@@ -283,7 +297,12 @@ export const handleRemove = (
             title: title,
           }),
         )
-        queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})
+        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, moduleId || '']})
+        queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
+      })
+      .then(() => {
+        if (onAfterSuccess) onAfterSuccess()
       })
       .catch(() => {
         showFlashError(I18n.t('Failed to remove item'))
@@ -294,14 +313,8 @@ export const handleRemove = (
   }
 }
 
-export const handleMasteryPaths = (
-  masteryPathsData: MasteryPathsData | null,
-  _id: string,
-  setIsMenuOpen?: (isOpen: boolean) => void,
-) => {
-  if (masteryPathsData?.isTrigger && _id) {
-    window.location.href = `${ENV.CONTEXT_URL_ROOT}/modules/items/${_id}/edit_mastery_paths`
-  }
+export const handleMasteryPaths = (_id: string, setIsMenuOpen?: (isOpen: boolean) => void) => {
+  window.location.href = `${ENV.CONTEXT_URL_ROOT}/modules/items/${_id}/edit_mastery_paths`
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }

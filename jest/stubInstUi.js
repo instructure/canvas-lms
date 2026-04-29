@@ -18,7 +18,7 @@
 
 // https://github.com/instructure/instructure-ui/blob/v7.18.0/packages/ui-dom-utils/src/addPositionChangeListener.js
 // This file creates a recursive listener that is never ending, causing jest.runAllTimers() to run infinitely long.
-jest.mock('@instructure/ui-dom-utils/lib/addPositionChangeListener', () => ({
+jest.mock('@instructure/ui-dom-utils/es/addPositionChangeListener', () => ({
   addPositionChangeListener: () => ({remove: () => {}}),
 }))
 
@@ -26,6 +26,6 @@ jest.mock('@instructure/ui-dom-utils/lib/addPositionChangeListener', () => ({
 // JSDOM getComputedStyle() is painfully slow and our tests don't really need it.
 // If you ever need it in the future, use jest.unmock() in the file that needs it
 // or be prepared to fix the build speed regression in another way.
-jest.mock('@instructure/ui-dom-utils/lib/getComputedStyle', () => ({
-  getComputedStyle: () => ({getPropertyValue: () => undefined}),
+jest.mock('@instructure/ui-dom-utils/es/getCSSStyleDeclaration', () => ({
+  getCSSStyleDeclaration: () => ({getPropertyValue: () => undefined}),
 }))

@@ -23,19 +23,58 @@ import {List} from '@instructure/ui-list'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {formatTimeAgoDate, formatTimeAgoTitle} from '@canvas/enhanced-user-content'
+import {formatTimeAgoTitle} from '@canvas/enhanced-user-content'
+import {fromNow} from '@canvas/fuzzy-relative-time'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
 import {useInfiniteQuery} from '@tanstack/react-query'
 import type {QueryFunctionContext} from '@tanstack/react-query'
+import ConfusedPanda from '@instructure/platform-images/assets/ConfusedPanda.svg'
 
 const I18n = createI18nScope('new_nav')
 
-const fetchHistory = async (context: QueryFunctionContext<string[], string>) => {
+type HistoryEntry = {
+  asset_code: string
+  asset_name: string
+  asset_icon: string
+  asset_readable_category: string
+  context_name: string
+  visited_url: string
+  visited_at: string
+}
+
+type HistoryPage = {
+  json: HistoryEntry[]
+  nextPage: string | null
+}
+
+const fetchHistory = async (
+  context: QueryFunctionContext<string[], string>,
+): Promise<HistoryPage> => {
   const {pageParam = '/api/v1/users/self/history'} = context
-  const {json, link} = await doFetchApi({path: pageParam})
+  const {json, link} = await doFetchApi<HistoryEntry[]>({path: pageParam})
   const nextPage = link?.next ? link.next.url : null
-  return {json, nextPage}
+  return {json: json ?? [], nextPage}
+}
+
+function EmptyState(): React.JSX.Element {
+  return (
+    <Flex direction="column" alignItems="center" gap="small">
+      <img
+        src={ConfusedPanda}
+        alt={I18n.t('Nothing in the last 30 days')}
+        style={{maxWidth: '160px'}}
+      />
+      <Text size="large" weight="bold">
+        {I18n.t('Nothing in the last 30 days')}
+      </Text>
+      <Text>
+        {I18n.t(
+          "This page shows only the past 30 days of history. It looks like there hasn't been anything recent to show. Once you take some actions, they'll appear here.",
+        )}
+      </Text>
+    </Flex>
+  )
 }
 
 export default function HistoryList() {
@@ -50,18 +89,14 @@ export default function HistoryList() {
     },
   )
 
-  // @ts-expect-error
-  const combineHistoryEntries = pages => {
+  const combineHistoryEntries = (pages: HistoryPage[] | undefined): HistoryEntry[] => {
     if (pages != null) {
       // combine all entries into one array
-      // @ts-expect-error
-      const allEntries = pages.reduce((accumulator, page) => {
+      const allEntries = pages.reduce<HistoryEntry[]>((accumulator, page) => {
         return [...accumulator, ...page.json]
       }, [])
       // iterate over all entries and combine based on asset_code
-      // @ts-expect-error
-      const historyEntries = allEntries.reduce((accumulator, historyItem) => {
-        // @ts-expect-error
+      const historyEntries = allEntries.reduce<HistoryEntry[]>((accumulator, historyItem) => {
         const alreadyAdded = accumulator.some(entry => historyItem.asset_code === entry.asset_code)
         if (!alreadyAdded) {
           accumulator.push(historyItem)
@@ -100,11 +135,15 @@ export default function HistoryList() {
     return <Spinner size="small" renderTitle={I18n.t('Loading')} />
   } else {
     const historyEntries = combineHistoryEntries(data.pages)
+
+    if (historyEntries.length === 0) {
+      return <EmptyState />
+    }
+
     return (
       <>
         <List isUnstyled={true} margin="small 0" itemSpacing="small">
-          {/* @ts-expect-error */}
-          {historyEntries.map((entry, index) => {
+          {historyEntries.map(entry => {
             return (
               <List.Item key={entry.asset_code}>
                 <Flex>
@@ -115,24 +154,27 @@ export default function HistoryList() {
                     <Link
                       href={entry.visited_url}
                       aria-label={`${entry.asset_name}, ${entry.asset_readable_category}`}
+                      aria-describedby={`history_list_${entry.asset_code}`}
                     >
                       {entry.asset_name}
                     </Link>
-                    <Text as="div" transform="uppercase" size="x-small" lineHeight="condensed">
-                      {entry.context_name}
-                    </Text>
-                    <Text
-                      data-testid={`${entry.asset_code}_time_ago`}
-                      as="div"
-                      size="x-small"
-                      color="secondary"
-                      lineHeight="condensed"
-                      className="time_ago_date"
-                      data-timestamp={entry.visited_at}
-                      title={formatTimeAgoTitle(entry.visited_at)}
-                    >
-                      {formatTimeAgoDate(entry.visited_at)}
-                    </Text>
+                    <div id={`history_list_${entry.asset_code}`}>
+                      <Text as="div" transform="uppercase" size="x-small" lineHeight="condensed">
+                        {entry.context_name}
+                      </Text>
+                      <Text
+                        data-testid={`${entry.asset_code}_time_ago`}
+                        as="div"
+                        size="x-small"
+                        color="secondary"
+                        lineHeight="condensed"
+                        className="time_ago_date"
+                        data-timestamp={entry.visited_at}
+                        title={formatTimeAgoTitle(entry.visited_at)}
+                      >
+                        {fromNow(entry.visited_at)}
+                      </Text>
+                    </div>
                   </Flex.Item>
                 </Flex>
               </List.Item>

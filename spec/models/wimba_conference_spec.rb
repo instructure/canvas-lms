@@ -21,7 +21,7 @@
 require_relative("web_conference_spec_helper")
 
 describe WimbaConference do
-  include_examples "WebConference"
+  it_behaves_like "WebConference"
 
   # implements this WebConference option:
   it { is_expected.to respond_to :admin_settings_url }

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
 import {underscoreProperties} from '@canvas/convert-case'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {
   DEFAULT_LATE_POLICY_DATA,
   fetchLatePolicy,
@@ -27,6 +27,8 @@ import {
   updateLatePolicy,
 } from '../GradebookSettingsModalApi'
 import type {LatePolicyCamelized} from '../../gradebook.d'
+
+const server = setupServer()
 
 const latePolicyData: LatePolicyCamelized & {id: string} = {
   id: '15',
@@ -39,25 +41,28 @@ const latePolicyData: LatePolicyCamelized & {id: string} = {
   lateSubmissionMinimumPercent: 40.0,
 }
 
-const lastCallRequestBody = (fetchMockStub: fetchMock.FetchMockStatic) => {
-  const lastOptions = fetchMockStub.lastOptions()
-  if (!lastOptions) return undefined
-
-  // fetch-mock library needs to be updated; this is a workaround.
-  const body = lastOptions.body as unknown as string
-  return JSON.parse(body)
-}
-
 describe('GradebookSettingsModalApi', () => {
+  beforeEach(() => {
+    server.listen({onUnhandledRequest: 'bypass'})
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   describe('fetchLatePolicy success', () => {
     beforeEach(() => {
-      fetchMock.get('/api/v1/courses/19/late_policy', {
-        late_policy: underscoreProperties(latePolicyData),
-      })
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(
+        http.get('/api/v1/courses/19/late_policy', () => {
+          return HttpResponse.json({
+            late_policy: underscoreProperties(latePolicyData),
+          })
+        })
+      )
     })
 
     it('returns the late policy', async () => {
@@ -68,11 +73,9 @@ describe('GradebookSettingsModalApi', () => {
 
   describe('fetchLatePolicy when late policy does not exist', () => {
     beforeEach(() => {
-      fetchMock.get('/api/v1/courses/19/late_policy', 404)
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(
+        http.get('/api/v1/courses/19/late_policy', () => new HttpResponse(null, {status: 404}))
+      )
     })
 
     it('returns the default late policy', async () => {
@@ -83,11 +86,9 @@ describe('GradebookSettingsModalApi', () => {
 
   describe('fetchLatePolicy when the request fails', () => {
     beforeEach(() => {
-      fetchMock.get('/api/v1/courses/19/late_policy', 500)
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(
+        http.get('/api/v1/courses/19/late_policy', () => new HttpResponse(null, {status: 500}))
+      )
     })
 
     it('throws an error when the response is not a 200 or a 404', async () => {
@@ -96,7 +97,7 @@ describe('GradebookSettingsModalApi', () => {
   })
 
   describe('createLatePolicy', () => {
-    let createStub: fetchMock.FetchMockStatic
+    let capturedBody: any
     let latePolicyCreationData: Partial<typeof latePolicyData>
     let url: string
 
@@ -104,17 +105,17 @@ describe('GradebookSettingsModalApi', () => {
       latePolicyCreationData = {...latePolicyData, id: undefined}
       url = '/api/v1/courses/19/late_policy'
       const responseBody = {late_policy: underscoreProperties(latePolicyData)}
-      createStub = fetchMock.post(url, responseBody)
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(
+        http.post(url, async ({request}) => {
+          capturedBody = await request.json()
+          return HttpResponse.json(responseBody)
+        })
+      )
     })
 
     it('includes data to create a late_policy', async () => {
       await createLatePolicy('19', latePolicyCreationData)
-      const body = lastCallRequestBody(createStub)
-      expect(body).toEqual({late_policy: underscoreProperties(latePolicyCreationData)})
+      expect(capturedBody).toEqual({late_policy: underscoreProperties(latePolicyCreationData)})
     })
 
     it('returns the late policy', async () => {
@@ -126,22 +127,22 @@ describe('GradebookSettingsModalApi', () => {
   describe('updateLatePolicy', () => {
     let url: string
     let changes: Pick<LatePolicyCamelized, 'lateSubmissionInterval'>
-    let updatePolicyStub: fetchMock.FetchMockStatic
+    let capturedBody: any
 
     beforeEach(() => {
       url = '/api/v1/courses/19/late_policy'
       changes = {lateSubmissionInterval: 'hour'}
-      updatePolicyStub = fetchMock.patch(url, 204)
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      server.use(
+        http.patch(url, async ({request}) => {
+          capturedBody = await request.json()
+          return new HttpResponse(null, {status: 204})
+        })
+      )
     })
 
     it('includes data to update a late_policy', async () => {
       await updateLatePolicy('19', changes)
-      const body = lastCallRequestBody(updatePolicyStub)
-      expect(body).toEqual({late_policy: underscoreProperties(changes)})
+      expect(capturedBody).toEqual({late_policy: underscoreProperties(changes)})
     })
 
     it('returns a 204 (successfully fulfilled request and no content)', async () => {
@@ -151,27 +152,30 @@ describe('GradebookSettingsModalApi', () => {
   })
 
   describe('updateCourseSettings', () => {
-    let updateStub: fetchMock.FetchMockStatic
+    let capturedBody: any
     let responseData: {allow_final_grade_override: boolean}
+    let callCount: number
 
     beforeEach(() => {
       responseData = {allow_final_grade_override: true}
-      updateStub = fetchMock.put('/api/v1/courses/1201/settings', responseData)
-    })
-
-    afterEach(() => {
-      fetchMock.restore()
+      callCount = 0
+      server.use(
+        http.put('/api/v1/courses/1201/settings', async ({request}) => {
+          capturedBody = await request.json()
+          callCount++
+          return HttpResponse.json(responseData)
+        })
+      )
     })
 
     it('sends a request to update course settings', async () => {
       await updateCourseSettings('1201', {allowFinalGradeOverride: true})
-      expect(updateStub.called()).toBe(true)
+      expect(callCount).toBeGreaterThan(0)
     })
 
     it('normalizes the request body with snake case', async () => {
       await updateCourseSettings('1201', {allowFinalGradeOverride: true})
-      const body = lastCallRequestBody(updateStub)
-      expect(body).toEqual({allow_final_grade_override: true})
+      expect(capturedBody).toEqual({allow_final_grade_override: true})
     })
 
     it('normalizes the response body with camel case upon success', async () => {
@@ -181,7 +185,9 @@ describe('GradebookSettingsModalApi', () => {
 
     it('does not catch errors', async () => {
       // Catching errors is the responsibility of the consumer.
-      updateStub.put('/api/v1/courses/1201/settings', 500, {overwriteRoutes: true})
+      server.use(
+        http.put('/api/v1/courses/1201/settings', () => new HttpResponse(null, {status: 500}))
+      )
       try {
         await updateCourseSettings('1201', {allowFinalGradeOverride: true})
       } catch (error) {

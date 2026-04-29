@@ -80,14 +80,18 @@ export function MediaAttachment(props: MediaAttachmentProps) {
 
 type MediaAttachmentPlayerProps = Omit<MediaAttachmentProps, 'onRemoveMediaComment'>
 
+type MediaSourceOption = {
+  label: string
+  src: string
+  bitrate: string
+}
+
 const MediaAttachmentPlayer = (props: MediaAttachmentPlayerProps) => {
-  const mediaSources = (): string[] => {
+  const mediaSources = (): MediaSourceOption[] => {
     if (props.file.src) {
-      // @ts-expect-error
       return [{label: I18n.t('Standard'), src: props.file.src, bitrate: '0'}]
     }
 
-    // @ts-expect-error
     return (
       props.file.mediaSources?.map(media => ({
         label: media.width + ' x ' + media.height,

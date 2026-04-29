@@ -251,9 +251,9 @@ describe CalendarEvent do
         double_testing_with_disable_adding_uuid_verifier_in_api_ff do
           it "does not add verifiers to files unless course or attachment is public" do
             html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
-            calendar_event_model(start_at: "Sep 3 2008 12:00am", description: html)
+            calendar_event_model(start_at: "Sep 3 2008 12:00am", description: html, saving_user: @teacher)
             ev = @event.to_ics(in_own_calendar: false)
-            expect(ev.description).to_not include("verifier")
+            expect(ev.description).not_to include("verifier")
 
             @attachment.file_state = "public"
             @attachment.save!
@@ -1090,6 +1090,7 @@ describe CalendarEvent do
                                              { start_at: "2012-01-02 12:00:00", end_at: "2012-01-02 13:00:00", context_code: s2.asset_string },
                                            ]
         e1.updating_user = @user
+        e1.saving_user = @user
         e1.save!
         e1.child_event_data = [
           { start_at: "2012-01-01 12:00:00", end_at: "2012-01-01 13:00:00", context_code: @course.default_section.asset_string },
@@ -1322,6 +1323,22 @@ describe CalendarEvent do
         event = section.calendar_events.build title: "Foo", web_conference: conference(context: course2)
         expect(event).not_to be_valid
       end
+    end
+  end
+
+  describe "valid_ranges scope" do
+    it "filters out calendar events with unpopulated start_at or end_at fields" do
+      course_model
+      common_fields = { context_id: @course.id, context_type: "Course" }
+      @ce1 = CalendarEvent.create(common_fields.merge({ start_at: 1.day.ago, end_at: nil, description: "nil end_at" }))
+                          .update_columns(end_at: nil)
+      @ce2 = CalendarEvent.create(common_fields.merge({ start_at: nil, end_at: 1.day.from_now, description: "nil start_at" }))
+                          .update_columns(start_at: nil)
+      @ce3 = CalendarEvent.create(common_fields.merge({ start_at: nil, end_at: nil, description: "nil range" }))
+      @ce4 = CalendarEvent.create(common_fields.merge({ start_at: 1.day.ago, end_at: 1.day.from_now, description: "populated range" }))
+
+      expect(CalendarEvent.valid_ranges.length).to eq 1
+      expect(CalendarEvent.valid_ranges).to include(@ce4)
     end
   end
 end

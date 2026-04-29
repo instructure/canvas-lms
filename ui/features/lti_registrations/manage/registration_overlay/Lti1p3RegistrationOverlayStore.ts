@@ -16,16 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {LtiMessageType} from '../model/LtiMessageType'
-import {type LtiPlacement, type LtiPlacementWithIcon} from '../model/LtiPlacement'
+import {
+  LtiDeepLinkingRequest,
+  LtiResourceLinkRequest,
+  type LtiMessageType,
+} from '../model/LtiMessageType'
+import {
+  type LtiPlacement,
+  type LtiPlacementWithIcon,
+  LtiPlacements,
+  isLtiPlacementWithIcon,
+  supportsDeepLinkingRequest,
+} from '../model/LtiPlacement'
 import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
-import type {LtiScope} from '@canvas/lti/model/LtiScope'
+import {type LtiScope, LtiScopes} from '@canvas/lti/model/LtiScope'
+import type {MessageSetting} from '../model/internal_lti_configuration/InternalBaseLaunchSettings'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import {create} from 'zustand'
 import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
 import {initialOverlayStateFromInternalConfig} from './Lti1p3RegistrationOverlayStateHelpers'
 import {filterEmptyString} from '../../common/lib/filterEmptyString'
 import {Lti1p3RegistrationOverlayState} from './Lti1p3RegistrationOverlayState'
+import {filterPlacementsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
 
 export type PlacementLabelOverride = string
 export type IconUrlOverride = string
@@ -43,8 +55,10 @@ export interface Lti1p3RegistrationOverlayActions {
   setJwk: (jwk: string) => void
   setDomain: (domain: string) => void
   setCustomFields: (customFields: string) => void
+  setMessageSettings: (messageSettings: MessageSetting[]) => void
   setOverrideURI: (placement: LtiPlacement, uri: string) => void
   setPlacementIconUrl: (placement: LtiPlacementWithIcon, iconUrl: string) => void
+  setDefaultIconUrl: (iconUrl: string) => void
   setMessageType: (placement: LtiPlacement, messageType: LtiMessageType) => void
   setAdminNickname: (nickname: string) => void
   setDescription: (description: string) => void
@@ -53,6 +67,11 @@ export interface Lti1p3RegistrationOverlayActions {
   setPrivacyLevel: (privacyLevel: LtiPrivacyLevel) => void
   togglePlacement: (placement: LtiPlacement) => void
   toggleCourseNavigationDefaultDisabled: () => void
+  toggleTopNavigationAllowFullscreen: () => void
+}
+
+export interface Lti1p3RegistrationOverlayGetters {
+  isEulaCapable: () => boolean
 }
 
 const updateState =
@@ -118,7 +137,10 @@ export const createLti1p3RegistrationOverlayStore = (
   adminNickname?: string,
   existingOverlay?: LtiConfigurationOverlay,
 ) =>
-  create<{state: Lti1p3RegistrationOverlayState} & Lti1p3RegistrationOverlayActions>(set => ({
+  create<
+    {state: Lti1p3RegistrationOverlayState} & Lti1p3RegistrationOverlayActions &
+      Lti1p3RegistrationOverlayGetters
+  >((set, get) => ({
     state: initialOverlayStateFromInternalConfig(internalConfig, adminNickname, existingOverlay),
     setDirty: dirty => set(s => ({...set, state: {...s.state, dirty}})),
     setHasSubmitted: hasSubmitted => set(s => ({...set, state: {...s.state, hasSubmitted}})),
@@ -134,6 +156,8 @@ export const createLti1p3RegistrationOverlayStore = (
     setDomain: domain => set(updateLaunchSetting('domain', filterEmptyString(domain))),
     setCustomFields: customFields =>
       set(updateLaunchSetting('customFields', filterEmptyString(customFields))),
+    setMessageSettings: messageSettings =>
+      set(updateLaunchSetting('message_settings', messageSettings)),
     setOverrideURI: (placement, uri) => set(updateOverrideURI(placement, uri)),
     setMessageType: (placement, messageType) => set(updateMessageType(placement, messageType)),
     setAdminNickname: nickname =>
@@ -201,16 +225,37 @@ export const createLti1p3RegistrationOverlayStore = (
         }),
       )
     },
+    toggleTopNavigationAllowFullscreen: () => {
+      set(
+        updateState(state => {
+          return {
+            ...state,
+            placements: {
+              ...state.placements,
+              topNavigationAllowFullscreen: !state.placements.topNavigationAllowFullscreen,
+            },
+          }
+        }),
+      )
+    },
     togglePlacement: placement => {
       set(
         updateState(state => {
           let updatedPlacements = state.placements.placements
+          const isAdding = !updatedPlacements?.includes(placement)
 
-          if (updatedPlacements?.includes(placement)) {
-            updatedPlacements = updatedPlacements.filter(p => p !== placement)
-          } else {
+          if (isAdding) {
             updatedPlacements = [...(updatedPlacements ?? []), placement]
+          } else {
+            updatedPlacements = updatedPlacements.filter(p => p !== placement)
           }
+
+          const needsDefaultMessageType =
+            isAdding && !state.override_uris.placements[placement]?.message_type
+
+          const defaultMessageType = supportsDeepLinkingRequest(placement)
+            ? LtiDeepLinkingRequest
+            : LtiResourceLinkRequest
 
           return {
             ...state,
@@ -218,6 +263,18 @@ export const createLti1p3RegistrationOverlayStore = (
               ...state.placements,
               placements: updatedPlacements,
             },
+            ...(needsDefaultMessageType && {
+              override_uris: {
+                ...state.override_uris,
+                placements: {
+                  ...state.override_uris.placements,
+                  [placement]: {
+                    ...state.override_uris.placements[placement],
+                    message_type: defaultMessageType,
+                  },
+                },
+              },
+            }),
           }
         }),
       )
@@ -238,6 +295,41 @@ export const createLti1p3RegistrationOverlayStore = (
         }),
       )
     },
+    setDefaultIconUrl: iconUrl => {
+      set(
+        updateState(state => {
+          return {
+            ...state,
+            icons: {
+              ...state.icons,
+              defaultIconUrl: filterEmptyString(iconUrl),
+            },
+          }
+        }),
+      )
+    },
+    isEulaCapable: () => {
+      const state = get().state
+      return !!(
+        state.launchSettings?.message_settings?.some(m => m.type === 'LtiEulaRequest') ||
+        (state.permissions.scopes?.includes(LtiScopes.EulaUser) &&
+          (state.placements.placements?.includes(LtiPlacements.ActivityAssetProcessor) ||
+            state.placements.placements?.includes(
+              LtiPlacements.ActivityAssetProcessorContribution,
+            )))
+      )
+    },
   }))
 
 export type Lti1p3RegistrationOverlayStore = ReturnType<typeof createLti1p3RegistrationOverlayStore>
+
+/**
+ * Returns true if the given state contains placements with icons
+ * Used to determine if we should show the IconConfirmation step
+ * @param state
+ * @returns
+ */
+export const containsPlacementWithIcon = (state: Lti1p3RegistrationOverlayState): boolean => {
+  const enabledPlacements = filterPlacementsByFeatureFlags(state.placements.placements)
+  return enabledPlacements.some(p => isLtiPlacementWithIcon(p))
+}

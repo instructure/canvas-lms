@@ -34,12 +34,12 @@ describe('OutcomeSearchBar', () => {
   })
 
   beforeEach(() => {
-    onChangeHandlerMock = jest.fn()
-    onClearHandlerMock = jest.fn()
+    onChangeHandlerMock = vi.fn()
+    onClearHandlerMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('shows placeholder if placeholder prop passed', () => {

@@ -37,7 +37,7 @@ describe('a11yCheckerHooks', () => {
     fakeEditor = {
       dom: {
         styleSheetLoader: {
-          load: jest.fn((url, callback) => {
+          load: vi.fn((url, callback) => {
             const link = document.createElement('link')
             link.href = url
             link.type = 'text/css'
@@ -80,15 +80,17 @@ describe('a11yCheckerHooks', () => {
       })
     })
 
-    it('calls done callback when complete', done => {
-      beforeCheck(fakeEditor, () => {
-        expect(true).toBe(true)
-        done()
-      })
+    it('calls done callback when complete', () => {
+      return new Promise(resolve => {
+        beforeCheck(fakeEditor, () => {
+          expect(true).toBe(true)
+          resolve()
+        })
 
-      // Simulate all stylesheets loading
-      const links = fixturesContainer.querySelectorAll('link')
-      links.forEach(link => link.onload())
+        // Simulate all stylesheets loading
+        const links = fixturesContainer.querySelectorAll('link')
+        links.forEach(link => link.onload())
+      })
     })
   })
 
@@ -96,7 +98,7 @@ describe('a11yCheckerHooks', () => {
     let removeChildMock
 
     beforeEach(() => {
-      removeChildMock = jest.fn()
+      removeChildMock = vi.fn()
       const createStyleSheet = (disabled, href) => ({
         disabled,
         href,

@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import ModuleDuplicationSpinner from '../react/ModuleDuplicationSpinner'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {reorderElements, renderTray} from '@canvas/move-item-tray'
 import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
@@ -28,21 +28,20 @@ import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import ContextModulesView from '../backbone/views/context_modules' /* handles the publish/unpublish state */
 import RelockModulesDialog from '@canvas/relock-modules-dialog'
-import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
+import vddTooltip from '@canvas/due-dates/react/vddTooltip'
 import vddTooltipView from '../jst/_vddTooltip.handlebars'
 import Publishable from '../backbone/models/Publishable'
 import PublishButtonView from '@canvas/publish-button-view'
 // eslint-disable-next-line import/no-named-as-default
 import htmlEscape from '@instructure/html-escape'
-import get from 'lodash/get'
+import {get} from 'es-toolkit/compat'
 import axios from '@canvas/axios'
-import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashAlert} from '@instructure/platform-alerts'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {dateString, datetimeString} from '@canvas/datetime/date-functions'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */
 import 'jqueryui/dialog'
-import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.underscore/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
 import '@canvas/jquery/jquery.simulate'
@@ -55,6 +54,8 @@ import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import ExternalAppsMenuTray from '@canvas/external-apps/react/components/ExternalAppsMenuTray'
+import {PeerReviewInfo} from '@canvas/assignments/react/PeerReviewInfo'
+import {captureException} from '@sentry/browser'
 import {
   initPublishButton,
   onContainerOverlapped,
@@ -102,6 +103,8 @@ import {fetchItemTitles} from '../utils/fetchItemTitles'
 if (!('INST' in window)) window.INST = {}
 
 const I18n = createI18nScope('context_modulespublic')
+
+const peerReviewRoots = new Map()
 
 // TODO: AMD don't export global, use as module
 /* global modules */
@@ -477,6 +480,20 @@ window.modules = (function () {
               }
 
               $context_module_item.addClass('rendered')
+
+              if (!ENV.IS_STUDENT) {
+                const moduleType = $context_module_item.find('.lock-icon').attr('data-module-type')
+                if (moduleType === 'assignment') {
+                  const contextModuleId = $context_module_item
+                    .closest('.context_module')
+                    .attr('id')
+                    ?.replace('context_module_', '')
+                  const contentId = $context_module_item.find('.lock-icon').attr('data-content-id')
+                  if (contextModuleId && contentId) {
+                    renderPeerReviewInfo(contentId, contextModuleId, info)
+                  }
+                }
+              }
             })
 
             vddTooltip()
@@ -607,6 +624,13 @@ window.modules = (function () {
         id: 'context_module_item_' + data.id,
         hrefValues: ['id', 'context_module_id', 'content_id', 'content_type', 'assignment_id'],
       })
+
+      const $peerReviewContainer = $item.find('.peer-review-info-container')
+      if ($peerReviewContainer.length && data.content_id && data.context_module_id) {
+        const newId = `module_teacher_peer_review_info_${data.content_id}_${data.context_module_id}`
+        $peerReviewContainer.attr('id', newId)
+      }
+
       for (let idx = 0; idx < 10; idx++) {
         $item.removeClass('indent_' + idx)
       }
@@ -621,18 +645,20 @@ window.modules = (function () {
         const $assignToMenuItem = $item.find('.assign-to-option')
         if ($assignToMenuItem.length) {
           $assignToMenuItem.removeClass('hidden')
-          const $a = $assignToMenuItem.find('a')
-          $a.attr('data-item-id', data.id)
-          $a.attr('data-item-name', data.title)
-          $a.attr(
+          const $dataSpan = $assignToMenuItem.find('.assign-to-link-resources')
+          $dataSpan.attr('data-item-id', data.id)
+          $dataSpan.attr('data-item-name', data.title)
+          $dataSpan.attr(
             'data-item-type',
             data.quiz_lti ? 'lti-quiz' : data.content_type == 'Quizzes::Quiz' ? 'quiz' : data.type,
           )
-          $a.attr('data-item-context-id', data.context_id)
-          $a.attr('data-item-context-type', data.context_type)
-          $a.attr('data-item-content-id', data.content_id)
-          $a.attr('data-item-has-assignment', data.assignment_id ? 'true' : 'false')
-          $a.attr('data-item-has-assignment-checkpoint', data.is_checkpointed ? 'true' : 'false')
+          $dataSpan.attr('data-item-context-id', data.context_id)
+          $dataSpan.attr('data-item-content-id', data.content_id)
+          $dataSpan.attr('data-item-has-assignment', data.assignment_id ? 'true' : 'false')
+          $dataSpan.attr(
+            'data-item-has-assignment-checkpoint',
+            data.is_checkpointed ? 'true' : 'false',
+          )
         }
       }
 
@@ -763,20 +789,6 @@ window.modules = (function () {
       }
     },
 
-    getNextPosition($module) {
-      let maxPosition = 0
-      $module
-        .find('.context_module_items')
-        .children()
-        .each(function () {
-          const position = parseInt(
-            $(this).getTemplateData({textValues: ['position']}).position,
-            10,
-          )
-          if (position > maxPosition) maxPosition = position
-        })
-      return maxPosition + 1
-    },
     refreshModuleList() {
       $('#module_list').find('.context_module_option').remove()
       $('#context_modules .context_module').each(function () {
@@ -923,8 +935,7 @@ const renderDifferentiatedModulesTray = (
 ) => {
   const container = document.getElementById('differentiated-modules-mount-point')
   if (container.reactRoot) container.reactRoot.unmount()
-  container.reactRoot = createRoot(container)
-  container.reactRoot.render(
+  container.reactRoot = render(
     <DifferentiatedModulesTray
       onDismiss={() => {
         container.reactRoot.unmount()
@@ -935,6 +946,7 @@ const renderDifferentiatedModulesTray = (
       courseId={ENV.COURSE_ID ?? ''}
       {...settingsProps}
     />,
+    container,
   )
 }
 
@@ -1047,16 +1059,18 @@ const updatePublishMenuDisabledState = function (disabled) {
       const $publishMenu = $(publishMenu)
       $publishMenu.data('disabled', disabled)
 
-      if (!publishMenu.reactRoot) {
-        publishMenu.reactRoot = createRoot(publishMenu)
-      }
-      publishMenu.reactRoot.render(
+      const menuElement = (
         <ContextModulesPublishMenu
           courseId={$publishMenu.data('courseId')}
           runningProgressId={$publishMenu.data('progressId')}
           disabled={disabled}
-        />,
+        />
       )
+      if (!publishMenu.reactRoot) {
+        publishMenu.reactRoot = render(menuElement, publishMenu)
+      } else {
+        rerender(publishMenu.reactRoot, menuElement)
+      }
     }
   }
 }
@@ -1218,9 +1232,10 @@ modules.initModuleManagement = async function (duplicate) {
     const spinnerContainer = $('#temporary-spinner')[0]
     if (spinnerContainer) {
       if (!spinnerContainer.reactRoot) {
-        spinnerContainer.reactRoot = createRoot(spinnerContainer)
+        spinnerContainer.reactRoot = render(spinner, spinnerContainer)
+      } else {
+        rerender(spinnerContainer.reactRoot, spinner)
       }
-      spinnerContainer.reactRoot.render(spinner)
     }
 
     $.screenReaderFlashMessage(I18n.t('Duplicating Module, this may take some time'))
@@ -1305,6 +1320,7 @@ modules.initModuleManagement = async function (duplicate) {
             : $addModuleButton
           removeEmptyModuleUI($(this)[0])
           $(this).slideUp(function () {
+            cleanupPeerReviewComponentsForModule(this)
             $(this).remove()
             modules.updateTaggedItems()
             $toFocus.focus()
@@ -1482,6 +1498,7 @@ modules.initModuleManagement = async function (duplicate) {
         success(data) {
           delete ENV.MODULE_FILE_DETAILS[data.content_tag.id]
           $(this).slideUp(function () {
+            cleanupPeerReviewComponentsForItem(this)
             $(this).remove()
             modules.updateTaggedItems()
             modules.updateEstimatedDurations()
@@ -1705,9 +1722,10 @@ modules.initModuleManagement = async function (duplicate) {
     const midSizeModal = window.matchMedia('(min-width: 500px)').matches
     const fullSizeModal = window.matchMedia('(min-width: 770px)').matches
     const responsiveWidth = fullSizeModal ? 770 : midSizeModal ? 500 : 320
+    const responsiveHeight = fullSizeModal ? 550 : Math.min(window.innerHeight * 0.9, 600)
     options.select_button_text = I18n.t('buttons.add_item', 'Add Item')
     options.holder_name = name
-    options.height = 550
+    options.height = responsiveHeight
     options.width = responsiveWidth
     options.dialog_title = I18n.t('titles.add_item', 'Add Item to %{module}', {module: name})
     options.close = function () {
@@ -1730,9 +1748,12 @@ modules.initModuleManagement = async function (duplicate) {
       const $module = $('#context_module_' + id)
       let $item
       if (!ENV.FEATURE_MODULES_PERF) {
-        let nextPosition = modules.getNextPosition($module)
+        const nextPosition = item_data._bulk_base_position + item_data._bulk_item_index
         item_data.content_details = ['items']
-        item_data['item[position]'] = nextPosition++
+        item_data['item[position]'] = nextPosition
+        // Remove the bulk metadata before sending to server
+        delete item_data._bulk_item_index
+        delete item_data._bulk_base_position
         $item = modules.addItemToModule($module, item_data)
       }
       $module.find('.context_module_items.ui-sortable').sortable('refresh').sortable('disable')
@@ -1743,6 +1764,7 @@ modules.initModuleManagement = async function (duplicate) {
             maybeExpandAndLoadAll(id, true)
             modules.addContentTagToEnv(data.content_tag)
           } else {
+            if ($item?.[0]) cleanupPeerReviewComponentsForItem($item[0])
             $item?.remove()
             data.content_tag.type = item_data['item[type]']
             $item = modules.addItemToModule($module, data.content_tag)
@@ -1750,14 +1772,15 @@ modules.initModuleManagement = async function (duplicate) {
             $module.find('.context_module_items.ui-sortable').sortable('enable').sortable('refresh')
             initNewItemPublishButton($item, data.content_tag)
             initNewItemDirectShare($item, data.content_tag)
+            initNewItemMoveHandler($item)
             modules.updateAssignmentData()
             modules.updateEstimatedDurations()
 
-            $item.find('.lock-icon').data({
-              moduleType: data.content_tag.type,
-              contentId: data.content_tag.content_id,
-              moduleItemId: data.content_tag.id,
-            })
+            $item
+              .find('.lock-icon')
+              .attr('data-module-type', data.content_tag.type)
+              .attr('data-content-id', data.content_tag.content_id)
+              .attr('data-module-item-id', data.content_tag.id)
             modules.loadMasterCourseData(data.content_tag.id)
           }
         }),
@@ -1791,15 +1814,16 @@ modules.initModuleManagement = async function (duplicate) {
           const $item = modules.addItemToModule($module, data.content_tag)
           initNewItemPublishButton($item, data.content_tag)
           initNewItemDirectShare($item, data.content_tag)
+          initNewItemMoveHandler($item)
 
           modules.updateAssignmentData()
           modules.updateEstimatedDurations()
 
-          $item.find('.lock-icon').data({
-            moduleType: data.content_tag.type,
-            contentId: data.content_tag.content_id,
-            moduleItemId: data.content_tag.id,
-          })
+          $item
+            .find('.lock-icon')
+            .attr('data-module-type', data.content_tag.type)
+            .attr('data-content-id', data.content_tag.content_id)
+            .attr('data-module-item-id', data.content_tag.id)
           modules.loadMasterCourseData(data.content_tag.id)
 
           $module.find('.context_module_items.ui-sortable').sortable('disable')
@@ -2056,6 +2080,108 @@ function moduleContentIsHidden(contentEl) {
   )
 }
 
+function convertVddToAllDates(vddTooltip) {
+  if (!vddTooltip || !vddTooltip.due_dates) return []
+  return vddTooltip.due_dates.map(date => ({
+    dueFor: date.due_for,
+    dueAt: date.due_at,
+    unlockAt: date.unlock_at,
+    lockAt: date.lock_at,
+  }))
+}
+
+function unmountPeerReviewInfo(mountPointId) {
+  const root = peerReviewRoots.get(mountPointId)
+  if (root) {
+    root.unmount()
+    peerReviewRoots.delete(mountPointId)
+  }
+}
+
+function cleanupPeerReviewComponentsForItem(itemElement) {
+  const peerReviewContainer = itemElement.querySelector('.peer-review-info-container')
+  if (peerReviewContainer) {
+    const mountPointId = peerReviewContainer.id
+    if (mountPointId) {
+      unmountPeerReviewInfo(mountPointId)
+    }
+  }
+}
+
+function cleanupPeerReviewComponentsForModule(moduleElement) {
+  const items = moduleElement.querySelectorAll('.context_module_item')
+  items.forEach(item => cleanupPeerReviewComponentsForItem(item))
+}
+
+function renderPeerReviewInfo(contentId, contextModuleId, assignmentInfo) {
+  const mountPointId = `module_teacher_peer_review_info_${contentId}_${contextModuleId}`
+  const mountPoint = document.getElementById(mountPointId)
+
+  if (!mountPoint) {
+    return
+  }
+
+  if (!assignmentInfo.peer_review) {
+    mountPoint.remove()
+    return
+  }
+
+  const moduleItem = mountPoint.closest('.context_module_item')
+  if (moduleItem) {
+    const dueDateDisplay = moduleItem.querySelector('.due_date_display')
+    const pointsDisplay = moduleItem.querySelector('.points_possible_display')
+    if (dueDateDisplay) dueDateDisplay.style.display = 'none'
+    if (pointsDisplay) pointsDisplay.style.display = 'none'
+  }
+
+  mountPoint.style.display = ''
+  unmountPeerReviewInfo(mountPointId)
+
+  const peerReviewSubAssignment = assignmentInfo.peer_review
+  const assignmentAllDates =
+    assignmentInfo.all_dates || convertVddToAllDates(assignmentInfo.vdd_tooltip)
+  const peerReviewAllDates =
+    peerReviewSubAssignment.all_dates || convertVddToAllDates(peerReviewSubAssignment.vdd_tooltip)
+
+  const assignmentData = {
+    id: contentId,
+    name: assignmentInfo.name || '',
+    due_at: assignmentInfo.due_date,
+    unlock_at: null,
+    lock_at: null,
+    points_possible: assignmentInfo.points_possible,
+    all_dates: assignmentAllDates,
+    peer_reviews: true,
+    peer_review_count: peerReviewSubAssignment.peer_review_count || 0,
+    peer_review_sub_assignment: {
+      id: peerReviewSubAssignment.id,
+      points_possible: peerReviewSubAssignment.points_possible,
+      due_at: peerReviewSubAssignment.due_date,
+      unlock_at: null,
+      lock_at: null,
+      all_dates: peerReviewAllDates,
+    },
+    html_url: peerReviewSubAssignment.parent_assignment_html_url || assignmentInfo.html_url || '#',
+    availability_status: null,
+  }
+
+  try {
+    const root = render(
+      React.createElement(PeerReviewInfo, {
+        assignment: assignmentData,
+        showDueDateLabel: false,
+        useDateOnly: true,
+        showAvailability: false,
+      }),
+      mountPoint,
+    )
+    peerReviewRoots.set(mountPointId, root)
+  } catch (error) {
+    const errorMessage = I18n.t('Peer review info mount point element not found')
+    captureException(new Error(errorMessage), error)
+  }
+}
+
 function updateSubAssignmentData(contextModuleItem, subAssignments) {
   subAssignments.forEach(subAssignment => {
     const replyToTopicElement = contextModuleItem.find('.reply_to_topic_display')
@@ -2103,38 +2229,8 @@ if (!ENV.FEATURE_MODULES_PERF || ENV.IS_STUDENT) {
 }
 
 // Post process lazy loaded module items ----------------------
-function initContextModuleItems(moduleId) {
-  const $module = moduleId ? $(`#context_module_${moduleId}`) : $('#context_modules')
-
-  if (ENV.IS_STUDENT) {
-    $module.find('.context_module_item .ig-row').addClass('student-view')
-  }
-
-  $module.find('.context_module_item').each((_i, $item) => {
-    modules.evaluateItemCyoe($item)
-  })
-
-  $module.find('.publish-icon').each((_index, el) => {
-    const $el = $(el)
-    if ($el.data('id')) {
-      const view = initPublishButton($el)
-      overrideModel({}, modules.relock_modules_dialog, view.model, view)
-    }
-  })
-
-  const opts = modules.sortable_module_options
-  opts.update = modules.updateModuleItemPositions
-  $module.find('.context_module_items').sortable(opts)
-  // NOTE: This takes an extraordinary amount of time, and without it
-  //       I have not seen any issues with drag-and-drop ordering
-  //       of module items
-  // $('#context_modules.ui-sortable').sortable('refresh')
-  // $('#context_modules .context_module .context_module_items.ui-sortable').each(function () {
-  //   $(this).sortable('refresh')
-  //   $(this).sortable('option', 'connectWith', '.context_module_items')
-  // })
-
-  $module.find('.move_module_item_link').on('click keyclick', function (event) {
+function initNewItemMoveHandler($item) {
+  $item.find('.move_module_item_link').on('click keyclick', function (event) {
     event.preventDefault()
 
     const currentItem = $(this).parents('.context_module_item')[0]
@@ -2179,6 +2275,7 @@ function initContextModuleItems(moduleId) {
           reorderElements(order, $container[0], id => `#context_module_item_${id}`)
           $container.sortable('enable').sortable('refresh')
         } else {
+          cleanupPeerReviewComponentsForItem(item)
           item.remove()
         }
         if (ENV.FEATURE_MODULES_PERF) {
@@ -2191,6 +2288,53 @@ function initContextModuleItems(moduleId) {
     }
 
     renderTray(moveTrayProps, document.getElementById('not_right_side'))
+  })
+}
+
+function initContextModuleItems(moduleId) {
+  const $module = moduleId ? $(`#context_module_${moduleId}`) : $('#context_modules')
+
+  if (ENV.IS_STUDENT) {
+    $module.find('.context_module_item .ig-row').addClass('student-view')
+  }
+
+  $module.find('.context_module_item').each((_i, $item) => {
+    modules.evaluateItemCyoe($item)
+  })
+
+  $module.find('.publish-icon').each((_index, el) => {
+    const $el = $(el)
+    if ($el.data('id')) {
+      const view = initPublishButton($el)
+      overrideModel({}, modules.relock_modules_dialog, view.model, view)
+    }
+  })
+
+  const opts = modules.sortable_module_options
+  opts.update = modules.updateModuleItemPositions
+  $module.find('.context_module_items').sortable(opts)
+
+  $module.find('.context_module_item').each(function () {
+    initNewItemMoveHandler($(this))
+  })
+
+  const seamlessRedirectEnabled = window.ENV?.MODULE_FEATURES?.SEAMLESS_EXTERNAL_URL_REDIRECT
+
+  $module.find('.external_url_link').each(function () {
+    const $link = $(this)
+    const isNewTab = $link.attr('target') === '_blank'
+
+    if (seamlessRedirectEnabled && isNewTab) {
+      let url = $link.attr('data-item-href')
+      if (url) {
+        url += url.includes('?') ? '&follow_redirect=1' : '?follow_redirect=1'
+        $link.attr('href', url)
+      }
+    } else {
+      $link.click(function (event) {
+        Helper.externalUrlLinkClick(event, $(this))
+      })
+    }
   })
 
   if (ENV.FEATURE_MODULES_PERF) {
@@ -2225,8 +2369,7 @@ function handleRemoveDueDateInput(itemProps) {
 function renderItemAssignToTray(open, returnFocusTo, itemProps) {
   const container = document.getElementById('differentiated-modules-mount-point')
   if (container.reactRoot) container.reactRoot.unmount()
-  container.reactRoot = createRoot(container)
-  container.reactRoot.render(
+  container.reactRoot = render(
     <ItemAssignToManager
       open={open}
       onClose={() => {
@@ -2247,16 +2390,14 @@ function renderItemAssignToTray(open, returnFocusTo, itemProps) {
       removeDueDateInput={handleRemoveDueDateInput(itemProps)}
       isCheckpointed={itemProps.moduleItemHasCheckpoint === 'true'}
     />,
+    container,
   )
 }
 
 function renderCopyToTray(open, contentSelection, returnFocusTo) {
   const mountPoint = document.getElementById('direct-share-mount-point')
   if (!mountPoint) return
-  if (!mountPoint.reactRoot) {
-    mountPoint.reactRoot = createRoot(mountPoint)
-  }
-  mountPoint.reactRoot.render(
+  const element = (
     <DirectShareCourseTray
       open={open}
       sourceCourseId={ENV.COURSE_ID}
@@ -2265,17 +2406,19 @@ function renderCopyToTray(open, contentSelection, returnFocusTo) {
         renderCopyToTray(false, contentSelection, returnFocusTo)
         returnFocusTo.focus()
       }}
-    />,
+    />
   )
+  if (!mountPoint.reactRoot) {
+    mountPoint.reactRoot = render(element, mountPoint)
+  } else {
+    rerender(mountPoint.reactRoot, element)
+  }
 }
 
 function renderSendToTray(open, contentSelection, returnFocusTo) {
   const mountPoint = document.getElementById('direct-share-mount-point')
   if (!mountPoint) return
-  if (!mountPoint.reactRoot) {
-    mountPoint.reactRoot = createRoot(mountPoint)
-  }
-  mountPoint.reactRoot.render(
+  const element = (
     <DirectShareUserModal
       open={open}
       sourceCourseId={ENV.COURSE_ID}
@@ -2284,17 +2427,19 @@ function renderSendToTray(open, contentSelection, returnFocusTo) {
         renderSendToTray(false, contentSelection, returnFocusTo)
         returnFocusTo.focus()
       }}
-    />,
+    />
   )
+  if (!mountPoint.reactRoot) {
+    mountPoint.reactRoot = render(element, mountPoint)
+  } else {
+    rerender(mountPoint.reactRoot, element)
+  }
 }
 
 function renderExternalAppsTray(open, contentSelection, moduleId, returnFocusTo) {
   const mountPoint = document.getElementById('direct-share-mount-point')
   if (!mountPoint) return
-  if (!mountPoint.reactRoot) {
-    mountPoint.reactRoot = createRoot(mountPoint)
-  }
-  mountPoint.reactRoot.render(
+  const element = (
     <ExternalAppsMenuTray
       open={open}
       sourceCourseId={ENV.COURSE_ID}
@@ -2304,8 +2449,13 @@ function renderExternalAppsTray(open, contentSelection, moduleId, returnFocusTo)
         renderExternalAppsTray(false, contentSelection, moduleId, returnFocusTo)
         returnFocusTo.focus()
       }}
-    />,
+    />
   )
+  if (!mountPoint.reactRoot) {
+    mountPoint.reactRoot = render(element, mountPoint)
+  } else {
+    rerender(mountPoint.reactRoot, element)
+  }
 }
 
 // --------------------------------------------------------
@@ -2326,8 +2476,23 @@ function initContextModules() {
   // I cannot find anywhere that these classname is added to the modules dom
   // Skipping this when lazy loading items
   if (!ENV.FEATURE_MODULES_PERF) {
-    $('.external_url_link').click(function (event) {
-      Helper.externalUrlLinkClick(event, $(this))
+    const seamlessRedirectEnabled = window.ENV?.MODULE_FEATURES?.SEAMLESS_EXTERNAL_URL_REDIRECT
+
+    $('.external_url_link').each(function () {
+      const $link = $(this)
+      const isNewTab = $link.attr('target') === '_blank'
+
+      if (seamlessRedirectEnabled && isNewTab) {
+        let url = $link.attr('data-item-href')
+        if (url) {
+          url += url.includes('?') ? '&follow_redirect=1' : '?follow_redirect=1'
+          $link.attr('href', url)
+        }
+      } else {
+        $link.click(function (event) {
+          Helper.externalUrlLinkClick(event, $(this))
+        })
+      }
     })
 
     renderDatetimeField($('.datetime_field'))
@@ -2549,15 +2714,11 @@ function initContextModules() {
 
   // this is the callback after the expand/collapse all button is clicked
   // when the instui header is NOT enabled
-  async function expandCollapseAllButtonHandler(expanding) {
-    if (expanding && ENV.FEATURE_MODULES_PERF) {
-      const moduleSelector = '.context_module.collapsed_module:not(#context_module_blank)'
-      const moduleIds = Array.from(document.querySelectorAll(moduleSelector)).map(
-        d => d.dataset.moduleId,
-      )
-      await modules.lazyLoadItems(moduleIds)
+  async function expandCollapseAllButtonHandler(expanding, collapsedModuleIds) {
+    if (expanding && ENV.FEATURE_MODULES_PERF && collapsedModuleIds?.length > 0) {
+      await modules.lazyLoadItems(collapsedModuleIds)
     }
-    $('#expand_collapse_all').prop('disabled', false)
+    $('#expand_collapse_all').attr('aria-disabled', 'false')
   }
 
   // This is the onClick handler for the expand/collapse all button
@@ -2621,18 +2782,20 @@ function initContextModules() {
     const root = $('#context-modules-header-root')
     if (!root.length) return
     const mountPoint = root[0]
-    if (!mountPoint.reactRoot) {
-      mountPoint.reactRoot = createRoot(mountPoint)
-    }
-    mountPoint.reactRoot.render(
+    const element = (
       <ContextModulesHeader
         {...root.data('props')}
         expandCollapseAll={{
           onExpandCollapseAll: expandCollapseAllButtonHandler_instui_header,
           anyModuleExpanded,
         }}
-      />,
+      />
     )
+    if (!mountPoint.reactRoot) {
+      mountPoint.reactRoot = render(element, mountPoint)
+    } else {
+      rerender(mountPoint.reactRoot, element)
+    }
   }
 
   $(document).on('click', '.module_copy_to', event => {
@@ -2703,13 +2866,18 @@ function initContextModules() {
   $(document).on('click keyclick', '.module-item-assign-to-link', function (event) {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
-    const moduleItemId = event.target.getAttribute('data-item-id')
-    const moduleItemName = event.target.getAttribute('data-item-name')
-    const moduleItemType = event.target.getAttribute('data-item-type')
-    const courseId = event.target.getAttribute('data-item-context-id')
-    const moduleItemContentId = event.target.getAttribute('data-item-content-id')
-    const moduleItemHasAssignment = event.target.getAttribute('data-item-has-assignment')
-    const moduleItemHasCheckpoint = event.target.getAttribute('data-item-has-assignment-checkpoint')
+
+    // Get data from the inner span with translate="no"
+    const $link = $(event.target).closest('.module-item-assign-to-link')
+    const $dataSpan = $link.find('.assign-to-link-resources')
+
+    const moduleItemId = $dataSpan.attr('data-item-id')
+    const moduleItemName = $dataSpan.attr('data-item-name')
+    const moduleItemType = $dataSpan.attr('data-item-type')
+    const courseId = $dataSpan.attr('data-item-context-id')
+    const moduleItemContentId = $dataSpan.attr('data-item-content-id')
+    const moduleItemHasAssignment = $dataSpan.attr('data-item-has-assignment')
+    const moduleItemHasCheckpoint = $dataSpan.attr('data-item-has-assignment-checkpoint')
 
     const itemProps = parseModuleItemElement(
       document.getElementById(`context_module_item_${moduleItemId}`),

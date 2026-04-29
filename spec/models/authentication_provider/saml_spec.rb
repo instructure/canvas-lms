@@ -19,15 +19,18 @@
 #
 
 describe AuthenticationProvider::SAML do
+  include AccountDomainSpecHelper
+
   before do
     skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
-    allow_any_instance_of(Account).to receive(:environment_specific_domain)
+    stub_host_for_environment_specific_domain("test.host")
     @account = Account.create!(name: "account")
     @file_that_exists = File.expand_path(__FILE__)
   end
 
   it "sets the entity_id with the current domain" do
     allow(HostUrl).to receive(:default_host).and_return("bob.cody.instructure.com")
+    stub_host_for_environment_specific_domain("bob.cody.instructure.com")
     @aac = @account.authentication_providers.create!(auth_type: "saml")
     expect(@aac.entity_id).to eq "http://bob.cody.instructure.com/saml2"
     @account.reload
@@ -255,6 +258,152 @@ describe AuthenticationProvider::SAML do
       allow(AuthenticationProvider::SAML).to receive(:private_keys).and_return({})
       entity = AuthenticationProvider::SAML.sp_metadata_for_account(@account)
       expect(entity.roles.last.authn_requests_signed?).to be_nil
+    end
+  end
+
+  describe "#persist_metadata" do
+    it "generates metadata on save when none exists" do
+      aac = @account.authentication_providers.create!(auth_type: "saml")
+      expect(aac.settings["metadata"]).to be_present
+      expect(aac.settings["metadata_source"]).to eq("generated")
+    end
+
+    it "regenerates auto-generated metadata on save" do
+      aac = @account.authentication_providers.create!(auth_type: "saml", idp_entity_id: "https://original.example.com")
+      expect(aac.settings["metadata"]).to include("https://original.example.com")
+
+      aac.update!(idp_entity_id: "https://updated.example.com")
+      expect(aac.settings["metadata"]).to be_present
+      expect(aac.settings["metadata_source"]).to eq("generated")
+      expect(aac.settings["metadata"]).to include("https://updated.example.com")
+    end
+
+    it "regenerates synthetic metadata when metadata_uri is removed" do
+      aac = @account.authentication_providers.create!(auth_type: "saml", idp_entity_id: "https://example.com")
+      # simulate having previously downloaded real metadata from a metadata_uri
+      real_metadata = aac.idp_metadata.to_xml.to_s
+      aac.update_columns(settings: aac.settings.merge("metadata" => real_metadata, "metadata_source" => "url", "metadata_uri" => "https://metadata.example.com"))
+
+      aac.reload
+      expect(aac.settings["metadata_source"]).to eq("url")
+
+      aac.update!(metadata_uri: "")
+      expect(aac.settings["metadata_source"]).to eq("generated")
+    end
+
+    it "does not overwrite user-provided metadata" do
+      aac = @account.authentication_providers.create!(auth_type: "saml")
+      user_metadata = aac.idp_metadata.to_xml.to_s
+      aac.settings["metadata"] = user_metadata
+      aac.settings["metadata_source"] = "manual"
+      aac.save!
+
+      expect(aac.settings["metadata"]).to eq(user_metadata)
+      expect(aac.settings["metadata_source"]).to eq("manual")
+    end
+  end
+
+  describe "#validate_metadata" do
+    it "rejects invalid XML metadata" do
+      aac = @account.authentication_providers.create!(auth_type: "saml")
+      aac.settings["metadata"] = "not valid xml"
+      aac.settings["metadata_source"] = "manual"
+      expect(aac).not_to be_valid
+      expect(aac.errors[:metadata]).to be_present
+    end
+
+    it "accepts valid SAML entity metadata" do
+      aac = @account.authentication_providers.create!(auth_type: "saml")
+      expect(aac.settings["metadata"]).to be_present
+      expect(aac).to be_valid
+    end
+  end
+
+  describe "#idp_metadata" do
+    it "returns parsed metadata from settings when present" do
+      aac = @account.authentication_providers.create!(auth_type: "saml")
+      # After save, settings["metadata"] should be populated
+      result = aac.idp_metadata
+      expect(result).to be_a(SAML2::Entity)
+    end
+
+    it "falls back to synthetic metadata when settings metadata is blank" do
+      aac = @account.authentication_providers.create!(auth_type: "saml")
+      aac.settings.delete("metadata")
+      result = aac.idp_metadata
+      expect(result).to be_a(SAML2::Entity)
+    end
+  end
+
+  describe "#populate_from_metadata_xml" do
+    let(:entity) do
+      entity = SAML2::Entity.new
+      entity.entity_id = "https://idp.example.com"
+      idp = SAML2::IdentityProvider.new
+      idp.single_sign_on_services << SAML2::Endpoint.new("https://idp.example.com/sso",
+                                                         SAML2::Bindings::HTTPRedirect::URN)
+      entity.roles << idp
+      entity
+    end
+
+    it "stores the raw XML in settings with manual source" do
+      aac = @account.authentication_providers.create!(auth_type: "saml")
+      aac.populate_from_metadata_xml(entity.to_xml.to_s)
+      expect(aac.settings["metadata"]).to be_present
+      expect(aac.settings["metadata_source"]).to eq("manual")
+    end
+
+    it "stores the source as url when specified" do
+      aac = @account.authentication_providers.create!(auth_type: "saml")
+      aac.populate_from_metadata_xml(entity.to_xml.to_s, source: "url")
+      expect(aac.settings["metadata_source"]).to eq("url")
+    end
+  end
+
+  context "response collection" do
+    skip "requires Redis" unless CanvasCache::Redis.enabled?
+
+    let(:ap) { @account.authentication_providers.create!(auth_type: "saml") }
+    let(:response) { instance_double(SAML2::Response, errors: []) }
+
+    before do
+      ap.settings["collect_responses"] = true
+    end
+
+    it "does nothing if not enabled" do
+      ap.settings.delete("collect_responses")
+
+      ap.collect_response(response, "<xml>")
+      expect(ap.collected_responses).to eql []
+    end
+
+    it "stores and retrieves SAML responses" do
+      responses = Array.new(12) { |i| "<xml#{i}>" }
+      responses.each do |resp|
+        ap.collect_response(response, resp)
+      end
+      # defaults to keeping 10
+      expect(ap.collected_responses).to eql(responses[2..].map { |r| { "xml" => r, "errors" => "" } })
+    end
+
+    it "limits it if configured" do
+      ap.settings["collect_responses"] = 3
+      responses = Array.new(5) { |i| "<xml#{i}>" }
+      responses.each do |resp|
+        ap.collect_response(response, resp)
+      end
+      expect(ap.collected_responses).to eql(responses[2..].map { |r| { "xml" => r, "errors" => "" } })
+    end
+
+    it "collects a response with errors" do
+      allow(response).to receive(:errors).and_return(["bad signature"])
+      ap.collect_response(response, "<xml_with_errors>")
+      expect(ap.collected_responses).to eql([{ "xml" => "<xml_with_errors>", "errors" => "bad signature" }])
+    end
+
+    it "collects a response with additional fields" do
+      ap.collect_response(response, "<xml>", more: "data")
+      expect(ap.collected_responses).to eql([{ "xml" => "<xml>", "errors" => "", "more" => "data" }])
     end
   end
 end

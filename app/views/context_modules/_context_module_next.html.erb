@@ -145,7 +145,7 @@
         <% end %>
 
         <% if @can_view || can_direct_share %>
-          <button class="Button--icon-action al-trigger" aria-label="<%= t('Manage %{module_name}', {module_name: context_module ? context_module.name : 'module'})  %>">
+          <button class="Button--icon-action al-trigger" aria-label="<%= t('Manage %{module_name}', {module_name: context_module ? context_module.name : 'module'})  %>" aria-haspopup="false">
             <i class="icon-more" aria-hidden="true"></i>
           </button>
           <ul class="al-options">

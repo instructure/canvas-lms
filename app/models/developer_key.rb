@@ -20,9 +20,9 @@
 
 require "aws-sdk-sns"
 
-class DeveloperKey < ActiveRecord::Base
+class DeveloperKey < ApplicationRecord
   class CacheOnAssociation < ActiveRecord::Associations::BelongsToAssociation
-    def find_target
+    def find_target(...)
       if owner.instance_variable_get(:@skip_dev_key_cache)
         super
       else
@@ -34,6 +34,19 @@ class DeveloperKey < ActiveRecord::Base
   CONFIDENTIAL_CLIENT_TYPE = "confidential"
   PUBLIC_CLIENT_TYPE = "public"
   ALLOWED_AUTHORIZED_FLOWS = ["service_user_client_credentials"].freeze
+  TRACKED_ATTRIBUTES = %w[
+    email
+    user_name
+    name
+    redirect_uri
+    redirect_uris
+    icon_url
+    vendor_code
+    public_jwk
+    oidc_initiation_url
+    public_jwk_url
+    scopes
+  ].freeze
 
   include CustomValidations
   include Workflow
@@ -63,6 +76,7 @@ class DeveloperKey < ActiveRecord::Base
   before_validation :normalize_public_jwk_url
   before_validation :normalize_scopes
   before_validation :validate_scopes!
+  before_validation :normalize_public_jwk
   before_create :generate_api_key
   before_create :set_auto_expire_tokens
   before_create :set_visible
@@ -90,8 +104,8 @@ class DeveloperKey < ActiveRecord::Base
   attr_reader :private_jwk
   attr_accessor :skip_lti_sync, :current_user
 
-  scope :nondeleted, -> { where("workflow_state<>'deleted'") }
-  scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
+  scope :nondeleted, -> { where.not(workflow_state: "deleted") }
+  scope :not_active, -> { where.not(workflow_state: "active") } # search for deleted & inactive keys
   scope :visible, -> { where(visible: true) }
   scope :site_admin, -> { where(account_id: nil) } # site_admin keys have a nil account_id
   scope :site_admin_lti, lambda { |key_ids|
@@ -148,6 +162,10 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def usable_in_context?(context)
+    if is_lti_key && context.try(:root_account)&.feature_enabled?(:lti_deactivate_registrations)
+      return usable? && !!lti_registration&.active?
+    end
+
     account_binding_for(context.try(:account) || context)&.on? && usable?
   end
 
@@ -185,7 +203,7 @@ class DeveloperKey < ActiveRecord::Base
     self.icon_url = nil if icon_url.blank?
   end
 
-  def generate_api_key(overwrite = false)
+  def generate_api_key(overwrite: false)
     self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !api_key
   end
 
@@ -219,6 +237,10 @@ class DeveloperKey < ActiveRecord::Base
     ims_registration&.destroy
     lti_registration&.destroy
     developer_key_account_bindings&.find_each(&:destroy)
+  end
+
+  def current_tracked_attributes
+    attributes.with_indifferent_access.slice(*TRACKED_ATTRIBUTES)
   end
 
   class << self
@@ -300,7 +322,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def authorized_for_account?(target_account)
-    return false unless binding_on_in_account?(target_account)
+    return false unless usable_in_context?(target_account)
     return true if account_id.blank?
     return true if target_account.id == account_id
 
@@ -376,10 +398,6 @@ class DeveloperKey < ActiveRecord::Base
 
   def owner_account
     account || Account.site_admin
-  end
-
-  def binding_on_in_account?(target_account)
-    account_binding_for(target_account)&.on?
   end
 
   def disable_external_tools!(binding_account)
@@ -515,6 +533,10 @@ class DeveloperKey < ActiveRecord::Base
     self.public_jwk_url = nil if public_jwk_url.blank?
   end
 
+  def normalize_public_jwk
+    self.public_jwk = nil if public_jwk.blank?
+  end
+
   def normalize_scopes
     self.scopes = scopes.uniq
   end
@@ -614,11 +636,11 @@ class DeveloperKey < ActiveRecord::Base
 
   def tool_management_scope(base_scope, affected_account)
     if affected_account&.site_admin? || affected_account.blank?
-      return base_scope.where(developer_key: self)
+      return base_scope.where(developer_key: self, lti_registration:)
     end
 
     # Don't update tools in another root account on the same shard
-    base_scope.where(developer_key: self, root_account: affected_account)
+    base_scope.where(developer_key: self, lti_registration:, root_account: affected_account)
   end
 
   def update_tools_on_active_shard!(account)
@@ -630,6 +652,14 @@ class DeveloperKey < ActiveRecord::Base
       # Skip them.
       ContextExternalTool.where(id: tool_ids).preload(:context).each do |tool|
         next unless tool.context
+
+        if (account.blank? || account.site_admin?) && !tool.root_account.feature_enabled?(:lti_registrations_templates)
+          Rails.logger.info(
+            "Replacing tool configuration for tool #{tool.global_id} " \
+            "(registration #{lti_registration.global_id}) with site admin configuration. " \
+            "Old settings: #{tool.settings.to_json}"
+          )
+        end
 
         lti_registration.new_external_tool(
           tool.context,

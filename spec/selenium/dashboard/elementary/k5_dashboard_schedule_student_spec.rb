@@ -117,30 +117,6 @@ describe "student k5 dashboard schedule" do
       expect(items_missing_exists?).to be_truthy
     end
 
-    it "does not display points possible if RQD is enabled" do
-      skip "VICE-3678 7/23/2023"
-      assignment1 = create_dated_assignment(@subject_course, "missing assignment", 1.day.ago(@now))
-      # truthy feature flag
-      Account.default.enable_feature! :restrict_quantitative_data
-
-      # falsy setting
-      Account.default.settings[:restrict_quantitative_data] = { value: false, locked: true }
-      Account.default.save!
-
-      get "/#schedule"
-      expect(fj(".PlannerItem-styles__score:contains('#{assignment1.points_possible.to_i}')")).to be_present
-
-      # now truthy setting
-      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
-      Account.default.save!
-      @subject_course.restrict_quantitative_data = true
-      @subject_course.save!
-
-      get "/#schedule"
-
-      expect(f("body")).not_to contain_jqcss(".PlannerItem-styles__score:contains('#{assignment1.points_possible.to_i}')")
-    end
-
     it "shows the list of missing assignments in dropdown" do
       assignment1 = create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
       create_dated_assignment(@subject_course, "missing assignment2", 1.day.ago(@now))
@@ -156,25 +132,6 @@ describe "student k5 dashboard schedule" do
       expect(assignments_list.count).to eq(2)
       expect(assignments_list.first.text).to include("missing assignment1")
       expect(assignment_link(missing_assignments[0], @subject_course.id, assignment1.id)).to be_displayed
-    end
-
-    it "clicking list twice hides missing assignments" do
-      skip "VICE-3678 7/23/2023"
-      create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
-
-      get "/#schedule"
-      wait_for_ajaximations
-
-      click_missing_items
-
-      assignments_list = missing_assignments
-
-      expect(assignments_list.count).to eq(1)
-
-      click_missing_items
-      wait_for_ajaximations
-
-      expect(missing_assignments_exist?).to be_falsey
     end
   end
 

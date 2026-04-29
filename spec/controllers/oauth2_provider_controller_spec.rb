@@ -30,7 +30,7 @@ describe OAuth2ProviderController do
       get :auth
       assert_status(401)
       expect(response.body).to match(/unknown client/)
-      expect(response["WWW-Authenticate"]).to_not be_blank
+      expect(response["WWW-Authenticate"]).not_to be_blank
     end
 
     it "renders 400 on a bad redirect_uri" do
@@ -133,7 +133,7 @@ describe OAuth2ProviderController do
       before do
         user_session(@user)
 
-        redis = double("Redis")
+        redis = instance_double(Redis)
         allow(redis).to receive(:setex)
         allow(Canvas).to receive_messages(redis:)
       end
@@ -195,21 +195,23 @@ describe OAuth2ProviderController do
       end
 
       it "redirects to the redirect uri if the user already has remember-me token" do
-        @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil })
+        @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: "test" })
         get :auth,
             params: { client_id: key.id,
                       redirect_uri: "https://example.com",
                       response_type: "code",
-                      scope: "/auth/userinfo" }
+                      scope: "/auth/userinfo",
+                      purpose: "test" }
         expect(response).to be_redirect
         expect(response.location).to match(%r{https://example.com})
       end
 
       it "does not reuse userinfo tokens for other scopes" do
-        @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil })
+        @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: "test" })
         get :auth, params: { client_id: key.id,
                              redirect_uri: "https://example.com",
-                             response_type: "code" }
+                             response_type: "code",
+                             purpose: "test" }
         expect(response).to redirect_to(oauth2_auth_confirm_url)
       end
 
@@ -232,12 +234,13 @@ describe OAuth2ProviderController do
             response_type: "code",
             scope: "/auth/userinfo",
             prompt: "none",
-            state: "value"
+            state: "value",
+            purpose: "test"
           }
         end
 
         it "redirects to the redirect uri if the user already has remember-me token" do
-          @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil })
+          @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: "test" })
           get(:auth, params:)
           expect(response).to be_redirect
           expect(response.location).to match(%r{https://example.com})
@@ -382,12 +385,61 @@ describe OAuth2ProviderController do
     end
   end
 
+  describe "GET confirm" do
+    render_views
+
+    let_once(:key) { DeveloperKey.create! redirect_uri: "https://example.com" }
+    let_once(:user) { User.create! }
+    let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: "https://example.com" } } }
+
+    before { user_session user }
+
+    it "renders the mobile confirm page with the oauth2_accept_form id and data-disable-with" do
+      get :confirm, params: { mobile: true }, session: session_hash
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('id="oauth2_accept_form"')
+      expect(response.body).to include("data-disable-with")
+    end
+
+    context "site admin token restriction" do
+      let_once(:site_admin) { site_admin_user }
+      let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: "https://example.com" } } }
+
+      before { user_session site_admin }
+
+      context "when the site admin has the site_admin_self_token_create permission" do
+        it "renders the confirm page" do
+          get :confirm, session: session_hash
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context "when the site admin lacks the site_admin_self_token_create permission" do
+        before do
+          account_with_role_changes(account: Account.site_admin, role_changes: { site_admin_self_token_create: false })
+        end
+
+        it "redirects with a client_not_allowed_for_user error" do
+          get :confirm, session: session_hash
+          expect(response).to be_redirect
+          expect(response.location).to include("error=client_not_allowed_for_user")
+        end
+
+        it "allows confirm when the developer key is trusted" do
+          key.update!(trusted: true)
+          get :confirm, session: session_hash
+          expect(response).to have_http_status(:ok)
+        end
+      end
+    end
+  end
+
   describe "POST token" do
     subject { response }
 
-    let_once(:key) { DeveloperKey.create! scopes: [TokenScopes::USER_INFO_SCOPE[:scope]] }
-    let_once(:other_key) { DeveloperKey.create! }
-    let_once(:inactive_key) { DeveloperKey.create! workflow_state: "inactive" }
+    let_once(:key) { DeveloperKey.create! name: "test", scopes: [TokenScopes::USER_INFO_SCOPE[:scope]] }
+    let_once(:other_key) { DeveloperKey.create! name: "other" }
+    let_once(:inactive_key) { DeveloperKey.create! name: "inactive", workflow_state: "inactive" }
     let_once(:user) { User.create!(locale: "zh-Hant") }
     let(:old_token) { user.access_tokens.create!(developer_key: key) }
     let(:client_id) { key.id }
@@ -447,10 +499,8 @@ describe OAuth2ProviderController do
         context "key secret and provided secret do not match" do
           let(:client_secret) { other_key.api_key }
 
-          it do
-            if grant_type == "client_credentials" && !key.site_admin_service_auth?
-              skip "not valid for this grant_type"
-            end
+          it "returns unauthorized" do
+            skip "not valid for this grant_type" if grant_type == "client_credentials" && !key.site_admin_service_auth?
 
             expect(subject).to have_http_status(:unauthorized)
           end
@@ -459,10 +509,8 @@ describe OAuth2ProviderController do
         context "key secret is not provided" do
           let(:client_secret) { nil }
 
-          it do
-            if grant_type == "client_credentials" && !key.site_admin_service_auth?
-              skip "not valid for this grant_type"
-            end
+          it "returns unauthorized" do
+            skip "not valid for this grant_type" if grant_type == "client_credentials" && !key.site_admin_service_auth?
 
             expect(subject).to have_http_status(:unauthorized)
           end
@@ -511,7 +559,7 @@ describe OAuth2ProviderController do
       let(:valid_code) { "thecode" }
       let(:valid_code_redis_key) { "#{Canvas::OAuth::Token::REDIS_PREFIX}#{valid_code}" }
       let(:redis) do
-        redis = double("Redis")
+        redis = instance_double(Redis)
         allow(redis).to receive(:get)
         allow(redis).to receive(:get).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
         allow(redis).to receive(:del).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
@@ -583,7 +631,7 @@ describe OAuth2ProviderController do
       let(:code_challenge_key) { "#{Canvas::OAuth::PKCE::KEY_PREFIX}#{valid_code}" }
 
       let(:redis) do
-        redis = double("Redis")
+        redis = instance_double(Redis)
 
         allow(redis).to receive(:get)
 
@@ -607,8 +655,6 @@ describe OAuth2ProviderController do
       end
 
       before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(true)
         allow(Canvas).to receive_messages(redis:)
         key.update!(redirect_uri: "https://example.com", client_type: DeveloperKey::PUBLIC_CLIENT_TYPE)
       end
@@ -692,7 +738,7 @@ describe OAuth2ProviderController do
       it "generates a new access_token" do
         post :token, params: base_params.merge(refresh_token:)
         json = response.parsed_body
-        expect(json["access_token"]).to_not eq old_token.full_token
+        expect(json["access_token"]).not_to eq old_token.full_token
       end
 
       it "does not rotate the refresh token" do
@@ -710,13 +756,13 @@ describe OAuth2ProviderController do
         post :token, params: base_params.merge(refresh_token:)
         expect(response).to be_successful
         json = response.parsed_body
-        expect(json["access_token"]).to_not eq old_token.full_token
+        expect(json["access_token"]).not_to eq old_token.full_token
 
         access_token = json["access_token"]
         post :token, params: base_params.merge(refresh_token:)
         expect(response).to be_successful
         json = response.parsed_body
-        expect(json["access_token"]).to_not eq access_token
+        expect(json["access_token"]).not_to eq access_token
       end
 
       context "with public clients" do
@@ -733,8 +779,6 @@ describe OAuth2ProviderController do
         end
 
         before do
-          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-          allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(true)
           key.update!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE)
         end
 
@@ -755,7 +799,7 @@ describe OAuth2ProviderController do
 
           it "rotates the refresh token" do
             refresh_token_request
-            expect(json_parse["refresh_token"]).to_not eq old_token.plaintext_refresh_token
+            expect(json_parse["refresh_token"]).not_to eq old_token.plaintext_refresh_token
           end
 
           it "extends the permanent expiration on the token" do
@@ -982,7 +1026,7 @@ describe OAuth2ProviderController do
 
         context "with public key url setting and invalid kid in the header" do
           before do
-            allow(CanvasHttp).to receive(:get).and_return(double(body: '{"keys": []}'))
+            allow(CanvasHttp).to receive(:get).and_return(instance_double(Net::HTTPSuccess, body: '{"keys": []}'))
             key.public_jwk_url = "http://localhost"
             key.save!
           end
@@ -1061,22 +1105,6 @@ describe OAuth2ProviderController do
     it "with wrong custom CSRF token" do
       post :accept, session: session_hash, params: { custom_csrf_token: "456" }
       expect(response).to have_http_status(:bad_request)
-    end
-
-    context "with custom_csrf_token FF off" do
-      before do
-        Account.site_admin.disable_feature! :csrf_oauth2_fix
-      end
-
-      it "does NOT skip standard CSRF protection if :csrf_oauth2_fix is off" do
-        allow(controller).to receive(:action_name).and_return("accept")
-        expect(controller.send(:skip_csrf?)).to be false
-      end
-
-      it "and custom_csrf_token is empty" do
-        post :accept, session: session_hash
-        expect(response).to have_http_status(:redirect)
-      end
     end
 
     it "uses the global id of the user for generating the code" do
@@ -1172,6 +1200,8 @@ describe OAuth2ProviderController do
     let_once(:key) { DeveloperKey.create! }
     let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
 
+    before { Account.default.disable_feature!(:oauth2_deny_post) }
+
     it "forwards the oauth state if it was provided" do
       session_hash[:oauth2][:state] = "1234567890"
       get "deny", session: session_hash
@@ -1191,6 +1221,36 @@ describe OAuth2ProviderController do
     end
   end
 
+  describe "POST deny" do
+    let_once(:key) { DeveloperKey.create! }
+    let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
+
+    before { Account.default.enable_feature!(:oauth2_deny_post) }
+
+    it "forwards the oauth state if it was provided" do
+      session_hash[:oauth2][:state] = "1234567890"
+      post "deny", session: session_hash
+      expect(response).to be_redirect
+      expect(response.location).to match(/state=1234567890/)
+    end
+
+    it "does not provide state if there wasn't one provided" do
+      post "deny", session: session_hash
+      expect(response).to be_redirect
+      expect(response.location).not_to match(/state=/)
+    end
+
+    it "doesn't error on an empty session" do
+      post "deny", session: {}
+      expect(response).to be_bad_request
+    end
+
+    it "rejects GET requests" do
+      get "deny", session: session_hash
+      expect(response).to have_http_status(:method_not_allowed)
+    end
+  end
+
   describe "DELETE token" do
     let_once(:key) do
       d = DeveloperKey.create! redirect_uri: "https://example.com"
@@ -1198,7 +1258,7 @@ describe OAuth2ProviderController do
       d
     end
     let_once(:user) { user_with_pseudonym(active_all: 1, password: "qwertyuiop") }
-    let(:token) { user.access_tokens.create!(developer_key: key) }
+    let(:token) { user.access_tokens.create!(developer_key: key, purpose: "test") }
 
     it "deletes the token" do
       delete :destroy, params: { access_token: token.full_token }

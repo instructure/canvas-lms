@@ -32,7 +32,7 @@ module I18nliner
   class AmbiguousTranslationKeyError < ExtractionError; end
 end
 
-module I18nExtraction; end
+module I18nExtraction; end # rubocop:disable Style/OneClassPerFile
 
 module I18nExtraction::Extensions
   module TranslateCall
@@ -76,7 +76,9 @@ module I18nExtraction::Extensions
     end
 
     def self.prepended(klass)
-      klass::TRANSLATE_CALLS.concat(CANVAS_TRANSLATE_CALLS)
+      all_translate_calls = (klass::TRANSLATE_CALLS + CANVAS_TRANSLATE_CALLS).freeze
+      klass.send(:remove_const, :TRANSLATE_CALLS)
+      klass.const_set(:TRANSLATE_CALLS, all_translate_calls)
     end
 
     def process_call(exp)

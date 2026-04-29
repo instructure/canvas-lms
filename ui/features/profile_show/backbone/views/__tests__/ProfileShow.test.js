@@ -19,12 +19,24 @@
 import ProfileShow from '../ProfileShow'
 import $ from 'jquery'
 import 'jquery-migrate'
+import {destroyContainer, showFlashAlert} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    destroyContainer: vi.fn(),
+    showFlashAlert: vi.fn(),
+  }
+})
 
 describe('ProfileShow', () => {
   let view
   let container
 
   beforeEach(() => {
+    vi.useFakeTimers()
+
     container = document.createElement('div')
     document.body.appendChild(container)
 
@@ -40,6 +52,10 @@ describe('ProfileShow', () => {
   })
 
   afterEach(() => {
+    // Clean up flash alerts and their timers before restoring real timers
+    destroyContainer()
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
     container.remove()
   })
 
@@ -109,7 +125,7 @@ describe('ProfileShow', () => {
         it('succeeds', () => {
           // Arrange
           const form = document.querySelector('#profile_form')
-          const preventDefault = jest.fn()
+          const preventDefault = vi.fn()
 
           // Act & Assert
           view.validateForm({preventDefault, target: form})
@@ -123,7 +139,7 @@ describe('ProfileShow', () => {
           const form = document.querySelector('#profile_form')
           const nameInput = document.querySelector('#user_short_name')
           nameInput.value = ''
-          const preventDefault = jest.fn()
+          const preventDefault = vi.fn()
 
           // Act & Assert
           view.validateForm({preventDefault, target: form})
@@ -137,7 +153,7 @@ describe('ProfileShow', () => {
           const form = document.querySelector('#profile_form')
           const nameInput = document.querySelector('#user_short_name')
           nameInput.remove()
-          const preventDefault = jest.fn()
+          const preventDefault = vi.fn()
 
           // Act & Assert
           view.validateForm({preventDefault, target: form})
@@ -150,7 +166,7 @@ describe('ProfileShow', () => {
       // Arrange
       const form = document.querySelector('#profile_form')
       const titleInput = document.querySelector('#profile_title')
-      const preventDefault = jest.fn()
+      const preventDefault = vi.fn()
 
       // Act & Assert - Valid input
       titleInput.value = 'a'.repeat(255)
@@ -167,7 +183,7 @@ describe('ProfileShow', () => {
       // Arrange
       const form = document.querySelector('#profile_form')
       const bioInput = document.querySelector('#profile_bio')
-      const preventDefault = jest.fn()
+      const preventDefault = vi.fn()
 
       // Act & Assert - Valid input
       bioInput.value = 'a'.repeat(65536)
@@ -184,7 +200,7 @@ describe('ProfileShow', () => {
       // Arrange
       const form = document.querySelector('#profile_form')
       const linkInput = document.querySelector('#profile_link')
-      const preventDefault = jest.fn()
+      const preventDefault = vi.fn()
 
       // Act & Assert - Valid input
       linkInput.value = 'yahoo'
@@ -200,24 +216,16 @@ describe('ProfileShow', () => {
 
   describe('profile update notifications', () => {
     it('shows success message when success container is present', () => {
-      // Arrange
-      container.innerHTML = '<div id="profile_alert_holder_success"></div>'
-      view = new ProfileShow()
-
-      // Assert
-      expect(document.querySelector('#profile_alert_holder_success').textContent).toBe(
-        'Profile has been saved successfully',
+      view.renderAlert('Profile has been saved successfully', 'error')
+      expect(showFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'Profile has been saved successfully'}),
       )
     })
 
     it('shows failure message when failed container is present', () => {
-      // Arrange
-      container.innerHTML = '<div id="profile_alert_holder_failed"></div>'
-      view = new ProfileShow()
-
-      // Assert
-      expect(document.querySelector('#profile_alert_holder_failed').textContent).toBe(
-        'Profile save was unsuccessful',
+      view.renderAlert('Profile save was unsuccessful', 'error')
+      expect(showFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'Profile save was unsuccessful'}),
       )
     })
   })

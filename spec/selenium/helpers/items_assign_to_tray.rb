@@ -106,7 +106,7 @@ module ItemsAssignToTray
   end
 
   def loading_spinner_selector
-    "[data-testid='module-item-edit-tray'] [title='Loading']"
+    "[data-testid='cards-loading']"
   end
 
   def module_item_assignee_selector
@@ -209,7 +209,7 @@ module ItemsAssignToTray
     assign_to_time[position + (card_number * number_of_fields)]
   end
 
-  def assign_to_available_from_date(card_number = 0, exclude_due_date = false, exclude_checkpoints = true)
+  def assign_to_available_from_date(card_number = 0, exclude_due_date: false, exclude_checkpoints: true)
     position = exclude_due_date ? 0 : 1
     position = 2 unless exclude_checkpoints
     number_of_fields = exclude_due_date ? 2 : 3
@@ -220,7 +220,7 @@ module ItemsAssignToTray
     assign_to_date[position + (card_number * number_of_fields)]
   end
 
-  def assign_to_available_from_time(card_number = 0, exclude_due_date = false, exclude_checkpoints = true)
+  def assign_to_available_from_time(card_number = 0, exclude_due_date: false, exclude_checkpoints: true)
     position = exclude_due_date ? 0 : 1
     number_of_fields = exclude_due_date ? 2 : 3
     unless exclude_checkpoints
@@ -246,7 +246,7 @@ module ItemsAssignToTray
     ffxpath(assign_to_time_selector)
   end
 
-  def assign_to_until_date(card_number = 0, exclude_due_date = false, exclude_checkpoints = true)
+  def assign_to_until_date(card_number = 0, exclude_due_date: false, exclude_checkpoints: true)
     position = exclude_due_date ? 1 : 2
     number_of_fields = exclude_due_date ? 2 : 3
     unless exclude_checkpoints
@@ -256,7 +256,7 @@ module ItemsAssignToTray
     assign_to_date[position + (card_number * number_of_fields)]
   end
 
-  def assign_to_until_time(card_number = 0, exclude_due_date = false, exclude_checkpoints = true)
+  def assign_to_until_time(card_number = 0, exclude_due_date: false, exclude_checkpoints: true)
     position = exclude_due_date ? 1 : 2
     number_of_fields = exclude_due_date ? 2 : 3
     unless exclude_checkpoints
@@ -405,25 +405,25 @@ module ItemsAssignToTray
     replace_content(assign_to_required_replies_time(card_number), due_time, tab_out: true)
   end
 
-  def update_available_date(card_number, available_date, exclude_due_date = false, exclude_checkpoints = true)
-    replace_content(assign_to_available_from_date(card_number, exclude_due_date, exclude_checkpoints), available_date, tab_out: true)
+  def update_available_date(card_number, available_date, exclude_due_date: false, exclude_checkpoints: true)
+    replace_content(assign_to_available_from_date(card_number, exclude_due_date:, exclude_checkpoints:), available_date, tab_out: true)
   end
 
-  def update_available_time(card_number, available_time, exclude_due_date = false, exclude_checkpoints = true)
-    replace_content(assign_to_available_from_time(card_number, exclude_due_date, exclude_checkpoints), available_time, tab_out: true)
+  def update_available_time(card_number, available_time, exclude_due_date: false, exclude_checkpoints: true)
+    replace_content(assign_to_available_from_time(card_number, exclude_due_date:, exclude_checkpoints:), available_time, tab_out: true)
   end
 
-  def update_until_date(card_number, until_date, exclude_due_date = false, exclude_checkpoints = true)
-    replace_content(assign_to_until_date(card_number, exclude_due_date, exclude_checkpoints), until_date, tab_out: true)
+  def update_until_date(card_number, until_date, exclude_due_date: false, exclude_checkpoints: true)
+    replace_content(assign_to_until_date(card_number, exclude_due_date:, exclude_checkpoints:), until_date, tab_out: true)
   end
 
-  def update_until_time(card_number, until_time, exclude_due_date = false, exclude_checkpoints = true)
-    replace_content(assign_to_until_time(card_number, exclude_due_date, exclude_checkpoints), until_time, tab_out: true)
+  def update_until_time(card_number, until_time, exclude_due_date: false, exclude_checkpoints: true)
+    replace_content(assign_to_until_time(card_number, exclude_due_date:, exclude_checkpoints:), until_time, tab_out: true)
   end
 
   def wait_for_assign_to_tray_spinner
     begin
-      keep_trying_until { (element_exists?(loading_spinner_selector) == false) }
+      keep_trying_until { element_exists?(loading_spinner_selector) == false }
     rescue Selenium::WebDriver::Error::TimeoutError
       # ignore - sometimes spinner doesn't appear in Chrome
     end

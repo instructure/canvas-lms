@@ -20,6 +20,65 @@ def getFuzzyTagSuffix() {
   return "fuzzy-${env.IMAGE_CACHE_MERGE_SCOPE}"
 }
 
+def uploadCacheImages(includeWebpackCache = true) {
+  def cacheScript = """
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_BUILDER_PREFIX || true
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $YARN_RUNNER_PREFIX || true
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_ASSETS_PREFIX
+  """
+
+  if (includeWebpackCache) {
+    cacheScript += "\n    ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_CACHE_PREFIX || true"
+  }
+
+  sh(script: cacheScript, label: 'upload cache images')
+}
+
+def mirrorToStarlord() {
+  def isSuccess = currentBuild.currentResult == 'SUCCESS'
+  def isChangeMerged = configuration.isChangeMerged()
+
+  // Each entry is [sourceLocalImage, targetStarlordImage]
+  def alwaysImages = [
+    [env.PATCHSET_TAG,
+     env.PATCHSET_TAG.replace(configuration.buildRegistryPath(), configuration.starlordRegistryPath())],
+    [env.PATCHSET_TAG,
+     env.EXTERNAL_TAG.replace(configuration.buildRegistryPath(), configuration.starlordRegistryPath())],
+    [env.DYNAMODB_IMAGE_TAG,
+     env.DYNAMODB_IMAGE_TAG.replace(configuration.buildRegistryPath('dynamodb-migrations'), configuration.starlordRegistryPath('dynamodb-migrations'))],
+    [env.POSTGRES_IMAGE_TAG,
+     env.POSTGRES_IMAGE_TAG.replace(configuration.buildRegistryPath('postgres-migrations'), configuration.starlordRegistryPath('postgres-migrations'))],
+    [env.KARMA_RUNNER_IMAGE,
+     env.KARMA_RUNNER_IMAGE.replace(configuration.buildRegistryPath('karma-runner'), configuration.starlordRegistryPath('karma-runner'))],
+  ]
+
+  def mergeImages = (isChangeMerged && isSuccess) ? [
+    [env.PATCHSET_TAG,
+     env.MERGE_TAG.replace(configuration.buildRegistryPath(), configuration.starlordRegistryPath())],
+    [env.DYNAMODB_IMAGE_TAG,
+     env.DYNAMODB_MERGE_IMAGE.replace(configuration.buildRegistryPath('dynamodb-migrations'), configuration.starlordRegistryPath('dynamodb-migrations'))],
+    [env.POSTGRES_IMAGE_TAG,
+     env.POSTGRES_MERGE_IMAGE.replace(configuration.buildRegistryPath('postgres-migrations'), configuration.starlordRegistryPath('postgres-migrations'))],
+    [env.KARMA_RUNNER_IMAGE,
+     env.KARMA_MERGE_IMAGE.replace(configuration.buildRegistryPath('karma-runner'), configuration.starlordRegistryPath('karma-runner'))],
+  ] : []
+
+  (alwaysImages + mergeImages).each { pair ->
+    def localImage = pair[0]
+    def starlordImage = pair[1]
+    def tagged = sh(label: "tag ${localImage} as ${starlordImage}", script: "docker tag '${localImage}' '${starlordImage}'", returnStatus: true) == 0
+    if (!tagged) {
+      return
+    }
+
+    credentials.withStarlordCredentials {
+      sh(label: "push ${starlordImage} to starlord", script: "./build/new-jenkins/docker-with-flakey-network-protection.sh push '${starlordImage}' || true")
+    }
+  }
+}
+
 def getPinnedGitHubGems() {
   return commitMessageFlag("pin-github-gems") as String
 }
@@ -36,7 +95,7 @@ def handleDockerBuildFailure(imagePrefix, e) {
 
     sh(script: """
       docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $imagePrefix-failed
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $imagePrefix-failed
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $imagePrefix-failed
     """, label: 'upload failed image')
   }
 
@@ -91,36 +150,32 @@ def slackSendCacheBuild(block) {
 }
 
 def jsImage() {
-  credentials.withStarlordCredentials {
-    try {
-      def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
+  try {
+    def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
-      withEnv([
-        "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
-        "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
-        "CACHE_SAVE_SCOPE=${cacheScope}",
-        "PATCHSET_TAG=${env.PATCHSET_TAG}",
-        "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
-        "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
-        "CRYSTALBALL_MAP=${env.CRYSTALBALL_MAP}"
-      ]) {
-        sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
-      }
-
-      sh """
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
-      """
-    } catch (e) {
-      handleDockerBuildFailure(KARMA_RUNNER_IMAGE, e)
+    withEnv([
+      "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+      "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
+      "CACHE_SAVE_SCOPE=${cacheScope}",
+      "PATCHSET_TAG=${env.PATCHSET_TAG}",
+      "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
+      "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
+      "CRYSTALBALL_MAP=${env.CRYSTALBALL_MAP}"
+    ]) {
+      sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
     }
+
+    sh """
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
+    """
+  } catch (e) {
+    handleDockerBuildFailure(KARMA_RUNNER_IMAGE, e)
   }
 }
 
 def lintersImage() {
-  credentials.withStarlordCredentials {
-    sh './build/new-jenkins/linters/docker-build.sh $LINTERS_RUNNER_IMAGE'
-    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push -a $LINTERS_RUNNER_PREFIX'
-  }
+  sh './build/new-jenkins/linters/docker-build.sh $LINTERS_RUNNER_IMAGE'
+  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push -a $LINTERS_RUNNER_PREFIX'
 }
 
 def preloadCacheImagesAsync() {
@@ -128,7 +183,7 @@ def preloadCacheImagesAsync() {
   libraryScript.load('bash/docker-with-flakey-network-protection.sh', '/tmp/docker-with-flakey-network-protection.sh')
 
   sh """#!/bin/bash
-    /tmp/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.5.2 &
+    /tmp/docker-with-flakey-network-protection.sh pull 948781806214.dkr.ecr.us-east-1.amazonaws.com/docker.io/docker/dockerfile:1.5.2 &
     {
       /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()}
       /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_BUILDER_PREFIX}:${getFuzzyTagSuffix()}
@@ -138,7 +193,6 @@ def preloadCacheImagesAsync() {
 }
 
 def premergeCacheImage() {
-  credentials.withStarlordCredentials {
     withEnv([
       "BASE_RUNNER_PREFIX=${env.BASE_RUNNER_PREFIX}",
       "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
@@ -169,20 +223,11 @@ def premergeCacheImage() {
 
       // We need to attempt to upload all prefixes here in case instructure/ruby-passenger
       // has changed between the post-merge build and this pre-merge build.
-      sh(script: """
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_BUILDER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $YARN_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_ASSETS_PREFIX
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_CACHE_PREFIX || true
-      """, label: 'upload cache images')
+      uploadCacheImages(true)
     }
-  }
 }
 
 def patchsetImage(asyncStepsStr = '', platformSuffix = '') {
-  credentials.withStarlordCredentials {
     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
     def readBuildCache = configuration.isChangeMerged() ? 0 : 1
     def webpackAssetsFuzzyTag = configuration.isChangeMerged() ? "" : "${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()}"
@@ -233,14 +278,7 @@ def patchsetImage(asyncStepsStr = '', platformSuffix = '') {
       sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
     }
 
-    sh(script: """
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_BUILDER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $YARN_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_ASSETS_PREFIX
-    """, label: 'upload cache images')
-  }
+    uploadCacheImages(false)
 }
 
 def i18nExtract() {
@@ -278,6 +316,26 @@ def i18nExtract() {
       aws s3 cp --profile transifreq --acl bucket-owner-full-control \
         ./transifreq-en.yml \
         $dest
+    """
+  )
+}
+
+def augmentArm64Manifest() {
+  sh(
+    label: 'augment manifest with ARM64 variant',
+    script: """#!/bin/bash -ex
+      # Check if the tag is already a manifest list
+      if docker manifest inspect $PATCHSET_TAG 2>/dev/null | grep -q "manifests"; then
+        echo "Warning: $PATCHSET_TAG is already a manifest list. Skipping manifest creation."
+        # Show current manifest for debugging
+        echo "Current manifest:"
+        docker manifest inspect $PATCHSET_TAG
+        exit 0
+      else
+        echo "Creating manifest list for $PATCHSET_TAG..."
+        docker manifest create --amend $PATCHSET_TAG $PATCHSET_TAG $PATCHSET_TAG-arm64
+        docker manifest push $PATCHSET_TAG
+      fi
     """
   )
 }

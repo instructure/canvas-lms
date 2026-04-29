@@ -87,6 +87,52 @@ describe ContextModulesController do
       expect(combined_active_quizzes_includes_both_types).to be false
     end
 
+    describe "index quizzes engine js_env" do
+      before do
+        user_session(@teacher)
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        @course.root_account.enable_feature! :quizzes_next
+        @course.enable_feature! :quizzes_next
+        @course.enable_feature!(:new_quizzes_by_default)
+      end
+
+      it "new quizzes enabled if flag on and context_external_tools present" do
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        get "index", params: { course_id: @course.id }
+        js_env = controller.js_env
+        expect(js_env[:NEW_QUIZZES_ENABLED]).to be true
+      end
+
+      it "new quizzes by default enabled if flag on and new quizzes enabled" do
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        get "index", params: { course_id: @course.id }
+        js_env = controller.js_env
+        expect(js_env[:NEW_QUIZZES_BY_DEFAULT]).to be true
+      end
+
+      it "new quizzes and new quizzes by default disabled if context_external_tools NOT present" do
+        get "index", params: { course_id: @course.id }
+        js_env = controller.js_env
+        expect(js_env[:NEW_QUIZZES_ENABLED]).to be false
+        expect(js_env[:NEW_QUIZZES_BY_DEFAULT]).to be false
+      end
+    end
+
     it "touches modules if necessary" do
       time = 2.days.ago
       Timecop.freeze(time) do
@@ -97,7 +143,7 @@ describe ContextModulesController do
       user_session(@student)
       get "index", params: { course_id: @course.id }
       expect(response).to be_successful
-      expect(@mod1.reload.updated_at.to_i).to_not eq time.to_i # should be touched in case view for old unlock time was cached
+      expect(@mod1.reload.updated_at.to_i).not_to eq time.to_i # should be touched in case view for old unlock time was cached
       expect(@mod2.reload.updated_at.to_i).to eq time.to_i # should not be touched since the unlock_at was already in the past the last time it was updated
     end
 
@@ -529,7 +575,6 @@ describe ContextModulesController do
 
     context "assign to differentiation tags" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -563,6 +608,22 @@ describe ContextModulesController do
         user_session(@student)
         get "index", params: { course_id: @course.id }
         expect(controller.js_env[:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
+      end
+    end
+
+    context "peer review allocation and grading" do
+      it "is true if feature flag is enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(controller.js_env[:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be true
+      end
+
+      it "is false if feature flag is disabled" do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(controller.js_env[:PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED]).to be false
       end
     end
 
@@ -603,6 +664,38 @@ describe ContextModulesController do
         it "is ignored" do
           expect(tool_definitions[:module_index_menu_modal]).to eq []
         end
+      end
+    end
+
+    context "student viewing modules" do
+      before :once do
+        course_with_student(active_all: true)
+        @module1 = @course.context_modules.create!(name: "Module 1")
+        @module2 = @course.context_modules.create!(name: "Module 2")
+        @module3 = @course.context_modules.create!(name: "Module 3")
+      end
+
+      it "does not trigger N+1 queries when evaluating module progressions" do
+        [@module1, @module2, @module3].each { |m| m.evaluate_for(@student) }
+        user_session(@student)
+
+        expect do
+          get "index", params: { course_id: @course.id }
+        end.to make_database_queries(count: 0..1, matching: /SELECT.*context_module_progressions.*WHERE.*context_module_id.*=/)
+      end
+
+      it "preloads progressions in a single query" do
+        [@module1, @module2, @module3].each { |m| m.evaluate_for(@student) }
+        user_session(@student)
+
+        query_count = 0
+        allow(ContextModuleProgression).to receive(:where).and_wrap_original do |method, *args|
+          query_count += 1 if args.any? { |arg| arg.is_a?(Hash) && arg.key?(:context_module_id) }
+          method.call(*args)
+        end
+
+        get "index", params: { course_id: @course.id }
+        expect(query_count).to eq 1
       end
     end
   end
@@ -885,6 +978,46 @@ describe ContextModulesController do
       expect(@module.evaluate_for(@user)).to be_locked
       get "item_redirect", params: { course_id: @course.id, id: tag.id }
       expect(@module.evaluate_for(@user).requirements_met).to be_blank
+    end
+
+    context "with seamless redirect feature flag" do
+      before do
+        Account.site_admin.enable_feature!(:module_external_url_seamless_redirect)
+      end
+
+      it "redirects directly to external URL for new_tab items when follow_redirect param present" do
+        user_session(@student)
+        @module = @course.context_modules.create!
+        tag = @module.add_item type: "external_url", url: "http://example.com/lolcats", title: "lol", new_tab: true
+        tag.publish if tag.unpublished?
+        @module.completion_requirements = { tag.id => { type: "must_view" } }
+        @module.save!
+        get "item_redirect", params: { course_id: @course.id, id: tag.id, follow_redirect: "1" }
+        expect(response).to redirect_to("http://example.com/lolcats")
+        requirements_met = @module.evaluate_for(@user).requirements_met
+        expect(requirements_met[0][:type]).to eq "must_view"
+        expect(requirements_met[0][:id]).to eq tag.id
+      end
+
+      it "renders intermediate page for prev/next navigation (no follow_redirect param)" do
+        user_session(@student)
+        @module = @course.context_modules.create!
+        tag = @module.add_item type: "external_url", url: "http://example.com/lolcats", title: "lol", new_tab: true
+        tag.publish if tag.unpublished?
+        @module.save!
+        get "item_redirect", params: { course_id: @course.id, id: tag.id }
+        expect(response).to render_template("context_modules/url_show")
+      end
+
+      it "still renders view for non-new_tab external URLs" do
+        user_session(@student)
+        @module = @course.context_modules.create!
+        tag = @module.add_item type: "external_url", url: "http://example.com/lolcats", title: "lol", new_tab: false
+        tag.publish if tag.unpublished?
+        @module.save!
+        get "item_redirect", params: { course_id: @course.id, id: tag.id, follow_redirect: "1" }
+        expect(response).to render_template("context_modules/url_show")
+      end
     end
   end
 
@@ -1238,7 +1371,7 @@ describe ContextModulesController do
           it "does create estimated_duration" do
             @assignment_item.reload.estimated_duration.destroy!
             put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { estimated_duration_minutes: 30 } }
-            expect(@assignment_item.reload.estimated_duration).to_not be_nil
+            expect(@assignment_item.reload.estimated_duration).not_to be_nil
           end
         end
 
@@ -1333,6 +1466,20 @@ describe ContextModulesController do
         @mod1.add_item(type: "assignment", id: assignment.id)
         get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
         expect(response).to have_http_status :ok
+      end
+
+      it "allows item_redirect for published module items" do
+        assignment = @course.assignments.create!(title: "hello")
+        tag = @mod1.add_item(type: "assignment", id: assignment.id)
+        get "item_redirect", params: { course_id: @course.id, id: tag.id }
+        expect(response).to be_redirect
+      end
+
+      it "allows module_redirect for published modules" do
+        assignment = @course.assignments.create!(title: "hello")
+        @mod1.add_item(type: "assignment", id: assignment.id)
+        get "module_redirect", params: { course_id: @course.id, context_module_id: @mod1.id, first: 1 }
+        expect(response).to be_redirect
       end
     end
 
@@ -1452,7 +1599,7 @@ describe ContextModulesController do
       expect(json[@tag.id.to_s]["due_date"]).to be_nil
 
       # overridden date for active enrollment; override gets used
-      @course.enrollments.find_by(user: student1, course_section: section1).accept(:force)
+      @course.enrollments.find_by(user: student1, course_section: section1).accept(force: true)
       get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
       json = json_parse(response.body)
       expect(json[@tag.id.to_s]["due_date"].to_date).to eq new_due_date.to_date
@@ -1883,6 +2030,243 @@ describe ContextModulesController do
       json = json_parse(response.body)
       expect(json[@tag.id.to_s]["mc_objectives"]).to eq(ext_data[:objectives])
     end
+
+    context "with peer reviews" do
+      before :once do
+        course_with_student(active_all: true)
+        @course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+        @mod = @course.context_modules.create!
+        @assign = @course.assignments.create!(
+          title: "Peer Review Assignment",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_review_count: 3,
+          due_at: 1.day.from_now
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: @assign,
+          points_possible: 5,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        )
+
+        @tag = @mod.add_item(type: "assignment", id: @assign.id)
+      end
+
+      it "includes peer review data when feature flag is enabled" do
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tag_info = json[@tag.id.to_s]
+
+        expect(tag_info).to have_key("peer_review")
+        peer_review = tag_info["peer_review"]
+        expect(peer_review).to have_key("id")
+        expect(peer_review).to have_key("points_possible")
+        expect(peer_review).to have_key("due_date")
+      end
+
+      it "does not include peer review data when feature flag is disabled" do
+        @course.root_account.disable_feature!(:peer_review_allocation_and_grading)
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tag_info = json[@tag.id.to_s]
+
+        expect(tag_info).not_to have_key("peer_review")
+      end
+
+      it "does not include peer review data for admin when feature flag is disabled" do
+        @course.root_account.disable_feature!(:peer_review_allocation_and_grading)
+        teacher_in_course(active_all: true, course: @course)
+        user_session(@teacher)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tag_info = json[@tag.id.to_s]
+
+        expect(tag_info).not_to have_key("peer_review")
+      end
+
+      it "includes peer review due date in ISO8601 format" do
+        @assign.reload
+        peer_review_sub = @assign.peer_review_sub_assignment
+        target_date = Time.zone.parse("2025-12-17 06:59:59")
+        peer_review_sub.update!(
+          unlock_at: target_date - 1.day,
+          due_at: target_date,
+          lock_at: target_date + 1.day
+        )
+
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review["due_date"]).to eq("2025-12-17T06:59:59Z")
+      end
+
+      it "includes peer review points_possible" do
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review["points_possible"]).to eq(5)
+      end
+
+      it "marks peer review as past_due when not submitted" do
+        @assign.reload
+        peer_review_sub = @assign.peer_review_sub_assignment
+        past_due_date = 1.day.ago
+        peer_review_sub.update!(
+          unlock_at: past_due_date - 2.days,
+          due_at: past_due_date,
+          lock_at: 1.day.from_now
+        )
+
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review["past_due"]).to be true
+      end
+
+      it "does not mark peer review as past_due when submitted" do
+        @assign.reload
+        peer_review_sub = @assign.peer_review_sub_assignment
+        past_due_date = 1.day.ago
+        peer_review_sub.update!(
+          unlock_at: past_due_date - 2.days,
+          due_at: past_due_date,
+          lock_at: 1.day.from_now
+        )
+        peer_review_sub.submit_homework(@student, submission_type: "online_text_entry", body: "review")
+
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review["past_due"]).to be_falsey
+      end
+
+      it "does not mark peer review as past_due when excused" do
+        @assign.reload
+        peer_review_sub = @assign.peer_review_sub_assignment
+        past_due_date = 1.day.ago
+        peer_review_sub.update!(
+          unlock_at: past_due_date - 2.days,
+          due_at: past_due_date,
+          lock_at: 1.day.from_now
+        )
+        submission = peer_review_sub.submissions.find_or_create_by!(user: @student)
+        submission.update!(excused: true)
+
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review["past_due"]).to be_falsey
+      end
+
+      it "includes vdd_tooltip for peer reviews with multiple overrides" do
+        @assign.reload
+        peer_review_sub = @assign.peer_review_sub_assignment
+        section1 = @course.course_sections.create!(name: "Section A")
+        section2 = @course.course_sections.create!(name: "Section B")
+
+        override_date1 = 2.days.from_now
+        override_date2 = 3.days.from_now
+
+        parent_override1 = @assign.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id
+        )
+        parent_override2 = @assign.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id
+        )
+
+        peer_review_sub.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          parent_override_id: parent_override1.id,
+          unlock_at: override_date1 - 1.day,
+          due_at: override_date1,
+          lock_at: override_date1 + 2.days
+        )
+        peer_review_sub.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id,
+          parent_override_id: parent_override2.id,
+          unlock_at: override_date2 - 1.day,
+          due_at: override_date2,
+          lock_at: override_date2 + 2.days
+        )
+
+        teacher_in_course(active_all: true, course: @course)
+        user_session(@teacher)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        peer_review = json[@tag.id.to_s]["peer_review"]
+
+        expect(peer_review).to be_present
+        expect(peer_review["id"]).to eq(peer_review_sub.id)
+        expect(peer_review["points_possible"]).to eq(5.0)
+        expect(peer_review).to have_key("vdd_tooltip")
+        expect(peer_review["vdd_tooltip"]).to have_key("due_dates")
+        expect(peer_review["vdd_tooltip"]["due_dates"].length).to be >= 2
+      end
+
+      it "does not include peer review data when no peer_review_sub_assignment exists" do
+        @assign.reload
+        @assign.peer_review_sub_assignment.destroy!
+        @assign.reload
+
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tag_info = json[@tag.id.to_s]
+
+        expect(tag_info).not_to have_key("peer_review")
+      end
+
+      it "does not include peer review data for assignments without peer_reviews enabled" do
+        @assign.update!(peer_reviews: false)
+        user_session(@student)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        tag_info = json[@tag.id.to_s]
+
+        expect(tag_info).not_to have_key("peer_review")
+      end
+    end
   end
 
   describe "GET show" do
@@ -1931,7 +2315,7 @@ describe ContextModulesController do
       allow(ConditionalRelease::Service).to receive(:rules_for).and_return([])
 
       get "choose_mastery_path", params: { course_id: @course.id, id: @item.id }
-      assert_response(:missing)
+      expect(response).to have_http_status(:missing)
     end
 
     it "returns 404 if matching rule is unlocked but has one selected assignment set" do
@@ -1947,7 +2331,7 @@ describe ContextModulesController do
                                                                            ])
 
       get "choose_mastery_path", params: { course_id: @course.id, id: @item.id }
-      assert_response(:missing)
+      expect(response).to have_http_status(:missing)
     end
 
     it "redirects to context modules page with warning if matching rule is locked" do
@@ -1982,7 +2366,7 @@ describe ContextModulesController do
                                                                            ])
 
       get "choose_mastery_path", params: { course_id: @course.id, id: @item.id }
-      assert_response(:success)
+      expect(response).to have_http_status(:success)
       mastery_path_data = controller.js_env[:CHOOSE_MASTERY_PATH_DATA]
       expect(mastery_path_data).to include({
                                              selectedOption: nil,
@@ -2008,7 +2392,7 @@ describe ContextModulesController do
                                                                            ])
 
       get "choose_mastery_path", params: { course_id: @course.id, id: @item.id }
-      assert_response(:success)
+      expect(response).to have_http_status(:success)
       mastery_path_data = controller.js_env[:CHOOSE_MASTERY_PATH_DATA]
       expect(mastery_path_data).to include({
                                              selectedOption: nil
@@ -2040,7 +2424,7 @@ describe ContextModulesController do
                                                                            ])
 
       get "choose_mastery_path", params: { course_id: @course.id, id: @item.id }
-      assert_response(:success)
+      expect(response).to have_http_status(:success)
       options = controller.js_env[:CHOOSE_MASTERY_PATH_DATA][:options]
       expect(options.length).to eq 2
       expect(options[0][:setId]).to eq 3
@@ -2099,7 +2483,7 @@ describe ContextModulesController do
       item = @mod.add_item type: "page", id: page.id
 
       get "item_redirect_mastery_paths", params: { course_id: @course.id, id: item.id }
-      assert_response :missing
+      expect(response).to have_http_status(:missing)
     end
   end
 

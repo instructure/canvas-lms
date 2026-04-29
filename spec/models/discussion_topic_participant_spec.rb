@@ -50,4 +50,49 @@ describe DiscussionTopicParticipant do
       expect(@participant.root_account_id).to eq @topic.root_account_id
     end
   end
+
+  describe "#posted?" do
+    subject { participant.posted? }
+
+    let(:user) { user_factory }
+    let(:other_user) { user_factory }
+    let(:discussion_topic) { discussion_topic_model }
+    let(:participant) { DiscussionTopicParticipant.new(user:, discussion_topic:) }
+
+    before do
+      DiscussionTopicParticipant.create!(user:, discussion_topic:)
+    end
+
+    context "when participant has no entry but other user has one" do
+      before do
+        DiscussionTopicParticipant.create!(user: other_user, discussion_topic:)
+        DiscussionEntry.create!(user: other_user, discussion_topic:, message: "hi")
+      end
+
+      it "returns false" do
+        expect(subject).to be_falsey
+      end
+    end
+
+    context "when participant has a top-level entry" do
+      before do
+        DiscussionEntry.create!(user:, discussion_topic:, message: "hi")
+      end
+
+      it "returns true" do
+        expect(subject).to be_truthy
+      end
+    end
+
+    context "when participant has only a reply entry" do
+      before do
+        parent_entry = DiscussionEntry.create!(user: other_user, discussion_topic:, message: "hi")
+        DiscussionEntry.create!(user:, discussion_topic:, message: "hi", parent_entry:)
+      end
+
+      it "returns false" do
+        expect(subject).to be_falsey
+      end
+    end
+  end
 end

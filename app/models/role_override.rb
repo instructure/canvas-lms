@@ -18,8 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class RoleOverride < ActiveRecord::Base
+class RoleOverride < ApplicationRecord
   extend RootAccountResolver
+
   belongs_to :context, polymorphic: [:account]
 
   belongs_to :role
@@ -67,17 +68,11 @@ class RoleOverride < ActiveRecord::Base
     res
   end
 
-  ENROLLMENT_TYPE_LABELS =
-    [
-      # StudentViewEnrollment permissions will mirror StudentPermissions
-      { base_role_name: "StudentEnrollment", name: "StudentEnrollment", label: -> { t("roles.student", "Student") }, plural_label: -> { t("roles.students", "Students") } },
-      { base_role_name: "TeacherEnrollment", name: "TeacherEnrollment", label: -> { t("roles.teacher", "Teacher") }, plural_label: -> { t("roles.teachers", "Teachers") } },
-      { base_role_name: "TaEnrollment", name: "TaEnrollment", label: -> { t("roles.ta", "TA") }, plural_label: -> { t("roles.tas", "TAs") } },
-      { base_role_name: "DesignerEnrollment", name: "DesignerEnrollment", label: -> { t("roles.designer", "Designer") }, plural_label: -> { t("roles.designers", "Designers") } },
-      { base_role_name: "ObserverEnrollment", name: "ObserverEnrollment", label: -> { t("roles.observer", "Observer") }, plural_label: -> { t("roles.observers", "Observers") } }
-    ].freeze
-  def self.enrollment_type_labels
-    ENROLLMENT_TYPE_LABELS
+  ENROLLMENT_TYPE_DEFINITIONS = EnrollmentTypes::ENROLLMENT_TYPE_DEFINITIONS
+  ENROLLMENT_TYPES = EnrollmentTypes::ENROLLMENT_TYPES
+
+  def self.enrollment_type_labels(context = nil)
+    EnrollmentTypes.labels(context)
   end
 
   # Common set of granular permissions for checking rights against
@@ -117,6 +112,11 @@ class RoleOverride < ActiveRecord::Base
     add_designer_to_course
     add_observer_to_course
   ].freeze
+  GRANULAR_EDIT_DISCUSSION_TOPIC_PERMISSIONS = %i[
+    edit_discussion_options
+    edit_discussion_views
+    edit_discussion_anonymity
+  ].freeze
 
   ACCESS_TOKEN_SCOPE_PREFIX = "https://api.instructure.com/auth/canvas"
 
@@ -130,7 +130,8 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def self.manageable_permissions(context, base_role_type = nil)
-    permissions = self.permissions.dup
+    permissions = Permissions.retrieve(context).dup
+
     permissions.reject! { |_k, p| p[:account_only] == :site_admin } unless context.site_admin?
     permissions.reject! { |_k, p| p[:account_only] == :root } unless context.root_account?
     permissions.reject! { |_k, p| p[:available_to].exclude?(base_role_type) } unless base_role_type.nil?
@@ -149,7 +150,7 @@ class RoleOverride < ActiveRecord::Base
     permissions.map do |k, p|
       {
         name: "#{ACCESS_TOKEN_SCOPE_PREFIX}.#{k}",
-        label: p.key?(label_v2) ? p[:label_v2].call : p[:label].call
+        label: p[:label].call
       }
     end
   end
@@ -188,23 +189,25 @@ class RoleOverride < ActiveRecord::Base
     Setting.get("role_override_local_cache_ttl_seconds", "300").to_i.seconds
   end
 
-  def self.permission_for(context, permission, role_or_role_id, role_context = :role_account, no_caching = false, preloaded_overrides: nil)
+  def self.permission_for(context, permission, role_or_role_id, role_context = :role_account, caching: true, preloaded_overrides: nil)
     # we can avoid a query since we're just using it for the batched keys on redis
-    permissionless_base_key = ["role_override_calculation2", Shard.global_id_for(role_or_role_id)].join("/") unless no_caching
+    permissionless_base_key = ["role_override_calculation2", Shard.global_id_for(role_or_role_id)].join("/") if caching
     account = context.is_a?(Account) ? context : Account.new(id: context.account_id)
     default_data = permissions[permission]
 
-    if default_data[:account_allows] || no_caching
+    if default_data[:account_allows] || !caching
       # could depend on anything - can't cache (but that's okay because it's not super common)
-      uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, no_caching, preloaded_overrides:)
+      uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, caching:, preloaded_overrides:)
     else
       full_base_key = [permissionless_base_key, permission, Shard.global_id_for(role_context)].join("/")
-      LocalCache.fetch([full_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
-        Rails.cache.fetch_with_batched_keys(full_base_key,
-                                            batch_object: account,
-                                            batched_keys: [:account_chain, :role_overrides],
-                                            skip_cache_if_disabled: true) do
-          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, preloaded_overrides:)
+      RequestCache.cache(full_base_key, account) do
+        LocalCache.fetch([full_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
+          Rails.cache.fetch_with_batched_keys(full_base_key,
+                                              batch_object: account,
+                                              batched_keys: [:account_chain, :role_overrides],
+                                              skip_cache_if_disabled: true) do
+            uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, caching: true, preloaded_overrides:)
+          end
         end
       end
     end.freeze
@@ -312,7 +315,7 @@ class RoleOverride < ActiveRecord::Base
                                    account,
                                    permissionless_base_key,
                                    default_data,
-                                   no_caching = false,
+                                   caching: true,
                                    preloaded_overrides: nil)
     role = role_or_role_id.is_a?(Role) ? role_or_role_id : Role.get_role_by_id(role_or_role_id)
 
@@ -326,9 +329,11 @@ class RoleOverride < ActiveRecord::Base
     role_context = role.account if role_context == :role_account
 
     # Determine if the permission is able to be used for the account. A non-setting is 'true'.
-    # Execute linked proc if given.
+    # When the proc is called, it should receive the account as an argument, and if the permission
+    # check needs to be more specific, it can use the account's root account in the block
+    # defined in account_allows in permissions_registry.rb
     account_allows = !!(default_data[:account_allows].nil? || (default_data[:account_allows].respond_to?(:call) &&
-        default_data[:account_allows].call(context.root_account)))
+      default_data[:account_allows].call(context.is_a?(Account) ? context : context.root_account)))
 
     base_role = role.base_role_type
     enabled = if account_allows && (default_data[:true_for].include?(base_role) || true_for_custom_site_admin_role)
@@ -362,9 +367,7 @@ class RoleOverride < ActiveRecord::Base
     # cannot be overridden; don't bother looking for overrides
     return generated_permission if locked
 
-    overrides = if no_caching
-                  uncached_overrides_for(context, role, role_context, preloaded_overrides:, only_permission: permission.to_s)
-                else
+    overrides = if caching
                   RequestCache.cache(permissionless_base_key, account) do
                     LocalCache.fetch([permissionless_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
                       Rails.cache.fetch_with_batched_keys(permissionless_base_key,
@@ -375,6 +378,8 @@ class RoleOverride < ActiveRecord::Base
                       end
                     end
                   end
+                else
+                  uncached_overrides_for(context, role, role_context, preloaded_overrides:, only_permission: permission.to_s)
                 end
 
     # walk the overrides from most general (site admin, root account) to most specific (the role's account)

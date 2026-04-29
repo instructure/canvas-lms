@@ -244,6 +244,92 @@ describe AuthenticationProvider do
     end
   end
 
+  describe "#not_in_discovery_page validation" do
+    let(:account) { Account.create! }
+    let(:aac) { account.authentication_providers.create!(auth_type: "saml") }
+
+    context "when discovery page feature is enabled and active" do
+      context "when provider is in primary configuration" do
+        before do
+          allow(account).to receive(:discovery_page_allowed?).and_return(true)
+          account.settings[:discovery_page] = {
+            active: true,
+            primary: [{ authentication_provider_id: aac.id, label: "Test Provider" }],
+            secondary: []
+          }
+          account.save!
+        end
+
+        it "prevents deletion" do
+          expect { aac.destroy! }.to raise_error(ActiveRecord::RecordInvalid)
+          expect(aac.errors[:base]).to include(match(/remove.*from the discovery page/))
+        end
+      end
+
+      context "when provider is in secondary configuration" do
+        before do
+          allow(account).to receive(:discovery_page_allowed?).and_return(true)
+          account.settings[:discovery_page] = {
+            active: true,
+            primary: [],
+            secondary: [{ authentication_provider_id: aac.id, label: "Test Provider" }]
+          }
+          account.save!
+        end
+
+        it "prevents deletion" do
+          expect { aac.destroy! }.to raise_error(ActiveRecord::RecordInvalid)
+          expect(aac.errors[:base]).to include(match(/remove.*from the discovery page/))
+        end
+      end
+
+      context "when provider is not on discovery page" do
+        before do
+          allow(account).to receive(:discovery_page_allowed?).and_return(true)
+          account.settings[:discovery_page] = {
+            active: true,
+            primary: [],
+            secondary: []
+          }
+          account.save!
+        end
+
+        it "allows deletion" do
+          expect { aac.destroy! }.not_to raise_error
+          expect(aac.workflow_state).to eq("deleted")
+        end
+      end
+    end
+
+    context "when discovery page is not allowed or active" do
+      context "when discovery page is not active" do
+        before do
+          allow(account).to receive(:discovery_page_allowed?).and_return(true)
+          account.settings[:discovery_page] = {
+            active: false,
+            primary: [{ authentication_provider_id: aac.id, label: "Test Provider" }],
+            secondary: []
+          }
+          account.save!
+        end
+
+        it "allows deletion" do
+          expect { aac.destroy! }.not_to raise_error
+        end
+      end
+
+      context "when discovery page is not allowed" do
+        before do
+          allow(account).to receive(:discovery_page_allowed?).and_return(false)
+        end
+
+        it "allows deletion" do
+          expect { aac.destroy! }.not_to raise_error
+        end
+      end
+    end
+  end
+
   describe "#restore" do
     let(:user) { user_model }
     let(:aac) { account.authentication_providers.create!(auth_type: "cas") }
@@ -294,6 +380,20 @@ describe AuthenticationProvider do
     it "ignores aacs which have been deleted" do
       aac.destroy
       expect(AuthenticationProvider.active).not_to include(aac)
+    end
+  end
+
+  describe ".valid_for_discovery_page" do
+    let!(:cas_provider) { account.authentication_providers.create!(auth_type: "cas") }
+    let!(:canvas_provider) { account.authentication_providers.where(auth_type: "canvas").first }
+
+    it "includes active providers" do
+      expect(account.authentication_providers.valid_for_discovery_page).to include(cas_provider, canvas_provider)
+    end
+
+    it "excludes deleted providers" do
+      cas_provider.destroy
+      expect(account.authentication_providers.valid_for_discovery_page).not_to include(cas_provider)
     end
   end
 
@@ -459,6 +559,39 @@ describe AuthenticationProvider do
       expect(@user.sortable_name).to eq "Cutrer, Cody"
     end
 
+    context "when only display_name is provided" do
+      before do
+        @user.update!(name: @pseudonym.unique_id, short_name: "Mr. Cutrer")
+
+        aac.federated_attributes = {
+          "display_name" => { "attribute" => "display_name", "provisioning_only" => true }
+        }
+      end
+
+      it "overrides the name if the display_name is provided and the name is the same as the unique_id" do
+        aac.apply_federated_attributes(@pseudonym,
+                                       {
+                                         "display_name" => "Cody Cutrer",
+                                       },
+                                       purpose: :provisioning)
+
+        expect(@user.name).to eq "Cody Cutrer"
+        expect(@user.sortable_name).to eq "Cutrer, Cody"
+        expect(@user.short_name).to eq "Cody Cutrer"
+      end
+
+      it "does not override the name when not provisioning" do
+        aac.apply_federated_attributes(@pseudonym,
+                                       {
+                                         "display_name" => "Cody Cutrer",
+                                       })
+
+        expect(@user.name).to eq @pseudonym.unique_id
+        expect(@user.sortable_name).to eq @pseudonym.unique_id
+        expect(@user.short_name).to eq "Mr. Cutrer"
+      end
+    end
+
     it "ignores attributes that are for provisioning only when not provisioning" do
       aac.apply_federated_attributes(@pseudonym,
                                      {
@@ -487,6 +620,11 @@ describe AuthenticationProvider do
 
     it "doesn't asplode with an empty email" do
       aac.apply_federated_attributes(@pseudonym, { "email" => "" })
+      expect(@user.name).not_to be_blank
+    end
+
+    it "doesn't asplode with invalid email" do
+      aac.apply_federated_attributes(@pseudonym, { "email" => "garbage" })
       expect(@user.name).not_to be_blank
     end
 
@@ -636,15 +774,39 @@ describe AuthenticationProvider do
     it "works" do
       p = auth_provider.provision_user("unique_id")
       expect(p.unique_id).to eq "unique_id"
-      expect(p.login_attribute).to eq "sub"
       expect(p.unique_ids).to eq({})
     end
 
     it "handles a hash of unique ids" do
       p = auth_provider.provision_user("sub" => "unique_id", "tid" => "abc")
       expect(p.unique_id).to eq "unique_id"
-      expect(p.login_attribute).to eq "sub"
       expect(p.unique_ids).to eq({ "sub" => "unique_id", "tid" => "abc" })
+    end
+
+    it "defaults to the user's unique_id if no name is provided" do
+      p = auth_provider.provision_user("unique_id")
+      expect(p.user.name).to eq "unique_id"
+    end
+
+    it "uses an override default name if present" do
+      p = auth_provider.provision_user("unique_id", {}, "Default Name")
+      expect(p.user.name).to eq "Default Name"
+    end
+
+    it "assigns the user's actual name" do
+      auth_provider.federated_attributes = { "name" => "name" }
+      auth_provider.save!
+
+      p = auth_provider.provision_user({ "sub" => "unique_id" }, { "name" => "Cody Cutrer" })
+      expect(p.user.name).to eq "Cody Cutrer"
+    end
+
+    it "assigns the user's actual name if the display_name is provided" do
+      auth_provider.federated_attributes = { "display_name" => "name" }
+      auth_provider.save!
+
+      p = auth_provider.provision_user({ "sub" => "unique_id" }, { "name" => "Cody Cutrer" })
+      expect(p.user.name).to eq "Cody Cutrer"
     end
   end
 
@@ -665,6 +827,136 @@ describe AuthenticationProvider do
     it "can opt back in" do
       aac.update! settings: { otp_via_sms: true }
       expect(aac.otp_via_sms?).to be_truthy
+    end
+  end
+
+  describe "#login_authentication_provider_path" do
+    shared_examples_for "singleton provider" do |auth_type, required_attrs = {}|
+      it "returns path without ID for #{auth_type} when persisted" do
+        provider = account.authentication_providers.create!(auth_type:, **required_attrs)
+        expect(provider.login_authentication_provider_path).to eq "/login/#{auth_type}"
+      end
+
+      it "returns path without ID for #{auth_type} when unsaved" do
+        provider = account.authentication_providers.new(auth_type:, **required_attrs)
+        expect(provider.login_authentication_provider_path).to eq "/login/#{auth_type}"
+      end
+    end
+
+    shared_examples_for "non-singleton provider" do |auth_type, required_attrs = {}|
+      it "returns path with ID for #{auth_type} when persisted" do
+        provider = account.authentication_providers.create!(auth_type:, **required_attrs)
+        expect(provider.login_authentication_provider_path).to eq "/login/#{auth_type}/#{provider.id}"
+      end
+
+      it "raises error for #{auth_type} when unsaved" do
+        provider = account.authentication_providers.new(auth_type:, **required_attrs)
+        expect { provider.login_authentication_provider_path }.to raise_error(
+          ActionController::UrlGenerationError,
+          "Cannot generate URL for unsaved authentication provider"
+        )
+      end
+    end
+
+    context "for singleton providers" do
+      it_behaves_like "singleton provider", "apple"
+      it_behaves_like "singleton provider", "canvas"
+      it_behaves_like "singleton provider", "facebook"
+      it_behaves_like "singleton provider", "github"
+      it_behaves_like "singleton provider", "linkedin"
+    end
+
+    context "for non-singleton providers" do
+      it_behaves_like "non-singleton provider", "cas"
+      it_behaves_like "non-singleton provider", "clever"
+      it_behaves_like "non-singleton provider", "google"
+      it_behaves_like "non-singleton provider", "ldap"
+      it_behaves_like "non-singleton provider", "microsoft", { tenant: "common", login_attribute: "tid+oid" }
+      it_behaves_like "non-singleton provider", "openid_connect"
+      it_behaves_like "non-singleton provider", "saml"
+      it_behaves_like "non-singleton provider", "saml_idp_discovery"
+    end
+
+    context "error handling" do
+      it "raises error for invalid auth type" do
+        invalid_provider = account.authentication_providers.create!(auth_type: "cas")
+        allow(invalid_provider.class).to receive(:sti_name).and_return("invalid_type")
+        expect { invalid_provider.login_authentication_provider_path }.to raise_error(
+          ActionController::UrlGenerationError,
+          "No route matches invalid_type authentication provider"
+        )
+      end
+    end
+  end
+
+  describe "#creation_timeout_options" do
+    it "returns timeout protection options for OAuth callbacks" do
+      provider = account.authentication_providers.create!(auth_type: "openid_connect")
+      options = provider.creation_timeout_options
+      expect(options).to eq({
+                              raise_on_timeout: true,
+                              fallback_timeout_length: 10.seconds,
+                              exception_class: Timeout::Error
+                            })
+    end
+  end
+
+  describe "#show_mfa_configuration_options?" do
+    let(:aac) { account.authentication_providers.create!(auth_type: "saml") }
+
+    context "when account MFA is disabled" do
+      before do
+        account.settings[:mfa_settings] = :disabled
+        account.save!
+      end
+
+      it "is false" do
+        expect(aac.show_mfa_configuration_options?).to be false
+      end
+    end
+
+    context "when account MFA is required" do
+      before do
+        account.settings[:mfa_settings] = :required
+        account.save!
+      end
+
+      it "is true for SAML provider" do
+        expect(aac.show_mfa_configuration_options?).to be true
+      end
+
+      it "is false for canvas provider" do
+        canvas_aac = account.authentication_providers.find_by(auth_type: "canvas")
+        expect(canvas_aac.show_mfa_configuration_options?).to be false
+      end
+    end
+
+    context "when account MFA is optional" do
+      before do
+        account.settings[:mfa_settings] = :optional
+        account.save!
+      end
+
+      it "is true for SAML provider" do
+        expect(aac.show_mfa_configuration_options?).to be true
+      end
+
+      it "is true for canvas provider" do
+        canvas_aac = account.authentication_providers.find_by(auth_type: "canvas")
+        expect(canvas_aac.show_mfa_configuration_options?).to be true
+      end
+    end
+
+    context "when account MFA is required for admins" do
+      before do
+        account.settings[:mfa_settings] = :required_for_admins
+        account.save!
+      end
+
+      it "is true for canvas provider" do
+        canvas_aac = account.authentication_providers.find_by(auth_type: "canvas")
+        expect(canvas_aac.show_mfa_configuration_options?).to be true
+      end
     end
   end
 end

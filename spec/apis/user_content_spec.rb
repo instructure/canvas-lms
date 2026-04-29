@@ -51,7 +51,7 @@ describe UserContent, type: :request do
       double_testing_with_disable_adding_uuid_verifier_in_api_ff do
         it "translates group file download links to directly-downloadable urls" do
           @group.add_user(@teacher)
-          @group_topic = @group.discussion_topics.create!(title: "group topic", user: @teacher, message: "<img src=\"/groups/#{@group.id}/files/#{@attachment1.id}/download\" alt=\"important\">")
+          @group_topic = @group.discussion_topics.create!(title: "group topic", user: @teacher, saving_user: @teacher, message: "<img src=\"/groups/#{@group.id}/files/#{@attachment1.id}/download\" alt=\"important\">")
           json = api_call(:get,
                           "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
                           { controller: "discussion_topics_api",
@@ -77,7 +77,7 @@ describe UserContent, type: :request do
         it "translates file download links to directly-downloadable urls for deleted and replaced files" do
           expect(@context.attachments.find(@attachment.id).id).to eq @attachment2.id
 
-          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">", saving_user: @teacher)
           subject
           expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment2.id}/download#{"?verifier=#{@attachment2.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
@@ -91,13 +91,13 @@ describe UserContent, type: :request do
 
       double_testing_with_disable_adding_uuid_verifier_in_api_ff do
         it "translates course file download links to directly-downloadable urls" do
-          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">", saving_user: @teacher)
           subject
           expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
 
         it "translates file preview links to directly-downloadable preview urls" do
-          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">")
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">", saving_user: @teacher)
           subject
           expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
@@ -111,13 +111,13 @@ describe UserContent, type: :request do
 
       double_testing_with_disable_adding_uuid_verifier_in_api_ff do
         it "does not corrupt absolute links" do
-          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">", saving_user: @teacher)
           subject
           expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
 
         it "does not remove wrap parameter on file download links" do
-          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1\" alt=\"important\">")
+          @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1\" alt=\"important\">", saving_user: @teacher)
           subject
           expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?#{"verifier=#{@attachment.uuid}&" unless disable_adding_uuid_verifier_in_api}wrap=1"
         end
@@ -155,7 +155,7 @@ describe UserContent, type: :request do
     end
 
     it "does not translate links from content not viewable by user" do
-      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">")
+      @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">", saving_user: @teacher)
       student_in_course(course: @course, active_all: true)
       @attachment.locked = true
       @attachment.save
@@ -190,13 +190,13 @@ describe UserContent, type: :request do
     context "with precise_link_replacements FF OFF" do
       before { Account.site_admin.disable_feature! :precise_link_replacements }
 
-      include_examples "link translation examples"
+      it_behaves_like "link translation examples"
     end
 
     context "with precise_link_replacements FF ON" do
       before { Account.site_admin.enable_feature! :precise_link_replacements }
 
-      include_examples "link translation examples"
+      it_behaves_like "link translation examples"
     end
   end
 
@@ -227,6 +227,7 @@ describe UserContent, type: :request do
           </p>
         HTML
         @wiki_page.workflow_state = "active"
+        @wiki_page.saving_user = @teacher
         @wiki_page.save!
 
         json = api_call(:get,
@@ -280,6 +281,7 @@ describe UserContent, type: :request do
           </p>
         HTML
         @wiki_page.workflow_state = "active"
+        @wiki_page.saving_user = @group.users.first
         @wiki_page.save!
 
         json = api_call(:get,
@@ -308,7 +310,7 @@ describe UserContent, type: :request do
 
     context "user context" do
       it "processes links to each type of object" do
-        @topic = @course.discussion_topics.create!(message: <<~HTML)
+        @topic = @course.discussion_topics.create!(message: <<~HTML, user: @teacher, saving_user: @teacher)
           <a href='/users/#{@teacher.id}/files'>file index</a>
           <a href='/users/#{@teacher.id}/files/789/preview'>file</a>
         HTML
@@ -429,6 +431,65 @@ describe UserContent, type: :request do
                @course
              )).to eq({ a1.id => a1, a2.id => a2, a3.id => a3 })
     end
+
+    context "with deleted attachments" do
+      let(:tester) { Class.new { include Api }.new }
+
+      it "excludes deleted attachments from course context" do
+        attachment_1, attachment_2 = attachment_model(context: @course), attachment_model(context: @course)
+        attachment_2.destroy
+
+        html = <<~HTML
+          <a href="/courses/#{@course.id}/files/#{attachment_1.id}/download">File 1</a>
+          <a href="/courses/#{@course.id}/files/#{attachment_2.id}/download">File 2</a>
+        HTML
+
+        result = tester.api_bulk_load_user_content_attachments([html], @course)
+        expect(result).to eq({ attachment_1.id => attachment_1 })
+        expect(result).not_to have_key(attachment_2.id)
+      end
+
+      it "includes non-deleted attachments from course context" do
+        attachment_1, attachment_2 = attachment_model(context: @course), attachment_model(context: @course)
+
+        html = <<~HTML
+          <a href="/courses/#{@course.id}/files/#{attachment_1.id}/download">File 1</a>
+          <a href="/courses/#{@course.id}/files/#{attachment_2.id}/download">File 2</a>
+        HTML
+
+        result = tester.api_bulk_load_user_content_attachments([html], @course)
+        expect(result).to eq({ attachment_1.id => attachment_1, attachment_2.id => attachment_2 })
+      end
+
+      it "includes all attachments for user context regardless of deleted status" do
+        user = user_model
+        attachment_1 = attachment_model(context: user)
+        attachment_2 = attachment_model(context: user)
+        attachment_2.destroy
+
+        html = <<~HTML
+          <a href="/users/#{user.id}/files/#{attachment_1.id}/download">File 1</a>
+          <a href="/users/#{user.id}/files/#{attachment_2.id}/download">File 2</a>
+        HTML
+
+        result = tester.api_bulk_load_user_content_attachments([html], user)
+        expect(result.keys).to contain_exactly(attachment_1.id, attachment_2.id)
+      end
+
+      it "includes all attachments for nil context regardless of deleted status" do
+        attachment_1 = attachment_model
+        attachment_2 = attachment_model
+        attachment_2.destroy
+
+        html = <<~HTML
+          <a href="/files/#{attachment_1.id}/download">File 1</a>
+          <a href="/files/#{attachment_2.id}/download">File 2</a>
+        HTML
+
+        result = tester.api_bulk_load_user_content_attachments([html], nil)
+        expect(result.keys).to contain_exactly(attachment_1.id, attachment_2.id)
+      end
+    end
   end
 
   describe "latex_to_mathml" do
@@ -458,7 +519,7 @@ describe UserContent, type: :request do
         end
 
         it "adds mathml in a span" do
-          escaped = UserContent.escape(@html, nil, false)
+          escaped = UserContent.escape(@html, nil, use_updated_math_rendering: false)
           node = Nokogiri::HTML5.fragment(escaped).css("img").first.next_sibling
           expect(node.node_name).to eql("span")
           expect(node.inner_html).to eql(Ritex::Parser.new.parse(@latex))

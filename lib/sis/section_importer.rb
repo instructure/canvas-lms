@@ -48,6 +48,12 @@ module SIS
         end
       end
 
+      if importer.deleted_section_ids.any?
+        DiscussionTopicSectionVisibility
+          .where(course_section_id: importer.deleted_section_ids.to_a)
+          .update_all(workflow_state: "deleted")
+      end
+
       importer.success_count
     end
 
@@ -113,7 +119,7 @@ module SIS
           @course_ids_to_update_associations.merge [section.course_id, section.course_id_was].compact
         end
 
-        section.integration_id = integration_id
+        section.integration_id = integration_id if integration_id.present?
         case status
         when /active/i
           section.workflow_state = "active"

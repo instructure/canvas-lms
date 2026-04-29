@@ -25,6 +25,6 @@ describe "sub account question banks" do
     let(:account) { Account.create(name: "sub account from default account", parent_account: Account.default) }
     let(:url) { "/accounts/#{account.id}/question_banks" }
 
-    include_examples "question bank basic tests"
+    it_behaves_like "question bank basic tests"
   end
 end

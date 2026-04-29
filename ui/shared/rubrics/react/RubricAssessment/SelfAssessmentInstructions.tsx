@@ -42,7 +42,9 @@ export const SelfAssessmentInstructions = () => {
         >
           <Text weight="bold">{I18n.t('How well did you do?')}</Text>
           <Text>{I18n.t('Evaluate your work as you believe your instructor would.')}</Text>
-          <Text>{I18n.t('Keep in mind that your instructor can review your self-assessment.')}</Text>
+          <Text>
+            {I18n.t('Keep in mind that your instructor can review your self-assessment.')}
+          </Text>
 
           <div
             style={{

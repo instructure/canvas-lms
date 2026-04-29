@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../errors"
 module Canvas
   class Errors
     # This is a class for taking the common context
@@ -54,8 +53,8 @@ module Canvas
             request_method: @req.request_method_symbol,
             format: @req.format,
           }.merge(self.class.useful_http_env_stuff_from_request(@req))
-            .merge(self.class.useful_http_headers(@req))
-            .merge(@canvas_error_info)
+           .merge(self.class.useful_http_headers(@req))
+           .merge(@canvas_error_info)
         }
       end
 

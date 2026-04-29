@@ -1,0 +1,18 @@
+---
+pendo_extended:
+  applies_to: Account
+  type: setting
+  state: hidden
+  display_name: Impact
+  description: Enables sending user PII and Impact-specific fields to Pendo
+    for new and converting customers. General Pendo data transmission is
+    managed by a separate feature option.
+  shadow: true
+institutional_tags:
+  type: setting
+  state: hidden
+  applies_to: Account
+  root_opt_in: true
+  shadow: true
+  display_name: Institutional Tags
+  description: Create and manage user tags at the account level.

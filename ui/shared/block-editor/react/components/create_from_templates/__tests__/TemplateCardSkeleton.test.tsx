@@ -31,8 +31,8 @@ const renderComponent = (props = {}) => {
   return render(
     <TemplateCardSkeleton
       template={blocktemplate}
-      createAction={jest.fn()}
-      quickLookAction={jest.fn()}
+      createAction={vi.fn()}
+      quickLookAction={vi.fn()}
       inLayout="grid"
       {...props}
     />,

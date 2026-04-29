@@ -125,7 +125,7 @@ describe('SelectMenu', () => {
 
   test('calls onChange when the menu is changed', async () => {
     const user = userEvent.setup()
-    props.onChange = jest.fn()
+    props.onChange = vi.fn()
     wrapper = mountComponent()
     await user.click(wrapper.container.querySelector('#select-menu'))
     const options = screen.getAllByTestId('select-menu-option')

@@ -22,6 +22,7 @@ module Outcomes
   class LearningOutcomeGroupChildren
     include OutcomesFeaturesHelper
     include OutcomesServiceAlignmentsHelper
+
     attr_reader :context
 
     SHORT_DESCRIPTION = "coalesce(learning_outcomes.short_description, '')"

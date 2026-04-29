@@ -260,29 +260,6 @@ shared_examples "context modules for students" do
       expect(f('[data-testid="discussion-topic-container"]')).not_to include_text("discussion description")
     end
 
-    it "allows a student view student to progress through module content" do
-      skip_if_chrome("breaks because of masquerade_bar")
-      # course_with_teacher_logged_in(:course => @course, :active_all => true)
-      user_session(@teacher)
-      @fake_student = @course.student_view_student
-
-      enter_student_view
-
-      # sequential error validation
-      get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
-      expect(f("#content")).to include_text("hasn't been unlocked yet")
-      expect(f("#module_prerequisites_list")).to be_displayed
-
-      go_to_modules
-      validate_context_module_status_icon(@module_1.id, @no_icon)
-      validate_context_module_status_icon(@module_2.id, @locked_icon)
-
-      # sequential normal validation
-      navigate_to_module_item(0, @assignment_1.title)
-      validate_context_module_status_icon(@module_1.id, @completed_icon)
-      validate_context_module_status_icon(@module_2.id, @no_icon)
-    end
-
     context "next and previous buttons", priority: "2" do
       before do
         user_session(@teacher)
@@ -326,10 +303,6 @@ shared_examples "context modules for students" do
     context "shows previous and next buttons buttons on the discussion page in student view", priority: "2" do
       before do
         user_session(@teacher)
-      end
-
-      before :once do
-        Account.site_admin.enable_feature!(:discussion_create)
       end
 
       before :once do
@@ -396,9 +369,6 @@ shared_examples "context modules for students" do
         nxt = f(".module-sequence-footer-button--next a")
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
       end
-
-      # TODO: reimplement per CNVS-29600, but make sure we're testing at the right level
-      it "should show module navigation for group assignment discussions"
     end
 
     context "mark as done" do
@@ -409,13 +379,13 @@ shared_examples "context modules for students" do
         validate_context_module_status_icon(@mark_done_module.id, @no_icon)
         navigate_to_wikipage "The page"
         el = f "#mark-as-done-checkbox"
-        expect(el).to_not be_nil
-        expect(el).to_not be_selected
+        expect(el).not_to be_nil
+        expect(el).not_to be_selected
         el.click
         go_to_modules
         validate_context_module_status_icon(@mark_done_module.id, @completed_icon)
         expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .fulfilled")).to be_displayed
-        expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .unfulfilled")).to_not be_displayed
+        expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .unfulfilled")).not_to be_displayed
       end
 
       it "still shows the mark done button when navigating directly" do
@@ -430,15 +400,15 @@ shared_examples "context modules for students" do
 
         get "/courses/#{@course.id}/pages/#{page.url}"
         el = f "#mark-as-done-checkbox"
-        expect(el).to_not be_nil
-        expect(el).to_not be_selected
+        expect(el).not_to be_nil
+        expect(el).not_to be_selected
         el.click
         wait_for_ajaximations
 
         get "/courses/#{@course.id}/assignments/#{assmt.id}"
         el = f "#mark-as-done-checkbox"
-        expect(el).to_not be_nil
-        expect(el).to_not be_selected
+        expect(el).not_to be_nil
+        expect(el).not_to be_selected
         el.click
         wait_for_ajaximations
 
@@ -461,7 +431,7 @@ shared_examples "context modules for students" do
         get "/courses/#{@course.id}/pages/#{page.url}"
         content = f("#content")
         expect(content).to contain_css(".lock_explanation")
-        expect(content).to_not contain_css("#mark-as-done-checkbox")
+        expect(content).not_to contain_css("#mark-as-done-checkbox")
       end
     end
 
@@ -535,13 +505,6 @@ shared_examples "context modules for students" do
         validate_context_module_status_icon(@module_2.id, @locked_icon)
       end
 
-      it "shows a tooltip for locked icon when module is locked", priority: "1" do
-        skip "flaky, LS-1297 (8/23/2020)"
-        go_to_modules
-        driver.action.move_to(f("#context_module_#{@module_2.id} .completion_status .icon-lock"), 0, 0).perform
-        expect(fj(".ui-tooltip:visible")).to include_text("Locked")
-      end
-
       it "shows a warning in-progress icon when module has been started", priority: "1" do
         create_additional_assignment_for_module_1
         go_to_modules
@@ -602,22 +565,6 @@ shared_examples "context modules for students" do
           validate_context_module_item_icon(@tag_4.id, @in_progress_icon)
         end
 
-        it "shows tool tip text when hovering over the warning icon for a min score requirement", priority: "1" do
-          skip "flaky, LS-1297 (8/23/2020)"
-          grade_assignment(50)
-          go_to_modules
-          driver.action.move_to(f(".ig-header-admin .completion_status .icon-minimize"), 0, 0).perform
-          expect(fj(".ui-tooltip:visible")).to include_text("Started")
-        end
-
-        it "shows tooltip warning for a min score assignemnt", priority: "1" do
-          skip "flaky, LS-1297 (8/23/2020)"
-          grade_assignment(50)
-          go_to_modules
-          driver.action.move_to(f(".ig-row .module-item-status-icon .icon-minimize"), 0, 0).perform
-          expect(fj(".ui-tooltip:visible")).to include_text("You scored a 50. Must score at least a 90.0.")
-        end
-
         it "shows an info icon when module item is a min score requirement that has not yet been graded" do
           @assignment_4.submission_types = "online_text_entry"
           @assignment_4.save!
@@ -672,7 +619,7 @@ shared_examples "context modules for students" do
 
       wait_for_ajaximations
       expect(f("#module_prerequisites_list")).to be_displayed
-      expect(f(".module_prerequisites_fallback")).to_not be_displayed
+      expect(f(".module_prerequisites_fallback")).not_to be_displayed
     end
 
     it "validates that a student can see published and not see unpublished context module", priority: "1" do
@@ -774,7 +721,7 @@ shared_examples "context modules for students" do
       sub_account = Account.create!(name: "sub account", parent_account: Account.default)
       @course.update!(account: sub_account)
       @course.account.enable_feature!(:discussion_checkpoints)
-      modules = create_modules(1, true)
+      @modules = create_modules(1, published: true)
 
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
       @c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
@@ -790,7 +737,7 @@ shared_examples "context modules for students" do
         points_possible: 5,
         replies_required: 2
       )
-      modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
+      @ck_item = @modules[0].add_item({ id: @topic.id, type: "discussion_topic" })
     end
 
     it "shows checkpoints with a submitted icon only when student has submitted" do
@@ -805,6 +752,25 @@ shared_examples "context modules for students" do
       checkpoints = ff("div[data-testid='checkpoint']")
       expect(checkpoints[0].text).to include("submitted")
       expect(checkpoints[1].text).to include("submitted")
+    end
+
+    it "shows checkpoints with completed icon when teacher grades the discussion" do
+      rtt = @topic.discussion_entries.create!(user: @student, message: "my reply to topic")
+      2.times do |i|
+        @topic.discussion_entries.create!(
+          user: @student, message: "my reply to entry #{i}", parent_entry: rtt
+        )
+      end
+
+      @c1.grade_student(@student, grade: 5, grader: @teacher)
+      @c2.grade_student(@student, grade: 5, grader: @teacher)
+      @modules[0].completion_requirements = { @ck_item.id => { type: "must_submit" } }
+      @modules[0].save!
+      user_session(@student)
+
+      go_to_modules
+
+      validate_context_module_item_icon(@ck_item.id, "icon-check")
     end
 
     it "shows checkpoints (with applicable override for student) as child items in checkpointed discussions" do
@@ -919,18 +885,6 @@ shared_examples "context modules for students" do
       expect(f("[data-testid='modules-rewrite-student-container']")).to be_present
     end
 
-    context "with disable_graphql_authentication flag" do
-      before do
-        Account.site_admin.enable_feature!(:disable_graphql_authentication)
-      end
-
-      it "page renders for anonymous users when the course visibility is public" do
-        @course.update(is_public: true)
-        get "/courses/#{@course.id}/modules"
-        expect(f("[data-testid='modules-rewrite-student-container']")).to be_present
-      end
-    end
-
     context "with graphql_persisted_queries flag" do
       before do
         @course.root_account.enable_feature!(:graphql_persisted_queries)
@@ -941,6 +895,59 @@ shared_examples "context modules for students" do
         get "/courses/#{@course.id}/modules"
         expect(f("[data-testid='modules-rewrite-student-container']")).to be_present
       end
+    end
+  end
+
+  context "peer review sub-assignments" do
+    before :once do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @course.enable_feature!(:assignments_2_student)
+      @module = @course.context_modules.create!(name: "Test Module")
+      @assignment = @course.assignments.create!(
+        name: "Peer Review Assignment",
+        peer_reviews: true,
+        peer_review_count: 2,
+        points_possible: 10,
+        submission_types: "online_text_entry",
+        due_at: 5.days.from_now
+      )
+      @peer_review_sub = PeerReview::PeerReviewCreatorService.call(
+        parent_assignment: @assignment,
+        points_possible: 10,
+        due_at: 9.days.from_now
+      )
+      @module.add_item({ id: @assignment.id, type: "assignment" })
+    end
+
+    before do
+      user_session(@student)
+    end
+
+    it "renders peer review sub-assignment with correct title and points" do
+      get "/courses/#{@course.id}/modules"
+
+      parent_item = f("#context_module_item_#{@module.content_tags.first.id}")
+      expect(parent_item).to be_displayed
+      expect(parent_item).to include_text(@assignment.name)
+
+      peer_review_container = f("#module_student_view_peer_reviews_#{@assignment.id}_#{@module.id}")
+      expect(peer_review_container).to be_displayed
+
+      peer_review_title = wait_for(method: nil, timeout: 10) do
+        fj("a.ig-title:contains('#{@assignment.name} Peer Reviews')")
+      end
+      expect(peer_review_title).to be_displayed
+      expect(peer_review_title.text).to include("#{@assignment.name} Peer Reviews (#{@assignment.peer_review_count})")
+
+      points_display = wait_for(method: nil, timeout: 10) do
+        fj(".points_possible_display:contains('pts')")
+      end
+      expect(points_display.text).to eq("10 pts")
+
+      due_date_display = wait_for(method: nil, timeout: 10) do
+        f(".due_date_display")
+      end
+      expect(due_date_display.text).not_to be_empty
     end
   end
 end

@@ -23,7 +23,7 @@ module Types
   class LtiAssetProcessorType < ApplicationObjectType
     implements Interfaces::LegacyIDInterface
 
-    field :external_tool, Types::ExternalToolType, null: true
+    field :external_tool, Types::ExternalToolType, null: false
     def external_tool
       load_association(:context_external_tool)
     end
@@ -33,6 +33,7 @@ module Types
 
     field :icon_or_tool_icon_url, String, null: true
     def icon_or_tool_icon_url
+      # also uses assignment association, but currently this is always loaded as this type is only accessible through assignment
       load_association(:context_external_tool).then do
         object.icon_or_tool_icon_url
       end

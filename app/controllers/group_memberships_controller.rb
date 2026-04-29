@@ -73,7 +73,7 @@
 #     }
 #
 class GroupMembershipsController < ApplicationController
-  before_action :find_group, only: %i[index show create update destroy]
+  before_action :find_group, only: %i[index show create update destroy destroy_bulk]
 
   include Api::V1::Group
 
@@ -220,12 +220,13 @@ class GroupMembershipsController < ApplicationController
         memberships = @group.bulk_add_users_to_differentiation_tag(active_user_ids)
         membership_errors = memberships.select { |m| m.errors.any? }
 
-        # Recompute submissions for the added users
+        # Recompute submissions and invalidate visibility caches for the added users
         # - Typically this is handled by update_cached_due_dates callback in group_membership.rb, but since we are
         #   bulk creating memberships, it will bypass callbacks.
         added_user_ids = (memberships - membership_errors).map(&:user_id)
         assignments = AssignmentOverride.active.where(set_type: "Group", set_id: @group.id).pluck(:assignment_id)
         SubmissionLifecycleManager.recompute_users_for_course(added_user_ids, @group.context_id, assignments) if assignments.any?
+        GroupMembership.invalidate_visibility_caches_for_group(@group, added_user_ids)
 
         if membership_errors.any? || invalid_user_ids.any?
           render json: {
@@ -299,10 +300,49 @@ class GroupMembershipsController < ApplicationController
   def destroy
     find_membership
     if authorized_action(@membership, @current_user, :delete)
-      @membership.workflow_state = "deleted"
-      @membership.save
+      @membership.update(workflow_state: "deleted")
       render json: { "ok" => true }
     end
+  end
+
+  # @API Bulk delete memberships
+  #  Bulk deletes memberships by providing an array of user IDs.
+  #
+  # @argument user_ids[] [Integer] - An array of user IDs to delete memberships in bulk.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id>/users \
+  #          -X DELETE \
+  #          -F 'user_ids[]=123' \
+  #          -F 'user_ids[]=456' \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [JSON]
+  #   - For single deletion: `{ "ok": true }`
+  #   - For bulk deletion:
+  #     ```json
+  #     {
+  #       "message": "Bulk delete completed",
+  #       "deleted_user_ids": [123, 456],
+  #       "unauthorized_user_ids": [789]
+  #     }
+  def destroy_bulk
+    user_ids = Array(params[:user_ids]).map(&:to_i)
+    memberships = @group.group_memberships.where(user_id: user_ids)
+
+    unauthorized_memberships = memberships.reject do |membership|
+      can_do(membership, @current_user, :delete)
+    end
+
+    memberships_to_delete = memberships - unauthorized_memberships
+    memberships_to_delete.each { |membership| membership.update(workflow_state: "deleted") }
+
+    render json: {
+             message: "Bulk delete completed",
+             deleted_user_ids: memberships_to_delete.map(&:user_id),
+             unauthorized_user_ids: unauthorized_memberships.map(&:user_id)
+           },
+           status: :ok
   end
 
   protected

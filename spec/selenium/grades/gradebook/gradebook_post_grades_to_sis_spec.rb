@@ -29,6 +29,7 @@ shared_examples "Gradebook - post grades to SIS" do |ff_enabled|
   include GradebookCommon
   include GradebookSetup
   include FeatureFlagHelper
+
   include_context "in-process server selenium tests"
 
   before(:once) do
@@ -44,6 +45,9 @@ shared_examples "Gradebook - post grades to SIS" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
     user_session(@teacher)
   end
 
@@ -224,24 +228,6 @@ shared_examples "Gradebook - post grades to SIS" do |ff_enabled|
     let(:tool_name) { "post_grades_lti_#{tool.id}" }
 
     it "shows when a post_grades lti tool is installed", priority: "1" do
-      Gradebook.visit(@course)
-      Gradebook.select_sync
-
-      expect(Gradebook.action_menu_item_selector(tool_name)).to be_displayed
-
-      Gradebook.action_menu_item_selector(tool_name).click
-
-      expect(f("iframe.post-grades-frame")).to be_displayed
-    end
-
-    # flakey; passes locally
-    xit "shows post grades lti button when only one section available" do
-      course = Course.new(name: "Math 201", account: @account, sis_source_id: "xyz")
-      course.save
-      course.enroll_teacher(@user).accept!
-      course.assignments.create!(name: "Assignment1", post_to_sis: true)
-      create_post_grades_tool(course:)
-
       Gradebook.visit(@course)
       Gradebook.select_sync
 

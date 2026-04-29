@@ -31,10 +31,8 @@
       <%= t("You're editing your Canvas Theme! The changes have not been applied yet.") %>
     <% else %>
       <% current_account = ::Context.get_account(@context) || @domain_root_account %>
-      <%= t do %>
-        You're editing your Canvas Theme! Apply or cancel changes from within the
-        <%= link_to "Theme Editor", account_theme_editor_path(current_account), target: "_top" %>.
-      <% end %>
+      <%= t("You're editing your Canvas Theme! Apply or cancel changes from within the *Theme Editor*.",
+            wrapper: link_to('\1', account_theme_editor_path(current_account), target: "_top")) %>
       <% if current_account.settings[:sub_account_includes] %>
         <br />
         <%= t "Note: sub-account themes are not active during this preview. " %>

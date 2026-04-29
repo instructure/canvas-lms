@@ -16,8 +16,50 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {RubricUnderscoreType, RubricAssociationUnderscore} from '@canvas/rubrics/react/utils'
+
 export interface EnvDiscussions {
+  AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS?: string
+  discussion_ai_survey_link: string
   DISCUSSION_TOPIC: {
     ATTRIBUTES: Record<string, any>
+    PERMISSIONS?: {
+      CAN_EDIT_DISCUSSION_ANONYMITY?: boolean
+      CAN_EDIT_DISCUSSION_OPTIONS?: boolean
+      CAN_EDIT_DISCUSSION_VIEWS?: boolean
+      [key: string]: boolean | undefined
+    }
   }
+  DEFAULT_DISCUSSION_SETTINGS?: {
+    anonymous_state?: string
+    disallow_threaded_replies?: boolean
+    require_initial_post?: boolean
+    podcast_enabled?: boolean
+    podcast_has_student_posts?: boolean
+    allow_rating?: boolean
+    only_graders_can_rate?: boolean
+    expanded?: boolean | string
+    expanded_locked?: boolean
+    sort_order?: string
+    sort_order_locked?: boolean
+  }
+  discussion_pin_post: string
+  ASSIGNMENT_SECURE_PARAMS?: string
+  DISCUSSION_CHECKPOINTS_ENABLED?: boolean
+  /**
+   * Set in DiscussionTopicsController for discussion topic insights
+   * Used by ui/features/discussion_topics_post/react/components/DiscussionSummary/DiscussionSummary.tsx
+   */
+  context_type?: string
+  context_id?: string | number
+  discussion_topic_id?: string | number
+
+  /**
+   * Set in DiscussionTopicContainer for rubrics on discussions
+   * Used by ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.tsx
+   */
+  ai_rubrics_enabled: boolean
+  assigned_rubric?: RubricUnderscoreType & {association_count: number}
+  rubric_association?: RubricAssociationUnderscore
+  rubric_self_assessment_ff_enabled: boolean
 }

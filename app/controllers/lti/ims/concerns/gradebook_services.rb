@@ -20,13 +20,14 @@
 module Lti::IMS::Concerns
   module GradebookServices
     include AdvantageServices
+    include Lti::GradePassbackEligibility
 
     def self.included(klass)
       super
 
       AdvantageServices.included(klass)
 
-      klass.before_action :verify_course_not_concluded
+      klass.before_action :verify_course_not_concluded_for_user
       klass.before_action :verify_line_item_client_id_connection, only: %i[show update destroy]
     end
 
@@ -60,16 +61,25 @@ module Lti::IMS::Concerns
       params[:limit] ? { per_page: params[:limit] } : {}
     end
 
+    def verify_course_not_concluded_for_user
+      return verify_course_not_concluded if user.nil?
+
+      unless grade_passback_allowed?(context, user)
+        render_error("This course has concluded for this student. AGS requests will no longer be accepted for this course.",
+                     :unprocessable_entity)
+      end
+    end
+
     def verify_course_not_concluded
       # If context is nil, the verify_context will handle rendering a 404.
-      if context&.concluded?
+      if course_concluded?(context)
         render_error("This course has concluded. AGS requests will no longer be accepted for this course.",
                      :unprocessable_entity)
       end
     end
 
     def verify_user_in_context
-      return if context.user_is_student?(user, include_fake_student: true)
+      return if context.user_is_student?(user, include_fake_student: true, include_all: true)
 
       render_error("User not found in course or is not a student", :unprocessable_entity)
     end

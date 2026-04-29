@@ -23,6 +23,7 @@ require_relative "concerns/lti_services_shared_examples"
 
 describe Lti::IMS::NamesAndRolesController do
   include Lti::IMS::NamesAndRolesMatchers
+  include AccountDomainSpecHelper
 
   include_context "advantage services context"
 
@@ -100,7 +101,6 @@ describe Lti::IMS::NamesAndRolesController do
       context "and when the page index parameter is too large" do
         let(:rqst_page) { total_items + 1 } # cant have more pages than there are items
         let(:rsp_page) { rqst_page }
-        let(:effective_page_size) { 30 } # don't know why, Api just does this
         let(:rsp_page_size) { 0 }
 
         it "returns an empty members array, with the correct size and proper navigation links" do
@@ -326,6 +326,95 @@ describe Lti::IMS::NamesAndRolesController do
           expect(json).to be_lti_advantage_error_response_body("bad_request", "Requested ResourceLink was not found")
         end
       end
+
+      context "when the rlid param specifies a non-assignment resource link created with a different installation of the same registration" do
+        let(:course_tool) do
+          ContextExternalTool.create!(
+            context: course,
+            consumer_key: "key2",
+            shared_secret: "secret",
+            name: "test tool (course-level)",
+            url: "http://www.tool.com/launch",
+            developer_key:,
+            lti_version: "1.3",
+            workflow_state: "public"
+          )
+        end
+        let(:resource_link) do
+          Lti::ResourceLink.create!(
+            context: course,
+            context_external_tool: course_tool,
+            url: "http://www.tool.com/launch"
+          )
+        end
+        let(:course_module) { ContextModule.create!(context: course) }
+        let(:rlid_param) { resource_link.resource_link_uuid }
+
+        before do
+          course_module.content_tags.create!(
+            context: course,
+            context_module: course_module,
+            tag_type: "context_module",
+            content_type: "ContextExternalTool",
+            title: "Test Title",
+            url: course_tool.url,
+            content: course_tool,
+            associated_asset: resource_link
+          )
+        end
+
+        it "allows the account-level tool installation to access the resource link" do
+          send_request
+          expect_single_member(enrollment)
+        end
+      end
+
+      context "when the rlid param specifies a non-assignment resource link created with an unrelated tool" do
+        let(:other_developer_key) do
+          dk = lti_developer_key_model(account: root_account)
+          dk.developer_key_account_bindings.first.update!(workflow_state: "on")
+          dk
+        end
+        let(:other_tool) do
+          ContextExternalTool.create!(
+            context: root_account,
+            consumer_key: "other_key",
+            shared_secret: "secret",
+            name: "other tool",
+            url: "http://www.other-tool.com/launch",
+            developer_key: other_developer_key,
+            lti_version: "1.3",
+            workflow_state: "public"
+          )
+        end
+        let(:resource_link) do
+          Lti::ResourceLink.create!(
+            context: course,
+            context_external_tool: other_tool,
+            url: "http://www.other-tool.com/launch"
+          )
+        end
+        let(:course_module) { ContextModule.create!(context: course) }
+        let(:rlid_param) { resource_link.resource_link_uuid }
+
+        before do
+          course_module.content_tags.create!(
+            context: course,
+            context_module: course_module,
+            tag_type: "context_module",
+            content_type: "ContextExternalTool",
+            title: "Test Title",
+            url: other_tool.url,
+            content: other_tool,
+            associated_asset: resource_link
+          )
+        end
+
+        it "returns an error" do
+          send_request
+          expect(json).to be_lti_advantage_error_response_body("bad_request", "Tool does not have access to rlid or rlid does not exist")
+        end
+      end
     end
 
     context "when the rlid param does not specify the course context LTI ID" do
@@ -358,7 +447,7 @@ describe Lti::IMS::NamesAndRolesController do
 
     describe "id field" do
       it "uses the Account#domain in the line item id" do
-        expect_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical.host")
+        stub_host_for_environment_specific_domain("canonical.host")
         send_request
         expect(json[:id]).to eq(
           "http://canonical.host/api/lti/courses/#{course.id}/names_and_roles"
@@ -993,17 +1082,6 @@ describe Lti::IMS::NamesAndRolesController do
       end
     end
 
-    context "when a group has a pending membership" do
-      let(:group_record) { group_with_user(join_level: "invitation_only", context: course).group }
-      let(:group_member) { group_record.group_memberships.first }
-
-      it "does not return the pending membership" do
-        pending("group memberships are always auto-accepted so cant test \"invited\" workflow state - see GroupMembership#auto_join")
-        send_request
-        expect_empty_members_array
-      end
-    end
-
     # rubocop:disable RSpec/LetSetup
     context "when the rlid param is specified" do
       let(:group_record) { group_with_user(active_all: true, context: course, name: user_full_name).group }
@@ -1130,7 +1208,6 @@ describe Lti::IMS::NamesAndRolesController do
       # Group Assignments can't be associated to external tools, so this is basically the same set of tests as
       # for Course contexts, except that we're just checking to see if we can narrow results even further based
       # on group memberships
-      # rubocop:disable RSpec/LetSetup
       context "and an assignment rlid param is specified" do
         include_context "assignment context"
         let(:rlid_param) { rlid_param_1 }
@@ -1355,7 +1432,6 @@ describe Lti::IMS::NamesAndRolesController do
           end
         end
       end
-      # rubocop:enable RSpec/LetSetup
     end
   end
 
@@ -1435,9 +1511,8 @@ describe Lti::IMS::NamesAndRolesController do
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{total_pages}&per_page=#{effective_page_size}>; rel=\"last\""
     ]
 
-    expected_links.reject! { |el| el.include?('rel="next"') } if rsp_page == total_pages
+    expected_links.reject! { |el| el.include?('rel="next"') } if rsp_page >= total_pages
     expected_links.reject! { |el| el.include?('rel="prev"') } if rsp_page <= 1
-    expected_links.reject! { |el| el.include?('rel="last"') } if rsp_page > total_pages
     match_array(expected_links)
   end
 

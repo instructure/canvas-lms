@@ -39,6 +39,7 @@ module SmartSearchable
     def use_smart_search(title_column:, body_column:, index_scope:, search_scope:)
       class_eval do
         include HtmlTextHelper
+
         has_many :embeddings, class_name: embedding_class_name, inverse_of: table_name.singularize.to_sym
         cattr_accessor :search_title_column, :search_body_column
         attr_accessor :skip_embeddings

@@ -22,13 +22,13 @@ describe('resizeHelpers', () => {
   describe('changeSizeVariant', () => {
     it('returns the current size of the element if the new size variant is auto', () => {
       const elem = {} as HTMLElement
-      elem.getBoundingClientRect = jest.fn().mockReturnValue({width: 100, height: 100})
+      elem.getBoundingClientRect = vi.fn().mockReturnValue({width: 100, height: 100})
       expect(changeSizeVariant(elem, 'auto')).toEqual({width: 100, height: 100})
     })
 
     it('returns the current size of the element if the new size variant is pixel', () => {
       const elem = {} as HTMLElement
-      elem.getBoundingClientRect = jest.fn().mockReturnValue({width: 100, height: 100})
+      elem.getBoundingClientRect = vi.fn().mockReturnValue({width: 100, height: 100})
       expect(changeSizeVariant(elem, 'pixel')).toEqual({width: 100, height: 100})
     })
 
@@ -40,7 +40,7 @@ describe('resizeHelpers', () => {
       const elem = {} as HTMLElement
       // @ts-expect-error
       elem.offsetParent = parent
-      elem.getBoundingClientRect = jest.fn().mockReturnValue({width: 100, height: 120})
+      elem.getBoundingClientRect = vi.fn().mockReturnValue({width: 100, height: 120})
 
       expect(changeSizeVariant(elem, 'percent')).toEqual({width: 50, height: 120})
     })

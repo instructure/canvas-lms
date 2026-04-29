@@ -34,7 +34,9 @@ it('sums numbers', () => {
 ```
 
 All `expect()` matchers supported by Jest are [extensively documented here](http://facebook.github.io/jest/docs/api.html#expect-value).<br>
-You can also use [`jest.fn()` and `expect(fn).toBeCalled()`](http://facebook.github.io/jest/docs/api.html#tobecalled) to create “spies” or mock functions and in jest tests you should probably use that instead of sinon mocks/spies/stubs like we use in our QUnit tests.
+You can also use [`jest.fn()` and `expect(fn).toBeCalled()`](http://facebook.github.io/jest/docs/api.html#tobecalled) to create "spies" or mock functions and in jest tests you should probably use that instead of sinon mocks/spies/stubs like we use in our QUnit tests.
+
+**NEVER use `getByRole` queries in tests.** Use of `byRole` queries (`getByRole`, `findByRole`, `queryByRole`, `getAllByRole`, `findAllByRole`, `queryAllByRole`) is discouraged due to performance issues. Please consider using a different query such as `byText` or `byLabelText` instead.
 
 \*NOTE: You cannot run jest if there is anything with AMD, CoffeeScript, or some of the Webpack aliases (which lead to AMD or CoffeeScript).
 

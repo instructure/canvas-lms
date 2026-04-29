@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DiscussionTopicParticipant < ActiveRecord::Base
+class DiscussionTopicParticipant < ApplicationRecord
   include Workflow
 
   belongs_to :discussion_topic
@@ -29,11 +29,16 @@ class DiscussionTopicParticipant < ActiveRecord::Base
   after_save :check_planner_cache
 
   validates :discussion_topic_id, :user_id, :workflow_state, :unread_entry_count, presence: true
+  validates :preferred_language, inclusion: { in: Translation.languages.pluck(:id) }, allow_nil: true
 
   # keeps track of the read state for the initial discussion topic text
   workflow do
     state :unread
     state :read
+  end
+
+  def posted?
+    discussion_topic.discussion_entries.top_level_for_user(user).exists?
   end
 
   private
@@ -47,6 +52,7 @@ class DiscussionTopicParticipant < ActiveRecord::Base
 
   def check_planner_cache
     if previously_new_record? ||
+       saved_change_to_workflow_state? ||
        (unread_entry_count_before_last_save == 0 && unread_entry_count > 0) ||
        (unread_entry_count_before_last_save > 0 && unread_entry_count == 0)
       PlannerHelper.clear_planner_cache(user)

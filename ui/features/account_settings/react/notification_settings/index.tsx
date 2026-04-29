@@ -27,7 +27,7 @@ import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import {SimpleSelect, type SimpleSelectProps} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput, type TextInputProps} from '@instructure/ui-text-input'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('account_notification_settings')
 
@@ -47,14 +47,14 @@ export default function NotificationSettings(props: NotificationSettingsProps): 
   const [externalWarning, setExternalWarning] = useState(props.externalWarning)
   const [customNameOption, setCustomNameOption] = useState(props.customNameOption)
   const [customName, setCustomName] = useState(props.customName?.trim())
-  const [error, setError] = useState(false)
+  const [error, setErrorType] = useState(false)
   const [updateButtonDisabled, setUpdateButtonDisabled] = useState<ButtonInteraction>('enabled')
   const customNameInputElement = useRef<HTMLElement | null>(null)
 
   function validateCustomName(value: string | undefined): boolean {
     if (customNameOption !== 'custom') return true
     const isEmpty = typeof value === 'undefined' || value.trim().length === 0
-    setError(isEmpty)
+    setErrorType(isEmpty)
     return !isEmpty
   }
 
@@ -64,7 +64,7 @@ export default function NotificationSettings(props: NotificationSettingsProps): 
         setCustomNameOption(value)
         if (value === 'custom') return
         setCustomName('')
-        setError(false)
+        setErrorType(false)
         return
       }
     }

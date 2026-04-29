@@ -18,34 +18,44 @@
 
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import ConfirmCommunicationChannel, {
   type ConfirmCommunicationChannelProps,
 } from '../ConfirmCommunicationChannel'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
+
+const server = setupServer()
 
 describe('ConfirmCommunicationChannel', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    fetchMock.restore()
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
   const props: ConfirmCommunicationChannelProps = {
     phoneNumberOrEmail: '123-456-7890',
     communicationChannel: {user_id: '1', pseudonym_id: '2', channel_id: '3'},
     children: <div />,
-    onClose: jest.fn(),
-    onError: jest.fn(),
-    onSubmit: jest.fn(),
+    onClose: vi.fn(),
+    onError: vi.fn(),
+    onSubmit: vi.fn(),
   }
 
   it('should render the provided phone number', () => {
@@ -91,7 +101,11 @@ describe('ConfirmCommunicationChannel', () => {
 
   it('should call onSubmit after a successful response', async () => {
     const code = '1234'
-    fetchMock.post(`/register/${code}`, 200, {overwriteRoutes: true})
+    server.use(
+      http.post(`/register/${code}`, () => {
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
     const {getByLabelText} = render(<ConfirmCommunicationChannel {...props} />)
     const codeInput = getByLabelText('Code')
     const confirm = getByLabelText('Confirm')
@@ -106,7 +120,11 @@ describe('ConfirmCommunicationChannel', () => {
 
   it('should call onError after a failed response', async () => {
     const code = '1234'
-    fetchMock.post(`/register/${code}`, 500, {overwriteRoutes: true})
+    server.use(
+      http.post(`/register/${code}`, () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
     const {getByLabelText} = render(<ConfirmCommunicationChannel {...props} />)
     const codeInput = getByLabelText('Code')
     const confirm = getByLabelText('Confirm')

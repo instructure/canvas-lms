@@ -84,6 +84,7 @@ module VisibilitySqlHelper
         INNER JOIN #{GroupMembership.quoted_table_name} gm
           ON gm.group_id = g.id
           AND gm.user_id = e.user_id
+          AND gm.workflow_state = 'accepted'
       SQL
     end
 
@@ -136,6 +137,7 @@ module VisibilitySqlHelper
         INNER JOIN #{GroupMembership.quoted_table_name} gm
           ON gm.group_id = g.id
           AND gm.user_id = e.user_id
+          AND gm.workflow_state = 'accepted'
       SQL
     end
 
@@ -219,17 +221,6 @@ module VisibilitySqlHelper
           AND o.workflow_state NOT IN ('deleted','unpublished')
           AND ao.workflow_state = 'active'
       SQL
-    end
-
-    def assign_to_differentiation_tags_enabled?(course_ids)
-      # alternatively this could throw a error if course_ids is nil. However, this feature flag check will go
-      # away once the feature is fully enabled.
-      return false unless course_ids.present?
-
-      account_ids = Course.where(id: course_ids).distinct.pluck(:account_id).uniq
-      accounts = Account.where(id: account_ids).to_a
-
-      accounts.any? { |account| account.feature_enabled?(:assign_to_differentiation_tags) }
     end
 
     def full_section_with_left_joins_sql(filter_condition_sql:, id_column_name:, content_tag_type:)

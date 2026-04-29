@@ -20,7 +20,7 @@ import Helper from '../context_modules_helper'
 
 describe('ContextModulesHelper', () => {
   beforeEach(() => {
-    jest.spyOn(Helper, 'setWindowLocation').mockImplementation(() => {})
+    vi.spyOn(Helper, 'setWindowLocation').mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -29,10 +29,10 @@ describe('ContextModulesHelper', () => {
 
   test('externalUrlLinkClick', () => {
     const event = {
-      preventDefault: jest.fn(),
+      preventDefault: vi.fn(),
     }
     const elt = {
-      attr: jest.fn().mockReturnValue('http://example.com'),
+      attr: vi.fn().mockReturnValue('http://example.com'),
     }
     Helper.externalUrlLinkClick(event, elt)
     expect(event.preventDefault).toHaveBeenCalledTimes(1)
@@ -42,10 +42,10 @@ describe('ContextModulesHelper', () => {
 
   test('externalUrlLinkClick sanitizeUrl', () => {
     const event = {
-      preventDefault: jest.fn(),
+      preventDefault: vi.fn(),
     }
     const elt = {
-      attr: jest.fn().mockReturnValue('javascript:alert("hi")'),
+      attr: vi.fn().mockReturnValue('javascript:alert("hi")'),
     }
     Helper.externalUrlLinkClick(event, elt)
     expect(event.preventDefault).toHaveBeenCalledTimes(1)

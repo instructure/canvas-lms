@@ -20,20 +20,20 @@
 describe AuthenticationProvidersPresenter do
   describe "initialization" do
     it "wraps an account" do
-      account = double
+      account = instance_double(Account)
       presenter = described_class.new(account)
       expect(presenter.account).to eq(account)
     end
   end
 
   def stubbed_account(providers = [])
-    double(authentication_providers: double(active: providers))
+    instance_double(Account, authentication_providers: class_double(AuthenticationProvider, active: providers))
   end
 
   describe "#configs" do
     it "pulls configs from account" do
-      config2 = double(visible_to?: true)
-      account = stubbed_account([double(visible_to?: true), config2])
+      config2 = instance_double(AuthenticationProvider, visible_to?: true)
+      account = stubbed_account([instance_double(AuthenticationProvider, visible_to?: true), config2])
       presenter = described_class.new(account)
       expect(presenter.configs[1]).to eq(config2)
     end
@@ -45,15 +45,15 @@ describe AuthenticationProvidersPresenter do
     end
 
     it "only pulls from the db connection one time" do
-      account = double
-      expect(account).to receive(:authentication_providers).exactly(1).times.and_return(double(active: []))
+      account = instance_double(Account)
+      expect(account).to receive(:authentication_providers).once.and_return(class_double(AuthenticationProvider, active: []))
       presenter = described_class.new(account)
       5.times { presenter.configs }
     end
   end
 
   describe "SAML view helpers" do
-    let(:presenter) { described_class.new(double) }
+    let(:presenter) { described_class.new(instance_double(Account)) }
 
     describe "#saml_identifiers" do
       it "is empty when saml disabled" do
@@ -93,13 +93,13 @@ describe AuthenticationProvidersPresenter do
 
   describe "#auth?" do
     it "is true for one aac" do
-      account = stubbed_account([double(visible_to?: true)])
+      account = stubbed_account([instance_double(AuthenticationProvider, visible_to?: true)])
       presenter = described_class.new(account)
       expect(presenter.auth?).to be(true)
     end
 
     it "is true for many aacs" do
-      account = stubbed_account([double(visible_to?: true), double(visible_to?: true)])
+      account = stubbed_account([instance_double(AuthenticationProvider, visible_to?: true), instance_double(AuthenticationProvider, visible_to?: true)])
       presenter = described_class.new(account)
       expect(presenter.auth?).to be(true)
     end
@@ -125,7 +125,8 @@ describe AuthenticationProvidersPresenter do
     end
 
     it "is false for aacs which are not ldap" do
-      account = stubbed_account([double(auth_type: "saml", visible_to?: true), double(auth_type: "cas", visible_to?: true)])
+      account = stubbed_account([instance_double(AuthenticationProvider, auth_type: "saml", visible_to?: true),
+                                 instance_double(AuthenticationProvider, auth_type: "cas", visible_to?: true)])
       presenter = described_class.new(account)
       expect(presenter.ldap_config?).to be(false)
     end
@@ -160,7 +161,7 @@ describe AuthenticationProvidersPresenter do
 
   describe "#login_placeholder" do
     it "wraps AAC.default_delegated_login_handle_name" do
-      expect(described_class.new(double).login_placeholder).to eq(
+      expect(described_class.new(instance_double(Account)).login_placeholder).to eq(
         AuthenticationProvider.default_delegated_login_handle_name
       )
     end
@@ -181,11 +182,43 @@ describe AuthenticationProvidersPresenter do
     end
   end
 
+  describe "#discovery_page_active?" do
+    it "returns true when account.discovery_page_active is true" do
+      account = Account.create!(name: "Test")
+      account.discovery_page_active = true
+      presenter = described_class.new(account)
+      expect(presenter.discovery_page_active?).to be(true)
+    end
+
+    it "returns false when account.discovery_page_active is false" do
+      account = Account.create!(name: "Test")
+      presenter = described_class.new(account)
+      expect(presenter.discovery_page_active?).to be(false)
+    end
+
+    it "returns false when active is nil" do
+      account = Account.create!(name: "Test")
+      account.settings[:discovery_page] = { active: nil }
+      presenter = described_class.new(account)
+      expect(presenter.discovery_page_active?).to be(false)
+    end
+
+    it "returns false when discovery_page is not set" do
+      account = Account.create!(name: "Test")
+      account.settings.delete(:discovery_page)
+      presenter = described_class.new(account)
+      expect(presenter.discovery_page_active?).to be(false)
+    end
+  end
+
   describe "#ldap_configs" do
     it "selects out all ldap configs" do
       config = AuthenticationProvider::LDAP.new
       config2 = AuthenticationProvider::LDAP.new
-      account = stubbed_account([double(visible_to?: true), config, double(visible_to?: true), config2])
+      account = stubbed_account([instance_double(AuthenticationProvider, visible_to?: true),
+                                 config,
+                                 instance_double(AuthenticationProvider, visible_to?: true),
+                                 config2])
       presenter = described_class.new(account)
       expect(presenter.ldap_configs).to eq([config, config2])
     end
@@ -195,7 +228,10 @@ describe AuthenticationProvidersPresenter do
     it "selects out all saml configs" do
       config = AuthenticationProvider::SAML.new
       config2 = AuthenticationProvider::SAML.new
-      pre_configs = [double(visible_to?: true), config, double(visible_to?: true), config2]
+      pre_configs = [instance_double(AuthenticationProvider, visible_to?: true),
+                     config,
+                     instance_double(AuthenticationProvider, visible_to?: true),
+                     config2]
       allow(pre_configs).to receive(:all).and_return(AuthenticationProvider)
       account = stubbed_account(pre_configs)
       configs = described_class.new(account).saml_configs

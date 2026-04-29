@@ -17,25 +17,24 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/client/testing'
 import {render} from '@testing-library/react'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import StudentContent from '../StudentContent'
 import ContextModuleApi from '../../apis/ContextModuleApi'
-import {withSubmissionContext} from '../../test-utils/submission-context'
 
 injectGlobalAlertContainers()
 
-jest.mock('../AttemptSelect')
+vi.mock('../AttemptSelect')
 
-jest.mock('../../apis/ContextModuleApi')
+vi.mock('../../apis/ContextModuleApi')
 
-jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
+vi.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
   return {
-    initializeReaderButton: jest.fn(),
+    initializeReaderButton: vi.fn(),
   }
 })
 
@@ -56,12 +55,9 @@ describe('Assignment Student Content View', () => {
     it('renders as "Add Comment" by default', async () => {
       const props = await mockAssignmentAndSubmission()
       const {getByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(getByText('Add Comment')).toBeInTheDocument()
     })
@@ -71,12 +67,9 @@ describe('Assignment Student Content View', () => {
         Submission: {unreadCommentCount: 1, feedbackForCurrentAttempt: true},
       })
       const {getByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(getByTestId('view_feedback_button')).toHaveTextContent('View Feedback')
       expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
@@ -88,12 +81,9 @@ describe('Assignment Student Content View', () => {
       })
       props.submission.gradingStatus = 'needs_grading'
       const {queryByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
     })
@@ -101,12 +91,9 @@ describe('Assignment Student Content View', () => {
     it('does not show the unread comments badge if there are no unread comments', async () => {
       const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 0}})
       const {queryByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
     })
@@ -117,12 +104,9 @@ describe('Assignment Student Content View', () => {
         Submission: {...SubmissionMocks.submitted},
       })
       const {getByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(getByText('Add Comment')).toBeInTheDocument()
     })
@@ -131,20 +115,17 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission()
 
       const {getByText} = render(
-        <StudentViewContext.Provider
-          value={{
-            allowChangesToSubmission: false,
-            isObserver: true,
-            latestSubmission: props.submission,
-          }}
-        >
-          <MockedProvider>
-            {withSubmissionContext(<StudentContent {...props} />, {
-              assignmentId: '1',
-              submissionId: '1',
-            })}
-          </MockedProvider>
-        </StudentViewContext.Provider>,
+        <MockedQueryProvider>
+          <StudentViewContext.Provider
+            value={{
+              allowChangesToSubmission: false,
+              isObserver: true,
+              latestSubmission: props.submission,
+            }}
+          >
+            <StudentContent {...props} />
+          </StudentViewContext.Provider>
+        </MockedQueryProvider>,
       )
       expect(getByText('View Feedback')).toBeInTheDocument()
     })
@@ -154,12 +135,9 @@ describe('Assignment Student Content View', () => {
         Submission: {feedbackForCurrentAttempt: true},
       })
       const {getByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(getByText('View Feedback')).toBeInTheDocument()
     })
@@ -170,12 +148,9 @@ describe('Assignment Student Content View', () => {
         Submission: {feedbackForCurrentAttempt: true},
       })
       const {getByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(getByText('View Feedback')).toBeInTheDocument()
     })
@@ -190,12 +165,9 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.peerReviewModeEnabled = false
       props.assignment.env.peerReviewAvailable = false
       const {getByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(getByText('Add Comment').closest('button')).toBeDisabled()
     })
@@ -210,12 +182,9 @@ describe('Assignment Student Content View', () => {
       props.assignment.env.peerReviewModeEnabled = false
       props.assignment.env.peerReviewAvailable = false
       const {getByText} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       const screenText = getByText(
         /After the first attempt, you cannot leave comments until you submit the assignment./,
@@ -231,12 +200,9 @@ describe('Assignment Student Content View', () => {
         },
       })
       const {queryByRole} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(
         queryByRole('button', {
@@ -253,12 +219,9 @@ describe('Assignment Student Content View', () => {
         },
       })
       const {queryByRole} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(
         queryByRole('button', {
@@ -283,12 +246,9 @@ describe('Assignment Student Content View', () => {
         ],
       }
       const {queryByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
     })
@@ -299,12 +259,9 @@ describe('Assignment Student Content View', () => {
       })
       props.assignment.env.peerReviewModeEnabled = false
       const {getByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(getByTestId('view_feedback_button')).toHaveTextContent('View Feedback')
       expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
@@ -313,27 +270,21 @@ describe('Assignment Student Content View', () => {
   describe('submission workflow tracker', () => {
     it('is rendered when a submission exists and the assignment is available', async () => {
       const props = await mockAssignmentAndSubmission()
-      const {findByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+      const {queryByTestId} = render(
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
-      expect(await findByTestId('submission-workflow-tracker')).toBeInTheDocument()
+      expect(queryByTestId('submission-workflow-tracker')).toBeInTheDocument()
     })
 
     it('is not rendered when no submission object is present', async () => {
       const props = await mockAssignmentAndSubmission({Query: {submission: null}})
       props.allSubmissions = [{id: '1', _id: '1'}]
       const {queryByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
     })
@@ -342,12 +293,9 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission()
       props.assignment.env.currentUser = null
       const {queryByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
     })
@@ -356,12 +304,9 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission()
       props.assignment.env.modulePrereq = 'simulate not null'
       const {queryByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
     })
@@ -370,12 +315,9 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission()
       props.assignment.env.unlockDate = 'soon'
       const {queryByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
     })
@@ -383,15 +325,12 @@ describe('Assignment Student Content View', () => {
     it('is rendered if peerReviewModeEnabled is set to false', async () => {
       const props = await mockAssignmentAndSubmission()
       props.assignment.env.peerReviewModeEnabled = false
-      const {findByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+      const {queryByTestId} = render(
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
-      expect(await findByTestId('submission-workflow-tracker')).toBeInTheDocument()
+      expect(queryByTestId('submission-workflow-tracker')).toBeInTheDocument()
     })
 
     it('is not rendered if peerReviewModeEnabled is set to true', async () => {
@@ -411,12 +350,9 @@ describe('Assignment Student Content View', () => {
         ],
       }
       const {queryByTestId} = render(
-        <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <StudentContent {...props} />
+        </MockedQueryProvider>,
       )
       expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
     })

@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {isEmpty, pick} from 'lodash'
+import {pick, isEmpty} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import template from '../../jst/SelectContent.handlebars'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'

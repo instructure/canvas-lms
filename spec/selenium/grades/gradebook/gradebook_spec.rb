@@ -42,6 +42,9 @@ shared_examples "Gradebook" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
     user_session(@teacher)
   end
 
@@ -339,16 +342,6 @@ shared_examples "Gradebook" do |ff_enabled|
     Gradebook.visit(@course)
 
     expect(ff(".late")).to have_size(1)
-  end
-
-  it "hides the speedgrader link for large courses", priority: "2" do
-    pending("TODO: Refactor this and add it back as part of CNVS-32440")
-    allow(@course).to receive(:large_roster?).and_return(true)
-
-    Gradebook.visit(@course)
-
-    f(".Gradebook__ColumnHeaderAction button").click
-    expect(f(".gradebook-header-menu")).not_to include_text("SpeedGrader")
   end
 
   context "grading quiz submissions" do

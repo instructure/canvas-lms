@@ -42,19 +42,6 @@ describe "SpeedGrader" do
     user_session(@teacher1)
   end
 
-  context "alerts" do
-    it "alerts the teacher before leaving the page if comments are not saved", priority: "1" do
-      student_in_course(active_user: true).user
-      Speedgrader.visit(@course.id, @assignment.id)
-      replace_content(Speedgrader.new_comment_text_area, "oh no i forgot to save this comment!")
-      # navigate away
-      driver.navigate.refresh
-      alert_shown = alert_present?
-      dismiss_alert
-      expect(alert_shown).to be(true)
-    end
-  end
-
   context "manually submitted comments" do
     context "using media" do
       before do
@@ -112,6 +99,7 @@ describe "SpeedGrader" do
 
       # immediately from javascript
       extend TextHelper
+
       expected_posted_at = datetime_string(@comment.created_at).gsub(/\s+/, " ")
       expect(Speedgrader.fetch_comment_posted_at_by_index(0)).to include_text(expected_posted_at)
       # after refresh
@@ -266,16 +254,6 @@ describe "SpeedGrader" do
       it "when choosing a student from the dropdown", priority: "1" do
         expect do
           Speedgrader.select_student @student2
-          wait_for_ajaximations
-        end.to change {
-          SubmissionComment.draft.count
-        }.by(1)
-      end
-
-      it "when going back to the assignment", priority: "1" do
-        expect do
-          Speedgrader.assignment_link.click
-          dismiss_alert
           wait_for_ajaximations
         end.to change {
           SubmissionComment.draft.count
@@ -443,7 +421,7 @@ describe "SpeedGrader" do
 
   context "group assignment comments" do
     before(:once) do
-      @assignment = create_assignment_for_group("online_url", true)
+      @assignment = create_assignment_for_group("online_url", grade_group_students_individually: true)
       @student_1 = @students.first
       @student_2 = @students.second
       add_user_to_group(@student_2, @testgroup[0])

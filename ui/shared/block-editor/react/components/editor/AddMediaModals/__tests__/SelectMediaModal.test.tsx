@@ -28,8 +28,8 @@ const user = userEvent.setup()
 describe('SelectMediaModal', () => {
   const defaultProps = {
     open: true,
-    onSubmit: jest.fn(),
-    onDismiss: jest.fn(),
+    onSubmit: vi.fn(),
+    onDismiss: vi.fn(),
     accept: 'video/*',
   }
 
@@ -49,7 +49,7 @@ describe('SelectMediaModal', () => {
   })
 
   it('calls onDismiss when the modal is dismissed', async () => {
-    const mockOnDismiss = jest.fn()
+    const mockOnDismiss = vi.fn()
     renderComponent({onDismiss: mockOnDismiss})
     await user.click(screen.getAllByText('Close')[1].closest('button') as Element)
     await waitFor(() => {

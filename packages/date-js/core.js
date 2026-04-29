@@ -7,7 +7,7 @@
  * @website: http://www.datejs.com/
  */
  
-import './globalization/en-US'
+import './globalization/en-US.js'
 (function () {
     var _originalDateDotPrototypeDotToString = Date.prototype.toString;
     var $D = Date, 

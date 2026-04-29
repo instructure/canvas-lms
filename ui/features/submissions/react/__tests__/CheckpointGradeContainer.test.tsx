@@ -47,7 +47,7 @@ const renderComponent = (props = defaultProps()) => {
   return render(
     <ApolloProvider client={createClient()}>
       <CheckpointGradeContainer {...props} />
-    </ApolloProvider>
+    </ApolloProvider>,
   )
 }
 

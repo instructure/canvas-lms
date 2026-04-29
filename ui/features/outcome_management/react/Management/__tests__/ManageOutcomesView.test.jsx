@@ -52,21 +52,21 @@ describe('ManageOutcomesView', () => {
   })
 
   beforeEach(() => {
-    onSelectOutcomesHandler = jest.fn()
-    onOutcomeGroupMenuHandler = jest.fn()
-    onOutcomeMenuHandler = jest.fn()
-    onSearchChangeHandler = jest.fn()
-    onSearchClearHandler = jest.fn()
-    loadMore = jest.fn()
+    onSelectOutcomesHandler = vi.fn()
+    onOutcomeGroupMenuHandler = vi.fn()
+    onOutcomeMenuHandler = vi.fn()
+    onSearchChangeHandler = vi.fn()
+    onSearchClearHandler = vi.fn()
+    loadMore = vi.fn()
     removeOutcomesStatus = {}
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const mockContainer = (container, prop, value) => {
-    jest.spyOn(container, prop, 'get').mockImplementation(() => value)
+    vi.spyOn(container, prop, 'get').mockImplementation(() => value)
   }
 
   const renderWithContext = (children, {canManage = true} = {}) => {

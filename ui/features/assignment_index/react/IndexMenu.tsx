@@ -24,10 +24,11 @@ import {Flex, FlexItem} from '@instructure/ui-flex'
 import {IconAddSolid} from '@instructure/ui-icons'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import Actions from './actions/IndexMenuActions'
-import ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode, legacyRender} from '@canvas/react'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import type {SelectableItem} from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
+import {reloadWindow} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('assignment_index_menu')
 
@@ -153,9 +154,7 @@ export default class IndexMenu extends React.Component<Props, State> {
     ))
 
   renderTrayTools = () => {
-    // @ts-expect-error
     if (ENV.assignment_index_menu_tools) {
-      // @ts-expect-error
       return ENV.assignment_index_menu_tools.map(tool => (
         <li key={tool.id} role="menuitem">
           {/* TODO: use InstUI button */}
@@ -169,7 +168,7 @@ export default class IndexMenu extends React.Component<Props, State> {
     }
   }
 
-  iconForTrayTool(tool: {canvas_icon_class: string; icon_url: string; title: string}) {
+  iconForTrayTool(tool: {canvas_icon_class?: string; icon_url: string; title: string}) {
     if (tool.canvas_icon_class) {
       return <i className={tool.canvas_icon_class} />
     } else if (tool.icon_url) {
@@ -177,20 +176,19 @@ export default class IndexMenu extends React.Component<Props, State> {
     }
   }
 
-  onLaunchTrayTool =
-    (tool: string | null) => (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-      if (e != null) {
-        e.preventDefault()
-      }
-      this.setExternalToolTray(tool, document.getElementById('course_assignment_settings_link'))
+  onLaunchTrayTool = (tool: any) => (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+    if (e != null) {
+      e.preventDefault()
     }
+    this.setExternalToolTray(tool, document.getElementById('course_assignment_settings_link'))
+  }
 
   setExternalToolTray(tool: any, returnFocusTo: any = null) {
     const handleDismiss = () => {
       this.setExternalToolTray(null)
       returnFocusTo.focus()
       if (ltiState?.tray?.refreshOnClose) {
-        window.location.reload()
+        reloadWindow()
       }
     }
     const groupData: SelectableItem[] = [
@@ -200,7 +198,7 @@ export default class IndexMenu extends React.Component<Props, State> {
       },
     ]
 
-    ReactDOM.render(
+    legacyRender(
       <ContentTypeExternalToolTray
         tool={tool}
         placement="assignment_index_menu"
@@ -220,7 +218,7 @@ export default class IndexMenu extends React.Component<Props, State> {
     // unmount tray component and clear its postMessage handler
     const mountPointDomElement = document.getElementById('external-tool-mount-point')
     if (mountPointDomElement) {
-      ReactDOM.unmountComponentAtNode(mountPointDomElement)
+      legacyUnmountComponentAtNode(mountPointDomElement)
     }
   }
 

@@ -46,6 +46,7 @@ class ScoringRange extends React.Component {
       isBottom: bool,
       onScoreChanged: func,
       onAddItems: func,
+      readOnly: bool,
 
       // action props
       removeAssignment: func.isRequired,
@@ -104,6 +105,7 @@ class ScoringRange extends React.Component {
           error={this.props.range.get('error')}
           onScoreChanged={this.props.onScoreChanged}
           triggerAssignment={this.props.triggerAssignment}
+          readOnly={this.props.readOnly}
         />
       )
     }
@@ -155,6 +157,7 @@ class ScoringRange extends React.Component {
             moveAssignment={this.props.moveAssignment}
             disableSplit={sets.size >= MAX_SETS}
             setGlobalWarning={this.props.setGlobalWarning}
+            readOnly={this.props.readOnly}
           />
         )
       })
@@ -187,18 +190,24 @@ class ScoringRange extends React.Component {
           <div className="cr-scoring-range__bound cr-scoring-range__upper-bound">
             {this.renderUpperBound()}
           </div>
-          <div className="cr-scoring-range__center">
-            <button
-              type="button"
-              className="cr-scoring-range__add-assignment-button"
-              aria-label={I18n.t('Add Items to Score Range')}
-              onClick={this.handleAddItems}
-            >
-              +
-            </button>
+          <div
+            className={`cr-scoring-range__center${this.props.readOnly ? ' cr-scoring-range__center--read-only' : ''}`}
+          >
+            {!this.props.readOnly && (
+              <button
+                type="button"
+                className="cr-scoring-range__add-assignment-button"
+                aria-label={I18n.t('Add Items to Score Range')}
+                onClick={this.handleAddItems}
+              >
+                +
+              </button>
+            )}
             <div className="cr-scoring-range__assignments">{this.renderAssignmentSets()}</div>
           </div>
-          <div className="cr-scoring-range__bound cr-scoring-range__lower-bound">
+          <div
+            className={`cr-scoring-range__bound cr-scoring-range__lower-bound${this.props.readOnly ? ' cr-scoring-range__lower-bound--read-only' : ''}`}
+          >
             {this.renderLowerBound()}
           </div>
         </div>

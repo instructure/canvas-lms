@@ -16,10 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, waitFor} from '@testing-library/react'
+import {ZAccountId} from '@canvas/lti-apps/models/AccountId'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
+import {ZLtiDeploymentId} from '../../../../model/LtiDeploymentId'
 import type {LtiOverlayVersion} from '../../../../model/LtiOverlayVersion'
+import type {
+  AvailabilityChangeHistoryEntry,
+  LtiRegistrationHistoryEntry,
+} from '../../../../model/LtiRegistrationHistoryEntry'
+import {ZLtiRegistrationHistoryEntryId} from '../../../../model/LtiRegistrationHistoryEntry'
+import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
 import {
   mockLtiOverlayVersion,
   mockRegistrationWithAllInformation,
@@ -27,156 +37,353 @@ import {
 } from '../../../manage/__tests__/helpers'
 import {renderWithRouter} from '../../__tests__/helpers'
 import {ToolHistory} from '../ToolHistory'
+import {HISTORY_DISPLAY_LIMIT} from '../useHistory'
 
 const server = setupServer()
 
+const mockLtiRegistrationHistoryEntry = (
+  overrides: Partial<AvailabilityChangeHistoryEntry> = {},
+): AvailabilityChangeHistoryEntry => ({
+  id: ZLtiRegistrationHistoryEntryId.parse('1'),
+  root_account_id: ZAccountId.parse('4'),
+  lti_registration_id: ZLtiRegistrationId.parse('1'),
+  created_at: new Date('2025-01-15T12:00:00Z'),
+  updated_at: new Date('2025-01-15T12:00:00Z'),
+  diff: {registration: [['~', 'name', 'Old Name', 'New Name']]},
+  update_type: 'control_edit',
+  comment: 'Test update',
+  created_by: mockUser({overrides: {name: 'Foo Bar Baz'}}),
+  old_controls_by_deployment: [],
+  new_controls_by_deployment: [
+    {
+      id: ZLtiDeploymentId.parse('1'),
+      registration_id: ZLtiRegistrationId.parse('1'),
+      deployment_id: '4',
+      context_id: '4',
+      context_type: 'Account',
+      context_name: 'Test Account',
+      root_account_deployment: false,
+      workflow_state: 'active',
+      context_controls: [
+        {
+          id: ZLtiContextControlId.parse('1'),
+          registration_id: ZLtiRegistrationId.parse('1'),
+          deployment_id: ZLtiDeploymentId.parse('4'),
+          available: false,
+          account_id: ZAccountId.parse('4'),
+          course_id: null,
+          workflow_state: 'active',
+          path: '/4',
+          display_path: ['Test Account'],
+          context_name: 'Test Account',
+          depth: 0,
+          child_control_count: 0,
+          course_count: 0,
+          subaccount_count: 0,
+          created_at: new Date('2025-01-15T12:00:00Z'),
+          updated_at: new Date('2025-01-15T12:00:00Z'),
+          created_by: null,
+          updated_by: null,
+        },
+      ],
+    },
+  ],
+  ...overrides,
+})
+
 describe('ToolHistory', () => {
   beforeAll(() => server.listen())
-  afterEach(() => server.resetHandlers())
+  afterEach(() => {
+    cleanup()
+    server.resetHandlers()
+    fakeENV.teardown()
+  })
   afterAll(() => server.close())
 
-  it('renders without crashing', async () => {
-    const registration = mockRegistrationWithAllInformation({
-      n: 'foo',
-      i: 1,
-      overlayVersions: [
-        mockLtiOverlayVersion({user: mockUser({overrides: {name: 'Foo Bar Baz'}})}),
-      ],
+  const accountId = ZAccountId.parse('4')
+
+  describe('with feature flag disabled (overlay history)', () => {
+    beforeEach(() => {
+      fakeENV.setup({LTI_REGISTRATIONS_HISTORY: false})
     })
 
-    server.use(
-      http.get(
-        `/api/v1/accounts/${registration.account_id}/lti_registrations/${registration.id}/overlay_history`,
-        () => {
-          return HttpResponse.json([
-            mockLtiOverlayVersion({user: mockUser({overrides: {name: 'Foo Bar Baz'}})}),
-          ])
-        },
-      ),
-    )
+    it('renders without crashing', async () => {
+      const registration = mockRegistrationWithAllInformation({
+        n: 'foo',
+        i: 1,
+        overlayVersions: [
+          mockLtiOverlayVersion({user: mockUser({overrides: {name: 'Foo Bar Baz'}})}),
+        ],
+      })
 
-    render(renderWithRouter({child: <ToolHistory />, registration}))
+      server.use(
+        http.get(
+          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/overlay_history`,
+          () => {
+            return HttpResponse.json([
+              mockLtiOverlayVersion({user: mockUser({overrides: {name: 'Foo Bar Baz'}})}),
+            ])
+          },
+        ),
+      )
 
-    expect(await screen.findByText('Foo Bar Baz')).toBeInTheDocument()
-  })
+      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
 
-  it('only renders the 5 most recent overlay versions, even if more are included', async () => {
-    const allNames = ['foo', 'bar', 'baz', 'qux', 'quux', 'corge']
-    const versions: LtiOverlayVersion[] = allNames.map(name => {
-      return mockLtiOverlayVersion({user: mockUser({overrides: {name: name}})})
+      expect(await screen.findByText('Foo Bar Baz')).toBeInTheDocument()
     })
 
-    const registration = mockRegistrationWithAllInformation({
-      n: 'foo',
-      i: 1,
-      overlayVersions: versions,
-    })
+    it('only renders the 5 most recent overlay versions, even if more are included', async () => {
+      const allNames = ['foo', 'bar', 'baz', 'qux', 'quux', 'corge']
+      const versions: LtiOverlayVersion[] = allNames.map(name => {
+        return mockLtiOverlayVersion({user: mockUser({overrides: {name: name}})})
+      })
 
-    server.use(
-      http.get(
-        `/api/v1/accounts/${registration.account_id}/lti_registrations/${registration.id}/overlay_history`,
-        () => {
-          return HttpResponse.json(versions)
-        },
-      ),
-    )
+      const registration = mockRegistrationWithAllInformation({
+        n: 'foo',
+        i: 1,
+        overlayVersions: versions,
+      })
 
-    render(renderWithRouter({child: <ToolHistory />, registration}))
+      server.use(
+        http.get(
+          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/overlay_history`,
+          () => {
+            return HttpResponse.json(versions)
+          },
+        ),
+      )
 
-    await waitFor(() => {
-      const renderedNames = screen.getAllByText(new RegExp(allNames.join('|')))
-      expect(renderedNames).toHaveLength(6)
-    })
-  })
+      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
 
-  it('limits display to 100 entries and shows message when there are more than 100 history items', async () => {
-    // Create 101 overlay versions to exceed the limit
-    const versions: LtiOverlayVersion[] = Array.from({length: 101}, (_, index) => {
-      return mockLtiOverlayVersion({
-        user: mockUser({overrides: {name: `User ${index + 1}`}}),
-        id: `${index + 1}`,
+      await waitFor(() => {
+        const renderedNames = screen.getAllByText(new RegExp(allNames.join('|')))
+        expect(renderedNames).toHaveLength(6)
       })
     })
 
-    const registration = mockRegistrationWithAllInformation({
-      n: 'foo',
-      i: 1,
-      overlayVersions: versions,
-    })
-
-    server.use(
-      http.get(
-        `/api/v1/accounts/${registration.account_id}/lti_registrations/${registration.id}/overlay_history`,
-        () => {
-          return HttpResponse.json(versions)
+    it('limits display to 100 entries and shows message when there are more than 100 history items', async () => {
+      const versions: LtiOverlayVersion[] = Array.from(
+        {length: HISTORY_DISPLAY_LIMIT + 1},
+        (_, index) => {
+          return mockLtiOverlayVersion({
+            user: mockUser({overrides: {name: `User ${index + 1}`}}),
+            id: `${index + 1}`,
+          })
         },
-      ),
-    )
+      )
 
-    render(renderWithRouter({child: <ToolHistory />, registration}))
+      const registration = mockRegistrationWithAllInformation({
+        n: 'foo',
+        i: 1,
+        overlayVersions: versions,
+      })
 
-    // Wait for the table to load
-    await waitFor(() => {
-      expect(screen.getByText('Configuration Update History')).toBeInTheDocument()
+      server.use(
+        http.get(
+          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/overlay_history`,
+          () => {
+            return HttpResponse.json(versions)
+          },
+        ),
+      )
+
+      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
+
+      await waitFor(() => {
+        expect(screen.getByText('Configuration Update History')).toBeInTheDocument()
+      })
+
+      const tableRows = screen.getAllByRole('row')
+      expect(tableRows).toHaveLength(HISTORY_DISPLAY_LIMIT + 1) // 99 data rows + 1 header row
+
+      expect(screen.getByText(/Showing the most recent 99 updates./)).toBeInTheDocument()
+
+      expect(screen.getByText('User 1')).toBeInTheDocument()
+
+      expect(screen.getByText('User 99')).toBeInTheDocument()
+
+      expect(screen.queryByText('User 100')).not.toBeInTheDocument()
     })
 
-    // Check that only 100 entries are displayed (the limit)
-    const tableRows = screen.getAllByRole('row')
-    // Subtract 1 for the header row
-    expect(tableRows).toHaveLength(101) // 100 data rows + 1 header row
+    it('renders a different message if the overlay was reset', async () => {
+      const registration = mockRegistrationWithAllInformation({
+        n: 'foo',
+        i: 1,
+        overlayVersions: [mockLtiOverlayVersion({overrides: {caused_by_reset: true}})],
+      })
 
-    // Check that the limiting message is shown
-    expect(screen.getByText(/Showing the most recent 100 updates./)).toBeInTheDocument()
+      server.use(
+        http.get(
+          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/overlay_history`,
+          () => {
+            return HttpResponse.json([mockLtiOverlayVersion({overrides: {caused_by_reset: true}})])
+          },
+        ),
+      )
 
-    // Verify the first displayed entry is "User 1" (most recent)
-    expect(screen.getByText('User 1')).toBeInTheDocument()
+      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
 
-    // Verify the last displayed entry is "User 100"
-    expect(screen.getByText('User 100')).toBeInTheDocument()
+      expect(await screen.findByText('Restored to default')).toBeInTheDocument()
+    })
 
-    // Verify that "User 101" is not displayed (beyond the limit)
-    expect(screen.queryByText('User 101')).not.toBeInTheDocument()
+    it('renders Instructure as the name if the change was made by a Site Admin', async () => {
+      const registration = mockRegistrationWithAllInformation({
+        n: 'foo',
+        i: 1,
+        overlayVersions: [mockLtiOverlayVersion({user: 'Instructure'})],
+      })
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/overlay_history`,
+          () => {
+            return HttpResponse.json([mockLtiOverlayVersion({user: 'Instructure'})])
+          },
+        ),
+      )
+
+      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
+
+      expect(await screen.findByText('Instructure')).toBeInTheDocument()
+    })
   })
 
-  it('renders a different message if the overlay was reset', async () => {
-    const registration = mockRegistrationWithAllInformation({
-      n: 'foo',
-      i: 1,
-      overlayVersions: [mockLtiOverlayVersion({overrides: {caused_by_reset: true}})],
+  // These are almost identical to the tests above, just with different URLs.
+  // TODO: Once we switch to always using this flag, we can remove the old
+  // tests and the older component.
+  describe('with feature flag enabled (registration history)', () => {
+    beforeEach(() => {
+      fakeENV.setup({LTI_REGISTRATIONS_HISTORY: true})
     })
 
-    server.use(
-      http.get(
-        `/api/v1/accounts/${registration.account_id}/lti_registrations/${registration.id}/overlay_history`,
-        () => {
-          return HttpResponse.json([mockLtiOverlayVersion({overrides: {caused_by_reset: true}})])
-        },
-      ),
-    )
+    it('renders without crashing', async () => {
+      const registration = mockRegistrationWithAllInformation({
+        n: 'foo',
+        i: 1,
+      })
 
-    render(renderWithRouter({child: <ToolHistory />, registration}))
+      server.use(
+        http.get(
+          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/history`,
+          () => {
+            return HttpResponse.json([
+              mockLtiRegistrationHistoryEntry({
+                created_by: mockUser({overrides: {name: 'Foo Bar Baz'}}),
+              }),
+            ])
+          },
+        ),
+      )
 
-    expect(await screen.findByText('Restored to default')).toBeInTheDocument()
-  })
+      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
 
-  it('renders Instructure as the name if the change was made by a Site Admin', async () => {
-    const registration = mockRegistrationWithAllInformation({
-      n: 'foo',
-      i: 1,
-      overlayVersions: [mockLtiOverlayVersion({user: 'Instructure'})],
+      expect(await screen.findByText('Foo Bar Baz')).toBeInTheDocument()
     })
 
-    server.use(
-      http.get(
-        `/api/v1/accounts/${registration.account_id}/lti_registrations/${registration.id}/overlay_history`,
-        () => {
-          return HttpResponse.json([mockLtiOverlayVersion({user: 'Instructure'})])
-        },
-      ),
-    )
+    it('only renders the most recent history entries, even if more are included', async () => {
+      const allNames = ['foo', 'bar', 'baz', 'qux', 'quux', 'corge']
+      const entries: LtiRegistrationHistoryEntry[] = allNames.map((name, index) => {
+        return mockLtiRegistrationHistoryEntry({
+          id: ZLtiRegistrationHistoryEntryId.parse(`${index + 1}`),
+          created_by: mockUser({overrides: {name: name}}),
+        })
+      })
 
-    render(renderWithRouter({child: <ToolHistory />, registration}))
+      const registration = mockRegistrationWithAllInformation({
+        n: 'foo',
+        i: 1,
+      })
 
-    expect(await screen.findByText('Instructure')).toBeInTheDocument()
+      server.use(
+        http.get(
+          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/history`,
+          () => {
+            return HttpResponse.json(entries)
+          },
+        ),
+      )
+
+      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
+
+      await waitFor(() => {
+        const renderedNames = screen.getAllByText(new RegExp(allNames.join('|')))
+        expect(renderedNames).toHaveLength(6)
+      })
+    })
+
+    it('renders Instructure as the name if the change was made by a Site Admin', async () => {
+      const registration = mockRegistrationWithAllInformation({
+        n: 'foo',
+        i: 1,
+      })
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/history`,
+          () => {
+            return HttpResponse.json([
+              mockLtiRegistrationHistoryEntry({
+                created_by: 'Instructure',
+              }),
+            ])
+          },
+        ),
+      )
+
+      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
+
+      expect(await screen.findByText('Instructure')).toBeInTheDocument()
+    })
+
+    it('shows empty state when no history entries exist', async () => {
+      const registration = mockRegistrationWithAllInformation({
+        n: 'foo',
+        i: 1,
+      })
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/history`,
+          () => {
+            return HttpResponse.json([])
+          },
+        ),
+      )
+
+      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
+
+      expect(await screen.findByText('No configuration updates found')).toBeInTheDocument()
+    })
+
+    it('displays history entries with correct status and formatting', async () => {
+      const registration = mockRegistrationWithAllInformation({
+        n: 'foo',
+        i: 1,
+      })
+
+      const historyEntry = mockLtiRegistrationHistoryEntry({
+        created_by: mockUser({overrides: {name: 'Test User'}}),
+        created_at: new Date('2025-01-15T12:00:00Z'),
+      })
+
+      server.use(
+        http.get(
+          `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/history`,
+          () => {
+            return HttpResponse.json([historyEntry])
+          },
+        ),
+      )
+
+      render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
+
+      expect(await screen.findByText('Configuration Update History')).toBeInTheDocument()
+      expect(screen.getByText('Updated On')).toBeInTheDocument()
+      expect(screen.getByText('Updated By')).toBeInTheDocument()
+      expect(screen.getByText('Summary')).toBeInTheDocument()
+
+      expect(screen.getByText('Availability & Exceptions')).toBeInTheDocument()
+      expect(screen.getByText('Test User')).toBeInTheDocument()
+    })
   })
 })

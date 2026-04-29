@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {TempEnrollSearch} from '../TempEnrollSearch'
-import fetchMock from 'fetch-mock'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import type {User} from '../types'
 
 describe('TempEnrollSearch', () => {
@@ -29,25 +29,19 @@ describe('TempEnrollSearch', () => {
       id: '1',
     } as User,
     accountId: '1',
-    searchFail: jest.fn(),
-    searchSuccess: jest.fn(),
+    searchFail: vi.fn(),
+    searchSuccess: vi.fn(),
     canReadSIS: true,
     foundUsers: [],
     duplicateReq: false,
   }
 
   beforeAll(() => {
-    // @ts-expect-error
-    window.ENV = {ACCOUNT_ID: '1'}
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
+    fakeENV.setup({ACCOUNT_ID: '1'})
   })
 
   afterAll(() => {
-    // @ts-expect-error
-    window.ENV = {}
+    fakeENV.teardown()
   })
 
   it('shows search page', () => {

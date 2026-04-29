@@ -17,8 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require "spec_helper"
+
 require_relative "../graphql_spec_helper"
+
 describe Mutations::CreateInternalSetting do
   let(:sender) { site_admin_user }
 
@@ -59,7 +60,6 @@ describe Mutations::CreateInternalSetting do
     expect(internal_setting_result["value"]).to eq "never! 👀"
     expect(internal_setting_result["secret"]).to be false
 
-    Setting.reset_cache!
     expect(Setting.get("sentry_disabled", "")).to eq "never! 👀"
   end
 

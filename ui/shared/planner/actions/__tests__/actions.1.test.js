@@ -25,16 +25,16 @@ import {initialize as alertInitialize} from '../../utilities/alertUtils'
 
 const isPromise = obj => obj && typeof obj.then === 'function'
 
-jest.mock('../../utilities/apiUtils', () => ({
-  ...jest.requireActual('../../utilities/apiUtils'),
-  transformApiToInternalItem: jest.fn(response => ({...response, transformedToInternal: true})),
-  transformInternalToApiItem: jest.fn(internal => ({...internal, transformedToApi: true})),
-  transformInternalToApiOverride: jest.fn(internal => ({
+vi.mock('../../utilities/apiUtils', async () => ({
+  ...(await vi.importActual('../../utilities/apiUtils')),
+  transformApiToInternalItem: vi.fn(response => ({...response, transformedToInternal: true})),
+  transformInternalToApiItem: vi.fn(internal => ({...internal, transformedToApi: true})),
+  transformInternalToApiOverride: vi.fn(internal => ({
     ...internal.planner_override,
     marked_complete: null,
     transformedToApiOverride: true,
   })),
-  transformPlannerNoteApiToInternalItem: jest.fn(response => ({
+  transformPlannerNoteApiToInternalItem: vi.fn(response => ({
     ...response,
     transformedToInternal: true,
   })),
@@ -81,7 +81,6 @@ describe('api actions', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
-    SidebarActions.maybeUpdateTodoSidebar.reset()
   })
   afterAll(() => server.close())
 
@@ -114,7 +113,7 @@ describe('api actions', () => {
         }),
       )
 
-      const mockDispatch = jest.fn(action => {
+      const mockDispatch = vi.fn(action => {
         // If the action returns a promise, resolve it
         if (isPromise(action)) {
           return action
@@ -139,7 +138,7 @@ describe('api actions', () => {
       })
     })
     it('if nextUrl not set show all opportunities loaded', () => {
-      const mockDispatch = jest.fn()
+      const mockDispatch = vi.fn()
       const state = getBasicState()
       state.opportunities.nextUrl = null
       const getState = () => {
@@ -148,6 +147,18 @@ describe('api actions', () => {
       Actions.getNextOpportunities()(mockDispatch, getState)
       expect(mockDispatch).toHaveBeenCalledWith({type: 'START_LOADING_OPPORTUNITIES'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'ALL_OPPORTUNITIES_LOADED'})
+    })
+    it('returns early without dispatching if items array is empty', () => {
+      const mockDispatch = vi.fn()
+      const state = getBasicState()
+      // no items means initial load hasn't happened yet
+      state.opportunities.items = []
+      state.opportunities.nextUrl = '/'
+      const getState = () => {
+        return state
+      }
+      Actions.getNextOpportunities()(mockDispatch, getState)
+      expect(mockDispatch).not.toHaveBeenCalled()
     })
   })
 
@@ -171,7 +182,7 @@ describe('api actions', () => {
         }),
       )
 
-      const mockDispatch = jest.fn(action => {
+      const mockDispatch = vi.fn(action => {
         // If the action returns a promise, resolve it
         if (isPromise(action)) {
           return action
@@ -191,6 +202,32 @@ describe('api actions', () => {
       })
     })
 
+    it('dispatches allOpportunitiesLoaded when response is empty', async () => {
+      server.use(
+        http.get('*', () => {
+          return new HttpResponse(JSON.stringify([]), {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json',
+              link: '</>; rel="current"',
+            },
+          })
+        }),
+      )
+
+      const mockDispatch = vi.fn(action => {
+        if (isPromise(action)) {
+          return action
+        }
+      })
+      await Actions.getInitialOpportunities()(mockDispatch, getBasicState)
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'START_LOADING_OPPORTUNITIES'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'ALL_OPPORTUNITIES_LOADED'})
+      expect(mockDispatch).not.toHaveBeenCalledWith(
+        expect.objectContaining({type: 'ADD_OPPORTUNITIES'}),
+      )
+    })
+
     it('dispatches startDismissingOpportunity and dismissedOpportunity actions', async () => {
       server.use(
         http.put('/api/v1/planner/overrides/10', () => {
@@ -204,7 +241,7 @@ describe('api actions', () => {
         }),
       )
 
-      const mockDispatch = jest.fn()
+      const mockDispatch = vi.fn()
       const plannerOverride = {
         id: '10',
         plannable_type: 'assignment',
@@ -237,7 +274,7 @@ describe('api actions', () => {
         }),
       )
 
-      const mockDispatch = jest.fn()
+      const mockDispatch = vi.fn()
       await Actions.dismissOpportunity('6', {id: '6'})(mockDispatch, getBasicState)
       expect(mockDispatch).toHaveBeenCalledWith({
         payload: '6',
@@ -307,7 +344,7 @@ describe('api actions', () => {
         }),
       )
 
-      const fakeAlert = jest.fn()
+      const fakeAlert = vi.fn()
       alertInitialize({
         visualErrorCallback: fakeAlert,
       })
@@ -322,13 +359,13 @@ describe('api actions', () => {
         }),
       )
 
-      const mockDispatch = jest.fn(action => {
+      const mockDispatch = vi.fn(action => {
         // If the action returns a promise, resolve it
         if (isPromise(action)) {
           return action
         }
       })
-      const fakeAlert = jest.fn()
+      const fakeAlert = vi.fn()
       alertInitialize({
         visualErrorCallback: fakeAlert,
       })

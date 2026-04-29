@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import {noop} from 'lodash'
+import {noop} from 'es-toolkit/compat'
 import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {EnabledState} from '../types'
 import * as reduxHooks from 'react-redux'
 
@@ -27,9 +28,9 @@ import PermissionButton from '../PermissionButton'
 const PERM_LABEL = 'Add widgets'
 const ROLE_LABEL = 'Superuser'
 
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn(),
-  useDispatch: jest.fn(),
+vi.mock('react-redux', () => ({
+  useSelector: vi.fn(),
+  useDispatch: vi.fn(),
 }))
 
 function buildProps({
@@ -37,9 +38,18 @@ function buildProps({
   locked = false,
   readonly = false,
   explicit = true,
-}) {
+  applies_to_self,
+  applies_to_descendants,
+}: {
+  enabled?: EnabledState
+  locked?: boolean
+  readonly?: boolean
+  explicit?: boolean
+  applies_to_self?: boolean
+  applies_to_descendants?: boolean
+} = {}) {
   return {
-    permission: {enabled, locked, readonly, explicit},
+    permission: {enabled, locked, readonly, explicit, applies_to_self, applies_to_descendants},
     permissionName: PERM_LABEL,
     permissionLabel: PERM_LABEL,
     onFocus: noop,
@@ -55,33 +65,37 @@ function getThings(div: HTMLElement) {
   const x = div.querySelector('svg[name="IconTrouble"]')
   const oval = div.querySelector('svg[name="IconOvalHalf"]')
   const locked = div.querySelector('svg[name="IconLock"]')
+  const removeLink = div.querySelector('svg[name="IconRemoveLink"]')
+  const deactivateLink = div.querySelector('svg[name="IconDeactivateUser"]')
+  const buttonColor = div.querySelector('button[data-color]')?.getAttribute('data-color') ?? null
 
-  return {check, x, oval, locked}
+  return {check, x, oval, locked, removeLink, deactivateLink, buttonColor}
 }
 
 // TODO:  this doesn't test the click/menu actions, just the display!
 // Maybe some integration tests do that but it should also be tested here.
 
 describe('permissions::PermissionButton', () => {
-  const mockUseSelector = jest.spyOn(reduxHooks, 'useSelector')
-  const mockUseDispatch = jest.spyOn(reduxHooks, 'useDispatch')
+  const mockUseSelector = vi.spyOn(reduxHooks, 'useSelector')
+  const mockUseDispatch = vi.spyOn(reduxHooks, 'useDispatch')
 
   // if anything needs to examine how PermissionButton calls the Redux
   // dispatching methods, this is the way to do it.
-  let mockDispatch: jest.Mock | undefined = undefined
+  let mockDispatch: any | undefined = undefined
 
   beforeEach(() => {
     // Reset all redux hook mocks before each test
     mockUseSelector.mockClear()
     mockUseDispatch.mockClear()
-    mockDispatch = jest.fn()
+    mockDispatch = vi.fn()
     mockUseDispatch.mockReturnValue(mockDispatch)
   })
 
   it('displays a spinner whilst the API is in flight', () => {
     mockUseSelector
-      .mockReturnValueOnce(true) // for apiBusy
-      .mockReturnValueOnce(false) // for setFocus
+      .mockReturnValueOnce(false) // isSiteAdmin
+      .mockReturnValueOnce(true) // apiBusy
+      .mockReturnValueOnce(false) // setFocus
 
     const {getByText} = render(<PermissionButton {...buildProps({})} />)
 
@@ -92,13 +106,15 @@ describe('permissions::PermissionButton', () => {
     mockUseSelector.mockReturnValue(false) // both apiBusy and setFocus
 
     const {container, getByText, queryByText} = render(<PermissionButton {...buildProps({})} />)
-    const {check, x, oval, locked} = getThings(container)
+    const {check, x, oval, locked, removeLink, buttonColor} = getThings(container)
 
     expect(check).not.toBeNull()
     expect(x).toBeNull()
     expect(oval).toBeNull()
     expect(locked).toBeNull()
-    expect(getByText(`Enabled ${PERM_LABEL} ${ROLE_LABEL}`)).toBeInTheDocument()
+    expect(removeLink).toBeNull()
+    expect(buttonColor).toBe('success')
+    expect(getByText(/Enabled$/)).toBeInTheDocument()
     expect(queryByText('Waiting for request to complete')).toBeNull()
   })
 
@@ -108,13 +124,15 @@ describe('permissions::PermissionButton', () => {
     const {container, getByText} = render(
       <PermissionButton {...buildProps({enabled: EnabledState.NONE})} />,
     )
-    const {check, x, oval, locked} = getThings(container)
+    const {check, x, oval, locked, removeLink, buttonColor} = getThings(container)
 
     expect(check).toBeNull()
     expect(x).not.toBeNull()
     expect(oval).toBeNull()
     expect(locked).toBeNull()
-    expect(getByText(`Disabled ${PERM_LABEL} ${ROLE_LABEL}`)).toBeInTheDocument()
+    expect(removeLink).toBeNull()
+    expect(buttonColor).toBe('danger')
+    expect(getByText(/Disabled$/)).toBeInTheDocument()
   })
 
   it('displays the partially-enabled state', () => {
@@ -123,26 +141,30 @@ describe('permissions::PermissionButton', () => {
     const {container, getByText} = render(
       <PermissionButton {...buildProps({enabled: EnabledState.PARTIAL})} />,
     )
-    const {check, x, oval, locked} = getThings(container)
+    const {check, x, oval, locked, removeLink, buttonColor} = getThings(container)
 
     expect(check).toBeNull()
     expect(x).toBeNull()
     expect(oval).not.toBeNull()
     expect(locked).toBeNull()
-    expect(getByText(`Partially enabled ${PERM_LABEL} ${ROLE_LABEL}`)).toBeInTheDocument()
+    expect(removeLink).toBeNull()
+    expect(buttonColor).toBe('success')
+    expect(getByText(/Partially enabled$/)).toBeInTheDocument()
   })
 
   it('displays enabled and locked', () => {
     mockUseSelector.mockReturnValue(false) // both apiBusy and setFocus
 
     const {container, getByText} = render(<PermissionButton {...buildProps({locked: true})} />)
-    const {check, x, oval, locked} = getThings(container)
+    const {check, x, oval, locked, removeLink, buttonColor} = getThings(container)
 
     expect(check).not.toBeNull()
     expect(x).toBeNull()
     expect(oval).toBeNull()
     expect(locked).not.toBeNull()
-    expect(getByText(`Enabled and Locked ${PERM_LABEL} ${ROLE_LABEL}`)).toBeInTheDocument()
+    expect(removeLink).toBeNull()
+    expect(buttonColor).toBe('success')
+    expect(getByText(/Enabled and Locked$/)).toBeInTheDocument()
   })
 
   it('displays disabled and locked', () => {
@@ -151,13 +173,15 @@ describe('permissions::PermissionButton', () => {
     const {container, getByText} = render(
       <PermissionButton {...buildProps({enabled: EnabledState.NONE, locked: true})} />,
     )
-    const {check, x, oval, locked} = getThings(container)
+    const {check, x, oval, locked, removeLink, buttonColor} = getThings(container)
 
     expect(check).toBeNull()
     expect(x).not.toBeNull()
     expect(oval).toBeNull()
     expect(locked).not.toBeNull()
-    expect(getByText(`Disabled and Locked ${PERM_LABEL} ${ROLE_LABEL}`)).toBeInTheDocument()
+    expect(removeLink).toBeNull()
+    expect(buttonColor).toBe('danger')
+    expect(getByText(/Disabled and Locked$/)).toBeInTheDocument()
   })
 
   it('displays partially-enabled and locked', () => {
@@ -166,15 +190,15 @@ describe('permissions::PermissionButton', () => {
     const {container, getByText} = render(
       <PermissionButton {...buildProps({enabled: EnabledState.PARTIAL, locked: true})} />,
     )
-    const {check, x, oval, locked} = getThings(container)
+    const {check, x, oval, locked, removeLink, buttonColor} = getThings(container)
 
     expect(check).toBeNull()
     expect(x).toBeNull()
     expect(oval).not.toBeNull()
     expect(locked).not.toBeNull()
-    expect(
-      getByText(`Partially enabled and Locked ${PERM_LABEL} ${ROLE_LABEL}`),
-    ).toBeInTheDocument()
+    expect(removeLink).toBeNull()
+    expect(buttonColor).toBe('success')
+    expect(getByText(/Partially enabled and Locked$/)).toBeInTheDocument()
   })
 
   it('displays a not-disabled button by default', () => {
@@ -191,5 +215,157 @@ describe('permissions::PermissionButton', () => {
     const {container} = render(<PermissionButton {...buildProps({readonly: true, locked: true})} />)
     const button = container.querySelector('button')
     expect(button!.disabled).toBe(true)
+  })
+
+  describe('applies to self/descendants (site admin)', () => {
+    function setupSiteAdmin() {
+      mockUseSelector.mockImplementation((selector: any) =>
+        selector({
+          isSiteAdmin: true,
+          apiBusy: [],
+          nextFocus: {targetArea: '', roleId: '', permissionName: ''},
+        }),
+      )
+    }
+
+    it('shows "Apply to..." group with both items checked by default', async () => {
+      setupSiteAdmin()
+      const user = userEvent.setup()
+      const props = buildProps({})
+      const {container, getByText} = render(<PermissionButton {...props} inTray={true} />)
+
+      const button = container.querySelector('button')!
+      await user.click(button)
+
+      expect(getByText('Self')).toBeInTheDocument()
+      expect(getByText('Descendants')).toBeInTheDocument()
+    })
+
+    it('shows checkmarks even when explicit is false (Use Default)', async () => {
+      setupSiteAdmin()
+      const user = userEvent.setup()
+      const props = buildProps({explicit: false})
+      const {container, getByText} = render(<PermissionButton {...props} inTray={true} />)
+
+      const button = container.querySelector('button')!
+      await user.click(button)
+
+      // Both "Self" and "Descendants" should be present even with explicit: false
+      expect(getByText('Self')).toBeInTheDocument()
+      expect(getByText('Descendants')).toBeInTheDocument()
+    })
+
+    it('does not show "Apply to..." group for non-site-admins', async () => {
+      mockUseSelector.mockReturnValue(false) // isSiteAdmin=false, apiBusy=false, setFocus=false
+      const user = userEvent.setup()
+      const props = buildProps({})
+      const {container, queryByText} = render(<PermissionButton {...props} inTray={true} />)
+
+      const button = container.querySelector('button')!
+      await user.click(button)
+
+      expect(queryByText('Self')).toBeNull()
+      expect(queryByText('Descendants')).toBeNull()
+    })
+
+    it('disables "Apply to..." selections when the permission is disabled', async () => {
+      setupSiteAdmin()
+      const user = userEvent.setup()
+      const props = buildProps({enabled: EnabledState.NONE})
+      const {container, getByText} = render(<PermissionButton {...props} inTray={true} />)
+
+      const button = container.querySelector('button')!
+      await user.click(button)
+
+      const selfItem = getByText('Self').closest('[role="menuitemcheckbox"]')
+      const descendantsItem = getByText('Descendants').closest('[role="menuitemcheckbox"]')
+      expect(selfItem).toHaveAttribute('aria-disabled', 'true')
+      expect(descendantsItem).toHaveAttribute('aria-disabled', 'true')
+    })
+
+    it('shows deactivate-user icon if site admin and applies_to_self is false', () => {
+      setupSiteAdmin()
+      const {container} = render(<PermissionButton {...buildProps({applies_to_self: false})} />)
+      const {deactivateLink, buttonColor} = getThings(container)
+      expect(deactivateLink).toBeInTheDocument()
+      expect(buttonColor).toBe('success')
+    })
+
+    it('does not show deactivate-user icon if applies_to_self is not false', () => {
+      setupSiteAdmin()
+      const {container} = render(<PermissionButton {...buildProps({})} />)
+      const {deactivateLink, buttonColor} = getThings(container)
+      expect(deactivateLink).toBeNull()
+      expect(buttonColor).toBe('success')
+    })
+
+    it('does not show deactivate-user icon for non-site-admin even if applies_to_self is false', () => {
+      mockUseSelector.mockReturnValue(false)
+      const {container} = render(<PermissionButton {...buildProps({applies_to_self: false})} />)
+      const {removeLink, buttonColor} = getThings(container)
+      expect(removeLink).toBeNull()
+      expect(buttonColor).toBe('success')
+    })
+
+    it('shows remove-link icon if site admin and applies_to_descendants is false', () => {
+      setupSiteAdmin()
+      const {container} = render(
+        <PermissionButton {...buildProps({applies_to_descendants: false})} />,
+      )
+      const {removeLink, buttonColor} = getThings(container)
+      expect(removeLink).not.toBeNull()
+      expect(buttonColor).toBe('success')
+    })
+
+    it('does not show remove-link icon if applies_to_descendants is not false', () => {
+      setupSiteAdmin()
+      const {container} = render(<PermissionButton {...buildProps({})} />)
+      const {removeLink, buttonColor} = getThings(container)
+      expect(removeLink).toBeNull()
+      expect(buttonColor).toBe('success')
+    })
+
+    it('does not show remove-link icon for non-site-admin even if applies_to_descendants is false', () => {
+      mockUseSelector.mockReturnValue(false)
+      const {container} = render(
+        <PermissionButton {...buildProps({applies_to_descendants: false})} />,
+      )
+      const {removeLink, buttonColor} = getThings(container)
+      expect(removeLink).toBeNull()
+      expect(buttonColor).toBe('success')
+    })
+
+    it('replaces remove-link icon with spinner while API call is in progress', () => {
+      mockUseSelector.mockImplementation((selector: any) =>
+        selector({
+          isSiteAdmin: true,
+          apiBusy: [{id: '1', name: PERM_LABEL}],
+          nextFocus: {targetArea: '', roleId: '', permissionName: ''},
+        }),
+      )
+      const {container, getByText} = render(
+        <PermissionButton {...buildProps({applies_to_descendants: false})} />,
+      )
+      const {removeLink, buttonColor} = getThings(container)
+      expect(removeLink).toBeNull()
+      expect(buttonColor).toBe('success')
+      expect(getByText('Waiting for request to complete')).toBeInTheDocument()
+    })
+
+    it('dispatches correct action when toggling self off', async () => {
+      setupSiteAdmin()
+      const user = userEvent.setup()
+      const props = buildProps({applies_to_self: true, applies_to_descendants: true})
+      const {container, getByText} = render(<PermissionButton {...props} inTray={true} />)
+
+      const button = container.querySelector('button')!
+      await user.click(button)
+
+      mockDispatch.mockClear()
+      await user.click(getByText('Self'))
+
+      // modifyPermissions returns a thunk, so dispatch is called with a function
+      expect(mockDispatch).toHaveBeenCalledWith(expect.any(Function))
+    })
   })
 })

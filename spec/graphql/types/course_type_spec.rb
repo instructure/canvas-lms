@@ -19,6 +19,7 @@
 #
 
 require_relative "../graphql_spec_helper"
+require "lti_1_3_tool_configuration_spec_helper"
 
 describe Types::CourseType do
   let_once(:course) do
@@ -275,16 +276,26 @@ describe Types::CourseType do
             submission_types: "online_upload,online_quiz",
             workflow_state: "published"
           )
+          @assignment5 = course.assignments.create!(
+            name: "No Submission Assignment 2",
+            submission_types: "",
+            workflow_state: "published"
+          )
         end
 
-        it "only returns assignments with online_upload submission type" do
+        it "only returns assignments with `online_upload` submission type" do
           result = course_type.resolve("assignmentsConnection(filter: { submissionTypes: [online_upload] }) { edges { node { _id } } }", current_user: @student)
           expect(result).to eq [@assignment1.id.to_s, @assignment4.id.to_s]
         end
 
-        it "only returns assignments with online_upload, online_quiz submission type" do
+        it "only returns assignments with `online_upload, online_quiz` submission type" do
           result = course_type.resolve("assignmentsConnection(filter: { submissionTypes: [online_upload, online_quiz] }) { edges { node { _id } } }", current_user: @student)
           expect(result).to eq [@assignment1.id.to_s, @assignment2.id.to_s, @assignment4.id.to_s]
+        end
+
+        it "only returns assignments with `no submission` submission type" do
+          result = course_type.resolve("assignmentsConnection(filter: { submissionTypes: [none] }) { edges { node { _id } } }", current_user: @student)
+          expect(result).to eq [@assignment3.id.to_s, @assignment5.id.to_s]
         end
       end
 
@@ -537,58 +548,139 @@ describe Types::CourseType do
         @quiz_1 = course.quizzes.create!(title: "asdf", quiz_type: "assignment")
         @quiz_2 = course.quizzes.create!(title: "asdf2", quiz_type: "assignment")
         @quiz_3 = course.quizzes.create!(title: "asdf3", quiz_type: "assignment")
+        @quiz_lti_1 = new_quizzes_assignment(course:, title: "quiz_lti_1")
+
+        @quiz_lti_1.quiz_lti!
+        @quiz_lti_1.save!
       end
 
-      it "returns quizzes" do
-        expect(
-          course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @teacher)
-        ).to eq [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
-      end
+      shared_examples "userId filter tests" do
+        context "userId filter" do
+          it "returns unauthorized code when user is not allowed to act as another user" do
+            expect_error = "You do not have permission to view this course."
+            expect do
+              course_type.resolve("quizzesConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @student)
+            end.to raise_error(GraphQLTypeTester::Error, /#{Regexp.escape(expect_error)}/)
+          end
 
-      context "searchTerm" do
-        it "returns quizzes with general search term" do
-          expect(
-            course_type.resolve("quizzesConnection(filter: { searchTerm: \"asdf\" }) { edges { node { _id } } }", current_user: @teacher)
-          ).to eq [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
+          it "returns quizzes for the given user" do
+            expect(
+              course_type.resolve("quizzesConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @teacher)
+            ).to match_array expected_quiz_ids_for_teacher
+          end
         end
-
-        it "returns quizzes with specific search term" do
-          expect(
-            course_type.resolve("quizzesConnection(filter: { searchTerm: \"asdf2\" }) { edges { node { _id } } }", current_user: @teacher)
-          ).to eq [@quiz_2.id.to_s]
-        end
       end
 
-      context "as a student" do
+      context "without new quizzes enabled" do
+        let(:expected_quiz_ids_for_teacher) { [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s] }
+
         it "returns quizzes" do
           expect(
-            course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @student)
-          ).to eq [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
+            course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @teacher)
+          ).to match_array [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
         end
 
-        it "returns only quizzes assigned to the student" do
-          new_section = course.course_sections.create!(name: "new section")
-          @quiz_1.assignment_overrides.create!(course_section: new_section)
-          @quiz_1.update!(only_visible_to_overrides: true)
-          expect(
-            course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @student)
-          ).to eq [@quiz_2.id.to_s, @quiz_3.id.to_s]
+        context "searchTerm" do
+          it "returns quizzes with general search term" do
+            expect(
+              course_type.resolve("quizzesConnection(filter: { searchTerm: \"asdf\" }) { edges { node { _id } } }", current_user: @teacher)
+            ).to match_array [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
+          end
+
+          it "returns quizzes with specific search term" do
+            expect(
+              course_type.resolve("quizzesConnection(filter: { searchTerm: \"asdf2\" }) { edges { node { _id } } }", current_user: @teacher)
+            ).to match_array [@quiz_2.id.to_s]
+          end
+
+          it "returns empty array for LTI quiz search term" do
+            expect(
+              course_type.resolve("quizzesConnection(filter: { searchTerm: \"quiz_lti_1\" }) { edges { node { _id } } }", current_user: @teacher)
+            ).to be_empty
+          end
         end
+
+        context "as a student" do
+          it "returns quizzes" do
+            expect(
+              course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @student)
+            ).to match_array [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
+          end
+
+          it "returns only quizzes assigned to the student" do
+            new_section = course.course_sections.create!(name: "new section")
+            @quiz_1.assignment_overrides.create!(course_section: new_section)
+            @quiz_1.update!(only_visible_to_overrides: true)
+            expect(
+              course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @student)
+            ).to match_array [@quiz_2.id.to_s, @quiz_3.id.to_s]
+          end
+        end
+
+        it_behaves_like "userId filter tests"
       end
 
-      context "userId filter" do
-        it "returns unauthorized code when user is not allowed to act as another user" do
-          expect_error = "You do not have permission to view this course."
-          expect do
-            course_type.resolve("quizzesConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @student)
-          end.to raise_error(GraphQLTypeTester::Error, /#{Regexp.escape(expect_error)}/)
+      context "with new quizzes enabled" do
+        let(:expected_quiz_ids_for_teacher) { [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s, @quiz_lti_1.id.to_s] }
+
+        before do
+          course.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          course.root_account.settings[:provision] = { "lti" => "lti url" }
+          course.root_account.save!
+          course.root_account.enable_feature! :quizzes_next
+          course.enable_feature! :quizzes_next
         end
 
-        it "returns quizzes for the given user" do
+        it "returns quizzes" do
           expect(
-            course_type.resolve("quizzesConnection(filter: { userId: \"#{@teacher.id}\" }) { edges { node { _id } } }", current_user: @teacher)
-          ).to eq [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
+            course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @teacher)
+          ).to match_array [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s, @quiz_lti_1.id.to_s]
         end
+
+        context "searchTerm" do
+          it "returns quizzes with general search term" do
+            expect(
+              course_type.resolve("quizzesConnection(filter: { searchTerm: \"asdf\" }) { edges { node { _id } } }", current_user: @teacher)
+            ).to match_array [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s]
+          end
+
+          it "returns quizzes with specific search term" do
+            expect(
+              course_type.resolve("quizzesConnection(filter: { searchTerm: \"asdf2\" }) { edges { node { _id } } }", current_user: @teacher)
+            ).to match_array [@quiz_2.id.to_s]
+          end
+
+          it "returns quiz with new engine" do
+            expect(
+              course_type.resolve("quizzesConnection(filter: { searchTerm: \"quiz_lti_1\" }) { edges { node { quizType } } }", current_user: @teacher)
+            ).to match_array ["assignment"]
+          end
+        end
+
+        context "as a student" do
+          it "returns quizzes" do
+            expect(
+              course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @student)
+            ).to match_array [@quiz_1.id.to_s, @quiz_2.id.to_s, @quiz_3.id.to_s, @quiz_lti_1.id.to_s]
+          end
+
+          it "returns only quizzes assigned to the student" do
+            new_section = course.course_sections.create!(name: "new section")
+            @quiz_1.assignment_overrides.create!(course_section: new_section)
+            @quiz_1.update!(only_visible_to_overrides: true)
+            expect(
+              course_type.resolve("quizzesConnection { edges { node { _id } } }", current_user: @student)
+            ).to match_array [@quiz_2.id.to_s, @quiz_3.id.to_s, @quiz_lti_1.id.to_s]
+          end
+        end
+
+        it_behaves_like "userId filter tests"
       end
     end
 
@@ -775,6 +867,82 @@ describe Types::CourseType do
         @assignment.destroy
         expect { course_type.resolve(query) }.to raise_error(/assignment not found/)
       end
+
+      context "with peer review sub assignments" do
+        before do
+          course.enable_feature!(:peer_review_allocation_and_grading)
+          @section1 = course.course_sections.create!(name: "Section 1")
+          @section2 = course.course_sections.create!(name: "Section 2")
+          @parent_assignment = course.assignments.create!(
+            title: "Parent Assignment",
+            peer_reviews: true,
+            peer_review_count: 2
+          )
+          @peer_review_sub_assignment = peer_review_model(parent_assignment: @parent_assignment)
+        end
+
+        let(:peer_review_query) { "sectionsConnection(filter: { assignmentId: #{@peer_review_sub_assignment.id} }) { edges { node { _id } } }" }
+
+        it "returns course sections for peer review sub assignment" do
+          result = course_type.resolve(peer_review_query)
+          expect(result).to be_an(Array)
+          expect(result).not_to be_empty
+        end
+
+        it "returns all course sections including multiple sections" do
+          result = course_type.resolve(peer_review_query)
+          expect(result).to include(@section1.id.to_s, @section2.id.to_s)
+        end
+
+        context "with visibility overrides" do
+          before do
+            @section3 = course.course_sections.create!(name: "Section 3")
+            student_in_section(@section1)
+            student_in_section(@section2)
+            @peer_review_sub_assignment.update!(only_visible_to_overrides: true)
+            parent_override1 = @parent_assignment.assignment_overrides.create!(set: @section1)
+            parent_override2 = @parent_assignment.assignment_overrides.create!(set: @section2)
+            @peer_review_sub_assignment.assignment_overrides.create!(set: @section1, parent_override: parent_override1)
+            @peer_review_sub_assignment.assignment_overrides.create!(set: @section2, parent_override: parent_override2)
+          end
+
+          it "returns only sections with overrides when only_visible_to_overrides is true" do
+            result = course_type.resolve(peer_review_query)
+            expect(result).to contain_exactly(@section1.id.to_s, @section2.id.to_s)
+            expect(result).not_to include(@section3.id.to_s)
+          end
+        end
+
+        context "with regular assignment visibility overrides" do
+          before do
+            @regular_assignment = course.assignments.create!(
+              title: "Regular Assignment",
+              only_visible_to_overrides: true
+            )
+            @section3 = course.course_sections.create!(name: "Section 3")
+            student_in_section(@section1)
+            @regular_assignment.assignment_overrides.create!(set: @section1)
+          end
+
+          let(:regular_query) { "sectionsConnection(filter: { assignmentId: #{@regular_assignment.id} }) { edges { node { _id } } }" }
+
+          it "still works correctly for regular assignments" do
+            result = course_type.resolve(regular_query)
+            expect(result).to contain_exactly(@section1.id.to_s)
+            expect(result).not_to include(@section3.id.to_s)
+          end
+        end
+
+        context "when feature flag is disabled" do
+          before do
+            course.disable_feature!(:peer_review_allocation_and_grading)
+          end
+
+          it "raises an error for peer review sub assignment" do
+            expect { course_type.resolve(peer_review_query) }.to raise_error(/assignment not found/)
+          end
+        end
+      end
     end
   end
 
@@ -802,9 +970,9 @@ describe Types::CourseType do
       student_in_course(active_all: true)
       @student2 = @student
 
-      @student1a1_submission, _ = a1.grade_student(@student1, grade: 1, grader: @teacher)
-      @student1a2_submission, _ = a2.grade_student(@student1, grade: 9, grader: @teacher)
-      @student2a1_submission, _ = a1.grade_student(@student2, grade: 5, grader: @teacher)
+      @student1a1_submission = a1.grade_student(@student1, grade: 1, grader: @teacher).first
+      @student1a2_submission = a2.grade_student(@student1, grade: 9, grader: @teacher).first
+      @student2a1_submission = a1.grade_student(@student2, grade: 5, grader: @teacher).first
 
       @student1a1_submission.update_attribute :graded_at, 4.days.ago
       @student1a2_submission.update_attribute :graded_at, 2.days.ago
@@ -955,7 +1123,7 @@ describe Types::CourseType do
                 }
               ) { nodes { _id } }
             GQL
-          ).to_not include @student2a1_submission.id.to_s
+          ).not_to include @student2a1_submission.id.to_s
         end
 
         it "accepts a start-open range" do
@@ -988,6 +1156,96 @@ describe Types::CourseType do
               ) { nodes { _id } }
             GQL
           ).to include @student2a1_submission.id.to_s
+        end
+      end
+    end
+
+    context "with peer review sub assignments" do
+      before(:once) do
+        course.enable_feature!(:peer_review_allocation_and_grading)
+        @parent_assignment = course.assignments.create!(
+          title: "Parent Assignment",
+          submission_types: "online_text_entry",
+          points_possible: 100
+        )
+        @peer_review_sub_assignment = PeerReviewSubAssignment.create!(
+          parent_assignment: @parent_assignment,
+          title: "Peer Review",
+          points_possible: 50
+        )
+        @parent_assignment.submit_homework(@student1, body: "Student 1 submission")
+        @peer_review_submission = @peer_review_sub_assignment.grade_student(@student1, grade: 40, grader: @teacher).first
+      end
+
+      it "includes peer review sub assignment submissions when feature enabled and filter is true" do
+        result = course_type.resolve(<<~GQL, current_user: @teacher)
+          submissionsConnection(
+            studentIds: ["#{@student1.id}"],
+            filter: { includePeerReviewSubmissions: true },
+            orderBy: [{field: _id, direction: ascending}]
+          ) { edges { node { _id } } }
+        GQL
+
+        expect(result).to include(@peer_review_submission.id.to_s)
+      end
+
+      it "excludes peer review submissions when feature disabled" do
+        course.disable_feature!(:peer_review_allocation_and_grading)
+
+        result = course_type.resolve(<<~GQL, current_user: @teacher)
+          submissionsConnection(
+            studentIds: ["#{@student1.id}"],
+            orderBy: [{field: _id, direction: ascending}]
+          ) { edges { node { _id } } }
+        GQL
+
+        expect(result).not_to include(@peer_review_submission.id.to_s)
+      end
+
+      context "with include_peer_review_submissions filter" do
+        it "excludes peer review submissions when filter is false" do
+          result = course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              studentIds: ["#{@student1.id}"],
+              filter: { includePeerReviewSubmissions: false }
+            ) { edges { node { _id } } }
+          GQL
+
+          expect(result).not_to include(@peer_review_submission.id.to_s)
+        end
+
+        it "excludes peer review submissions when filter is not provided" do
+          result = course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              studentIds: ["#{@student1.id}"]
+            ) { edges { node { _id } } }
+          GQL
+
+          expect(result).not_to include(@peer_review_submission.id.to_s)
+        end
+
+        it "includes peer review submissions when filter is true and feature enabled" do
+          result = course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              studentIds: ["#{@student1.id}"],
+              filter: { includePeerReviewSubmissions: true }
+            ) { edges { node { _id } } }
+          GQL
+
+          expect(result).to include(@peer_review_submission.id.to_s)
+        end
+
+        it "excludes peer review submissions when filter is true but feature disabled" do
+          course.disable_feature!(:peer_review_allocation_and_grading)
+
+          result = course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              studentIds: ["#{@student1.id}"],
+              filter: { includePeerReviewSubmissions: true }
+            ) { edges { node { _id } } }
+          GQL
+
+          expect(result).not_to include(@peer_review_submission.id.to_s)
         end
       end
     end
@@ -1679,7 +1937,7 @@ describe Types::CourseType do
               "enrollmentsConnection(filter: {states: [inactive, deleted, rejected]}) { nodes { _id } }",
               current_user: @teacher
             )
-          ).to eq [inactive_student.enrollments.first.id.to_s, deleted_student.enrollments.first.id.to_s, rejected_student.enrollments.first.id.to_s]
+          ).to match_array [inactive_student.enrollments.first.id.to_s, deleted_student.enrollments.first.id.to_s, rejected_student.enrollments.first.id.to_s]
         end
       end
     end
@@ -1711,7 +1969,6 @@ describe Types::CourseType do
 
     context "differentiation_tags" do
       before :once do
-        Account.default.enable_feature! :assign_to_differentiation_tags
         Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
         Account.default.save!
         Account.default.reload
@@ -1771,7 +2028,6 @@ describe Types::CourseType do
     end
 
     it "includes non_collaborative group sets when asked for by someone with permissions" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1823,7 +2079,6 @@ describe Types::CourseType do
     end
 
     it "includes non_collaborative group sets when asked for by someone with permissions" do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
       @course.account.reload
@@ -1954,15 +2209,15 @@ describe Types::CourseType do
     it "returns a url from an uploaded image" do
       course.image_id = attachment_model(context: @course).id
       course.save!
-      expect(course_type.resolve("imageUrl")).to_not be_nil
+      expect(course_type.resolve("imageUrl")).not_to be_nil
     end
 
     it "returns a url from id when url is blank" do
       course.image_url = ""
       course.image_id = attachment_model(context: @course).id
       course.save!
-      expect(course_type.resolve("imageUrl")).to_not be_nil
-      expect(course_type.resolve("imageUrl")).to_not eq ""
+      expect(course_type.resolve("imageUrl")).not_to be_nil
+      expect(course_type.resolve("imageUrl")).not_to eq ""
     end
 
     it "returns a url from settings" do
@@ -2352,6 +2607,538 @@ describe Types::CourseType do
         expect(result["availableModerators"]).to be_nil
         expect(result["availableModeratorsCount"]).to be_nil
       end
+    end
+  end
+
+  describe "modules_connection with filters" do
+    let(:course) { @course }
+    let(:student) { @student }
+    let(:teacher) { @teacher }
+
+    def execute_with_context(query, user)
+      CanvasSchema.execute(query, context: { current_user: user })
+    end
+
+    before :once do
+      # Create modules with different completion states
+      @completed_module = @course.context_modules.create!(name: "Completed Module")
+      @started_module = @course.context_modules.create!(name: "Started Module")
+      @unlocked_module = @course.context_modules.create!(name: "Unlocked Module")
+      @no_progression_module = @course.context_modules.create!(name: "No Progression Module")
+
+      # Create progressions for student and ensure they're persisted
+      completed_progression = @completed_module.context_module_progressions.create!(
+        user: @student,
+        workflow_state: "completed"
+      )
+      started_progression = @started_module.context_module_progressions.create!(
+        user: @student,
+        workflow_state: "started"
+      )
+      unlocked_progression = @unlocked_module.context_module_progressions.create!(
+        user: @student,
+        workflow_state: "unlocked"
+      )
+
+      # Ensure all progressions are committed to the database before tests run
+      [completed_progression, started_progression, unlocked_progression].each(&:reload)
+    end
+
+    context "filtering by completion status" do
+      def modules_query(completion_status, user_id = nil)
+        <<~GQL
+          query {
+            course(id: "#{@course.id}") {
+              modulesConnection(filter: {
+                completionStatus: #{completion_status}
+                #{", userId: \"#{user_id}\"" if user_id}
+              }) {
+                nodes {
+                  _id
+                  name
+                  progression {
+                    workflowState
+                  }
+                }
+              }
+            }
+          }
+        GQL
+      end
+
+      def fetch_modules_from_result(result)
+        result.dig("data", "course", "modulesConnection", "nodes")
+      end
+
+      context "as a student" do
+        it "returns completed modules" do
+          result = execute_with_context(modules_query("COMPLETED"), student)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(1)
+          expect(modules[0]["name"]).to eq("Completed Module")
+        end
+
+        it "returns incomplete modules" do
+          result = execute_with_context(modules_query("INCOMPLETE"), student)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(3)
+          module_names = modules.pluck("name")
+          expect(module_names).to contain_exactly("Started Module", "Unlocked Module", "No Progression Module")
+        end
+
+        it "returns in progress modules" do
+          result = execute_with_context(modules_query("IN_PROGRESS"), student)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(1)
+          expect(modules[0]["name"]).to eq("Started Module")
+        end
+
+        it "returns not started modules" do
+          result = execute_with_context(modules_query("NOT_STARTED"), student)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(2)
+          module_names = modules.pluck("name")
+          expect(module_names).to contain_exactly("Unlocked Module", "No Progression Module")
+        end
+
+        it "returns error when trying to view another user's progress" do
+          other_student = user_factory(active_all: true)
+          @course.enroll_student(other_student, enrollment_state: "active")
+
+          # Ensure they're different users
+          expect(student.id).not_to eq(other_student.id)
+
+          result = execute_with_context(modules_query("COMPLETED", other_student.id), student)
+
+          expect(result["errors"]).to be_present
+          expect(result["errors"][0]["message"]).to eq("Not authorized to view this user's module progress")
+        end
+      end
+
+      context "as a teacher" do
+        it "can view student's completed modules" do
+          result = execute_with_context(modules_query("COMPLETED", student.id), teacher)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(1)
+          expect(modules[0]["name"]).to eq("Completed Module")
+        end
+
+        it "defaults to teacher's own progress when no user_id specified" do
+          # Teacher has no progressions, so should return no completed modules
+          result = execute_with_context(modules_query("COMPLETED"), teacher)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules).to be_empty
+        end
+      end
+
+      context "filtering performance" do
+        it "uses efficient filtering at database level for completion status" do
+          # Create many modules and ensure progressions are persisted
+          progressions = []
+          10.times do |i|
+            mod = @course.context_modules.create!(name: "Module #{i}")
+            progressions << mod.context_module_progressions.create!(
+              user: student,
+              workflow_state: i.even? ? "completed" : "started"
+            )
+          end
+
+          # Ensure all progressions are committed to the database before testing
+          progressions.each(&:reload)
+
+          # The filter uses a JOIN which is expected for database-level filtering
+          result = execute_with_context(modules_query("COMPLETED"), student)
+          modules = fetch_modules_from_result(result)
+
+          # Should return only completed modules
+          expect(modules.length).to eq(6) # 1 original + 5 even-numbered new ones
+          expect(modules.all? { |m| m.dig("progression", "workflowState") == "completed" }).to be true
+        end
+      end
+
+      context "as an unauthenticated user (public course)" do
+        before do
+          @course.update!(is_public: true)
+        end
+
+        it "returns all modules for incomplete filter" do
+          result = execute_with_context(modules_query("INCOMPLETE"), nil)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules.length).to eq(4)
+          module_names = modules.pluck("name")
+          expect(module_names).to contain_exactly(
+            "Completed Module",
+            "Started Module",
+            "Unlocked Module",
+            "No Progression Module"
+          )
+        end
+
+        it "returns no modules for completed filter" do
+          result = execute_with_context(modules_query("COMPLETED"), nil)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules).to be_empty
+        end
+
+        it "returns no modules for in_progress filter" do
+          result = execute_with_context(modules_query("IN_PROGRESS"), nil)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules).to be_empty
+        end
+
+        it "returns no modules for not_started filter" do
+          result = execute_with_context(modules_query("NOT_STARTED"), nil)
+          modules = fetch_modules_from_result(result)
+
+          expect(modules).to be_empty
+        end
+
+        it "cannot specify a user_id when unauthenticated" do
+          result = execute_with_context(modules_query("COMPLETED", student.id), nil)
+
+          expect(result["errors"]).to be_present
+          expect(result["errors"][0]["message"]).to eq("Authentication required to view other users' module progress")
+        end
+      end
+    end
+  end
+
+  describe "submission_statistics with observed_user_id" do
+    before do
+      course_with_teacher(active_all: true)
+
+      @observer = user_factory(name: "Observer")
+      @observed_student = user_factory(name: "Observed Student")
+
+      @course.enroll_student(@observed_student, active_all: true)
+      @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, active_all: true)
+
+      @assignment = @course.assignments.create!(
+        title: "Test Assignment",
+        points_possible: 10,
+        workflow_state: "published",
+        submission_types: "online_text_entry",
+        due_at: 1.day.from_now
+      )
+
+      # Create unsubmitted submission for observed student
+      @observed_submission = @assignment.submissions.find_by(user: @observed_student)
+      @observed_submission.update!(cached_due_date: 1.day.from_now)
+    end
+
+    context "as observer with observed_user_id" do
+      let(:observer_type) { GraphQLTypeTester.new(@course, current_user: @observer) }
+
+      it "returns statistics for the specified observed user" do
+        due_count = observer_type.resolve(<<~GQL)
+          submissionStatistics(observedUserId: "#{@observed_student.id}") {
+            submissionsDueCount(startDate: "#{1.week.ago.iso8601}", endDate: "#{1.week.from_now.iso8601}")
+          }
+        GQL
+
+        submitted_count = observer_type.resolve(<<~GQL)
+          submissionStatistics(observedUserId: "#{@observed_student.id}") {
+            submissionsSubmittedCount
+          }
+        GQL
+
+        expect(due_count).to eq(1)
+        expect(submitted_count).to eq(0)
+      end
+
+      it "returns nil when observed_user_id is provided but user is not an observer in this course" do
+        # Enroll observer as student in another course
+        other_course = course_factory
+        other_course.enroll_student(@observer, enrollment_state: "active")
+        other_course_type = GraphQLTypeTester.new(other_course, current_user: @observer)
+
+        result = other_course_type.resolve(<<~GQL)
+          submissionStatistics(observedUserId: "#{@observed_student.id}") {
+            submissionsDueCount(startDate: "#{1.week.ago.iso8601}", endDate: "#{1.week.from_now.iso8601}")
+          }
+        GQL
+
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe "External Tools Connection" do
+    include_context "lti_1_3_tool_configuration_spec_helper"
+
+    let_once(:developer_key) do
+      dk = lti_developer_key_model(account: course.root_account)
+      dk.developer_key_account_bindings.first.update! workflow_state: "on"
+      dk
+    end
+
+    let_once(:tool_json_definitions) do
+      [
+        {
+          name: "Tool 1",
+          url: "https://example.com/tool1",
+          workflow_state: "public",
+          lti_version: "1.3",
+          not_selectable: false,
+          placement_type: "link_selection"
+        },
+        {
+          name: "Tool 2",
+          url: "https://example.com/tool2",
+          workflow_state: "public",
+          lti_version: "1.3",
+          not_selectable: false,
+          placement_type: "homework_submission"
+        },
+        {
+          name: "Tool 3",
+          url: "https://example.com/tool2",
+          workflow_state: "email_only",
+          lti_version: "1.3",
+          not_selectable: false,
+          placement_type: "resource_selection"
+        },
+        {
+          name: "Tool 4",
+          url: "https://example.com/tool4",
+          workflow_state: "email_only",
+          lti_version: "1.1",
+          not_selectable: false,
+          placement_type: "homework_submission"
+        },
+        {
+          name: "Tool 5",
+          url: "https://example.com/tool5",
+          workflow_state: "email_only",
+          lti_version: "1.1",
+          not_selectable: true,
+          placement_type: "homework_submission"
+        }
+      ]
+    end
+
+    def create_tool(tool_json_definition)
+      tool = course.context_external_tools.create!(
+        name: tool_json_definition[:name],
+        shared_secret: "test_secret",
+        developer_key:,
+        consumer_key: "test_key",
+        domain: "example.com",
+        not_selectable: tool_json_definition[:not_selectable],
+        url: tool_json_definition[:url],
+        workflow_state: tool_json_definition[:workflow_state],
+        lti_version: tool_json_definition[:lti_version]
+      )
+      tool.context_external_tool_placements.create(placement_type: tool_json_definition[:placement_type])
+
+      control = tool.context_controls.new(registration: tool.developer_key.lti_registration, available: true)
+      control.course = course
+      control.save!
+      tool
+    end
+
+    before(:once) do
+      @teacher = course.enroll_teacher(user_factory).user
+
+      tool_json_definitions.each do |tool_json_definition|
+        create_tool(tool_json_definition)
+      end
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "no placement filter for external tools" do
+      result_array = tool_json_definitions.pluck(:name)
+
+      expect(
+        course_type.resolve(<<~GQL, current_user: @teacher)
+          externalToolsConnection { edges { node { name } } }
+        GQL
+      ).to match_array result_array
+    end
+
+    it "placement filter for external tools" do
+      result_array = tool_json_definitions.select { |tool| tool[:placement_type] == "homework_submission" }.pluck(:name)
+
+      expect(
+        course_type.resolve(<<~GQL, current_user: @teacher)
+          externalToolsConnection(filter: { placement: homework_submission }) { edges { node { name } } }
+        GQL
+      ).to match_array result_array
+    end
+
+    it "placement list filter includes LTI 1.1 tools with not_selectable false when legacy placements requested" do
+      result_array = tool_json_definitions.select { |tool| ["link_selection", "resource_selection"].include?(tool[:placement_type]) || (tool[:lti_version] == "1.1" && tool[:not_selectable] == false) }.pluck(:name)
+
+      expect(
+        course_type.resolve(<<~GQL, current_user: @teacher)
+          externalToolsConnection(filter: { placementList: [link_selection, resource_selection] }) { edges { node { name } } }
+        GQL
+      ).to match_array result_array
+    end
+
+    it "verifies LTI version filtering behavior with legacy placements" do
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        externalToolsConnection(filter: { placementList: [link_selection, resource_selection] }) { edges { node { name } } }
+      GQL
+
+      expect(result).to include("Tool 1")
+      expect(result).to include("Tool 3")
+      expect(result).to include("Tool 4")
+      expect(result).not_to include("Tool 2")
+      expect(result).not_to include("Tool 5")
+    end
+
+    it "includes all tools with explicit non-legacy placement regardless of not_selectable" do
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        externalToolsConnection(filter: { placement: homework_submission }) { edges { node { name } } }
+      GQL
+
+      expect(result).to include("Tool 2")
+      expect(result).to include("Tool 4")
+      expect(result).to include("Tool 5")
+      expect(result).not_to include("Tool 1")
+      expect(result).not_to include("Tool 3")
+    end
+
+    it "state filter for external tools" do
+      result_array = tool_json_definitions.select { |tool| tool[:workflow_state] == "email_only" }.pluck(:name)
+      expect(
+        course_type.resolve(<<~GQL, current_user: @teacher)
+          externalToolsConnection(filter: { state: email_only }) { edges { node { name } } }
+        GQL
+      ).to match_array result_array
+    end
+  end
+
+  describe "career_learning_library_only field" do
+    before :once do
+      @horizon_account = Account.create!
+      @horizon_account.enable_feature!(:horizon_course_setting)
+      @horizon_account.enable_feature!(:horizon_learning_library_ms2)
+      @horizon_account.horizon_account = true
+      @horizon_account.save!
+
+      @horizon_course = course_with_teacher(
+        account: @horizon_account,
+        course_name: "Horizon Course",
+        career_learning_library_only: true,
+        active_all: true
+      ).course
+
+      @teacher = @user
+    end
+
+    let(:course_type) { GraphQLTypeTester.new(@horizon_course, current_user: @teacher) }
+
+    it "returns nil when feature flag is not enabled" do
+      account = Account.create!
+      course = course_with_teacher(
+        account:,
+        course_name: "Regular Course",
+        active_all: true
+      ).course
+
+      result = GraphQLTypeTester.new(course, current_user: @teacher).resolve(<<~GQL)
+        careerLearningLibraryOnly
+      GQL
+
+      expect(result).to be_nil
+    end
+
+    it "returns boolean value when feature flag is enabled" do
+      result = GraphQLTypeTester.new(@horizon_course, current_user: @teacher).resolve(<<~GQL)
+        careerLearningLibraryOnly
+      GQL
+
+      expect(result).to be(true)
+    end
+
+    it "returns false for regular courses in horizon account" do
+      regular_course = course_with_teacher(
+        account: @horizon_account,
+        course_name: "Regular Course",
+        career_learning_library_only: false,
+        active_all: true
+      ).course
+
+      result = GraphQLTypeTester.new(regular_course, current_user: @teacher).resolve(<<~GQL)
+        careerLearningLibraryOnly
+      GQL
+
+      expect(result).to be(false)
+    end
+  end
+
+  context "rubrics_connection field" do
+    before(:once) do
+      @rubric1 = rubric_model(context: @course, title: "Rubric 1")
+      @rubric2 = rubric_model(context: @course, title: "Rubric 2")
+      @rubric3 = rubric_model(context: @course, title: "Rubric 3")
+
+      # Create rubric associations to make them bookmarked
+      @rubric1.associate_with(@course, @course, purpose: "bookmark")
+      @rubric2.associate_with(@course, @course, purpose: "bookmark")
+      @rubric3.associate_with(@course, @course, purpose: "bookmark")
+    end
+
+    it "returns all rubrics without filter" do
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection { nodes { _id } }
+      GQL
+
+      expect(result).to contain_exactly(@rubric1.id.to_s, @rubric2.id.to_s, @rubric3.id.to_s)
+    end
+
+    it "filters by rubric id" do
+      result_ids = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { _id } }
+      GQL
+      result_titles = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { title } }
+      GQL
+
+      expect(result_ids.length).to eq(1)
+      expect(result_ids[0]).to eq(@rubric2.id.to_s)
+      expect(result_titles[0]).to eq("Rubric 2")
+    end
+
+    it "returns empty array when filtered id does not match" do
+      non_existent_id = @rubric3.id + 999
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{non_existent_id}") { nodes { _id } }
+      GQL
+
+      expect(result).to eq([])
+    end
+
+    it "does not return deleted rubrics" do
+      @rubric2.destroy
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection { nodes { _id } }
+      GQL
+
+      expect(result).to contain_exactly(@rubric1.id.to_s, @rubric3.id.to_s)
+    end
+
+    it "does not return deleted rubrics even when filtered by id" do
+      @rubric2.destroy
+      result = course_type.resolve(<<~GQL, current_user: @teacher)
+        rubricsConnection(id: "#{@rubric2.id}") { nodes { _id } }
+      GQL
+
+      expect(result).to eq([])
     end
   end
 end

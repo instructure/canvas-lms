@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {AttachedAssetProcessor} from '@canvas/lti-asset-processor/react/hooks/AssetProcessorsState'
 import {AssetProcessorCommonFields} from '@canvas/deep-linking/models/AssetProcessorContentItem'
 
@@ -52,56 +51,5 @@ export function attachedAssetProcessorGraphqlMutationFromStateAttachedProcessor(
         ...rest,
       },
     }
-  }
-}
-
-// Should match shape in ui/features/discussion_topic_edit_v2/graphql/Assignment.js
-export type ExistingAttachedAssetProcessorGraphql = {
-  _id: string
-  title: string | null
-  text: string | null
-  iconOrToolIconUrl: string | null
-  externalTool: {
-    _id: string
-    name: string
-    labelFor: string | null
-  }
-  iframe: {
-    width: number | null
-    height: number | null
-  } | null
-  window: {
-    width: number | null
-    height: number | null
-    targetName: string | null
-    windowFeatures: string | null
-  } | null
-}
-
-export function existingAttachedAssetProcessorFromGraphql(
-  processor: ExistingAttachedAssetProcessorGraphql,
-): ExistingAttachedAssetProcessor {
-  return {
-    id: parseInt(processor._id),
-    title: processor.title || undefined,
-    text: processor.text || undefined,
-    tool_id: parseInt(processor.externalTool._id),
-    tool_name: processor.externalTool.name,
-    tool_placement_label: processor.externalTool.labelFor || undefined,
-    icon_or_tool_icon_url: processor.iconOrToolIconUrl || undefined,
-    iframe: processor.iframe
-      ? {
-          width: processor.iframe.width || undefined,
-          height: processor.iframe.height || undefined,
-        }
-      : undefined,
-    window: processor.window
-      ? {
-          width: processor.window.width || undefined,
-          height: processor.window.height || undefined,
-          targetName: processor.window.targetName || undefined,
-          windowFeatures: processor.window.windowFeatures || undefined,
-        }
-      : undefined,
   }
 }

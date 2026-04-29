@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import tourPubSub from '@canvas/tour-pubsub'
 import {replaceLocation} from '@canvas/util/globalUtils'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
@@ -32,7 +32,7 @@ import type {HelpLink} from '../../../api.d'
 import helpLinksQuery from '../queries/helpLinksQuery'
 import FeaturedHelpLink from './FeaturedHelpLink'
 import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 
 const I18n = createI18nScope('HelpLinks')
 
@@ -44,7 +44,7 @@ export default function HelpLinks({onClick}: Props) {
   const {data, isLoading, isSuccess} = useQuery<HelpLink[]>({
     queryKey: ['helpLinks'],
     queryFn: helpLinksQuery,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
     // 1 hour
     staleTime: 60 * 60 * 1000,
   })
@@ -56,7 +56,11 @@ export default function HelpLinks({onClick}: Props) {
   const showSeparator = featuredLink && !!nonFeaturedLinks.length
 
   const handleClick = (link: HelpLink) => (event: React.MouseEvent<unknown, MouseEvent>) => {
-    if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
+    if (
+      link.url === '#create_ticket' ||
+      link.url === '#teacher_feedback' ||
+      link.url === '#ada_chatbot'
+    ) {
       event.preventDefault()
       onClick(link.url)
     }
@@ -82,12 +86,14 @@ export default function HelpLinks({onClick}: Props) {
           {nonFeaturedLinks
             .map(link => {
               const has_new_tag = link.is_new
+              const linkId = `help-link-${link.id}`
               return (
                 <List.Item key={`link-${link.id}`}>
                   <Flex justifyItems="space-between" alignItems="center">
                     <Flex.Item size={has_new_tag ? '80%' : '100%'}>
                       <span role="presentation">
                         <Link
+                          aria-describedby={linkId}
                           isWithinText={false}
                           href={link.url}
                           onClick={handleClick(link)}
@@ -97,7 +103,6 @@ export default function HelpLinks({onClick}: Props) {
                           {link.text || ''}
                         </Link>
                       </span>
-                      {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
                       {link.subtext && (
                         <Text as="div" size="small">
                           {link.subtext}
@@ -107,7 +112,9 @@ export default function HelpLinks({onClick}: Props) {
                     <Flex.Item>
                       {has_new_tag && (
                         <PresentationContent>
-                          <Pill color="success">{I18n.t('NEW')}</Pill>
+                          <Pill color="success" id={linkId}>
+                            {I18n.t('NEW')}
+                          </Pill>
                         </PresentationContent>
                       )}
                     </Flex.Item>

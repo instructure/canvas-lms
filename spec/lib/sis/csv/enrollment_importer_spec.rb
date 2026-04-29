@@ -665,9 +665,9 @@ describe SIS::CSV::EnrollmentImporter do
   describe "#persist_errors" do
     it "gracefully handles string errors" do
       batch = Account.default.sis_batches.create!
-      csv = double(:root_account => Account.default, :batch => batch, :[] => nil)
-      importer = SIS::CSV::EnrollmentImporter.new(csv)
-      importer.persist_errors(csv, ["a string error message"])
+      sis_csv = instance_double(SIS::CSV::ImportRefactored, root_account: Account.default, batch:)
+      importer = SIS::CSV::EnrollmentImporter.new(sis_csv)
+      importer.persist_errors({ file: nil }, ["a string error message"])
       expect(batch.sis_batch_errors.count).to eq(1)
     end
   end
@@ -815,6 +815,23 @@ describe SIS::CSV::EnrollmentImporter do
         expect(importer.errors.map(&:last)).to eq ["Improper role \"Pixel Pusher\" for an enrollment"]
         expect(@user1.enrollments.size).to eq 0
         expect(@user2.enrollments.map { |e| [e.type, e.role.name] }).to eq [["DesignerEnrollment", "Pixel Pusher"]]
+      end
+
+      it "finds the most specific role when multiple roles have the same name" do
+        sub1 = @account.sub_accounts.create!
+        sub2 = sub1.sub_accounts.create!
+        sub3 = sub2.sub_accounts.create!
+        @account.roles.create! name: "Pixel Pusher", base_role_type: "DesignerEnrollment"
+        sub2.roles.create! name: "Pixel Pusher", base_role_type: "DesignerEnrollment"
+        sub1.roles.create! name: "Pixel Pusher", base_role_type: "DesignerEnrollment"
+        course2 = course_model(account: sub3, sis_source_id: "OtherCourse")
+        process_csv_data_cleanly(
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "OtherCourse,user2,Pixel Pusher,,active,"
+        )
+        role = course2.enrollments.where(user_id: @user2).first.role
+        expect(role.name).to eq "Pixel Pusher"
+        expect(role.account_id).to eq sub2.id
       end
     end
   end
@@ -1338,6 +1355,16 @@ describe SIS::CSV::EnrollmentImporter do
         expect(Enrollment.where(temporary_enrollment_pairing_id: enrollment_pairing_id)).to exist
       end
 
+      it "does not create enrollment if start or end date is missing" do
+        importer = process_csv_data(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,recipient,teacher,active,,,provider"
+        )
+        errors = importer.errors.map(&:last)
+        expect(@course.enrollments.count).to eq 1
+        expect(errors).to eq ["A temporary enrollment is missing a start or end date (start_date: , end_date: )"]
+      end
+
       it "does not create enrollment if end date is before start" do
         importer = process_csv_data(
           "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
@@ -1358,6 +1385,16 @@ describe SIS::CSV::EnrollmentImporter do
         expect(errors).to eq ["A temporary enrollment provider and recipient are the same (temporary_source_user_id: provider, user: provider)"]
       end
 
+      it "does not create enrollment if source user does not exist" do
+        importer = process_csv_data(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,recipient,teacher,active,2023-09-10T23:08:51Z,2043-09-30T23:08:51Z,nonexistent_user"
+        )
+        errors = importer.errors.map(&:last)
+        expect(@course.enrollments.count).to eq 1
+        expect(errors).to eq ["An enrollment referenced a non-existent temporary enrollment provider nonexistent_user"]
+      end
+
       it "does not create enrollment if source is not enrolled in the course" do
         importer = process_csv_data(
           "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
@@ -1366,6 +1403,46 @@ describe SIS::CSV::EnrollmentImporter do
         errors = importer.errors.map(&:last)
         expect(@course.enrollments.count).to eq 1
         expect(errors).to eq ["The temporary enrollment provider is not enrolled in the course (course: test_1, temporary_source_user_id: recipient)"]
+      end
+
+      context "when the recipient has an existing temporary enrollment" do
+        before(:once) do
+          process_csv_data_cleanly(
+            "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+            "test_1,recipient,student,active,2023-09-10T23:08:51Z,2043-09-30T23:08:51Z,provider"
+          )
+          @temp_enrollment = @recipient.enrollments.take
+        end
+
+        it "restores a deleted temporary enrollment as a regular enrollment" do
+          @temp_enrollment.destroy
+
+          process_csv_data_cleanly(
+            "course_id,user_id,role,status",
+            "test_1,recipient,student,active"
+          )
+
+          @temp_enrollment.reload
+          expect(@recipient.enrollments.count).to eq 1
+          expect(@temp_enrollment.workflow_state).to eql "active"
+          expect(@temp_enrollment.temporary_enrollment_source_user_id).to be_nil
+          expect(@temp_enrollment.temporary_enrollment_pairing_id).to be_nil
+        end
+
+        it "restores a concluded temporary enrollment as a regular enrollment" do
+          @temp_enrollment.conclude
+
+          process_csv_data_cleanly(
+            "course_id,user_id,role,status",
+            "test_1,recipient,student,active"
+          )
+
+          @temp_enrollment.reload
+          expect(@recipient.enrollments.count).to eq 1
+          expect(@temp_enrollment.workflow_state).to eql "active"
+          expect(@temp_enrollment.temporary_enrollment_source_user_id).to be_nil
+          expect(@temp_enrollment.temporary_enrollment_pairing_id).to be_nil
+        end
       end
     end
 
@@ -1384,6 +1461,60 @@ describe SIS::CSV::EnrollmentImporter do
         expect(@provider.enrollments.map(&:type)).to eq ["TeacherEnrollment"]
         errors = importer.errors.map(&:last)
         expect(errors).to eq ["Temporary enrollments are not enabled"]
+      end
+    end
+  end
+
+  describe "enrollments in concluded courses" do
+    before do
+      @course = course_factory(account: @account, sis_source_id: "concluded_course")
+      @student = user_with_managed_pseudonym(account: @account, sis_user_id: "student1")
+      @teacher = user_with_managed_pseudonym(account: @account, sis_user_id: "teacher1")
+      @course.enroll_student(@student, enrollment_state: "active")
+      @course.enroll_teacher(@teacher, enrollment_state: "active")
+      @course.start_at = 2.months.ago
+      @course.conclude_at = 2.days.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+    end
+
+    context "when the import runs with 'deleted_last_completed' status" do
+      it "set the completed_at timestamp to the end date of the course" do
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status",
+          "concluded_course,student1,student,deleted_last_completed,"
+        )
+
+        student_enrollment = @course.enrollments.find_by(user: @student)
+        expect(student_enrollment.workflow_state).to eq "completed"
+        expect(student_enrollment.completed_at).to eq @course.conclude_at
+      end
+
+      it "leaves the completed_at timestamp alone if the enrollment was hard-concluded (and the course is active)" do
+        @course.update! conclude_at: nil
+        student_enrollment = @course.enrollments.find_by(user: @student)
+        Timecop.travel(1.week.ago) do
+          student_enrollment.conclude
+        end
+        old_completed_at = student_enrollment.completed_at
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status",
+          "concluded_course,student1,student,deleted_last_completed,"
+        )
+        expect(student_enrollment.reload.completed_at).to eq old_completed_at
+      end
+    end
+
+    context "when the import runs with 'completed' status" do
+      it "set the completed_at timestamp to the end date of the course" do
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status",
+          "concluded_course,student1,student,completed,"
+        )
+
+        student_enrollment = @course.enrollments.find_by(user: @student)
+        expect(student_enrollment.workflow_state).to eq "completed"
+        expect(student_enrollment.completed_at).to eq @course.conclude_at
       end
     end
   end

@@ -43,6 +43,9 @@ shared_examples "Final Grade Override" do |ff_enabled|
   end
 
   before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
     allow(AuditLogFieldExtension).to receive(:enabled?).and_return(false)
 
     course_with_teacher(course_name: "Grade Override", active_course: true, active_enrollment: true, name: "Dedicated Teacher1", active_user: true)

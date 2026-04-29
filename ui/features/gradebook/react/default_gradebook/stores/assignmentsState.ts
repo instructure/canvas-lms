@@ -25,7 +25,7 @@ import type {GradingPeriodAssignmentMap} from '../gradebook.d'
 import type {AssignmentGroup, Assignment, AssignmentMap, SubmissionType} from '../../../../../api.d'
 import {getAllAssignmentGroups} from './graphql/assignmentGroups/getAllAssignmentGroups'
 import {transformAssignmentGroup} from './graphql/assignmentGroups/transformAssignmentGroup'
-import {flatten, groupBy, isArray} from 'lodash'
+import {groupBy, flatten, isArray} from 'es-toolkit/compat'
 import {getAllAssignments} from './graphql/assignments/getAllAssignments'
 import {transformAssignment} from './graphql/assignments/transformAssignments'
 import pLimit from 'p-limit'
@@ -185,6 +185,7 @@ export default (
       'post_manually',
       'checkpoints',
       'has_rubric',
+      'peer_review',
     ]
 
     if (get().hasModules) {
@@ -285,12 +286,16 @@ export default (
   fetchCompositeAssignmentGroups: ({params}) => {
     const path = `/api/v1/courses/${get().courseId}/assignment_groups`
 
-    return get().dispatch.getDepaginated<AssignmentGroup[]>(path, params)
+    return get().dispatch.getDepaginated<AssignmentGroup[]>(path, params, undefined, undefined, {
+      'Correlation-Id': get().correlationId, // Enables request correlation for performance monitoring and analysis
+    })
   },
 
   fetchGrapqhlAssignmentGroups: async ({gradingPeriodIds = null}) => {
     const {data: assignmentGroups} = await getAllAssignmentGroups({
       queryParams: {courseId: get().courseId},
+      headers: {'Correlation-Id': get().correlationId},
+      queue: get().returnQueueIfDefined(),
     })
     const assignmentGroupIds = assignmentGroups.map(group => group._id)
     const limit = pLimit(GRADEBOOK_GRAPHQL_CONFIG.maxAssignmentRequestCount)
@@ -303,7 +308,13 @@ export default (
             : [gradingPeriodIds]
 
           return gradingPeriodIdsArray.map(gradingPeriodId =>
-            limit(() => getAllAssignments({queryParams: {assignmentGroupId, gradingPeriodId}})),
+            limit(() =>
+              getAllAssignments({
+                queryParams: {assignmentGroupId, gradingPeriodId},
+                headers: {'Correlation-Id': get().correlationId},
+                queue: get().returnQueueIfDefined(),
+              }),
+            ),
           )
         }),
       ),

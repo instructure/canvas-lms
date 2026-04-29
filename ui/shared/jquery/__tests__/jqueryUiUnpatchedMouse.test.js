@@ -34,29 +34,35 @@ describe('Mouse Widget', () => {
     $('#fixtures').empty()
   })
 
-  it('Mouse down event fires', function (done) {
+  it('Mouse down event fires', async () => {
     const $mouse = $('#test-mouse')
 
     // setup mouse events
-    $mouse.mousedown(() => {
-      ok(true)
-      done()
+    const eventPromise = new Promise(resolve => {
+      $mouse.mousedown(() => {
+        resolve()
+      })
     })
 
     // make the call we are testing: Trigger mousedown event
     $mouse.trigger('mousedown')
+    await eventPromise
+    ok(true)
   })
 
-  it('Mouse up event fires', function (done) {
+  it('Mouse up event fires', async () => {
     const $mouse = $('#test-mouse')
 
     // setup mouse events
-    $mouse.mouseup(() => {
-      ok(true)
-      done()
+    const eventPromise = new Promise(resolve => {
+      $mouse.mouseup(() => {
+        resolve()
+      })
     })
 
     // make the call we are testing: Trigger mouse up event
     $mouse.trigger('mouseup')
+    await eventPromise
+    ok(true)
   })
 })

@@ -42,6 +42,10 @@ class DiscussionTopicsTestCourseApi
   def course_assignment_url(*args)
     "course_assignment_url(#{args.inspect[1..-2]})"
   end
+
+  def speed_grader_course_gradebook_url(*args)
+    "speed_grader_course_gradebook_url(#{args.inspect[1..-2]})"
+  end
 end
 
 describe Api::V1::DiscussionTopics do
@@ -211,10 +215,8 @@ describe DiscussionTopicsController, type: :request do
   include Api::V1::User
   include AvatarHelper
 
-  context "locked api item" do
+  it_behaves_like "a locked api item" do
     let(:item_type) { "discussion_topic" }
-
-    include_examples "a locked api item"
 
     let_once(:locked_item) do
       @course.discussion_topics.create!(user: @user, message: "Locked Discussion")
@@ -355,8 +357,8 @@ describe DiscussionTopicsController, type: :request do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
-      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(force: true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(force: true)
       @group_category = @course.group_categories.create(name: "gc")
       @group = @course.groups.create!(group_category: @group_category)
       api_call(:post,
@@ -692,7 +694,7 @@ describe DiscussionTopicsController, type: :request do
 
   context "when file_association_access feature flag is enabled" do
     before do
-      @attachment = create_attachment(@course)
+      @attachment = create_attachment(@user)
       @attachment.root_account.enable_feature!(:file_association_access)
       @topic = create_topic(@course, title: "Topic 1", message: "/users/#{@user.id}/files/#{@attachment.id}", attachment: @attachment)
     end
@@ -929,9 +931,7 @@ describe DiscussionTopicsController, type: :request do
                           scope: "unlocked" })
         expect(json.size).to eq 1
         links = response.headers["Link"].split(",")
-        links.each do |link|
-          expect(link).to match("scope=unlocked")
-        end
+        expect(links).to all(match("scope=unlocked"))
 
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=locked",
@@ -943,9 +943,7 @@ describe DiscussionTopicsController, type: :request do
                           scope: "locked" })
         expect(json.size).to eq 2
         links = response.headers["Link"].split(",")
-        links.each do |link|
-          expect(link).to match("scope=locked")
-        end
+        expect(links).to all(match("scope=locked"))
 
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/discussion_topics.json?per_page=10&scope=pinned",
@@ -998,11 +996,9 @@ describe DiscussionTopicsController, type: :request do
                           scope: "unlocked" })
         expect(json.size).to eq 2
         links = response.headers["Link"].split(",")
-        links.each do |link|
-          expect(link).to match("only_announcements=true")
-          expect(link).to match("order_by=recent_activity")
-          expect(link).to match("scope=unlocked")
-        end
+        expect(links).to all(match("only_announcements=true")
+          .and(match("order_by=recent_activity"))
+          .and(match("scope=unlocked")))
       end
 
       it "returns group_topic_children for group discussions" do
@@ -1764,7 +1760,7 @@ describe DiscussionTopicsController, type: :request do
 
         gtopic.reload
         expect(gtopic.allow_rating).to be_truthy
-        expect(gtopic.require_initial_post).to_not be_truthy
+        expect(gtopic.require_initial_post).not_to be_truthy
       end
 
       it "does not allow updating certain attributes for group sub-discussions" do
@@ -2322,7 +2318,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   it "translates user content in topics without verifiers" do
-    should_translate_user_content(@course, false) do |user_content|
+    should_translate_user_content(@course, include_verifiers: false) do |user_content|
       @topic ||= create_topic(@course, title: "Topic 1", message: user_content)
       json = api_call(
         :get,
@@ -2774,7 +2770,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "allows including attachments on top-level entries" do
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       json = api_call(
         :post,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
@@ -2792,7 +2788,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "includes attachments on replies to top-level entries" do
       top_entry = create_entry(@topic, message: "top-level message")
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       json = api_call(
         :post,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
@@ -2893,6 +2889,7 @@ describe DiscussionTopicsController, type: :request do
       it "tags attachment urls with location of the asset" do
         @attachment.root_account.enable_feature!(:file_association_access)
         message = "<img src='/courses/#{@course.id}/files/#{@attachment.id}'>"
+        @entry.saving_user = @user
         @entry.update!(message:)
         json = api_call(
           :get,
@@ -3085,6 +3082,7 @@ describe DiscussionTopicsController, type: :request do
 
     it "translates user content in replies" do
       should_translate_user_content(@course) do |user_content|
+        @reply.saving_user = @user
         @reply.update_attribute("message", user_content)
         json = api_call(
           :get,
@@ -3102,7 +3100,8 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "translates user content in replies without verifiers" do
-      should_translate_user_content(@course, false) do |user_content|
+      should_translate_user_content(@course, include_verifiers: false) do |user_content|
+        @reply.saving_user = @user
         @reply.update_attribute("message", user_content)
         json = api_call(
           :get,
@@ -3566,6 +3565,26 @@ describe DiscussionTopicsController, type: :request do
                      topic_id: topic.id.to_s })
     end
 
+    it "does not expose other users' read states" do
+      student1 = student_in_course(active_all: true).user
+      student2 = student_in_course(active_all: true).user
+
+      @user = student1
+      call_mark_topic_read(@course, @topic)
+      assert_status(204)
+
+      @user = student2
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/discussion_topics.json",
+                      { controller: "discussion_topics",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s })
+
+      expect(json.first["read_state"]).to eq "unread"
+      expect(json.first["unread_count"]).to eq 2
+    end
+
     it "sets the read state for a topic" do
       student_in_course(active_all: true)
       call_mark_topic_read(@course, @topic)
@@ -3894,11 +3913,6 @@ describe DiscussionTopicsController, type: :request do
         expect(json.pluck("parent_id")).to eq [@sub2.id, @entry.id, @sub2.id, @sub1.id, @entry.id]
       end
 
-      it "sets and return editor_id if editing another user's post" do
-        pending "WIP: Not implemented"
-        raise
-      end
-
       it "fails if the max entry depth is reached" do
         entry = @entry
         (DiscussionEntry::MAX_DEPTH - 1).times do
@@ -3958,6 +3972,7 @@ describe DiscussionTopicsController, type: :request do
         @reply3.change_read_state("read", @user)
         # have the teacher edit one of the student's replies
         @reply_reply1.editor = @teacher
+        @reply_reply1.saving_user = @teacher
         @reply_reply1.update(message: "<p>censored</p>")
 
         @all_entries.each(&:reload)
@@ -4097,7 +4112,7 @@ describe DiscussionTopicsController, type: :request do
       before :once do
         course_with_teacher(active_all: true)
         student_in_course(course: @course, active_all: true)
-        @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+        @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, saving_user: @teacher, discussion_type: "threaded")
         @root1 = @topic.reply_from(user: @student, html: "root1")
         @reply1 = @root1.reply_from(user: @teacher, html: "reply1")
 
@@ -4138,16 +4153,16 @@ describe DiscussionTopicsController, type: :request do
                         { controller: "discussion_topics_api", action: "view", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s },
                         { include_new_entries: "1" })
 
-        expect(json["view"].first["message"]).to_not start_with(@tag)
-        expect(json["view"].first["replies"].first["message"]).to_not start_with(@tag)
-        expect(json["new_entries"].first["message"]).to_not start_with(@tag)
+        expect(json["view"].first["message"]).not_to start_with(@tag)
+        expect(json["view"].first["replies"].first["message"]).not_to start_with(@tag)
+        expect(json["new_entries"].first["message"]).not_to start_with(@tag)
       end
     end
 
     it "includes new entries if the flag is given" do
       course_with_teacher(active_all: true)
       student_in_course(course: @course, active_all: true)
-      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, saving_user: @teacher, discussion_type: "threaded")
       @root1 = @topic.reply_from(user: @student, html: "root1")
 
       # materialized view jobs are now delayed
@@ -4208,7 +4223,7 @@ describe DiscussionTopicsController, type: :request do
     it "resolves the placeholder domain in new entries" do
       course_with_teacher(active_all: true)
       student_in_course(course: @course, active_all: true)
-      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, saving_user: @teacher, discussion_type: "threaded")
       @root1 = @topic.reply_from(user: @student, html: "root1")
 
       link = "/courses/#{@course.id}/discussion_topics"
@@ -4231,10 +4246,10 @@ describe DiscussionTopicsController, type: :request do
 
       new_entry = json["new_entries"].first
       message = new_entry["message"]
-      expect(message).to_not include("placeholder.invalid")
+      expect(message).not_to include("placeholder.invalid")
       expect(message).to include("www.example.com#{link}")
       att_url = new_entry["attachments"].first["url"]
-      expect(att_url).to_not include("placeholder.invalid")
+      expect(att_url).not_to include("placeholder.invalid")
       expect(att_url).to include("www.example.com")
     end
   end
@@ -4249,10 +4264,11 @@ describe DiscussionTopicsController, type: :request do
                         section: @section,
                         enrollment_state: :active)
 
-    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, saving_user: @teacher, discussion_type: "threaded")
     @assignment = @course.assignments.build(submission_types: "discussion_topic", title: @topic.title, due_at: 1.day.from_now)
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment
+    @topic.saving_user = @teacher
     @topic.save
 
     override = @assignment.assignment_overrides.build
@@ -4722,6 +4738,7 @@ def create_topic(context, opts = {})
   opts[:user] ||= @user
   topic = context.discussion_topics.build(opts)
   topic.attachment = attachment if attachment
+  topic.saving_user = opts[:user]
   topic.save!
   topic.publish if topic.unpublished?
   topic

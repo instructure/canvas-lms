@@ -21,6 +21,7 @@
 # this isn't technically OpenID Connect, but it's close
 class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   include AuthenticationProvider::PluginSettings
+
   self.plugin = :apple
   plugin_settings :client_id, client_secret: :client_secret_dec
 

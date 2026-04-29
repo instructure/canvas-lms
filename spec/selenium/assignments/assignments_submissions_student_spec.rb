@@ -192,9 +192,6 @@ describe "submissions" do
       create_assignment_and_go_to_page "media_recording"
       f(".submit_assignment_link").click
       expect(f("#media_comment_submit_button")).not_to be_displayed
-      # leave so the "are you sure?!" message doesn't freeze up selenium
-      f("#section-tabs .home").click
-      driver.switch_to.alert.accept
     end
 
     it "does not break when submitting a media recording with url online entry as an option" do
@@ -223,26 +220,6 @@ describe "submissions" do
 
       # submit the assignment so the "are you sure?!" message doesn't freeze up selenium
       expect_new_page_load { submit_form("#submit_media_recording_form") }
-    end
-
-    it "allows you to submit a file", priority: "1" do
-      skip("investigate in EVAL-2966")
-      @assignment.submission_types = "online_upload"
-      @assignment.save!
-      _filename, fullpath, _data = get_file("testfile1.txt")
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f(".submit_assignment_link").click
-      f(".submission_attachment input").send_keys(fullpath)
-      f("#submission_comment").send_keys("hello comment")
-      expect_new_page_load { f("#submit_file_button").click }
-
-      expect(f("#sidebar_content .header")).to include_text "Submitted!"
-      expect(f(".details")).to include_text "testfile1"
-      @submission = @assignment.reload.submissions.where(user_id: @student).first
-      expect(@submission.submission_type).to eq "online_upload"
-      expect(@submission.attachments.length).to eq 1
-      expect(@submission.workflow_state).to eq "submitted"
     end
 
     it "renders the webcam wraper", priority: "1" do
@@ -431,77 +408,6 @@ describe "submissions" do
       expect(submission.reload.body).to eq body_html
     end
 
-    it "does not allow a submission with only comments", priority: "1" do
-      skip_if_safari(:alert)
-      skip("flash alert is fragile, will be addressed in ADMIN-3015")
-      @assignment.update(submission_types: "online_text_entry")
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f(".submit_assignment_link").click
-
-      expect(f("#submission_body_ifr")).to be_displayed
-      replace_content(f("#submit_online_text_entry_form").find_element(:id, "submission_comment"), "this should not be able to be submitted for grading")
-      submission = @assignment.submissions.find_by!(user_id: @student)
-
-      # it should not actually submit and pop up an error message
-      expect { submit_form("#submit_online_text_entry_form") }.not_to change { submission.reload.updated_at }
-      expect(f("#body_errors")).to include_text("Text entry must not be empty")
-
-      # navigate off the page and dismiss the alert box to avoid problems
-      # with other selenium tests
-      f("#section-tabs .home").click
-      driver.switch_to.alert.accept
-      driver.switch_to.default_content
-    end
-
-    it "does not allow peer reviewers to see turnitin scores/reports", priority: "1" do
-      skip("investigate in EVAL-2966")
-      @student1 = @user
-      @assignment.submission_types = "online_upload,online_text_entry"
-      @assignment.turnitin_enabled = true
-      @assignment.save!
-      _filename, fullpath, _data = get_file("testfile1.txt")
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f(".submit_assignment_link").click
-      f(".submission_attachment input").send_keys(fullpath)
-      f("#submission_comment").send_keys("hello comment")
-      f(".turnitin_pledge").click
-      expect_new_page_load { f("#submit_file_button").click }
-      @submission = @assignment.reload.submissions.last
-
-      user_logged_in(username: "assessor@example.com")
-      @student2 = @user
-      student_in_course(active_enrollment: true, user: @student2)
-
-      @assignment.peer_reviews = true
-      @assignment.assign_peer_review(@student2, @student1)
-      @assignment.due_at = 1.day.ago
-      @assignment.save!
-
-      asset = @submission.turnitin_assets.first.asset_string
-      @submission.turnitin_data = {
-        asset.to_s => {
-          object_id: "123456",
-          publication_overlap: 5,
-          similarity_score: 100,
-          state: "failure",
-          status: "scored",
-          student_overlap: 44,
-          web_overlap: 100
-        },
-        :last_processed_attempt => 1
-      }
-      @submission.turnitin_data_changed!
-      @submission.save!
-      @assignment.submit_homework(@student2, body: "hello")
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}"
-      in_frame("preview_frame") do
-        expect(f("body")).not_to contain_css(".turnitin_score_container")
-      end
-    end
-
-    it "should submit an assignment and validate confirmation information", priority: "1"
-
     context "with Canvadocs enabled" do
       before(:once) do
         PluginSetting.create! name: "canvadocs",
@@ -526,7 +432,7 @@ describe "submissions" do
 
         # Expect preview link to exist
         driver.switch_to.frame(f("#preview_frame"))
-        expect(f(".modal_preview_link")).to be
+        expect(f(".modal_preview_link")).not_to be_nil
       end
     end
 
@@ -586,12 +492,6 @@ describe "submissions" do
 
         # Make sure the flash message is being displayed
         expect_flash_message :error
-
-        # navigate off the page and dismiss the alert box to avoid problems
-        # with other selenium tests
-        f("#section-tabs .home").click
-        driver.switch_to.alert.accept
-        driver.switch_to.default_content
       end
     end
 
@@ -676,7 +576,7 @@ describe "submissions" do
         assignment.grade_student @student, excuse: true, grader: @teacher
       end
 
-      include_examples "shows as excused"
+      it_behaves_like "shows as excused"
     end
 
     context "an unsubmitted online assignment" do
@@ -684,7 +584,7 @@ describe "submissions" do
         @course.assignments.create!(title: "Assignment", submission_types: "online_text_entry", points_possible: 20)
       end
 
-      include_examples "shows as excused"
+      it_behaves_like "shows as excused"
     end
 
     context "an assignment with no submission type" do
@@ -692,7 +592,7 @@ describe "submissions" do
         @course.assignments.create!(title: "Assignment", submission_types: "none", points_possible: 20)
       end
 
-      include_examples "shows as excused"
+      it_behaves_like "shows as excused"
     end
 
     context "an on_paper assignment" do
@@ -700,7 +600,7 @@ describe "submissions" do
         @course.assignments.create!(title: "Assignment", submission_types: "on_paper", points_possible: 20)
       end
 
-      include_examples "shows as excused"
+      it_behaves_like "shows as excused"
     end
 
     it "does not allow submissions", priority: "1" do

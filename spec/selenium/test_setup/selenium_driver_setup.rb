@@ -20,7 +20,9 @@
 require_relative "common_helper_methods/custom_alert_actions"
 require_relative "common_helper_methods/custom_screen_actions"
 require_relative "patches/selenium/webdriver/remote/w3c/bridge"
+require_relative "test_only_routes"
 
+# rubocop:disable Rails/Output, RSpec/Output
 module SeleniumDriverSetup
   CONFIG = ConfigFile.load("selenium") || {}.freeze
   SECONDS_UNTIL_GIVING_UP = 10
@@ -31,7 +33,7 @@ module SeleniumDriverSetup
     implicit_wait: 0,
     # except finding elements
     finder: CONFIG[:finder_timeout_seconds] || 5,
-    script: CONFIG[:script_timeout_seconds] || 5,
+    script: CONFIG[:script_timeout_seconds] || 10,
   }.freeze
 
   # If you have some really slow UI, you can temporarily override
@@ -85,7 +87,9 @@ module SeleniumDriverSetup
         # examples in this group, meaning other workers won't pick them
         # up).
         #
+        # rubocop:disable Rails/Exit
         exit! 98
+        # rubocop:enable Rails/Exit
       end
 
       at_exit { shutdown }
@@ -115,7 +119,6 @@ module SeleniumDriverSetup
       @driver = create_driver
 
       set_timeouts(TIMEOUTS)
-
       puts "Browser: #{browser_name} - #{browser_version}"
 
       @driver
@@ -282,6 +285,8 @@ module SeleniumDriverSetup
         options.args << "--enable-automation"
         options.args << "--disable-dev-shm-usage"
         options.add_preference("profile.password_manager_leak_detection", false)
+        options.web_socket_url = true
+        options.unhandled_prompt_behavior = "ignore" # accept, dismiss, ignore
         if ENV["DISABLE_CORS"]
           options.args << "disable-web-security"
         end
@@ -396,6 +401,7 @@ module SeleniumDriverSetup
 
     def spec_safe_rack_app
       app = base_rack_app
+      # Routes now registered in config/routes.rb wrapped in Rails.env.test?
 
       lambda do |env|
         nope = [503, {}, [""]]
@@ -427,15 +433,23 @@ module SeleniumDriverSetup
       app = spec_safe_rack_app
 
       lambda do |env|
-        # make legit asset 404s return more quickly
         asset_request = asset_request?(env["REQUEST_URI"])
-        return [404, {}, [""]] if asset_request && !File.exist?("public/#{env["REQUEST_URI"]}")
-
-        req = "#{env["REQUEST_METHOD"]} #{env["REQUEST_URI"]}"
-        Rails.logger.info "STARTING REQUEST #{req}" unless asset_request
-        result = app.call(env)
-        Rails.logger.info "FINISHED REQUEST #{req}: #{result[0]}" unless asset_request
-        result
+        if asset_request
+          file_path = File.join("public", env["REQUEST_URI"])
+          if File.exist?(file_path)
+            content_type = Rack::Mime.mime_type(File.extname(file_path))
+            body = File.binread(file_path)
+            [200, { "content-type" => content_type, "content-length" => body.bytesize.to_s }, [body]]
+          else
+            [404, {}, [""]]
+          end
+        else
+          req = "#{env["REQUEST_METHOD"]} #{env["REQUEST_URI"]}"
+          Rails.logger.info "STARTING REQUEST #{req}"
+          result = app.call(env)
+          Rails.logger.info "FINISHED REQUEST #{req}: #{result[0]}"
+          result
+        end
       end
     end
 
@@ -468,6 +482,7 @@ module SeleniumDriverSetup
     end
   end
 end
+# rubocop:enable Rails/Output, RSpec/Output
 
 # make Wait play nicely with Timecop
 module Selenium::WebDriver::Wait::Time

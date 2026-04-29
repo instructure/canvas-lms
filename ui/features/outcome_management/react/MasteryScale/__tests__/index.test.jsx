@@ -25,13 +25,11 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {ACCOUNT_OUTCOME_PROFICIENCY_QUERY} from '@canvas/outcomes/graphql/MasteryScale'
 import MasteryScale from '../index'
 import {masteryScalesGraphqlMocks} from '@canvas/outcomes/mocks/Outcomes'
-import {useAllPages} from '@canvas/query'
+import {useAllPages} from '@instructure/platform-query'
 
-jest.mock('@canvas/query', () => ({
-  useAllPages: jest.fn(),
-}))
+vi.mock('@instructure/platform-query')
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('MasteryScale', () => {
   beforeEach(() => {

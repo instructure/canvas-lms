@@ -19,6 +19,19 @@
 
 module Accessibility
   module NokogiriMethods
+    def parse_html_content(html_content)
+      doc = Nokogiri::HTML5(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
+      body = doc.at_css("body")
+      extend_nokogiri_with_dom_adapter(body)
+      [doc, body]
+    end
+
+    def find_element_at_path(html_content, path)
+      doc, = parse_html_content(html_content)
+      absolute_path = path.sub(/^\./, "/html/body")
+      doc.at_xpath(absolute_path)
+    end
+
     def walk_dom_tree(node, &)
       return unless node
 
@@ -26,35 +39,6 @@ module Accessibility
         yield(node)
         node.children.each { |child| walk_dom_tree(child, &) }
       end
-    end
-
-    def element_path(element)
-      path = []
-      current = element
-
-      while current && current.name != "document"
-        break if current.name == "#document-fragment"
-
-        identifier = current.name
-
-        if current["id"]
-          identifier += "[@id='#{current["id"]}']"
-        elsif current["class"]
-          classes = current["class"].split.map { |cls| "contains(concat(' ', normalize-space(@class), ' '), ' #{cls} ')" }.join(" and ")
-          identifier += "[#{classes}]" unless classes.empty?
-        end
-
-        siblings = current.parent ? current.parent.xpath("./#{current.name}") : []
-        if siblings.size > 1 && siblings.index(current)
-          index = siblings.index(current) + 1
-          identifier += "[#{index}]" if siblings.size > 1
-        end
-
-        path.unshift(identifier)
-        current = current.parent
-      end
-
-      "./" + path.join("/")
     end
 
     def extend_nokogiri_with_dom_adapter(doc)

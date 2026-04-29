@@ -22,6 +22,7 @@ class InfoController < ApplicationController
   skip_before_action :check_pending_otp, only: %i[web_app_manifest]
   skip_before_action :load_account, only: %i[health_check readiness deep]
   skip_before_action :load_user, only: %i[health_check readiness deep browserconfig]
+  skip_before_action :require_user
 
   def styleguide
     render layout: "layouts/styleguide"
@@ -193,6 +194,11 @@ class InfoController < ApplicationController
 
     failed = deep_check[:critical].reject { |_k, v| v[:status] }.map(&:first)
     render_deep_json(deep_check[:critical], deep_check[:secondary], failed.any? ? 503 : 200)
+  end
+
+  def shard_info
+    info = Shard.current.database_server.config.slice(:region, :database)
+    render json: info.merge({ shard: Shard.current.id })
   end
 
   private

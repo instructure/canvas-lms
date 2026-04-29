@@ -16,12 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import SisImportForm from '../SisImportForm'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import userEvent, {UserEvent} from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
+import {vi} from 'vitest'
+import {completeUpload} from '@canvas/upload-file'
+
+// Mock the completeUpload function
+vi.mock('@canvas/upload-file', () => ({
+  completeUpload: vi.fn().mockResolvedValue({
+    id: 456,
+    filename: 'users.csv',
+    display_name: 'users.csv',
+  }),
+}))
 
 const ACCOUNT_ID = '100'
 const SIS_IMPORT_URI = `/sis_imports`
@@ -38,18 +49,35 @@ const mockPost = (expected: {batchMode: boolean; overrideSis: boolean; termId?: 
   fetchMock.post(SIS_IMPORT_URI, (_url, opts) => {
     const body = opts?.body
 
-    if (!(body instanceof FormData)) {
-      throw new Error('Expected FormData')
+    if (typeof body !== 'string') {
+      throw new Error('Expected JSON string')
     }
 
-    // validate body (FormData)
-    expect(body.get('attachment')).not.toBeNull() // file should be present
-    expect(body.get('batch_mode')).toEqual(batchMode.toString())
-    expect(body.get('override_sis_stickiness')).toEqual(overrideSis.toString())
+    const parsedBody = JSON.parse(body)
+
+    expect(parsedBody.pre_attachment).toBeDefined() // pre_attachment should be present
+    expect(parsedBody.batch_mode).toEqual(batchMode)
+    expect(parsedBody.override_sis_stickiness).toEqual(overrideSis)
     if (termId) {
-      expect(body.get('batch_mode_term_id')).toEqual(termId.toString())
+      expect(parsedBody.batch_mode_term_id).toEqual(termId)
     }
-    return 200
+
+    // Return response with pre_attachment data for the two-step flow
+    return {
+      id: 123,
+      workflow_state: 'created',
+      data: {},
+      progress: 0,
+      pre_attachment: {
+        upload_url: 'https://s3.example.com/upload',
+        upload_params: {
+          key: 'uploads/123/users.csv',
+          policy: 'base64policy',
+          signature: 'signature',
+        },
+        file_param: 'file',
+      },
+    }
   })
 }
 
@@ -81,6 +109,7 @@ describe('SisImportForm', () => {
     fetchMock.restore()
     queryClient.clear()
     fakeENV.teardown()
+    vi.clearAllMocks()
   })
 
   const renderWithClient = (ui: React.ReactElement) => {
@@ -89,7 +118,7 @@ describe('SisImportForm', () => {
 
   it('should render checkboxes and descriptions', () => {
     const {queryByText, queryByTestId, getByTestId, getByText} = renderWithClient(
-      <SisImportForm onSuccess={jest.fn()} />,
+      <SisImportForm onSuccess={vi.fn()} />,
     )
     expect(getByText('Choose a file to import')).toBeInTheDocument()
 
@@ -115,7 +144,7 @@ describe('SisImportForm', () => {
   it('should show term select if full batch checked', async () => {
     const user = userEvent.setup()
     const {getByTestId, findByText, findByTestId} = renderWithClient(
-      <SisImportForm onSuccess={jest.fn()} />,
+      <SisImportForm onSuccess={vi.fn()} />,
     )
 
     await user.click(getByTestId('batch_mode'))
@@ -130,7 +159,7 @@ describe('SisImportForm', () => {
 
   it('should show additional checkboxes if override sis', async () => {
     const user = userEvent.setup()
-    const {getByText, getByTestId} = renderWithClient(<SisImportForm onSuccess={jest.fn()} />)
+    const {getByText, getByTestId} = renderWithClient(<SisImportForm onSuccess={vi.fn()} />)
 
     await user.click(getByTestId('override_sis_stickiness'))
     expect(getByTestId('add_sis_stickiness')).toBeInTheDocument()
@@ -142,7 +171,7 @@ describe('SisImportForm', () => {
 
   it('disables override checkboxes based on check status', async () => {
     const user = userEvent.setup()
-    const {getByTestId} = renderWithClient(<SisImportForm onSuccess={jest.fn()} />)
+    const {getByTestId} = renderWithClient(<SisImportForm onSuccess={vi.fn()} />)
 
     await user.click(getByTestId('override_sis_stickiness'))
     const addCheck = getByTestId('add_sis_stickiness')
@@ -161,25 +190,160 @@ describe('SisImportForm', () => {
     expect(clearCheck).not.toBeDisabled()
   })
 
-  it('calls onSuccess with data on submit', async () => {
-    const onSuccess = jest.fn()
+  it('calls onSuccess with data on submit and handles two-step upload', async () => {
+    const onSuccess = vi.fn()
     const user = userEvent.setup()
     mockPost({batchMode: false, overrideSis: false})
+    vi.mocked(completeUpload).mockClear()
 
     const {getByText, getByTestId} = renderWithClient(<SisImportForm onSuccess={onSuccess} />)
 
-    await uploadFile(user, getByTestId('file_drop'))
+    const file = await uploadFile(user, getByTestId('file_drop'))
 
     getByText('Process Data').click()
     await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
-    expect(onSuccess).toHaveBeenCalled()
+
+    // Verify completeUpload was called with the correct parameters
+    expect(completeUpload).toHaveBeenCalledWith(
+      {
+        upload_url: 'https://s3.example.com/upload',
+        upload_params: {
+          key: 'uploads/123/users.csv',
+          policy: 'base64policy',
+          signature: 'signature',
+        },
+        file_param: 'file',
+      },
+      file,
+      expect.objectContaining({
+        onProgress: expect.any(Function),
+      }),
+    )
+
+    await waitFor(() => expect(onSuccess).toHaveBeenCalled())
+
+    // Verify onSuccess was called with the SIS import data
+    const sisImportData = onSuccess.mock.calls[0][0]
+    expect(sisImportData).toEqual(
+      expect.objectContaining({
+        id: 123,
+        workflow_state: 'created',
+        data: {},
+        progress: 0,
+      }),
+    )
+  })
+
+  describe('site admin confirmation modal', () => {
+    const ACCOUNT_NAME = 'Stride Academy'
+
+    describe('when SHOW_SITE_ADMIN_CONFIRMATION is true', () => {
+      beforeEach(() => {
+        fakeENV.teardown()
+        fakeENV.setup({
+          ACCOUNT_ID,
+          SHOW_SITE_ADMIN_CONFIRMATION: true,
+          current_context: {name: ACCOUNT_NAME},
+        })
+      })
+
+      it('shows modal on submit', async () => {
+        const user = userEvent.setup()
+        const {getByTestId, getByText} = renderWithClient(
+          <SisImportForm onSuccess={vi.fn()} />,
+        )
+        await uploadFile(user, getByTestId('file_drop'))
+
+        getByText('Process Data').click()
+        expect(getByText('Confirm SIS Import')).toBeInTheDocument()
+        expect(getByText(`Account: ${ACCOUNT_NAME}`)).toBeInTheDocument()
+      })
+
+      it('proceeds with import after typing correct account name', async () => {
+        const onSuccess = vi.fn()
+        const user = userEvent.setup()
+        mockPost({batchMode: false, overrideSis: false})
+        const {getByTestId, getByText} = renderWithClient(
+          <SisImportForm onSuccess={onSuccess} />,
+        )
+        await uploadFile(user, getByTestId('file_drop'))
+
+        getByText('Process Data').click()
+        // Use fireEvent.change instead of user.type to avoid InstUI Modal
+        // focus management conflict with the space in the account name.
+        fireEvent.change(getByTestId('site-admin-confirm-input'), {target: {value: ACCOUNT_NAME}})
+        await user.click(getByTestId('site-admin-confirm-btn'))
+
+        await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
+        expect(onSuccess).toHaveBeenCalled()
+      })
+
+      it('does not proceed when cancelled', async () => {
+        const onSuccess = vi.fn()
+        const user = userEvent.setup()
+        const {getByTestId, getByText, queryByText} = renderWithClient(
+          <SisImportForm onSuccess={onSuccess} />,
+        )
+        await uploadFile(user, getByTestId('file_drop'))
+
+        getByText('Process Data').click()
+        await user.click(getByTestId('site-admin-cancel-btn'))
+
+        await waitFor(() => {
+          expect(queryByText('Confirm SIS Import')).toBeNull()
+          expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(false)
+          expect(onSuccess).not.toHaveBeenCalled()
+        })
+      })
+
+      it('shows both site admin and batch mode warnings in one modal when both apply', async () => {
+        const onSuccess = vi.fn()
+        const user = userEvent.setup()
+        mockPost({batchMode: true, overrideSis: false, termId: '1'})
+        const {getByTestId, getByText, getAllByText, findByTestId} = renderWithClient(
+          <SisImportForm onSuccess={onSuccess} />,
+        )
+        await uploadFile(user, getByTestId('file_drop'))
+        await user.click(getByTestId('batch_mode'))
+        await findByTestId('full-batch-dropdown')
+
+        // Click submit — unified modal appears with both sections
+        getByText('Process Data').click()
+        expect(getByText('Confirm SIS Import')).toBeInTheDocument()
+        expect(getByText(`Account: ${ACCOUNT_NAME}`)).toBeInTheDocument()
+        // Warning text appears both in FullBatchDropdown and in the modal
+        expect(getAllByText(/this will delete everything for this term/).length).toBeGreaterThanOrEqual(2)
+
+        // Use fireEvent.change instead of user.type to avoid InstUI Modal
+        // focus management conflict: re-rendering the batch mode Alert shifts
+        // focus to a button, and the space in the account name activates it.
+        fireEvent.change(getByTestId('site-admin-confirm-input'), {target: {value: ACCOUNT_NAME}})
+        await user.click(getByTestId('site-admin-confirm-btn'))
+        await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
+        expect(onSuccess).toHaveBeenCalled()
+      })
+    })
+
+    it('does not show modal when SHOW_SITE_ADMIN_CONFIRMATION is false', async () => {
+      const user = userEvent.setup()
+      mockPost({batchMode: false, overrideSis: false})
+      const onSuccess = vi.fn()
+      const {getByTestId, getByText, queryByText} = renderWithClient(
+        <SisImportForm onSuccess={onSuccess} />,
+      )
+      await uploadFile(user, getByTestId('file_drop'))
+
+      getByText('Process Data').click()
+      expect(queryByText('Confirm SIS Import')).toBeNull()
+      await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
+    })
   })
 
   describe('opens confirmation modal', () => {
     it('if full batch checked', async () => {
       const user = userEvent.setup()
-      const {getByTestId, getByText, findByTestId} = renderWithClient(
-        <SisImportForm onSuccess={jest.fn()} />,
+      const {getByTestId, getByText, getAllByText, findByTestId} = renderWithClient(
+        <SisImportForm onSuccess={vi.fn()} />,
       )
       await uploadFile(user, getByTestId('file_drop'))
       await user.click(getByTestId('batch_mode'))
@@ -188,13 +352,16 @@ describe('SisImportForm', () => {
       await findByTestId('full-batch-dropdown')
 
       getByText('Process Data').click()
-      expect(getByText('Confirm Changes')).toBeInTheDocument()
+      expect(getByText('Confirm SIS Import')).toBeInTheDocument()
+      // Warning text appears both in FullBatchDropdown and in the modal
+      expect(getAllByText(/this will delete everything for this term/).length).toBeGreaterThanOrEqual(2)
     })
 
     it('calls onSuccess if confirmed', async () => {
-      const onSuccess = jest.fn()
+      const onSuccess = vi.fn()
       const user = userEvent.setup()
       mockPost({batchMode: true, overrideSis: false, termId: '1'})
+      vi.mocked(completeUpload).mockClear()
       const {getByText, getByTestId, findByTestId} = renderWithClient(
         <SisImportForm onSuccess={onSuccess} />,
       )
@@ -207,11 +374,11 @@ describe('SisImportForm', () => {
       getByText('Process Data').click()
       getByText('Confirm').click()
       await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
-      expect(onSuccess).toHaveBeenCalled()
+      await waitFor(() => expect(onSuccess).toHaveBeenCalled())
     })
 
     it('does not call onSuccess if cancelled', async () => {
-      const onSuccess = jest.fn()
+      const onSuccess = vi.fn()
       const user = userEvent.setup()
       const {getByText, getByTestId, queryByText, findByTestId} = renderWithClient(
         <SisImportForm onSuccess={onSuccess} />,
@@ -225,7 +392,7 @@ describe('SisImportForm', () => {
       getByText('Process Data').click()
       getByText('Cancel').click()
       await waitFor(() => {
-        expect(queryByText('Confirm Changes')).toBeNull()
+        expect(queryByText('Confirm SIS Import')).toBeNull()
         expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(false)
         expect(onSuccess).not.toHaveBeenCalled()
       })

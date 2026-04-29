@@ -23,11 +23,15 @@ import {renderHook, act} from '@testing-library/react-hooks'
 import {courseAlignmentStatsMocks} from '../../../mocks/Management'
 import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext from '../../contexts/OutcomesContext'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 describe('useCourseAlignmentStats', () => {
   let cache
@@ -52,12 +56,12 @@ describe('useCourseAlignmentStats', () => {
   }
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     cache = createCache()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const wrapper = ({
@@ -79,7 +83,7 @@ describe('useCourseAlignmentStats', () => {
     })
     expect(result.current.loading).toBe(true)
     expect(result.current.data).toBeUndefined()
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.loading).toBe(false)
     expect(getStats(result)).toEqual([2, 1, 4, 5, 3, 3])
   })
@@ -91,7 +95,7 @@ describe('useCourseAlignmentStats', () => {
         mocks: [],
       },
     })
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading course alignment statistics.',
       type: 'error',
@@ -108,7 +112,7 @@ describe('useCourseAlignmentStats', () => {
     })
     expect(hook.result.current.loading).toBe(true)
     expect(hook.result.current.data).toBeUndefined()
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(hook.result.current.loading).toBe(false)
     expect(getStats(hook.result)).toEqual([2, 1, 4, 5, 3, 3])
 
@@ -117,7 +121,7 @@ describe('useCourseAlignmentStats', () => {
     hook.rerender({contextId: '2'})
     hook.rerender({contextId: '1'})
     expect(hook.result.current.loading).toBe(true)
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(hook.result.current.loading).toBe(false)
     expect(getStats(hook.result)).toEqual([12, 11, 14, 15, 13, 13])
   })

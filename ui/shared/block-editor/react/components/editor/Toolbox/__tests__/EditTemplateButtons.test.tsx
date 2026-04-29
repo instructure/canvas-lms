@@ -22,8 +22,8 @@ import {EditTemplateButtons} from '../EditTemplateButtons'
 
 const defaultProps = {
   templateId: '1',
-  onEditTemplate: jest.fn(),
-  onDeleteTemplate: jest.fn(),
+  onEditTemplate: vi.fn(),
+  onDeleteTemplate: vi.fn(),
 }
 
 const renderComponent = (props = {}) => {

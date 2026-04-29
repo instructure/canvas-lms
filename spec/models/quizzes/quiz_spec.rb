@@ -25,6 +25,43 @@ describe Quizzes::Quiz do
     course_factory
   end
 
+  describe "attachment handling" do
+    it "creates associations on quiz creation" do
+      course_with_teacher
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+      quiz = @course.quizzes.create!(title: "hello", description: aa_test_data.base_html, saving_user: @teacher)
+      expect(quiz.attachment_associations.count).to eq(1)
+      expect(quiz.attachment_associations.first.attachment_id).to eq aa_test_data.attachment1.id
+    end
+
+    it "updates associations on quiz update" do
+      course_with_teacher
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+      quiz = @course.quizzes.create!(title: "hello", description: aa_test_data.base_html, saving_user: @teacher)
+      quiz.update!(description: aa_test_data.replaced_html, saving_user: @teacher)
+      expect(quiz.reload.attachment_associations.count).to eq(1)
+      expect(quiz.attachment_associations.first.attachment_id).to eq aa_test_data.attachment2.id
+    end
+
+    it "versions attachment associations with the quiz" do
+      course_with_teacher
+      attachment_model(context: @course)
+      quiz = @course.quizzes.create!(description: "file linke: <a href='/courses/#{@course.id}/files/#{@attachment.id}/download'>file</a>", updating_user: @teacher)
+      quiz.reload.update(description: "meh", updating_user: @teacher)
+
+      expect(YAML.load(quiz.reload.versions.find_by(number: 1).yaml)["attachment_associations"][0]).to include({
+                                                                                                                 attachment_id: @attachment.id,
+                                                                                                                 context_id: quiz.id,
+                                                                                                                 context_type: "Quizzes::Quiz",
+                                                                                                                 root_account_id: @course.root_account_id,
+                                                                                                                 user_id: @teacher.id,
+                                                                                                                 context_concern: nil
+                                                                                                               })
+
+      expect(YAML.load(quiz.reload.versions.find_by(number: 2).yaml)["attachment_associations"]).to eq([])
+    end
+  end
+
   describe "default values for boolean attributes" do
     before(:once) do
       @quiz = @course.quizzes.create!(title: "hello")
@@ -562,7 +599,7 @@ describe Quizzes::Quiz do
     q.quiz_questions.create!
     q.quiz_questions.create!(question_data: { question_type: "text_only_question" })
     # this is necessary because of some caching that happens on the quiz object, that is not a factor in production
-    q.root_entries(true)
+    q.root_entries(force_check: true)
     q.save
     expect(q.question_count).to be(0)
     expect(q.unpublished_question_count).to be(3)
@@ -602,7 +639,7 @@ describe Quizzes::Quiz do
     expect(q.quiz_groups.length).to be(1)
     expect(g.quiz_questions.reload.active.size).to be(2)
 
-    entries = q.root_entries(true)
+    entries = q.root_entries(force_check: true)
     expect(entries.length).to be(3)
     expect(entries[0][:questions]).not_to be_nil
     expect(entries[1][:answers]).not_to be_nil
@@ -743,7 +780,7 @@ describe Quizzes::Quiz do
       q.quiz_questions.create!(question_data: question_data.merge(name: "root #{i}"))
     end
 
-    possible = Quizzes::Quiz.count_points_possible(q.root_entries(true))
+    possible = Quizzes::Quiz.count_points_possible(q.root_entries(force_check: true))
     expect(possible).to eq 9.9
   end
 
@@ -822,7 +859,7 @@ describe Quizzes::Quiz do
       lock_at = 1.day.ago
       u = User.create!(name: "Fred Colon")
       q = @course.quizzes.create!(title: "locked yesterday", lock_at:)
-      sub = Quizzes::SubmissionManager.new(q).find_or_create_submission(u, nil, "settings_only")
+      sub = Quizzes::SubmissionManager.new(q).find_or_create_submission(u, state: "settings_only")
       sub.manually_unlocked = true
       sub.save!
       sub2 = q.generate_submission(u)
@@ -1229,7 +1266,7 @@ describe Quizzes::Quiz do
   describe "#group_category_id" do
     it "returns the assignment's group category id if it has an assignment" do
       quiz = Quizzes::Quiz.new(title: "Assignment Group Category Quizzes::Quiz")
-      expect(quiz).to receive(:assignment).and_return double(group_category_id: 1)
+      expect(quiz).to receive(:assignment).and_return instance_double(Assignment, group_category_id: 1)
       expect(quiz.group_category_id).to eq 1
     end
 
@@ -1659,7 +1696,7 @@ describe Quizzes::Quiz do
       @concluded_teacher.enrollments.each(&:conclude)
       quiz = @course.quizzes.create!
 
-      expect(quiz.teachers).to_not include(@concluded_teacher)
+      expect(quiz.teachers).not_to include(@concluded_teacher)
     end
   end
 
@@ -2001,7 +2038,7 @@ describe Quizzes::Quiz do
     before :once do
       @course.workflow_state = "available"
       @course.save!
-      course_quiz(course: @course)
+      course_quiz(active: true)
       student_in_course(course: @course, active_all: true)
       teacher_in_course(course: @course, active_all: true)
     end
@@ -2262,13 +2299,13 @@ describe Quizzes::Quiz do
     end
 
     it "links the generated QS to a user" do
-      expect(subject).to receive(:generate_submission).with(participant.user, false)
+      expect(subject).to receive(:generate_submission).with(participant.user, preview: false)
 
       subject.generate_submission_for_participant(participant)
     end
 
     it "links the generated QS to a temporary user code" do
-      expect(subject).to receive(:generate_submission).with(participant.user_code, false)
+      expect(subject).to receive(:generate_submission).with(participant.user_code, preview: false)
 
       allow(participant).to receive(:anonymous?).and_return true
       subject.generate_submission_for_participant(participant)
@@ -2304,7 +2341,7 @@ describe Quizzes::Quiz do
         quiz.unlock_at = 1.hour.from_now
       end
 
-      include_examples "overrides"
+      it_behaves_like "overrides"
 
       it { is_expected.to be_truthy }
 
@@ -2324,7 +2361,7 @@ describe Quizzes::Quiz do
         quiz.lock_at = 1.hour.ago
       end
 
-      include_examples "overrides"
+      it_behaves_like "overrides"
 
       it { is_expected.to be_truthy }
 
@@ -2357,7 +2394,7 @@ describe Quizzes::Quiz do
           quiz.assignment.save
         end
 
-        include_examples "overrides"
+        it_behaves_like "overrides"
 
         it { is_expected.to be_truthy }
 
@@ -2379,7 +2416,7 @@ describe Quizzes::Quiz do
         locked_module.add_item(id: quiz.id, type: "quiz")
       end
 
-      include_examples "overrides"
+      it_behaves_like "overrides"
 
       it { is_expected.to be_truthy }
 
@@ -2496,6 +2533,44 @@ describe Quizzes::Quiz do
             expect(@quiz.visible_to_user?(@teacher)).to be_truthy
           end
         end
+      end
+    end
+
+    context "visible_students_with_da" do
+      before :once do
+        course_with_teacher(active_all: true)
+        @student1, @student2 = create_users(2, return_type: :record)
+        @course.enroll_student(@student1, enrollment_state: "active")
+        @course.enroll_student(@student2, enrollment_state: "active")
+        @quiz = Quizzes::Quiz.create!({
+                                        context: @course,
+                                        description: "quiz for differentiated tags",
+                                        only_visible_to_overrides: true,
+                                        title: "Quiz with tags"
+                                      })
+        @quiz.publish
+        @quiz.save!
+      end
+
+      it "returns all students when no students are specifically visible" do
+        context_students = @course.students
+        result = @quiz.visible_students_with_da(context_students)
+        expect(result.to_a).to eq(context_students.to_a)
+      end
+
+      it "returns visible students when they are assigned via overrides" do
+        context_students = @course.students
+        section = @course.course_sections.create!(name: "test section")
+        student_in_section(section, user: @student1)
+        create_section_override_for_assignment(@quiz.assignment, { course_section: section })
+        result = @quiz.visible_students_with_da(context_students)
+        expect(result).to include(@student1)
+        expect(result).not_to include(@student2)
+      end
+
+      it "does not raise an error when visible_user_ids is empty" do
+        context_students = @course.students
+        expect { @quiz.visible_students_with_da(context_students) }.not_to raise_error
       end
     end
   end
@@ -2672,12 +2747,6 @@ describe Quizzes::Quiz do
         quiz = @course.quizzes.create!(title: "hello")
         expect(quiz.root_account).to eq @course.root_account
       end
-
-      it "leaves root_account_id nil if no context" do
-        @course.root_account_id = nil
-        quiz = @course.quizzes.create!(title: "hello")
-        expect(quiz.root_account).to be_nil
-      end
     end
   end
 
@@ -2704,7 +2773,7 @@ describe Quizzes::Quiz do
   describe "Horizon course" do
     it "does not allow classic quiz creation" do
       allow(@course).to receive(:horizon_course?).and_return(true)
-      expect { @course.quizzes.create!(title: "test") }.to raise_error(ActiveRecord::RecordInvalid)
+      expect { @course.quizzes.create!(title: "test", workflow_state: "available") }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 end

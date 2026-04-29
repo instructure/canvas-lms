@@ -20,11 +20,15 @@
 module VisibilityHelpers
   class CacheSettings
     def self.ttl
-      config["ttl"] || 1.minute
+      config["ttl"] || 5.minutes
     end
 
     class << self
       private
+
+      Canvas::Reloader.on_reload do
+        @config = nil
+      end
 
       def config
         @config ||=

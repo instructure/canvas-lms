@@ -232,10 +232,10 @@ describe "Outcome Reports" do
         @account.set_feature_flag!(:account_level_mastery_scales, "on")
         expect(report.length).to eq 4
         report.each do |r|
-          expect(r).to_not have_key("mastery_points")
-          expect(r).to_not have_key("calculation_method")
-          expect(r).to_not have_key("calculation_int")
-          expect(r).to_not have_key("ratings")
+          expect(r).not_to have_key("mastery_points")
+          expect(r).not_to have_key("calculation_method")
+          expect(r).not_to have_key("calculation_int")
+          expect(r).not_to have_key("ratings")
         end
       end
 

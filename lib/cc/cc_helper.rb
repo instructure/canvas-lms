@@ -91,6 +91,7 @@ module CC
     MODULE_META = "module_meta.xml"
     COURSE_PACES = "course_paces.xml"
     RUBRICS = "rubrics.xml"
+    NAV_MENU_LINKS = "nav_menu_links.xml"
     EXTERNAL_TOOLS = "external_tools.xml"
     FILES_META = "files_meta.xml"
     SYLLABUS = "syllabus.html"
@@ -206,7 +207,7 @@ module CC
 
     class HtmlContentExporter
       attr_reader :course, :user, :used_media_objects, :media_object_flavor, :media_object_infos
-      attr_accessor :referenced_files, :referenced_assessment_question_files
+      attr_accessor :referenced_files
 
       def initialize(course, user, opts = {})
         @media_object_flavor = opts[:media_object_flavor]
@@ -220,7 +221,6 @@ module CC
         @for_epub_export = opts[:for_epub_export]
         @key_generator = opts[:key_generator] || CC::CCHelper
         @referenced_files = {}
-        @referenced_assessment_question_files = {}
         @disable_content_rewriting = !!opts[:disable_content_rewriting] || false
 
         @rewriter.set_handler("file_contents") do |match|
@@ -248,30 +248,34 @@ module CC
               "#{COURSE_TOKEN}/files"
             end
           else
-            context = @course
-            current_referenced_files = @referenced_files
-            if match.context_type == "assessment_questions" && !@for_course_copy
-              context = match.context_type.classify.constantize.find_by(id: match.context_id)
-              current_referenced_files = @referenced_assessment_question_files
-            end
+            obj = match.obj_class.find_by(id: match.obj_id)
+            next(match.url) if obj.try(:context_type).nil? || %w[Course User AssessmentQuestion].exclude?(obj.context_type)
 
-            obj = if context && match.obj_class == Attachment
-                    context.attachments.find_by(id: match.obj_id)
-                  else
-                    match.obj_class.where(id: match.obj_id).first
-                  end
-            next(match.url) unless obj && (@rewriter.user_can_view_content?(obj) || @for_epub_export)
+            # find the object in the context in case it's deleted and we need to find the active attachment
+            obj = obj.context.attachments.find_by(id: obj) if obj.deleted? && %w[Course User].include?(obj.context_type)
+            next(match.url) unless obj
+            next(match.url) if obj.context_type == "Course" && obj.context_id != @course.id
+            next(match.url) if obj.context_type == "AssessmentQuestion" && @for_course_copy
+            next(match.url) if match.context_type.present? && (match.context_type.classify != obj&.context_type || match.context_id != obj.context_id.to_s)
+            next(match.url) unless @rewriter.user_can_view_content?(obj) || @for_epub_export
 
             obj.export_id = @key_generator.create_key(obj)
-            current_referenced_files[obj.id] = obj if @track_referenced_files && !current_referenced_files[obj.id]
+            @referenced_files[obj.id] = obj if @track_referenced_files && !@referenced_files[obj.id]
+            if obj.context_type == "User"
+              uri = Addressable::URI.parse(match.rest)
+              uri.query_values = uri.query_values&.except("verifier").presence
+              match.rest = uri.to_s
+            end
 
             if @for_course_copy
               "#{COURSE_TOKEN}/file_ref/#{obj.export_id}#{match.rest}"
             else
               # for files in exports, turn it into a relative link by path, rather than by file id
               # we retain the file query string parameters
-              folder = if match.context_type == "assessment_questions"
+              folder = if obj.context_type == "AssessmentQuestion"
                          "#{WEB_CONTENT_TOKEN}/assessment_questions"
+                       elsif obj.context_type == "User"
+                         "#{WEB_CONTENT_TOKEN}/#{Folder.media_folder(course).name}"
                        else
                          obj.folder&.full_name&.sub(/course( |%20)files/, WEB_CONTENT_TOKEN)
                        end
@@ -288,9 +292,7 @@ module CC
           # WikiPagesController allows loosely-matching URLs; fix them before exporting
           if match.obj_id.present?
             url_or_title = match.obj_id
-            lookup = if Account.site_admin.feature_enabled?(:permanent_page_links)
-                       @course.wiki_page_lookups.where(slug: url_or_title.to_url).first
-                     end
+            lookup = find_wiki_page_lookup(url_or_title)
             page = if lookup
                      @course.wiki_pages.deleted_last.where(id: lookup.wiki_page_id).first
                    else
@@ -338,6 +340,17 @@ module CC
         port = ConfigFile.load("domain").try(:[], :domain).try(:split, ":").try(:[], 1)
         @url_prefix = "#{protocol}://#{host}"
         @url_prefix += ":#{port}" if !host&.include?(":") && port.present?
+      end
+
+      def decode_url_slug(url_slug)
+        Rack::Utils.unescape_path(url_slug).to_url
+      end
+
+      def find_wiki_page_lookup(url_or_title)
+        return nil unless Account.site_admin.feature_enabled?(:permanent_page_links)
+
+        @course.wiki_page_lookups.where(slug: url_or_title.to_url).first ||
+          @course.wiki_page_lookups.where(slug: decode_url_slug(url_or_title)).first
       end
 
       def translate_module_item_query(query)
@@ -396,6 +409,10 @@ module CC
         attachment.export_id = @key_generator.create_key(attachment)
         referenced_files[attachment.id] = attachment unless referenced_files[attachment.id]
         File.join(WEB_CONTENT_TOKEN, info[:path])
+      end
+
+      def translate_url(url)
+        @disable_content_rewriting ? url : @rewriter.translate_url(url)
       end
 
       def html_content(html)

@@ -151,9 +151,11 @@ module CC
     end
 
     def create_sub_assignments(doc, topic)
-      unless topic.sub_assignments.empty?
+      checkpoints = SubAssignment.where(parent_assignment_id: topic.assignment_id)
+
+      unless checkpoints.empty?
         doc.sub_assignments do
-          topic.sub_assignments.each do |sub_assignment|
+          checkpoints.each do |sub_assignment|
             add_exported_asset(sub_assignment)
 
             identifier = create_key(sub_assignment)

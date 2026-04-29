@@ -18,7 +18,7 @@
 
 import React from 'react'
 import AttemptSelect from './AttemptSelect'
-import CommentsTray from './CommentsTray/index'
+import CommentsTray from '@canvas/assignments/react/CommentsTray/index'
 import OriginalityReport from './OriginalityReport'
 import SubmissionWorkflowTracker from './SubmissionWorkflowTracker'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import {Badge} from '@instructure/ui-badge'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import StudentViewContext from './Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {IconChatLine, IconQuestionLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
@@ -149,8 +149,7 @@ export default ({
                 !context.allowChangesToSubmission
               const button = (
                 <Button
-                  // @ts-expect-error
-                  renderIcon={IconChatLine}
+                  renderIcon={<IconChatLine />}
                   onClick={openCommentTray}
                   disabled={addCommentsDisabled}
                   data-testid="view_feedback_button"
@@ -238,7 +237,7 @@ export default ({
 
               {assignment.env.currentUser && !lockAssignment && !peerReviewModeEnabled && (
                 <Flex.Item>
-                  <SubmissionWorkflowTracker />
+                  <SubmissionWorkflowTracker submission={submission} />
                 </Flex.Item>
               )}
 

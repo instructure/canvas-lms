@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {map} from 'es-toolkit/compat'
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 
 describe('Gradebook init', () => {
@@ -43,7 +43,7 @@ describe('Gradebook init', () => {
     const gradingPeriodSet = createGradebook(options).gradingPeriodSet
     expect(gradingPeriodSet.id).toBe('1501')
     expect(gradingPeriodSet.gradingPeriods).toHaveLength(2)
-    expect(_.map(gradingPeriodSet.gradingPeriods, 'id')).toEqual(['701', '702'])
+    expect(map(gradingPeriodSet.gradingPeriods, 'id')).toEqual(['701', '702'])
   })
 })
 

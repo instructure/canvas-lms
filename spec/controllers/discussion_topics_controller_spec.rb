@@ -19,7 +19,6 @@
 #
 
 require "feedjira"
-require_relative "../spec_helper"
 
 describe DiscussionTopicsController do
   before :once do
@@ -444,29 +443,23 @@ describe DiscussionTopicsController do
       before do
         allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:count)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
       end
 
       it "count discussion_topic.index.visit" do
-        user_session(@teacher)
-        get "index", params: { course_id: @course.id }
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.index.visit").at_least(:once)
       end
 
       it "count number of pinned discussions discussion_topic.index.pinned" do
-        user_session(@teacher)
-        get "index", params: { course_id: @course.id }
         expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.index.visit.pinned", 0).at_least(:once)
       end
 
       it "count number of discussion_topic.index.visit.discussions" do
-        user_session(@teacher)
-        get "index", params: { course_id: @course.id }
         expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.index.visit.discussions", 0).at_least(:once)
       end
 
       it "count number of discussion_topic.index.visit.closed_for_comments" do
-        user_session(@teacher)
-        get "index", params: { course_id: @course.id }
         expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.index.visit.closed_for_comments", 0).at_least(:once)
       end
     end
@@ -656,7 +649,6 @@ describe DiscussionTopicsController do
 
     context "assign to differentiation tags" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -743,12 +735,15 @@ describe DiscussionTopicsController do
     end
 
     context "js_env current_page is set correctly" do
-      before do
-        user_session(@student)
+      before(:once) do
         course_topic
         41.times do |i|
           @topic.discussion_entries.create!(user: @teacher, message: (i + 1).to_s)
         end
+      end
+
+      before do
+        user_session(@student)
         participant = @topic.participant(@student)
         participant.sort_order = DiscussionTopic::SortOrder::ASC
         participant.save!
@@ -854,27 +849,74 @@ describe DiscussionTopicsController do
       expect(controller.js_env[:discussion_topic_menu_tools].first).to eq commons_hash
     end
 
+    context "ASSET_PROCESSOR_EULA_LAUNCH_URLS" do
+      it "sets ASSET_PROCESSOR_EULA_LAUNCH_URLS if the user is a student and the discussion is graded" do
+        assignment = assignment_model(course: @course)
+        discussion = discussion_topic_model(context: @course, assignment:)
+        user_session(@student)
+        urls = [
+          { name: "test tool", url: "http://localhost/courses/#{@course.id}/external_tools/1/eula_launch" }
+        ]
+        allow(Lti::EulaUiService).to receive(:eula_launch_urls)
+          .with(user: @student, assignment:)
+          .and_return(urls)
+
+        get :show, params: { course_id: @course.id, id: discussion.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to eq urls
+      end
+
+      it "does not set ASSET_PROCESSOR_EULA_LAUNCH_URLS if the user is a teacher" do
+        assignment = assignment_model(course: @course)
+        discussion = discussion_topic_model(context: @course, assignment:)
+        user_session(@teacher)
+
+        get :show, params: { course_id: @course.id, id: discussion.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to be_nil
+      end
+
+      it "does not set ASSET_PROCESSOR_EULA_LAUNCH_URLS for non-graded discussions" do
+        discussion = discussion_topic_model(context: @course)
+        user_session(@student)
+
+        get :show, params: { course_id: @course.id, id: discussion.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to be_nil
+      end
+
+      it "does not set ASSET_PROCESSOR_EULA_LAUNCH_URLS when lti_asset_processor_discussions feature flag is disabled" do
+        @course.root_account.disable_feature! :lti_asset_processor_discussions
+        assignment = assignment_model(course: @course)
+        discussion = discussion_topic_model(context: @course, assignment:)
+        user_session(@student)
+
+        get :show, params: { course_id: @course.id, id: discussion.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to be_nil
+      end
+    end
+
     context "assign to differentiation tags" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
         end
       end
 
+      let(:discussion) { @course.discussion_topics.create!(user: @teacher, message: "hello") }
+
       it "adds differentiation tags information if account setting is on" do
         user_session(@teacher)
-        @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello")
-        get "show", params: { course_id: @course.id, id: @discussion.id }
+        get "show", params: { course_id: @course.id, id: discussion.id }
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
         expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
       end
 
       it "CAN_MANAGE_DIFFERENTIAITON_TAGS is false if user cannot manage tags" do
         user_session(@student)
-        @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello")
-        get "show", params: { course_id: @course.id, id: @discussion.id }
+        get "show", params: { course_id: @course.id, id: discussion.id }
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
         expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
       end
@@ -887,7 +929,7 @@ describe DiscussionTopicsController do
         message: "some message"
       )
       get "show", params: { course_id: @course.id, id: @announcement.id }
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
     end
 
     it "does not display announcements in private courses to users who aren't logged in" do
@@ -896,7 +938,7 @@ describe DiscussionTopicsController do
       assert_unauthorized
     end
 
-    context 'with the "react_discussions_post" FF enabled' do
+    context "show action" do
       render_views
       subject { get "show", params: { course_id: course.id, id: discussion.id } }
 
@@ -987,6 +1029,7 @@ describe DiscussionTopicsController do
         end
 
         it "teacher can summarize when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_summary
 
           user_session(@teacher)
@@ -995,6 +1038,7 @@ describe DiscussionTopicsController do
         end
 
         it "student cannot summarize when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_summary
 
           user_session(@student)
@@ -1025,6 +1069,7 @@ describe DiscussionTopicsController do
         end
 
         it "teacher can access insights when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_insights
 
           user_session(@teacher)
@@ -1033,6 +1078,7 @@ describe DiscussionTopicsController do
         end
 
         it "student cannot access insights when the feature is enabled" do
+          allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
           Account.site_admin.enable_feature! :discussion_insights
 
           user_session(@student)
@@ -1056,6 +1102,18 @@ describe DiscussionTopicsController do
         subject
         expect(response.body).to match(/.+enrollment.+\.atom/)
         expect(response.body).to include("Discussion Atom Feed")
+      end
+
+      context "embed param" do
+        it "adds mobile-embed body class when embed=true" do
+          get "show", params: { course_id: course.id, id: discussion.id, embed: "true" }
+          expect(assigns(:body_classes)).to include("mobile-embed")
+        end
+
+        it "does not add mobile-embed body class without embed param" do
+          subject
+          expect(assigns(:body_classes)).not_to include("mobile-embed")
+        end
       end
     end
 
@@ -1353,6 +1411,194 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:PEER_REVIEWS_URL]).to eq "/courses/#{@course.id}/assignments/#{@topic.assignment.id}/peer_reviews"
       end
 
+      it "sets manage_rubrics to true for user with only manage_assignments_edit" do
+        custom_role = custom_teacher_role("NoRubricsTeacher", account: @course.account)
+        @course.account.role_overrides.create!(role: custom_role, permission: :manage_rubrics, enabled: false)
+        @course.account.role_overrides.create!(role: custom_role, permission: :manage_assignments_edit, enabled: true)
+        custom_teacher = course_with_user("TeacherEnrollment", {
+                                            active_all: true,
+                                            course: @course,
+                                            role: custom_role
+                                          }).user
+        user_session(custom_teacher)
+
+        get "show", params: { course_id: @course.id, id: @topic.id }
+
+        expect(assigns[:js_env][:PERMISSIONS]).to include manage_rubrics: true
+      end
+
+      context "enhanced rubrics js_env variables" do
+        before do
+          Account.site_admin.enable_feature! :enhanced_rubrics_assignments
+          @course.enable_feature! :enhanced_rubrics
+        end
+
+        context "when enhanced_rubrics feature is enabled and assignment has rubric" do
+          before do
+            outcome_with_rubric
+            @rubric.associate_with(@topic.assignment, @course, purpose: "grading")
+            user_session(@teacher)
+          end
+
+          it "sets all assignment-level env variables correctly" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@topic.assignment.id)
+            expect(assigns[:js_env][:ASSIGNMENT_POINTS]).to eq(@topic.assignment.points_possible)
+            expect(assigns[:js_env][:rubric_self_assessment_enabled]).to be(false)
+            expect(assigns[:js_env][:can_update_rubric_self_assessment]).to be_truthy
+          end
+
+          it "sets assigned_rubric with complete rubric JSON with rubric association" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            assigned_rubric = assigns[:js_env][:assigned_rubric]
+            rubric_assoc = assigns[:js_env][:rubric_association]
+            expect(assigned_rubric).to be_present
+            expect(assigned_rubric[:id]).to eq(@rubric.id)
+            expect(assigned_rubric[:title]).to eq(@rubric.title)
+            expect(assigned_rubric[:criteria]).to be_present
+            expect(assigned_rubric[:can_update]).to be_truthy
+            expect(assigned_rubric).to have_key(:unassessed)
+            expect(assigned_rubric).to have_key(:association_count)
+            expect(rubric_assoc).to be_present
+            expect(rubric_assoc[:id]).to eq(@topic.assignment.rubric_association.id)
+            expect(rubric_assoc[:rubric_id]).to eq(@rubric.id)
+            expect(rubric_assoc[:purpose]).to eq("grading")
+          end
+
+          it "sets all context-level env variables correctly" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
+            expect(assigns[:js_env][:ai_rubrics_enabled]).to be(false)
+            expect(assigns[:js_env][:rubric_self_assessment_ff_enabled]).to be(false)
+            expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).to be_present
+            expect(assigns[:js_env][:ROOT_OUTCOME_GROUP][:id]).to eq(@course.root_outcome_group.id)
+          end
+
+          context "when account_level_mastery_scales is disabled" do
+            it "sets ACCOUNT_LEVEL_MASTERY_SCALES to false" do
+              get "show", params: { course_id: @course.id, id: @topic.id }
+              expect(assigns[:js_env][:ACCOUNT_LEVEL_MASTERY_SCALES]).to be(false)
+            end
+          end
+
+          context "when account_level_mastery_scales is enabled" do
+            before do
+              @course.root_account.enable_feature! :account_level_mastery_scales
+            end
+
+            it "sets ACCOUNT_LEVEL_MASTERY_SCALES to true" do
+              get "show", params: { course_id: @course.id, id: @topic.id }
+              expect(assigns[:js_env][:ACCOUNT_LEVEL_MASTERY_SCALES]).to be(true)
+            end
+          end
+
+          context "when ai_rubrics feature is enabled" do
+            before do
+              @course.enable_feature! :ai_rubrics
+            end
+
+            it "sets ai_rubrics_enabled to true" do
+              get "show", params: { course_id: @course.id, id: @topic.id }
+              expect(assigns[:js_env][:ai_rubrics_enabled]).to be(true)
+            end
+          end
+
+          context "when rubric_self_assessment feature is enabled" do
+            before do
+              @course.root_account.enable_feature! :rubric_self_assessment
+              @course.enable_feature! :assignments_2_student
+            end
+
+            it "sets rubric_self_assessment_ff_enabled to false" do
+              get "show", params: { course_id: @course.id, id: @topic.id }
+              expect(assigns[:js_env][:rubric_self_assessment_ff_enabled]).to be(false)
+            end
+          end
+        end
+
+        context "when enhanced_rubrics feature is enabled but assignment has no rubric" do
+          before do
+            user_session(@teacher)
+          end
+
+          it "sets assignment-level variables but not rubric-specific ones" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            expect(assigns[:js_env][:ASSIGNMENT_ID]).to eq(@topic.assignment.id)
+            expect(assigns[:js_env][:ASSIGNMENT_POINTS]).to eq(@topic.assignment.points_possible)
+            expect(assigns[:js_env][:assigned_rubric]).to be_nil
+            expect(assigns[:js_env][:rubric_association]).to be_nil
+            expect(assigns[:js_env][:rubric_self_assessment_enabled]).to be(false)
+            expect(assigns[:js_env][:can_update_rubric_self_assessment]).to be(false)
+
+            expect(assigns[:js_env][:COURSE_ID]).to eq(@course.id)
+            expect(assigns[:js_env][:ACCOUNT_LEVEL_MASTERY_SCALES]).to be(false)
+            expect(assigns[:js_env][:ai_rubrics_enabled]).to be(false)
+            expect(assigns[:js_env][:rubric_self_assessment_ff_enabled]).to be(false)
+            expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).to be_present
+          end
+        end
+
+        context "when enhanced_rubrics feature is disabled" do
+          before do
+            @course.disable_feature! :enhanced_rubrics
+            outcome_with_rubric
+            @rubric.associate_with(@topic.assignment, @course, purpose: "grading")
+            user_session(@teacher)
+          end
+
+          it "does not set any enhanced rubrics env variables" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            expect(assigns[:js_env][:ASSIGNMENT_ID]).to be_nil
+            expect(assigns[:js_env][:ASSIGNMENT_POINTS]).to be_nil
+            expect(assigns[:js_env][:assigned_rubric]).to be_nil
+            expect(assigns[:js_env][:rubric_association]).to be_nil
+            expect(assigns[:js_env][:COURSE_ID]).to be_nil
+            expect(assigns[:js_env][:ACCOUNT_LEVEL_MASTERY_SCALES]).to be_nil
+            expect(assigns[:js_env][:ai_rubrics_enabled]).to be_nil
+            expect(assigns[:js_env][:rubric_self_assessment_enabled]).to be_nil
+            expect(assigns[:js_env][:can_update_rubric_self_assessment]).to be_nil
+          end
+        end
+
+        context "when enhanced_rubrics_assignments site admin feature is disabled" do
+          before do
+            Account.site_admin.disable_feature! :enhanced_rubrics_assignments
+            @course.enable_feature! :enhanced_rubrics
+            outcome_with_rubric
+            @rubric.associate_with(@topic.assignment, @course, purpose: "grading")
+            user_session(@teacher)
+          end
+
+          it "does not set any enhanced rubrics env variables" do
+            get "show", params: { course_id: @course.id, id: @topic.id }
+            expect(assigns[:js_env][:ASSIGNMENT_ID]).to be_nil
+            expect(assigns[:js_env][:ASSIGNMENT_POINTS]).to be_nil
+            expect(assigns[:js_env][:assigned_rubric]).to be_nil
+            expect(assigns[:js_env][:rubric_association]).to be_nil
+            expect(assigns[:js_env][:COURSE_ID]).to be_nil
+          end
+        end
+
+        context "when context is a group, not a course" do
+          before do
+            @group1.add_user(@teacher)
+            @group_topic = @group1.discussion_topics.create!(title: "group topic")
+            user_session(@teacher)
+          end
+
+          it "sets enhanced_rubrics_enabled to false" do
+            get "show", params: { group_id: @group1.id, id: @group_topic.id }
+            expect(assigns[:js_env][:enhanced_rubrics_enabled]).to be(false)
+          end
+
+          it "does not set enhanced rubrics assignment env variables" do
+            get "show", params: { group_id: @group1.id, id: @group_topic.id }
+            expect(assigns[:js_env][:ASSIGNMENT_ID]).to be_nil
+            expect(assigns[:js_env][:COURSE_ID]).to be_nil
+          end
+        end
+      end
+
       it "assigns groups from the topic's category" do
         user_session(@teacher)
 
@@ -1469,7 +1715,23 @@ describe DiscussionTopicsController do
         mod.save!
         expect(@topic.read_state(@student)).to eq "unread"
         get "index", params: { course_id: @course.id, exclude_context_module_locked_topics: true }, format: "json"
-        expect(response.parsed_body.pluck("id")).to_not include @topic.id
+        expect(response.parsed_body.pluck("id")).not_to include @topic.id
+      end
+
+      it "sets ASSET_PROCESSOR_EULA_LAUNCH_URLS with group context" do
+        user_session(@student)
+
+        urls = [
+          { name: "test tool", url: "http://localhost/courses/#{@course.id}/external_tools/1/eula_launch" }
+        ]
+
+        expect(Lti::EulaUiService).to receive(:eula_launch_urls)
+          .with(user: @student, assignment: @topic.assignment)
+          .and_return(urls)
+
+        get :show, params: { id: @group1.all_discussion_topics.last.id, group_id: @group1.id }
+
+        expect(assigns[:js_env][:ASSET_PROCESSOR_EULA_LAUNCH_URLS]).to eq urls
       end
     end
 
@@ -1673,9 +1935,8 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_truthy
     end
 
-    it "js_bundles includes discussion_create when ff is on" do
+    it "js_bundles includes discussion_topic_edit_v2" do
       user_session(@teacher)
-      @course.root_account.enable_feature!(:discussion_create)
       get :new, params: { course_id: @course.id }
       expect(assigns[:js_bundles].first).to include(:discussion_topic_edit_v2)
     end
@@ -1842,6 +2103,65 @@ describe DiscussionTopicsController do
       end
     end
 
+    context "assignment secure params" do
+      before(:once) do
+        course_topic
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "sets ASSIGNMENT_SECURE_PARAMS for new discussion topics without assignments" do
+        new_topic = @course.discussion_topics.create!(title: "New topic")
+
+        get :edit, params: { course_id: @course.id, id: new_topic.id }
+
+        expect(assigns[:js_env][:ASSIGNMENT_SECURE_PARAMS]).to be_present
+        # Verify it contains a JWT token
+        expect(assigns[:js_env][:ASSIGNMENT_SECURE_PARAMS]).to match(/^eyJ/)
+      end
+
+      it "does not set ASSIGNMENT_SECURE_PARAMS for existing discussion topics with assignments" do
+        course_topic(with_assignment: true)
+
+        get :edit, params: { course_id: @course.id, id: @topic.id }
+
+        expect(assigns[:js_env][:ASSIGNMENT_SECURE_PARAMS]).to be_nil
+      end
+
+      it "sets secure_params in DISCUSSION_TOPIC.ATTRIBUTES.assignment for existing assignments" do
+        course_topic(with_assignment: true)
+
+        get :edit, params: { course_id: @course.id, id: @topic.id }
+
+        discussion_topic_data = assigns[:js_env][:DISCUSSION_TOPIC]
+        assignment_data = discussion_topic_data[:ATTRIBUTES][:assignment]
+
+        expect(assignment_data[:secure_params]).to be_present
+        expect(assignment_data[:secure_params]).to match(/^eyJ/)
+        expected_secure_params = @topic.assignment.secure_params(include_description: false)
+        expect(assignment_data[:secure_params]).to eq(expected_secure_params)
+      end
+
+      it "includes description in secure_params when assignment has description" do
+        course_topic(with_assignment: true)
+        @topic.assignment.update!(description: "Test assignment description")
+
+        get :edit, params: { course_id: @course.id, id: @topic.id }
+
+        discussion_topic_data = assigns[:js_env][:DISCUSSION_TOPIC]
+        assignment_data = discussion_topic_data[:ATTRIBUTES][:assignment]
+
+        expect(assignment_data[:secure_params]).to be_present
+        expected_secure_params = @topic.assignment.secure_params(include_description: true)
+        expect(assignment_data[:secure_params]).to eq(expected_secure_params)
+
+        decoded = Canvas::Security.decode_jwt(assignment_data[:secure_params])
+        expect(decoded[:lti_assignment_description]).to be_present
+      end
+    end
+
     it "returns unauthorized for a user that does not have visibilites to view thiss" do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
@@ -1979,7 +2299,6 @@ describe DiscussionTopicsController do
 
     context "assign to differentiation tags" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -2039,13 +2358,13 @@ describe DiscussionTopicsController do
       context "enabled on course" do
         before { @course.update!(usage_rights_required: true) }
 
-        include_examples "usage rights returned"
+        it_behaves_like "usage rights returned"
       end
 
       context "disabled on course" do
         before { @course.update!(usage_rights_required: false) }
 
-        include_examples "no usage rights returned"
+        it_behaves_like "no usage rights returned"
       end
     end
   end
@@ -2058,6 +2377,7 @@ describe DiscussionTopicsController do
 
     context "when the feature flag is enabled" do
       before do
+        allow(FeatureFlags::Hooks).to receive(:tier_2_visible_on_hook).and_return(true)
         @course.root_account.enable_feature!(:discussion_insights)
       end
 
@@ -2065,6 +2385,23 @@ describe DiscussionTopicsController do
         user_session(@teacher)
         get :insights, params: { course_id: @course.id, id: @topic.id }
         expect(response).to have_http_status(:ok)
+      end
+
+      it "sets speedgrader URL template to nil when topic has no assignment" do
+        user_session(@teacher)
+        get :insights, params: { course_id: @course.id, id: @topic.id }
+        expect(assigns[:js_env][:SPEEDGRADER_URL_TEMPLATE]).to be_nil
+      end
+
+      it "sets speedgrader URL template when topic has assignment" do
+        user_session(@teacher)
+        @topic.assignment = @course.assignments.build(submission_types: "discussion_topic", title: @topic.title)
+        @topic.assignment.infer_times
+        @topic.assignment.saved_by = :discussion_topic
+        @topic.save!
+
+        get :insights, params: { course_id: @course.id, id: @topic.id }
+        expect(assigns[:js_env][:SPEEDGRADER_URL_TEMPLATE]).not_to be_nil
       end
     end
   end
@@ -2297,6 +2634,7 @@ describe DiscussionTopicsController do
       let(:topic) { assigns[:topic] }
 
       before do
+        Account.default.disable_feature!(:default_discussion_options)
         user_session(@student)
         post "create", params: topic_params(@course), format: :json
       end
@@ -2355,26 +2693,30 @@ describe DiscussionTopicsController do
         expect(DiscussionTopic.count).to eq old_count
       end
 
-      it "admins can see section-specific discussions" do
-        admin = account_admin_user(account: @course.root_account, role: admin_role, active_user: true)
-        user_session(admin)
-        topic = @course.discussion_topics.create!
-        topic.is_section_specific = true
-        topic.course_sections << @section1
-        topic.save!
-        get "index", params: { course_id: @course.id }, format: :json
-        expect(response).to be_successful
-        expect(assigns[:topics].length).to eq(1)
-      end
+      context "with admin" do
+        let(:admin) { account_admin_user(account: @course.root_account, role: admin_role, active_user: true) }
 
-      it "admins can create section-specific discussions" do
-        admin = account_admin_user(account: @course.root_account, role: admin_role, active_user: true)
-        user_session(admin)
-        post "create",
-             params: topic_params(@course, { is_announcement: true, specific_sections: @section1.id.to_s }),
-             format: :json
-        expect(response).to be_successful
-        expect(DiscussionTopic.last.course_sections.first).to eq @section1
+        before do
+          user_session(admin)
+        end
+
+        it "admins can see section-specific discussions" do
+          topic = @course.discussion_topics.create!
+          topic.is_section_specific = true
+          topic.course_sections << @section1
+          topic.save!
+          get "index", params: { course_id: @course.id }, format: :json
+          expect(response).to be_successful
+          expect(assigns[:topics].length).to eq(1)
+        end
+
+        it "admins can create section-specific discussions" do
+          post "create",
+               params: topic_params(@course, { is_announcement: true, specific_sections: @section1.id.to_s }),
+               format: :json
+          expect(response).to be_successful
+          expect(DiscussionTopic.last.course_sections.first).to eq @section1
+        end
       end
 
       it "creates a discussion with sections" do
@@ -2418,7 +2760,7 @@ describe DiscussionTopicsController do
                      .merge(assignment_params(@course))
         expect(DiscussionTopic.count).to eq 0
         post("create", params: obj_params, format: :json)
-        expect(response).to have_http_status :unprocessable_entity
+        expect(response).to have_http_status :unprocessable_content
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
       end
@@ -2434,8 +2776,11 @@ describe DiscussionTopicsController do
     end
 
     describe "discussion anonymity" do
-      it "allows full_anonymity" do
+      before do
         user_session @teacher
+      end
+
+      it "allows full_anonymity" do
         post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
         expect(response).to be_successful
         expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
@@ -2445,7 +2790,6 @@ describe DiscussionTopicsController do
       it "returns an error for creating anonymous discussions in a Group" do
         group_category = @course.group_categories.create(name: "gc")
         group = @course.groups.create!(group_category:)
-        user_session @teacher
         post "create", params: group_topic_params(group, { anonymous_state: "full_anonymity" }), format: :json
         expect(response).to have_http_status :bad_request
         expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Group discussions cannot be anonymous." })
@@ -2453,7 +2797,6 @@ describe DiscussionTopicsController do
 
       it "returns an error for creating anonymous discussions assigned to a Group Category in a Course" do
         group_category = @course.group_categories.create(name: "gc")
-        user_session @teacher
         post "create", params: topic_params(@course, { anonymous_state: "full_anonymity", group_category_id: group_category.id }), format: :json
         expect(response).to have_http_status :bad_request
         expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Group discussions cannot be anonymous." })
@@ -2461,14 +2804,12 @@ describe DiscussionTopicsController do
 
       it "returns an error for creating a graded anonymous discussion" do
         obj_params = topic_params(@course, { anonymous_state: "full_anonymity" }).merge(assignment_params(@course))
-        user_session(@teacher)
         post "create", params: obj_params, format: :json
         expect(response).to have_http_status :bad_request
         expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Anonymous discussions cannot be graded" })
       end
 
       it "allows partial_anonymity" do
-        user_session @teacher
         post "create", params: topic_params(@course, { anonymous_state: "partial_anonymity" }), format: :json
         expect(response).to be_successful
         expect(DiscussionTopic.last.anonymous_state).to eq "partial_anonymity"
@@ -2476,7 +2817,6 @@ describe DiscussionTopicsController do
       end
 
       it "nullifies anonymous_state when unaccounted for" do
-        user_session @teacher
         post "create", params: topic_params(@course, { anonymous_state: "thisisunaccountedfor" }), format: :json
         expect(response).to be_successful
         expect(DiscussionTopic.last.anonymous_state).to be_nil
@@ -2484,16 +2824,20 @@ describe DiscussionTopicsController do
       end
     end
 
-    it "requires authorization to create a discussion" do
-      @course.update_attribute(:is_public, true)
-      post "create", params: topic_params(@course, { is_announcement: false }), format: :json
-      assert_unauthorized
-    end
+    context "for public courses" do
+      before(:once) do
+        @course.update_attribute(:is_public, true)
+      end
 
-    it "requires authorization to create an announcement" do
-      @course.update_attribute(:is_public, true)
-      post "create", params: topic_params(@course, { is_announcement: true }), format: :json
-      assert_unauthorized
+      it "requires authorization to create a discussion" do
+        post "create", params: topic_params(@course, { is_announcement: false }), format: :json
+        assert_unauthorized
+      end
+
+      it "requires authorization to create an announcement" do
+        post "create", params: topic_params(@course, { is_announcement: true }), format: :json
+        assert_unauthorized
+      end
     end
 
     it "logs an asset access record for the discussion topic" do
@@ -2544,46 +2888,48 @@ describe DiscussionTopicsController do
       expect(@student.recent_stream_items.map { |item| item.data["notification_id"] }).not_to include notification.id
     end
 
-    it "does not dispatch new topic notification when hidden by selective release" do
-      Notification.create(name: "New Discussion Topic", category: "TestImmediately")
-      @student.communication_channels.create!(path: "student@example.com") { |cc| cc.workflow_state = "active" }
-      new_section = @course.course_sections.create!
-      obj_params = topic_params(@course, published: true).merge(assignment_params(@course, only_visible_to_overrides: true, assignment_overrides: [{ course_section_id: new_section.id }]))
-      user_session(@teacher)
-      post "create", params: obj_params, format: :json
-      json = response.parsed_body
-      topic = DiscussionTopic.find(json["id"])
-      expect(topic).to be_published
-      expect(topic.assignment).to be_published
-      expect(@student.email_channel.messages).to be_empty
-      expect(@student.recent_stream_items.map(&:data)).not_to include topic
-    end
+    context "with notification and active communication channel" do
+      before(:once) do
+        Notification.create(name: "New Discussion Topic", category: "TestImmediately")
+        @student.communication_channels.create!(path: "student@example.com") { |cc| cc.workflow_state = "active" }
+      end
 
-    it "does dispatch new topic notification when not hidden" do
-      Notification.create(name: "New Discussion Topic", category: "TestImmediately")
-      @student.communication_channels.create!(path: "student@example.com") { |cc| cc.workflow_state = "active" }
-      obj_params = topic_params(@course, published: true)
-      user_session(@teacher)
-      post "create", params: obj_params, format: :json
-      json = response.parsed_body
-      topic = DiscussionTopic.find(json["id"])
-      expect(topic).to be_published
-      expect(@student.email_channel.messages.map(&:context)).to include(topic)
-    end
+      before do
+        user_session(@teacher)
+      end
 
-    it "does dispatch new topic notification when published" do
-      Notification.create(name: "New Discussion Topic", category: "TestImmediately")
-      @student.communication_channels.create!(path: "student@example.com") { |cc| cc.workflow_state = "active" }
-      obj_params = topic_params(@course, published: false)
-      user_session(@teacher)
-      post "create", params: obj_params, format: :json
+      it "does not dispatch new topic notification when hidden by selective release" do
+        new_section = @course.course_sections.create!
+        obj_params = topic_params(@course, published: true).merge(assignment_params(@course, only_visible_to_overrides: true, assignment_overrides: [{ course_section_id: new_section.id }]))
+        post "create", params: obj_params, format: :json
+        json = response.parsed_body
+        topic = DiscussionTopic.find(json["id"])
+        expect(topic).to be_published
+        expect(topic.assignment).to be_published
+        expect(@student.email_channel.messages).to be_empty
+        expect(@student.recent_stream_items.map(&:data)).not_to include topic
+      end
 
-      json = response.parsed_body
-      topic = DiscussionTopic.find(json["id"])
-      expect(@student.email_channel.messages).to be_empty
+      it "does dispatch new topic notification when not hidden" do
+        obj_params = topic_params(@course, published: true)
+        post "create", params: obj_params, format: :json
+        json = response.parsed_body
+        topic = DiscussionTopic.find(json["id"])
+        expect(topic).to be_published
+        expect(@student.email_channel.messages.map(&:context)).to include(topic)
+      end
 
-      put "update", params: { course_id: @course.id, topic_id: topic.id, title: "Updated Topic", published: true }, format: "json"
-      expect(@student.email_channel.messages.map(&:context)).to include(topic)
+      it "does dispatch new topic notification when published" do
+        obj_params = topic_params(@course, published: false)
+        post "create", params: obj_params, format: :json
+
+        json = response.parsed_body
+        topic = DiscussionTopic.find(json["id"])
+        expect(@student.email_channel.messages).to be_empty
+
+        put "update", params: { course_id: @course.id, topic_id: topic.id, title: "Updated Topic", published: true }, format: "json"
+        expect(@student.email_channel.messages.map(&:context)).to include(topic)
+      end
     end
 
     it "dispatches an assignment stream item with the correct title" do
@@ -2609,7 +2955,7 @@ describe DiscussionTopicsController do
     end
 
     context "usage rights - student" do
-      let(:data) { fixture_file_upload("docs/txt.txt", "text/plain", true) }
+      let(:data) { fixture_file_upload("docs/txt.txt", "text/plain", binary: true) }
 
       before { user_session(@student) }
 
@@ -2630,13 +2976,13 @@ describe DiscussionTopicsController do
       context "enabled on course" do
         before { @course.update!(usage_rights_required: true) }
 
-        include_examples "usage rights set"
+        it_behaves_like "usage rights set"
       end
 
       context "disabled on course" do
         before { @course.update!(usage_rights_required: false) }
 
-        include_examples "no usage rights set"
+        it_behaves_like "no usage rights set"
       end
     end
   end
@@ -2690,8 +3036,8 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
       section2 = @course.course_sections.create!(name: "Section 2")
-      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(true)
-      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept(force: true)
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(force: true)
 
       group_category = @course.group_categories.create(name: "gc")
       group = @course.groups.create!(group_category:)
@@ -2706,7 +3052,7 @@ describe DiscussionTopicsController do
             specific_sections: section2.id,
             title: "Updated Topic",
           })
-      expect(response).to have_http_status :unprocessable_entity
+      expect(response).to have_http_status :unprocessable_content
       expect(DiscussionTopic.count).to eq 2
       expect(DiscussionTopicSectionVisibility.count).to eq 0
     end
@@ -2727,6 +3073,30 @@ describe DiscussionTopicsController do
             title: "Updated Topic",
           })
       expect(response).to have_http_status :bad_request
+    end
+
+    it "allows updating an announcement when one enrolled section was deleted via SIS" do
+      user_session(@teacher)
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
+      @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept!
+      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
+      ann = @course.announcements.create!(
+        message: "testing",
+        is_section_specific: true,
+        course_sections: [section1, section2]
+      )
+
+      section2.update!(workflow_state: "deleted")
+      section2.enrollments.update_all(workflow_state: "deleted")
+
+      put("update", params: {
+            course_id: @course.id,
+            topic_id: ann.id,
+            title: "Updated Announcement",
+          })
+      expect(response).to have_http_status :ok
     end
 
     it "Allows an admin to update a section-specific discussion" do
@@ -2850,7 +3220,7 @@ describe DiscussionTopicsController do
       put("update", params: { course_id: @course.id, topic_id: @topic.id, pinned: "1" }, format: "json")
       @topic.reload
       expect(@topic.pinned).to be_truthy
-      expect(@topic.editor).to_not eq @teacher
+      expect(@topic.editor).not_to eq @teacher
     end
 
     it "does not clear delayed_post_at if published is not changed" do
@@ -2909,7 +3279,7 @@ describe DiscussionTopicsController do
     end
 
     it "attaches a file and handles duplicates" do
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)
       put "update", params: { course_id: @course.id, topic_id: @topic.id, attachment: data }, format: "json"
       expect(response).to be_successful
@@ -2937,7 +3307,7 @@ describe DiscussionTopicsController do
       @course.save!
       old_count = DiscussionTopic.count
       # the doc.doc is a 63 kb file
-      data = fixture_file_upload("docs/doc.doc", "application/msword", true)
+      data = fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
       post "create", params: topic_params(@course, { attachment: data }), format: :json
       expect(response).to have_http_status :bad_request
       expect(response.body).to include("Course storage quota exceeded")
@@ -2948,7 +3318,7 @@ describe DiscussionTopicsController do
       uuid = "1234-abcd"
       allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
 
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)
       put "update", params: { course_id: @course.id, topic_id: @topic.id, attachment: data }, format: "json"
 
@@ -3047,6 +3417,329 @@ describe DiscussionTopicsController do
             },
             format: "json"
         expect(response).to be_successful
+      end
+    end
+  end
+
+  describe "granular discussion permissions" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      Account.default.enable_feature!(:default_discussion_options)
+      @course.default_discussion_settings = {
+        anonymous_state: "partial_anonymity",
+        disallow_threaded_replies: true,
+        require_initial_post: true,
+        podcast_enabled: true,
+        podcast_has_student_posts: true,
+        allow_rating: true,
+        only_graders_can_rate: true,
+        expanded: true,
+        expanded_locked: true,
+        sort_order: "asc",
+        sort_order_locked: true
+      }
+      @course.use_default_discussion_settings = true
+      @course.save!
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    context "when user has all permissions" do
+      it "allows saving discussion settings on create" do
+        post_params = topic_params(@course, {
+                                     discussion_type: "not_threaded",
+                                     require_initial_post: false,
+                                     podcast_enabled: false,
+                                     allow_rating: false,
+                                     expanded: true,
+                                     sort_order: "desc"
+                                   })
+
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.discussion_type).to eq("not_threaded")
+        expect(topic.require_initial_post).to be false
+        expect(topic.podcast_enabled).to be false
+        expect(topic.allow_rating).to be false
+        expect(topic.expanded).to be true
+        expect(topic.sort_order).to eq("desc")
+      end
+    end
+
+    context "when user lacks edit_discussion_options permission" do
+      before do
+        @course.account.role_overrides.create!(
+          permission: "edit_discussion_options",
+          role: teacher_role,
+          enabled: false
+        )
+      end
+
+      it "ignores options settings on create" do
+        post_params = topic_params(@course, {
+                                     discussion_type: "not_threaded",
+                                     require_initial_post: true,
+                                     podcast_enabled: true,
+                                     allow_rating: true
+                                   })
+
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.discussion_type).not_to eq("not_threaded")
+        expect(topic.require_initial_post).to be_falsey
+        expect(topic.podcast_enabled).to be_falsey
+        expect(topic.allow_rating).to be_falsey
+      end
+
+      it "ignores options settings on update" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original",
+          discussion_type: "threaded",
+          require_initial_post: false,
+          podcast_enabled: false,
+          allow_rating: false,
+          expanded: true
+        )
+
+        original_discussion_type = topic.discussion_type
+        original_require_initial_post = topic.require_initial_post
+        original_podcast_enabled = topic.podcast_enabled
+        original_allow_rating = topic.allow_rating
+        original_expanded = topic.expanded
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              title: "Updated Title",
+              discussion_type: "not_threaded",
+              require_initial_post: true,
+              podcast_enabled: true,
+              allow_rating: true,
+              expanded: false,
+              expanded_locked: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+
+        expect(topic.title).to eq("Updated Title")
+        expect(topic.discussion_type).to eq(original_discussion_type)
+        expect(topic.require_initial_post).to eq(original_require_initial_post)
+        expect(topic.podcast_enabled).to eq(original_podcast_enabled)
+        expect(topic.allow_rating).to eq(original_allow_rating)
+        expect(topic.expanded).to eq(original_expanded)
+      end
+
+      it "still allows updating view settings when only options are restricted" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original",
+          sort_order: "desc"
+        )
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              sort_order: "asc"
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+        expect(topic.sort_order).to eq("asc")
+      end
+    end
+
+    context "when user lacks edit_discussion_views permission" do
+      before do
+        @course.account.role_overrides.create!(
+          permission: "edit_discussion_views",
+          role: teacher_role,
+          enabled: false
+        )
+      end
+
+      it "ignores view settings on create" do
+        post_params = topic_params(@course, { sort_order: "asc", sort_order_locked: true })
+
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.sort_order).not_to eq("asc")
+      end
+
+      it "ignores view settings on update" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original",
+          sort_order: "desc"
+        )
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              sort_order: "asc",
+              sort_order_locked: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+        expect(topic.sort_order).to eq("desc")
+      end
+
+      it "still allows updating options settings when only views are restricted" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original",
+          allow_rating: false
+        )
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              allow_rating: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+        expect(topic.allow_rating).to be true
+      end
+    end
+
+    context "when user lacks edit_discussion_anonymity permission" do
+      before do
+        @course.account.role_overrides.create!(
+          permission: "edit_discussion_anonymity",
+          role: teacher_role,
+          enabled: false
+        )
+      end
+
+      it "ignores anonymous_state on create" do
+        post_params = topic_params(@course, { anonymous_state: "full_anonymity" })
+
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.anonymous_state).to be_nil
+      end
+
+      it "ignores anonymous_state on update" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original"
+        )
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              anonymous_state: "full_anonymity"
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+        expect(topic.anonymous_state).to be_nil
+      end
+    end
+
+    context "when user lacks all discussion permissions" do
+      before do
+        %w[edit_discussion_anonymity edit_discussion_options edit_discussion_views].each do |perm|
+          @course.account.role_overrides.create!(
+            permission: perm,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+      end
+
+      it "ignores all discussion settings on create" do
+        post_params = topic_params(@course, {
+                                     discussion_type: "not_threaded",
+                                     require_initial_post: true,
+                                     podcast_enabled: true,
+                                     allow_rating: true,
+                                     sort_order: "asc",
+                                     anonymous_state: "full_anonymity"
+                                   })
+
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.discussion_type).not_to eq("not_threaded")
+        expect(topic.require_initial_post).to be_falsey
+        expect(topic.podcast_enabled).to be_falsey
+        expect(topic.allow_rating).to be_falsey
+        expect(topic.anonymous_state).to be_nil
+      end
+
+      it "still allows updating other non-protected settings" do
+        topic = @course.discussion_topics.create!(
+          title: "Original Topic",
+          message: "Original message"
+        )
+
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              title: "Updated Title",
+              message: "Updated message",
+              pinned: true,
+              require_initial_post: true
+            },
+            format: :json
+
+        expect(response).to be_successful
+        topic.reload
+
+        expect(topic.title).to eq("Updated Title")
+        expect(topic.message).to eq("Updated message")
+        expect(topic.pinned).to be true
+        expect(topic.require_initial_post).to be false
+      end
+    end
+
+    context "when course has a default_discussion_settings snapshot" do
+      before do
+        # Simulate a course that was created when account had different defaults
+        @course.default_discussion_settings = {
+          allow_rating: false,
+          sort_order: "desc"
+        }
+        @course.save!
+      end
+
+      it "uses course-level snapshot instead of current account settings on create" do
+        # Account default has sort_order: "asc" and allow_rating: true
+        # Course snapshot has sort_order: "desc" and allow_rating: false
+        post_params = topic_params(@course)
+        user_session(@teacher)
+        post "create", params: post_params, format: :json
+        expect(response).to be_successful
+
+        topic = assigns[:topic]
+        expect(topic.sort_order).to eq "desc"
+        expect(topic.allow_rating).to be false
       end
     end
   end
@@ -3152,7 +3845,7 @@ describe DiscussionTopicsController do
 
     it "increment discussion_topic.created.attachment" do
       user_session @teacher
-      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      data = fixture_file_upload("docs/txt.txt", "text/plain", binary: true)
       attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)
       post "create", params: topic_params(@course, { attachment: data }), format: :json
       expect(response).to be_successful

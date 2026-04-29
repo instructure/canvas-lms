@@ -31,7 +31,7 @@ describe "new login Forgot Password page" do
     get "/login/canvas"
     f('[data-testid="forgot-password-link"]').click
     expect(f("h1").text).to include("Forgot password?")
-    expect(f('[data-testid="email-input"]')).to be_displayed
+    expect(f('[data-testid="username-input"]')).to be_displayed
   end
 
   it "navigates to custom forgot password URL if configured" do
@@ -45,22 +45,22 @@ describe "new login Forgot Password page" do
   it "shows an error when submitting with no email" do
     get "/login/canvas/forgot-password"
     find_by_test_id("submit-button").click
-    error_el = fxpath("//*[text()='Please enter a valid email.']")
+    error_el = fxpath("//*[text()='Please enter your email.']")
     expect(error_el).to be_displayed
   end
 
-  it "shows an error for invalid email format" do
+  it "shows an error for whitespace-only input" do
     get "/login/canvas/forgot-password"
-    find_by_test_id("email-input").send_keys("notanemail")
+    find_by_test_id("username-input").send_keys("   ")
     find_by_test_id("submit-button").click
-    error_el = fxpath("//*[text()='Please enter a valid email.']")
+    error_el = fxpath("//*[text()='Please enter your email.']")
     expect(error_el).to be_displayed
   end
 
   it "shows confirmation message for valid email" do
     user_with_pseudonym(active_user: true, unique_id: "forgotme@example.com")
     get "/login/canvas/forgot-password"
-    f('[data-testid="email-input"]').send_keys("forgotme@example.com")
+    f('[data-testid="username-input"]').send_keys("forgotme@example.com")
     f('[data-testid="submit-button"]').click
     expect(f('[data-testid="confirmation-heading"]').text).to include("Check Your Email")
     expect(f('[data-testid="confirmation-message"]').text).to include("forgotme@example.com")
@@ -70,7 +70,7 @@ describe "new login Forgot Password page" do
     it "returns to login page from confirmation screen" do
       user_with_pseudonym(active_user: true, unique_id: "forgotme@example.com")
       get "/login/canvas/forgot-password"
-      f('[data-testid="email-input"]').send_keys("forgotme@example.com")
+      f('[data-testid="username-input"]').send_keys("forgotme@example.com")
       f('[data-testid="submit-button"]').click
       expect(f('[data-testid="confirmation-heading"]').text).to include("Check Your Email")
       f('[data-testid="confirmation-back-button"]').click

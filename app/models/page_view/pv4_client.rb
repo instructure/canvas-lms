@@ -27,9 +27,10 @@ class PageView
     class Pv4TooManyRequests < StandardError; end
     class Pv4Unauthorized < StandardError; end
 
-    def initialize(uri, access_token)
+    def initialize(uri, requestor_user: nil, **)
       uri = URI.parse(uri) if uri.is_a?(String)
-      @uri, @access_token = uri, access_token
+      @uri = uri
+      @requestor_user = requestor_user
     end
 
     PRECISION = 3
@@ -49,7 +50,7 @@ class PageView
       params << "&limit=#{limit}" if limit
       response = CanvasHttp.get(
         @uri.merge("users/#{user.global_id}/page_views?#{params}").to_s,
-        { "Authorization" => "Bearer #{@access_token}" }
+        request_headers
       )
 
       case response.code.to_i
@@ -73,11 +74,19 @@ class PageView
 
       json["page_views"].map! do |pv|
         pv["session_id"] = pv.delete("sessionid")
-        pv["url"] = "#{HostUrl.protocol}://#{pv.delete("vhost")}#{pv.delete("http_request")}"
+        vhost = pv.delete("vhost")
+        http_request = pv.delete("http_request")
+        pv["url"] = if vhost.present? && http_request.present?
+                      "#{HostUrl.protocol}://#{vhost}#{http_request}"
+                    elsif http_request.present?
+                      "#{HostUrl.protocol}:#{http_request}"
+                    elsif vhost.present?
+                      "#{HostUrl.protocol}://#{vhost}"
+                    end
         pv["context_id"] = pv.delete("canvas_context_id")
         pv["context_type"] = pv.delete("canvas_context_type")
         pv["updated_at"] = pv["created_at"] = pv.delete("timestamp")
-        pv["user_agent"] = pv.delete("agent")
+        pv["user_agent"] = pv.delete("agent").presence
         pv["account_id"] = pv.delete("root_account_id")
         pv["remote_ip"] = pv.delete("client_ip")
         pv["render_time"] = pv.delete("microseconds").to_f / 1_000_000
@@ -103,12 +112,31 @@ class PageView
                             end_time: newest,
                             last_page_view_id:,
                             limit: pager.per_page))
-        pager.has_more! unless pager.empty?
+        pager.has_more! if pager.size >= pager.per_page
         pager
       end
     end
 
     private
+
+    def request_headers
+      auth_token = generate_auth_token
+      {
+        "Authorization" => "Bearer #{auth_token}",
+        "X-Request-Context-Id" => RequestContext::Generator.request_id
+      }
+    end
+
+    def generate_auth_token
+      raise ArgumentError, "requestor_user must be provided" unless @requestor_user
+
+      CanvasSecurity::ServicesJwt.for_user(
+        HostUrl.default_host,
+        @requestor_user,
+        encrypt: false,
+        base64: false
+      )
+    end
 
     def cached_root_account_uuids_for(user:)
       root_account_uuids = user.shard.activate do

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GroupMembership < ActiveRecord::Base
+class GroupMembership < ApplicationRecord
   include Workflow
   extend RootAccountResolver
 
@@ -80,9 +80,8 @@ class GroupMembership < ActiveRecord::Base
     p.whenever do |record|
       record.previously_new_record? &&
         record.accepted? &&
-        record.group &&
-        record.group.context_available? &&
-        record.group&.can_participate?(user) &&
+        record.group&.context_available? &&
+        record.group.can_participate?(user) &&
         record.sis_batch_id.blank?
     end
     p.data { course_broadcast_data }
@@ -92,9 +91,8 @@ class GroupMembership < ActiveRecord::Base
     p.whenever do |record|
       record.previously_new_record? &&
         record.invited? &&
-        record.group &&
-        record.group.context_available? &&
-        record.group&.can_participate?(user) &&
+        record.group&.context_available? &&
+        record.group.can_participate?(user) &&
         record.sis_batch_id.blank?
     end
     p.data { course_broadcast_data }
@@ -180,28 +178,46 @@ class GroupMembership < ActiveRecord::Base
   end
   protected :capture_old_group_id
 
-  # This method is meant to be used in an after_commit setting
-  def update_cached_due_dates?
-    workflow_state_changed = previous_changes.key?(:workflow_state)
-
-    workflow_state_changed && group.group_category_id && group.context_type == "Course"
-  end
-  private :update_cached_due_dates?
-
   def update_cached_due_dates
     return unless update_cached_due_dates?
 
     assignments = []
+    wiki_pages = []
+    discussion_topics = []
+    quizzes = []
+    context_modules = []
+
     if group.non_collaborative
-      assignments += AssignmentOverride.active.where(set_type: "Group", set_id: group.id).pluck(:assignment_id)
+      overrides = AssignmentOverride.active.where(set_type: "Group", set_id: group.id)
+      parent_assignment_ids = overrides.where.not(assignment_id: nil).pluck(:assignment_id)
+      assignments += parent_assignment_ids
+      if parent_assignment_ids.any?
+        assignments += SubAssignment.active.where(parent_assignment_id: parent_assignment_ids).pluck(:id)
+      end
+      wiki_pages += overrides.where.not(wiki_page_id: nil).pluck(:wiki_page_id)
+      discussion_topics += overrides.where.not(discussion_topic_id: nil).pluck(:discussion_topic_id)
+      quizzes += overrides.where.not(quiz_id: nil).pluck(:quiz_id)
+      context_modules += overrides.where.not(context_module_id: nil).pluck(:context_module_id)
     else
-      assignments += Assignment.where(context_type: group.context_type, context_id: group.context_id)
-                               .where(group_category_id: group.group_category_id).pluck(:id)
-      assignments += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id)
-                                    .where.not(assignment_id: nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
+      parent_assignment_ids = Assignment.where(context_type: group.context_type, context_id: group.context_id)
+                                        .where(group_category_id: group.group_category_id).pluck(:id)
+      parent_assignment_ids += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id)
+                                              .where.not(assignment_id: nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
+      parent_assignment_ids.uniq!
+      assignments += parent_assignment_ids
+      assignments += SubAssignment.active.where(parent_assignment_id: parent_assignment_ids).pluck(:id) if parent_assignment_ids.any?
     end
 
-    SubmissionLifecycleManager.recompute_users_for_course(user.id, group.context_id, assignments) if assignments.any?
+    process_cache_for_assignments(assignments)
+
+    RequestCache.clear if RequestCache.instance_variable_get(:@enabled)
+
+    process_cache_for_wiki_pages(wiki_pages)
+    process_cache_for_discussion_topics(discussion_topics)
+    process_cache_for_quizzes(quizzes)
+    process_cache_for_context_modules(context_modules)
+
+    User.touch_and_clear_cache_keys([user], :groups, :todo_list, :submissions, :potential_unread_submission_ids)
   end
 
   def touch_groups
@@ -235,7 +251,7 @@ class GroupMembership < ActiveRecord::Base
   end
 
   def invalidate_user_membership_cache
-    user.clear_cache_key(:groups)
+    user.clear_cache_key(:groups, :todo_list, :submissions, :potential_unread_submission_ids)
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -305,5 +321,147 @@ class GroupMembership < ActiveRecord::Base
       given { |user, session| group.grants_right?(user, session, :delete) }
       can :delete
     end
+  end
+
+  def self.invalidate_visibility_caches_for_group(group, user_ids)
+    return unless group.non_collaborative? && group.context_type == "Course"
+
+    overrides = AssignmentOverride.active.where(set_type: "Group", set_id: group.id)
+    wiki_pages = overrides.where.not(wiki_page_id: nil).pluck(:wiki_page_id)
+    discussion_topics = overrides.where.not(discussion_topic_id: nil).pluck(:discussion_topic_id)
+    quizzes = overrides.where.not(quiz_id: nil).pluck(:quiz_id)
+    context_modules = overrides.where.not(context_module_id: nil).pluck(:context_module_id)
+
+    Array(user_ids).each do |user_id|
+      process_wiki_page_visibility_cache(group, user_id, wiki_pages)
+      process_discussion_visibility_cache(group, user_id, discussion_topics)
+      process_quiz_visibility_cache(group, user_id, quizzes)
+      process_module_visibility_cache(group, user_id, context_modules)
+    end
+  end
+
+  def self.process_wiki_page_visibility_cache(group, user_id, wiki_pages)
+    return if wiki_pages.empty?
+
+    WikiPage.where(id: wiki_pages).touch_and_clear_cache_keys(:availability)
+    active_ids = WikiPage.where(context_type: "Course", context_id: group.context_id, workflow_state: "active").pluck(:id)
+    invalidate_visibility_cache(
+      group:,
+      user_id:,
+      service_class: WikiPageVisibility::WikiPageVisibilityService,
+      id_sets: [wiki_pages, active_ids].uniq,
+      id_param: :wiki_page_ids
+    )
+  end
+  private_class_method :process_wiki_page_visibility_cache
+
+  def self.process_discussion_visibility_cache(group, user_id, discussion_topics)
+    return if discussion_topics.empty?
+
+    DiscussionTopic.where(id: discussion_topics).touch_and_clear_cache_keys(:availability)
+    active_ids = DiscussionTopic.where(context_type: "Course", context_id: group.context_id, workflow_state: "active").pluck(:id)
+    invalidate_visibility_cache(
+      group:,
+      user_id:,
+      service_class: UngradedDiscussionVisibility::UngradedDiscussionVisibilityService,
+      id_sets: [discussion_topics, active_ids].uniq,
+      id_param: :discussion_topic_ids
+    )
+  end
+  private_class_method :process_discussion_visibility_cache
+
+  def self.process_quiz_visibility_cache(group, user_id, quizzes)
+    return if quizzes.empty?
+
+    Quizzes::Quiz.where(id: quizzes).touch_and_clear_cache_keys(:availability)
+    active_ids = Quizzes::Quiz.where(context_type: "Course", context_id: group.context_id, workflow_state: "available").pluck(:id)
+    invalidate_visibility_cache(
+      group:,
+      user_id:,
+      service_class: QuizVisibility::QuizVisibilityService,
+      id_sets: [quizzes, active_ids].uniq,
+      id_param: :quiz_ids
+    )
+  end
+  private_class_method :process_quiz_visibility_cache
+
+  def self.process_module_visibility_cache(group, user_id, context_modules)
+    return if context_modules.empty?
+
+    ContextModule.where(id: context_modules).touch_and_clear_cache_keys(:availability)
+    active_ids = ContextModule.where(context_type: "Course", context_id: group.context_id, workflow_state: "active").pluck(:id)
+    invalidate_visibility_cache(
+      group:,
+      user_id:,
+      service_class: ModuleVisibility::ModuleVisibilityService,
+      id_sets: [context_modules, active_ids].uniq,
+      id_param: :context_module_ids
+    )
+  end
+  private_class_method :process_module_visibility_cache
+
+  def self.invalidate_visibility_cache(group:, user_id:, service_class:, id_sets:, id_param:)
+    [true, false].each do |include_concluded|
+      id_sets.each do |ids|
+        service_class.invalidate_cache(
+          :course_ids => [group.context_id],
+          :user_ids => [user_id],
+          id_param => ids,
+          :include_concluded => include_concluded
+        )
+      end
+
+      service_class.invalidate_cache(
+        course_ids: [group.context_id],
+        user_ids: [user_id],
+        include_concluded:
+      )
+    end
+  end
+  private_class_method :invalidate_visibility_cache
+
+  private
+
+  def update_cached_due_dates?
+    workflow_state_changed = previous_changes.key?(:workflow_state)
+
+    workflow_state_changed && group.group_category_id && group.context_type == "Course"
+  end
+
+  def process_cache_for_assignments(assignments)
+    return if assignments.empty?
+
+    Submission.active.where(user_id: user.id, assignment_id: assignments)
+              .update_all(workflow_state: :deleted, updated_at: Time.zone.now)
+
+    AbstractAssignment.where(id: assignments).touch_and_clear_cache_keys(:availability)
+
+    published_assignment_ids = Assignment.where(context_id: group.context_id, workflow_state: "published").pluck(:id)
+    assignment_id_sets = [assignments, published_assignment_ids].uniq
+
+    self.class.send(:invalidate_visibility_cache,
+                    group:,
+                    user_id: user.id,
+                    service_class: AssignmentVisibility::AssignmentVisibilityService,
+                    id_sets: assignment_id_sets,
+                    id_param: :assignment_ids)
+
+    SubmissionLifecycleManager.recompute_users_for_course(user.id, group.context_id, assignments)
+  end
+
+  def process_cache_for_wiki_pages(wiki_pages)
+    self.class.send(:process_wiki_page_visibility_cache, group, user.id, wiki_pages)
+  end
+
+  def process_cache_for_discussion_topics(discussion_topics)
+    self.class.send(:process_discussion_visibility_cache, group, user.id, discussion_topics)
+  end
+
+  def process_cache_for_quizzes(quizzes)
+    self.class.send(:process_quiz_visibility_cache, group, user.id, quizzes)
+  end
+
+  def process_cache_for_context_modules(context_modules)
+    self.class.send(:process_module_visibility_cache, group, user.id, context_modules)
   end
 end

@@ -18,11 +18,9 @@
 
 import formatMessage from '../../../format-message'
 import {scaleForHeight, scaleForWidth} from '../shared/DimensionUtils'
-import RCEGlobals from '../../../rce/RCEGlobals'
 
 export const MIN_HEIGHT = 10
 export const MIN_WIDTH = 10
-export const MIN_WIDTH_VIDEO = 320
 export const MIN_PERCENTAGE = 10
 
 export const SMALL = 'small'
@@ -32,7 +30,6 @@ export const EXTRA_LARGE = 'extra-large'
 export const CUSTOM = 'custom'
 
 export const imageSizes = [SMALL, MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
-export const videoSizes = [MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
 export const studioPlayerSizes = [SMALL, MEDIUM, LARGE, CUSTOM]
 
 const sizeByMaximumDimension = {
@@ -155,13 +152,9 @@ export function fromVideoEmbed($element) {
     // bad json?
   }
 
-  if (RCEGlobals.getFeatures()?.consolidated_media_player) {
-    const width = videoOptions.appliedWidth || videoOptions.naturalWidth
-    videoOptions.videoSize =
-      [SMALL, MEDIUM, LARGE].find(size => width === studioPlayerDimensions[size].width) || CUSTOM
-  } else {
-    videoOptions.videoSize = imageSizeFromKnownOptions(videoOptions)
-  }
+  const width = videoOptions.appliedWidth || videoOptions.naturalWidth
+  videoOptions.videoSize =
+    [SMALL, MEDIUM, LARGE].find(size => width === studioPlayerDimensions[size].width) || CUSTOM
 
   const source = $videoIframe.getAttribute('src')
   const matches = source?.match(/\/media_attachments_iframe\/(\d+)/)

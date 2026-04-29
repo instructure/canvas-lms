@@ -16,5 +16,6 @@
   </blti:custom>
   <blti:extensions platform="canvas.instructure.com">
     <lticm:property name="lookup_uuid">1b302c1e-c0a2-42dc-88b6-c029699a7c7a</lticm:property>
+    <lticm:property name="assignment_migration_id">76cf9398-0f63-4be2-a196-8e21d44716de</lticm:property>
   </blti:extensions>
 </cartridge_basiclti_link>

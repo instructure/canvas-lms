@@ -27,14 +27,18 @@ import useOutcomesRemove, {
 import {createCache} from '@canvas/apollo-v3'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {deleteOutcomeMocks} from '../../../mocks/Management'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {MockedProvider} from '@apollo/client/testing'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(() => vi.fn(() => {})),
+  }
+})
 
 const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, title = '') =>
   new Array(count).fill(0).reduce(
@@ -59,7 +63,7 @@ describe('useOutcomesRemove', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const wrapper = ({
@@ -96,7 +100,7 @@ describe('useOutcomesRemove', () => {
       act(() => {
         result.current.removeOutcomes(outcomes)
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'This outcome was successfully removed.',
         type: 'success',
@@ -114,7 +118,7 @@ describe('useOutcomesRemove', () => {
       act(() => {
         result.current.removeOutcomes(outcomes)
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
         type: 'error',
@@ -132,7 +136,7 @@ describe('useOutcomesRemove', () => {
       act(() => {
         result.current.removeOutcomes(outcomes)
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
         type: 'error',
@@ -150,7 +154,7 @@ describe('useOutcomesRemove', () => {
       act(() => {
         result.current.removeOutcomes(outcomes)
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
         type: 'error',
@@ -168,7 +172,7 @@ describe('useOutcomesRemove', () => {
       act(() => {
         result.current.removeOutcomes(outcomes)
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
         type: 'error',
@@ -187,7 +191,7 @@ describe('useOutcomesRemove', () => {
         result.current.removeOutcomes(outcomes)
       })
       expect(result.current.removeOutcomesStatus).toEqual({1: REMOVE_PENDING})
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.removeOutcomesStatus).toEqual({1: REMOVE_COMPLETED})
     })
 
@@ -203,7 +207,7 @@ describe('useOutcomesRemove', () => {
         result.current.removeOutcomes(outcomes)
       })
       expect(result.current.removeOutcomesStatus).toEqual({1: REMOVE_PENDING})
-      await act(async () => jest.runAllTimers())
+      await act(async () => vi.runAllTimers())
       expect(result.current.removeOutcomesStatus).toEqual({1: REMOVE_FAILED})
     })
 
@@ -219,7 +223,7 @@ describe('useOutcomesRemove', () => {
         act(() => {
           result.current.removeOutcomes(outcomes)
         })
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         expect(showFlashAlert).toHaveBeenCalledWith({
           message: '4 outcomes were successfully removed.',
           type: 'success',
@@ -237,7 +241,7 @@ describe('useOutcomesRemove', () => {
         act(() => {
           result.current.removeOutcomes(outcomes)
         })
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         expect(showFlashAlert).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
           type: 'error',
@@ -255,7 +259,7 @@ describe('useOutcomesRemove', () => {
         act(() => {
           result.current.removeOutcomes(outcomes)
         })
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         expect(showFlashAlert).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
           type: 'error',
@@ -273,7 +277,7 @@ describe('useOutcomesRemove', () => {
         act(() => {
           result.current.removeOutcomes(outcomes)
         })
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         expect(showFlashAlert).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
           type: 'error',
@@ -291,7 +295,7 @@ describe('useOutcomesRemove', () => {
         act(() => {
           result.current.removeOutcomes(outcomes)
         })
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         expect(showFlashAlert).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
           type: 'error',
@@ -321,7 +325,7 @@ describe('useOutcomesRemove', () => {
           3: REMOVE_PENDING,
           4: REMOVE_NOT_STARTED,
         })
-        await act(async () => jest.runAllTimers())
+        await act(async () => vi.runAllTimers())
         expect(result.current.removeOutcomesStatus).toEqual({
           1: REMOVE_COMPLETED,
           2: REMOVE_NOT_STARTED,

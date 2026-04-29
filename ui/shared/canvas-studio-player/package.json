@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "Jacob DeWar <jacob.dewar@instructure.com>",
-  "main": "./react/CanvasStudioPlayer.tsx"
+  "main": "./react/CanvasStudioPlayer.tsx",
+  "owner": "RCX"
 }

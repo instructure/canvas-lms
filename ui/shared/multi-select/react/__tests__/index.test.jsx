@@ -129,7 +129,7 @@ describe('CanvasMultiSelect', () => {
   })
 
   it('calls customOnRequestShowOptions when clicking the input', async () => {
-    const customOnRequestShowOptions = jest.fn()
+    const customOnRequestShowOptions = vi.fn()
     props.customOnRequestShowOptions = customOnRequestShowOptions
     const {getByRole} = renderComponent()
     const combobox = getByRole('combobox', {name: 'Vegetables'})
@@ -138,7 +138,7 @@ describe('CanvasMultiSelect', () => {
   })
 
   it('calls customOnRequestHideOptions when blurring the input', async () => {
-    const customOnRequestHideOptions = jest.fn()
+    const customOnRequestHideOptions = vi.fn()
     props.customOnRequestHideOptions = customOnRequestHideOptions
     const {getByRole} = renderComponent()
     const combobox = getByRole('combobox', {name: 'Vegetables'})

@@ -23,14 +23,19 @@ import {MutableRefObject} from 'react'
 export type GenerateCriteriaFormProps = {
   criteriaCount: number
   ratingCount: number
-  pointsPerCriterion: string
+  totalPoints: string
   useRange: boolean
   additionalPromptInfo: string
   gradeLevel: string
+  standard: string
 }
+export type AssociationType = 'Assignment' | 'Account' | 'Course'
 
 export type RubricFormProps = {
+  associationType: AssociationType
+  associationTypeId?: string
   id?: string
+  canUpdateRubric: boolean
   title: string
   hasRubricAssociations: boolean
   accountId?: string
@@ -47,6 +52,7 @@ export type RubricFormProps = {
   hideScoreTotal: boolean
   useForGrading: boolean
   rubricAssociationId?: string
+  skipUpdatingPointsPossible?: boolean
 }
 
 export type RubricFormFieldSetter = <K extends keyof RubricFormProps>(
@@ -64,7 +70,7 @@ export type RatingRowProps = {
   errorMessage: FormMessage[]
   hidePoints: boolean
   index: number
-  rangeStart: number
+  rangeStart?: number
   rating: RubricRating
   ratingInputRefs: MutableRefObject<HTMLInputElement[]>
   scale: number
@@ -74,5 +80,4 @@ export type RatingRowProps = {
   setPointsInputText: (value: string | number) => void
   showRemoveButton: boolean
   onRemove: () => void
-  unassessed: boolean
 }

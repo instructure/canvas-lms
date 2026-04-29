@@ -23,7 +23,7 @@ describe('contentUtils::convertApiUserContent', () => {
   const double = x => 2 * x
 
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     process.env = {...oldEnv}
     delete process.env.NODE_ENV
     initializeContent({convertApiUserContent: double})

@@ -28,6 +28,7 @@ module Types
 
   class ActivityStreamType < ApplicationObjectType
     include Api::V1::StreamItem
+
     description "An activity stream"
 
     VALID_CONTEXTS = %w[Course User Group].freeze

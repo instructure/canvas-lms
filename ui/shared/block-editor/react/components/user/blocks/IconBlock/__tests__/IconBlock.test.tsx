@@ -31,15 +31,15 @@ const mockNode = {
   },
 }
 
-jest.mock('@craftjs/core', () => {
-  const module = jest.requireActual('@craftjs/core')
+vi.mock('@craftjs/core', async () => {
+  const module = await vi.importActual('@craftjs/core')
   return {
     ...module,
-    useNode: jest.fn(() => ({
+    useNode: vi.fn(() => ({
       node: mockNode,
       connectors: {
-        connect: jest.fn(),
-        drag: jest.fn(),
+        connect: vi.fn(),
+        drag: vi.fn(),
       },
     })),
   }
@@ -61,7 +61,7 @@ describe('IconBlock', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('rendering', () => {

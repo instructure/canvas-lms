@@ -64,6 +64,8 @@ type QueryData = {
 const I18n = createI18nScope('mutationActivity')
 
 function formatDate(date: Date) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
   return tz.format(date, 'date.formats.medium_with_weekday') ?? ''
 }
 

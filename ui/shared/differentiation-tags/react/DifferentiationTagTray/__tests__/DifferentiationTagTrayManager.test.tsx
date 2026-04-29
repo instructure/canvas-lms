@@ -22,14 +22,14 @@ import userEvent from '@testing-library/user-event'
 import DifferentiationTagTrayManager from '../DifferentiationTagTrayManager'
 import {useDifferentiationTagCategoriesIndex} from '../../hooks/useDifferentiationTagCategoriesIndex'
 
-jest.mock('../../hooks/useDifferentiationTagCategoriesIndex')
+vi.mock('../../hooks/useDifferentiationTagCategoriesIndex')
 
-const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as jest.Mock
+const mockUseDifferentiationTagCategoriesIndex = useDifferentiationTagCategoriesIndex as any
 
 describe('DifferentiationTagTrayManager', () => {
   const defaultProps = {
     isOpen: true,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
     courseID: 123,
   }
 
@@ -45,7 +45,7 @@ describe('DifferentiationTagTrayManager', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the tray when isOpen is true', () => {

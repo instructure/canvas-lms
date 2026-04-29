@@ -19,7 +19,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import PageList from '../PageList'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 describe('PageList', () => {
   const portfolio = {id: 0, name: 'Test Portfolio', public: true, profile_url: '/path/to/portfolio'}
@@ -40,7 +40,7 @@ describe('PageList', () => {
     portfolio: portfolio,
     sectionId: section.id,
     sectionName: section.name,
-    onUpdate: jest.fn(),
+    onUpdate: vi.fn(),
     isOwner: true,
   }
 

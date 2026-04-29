@@ -68,10 +68,21 @@ const BaseWarningModal: React.FC<BaseModalProps> = ({
       </Modal.Header>
       <Modal.Body padding="none medium">{children}</Modal.Body>
       <Modal.Footer>
-        <Button onClick={onClose} margin="0 x-small 0 0" disabled={isLoading}>
+        <Button
+          data-testid="cancel-warning-modal"
+          onClick={onClose}
+          margin="0 x-small 0 0"
+          disabled={isLoading}
+        >
           {cancelText}
         </Button>
-        <Button onClick={onContinue} color="primary" type="button" disabled={isLoading}>
+        <Button
+          data-testid="continue-warning-modal"
+          onClick={onContinue}
+          color="primary"
+          type="button"
+          disabled={isLoading}
+        >
           {isLoading ? I18n.t('Deleting...') : continueText}
         </Button>
       </Modal.Footer>
@@ -122,6 +133,33 @@ export const RemoveTagWarningModal: React.FC<{
           <p>
             {I18n.t(
               'Removing the tag from a student preserves past assignments in the gradebook and removes the student from any upcoming assignments where they have been assigned via tag.',
+            )}
+          </p>
+        </Text>
+      </View>
+    </BaseWarningModal>
+  )
+}
+
+export const DeleteVariantWarningModal: React.FC<{
+  open: boolean
+  onClose: () => void
+  onContinue: () => void
+}> = ({open, onClose, onContinue}) => {
+  return (
+    <BaseWarningModal
+      open={open}
+      title="Delete Variant"
+      onClose={onClose}
+      onContinue={onContinue}
+      cancelText={I18n.t('Cancel')}
+      continueText={I18n.t('Delete Variant')}
+    >
+      <View>
+        <Text>
+          <p>
+            {I18n.t(
+              'Deleting this variant preserves past assignments in the gradebook and removes students from upcoming assignments where they have been assigned via this variant.',
             )}
           </p>
         </Text>

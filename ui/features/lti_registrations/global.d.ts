@@ -16,4 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-declare module "ltiusage/AppModule"
+declare module 'ltiusage/AppModule'

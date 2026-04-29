@@ -22,6 +22,15 @@ module Csp::CourseHelper
     course_class.add_setting :csp_disabled, boolean: true, default: false
   end
 
+  def can_update_csp_settings?(user, session)
+    account.grants_right?(user, session, :manage_courses_admin) && !csp_locked?
+  end
+
+  def can_view_csp_settings?
+    # must be enabled at account level to see course settings
+    root_account.feature_enabled?(:javascript_csp) && account.csp_enabled?
+  end
+
   def csp_enabled?
     account.csp_enabled? && csp_inherited?
   end

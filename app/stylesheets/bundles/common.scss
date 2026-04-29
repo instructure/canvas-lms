@@ -32,6 +32,7 @@
 
 // Utility classes
 @import 'base/ic_utilities';
+@import 'base/forced_colors';
 
 // Canvas components and area-specific styles
 @import 'components/buttons';
@@ -51,6 +52,7 @@
 @import 'components/canvas-icons';
 @import 'components/misc';
 @import 'components/new-and-total-badge';
+@import 'components/oak';
 @import 'components/react_modal';
 @import 'components/show_hide_opacity';
 @import 'components/spacing';
@@ -94,7 +96,6 @@
 @import 'components/g_mini_calendar';
 @import 'components/helpDialog';
 @import 'components/ic-expand-link';
-@import 'components/flickrSearch';
 @import 'bundles/context_cards';
 @import 'bundles/rce';
 @import 'pages/react_files/_FilePreview.scss';

@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
 import {render, screen} from '@testing-library/react'
 import * as ue from '@testing-library/user-event'
 import {IconConfirmationWrapper} from '../components/IconConfirmationWrapper'
@@ -24,16 +23,16 @@ import {mockInternalConfiguration} from './helpers'
 import {LtiPlacements, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
 import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 
-const userEvent = ue.userEvent.setup({advanceTimers: jest.advanceTimersByTime})
+const userEvent = ue.userEvent.setup({advanceTimers: vi.advanceTimersByTime})
 describe('IconConfirmationWrapper', () => {
   beforeEach(() => {
-    jest.resetAllMocks()
-    jest.useFakeTimers()
+    vi.resetAllMocks()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.runAllTimers()
-    jest.useRealTimers()
+    vi.runAllTimers()
+    vi.useRealTimers()
   })
 
   it('renders correctly', () => {
@@ -41,20 +40,17 @@ describe('IconConfirmationWrapper', () => {
       placements: [{placement: LtiPlacements.GlobalNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
-    expect(screen.getByText(/Icon URLs/i)).toBeInTheDocument()
+    expect(screen.getByText('Placement Icon URLs')).toBeInTheDocument()
+    expect(screen.getByRole('heading', {name: /^Tool Icon URL$/i, level: 3})).toBeInTheDocument()
   })
 
   it('renders the correct number of icon inputs', () => {
@@ -68,20 +64,17 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
-    expect(screen.getAllByPlaceholderText(/https:\/\/example.com\/icon/i)).toHaveLength(2)
+    // 3 inputs: 1 tool icon url + 2 placement-specific
+    expect(screen.getAllByPlaceholderText(/https:\/\/example.com\/icon/i)).toHaveLength(3)
   })
 
   it('allows users to change the icon URL for a placement', async () => {
@@ -91,16 +84,12 @@ describe('IconConfirmationWrapper', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -115,7 +104,7 @@ describe('IconConfirmationWrapper', () => {
     await userEvent.click(input)
     await userEvent.clear(input)
     await userEvent.paste('https://new-icon-url.com')
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     expect(overlayStore.getState().state.icons.placements[placement as LtiPlacementWithIcon]).toBe(
       'https://new-icon-url.com',
@@ -127,16 +116,12 @@ describe('IconConfirmationWrapper', () => {
       placements: [{placement: 'global_navigation', icon_url: 'https://example.com/icon'}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -151,36 +136,6 @@ describe('IconConfirmationWrapper', () => {
     expect(screen.getByText('Invalid URL')).toBeInTheDocument()
   })
 
-  it('focuses the invalid input if any of the URLs are invalid', async () => {
-    const internalConfig = mockInternalConfiguration({
-      placements: [{placement: 'global_navigation', icon_url: 'https://example.com/icon'}],
-    })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
-    render(
-      <IconConfirmationWrapper
-        overlayStore={overlayStore}
-        internalConfig={internalConfig}
-        reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
-      />,
-    )
-    const input = screen.getByLabelText(
-      new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation)),
-    )
-    await userEvent.click(input)
-    await userEvent.clear(input)
-    await userEvent.paste('invalid-url')
-    await userEvent.tab()
-
-    await userEvent.click(screen.getByText('Next').closest('button')!)
-
-    expect(input).toHaveFocus()
-    expect(onNextButtonClicked).not.toHaveBeenCalled()
-  })
-
   it('renders a default icon if no icon is provided for the editor button placement', () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: LtiPlacements.EditorButton, icon_url: undefined}],
@@ -189,16 +144,12 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -209,7 +160,7 @@ describe('IconConfirmationWrapper', () => {
     ).toBeInTheDocument()
   })
 
-  it('uses the default icon url if none is provided', async () => {
+  it('uses the Tool Icon URL if none is provided', async () => {
     const internalConfig = mockInternalConfiguration({
       placements: [
         {
@@ -222,16 +173,12 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -253,16 +200,12 @@ describe('IconConfirmationWrapper', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
@@ -281,7 +224,7 @@ describe('IconConfirmationWrapper', () => {
     )
     expect(img).toHaveAttribute('src', 'https://example.com/icon/first')
 
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     expect(overlayStore.getState().state.icons.placements[LtiPlacements.GlobalNavigation]).toBe(
       'https://new-icon-url.com',
@@ -299,21 +242,17 @@ describe('IconConfirmationWrapper', () => {
       },
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextButtonClicked = jest.fn()
-    const onPreviousButtonClicked = jest.fn()
 
     render(
       <IconConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
         reviewing={false}
-        onNextButtonClicked={onNextButtonClicked}
-        onPreviousButtonClicked={onPreviousButtonClicked}
       />,
     )
 
     overlayStore.getState().togglePlacement(LtiPlacements.EditorButton)
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     const input = screen.getByLabelText(
       new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation), 'i'),
@@ -332,5 +271,144 @@ describe('IconConfirmationWrapper', () => {
 
     expect(newPlacementInput.placeholder).toBe('https://example.com/default_icon')
     expect(newPlacementInput).toHaveValue('')
+  })
+
+  describe('Tool Icon URL', () => {
+    it('should render a Tool Icon URL input section', () => {
+      const internalConfig = mockInternalConfiguration({
+        placements: [{placement: LtiPlacements.GlobalNavigation}],
+        launch_settings: {icon_url: 'https://example.com/default-icon.png'},
+      })
+      const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+      render(
+        <IconConfirmationWrapper
+          overlayStore={overlayStore}
+          internalConfig={internalConfig}
+          reviewing={false}
+        />,
+      )
+
+      expect(screen.getAllByText('Tool Icon URL')).toHaveLength(2) // heading and label
+    })
+
+    it('should allow users to change the Tool Icon URL', async () => {
+      const internalConfig = mockInternalConfiguration({
+        placements: [{placement: LtiPlacements.GlobalNavigation}],
+        launch_settings: {icon_url: 'https://example.com/default-icon.png'},
+      })
+      const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+      render(
+        <IconConfirmationWrapper
+          overlayStore={overlayStore}
+          internalConfig={internalConfig}
+          reviewing={false}
+        />,
+      )
+
+      const input = screen.getByLabelText(/Tool Icon URL/i, {selector: 'input'})
+      await userEvent.clear(input)
+      await userEvent.click(input)
+      await userEvent.paste('https://example.com/new-default.png')
+      jest.runAllTimers()
+
+      expect(input).toHaveValue('https://example.com/new-default.png')
+    })
+
+    it('should display the existing Tool Icon URL', () => {
+      const internalConfig = mockInternalConfiguration({
+        placements: [{placement: LtiPlacements.GlobalNavigation}],
+        launch_settings: {icon_url: 'https://example.com/default-icon.png'},
+      })
+      const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+      render(
+        <IconConfirmationWrapper
+          overlayStore={overlayStore}
+          internalConfig={internalConfig}
+          reviewing={false}
+        />,
+      )
+
+      const input = screen.getByLabelText(/Tool Icon URL/i, {selector: 'input'})
+      // The value is initialized from the state which loads from internalConfig
+      expect(input).toHaveValue('https://example.com/default-icon.png')
+      expect(input).toHaveAttribute('placeholder', 'https://example.com/default-icon.png')
+    })
+
+    it('should show an error for invalid Tool Icon URLs', async () => {
+      const internalConfig = mockInternalConfiguration({
+        placements: [{placement: LtiPlacements.GlobalNavigation}],
+      })
+      const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+      render(
+        <IconConfirmationWrapper
+          overlayStore={overlayStore}
+          internalConfig={internalConfig}
+          reviewing={false}
+          hasClickedNext={true}
+        />,
+      )
+
+      const input = screen.getByLabelText(/Tool Icon URL/i, {selector: 'input'})
+      await userEvent.click(input)
+      await userEvent.paste('invalid-url')
+      await userEvent.tab()
+      jest.runAllTimers()
+
+      expect(screen.getByText('Invalid URL')).toBeInTheDocument()
+    })
+
+    it('should display the default icon image when a valid URL is provided', async () => {
+      const internalConfig = mockInternalConfiguration({
+        placements: [{placement: LtiPlacements.GlobalNavigation}],
+      })
+      const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+      render(
+        <IconConfirmationWrapper
+          overlayStore={overlayStore}
+          internalConfig={internalConfig}
+          reviewing={false}
+        />,
+      )
+
+      const input = screen.getByLabelText(/Tool Icon URL/i, {selector: 'input'})
+      await userEvent.click(input)
+      await userEvent.paste('https://example.com/default-icon.png')
+      jest.runAllTimers()
+
+      expect(screen.getByTestId('img-default-icon')).toHaveAttribute(
+        'src',
+        'https://example.com/default-icon.png',
+      )
+    })
+
+    it('should display the default icon image when the input is cleared', async () => {
+      const internalConfig = mockInternalConfiguration({
+        placements: [{placement: LtiPlacements.GlobalNavigation}],
+        launch_settings: {icon_url: 'https://example.com/default-icon.png'},
+      })
+      const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+
+      render(
+        <IconConfirmationWrapper
+          overlayStore={overlayStore}
+          internalConfig={internalConfig}
+          reviewing={false}
+        />,
+      )
+
+      const input = screen.getByLabelText(/Tool Icon URL/i, {selector: 'input'})
+      await userEvent.clear(input)
+      jest.runAllTimers()
+
+      expect(screen.getByTestId('img-default-icon')).toHaveAttribute(
+        'src',
+        'https://example.com/default-icon.png',
+      )
+    })
   })
 })

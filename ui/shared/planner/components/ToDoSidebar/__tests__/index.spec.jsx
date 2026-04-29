@@ -37,13 +37,13 @@ it('displays a spinner when the loaded prop is false', () => {
 })
 
 it('calls loadItems prop on mount', () => {
-  const fakeLoadItems = jest.fn()
+  const fakeLoadItems = vi.fn()
   render(<ToDoSidebar {...defaultProps} sidebarLoadInitialItems={fakeLoadItems} />)
   expect(fakeLoadItems).toHaveBeenCalled()
 })
 
 it('includes course_id in call loadItems prop on mount', () => {
-  const fakeLoadItems = jest.fn()
+  const fakeLoadItems = vi.fn()
   const course_id = '17'
   render(
     <ToDoSidebar {...defaultProps} sidebarLoadInitialItems={fakeLoadItems} forCourse={course_id} />,
@@ -136,7 +136,7 @@ it('initially renders out 7 ToDoItems', () => {
 })
 
 it('invokes change dashboard view when link is clicked', async () => {
-  const changeDashboardView = jest.fn()
+  const changeDashboardView = vi.fn()
   // becasue the show all button is only rendered if there are items
   const items = [
     {

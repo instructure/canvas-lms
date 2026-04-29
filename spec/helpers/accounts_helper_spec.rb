@@ -20,6 +20,7 @@
 
 describe AccountsHelper do
   include AccountsHelper
+
   let_once(:account) { Account.create! }
   let(:subaccount) { account.sub_accounts.create! }
 

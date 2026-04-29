@@ -1,7 +1,9 @@
 {
+  "type": "module",
   "name": "@canvas/parse-link-header",
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./parseLinkHeader.ts"
+  "main": "./parseLinkHeader.ts",
+  "owner": "CFA"
 }

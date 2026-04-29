@@ -144,6 +144,11 @@
 #           "description": "If an unknown user url is set, Canvas will forward to that url when a service authenticates a user, but that user does not exist in Canvas. The default behavior is to present an error.",
 #           "example": "https://example.com/register_for_canvas",
 #           "type": "string"
+#        },
+#        "login_help_url": {
+#           "description": "A login help URL shown as a 'Trouble logging in?' link on the login page and in failed login messages. Falls back to the global setting if not set.",
+#           "example": "https://example.com/login-help",
+#           "type": "string"
 #        }
 #       }
 #     }
@@ -228,10 +233,10 @@
 class AuthenticationProvidersController < ApplicationController
   before_action :require_context
   before_action :require_root_account_management, except: :show
-  before_action :require_user, only: :show
   include Api::V1::AuthenticationProvider
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index]
 
   # @API List authentication providers
@@ -249,6 +254,14 @@ class AuthenticationProvidersController < ApplicationController
     else
       @presenter = AuthenticationProvidersPresenter.new(@account, @current_user)
       @page_title = t("Authentication Settings")
+
+      if @account.discovery_page_allowed?
+        auth_providers = @account.authentication_providers.valid_for_discovery_page
+                                 .map { |ap| { id: ap.id, url: ap.login_authentication_provider_path, auth_type: ap.auth_type } }
+        discovery_page_url = @domain_root_account.discovery_page_url
+        js_env({ auth_providers:, discovery_page_url: })
+      end
+
       add_crumb @page_title
       page_has_instui_topnav
     end
@@ -263,7 +276,7 @@ class AuthenticationProvidersController < ApplicationController
   #
   # @returns AuthenticationProvider
   def show
-    aac = @account.authentication_providers.active.find(params[:id])
+    aac = load_aac(params[:id])
     return if aac.auth_type != "canvas" && !require_root_account_management
 
     render json: aac_json(aac)
@@ -700,7 +713,7 @@ class AuthenticationProvidersController < ApplicationController
         end
         format.json do
           msg = "duplicate provider #{account_config.auth_type}"
-          render json: { errors: [{ message: msg }] }, status: :unprocessable_entity
+          render json: { errors: [{ message: msg }] }, status: :unprocessable_content
         end
       end
       return
@@ -744,7 +757,7 @@ class AuthenticationProvidersController < ApplicationController
   # @returns AuthenticationProvider
   def update
     aac_data = params.fetch(:authentication_provider, params)
-    aac = @account.authentication_providers.active.find params[:id]
+    aac = load_aac(params[:id])
     aac_data["auth_type"] ||= aac.auth_type
     update_deprecated_account_settings_data(aac_data, aac)
     position = aac_data.delete(:position)
@@ -792,12 +805,21 @@ class AuthenticationProvidersController < ApplicationController
   #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/authentication_providers/<id>' \
   #        -H 'Authorization: Bearer <token>'
   def destroy
-    aac = @account.authentication_providers.active.find params[:id]
+    aac = load_aac(params[:id])
+
     aac.destroy
 
     respond_to do |format|
       format.html { redirect_to(account_authentication_providers_path(@account)) }
       format.json { render json: aac_json(aac) }
+    end
+  rescue ActiveRecord::RecordInvalid
+    respond_to do |format|
+      format.html do
+        flash[:error] = aac.errors.full_messages
+        redirect_to(account_authentication_providers_path(@account))
+      end
+      format.json { render json: { errors: aac.errors.full_messages }, status: :unprocessable_content }
     end
   end
 
@@ -822,14 +844,19 @@ class AuthenticationProvidersController < ApplicationController
   end
 
   def sso_settings_json(account)
-    {
-      sso_settings: {
-        login_handle_name: account.login_handle_name,
-        change_password_url: account.change_password_url,
-        auth_discovery_url: account.auth_discovery_url,
-        unknown_user_url: account.unknown_user_url,
-      }
+    settings = {
+      login_handle_name: account.login_handle_name,
+      change_password_url: account.change_password_url,
+      auth_discovery_url: account.auth_discovery_url,
+      unknown_user_url: account.unknown_user_url,
+      login_help_url: account.login_help_url
     }
+
+    if account.discovery_page_allowed?
+      settings[:discovery_page_active] = account.discovery_page_active?
+    end
+
+    { sso_settings: settings }
   end
 
   # @API Show account auth settings
@@ -870,11 +897,35 @@ class AuthenticationProvidersController < ApplicationController
   #
   # @returns SSOSettings
   def update_sso_settings
-    sets = params.require(:sso_settings).permit(:login_handle_name,
-                                                :change_password_url,
-                                                :auth_discovery_url,
-                                                :unknown_user_url)
-    update_account_settings_from_hash(sets)
+    permitted_params = %i[
+      login_handle_name
+      change_password_url
+      auth_discovery_url
+      unknown_user_url
+      login_help_url
+    ]
+
+    if @account.discovery_page_allowed?
+      permitted_params << :discovery_page_active
+    end
+
+    sets = params.fetch(:sso_settings, {}).permit(*permitted_params)
+
+    begin
+      update_account_settings_from_hash(sets)
+    rescue ActiveRecord::RecordInvalid => e
+      errors = e.record&.errors
+      respond_to do |format|
+        format.html do
+          flash[:error] = errors&.map(&:message)&.join(", ") || e.message
+          redirect_to(account_authentication_providers_path(@account))
+        end
+        format.json do
+          render json: errors || { errors: [e.message] }, status: :unprocessable_content
+        end
+      end
+      return
+    end
 
     respond_to do |format|
       format.html { redirect_to(account_authentication_providers_path(@account)) }
@@ -958,7 +1009,17 @@ class AuthenticationProvidersController < ApplicationController
   end
 
   def destroy_all
-    @account.authentication_providers.active.filter { |ap| ap.visible_to?(@current_user) }.each(&:destroy)
+    errors = []
+    @account.authentication_providers.active.filter { |ap| ap.visible_to?(@current_user) }.each do |ap|
+      unless ap.destroy
+        errors.concat(ap.errors.full_messages)
+      end
+    end
+
+    if errors.any?
+      flash[:error] = errors
+    end
+
     redirect_to :account_authentication_providers
   end
 
@@ -1102,5 +1163,9 @@ class AuthenticationProvidersController < ApplicationController
 
   def ldap_providers(account)
     account.authentication_providers.active.where(auth_type: "ldap")
+  end
+
+  def load_aac(aac_id)
+    @account.authentication_providers.active.find(aac_id)
   end
 end

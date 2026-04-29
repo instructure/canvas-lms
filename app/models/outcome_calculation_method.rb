@@ -20,6 +20,7 @@
 
 class OutcomeCalculationMethod < ApplicationRecord
   include Canvas::SoftDeletable
+  include CanvasOutcomesHelper
   extend RootAccountResolver
 
   CALCULATION_METHODS = %w[
@@ -65,6 +66,7 @@ class OutcomeCalculationMethod < ApplicationRecord
   }
 
   before_validation :adjust_calculation_method
+  after_commit :rollup_calculation, on: :update, if: :rollup_relevant_changes?
   after_save :clear_cached_methods
 
   def as_json(options = {})
@@ -126,6 +128,24 @@ class OutcomeCalculationMethod < ApplicationRecord
   def clear_cached_methods
     if context_type == "Account"
       context.clear_downstream_caches(:resolved_outcome_calculation_method)
+    end
+  end
+
+  def rollup_relevant_changes?
+    saved_changes.keys.intersect?(%w[calculation_method calculation_int])
+  end
+
+  def rollup_calculation
+    return unless context.is_a?(Course)
+
+    begin
+      enqueue_rollup_calculation(course_id: context.id)
+    rescue => e
+      Canvas::Errors.capture_exception(:outcome_rollup_callback, e, {
+                                         course_id: context.id,
+                                         outcome_calculation_method_id: id,
+                                         calculation_method:
+                                       })
     end
   end
 end

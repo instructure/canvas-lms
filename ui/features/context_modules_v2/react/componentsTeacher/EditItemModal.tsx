@@ -16,19 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import React, {useEffect, useState} from 'react'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 import IndentSelector from './AddItemModalComponents/IndentSelector'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {submiEditItem, prepareItemData} from '../handlers/editItemHandlers'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {ModuleItemMasterCourseRestrictionType} from '../utils/types'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -37,6 +40,7 @@ export interface EditItemModalProps {
   onRequestClose: () => void
   itemName: string
   itemURL?: string
+  itemNewTab?: boolean
   itemIndent: number
   courseId: string
   moduleId: string
@@ -51,6 +55,7 @@ const EditItemModal = (props: EditItemModalProps) => {
     onRequestClose,
     itemName,
     itemURL,
+    itemNewTab,
     itemIndent,
     itemId,
     courseId,
@@ -61,25 +66,48 @@ const EditItemModal = (props: EditItemModalProps) => {
 
   const [title, setTitle] = useState(itemName)
   const [url, setUrl] = useState(itemURL)
+  const [newTab, setNewTab] = useState(itemNewTab || false)
   const [indent, setIndent] = useState(itemIndent)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [nameError, setNameError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setTitle(itemName)
+    setUrl(itemURL)
+    setNewTab(itemNewTab || false)
+    setIndent(itemIndent)
+  }, [itemIndent, itemName, itemNewTab, itemURL])
 
   const showExternalUrlFields =
-    itemType && ['external', 'externalurl', 'externaltool'].includes(itemType)
+    itemType &&
+    [
+      'external',
+      'externalurl',
+      'externaltool',
+      'contextexternaltool',
+      'moduleexternaltool',
+    ].includes(itemType)
 
   const handleSubmit = () => {
+    if (title.trim() === '') {
+      setNameError(I18n.t('Name is required'))
+      return
+    }
+
     setIsLoading(true)
 
     const itemData = prepareItemData({
       title,
       indentation: indent,
       url,
+      newTab,
     })
 
     submiEditItem(courseId, itemId, itemData)
       .then(response => {
         if (response) {
-          queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId], exact: false})
+          queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId], exact: false})
+          queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, moduleId], exact: false})
         }
       })
       .catch(_error => {
@@ -87,13 +115,21 @@ const EditItemModal = (props: EditItemModalProps) => {
       })
       .finally(() => {
         onRequestClose()
+        setNameError(null)
         setIsLoading(false)
       })
   }
 
   const footer = (
     <>
-      <Button onClick={onRequestClose} margin="0 x-small 0 0">
+      <Button
+        onClick={() => {
+          onRequestClose()
+          setNameError(null)
+          setTitle(itemName)
+        }}
+        margin="0 x-small 0 0"
+      >
         {I18n.t('Cancel')}{' '}
       </Button>
       <Button color="primary" type="submit" disabled={isLoading}>
@@ -111,7 +147,11 @@ const EditItemModal = (props: EditItemModalProps) => {
       closeButtonSize="medium"
       label={I18n.t('Edit Item Details')}
       footer={footer}
-      onDismiss={onRequestClose}
+      onDismiss={() => {
+        onRequestClose()
+        setNameError(null)
+        setTitle(itemName)
+      }}
       themeOverride={{
         smallMaxWidth: '20rem',
       }}
@@ -120,6 +160,8 @@ const EditItemModal = (props: EditItemModalProps) => {
         handleSubmit()
       }}
       data-testid="edit-item-modal"
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <View as="div" padding="small small small medium">
         <Grid>
@@ -133,7 +175,14 @@ const EditItemModal = (props: EditItemModalProps) => {
                 name="title"
                 renderLabel={<ScreenReaderContent>{I18n.t('Title')}</ScreenReaderContent>}
                 value={title}
-                onChange={e => setTitle(e.target.value)}
+                onChange={e => {
+                  const title = e.target.value
+                  if (nameError && title.trim()) {
+                    setNameError(null)
+                  }
+                  setTitle(title)
+                }}
+                required
                 display="inline-block"
                 width="12.5rem"
                 data-testid="edit-modal-title"
@@ -142,6 +191,7 @@ const EditItemModal = (props: EditItemModalProps) => {
                     ? 'disabled'
                     : 'enabled'
                 }
+                messages={nameError ? [{text: I18n.t('Name is required'), type: 'newError'}] : []}
               />
             </Grid.Col>
           </Grid.Row>
@@ -176,6 +226,20 @@ const EditItemModal = (props: EditItemModalProps) => {
               />
             </Grid.Col>
           </Grid.Row>
+          {showExternalUrlFields && (
+            <Grid.Row>
+              <Grid.Col vAlign="middle">
+                <Checkbox
+                  label={I18n.t('Load in a new tab')}
+                  checked={newTab}
+                  onChange={e => {
+                    setNewTab(e.target.checked)
+                  }}
+                  data-testid="edit-modal-new-tab"
+                />
+              </Grid.Col>
+            </Grid.Row>
+          )}
         </Grid>
       </View>
     </CanvasModal>

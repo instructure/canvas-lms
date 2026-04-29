@@ -338,8 +338,8 @@ class GradeCalculator
   end
 
   def grading_period_weights
-    @grading_period_weights ||= grading_periods_for_course.each_with_object({}) do |period, weights|
-      weights[period.id] = period.weight
+    @grading_period_weights ||= grading_periods_for_course.to_h do |period|
+      [period.id, period.weight]
     end
   end
 
@@ -431,20 +431,20 @@ class GradeCalculator
   end
 
   def group_dropped_rows
-    enrollments_by_user.keys.map do |user_id|
+    enrollments_by_user.keys.flat_map do |user_id|
       current = @current_groups[user_id].pluck(:global_id, :dropped).to_h
       final = @final_groups[user_id].pluck(:global_id, :dropped).to_h
-      @groups.map do |group|
+      @groups.flat_map do |group|
         agid = group.global_id
         hsh = {
           current: { dropped: current[agid] },
           final: { dropped: final[agid] }
         }
         enrollments_by_user[user_id].map do |enrollment|
-          "(#{enrollment.id}, #{group.id}, '#{hsh.to_json}')"
+          [enrollment.id, group.id, hsh]
         end
       end
-    end.flatten
+    end
   end
 
   def updated_at
@@ -490,8 +490,7 @@ class GradeCalculator
         save_course_and_grading_period_metadata
         score_rows = group_score_rows
         if @grading_period.nil? && score_rows.any?
-          dropped_rows = group_dropped_rows
-          save_assignment_group_scores(score_rows, dropped_rows)
+          save_assignment_group_scores(score_rows, group_dropped_rows)
         end
       end
     end
@@ -714,29 +713,66 @@ class GradeCalculator
     # score metadata for unposted grades.
     if @ignore_muted
       table = ScoreMetadata.quoted_table_name
-      Score.connection.with_max_update_limit(dropped_values.length) do
-        ScoreMetadata.connection.execute(<<~SQL.squish)
-          INSERT INTO #{table}
-            (score_id, calculation_details, created_at, updated_at)
-            SELECT
-              scores.id AS score_id,
-              CAST(val.calculation_details as json) AS calculation_details,
-              #{updated_at} AS created_at,
-              #{updated_at} AS updated_at
-            FROM (VALUES #{dropped_values.join(",")}) val
-              (enrollment_id, assignment_group_id, calculation_details)
-            LEFT OUTER JOIN #{Score.quoted_table_name} scores ON
-              scores.enrollment_id = val.enrollment_id AND
-              scores.assignment_group_id = val.assignment_group_id
-            ORDER BY score_id
-          ON CONFLICT (score_id)
-          DO UPDATE SET
-            calculation_details = excluded.calculation_details,
-            updated_at = excluded.updated_at
-          WHERE
-          #{table}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR
-          #{table}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'
+      batch_size = 1000
+
+      # Separate data into empty drops and non-empty drops
+      empty_drop_hsh = { current: { dropped: [] }, final: { dropped: [] } }
+      empty_drop_json = "'#{empty_drop_hsh.to_json}'::json"
+
+      empty_drop_rows = []
+      non_empty_drop_rows = []
+
+      dropped_values.each do |enrollment_id, group_id, hsh|
+        if hsh == empty_drop_hsh
+          empty_drop_rows << "(#{enrollment_id}, #{group_id})"
+        else
+          non_empty_drop_rows << "(#{enrollment_id}, #{group_id}, '#{hsh.to_json}')"
+        end
+      end
+
+      execute_score_metadata_upsert = lambda do |max_update_limit, from_clause|
+        Score.connection.with_max_update_limit(max_update_limit) do
+          ScoreMetadata.connection.execute(<<~SQL.squish)
+            INSERT INTO #{table}
+              (score_id, calculation_details, created_at, updated_at)
+              SELECT
+                scores.id AS score_id,
+                CAST(val.calculation_details as json) AS calculation_details,
+                #{updated_at} AS created_at,
+                #{updated_at} AS updated_at
+              #{from_clause}
+              LEFT OUTER JOIN #{Score.quoted_table_name} scores ON
+                scores.enrollment_id = val.enrollment_id AND
+                scores.assignment_group_id = val.assignment_group_id
+              ORDER BY score_id
+            ON CONFLICT (score_id)
+            DO UPDATE SET
+              calculation_details = excluded.calculation_details,
+              updated_at = excluded.updated_at
+            WHERE
+            #{table}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR
+            #{table}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'
+          SQL
+        end
+      end
+
+      # CROSS JOIN optimization: reference identical JSON once instead of repeating in massive VALUES
+      empty_drop_rows.each_slice(batch_size) do |batch_values|
+        from_clause = <<~SQL.squish
+          FROM (
+            SELECT pairs.enrollment_id, pairs.assignment_group_id, json_data.calculation_details
+            FROM (VALUES #{batch_values.join(",")}) pairs(enrollment_id, assignment_group_id)
+            CROSS JOIN (SELECT #{empty_drop_json} as calculation_details) json_data
+          ) val
         SQL
+
+        execute_score_metadata_upsert.call(batch_values.length, from_clause)
+      end
+
+      non_empty_drop_rows.each_slice(batch_size) do |batch_values|
+        from_clause = "FROM (VALUES #{batch_values.join(",")}) val (enrollment_id, assignment_group_id, calculation_details)"
+
+        execute_score_metadata_upsert.call(batch_values.length, from_clause)
       end
     end
   rescue ActiveRecord::Deadlocked => e
@@ -1002,7 +1038,7 @@ class GradeCalculator
       if full_weight.zero?
         final_grade = nil
       elsif full_weight < 100
-        final_grade *= 100.0 / full_weight
+        final_grade = BigDecimal(final_grade.to_s) / BigDecimal(full_weight.to_s) * BigDecimal(100)
       end
 
       rounded_grade = final_grade&.to_f.try(:round, 2)

@@ -21,11 +21,13 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import AnnouncementRow from '../AnnouncementRow'
 
 const mockLockIconView = {
-  render: jest.fn(),
-  remove: jest.fn(),
+  render: vi.fn(),
+  remove: vi.fn(),
 }
 
-jest.mock('@canvas/lock-icon', () => jest.fn(() => mockLockIconView))
+vi.mock('@canvas/lock-icon', () => ({
+  default: vi.fn(() => mockLockIconView),
+}))
 
 const defaultProps = (props = {}) => ({
   canManage: false,
@@ -165,12 +167,14 @@ describe('AnnouncementRow', () => {
     expect(container.querySelector('.lock-icon .lock-icon')).not.toBeInTheDocument()
   })
 
-  it('renders master course lock icon if masterCourseData is provided', () => {
+  it('renders master course lock icon if masterCourseData is provided', async () => {
     const masterCourseData = {isMasterCourse: true, masterCourse: {id: '1'}}
 
     renderAnnouncementRow({masterCourseData})
 
-    expect(mockLockIconView.render).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(mockLockIconView.render).toHaveBeenCalled()
+    })
   })
 
   it('renders reply button icon if user has reply permission', async () => {
@@ -230,7 +234,7 @@ describe('AnnouncementRow', () => {
       describe('when canDelete is false', () => {
         it('does not render delete button in manage menu', () => {
           renderAnnouncementRow({canManage: true, canDelete: false})
-          fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+          fireEvent.click(screen.getByTestId('manage-announcement-options'))
           expect(screen.queryByText(/Delete/)).not.toBeInTheDocument()
         })
       })
@@ -238,7 +242,7 @@ describe('AnnouncementRow', () => {
       describe('when canDelete is true', () => {
         it('renders delete button in manage menu', () => {
           renderAnnouncementRow({canManage: true, canDelete: true, announcementsLocked: true})
-          fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+          fireEvent.click(screen.getByTestId('manage-announcement-options'))
           const menuItems = screen.getAllByRole('menuitem')
           expect(menuItems).toHaveLength(1)
           expect(menuItems[0]).toHaveTextContent(/Delete/)
@@ -248,7 +252,7 @@ describe('AnnouncementRow', () => {
       describe('when announcements are globally locked', () => {
         it('does not render lock button in manage menu', () => {
           renderAnnouncementRow({canManage: true, canDelete: false, announcementsLocked: true})
-          fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+          fireEvent.click(screen.getByTestId('manage-announcement-options'))
           expect(screen.queryByText(/Allow Comments/)).not.toBeInTheDocument()
         })
       })
@@ -262,7 +266,7 @@ describe('AnnouncementRow', () => {
               announcementsLocked: false,
               announcement: {locked: true},
             })
-            fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+            fireEvent.click(screen.getByTestId('manage-announcement-options'))
             const menuItems = screen.getAllByRole('menuitem')
             expect(menuItems).toHaveLength(1)
             expect(menuItems[0]).toHaveTextContent(/Allow Comments/)
@@ -278,7 +282,7 @@ describe('AnnouncementRow', () => {
               announcementsLocked: false,
               announcement: {locked: false},
             })
-            fireEvent.click(screen.getByRole('button', {name: /Manage options for /}))
+            fireEvent.click(screen.getByTestId('manage-announcement-options'))
             const menuItems = screen.getAllByRole('menuitem')
             expect(menuItems).toHaveLength(1)
             expect(menuItems[0]).toHaveTextContent(/Disallow Comments/)

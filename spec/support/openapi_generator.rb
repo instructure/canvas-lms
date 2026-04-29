@@ -27,9 +27,7 @@ module OpenApiGenerator
     # inside of the test ("running_context"). It will throw an exception
     # if the test has a request variable defined that is not actually
     # an HTTP request object.
-    # rubocop:disable Style/RedundantBegin
     begin
-      # rubocop:enable Style/RedundantBegin
       CanvasRails::Application.routes.router.recognize(running_context.request) do |route|
         controller_name = route.defaults[:controller]
         openapi_doc_file_location = "spec/openapi/#{controller_name}.yaml"

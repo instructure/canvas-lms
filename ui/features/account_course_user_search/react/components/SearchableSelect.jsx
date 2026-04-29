@@ -63,7 +63,7 @@ function flattenOptions(nodes) {
 }
 
 function SearchableSelect(props) {
-  const {id: selectId, value, children, isLoading, onChange, label} = props
+  const {id: selectId, value, children, isLoading, onChange, label, matchAnywhere} = props
   const noResultsLabel = props.noResultsLabel || I18n.t('No results')
   const noSearchMatchLabel = props.noSearchMatchLabel || I18n.t('No matches to your search')
   const placeholder = props.placeholder || I18n.t('Begin typing to search')
@@ -106,7 +106,10 @@ function SearchableSelect(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, React.Children.count(children)])
 
-  const matcherFor = v => new RegExp('^(\\s*)' + reEscape(v), 'i')
+  function matcherFor(v) {
+    const constrain = matchAnywhere ? '' : '^(\\s*)'
+    return new RegExp(constrain + reEscape(v), 'i')
+  }
 
   function onInputChange(e) {
     const newMatcher = matcherFor(e.target.value)
@@ -260,6 +263,7 @@ SearchableSelect.propTypes = {
   onChange: func.isRequired,
   label: oneOfType([node, func]),
   placeholder: string,
+  matchAnywhere: bool,
   noResultsLabel: string,
   noSearchMatchLabel: string,
   children: node,
@@ -268,6 +272,7 @@ SearchableSelect.propTypes = {
 SearchableSelect.defaultProps = {
   isLoading: false,
   label: <span />,
+  matchAnywhere: false,
 }
 
 SearchableSelect.Option = SearchableSelectOption

@@ -81,7 +81,7 @@ $turnitin_gray: #808080;
   border-radius: 3px;
   padding: 2px 4px;
   font-weight: bold;
-  color: $ic-color-light;
+  color: #000000; // Pure black for WCAG AA compliance (4.5:1 contrast)
   @include fontSize(12px);
   text-decoration: none;
   &.none_score {
@@ -98,9 +98,11 @@ $turnitin_gray: #808080;
   }
   &.failure_score {
     background-color: $turnitin_red;
+    color: #FFFFFF; // Pure white for WCAG AA compliance (6.13:1 contrast)
   }
   &.submission_error, &.submission_pending {
     background-color: $turnitin_gray;
+    color: $ic-color-dark; // Revert to original color (no text displayed in these states)
   }
   &.pending_score {
     background-image: url(/images/turnitin_submission_pending.png);

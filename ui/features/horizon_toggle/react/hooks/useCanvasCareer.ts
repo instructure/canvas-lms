@@ -18,7 +18,7 @@
 
 import {useState, useEffect, useMemo, useCallback} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {CanvasCareerValidationResponse, CompletionProgressResponse} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -42,7 +42,9 @@ const timeout = (delay: number) => {
 
 export const useCanvasCareer = ({
   onConversionCompleted,
-}: {onConversionCompleted: () => void}): UseCanvasCareerResult => {
+}: {
+  onConversionCompleted: () => void
+}): UseCanvasCareerResult => {
   const [data, setData] = useState<CanvasCareerValidationResponse>({errors: {}})
   const [loading, setLoading] = useState<boolean>(true)
   const [loadingText, setLoadingText] = useState<string>('')

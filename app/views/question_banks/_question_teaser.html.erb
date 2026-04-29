@@ -18,6 +18,7 @@
 
 <% question_teaser ||= nil %>
 <% data = question_teaser.try_rescue(:data) %>
+<% asset_string ||= data ? "assessment_question_#{hash_get(data, :id)}" : nil %>
 <div class="quiz_sortable question_holder question_teaser" id="question_teaser_<%= question_teaser ? question_teaser.id : "blank" %>" style="<%= hidden unless question_teaser %>">
   <div class="display_question question">
     <%= render partial: "quizzes/quizzes/move_handle" %>
@@ -32,7 +33,7 @@
     </div>
     <div class="text">
       <div class="teaser question_text user_content">
-        <%= user_content(hash_get(data, :question_text)) %>
+        <%= user_content(hash_get(data, :question_text), location: asset_string) %>
       </div>
     </div>
     <div class="bottom_links">

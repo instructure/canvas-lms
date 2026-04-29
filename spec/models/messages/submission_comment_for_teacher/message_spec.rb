@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require_relative "../../../messages/messages_helper"
 
 describe "submission_comment_for_teacher" do
@@ -37,5 +36,5 @@ describe "submission_comment_for_teacher" do
   let_once(:asset) { submission.add_comment(author: commenter, comment: "Looks good!") }
   let_once(:notification_name) { "Submission Comment For Teacher" }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

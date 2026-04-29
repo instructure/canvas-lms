@@ -20,10 +20,13 @@ import React from 'react'
 import {render, screen, within} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 import GradingStandardCollection from '../index'
 
 // Mock jQuery and its plugins
-jest.mock('@canvas/jquery/jquery.instructure_misc_plugins', () => {})
+vi.mock('@canvas/jquery/jquery.instructure_misc_plugins', () => ({
+  default: {},
+}))
 import $ from 'jquery'
 
 const server = setupServer()
@@ -55,7 +58,7 @@ describe('GradingStandardCollection', () => {
   ]
 
   beforeEach(() => {
-    window.ENV = {
+    fakeEnv.setup({
       current_user_roles: ['admin', 'teacher'],
       GRADING_STANDARDS_URL: '/courses/1/grading_standards',
       DEFAULT_GRADING_STANDARD_DATA: [
@@ -66,7 +69,7 @@ describe('GradingStandardCollection', () => {
         ['F', 0],
       ],
       context_asset_string: 'course_1',
-    }
+    })
 
     // Setup server handler for default case
     server.use(
@@ -76,7 +79,7 @@ describe('GradingStandardCollection', () => {
     )
 
     // Mock jQuery getJSON - component uses jQuery's promise interface
-    $.getJSON = jest.fn(url => {
+    $.getJSON = vi.fn(url => {
       const deferred = $.Deferred()
 
       fetch(url)
@@ -88,14 +91,14 @@ describe('GradingStandardCollection', () => {
     })
 
     // Mock jQuery plugins
-    $.flashMessage = jest.fn()
-    $.flashError = jest.fn()
-    $.fn.confirmDelete = jest.fn(({success}) => success())
+    $.flashMessage = vi.fn()
+    $.flashError = vi.fn()
+    $.fn.confirmDelete = vi.fn(({success}) => success())
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    delete window.ENV
+    vi.clearAllMocks()
+    fakeEnv.teardown()
   })
 
   it('shows empty state when no standards exist', async () => {
@@ -138,7 +141,19 @@ describe('GradingStandardCollection', () => {
   })
 
   it('disables add button for student role', async () => {
-    window.ENV.current_user_roles = ['student']
+    fakeEnv.teardown()
+    fakeEnv.setup({
+      current_user_roles: ['student'],
+      GRADING_STANDARDS_URL: '/courses/1/grading_standards',
+      DEFAULT_GRADING_STANDARD_DATA: [
+        ['A', 0.94],
+        ['B', 0.84],
+        ['C', 0.74],
+        ['D', 0.64],
+        ['F', 0],
+      ],
+      context_asset_string: 'course_1',
+    })
     render(<GradingStandardCollection />)
     const addButton = screen.getByRole('button', {name: /add grading scheme/i})
     expect(addButton).toHaveClass('disabled')

@@ -72,7 +72,6 @@ function normalizeFileData(file) {
 
 function throwConnectionError(error) {
   if (error.name === 'TypeError') {
-     
     console.error(`Failed to fetch from the canvas-rce-api.
       Did you forget to start it or configure it?
       Details can be found at https://github.com/instructure/canvas-rce-api
@@ -140,14 +139,6 @@ class RceApiSource {
 
   initializeMedia(props) {
     return this.initializeDocuments(props)
-  }
-
-  initializeFlickr() {
-    return {
-      searchResults: [],
-      searching: false,
-      formExpanded: false,
-    }
   }
 
   // fetches the given URI and filters it to either an error or parsed response
@@ -233,18 +224,20 @@ class RceApiSource {
     return this.apiPost(this.baseUri('media_objects'), headerFor(this.jwt), body)
   }
 
-  updateMediaObject(apiProps, {media_object_id, title, attachment_id}) {
-    const uri =
-      attachment_id
-        ? `${this.baseUri(
-            'media_attachments',
-            apiProps.host,
-          )}/${attachment_id}?user_entered_title=${encodeURIComponent(title)}`
-        : `${this.baseUri(
-            'media_objects',
-            apiProps.host,
-          )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
-    return this.apiPost(uri, headerFor(this.jwt), null, 'PUT')
+  updateMediaObject(apiProps, {media_object_id, title, attachment_id, viewerRestrictions = {}}) {
+    const uri = attachment_id
+      ? `${this.baseUri(
+          'media_attachments',
+          apiProps.host,
+        )}/${attachment_id}?user_entered_title=${encodeURIComponent(title)}`
+      : `${this.baseUri(
+          'media_objects',
+          apiProps.host,
+        )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
+
+    const body = {viewer_restrictions: viewerRestrictions}
+
+    return this.apiPost(uri, headerFor(this.jwt), body, 'PUT')
   }
 
   // PUT to //RCS/api/media_objects/:mediaId/media_tracks [{locale, content}, ...]
@@ -384,7 +377,7 @@ class RceApiSource {
     return fetch(preflightProps.upload_url, fetchOptions)
       .then(checkStatus)
       .then(res => {
-        if (res.headers.get('content-type').includes('application/xml')) {
+        if (res.headers.get('content-type')?.includes('application/xml')) {
           if (res.status === 201) {
             return res.text().then(text => {
               const xmldoc = new window.DOMParser().parseFromString(text, 'application/xml')
@@ -443,13 +436,6 @@ class RceApiSource {
     const uri = this.baseUri('usage_rights')
     const body = {fileId, ...usageRights}
     return this.apiPost(uri, headers, body)
-  }
-
-  searchFlickr(term, apiProps) {
-    const headers = headerFor(this.jwt)
-    const base = this.baseUri('flickr_search', apiProps.host)
-    const uri = `${base}?term=${encodeURIComponent(term)}`
-    return this.apiFetch(uri, headers)
   }
 
   getFile(id, options = {}) {
@@ -549,13 +535,14 @@ class RceApiSource {
       .then(checkStatus)
       .then(res => res.json())
       .catch(throwConnectionError)
-      .catch(e =>
-        e.response.json().then(responseBody => {
-          console.error(e)  
+      .catch(e => {
+        if (!e.response) throw e
+        return e.response.json().then(responseBody => {
+          console.error(e)
           this.alertFunc(buildError(responseBody))
           throw e
-        }),
-      )
+        })
+      })
   }
 
   // @private

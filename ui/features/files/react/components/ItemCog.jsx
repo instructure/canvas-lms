@@ -157,66 +157,69 @@ class ItemCog extends React.Component {
       })
 
     const menuItems = []
+    const isAccessRestricted = filesEnv.userFileAccessRestricted
 
-    // Download Link
-    if (this.props.model instanceof Folder) {
-      menuItems.push(
-        <li key="folderDownload" role="presentation">
-          <a
-            href="#"
-            onClick={wrap(this.downloadZip)}
-            data-testid="download"
-            role="menuitem"
-            tabIndex="-1"
-          >
-            {I18n.t('Download')}
-          </a>
-        </li>,
-      )
-    } else {
-      menuItems.push(
-        <li key="download" role="presentation">
-          <a
-            onClick={wrap(this.downloadFile)}
-            href={this.props.model.get('url')}
-            data-testid="download"
-            role="menuitem"
-            tabIndex="-1"
-          >
-            {I18n.t('Download')}
-          </a>
-        </li>,
-      )
+    if (!isAccessRestricted) {
+      // Download Link
+      if (this.props.model instanceof Folder) {
+        menuItems.push(
+          <li key="folderDownload" role="presentation">
+            <a
+              href="#"
+              onClick={wrap(this.downloadZip)}
+              data-testid="download"
+              role="menuitem"
+              tabIndex="-1"
+            >
+              {I18n.t('Download')}
+            </a>
+          </li>,
+        )
+      } else {
+        menuItems.push(
+          <li key="download" role="presentation">
+            <a
+              onClick={wrap(this.downloadFile)}
+              href={this.props.model.get('url')}
+              data-testid="download"
+              role="menuitem"
+              tabIndex="-1"
+            >
+              {I18n.t('Download')}
+            </a>
+          </li>,
+        )
 
-      if (this.props.userCanEditFilesForContext) {
-        if (ENV.context_asset_string?.startsWith('course_')) {
-          menuItems.push(
-            <li key="send-to" role="presentation">
-              <a
-                href="#"
-                onClick={() => {
-                  this.props.onSendToClick(this.props.model)
-                }}
-                role="menuitem"
-                tabIndex="-1"
-              >
-                {I18n.t('Send To...')}
-              </a>
-            </li>,
+        if (this.props.userCanEditFilesForContext) {
+          if (ENV.context_asset_string?.startsWith('course_')) {
+            menuItems.push(
+              <li key="send-to" role="presentation">
+                <a
+                  href="#"
+                  onClick={() => {
+                    this.props.onSendToClick(this.props.model)
+                  }}
+                  role="menuitem"
+                  tabIndex="-1"
+                >
+                  {I18n.t('Send To...')}
+                </a>
+              </li>,
 
-            <li key="copy-to" role="presentation">
-              <a
-                href="#"
-                onClick={() => {
-                  this.props.onCopyToClick(this.props.model)
-                }}
-                role="menuitem"
-                tabIndex="-1"
-              >
-                {I18n.t('Copy To...')}
-              </a>
-            </li>,
-          )
+              <li key="copy-to" role="presentation">
+                <a
+                  href="#"
+                  onClick={() => {
+                    this.props.onCopyToClick(this.props.model)
+                  }}
+                  role="menuitem"
+                  tabIndex="-1"
+                >
+                  {I18n.t('Copy To...')}
+                </a>
+              </li>,
+            )
+          }
         }
       }
     }
@@ -237,23 +240,25 @@ class ItemCog extends React.Component {
             </a>
           </li>,
         )
-        // Move Link
-        menuItems.push(
-          <li key="move-to" role="presentation">
-            <a
-              href="#"
-              onClick={wrap(openMoveDialog, {
-                clearSelectedItems: this.props.clearSelectedItems,
-                onMove: this.props.onMove,
-              })}
-              data-testid="move"
-              role="menuitem"
-              tabIndex="-1"
-            >
-              {I18n.t('Move To...')}
-            </a>
-          </li>,
-        )
+        if (!isAccessRestricted) {
+          // Move Link
+          menuItems.push(
+            <li key="move-to" role="presentation">
+              <a
+                href="#"
+                onClick={wrap(openMoveDialog, {
+                  clearSelectedItems: this.props.clearSelectedItems,
+                  onMove: this.props.onMove,
+                })}
+                data-testid="move"
+                role="menuitem"
+                tabIndex="-1"
+              >
+                {I18n.t('Move To...')}
+              </a>
+            </li>,
+          )
+        }
         // Manage Usage Rights Link
         if (this.props.usageRightsRequiredForContext) {
           menuItems.push(
@@ -288,6 +293,10 @@ class ItemCog extends React.Component {
           </li>,
         )
       }
+    }
+
+    if (menuItems.concat(externalToolMenuItems).length === 0) {
+      return null
     }
 
     return (

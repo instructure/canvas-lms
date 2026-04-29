@@ -17,6 +17,7 @@
  */
 
 import {fireEvent, waitFor} from '@testing-library/react'
+import * as FlashAlert from '@instructure/platform-alerts'
 import {
   mockAssignment,
   findInputForLabel,
@@ -29,9 +30,15 @@ import {
   renderTeacherQueryAndWaitForResult,
 } from './integration/integration-utils'
 
+vi.mock('@instructure/platform-alerts')
+
+afterEach(() => {
+  vi.clearAllMocks()
+})
+
 describe('TeacherView', () => {
   describe('basic TeacherView stuff', () => {
-    it.skip('shows the assignment', async () => {
+    it('shows the assignment', async () => {
       const assignment = mockAssignment()
       const {getByText, getAllByText} = await renderTeacherView(assignment)
       expect(await waitFor(() => getAllByText(assignment.name)[0])).toBeInTheDocument()
@@ -45,8 +52,9 @@ describe('TeacherView', () => {
   })
 
   describe('publish toggle', () => {
-    // will be re-checked with ADMIN-2345 for flakiness
-
+    // TODO: These tests are skipped due to errors after Jest-to-Vitest migration.
+    // Error: Cannot read properties of undefined (reading 'length') in Overrides.renderOverrides
+    // Needs investigation into test setup and mock data for assignment overrides.
     it.skip('unpublishes the assignment', async () => {
       const assignment = mockAssignment()
       const {getByText, container} = await renderTeacherQueryAndWaitForResult(assignment, [
@@ -61,8 +69,6 @@ describe('TeacherView', () => {
       // make sure the mutation finishes
       expect(await waitForNoElement(() => getByText('Saving assignment'))).toBe(true)
     })
-
-    // will be re-checked with ADMIN-2345 for flakiness
 
     it.skip('saves the entire assignment when publishing via the toggle', async () => {
       const assignment = mockAssignment({state: 'unpublished'})
@@ -127,7 +133,7 @@ describe('TeacherView', () => {
   })
 
   describe('editing the assignment', () => {
-    it.skip('render footer when assignment is changed', async () => {
+    it('render footer when assignment is changed', async () => {
       const assignment = mockAssignment({name: 'old name'})
       const {getByText, getByDisplayValue, getByTestId} = await renderTeacherView(assignment, [], {
         readOnly: false,
@@ -145,7 +151,7 @@ describe('TeacherView', () => {
       expect(getByTestId('TeacherFooter')).toBeInTheDocument()
     })
 
-    it.skip('resets assignment on Cancel', async () => {
+    it('resets assignment on Cancel', async () => {
       const assignment = mockAssignment({name: 'old name'})
       const {getByText, getAllByText, getByDisplayValue, getByTestId} = renderTeacherView(
         assignment,
@@ -174,7 +180,7 @@ describe('TeacherView', () => {
       expect(getAllByText('old name')[0]).toBeInTheDocument()
     })
 
-    it.skip('aborts save if there is an invalid field in the assignment', async () => {
+    it('aborts save if there is an invalid field in the assignment', async () => {
       const assignment = mockAssignment({name: 'old name'})
       const {getByText, getAllByText, getByDisplayValue, getByTestId} = renderTeacherView(
         assignment,
@@ -198,10 +204,12 @@ describe('TeacherView', () => {
       const saveBtn = closest(getByText('Save'), 'button')
       saveBtn.click()
 
-      expect(getAllByText('You cannot save while there are errors')[0]).toBeInTheDocument()
+      expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'You cannot save while there are errors'}),
+      )
     })
 
-    it.skip('bypasses update if new value == old', async () => {
+    it('bypasses update if new value == old', async () => {
       // this spec is here to exercise 1 line of code
       const assignment = mockAssignment({name: 'old name'})
       const {getByText, getAllByText, getByDisplayValue, queryByTestId} = renderTeacherView(

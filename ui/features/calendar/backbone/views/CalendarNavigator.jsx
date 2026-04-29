@@ -17,13 +17,17 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/calendarNavigator.handlebars'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import CalendarNavigatorComponent from '../../react/CalendarNavigatorComponent'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import $ from 'jquery'
+
+const I18n = createI18nScope('calendar')
 
 extend(CalendarNavigator, Backbone.View)
 
@@ -69,9 +73,55 @@ CalendarNavigator.prototype.initialize = function () {
   CalendarNavigator.__super__.initialize.apply(this, arguments)
   this.render()
   this._savedButtonsVisibility = true
+  this.currentView = 'month'
 
   // use debounce to make the aria-live updates nicer
   this._flashDateSuggestion = debounce(this._flashDateSuggestion, 1500)
+
+  const handleViewChange = e => {
+    this.currentView = e.detail.viewName
+    if (ENV.FEATURES?.instui_header) {
+      this._reRenderReactComponent()
+    } else {
+      this._updateNavigationButtonLabels()
+    }
+  }
+  document.addEventListener('calendar:header:select_view', handleViewChange)
+  this._viewChangeHandler = handleViewChange
+}
+
+CalendarNavigator.prototype._detectInitialView = function () {
+  const $activeButton = $(
+    '.calendar_view_buttons button.active, .calendar_view_buttons button[aria-selected="true"]',
+  )
+  if ($activeButton.length > 0) {
+    const viewId = $activeButton.attr('id')
+    if (viewId) {
+      this.currentView = viewId
+    }
+  }
+
+  if (!this.currentView) {
+    this.currentView = 'month'
+  }
+}
+
+CalendarNavigator.prototype._updateNavigationButtonLabels = function () {
+  if (!this.$buttons) return
+
+  const $prevButton = this.$buttons.find('.navigate_prev .screenreader-only')
+  const $nextButton = this.$buttons.find('.navigate_next .screenreader-only')
+
+  if (this.currentView === 'week') {
+    $prevButton.text(I18n.t('previous_week', 'Previous Week'))
+    $nextButton.text(I18n.t('next_week', 'Next Week'))
+  } else if (this.currentView === 'month') {
+    $prevButton.text(I18n.t('previous_month', 'Previous Month'))
+    $nextButton.text(I18n.t('next_month', 'Next Month'))
+  } else {
+    $prevButton.text(I18n.t('previous', 'Previous'))
+    $nextButton.text(I18n.t('next', 'Next'))
+  }
 }
 
 CalendarNavigator.prototype.show = function (visible) {
@@ -106,7 +156,12 @@ CalendarNavigator.prototype.showPicker = function (visible) {
 }
 
 CalendarNavigator.prototype.hidePicker = function () {
-  return this.showPicker(false)
+  this.showPicker(false)
+  // Restore focus to the trigger element for accessibility
+  if (this._pickerTriggerElement) {
+    this._pickerTriggerElement.focus()
+    this._pickerTriggerElement = null
+  }
 }
 
 CalendarNavigator.prototype.showPrevNext = function () {
@@ -161,6 +216,10 @@ CalendarNavigator.prototype._triggerDate = function (selectedDate) {
 
 CalendarNavigator.prototype._onTitleClick = function (event) {
   event.preventDefault()
+  // Store the trigger element only for keyboard navigation (not mouse clicks)
+  if (event.type === 'keyclick') {
+    this._pickerTriggerElement = event.target
+  }
   return this._titleActivated()
 }
 
@@ -210,15 +269,25 @@ CalendarNavigator.prototype._loadDateField = function () {
   }
 }
 
+CalendarNavigator.prototype._reRenderReactComponent = function () {
+  if (ENV.FEATURES?.instui_header && this.$el.find('#calendar_navigator_component')[0]) {
+    this.afterRender()
+  }
+}
+
 CalendarNavigator.prototype.afterRender = function () {
   if (!ENV.FEATURES?.instui_header) {
     this.$buttons.buttonset()
-    return this._loadDateField()
+    this._loadDateField()
+    this._detectInitialView()
+    setTimeout(() => this._updateNavigationButtonLabels(), 100)
+    return
   }
 
-  ReactDOM.render(
+  legacyRender(
     <CalendarNavigatorComponent
       size={this.options.size || 'large'}
+      currentView={this.currentView}
       bridge={{
         navigatePrev: () => this.trigger('navigatePrev'),
         navigateToday: () => this.trigger('navigateToday'),

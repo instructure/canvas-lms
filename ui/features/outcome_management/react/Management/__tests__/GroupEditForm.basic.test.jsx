@@ -25,11 +25,11 @@ describe('GroupEditForm - Basic', () => {
   let onCloseHandler, onSubmit, user
 
   beforeAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterAll(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   const defaultProps = (props = {}) => ({
@@ -40,14 +40,14 @@ describe('GroupEditForm - Basic', () => {
   })
 
   beforeEach(() => {
-    onCloseHandler = jest.fn()
-    onSubmit = jest.fn()
-    user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
+    onCloseHandler = vi.fn()
+    onSubmit = vi.fn()
+    user = userEvent.setup({advanceTimers: vi.advanceTimersByTime})
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    jest.runOnlyPendingTimers()
+    vi.clearAllMocks()
+    vi.runOnlyPendingTimers()
   })
 
   it('renders form with empty data', async () => {

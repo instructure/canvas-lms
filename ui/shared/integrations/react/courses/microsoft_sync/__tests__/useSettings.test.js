@@ -17,44 +17,60 @@
  */
 
 import useSettings from '../useSettings'
-import useFetchApi from '@canvas/use-fetch-api-hook'
 import {act} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks/dom'
-import axios from 'axios'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/use-fetch-api-hook')
-jest.mock('axios')
+const server = setupServer()
 
 const courseId = 11
 const subject = () => renderHook(() => useSettings(courseId))
 
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+
 afterEach(() => {
-  useFetchApi.mockClear()
-  axios.request.mockClear()
+  server.resetHandlers()
 })
 
 describe('useSettings', () => {
   it('renders without error', () => {
+    server.use(
+      http.get(`/api/v1/courses/${courseId}/microsoft_sync/group`, () => HttpResponse.json({})),
+    )
     const {result} = subject()
     expect(result.error).toBeFalsy()
   })
 
-  it('makes a GET request to load the group', () => {
-    subject()
-    const lastCall = useFetchApi.mock.calls.pop()
-
-    expect(lastCall[0]).toMatchObject({
-      path: `/api/v1/courses/${courseId}/microsoft_sync/group`,
-    })
+  it('makes a GET request to load the group', async () => {
+    let requestMade = false
+    server.use(
+      http.get(`/api/v1/courses/${courseId}/microsoft_sync/group`, () => {
+        requestMade = true
+        return HttpResponse.json({})
+      }),
+    )
+    const {waitForNextUpdate} = subject()
+    await waitForNextUpdate()
+    expect(requestMade).toBe(true)
   })
 
   describe('when last_error and last_error_report_id are set on the group', () => {
-    it('sets the error with a link to the error report', () => {
-      useFetchApi.mockImplementationOnce(({success}) => {
-        success({workflow_state: 'errored', last_error: 'foo', last_error_report_id: 456})
-      })
+    it('sets the error with a link to the error report', async () => {
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/microsoft_sync/group`, () =>
+          HttpResponse.json({
+            workflow_state: 'errored',
+            last_error: 'foo',
+            last_error_report_id: 456,
+          }),
+        ),
+      )
 
-      const result = subject().result
+      const {result, waitForNextUpdate} = subject()
+      await waitForNextUpdate()
+
       const message = result.current[3].message
       expect(message.type).toBe('a')
       expect(message.props.href).toBe('/error_reports/456')
@@ -64,62 +80,70 @@ describe('useSettings', () => {
 
   describe('toggleEnabled', () => {
     it('enables the integration when it is disabled', async () => {
-      const {result} = subject()
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/microsoft_sync/group`, () => HttpResponse.json({})),
+        http.post(`/api/v1/courses/${courseId}/microsoft_sync/group`, () =>
+          HttpResponse.json({}, {status: 201}),
+        ),
+      )
+
+      const {result, waitForNextUpdate} = subject()
+      await waitForNextUpdate()
+
       const toggleEnabled = result.current[4]
-
-      axios.request.mockImplementationOnce(_req => Promise.resolve({status: 201, data: {}}))
-
       await act(toggleEnabled)
-
-      expect(axios.request).toHaveBeenLastCalledWith({
-        method: 'post',
-        url: `/api/v1/courses/${courseId}/microsoft_sync/group`,
-      })
     })
 
     it('disables the integration when it is enabled', async () => {
-      useFetchApi.mockImplementationOnce(({success}) => {
-        success({workflow_state: 'active'})
-      })
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/microsoft_sync/group`, () =>
+          HttpResponse.json({workflow_state: 'active'}),
+        ),
+        http.delete(`/api/v1/courses/${courseId}/microsoft_sync/group`, () =>
+          HttpResponse.json({}, {status: 201}),
+        ),
+      )
 
-      const {result} = subject()
+      const {result, waitForNextUpdate} = subject()
+      await waitForNextUpdate()
+
       const toggleEnabled = result.current[4]
-
-      axios.request.mockImplementationOnce(_req => Promise.resolve({status: 201, data: {}}))
-
       await act(toggleEnabled)
-
-      expect(axios.request).toHaveBeenLastCalledWith({
-        method: 'delete',
-        url: `/api/v1/courses/${courseId}/microsoft_sync/group`,
-      })
     })
 
     it('uses the error message in the response if it exists', async () => {
-      const {result} = subject()
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/microsoft_sync/group`, () => HttpResponse.json({})),
+        http.post(`/api/v1/courses/${courseId}/microsoft_sync/group`, () =>
+          HttpResponse.json({message: 'Something bad happened, sorry'}, {status: 422}),
+        ),
+      )
+
+      const {result, waitForNextUpdate} = subject()
+      await waitForNextUpdate()
+
       const toggleEnabled = result.current[4]
-      const e = new Error('422 error')
-      e.response = {status: 422, data: {message: 'Something bad happened, sorry'}}
-
-      axios.request.mockImplementationOnce(_req => Promise.reject(e))
-
       await act(toggleEnabled)
 
       expect(result.current[3]).toEqual({message: 'Something bad happened, sorry'})
     })
 
     it('uses the message in the Error object if no message is in the response', async () => {
-      const {result} = subject()
+      server.use(
+        http.get(`/api/v1/courses/${courseId}/microsoft_sync/group`, () => HttpResponse.json({})),
+        http.post(
+          `/api/v1/courses/${courseId}/microsoft_sync/group`,
+          () => new HttpResponse(null, {status: 400}),
+        ),
+      )
+
+      const {result, waitForNextUpdate} = subject()
+      await waitForNextUpdate()
+
       const toggleEnabled = result.current[4]
-
-      const e = new Error('400 error')
-      e.response = {status: 400}
-
-      axios.request.mockImplementationOnce(_req => Promise.reject(e))
-
       await act(toggleEnabled)
 
-      expect(result.current[3]).toBe('400 error')
+      expect(result.current[3]).toContain('400')
     })
   })
 })

@@ -22,8 +22,8 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import FilterPeerReview from '../FilterPeerReview'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 describe('Filter Peer Review Tests', () => {
@@ -32,7 +32,7 @@ describe('Filter Peer Review Tests', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('peer review search bar', () => {

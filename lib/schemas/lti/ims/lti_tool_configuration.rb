@@ -85,6 +85,7 @@ module Schemas::Lti::IMS
       "type" => "object",
       "required" => %w[
         domain
+        target_link_uri
         messages
         claims
       ].freeze,
@@ -107,6 +108,7 @@ module Schemas::Lti::IMS
             "type" => "string"
           }.freeze
         }.freeze,
+        "target_link_uri" => { "type" => "string" }.freeze,
 
         # Optional properties
         "secondary_domains" => {
@@ -117,7 +119,6 @@ module Schemas::Lti::IMS
           }.freeze
         }.freeze,
         "deployment_id" => { "type" => %w[string null] }.freeze,
-        "target_link_uri" => { "type" => %w[string null] }.freeze,
         "custom_parameters" => CUSTOM_PARAMS_SCHEMA,
         "description" => { "type" => %w[string null] }.freeze,
 
@@ -126,6 +127,7 @@ module Schemas::Lti::IMS
           { type: %w[string null], enum: [nil, *Lti::PrivacyLevelExpander::SUPPORTED_LEVELS] },
         ::Lti::IMS::Registration::TOOL_ID_EXTENSION => { type: %w[string null] },
         ::Lti::IMS::Registration::VENDOR_EXTENSION => { type: %w[string null] },
+        ::Lti::IMS::Registration::DISABLE_REINSTALL_EXTENSION => { type: %w[boolean null] },
         ::Lti::IMS::Registration::CONTENT_MIGRATION_EXTENSION => {
           "type" => "object",
           "required" => %w[

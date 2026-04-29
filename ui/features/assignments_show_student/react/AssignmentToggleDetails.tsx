@@ -19,21 +19,14 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
+import AssignmentDescription from '@canvas/assignments/react/AssignmentDescription'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import apiUserContent from '@canvas/util/jquery/apiUserContent'
 
 const I18n = createI18nScope('assignment_2_assignment_toggle_details')
 
 interface AssignmentToggleDetailsProps {
   description?: string
-}
-
-function AssignmentDetailsText(description?: string): string {
-  return description
-    ? apiUserContent.convert(description)
-    : I18n.t('No additional details were added for this assignment.')
 }
 
 export default function AssignmentToggleDetails(props: AssignmentToggleDetailsProps) {
@@ -44,14 +37,7 @@ export default function AssignmentToggleDetails(props: AssignmentToggleDetailsPr
         data-testid="assignments-2-assignment-toggle-details"
         summary={<Text weight="bold">{I18n.t('Details')}</Text>}
       >
-        <View margin="0" padding="0">
-          {/* html is sanitized on the server side */}
-          <div
-            className="user_content"
-            dangerouslySetInnerHTML={{__html: AssignmentDetailsText(props.description)}}
-            data-testid="assignments-2-assignment-toggle-details-text"
-          />
-        </View>
+        <AssignmentDescription description={props.description} />
       </ToggleDetails>
     </div>
   )

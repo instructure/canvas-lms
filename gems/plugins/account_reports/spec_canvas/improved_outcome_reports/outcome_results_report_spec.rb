@@ -34,7 +34,7 @@ describe "OutcomeResultsReport" do
   let(:all_values) { [user1_values] }
   let(:order) { [0, 2, 3, 13, 18] }
 
-  include_examples "common outcomes report behavior"
+  it_behaves_like "common outcomes report behavior"
 
   context "with quiz question results" do
     before(:once) do
@@ -173,7 +173,7 @@ describe "OutcomeResultsReport" do
         report_record = run_report(report_type, account: @root_account, params: { "include_deleted" => true })
         expect(report_record.workflow_state).to eq "error"
         expect(report_record.message).to start_with "Generating the report, Outcome Results CSV, failed."
-        expect(report_record.parameters["extra_text"]).to eq "Failed, the report failed to generate a file. Please try again."
+        expect(report_record.parameters["extra_text"]).to include "Failed, please report the following error code"
       end
     end
 
@@ -230,27 +230,33 @@ describe "OutcomeResultsReport" do
         report_record = run_report(report_type, account: @root_account, params: { "include_deleted" => true })
         expect(report_record.workflow_state).to eq "error"
         expect(report_record.message).to start_with "Generating the report, Outcome Results CSV, failed."
-        expect(report_record.parameters["extra_text"]).to eq "Failed, the report failed to generate a file. Please try again."
+        expect(report_record.parameters["extra_text"]).to include "Failed, please report the following error code"
       end
     end
 
     context ":outcome_service_results_to_canvas" do
       # Column indexes
-      student_name = 0
-      assessment_title = 3
-      assessment_type = 5
-      outcome = 8
-      question = 12
-      question_id = 13
-      course = 14
+      let(:student_name) { 0 }
+      let(:assessment_title) { 3 }
+      let(:assessment_type) { 5 }
+      let(:outcome) { 8 }
+      let(:question) { 12 }
+      let(:question_id) { 13 }
+      let(:course) { 14 }
 
       # These columns are added/modified to the report when writing the csv file
-      outcome_score = 11
-      learning_outcome_points_possible = 22
-      learning_outcome_mastery_score = 23
-      learning_outcome_mastered = 24
-      learning_outcome_rating = 25
-      learning_outcome_rating_points = 26
+      let(:outcome_score) { 11 }
+      let(:learning_outcome_points_possible) { 22 }
+      let(:learning_outcome_mastery_score) { 23 }
+      let(:learning_outcome_mastered) { 24 }
+      let(:learning_outcome_rating) { 25 }
+      let(:learning_outcome_rating_points) { 26 }
+
+      let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
+      let(:outcome_reports) { AccountReports::ImprovedOutcomeReports::OutcomeResultsReport.new(account_report) }
+      let(:assignment_ids) { @new_quiz.id.to_s }
+      let(:outcome_ids) { @outcome.id.to_s }
+      let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
       def mock_os_result(user, outcome, quiz, submission_date, attempts = nil)
         if attempts.nil?
@@ -281,35 +287,6 @@ describe "OutcomeResultsReport" do
            mastery: nil },]
       end
 
-      let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
-      let(:outcome_reports) { AccountReports::ImprovedOutcomeReports::OutcomeResultsReport.new(account_report) }
-      let(:assignment_ids) { @new_quiz.id.to_s }
-      let(:outcome_ids) { @outcome.id.to_s }
-      let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
-
-      it "does not call OS when FF is off for the account" do
-        @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
-
-        expect(outcome_reports).not_to receive(:get_lmgb_results)
-          .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
-
-        results = outcome_reports.send(:outcomes_new_quiz_scope)
-        expect(results).to be_empty
-      end
-
-      it "does not call OS when FF is off for course" do
-        @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
-        @course1.set_feature_flag!(:outcome_service_results_to_canvas, "off")
-
-        # get_lmgb_results is still called, but the first line checks is the FF is enabled and returns nil if OFF
-        # In that case, get_lmgb_results returns nil
-        expect(outcome_reports).to receive(:get_lmgb_results)
-          .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
-
-        results = outcome_reports.send(:outcomes_new_quiz_scope)
-        expect(results).to be_empty
-      end
-
       it "filters out users that do not have results" do
         @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
 
@@ -328,6 +305,33 @@ describe "OutcomeResultsReport" do
         expect(results[0]["learning outcome points possible"]).to eq 5.0
         expect(results[0]["outcome score"]).to eq 5.0
         expect(results[0]["attempt"]).to eq 1
+      end
+
+      it "does not duplicate user rows for inst ids" do
+        # We will skip this test if the pseudonym table does not have the is_inst_id column
+        inst_identity = Pseudonym.column_names.include?("is_inst_id")
+        if inst_identity
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+
+          @root_account.pseudonyms.create!(user: @user1, unique_id: "inst_id", is_inst_id: true)
+
+          # uuids contains both @user1 and @user2. The mock result only contains data for @user1, so @user2
+          # will not show up in the report.
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids)
+            .and_return(mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z"))
+
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+
+          # mock_os_result returns a result that has quiz metadata, but no question meta data. This means that
+          # learning outcome points possible and outcome score will be from the authoritative result.
+
+          expect(results.length).to eq(1)
+          expect(results[0]["student uuid"]).to eq @user1.uuid
+          expect(results[0]["learning outcome points possible"]).to eq 5.0
+          expect(results[0]["outcome score"]).to eq 5.0
+          expect(results[0]["attempt"]).to eq 1
+        end
       end
 
       it "includes users that do not have attempts" do
@@ -1001,6 +1005,34 @@ describe "OutcomeResultsReport" do
         expect(report[0]["learning outcome points possible"]).to eq "45.0"
         expect(report[2]["learning outcome points possible"]).to eq "5.0"
       end
+    end
+  end
+
+  context "GuardRail usage" do
+    before do
+      @root_account.enable_feature!(:outcome_service_results_to_canvas)
+    end
+
+    it "queries scopes on secondary/report replica" do
+      guardrail_environments_during_outcomes_call = []
+
+      report_class = AccountReports::ImprovedOutcomeReports::OutcomeResultsReport
+      outcomes_new_quiz_scope_method = report_class.instance_method(:outcomes_new_quiz_scope)
+      outcome_results_scope_method = report_class.instance_method(:outcome_results_scope)
+
+      allow_any_instance_of(report_class).to receive(:outcomes_new_quiz_scope) do |instance|
+        guardrail_environments_during_outcomes_call << GuardRail.environment
+        outcomes_new_quiz_scope_method.bind_call(instance)
+      end
+
+      allow_any_instance_of(report_class).to receive(:outcome_results_scope) do |instance|
+        guardrail_environments_during_outcomes_call << GuardRail.environment
+        outcome_results_scope_method.bind_call(instance)
+      end
+
+      read_report(report_type, { order:, parse_header: true, account: @root_account })
+
+      expect(guardrail_environments_during_outcomes_call).to all(be_in([:secondary, :report]))
     end
   end
 end

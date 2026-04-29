@@ -18,7 +18,17 @@
 
 import fetchMock from 'fetch-mock'
 import {screen, waitFor} from '@testing-library/react'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer, showFlashAlert, showFlashSuccess} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    destroyContainer: vi.fn(),
+    showFlashAlert: vi.fn(),
+    showFlashSuccess: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 import {actions as uiActions} from '../ui'
 import {coursePaceActions, PUBLISH_STATUS_POLLING_MS} from '../course_paces'
 import {
@@ -43,7 +53,7 @@ const PROGRESS_API = `/api/v1/progress/${PROGRESS_RUNNING.id}`
 const COMPRESS_API = `/api/v1/courses/${COURSE.id}/course_pacing/compress_dates`
 const DESTROY_API = `/api/v1/courses/${COURSE.id}/course_pacing/${PRIMARY_PACE.id}`
 
-const dispatch = jest.fn()
+const dispatch = vi.fn()
 
 const mockGetState =
   (
@@ -63,13 +73,13 @@ const mockGetState =
   })
 
 beforeEach(() => {
-  jest.useFakeTimers()
-  jest.spyOn(global, 'setTimeout')
+  vi.useFakeTimers()
+  vi.spyOn(global, 'setTimeout')
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
-  jest.useRealTimers()
+  vi.clearAllMocks()
+  vi.useRealTimers()
   fetchMock.restore()
   destroyContainer()
 })
@@ -184,7 +194,7 @@ describe('Course paces actions', () => {
       const progressCompleted = {...PROGRESS_RUNNING, completion: 100, workflow_state: 'completed'}
       fetchMock.get(PROGRESS_API, progressCompleted, {overwriteRoutes: true})
 
-      jest.advanceTimersByTime(PUBLISH_STATUS_POLLING_MS)
+      vi.advanceTimersByTime(PUBLISH_STATUS_POLLING_MS)
 
       await waitFor(() => {
         expect(dispatch.mock.calls).toHaveLength(6)
@@ -193,14 +203,16 @@ describe('Course paces actions', () => {
         expect(dispatch.mock.calls[4]).toEqual([
           coursePaceActions.coursePaceSaved(getState().coursePace),
         ])
-        expect(
-          screen.getAllByText(`${contextsPublishing[0].pace_context?.name} Pace updated`)[0],
-        ).toBeInTheDocument()
+        expect(showFlashAlert).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: `${contextsPublishing[0].pace_context?.name} Pace updated`,
+          }),
+        )
       })
     })
 
     it('stops polling and displays an error message if checking the progress API fails', async () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
       const getState = () => ({
         ...DEFAULT_STORE_STATE,
         coursePace: {...DEFAULT_STORE_STATE.coursePace, publishingProgress: {...PROGRESS_RUNNING}},
@@ -254,6 +266,8 @@ describe('Course paces actions', () => {
         course_pace: {
           start_date: PRIMARY_PACE.start_date,
           end_date: PRIMARY_PACE.end_date,
+          context_type: PRIMARY_PACE.context_type,
+          context_id: PRIMARY_PACE.context_id,
           course_pace_module_items_attributes: PRIMARY_PACE.modules.reduce(
             (runningValue: Array<any>, module) => {
               return runningValue.concat(
@@ -284,6 +298,8 @@ describe('Course paces actions', () => {
         course_pace: {
           start_date: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.start_date,
           end_date: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.end_date,
+          context_type: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.context_type,
+          context_id: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.context_id,
           course_pace_module_items_attributes:
             PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.modules.reduce(
               (runningValue: Array<any>, module) => {
@@ -304,7 +320,7 @@ describe('Course paces actions', () => {
     })
 
     it('Sets an error message if compression fails', async () => {
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation()
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
       const updatedPace = {...PRIMARY_PACE}
       const error = new Error('Whoops!')
       const getState = mockGetState(updatedPace, PRIMARY_PACE)
@@ -327,7 +343,7 @@ describe('Course paces actions', () => {
 
   describe('syncUnpublishedChanges', () => {
     it('saves blackout dates and publishes the pace', async () => {
-      const asyncDispatch = jest.fn((..._args) => Promise.resolve())
+      const asyncDispatch = vi.fn((..._args) => Promise.resolve())
       const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}
       const getState = mockGetState(updatedPace, PRIMARY_PACE, {
         syncing: SyncState.UNSYNCED,
@@ -346,7 +362,7 @@ describe('Course paces actions', () => {
     })
 
     it('only publishes the pace if blackout dates have not changed', async () => {
-      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const asyncDispatch = vi.fn(() => Promise.resolve())
       const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}
       const getState = mockGetState(updatedPace, PRIMARY_PACE)
 
@@ -359,7 +375,7 @@ describe('Course paces actions', () => {
 
   describe('removePace', () => {
     it('shows and hides loading overlay properly', async () => {
-      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const asyncDispatch = vi.fn(() => Promise.resolve())
       const updatedPace = {...PRIMARY_PACE}
       const getState = mockGetState(updatedPace, PRIMARY_PACE)
 
@@ -377,8 +393,8 @@ describe('Course paces actions', () => {
     })
 
     it('fetches the pace context info again with all the previous filters', async () => {
-      const asyncDispatch = jest.fn(() => Promise.resolve())
-      paceContextsActions.fetchPaceContexts = jest.fn().mockReturnValue('fetchPaceContextsThunk')
+      const asyncDispatch = vi.fn(() => Promise.resolve())
+      paceContextsActions.fetchPaceContexts = vi.fn().mockReturnValue('fetchPaceContextsThunk')
       const page = 2
       const order = 'desc'
       const contextType = 'student_enrollment'
@@ -422,7 +438,7 @@ describe('Course paces actions', () => {
     })
 
     it('sets an error if the request fails', async () => {
-      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const asyncDispatch = vi.fn(() => Promise.resolve())
       const updatedPace = {...PRIMARY_PACE}
       const error = new Error('Bad!')
       const getState = mockGetState(updatedPace, PRIMARY_PACE)

@@ -31,8 +31,8 @@ describe('GroupModal', () => {
   afterEach(() => server.resetHandlers())
   afterAll(() => server.close())
 
-  const onSave = jest.fn()
-  const onDismiss = jest.fn()
+  const onSave = vi.fn()
+  const onDismiss = vi.fn()
   const open = true
   const groupCategory = {id: '1'}
   const group = {
@@ -419,7 +419,7 @@ describe('GroupModal', () => {
 
   describe('errors', () => {
     beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation()
+      vi.spyOn(console, 'error').mockImplementation()
     })
 
     afterEach(() => {

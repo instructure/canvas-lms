@@ -22,5 +22,6 @@ export type GlobalRemotes = Partial<{
   ltiUsage: string
   ams: {
     launch_url: string
+    api_url: string
   }
 }>

@@ -26,7 +26,7 @@ import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 import useStore from '../../../../stores'
 
 const mockTotalGradeOverrideStore = (state = {}) => {
-  jest.spyOn(useStore, 'getState').mockImplementation(() => {
+  vi.spyOn(useStore, 'getState').mockImplementation(() => {
     return {
       finalGradeOverrideTrayProps: {
         isFirstStudent: false,
@@ -58,7 +58,7 @@ const mockTotalGradeOverrideStore = (state = {}) => {
     }
   })
 
-  return jest.spyOn(useStore, 'setState')
+  return vi.spyOn(useStore, 'setState')
 }
 
 describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
@@ -91,10 +91,10 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
         },
 
         gradebookGrid: {
-          updateRowCell: jest.fn(),
+          updateRowCell: vi.fn(),
         },
 
-        isFilteringColumnsByGradingPeriod: jest.fn().mockReturnValue(false),
+        isFilteringColumnsByGradingPeriod: vi.fn().mockReturnValue(false),
 
         studentCanReceiveGradeOverride(id) {
           return {1101: true, 1102: false}[id]
@@ -137,7 +137,7 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
     })
 
     afterEach(() => {
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     function getProps() {
@@ -183,7 +183,7 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
       let props
 
       beforeEach(() => {
-        jest.spyOn(gradebook.finalGradeOverrides, 'updateGrade').mockImplementation(() => {})
+        vi.spyOn(gradebook.finalGradeOverrides, 'updateGrade').mockImplementation(() => {})
         props = getProps()
       })
 

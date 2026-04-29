@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import {map, difference} from 'lodash'
+import {difference, map} from 'es-toolkit/compat'
 import AssignmentOverride from '../models/AssignmentOverride'
 import Section from '@canvas/sections/backbone/models/Section'
 

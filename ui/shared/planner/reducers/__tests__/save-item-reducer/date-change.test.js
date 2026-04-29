@@ -71,7 +71,7 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 it('removes item from days and adds it to partial past days when the date has changed to a near past date', () => {

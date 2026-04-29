@@ -60,7 +60,7 @@ describe UserProfile do
       student_in_course(active_all: true)
       I18n.with_locale(:es) do
         tabs = @student.profile.tabs_available(@user, root_account: account)
-        expect(tabs.detect { |t| t[:id] == UserProfile::TAB_FILES }[:label]).to_not eq "Files"
+        expect(tabs.detect { |t| t[:id] == UserProfile::TAB_FILES }[:label]).not_to eq "Files"
       end
     end
 
@@ -235,6 +235,40 @@ describe UserProfile do
           account.settings[:mobile_qr_login_is_enabled] = true
           tabs = @user.profile.tabs_available(@user, root_account: account)
           expect(tabs.pluck(:id)).not_to include UserProfile::TAB_QR_MOBILE_LOGIN
+        end
+      end
+    end
+
+    describe "nav_menu_links" do
+      before :once do
+        user_factory(active_all: true)
+      end
+
+      context "when nav_menu_links feature is enabled" do
+        before { account.enable_feature!(:nav_menu_links) }
+
+        it "includes user_nav links in tabs" do
+          link = NavMenuLink.create!(context: account, user_nav: true, label: "My Link", url: "https://example.com")
+          tabs = @user.profile.tabs_available(@user, root_account: account)
+          expect(tabs.pluck(:id)).to include("nav_menu_link_#{link.id}")
+        end
+
+        it "does not include links without user_nav" do
+          NavMenuLink.create!(context: account, account_nav: true, label: "Account Only", url: "https://example.com")
+          tabs = @user.profile.tabs_available(@user, root_account: account)
+          tab_ids = tabs.pluck(:id).select { |id| id.to_s.start_with?("nav_menu_link_") }
+          expect(tab_ids).to be_empty
+        end
+      end
+
+      context "when nav_menu_links feature is disabled" do
+        before { account.disable_feature!(:nav_menu_links) }
+
+        it "does not include nav_menu_link tabs" do
+          NavMenuLink.create!(context: account, user_nav: true, label: "My Link", url: "https://example.com")
+          tabs = @user.profile.tabs_available(@user, root_account: account)
+          tab_ids = tabs.pluck(:id).select { |id| id.to_s.start_with?("nav_menu_link_") }
+          expect(tab_ids).to be_empty
         end
       end
     end

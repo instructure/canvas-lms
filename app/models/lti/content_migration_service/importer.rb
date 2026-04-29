@@ -64,17 +64,19 @@ module Lti
       end
 
       def import_completed?
-        response = Canvas.retriable(on: Timeout::Error) { CanvasHttp.get(@status_url, base_request_headers) } if @status_url
-        if response&.code.to_i == 200
-          parsed_response = JSON.parse(response.body)
-          @export_status = parsed_response["status"]
-          case @export_status
-          when SUCCESSFUL_STATUS
-            true
-          when FAILED_STATUS
-            raise parsed_response["message"]
-          else
-            false
+        InstrumentTLSCiphers.without_tls_metrics do
+          response = Canvas.retriable(on: Timeout::Error) { CanvasHttp.get(@status_url, base_request_headers) } if @status_url
+          if response&.code.to_i == 200
+            parsed_response = JSON.parse(response.body)
+            @export_status = parsed_response["status"]
+            case @export_status
+            when SUCCESSFUL_STATUS
+              true
+            when FAILED_STATUS
+              raise parsed_response["message"]
+            else
+              false
+            end
           end
         end
       rescue Timeout::Error

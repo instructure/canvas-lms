@@ -21,11 +21,13 @@ import 'jquery-migrate'
 import EditorToggle from '../EditorToggle'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
-jest.mock('@canvas/rce/RichContentEditor', () => ({
-  destroyRCE: jest.fn(),
-  closeRCE: jest.fn(),
-  preloadRemoteModule: jest.fn(),
-  callOnRCE: jest.fn(),
+vi.mock('@canvas/rce/RichContentEditor', () => ({
+  default: {
+    destroyRCE: vi.fn(),
+    closeRCE: vi.fn(),
+    preloadRemoteModule: vi.fn(),
+    callOnRCE: vi.fn(),
+  },
 }))
 
 describe('EditorToggle', () => {
@@ -98,7 +100,7 @@ describe('EditorToggle', () => {
 
   describe('createDone', () => {
     it('does not throw error when editButton does not exist', () => {
-      const mockClick = jest.spyOn($.fn, 'click')
+      const mockClick = vi.spyOn($.fn, 'click')
       mockClick.mockImplementation(cb => cb())
 
       EditorToggle.prototype.createDone.call({
@@ -121,10 +123,10 @@ describe('EditorToggle', () => {
     })
 
     it('replaces textarea correctly', () => {
-      jest.spyOn(RichContentEditor, 'destroyRCE').mockImplementation()
-      jest.spyOn($.fn, 'insertBefore')
-      jest.spyOn($.fn, 'remove')
-      jest.spyOn($.fn, 'detach')
+      vi.spyOn(RichContentEditor, 'destroyRCE').mockImplementation()
+      vi.spyOn($.fn, 'insertBefore')
+      vi.spyOn($.fn, 'remove')
+      vi.spyOn($.fn, 'detach')
 
       const textArea = $('<textarea/>')
       const et = {

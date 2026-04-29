@@ -18,41 +18,28 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-  class ToolConfiguration < ActiveRecord::Base
-    self.ignored_columns += ["settings"]
+  class ToolConfiguration < ApplicationRecord
+    include Canvas::SoftDeletable
 
-    belongs_to :developer_key
+    VISIBLE_TO_ADMINS = "admins"
+    VISIBLE_TO_MEMBERS = "members"
+    PUBLIC = "public"
+
+    belongs_to :developer_key, optional: true
     belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :manual_configuration, optional: true
 
     before_validation :set_redirect_uris
     before_validation :remove_placements_from_launch_settings
+    before_validation Lti::ToolConfigurationCleaner
     after_update :update_external_tools!, if: :configuration_changed?
     after_commit :update_unified_tool_id, if: :update_unified_tool_id?
 
-    validates :developer_key_id, uniqueness: true, presence: true
+    validates :developer_key_id, uniqueness: { scope: :lti_registration_id }, allow_nil: true
+    validates :workflow_state, presence: true, inclusion: { in: %w[active deleted] }
+    validate :require_developer_key_or_lti_registration
     validate :validate_configuration
     validate :validate_placements
     validate :validate_oidc_initiation_urls
-
-    # @return [String | nil] A warning message about any disallowed placements
-    def verify_placements
-      placements_to_verify = placements.filter_map { |p| p["placement"] if Lti::ResourcePlacement::RESTRICTED_PLACEMENTS.include? p["placement"].to_sym }
-      return unless placements_to_verify.present?
-
-      # This is a candidate for a deduplication with the same logic in app/models/context_external_tool.rb#placement_allowed?
-      placements_to_verify.each do |placement|
-        allowed_domains = Setting.get("#{placement}_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
-        allowed_dev_keys = Setting.get("#{placement}_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
-        next if allowed_domains.include?(domain) || allowed_dev_keys.include?(Shard.global_id_for(developer_key_id).to_s)
-
-        return t(
-          "Warning: the %{placement} placement is only allowed for Instructure approved LTI tools. If you believe you have received this message in error, please contact your support team.",
-          placement:
-        )
-      end
-
-      nil
-    end
 
     # @return [String[]] A list of warning messages for deprecated placements
     def placement_warnings
@@ -64,8 +51,6 @@ module Lti
           )
         )
       end
-      may_be_warning = verify_placements
-      warnings.push(may_be_warning) unless may_be_warning.nil?
       warnings
     end
 
@@ -87,18 +72,24 @@ module Lti
         redirect_uris:,
         launch_settings:,
         placements:,
-      }
+      }.with_indifferent_access
+    end
+
+    def effective_developer_key
+      developer_key || lti_registration&.developer_key
     end
 
     def self.retrieve_and_extract_configuration(url)
-      response = CanvasHttp.get(url)
+      InstrumentTLSCiphers.without_tls_metrics do
+        response = CanvasHttp.get(url)
 
-      raise_error(:configuration_url, 'Content type must be "application/json"') unless response["content-type"].include? "application/json"
-      raise_error(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess
+        raise_error(:configuration_url, 'Content type must be "application/json"') unless response["content-type"].include? "application/json"
+        raise_error(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess
 
-      JSON.parse(response.body).with_indifferent_access
-    rescue Timeout::Error
-      raise_error(:configuration_url, "Could not retrieve settings, the server response timed out.")
+        JSON.parse(response.body).with_indifferent_access
+      rescue Timeout::Error
+        raise_error(:configuration_url, "Could not retrieve settings, the server response timed out.")
+      end
     end
 
     private
@@ -110,8 +101,14 @@ module Lti
     end
     private_class_method :raise_error
 
+    def require_developer_key_or_lti_registration
+      if developer_key_id.blank? && lti_registration_id.blank?
+        errors.add(:base, "must have either a developer_key or lti_registration")
+      end
+    end
+
     def update_external_tools!
-      developer_key.update_external_tools!
+      effective_developer_key&.update_external_tools!
     end
 
     def set_redirect_uris

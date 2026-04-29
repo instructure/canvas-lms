@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 
-const MessageBus = _.extend({}, Backbone.Events)
+const MessageBus = Object.assign({}, Backbone.Events)
 
 export default MessageBus

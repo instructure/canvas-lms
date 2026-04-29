@@ -20,7 +20,7 @@
 
 require "anonymity"
 
-class Submission < ActiveRecord::Base
+class Submission < ApplicationRecord
   include Canvas::GradeValidations
   include CustomValidations
   include SendToStream
@@ -125,7 +125,8 @@ class Submission < ActiveRecord::Base
                 :score_unchanged,
                 :skip_grade_calc,
                 :skip_grader_check,
-                :visible_to_user
+                :visible_to_user,
+                :preloaded_attachments
 
   # This can be set to true to force late policy behaviour that would
   # be skipped otherwise. See #late_policy_relevant_changes? and
@@ -135,6 +136,7 @@ class Submission < ActiveRecord::Base
   attr_writer :regraded
   attr_writer :audit_grade_changes
   attr_writer :versioned_originality_reports
+  attr_writer :auto_grade_result_present
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment, inverse_of: :submissions, class_name: "AbstractAssignment"
@@ -152,6 +154,7 @@ class Submission < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
 
   belongs_to :quiz_submission, class_name: "Quizzes::QuizSubmission"
+  belongs_to :real_submitter, class_name: "User", optional: true
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: "SubmissionComment", dependent: :destroy
   has_many :all_submission_comments_for_groups, -> { for_groups.order(:created_at) }, class_name: "SubmissionComment"
   has_many :group_memberships, through: :assignment
@@ -159,7 +162,7 @@ class Submission < ActiveRecord::Base
   has_many :visible_submission_comments,
            -> { published.visible.for_final_grade.order(:created_at, :id) },
            class_name: "SubmissionComment"
-  has_many :hidden_submission_comments, -> { order("created_at, id").where(provisional_grade_id: nil, hidden: true) }, class_name: "SubmissionComment"
+  has_many :hidden_submission_comments, -> { order(:created_at, :id).where(provisional_grade_id: nil, hidden: true) }, class_name: "SubmissionComment"
   has_many :assessment_requests, as: :asset
   has_many :assigned_assessments, class_name: "AssessmentRequest", as: :assessor_asset
   has_many :rubric_assessments, as: :artifact
@@ -185,13 +188,14 @@ class Submission < ActiveRecord::Base
   has_many :content_participations, as: :content
 
   has_many :canvadocs_annotation_contexts, inverse_of: :submission, dependent: :destroy
-  has_many :canvadocs_submissions
+  has_many :canvadocs_submissions, dependent: :destroy
 
   has_many :auditor_grade_change_records,
            class_name: "Auditors::ActiveRecord::GradeChangeRecord",
            dependent: :destroy,
            inverse_of: :submission
   has_many :submission_texts, dependent: :destroy
+  has_many :auto_grade_results, dependent: :destroy
 
   serialize :turnitin_data, type: Hash
 
@@ -227,11 +231,11 @@ class Submission < ActiveRecord::Base
 
   scope :postable, lambda {
     all.primary_shard.activate do
-      graded.union(with_hidden_comments)
+      graded.union(with_hidden_comments).union(with_sticker)
     end
   }
   scope :with_hidden_comments, lambda {
-    where(SubmissionComment.where("submission_id = submissions.id AND hidden = true").arel.exists)
+    where(SubmissionComment.where("submission_id = submissions.id").where(hidden: true, draft: false).arel.exists)
   }
 
   # This should only be used in the course drop down to show assignments recently graded.
@@ -242,9 +246,27 @@ class Submission < ActiveRecord::Base
       .joins(:assignment)
       .joins("JOIN #{Course.quoted_table_name} ON courses.id=assignments.context_id")
       .where("graded_at>? AND user_id=? AND muted=?", date, user_id, false)
-      .order("graded_at DESC")
+      .order(graded_at: :desc)
       .limit(limit)
   }
+
+  # Returns true if an AutoGradeResult exists for this submission and attempt.
+  # Used by GraphQL SubmissionInterface to surface AI-grading disclaimer flags.
+  def auto_grade_result_present?
+    return @auto_grade_result_present if defined?(@auto_grade_result_present)
+
+    auto_grade_results.where(attempt: attempt || 1).exists?
+  end
+
+  alias_method :auto_grade_result_present, :auto_grade_result_present?
+
+  def self.preload_auto_grade_result_present(submissions)
+    ids_with_auto_grade_results = Submission.joins(:auto_grade_results)
+                                            .where(submissions: { id: submissions })
+                                            .where("auto_grade_results.attempt = COALESCE(submissions.attempt, 1)")
+                                            .pluck("submissions.id")
+    submissions.each { |sub| sub.auto_grade_result_present = ids_with_auto_grade_results.include?(sub.id) }
+  end
 
   scope :for_course, ->(course) { where(course_id: course) }
   scope :for_assignment, ->(assignment) { where(assignment:) }
@@ -272,7 +294,7 @@ class Submission < ActiveRecord::Base
             /* we expect a digital submission */
             AND NOT (
               cached_quiz_lti IS NOT TRUE AND
-              assignments.submission_types IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool')
+              assignments.submission_types IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool', 'ams')
             )
             AND assignments.submission_types IS NOT NULL
             AND NOT (
@@ -322,13 +344,27 @@ class Submission < ActiveRecord::Base
   scope :unposted, -> { where(posted_at: nil) }
 
   scope :in_current_grading_period_for_courses, lambda { |course_ids|
-    current_period_clause = ""
-    course_ids.uniq.each_with_index do |course_id, i|
-      grading_period_id = GradingPeriod.current_period_for(Course.find(course_id))&.id
-      current_period_clause += grading_period_id.nil? ? sanitize_sql(["course_id = ?", course_id]) : sanitize_sql(["(course_id = ? AND grading_period_id = ?)", course_id, grading_period_id])
-      current_period_clause += " OR " if i < course_ids.length - 1
+    unique_course_ids = course_ids.uniq
+    return none if unique_course_ids.empty?
+
+    courses = Course.where(id: unique_course_ids).preload(
+      :grading_period_groups,
+      :grading_periods,
+      enrollment_term: [:grading_period_group, :grading_periods]
+    ).index_by(&:id)
+
+    clauses = unique_course_ids.map do |course_id|
+      course = courses[course_id]
+      grading_period_id = course ? GradingPeriod.for(course).find(&:current?)&.id : nil
+
+      if grading_period_id.nil?
+        sanitize_sql(["course_id = ?", course_id])
+      else
+        sanitize_sql(["(course_id = ? AND grading_period_id = ?)", course_id, grading_period_id])
+      end
     end
-    where(current_period_clause)
+
+    where(clauses.join(" OR "))
   }
 
   workflow do
@@ -373,7 +409,7 @@ class Submission < ActiveRecord::Base
   end
 
   # see .needs_grading_conditions
-  def needs_grading?(was = false)
+  def needs_grading?(was: false)
     suffix = was ? "_before_last_save" : ""
 
     !send(:"submission_type#{suffix}").nil? &&
@@ -405,7 +441,7 @@ class Submission < ActiveRecord::Base
   end
 
   def needs_grading_changed?
-    needs_grading? != needs_grading?(:was)
+    needs_grading? != needs_grading?(was: true)
   end
 
   def submitted_changed?
@@ -451,7 +487,7 @@ class Submission < ActiveRecord::Base
   before_save :clear_body_word_count, if: -> { body.nil? }
   before_save :set_lti_id
   after_save :update_body_word_count_later, if: -> { saved_change_to_body? && get_word_count_from_body? }
-  after_save :extract_text_from_upload_later, if: -> { extract_text_from_upload? }
+  after_save :extract_text_later, if: -> { need_to_extract_text? }
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -574,7 +610,7 @@ class Submission < ActiveRecord::Base
       assignment.published? &&
         assignment.context.grants_right?(user, session, :manage_grades)
     end
-    can :read and can :comment and can :make_group_comment and can :read_grade and can :read_comments
+    can :read and can :comment and can :make_group_comment and can :read_grade and can :read_comments and can :download
 
     given do |user, _session|
       can_grade?(user)
@@ -612,7 +648,13 @@ class Submission < ActiveRecord::Base
     end
     can :read_grade
 
-    given { |user| peer_reviewer?(user) && !!assignment&.submitted?(user:) }
+    given do |user|
+      peer_reviewer?(user) && if assignment&.context&.feature_enabled?(:peer_review_allocation_and_grading)
+                                !assignment.peer_review_submission_required || !!assignment.submitted?(user:)
+                              else
+                                !!assignment&.submitted?(user:)
+                              end
+    end
     can :read and can :comment and can :make_group_comment
 
     given { |user, session| can_view_plagiarism_report("turnitin", user, session) }
@@ -636,6 +678,16 @@ class Submission < ActiveRecord::Base
       assignment.context.participating_students.where(id: self.user).exists? &&
       user &&
       assessment_requests.map(&:assessor_id).include?(user.id)
+  end
+
+  # Cached version of peer_reviewer? to prevent N+1 queries when checking
+  # multiple times for the same user (e.g., when loading multiple file attachments)
+  def peer_reviewer_for?(user)
+    @_peer_reviewer_cache ||= {}
+    user_id = user&.id
+    return @_peer_reviewer_cache[user_id] if @_peer_reviewer_cache.key?(user_id)
+
+    @_peer_reviewer_cache[user_id] = peer_reviewer?(user)
   end
 
   def can_view_details?(user)
@@ -691,6 +743,7 @@ class Submission < ActiveRecord::Base
 
   def user_can_read_grade?(user, session = nil, for_plagiarism: false)
     # improves performance by checking permissions on the assignment before the submission
+    # for asset reports permissions, see also app/graphql/types/submission_type.rb#lti_asset_reports_connection
     return true if assignment.user_can_read_grades?(user, session)
     return false if hide_grade_from_student?(for_plagiarism:)
     return true if user && user.id == user_id # this is fast, so skip the policy cache check if possible
@@ -706,7 +759,9 @@ class Submission < ActiveRecord::Base
   end
 
   def can_read_submission_user_name?(user, session)
-    return false if user_id != user.id && assignment.anonymize_students?
+    if user_id != user.id && (assignment.anonymize_students? || assignment.new_quizzes_anonymous_participants?)
+      return false
+    end
 
     !assignment.anonymous_peer_reviews? ||
       user_id == user.id ||
@@ -737,14 +792,28 @@ class Submission < ActiveRecord::Base
   def create_alert
     return unless saved_change_to_score? && grader_id && !autograded? &&
                   assignment.points_possible && assignment.points_possible > 0
+    return if hide_grade_from_student?
 
+    prev_score = saved_changes["score"][0]
+    prev_percentage = prev_score.present? ? prev_score.to_f / assignment.points_possible * 100 : nil
+    percentage = score.present? ? score.to_f / assignment.points_possible * 100 : nil
+    create_assignment_grade_alerts(prev_percentage, percentage)
+  end
+
+  def create_alert_on_post
+    return unless grader_id && !autograded? &&
+                  assignment.points_possible && assignment.points_possible > 0
+    return unless graded?
+
+    percentage = score.present? ? score.to_f / assignment.points_possible * 100 : nil
+    create_assignment_grade_alerts(nil, percentage)
+  end
+
+  def create_assignment_grade_alerts(prev_percentage, percentage)
     thresholds = ObserverAlertThreshold.active.where(student: user,
                                                      alert_type: ["assignment_grade_high", "assignment_grade_low"])
 
     thresholds.each do |threshold|
-      prev_score = saved_changes["score"][0]
-      prev_percentage = prev_score.present? ? prev_score.to_f / assignment.points_possible * 100 : nil
-      percentage = score.present? ? score.to_f / assignment.points_possible * 100 : nil
       next unless threshold.did_pass_threshold(prev_percentage, percentage)
 
       observer = threshold.observer
@@ -774,6 +843,7 @@ class Submission < ActiveRecord::Base
       end
     end
   end
+  private :create_assignment_grade_alerts
 
   def update_quiz_submission
     return true if @saved_by == :quiz_submission || !quiz_submission_id || entered_score == quiz_submission.kept_score
@@ -793,6 +863,7 @@ class Submission < ActiveRecord::Base
 
   def plaintext_body
     extend HtmlTextHelper
+
     strip_tags((body || "").gsub(%r{<\s*br\s*/>}, "\n<br/>").gsub(%r{</p>}, "</p>\n"))
   end
 
@@ -906,20 +977,45 @@ class Submission < ActiveRecord::Base
   # This method pulls data from the OriginalityReport table
   # Preload OriginalityReport before using this method in a collection of submissions
   def originality_data
-    data = originality_reports_for_display.each_with_object({}) do |originality_report, hash|
-      hash[originality_report.asset_key] = {
-        similarity_score: originality_report.originality_score&.round(2),
-        state: originality_report.state,
-        attachment_id: originality_report.attachment_id,
-        report_url: originality_report.report_launch_path(assignment),
-        status: originality_report.workflow_state,
-        error_message: originality_report.error_message,
-        created_at: originality_report.created_at,
-        updated_at: originality_report.updated_at,
-      }
+    return {} if assignment.cpf_migrated?
+
+    data = originality_reports_for_display.to_h do |originality_report|
+      [originality_report.asset_key,
+       {
+         similarity_score: originality_report.originality_score&.round(2),
+         state: originality_report.state,
+         attachment_id: originality_report.attachment_id,
+         report_url: originality_report.report_launch_path(assignment),
+         view_report_url: view_report_url("originality_report", originality_report.asset_key),
+         status: originality_report.workflow_state,
+         error_message: originality_report.error_message,
+         created_at: originality_report.created_at,
+         updated_at: originality_report.updated_at,
+       }]
     end
-    turnitin_data.except(:webhook_info, :provider, :last_processed_attempt).merge(data)
+
+    legacy_turnitin_data = turnitin_data.except(:webhook_info, :provider, :last_processed_attempt)
+    merged_data = legacy_turnitin_data.merge(data)
+
+    return merged_data if assignment.vericite_enabled?
+
+    legacy_turnitin_data.each_key do |asset_key|
+      next unless merged_data[asset_key].is_a?(Hash)
+      next if merged_data[asset_key].key?(:view_report_url)
+
+      merged_data[asset_key][:view_report_url] = view_report_url("turnitin", asset_key)
+    end
+
+    merged_data
   end
+
+  def view_report_url(report_type, asset_key)
+    submission_identifier = assignment.anonymize_students? ? anonymous_id : user_id
+    url_path_prefix = assignment.anonymize_students? ? "anonymous_submissions" : "submissions"
+
+    "/courses/#{assignment.context_id}/assignments/#{assignment_id}/#{url_path_prefix}/#{submission_identifier}/#{report_type}/#{asset_key}?attempt=#{attempt}"
+  end
+  private :view_report_url
 
   # Returns an array of the versioned originality reports in a sorted order. The ordering goes
   # from least preferred report to most preferred reports, assuming there are reports that share
@@ -947,23 +1043,52 @@ class Submission < ActiveRecord::Base
   def originality_report_url(asset_string, user, attempt = nil)
     return unless grants_right?(user, :view_turnitin_report)
 
-    version_sub = if attempt.present?
-                    (attempt.to_i == self.attempt) ? self : versions.find { |v| v.model&.attempt == attempt.to_i }&.model
-                  end
-    requested_attachment = all_versioned_attachments.find_by_asset_string(asset_string) unless asset_string == self.asset_string
-    scope = association(:originality_reports).loaded? ? versioned_originality_reports : originality_reports
-    scope = scope.where(submission_time: version_sub.submitted_at) if version_sub
-    # This ordering ensures that if multiple reports exist for this submission and attachment combo,
-    # we grab the desired report. This is the reversed ordering of
-    # OriginalityReport::PREFERRED_STATE_ORDER
-    report = scope.where(attachment: requested_attachment).order(Arel.sql("CASE
-      WHEN workflow_state = 'scored' THEN 0
-      WHEN workflow_state = 'error' THEN 1
-      WHEN workflow_state = 'pending' THEN 2
-      END"),
-                                                                 updated_at: :desc).first
+    # Find the attachment, returning early if requested but not found.
+    is_attachment_request = (asset_string != self.asset_string)
+    requested_attachment = find_versioned_attachment(asset_string) if is_attachment_request
+    return nil if is_attachment_request && requested_attachment.nil?
+
+    # Start with a base scope for reports.
+    base_scope = association(:originality_reports).loaded? ? versioned_originality_reports : originality_reports
+
+    report = nil
+
+    # Try to find a report for the specific attempt.
+    if attempt.present?
+      submission_version = submission_for_attempt(attempt)
+      if submission_version
+        attempt_scope = base_scope.where(submission_time: submission_version.submitted_at)
+        report = find_preferred_report(attempt_scope, requested_attachment)
+      end
+    end
+
+    # If no report was found (or no attempt was given), search all attempts as a fallback.
+    # We sometimes show scores for the same attachment from a different attempt (see 32f7585d)
+    report ||= find_preferred_report(base_scope, requested_attachment)
+
+    # Return the final launch path.
     report&.report_launch_path(assignment)
   end
+
+  def submission_for_attempt(attempt_number)
+    return self if attempt_number.to_i == attempt
+
+    versions.find { |v| v.model&.attempt == attempt_number.to_i }&.model
+  end
+  private :submission_for_attempt
+
+  def find_versioned_attachment(asset_string)
+    all_versioned_attachments.find_by_asset_string(asset_string)
+  end
+  private :find_versioned_attachment
+
+  def find_preferred_report(scope, attachment)
+    scope.where(attachment:)
+         .in_order_of(:workflow_state, %w[scored error pending])
+         .order(updated_at: :desc)
+         .first
+  end
+  private :find_preferred_report
 
   def has_originality_report?
     versioned_originality_reports.present?
@@ -983,10 +1108,10 @@ class Submission < ActiveRecord::Base
   end
   private :all_versioned_attachments
 
-  def attachment_ids_for_version
+  def attachment_ids_for_version(include_attachment_id: true)
     ids = (attachment_ids || "").split(",").map(&:to_i)
-    ids << attachment_id if attachment_id
-    ids
+    ids << attachment_id if include_attachment_id && attachment_id
+    ids.uniq
   end
 
   def delete_turnitin_errors
@@ -1043,11 +1168,15 @@ class Submission < ActiveRecord::Base
     (submission_type == "online_upload" || text_entry_submission?) && root_account.feature_enabled?(:lti_asset_processor)
   end
 
+  def asset_processor_for_discussions_compatible?
+    assignment.discussion_topic? && root_account.feature_enabled?(:lti_asset_processor) && root_account.feature_enabled?(:lti_asset_processor_discussions)
+  end
+
   # VeriCite
 
   # this function will check if the score needs to be updated and update/save the new score if so,
   # otherwise, it just returns the vericite_data_hash
-  def vericite_data(lookup_data = false)
+  def vericite_data(lookup_data: false)
     self.vericite_data_hash ||= {}
     # check to see if the score is stale, if so, fetch it again
     update_scores = false
@@ -1062,11 +1191,17 @@ class Submission < ActiveRecord::Base
         check_vericite_status(0)
       end
     end
-    unless self.vericite_data_hash.empty?
+
+    # Return a copy with the provider flag set, without mutating the original hash
+    # This prevents the vericite provider from being added to turnitin_data when
+    # both turnitinData and vericiteData GraphQL fields are queried together.
+    # Mutating the shared hash causes turnitin permission checks to fail.
+    result = self.vericite_data_hash.dup
+    unless result.empty?
       # only set vericite provider flag if the hash isn't empty
-      self.vericite_data_hash[:provider] = :vericite
+      result[:provider] = :vericite
     end
-    self.vericite_data_hash
+    result
   end
 
   def vericite_data_hash
@@ -1173,7 +1308,7 @@ class Submission < ActiveRecord::Base
     if data_changed
       vericite_data_changed!
       if recheck_score_all
-        with_versioning(false, &:save!)
+        without_versioning(&:save!)
       else
         save
       end
@@ -1473,20 +1608,15 @@ class Submission < ActiveRecord::Base
     return if @assignment_changed_not_sub
 
     if submission_type == "online_text_entry"
-      self.saving_user = user
+      self.updating_user = user
       super
     else
-      association_ids = attachment_associations.pluck(:attachment_id)
-      ids = (attachment_ids || "").split(",").map(&:to_i)
-      ids << attachment_id if attachment_id
-      ids.uniq!
-      associations_to_delete = association_ids - ids
-      attachment_associations.where(attachment_id: associations_to_delete).delete_all unless associations_to_delete.empty?
-      unassociated_ids = ids - association_ids
+      attachments_with_associations_ids = attachment_associations.pluck(:attachment_id)
+      unassociated_ids = attachment_ids_for_version - attachments_with_associations_ids
       return if unassociated_ids.empty?
 
-      attachments = Attachment.where(id: unassociated_ids)
-      attachments.each do |a|
+      unassociated_attachments = Attachment.where(id: unassociated_ids)
+      unassociated_attachments.each do |a|
         next unless (a.context_type == "User" && a.context_id == user_id) ||
                     (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
                     (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
@@ -1509,7 +1639,7 @@ class Submission < ActiveRecord::Base
 
   def submit_attachments_to_canvadocs
     if saved_change_to_attachment_ids? && submission_type != "discussion_topic"
-      attachments.preload(:crocodoc_document, :canvadoc).each do |a|
+      attachments.preload(:canvadoc).find_each do |a|
         # associate previewable-document and submission for permission checks
         if a.canvadocable? && Canvadocs.annotations_supported?
           submit_to_canvadocs = true
@@ -1517,18 +1647,12 @@ class Submission < ActiveRecord::Base
           a.shard.activate do
             CanvadocsSubmission.find_or_create_by(submission_id: id, canvadoc_id: a.canvadoc.id)
           end
-        elsif a.crocodocable?
-          submit_to_canvadocs = true
-          a.create_crocodoc_document! unless a.crocodoc_document
-          a.shard.activate do
-            CanvadocsSubmission.find_or_create_by(submission_id: id, crocodoc_document_id: a.crocodoc_document.id)
-          end
         end
 
         next unless submit_to_canvadocs
 
         opts = {
-          preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
+          preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX],
           wants_annotation: true,
         }
 
@@ -1599,6 +1723,9 @@ class Submission < ActiveRecord::Base
     if media_comment_id && (media_comment_id_changed? || !media_object_id)
       mo = MediaObject.by_media_id(media_comment_id).first
       self.media_object_id = mo && mo.id
+      if mo && submission_type == "media_recording" && mo.attachment_id
+        self.attachment_id = mo.attachment_id
+      end
     end
     self.media_comment_type = nil unless media_comment_id
     if self.submitted_at
@@ -1673,20 +1800,20 @@ class Submission < ActiveRecord::Base
     key = include_version ? :with_version : :without_version
     @submission_histories[key] ||= begin
       res = []
-      last_submitted_at = nil
+      seen_submitted_ats = Set.new
       versions.sort_by(&:created_at).reverse_each do |version|
         model = version.model
         # since vericite_data is a function, make sure you are cloning the most recent vericite_data_hash
         if vericiteable?
-          model.turnitin_data = vericite_data(true)
+          model.turnitin_data = vericite_data(lookup_data: true)
         # only use originality data if it's loaded, we want to avoid making N+1 queries
         elsif association(:originality_reports).loaded?
           model.turnitin_data = originality_data
         end
 
-        if model.submitted_at && last_submitted_at.to_i != model.submitted_at.to_i
+        if model.submitted_at && !seen_submitted_ats.include?(model.submitted_at.to_i)
           res << (include_version ? { model:, version: } : model)
-          last_submitted_at = model.submitted_at
+          seen_submitted_ats << model.submitted_at.to_i
         end
       end
 
@@ -1958,9 +2085,7 @@ class Submission < ActiveRecord::Base
     # look equal to the Hash key and the attachments for the last one
     # will cancel out the former ones.
     submissions_with_index_and_attachment_ids = submissions.each_with_index.map do |s, index|
-      attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
-      attachment_ids << s.attachment_id if s.attachment_id
-      [[s, index], attachment_ids]
+      [[s, index], s.attachment_ids_for_version]
     end
     submissions_with_index_and_attachment_ids.to_h
   end
@@ -1990,8 +2115,7 @@ class Submission < ActiveRecord::Base
   def self.bulk_load_attachments_and_previews(submissions)
     bulk_load_versioned_attachments(submissions)
     attachments = submissions.flat_map(&:versioned_attachments)
-    ActiveRecord::Associations.preload(attachments,
-                                       [:canvadoc, :crocodoc_document])
+    ActiveRecord::Associations.preload(attachments, :canvadoc)
     Version.preload_version_number(submissions)
   end
 
@@ -2048,29 +2172,54 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  # Avoids having O(N) attachment queries.  Returns a hash of
-  # submission to attachments.
-  def self.bulk_load_attachments_for_submissions(submissions, preloads: nil)
+  # Avoids having O(N) attachment queries.  If preload_only is true, sets the
+  # preloaded_attachments attribute on each given submission and returns nil.
+  # Otherwise, returns a hash of submission to attachments.
+  def self.bulk_load_attachments_for_submissions(submissions, preloads: nil, preload_only: false)
     submissions = Array(submissions)
-    attachment_ids_by_submission =
-      submissions.index_with { |s| s.attachment_associations.map(&:attachment_id) }
+    attachment_ids_by_submission = submissions.index_with(&:attachment_ids_for_version)
     bulk_attachment_ids = attachment_ids_by_submission.values.flatten.uniq
     if bulk_attachment_ids.empty?
       attachments_by_id = {}
     else
-      attachments_by_id = Attachment.where(id: bulk_attachment_ids)
+      # join by attachment_associations here to filter out attachments that don't contain an
+      # AttachmentAssociation linking them to the submissions, even though the attachment is
+      # referenced in a submission's attachment_ids field. See 5e327e3.
+      attachments_by_id = Attachment.joins(:attachment_associations)
+                                    .where(id: bulk_attachment_ids, attachment_associations: { context: submissions })
+                                    .distinct
       attachments_by_id = attachments_by_id.preload(*preloads) unless preloads.nil?
       attachments_by_id = attachments_by_id.group_by(&:id)
     end
 
-    attachments_by_submission = submissions.map do |s|
-      [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.compact.uniq]
+    get_attachments = ->(s) { attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.compact.uniq }
+
+    if preload_only
+      submissions.each do |s|
+        attachments = get_attachments.call(s)
+        s.preloaded_attachments = attachments
+      end
+      nil
+    else
+      attachments_by_submission = submissions.map do |s|
+        attachments = get_attachments.call(s)
+        s.preloaded_attachments = attachments
+        [s, attachments]
+      end
+      attachments_by_submission.to_h
     end
-    attachments_by_submission.to_h
   end
 
   def includes_attachment?(attachment)
-    versions.map(&:model).any? { |v| (v.attachment_ids || "").split(",").map(&:to_i).include?(attachment.id) }
+    # TODO: after GROW-239, change this to check if the attachment
+    # is referenced in one of the associated AttachmentAssociation records.
+    #
+    # attachment_associations.where(attachment_id: attachment.id).exists?
+    #
+    versions.any? do |v|
+      ids = v.model.attachment_ids_for_version(include_attachment_id: false)
+      ids.include?(attachment.id)
+    end
   end
 
   def <=>(other)
@@ -2159,8 +2308,13 @@ class Submission < ActiveRecord::Base
     true
   end
 
+  # Note that this only returns attachments for the current version of the submission.
   def attachments
-    Attachment.where(id: attachment_associations.pluck(:attachment_id))
+    if attachment_ids_for_version.blank?
+      Attachment.none
+    else
+      Attachment.where(id: attachment_associations.where(attachment_id: attachment_ids_for_version).pluck(:attachment_id))
+    end
   end
 
   def attachments=(attachments)
@@ -2169,8 +2323,16 @@ class Submission < ActiveRecord::Base
     # one student from sneakily getting access to files in another user's comments,
     # since they're all being held on the assignment for now.
     attachments ||= []
-    old_ids = Array(attachment_ids || "").join(",").split(",").map(&:to_i)
-    self.attachment_ids = attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == assignment) || a.context != assignment }.map(&:id).join(",")
+
+    old_ids = attachment_ids_for_version(include_attachment_id: false)
+    self.attachment_ids = attachments.filter_map do |a|
+      next nil if a.blank?
+      next a.id if a.id && old_ids.include?(a.id)
+      next a.id if a.recently_created? && a.context == assignment
+      next a.id if a.context != assignment
+
+      nil
+    end.join(",")
   end
 
   # someday code-archaeologists will wonder how this method came to be named
@@ -2249,6 +2411,7 @@ class Submission < ActiveRecord::Base
   scope :with_assignment, -> { joins(:assignment).merge(Assignment.active) }
 
   scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
+  scope :with_sticker, -> { where.not(sticker: nil) }
   scope :not_submitted_or_graded, -> { where(submission_type: nil).where("(submissions.score IS NULL OR submissions.workflow_state <> 'graded') AND submissions.excused IS NOT TRUE") }
 
   scope :ungraded, -> { where(grade: nil).preload(:assignment) }
@@ -2269,6 +2432,29 @@ class Submission < ActiveRecord::Base
   scope :speed_grader_includes, -> { preload(:versions, :submission_comments, :attachments, :rubric_assessment) }
   scope :for_user, ->(user) { where(user_id: user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL").order(:updated_at) }
+
+  # returns submissions that reference the given attachment in their attachment_ids or attachment_id fields.
+  scope :referencing_attachment, lambda { |attachment| # you can also provide an attachment ID
+    where(
+      "submissions.attachment_id = ? " \
+      "OR ? = ANY(regexp_split_to_array(NULLIF(submissions.attachment_ids, ''), ',')::INT8[])",
+      attachment,
+      attachment
+    )
+  }
+
+  # returns submissions that reference the given attachment in their attachment_ids or attachment_id fields,
+  # and have an associated AttachmentAssociation linking that attachment to the submission.
+  # web snapshot attachments do not get AttachmentAssociations generated, therefore they will not be included
+  # in the results of this scope, whereas they could be in the referencing_attachment scope
+  scope :referencing_linked_attachment, lambda { |attachment| # you can also provide an attachment ID
+    referencing_attachment(attachment).where(
+      AttachmentAssociation.where("attachment_associations.context_id = submissions.id")
+                           .where(context_type: "Submission", attachment:)
+                           .arel
+                           .exists
+    )
+  }
 
   def assignment_visible_to_user?(user)
     return visible_to_user unless visible_to_user.nil?
@@ -2378,10 +2564,7 @@ class Submission < ActiveRecord::Base
   def moderated_grading_allow_list(current_user = user, loaded_attachments: nil)
     return nil unless assignment.moderated_grading? && current_user.present?
 
-    has_crocodoc = (loaded_attachments || attachments).any?(&:crocodoc_available?)
-    moderation_allow_list_for_user(current_user).map do |user|
-      user.moderated_grading_ids(has_crocodoc)
-    end
+    moderation_allow_list_for_user(current_user).map(&:moderated_grading_ids)
   end
 
   def moderation_allow_list_for_user(current_user)
@@ -2529,7 +2712,7 @@ class Submission < ActiveRecord::Base
   end
 
   def visible_submission_comments_for(current_user)
-    displayable_comments = if assignment.grade_as_group?
+    displayable_comments = if assignment.grade_as_group? && assignment.has_groups?
                              all_submission_comments_for_groups
                            elsif assignment.moderated_grading? && assignment.grades_published?
                              # When grades are published for a moderated assignment, provisional
@@ -2578,11 +2761,22 @@ class Submission < ActiveRecord::Base
     @assessment_request_count ||= 0
     @assessment_request_count += 1
     user = obj.try(:user)
-    association = AbstractAssignment.find(assignment_id).active_rubric_association? ? assignment.rubric_association : nil
+    assignment = AbstractAssignment.find(assignment_id)
+    association = assignment.active_rubric_association? ? assignment.rubric_association : nil
     res = assessment_requests.where(assessor_asset_id: obj.id, assessor_asset_type: obj.class.to_s, assessor_id: user.id, rubric_association_id: association.try(:id))
                              .first_or_initialize
     res.user_id = user_id
     res.workflow_state = "assigned" if res.new_record?
+
+    # To maintain backward compatibility with legacy peer reviews, we link the assessment
+    # request to the peer_review_sub_assignment regardless of the feature flag state
+    peer_review_sub = assignment.peer_review_sub_assignment
+    if res.new_record? &&
+       assignment.peer_reviews? &&
+       peer_review_sub.present?
+      res.peer_review_sub_assignment_id = peer_review_sub.id
+    end
+
     res.send_reminder! # this method also saves the assessment_request
     obj.assign_assessment(res) if obj.is_a?(Submission) && res.previously_new_record?
     res
@@ -2667,9 +2861,48 @@ class Submission < ActiveRecord::Base
     def time_of_submission
       time = submitted_at || Time.zone.now
       time -= 60.seconds if submission_type == "online_quiz" || cached_quiz_lti?
+
+      if discussion_checkpoint_submission_with_required_replies?
+        checkpoint_completion_time = calculate_checkpoint_completion_time
+        time = checkpoint_completion_time if checkpoint_completion_time.present?
+      end
+
       time
     end
     private :time_of_submission
+
+    def discussion_checkpoint_submission_with_required_replies?
+      return false unless submission_type == "discussion_topic"
+      return false unless assignment
+
+      assignment.is_a?(SubAssignment) && assignment.sub_assignment_tag == "reply_to_entry"
+    end
+
+    def calculate_checkpoint_completion_time
+      return @calculate_checkpoint_completion_time if defined?(@calculate_checkpoint_completion_time)
+
+      @calculate_checkpoint_completion_time = fetch_checkpoint_completion_time
+    end
+
+    def fetch_checkpoint_completion_time
+      return nil unless user_id && assignment
+
+      discussion_topic = assignment.parent_assignment&.discussion_topic
+      return nil unless discussion_topic
+
+      required_count = discussion_topic.reply_to_entry_required_count
+      return nil if required_count <= 0
+
+      discussion_topic.discussion_entries
+                      .non_top_level_for_user(user_id)
+                      .order(created_at: :asc)
+                      .offset(required_count - 1)
+                      .limit(1)
+                      .pick(:created_at)
+    end
+    private :discussion_checkpoint_submission_with_required_replies?,
+            :calculate_checkpoint_completion_time,
+            :fetch_checkpoint_completion_time
   end
   include Tardiness
 
@@ -2787,6 +3020,45 @@ class Submission < ActiveRecord::Base
       comments.select { |comment| comment.non_draft_or_authored_by(user) }
     else
       comments.authored_by(user.id)
+    end
+  end
+
+  def visible_provisional_comments(current_user, provisional_comments: nil)
+    return [] unless assignment.moderated_grading?
+
+    if provisional_comments.nil?
+      provisional_comments = SubmissionComment.where(provisional_grade_id: provisional_grades.pluck(:id))
+    end
+
+    grades_published = assignment.grades_published?
+    can_moderate = assignment.permits_moderation?(current_user)
+    comments_visible_to_graders = assignment.grader_comments_visible_to_graders?
+    current_grader_id = grader_id if grades_published
+
+    # If grades are published, filter out the selected grader's provisional comments
+    # since they've been duplicated as non-provisional comments
+    if grades_published && current_grader_id
+      provisional_comments = provisional_comments.reject { |comment| comment.author_id == current_grader_id }
+    end
+
+    if current_user.id == user_id
+      []
+    elsif !can_moderate && !comments_visible_to_graders
+      if grades_published
+        author_ids = provisional_comments.map(&:author_id).uniq
+        authors = User.where(id: author_ids).index_by(&:id)
+        moderator_ids = author_ids.select do |author_id|
+          assignment.permits_moderation?(authors[author_id])
+        end
+
+        provisional_comments.select do |comment|
+          comment.author_id == current_user.id || moderator_ids.include?(comment.author_id)
+        end
+      else
+        provisional_comments.select { |comment| comment.author_id == current_user.id }
+      end
+    else
+      provisional_comments
     end
   end
 
@@ -2963,16 +3235,29 @@ class Submission < ActiveRecord::Base
     assignment.muted?
   end
 
+  def graded_or_resubmitted_without_posting?
+    # Only indicate that the grade is hidden if there's an actual grade.
+    # Similarly, hide the grade if the student resubmits (which will keep
+    # the old grade but bump the workflow back to "submitted").
+    (graded? || resubmitted?) && !posted?
+  end
+  private :graded_or_resubmitted_without_posting?
+
   def hide_grade_from_student?(for_plagiarism: false)
     return false if for_plagiarism
 
     if assignment.post_manually?
       posted_at.blank?
     else
-      # Only indicate that the grade is hidden if there's an actual grade.
-      # Similarly, hide the grade if the student resubmits (which will keep
-      # the old grade but bump the workflow back to "submitted").
-      (graded? || resubmitted?) && !posted?
+      graded_or_resubmitted_without_posting?
+    end
+  end
+
+  def hide_comments_from_student?
+    if assignment.post_manually?
+      !comments_posted?
+    else
+      graded_or_resubmitted_without_posting?
     end
   end
 
@@ -2987,6 +3272,10 @@ class Submission < ActiveRecord::Base
     posted_at.present?
   end
 
+  def comments_posted?
+    posted? || posted_comments_at.present?
+  end
+
   def assignment_muted_changed
     grade_change_audit(force_audit: true)
   end
@@ -2995,20 +3284,36 @@ class Submission < ActiveRecord::Base
     !has_submission? && !graded?
   end
 
-  def visible_rubric_assessments_for(viewing_user, attempt: nil)
+  def visible_rubric_assessments_for(viewing_user, attempt: nil, include_provisional: false, provisional_assessments: nil)
     return [] unless assignment.active_rubric_association?
 
-    unless posted? || grants_right?(viewing_user, :read_grade)
-      # If this submission is unposted and the viewer can't view the grade,
-      # show only that viewer's assessments
-      return rubric_assessments_for_attempt(attempt:).select do |assessment|
-        assessment.assessor_id == viewing_user.id
+    # When grades are published in moderated grading, only show the selected rubric assessment
+    if assignment.moderated_grading? && assignment.grades_published?
+      return unposted_rubric_assessments_for(viewing_user, attempt:) if !posted? && !grants_right?(viewing_user, :read_grade)
+
+      selected_assessment = rubric_assessments_for_attempt(attempt:).find do |a|
+        a.assessment_type == "grading" &&
+          a.rubric_association == assignment.rubric_association
       end
+      return selected_assessment ? [selected_assessment] : []
     end
+
+    return unposted_rubric_assessments_for(viewing_user, attempt:) if !posted? && !grants_right?(viewing_user, :read_grade)
+
+    can_moderate = include_provisional && assignment.permits_moderation?(viewing_user)
+    target_rubric_association = assignment.rubric_association
 
     filtered_assessments = rubric_assessments_for_attempt(attempt:).select do |a|
       a.grants_right?(viewing_user, :read) &&
-        a.rubric_association == assignment.rubric_association
+        a.rubric_association == target_rubric_association
+    end
+
+    if include_provisional && provisional_assessments.present?
+      filtered_provisional = provisional_assessments.select do |assessment|
+        can_moderate || assessment.assessor_id == viewing_user.id
+      end
+
+      filtered_assessments.concat(filtered_provisional)
     end
 
     if assignment.anonymous_peer_reviews? && !grants_right?(viewing_user, :grade)
@@ -3046,6 +3351,36 @@ class Submission < ActiveRecord::Base
     end
   end
   private :rubric_assessments_for_attempt
+
+  def unposted_rubric_assessments_for(viewing_user, attempt:)
+    assessments = rubric_assessments_for_attempt(attempt:)
+    if posted_comments_at.present?
+      return assessments.map { |a| strip_rubric_assessment_points(a) }
+    end
+
+    assessments.select { |a| a.assessor_id == viewing_user.id }
+  end
+  private :unposted_rubric_assessments_for
+
+  # Strips point information from a rubric assessment while preserving comments
+  # Used when comments are posted but grades are not (posted_comments_at set but not posted_at)
+  def strip_rubric_assessment_points(assessment)
+    stripped = assessment.dup
+    stripped.id = assessment.id
+    stripped.score = nil
+
+    # Strip points from each rating in the data while keeping comments
+    if assessment.data.present?
+      stripped.data = assessment.data.map do |rating|
+        rating = rating.dup if rating.is_a?(Hash)
+        rating.delete(:points) if rating.is_a?(Hash)
+        rating
+      end
+    end
+
+    stripped
+  end
+  private :strip_rubric_assessment_points
 
   def self.queue_bulk_update(context, section, grader, grade_data)
     progress = Progress.create!(context:, tag: "submissions_update")
@@ -3126,7 +3461,7 @@ class Submission < ActiveRecord::Base
             comment = {
               comment: comment[:text_comment],
               author: grader,
-              hidden: assignment.post_manually? && !submission.posted?
+              hidden: assignment.post_manually? && !submission.comments_posted?,
             }.merge(
               comment
             ).with_indifferent_access
@@ -3246,12 +3581,22 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def attachment_text
-    read_or_calc_extracted_attachment[:text]
+  def extracted_text
+    read_or_calc_extracted_text[:text]
   end
 
-  def attachment_contains_images
-    read_or_calc_extracted_attachment[:contains_images]
+  def contains_images
+    read_or_calc_extracted_text[:contains_images]
+  end
+
+  def read_extracted_text
+    rows = submission_texts.where(attempt:).pluck(:text, :contains_images)
+
+    rows.each_with_object({ text: +"", contains_images: false }) do |(row_txt, has_img), result|
+      result[:text] << "\n\n" unless result[:text].empty?
+      result[:text] << row_txt.to_s
+      result[:contains_images] ||= has_img
+    end
   end
 
   def extract_text_from_upload?
@@ -3288,6 +3633,19 @@ class Submission < ActiveRecord::Base
     false
   end
 
+  # Incomplete submissions for discussions with checkpoints have null
+  # submission_type, but they can still have Asset Reports (LTI Asset Processor
+  # spec), so we need to pretend these are of type "discussion_topic"
+  def submission_type_for_asset_reports
+    return submission_type if submission_type
+
+    if assignment.submission_types == "discussion_topic" && assignment.has_sub_assignments?
+      "discussion_topic"
+    else
+      nil
+    end
+  end
+
   # For large body text, this can be SLOW. Call this method in a delayed job.
   def calc_body_word_count
     return 0 if body.nil?
@@ -3301,6 +3659,10 @@ class Submission < ActiveRecord::Base
 
   def lti_attempt_id(attempt = nil)
     "#{lti_id}:#{attempt || self.attempt}"
+  end
+
+  def skip_broadcasts
+    super || assignment.rollcall_assignment?
   end
 
   private
@@ -3324,7 +3686,7 @@ class Submission < ActiveRecord::Base
   end
 
   def get_word_count_from_body?
-    !body.nil? && submission_type != "online_quiz"
+    !body.nil? && %w[online_quiz online_upload].exclude?(submission_type)
   end
 
   def update_body_word_count_later
@@ -3379,12 +3741,6 @@ class Submission < ActiveRecord::Base
   def set_lti_id
     # Old records may not have an lti_id, so we need to set one
     self.lti_id ||= SecureRandom.uuid
-  end
-
-  # For internal use only.
-  # The lti_id field on its own is not enough to uniquely identify a submission; use lti_attempt_id instead.
-  def lti_id
-    read_attribute(:lti_id)
   end
 
   def set_anonymous_id
@@ -3493,61 +3849,96 @@ class Submission < ActiveRecord::Base
                              tags: { quiz_type: (submission_type == "online_quiz") ? "classic_quiz" : "new_quiz" })
   end
 
-  def extract_text_from_upload_later
-    return unless extract_text_from_upload?
+  # we should only extract text when the content associated with the submission has changed, and is present.
+  def need_to_extract_text?
+    # the submission body or the attached files get updated in the same update that changes the attempt number
+    return false unless saved_change_to_attempt?
+
+    if extract_text_from_upload?
+      # the attachment_ids change when something new gets uploaded
+      # and we don't want to create a SubmissionText record when there's no attachment
+      saved_change_to_attachment_ids? && attachment_ids.present?
+    else
+      # we don't want to create a SubmissionText record when there's no attachment nor body
+      saved_change_to_body? && body.present?
+    end
+  end
+
+  def extract_text_later
+    return unless course&.feature_enabled?(:project_lhotse)
 
     delay(
-      n_strand: ["Submission#extract_text_from_upload", global_root_account_id],
-      singleton: "extract_text_from_upload#{global_id}-attempt#{attempt}"
-    ).extract_text_from_upload
+      n_strand: ["Submission#extract_text", global_root_account_id],
+      singleton: "extract_text#{global_id}-attempt#{attempt}"
+    ).extract_text
   end
 
-  def extract_text_from_upload
+  def extract_text
     upsert_rows = []
+    unique_index = nil
 
-    attachments.find_each do |attachment|
-      result = FileTextExtractionService.new(attachment:).call
+    if extract_text_from_upload?
+      upsert_rows = attachments.filter_map do |attachment|
+        result = FileTextExtractionService.new(attachment:).call
+        next unless result && result.text.present?
 
-      upsert_rows << {
-        submission_id: id,
-        attachment_id: attachment.id,
-        root_account_id: root_account.id,
-        text: result.text,
-        contains_images: result.contains_images,
-        attempt:,
-        updated_at: Time.current,
-        created_at: Time.current
-      }
+        build_upsert_row(
+          text: result.text,
+          contains_images: result.contains_images,
+          attachment_id: attachment.id
+        )
+      end
+      unique_index = :index_on_sub_attempt_attach
+    elsif body.present?
+      upsert_rows = [
+        build_upsert_row(
+          text: body,
+          contains_images: contains_rce_file_link?(body)
+        )
+      ]
+      unique_index = :index_on_sub_attempt
     end
+    return unless upsert_rows.any?
 
-    SubmissionText.upsert_all(upsert_rows, unique_by: %i[submission_id attachment_id attempt]) if upsert_rows.any?
+    begin
+      SubmissionText.upsert_all(upsert_rows, unique_by: unique_index)
+    rescue => e
+      Rails.logger.error("Failed to upsert SubmissionText records (#{unique_index}): #{e.message}")
+    end
   end
 
-  def read_or_calc_extracted_attachment
-    return unless extract_text_from_upload?
+  def build_upsert_row(text:, contains_images:, attachment_id: nil)
+    {
+      submission_id: id,
+      attachment_id:,
+      root_account_id: root_account.id,
+      text:,
+      contains_images:,
+      attempt:,
+      updated_at: Time.current,
+      created_at: Time.current,
+      submission_type:
+    }
+  end
 
-    @read_or_calc_extracted_attachment ||= begin
-      result = read_extracted_attachment
+  def read_or_calc_extracted_text
+    @read_or_calc_extracted_text ||= begin
+      result = read_extracted_text
 
       if result[:text].blank? && !result[:contains_images]
-        extract_text_from_upload
-        result = read_extracted_attachment
+        extract_text
+        result = read_extracted_text
       end
 
       result
     end
   end
 
-  def read_extracted_attachment
-    rows = submission_texts.where(attempt:).pluck(:text, :contains_images)
+  def contains_rce_file_link?(html_body)
+    return false if html_body.blank?
 
-    rows.each_with_object({ text: +"", contains_images: false }) do |(row_txt, has_img), result|
-      result[:text] << "\n\n" unless result[:text].empty?
-      result[:text] << row_txt.to_s
-      result[:contains_images] ||= has_img
-    end
-  rescue => e
-    Rails.logger.error("Failed to read extracted attachment for submission #{id}: #{e.message}")
-    { text: "", contains_images: false }
+    normalized_html = html_body.gsub('\"', '"')
+    decoded_html = CGI.unescapeHTML(normalized_html)
+    decoded_html.match?(/<(img|a)[^>]+(data-api-returntype="File"|class="instructure_file_link")[^>]*>/)
   end
 end

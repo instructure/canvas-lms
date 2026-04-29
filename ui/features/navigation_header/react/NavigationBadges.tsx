@@ -23,8 +23,8 @@ import {Portal} from '@instructure/ui-portal'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {getSetting} from '@canvas/settings-query/react/settingsQuery'
 import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
-import {useBroadcastQuery} from '@canvas/query/broadcast'
+import {sessionStoragePersister} from '@instructure/platform-query'
+import {useBroadcastQuery} from '@instructure/platform-query/broadcast'
 
 const I18n = createI18nScope('Navigation')
 
@@ -47,7 +47,7 @@ export default function NavigationBadges() {
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSetting,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   const {data: unreadContentSharesCount, isSuccess: hasUnreadContentSharesCount} = useQuery({
@@ -55,7 +55,7 @@ export default function NavigationBadges() {
     queryFn: getUnreadCount,
     staleTime: 60 * 60 * 1000, // 1 hour
     enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
     refetchOnWindowFocus: true,
   })
 
@@ -68,7 +68,7 @@ export default function NavigationBadges() {
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
     refetchOnWindowFocus: true,
   })
 
@@ -122,7 +122,9 @@ export default function NavigationBadges() {
       </Portal>
 
       <Portal
-        open={hasUnreadReleaseNotesCount && unreadReleaseNotesCount > 0}
+        open={
+          hasUnreadReleaseNotesCount && unreadReleaseNotesCount > 0 && !releaseNotesBadgeDisabled
+        }
         mountNode={unreadReleaseNotesCountElement}
       >
         <ScreenReaderContent>

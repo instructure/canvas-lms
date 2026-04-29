@@ -23,8 +23,8 @@ import TeacherFeedbackForm from '../TeacherFeedbackForm'
 const server = setupServer()
 
 describe('TeacherFeedbackForm', () => {
-  const onCancel = jest.fn()
-  const onSubmit = jest.fn()
+  const onCancel = vi.fn()
+  const onSubmit = vi.fn()
   const courses = [
     {
       id: '1',

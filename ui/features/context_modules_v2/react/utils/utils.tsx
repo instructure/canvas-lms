@@ -22,12 +22,23 @@ import {
   IconDiscussionLine,
   IconAssignmentLine,
   IconQuizLine,
+  IconQuizSolid,
   IconLinkLine,
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from './types'
 import {DateTime} from '@instructure/ui-i18n'
 import moment from 'moment'
+import {ModuleItemContentType} from '../hooks/queries/useModuleItemContent'
+import {
+  EXTERNAL_NEW_ITEM_FIELDS,
+  EXTERNAL_TOOL_NEW_ITEM_FIELDS,
+  ITEM_TYPE,
+  ItemType,
+  TYPES_WITH_CREATE_NAME,
+  TYPES_WITH_URL,
+} from './constants'
+import {captureMessage} from '@sentry/react'
 
 const I18n = createI18nScope('context_modules_v2')
 const pixelOffset = 20
@@ -46,16 +57,20 @@ export const getIconColor = (published: boolean | undefined, isStudentView = fal
   return published && !isStudentView ? 'success' : 'primary'
 }
 
-export const getItemIcon = (content: ModuleItemContent, isStudentView = false) => {
+export const getItemIcon = (
+  content: ModuleItemContent,
+  published: boolean,
+  isStudentView = false,
+) => {
   if (!content?.type) return <IconDocumentLine />
 
   const type = content.type
-  const color = getIconColor(content?.published, isStudentView)
+  const color = getIconColor(published, isStudentView)
 
   switch (type) {
     case 'Assignment':
       return content.isNewQuiz ? (
-        <IconQuizLine color={color} data-testid="new-quiz-icon" />
+        <IconQuizSolid color={color} data-testid="new-quiz-icon" />
       ) : (
         <IconAssignmentLine color={color} data-testid="assignment-icon" />
       )
@@ -72,6 +87,8 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
       return <IconLinkLine color={color} data-testid="url-icon" />
     case 'Page':
       return <IconDocumentLine color={color} data-testid="page-icon" />
+    case 'SubHeader':
+      return null
     default:
       return <IconDocumentLine color="primary" data-testid="document-icon" />
   }
@@ -117,7 +134,7 @@ export const mapContentSelection = (id: string, contentType: string) => {
 
   if (type === 'assignment') return {assignments: [id]}
   if (type === 'quiz') return {quizzes: [id]}
-  if (type === 'discussion') return {discussions: [id]}
+  if (type === 'discussion') return {discussion_topics: [id]}
   if (type === 'attachment' || type === 'file') return {files: [id]}
   if (type === 'external' || type === 'url') return {urls: [id]}
   if (type === 'page') return {pages: [id]}
@@ -126,12 +143,25 @@ export const mapContentSelection = (id: string, contentType: string) => {
   return {modules: [id]}
 }
 
+export const mapContentTypeForSharing = (contentType: string): string => {
+  const lowerType = contentType.toLowerCase()
+
+  const typeMap: Record<string, string> = {
+    discussion: 'discussion_topic',
+    file: 'attachment',
+    page: 'wiki_page',
+  }
+
+  return typeMap[lowerType] || lowerType
+}
+
 export const validateModuleStudentRenderRequirements = (prevProps: any, nextProps: any) => {
   return (
     prevProps.id === nextProps.id &&
     prevProps.expanded === nextProps.expanded &&
     prevProps.name === nextProps.name &&
-    prevProps.completionRequirements === nextProps.completionRequirements
+    prevProps.completionRequirements === nextProps.completionRequirements &&
+    prevProps.position === nextProps.position
   )
 }
 
@@ -142,7 +172,8 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
     prevProps.title === nextProps.title &&
     prevProps.indent === nextProps.indent &&
     prevProps.index === nextProps.index &&
-    prevProps.smallScreen === nextProps.smallScreen
+    prevProps.smallScreen === nextProps.smallScreen &&
+    prevProps.published === nextProps.published
 
   if (!basicPropsEqual) return false
 
@@ -176,7 +207,6 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
     prevProps.content?.id === nextProps.content?.id &&
     prevProps.content?.title === nextProps.content?.title &&
     prevProps.content?.type === nextProps.content?.type &&
-    prevProps.content?.published === nextProps.content?.published &&
     prevProps.content?.pointsPossible === nextProps.content?.pointsPossible &&
     prevProps.content?.dueAt === nextProps.content?.dueAt &&
     prevProps.content?.lockAt === nextProps.content?.lockAt &&
@@ -185,7 +215,93 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
   return contentPropsEqual
 }
 
+// Optimized shallow comparison for completion requirements
+const compareCompletionRequirements = (prev: any[], next: any[]): boolean => {
+  if (!prev && !next) return true
+  if (!prev || !next) return false
+  if (prev.length !== next.length) return false
+
+  for (let i = 0; i < prev.length; i++) {
+    const prevReq = prev[i]
+    const nextReq = next[i]
+    if (
+      prevReq?.type !== nextReq?.type ||
+      prevReq?.min_score !== nextReq?.min_score ||
+      prevReq?.minScore !== nextReq?.minScore ||
+      prevReq?.score !== nextReq?.score
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
+// Optimized checkpoint comparison
+const compareCheckpoints = (prev: any[], next: any[]): boolean => {
+  if (!prev && !next) return true
+  if (!prev || !next) return false
+  if (prev.length !== next.length) return false
+
+  for (let i = 0; i < prev.length; i++) {
+    const prevCP = prev[i]
+    const nextCP = next[i]
+    if (
+      prevCP?.dueAt !== nextCP?.dueAt ||
+      prevCP?.name !== nextCP?.name ||
+      prevCP?.tag !== nextCP?.tag
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
+// Optimized assignment overrides comparison
+const compareAssignmentOverrides = (prev: any, next: any): boolean => {
+  if (!prev && !next) return true
+  if (!prev || !next) return false
+
+  const prevEdges = prev.edges || []
+  const nextEdges = next.edges || []
+
+  if (prevEdges.length !== nextEdges.length) return false
+  if (prevEdges.length === 0) return true
+
+  // For performance, only do deep comparison if edges count is reasonable
+  if (prevEdges.length > 20) {
+    // For very large override lists, fall back to JSON comparison but cache it
+    return JSON.stringify(prev) === JSON.stringify(next)
+  }
+
+  for (let i = 0; i < prevEdges.length; i++) {
+    const prevEdge = prevEdges[i]
+    const nextEdge = nextEdges[i]
+    const prevNode = prevEdge?.node
+    const nextNode = nextEdge?.node
+
+    if (
+      prevNode?._id !== nextNode?._id ||
+      prevNode?.dueAt !== nextNode?.dueAt ||
+      prevNode?.lockAt !== nextNode?.lockAt ||
+      prevNode?.unlockAt !== nextNode?.unlockAt
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
+function extractDueAts(props: {content: {assignedToDates: any}}) {
+  const dates = props?.content?.assignedToDates
+  if (!Array.isArray(dates)) return []
+
+  return dates
+    .map(date => date?.dueAt)
+    .filter(dueAt => typeof dueAt !== 'undefined' && dueAt !== null)
+}
+
 export const validateModuleItemTeacherRenderRequirements = (prevProps: any, nextProps: any) => {
+  // Basic props comparison (most likely to differ)
   const basicPropsEqual =
     prevProps.id === nextProps.id &&
     prevProps.moduleId === nextProps.moduleId &&
@@ -193,43 +309,45 @@ export const validateModuleItemTeacherRenderRequirements = (prevProps: any, next
     prevProps.index === nextProps.index &&
     prevProps.indent === nextProps.indent &&
     prevProps.title === nextProps.title &&
+    prevProps.focusTargetItemId === nextProps.focusTargetItemId &&
     prevProps?.content?.dueAt === nextProps?.content?.dueAt &&
     prevProps?.content?.lockAt === nextProps?.content?.lockAt &&
     prevProps?.content?.unlockAt === nextProps?.content?.unlockAt &&
-    JSON.stringify(prevProps.completionRequirements) ===
-      JSON.stringify(nextProps.completionRequirements)
+    prevProps.position === nextProps.position
 
   if (!basicPropsEqual) return false
 
-  // Compare checkpoint data explicitly (deep comparison needed for nested arrays)
-  const prevCheckpoints = prevProps.content?.checkpoints
-  const nextCheckpoints = nextProps.content?.checkpoints
-
-  // Handle exact null/undefined differences
-  if (prevCheckpoints !== nextCheckpoints && (!prevCheckpoints || !nextCheckpoints)) return false
-
-  if (prevCheckpoints && nextCheckpoints) {
-    if (prevCheckpoints.length !== nextCheckpoints.length) return false
-
-    // Use JSON.stringify for deep comparison of checkpoint arrays
-    if (JSON.stringify(prevCheckpoints) !== JSON.stringify(nextCheckpoints)) return false
+  const prevDueAts = extractDueAts(prevProps)
+  const nextDueAts = extractDueAts(nextProps)
+  if (
+    prevDueAts.length !== nextDueAts.length ||
+    !prevDueAts.every((val, idx) => val === nextDueAts[idx])
+  ) {
+    return false
   }
 
+  // Optimized completion requirements comparison
+  if (
+    !compareCompletionRequirements(
+      prevProps.completionRequirements,
+      nextProps.completionRequirements,
+    )
+  ) {
+    return false
+  }
+
+  // Optimized checkpoint comparison
+  const prevCheckpoints = prevProps.content?.checkpoints
+  const nextCheckpoints = nextProps.content?.checkpoints
+  if (!compareCheckpoints(prevCheckpoints, nextCheckpoints)) {
+    return false
+  }
+
+  // Optimized assignment overrides comparison
   const prevOverrides = prevProps.content?.assignmentOverrides
   const nextOverrides = nextProps.content?.assignmentOverrides
-
-  if (!!prevOverrides !== !!nextOverrides) return false
-
-  if (!prevOverrides && !nextOverrides) return true
-
-  const prevEdgesCount = prevOverrides?.edges?.length ?? 0
-  const nextEdgesCount = nextOverrides?.edges?.length ?? 0
-  if (prevEdgesCount !== nextEdgesCount) return false
-
-  if (prevEdgesCount > 0) {
-    const prevOverridesStr = JSON.stringify(prevOverrides)
-    const nextOverridesStr = JSON.stringify(nextOverrides)
-    return prevOverridesStr === nextOverridesStr
+  if (!compareAssignmentOverrides(prevOverrides, nextOverrides)) {
+    return false
   }
 
   return true
@@ -246,7 +364,8 @@ export const validateModuleTeacherRenderRequirements = (prevProps: any, nextProp
     prevProps.completionRequirements === nextProps.completionRequirements &&
     prevProps.unlockAt === nextProps.unlockAt &&
     prevProps.requirementCount === nextProps.requirementCount &&
-    prevProps.lockAt === nextProps.lockAt
+    prevProps.lockAt === nextProps.lockAt &&
+    prevProps.position === nextProps.position
   )
 }
 
@@ -275,4 +394,74 @@ export const isModuleUnlockAtDateInTheFuture = (unlockAtDate: string) => {
   const now = moment.tz(TIMEZONE)
 
   return unlockMoment.isAfter(now)
+}
+
+export function focusModuleItemTitleLinkById(id?: string, preventScroll = false) {
+  if (!id) return
+
+  const selector = `[data-testid="module-item-title-link"][data-module-item-id="${id}"]`
+  const el = document.querySelector<HTMLElement>(selector)
+
+  if (el && typeof el.focus === 'function') {
+    el.focus({preventScroll})
+  }
+}
+
+export function getItemTypeLabel(type: ModuleItemContentType): string {
+  switch (type) {
+    case ITEM_TYPE.ASSIGNMENT:
+      return I18n.t('Assignment')
+    case ITEM_TYPE.QUIZ:
+      return I18n.t('Quiz')
+    case ITEM_TYPE.DISCUSSION:
+      return I18n.t('Discussion')
+    case ITEM_TYPE.FILE:
+      return I18n.t('File')
+    case ITEM_TYPE.PAGE:
+      return I18n.t('Page')
+    case ITEM_TYPE.EXTERNAL_URL:
+      return I18n.t('External URL')
+    case ITEM_TYPE.EXTERNAL_TOOL:
+      return I18n.t('External Tool')
+    case ITEM_TYPE.CONTEXT_MODULE_SUB_HEADER:
+      return I18n.t('Header')
+    default: {
+      captureMessage(`Unhandled ModuleItemContentType: ${String(type)}`, 'error')
+      return I18n.t('Unknown')
+    }
+  }
+}
+
+export const getWarningLabel = (itemType: ItemType, state: {tabIndex: number}, type: string) => {
+  const itemLabel = getItemTypeLabel(itemType)
+
+  if (TYPES_WITH_CREATE_NAME.includes(itemType) && state.tabIndex == 1) {
+    return I18n.t('%{itemLabel} name is required', {itemLabel})
+  }
+
+  if (itemType === ITEM_TYPE.CONTEXT_MODULE_SUB_HEADER) {
+    return I18n.t('Header text is required')
+  }
+
+  if (TYPES_WITH_URL.includes(itemType) && type === 'name') {
+    return I18n.t('Page name is required')
+  }
+
+  if (TYPES_WITH_URL.includes(itemType) && type === 'url') {
+    return I18n.t('Url is required')
+  }
+
+  return I18n.t('%{itemLabel} is required', {itemLabel})
+}
+
+export const isExternalNewItemField = (
+  field: string,
+): field is (typeof EXTERNAL_NEW_ITEM_FIELDS)[number] => {
+  return (EXTERNAL_NEW_ITEM_FIELDS as readonly string[]).includes(field)
+}
+
+export const isExternalToolNewItemField = (
+  field: string,
+): field is (typeof EXTERNAL_TOOL_NEW_ITEM_FIELDS)[number] => {
+  return (EXTERNAL_TOOL_NEW_ITEM_FIELDS as readonly string[]).includes(field)
 }

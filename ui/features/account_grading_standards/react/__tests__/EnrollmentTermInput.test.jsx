@@ -20,7 +20,6 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import EnrollmentTermInput from '../EnrollmentTermInput'
-import '@testing-library/jest-dom/extend-expect'
 
 const defaultProps = {
   enrollmentTerms: [
@@ -59,7 +58,7 @@ const defaultProps = {
     },
   ],
   selectedIDs: ['2'],
-  setSelectedEnrollmentTermIDs: jest.fn(),
+  setSelectedEnrollmentTermIDs: vi.fn(),
 }
 
 const renderComponent = (props = {}) => {
@@ -117,7 +116,7 @@ describe('EnrollmentTermInput', () => {
 
   it('allows removing selected terms', async () => {
     const user = userEvent.setup()
-    const setSelectedEnrollmentTermIDs = jest.fn()
+    const setSelectedEnrollmentTermIDs = vi.fn()
     renderComponent({setSelectedEnrollmentTermIDs})
     const removeButton = screen.getByTestId('enrollment-term-tag-2')
     await user.click(removeButton)
@@ -127,7 +126,7 @@ describe('EnrollmentTermInput', () => {
 
   it('allows selecting a term from the dropdown', async () => {
     const user = userEvent.setup()
-    const setSelectedEnrollmentTermIDs = jest.fn()
+    const setSelectedEnrollmentTermIDs = vi.fn()
     renderComponent({setSelectedEnrollmentTermIDs})
     await user.click(screen.getByTestId('enrollment-term-select'))
     await user.click(await screen.findByTestId('enrollment-term-option-5'))

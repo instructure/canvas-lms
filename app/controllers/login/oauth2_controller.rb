@@ -20,6 +20,7 @@
 
 class Login::OAuth2Controller < Login::OAuthBaseController
   skip_before_action :verify_authenticity_token
+  skip_before_action :require_user, only: %i[new create]
 
   rescue_from Canvas::Security::TokenExpired, with: :handle_expired_token
 
@@ -49,23 +50,46 @@ class Login::OAuth2Controller < Login::OAuthBaseController
       @aac.debug_set(:debugging, t("Received callback from identity provider"))
       @aac.instance_debugging = true
     end
-    timeout_protection do
-      token = nil
-      begin
-        token = @aac.get_token(params[:code], oauth2_login_callback_url, params)
-        token.options[:nonce] = jwt["nonce"]
-      rescue => e
-        @aac.debug_set(:get_token_response, e) if debugging
-        increment_statsd(:failure, reason: :get_token)
-        raise
+    attempts = 0
+    timeout_options = @aac.creation_timeout_options
+    begin
+      Canvas.timeout_protection("oauth:#{@aac.global_id}", timeout_options) do
+        token = nil
+        begin
+          token = @aac.get_token(params[:code], oauth2_login_callback_url, params)
+          token.options[:nonce] = jwt["nonce"]
+        rescue => e
+          @aac.debug_set(:get_token_response, e) if debugging
+          # counted below if it's a timeout
+          increment_statsd(:failure, reason: :get_token) unless e.is_a?(Timeout::Error) || e.is_a?(Faraday::TimeoutError)
+          raise
+        end
+        process_token(token)
       end
-      process_token(token)
-    rescue Canvas::TimeoutCutoff
+    rescue Timeout::Error, Faraday::TimeoutError => e
+      if attempts < @aac.settings["oauth2_timeout_retries"].to_i && !e.is_a?(Canvas::TimeoutCutoff)
+        attempts += 1
+        increment_statsd(:retry, reason: :timeout)
+        retry
+      end
+
+      unless e.is_a?(Canvas::TimeoutCutoff)
+        Canvas::Errors.capture(e,
+                               type: :oauth_consumer,
+                               aac_id: @aac.global_id,
+                               account_id: @aac.global_account_id)
+      end
       flash[:delegated_message] = t("A timeout occurred contacting external authentication service")
-      increment_statsd(:failure, reason: :timeout)
+      increment_statsd(:failure, reason: e.is_a?(Canvas::TimeoutCutoff) ? :circuit_breaker : :timeout)
       redirect_to login_url
-      # don't re-raise; we don't actually want OAuthBaseContoller#timeout_protection to handle this,
-      # otherwise it will overwrite the flash message
+    rescue => e
+      Canvas::Errors.capture(e,
+                             type: :oauth_consumer,
+                             aac_id: @aac.global_id,
+                             account_id: @aac.global_account_id)
+      flash[:delegated_message] = t("There was a problem logging in at %{institution}",
+                                    institution: @domain_root_account.display_name)
+      redirect_to login_url
     end
   end
 
@@ -129,7 +153,8 @@ class Login::OAuth2Controller < Login::OAuthBaseController
         redirect_to login_url
         return false
       end
-      if jwt["nonce"] != pop_nonce
+      unless pop_nonce(jwt["nonce"])
+        logger.error("Nonce mismatch - JWT nonce: '#{jwt["nonce"]}', Session nonce(s): #{session[:oauth2_nonce].inspect}")
         increment_statsd(:failure, reason: :invalid_nonce)
         raise ActionController::InvalidAuthenticityToken
       end
@@ -161,12 +186,15 @@ class Login::OAuth2Controller < Login::OAuthBaseController
     nonce
   end
 
-  def pop_nonce
+  def pop_nonce(expected_nonce)
     return unless (nonce_array = session[:oauth2_nonce])
-    return nonce_array if nonce_array.is_a?(String)
 
-    nonce = nonce_array.pop
+    nonce_array = Array.wrap(nonce_array)
+
+    found = nonce_array.index(expected_nonce)
+
+    nonce_array.delete_at(found) if found
     session.delete(:oauth2_nonce) if nonce_array.empty?
-    nonce
+    found
   end
 end

@@ -226,67 +226,91 @@ describe('showAllOrLess', () => {
   })
 
   describe('expandModuleAndLoadAll', () => {
-    it('should fire the event', (done: jest.DoneCallback) => {
-      document.addEventListener(MODULE_EXPAND_AND_LOAD_ALL, ((event: Event) => {
-        const customEvent = event as CustomEvent<{moduleId: string; allPages: boolean}>
-        expect(customEvent.detail.moduleId).toBe('1')
-        expect(customEvent.detail.allPages).toBe(true)
-        done()
-      }) as EventListener)
+    it('should fire the event', async () => {
+      const eventPromise = new Promise<CustomEvent<{moduleId: string; allPages: boolean}>>(
+        resolve => {
+          document.addEventListener(
+            MODULE_EXPAND_AND_LOAD_ALL,
+            ((event: Event) => resolve(event as CustomEvent)) as EventListener,
+            {once: true},
+          )
+        },
+      )
       expandModuleAndLoadAll('1')
+      const event = await eventPromise
+      expect(event.detail.moduleId).toBe('1')
+      expect(event.detail.allPages).toBe(true)
     })
   })
 
   describe('loadAll', () => {
-    it('should fire the event', (done: jest.DoneCallback) => {
-      document.addEventListener(MODULE_LOAD_ALL, ((event: Event) => {
-        const customEvent = event as CustomEvent<{moduleId: string}>
-        expect(customEvent.detail.moduleId).toBe('1')
-        done()
-      }) as EventListener)
+    it('should fire the event', async () => {
+      const eventPromise = new Promise<CustomEvent<{moduleId: string}>>(resolve => {
+        document.addEventListener(
+          MODULE_LOAD_ALL,
+          ((event: Event) => resolve(event as CustomEvent)) as EventListener,
+          {once: true},
+        )
+      })
       loadAll('1')
+      const event = await eventPromise
+      expect(event.detail.moduleId).toBe('1')
     })
   })
 
   describe('loadFirstPage', () => {
-    it('should fire the event', (done: jest.DoneCallback) => {
-      document.addEventListener(MODULE_LOAD_FIRST_PAGE, ((event: Event) => {
-        const customEvent = event as CustomEvent<{moduleId: string}>
-        expect(customEvent.detail.moduleId).toBe('1')
-        done()
-      }) as EventListener)
+    it('should fire the event', async () => {
+      const eventPromise = new Promise<CustomEvent<{moduleId: string}>>(resolve => {
+        document.addEventListener(
+          MODULE_LOAD_FIRST_PAGE,
+          ((event: Event) => resolve(event as CustomEvent)) as EventListener,
+          {once: true},
+        )
+      })
       loadFirstPage('1')
+      const event = await eventPromise
+      expect(event.detail.moduleId).toBe('1')
     })
   })
 
   describe('maybeExpandAndLoadAll', () => {
-    it('should call expandModuleAndLoadAll when module is collapsed', (done: jest.DoneCallback) => {
+    it('should call expandModuleAndLoadAll when module is collapsed', async () => {
       const module = document.createElement('div')
       module.id = 'context_module_1'
       module.setAttribute('data-module-id', '1')
       module.classList.add('collapsed_module')
       document.body.appendChild(module)
-      document.addEventListener(MODULE_EXPAND_AND_LOAD_ALL, ((event: Event) => {
-        const customEvent = event as CustomEvent<{moduleId: string; allPages: boolean}>
-        expect(customEvent.detail.moduleId).toBe('1')
-        expect(customEvent.detail.allPages).toBe(true)
-        done()
-      }) as EventListener)
+      const eventPromise = new Promise<CustomEvent<{moduleId: string; allPages: boolean}>>(
+        resolve => {
+          document.addEventListener(
+            MODULE_EXPAND_AND_LOAD_ALL,
+            ((event: Event) => resolve(event as CustomEvent)) as EventListener,
+            {once: true},
+          )
+        },
+      )
       maybeExpandAndLoadAll('1')
+      const event = await eventPromise
+      expect(event.detail.moduleId).toBe('1')
+      expect(event.detail.allPages).toBe(true)
     })
 
-    it('should call loadAll when module is paginated', (done: jest.DoneCallback) => {
+    it('should call loadAll when module is paginated', async () => {
       const module = document.createElement('div')
       module.id = 'context_module_1'
       module.setAttribute('data-module-id', '1')
       module.dataset.loadstate = 'paginated'
       document.body.appendChild(module)
-      document.addEventListener(MODULE_LOAD_ALL, ((event: Event) => {
-        const customEvent = event as CustomEvent<{moduleId: string}>
-        expect(customEvent.detail.moduleId).toBe('1')
-        done()
-      }) as EventListener)
+      const eventPromise = new Promise<CustomEvent<{moduleId: string}>>(resolve => {
+        document.addEventListener(
+          MODULE_LOAD_ALL,
+          ((event: Event) => resolve(event as CustomEvent)) as EventListener,
+          {once: true},
+        )
+      })
       maybeExpandAndLoadAll('1')
+      const event = await eventPromise
+      expect(event.detail.moduleId).toBe('1')
     })
   })
 
@@ -344,7 +368,7 @@ describe('showAllOrLess', () => {
     })
 
     it('should not call document dispatchEvent on isLoading true', () => {
-      const spy = jest.spyOn(document, 'dispatchEvent')
+      const spy = vi.spyOn(document, 'dispatchEvent')
       const module = makeModule()
       module.dataset.loadstate = 'paginated'
 

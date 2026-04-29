@@ -38,7 +38,7 @@ describe('PointsPossible', () => {
   })
 
   it('parses float number', () => {
-    const mockSetPointsPossible = jest.fn()
+    const mockSetPointsPossible = vi.fn()
     const {getByTestId} = render(
       <PointsPossible
         {...defaultProps}
@@ -54,7 +54,7 @@ describe('PointsPossible', () => {
   })
 
   it('ignores invalid number', () => {
-    const mockSetPointsPossible = jest.fn()
+    const mockSetPointsPossible = vi.fn()
     const {getByTestId} = render(
       <PointsPossible
         {...defaultProps}
@@ -77,7 +77,7 @@ describe('PointsPossible', () => {
   })
 
   it('cuts the number to 2 decimal points', () => {
-    const mockSetPointsPossible = jest.fn()
+    const mockSetPointsPossible = vi.fn()
     const {getByTestId} = render(
       <PointsPossible
         {...defaultProps}

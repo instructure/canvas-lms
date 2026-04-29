@@ -45,6 +45,9 @@ module Api::V1::ContextModule
     hash = api_json(context_module, current_user, session, only: MODULE_JSON_ATTRS)
     hash["require_sequential_progress"] = !!context_module.require_sequential_progress?
     hash["requirement_type"] = context_module.requirement_type
+    if opts.fetch(:can_have_requirement_count, false)
+      hash["requirement_count"] = context_module.requirement_count
+    end
     hash["publish_final_grade"] = context_module.publish_final_grade?
     hash["prerequisite_module_ids"] = context_module.prerequisites.select { |p| p[:type] == "context_module" }.pluck(:id)
     if progression
@@ -69,6 +72,7 @@ module Api::V1::ContextModule
         return nil if tags.count == 0
       end
       item_includes = includes & ["content_details", "estimated_durations"]
+      ActiveRecord::Associations.preload(tags, content: [:current_lookup, :wiki])
       hash["items"] = tags.map do |tag|
         module_item_json(tag, current_user, session, context_module, progression, item_includes, opts)
       end
@@ -92,14 +96,14 @@ module Api::V1::ContextModule
                          when "ExternalUrl"
                            if value_to_boolean(request.params[:frame_external_urls])
                              # canvas UI wants external links hosted in iframe
-                             course_context_modules_item_redirect_url(id: content_tag.id, course_id: context_module.context.id)
+                             course_context_modules_item_redirect_url(id: content_tag.id, course_id: context_module.context_id)
                            else
                              # API prefers to redirect to the external page, rather than host in an iframe
-                             api_v1_course_context_module_item_redirect_url(id: content_tag.id, course_id: context_module.context.id)
+                             api_v1_course_context_module_item_redirect_url(id: content_tag.id, course_id: context_module.context_id)
                            end
                          else
                            # otherwise we'll link to the same thing the web UI does
-                           course_context_modules_item_redirect_url(id: content_tag.id, course_id: context_module.context.id)
+                           course_context_modules_item_redirect_url(id: content_tag.id, course_id: context_module.context_id)
                          end
     end
 

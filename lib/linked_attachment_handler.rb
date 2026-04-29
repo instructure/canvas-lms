@@ -21,19 +21,29 @@ module LinkedAttachmentHandler
 
   def self.included(klass)
     klass.send(:attr_accessor, :saving_user)
+    klass.send(:attr_writer, :updating_user)
+    klass.send(:attr_writer, :current_user)
+    klass.send(:attr_accessor, :importing)
+    klass.send(:attr_accessor, :skip_attachment_association_update)
 
     klass.after_save :update_attachment_associations
     klass.extend(ClassMethods)
   end
 
-  def update_attachment_associations
-    return unless attachment_associations_enabled?
+  def updating_user
+    @updating_user || saving_user || try(:current_user) || try(:editor) || try(:user)
+  end
+
+  def update_attachment_associations(migration: nil)
+    return if skip_attachment_association_update
+    return if importing && !migration
+    return unless attachment_associations_creation_enabled?
 
     self.class.html_fields.each do |field|
-      next unless saved_change_to_attribute?(field)
+      next unless migration || saved_change_to_attribute?(field)
 
       context_concern = field if SPECIAL_CONCERN_FIELDS.include?(field)
-      associate_attachments_to_rce_object(send(field), actual_saving_user, context_concern:)
+      associate_attachments_to_rce_object(send(field), updating_user, context_concern:, migration:)
     end
   end
 
@@ -64,11 +74,7 @@ module LinkedAttachmentHandler
   end
 
   def keep_associations?(attachment, session, user)
-    if instance_of?(::WikiPage) || !attachment.grants_right?(user, session, :delete)
-      return true
-    end
-
-    false
+    instance_of?(Submission) || instance_of?(Quizzes::QuizSubmission) || !attachment.grants_right?(user, session, :delete)
   end
 
   # NB: context_concern is a virtual subdivision of context.
@@ -78,7 +84,7 @@ module LinkedAttachmentHandler
   # "terms of use" HTML, which should be treated as a publicly viewable
   # property of accounts, even for anonymous users, therefore any and all
   # attachments to it should also be viewable without restrictions.
-  def associate_attachments_to_rce_object(html, user, context_concern: nil, session: nil, skip_user_verification: false)
+  def associate_attachments_to_rce_object(html, user, context_concern: nil, session: nil, skip_user_verification: false, migration: nil)
     attachment_ids = Api::Html::Content.collect_attachment_ids(html) if html.present?
     attachment_ids = [] if attachment_ids.blank?
 
@@ -90,35 +96,49 @@ module LinkedAttachmentHandler
     to_process = to_create + to_delete
 
     return if to_process.none?
-    return unless attachment_associations_enabled?
-    raise "User is required to update attachment links" if user.blank? && !skip_user_verification
+    return unless attachment_associations_creation_enabled?
 
-    if to_process.any?
-      to_process.each_slice(1000) do |att_ids|
-        all_attachment_associations = []
+    unless user.present? || skip_user_verification || migration
+      error = "User is required to update attachment links for #{self.class}:#{try(:id)}"
+      Sentry.with_scope do |scope|
+        scope.set_context("attachment_associations", {
+                            class_name: self.class.name,
+                            context_id: try(:id)
+                          })
+        Sentry.capture_message(error, level: :warning)
+      end
+      raise error if Rails.env.local?
 
-        Attachment.where(id: att_ids).find_each do |attachment|
-          if to_delete.any? && to_delete.include?(Shard.global_id_for(attachment.id))
-            to_delete.delete(Shard.global_id_for(attachment.id)) if keep_associations?(attachment, session, user)
-          else
-            next if exclude_cross_course_attachment_association?(attachment) || (!(user.nil? && skip_user_verification) && !attachment.grants_right?(user, session, :update))
+      return
+    end
 
-            shard.activate do
-              all_attachment_associations << {
-                context_type: class_name,
-                context_id: id,
-                attachment_id: attachment.id,
-                user_id: user&.id,
-                context_concern:,
-                root_account_id: actual_root_account_id,
-              }
-            end
+    to_process.each_slice(1000) do |att_ids|
+      all_attachment_associations = []
+
+      Attachment.where(id: att_ids).find_each do |attachment|
+        if to_delete.include?(Shard.global_id_for(attachment.id))
+          to_delete.delete(Shard.global_id_for(attachment.id)) if keep_associations?(attachment, session, user)
+        else
+          next if exclude_cross_course_attachment_association?(attachment)
+          next unless skip_user_verification ||
+                      migration&.add_association_for_migration?(html, attachment) ||
+                      (user && attachment.grants_right?(user, session, :update))
+
+          shard.activate do
+            all_attachment_associations << {
+              context_type: self.class.polymorphic_name,
+              context_id: id,
+              attachment_id: attachment.id,
+              user_id: user&.id,
+              context_concern:,
+              root_account_id: actual_root_account_id,
+            }
           end
         end
+      end
 
-        shard.activate do
-          AttachmentAssociation.insert_all(all_attachment_associations)
-        end
+      shard.activate do
+        AttachmentAssociation.insert_all(all_attachment_associations)
       end
     end
 
@@ -127,15 +147,21 @@ module LinkedAttachmentHandler
     end
   end
 
+  def copy_attachment_associations_from(other)
+    return unless attachment_associations_creation_enabled?
+
+    AttachmentAssociation.copy_associations(other, [self])
+  end
+
+  def attachment_associations_creation_enabled?
+    root_account&.feature_enabled?(:allow_attachment_association_creation)
+  end
+
   def attachment_associations_enabled?
-    root_account.feature_enabled?(:file_association_access)
+    root_account&.feature_enabled?(:file_association_access)
   end
 
-  def actual_saving_user
-    saving_user
-  end
-
-  def access_for_attachment_association?(user, session, _association, _location_param)
+  def access_for_attachment_association?(user, session, _association)
     grants_right?(user, session, :read) if user && respond_to?(:grants_right?)
   end
 
@@ -146,10 +172,6 @@ module LinkedAttachmentHandler
   module ClassMethods
     def html_fields
       raise NotImplementedError
-    end
-
-    def actual_saving_user_attr
-      :saving_user
     end
   end
 end

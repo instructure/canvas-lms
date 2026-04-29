@@ -25,7 +25,6 @@ import {
   includes,
   isObject,
   reject,
-  chain,
   some,
   isNumber,
   pick,
@@ -39,7 +38,7 @@ import {
   zip,
   extend as lodashExtend,
   escape as lodashEscape,
-} from 'lodash'
+} from 'es-toolkit/compat'
 import HeaderFilterView from './react/HeaderFilterView'
 import OutcomeFilterView from './react/OutcomeFilterView'
 import OutcomeColumnView from './backbone/views/OutcomeColumnView'
@@ -48,7 +47,7 @@ import cellTemplate from './jst/outcome_gradebook_cell.handlebars'
 import studentCellTemplate from './jst/outcome_gradebook_student_cell.handlebars'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 const I18n = createI18nScope('gradebookOutcomeGradebookGrid')
 
@@ -441,7 +440,7 @@ const Grid = {
       return ['rating_3', '#E62429', I18n.t('Well Below Mastery')]
     },
     getColumnResults(data, column) {
-      return chain(data).map(column.field).filter(isObject).value()
+      return map(data, column.field).filter(isObject)
     },
     headerRowCell({node, column, grid}, score) {
       if (column.field === 'student') {
@@ -457,7 +456,7 @@ const Grid = {
       const filters = Grid.gridRef._getOutcomeFiltersParams()
         ? `${Grid.gridRef._getOutcomeFiltersParams()}`
         : ''
-      return `/api/v1/courses/${course}/outcome_rollups?aggregate=course&aggregate_stat=${stat}${sectionParam}${filters}`
+      return `/api/v1/courses/${course}/outcome_rollups?aggregate=course&aggregate_stat=${stat}&rating_percents=true&include[]=outcomes${sectionParam}${filters}`
     },
     redrawHeader(grid, fn = Grid.averageFn) {
       Grid.averageFn = fn
@@ -466,6 +465,14 @@ const Grid = {
         return $.flashError(I18n.t('There was an error fetching course statistics'))
       })
       return dfd.then((response, _status, _xhr) => {
+        if (response.linked?.outcomes) {
+          response.linked.outcomes.forEach(outcome => {
+            const stored = Grid.outcomes[`outcome_${outcome.id}`]
+            if (stored && outcome.ratings) {
+              stored.ratings = outcome.ratings
+            }
+          })
+        }
         // do for each column
         each(cols, function (col) {
           const header = grid.getHeaderRowColumn(col.id)
@@ -500,7 +507,7 @@ const Grid = {
         null,
       )
 
-      ReactDOM.render(menu, node)
+      legacyRender(menu, node)
     },
     studentHeaderRowCell(node, _column, grid) {
       const menu = React.createElement(
@@ -513,7 +520,7 @@ const Grid = {
         null,
       )
 
-      ReactDOM.render(menu, node)
+      legacyRender(menu, node)
     },
     headerCell({node, column, grid}, _fn = Grid.averageFn) {
       if (column.field === 'student') {

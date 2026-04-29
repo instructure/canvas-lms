@@ -27,8 +27,7 @@ module Gradebook
       :only_apply_to_past_due,
       :percent,
       :assignment_ids,
-      :student_ids,
-      keyword_init: true
+      :student_ids
     )
 
     def self.queue_apply_score(course:, grader:, options:)

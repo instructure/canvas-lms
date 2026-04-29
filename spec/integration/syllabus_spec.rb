@@ -21,9 +21,9 @@
 require "nokogiri"
 
 describe "syllabus" do
-  def anonymous_syllabus_access_allowed(property, value = true)
+  def anonymous_syllabus_access_allowed(property)
     course_with_teacher(course: @course, active_all: true)
-    @course.send(:"#{property}=", value)
+    @course.send(:"#{property}=", true)
     @course.save!
 
     get "/courses/#{@course.id}/assignments/syllabus"
@@ -47,8 +47,10 @@ describe "syllabus" do
       course_factory(active_all: true)
       attachment_model
       @attachment.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
+      @attachment.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
       @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
       @course.public_syllabus = true
+      @course.saving_user = @teacher
       @course.save!
 
       get "/courses/#{@course.id}/assignments/syllabus"
@@ -68,6 +70,7 @@ describe "syllabus" do
 
       @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
       @course.public_syllabus = true
+      @course.saving_user = @teacher
       @course.save!
 
       get "/courses/#{@course.id}/assignments/syllabus"
@@ -76,7 +79,7 @@ describe "syllabus" do
       page = Nokogiri::HTML5(response.body)
       expect(page.css('#identity a[href="/login"]')).not_to be_nil
       link = page.at_css("#course_syllabus a")
-      expect(link.attributes["href"].value).to_not include("verifier=#{@attachment.uuid}")
+      expect(link.attributes["href"].value).not_to include("verifier=#{@attachment.uuid}")
     end
   end
 
@@ -84,6 +87,7 @@ describe "syllabus" do
     before do
       course_factory(active_all: true)
       attachment_model
+      @attachment.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
     end
 
     double_testing_with_disable_adding_uuid_verifier_in_api_ff do
@@ -91,6 +95,7 @@ describe "syllabus" do
         @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
         @course.public_syllabus_to_auth = true
         @course.public_syllabus = false
+        @course.updating_user = @teacher
         @course.save!
 
         get "/courses/#{@course.id}/assignments/syllabus"
@@ -103,12 +108,12 @@ describe "syllabus" do
       end
 
       it "does not allow viewing locked files in a public to authenticated syllabus" do
-        @attachment.locked = true
-        @attachment.save!
+        @attachment.update!(locked: true)
 
         @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
         @course.public_syllabus = false
         @course.public_syllabus_to_auth = true
+        @course.updating_user = @teacher
         @course.save!
 
         get "/courses/#{@course.id}/assignments/syllabus"
@@ -117,7 +122,7 @@ describe "syllabus" do
         page = Nokogiri::HTML5(response.body)
         expect(page.css('#identity a[href="/login"]')).not_to be_nil
         link = page.at_css("#course_syllabus a")
-        expect(link.attributes["href"].value).to_not include("verifier=#{@attachment.uuid}")
+        expect(link.attributes["href"].value).not_to include("verifier=#{@attachment.uuid}")
       end
     end
   end
@@ -128,11 +133,11 @@ describe "syllabus" do
       user_session(@user)
     end
 
-    include_examples "public syllabus for authenticated file verifiers"
+    it_behaves_like "public syllabus for authenticated file verifiers"
   end
 
   context "as an anonymous user" do
-    include_examples "public syllabus file verifiers"
+    it_behaves_like "public syllabus file verifiers"
   end
 
   context "as an authenticated non-course user" do
@@ -141,7 +146,7 @@ describe "syllabus" do
       user_session(@user)
     end
 
-    include_examples "public syllabus file verifiers"
+    it_behaves_like "public syllabus file verifiers"
   end
 
   it "as an authenticated non-course user with public_syllabus_to_auth true" do
@@ -157,6 +162,7 @@ describe "syllabus" do
     syllabus_body = "test syllabus body"
     @course.syllabus_body = syllabus_body
     @course.default_view = "syllabus"
+    @course.saving_user = @teacher
     @course.save!
 
     get "/courses/#{@course.id}"

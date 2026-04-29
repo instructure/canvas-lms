@@ -18,8 +18,7 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import produce from 'immer'
-import get from 'lodash/get'
-import set from 'lodash/set'
+import {get, set} from 'es-toolkit/compat'
 import {Query} from '@apollo/client/react/components'
 import {Text} from '@instructure/ui-text'
 import SelectableText from './SelectableText'
@@ -117,6 +116,7 @@ class AssignmentGroupUI extends React.Component<AssignmentGroupUIProps> {
       <div data-testid="AssignmentGroup">
         <SelectableText
           key="assignment-group-select"
+          // @ts-expect-error
           id="assignment-group"
           mode={this.props.mode}
           label={I18n.t('Assignment Group')}

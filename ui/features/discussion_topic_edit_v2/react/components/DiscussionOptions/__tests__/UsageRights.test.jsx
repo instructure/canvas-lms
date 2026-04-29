@@ -80,7 +80,7 @@ describe('UsageRights', () => {
   })
 
   it('passes the correct values to onSaveUsageRights', async () => {
-    const onSaveUsageRightsMock = jest.fn()
+    const onSaveUsageRightsMock = vi.fn()
     const {getByText, getByLabelText, findAllByTestId, getByTestId} = setup({
       onSaveUsageRights: onSaveUsageRightsMock,
       isOpen: true,

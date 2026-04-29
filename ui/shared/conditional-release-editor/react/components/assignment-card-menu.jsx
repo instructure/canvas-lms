@@ -34,7 +34,7 @@ import {transformScore} from '../score-helpers'
 
 const I18n = createI18nScope('conditional_release')
 
-const {object, func} = PropTypes
+const {object, func, bool} = PropTypes
 
 export class AssignmentCardMenu extends React.Component {
   static get propTypes() {
@@ -44,6 +44,7 @@ export class AssignmentCardMenu extends React.Component {
       assignment: object.isRequired,
       removeAssignment: func.isRequired,
       triggerAssignment: object,
+      readOnly: bool,
 
       // action props
       moveAssignment: func.isRequired,
@@ -91,6 +92,9 @@ export class AssignmentCardMenu extends React.Component {
   }
 
   render() {
+    if (this.props.readOnly) {
+      return null
+    }
     return (
       <Menu
         trigger={

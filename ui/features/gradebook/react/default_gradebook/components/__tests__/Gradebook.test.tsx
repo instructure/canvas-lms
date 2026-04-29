@@ -19,26 +19,37 @@
  */
 
 import React from 'react'
-import fetchMock from 'fetch-mock'
-import {render, within} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import {cleanup, render, within} from '@testing-library/react'
 import {defaultGradebookProps} from '../../__tests__/GradebookSpecHelper'
 import {darken, defaultColors} from '../../constants/colors'
 import Gradebook from '../../Gradebook'
 import store from '../../stores/index'
 import type {AssignmentGroup, Student} from '../../../../../../api.d'
-import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
 
 window.ENV.SETTINGS = {}
 
+const server = setupServer(
+  http.get('*', () => new HttpResponse(null, {status: 200})),
+  http.post('*', () => new HttpResponse(null, {status: 200})),
+  http.put('*', () => new HttpResponse(null, {status: 200})),
+  http.delete('*', () => new HttpResponse(null, {status: 200})),
+)
+
 describe('Gradebook', () => {
   beforeEach(() => {
-    fetchMock.mock('*', 200)
+    server.listen({onUnhandledRequest: 'bypass'})
   })
   afterEach(() => {
+    cleanup()
     store.setState(originalState, true)
-    fetchMock.restore()
+    server.resetHandlers()
+  })
+  afterAll(() => {
+    server.close()
   })
 
   it('renders', () => {

@@ -23,7 +23,7 @@ describe EstimatedDuration do
       it "is invalid and adds an error" do
         estimated_duration = EstimatedDuration.new(duration: 1.hour + 30.minutes)
         expect(estimated_duration).not_to be_valid
-        expect(estimated_duration.errors[:base]).to include("Exactly one reference must be present.")
+        expect(estimated_duration.errors[:base]).to include("Exactly one context must be present")
       end
     end
 
@@ -38,7 +38,7 @@ describe EstimatedDuration do
         quiz = Quizzes::Quiz.create!(title: "quiz1", context: course)
         estimated_duration = EstimatedDuration.new(assignment_id: assignment.id, quiz_id: quiz.id, duration: 1.hour + 30.minutes)
         expect(estimated_duration).not_to be_valid
-        expect(estimated_duration.errors[:base]).to include("Exactly one reference must be present.")
+        expect(estimated_duration.errors[:base]).to include("Exactly one context must be present")
       end
     end
 

@@ -62,8 +62,8 @@ describe('Upload File', () => {
       )
     })
 
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockReturnValueOnce(preflightResponse)
     postStub.mockResolvedValueOnce({data: {}})
     const fakeAjaxLib = {
@@ -96,8 +96,8 @@ describe('Upload File', () => {
       )
     })
 
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockReturnValueOnce(preflightResponse)
     postStub.mockResolvedValueOnce({data: {}})
     const fakeAjaxLib = {
@@ -126,8 +126,8 @@ describe('Upload File', () => {
       )
     })
 
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockReturnValueOnce(preflightResponse)
     postStub.mockResolvedValueOnce({data: {}})
     getStub.mockResolvedValue({data: {}})
@@ -167,8 +167,8 @@ describe('Upload File', () => {
       )
     })
 
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockReturnValueOnce(preflightResponse)
     postStub.mockReturnValueOnce(postResponse)
     getStub.mockResolvedValue({data: {}})
@@ -206,8 +206,8 @@ describe('Upload File', () => {
       )
     })
 
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockReturnValueOnce(preflightResponse)
     postStub.mockReturnValueOnce(postResponse)
     getStub.mockResolvedValue({data: {}})
@@ -231,7 +231,7 @@ describe('Upload File', () => {
       attachments: [{upload_url}],
     }
 
-    const postStub = jest.fn()
+    const postStub = vi.fn()
     postStub.mockResolvedValue({data: {}})
     const fakeAjaxLib = {post: postStub}
 
@@ -243,13 +243,13 @@ describe('Upload File', () => {
   })
 
   test('completeUpload wires up progress callback if any', () => {
-    const postStub = jest.fn()
+    const postStub = vi.fn()
     postStub.mockResolvedValue({data: {}})
     const fakeAjaxLib = {post: postStub}
 
     const preflightResponse = {upload_url: 'http://uploadUrl'}
     const file = new Blob(['fake'], {type: 'text/plain'})
-    const onProgress = jest.fn()
+    const onProgress = vi.fn()
 
     const options = {
       ajaxLib: fakeAjaxLib,
@@ -279,8 +279,8 @@ describe('Upload File', () => {
       )
     })
 
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockReturnValueOnce(postResponse)
     getStub.mockResolvedValue({data: {}})
 
@@ -313,8 +313,8 @@ describe('Upload File', () => {
       )
     })
 
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockReturnValueOnce(postResponse)
     getStub.mockResolvedValue({data: {}})
 
@@ -338,8 +338,8 @@ describe('Upload File', () => {
   test('completeUpload to S3 posts withCredentials false', () => {
     const successUrl = 'http://successUrl'
 
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockResolvedValue({data: {}})
     getStub.mockResolvedValue({data: {}})
 
@@ -367,8 +367,8 @@ describe('Upload File', () => {
   })
 
   test('completeUpload to non-S3 posts withCredentials true', () => {
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockResolvedValue({data: {}})
     getStub.mockResolvedValue({data: {}})
 
@@ -393,7 +393,7 @@ describe('Upload File', () => {
   })
 
   test('completeUpload does not add a null file to the upload POST', () => {
-    const postStub = jest.fn()
+    const postStub = vi.fn()
     postStub.mockResolvedValue({data: {}})
 
     const fakeAjaxLib = {
@@ -420,8 +420,8 @@ describe('Upload File', () => {
 
   test('completeUpload immediately waits on progress if given a progress and no upload_url', () => {
     const results = {id: 1}
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockResolvedValue({data: {}})
     getStub.mockResolvedValue({data: {workflow_state: 'completed', results}})
 
@@ -442,8 +442,8 @@ describe('Upload File', () => {
 
   test('completeUpload waits on progress after upload POST if given both a progress and upload URL', () => {
     const results = {id: 1}
-    const postStub = jest.fn()
-    const getStub = jest.fn()
+    const postStub = vi.fn()
+    const getStub = vi.fn()
     postStub.mockResolvedValue({data: {}})
     getStub.mockResolvedValue({data: {workflow_state: 'completed', results}})
 
@@ -466,7 +466,7 @@ describe('Upload File', () => {
   })
 
   test('uploadFile differentiates network failures during preflight', async () => {
-    const fakeAjaxLib = {post: jest.fn()}
+    const fakeAjaxLib = {post: vi.fn()}
     fakeAjaxLib.post.mockRejectedValue({message: 'Network Error'}) // preflight attempt
     const file = new Blob(['fake'], {type: 'text/plain'})
     try {
@@ -478,7 +478,7 @@ describe('Upload File', () => {
   })
 
   test('uploadFile differentiates network failures during POST to upload_url', async () => {
-    const fakeAjaxLib = {post: jest.fn()}
+    const fakeAjaxLib = {post: vi.fn()}
     fakeAjaxLib.post.mockResolvedValueOnce({data: {upload_url: 'http://uploadUrl'}}) // preflight
     fakeAjaxLib.post.mockRejectedValue({message: 'Network Error'}) // upload attempt
     const file = new Blob(['fake'], {type: 'text/plain'})
@@ -491,7 +491,7 @@ describe('Upload File', () => {
   })
 
   test('uploadFile differentiates network failures after upload', async () => {
-    const fakeAjaxLib = {post: jest.fn(), get: jest.fn()}
+    const fakeAjaxLib = {post: vi.fn(), get: vi.fn()}
     fakeAjaxLib.post.mockResolvedValueOnce({
       data: {
         upload_url: 'http://uploadUrl',

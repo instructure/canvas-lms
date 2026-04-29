@@ -54,7 +54,7 @@ shared_context "advantage access token context" do
       https://purl.imsglobal.org/spec/lti/scope/eula/deployment
     ].join(" ")
   end
-  let(:access_token_signing_key) { Canvas::Security.encryption_key }
+  let(:access_token_signing_key) { Canvas::Security.jwt_encryption_key }
   let(:test_request_host) { "test.host" }
   let(:access_token_aud) { "http://#{test_request_host}/login/oauth2/token" }
   let(:access_token_jwt_hash) do

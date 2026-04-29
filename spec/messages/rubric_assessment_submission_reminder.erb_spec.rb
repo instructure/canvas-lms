@@ -35,5 +35,5 @@ describe "rubric_assessment_submission_reminder" do
   let(:asset) { @object }
   let(:notification_name) { :rubric_assessment_submission_reminder }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

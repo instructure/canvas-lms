@@ -24,7 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 const I18n = createI18nScope('jobs_v2')

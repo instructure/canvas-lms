@@ -24,12 +24,13 @@ require_relative "../rcs/pages/rce_next_page"
 describe "as a teacher" do
   specs_require_sharding
   include RCENextPage
+
   include_context "in-process server selenium tests"
 
   context "on assignments 2 page" do
     before(:once) do
-      Account.default.enable_feature!(:assignment_enhancements_teacher_view)
       @course = course_factory(name: "course", active_course: true)
+      @course.enable_feature!(:assignment_enhancements_teacher_view)
       @student = student_in_course(name: "Student", course: @course, enrollment_state: :active).user
       @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     end
@@ -53,7 +54,7 @@ describe "as a teacher" do
       end
 
       it "shows assignment title" do
-        expect(TeacherViewPageV2.assignment_title(@assignment.title)).to_not be_nil
+        expect(TeacherViewPageV2.assignment_title(@assignment.title)).not_to be_nil
       end
 
       it "shows publish button" do
@@ -61,7 +62,7 @@ describe "as a teacher" do
       end
 
       it "shows publish status" do
-        expect(TeacherViewPageV2.publish_status(@assignment.workflow_state)).to_not be_nil
+        expect(TeacherViewPageV2.publish_status(@assignment.workflow_state)).not_to be_nil
       end
 
       it "shows edit button" do
@@ -151,6 +152,168 @@ describe "as a teacher" do
         TeacherViewPageV2.options_button.click
         TeacherViewPageV2.download_submissions_option.click
         expect(TeacherViewPageV2.download_submissions_button).to be_displayed
+      end
+    end
+
+    context "assignment description" do
+      context "without peer review tabs" do
+        before(:once) do
+          @assignment = @course.assignments.create!(
+            name: "assignment with description",
+            description: "<p>This is a detailed assignment description</p>",
+            due_at: 5.days.from_now,
+            points_possible: 10,
+            submission_types: "online_text_entry"
+          )
+        end
+
+        before do
+          user_session(@teacher)
+          TeacherViewPageV2.visit(@course, @assignment)
+          wait_for_ajaximations
+        end
+
+        it "displays assignment description when peer reviews are disabled" do
+          expect(TeacherViewPageV2.assignment_description).to be_displayed
+          expect(TeacherViewPageV2.assignment_description.text).to include("This is a detailed assignment description")
+        end
+
+        it "does not show assignment tabs when peer reviews are disabled" do
+          expect(element_exists?("[data-testid='assignment-tab']")).to be_falsey
+          expect(element_exists?("[data-testid='peer-review-tab']")).to be_falsey
+        end
+      end
+
+      context "with peer review tabs" do
+        before(:once) do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+          @assignment = @course.assignments.create!(
+            name: "assignment with peer reviews",
+            description: "<p>Description within tabs</p>",
+            due_at: 5.days.from_now,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            peer_reviews: true
+          )
+          @assignment.create_peer_review_sub_assignment!(
+            peer_reviews: true,
+            peer_review_count: 1
+          )
+        end
+
+        before do
+          user_session(@teacher)
+          TeacherViewPageV2.visit(@course, @assignment)
+          wait_for_ajaximations
+        end
+
+        it "displays assignment and peer review tabs" do
+          expect(TeacherViewPageV2.assignment_tab).to be_displayed
+          expect(TeacherViewPageV2.peer_review_tab).to be_displayed
+        end
+
+        it "displays description in the assignment tab" do
+          expect(TeacherViewPageV2.assignment_description).to be_displayed
+          expect(TeacherViewPageV2.assignment_description.text).to include("Description within tabs")
+        end
+      end
+
+      context "with empty description" do
+        before(:once) do
+          @assignment = @course.assignments.create!(
+            name: "assignment without description",
+            description: "",
+            due_at: 5.days.from_now,
+            points_possible: 10,
+            submission_types: "online_text_entry"
+          )
+        end
+
+        before do
+          user_session(@teacher)
+          TeacherViewPageV2.visit(@course, @assignment)
+          wait_for_ajaximations
+        end
+
+        it "displays fallback message when description is empty" do
+          expect(TeacherViewPageV2.assignment_description).to be_displayed
+          expect(TeacherViewPageV2.assignment_description.text).to include("No additional details were added for this assignment.")
+        end
+      end
+    end
+
+    context "assignment footer" do
+      before do
+        # Create 3 assignments and put them in a module together
+        @assignments = Array.new(3) do |i|
+          @course.assignments.create!(
+            name: "assignment_#{i + 1}",
+            due_at: 5.days.from_now,
+            points_possible: 10,
+            submission_types: "online_upload"
+          )
+        end
+
+        @content_tags = []
+
+        @module = @course.context_modules.create!(name: "Module 1")
+        @assignments.each do |assignment|
+          tag = @module.add_item({ type: "assignment", id: assignment.id })
+          @content_tags << tag
+        end
+      end
+
+      it "renders 'Previous' and 'Next' buttons when viewing the middle assignment" do
+        user_session(@teacher)
+        TeacherViewPageV2.visit(@course, @assignments[1])
+        wait_for_ajaximations
+
+        expect(TeacherViewPageV2.previous_assignment_button).to be_displayed
+        expect(TeacherViewPageV2.next_assignment_button).to be_displayed
+      end
+
+      it "navigates to the previous assignment when 'Previous' button is clicked" do
+        user_session(@teacher)
+        TeacherViewPageV2.visit(@course, @assignments[1])
+        wait_for_ajaximations
+
+        TeacherViewPageV2.previous_assignment_button.click
+        wait_for_ajaximations
+
+        expect(TeacherViewPageV2.assignment_title(@assignments[0].title)).to be_displayed
+
+        # only the 'Next' button should be visible on the first assignment
+        expect(TeacherViewPageV2.next_assignment_button).to be_displayed
+        expect(element_exists?("[data-testid='previous-assignment-button']")).to be_falsey
+      end
+
+      it "navigates to the next assignment when 'Next' button is clicked" do
+        user_session(@teacher)
+        TeacherViewPageV2.visit(@course, @assignments[1])
+        wait_for_ajaximations
+
+        TeacherViewPageV2.next_assignment_button.click
+        wait_for_ajaximations
+
+        expect(TeacherViewPageV2.assignment_title(@assignments[2].title)).to be_displayed
+
+        # only the 'Previous' button should be visible on the last assignment
+        expect(TeacherViewPageV2.previous_assignment_button).to be_displayed
+        expect(element_exists?("[data-testid='next-assignment-button']")).to be_falsey
+      end
+
+      it "does not render 'Previous' and 'Next' buttons when only one assignment exists in one module" do
+        # Remove two of the assignments from the module
+        @content_tags[0].destroy
+        @content_tags[2].destroy
+        @module.reload
+
+        user_session(@teacher)
+        TeacherViewPageV2.visit(@course, @assignments[1])
+        wait_for_ajaximations
+
+        expect(element_exists?("[data-testid='previous-assignment-button']")).to be_falsey
+        expect(element_exists?("[data-testid='next-assignment-button']")).to be_falsey
       end
     end
   end

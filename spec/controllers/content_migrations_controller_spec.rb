@@ -70,7 +70,6 @@ describe ContentMigrationsController do
         toggle_k5_setting(@course.account)
         get :index, params: { course_id: @course.id }
         expect(assigns(:css_bundles).flatten).to include(:k5_theme)
-        expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
 
       context "instui_for_import_page flag" do
@@ -91,10 +90,10 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_DEFAULT]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_REQUIRED]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS]).not_to be_nil
-          expect(assigns[:js_env][:OLD_START_DATE]).to_not be_nil
-          expect(assigns[:js_env][:OLD_END_DATE]).to_not be_nil
-          expect(assigns[:js_env][:NEW_USER_TUTORIALS]).to_not be_nil
-          expect(assigns[:js_env][:NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT]).to_not be_nil
+          expect(assigns[:js_env][:OLD_START_DATE]).not_to be_nil
+          expect(assigns[:js_env][:OLD_END_DATE]).not_to be_nil
+          expect(assigns[:js_env][:NEW_USER_TUTORIALS]).not_to be_nil
+          expect(assigns[:js_env][:NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT]).not_to be_nil
         end
 
         it "exports proper environment variables with the flag ON" do
@@ -107,15 +106,28 @@ describe ContentMigrationsController do
           expect(assigns[:js_env][:COURSE_ID]).not_to be_nil
           expect(assigns[:js_env][:CONTENT_MIGRATIONS]).to be_nil
           expect(assigns[:js_env][:SHOW_SELECT]).not_to be_nil
-          expect(assigns[:js_env][:CONTENT_MIGRATIONS_EXPIRE_DAYS]).to_not be_nil
+          expect(assigns[:js_env][:CONTENT_MIGRATIONS_EXPIRE_DAYS]).not_to be_nil
           expect(assigns[:js_env][:QUIZZES_NEXT_ENABLED]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_IMPORT]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_DEFAULT]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_MIGRATION_REQUIRED]).not_to be_nil
           expect(assigns[:js_env][:NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS]).not_to be_nil
-          expect(assigns[:js_env][:OLD_START_DATE]).to_not be_nil
-          expect(assigns[:js_env][:OLD_END_DATE]).to_not be_nil
+          expect(assigns[:js_env][:OLD_START_DATE]).not_to be_nil
+          expect(assigns[:js_env][:OLD_END_DATE]).not_to be_nil
+        end
+
+        context "MISSING_POLICY_ENABLED value" do
+          it "is false when the course has no missing submission policy" do
+            get :index, params: { course_id: @course.id }
+            expect(assigns[:js_env][:MISSING_POLICY_ENABLED]).to be false
+          end
+
+          it "is true when the course has missing submission deduction enabled" do
+            @course.create_late_policy!(missing_submission_deduction_enabled: true, missing_submission_deduction: 100)
+            get :index, params: { course_id: @course.id }
+            expect(assigns[:js_env][:MISSING_POLICY_ENABLED]).to be true
+          end
         end
       end
     end

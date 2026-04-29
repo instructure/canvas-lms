@@ -52,7 +52,7 @@ const UploadMediaStrings = {
   SUBMIT_TEXT: I18n.t('Submit'),
   CLOSE_TEXT: I18n.t('Close'),
   UPLOAD_MEDIA_LABEL: I18n.t('Upload Media'),
-  CLEAR_FILE_TEXT: I18n.t('Clear selected file'),
+  CLEAR_FILE_TEXT: I18n.t('Remove'),
   INVALID_FILE_TEXT: I18n.t('Invalid file type'),
   DRAG_DROP_CLICK_TO_BROWSE: I18n.t('Drag and drop, or click to browse your computer'),
   EMBED_VIDEO_CODE_TEXT: I18n.t('Embed Video Code'),

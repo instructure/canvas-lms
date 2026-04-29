@@ -17,15 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe CanvasQuizStatistics::Analyzers::ShortAnswer do
   subject { described_class.new(question_data) }
 
   let(:question_data) { QuestionHelpers.fixture("short_answer_question") }
 
   it "does not blow up when no responses are provided" do
-    expect { expect(subject.run([])).to be_present }.to_not raise_error
+    expect { expect(subject.run([])).to be_present }.not_to raise_error
   end
 
   it_behaves_like "[:correct]"

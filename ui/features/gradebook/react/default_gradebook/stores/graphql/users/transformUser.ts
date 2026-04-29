@@ -30,7 +30,7 @@ export const transformUser = (user: User): Student & Record<string, unknown> => 
   created_at: user.createdAt ?? '',
   email: user.email,
   integration_id: user.integrationId,
-  login_id: user.loginId ?? '',
+  login_id: user.loginId,
   short_name: user.shortName ?? '',
   sis_user_id: user.sisId,
   group_ids: user.groupMemberships.map(membership => membership.group._id),

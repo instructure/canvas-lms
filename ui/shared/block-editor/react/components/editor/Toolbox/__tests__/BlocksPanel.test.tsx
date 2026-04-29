@@ -31,18 +31,18 @@ const user = userEvent.setup()
 const borderColorPrimary = '#d7dade'
 const borderColorWarning = '#cf4a00'
 
-const mockAddNodeTree = jest.fn()
-const mockCreate = jest.fn((_ref, cb) => {
+const mockAddNodeTree = vi.fn()
+const mockCreate = vi.fn((_ref, cb) => {
   if (typeof cb === 'function') {
     cb()
   }
 })
 
-jest.mock('@craftjs/core', () => {
-  const module = jest.requireActual('@craftjs/core')
+vi.mock('@craftjs/core', async () => {
+  const module = await vi.importActual('@craftjs/core')
   return {
     ...module,
-    useEditor: jest.fn(() => {
+    useEditor: vi.fn(() => {
       return {
         actions: {
           addNodeTree: mockAddNodeTree,
@@ -51,25 +51,25 @@ jest.mock('@craftjs/core', () => {
           create: mockCreate,
         },
         query: {
-          parseSerializedNode: jest.fn(n => {
+          parseSerializedNode: vi.fn(n => {
             return {
-              toNode: jest.fn(_n => n),
+              toNode: vi.fn(_n => n),
             }
           }),
-          parseFreshNode: jest.fn(n => ({
-            toNode: jest.fn(_n => n),
+          parseFreshNode: vi.fn(n => ({
+            toNode: vi.fn(_n => n),
           })),
-          parseReactElement: jest.fn(() => ({
-            toNodeTree: jest.fn(() => ({
+          parseReactElement: vi.fn(() => ({
+            toNodeTree: vi.fn(() => ({
               nodes: {xxx: {}},
               rootNodeId: 'xxx',
             })),
           })),
-          node: jest.fn(() => {
+          node: vi.fn(() => {
             return {
-              isCanvas: jest.fn(() => true),
-              isLinkedNode: jest.fn(() => true),
-              toSerializedNode: jest.fn(() => ({})),
+              isCanvas: vi.fn(() => true),
+              isLinkedNode: vi.fn(() => true),
+              toSerializedNode: vi.fn(() => ({})),
             }
           }),
         },
@@ -79,8 +79,8 @@ jest.mock('@craftjs/core', () => {
   }
 })
 
-const onDeleteTemplateMock = jest.fn()
-const onEditTemplateMock = jest.fn()
+const onDeleteTemplateMock = vi.fn()
+const onEditTemplateMock = vi.fn()
 
 const defaultProps: BlocksPanelProps = {
   templateEditor: TemplateEditor.NONE,
@@ -97,7 +97,7 @@ const blockList = ['Button', 'Text', 'Icon', 'Image', 'Group', 'Tabs', 'Divider'
 
 describe('Toolbox', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders', () => {
@@ -130,7 +130,7 @@ describe('Toolbox', () => {
     })
 
     it('calls onDeleteTemplate when delete button is clicked', async () => {
-      window.confirm = jest.fn(() => true)
+      window.confirm = vi.fn(() => true)
 
       const {getAllByText} = renderComponent({
         templates: testTemplates,

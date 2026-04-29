@@ -61,7 +61,8 @@ const CurveGradesDialogManager = {
         !gradesPublished ||
         checkpoints?.length > 0,
 
-      // @ts-expect-error
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore Legacy method callback not typed
       async onSelect(onClose) {
         if (!isAdmin && assignment.inClosedGradingPeriod) {
           return $.flashError(
@@ -73,6 +74,8 @@ const CurveGradesDialogManager = {
         }
 
         const CurveGradesDialog = await AsyncComponents.loadCurveGradesDialog()
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore Legacy dialog class not typed
         const dialog = new CurveGradesDialog({assignment, students, context_url: contextUrl})
         dialog.show(onClose)
       },

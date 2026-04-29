@@ -340,7 +340,7 @@ describe Login::CanvasController do
                                                                    .with("username", "password")
                                                                    .and_return([{ "uid" => ["12345"] }])
       unique_id = "username"
-      expect(Account.default.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+      expect(Account.default.pseudonyms.active.by_unique_id(unique_id)).not_to be_exists
 
       post "create", params: { pseudonym_session: { unique_id: "username", password: "password" } }
       expect(response).to be_redirect
@@ -654,12 +654,12 @@ describe Login::CanvasController do
     end
 
     before do
-      redis = double("Redis")
+      redis = instance_double(Redis)
       allow(redis).to receive_messages(setex: nil, hget: nil, hmget: nil, del: nil, pipelined: nil)
       allow(Canvas::Security::LoginRegistry).to receive_messages(redis:)
     end
 
-    let_once(:key) { DeveloperKey.create! redirect_uri: "https://example.com" }
+    let_once(:key) { DeveloperKey.create!(name: "Test Developer Key", redirect_uri: "https://example.com") }
     let(:params) { { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } } }
 
     it "redirects to the confirm url if the user has no token" do
@@ -670,8 +670,8 @@ describe Login::CanvasController do
     end
 
     it "redirects to the redirect uri if the user already has remember-me token" do
-      @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil)
-      provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, ["/auth/userinfo"], nil)
+      @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ["/auth/userinfo"])
+      provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, ["/auth/userinfo"], key.name)
 
       post :create, params:, session: { oauth2: provider.session_hash }
       expect(response).to be_redirect
@@ -679,8 +679,8 @@ describe Login::CanvasController do
     end
 
     it "redirects to the redirect uri with the provided state" do
-      @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil)
-      provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, ["/auth/userinfo"], nil)
+      @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ["/auth/userinfo"])
+      provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, ["/auth/userinfo"], key.name)
 
       post :create, params:, session: { oauth2: provider.session_hash.merge(state: "supersekrit") }
       expect(response).to be_redirect

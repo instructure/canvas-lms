@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "rule_test_helper"
-require_relative "../../../../app/models/accessibility/rules/img_alt_rule_helper"
 
 describe Accessibility::Rules::ImgAltLengthRule do
   include RuleTestHelper
@@ -91,33 +90,45 @@ describe Accessibility::Rules::ImgAltLengthRule do
       input_html = "<div><img alt='#{long_alt_text}'></div>"
 
       elem = Nokogiri::HTML.fragment(input_html).css("img").first
-      form = Accessibility::Rules::ImgAltLengthRule.form(elem)
+      form = Accessibility::Rules::ImgAltLengthRule.new.form(elem)
 
       expect(form).to be_a(Accessibility::Forms::TextInputWithCheckboxField)
       expect(form.value).to eq(long_alt_text)
     end
   end
 
-  context "when generating alt text automatically" do
-    it "calls ImgAltRuleHelper and returns generated text" do
-      # Create HTML with an image that has a source
-      input_html = '<figure><img src="https://example.com/image.jpg" class="hero-image" width="500" height="300"><figcaption>Beautiful scenery</figcaption></figure>'
+  context "when generating issue preview" do
+    it "returns styled HTML for img elements" do
+      long_alt = "This is an extremely long description" * 10
+      input_html = "<div><img id=\"test-img\" src=\"image.jpg\" alt=\"#{long_alt}\"></div>"
       document = Nokogiri::HTML.fragment(input_html)
-      extend_nokogiri_with_dom_adapter(document) # Using method from RuleTestHelper
+      extend_nokogiri_with_dom_adapter(document)
       img_element = document.at_css("img")
+      rule = Accessibility::Rules::ImgAltLengthRule.new
 
-      # Mock ImgAltRuleHelper to verify the call but still use a controlled return value
-      helper_class = Accessibility::Rules::ImgAltRuleHelper
-      generated_alt = "A beautiful landscape with mountains"
-      expect(helper_class).to receive(:generate_alt_text)
-        .with("https://example.com/image.jpg")
-        .and_return(generated_alt)
+      result = rule.issue_preview(img_element)
 
-      # Call the method with our image element
-      result = Accessibility::Rules::ImgAltRule.generate_fix(img_element)
+      expect(result).not_to be_nil
+      expect(result).to include("display: flex")
+      expect(result).to include("justify-content: center")
+      expect(result).to include("align-items: center")
+      expect(result).to include("max-width: 100%")
+      expect(result).to include("max-height: 100%")
+      expect(result).to include("object-fit: contain")
+      expect(result).to include('id="test-img"')
+      expect(result).to include('src="image.jpg"')
+    end
 
-      # Verify the result is what our mock returned
-      expect(result).to eq(generated_alt)
+    it "returns nil for non-img elements" do
+      input_html = '<div id="test-div">Some content</div>'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document)
+      div_element = document.at_css("div")
+      rule = Accessibility::Rules::ImgAltLengthRule.new
+
+      result = rule.issue_preview(div_element)
+
+      expect(result).to be_nil
     end
   end
 end

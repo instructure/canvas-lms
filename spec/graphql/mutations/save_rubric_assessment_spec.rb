@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::SaveRubricAssessment do
@@ -39,6 +38,53 @@ describe Mutations::SaveRubricAssessment do
       result = CanvasSchema.execute(mutation, context: student_context)
       expect(result["errors"]).to be_present
       expect(result["errors"].first["message"]).to eq("Not authorized to assess user")
+    end
+
+    it "requires authorization to update existing assessment" do
+      existing_assessment = RubricAssessment.create!({
+                                                       artifact: @student1_asset,
+                                                       assessment_type: "grading",
+                                                       assessor: @teacher2,
+                                                       rubric: @rubric,
+                                                       user: @student1_asset.user,
+                                                       rubric_association: @rubric_association,
+                                                       data: [{ points: 5.0 }]
+                                                     })
+
+      student_context = { current_user: @student1, domain_root_account: @course.root_account }
+      mutation = mutation_str(
+        rubric_association_id: @rubric_association.id,
+        rubric_assessment_id: existing_assessment.id,
+        submission_id: @student1_asset.id,
+        assessment_details: get_assessment_details("grading")
+      )
+      result = CanvasSchema.execute(mutation, context: student_context)
+      expect(result["errors"]).to be_present
+      expect(result["errors"].first["message"]).to eq("Not authorized to assess user")
+    end
+
+    it "allows authorized user to update existing assessment" do
+      existing_assessment = RubricAssessment.create!({
+                                                       artifact: @student1_asset,
+                                                       assessment_type: "grading",
+                                                       assessor: @teacher,
+                                                       rubric: @rubric,
+                                                       user: @student1_asset.user,
+                                                       rubric_association: @rubric_association,
+                                                       data: [{ points: 5.0 }]
+                                                     })
+
+      mutation = mutation_str(
+        rubric_association_id: @rubric_association.id,
+        rubric_assessment_id: existing_assessment.id,
+        submission_id: @student1_asset.id,
+        assessment_details: get_assessment_details("grading")
+      )
+      result = CanvasSchema.execute(mutation, context:)
+      expect(result["errors"]).to be_nil
+      expect(result["data"]["saveRubricAssessment"]["submission"]["_id"]).to eq(@student1_asset.id.to_s)
+      expect(result["data"]["saveRubricAssessment"]["submission"]["score"]).to eq(10)
+      expect(result["data"]["saveRubricAssessment"]["rubricAssessment"]["score"]).to eq(10)
     end
   end
 
@@ -84,6 +130,8 @@ describe Mutations::SaveRubricAssessment do
       expect(rubric_assessments.count).to eq(1)
       expect(result["data"]["saveRubricAssessment"]["rubricAssessment"]["_id"]).to eq(rubric_assessments.first.id.to_s)
       expect(result["data"]["saveRubricAssessment"]["rubricAssessment"]["score"]).to eq(10)
+
+      expect(result["data"]["saveRubricAssessment"]["rubricAssociation"]["_id"]).to eq(@rubric_association.id.to_s)
     end
 
     it "saves an existing rubric assessment and returns updated submission" do
@@ -111,6 +159,8 @@ describe Mutations::SaveRubricAssessment do
       expect(rubric_assessments.count).to eq(1)
       expect(result["data"]["saveRubricAssessment"]["rubricAssessment"]["_id"]).to eq(rubric_assessments.first.id.to_s)
       expect(result["data"]["saveRubricAssessment"]["rubricAssessment"]["score"]).to eq(10)
+
+      expect(result["data"]["saveRubricAssessment"]["rubricAssociation"]["_id"]).to eq(@rubric_association.id.to_s)
     end
 
     it "follow:s actions from two teachers should only create one assessment" do
@@ -307,6 +357,9 @@ describe Mutations::SaveRubricAssessment do
           rubricAssessment {
             _id
             score
+          }
+          rubricAssociation {
+            _id
           }
           errors {
             attribute

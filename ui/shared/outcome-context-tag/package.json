@@ -1,0 +1,8 @@
+{
+  "name": "@canvas/outcome-context-tag",
+  "private": true,
+  "version": "1.0.0",
+  "author": "Instructure",
+  "main": "./index.ts",
+  "owner": "EGG"
+}

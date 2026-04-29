@@ -40,7 +40,7 @@ module Api::V1::Conversation
 
   def conversation_json(conversation, current_user, session, options = {})
     options = {
-      include_participant_contexts: true
+      include_participant_contexts: true,
     }.merge(options)
     result = conversation.as_json(options)
     participants = conversation.participants(options.slice(:include_participant_contexts, :include_indirect_participants))
@@ -79,7 +79,7 @@ module Api::V1::Conversation
   def conversation_message_json(message, current_user, session)
     result = message.as_json
     result["participating_user_ids"] = message.conversation_message_participants.pluck(:user_id)
-    @file_association_access_enabled ||= message.root_account_feature_enabled?(:file_association_access)
+    @file_association_access_enabled ||= message.root_account_feature_enabled?(:file_association_access_conversation)
     url_opts = {}
     url_opts[:location] = message.asset_string if @file_association_access_enabled
     if result["media_comment"]
@@ -105,7 +105,7 @@ module Api::V1::Conversation
   end
 
   def conversation_recipients_json(recipients, current_user, session)
-    ActiveRecord::Associations.preload(recipients.select { |r| r.is_a?(User) },
+    ActiveRecord::Associations.preload(recipients.grep(User),
                                        { pseudonym: :account }) # for avatar_url
 
     preload_common_contexts(current_user, recipients)
@@ -135,6 +135,11 @@ module Api::V1::Conversation
       ActiveRecord::Associations.preload(users, { pseudonym: :account }) # for avatar_url
     end
 
+    if options[:include_participant_uuid]
+      uuid_map = User.where(id: users.map(&:id)).pluck(:id, :uuid).to_h
+      options[:uuid_map] = uuid_map
+    end
+
     preload_common_contexts(current_user, users) if options[:include_participant_contexts]
     users.map { |user| conversation_user_json(user, current_user, session, options) }
   end
@@ -146,6 +151,10 @@ module Api::V1::Conversation
       full_name: user.name,
       pronouns: user.pronouns
     }
+
+    if options[:include_participant_uuid]
+      result[:uuid] = options[:uuid_map][user.id]
+    end
 
     if options[:include_participant_contexts]
       result[:common_courses] = current_user.address_book.common_courses(user)

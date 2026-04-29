@@ -18,10 +18,10 @@
 
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {CardDashboardLoader, resetCardCache} from '../loadCardDashboard'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+vi.mock('@instructure/platform-alerts')
 
 const server = setupServer()
 
@@ -39,13 +39,13 @@ describe('loadCardDashboard', () => {
     // Clear session storage to prevent cached data from affecting tests
     sessionStorage.clear()
     // Mock sessionStorage.getItem to return null to prevent cached data
-    jest.spyOn(Storage.prototype, 'getItem').mockReturnValue(null)
+    vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null)
   })
 
   afterEach(() => {
     server.resetHandlers()
     resetCardCache()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   afterAll(() => {
@@ -65,7 +65,7 @@ describe('loadCardDashboard', () => {
         }),
       )
 
-      const callback = jest.fn()
+      const callback = vi.fn()
 
       // The CardDashboardLoader uses a timeout to debounce calls
       cardDashboardLoader.loadCardDashboard(callback, 2)
@@ -88,7 +88,7 @@ describe('loadCardDashboard', () => {
         }),
       )
 
-      const callback = jest.fn()
+      const callback = vi.fn()
       cardDashboardLoader.loadCardDashboard(callback, 5)
 
       // Wait for first load
@@ -114,7 +114,7 @@ describe('loadCardDashboard', () => {
         }),
       )
 
-      const callback = jest.fn()
+      const callback = vi.fn()
       cardDashboardLoader.loadCardDashboard(callback, 2)
 
       // Wait for the async operations to complete

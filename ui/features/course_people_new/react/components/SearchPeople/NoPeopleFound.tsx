@@ -29,10 +29,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('course_people')
 
 const NoPeopleFound: FC = () => {
-  const {
-    canViewLoginIdColumn,
-    canViewSisIdColumn
-  } = useCoursePeopleContext()
+  const {canViewLoginIdColumn, canViewSisIdColumn} = useCoursePeopleContext()
 
   return (
     <Flex as="div" justifyItems="center">
@@ -42,37 +39,27 @@ const NoPeopleFound: FC = () => {
           alt={I18n.t('No people found')}
           width="400px"
           height="250px"
-          data-testid='no-people-found-img'
+          data-testid="no-people-found-img"
         />
-      <Heading as="h2" margin="xx-small 0">
-        {I18n.t('No people found')}
-      </Heading>
-      <View as="div" margin="small 0">
-        {I18n.t('You can search by:')}
-      </View>
-      <InlineList>
-        <InlineList.Item>
-          {I18n.t('Name')}
-        </InlineList.Item>
-        {canViewLoginIdColumn && (
-          <InlineList.Item>
-              {I18n.t('Login ID')}
+        <Heading as="h2" margin="xx-small 0">
+          {I18n.t('No people found')}
+        </Heading>
+        <View as="div" margin="small 0">
+          {I18n.t('You can search by:')}
+        </View>
+        <InlineList>
+          <InlineList.Item>{I18n.t('Name')}</InlineList.Item>
+          {canViewLoginIdColumn && <InlineList.Item>{I18n.t('Login ID')}</InlineList.Item>}
+          {canViewSisIdColumn && <InlineList.Item>{I18n.t('SIS ID')}</InlineList.Item>}
+          <InlineList.Item
+            delimiter="none"
+            themeOverride={{
+              noneSpacing: '0px',
+            }}
+          >
+            {I18n.t('Canvas User ID')}
           </InlineList.Item>
-        )}
-        {canViewSisIdColumn && (
-          <InlineList.Item>
-              {I18n.t('SIS ID')}
-          </InlineList.Item>
-        )}
-        <InlineList.Item
-          delimiter='none'
-          themeOverride={{
-            noneSpacing: '0px'
-          }}
-        >
-          {I18n.t('Canvas User ID')}
-        </InlineList.Item>
-      </InlineList>
+        </InlineList>
       </Flex.Item>
     </Flex>
   )

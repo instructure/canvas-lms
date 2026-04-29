@@ -123,7 +123,7 @@ describe('moduleHelpers', () => {
       fakeENV.setup({
         IS_STUDENT: true,
       })
-      const spy = jest.spyOn(document, 'createElement')
+      const spy = vi.spyOn(document, 'createElement')
       updateModuleFileDrop(module)
       expect(spy).not.toHaveBeenCalled()
     })

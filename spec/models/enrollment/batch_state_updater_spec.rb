@@ -25,7 +25,7 @@ describe "Enrollment::BatchStateUpdater" do
   end
 
   it "does not fail with more than empty batch" do
-    expect { Enrollment::BatchStateUpdater.run_call_backs_for([], root_account: nil) }.to_not raise_error
+    expect { Enrollment::BatchStateUpdater.run_call_backs_for([], root_account: nil) }.not_to raise_error
   end
 
   before(:once) do
@@ -227,7 +227,8 @@ describe "Enrollment::BatchStateUpdater" do
       update_linked_enrollments
       update_user_account_associations_if_necessary
       _notify_live_events_observer_for_after_save
+      delete_student_allocation_rules_if_needed
     ]
-    expect(Enrollment._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
+    expect(Enrollment._save_callbacks.collect(&:filter).grep(Symbol) - accounted_for_callbacks).to eq []
   end
 end

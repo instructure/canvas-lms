@@ -34,28 +34,28 @@ class PaginatedUserCheckList extends React.Component {
 
   render() {
     return (
-        <CheckboxGroup
-          name="paginatedUserChecklist"
-          defaultValue={this.props.checked}
-          description={this.props.label}
-          onChange={(event) => {
-            this.props.onUserCheck(event)
-          }}
-          messages={this.props.messages}
-        >
-          { [...this.props.permanentUsers, ...this.props.users].map(u => (
-            <Checkbox
-              data-testid={`user-checkbox-${u.id}`}
-              key={`checkbox-${u.id}`}
-              label={<Text>{u.name || u.display_name}</Text>}
-              value={u.id}
-              name="users"
-              className="checkbox"
-              readOnly={this._isPermanentUser(u.id)}
-              disabled={this._isPermanentUser(u.id)}
-            />
-          ))}
-        </CheckboxGroup>
+      <CheckboxGroup
+        name="paginatedUserChecklist"
+        defaultValue={this.props.checked}
+        description={this.props.label}
+        onChange={event => {
+          this.props.onUserCheck(event)
+        }}
+        messages={this.props.messages}
+      >
+        {[...this.props.permanentUsers, ...this.props.users].map(u => (
+          <Checkbox
+            data-testid={`user-checkbox-${u.id}`}
+            key={`checkbox-${u.id}`}
+            label={<Text>{u.name || u.display_name}</Text>}
+            value={u.id}
+            name="users"
+            className="checkbox"
+            readOnly={this._isPermanentUser(u.id)}
+            disabled={this._isPermanentUser(u.id)}
+          />
+        ))}
+      </CheckboxGroup>
     )
   }
 }

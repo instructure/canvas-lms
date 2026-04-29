@@ -24,7 +24,7 @@ describe "Pages API", type: :request do
   include Api::V1::User
   include AvatarHelper
 
-  context "locked api item" do
+  it_behaves_like "a locked api item" do
     let(:item_type) { "page" }
 
     let(:locked_item) do
@@ -43,8 +43,6 @@ describe "Pages API", type: :request do
         { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: locked_item.url }
       )
     end
-
-    include_examples "a locked api item"
   end
 
   before :once do
@@ -1608,7 +1606,6 @@ describe "Pages API", type: :request do
         page_json = json.find { |p| p["url"] == @page.url }
         expect(page_json["locked_for_user"]).to be(false)
         expect(page_json.keys).not_to include("lock_explanation")
-        p page_json
         expect(page_json["body"]).to eq("the page body")
       end
     end

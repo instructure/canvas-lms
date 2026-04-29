@@ -113,4 +113,25 @@ describe Types::RubricAssessmentRatingType do
       ).to eq [[0]]
     end
   end
+
+  describe "when rubric changes on assignment" do
+    let(:new_rubric) do
+      rubric_model(
+        context: course,
+        data: rubric.data
+      )
+    end
+
+    it "uses criterion from current rubric_association, not the assessment's old rubric" do
+      rubric_association.update!(rubric: new_rubric)
+
+      expect(rubric_assessment.rubric_id).to eq(rubric.id)
+      expect(rubric_assessment.rubric_association.rubric_id).to eq(new_rubric.id)
+
+      result = submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { criterion { _id } } } }")
+
+      # Should return criteria IDs from the new rubric (which are the same as the old one)
+      expect(result).to eq [new_rubric.criteria.map { |c| c[:id].to_s }]
+    end
+  end
 end

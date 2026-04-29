@@ -26,9 +26,10 @@ class ContextController < ApplicationController
   before_action :require_context, except: [:inbox, :object_snippet]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:roster]
 
-  before_action :require_user, only: [:inbox, :report_avatar_image]
+  skip_before_action :require_user, only: :object_snippet
   before_action :reject_student_view_student, only: [:inbox]
   protect_from_forgery except: [:object_snippet], with: :exception
 
@@ -89,7 +90,7 @@ class ContextController < ApplicationController
       load_all_contexts(context: @context)
       manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)
       can_add_enrollments = @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_COURSE_ENROLLMENT_PERMISSIONS)
-      allow_assign_to_differentiation_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      allow_assign_to_differentiation_tags = @context.account.allow_assign_to_differentiation_tags?
       js_permissions = {
         read_sis: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
         view_user_logins: @context.grants_right?(@current_user, session, :view_user_logins),
@@ -132,6 +133,8 @@ class ContextController < ApplicationController
                  user_services_url: context_url(@context, :context_user_services_url),
                  observer_pairing_codes_url: course_observer_pairing_codes_url(@context),
                  course_student_count: allow_assign_to_differentiation_tags ? @context.student_enrollments.count : nil,
+                 max_differentiation_tag_per_course: allow_assign_to_differentiation_tags ? GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE : nil,
+                 max_variants_per_tag_category: allow_assign_to_differentiation_tags ? Group.MAX_VARIANTS_PER_TAG_CATEGORY : nil,
                }
              })
       set_tutorial_js_env
@@ -157,13 +160,6 @@ class ContextController < ApplicationController
         # UserSearch.scope_for makes the teachers and ta's list to match what api v1 is returning with respect to section restrictions
         @secondary_users = { t("roster.teachers_and_tas", "Teachers & TAs") => instructors.select { |instructor| UserSearch.scope_for(course, @current_user).include?(instructor) } }
       end
-    end
-
-    # Render upgraded People page if feature flag is enabled
-    if @domain_root_account.feature_enabled?(:react_people_page)
-      add_crumb t("People")
-      js_bundle :course_people
-      render html: "", layout: true
     end
 
     @secondary_users ||= {}
@@ -235,8 +231,10 @@ class ContextController < ApplicationController
             @accesses = @accesses.paginate(page: params[:page], per_page: 50)
             @last_activity_at = @context.enrollments.where(user_id: @user).maximum(:last_activity_at)
             @aua_expiration_date = AssetUserAccess.expiration_date
-            js_env(context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
-                   accesses_total_pages: @accesses.total_pages)
+            js_env({
+                     context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
+                     accesses_total_pages: @accesses.total_pages
+                   })
           end
           format.json do
             @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
@@ -262,7 +260,8 @@ class ContextController < ApplicationController
           @enrollments = scope.to_a
           user = @membership&.user
           js_permissions = {
-            can_manage_user_details: user.grants_right?(@current_user, :manage_user_details)
+            can_manage_user_details: user.grants_right?(@current_user, :manage_user_details),
+            can_view_user_generated_access_tokens: user.grants_right?(@current_user, :view_user_generated_access_tokens)
           }
           timezones = I18nTimeZone.all.map { |tz| { name: tz.name, name_with_hour_offset: tz.to_s } }
           default_timezone_name = @domain_root_account.try(:default_time_zone)&.name || "Mountain Time (US & Canada)"
@@ -284,6 +283,16 @@ class ContextController < ApplicationController
       when Group
         @membership = @context.group_memberships.active.where(user_id:).first
         @enrollments = []
+        if @membership
+          user = @membership&.user
+          js_permissions = {
+            can_view_user_generated_access_tokens: user.grants_right?(@current_user, :view_user_generated_access_tokens)
+          }
+          js_env({
+                   USER_ID: user_id,
+                   PERMISSIONS: js_permissions,
+                 })
+        end
       end
 
       @user = @membership&.user
@@ -300,7 +309,7 @@ class ContextController < ApplicationController
       end
       # rubocop:enable Rails/ActionControllerFlashBeforeRender
 
-      js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name)
+      js_env({ CONTEXT_USER_DISPLAY_NAME: @user.short_name })
 
       js_bundle :user_name, "context_roster_user"
       css_bundle :roster_user, :pairing_code
@@ -358,6 +367,7 @@ class ContextController < ApplicationController
                       wiki_pages
                       rubric_associations_with_deleted].freeze
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :combined_group_and_differentiation_tag_categories].freeze
+  MAX_ITEMS_PER_TYPE = 50
   def undelete_index
     if authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       @item_types =
@@ -368,10 +378,16 @@ class ContextController < ApplicationController
         end
 
       @deleted_items = @item_types.reduce([]) do |acc, scope|
-        acc + scope.where(workflow_state: "deleted").limit(25).to_a
+        acc + scope.where(workflow_state: "deleted")
+                   .order(updated_at: :desc)
+                   .limit(MAX_ITEMS_PER_TYPE)
+                   .to_a
       end.reject { |item| item.is_a?(DiscussionTopic) && !item.restorable? }
 
-      @deleted_items += @context.attachments.where(file_state: "deleted").limit(25).to_a
+      @deleted_items += @context.attachments.where(file_state: "deleted")
+                                .order(deleted_at: :desc)
+                                .limit(MAX_ITEMS_PER_TYPE)
+                                .to_a
 
       can_delete_group_categories = @context.grants_right?(@current_user, :manage_groups_delete)
       can_delete_differentiation_tag_categories = @context.grants_right?(@current_user, :manage_tags_delete)
@@ -385,10 +401,13 @@ class ContextController < ApplicationController
                          nil
                        end
       if undelete_scope.present?
-        @deleted_items += undelete_scope.where.not(deleted_at: nil).limit(25).to_a
+        @deleted_items += undelete_scope.where.not(deleted_at: nil)
+                                        .order(deleted_at: :desc)
+                                        .limit(MAX_ITEMS_PER_TYPE)
+                                        .to_a
       end
 
-      @deleted_items.sort_by { |item| item.read_attribute(:deleted_at) || item.created_at }.reverse
+      @deleted_items = @deleted_items.sort_by { |item| item.read_attribute(:deleted_at) || item.updated_at }.reverse
     end
   end
 
@@ -418,6 +437,7 @@ class ContextController < ApplicationController
         )
       end
 
+      @item.updating_user = @current_user if @item.respond_to?(:updating_user=)
       @item.restore
       if @item.errors.any?
         return render json: @item.errors.full_messages, status: :forbidden

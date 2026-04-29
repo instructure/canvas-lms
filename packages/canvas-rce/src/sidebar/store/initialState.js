@@ -52,7 +52,6 @@ export default function (props = {}) {
     images,
     documents,
     media,
-    flickr,
     newPageLinkExpanded,
     searchString,
     sortBy,
@@ -107,10 +106,6 @@ export default function (props = {}) {
     upload = source.initializeUpload(props)
   }
 
-  if (flickr === undefined) {
-    flickr = source.initializeFlickr(props)
-  }
-
   if (images === undefined) {
     images = source.initializeImages(props)
   }
@@ -153,7 +148,6 @@ export default function (props = {}) {
     images,
     documents,
     media,
-    flickr,
     newPageLinkExpanded,
     searchString,
     sortBy,

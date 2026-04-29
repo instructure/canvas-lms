@@ -20,6 +20,7 @@
 module Lti
   class ToolDefaultIconController < ApplicationController
     before_action :require_name, only: :show
+    skip_before_action :load_user, :require_user, only: :show
 
     # Generates an SVG icon for a tool based on its name and/or ID
 
@@ -35,7 +36,8 @@ module Lti
       # Use first number/"letter-like" character ('0', 'a', 'é', '我', etc.), or none.
       @glyph = params[:name]&.match(/[0-9\p{Letter}]/)&.to_s&.upcase
       # Color based on hash of the developer key / tool (global) ID.
-      @color = COLORS[params[:name].hash % COLORS.length]
+      name_hash = Digest::MD5.hexdigest(params[:name]).to_i(16)
+      @color = COLORS[name_hash % COLORS.length]
 
       response.headers["Cache-Control"] = "max-age=#{CACHE_MAX_AGE}"
       cancel_cache_buster

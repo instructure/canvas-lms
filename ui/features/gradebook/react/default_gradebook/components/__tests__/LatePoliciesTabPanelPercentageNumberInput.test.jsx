@@ -18,7 +18,6 @@
 
 import React, {useState} from 'react'
 import {render, fireEvent, cleanup, screen} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 
 import {DEFAULT_LATE_POLICY_DATA} from '../../apis/GradebookSettingsModalApi'
 import LatePoliciesTabPanel from '../LatePoliciesTabPanel'

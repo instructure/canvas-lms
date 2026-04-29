@@ -23,6 +23,8 @@
  */
 export interface EnvContextModules {
   course_id: string
+  CONTEXT_IS_AVAILABLE: boolean
+  PAGE_TITLE: string | null
   CONTEXT_URL_ROOT: string
   ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: boolean
   CONTENT_MIGRATIONS_EXPIRE_DAYS: number
@@ -45,11 +47,14 @@ export interface EnvContextModules {
         canAdd: boolean
         canEdit: boolean
         canDelete: boolean
+        canView: boolean
         canViewUnpublished: boolean
         canDirectShare: boolean
+        canManageSpeedGrader: boolean
       }
     | undefined
   NEW_QUIZZES_BY_DEFAULT: boolean | undefined
+  NEW_QUIZZES_ENABLED: boolean | undefined
   DEFAULT_POST_TO_SIS: boolean | undefined
   MODULE_TOOLS: Record<string, unknown>
 
@@ -71,5 +76,18 @@ export interface EnvContextModules {
   MODULE_FEATURES?: {
     STUDENT_MODULE_SELECTION: boolean
     TEACHER_MODULE_SELECTION: boolean
+    MODULES_ARE_PAGINATED?: boolean
+    PAGE_SIZE?: number
+    SEAMLESS_EXTERNAL_URL_REDIRECT?: boolean
   }
+  MODULES_OBSERVER_INFO?: {
+    isObserver: boolean
+    observedStudent: {id: string; name: string} | null
+    courseName: string
+  }
+  OBSERVER_OPTIONS?: {
+    OBSERVED_USERS_LIST: Array<{id: string; name: string; avatar_url?: string | null}>
+    CAN_ADD_OBSERVEE: boolean
+  }
+  CONTEXT_MODULES_HEADER_PROPS?: any
 }

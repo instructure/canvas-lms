@@ -97,6 +97,20 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       renderComponent()
       expect(tray.titleText).toEqual('')
     })
+
+    it('shows an error message when title is empty', () => {
+      props.videoOptions.titleText = ''
+      renderComponent()
+      expect(screen.getByText("Title can't be blank")).toBeInTheDocument()
+    })
+
+    it('clears the error message when a title is typed', () => {
+      props.videoOptions.titleText = ''
+      renderComponent()
+      expect(screen.getByText("Title can't be blank")).toBeInTheDocument()
+      tray.setTitleText('A turtle in a party suit.')
+      expect(screen.queryByText("Title can't be blank")).not.toBeInTheDocument()
+    })
   })
 
   describe('"Display Options" field', () => {
@@ -132,10 +146,25 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       expect(tray.size).toEqual('Medium')
     })
 
+    it('can be set to "Small"', async () => {
+      renderComponent()
+      await tray.setSize('Small')
+      expect(tray.size).toEqual('Small')
+      expect(screen.getByText(/320 x 254px/i)).toBeInTheDocument()
+    })
+
+    it('can be set to "Medium"', async () => {
+      renderComponent()
+      await tray.setSize('Medium')
+      expect(tray.size).toEqual('Medium')
+      expect(screen.getByText(/480 x 300px/i)).toBeInTheDocument()
+    })
+
     it('can be set to "Large"', async () => {
       renderComponent()
       await tray.setSize('Large')
       expect(tray.size).toEqual('Large')
+      expect(screen.getByText(/700 x 441px/i)).toBeInTheDocument()
     })
 
     it('can be set to "Custom"', async () => {
@@ -144,69 +173,28 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       expect(tray.size).toEqual('Custom')
     })
 
-    it('requires 320px custom width', () => {
-      props.videoOptions.videoSize = 'custom'
-      props.videoOptions.appliedWidth = 310
+    it('properly sets default size option', async () => {
+      props.videoOptions.videoSize = 'large'
       renderComponent()
-      // I don't know why, but getByText does not find the string,
-      // though I can prove it's there
-      expect(/Pixels must be at least 320 x 186px/.test(tray.messageText())).toBeTruthy()
+      await waitFor(() => {
+        expect(tray.size).toEqual('Large')
+      })
     })
 
-    describe('when consolidated_media_player feature flag is enabled', () => {
-      beforeEach(() => {
-        jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({consolidated_media_player: true})
-      })
-      it('can be set to "Small"', async () => {
-        renderComponent()
-        await tray.setSize('Small')
-        expect(tray.size).toEqual('Small')
-        expect(screen.getByText(/320 x 254px/i)).toBeInTheDocument()
-      })
+    it('requires 320px custom width', () => {
+      props.videoOptions.videoSize = 'custom'
+      props.videoOptions.appliedWidth = 319
+      props.videoOptions.appliedHeight = 254
+      renderComponent()
+      expect(/Pixels must be at least 320 x 254px/.test(tray.messageText())).toBeTruthy()
+    })
 
-      it('can be set to "Medium"', async () => {
-        renderComponent()
-        await tray.setSize('Medium')
-        expect(tray.size).toEqual('Medium')
-        expect(screen.getByText(/480 x 300px/i)).toBeInTheDocument()
-      })
-
-      it('can be set to "Large"', async () => {
-        renderComponent()
-        await tray.setSize('Large')
-        expect(tray.size).toEqual('Large')
-        expect(screen.getByText(/700 x 441px/i)).toBeInTheDocument()
-      })
-
-      it('can be set to "Custom"', async () => {
-        renderComponent()
-        await tray.setSize('Custom')
-        expect(tray.size).toEqual('Custom')
-      })
-
-      it('properly sets default size option', async () => {
-        props.videoOptions.videoSize = 'large'
-        renderComponent()
-        await waitFor(() => {
-          expect(tray.size).toEqual('Large')
-        })
-      })
-
-      it('requires 320px custom width', () => {
-        props.videoOptions.videoSize = 'custom'
-        props.videoOptions.appliedWidth = 319
-        props.videoOptions.appliedHeight = 254
-        renderComponent()
-        expect(/Pixels must be at least 320 x 254px/.test(tray.messageText())).toBeTruthy()
-      })
-
-      it('requires 254px custom height', () => {
-        props.videoOptions.videoSize = 'custom'
-        props.videoOptions.appliedWidth = 320
-        props.videoOptions.appliedHeight = 253
-        renderComponent()
-        expect(/Pixels must be at least 320 x 254px/.test(tray.messageText())).toBeTruthy()
-      })
+    it('requires 254px custom height', () => {
+      props.videoOptions.videoSize = 'custom'
+      props.videoOptions.appliedWidth = 320
+      props.videoOptions.appliedHeight = 253
+      renderComponent()
+      expect(/Pixels must be at least 320 x 254px/.test(tray.messageText())).toBeTruthy()
     })
   })
 
@@ -229,6 +217,78 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
     })
   })
 
+  describe('when rce_studio_embed_improvements feature flag is enabled', () => {
+    beforeEach(() => {
+      jest.spyOn(RCEGlobals, 'getFeatures').mockReturnValue({rce_studio_embed_improvements: true})
+    })
+
+    describe('Studio Viewer Restrictions', () => {
+      describe('when the media is a Studio media', () => {
+        beforeEach(() => {
+          props.studioOptions = {
+            resizable: true,
+            convertibleToLink: true,
+            isImprovedEmbed: true,
+            embedOptions: {
+              enableMediaDownload: false,
+              enableTranscriptDownload: false,
+              showRollingTranscript: false,
+              lockSpeed: false,
+              isExternal: false,
+            },
+          }
+        })
+
+        it('shows the checkbox group', () => {
+          renderComponent()
+          expect(screen.getByText('Viewer Restrictions')).toBeInTheDocument()
+        })
+
+        it('shows the "Allow media download" checkbox', () => {
+          renderComponent()
+          expect(screen.getByLabelText('Allow media download')).toBeInTheDocument()
+        })
+
+        it('shows the "Allow transcript download" checkbox', () => {
+          renderComponent()
+          expect(screen.getByLabelText('Allow transcript download')).toBeInTheDocument()
+        })
+
+        it('shows the "Lock speed at 1x" checkbox', () => {
+          renderComponent()
+          expect(screen.getByLabelText('Lock speed at 1x')).toBeInTheDocument()
+        })
+
+        it('shows the "Show rolling transcript" checkbox', () => {
+          renderComponent()
+          expect(screen.getByLabelText('Show rolling transcript')).toBeInTheDocument()
+        })
+
+        describe('and the media is external', () => {
+          beforeEach(() => {
+            props.studioOptions.embedOptions.isExternal = true
+          })
+
+          it('does not show the "Allow media download" checkbox', () => {
+            renderComponent()
+            expect(screen.queryByLabelText('Allow media download')).not.toBeInTheDocument()
+          })
+        })
+      })
+
+      describe('when the media is not a Studio media', () => {
+        beforeEach(() => {
+          props.studioOptions = null
+        })
+
+        it('does not show the checkbox group', () => {
+          renderComponent()
+          expect(screen.queryByText('Viewer Restrictions')).not.toBeInTheDocument()
+        })
+      })
+    })
+  })
+
   describe('"Done" button', () => {
     describe('when Title Text is present', () => {
       beforeEach(() => {
@@ -247,8 +307,26 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         tray.setTitleText('')
       })
 
-      it('is disabled ', () => {
-        expect(tray.doneButtonDisabled).toEqual(true)
+      it('does not call onSave when title is empty', () => {
+        tray.$doneButton.click()
+        expect(props.onSave).not.toHaveBeenCalled()
+      })
+
+      it('does not call onSave when title is whitespace only', () => {
+        tray.setTitleText('   ')
+        tray.$doneButton.click()
+        expect(props.onSave).not.toHaveBeenCalled()
+      })
+
+      it('focuses the title input after a blocked save attempt', () => {
+        tray.$doneButton.click()
+        expect(document.activeElement).toBe(tray.$titleTextField)
+      })
+
+      it('does not call onSave when display is link and title is empty', () => {
+        tray.setDisplayAs('link')
+        tray.$doneButton.click()
+        expect(props.onSave).not.toHaveBeenCalled()
       })
 
       it('is enabled when "Display Text Link" is selected', () => {

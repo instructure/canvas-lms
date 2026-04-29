@@ -21,7 +21,7 @@ require_relative "cc_spec_helper"
 require "nokogiri"
 
 describe CC::BasicLTILinks do
-  subject { (Class.new { include CC::BasicLTILinks }).new }
+  subject { Class.new { include CC::BasicLTILinks }.new }
 
   let(:tool) do
     ContextExternalTool.new
@@ -88,6 +88,29 @@ describe CC::BasicLTILinks do
       expect(xml_doc.at_xpath("//blti:secure_launch_url").text).to eq tool.url
     end
 
+    it "sets a launch_url for valid URLs without explicit scheme" do
+      tool.url = "example.com/launch"
+      subject.create_blti_link(tool, lti_doc)
+      xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+      expect(xml_doc.at_xpath("//blti:launch_url").text).to eq tool.url
+    end
+
+    it "does not set a launch_url for invalid URLs" do
+      tool.url = "not a valid url"
+      subject.create_blti_link(tool, lti_doc)
+      xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+      expect(xml_doc.at_xpath("//blti:launch_url")).to be_nil
+      expect(xml_doc.at_xpath("//blti:secure_launch_url")).to be_nil
+    end
+
+    it "does not set a launch_url when url is blank" do
+      tool.url = ""
+      subject.create_blti_link(tool, lti_doc)
+      xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+      expect(xml_doc.at_xpath("//blti:launch_url")).to be_nil
+      expect(xml_doc.at_xpath("//blti:secure_launch_url")).to be_nil
+    end
+
     it "add an icon element if found in the tool settings" do
       tool.icon_url = "http://example.com/icon"
       subject.create_blti_link(tool, lti_doc)
@@ -133,8 +156,8 @@ describe CC::BasicLTILinks do
       }
       subject.create_blti_link(tool, lti_doc)
       xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
-      parsed_custom_fields = xml_doc.xpath("//blti:custom/lticm:property").each_with_object({}) do |x, h|
-        h[x.attribute("name").text] = x.text
+      parsed_custom_fields = xml_doc.xpath("//blti:custom/lticm:property").to_h do |x|
+        [x.attribute("name").text, x.text]
       end
       expect(parsed_custom_fields).to eq tool.settings[:custom_fields]
     end
@@ -286,7 +309,7 @@ describe CC::BasicLTILinks do
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions/lticm:options[@name="course_navigation"]/blti:custom/lticm:property'
-          parsed_custom_fields = xml_doc.xpath(xpath).each_with_object({}) { |x, h| h[x.attribute("name").text] = x.text }
+          parsed_custom_fields = xml_doc.xpath(xpath).to_h { |x| [x.attribute("name").text, x.text] }
           expect(parsed_custom_fields).to eq custom_fields
         end
       end
@@ -308,7 +331,7 @@ describe CC::BasicLTILinks do
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions[@platform="my vendor platform"]/lticm:property'
-          parsed_custom_fields = xml_doc.xpath(xpath).each_with_object({}) { |x, h| h[x.attribute("name").text] = x.text }
+          parsed_custom_fields = xml_doc.xpath(xpath).to_h { |x| [x.attribute("name").text, x.text] }
           expect(parsed_custom_fields).to eq custom_fields
         end
       end

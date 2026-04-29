@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
 import type {GroupOutcome} from '@canvas/global/env/EnvCommon'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {RubricFormFieldSetter} from '../types/RubricForm'
 import {calcPointsPossible, stripPTags} from '../utils'
@@ -49,12 +49,18 @@ const useOutcomeDialog = ({
   }
 
   const createNewFindDialog = () => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Backbone FindDialog constructor type mismatch
     return new FindDialog({
       title: I18n.t('Find Outcome'),
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone OutcomeGroup constructor type mismatch
       selectedGroup: new OutcomeGroup(rootOutcomeGroup),
       useForScoring: true,
       shouldImport: false,
       disableGroupImport: true,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Backbone OutcomeGroup constructor type mismatch
       rootOutcomeGroup: new OutcomeGroup(rootOutcomeGroup),
       url: '/outcomes/find_dialog',
       zIndex: 10000,

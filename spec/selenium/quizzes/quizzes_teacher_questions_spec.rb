@@ -158,8 +158,6 @@ describe "quizzes questions" do
       expect(f(".points_possible").text).to eq "60"
     end
 
-    it "should round published quiz points correctly on main quiz page", priority: "2"
-
     it "rounds numeric questions when creating a quiz", priority: "1" do
       start_quiz_question
       click_option(".question_form:visible .question_type", "Numerical Answer")

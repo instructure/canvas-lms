@@ -33,9 +33,7 @@ module EportfoliosCommon
 
   def organize_sections
     f("#section_list_manage .manage_sections_link").click
-    sections.each do |section|
-      expect(section).to contain_jqcss(".section_settings_menu:visible")
-    end
+    expect(sections).to all(contain_jqcss(".section_settings_menu:visible"))
   end
 
   def add_eportfolio_section(name)
@@ -91,9 +89,7 @@ module EportfoliosCommon
   def organize_pages
     f(".manage_pages_link").click
     wait_for_animations
-    pages.each do |page|
-      expect(page).to contain_jqcss(".page_settings_menu:visible")
-    end
+    expect(pages).to all(contain_jqcss(".page_settings_menu:visible"))
     expect(f(".add_page_link")).to be_displayed
   end
 end

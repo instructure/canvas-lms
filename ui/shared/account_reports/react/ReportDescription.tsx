@@ -17,11 +17,9 @@
  */
 
 import {Modal} from '@instructure/ui-modal'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
-
-const I18n = createI18nScope('account_reports')
 
 interface Props {
   descHTML: string
@@ -30,8 +28,9 @@ interface Props {
 }
 
 export default function ReportDescription(props: Props) {
+  const {t} = useTranslation('account_reports')
   return (
-    <Modal label={I18n.t('Report Description')} open size="medium">
+    <Modal label={t('Report Description')} open size="medium">
       <Modal.Header>
         <Heading>{props.title}</Heading>
         <CloseButton
@@ -39,7 +38,7 @@ export default function ReportDescription(props: Props) {
           placement="end"
           size="medium"
           onClick={props.closeModal}
-          screenReaderLabel={I18n.t('Close')}
+          screenReaderLabel={t('Close')}
         />
       </Modal.Header>
       <Modal.Body dangerouslySetInnerHTML={{__html: props.descHTML}} />

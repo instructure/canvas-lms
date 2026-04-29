@@ -19,18 +19,23 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {AddButton} from './AddButton'
+import {useGetBlocksCount} from '../hooks/useGetBlocksCount'
+import {useAddBlockModal} from '../hooks/useAddBlockModal'
+import {useFocusManagement} from '../hooks/useFocusManagement'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const AddBlock = () => {
-  const {addBlockModal, initialAddBlockHandler} = useBlockContentEditorContext()
-  if (!initialAddBlockHandler.shouldShow) {
+  const {open} = useAddBlockModal()
+  const {blocksCount} = useGetBlocksCount()
+  const {elementRef} = useFocusManagement({buttonType: 'addButton'})
+
+  if (blocksCount > 0) {
     return null
   }
+
   return (
     <View borderWidth="small" borderRadius="medium">
       <Flex direction="column" padding="large" gap="large" alignItems="center">
@@ -38,16 +43,16 @@ export const AddBlock = () => {
           {I18n.t('Add a block')}
         </Heading>
         <Flex direction="column" alignItems="center">
-          <Text>
+          <span style={{textAlign: 'center'}}>
             {I18n.t('A block is a building element of your page. It helps you organize content.')}
-          </Text>
-          <Text>
+          </span>
+          <span style={{textAlign: 'center'}}>
             {I18n.t(
               'You can add, customize, and rearrange blocks to create a structured and engaging page.',
             )}
-          </Text>
+          </span>
         </Flex>
-        <AddButton onClicked={addBlockModal.open} />
+        <AddButton onClicked={open} elementRef={elementRef} />
       </Flex>
     </View>
   )

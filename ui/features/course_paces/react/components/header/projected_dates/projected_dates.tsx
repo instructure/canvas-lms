@@ -84,7 +84,8 @@ export const ProjectedDates = ({
 
   const startDateValue = coursePace.start_date
   const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
-  const endDateValue = coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
+  const endDateValue =
+    coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
   const endHelpText = END_DATE_CAPTIONS[coursePace.end_date_context]
 
   useEffect(() => {

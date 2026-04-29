@@ -181,6 +181,7 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
           attachment_preview_processing:
             attachment.workflow_state === 'pending_upload' ||
             attachment.workflow_state === 'processing',
+          attachment_name: attachment.display_name,
           disableGooglePreviews,
         })
         const $minimizeLink = document.createElement('a')

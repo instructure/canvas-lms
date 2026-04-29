@@ -45,7 +45,7 @@ describe Lti::ToolDefaultIconController do
 
     it "only requires a name to generate an icon" do
       name = "foobarbaz"
-      hash = name.hash
+      hash = Digest::MD5.hexdigest(name).to_i(16)
 
       color = Lti::ToolDefaultIconController::COLORS[hash % Lti::ToolDefaultIconController::COLORS.length]
 

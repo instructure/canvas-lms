@@ -28,7 +28,9 @@ module Api::V1::QuizQuestion
       position
       regrade_option
       assessment_question_id
+      assessment_question_bank_id
       quiz_group_id
+      created_at
     ]
   }.freeze
 
@@ -53,31 +55,72 @@ module Api::V1::QuizQuestion
     matching_answer_incorrect_matches
   ].freeze
 
+  # allowlist question details for students
+  API_CENSOR_ATTR_ALLOWLIST = %w[
+    id
+    position
+    quiz_group_id
+    quiz_id
+    assessment_question_id
+    assessment_question
+    question_name
+    question_type
+    question_text
+    answers
+    matches
+    formulas
+    variables
+    answer_tolerance
+    formula_decimal_places
+  ].freeze
+
+  # only include answers for types that need it to show choices
+  API_CENSOR_QUESTION_TYPE_ANSWERS_ALLOWLIST = %w[
+    multiple_choice_question
+    true_false_question
+    multiple_answers_question
+    matching_question
+    multiple_dropdowns_question
+    calculated_question
+  ].freeze
+
+  API_CENSOR_ANSWER_ATTRS_ALLOWLIST = %w[
+    id
+    text
+    html
+    blank_id
+    variables
+  ].freeze
+
   # @param [Quizzes::Quiz#quiz_data] quiz_data
   #   If you specify a quiz_data construct from a submission (or a quiz), then
   #   the questions will be modified to use the fields found in that
   #   data. This is needed if you're rendering questions for a submission
   #   as each submission might have differen data.
-  def questions_json(questions, user, session, context = nil, includes = [], censored = false, quiz_data = nil, opts = {})
+  def questions_json(questions, user, session, context: nil, includes: [], censored: false, quiz_data: nil, shuffle_answers: false, location: nil)
     questions.map do |question|
-      question_json(question, user, session, context, includes, censored, quiz_data, opts)
+      this_location = location.nil? ? "quiz_question_#{question.id}" : location
+      question_json(question, user, session, context:, includes:, censored:, quiz_data:, shuffle_answers:, location: this_location)
     end
   end
 
-  def question_json(question, user, session, _context = nil, includes = [], censored = false, quiz_data = nil, opts = {})
+  def question_json(question, user, session, context: nil, includes: [], censored: false, quiz_data: nil, shuffle_answers: false, location: nil)
     hsh = api_json(question, user, session, API_ALLOWED_QUESTION_OUTPUT_FIELDS).tap do |json|
       API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.each do |field|
         question_data = quiz_data&.find { |data_question| data_question[:id] == question[:id] } || question.question_data
         json[field] = question_data[field]
       end
+      if Account.site_admin.feature_enabled?(:ams_add_question_bank_to_quiz_question)
+        json[:assessment_question_bank_id] = question&.assessment_question_bank&.id
+      end
     end
 
     user ||= @current_user
     unless includes.include?(:plain_html)
-      hsh = add_verifiers_to_question(hsh, @context, user)
+      hsh = handle_question_html_content(hsh, @context, user, location)
     end
 
-    if opts[:shuffle_answers] && Quizzes::Quiz.shuffleable_question_type?(hsh[:question_type])
+    if shuffle_answers && Quizzes::Quiz.shuffleable_question_type?(hsh[:question_type])
       hsh["answers"].shuffle!
     end
 
@@ -86,6 +129,10 @@ module Api::V1::QuizQuestion
       if censored
         q_data = hsh[:assessment_question][:question_data]
         hsh[:assessment_question][:question_data] = censor(q_data)
+      end
+
+      unless includes.include?(:plain_html)
+        hsh[:assessment_question][:question_data] = handle_question_html_content(hsh[:assessment_question][:question_data], @context, user, "assessment_question_#{question.assessment_question.id}")
       end
     end
 
@@ -98,15 +145,19 @@ module Api::V1::QuizQuestion
 
   private
 
-  def add_verifiers_to_question(question_hash, context, user)
-    if question_hash["question_text"]
-      question_hash["question_text"] = api_user_content(question_hash["question_text"], context, user)
+  def handle_question_html_content(question_hash, context, user, location = nil)
+    Quizzes::QuizQuestion::QUESTION_DATA_HTML_FIELDS.each do |field|
+      next unless question_hash[field].present?
+
+      question_hash[field] = api_user_content(question_hash[field], context, user, location:)
     end
 
-    question_hash["answers"].each do |a|
-      next unless a["html"].present?
+    question_hash["answers"]&.each do |a|
+      Quizzes::QuizQuestion::QUESTION_DATA_ANSWER_HTML_FIELDS.each do |field|
+        next unless a[field].present?
 
-      a["html"] = api_user_content(a["html"], context, user)
+        a[field] = api_user_content(a[field], context, user, location:)
+      end
     end
 
     question_hash
@@ -120,38 +171,9 @@ module Api::V1::QuizQuestion
   #   question.
   def censor(question_data)
     question_data = question_data.with_indifferent_access
+    question_data.keep_if { |k, _v| API_CENSOR_ATTR_ALLOWLIST.include?(k.to_s) }
 
-    # whitelist question details for students
-    attr_whitelist = %w[
-      id
-      position
-      quiz_group_id
-      quiz_id
-      assessment_question_id
-      assessment_question
-      question_name
-      question_type
-      question_text
-      answers
-      matches
-      formulas
-      variables
-      answer_tolerance
-      formula_decimal_places
-    ]
-    question_data.keep_if { |k, _v| attr_whitelist.include?(k.to_s) }
-
-    # only include answers for types that need it to show choices
-    allow_answer_whitelist = %w[
-      multiple_choice_question
-      true_false_question
-      multiple_answers_question
-      matching_question
-      multiple_dropdowns_question
-      calculated_question
-    ]
-
-    unless allow_answer_whitelist.include?(question_data[:question_type])
+    unless API_CENSOR_QUESTION_TYPE_ANSWERS_ALLOWLIST.include?(question_data[:question_type])
       question_data.delete(:answers)
     end
 
@@ -159,7 +181,7 @@ module Api::V1::QuizQuestion
     # multiple_dropdown needs blank_id
     # formula questions need variables
     question_data[:answers]&.each do |record|
-      record.keep_if { |k, _| %w[id text html blank_id variables].include?(k.to_s) }
+      record.keep_if { |k, _| API_CENSOR_ANSWER_ATTRS_ALLOWLIST.include?(k.to_s) }
     end
 
     question_data

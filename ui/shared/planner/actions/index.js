@@ -22,7 +22,6 @@ import parseLinkHeader from '@canvas/parse-link-header'
 import configureAxios from '../utilities/configureAxios'
 import {alert} from '../utilities/alertUtils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {maybeUpdateTodoSidebar} from './sidebar-actions'
 import {
   getPlannerItems,
   getWeeklyPlannerItems,
@@ -116,11 +115,17 @@ function saveNewPlannerItem(apiItem) {
 
 export const getNextOpportunities = () => {
   return (dispatch, getState) => {
+    const state = getState()
+    if (state.opportunities.items?.length === 0) {
+      // if there are no items but allOpportunitiesLoaded is false,
+      // initial load hasn't happened yet
+      return
+    }
     dispatch(startLoadingOpportunities())
-    if (getState().opportunities.nextUrl) {
+    if (state.opportunities.nextUrl) {
       return axios({
         method: 'get',
-        url: getState().opportunities.nextUrl,
+        url: state.opportunities.nextUrl,
       })
         .then(response => {
           if (parseLinkHeader(getResponseHeader(response, 'link')).next) {
@@ -163,7 +168,11 @@ export const getInitialOpportunities = () => {
     return request
       .then(response => {
         const next = parseLinkHeader(getResponseHeader(response, 'link')).next
-        dispatch(addOpportunities({items: response.data, nextUrl: next ? next.url : null}))
+        if (response.data.length === 0) {
+          dispatch(allOpportunitiesLoaded())
+        } else {
+          dispatch(addOpportunities({items: response.data, nextUrl: next ? next.url : null}))
+        }
       })
       .catch(_ex => {
         alert(I18n.t('Failed to load opportunities'), true)
@@ -235,7 +244,6 @@ export const deletePlannerItem = plannerItem => {
       .catch(() => alert(I18n.t('Failed to delete to do'), true))
     dispatch(clearUpdateTodo())
     dispatch(deletedPlannerItem(promise))
-    dispatch(maybeUpdateTodoSidebar(promise))
     return promise
   }
 }
@@ -293,7 +301,6 @@ export const togglePlannerItemCompletion = plannerItem => {
         }
       })
     dispatch(savedPlannerItem(promise))
-    dispatch(maybeUpdateTodoSidebar(promise))
     return promise
   }
 }

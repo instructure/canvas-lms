@@ -32,8 +32,8 @@ describe('OutcomePopoverView', () => {
   }
 
   beforeEach(() => {
-    $.screenReaderFlashMessageExclusive = jest.fn()
-    jest.useFakeTimers()
+    $.screenReaderFlashMessageExclusive = vi.fn()
+    vi.useFakeTimers()
     container = document.createElement('div')
     container.id = 'application'
     document.body.appendChild(container)
@@ -46,8 +46,8 @@ describe('OutcomePopoverView', () => {
   })
 
   afterEach(() => {
-    jest.clearAllTimers()
-    jest.useRealTimers()
+    vi.clearAllTimers()
+    vi.useRealTimers()
     container.remove()
   })
 
@@ -71,7 +71,7 @@ describe('OutcomePopoverView', () => {
 
   describe('mouse interactions', () => {
     it('handles mouseenter event', () => {
-      const openPopoverSpy = jest.spyOn(popoverView, 'openPopover')
+      const openPopoverSpy = vi.spyOn(popoverView, 'openPopover')
       expect(popoverView.inside).toBeFalsy()
 
       popoverView.el.find('i').trigger(createEvent('mouseenter'))
@@ -81,11 +81,11 @@ describe('OutcomePopoverView', () => {
     })
 
     it('ignores mouseleave when no popover exists', () => {
-      const closePopoverSpy = jest.spyOn(popoverView, 'closePopover')
+      const closePopoverSpy = vi.spyOn(popoverView, 'closePopover')
       expect(popoverView.popover).toBeUndefined()
 
       popoverView.el.find('i').trigger(createEvent('mouseleave'))
-      jest.advanceTimersByTime(popoverView.TIMEOUT_LENGTH)
+      vi.advanceTimersByTime(popoverView.TIMEOUT_LENGTH)
 
       expect(closePopoverSpy).not.toHaveBeenCalled()
     })
@@ -95,9 +95,9 @@ describe('OutcomePopoverView', () => {
       expect(popoverView.popover).toBeDefined()
       expect(popoverView.inside).toBe(true)
 
-      const closePopoverSpy = jest.spyOn(popoverView, 'closePopover')
+      const closePopoverSpy = vi.spyOn(popoverView, 'closePopover')
       popoverView.el.find('i').trigger(createEvent('mouseleave'))
-      jest.advanceTimersByTime(popoverView.TIMEOUT_LENGTH)
+      vi.advanceTimersByTime(popoverView.TIMEOUT_LENGTH)
 
       expect(closePopoverSpy).toHaveBeenCalled()
     })
@@ -107,8 +107,8 @@ describe('OutcomePopoverView', () => {
     it('creates popover and sets up graph view', () => {
       expect(popoverView.popover).toBeUndefined()
 
-      const elementSpy = jest.spyOn(popoverView.outcomeLineGraphView, 'setElement')
-      const renderSpy = jest.spyOn(popoverView.outcomeLineGraphView, 'render')
+      const elementSpy = vi.spyOn(popoverView.outcomeLineGraphView, 'setElement')
+      const renderSpy = vi.spyOn(popoverView.outcomeLineGraphView, 'render')
 
       popoverView.openPopover(createEvent('mouseenter'))
 

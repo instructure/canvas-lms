@@ -125,5 +125,62 @@ describe CanvasSecurity::JWTWorkflow do
         expect(state[:use_high_contrast]).to be false
       end
     end
+
+    describe ":scone" do
+      it "sets can_manage_course to true when user has manage rights" do
+        expect(@c).to receive(:grants_right?).with(@u, :manage).and_return(true)
+        state = described_class.state_for(%i[scone], @c, @u)
+        expect(state[:can_manage_course]).to be true
+      end
+
+      it "sets can_manage_course to false when user does not have manage rights" do
+        expect(@c).to receive(:grants_right?).with(@u, :manage).and_return(false)
+        state = described_class.state_for(%i[scone], @c, @u)
+        expect(state[:can_manage_course]).to be false
+      end
+
+      it "returns empty hash when context is not a Course" do
+        state = described_class.state_for(%i[scone], @a, @u)
+        expect(state).to be_empty
+      end
+
+      it "requires a context" do
+        expect(CanvasSecurity::JWTWorkflow.workflow_requires_context?(:scone)).to be true
+      end
+    end
+
+    describe ":autopilot" do
+      let(:permissions) { %i[manage_rules_view manage_rules_add manage_rules_edit manage_rules_delete] }
+
+      it "returns a hash of permission results when context is an Account and user is present" do
+        permissions.each do |permission|
+          expect(@a).to receive(:grants_right?).with(@u, permission).and_return(true)
+        end
+        state = described_class.state_for(%i[autopilot], @a, @u)
+        expect(state).to eql(permissions.index_with { true })
+      end
+
+      it "reflects false grants per permission" do
+        allow(@a).to receive(:grants_right?).and_return(false)
+        expect(@a).to receive(:grants_right?).with(@u, :manage_rules_view).and_return(true)
+        state = described_class.state_for(%i[autopilot], @a, @u)
+        expect(state).to eql(
+          manage_rules_view: true,
+          manage_rules_add: false,
+          manage_rules_edit: false,
+          manage_rules_delete: false
+        )
+      end
+
+      it "returns empty hash when context is not an Account" do
+        state = described_class.state_for(%i[autopilot], @c, @u)
+        expect(state).to be_empty
+      end
+
+      it "returns empty hash when user is not present" do
+        state = described_class.state_for(%i[autopilot], @a, nil)
+        expect(state).to be_empty
+      end
+    end
   end
 end

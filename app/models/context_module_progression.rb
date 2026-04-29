@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-class ContextModuleProgression < ActiveRecord::Base
+class ContextModuleProgression < ApplicationRecord
   include Workflow
 
   belongs_to :context_module
@@ -121,7 +121,7 @@ class ContextModuleProgression < ActiveRecord::Base
       self.met_requirement_count += 1
     end
 
-    def requirement_met?(req, include_type = true)
+    def requirement_met?(req, include_type: true)
       actions_done.any? { |r| r[:id] == req[:id] && (include_type ? r[:type] == req[:type] : true) }
     end
 
@@ -145,7 +145,7 @@ class ContextModuleProgression < ActiveRecord::Base
     def check_view_requirements
       view_requirements.each do |req|
         # should mark a must_view as true if a completed must_submit/min_score/min_percentage action already exists
-        check_action!(req, requirement_met?(req, false))
+        check_action!(req, requirement_met?(req, include_type: false))
       end
     end
   end
@@ -201,8 +201,11 @@ class ContextModuleProgression < ActiveRecord::Base
         calc.check_action!(req, false)
       elsif req[:type] == "must_submit"
         req_met = !!(subs && subs.any? do |sub|
-          if sub.workflow_state == "graded" && sub.attempt.nil?
-            # is a manual grade - doesn't count for submission
+          if sub.workflow_state == "graded" && sub.attempt.nil? && !(
+            tag.content_type_discussion? &&
+            tag.content&.assignment&.checkpoints_parent?
+          )
+            # is a manual grade - doesn't count for submission. Excluding discussion checkpoints
             false
           elsif %w[submitted graded complete pending_review].include?(sub.workflow_state)
             true

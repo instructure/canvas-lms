@@ -55,6 +55,7 @@ export const defaultGradebookEnv = {
     filter_speed_grader_by_student_group: false,
   },
   currentUserId: '1',
+  custom_grade_statuses_enabled: false,
   dataloader_improvements: true,
   default_grading_standard: [
     ['A', 0.9],
@@ -100,6 +101,8 @@ export const defaultGradebookEnv = {
   settings_update_url: '/path/to/settingsUpdateUrl',
   speed_grader_enabled: true,
   student_groups: {},
+  viewHiddenGradesIndicator: false,
+  viewStatusForColorblindness: false,
 }
 
 export const defaultGradebookProps: GradebookProps = {
@@ -157,6 +160,9 @@ export function createGradebook(
     performance_controls?: any
     gradebook_is_editable?: any
     gradebookGridNode?: HTMLElement
+    post_grades_enhanced_modal?: boolean
+    post_grades_ltis?: any[]
+    [key: string]: any
   } = {},
 ): Gradebook & {
   props: GradebookProps

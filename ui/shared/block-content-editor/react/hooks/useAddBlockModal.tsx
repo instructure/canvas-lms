@@ -16,40 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useState} from 'react'
-import {Prettify} from '../utilities/Prettify'
-
-export type AddBlockModal = {
-  isOpen: boolean
-  insertAfterNodeId?: string
-  open: (insertAfterNodeId?: string) => void
-  close: () => void
-}
+import {useCallback} from 'react'
+import {useAppSetStore} from '../store'
 
 export const useAddBlockModal = () => {
-  const [modalState, setModalState] = useState<
-    Prettify<Pick<AddBlockModal, 'isOpen' | 'insertAfterNodeId'>>
-  >({
-    isOpen: false,
-    insertAfterNodeId: undefined,
-  })
+  const set = useAppSetStore()
 
   const open = useCallback((insertAfterNodeId?: string) => {
-    setModalState({
-      isOpen: true,
-      insertAfterNodeId,
+    set(state => {
+      state.addBlockModal = {
+        isOpen: true,
+        insertAfterNodeId,
+      }
     })
   }, [])
 
   const close = useCallback(() => {
-    setModalState({
-      isOpen: false,
-      insertAfterNodeId: undefined,
+    set(state => {
+      state.addBlockModal = {
+        isOpen: false,
+        insertAfterNodeId: undefined,
+      }
     })
   }, [])
 
   return {
-    ...modalState,
     open,
     close,
   }

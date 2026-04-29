@@ -19,10 +19,7 @@
 import {Flex} from '@instructure/ui-flex'
 import React from 'react'
 
-export const MainLayout = (props: {
-  header: React.ReactNode
-  body: React.ReactNode
-}) => {
+export const MainLayout = (props: {header: React.ReactNode; body: React.ReactNode}) => {
   return (
     <Flex direction="column" gap="medium">
       <Flex>{props.header}</Flex>

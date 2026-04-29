@@ -109,6 +109,24 @@ describe('GradeRow', () => {
       expect(queryByText('Out of 5 pts')).not.toBeInTheDocument()
     })
 
+    it('rounds grade to 2 decimal places for points gradingType', () => {
+      const {getByText} = render(
+        <table>
+          <tbody>
+            {GradeRow({
+              ...getProps({
+                grade: '0.7142857142857143',
+                score: 0.7142857142857143,
+                pointsPossible: 2,
+              }),
+            })}
+          </tbody>
+        </table>,
+      )
+      expect(getByText('0.71 pts')).toBeInTheDocument()
+      expect(getByText('Out of 2 pts')).toBeInTheDocument()
+    })
+
     it('shows — pts for ungraded assignment with points gradingType', () => {
       const {getByText} = render(
         <table>

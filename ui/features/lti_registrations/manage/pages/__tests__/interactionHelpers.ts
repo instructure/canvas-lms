@@ -21,9 +21,7 @@ import {userEvent} from '@testing-library/user-event'
 export const clickOrFail = async (element: HTMLButtonElement | null) => {
   if (element === null) {
     throw new Error("Couldn't click on non-existent element.")
-  }
-  else {
+  } else {
     return userEvent.click(element)
   }
 }
-

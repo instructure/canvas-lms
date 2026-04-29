@@ -1,0 +1,30 @@
+/*
+ * Copyright (C) 2026 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// Educator Dashboard visual overrides, scoped to the body class added by
+// UsersController#educator_dashboard. All rules here are intentionally
+// narrowly scoped so they do not bleed into the learner dashboard.
+
+body.educator-dashboard {
+  // No BrandableCSS token equivalent exists for this background color
+  background-color: #F2F4F5;
+
+  .unpublished_courses_redesign .ic-DashboardCard__box__header {
+    background: #F2F4F5;
+  }
+}

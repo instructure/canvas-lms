@@ -1,7 +1,13 @@
+<%
+  # For discussion checkpoints, use the parent assignment instead of the sub-assignment
+  # to ensure correct assignment IDs and URLs in notifications
+  assignment = asset.submission.assignment
+  assignment = assignment.parent_assignment if assignment.checkpoint? && assignment.parent_assignment
+%>
 <%= t :body, "New comment by %{author} for %{assignment}, %{user}, %{context}.",
       :author => submission_comment_author(asset, user),
-      :assignment => asset.submission.assignment.title,
+      :assignment => assignment.title,
       :user => submission_comment_submittor(asset, user),
-      :context => asset.submission.assignment.context.name %>
+      :context => assignment.context.name %>
 
-<%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(asset.submission.assignment.context) %>
+<%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(assignment.context) %>

@@ -16,38 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createContext, PropsWithChildren, useContext} from 'react'
+import {PropsWithChildren} from 'react'
 import {SerializedNodes} from '@craftjs/core'
-import {AddBlockModal, useAddBlockModal} from './hooks/useAddBlockModal'
-import {InitialAddBlockHandler, useInitialAddBlockHandler} from './hooks/useInitialAddBlockHandler'
-
-export type BlockContentEditorContextType = {
-  addBlockModal: AddBlockModal
-  initialAddBlockHandler: InitialAddBlockHandler
-}
+import {Provider} from './utilities/fastContext'
+import {createStore} from './store'
 
 export type BlockContentEditorContextProps = {
   data: SerializedNodes | null
+  aiAltTextGenerationURL: string | null
+  toolbarReorder: boolean
 }
-
-const Context = createContext<BlockContentEditorContextType>(null as any)
-
-export const useBlockContentEditorContext = () => useContext(Context)
 
 export const BlockContentEditorContext = (
   props: PropsWithChildren<BlockContentEditorContextProps>,
 ) => {
-  const addBlockModal = useAddBlockModal()
-  const initialAddBlockHandler = useInitialAddBlockHandler(props.data?.['ROOT']?.nodes.length ?? 0)
-
   return (
-    <Context.Provider
-      value={{
-        addBlockModal,
-        initialAddBlockHandler,
-      }}
+    <Provider
+      store={createStore({
+        aiAltTextGenerationURL: props.aiAltTextGenerationURL,
+        toolbarReorder: props.toolbarReorder,
+      })}
     >
       {props.children}
-    </Context.Provider>
+    </Provider>
   )
 }

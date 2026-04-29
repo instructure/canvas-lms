@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {random} from 'es-toolkit/compat'
 import React, {useEffect, useRef} from 'react'
 
 const useRandomInterval = (
@@ -29,7 +29,7 @@ const useRandomInterval = (
 
   useEffect(() => {
     const handleTick = () => {
-      const nextTickAt = _.random(minDelayMs, maxDelayMs)
+      const nextTickAt = random(minDelayMs, maxDelayMs)
       timeoutId.current = window.setTimeout(() => {
         memoizedCallback()
         handleTick()

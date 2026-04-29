@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe PlannerNotesController do
   before :once do
     course_with_teacher(active_all: true)
@@ -71,7 +69,7 @@ describe PlannerNotesController do
           @course_1.destroy
           get :index
           note_ids = json_parse(response.body).pluck("id")
-          expect(note_ids).to_not include(@course_1_note.id)
+          expect(note_ids).not_to include(@course_1_note.id)
           expect(note_ids).to include(@course_2_note.id)
 
           get :index, params: { context_codes: ["course_#{@course_1.id}"] }

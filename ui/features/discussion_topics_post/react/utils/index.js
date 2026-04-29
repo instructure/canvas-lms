@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CURRENT_USER} from './constants'
+import {CURRENT_USER, SUBMITTED} from './constants'
 import {
   DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
   DISCUSSION_SUBENTRIES_QUERY,
@@ -289,6 +289,7 @@ export const resolveAuthorRoles = (isAuthor, discussionRoles) => {
   return discussionRoles
 }
 
+/** @returns {import('@instructure/ui-responsive').BreakpointQueries} */
 export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
   const querySizes = {}
   if (mobile) {
@@ -340,6 +341,8 @@ export const getOptimisticResponse = ({
         createdAt: new Date().toString(),
         updatedAt: new Date().toString(),
         deleted: false,
+        pinType: null,
+        pinnedBy: null,
         message,
         ratingCount: null,
         ratingSum: null,
@@ -493,8 +496,15 @@ export const showErrorWhenMessageTooLong = message => {
   return false
 }
 
-export const getTranslation = async (text, translateTargetLanguage) => {
-  if (!text) return // Don't translate, if no content
+export const getTranslation = async (text, translateTargetLanguage, signal) => {
+  if (!text) return
+
+  // Check if already aborted before making the request
+  if (signal?.aborted) {
+    const error = new Error('Translation request was aborted')
+    error.name = 'AbortError'
+    throw error
+  }
 
   const apiPath = `/courses/${ENV.course_id}/translate`
 
@@ -509,13 +519,72 @@ export const getTranslation = async (text, translateTargetLanguage) => {
           feature_slug: 'discussion',
         },
       },
+      signal,
     })
+
+    // Check if aborted after receiving response but before returning
+    if (signal?.aborted) {
+      const error = new Error('Translation request was aborted')
+      error.name = 'AbortError'
+      throw error
+    }
 
     return json.translated_text
   } catch (e) {
-    const response = await e.response.json()
-    const error = new Error()
-    Object.assign(error, {...response})
-    throw error
+    // If the request was aborted, throw a specific error
+    if (e.name === 'AbortError' || signal?.aborted) {
+      const error = new Error('Translation request was aborted')
+      error.name = 'AbortError'
+      throw error
+    }
+
+    // Check if e has a response property before trying to read it
+    if (e.response) {
+      const response = await e.response.json()
+      const error = new Error()
+      Object.assign(error, {...response})
+      throw error
+    }
+
+    // If no response, just rethrow the original error
+    throw e
+  }
+}
+
+/**
+ * Checks if a checkpoint submission is completed
+ * @param {Object} submission - The submission object
+ * @returns {boolean} - Whether the checkpoint is completed
+ */
+export const isCheckpointCompleted = submission => {
+  return submission?.submissionStatus === SUBMITTED
+}
+
+/**
+ * Checks if all required submissions are complete for peer review
+ * For checkpointed discussions, both reply_to_topic and reply_to_entry must be submitted
+ * For non-checkpointed discussions, the user just needs to have posted
+ * @param {Object} discussionTopic - The discussion topic object
+ * @param {Object} replyToTopicSubmission - The reply to topic submission object
+ * @param {Object} replyToEntrySubmission - The reply to entry submission object
+ * @param {boolean} userHasPosted - Whether the user has posted in the discussion
+ * @returns {boolean} - Whether the submission is complete
+ */
+export const isSubmissionComplete = (
+  discussionTopic,
+  replyToTopicSubmission,
+  replyToEntrySubmission,
+  userHasPosted,
+) => {
+  const hasCheckpoints = (discussionTopic?.assignment?.checkpoints?.length || 0) > 0
+
+  if (hasCheckpoints) {
+    // For checkpointed discussions: both checkpoints must be completed
+    return (
+      isCheckpointCompleted(replyToTopicSubmission) && isCheckpointCompleted(replyToEntrySubmission)
+    )
+  } else {
+    // For non-checkpointed discussions: user just needs to have posted
+    return userHasPosted
   }
 }

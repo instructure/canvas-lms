@@ -98,12 +98,11 @@ export const mockTrayProps = {
   source: {
     initializeCollection() {},
     initializeUpload() {},
-    initializeFlickr() {},
     initializeImages() {},
     initializeDocuments() {},
     initializeMedia() {},
-    fetchMedia: jest.fn().mockResolvedValue({files}),
-    getSession: jest.fn().mockResolvedValue({usageRightsRequired: false}),
+    fetchMedia: vi.fn().mockResolvedValue({files}),
+    getSession: vi.fn().mockResolvedValue({usageRightsRequired: false}),
   },
   storeProps: {},
   images: {

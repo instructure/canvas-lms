@@ -39,8 +39,8 @@ describe LtiApiController, type: :request do
     allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
   end
 
-  def check_error_response(message, check_generated_sig = true, with_report: true)
-    expect(response.body.strip).to_not be_empty, "Should not have an empty response body"
+  def check_error_response(message, check_generated_sig: true, with_report: true)
+    expect(response.body.strip).not_to be_empty, "Should not have an empty response body"
 
     json = response.parsed_body
     expect(json["errors"][0]["message"]).to eq message
@@ -55,11 +55,11 @@ describe LtiApiController, type: :request do
       expect(data).to have_key("oauth_timestamp")
       expect(data).to have_key("generated_signature") if check_generated_sig
 
-      expect(data["oauth_signature"]).to_not be_empty
-      expect(data["oauth_signature_method"]).to_not be_empty
-      expect(data["oauth_nonce"]).to_not be_empty
-      expect(data["oauth_timestamp"]).to_not be_empty
-      expect(data["generated_signature"]).to_not be_empty if check_generated_sig
+      expect(data["oauth_signature"]).not_to be_empty
+      expect(data["oauth_signature_method"]).not_to be_empty
+      expect(data["oauth_nonce"]).not_to be_empty
+      expect(data["oauth_timestamp"]).not_to be_empty
+      expect(data["generated_signature"]).not_to be_empty if check_generated_sig
     end
   end
 
@@ -124,7 +124,7 @@ describe LtiApiController, type: :request do
   context "OAuth Requests" do
     it "fails on invalid signature method" do
       make_call("override_signature_method" => "BawkBawk256")
-      check_error_response("Invalid authorization header", false, with_report: false)
+      check_error_response("Invalid authorization header", check_generated_sig: false, with_report: false)
       assert_status(401)
     end
 
@@ -283,7 +283,7 @@ describe LtiApiController, type: :request do
     expect(@assignment.submissions.not_placeholder.where(user_id: @student)).not_to be_exists
     desc = xml.at_css("imsx_description").content.match(/(?<description>.+)\n\[EID_(?<error_report>[^\]]+)\]/)
     expect(desc[:description]).to eq error_message if error_message
-    expect(desc[:error_report]).to_not be_empty
+    expect(desc[:error_report]).not_to be_empty
   end
 
   def check_success
@@ -322,6 +322,16 @@ describe LtiApiController, type: :request do
       expect(submission).to be_submitted_at
       expect(submission.submission_type).to eql "external_tool"
       expect(submission.score).to eq 12
+    end
+
+    it "logs asset access for participation tracking" do
+      make_call("body" => replace_result(score: "0.6"))
+      check_success
+
+      asset_access = AssetUserAccess.where(user_id: @student, asset_code: @assignment.asset_string).first
+      expect(asset_access).to be_present
+      expect(asset_access.action_level).to eq "participate"
+      expect(asset_access.asset_category).to eq "assignments"
     end
 
     it "includes the appropriate data in the request headers" do

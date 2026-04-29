@@ -13,7 +13,7 @@
  **************************************************************
  */
  
-import './core'
+import './core.js'
 (function () {
     var $D = Date, $P = $D.prototype, $C = $D.CultureInfo, $N = Number.prototype;
 

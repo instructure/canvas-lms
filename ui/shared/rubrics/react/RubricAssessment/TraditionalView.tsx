@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMemo} from 'react'
+import {useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {Table} from '@instructure/ui-table'
@@ -30,15 +30,20 @@ import type {
 } from '../types/rubric'
 import {TraditionalViewCriterionRow} from './TraditionalViewCriterionRow'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
+import AiUsageButton from '../components/AiUsageButton'
+import {ProficiencyRating} from '@canvas/graphql/codegen/graphql'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
 export type TraditionalViewProps = {
   criteria: RubricCriterion[]
+  customRatings?: ProficiencyRating[]
   hidePoints: boolean
   isFreeFormCriterionComments: boolean
   isPeerReview?: boolean
   isPreviewMode: boolean
+  isAiEvaluated?: boolean
   ratingOrder?: string
   rubricAssessmentData: RubricAssessmentData[]
   rubricSavedComments?: Record<string, string[]>
@@ -51,10 +56,12 @@ export type TraditionalViewProps = {
 
 export const TraditionalView = ({
   criteria,
+  customRatings,
   hidePoints,
   isFreeFormCriterionComments,
   isPeerReview,
   isPreviewMode,
+  isAiEvaluated = false,
   ratingOrder = 'descending',
   rubricAssessmentData,
   rubricSavedComments,
@@ -64,6 +71,7 @@ export const TraditionalView = ({
   validationErrors,
   onUpdateAssessmentData,
 }: TraditionalViewProps) => {
+  const [selectedLearningOutcomeId, setSelectedLearningOutcomeId] = useState<string>()
   const pointsColumnWidth = hidePoints ? 0 : 8.875
   const criteriaColumnWidth = 11.25
   const maxRatingsCount = Math.max(...criteria.map(criterion => criterion.ratings.length))
@@ -116,7 +124,10 @@ export const TraditionalView = ({
         padding="x-small small"
         themeOverride={{paddingXSmall: '0.438rem'}}
       >
-        <Text weight="bold">{rubricTitle}</Text>
+        <Flex justifyItems="space-between" alignItems="center" padding="0">
+          <Text weight="bold">{rubricTitle}</Text>
+          {isAiEvaluated && <AiUsageButton />}
+        </Flex>
       </View>
 
       <table style={{width: '100%', height: '100%'}}>
@@ -164,6 +175,7 @@ export const TraditionalView = ({
                 criterion={criterion}
                 criterionAssessment={criterionAssessment}
                 criterionSelfAssessment={criterionSelfAssessment}
+                customRatings={customRatings}
                 hidePoints={hidePoints}
                 isFreeFormCriterionComments={isFreeFormCriterionComments}
                 isLastIndex={isLastIndex}
@@ -173,6 +185,8 @@ export const TraditionalView = ({
                 ratingOrder={ratingOrder}
                 ratingsColumnMinWidth={ratingsColumnMinWidth}
                 rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
+                selectedLearningOutcomeId={selectedLearningOutcomeId}
+                selectLearningOutcome={setSelectedLearningOutcomeId}
                 shouldFocusFirstRating={validationErrors?.[0] === criterion.id}
                 submissionUser={submissionUser}
                 validationErrors={validationErrors}

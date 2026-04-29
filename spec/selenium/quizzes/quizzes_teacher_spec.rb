@@ -56,10 +56,11 @@ describe "quizzes" do
       add_due_date_override(@quiz)
 
       get "/courses/#{@course.id}/quizzes"
-      expect(f(".item-group-container .date-available")).to include_text "Multiple Dates"
-      driver.action.move_to(f(".item-group-container .date-available")).perform
-      wait_for_ajaximations
-      tooltip = fj(".ui-tooltip:visible")
+      date_available = f(".item-group-container .date-available")
+      expect(date_available).to include_text "Multiple Dates"
+      driver.action.move_to(date_available).perform
+      tooltip_id = date_available.find_element(:css, "a").dom_attribute("aria-describedby")
+      tooltip = f("[role='tooltip'][id=#{tooltip_id}]")
       expect(tooltip).to include_text "New Section"
       expect(tooltip).to include_text "Everyone else"
     end
@@ -114,8 +115,6 @@ describe "quizzes" do
       expect(group_form.find_element(:css, ".group_display.name")).to include_text("new group")
     end
 
-    it "should update a question group", priority: "1"
-
     it "does not let you exceed the question limit", priority: "2" do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
@@ -164,7 +163,7 @@ describe "quizzes" do
         add_question_to_group
         wait_for_ajaximations
 
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
 
         f("#questions .edit_group_link").click
         replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), "2")
@@ -185,7 +184,7 @@ describe "quizzes" do
         add_question_to_group
         wait_for_ajaximations
 
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
       end
 
       it "shows a warning for groups picking too many questions from a bank", priority: "2" do
@@ -203,7 +202,7 @@ describe "quizzes" do
         submit_form(".quiz_group_form")
         wait_for_ajaximations
 
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
 
         f("#questions .edit_group_link").click
         replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), "2")
@@ -225,7 +224,7 @@ describe "quizzes" do
         replace_content(f('#questions .group_top input[name="quiz_group[pick_count]"]'), "1")
         submit_form(".quiz_group_form")
         wait_for_ajaximations
-        expect(f(".insufficient_count_warning")).to_not be_displayed
+        expect(f(".insufficient_count_warning")).not_to be_displayed
       end
     end
 
@@ -302,61 +301,11 @@ describe "quizzes" do
       user_session(@user)
     end
 
-    it "should mark dropdown questions as answered", priority: "2"
-
-    it "gives a student extra time if the time limit is extended", priority: "2" do
-      skip "Failing Crystalball DEMO-212"
-      @context = @course
-      bank = @course.assessment_question_banks.create!(title: "Test Bank")
-      q = quiz_model
-      a = bank.assessment_questions.create!
-      answers = [{ id: 1, answer_text: "A", weight: 100 }, { id: 2, answer_text: "B", weight: 0 }]
-      question = q.quiz_questions.create!(question_data: {
-                                            :name => "first question",
-                                            "question_type" => "multiple_choice_question",
-                                            "answers" => answers,
-                                            :points_possible => 1
-                                          },
-                                          assessment_question: a)
-
-      q.generate_quiz_data
-      q.time_limit = 10
-      q.save!
-
-      user_session(@student)
-      get "/courses/#{@course.id}/quizzes/#{q.id}/take"
-      f("#take_quiz_link").click
-      sleep 1
-
-      answer_one = f("#question_#{question.id}_answer_1")
-
-      # force a save to create a submission
-      answer_one.click
-      wait_for_ajaximations
-
-      # add time. this code replicates what happens in
-      # QuizSubmissions#extensions when a moderator extends a student's
-      # quiz time.
-
-      quiz_original_end_time = Quizzes::QuizSubmission.last.end_at
-      submission = Quizzes::QuizSubmission.last
-      submission.end_at = 20.minutes.from_now
-      submission.save!
-      expect(quiz_original_end_time).to be < Quizzes::QuizSubmission.last.end_at
-
-      # answer a question to force a quicker UI sync (so we don't have to
-      # wait ~15 seconds). need to wait 1 sec cuz updateSubmission :'(
-      sleep 1
-      f("#question_#{question.id}_answer_2").click
-
-      expect(f(".time_running")).to include_text "19 Minutes"
-    end
-
     def upload_attachment_answer
       f("input[type=file]").send_keys @fullpath
       wait_for_ajaximations
-      expect(f(".file-uploaded").text).to be
-      expect(f(".list_question, .answered").text).to be
+      expect(f(".file-uploaded").text).not_to be_nil
+      expect(f(".list_question, .answered").text).not_to be_nil
       f(".upload-label").click
       wait_for_ajaximations
     end
@@ -365,53 +314,6 @@ describe "quizzes" do
       @quiz.reload.quiz_submissions.first
            .submission_data[:"question_#{@question.id}"]
     end
-
-    def file_upload_attachment
-      @quiz.reload.quiz_submissions.first.attachments.first
-    end
-
-    it "works with file upload questions", priority: "1" do
-      skip_if_chrome("issue with upload_attachment_answer")
-      @context = @course
-      bank = @course.assessment_question_banks.create!(title: "Test Bank")
-      q = quiz_model
-      a = bank.assessment_questions.create!
-      answers = { "answer_0" => { "id" => 1 }, "answer_1" => { "id" => 2 } }
-      @question = q.quiz_questions.create!(question_data: {
-                                             :name => "first question",
-                                             "question_type" => "file_upload_question",
-                                             "question_text" => "file upload question maaaan",
-                                             "answers" => answers,
-                                             :points_possible => 1
-                                           },
-                                           assessment_question: a)
-      q.generate_quiz_data
-      q.save!
-      _filename, @fullpath, _data = get_file "testfile1.txt"
-
-      Setting.set("context_default_quota", "1") # shouldn't check quota
-
-      user_session(@student)
-      begin_quiz
-
-      # so we can .send_keys to the input, can't if it's invisible to the browser
-      driver.execute_script "$('.file-upload').removeClass('hidden')"
-      upload_attachment_answer
-      expect(file_upload_submission_data).to eq [file_upload_attachment.id.to_s]
-
-      expect_new_page_load do
-        driver.get driver.current_url
-        driver.switch_to.alert.accept
-      end
-
-      wait_for_ajaximations
-      attachment = file_upload_attachment
-      expect(f(".file-upload-box")).to include_text attachment.display_name
-      f("#submit_quiz_button").click
-      expect(f(".selected_answer")).to include_text attachment.display_name
-    end
-
-    it "should notify a student of extra time given by a moderator", priority: "2"
 
     it "displays a link to quiz statistics for a MOOC", priority: "2" do
       quiz_with_submission

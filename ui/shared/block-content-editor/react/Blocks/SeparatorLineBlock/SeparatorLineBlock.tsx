@@ -16,27 +16,58 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {View} from '@instructure/ui-view'
-import {BaseBlock} from '../BaseBlock'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {View} from '@instructure/ui-view'
 import {BorderWidth, BorderWidthValues} from '@instructure/emotion'
+import {BaseBlock} from '../BaseBlock'
+import {SeparatorLineBlockSettings} from './SeparatorLineBlockSettings'
+import {defaultProps} from './defaultProps'
+import {separatorLineContrast} from '../../accessibilityChecker/rules/separatorLineContrast'
+
+const I18n = createI18nScope('block_content_editor')
 
 export type SeparatorLineBlockProps = {
   thickness: BorderWidthValues
+  separatorColor: string
+  backgroundColor: string
 }
 
-export const SeparatorLineBlockContent = (props: SeparatorLineBlockProps) => {
+export const SeparatorLineBlockView = (props: SeparatorLineBlockProps) => {
   const borderWidth: BorderWidth = `0 0 ${props.thickness} 0`
 
-  return <View as="hr" data-testid="separator-line" borderWidth={borderWidth} />
+  return (
+    <View
+      as="hr"
+      aria-hidden="true"
+      data-testid="separator-line"
+      borderWidth={borderWidth}
+      borderColor="primary"
+      margin="none"
+      themeOverride={{
+        borderColorPrimary: props.separatorColor,
+      }}
+    />
+  )
 }
 
-const I18n = createI18nScope('page_editor')
-
-export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
+export const SeparatorLineBlock = (props: Partial<SeparatorLineBlockProps>) => {
+  const componentProps = {...defaultProps, ...props}
   return (
-    <BaseBlock title={I18n.t('Separator line')}>
-      <SeparatorLineBlockContent {...props} />
-    </BaseBlock>
+    <BaseBlock
+      ViewComponent={SeparatorLineBlockView}
+      EditViewComponent={SeparatorLineBlockView}
+      EditComponent={SeparatorLineBlockView}
+      componentProps={componentProps}
+      title={SeparatorLineBlock.craft.displayName}
+      backgroundColor={componentProps.backgroundColor}
+      customAccessibilityCheckRules={[separatorLineContrast]}
+    />
   )
+}
+
+SeparatorLineBlock.craft = {
+  displayName: I18n.t('Separator line') as string,
+  related: {
+    settings: SeparatorLineBlockSettings,
+  },
 }

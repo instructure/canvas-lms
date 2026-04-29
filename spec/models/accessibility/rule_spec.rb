@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe Accessibility::Rule do
   describe ".registry" do
     it "returns a hash" do
@@ -26,7 +24,7 @@ describe Accessibility::Rule do
     end
 
     it "has values that are subclasses of Accessibility::Rule" do
-      expect(described_class.registry.values).to all(be < Accessibility::Rule)
+      expect(described_class.registry.values).to all(be_a(Accessibility::Rule))
     end
   end
 
@@ -36,7 +34,7 @@ describe Accessibility::Rule do
     end
 
     it "contains only subclasses of Accessibility::Rule" do
-      expect(described_class.pdf_registry).to all(be < Accessibility::Rule)
+      expect(described_class.pdf_registry).to all(be_a(Accessibility::Rule))
     end
   end
 
@@ -44,7 +42,7 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.test(nil)
+          described_class.new.test(nil)
         end.to raise_error(NotImplementedError, "#{described_class} must implement/override test")
       end
     end
@@ -53,7 +51,7 @@ describe Accessibility::Rule do
   describe ".form" do
     context "by default" do
       it "returns an empty hash" do
-        expect(described_class.form(nil)).to eq({})
+        expect(described_class.new.form(nil)).to eq({})
       end
     end
   end
@@ -62,8 +60,16 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.fix!(nil, nil)
+          described_class.new.fix!(nil, nil)
         end.to raise_error(NotImplementedError, "#{described_class} must implement fix")
+      end
+    end
+  end
+
+  describe ".generate_fix" do
+    context "when not overridden" do
+      it "returns nil" do
+        expect(described_class.new.generate_fix(nil)).to be_nil
       end
     end
   end
@@ -72,7 +78,7 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.display_name
+          described_class.new.display_name
         end.to raise_error(NotImplementedError, "#{described_class} must implement display_name")
       end
     end
@@ -82,7 +88,7 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.message
+          described_class.new.message
         end.to raise_error(NotImplementedError, "#{described_class} must implement message")
       end
     end
@@ -92,8 +98,23 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.why
+          described_class.new.why
         end.to raise_error(NotImplementedError, "#{described_class} must implement/override why")
+      end
+    end
+  end
+
+  describe ".issue_preview" do
+    context "when element is nil" do
+      it "returns nil" do
+        expect(described_class.new.issue_preview(nil)).to be_nil
+      end
+    end
+
+    context "when element is provided" do
+      it "returns the element's HTML" do
+        element = instance_double(Nokogiri::XML::Element, to_html: "<div>Test</div>")
+        expect(described_class.new.issue_preview(element)).to eq("<div>Test</div>")
       end
     end
   end

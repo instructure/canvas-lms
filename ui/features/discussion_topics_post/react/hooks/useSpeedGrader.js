@@ -47,6 +47,11 @@ export default function useSpeedGrader() {
     window.top.postMessage(message, '*')
   }
 
+  function postMessageEntryIds(entryIds) {
+    const message = {subject: 'SG.entryIdPayload', payload: {studentEntryIds: entryIds}}
+    sendPostMessage(message)
+  }
+
   function handlePreviousStudentReply() {
     const message = {subject: 'DT.previousStudentReplyTab'}
     sendPostMessage(message)
@@ -74,6 +79,7 @@ export default function useSpeedGrader() {
 
   return {
     isInSpeedGrader,
+    postMessageEntryIds,
     handlePreviousStudentReply,
     handleNextStudentReply,
     handleJumpFocusToSpeedGrader,

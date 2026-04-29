@@ -38,6 +38,9 @@ describe('RailsFlashNotificationsHelper', () => {
   })
 
   afterEach(() => {
+    // Stop all jQuery animations and clear the animation queue before removing elements
+    // This prevents animations from trying to access window.getComputedStyle after teardown
+    $(fixtures).find('*').stop(true, true)
     fixtures.remove()
     $.fx.off = false // Re-enable jQuery animations
   })

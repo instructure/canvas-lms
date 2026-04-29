@@ -19,4 +19,6 @@
 import CoreDispatcher from '@canvas/quiz-legacy-client-apps/dispatcher'
 import config from './config'
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore Legacy class constructor not typed
 export default new CoreDispatcher(config)

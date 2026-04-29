@@ -19,13 +19,17 @@
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
 import {Props, TempEnrollAssign, tempEnrollAssignData} from '../TempEnrollAssign'
 import {MAX_ALLOWED_COURSES_PER_PAGE, PROVIDER, User} from '../types'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-const backCall = jest.fn()
+const server = setupServer()
 
-jest.mock('../api/enrollment', () => ({
-  deleteEnrollment: jest.fn(),
-  getTemporaryEnrollmentPairing: jest.fn(),
+const backCall = vi.fn()
+
+vi.mock('../api/enrollment', () => ({
+  deleteEnrollment: vi.fn(),
+  getTemporaryEnrollmentPairing: vi.fn(),
 }))
 
 const truePermissions = {
@@ -84,7 +88,7 @@ const props: Props = {
     },
   ],
   goBack: backCall,
-  setEnrollmentStatus: jest.fn(),
+  setEnrollmentStatus: vi.fn(),
   doSubmit: () => false,
   isInAssignEditMode: false,
   enrollmentType: PROVIDER,
@@ -103,27 +107,27 @@ const ENROLLMENTS_URI = encodeURI(
 )
 
 describe('TempEnrollAssign', () => {
+  beforeAll(() => server.listen())
+
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       ACCOUNT_ID: '1',
       CONTEXT_TIMEZONE: 'Asia/Brunei',
       context_asset_string: 'account_1',
-    }
-    fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
+    })
+    server.use(http.get(ENROLLMENTS_URI, () => HttpResponse.json(enrollmentsByCourse)))
   })
 
   afterEach(() => {
-    fetchMock.reset()
-    fetchMock.restore()
-    jest.clearAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
     // ensure a clean state before each tests
     localStorage.clear()
   })
 
   afterAll(() => {
-    // @ts-expect-error
-    window.ENV = {}
+    server.close()
+    fakeENV.teardown()
   })
 
   it('sets state from localStorage on mount', async () => {
@@ -185,14 +189,14 @@ describe('TempEnrollAssign', () => {
     )
     const startTime = await findByLabelTextWithinStartDate('Time *')
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     fireEvent.input(startDate, {target: {value: expectedStartDateDisplay}})
     fireEvent.blur(startDate)
-    jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+    vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
     fireEvent.input(startTime, {target: {value: expectedStartTime12Hr}})
     fireEvent.blur(startTime)
-    jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+    vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
     const storedDataRaw = localStorage.getItem(tempEnrollAssignData) as string
     expect(storedDataRaw).toBeTruthy()
@@ -224,14 +228,14 @@ describe('TempEnrollAssign', () => {
     const {findByLabelText: findByLabelTextWithinEndDate} = within(endDateContainer as HTMLElement)
     const endTime = await findByLabelTextWithinEndDate('Time *')
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     fireEvent.input(endDate, {target: {value: expectedEndDateDisplay}})
     fireEvent.blur(endDate)
-    jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+    vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
     fireEvent.input(endTime, {target: {value: expectedEndTime12Hr}})
     fireEvent.blur(endTime)
-    jest.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
+    vi.runAllTimers() // DateTimeInput has a setTimeout before firing the change event
 
     const storedDataRaw = localStorage.getItem(tempEnrollAssignData) as string
     expect(storedDataRaw).toBeTruthy()

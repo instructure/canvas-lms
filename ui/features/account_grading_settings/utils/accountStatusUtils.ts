@@ -47,6 +47,7 @@ export const mapCustomStatusQueryResults = (
     name: status.name,
     color: status.color,
     type: 'custom',
+    icon: status.icon,
   }))
 }
 

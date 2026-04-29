@@ -34,7 +34,7 @@ describe('Modal', () => {
 
     // Mock jQuery functions
     const $ = require('jquery')
-    $.fn.disableWhileLoading = jest.fn()
+    $.fn.disableWhileLoading = vi.fn()
   })
 
   afterEach(() => {
@@ -80,7 +80,7 @@ describe('Modal', () => {
   })
 
   it('closes the modal with the X function when the X is pressed', () => {
-    const closeWithX = jest.fn()
+    const closeWithX = vi.fn()
     renderModal({closeWithX})
 
     const closeButton = screen.getByRole('button', {name: 'Close'})
@@ -91,7 +91,7 @@ describe('Modal', () => {
   })
 
   it('updates modalIsOpen when props change', () => {
-    const onRequestClose = jest.fn()
+    const onRequestClose = vi.fn()
     const {rerender} = renderModal({isOpen: false, onRequestClose})
 
     expect(document.querySelector('.ReactModal__Layout')).not.toBeInTheDocument()
@@ -106,7 +106,7 @@ describe('Modal', () => {
   })
 
   it('Sets the iframe allowances', () => {
-    const onAfterOpen = jest.fn()
+    const onAfterOpen = vi.fn()
     renderModal({onAfterOpen})
 
     // Wait for next animation frame
@@ -119,7 +119,7 @@ describe('Modal', () => {
   })
 
   it('closeModal() sets modal open state to false and calls onRequestClose', () => {
-    const onRequestClose = jest.fn()
+    const onRequestClose = vi.fn()
     renderModal({onRequestClose})
 
     const closeButton = screen.getByRole('button', {name: 'Close'})
@@ -158,7 +158,7 @@ describe('Modal', () => {
   })
 
   it('warns when children are not wrapped in ModalContent or ModalButtons', () => {
-    const consoleWarn = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     render(
       <Modal isOpen={true} title="Hello">
         <div>Invalid child</div>

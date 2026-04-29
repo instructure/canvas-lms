@@ -9,9 +9,9 @@ if [ "${SKIP_ESLINT-}" != "true" ]; then
   files=$(git diff --name-only --diff-filter=d HEAD^ -- '*.js' '*.jsx' '*.ts' '*.tsx')
   if [ -n "$files" ]; then
     echo "Running ESLint..."
-    yarn run lint $files --quiet || { echo "ESLint check failed"; exit_status=1; }
+    yarn run lint --quiet || { echo "ESLint check failed"; exit_status=1; }
   else
-    echo "No changed JS/TS files to run ESLint on..."
+    echo "No JS/TS files changed, skipping ESLint..."
   fi
 else
   echo "Skipping ESLint..."

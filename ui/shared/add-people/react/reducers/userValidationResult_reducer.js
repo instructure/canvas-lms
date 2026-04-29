@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cloneDeep} from 'lodash'
+import {cloneDeep} from 'es-toolkit/compat'
 import {handleActions} from 'redux-actions'
 import {actionTypes} from '../actions'
 import {defaultState} from '../store'

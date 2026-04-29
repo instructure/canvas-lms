@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {FilePreviewTray, FilePreviewTrayProps} from '../FilePreviewTray'
 import type {File} from '../../../../../interfaces/File.ts'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 
 const defaultProps: FilePreviewTrayProps = {
   item: {
@@ -31,7 +31,7 @@ const defaultProps: FilePreviewTrayProps = {
     type: 'document',
     restricted_by_master_course: false,
   } as unknown as File,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
 }
 
 const renderComponent = (props?: Partial<FilePreviewTrayProps>) => {

@@ -33,13 +33,8 @@ module Lti::Messages
     end
 
     def generate_post_payload_message
-      add_activity_claim!
+      add_activity_claim!(@asset_processor.assignment)
       super(validate_launch: true)
-    end
-
-    def add_activity_claim!
-      @message.activity.id = @asset_processor.assignment.lti_context_id
-      @message.activity.title = @asset_processor.assignment.title
     end
 
     def unexpanded_custom_parameters

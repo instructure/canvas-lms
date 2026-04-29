@@ -142,6 +142,19 @@ describe Api::V1::Lti::Registration do
         expect(subject[:inherited]).to be(false)
       end
 
+      context "when registration has a template" do
+        let(:template_registration) { lti_registration_model(account: Account.site_admin) }
+
+        before do
+          registration.template_registration = template_registration
+          registration.save!
+        end
+
+        it "includes inherited as true" do
+          expect(subject[:inherited]).to be(true)
+        end
+      end
+
       context "when registration is from different account" do
         before do
           registration.account = account_model
@@ -204,9 +217,38 @@ describe Api::V1::Lti::Registration do
       end
     end
 
+    context "of manual registration type" do
+      let!(:tool_configuration) do
+        lti_tool_configuration_model(lti_registration: registration)
+      end
+
+      it "includes icon_url from launch_settings when no overlay is present" do
+        expect(subject[:icon_url]).to eql(tool_configuration.launch_settings["icon_url"])
+      end
+    end
+
+    # TEMPORARY: Manual registrations now merge overlays into configuration.
+    # Use a dynamic registration to test overlay functionality.
     context "with an overlay" do
+      let(:ims_registration) { lti_ims_registration_model(account: context) }
+      let(:registration) do
+        lti_registration_model(
+          account: context,
+          ims_registration:,
+          admin_nickname: "Test",
+          vendor: "Test Company",
+          created_by: user_model
+        )
+      end
+      let(:overlay) do
+        Lti::Overlay.create!(
+          registration:,
+          account: context,
+          data:,
+          updated_by: user_model
+        )
+      end
       let(:includes) { [:overlay] }
-      let(:overlay) { lti_overlay_model(registration:, account: context, data:) }
       let(:data) { { title: "Test" } }
 
       before do
@@ -214,10 +256,39 @@ describe Api::V1::Lti::Registration do
       end
 
       it "includes the overlay" do
+        registration
         expect(subject[:overlay]).to include({
                                                id: overlay.id,
                                                data:
                                              })
+      end
+
+      it "uses the icon_url from the overlay" do
+        overlay.update!(data: { icon_url: "https://example.com/agreaticon.png" })
+        expect(subject[:icon_url]).to eq("https://example.com/agreaticon.png")
+      end
+    end
+
+    context "with a template registration" do
+      let(:template_registration) { lti_registration_model(account: Account.site_admin) }
+
+      before do
+        registration.template_registration = template_registration
+        registration.save!
+      end
+
+      it "includes template_registration_id" do
+        expect(subject[:template_registration_id]).to eq(template_registration.id)
+      end
+
+      context "when lti_registrations_templates flag is enabled" do
+        before do
+          context.root_account.enable_feature!(:lti_registrations_templates)
+        end
+
+        it "includes inherited as true" do
+          expect(subject[:inherited]).to be(true)
+        end
       end
     end
   end

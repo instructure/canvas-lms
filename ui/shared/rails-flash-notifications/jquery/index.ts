@@ -17,81 +17,57 @@
 
 // does Rails-style flash message/error boxes that drop down from the top of the screen
 import $ from 'jquery'
+import type {FlashNotificationContent, FlashNotice} from '../../global/env/EnvNotices'
 import NotificationsHelper from './helper'
+import {FLASH_NOTICE_STORAGE_KEY} from '../index'
+
+export {addFlashNoticeForNextPage} from '../index'
 
 declare global {
-  type MessageContent = string | {html: string}
-
-  interface Env {
-    notices: ReadonlyArray<FlashNotice>
-  }
-
-  /**
-   * Types of flash notifcations,
-   * pulled from: app/controllers/application_controller.rb
-   */
-  type FlashNotificationType = 'warning' | 'error' | 'info' | 'success'
-
-  /**
-   * Types of icons for flash notifcations,
-   * pulled from: app/controllers/application_controller.rb
-   */
-  type FlashNotificationIcon = 'warning' | 'error' | 'info' | 'check'
-
-  type FlashNotice = {
-    type: FlashNotificationType
-    icon?: FlashNotificationIcon
-    classes?: string
-    content: {
-      html?: string
-      timeout?: number
-    }
-  }
-
   interface JQueryStatic {
     /**
      * Pops up a small notification box at the top of the screen.
      */
-    flashMessage: (message: MessageContent, timeout?: number) => void
+    flashMessage: (message: FlashNotificationContent, timeout?: number) => void
 
     /**
      * Like flashMessage, but escapes html even if 'html' field given
      * To be used when the input comes from an external source (e.g. an LTI tool)
      */
-    flashMessageSafe: (message: MessageContent, timeout?: number) => void
+    flashMessageSafe: (message: FlashNotificationContent, timeout?: number) => void
 
     /**
      *  Pops up a small error box at the top of the screen.
      */
-    flashError: (message: MessageContent, timeout?: number) => void
+    flashError: (message: FlashNotificationContent, timeout?: number) => void
 
     /**
      * Like flashError, but escapes html even if 'html' field given
      * To be used when the input comes from an external source (e.g. an LTI tool)
      */
-    flashErrorSafe: (message: MessageContent, timeout?: number) => void
+    flashErrorSafe: (message: FlashNotificationContent, timeout?: number) => void
 
     /**
      * Pops up a small warning box at the top of the screen.
      */
-    flashWarning: (message: MessageContent, timeout?: number) => void
+    flashWarning: (message: FlashNotificationContent, timeout?: number) => void
 
     /**
      * Like flashWarning, but escapes html even if 'html' field given
      * To be used when the input comes from an external source (e.g. an LTI tool)
      */
-    flashWarningSafe: (message: MessageContent, timeout?: number) => void
+    flashWarningSafe: (message: FlashNotificationContent, timeout?: number) => void
 
-    screenReaderFlashMessage: (message: MessageContent) => void
+    screenReaderFlashMessage: (message: FlashNotificationContent) => void
 
-    screenReaderFlashError: (message: MessageContent) => void
+    screenReaderFlashError: (message: FlashNotificationContent) => void
 
     /**
      * This is for when you want to clear the flash message content prior to
      * updating it with new content.  Makes it so the SR only reads this one
      * message.
      */
-    screenReaderFlashMessageExclusive: (message: MessageContent, polite?: boolean) => void
+    screenReaderFlashMessageExclusive: (message: FlashNotificationContent, polite?: boolean) => void
   }
 }
 
@@ -158,23 +134,32 @@ $.screenReaderFlashError = content => helper.createScreenreaderNode(content, fal
 $.screenReaderFlashMessageExclusive = (content, polite = false) =>
   helper.createScreenreaderNodeExclusive(content, polite)
 
+function renderFlashNotification(notice: FlashNotice): void {
+  const timeout = notice.content instanceof Object && notice.content.timeout
+  helper.createNode(notice.type, notice.content, timeout, undefined, notice.classes)
+  createScreenreaderNodeWithDelay(notice.content, false)
+}
+
 export function renderServerNotifications() {
-  if (typeof ENV !== 'undefined' && ENV && ENV.notices) {
-    ENV.notices.forEach(notice => {
-      const timeout = notice.content instanceof Object && notice.content.timeout
-      helper.createNode(notice.type, notice.content, timeout, undefined, notice.classes)
-      createScreenreaderNodeWithDelay(notice.content, false)
-    })
+  if (ENV?.notices) ENV.notices.forEach(renderFlashNotification)
+  const storedNotices = sessionStorage.getItem(FLASH_NOTICE_STORAGE_KEY)
+  if (storedNotices) {
+    try {
+      const notices: Array<FlashNotice> = JSON.parse(storedNotices)
+      notices.forEach(renderFlashNotification)
+    } catch {
+      // ignore invalid JSON, which should never happen
+    }
+    sessionStorage.removeItem(FLASH_NOTICE_STORAGE_KEY)
   }
 }
 
 /**
  *
- * @param {MessageContent} content
+ * @param {FlashNotificationContent} content
  * @param {boolean} closable
  */
-// @ts-expect-error
-function createScreenreaderNodeWithDelay(content, closable = true) {
+function createScreenreaderNodeWithDelay(content: FlashNotificationContent, closable = true) {
   setTimeout(() => helper.createScreenreaderNode(content, closable), 100)
 }
 

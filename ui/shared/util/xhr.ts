@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 
 declare global {
   interface Window {
@@ -124,6 +124,16 @@ export function asText(fetchRequest: Promise<Response>) {
   return fetchRequest.then(checkStatus).then(res => res.clone().text())
 }
 
+export class FetchError extends Error {
+  response: Response
+
+  constructor(message: string, response: Response) {
+    super(message)
+    this.response = response
+    this.name = 'FetchError'
+  }
+}
+
 /**
  * filter a response to raise an error on a 400+ status
  */
@@ -131,14 +141,9 @@ export function checkStatus(response: Response) {
   if (response.status < 400) {
     return response
   } else {
-    const error = new Error(response.statusText)
-    // @ts-expect-error
-    error.response = response
-    throw error
+    throw new FetchError(response.statusText, response)
   }
 }
-
-const csrfToken = getCookie('_csrf_token')
 
 type DefaultFetchOptionsOptions = {
   headers?: Record<string, string>
@@ -155,19 +160,22 @@ type DefaultFetchOptionsOptions = {
 export const defaultFetchOptions = (
   options: DefaultFetchOptionsOptions = {},
 ): {
-  credentials: 'include' | 'omit' | 'same-origin'
+  credentials: RequestCredentials
   headers: Record<string, string>
-} =>
+} => {
   // these are duplicated in application_helper.rb#prefetch_xhr
   // because we don't have a good pattern for sharing them yet.
   // If you change these defaults, you should probably cascade that change
   // to that ruby location
-  ({
-    credentials: 'same-origin',
+  const csrfToken = getCookie('_csrf_token') ?? ''
+
+  return {
+    credentials: 'same-origin' as RequestCredentials,
     headers: {
       Accept: 'application/json+canvas-string-ids, application/json',
       'X-Requested-With': 'XMLHttpRequest',
       'X-CSRF-Token': csrfToken,
       ...options.headers,
     },
-  })
+  }
+}

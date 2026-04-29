@@ -21,7 +21,7 @@
 # Associates an artifact with a rubric while offering an assessment and
 # scoring using the rubric.  Assessments are grouped together in one
 # RubricAssociation, which may or may not have an association model.
-class RubricAssessment < ActiveRecord::Base
+class RubricAssessment < ApplicationRecord
   include TextHelper
   include HtmlTextHelper
   include Trackable
@@ -185,6 +185,16 @@ class RubricAssessment < ActiveRecord::Base
       a.attributes = { rubric_assessment: self, assessor: }
       a.complete
     end
+
+    # Use a separate loop as all ARs must be completed before checking the PRs threshold
+    requests.each do |a| # rubocop:disable Style/CombinableLoops
+      next unless a.peer_review_sub_assignment
+
+      PeerReview::SubmissionCreatorService.new(
+        parent_assignment: a.asset.assignment,
+        assessor: a.assessor
+      ).call
+    end
   end
   protected :update_assessment_requests
 
@@ -284,12 +294,12 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def can_read_assessor_name?(user, session)
-    assessment_type == "grading" ||
-      !considered_anonymous? ||
-      assessor_id == user.id ||
-      rubric_association.association_object.context.grants_right?(
-        user, session, :view_all_grades
-      )
+    return true if assessor_id == user.id
+    return false if provisional_grader_names_hidden?
+    return true if assessment_type == "grading"
+    return true unless considered_anonymous?
+
+    rubric_association.association_object.context.grants_right?(user, session, :view_all_grades)
   end
 
   def considered_anonymous?
@@ -297,6 +307,13 @@ class RubricAssessment < ActiveRecord::Base
 
     rubric_association.association_type == "Assignment" &&
       rubric_association.association_object.anonymous_peer_reviews?
+  end
+
+  def provisional_grader_names_hidden?
+    return false unless active_rubric_association?
+    return false unless rubric_association.association_type == "Assignment"
+
+    !rubric_association.association_object.grader_names_visible_to_final_grader?
   end
 
   def ratings
@@ -310,7 +327,7 @@ class RubricAssessment < ActiveRecord::Base
         submission = rubric_association.association_object.find_asset_for_assessment(rubric_association, student).first
         { submission:,
           rubric_assessments: submission.rubric_assessments
-                                        .where.not(rubric_association: nil)
+                              .where.not(rubric_association: nil)
                                         .map { |ra| ra.as_json(methods: :assessor_name) } }
       end
     else

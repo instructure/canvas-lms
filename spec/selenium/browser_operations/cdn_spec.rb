@@ -36,8 +36,6 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
       it "finds the right fingerprints for normal bundles, plugins & handlebars" do
         sample_bundles = {
           "bundles/common" => false,
-          "../../gems/plugins/analytics/app/stylesheets/analytics" => false, # to test that it works with plugins
-          "jst/FindFlickrImageView" => false, # to test that it works with handlebars-loaded css
           "jst/messageStudentsDialog" => true
         }
         sample_bundles.each do |bundle_name, includes_no_variables|
@@ -47,7 +45,7 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
             expect(!!data[:includesNoVariables]).to eq(includes_no_variables)
             data
           end
-          expect(fingerprints.length).to eq(6), "We have 6 variants"
+          expect(fingerprints.length).to eq(8), "We have 8 variants"
           msg = "make sure the combined results match the result of all_fingerprints_for"
           expect(fingerprints).to eq(BrandableCSS.all_fingerprints_for(bundle_name).values), msg
           next unless includes_no_variables
@@ -73,7 +71,7 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
     assert_tag("link", "href", url)
   end
 
-  def check_asset(tag, asset_path, skip_rev = false)
+  def check_asset(tag, asset_path, skip_rev: false)
     unless skip_rev
       asset_path = Canvas::Cdn.registry.url_for(asset_path)
       expect(asset_path).to be_present
@@ -94,7 +92,7 @@ describe "Stuff related to how we load stuff from CDN and use brandable_css" do
 
     check_asset("script", "/timezone/Etc/UTC.js")
     check_asset("script", "/timezone/ca_ES.js")
-    Canvas::Cdn.registry.scripts_for("main").each { |c| check_asset("script", c, true) }
+    Canvas::Cdn.registry.scripts_for("main").each { |c| check_asset("script", c, skip_rev: true) }
 
     expect(element_exists?("head script[src*='/moment/locale/ca']")).to be true
     expect(element_exists?("head script[src^='/javascripts']")).to be false

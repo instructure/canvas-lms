@@ -31,7 +31,7 @@ const {object, bool, func} = PropTypes
 // implements the drag source contract
 const assignmentSource = {
   canDrag(props) {
-    return !!props.assignment
+    return !!props.assignment && !props.readOnly
   },
 
   beginDrag(props) {
@@ -50,6 +50,7 @@ class AssignmentCard extends React.Component {
       removeAssignment: func.isRequired,
       onDragOver: func.isRequired,
       onDragLeave: func.isRequired,
+      readOnly: bool,
 
       // injected by React DnD
       isDragging: bool.isRequired,
@@ -82,6 +83,7 @@ class AssignmentCard extends React.Component {
           assignment={this.props.assignment}
           removeAssignment={this.removeAssignment}
           path={this.props.path}
+          readOnly={this.props.readOnly}
         />
       )
     }
@@ -126,20 +128,28 @@ class AssignmentCard extends React.Component {
       'cr-assignment-card': true,
       'cr-assignment-card__loading': !this.props.assignment,
       'cr-assignment-card__dragging': this.props.isDragging,
+      'cr-assignment-card__read-only': this.props.readOnly,
     })
 
+    const content = (
+      <div
+        className={classes}
+        onDragOver={this.props.readOnly ? undefined : this.handleKeyDownDragOver}
+        onDragLeave={this.props.readOnly ? undefined : this.props.onDragLeave}
+        style={this.props.readOnly ? {cursor: 'default'} : {}}
+      >
+        {this.renderContent()}
+        {this.renderMenu()}
+      </div>
+    )
+
+    // Don't apply drag-and-drop wrappers when readOnly
+    if (this.props.readOnly) {
+      return content
+    }
+
     return this.props.connectDragPreview(
-      this.props.connectDragSource(
-        <div
-          className={classes}
-          onDragOver={this.handleKeyDownDragOver}
-          onDragLeave={this.props.onDragLeave}
-        >
-          {this.renderContent()}
-          {this.renderMenu()}
-        </div>,
-        {dropEffect: 'move'},
-      ),
+      this.props.connectDragSource(content, {dropEffect: 'move'}),
       {captureDraggingState: true},
     )
   }

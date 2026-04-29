@@ -23,9 +23,9 @@ import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import WithBreakpoints, {Breakpoints} from '@canvas/with-breakpoints'
+import {WithBreakpoints, Breakpoints} from '@instructure/platform-with-breakpoints'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('differentiated_modules')
 
@@ -87,51 +87,56 @@ function ClearableDateTimeInput({
   timeInputRef,
   clearButtonAltLabel,
 }: ClearableDateTimeInputProps) {
-  const elementRef = useRef<Element | null>(null)
-  const elementRefCallback = (element: Element | null) => {
-    elementRef.current = element
-    if (elementRef?.current) {
-      // @ts-expect-error
-      setHeight(elementRef.current.offsetHeight)
-    }
-  }
-
   const {setOnSuccess} = useContext(AlertManagerContext)
 
-  const [height, setHeight] = useState(0)
-
-  const [hasErrorBorder, setHasErrorBorder] = useState(false)
   const clearButtonContainer = useRef<HTMLElement | null>()
+  const [validationError, setValidationError] = useState<FormMessage | null>(null)
 
   const handleResize = useCallback((element: Element) => {
-    // Selector for the date time input that is affected by the red border and padding
-    const container = element.querySelector('fieldset > span > span:first-child > span > span')
-    if (!container) return
-    // If padding is cero means that the error border does not exist
-    setHasErrorBorder(getComputedStyle(container).padding !== '0px')
+    const dateInput = element.querySelector('input')
+    if (!dateInput || !clearButtonContainer.current) return
+    const containerTop = element.getBoundingClientRect().top
+    const inputTop = dateInput.getBoundingClientRect().top - containerTop
+    const newPadding = `${Math.max(0, inputTop)}px`
+    if (clearButtonContainer.current.style.paddingTop !== newPadding) {
+      clearButtonContainer.current.style.paddingTop = newPadding
+    }
   }, [])
 
-  // We used this instead of checking messages since we can't control internal error messages
   const [listenElement] = useElementResize(handleResize)
 
-  useEffect(() => {
-    if (!clearButtonContainer.current) return
-    if (height > 0) {
-      // labels + labels margins + 0.5rem (padding when the date time input has errors)
-      clearButtonContainer.current.style.paddingTop = hasErrorBorder
-        ? `${1.5 + height / 16}rem`
-        : `${1 + height / 16}rem`
-    }
-  }, [hasErrorBorder, height])
-  const renderDateLabel = <Text elementRef={elementRefCallback}>{dateRenderLabel}</Text>
+  const renderDateLabel = <Text>{dateRenderLabel}</Text>
 
-  const renderTimeLabel = (
-    <Flex as="div" height={height - 2} direction="column" justifyItems="end">
-      {I18n.t('Time')}
-    </Flex>
-  )
+  const renderTimeLabel = <Text>{I18n.t('Time')}</Text>
+
+  const handleChange = (event: React.SyntheticEvent, newValue: string | undefined) => {
+    // Clear any existing validation error first
+    setValidationError(null)
+
+    // If the value is being cleared or is undefined, allow it
+    if (!newValue) {
+      onChange(event, newValue)
+      return
+    }
+
+    // Parse the date to check the year
+    const selectedDate = new Date(newValue)
+
+    // Check if the date is valid and if the year is before 1980
+    if (!isNaN(selectedDate.getTime()) && selectedDate.getFullYear() < 1980) {
+      setValidationError({
+        text: I18n.t('Please select a date in the year 1980 or later'),
+        type: 'newError',
+      })
+      return
+    }
+
+    // Date is valid, proceed with the original onChange
+    onChange(event, newValue)
+  }
 
   const handleClear = () => {
+    setValidationError(null)
     onClear()
     setTimeout(() => {
       setOnSuccess(I18n.t('Cleared successfully'))
@@ -165,11 +170,11 @@ function ClearableDateTimeInput({
           nextMonthLabel={I18n.t('Next month')}
           value={value ?? undefined}
           layout="columns"
-          messages={messages}
+          messages={validationError ? [validationError] : messages}
           showMessages={showMessages}
           locale={locale}
           timezone={timezone}
-          onChange={onChange}
+          onChange={handleChange}
           onBlur={onBlur}
           dateInputRef={dateInputRef}
           timeInputRef={timeInputRef}
@@ -181,7 +186,11 @@ function ClearableDateTimeInput({
         margin="0 0 0 small"
         elementRef={e => (clearButtonContainer.current = e as HTMLElement)}
       >
-        <CondensedButton interaction={disabled ? 'disabled' : 'enabled'} onClick={handleClear}>
+        <CondensedButton
+          data-testid={`${id}_clear_button`}
+          interaction={disabled ? 'disabled' : 'enabled'}
+          onClick={handleClear}
+        >
           <AccessibleContent alt={clearButtonAltLabel}>{I18n.t('Clear')}</AccessibleContent>
         </CondensedButton>
       </Flex.Item>

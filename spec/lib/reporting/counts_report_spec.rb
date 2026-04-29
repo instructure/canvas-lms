@@ -88,7 +88,7 @@ describe Reporting::CountsReport do
 
       let(:datum) { "teachers" }
 
-      include_examples "user_counts"
+      it_behaves_like "user_counts"
     end
 
     describe "students" do
@@ -100,7 +100,7 @@ describe Reporting::CountsReport do
 
       let(:datum) { "students" }
 
-      include_examples "user_counts"
+      it_behaves_like "user_counts"
     end
 
     describe "users" do
@@ -112,7 +112,7 @@ describe Reporting::CountsReport do
 
       let(:datum) { "users" }
 
-      include_examples "user_counts"
+      it_behaves_like "user_counts"
 
       it "includes tas" do
         Reporting::CountsReport.process_shard

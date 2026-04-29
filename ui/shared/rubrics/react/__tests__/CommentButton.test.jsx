@@ -21,11 +21,11 @@ import CommentButton from '../CommentButton'
 
 describe('The CommentButton component', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders a button with the correct accessibility label', () => {
-    const onClick = jest.fn()
+    const onClick = vi.fn()
     const {getByTestId, getByText} = render(<CommentButton onClick={onClick} />)
 
     // Check that the button is rendered with the correct test ID
@@ -38,7 +38,7 @@ describe('The CommentButton component', () => {
   })
 
   it('calls onClick when the button is clicked', () => {
-    const onClick = jest.fn()
+    const onClick = vi.fn()
     const {getByTestId} = render(<CommentButton onClick={onClick} />)
 
     const button = getByTestId('add-comment-button')
@@ -48,7 +48,7 @@ describe('The CommentButton component', () => {
   })
 
   it('renders the feedback icon', () => {
-    const onClick = jest.fn()
+    const onClick = vi.fn()
     const {container} = render(<CommentButton onClick={onClick} />)
 
     // Check that an SVG icon is rendered

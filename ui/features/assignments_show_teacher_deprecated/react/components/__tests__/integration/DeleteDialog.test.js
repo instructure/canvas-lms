@@ -28,7 +28,7 @@ async function openDeleteDialog(assignment = mockAssignment(), apolloMocks = [])
 }
 
 afterEach(() => {
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('assignments 2 delete dialog', () => {
@@ -39,9 +39,9 @@ describe('assignments 2 delete dialog', () => {
     getCancelDialogElt: fns => fns.getByTestId('delete-dialog-cancel-button'),
   })
 
-  it.skip('deletes the assignment and reloads', async () => {
+  it('deletes the assignment and reloads', async () => {
     delete window.location
-    window.location = {reload: jest.fn()}
+    window.location = {reload: vi.fn()}
 
     const assignment = mockAssignment()
     const {getByTestId} = await openDeleteDialog(assignment, [
@@ -52,7 +52,7 @@ describe('assignments 2 delete dialog', () => {
     await waitFor(() => expect(window.location.reload).toHaveBeenCalled())
   })
 
-  it.skip('reports errors', async () => {
+  it('reports errors', async () => {
     const assignment = mockAssignment()
     const {getByTestId, getAllByText} = await openDeleteDialog(assignment, [
       saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'}, 'well rats'),

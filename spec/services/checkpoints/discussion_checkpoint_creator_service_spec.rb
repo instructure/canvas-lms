@@ -277,7 +277,6 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
       context "differentiation tags" do
         before do
           account = @topic.course.account
-          account.enable_feature!(:assign_to_differentiation_tags)
           account.tap do |a|
             a.settings[:allow_assign_to_differentiation_tags] = { value: true }
             a.save!
@@ -472,6 +471,105 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
             expect(checkpoint_parent_override_2.set).to eq checkpoint_2_override_2.set
           end
         end
+      end
+    end
+
+    describe "date synchronization" do
+      it "syncs parent dates when creating first checkpoint with nil dates" do
+        checkpoint = service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now, unlock_at: nil, lock_at: nil }],
+          points_possible: 5
+        )
+
+        parent_assignment = checkpoint.parent_assignment.reload
+
+        aggregate_failures do
+          expect(parent_assignment.unlock_at).to be_nil
+          expect(parent_assignment.lock_at).to be_nil
+        end
+      end
+
+      it "syncs parent dates from checkpoint even when dates are the same" do
+        now = Time.zone.now.change(usec: 0)
+        unlock_at = 1.day.from_now(now)
+        lock_at = 3.days.from_now(now)
+
+        first_checkpoint = service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now(now), unlock_at:, lock_at: }],
+          points_possible: 5
+        )
+
+        second_checkpoint = service.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now(now), unlock_at:, lock_at: }],
+          points_possible: 5
+        )
+
+        parent_assignment = first_checkpoint.parent_assignment.reload
+        first_checkpoint.reload
+        second_checkpoint.reload
+
+        aggregate_failures do
+          # All should have the same dates
+          expect(parent_assignment.unlock_at).to eq unlock_at
+          expect(parent_assignment.lock_at).to eq lock_at
+          expect(first_checkpoint.unlock_at).to eq unlock_at
+          expect(first_checkpoint.lock_at).to eq lock_at
+          expect(second_checkpoint.unlock_at).to eq unlock_at
+          expect(second_checkpoint.lock_at).to eq lock_at
+        end
+      end
+    end
+
+    context "when a student is added to a group after checkpoints with group overrides are created" do
+      it "creates sub-assignment submissions for the new student, not just the parent submission" do
+        course = course_model
+        course.account.enable_feature!(:discussion_checkpoints)
+
+        group_category = course.group_categories.create!(name: "Test Groups")
+        group = group_category.groups.create!(name: "Group 1", context: course)
+
+        student1 = user_factory(active_all: true)
+        course.enroll_student(student1, enrollment_state: :active)
+        group.group_memberships.create!(user: student1, workflow_state: :accepted)
+
+        topic = DiscussionTopic.create_graded_topic!(course:, title: "Checkpoint Group Discussion")
+        topic.update!(group_category:)
+
+        reply_to_topic = service.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          points_possible: 5,
+          dates: [{ type: "override", set_type: "Group", set_id: group.id, due_at: 1.week.from_now }]
+        )
+        reply_to_entry = service.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          points_possible: 5,
+          dates: [{ type: "override", set_type: "Group", set_id: group.id, due_at: 2.weeks.from_now }]
+        )
+
+        parent = topic.assignment
+
+        # Initial state: only student1 has submissions for all three
+        expect(parent.submissions.count).to eq 1
+        expect(reply_to_topic.submissions.count).to eq 1
+        expect(reply_to_entry.submissions.count).to eq 1
+
+        # Add student2 to the group after checkpoints are already set up
+        student2 = user_factory(active_all: true)
+        course.enroll_student(student2, enrollment_state: :active)
+        group.group_memberships.create!(user: student2, workflow_state: :accepted)
+
+        # All three should now have 2 submissions (one per student)
+        expect(parent.submissions.count).to eq 2
+        expect(reply_to_topic.submissions.count).to eq 2
+        expect(reply_to_entry.submissions.count).to eq 2
       end
     end
   end

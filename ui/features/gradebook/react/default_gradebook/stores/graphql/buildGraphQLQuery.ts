@@ -66,21 +66,11 @@ export function buildGraphQLQuery(
   return gql(queryString)
 }
 
-export function numberToLetters(n: number): string {
-  n += 1
-  const chars: string[] = []
-  while (n > 0) {
-    n--
-    chars.push(String.fromCharCode(97 + (n % 26)))
-    n = Math.floor(n / 26)
-  }
-  return chars.reverse().join('')
+// input is a number as string
+export function encode(s: string): string {
+  return `alias_${s}`
 }
 
-export function lettersToNumber(s: string): number {
-  let n = 0
-  for (let i = 0; i < s.length; i++) {
-    n = n * 26 + (s.charCodeAt(i) - 97 + 1)
-  }
-  return n - 1
+export function decode(s: string): string {
+  return s.replace(/^alias_/, '')
 }

@@ -20,6 +20,10 @@ import $ from 'jquery'
 import 'jquery-migrate' // required
 import {addUsersLink, openReportDescriptionLink} from '../index'
 
+vi.mock('../../../shared/tabs/react/LoadTab', () => ({
+  LoadTab: vi.fn(),
+}))
+
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)

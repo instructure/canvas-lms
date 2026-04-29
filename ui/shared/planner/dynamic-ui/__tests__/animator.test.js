@@ -19,13 +19,13 @@
 import {Animator} from '../animator'
 
 function mockVelocity(_opts = {}) {
-  return jest.fn()
+  return vi.fn()
 }
 
 function mockElement(opts = {}) {
   return {
-    getBoundingClientRect: jest.fn(),
-    focus: jest.fn(),
+    getBoundingClientRect: vi.fn(),
+    focus: vi.fn(),
     ...opts,
   }
 }
@@ -34,7 +34,7 @@ function mockWindow(_opts = {}) {
   const queue = []
   return {
     queue,
-    scroll: jest.fn(),
+    scroll: vi.fn(),
     requestAnimationFrame: fn => queue.push(fn),
     runAnimationFrames: () => {
       queue.forEach(fn => fn())
@@ -46,7 +46,7 @@ function mockWindow(_opts = {}) {
 function mockDocument(opts = {}) {
   return {
     documentElement: opts.documentElement || {
-      getBoundingClientRect: jest.fn(),
+      getBoundingClientRect: vi.fn(),
       clientHeight: 100,
     },
   }

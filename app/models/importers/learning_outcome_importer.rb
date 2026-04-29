@@ -42,7 +42,7 @@ module Importers
 
         begin
           if outcome[:type] == "learning_outcome_group"
-            Importers::LearningOutcomeGroupImporter.import_from_migration(outcome, migration, nil, selectable_outcomes && !import_item)
+            Importers::LearningOutcomeGroupImporter.import_from_migration(outcome, migration, skip_import: selectable_outcomes && !import_item)
           elsif !selectable_outcomes || import_item
             Importers::LearningOutcomeImporter.import_from_migration(outcome, migration)
           end
@@ -141,6 +141,7 @@ module Importers
           item.data[:rubric_criterion][:description] = item.short_description || item.description
         end
 
+        item.importing = true
         item.save!
 
         migration.add_imported_item(item)

@@ -33,7 +33,7 @@
 // thing.cache.set 'key', 'value'
 // thing.cache.get 'key'
 
-import {flattenDeep} from 'lodash'
+import {flattenDeep} from 'es-toolkit/compat'
 
 export default {
   cache: {

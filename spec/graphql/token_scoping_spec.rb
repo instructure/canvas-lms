@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
 require_relative "graphql_spec_helper"
 
 describe "GraphQL Token Scoping" do
@@ -26,8 +25,8 @@ describe "GraphQL Token Scoping" do
     teacher_in_course(active_all: true)
   end
 
-  let(:scoped_developer_key) { DeveloperKey.create!(require_scopes: true) }
-  let(:unscoped_developer_key) { DeveloperKey.create! }
+  let(:scoped_developer_key) { DeveloperKey.create!(require_scopes: true, name: "Test Scoped Developer Key") }
+  let(:unscoped_developer_key) { DeveloperKey.create!(name: "Test Unscoped Developer Key") }
   let(:course_type) { GraphQLTypeTester.new(@course, current_user: @teacher) }
 
   it "does not affect requests with an unscoped developer key" do

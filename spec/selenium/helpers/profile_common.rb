@@ -64,25 +64,18 @@ shared_examples "user settings page change pic window" do
     f(".avatar.profile_pic_link.none").click
     wait_for_ajaximations
 
-    # There is a window with title "Select Profile Picture"
-    expect(f(".ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons")).to be_truthy
-    expect(f(".ui-dialog-title")).to be_truthy
-    expect(f(".ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix")).to include_text("Select Profile Picture")
+    # Modal is open
+    expect(f("[data-testid='avatar-modal']")).to be_truthy
 
     # There is a default gray image placeholder for picture
-    expect(f(".avatar-content .active .select-photo-link")).to include_text("choose a picture")
+    expect(f("[data-testid='upload-panel'] .select-photo-link")).to include_text("choose a picture")
 
-    picture_options = f("#avatarDropdown")
-    select_list = Selenium::WebDriver::Support::Select.new(picture_options)
+    f("[data-testid='avatar-type-select']").click
+    wait_for_ajaximations
 
     # There are 'Upload Picture' and 'From Gravatar' buttons
-    expect(select_list.options[0]).to include_text("Upload a Picture")
-    expect(select_list.options[1]).to include_text("From Gravatar")
-
-    # There are 'X', Save, and Cancel buttons
-    expect(f(".ui-dialog-titlebar-close")).to be_truthy
-    expect(fj('.ui-button :contains("Cancel")')).to be_truthy
-    expect(fj('.ui-button :contains("Save")')).to be_truthy
+    expect(f("#upload-option")).to include_text("Upload a Picture")
+    expect(f("#gravatar-option")).to include_text("From Gravatar")
   end
 end
 
@@ -96,19 +89,10 @@ shared_examples "with gravatar settings" do
     f(".avatar.profile_pic_link.none").click
     wait_for_ajaximations
 
-    options = Selenium::WebDriver::Support::Select.new(f("#avatarDropdown")).options.map(&:text)
-    expect(options).not_to include("From Gravatar")
-  end
-
-  it "allows user to see gravatar when enabled", priority: "1" do
-    enable_avatars(true)
-    get "/profile/settings"
-
-    f(".avatar.profile_pic_link.none").click
+    f("[data-testid='avatar-type-select']").click
     wait_for_ajaximations
 
-    options = Selenium::WebDriver::Support::Select.new(f("#avatarDropdown")).options.map(&:text)
-    expect(options).to include("From Gravatar")
+    expect(f("body")).not_to contain_css("#gravatar-option")
   end
 end
 
@@ -121,12 +105,13 @@ shared_examples "user settings change pic cancel" do
 
     f(".avatar.profile_pic_link.none").click
     wait_for_ajaximations
-    expect(f(".ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons")).to be_truthy
-    expect(f(".ui-widget-overlay")).to be_truthy
 
-    fj('.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only :contains("Cancel")').click
+    expect(f("[data-testid='avatar-modal']")).to be_truthy
+
+    f("[data-testid='close-modal-button']").click
     wait_for_ajaximations
-    expect(f("body")).not_to contain_css(".ui-widget-overlay")
+
+    expect(f("body")).not_to contain_css("[data-testid='avatar-modal']")
   end
 end
 

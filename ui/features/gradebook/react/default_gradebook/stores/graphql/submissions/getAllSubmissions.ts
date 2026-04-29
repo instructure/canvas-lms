@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {getAllPages, GetAllPagesCallbacks, GetAllPagesReturnValue} from '../getAllPages'
-import {mapValues} from 'lodash'
+import {mapValues} from 'es-toolkit/compat'
 import {
   getSubmissions,
   GetSubmissionsParams,
   GetSubmissionsResult,
   Submission,
 } from './getSubmissions'
-import {lettersToNumber} from '../buildGraphQLQuery'
+import {decode} from '../buildGraphQLQuery'
+import PQueue from 'p-queue'
 
 // Gradebook does not respect anonymous assignments, and groups submissions by userId
 // Thus we are not returning an array of submissions, but the userId is coming from the
@@ -33,7 +34,7 @@ const flattenPages = (pages: GetSubmissionsResult[]): Submission[] => {
   const data: Submission[] = []
   pages.forEach(page => {
     Object.entries(page.course).forEach(([alias, course]) => {
-      const userId = lettersToNumber(alias).toString()
+      const userId = decode(alias)
       data.push(...course.nodes.map(node => ({...node, userId})))
     })
   })
@@ -41,13 +42,16 @@ const flattenPages = (pages: GetSubmissionsResult[]): Submission[] => {
 }
 type GetAllSubmissionsParams = {
   queryParams: Pick<GetSubmissionsParams, 'courseId' | 'userIds'>
+  headers?: Record<string, string>
+  queue?: PQueue
 } & GetAllPagesCallbacks<GetSubmissionsResult>
 export const getAllSubmissions = ({
   queryParams,
+  headers,
   ...params
 }: GetAllSubmissionsParams): GetAllPagesReturnValue<Submission[]> =>
   getAllPages({
-    query: after => getSubmissions({...queryParams, after}),
+    query: after => getSubmissions({...queryParams, after}, headers),
     getPageInfo: page => mapValues(page.course, it => it.pageInfo),
     flattenPages,
     isMulti: true,

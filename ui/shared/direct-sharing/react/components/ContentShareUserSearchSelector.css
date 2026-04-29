@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- #content-share-user-search:required:invalid {
+#content-share-user-search:required:invalid {
   /* reset global style, let instui handle it */
   box-shadow: initial;
 }

@@ -16,7 +16,7 @@
 <%= t('email_body', "The event, %{event_title}, for the course, %{course_name}, has changed times. It's now:", :event_title => asset.title, :course_name => asset.context.name) %>
 </p>
 
-<p><em style="color: #00ae00;">
+<p><em>
 <% if !asset.start_at && !asset.end_at %>
   <%= t('no_time_set', 'No Time Set') %>
 <% elsif (asset.start_at == asset.end_at || !asset.end_at) %>

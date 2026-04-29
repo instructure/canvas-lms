@@ -53,7 +53,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
   let(:report_type) { "student_analysis" }
 
-  include_examples "Quizzes::QuizStatistics::Report"
+  it_behaves_like "Quizzes::QuizStatistics::Report"
   before(:once) { course_factory }
 
   def csv(opts = {}, quiz = @quiz)
@@ -96,7 +96,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     sub.submission_data = [{ points: 10, text: "", correct: "undefined", question_id: question.id }]
     # simulate a positive fudge of 5 points:
     sub.score = 15
-    sub.with_versioning(true, &:save!)
+    sub.with_versioning(&:save!)
     stats = q.statistics
     expect(stats[:submission_score_average]).to eq 15
     expect(stats[:submission_score_high]).to eq 15
@@ -107,7 +107,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     sub.workflow_state = "complete"
     sub.submission_data = [{ points: 17, text: "", correct: "undefined", question_id: question.id }]
     sub.score = 17
-    sub.with_versioning(true, &:save!)
+    sub.with_versioning(&:save!)
     stats = q.statistics
     expect(stats[:submission_score_average]).to eq 16
     expect(stats[:submission_score_high]).to eq 17
@@ -118,7 +118,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     sub.workflow_state = "complete"
     sub.submission_data = [{ points: 20, text: "", correct: "undefined", question_id: question.id }]
     sub.score = 20
-    sub.with_versioning(true, &:save!)
+    sub.with_versioning(&:save!)
     stats = q.statistics
     expect(stats[:submission_score_average]).to be_within(0.0000000001).of(17 + (1.0 / 3))
     expect(stats[:submission_score_high]).to eq 20
@@ -142,8 +142,8 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect do
       quiz.quiz_statistics.build(report_type: "student_analysis",
                                  includes_all_versions: true,
-                                 anonymous: true).report.generate(false)
-    end.to_not raise_error
+                                 anonymous: true).report.generate(legacy: false)
+    end.not_to raise_error
   end
 
   it "creates quiz statistics with logged out users" do
@@ -151,8 +151,8 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect do
       @quiz.quiz_statistics.build(report_type: "student_analysis",
                                   includes_all_versions: true,
-                                  anonymous: false).report.generate(false)
-    end.to_not raise_error
+                                  anonymous: false).report.generate(legacy: false)
+    end.not_to raise_error
   end
 
   context "csv" do
@@ -276,7 +276,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       stats = @quiz.quiz_statistics.build(
         report_type: "student_analysis",
         includes_all_versions: true
-      ).report.generate(true, { section_ids: section2.id })
+      ).report.generate(legacy: true, section_ids: section2.id)
       expect(stats[:questions][0][1]["answers"][0]["responses"]).to eq 1
     end
 
@@ -394,7 +394,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.generate_quiz_data
     q.save!
     qs = q.generate_submission student
-    io = fixture_file_upload("docs/doc.doc", "application/msword", true)
+    io = fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
     attach = qs.attachments.create! filename: "doc.doc",
                                     display_name: "attachment.png",
                                     user: student,
@@ -512,7 +512,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.quiz_questions.create!(question_data: { :name => "q2", :points_possible => 1, "question_type" => "multiple_answers_question", "answers" => [{ "answer_text" => "", "answer_html" => "<a href='http://example.com/caturday.gif'>lolcats</a>", "answer_weight" => "100" }, { "answer_text" => "lolrus", "answer_weight" => "100" }] })
     q.generate_quiz_data
     q.save
-    qs = q.generate_submission(@teacher, true)
+    qs = q.generate_submission(@teacher, preview: true)
     qs.submission_data = {
       "question_#{q.quiz_data[0][:id]}" => q.quiz_data[0][:answers][0][:id].to_s,
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
@@ -574,7 +574,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
         .with(question_data, responses)
         .and_return({ some_metric: 5 })
 
-      output = subject.send(:stats_for_question, question_data, responses, false)
+      output = subject.send(:stats_for_question, question_data, responses, legacy: false)
       expect(output).to eq({
                              question_type: "essay_question",
                              some_metric: 5

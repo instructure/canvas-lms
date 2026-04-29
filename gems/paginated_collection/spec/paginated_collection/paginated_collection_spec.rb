@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe PaginatedCollection do
   describe ".build" do
     it "returns a #paginate proxy" do

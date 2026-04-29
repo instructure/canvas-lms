@@ -22,8 +22,8 @@ import FileSelectBox from '../FileSelectBox'
 import FileStore from '../../../stores/FileStore'
 import FolderStore from '../../../stores/FolderStore'
 
-jest.mock('../../../stores/FileStore')
-jest.mock('../../../stores/FolderStore')
+vi.mock('../../../stores/FileStore')
+vi.mock('../../../stores/FolderStore')
 
 const folders = [
   {
@@ -129,7 +129,7 @@ describe('FileSelectBox', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the component', () => {

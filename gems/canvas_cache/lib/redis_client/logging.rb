@@ -54,10 +54,10 @@ class RedisClient
                           end
         end
 
-        if defined?(Marginalia)
-          message[:controller] = Marginalia::Comment.controller
-          message[:action] = Marginalia::Comment.action
-          message[:job_tag] = Marginalia::Comment.job_tag
+        if Rails.application.respond_to?(:config) && Rails.application.config.active_record.query_log_tags_enabled
+          message[:controller] = ActiveRecord::QueryLogs.taggings[:controller].call(ActiveSupport::ExecutionContext.to_h)
+          message[:action] = ActiveRecord::QueryLogs.taggings[:action].call(ActiveSupport::ExecutionContext.to_h)
+          message[:job_tag] = ActiveRecord::QueryLogs.taggings[:job_tag].call
         end
 
         if SET_COMMANDS.include?(command) && Thread.current[:last_cache_generate]

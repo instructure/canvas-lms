@@ -91,18 +91,6 @@ describe "course pacing page" do
         expect(duration_info.text).to include("1 week, 2 days")
       end
     end
-
-    it "shows Dates shown in course time zone text" do
-      skip("LS-2616 Redesigned code needs the time zone info")
-      @course_module = create_course_module("New Module", "active")
-      @assignment = create_assignment(@course, "Module Assignment", "Module Assignment Description", 10, "published")
-      @module_item = @course_module.add_item(id: @assignment.id, type: "assignment")
-
-      visit_course_paces_page
-      click_create_default_pace_button
-
-      expect(dates_shown).to be_displayed
-    end
   end
 
   context "Skip Weekend Interactions" do

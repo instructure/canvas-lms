@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Checkpoints::DiscussionCheckpointCreatorService < Checkpoints::DiscussionCheckpointCommonService
-  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible:, replies_required: 1)
+  def initialize(discussion_topic:, checkpoint_label:, dates:, points_possible:, replies_required: 1, updating_user: nil)
     super
   end
 
@@ -36,10 +36,18 @@ class Checkpoints::DiscussionCheckpointCreatorService < Checkpoints::DiscussionC
   def create_checkpoint
     AbstractAssignment.suspend_due_date_caching_and_score_recalculation do
       @discussion_topic.update!(reply_to_entry_required_count: @replies_required) if update_required_replies?
-      checkpoint = @assignment.sub_assignments.create!(checkpoint_attributes)
+      checkpoint = @assignment.sub_assignments.create!(checkpoint_attributes.merge({ updating_user: @updating_user }))
       Checkpoints::DateOverrideCreatorService.call(checkpoint:, overrides: override_dates) if override_dates.any?
       update_assignment
+      sync_parent_dates_from_checkpoint(checkpoint)
       checkpoint
     end
+  end
+
+  def sync_parent_dates_from_checkpoint(checkpoint)
+    changed_attributes = SubAssignment::SUB_ASSIGNMENT_SYNC_ATTRIBUTES.index_with do |attr|
+      [nil, checkpoint.send(attr)]
+    end
+    @assignment.update_from_sub_assignment(changed_attributes) if changed_attributes.present?
   end
 end

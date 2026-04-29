@@ -19,7 +19,7 @@
 import {createGradebook} from './GradebookSpecHelper'
 import GradebookApi from '../apis/GradebookApi'
 
-jest.mock('../apis/GradebookApi')
+vi.mock('../apis/GradebookApi')
 
 describe('Gradebook > Teacher Notes', () => {
   let gradebook
@@ -34,20 +34,20 @@ describe('Gradebook > Teacher Notes', () => {
       getOptions: () => ({
         numberOfColumnsToFreeze: 0,
       }),
-      invalidate: jest.fn(),
-      setColumns: jest.fn(),
-      setNumberOfColumnsToFreeze: jest.fn(),
-      destroy: jest.fn(),
+      invalidate: vi.fn(),
+      setColumns: vi.fn(),
+      setNumberOfColumnsToFreeze: vi.fn(),
+      destroy: vi.fn(),
     }
     gradebook.gradebookGrid.gridSupport = {
-      destroy: jest.fn(),
+      destroy: vi.fn(),
     }
-    gradebook.renderViewOptionsMenu = jest.fn()
-    gradebook.flashError = jest.fn()
+    gradebook.renderViewOptionsMenu = vi.fn()
+    gradebook.flashError = vi.fn()
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     if (gradebook?.gradebookGrid?.grid?.destroy?.mockReset) {
       gradebook.gradebookGrid.grid.destroy.mockReset()
     }
@@ -108,7 +108,7 @@ describe('Gradebook > Teacher Notes', () => {
         const mockPromise = Promise.resolve({data: {}})
         GradebookApi.createTeacherNotesColumn.mockReturnValue(mockPromise)
         gradebook = createGradebook({teacher_notes: null})
-        jest.spyOn(gradebook, 'createTeacherNotes')
+        vi.spyOn(gradebook, 'createTeacherNotes')
         const props = gradebook.getTeacherNotesViewOptionsMenuProps()
         props.onSelect()
         expect(gradebook.createTeacherNotes).toHaveBeenCalledTimes(1)
@@ -125,7 +125,7 @@ describe('Gradebook > Teacher Notes', () => {
           hidden: true,
         }
         gradebook = createGradebook({teacher_notes: teacherNotes})
-        jest.spyOn(gradebook, 'setTeacherNotesHidden')
+        vi.spyOn(gradebook, 'setTeacherNotesHidden')
         const props = gradebook.getTeacherNotesViewOptionsMenuProps()
         props.onSelect()
         expect(gradebook.setTeacherNotesHidden).toHaveBeenCalledWith(false)
@@ -142,7 +142,7 @@ describe('Gradebook > Teacher Notes', () => {
           hidden: false,
         }
         gradebook = createGradebook({teacher_notes: teacherNotes})
-        jest.spyOn(gradebook, 'setTeacherNotesHidden')
+        vi.spyOn(gradebook, 'setTeacherNotesHidden')
         const props = gradebook.getTeacherNotesViewOptionsMenuProps()
         props.onSelect()
         expect(gradebook.setTeacherNotesHidden).toHaveBeenCalledWith(true)
@@ -193,7 +193,7 @@ describe('Gradebook > Teacher Notes', () => {
         data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
       })
       GradebookApi.createTeacherNotesColumn.mockResolvedValue(promise)
-      jest.spyOn(gradebook, 'showNotesColumn')
+      vi.spyOn(gradebook, 'showNotesColumn')
     })
 
     it('sets teacherNotesUpdating to true before sending the api request', () => {

@@ -28,15 +28,17 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {AccountReport} from '@canvas/account_reports/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
+
 const I18n = createI18nScope('account_reports')
 
 type Props = {
   accountId: string
   report: string
+  updatedReport?: AccountReport
   closeModal: () => void
 }
 
-export default function ReportHistoryModal({accountId, report, closeModal}: Props) {
+export default function ReportHistoryModal({accountId, report, updatedReport, closeModal}: Props) {
   const renderCloseButton = () => {
     return (
       <CloseButton
@@ -73,7 +75,9 @@ export default function ReportHistoryModal({accountId, report, closeModal}: Prop
         <Flex direction="column">
           {reportHistory.map(historyItem => (
             <Flex.Item key={historyItem.id}>
-              <ReportRun reportRun={historyItem} />
+              <ReportRun
+                reportRun={updatedReport?.id === historyItem.id ? updatedReport : historyItem}
+              />
             </Flex.Item>
           ))}
         </Flex>

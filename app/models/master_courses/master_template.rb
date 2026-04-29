@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class MasterCourses::MasterTemplate < ActiveRecord::Base
+class MasterCourses::MasterTemplate < ApplicationRecord
   # the root of all the magic for a blueprint course
   # is created when a course is marked as a blueprint
   # stores the locking (aka restrictions) settings
@@ -48,6 +48,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   include MasterCourses::TagHelper
+
   self.content_tag_association = :master_content_tags
 
   scope :for_full_course, -> { where(full_course: true) }
@@ -240,14 +241,14 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def last_export_started_at
     unless defined?(@last_export_started_at)
-      @last_export_started_at = master_migrations.where(workflow_state: "completed").order("id DESC").limit(1).pick(:exports_started_at)
+      @last_export_started_at = master_migrations.where(workflow_state: "completed").order(id: :desc).limit(1).pick(:exports_started_at)
     end
     @last_export_started_at
   end
 
   def last_export_completed_at
     unless defined?(@last_export_completed_at)
-      @last_export_completed_at = master_migrations.where(workflow_state: "completed").order("id DESC").limit(1).pick(:imports_completed_at)
+      @last_export_completed_at = master_migrations.where(workflow_state: "completed").order(id: :desc).limit(1).pick(:imports_completed_at)
     end
     @last_export_completed_at
   end
@@ -301,6 +302,32 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       deletions_by_type[klass] = deleted_mig_ids if deleted_mig_ids.any?
     end
     deletions_by_type
+  end
+
+  # sub types has no master_content_tags, but we still want to track deletions, without including these to normal exports
+  # We don't filter for last_export_started_at here since we want to handle unlock -> lock cycles correctly
+  def deletions_for_sub_types
+    return {} unless last_export_started_at
+
+    deletions_by_type = {}
+    MasterCourses::SUB_TYPES_FOR_DELETIONS.each do |sub_type|
+      next if sub_type == "Lti::AssetProcessor" && !course.root_account.feature_enabled?(:lti_asset_processor)
+
+      item_scope = case sub_type
+                   when "Lti::AssetProcessor"
+                     Lti::AssetProcessor.where(workflow_state: "deleted", assignment: course.assignments)
+                   end
+
+      deleted_mig_ids = item_scope.map do |ap|
+        migration_id_for(ap)
+      end
+      deletions_by_type[sub_type] = deleted_mig_ids if deleted_mig_ids.any?
+    end
+    deletions_by_type
+  end
+
+  def deletions_by_type
+    deletions_since_last_export.merge(deletions_for_sub_types)
   end
 
   def default_restrictions_for(object)

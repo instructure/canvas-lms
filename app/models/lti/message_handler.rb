@@ -19,7 +19,7 @@
 #
 
 module Lti
-  class MessageHandler < ActiveRecord::Base
+  class MessageHandler < ApplicationRecord
     BASIC_LTI_LAUNCH_REQUEST = "basic-lti-launch-request"
     TOOL_PROXY_REREGISTRATION_REQUEST = "ToolProxyRegistrationRequest"
 
@@ -47,6 +47,11 @@ module Lti
       where(Lti::ResourcePlacement.where(placement: placements)
                 .where("lti_message_handlers.id = lti_resource_placements.message_handler_id")
                 .arel.exists)
+    }
+
+    scope :for_non_migrated_tool_proxies, lambda {
+      joins(resource_handler: :tool_proxy)
+        .where(lti_tool_proxies: { migrated_to_context_external_tool: nil })
     }
 
     def self.lti_apps_tabs(context, placements, _opts)

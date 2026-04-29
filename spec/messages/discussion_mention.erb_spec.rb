@@ -31,7 +31,7 @@ describe "discussion_mention" do
   let(:asset) { @object }
   let(:notification_name) { "Discussion Mention" }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   describe ".email" do
     let(:path_type) { :email }

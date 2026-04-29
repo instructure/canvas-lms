@@ -19,11 +19,11 @@
 import {resetTrayHeight, getTrayHeight} from '../trayUtils'
 
 beforeEach(() => {
-  jest.resetModules()
+  vi.resetModules()
 })
 
 afterEach(() => {
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('trayUtils', () => {
@@ -42,7 +42,7 @@ describe('trayUtils', () => {
 
     it('only checks for the masquerade bar once', () => {
       resetTrayHeight()
-      jest.spyOn(document, 'querySelector')
+      vi.spyOn(document, 'querySelector')
       getTrayHeight()
       getTrayHeight()
       getTrayHeight()

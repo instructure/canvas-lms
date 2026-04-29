@@ -15,126 +15,119 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useRef, useEffect} from 'react'
-import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
-import {StudentCell} from './grid/StudentCell'
-import {OutcomeHeader} from './grid/OutcomeHeader'
-import {StudentHeader} from './grid/StudentHeader'
-import {ScoresGrid} from './grid/ScoresGrid'
+import React, {useEffect, useState, useCallback} from 'react'
+import {DragDropContext} from 'react-dnd'
+import ReactDnDHTML5Backend from 'react-dnd-html5-backend'
+import {GradebookSettings, DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
+import {NameDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {
-  COLUMN_WIDTH,
-  STUDENT_COLUMN_WIDTH,
-  STUDENT_COLUMN_RIGHT_PADDING,
-  COLUMN_PADDING,
-  CELL_HEIGHT,
-} from '../utils/constants'
-import {Student, Outcome, StudentRollupData, Pagination as PaginationType} from '../types/rollup'
+  Student,
+  Outcome,
+  StudentRollupData,
+  Pagination as PaginationType,
+} from '@canvas/outcomes/react/types/rollup'
 import {GradebookPagination} from './pagination/GradebookPagination'
-import {Sorting} from '../types/shapes'
+import {Sorting} from '@canvas/outcomes/react/types/shapes'
+import {
+  ContributingScoreAlignment,
+  ContributingScoresManager,
+} from '@canvas/outcomes/react/hooks/useContributingScores'
+import {GradebookTable} from './GradebookTable'
+import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 
 export interface GradebookProps {
   courseId: string
   students: Student[]
   outcomes: Outcome[]
   rollups: StudentRollupData[]
-  gradebookFilters: string[]
-  gradebookFilterHandler: (filter: string) => void
+  outcomeDistributions?: Record<string, OutcomeDistribution>
+  distributionStudents?: Student[]
+  isLoadingDistribution?: boolean
   pagination?: PaginationType
   setCurrentPage: (page: number) => void
   sorting: Sorting
+  gradebookSettings?: GradebookSettings
+  onChangeNameDisplayFormat: (format: NameDisplayFormat) => void
+  onOutcomesReorder?: (orderedOutcomes: Outcome[]) => void
+  contributingScores: ContributingScoresManager
+  onOpenStudentAssignmentTray?: (
+    outcome: Outcome,
+    student: Student,
+    alignmentIndex: number,
+    alignments: ContributingScoreAlignment[],
+  ) => void
 }
 
-export const Gradebook: React.FC<GradebookProps> = ({
+const GradebookComponent: React.FC<GradebookProps> = ({
   courseId,
   students,
-  outcomes,
+  outcomes: initialOutcomes,
   rollups,
+  outcomeDistributions,
+  distributionStudents,
+  isLoadingDistribution = false,
   pagination,
   setCurrentPage,
   sorting,
+  gradebookSettings = DEFAULT_GRADEBOOK_SETTINGS,
+  onChangeNameDisplayFormat,
+  onOutcomesReorder,
+  contributingScores,
+  onOpenStudentAssignmentTray,
 }) => {
-  const headerRow = useRef<HTMLElement | null>(null)
-  const gridRef = useRef<HTMLElement | null>(null)
+  const [outcomes, setOutcomes] = useState<Outcome[]>(initialOutcomes)
 
   useEffect(() => {
-    const handleGridScroll = (e: Event) => {
-      if (headerRow.current && e.target instanceof HTMLElement) {
-        headerRow.current.scrollLeft = e.target.scrollLeft
-      }
-    }
+    setOutcomes(initialOutcomes)
+  }, [initialOutcomes])
 
-    if (gridRef.current) {
-      gridRef.current.addEventListener('scroll', handleGridScroll)
-    }
+  const handleOutcomeMove = useCallback((outcomeId: string | number, hoverIndex: number) => {
+    setOutcomes(prevOutcomes => {
+      const dragIndex = prevOutcomes.findIndex(o => o.id.toString() === outcomeId.toString())
+      if (dragIndex === -1 || dragIndex === hoverIndex) return prevOutcomes
 
-    return function cleanup() {
-      if (gridRef.current) {
-        gridRef.current.removeEventListener('scroll', handleGridScroll)
-      }
-    }
+      const reorderedOutcomes = [...prevOutcomes]
+      const [draggedOutcome] = reorderedOutcomes.splice(dragIndex, 1)
+      reorderedOutcomes.splice(hoverIndex, 0, draggedOutcome)
+
+      return reorderedOutcomes
+    })
   }, [])
+
+  const handleOutcomeDragEnd = useCallback(() => {
+    onOutcomesReorder?.(outcomes)
+  }, [outcomes, onOutcomesReorder])
+
+  const handleOutcomeDragLeave = useCallback(() => {
+    setOutcomes(initialOutcomes)
+  }, [initialOutcomes])
 
   return (
     <>
-      <Flex padding="medium 0 0 0">
-        <Flex.Item>
-          <View borderWidth="large 0 medium 0">
-            <StudentHeader sorting={sorting} />
-          </View>
-        </Flex.Item>
-        <Flex.Item size={`${STUDENT_COLUMN_RIGHT_PADDING}px`} />
-        <View
-          as="div"
-          display="flex"
-          id="outcomes-header"
-          overflowX="hidden"
-          elementRef={el => {
-            if (el instanceof HTMLElement) {
-              headerRow.current = el
-            }
-          }}
-        >
-          {outcomes.map((outcome, index) => (
-            <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`} key={`${outcome.id}.${index}`}>
-              <OutcomeHeader outcome={outcome} />
-            </Flex.Item>
-          ))}
-        </View>
-      </Flex>
-      <View display="flex">
-        <View as="div" minWidth={STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING}>
-          {students.map(student => (
-            <View
-              key={student.id}
-              as="div"
-              overflowX="auto"
-              background="primary"
-              borderWidth="0 0 small 0"
-              height={CELL_HEIGHT}
-              width={STUDENT_COLUMN_WIDTH}
-            >
-              <StudentCell courseId={courseId} student={student} />
-            </View>
-          ))}
-        </View>
-        <View
-          as="div"
-          overflowX="auto"
-          overflowY="auto"
-          elementRef={el => {
-            if (el instanceof HTMLElement) {
-              gridRef.current = el
-            }
-          }}
-          width={outcomes.length * COLUMN_WIDTH}
-        >
-          <ScoresGrid students={students} outcomes={outcomes} rollups={rollups} />
-        </View>
-      </View>
+      <GradebookTable
+        courseId={courseId}
+        students={students}
+        outcomes={outcomes}
+        rollups={rollups}
+        sorting={sorting}
+        outcomeDistributions={outcomeDistributions}
+        distributionStudents={distributionStudents}
+        isLoadingDistribution={isLoadingDistribution}
+        gradebookSettings={gradebookSettings}
+        onChangeNameDisplayFormat={onChangeNameDisplayFormat}
+        contributingScores={contributingScores}
+        onOpenStudentAssignmentTray={onOpenStudentAssignmentTray}
+        handleOutcomeReorder={handleOutcomeMove}
+        handleOutcomeDragEnd={handleOutcomeDragEnd}
+        handleOutcomeDragLeave={handleOutcomeDragLeave}
+      />
       {pagination && pagination.totalPages > 1 && (
         <GradebookPagination pagination={pagination} onPageChange={setCurrentPage} />
       )}
     </>
   )
 }
+
+export const Gradebook = DragDropContext(ReactDnDHTML5Backend)(
+  GradebookComponent,
+) as React.ComponentType<GradebookProps>

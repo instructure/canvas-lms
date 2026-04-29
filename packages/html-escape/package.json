@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "@instructure/html-escape",
   "private": true,
   "version": "1.0.0",

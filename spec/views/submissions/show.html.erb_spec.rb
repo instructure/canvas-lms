@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require_relative "../views_helper"
 require_relative "../../selenium/helpers/groups_common"
 
@@ -42,7 +41,7 @@ describe "submissions/show" do
     before :once do
       @group_category = @course.group_categories.create!(name: "Test Group Set")
       @group = @course.groups.create!(name: "a group", group_category: @group_category)
-      add_user_to_group(@user, @group, true)
+      add_user_to_group(@user, @group, is_leader: true)
       @assignment =
         @course.assignments.create!(
           assignment_valid_attributes.merge(
@@ -73,7 +72,7 @@ describe "submissions/show" do
       @html = Nokogiri::HTML5.fragment(response.body)
       expect(@html.css('input[type="radio"][name="submission[group_comment]"]').size).to eq 0
       checkbox = @html.css("#submission_group_comment")
-      expect(checkbox.attr("checked")).to_not be_nil
+      expect(checkbox.attr("checked")).not_to be_nil
       expect(checkbox.attr("style").value).to include("display:none")
     end
 
@@ -92,7 +91,7 @@ describe "submissions/show" do
       assign(:submission, @submission)
       render "submissions/show"
       html = Nokogiri::HTML5.fragment(response.body)
-      expect(html.css("#submission_group_comment").attr("checked")).to_not be_nil
+      expect(html.css("#submission_group_comment").attr("checked")).not_to be_nil
     end
 
     it "students that are not peer reviewers are not allowed to make group comments" do
@@ -386,6 +385,49 @@ describe "submissions/show" do
     end
   end
 
+  describe "SpeedGrader link" do
+    let(:html) { Nokogiri::HTML5.fragment(response.body) }
+
+    before(:once) do
+      @course = Course.create!
+      @student = @course.enroll_user(User.create!, "StudentEnrollment", active_all: true).user
+      @teacher = @course.enroll_user(User.create!, "TeacherEnrollment", active_all: true).user
+      @assignment = @course.assignments.create!
+      @submission = @assignment.submissions.find_by(user: @student)
+    end
+
+    before do
+      assign(:assignment, @assignment)
+      assign(:context, @course)
+      assign(:submission, @submission)
+    end
+
+    it "shows SpeedGrader link when user has manage_grades permission" do
+      assign(:current_user, @teacher)
+      render "submissions/show"
+      speedgrader_link = html.at_css('a[href*="speed_grader"]')
+      expect(speedgrader_link).to be_present
+      expect(speedgrader_link.text).to include("SpeedGrader")
+    end
+
+    it "shows SpeedGrader link when user has view_all_grades permission" do
+      @ta = @course.enroll_user(User.create!, "TaEnrollment", active_all: true).user
+      @course.account.role_overrides.create!(permission: "view_all_grades", role: ta_role, enabled: true)
+
+      assign(:current_user, @ta)
+      render "submissions/show"
+      speedgrader_link = html.at_css('a[href*="speed_grader"]')
+      expect(speedgrader_link).to be_present
+    end
+
+    it "does not show SpeedGrader link when user is a student" do
+      assign(:current_user, @student)
+      render "submissions/show"
+      speedgrader_link = html.at_css('a[href*="speed_grader"]')
+      expect(speedgrader_link).not_to be_present
+    end
+  end
+
   context "comments sidebar" do
     describe "non-owner comment visibility" do
       let(:student) { User.create! }
@@ -423,8 +465,8 @@ describe "submissions/show" do
       before do
         assign(:context, course)
 
-        course.enroll_teacher(teacher).accept(true)
-        course.enroll_student(student).accept(true)
+        course.enroll_teacher(teacher).accept(force: true)
+        course.enroll_student(student).accept(force: true)
 
         muted_submission.add_comment(author: student, comment: "I did a great job!")
         muted_submission.add_comment(author: teacher, comment: "No, you did not", hidden: true)
@@ -801,6 +843,141 @@ describe "submissions/show" do
       media_comment = comment_list.css(".comment .comment").map { |comment| comment.text.strip }.first
       expect(comment_text.include?("good job!")).to be true
       expect(media_comment.include?("This is a media comment")).to be true
+    end
+  end
+
+  describe "asset report status containers" do
+    let_once(:assignment) { @course.assignments.create!(submission_types: "online_text_entry") }
+    let_once(:student) do
+      course_with_user("StudentEnrollment", course: @course, active_all: true).user
+    end
+    let_once(:submission) do
+      assignment.submit_homework(student, submission_type: "online_text_entry", body: "my text")
+    end
+
+    before do
+      assign(:assignment, assignment)
+      assign(:context, @course)
+      assign(:current_user, student)
+      assign(:submission, submission)
+    end
+
+    context "when submission is online_text_entry" do
+      it "renders asset report text entry status container with correct data attributes" do
+        render "submissions/show"
+
+        expect(response.body).to include('id="asset_report_status_container"')
+        expect(response.body).to match(/id="asset_report_status_container"[^>]*data-attempt="#{submission.attempt}"/)
+        expect(response.body).to match(/id="asset_report_status_container"[^>]*data-submission-id="#{submission.id}"/)
+        expect(response.body).to match(/id="asset_report_status_container"[^>]*data-submission-type="online_text_entry"/)
+      end
+
+      it "renders asset report modal mount point" do
+        render "submissions/show"
+
+        expect(response.body).to include('id="asset_report_modal"')
+      end
+    end
+
+    context "when submission is not online_text_entry" do
+      let(:upload_assignment) { @course.assignments.create!(submission_types: "online_upload") }
+      let(:upload_submission) do
+        upload_assignment.submission_for_student(student)
+      end
+
+      before do
+        assign(:assignment, upload_assignment)
+        assign(:submission, upload_submission)
+        assign(:context, @course)
+        assign(:current_user, student)
+      end
+
+      it "does not render text entry status container" do
+        render "submissions/show"
+
+        expect(response.body).not_to include('id="asset_report_status_container"')
+      end
+
+      it "still renders asset report modal mount point" do
+        render "submissions/show"
+
+        expect(response.body).to include('id="asset_report_modal"')
+      end
+    end
+
+    context "when submission is discussion_topic" do
+      let(:discussion_assignment) { @course.assignments.create!(submission_types: "discussion_topic") }
+      let(:discussion_submission) do
+        discussion_assignment.submit_homework(student, submission_type: "discussion_topic")
+      end
+
+      before do
+        assign(:assignment, discussion_assignment)
+        assign(:submission, discussion_submission)
+        assign(:context, @course)
+        assign(:current_user, student)
+      end
+
+      it "renders asset report status container with discussion_topic submission type" do
+        render "submissions/show"
+
+        expect(response.body).to include('id="asset_report_status_container"')
+        expect(response.body).to match(/id="asset_report_status_container"[^>]*data-submission-type="discussion_topic"/)
+      end
+    end
+
+    context "with checkpointed discussions" do
+      let_once(:checkpointed_topic) { DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion") }
+      let_once(:checkpointed_assignment) { checkpointed_topic.assignment }
+      let_once(:checkpoint_student) do
+        course_with_user("StudentEnrollment", course: @course, active_all: true).user
+      end
+
+      before :once do
+        # Create checkpoint sub-assignments
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 3
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 5.days.from_now }],
+          points_possible: 7
+        )
+      end
+
+      let_once(:checkpointed_submission) do
+        # For checkpointed discussions, the main submission won't have a
+        # submission_type until both checkpoints are complete
+        checkpointed_assignment.submission_for_student(checkpoint_student)
+      end
+
+      before do
+        view_context(@course, checkpoint_student)
+        assign(:assignment, checkpointed_assignment)
+        assign(:submission, checkpointed_submission)
+
+        # For checkpointed discussions, also need to assign the sub-assignment submissions
+        reply_to_topic_assignment = checkpointed_assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+        reply_to_entry_assignment = checkpointed_assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+        assign(:reply_to_topic_assignment, reply_to_topic_assignment)
+        assign(:reply_to_entry_assignment, reply_to_entry_assignment)
+        assign(:reply_to_topic_submission, reply_to_topic_assignment.submissions.find_by(user: checkpoint_student))
+        assign(:reply_to_entry_submission, reply_to_entry_assignment.submissions.find_by(user: checkpoint_student))
+      end
+
+      it "renders asset report status container with discussion_topic even when submission_type is nil" do
+        # Checkpointed discussions have nil submission_type until fully submitted
+        expect(checkpointed_submission.submission_type).to be_nil
+
+        render "submissions/show"
+
+        expect(response.body).to include('id="asset_report_status_container"')
+        expect(response.body).to match(/id="asset_report_status_container"[^>]*data-submission-type="discussion_topic"/)
+      end
     end
   end
 end

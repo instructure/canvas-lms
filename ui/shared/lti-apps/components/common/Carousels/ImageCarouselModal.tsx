@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useRef} from 'react'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {ContextView} from '@instructure/ui-view'

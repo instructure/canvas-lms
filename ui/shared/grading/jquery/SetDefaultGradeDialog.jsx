@@ -19,15 +19,14 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import setDefaultGradeDialogTemplate from '../jst/SetDefaultGradeDialog.handlebars'
-import {isString, values, filter, chain, includes} from 'lodash'
+import {isString, values, filter, includes, uniqBy} from 'es-toolkit/compat'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
-import '@canvas/util/jquery/fixDialogButtons'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {windowAlert} from '@canvas/util/globalUtils'
 
 // # this is a partial needed by the 'SetDefaultGradeDialog' template
@@ -203,7 +202,7 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
   })(this)
   getParams = (function (_this) {
     return function (page, grade) {
-      return chain(page)
+      const pairs = page
         .map(function (s) {
           const prefix = 'submissions[submission_' + s.id + ']'
           const params = [
@@ -218,22 +217,20 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
           }
           return params
         })
-        .flatten()
-        .fromPairs()
-        .value()
+        .flat()
+      return Object.fromEntries(pairs)
     }
   })(this)
 
   const mountPoint = document.getElementById(DEFAULT_GRADE_WITH_CHECKPOINTS_MOUNT_POINT)
 
   if (mountPoint) {
-    const root = createRoot(mountPoint)
-    root.render(<CheckpointsGradeInputs assignment={this.assignment} canEdit={true} />)
+    render(<CheckpointsGradeInputs assignment={this.assignment} canEdit={true} />, mountPoint)
   }
 
   const overwriteExitingGrades = document.getElementsByName('overwrite_existing_grades')[0]
   const infoMountPoint = document.getElementById(DEFAULT_GRADE_WITH_CHECKPOINTS_INFO_MOUNT_POINT)
-  const infoRoot = infoMountPoint ? createRoot(infoMountPoint) : null
+  const infoRoot = infoMountPoint ? render(<span />, infoMountPoint) : null
 
   overwriteExitingGrades.addEventListener(
     'change',
@@ -242,7 +239,10 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
         return
       }
 
-      infoRoot.render(overwriteExitingGrades.checked ? <CheckpointsDefaultGradeInfo /> : <span />)
+      rerender(
+        infoRoot,
+        overwriteExitingGrades.checked ? <CheckpointsDefaultGradeInfo /> : <span />,
+      )
     },
     false,
   )
@@ -251,25 +251,13 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
   // # return all submission in a group assignment leading to duplicates
   return (getSubmissions = (function (_this) {
     return function (responses) {
-      return chain(responses)
+      const submissions = responses
         .map(function (arg) {
-          let s
           const response = arg[0]
-          return [
-            (function () {
-              let i, len
-              const results = []
-              for (i = 0, len = response.length; i < len; i++) {
-                s = response[i]
-                results.push(s.submission)
-              }
-              return results
-            })(),
-          ]
+          return response.map(s => s.submission)
         })
-        .flattenDeep()
-        .uniqBy('id')
-        .value()
+        .flat()
+      return uniqBy(submissions, item => item.id)
     }
   })(this))
 }

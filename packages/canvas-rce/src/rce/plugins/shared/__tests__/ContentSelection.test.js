@@ -16,24 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import FakeEditor from '../../../__tests__/FakeEditor'
 import {
-  LINK_TYPE,
-  FILE_LINK_TYPE,
-  IMAGE_EMBED_TYPE,
-  NONE_TYPE,
-  TEXT_TYPE,
-  DISPLAY_AS_LINK,
+  asAudioElement,
+  asVideoElement,
   DISPLAY_AS_DOWNLOAD_LINK,
+  DISPLAY_AS_LINK,
+  FILE_LINK_TYPE,
   getContentFromEditor,
   getContentFromElement,
   getLinkContentFromEditor,
+  IMAGE_EMBED_TYPE,
+  isAudioElement,
   isFileLink,
   isImageEmbed,
   isVideoElement,
-  isAudioElement,
-  findMediaPlayerIframe,
+  LINK_TYPE,
+  NONE_TYPE,
+  TEXT_TYPE,
 } from '../ContentSelection'
-import FakeEditor from '../../../__tests__/FakeEditor'
 
 describe('RCE > Plugins > Shared > Content Selection', () => {
   let $container
@@ -325,34 +326,6 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
     })
   })
 
-  describe('findMediaPlayerIframe', () => {
-    let wrapper, mediaIframe, shim
-    beforeEach(() => {
-      wrapper = document.createElement('span')
-      mediaIframe = document.createElement('iframe')
-      shim = document.createElement('span')
-      shim.setAttribute('class', 'mce-shim')
-      wrapper.appendChild(mediaIframe)
-      wrapper.appendChild(shim)
-    })
-    it('returns the iframe if given the video iframe', () => {
-      const result = findMediaPlayerIframe(mediaIframe)
-      expect(result).toEqual(mediaIframe)
-    })
-    it('returns the iframe if given the tinymce wrapper span', () => {
-      const result = findMediaPlayerIframe(wrapper)
-      expect(result).toEqual(mediaIframe)
-    })
-    it('returns the iframe if given the shim', () => {
-      const result = findMediaPlayerIframe(shim)
-      expect(result).toEqual(mediaIframe)
-    })
-    it('does not error if given null', () => {
-      const result = findMediaPlayerIframe(null)
-      expect(result).toEqual(null)
-    })
-  })
-
   describe('predicates', () => {
     it('detect a canvas file link', () => {
       const $selectedNode = document.createElement('a')
@@ -445,6 +418,74 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       expect(isImageEmbed($selectedNode)).toBeFalsy()
       expect(isVideoElement($selectedNode)).toBeFalsy()
       expect(isAudioElement($selectedNode)).toBeTruthy()
+    })
+  })
+
+  describe('asVideoElement', () => {
+    it('includes viewerRestrictions from contentWindow', () => {
+      const $span = document.createElement('span')
+      $span.setAttribute('data-mce-p-data-media-id', 'm-id')
+      $span.setAttribute('data-mce-p-data-media-type', 'video')
+      const $iframe = document.createElement('iframe')
+      $span.appendChild($iframe)
+      Object.defineProperty($iframe, 'contentWindow', {
+        value: {
+          ['env'.toUpperCase()]: {
+            media_object: {
+              viewer_restrictions: {
+                show_rolling_transcript: true
+              }
+            }
+          }
+        },
+        writable: true,
+      })
+      const result = asVideoElement($span)
+      expect(result.viewerRestrictions).toEqual({show_rolling_transcript: true})
+    })
+
+    it('defaults viewerRestrictions to {} when contentWindow is absent', () => {
+      const $span = document.createElement('span')
+      $span.setAttribute('data-mce-p-data-media-id', 'm-id')
+      $span.setAttribute('data-mce-p-data-media-type', 'video')
+      const $iframe = document.createElement('iframe')
+      $span.appendChild($iframe)
+      const result = asVideoElement($span)
+      expect(result.viewerRestrictions).toEqual({})
+    })
+  })
+
+  describe('asAudioElement', () => {
+    it('includes viewerRestrictions from contentWindow', () => {
+      const $span = document.createElement('span')
+      $span.setAttribute('data-mce-p-data-media-id', 'm-id')
+      const $iframe = document.createElement('iframe')
+      $iframe.setAttribute('src', '/media_objects_iframe/m-id')
+      $span.appendChild($iframe)
+      Object.defineProperty($iframe, 'contentWindow', {
+        value: {
+          ['env'.toUpperCase()]: {
+            media_object: {
+              viewer_restrictions: {
+                show_rolling_transcript: true
+              }
+            }
+          }
+        },
+        writable: true,
+      })
+      const result = asAudioElement($span)
+      expect(result.viewerRestrictions).toEqual({show_rolling_transcript: true})
+    })
+
+    it('defaults viewerRestrictions to {} when contentWindow is absent', () => {
+      const $span = document.createElement('span')
+      $span.setAttribute('data-mce-p-data-media-id', 'm-id')
+      const $iframe = document.createElement('iframe')
+      $iframe.setAttribute('src', '/media_objects_iframe/m-id')
+      $span.appendChild($iframe)
+      const result = asAudioElement($span)
+      expect(result.viewerRestrictions).toEqual({})
     })
   })
 })

@@ -101,63 +101,6 @@ describe "assignment batch edit" do
         # should have 5 rows including overrides and assignment titles
         expect(bulk_edit_tr_rows.count).to eq 5
       end
-
-      it "allows editing and saving dates", custom_timeout: 30 do
-        skip "DEMO-76 (10/14/2020)"
-
-        date_inputs = assignment_dates_inputs(@assignment2.title)
-        # add a due date to Second Assignment
-        replace_content(date_inputs[0], format_date_for_view(@date, :medium))
-        # add unlock_at date
-        replace_content(date_inputs[1], format_date_for_view(@date - 5.days, :medium))
-        # add lock_at date
-        replace_content(date_inputs[2], format_date_for_view(@date + 5.days, :medium))
-        # save
-        save_bulk_edited_dates
-        # the assignment should now have due and available dates
-        keep_trying_until do
-          expect(@assignment2.reload.due_at).not_to be_nil
-          expect(@assignment2.lock_at).not_to be_nil
-          expect(@assignment2.unlock_at).not_to be_nil
-        end
-      end
-
-      it "allows selecting and shifting dates", custom_timeout: 30 do
-        skip "DEMO-76 (10/14/2020)"
-
-        select_assignment_checkbox(@assignment1.title).send_keys(:space)
-        open_batch_edit_dialog
-        # shift by 2 days
-        batch_edit_dialog_days_up_button.click
-        batch_edit_dialog_ok_button.click
-        date_inputs = assignment_dates_inputs(@assignment1.title)
-        save_bulk_edited_dates
-        expect(date_inputs[0].attribute("value")).to eq (@date + 3.days).strftime("%a %-b %-d, %Y")
-        # unlock_at was today-3.days
-        expect(date_inputs[1].attribute("value")).to eq (@date - 1.day).strftime("%a %-b %-d, %Y")
-        # lock_at date was today+3days
-        expect(date_inputs[2].attribute("value")).to eq (@date + 5.days).strftime("%a %-b %-d, %Y")
-        date_inputs = assignment_dates_inputs(@override1.title)
-        # Override1 due date was today-1.day
-        expect(date_inputs[0].attribute("value")).to eq (@date + 1.day).strftime("%a %-b %-d, %Y")
-        # Override1 unlock_at date was today-4.days
-        expect(date_inputs[1].attribute("value")).to eq (@date - 2.days).strftime("%a %-b %-d, %Y")
-        # Override1 lock_at date was today+4days
-        expect(date_inputs[2].attribute("value")).to eq (@date + 6.days).strftime("%a %-b %-d, %Y")
-      end
-
-      it "allows clearing dates", custom_timeout: 30 do
-        skip "DEMO-76 (10/14/2020)"
-
-        select_assignment_checkbox(@assignment1.title).send_keys(:space)
-        open_batch_edit_dialog
-        dialog_remove_date_radio_btn.send_keys(:space)
-        batch_edit_dialog_ok_button.click
-        date_inputs = assignment_dates_inputs(@assignment1.title)
-        save_bulk_edited_dates
-        # due date is cleared
-        expect(date_inputs[0].attribute("value")).to eq ""
-      end
     end
   end
 

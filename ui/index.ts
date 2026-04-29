@@ -21,17 +21,16 @@
 import './boot/initializers/setWebpackCdnHost'
 import '@canvas/jquery/jquery.instructure_jquery_patches' // this needs to be before anything else that requires jQuery
 import './boot'
+import './boot/featureRegistry'
 import {captureException} from '@sentry/browser'
 
 // true modules that we use in this file
 import ready from '@instructure/ready'
 import splitAssetString from '@canvas/util/splitAssetString'
-import {Mathml} from '@instructure/canvas-rce'
 import {Capabilities as C, up} from '@canvas/engine'
 import {loadReactRouter} from './boot/initializers/router'
 import loadLocale from './loadLocale'
 import featureBundles from './featureBundles'
-// @ts-expect-error
 import pluginBundles from 'plugin-bundles-generated'
 
 // these are all things that either define global $.whatever or $.fn.blah
@@ -115,10 +114,13 @@ const advanceReadiness = (target: string) => {
   }
 }
 
-function afterDocumentReady() {
+async function afterDocumentReady() {
   Promise.all((window.deferredBundles || []).map(loadBundle)).then(() => {
     advanceReadiness('deferredBundles')
   })
+
+  // Start the feature registry - mounts all registered features
+  window.CANVAS.startFeatures()
 
   const helpButton = document.querySelector('.help_dialog_trigger')
   if (helpButton !== null) helpButton.addEventListener('click', openHelpDialog)
@@ -127,16 +129,28 @@ function afterDocumentReady() {
   loadNewUserTutorials()
 
   if (!ENV.FEATURES.explicit_latex_typesetting) {
-    setupMathML()
+    await setupMathML()
   }
 }
 
-function setupMathML() {
+const RCE_HTML_EDITOR_CLASS = 'RceHtmlEditor'
+async function setupMathML() {
+  const {Mathml} = await import('@instructure/canvas-rce/enhance-user-content')
   const features = {
     new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
     explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
   }
   const config = {locale: ENV?.LOCALE || 'en'}
+
+  function isRceHtmlEditor(node: Node): boolean {
+    const element = node as Element
+    if (
+      element.closest(`.${RCE_HTML_EDITOR_CLASS}`) !== null ||
+      element.firstElementChild?.classList.contains(RCE_HTML_EDITOR_CLASS)
+    )
+      return true
+    return false
+  }
 
   // LS-1662: there are math equations on the page that
   // we don't see, so remain invisible and aren't
@@ -182,6 +196,7 @@ function setupMathML() {
         for (let n = 0; n < addedNodes.length; ++n) {
           const node = addedNodes[n]
           if (node.nodeType !== Node.ELEMENT_NODE) continue
+          if (isRceHtmlEditor(node)) continue
           const processNewMathEvent = new CustomEvent(Mathml.processNewMathEventName, {
             detail: {target: node, features, config},
           })

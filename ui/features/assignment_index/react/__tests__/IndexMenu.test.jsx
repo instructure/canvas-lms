@@ -17,21 +17,34 @@ import {cleanup, fireEvent, render, screen} from '@testing-library/react'
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import '@testing-library/jest-dom/extend-expect'
 import {ltiState} from '@canvas/lti/jquery/messages'
+import {reloadWindow} from '@canvas/util/globalUtils'
 import IndexMenu from '../IndexMenu'
-import Actions from '../actions/IndexMenuActions'
+import * as Actions from '../actions/IndexMenuActions'
 
-jest.mock('../actions/IndexMenuActions', () => ({
-  ...jest.requireActual('../actions/IndexMenuActions').default,
-  apiGetLaunches: jest.fn(),
-}))
+vi.mock('../actions/IndexMenuActions', async () => {
+  const actual = await vi.importActual('../actions/IndexMenuActions')
+  return {
+    ...actual,
+    SET_WEIGHTED: actual.default.SET_WEIGHTED,
+    default: {
+      ...actual.default,
+      apiGetLaunches: vi.fn(() => ({
+        type: 'STUB_API_GET_TOOLS',
+      })),
+    },
+  }
+})
 
-jest.mock('@canvas/lti/jquery/messages', () => ({
+vi.mock('@canvas/lti/jquery/messages', () => ({
   ltiState: {
     tray: null,
   },
-  onLtiClosePostMessage: jest.fn(),
+  onLtiClosePostMessage: vi.fn(),
+}))
+
+vi.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: vi.fn(),
 }))
 
 function createFakeStore(initialState) {
@@ -83,15 +96,11 @@ describe('AssignmentsIndexMenu', () => {
 
   beforeEach(() => {
     oldEnv = {...window.ENV}
-
-    Actions.apiGetLaunches.mockReturnValue({
-      type: 'STUB_API_GET_TOOLS',
-    })
   })
 
   afterEach(() => {
     window.ENV = oldEnv
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('renders a dropdown menu trigger and options list', () => {
@@ -105,7 +114,7 @@ describe('AssignmentsIndexMenu', () => {
   })
 
   it('renders a bulk edit option if property is specified', () => {
-    const requestBulkEditFn = jest.fn()
+    const requestBulkEditFn = vi.fn()
     const {getAllByText} = renderComponent({requestBulkEdit: requestBulkEditFn})
     const menuitem = getAllByText('Edit Assignment Dates')
     expect(menuitem).toHaveLength(1)
@@ -249,6 +258,8 @@ describe('AssignmentsIndexMenu', () => {
 
       // Verify that the LTI state was accessed
       expect(ltiState.tray.refreshOnClose).toBe(true)
+      // Verify that reloadWindow was called
+      expect(reloadWindow).toHaveBeenCalled()
     })
 
     it('clears the window listener handler when unmounted', () => {

@@ -24,19 +24,7 @@ describe "API Error Handling", type: :request do
   before :once do
     user_with_pseudonym(active_all: true)
     enable_default_developer_key!
-    @token = @user.access_tokens.create!
-  end
-
-  describe "ActiveRecord Error JSON override" do
-    it "does not return the base object in ActiveRecord::Errors.to_json" do
-      assmt = Assignment.new
-      expect(assmt.valid?).to be_falsey
-      errors = assmt.errors.to_json
-      parsed = JSON.parse(errors)["errors"]
-      expect(parsed.size).to be > 0
-      expect(errors).not_to match(/blah blah/)
-      parsed.each_value { |v| v.each { |i| expect(i.keys.sort).to eq %w[attribute message type] } }
-    end
+    @token = @user.access_tokens.create!(purpose: "Test")
   end
 
   it "responds not_found for 404 errors" do

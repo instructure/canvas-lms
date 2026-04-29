@@ -16,42 +16,78 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 import ready from '@instructure/ready'
-import {createRoot} from 'react-dom/client'
-import OnlineUploadAssetReportStatusLink from './OnlineUploadAssetReportStatusLink'
+import {
+  useShouldShowLtiAssetReportsForStudent,
+  useLtiAssetProcessorsAndReportsForStudent,
+} from '@canvas/lti-asset-processor/react/hooks/useLtiAssetProcessorsAndReportsForStudent'
 
-declare const ENV: {
-  ASSET_REPORTS?: LtiAssetReportWithAsset[]
-  ASSET_PROCESSORS?: ExistingAttachedAssetProcessor[]
-  ASSIGNMENT_NAME?: string
+import {sendOpenAssetReportModalMessage} from '@canvas/lti-asset-processor/react/StudentAssetReportModalWrapper'
+import LtiAssetReportStatus from '@canvas/lti-asset-processor/shared-with-sg/replicated/components/LtiAssetReportStatus'
+import {z} from 'zod'
+import {useTranslation} from '@canvas/i18next'
+import {renderAPComponent} from '@canvas/lti-asset-processor/react/util/renderToElements'
+
+/**
+ * This code, which renders Asset Report statuses, is used inside an iframe in
+ * case of online_upload in old student submission view, but we want the Report
+ * modal to open in the main window. To do this, we post a message to the main
+ * window which will then open the modal. The message is handled by the
+ * StudentLtiAssetReportModalWrapper component.
+ * (ui/features/submissions/react/StudentLtiAssetReportModalWrapper.tsx)
+ */
+
+/* 
+  We don't want to render the Asset Reports in the preview inside SpeedGrader, 
+  since SpeedGrader show them in the right panel. 
+*/
+function isInSpeedgrader(): boolean {
+  try {
+    return window.top?.location.href?.includes('/gradebook/speed_grader') || false
+  } catch (_) {
+    return false
+  }
+}
+
+const ZAttachmentAssetReportStatusProps = z.object({
+  submissionId: z.string(),
+  submissionType: z.string(),
+  attachmentId: z.string(),
+})
+export default function AttachmentAssetReportStatus(
+  props: z.infer<typeof ZAttachmentAssetReportStatusProps>,
+) {
+  const data = useLtiAssetProcessorsAndReportsForStudent(props)
+  if (!data) return null
+  const openModal = () => sendOpenAssetReportModalMessage(data)
+  return <LtiAssetReportStatus reports={data.reports} openModal={openModal} />
+}
+
+const ZDocumentProcessorsHeaderProps = z.object({
+  submissionId: z.string(),
+  submissionType: z.string(),
+})
+function DocumentProcessorsHeader(submission: z.infer<typeof ZDocumentProcessorsHeaderProps>) {
+  const {t} = useTranslation('lti_asset_reports_for_student')
+  const shouldShow = useShouldShowLtiAssetReportsForStudent(submission)
+  return shouldShow ? <>{t('Document Processors')}</> : null
 }
 
 ready(() => {
-  const reports = ENV['ASSET_REPORTS']
-  const assetProcessors = ENV['ASSET_PROCESSORS'] || []
-  const assignmentName = ENV['ASSIGNMENT_NAME'] || ''
-
-  // if lti_asset_processor FF is off, reports will be undefined
-  if (!reports || !assetProcessors || !assetProcessors.length) {
+  if (isInSpeedgrader()) {
     return
   }
 
-  const containers = document.querySelectorAll<HTMLDivElement>('.asset_report_status_container')
-  containers.forEach(container => {
-    const attachmentId = container.dataset['attachmentId']
-    if (!attachmentId) {
-      console.warn('No attachmentId found in asset report status container')
-      return
-    }
-    createRoot(container).render(
-      <OnlineUploadAssetReportStatusLink
-        assignmentName={assignmentName}
-        assetProcessors={assetProcessors}
-        assetReports={reports}
-        attachmentId={attachmentId}
-      />,
+  const nRendered = renderAPComponent(
+    '.asset-report-status-container',
+    AttachmentAssetReportStatus,
+    ZAttachmentAssetReportStatusProps,
+  )
+  if (nRendered > 0) {
+    renderAPComponent(
+      '.asset-report-status-header',
+      DocumentProcessorsHeader,
+      ZDocumentProcessorsHeaderProps,
     )
-  })
+  }
 })

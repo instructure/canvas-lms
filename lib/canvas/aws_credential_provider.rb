@@ -19,6 +19,8 @@
 
 module Canvas
   class AwsCredentialProvider
+    include Aws::CredentialProvider
+
     def initialize(credential_name, vault_path = nil)
       @credential_name = credential_name
       unless vault_path.nil?

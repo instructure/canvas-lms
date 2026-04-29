@@ -19,23 +19,86 @@
 
 module Accessibility
   class ContentLoader
-    def initialize(context:, type:, id:)
-      @context = context
-      @type = type
-      @id = id
+    class UnsupportedResourceTypeError < StandardError; end
+    class ElementNotFoundError < StandardError; end
+
+    include ::Accessibility::NokogiriMethods
+
+    def initialize(issue_id:)
+      @issue = AccessibilityIssue.find(issue_id)
+      # Use the resource from ResourceResolvable concern (handles syllabus)
+      @resource = @issue.resource
+      @rule_id = @issue.rule_type
+      @path = @issue.node_path
+    end
+
+    def resource_updated_since_issue?
+      @resource.updated_at > @issue.created_at
     end
 
     def content
-      case @type
-      when "Assignment"
-        return { json: { content: @context.assignments.find_by(id: @id)&.description }, status: :ok } if @context.assignments.exists?(@id)
-      when "Page"
-        return { json: { content: @context.wiki_pages.find_by(id: @id)&.body }, status: :ok } if @context.wiki_pages.exists?(@id)
+      if @path.present?
+        html, metadata = extract_element_from_content
+        { content: html, metadata: }
       else
-        Rails.logger.error "Unknown content type: #{@type}"
-        return { json: { error: "Unknown content type: #{@type}" }, status: :unprocessable_entity }
+        { content: full_document, metadata: {} }
       end
-      { json: { error: "Resource '#{@type}' with id '#{@id}' was not found." }, status: :not_found }
+    end
+
+    def full_document
+      resource_html_content
+    end
+
+    def extract_element_from_content
+      html_content = resource_html_content
+
+      element = find_element_at_path(html_content, @path)
+
+      raise ElementNotFoundError, "Element not found at path: #{@path}" unless element
+
+      html = generate_preview_html(element)
+      metadata = extract_metadata(element)
+      [html, metadata]
+    end
+
+    private
+
+    def resource_html_content
+      # Check if resource implements the new AccessibilityCheckable interface
+      if @resource.respond_to?(:scannable_content)
+        # New path for resources using AccessibilityCheckable (e.g., SyllabusResource)
+        @resource.scannable_content
+      else
+        # Legacy path for non-migrated resources
+        case @resource
+        when Assignment
+          @resource.description
+        when WikiPage
+          @resource.body
+        when DiscussionTopic, Announcement
+          @resource.message
+        else
+          raise UnsupportedResourceTypeError, "Unsupported resource type: #{@resource.class.name}"
+        end
+      end
+    end
+
+    def generate_preview_html(element)
+      return element.to_html unless @rule_id
+
+      rule = Accessibility::Rule.registry[@rule_id]
+      return element.to_html unless rule
+
+      rule.issue_preview(element) || element.to_html
+    end
+
+    def extract_metadata(element)
+      return {} unless @rule_id
+
+      rule = Accessibility::Rule.registry[@rule_id]
+      return {} unless rule
+
+      rule.respond_to?(:issue_metadata) ? rule.issue_metadata(element) : {}
     end
   end
 end

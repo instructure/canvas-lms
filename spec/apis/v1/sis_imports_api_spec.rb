@@ -34,8 +34,8 @@ describe SisImportsApiController, type: :request do
   end
 
   def post_csv(*lines_or_opts)
-    lines = lines_or_opts.reject { |thing| thing.is_a? Hash }
-    opts = lines_or_opts.select { |thing| thing.is_a? Hash }.inject({}, :merge)
+    lines = lines_or_opts.grep_v(Hash)
+    opts = lines_or_opts.grep(Hash).inject({}, :merge)
 
     tmp = Tempfile.new("sis_rspec")
     path = "#{tmp.path}.csv"
@@ -90,7 +90,7 @@ describe SisImportsApiController, type: :request do
   end
 
   it "kicks off a sis import via multipart attachment" do
-    expect(Delayed::Worker).to receive(:current_job).at_least(:twice).and_return(double("Delayed::Job", id: 123))
+    expect(Delayed::Worker).to receive(:current_job).at_least(:twice).and_return(instance_double(Delayed::Job, id: 123))
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: "sis_imports_api",
@@ -182,6 +182,12 @@ describe SisImportsApiController, type: :request do
                                 "group_categories" => 0,
                                 "groups" => 0,
                                 "group_memberships" => 0,
+                                "differentiation_tag_sets" => 0,
+                                "differentiation_tags" => 0,
+                                "differentiation_tag_memberships" => 0,
+                                "institutional_tag_categories" => 0,
+                                "institutional_tags" => 0,
+                                "institutional_tag_associations" => 0,
                                 "terms" => 0,
                                 "error_count" => 0,
                                 "warning_count" => 0 },
@@ -197,6 +203,9 @@ describe SisImportsApiController, type: :request do
                                     "CommunicationChannel" => { "created" => 1, "restored" => 0, "deleted" => 0 },
                                     "Enrollment" => { "created" => 0, "concluded" => 0, "deactivated" => 0, "restored" => 0, "deleted" => 0 },
                                     "GroupMembership" => { "created" => 0, "restored" => 0, "deleted" => 0 },
+                                    "InstitutionalTagCategory" => { "created" => 0, "restored" => 0, "deleted" => 0 },
+                                    "InstitutionalTag" => { "created" => 0, "restored" => 0, "deleted" => 0 },
+                                    "InstitutionalTagAssociation" => { "created" => 0, "restored" => 0, "deleted" => 0 },
                                     "UserObserver" => { "created" => 0, "restored" => 0, "deleted" => 0 },
                                     "AccountUser" => { "created" => 0, "restored" => 0, "deleted" => 0 },
                                     "AssignmentOverrideStudent" => { "created" => 0, "restored" => 0, "deleted" => 0 } } },
@@ -931,6 +940,12 @@ describe SisImportsApiController, type: :request do
                                 "group_categories" => 0,
                                 "groups" => 0,
                                 "group_memberships" => 0,
+                                "differentiation_tag_sets" => 0,
+                                "differentiation_tags" => 0,
+                                "differentiation_tag_memberships" => 0,
+                                "institutional_tag_categories" => 0,
+                                "institutional_tags" => 0,
+                                "institutional_tag_associations" => 0,
                                 "terms" => 0,
                                 "error_count" => 0,
                                 "warning_count" => 0 },
@@ -946,6 +961,9 @@ describe SisImportsApiController, type: :request do
                                     "CommunicationChannel" => { "created" => 0, "restored" => 0, "deleted" => 0 },
                                     "Enrollment" => { "created" => 0, "concluded" => 0, "deactivated" => 0, "restored" => 0, "deleted" => 0 },
                                     "GroupMembership" => { "created" => 0, "restored" => 0, "deleted" => 0 },
+                                    "InstitutionalTagCategory" => { "created" => 0, "restored" => 0, "deleted" => 0 },
+                                    "InstitutionalTag" => { "created" => 0, "restored" => 0, "deleted" => 0 },
+                                    "InstitutionalTagAssociation" => { "created" => 0, "restored" => 0, "deleted" => 0 },
                                     "UserObserver" => { "created" => 0, "restored" => 0, "deleted" => 0 },
                                     "AccountUser" => { "created" => 0, "restored" => 0, "deleted" => 0 },
                                     "AssignmentOverrideStudent" => { "created" => 0, "restored" => 0, "deleted" => 0 } } },
@@ -1117,7 +1135,7 @@ describe SisImportsApiController, type: :request do
   end
 
   it "works with import permissions" do
-    account_admin_user_with_role_changes(user: @user, role_changes: { manage_sis: false, import_sis: true })
+    account_with_role_changes(user: @user, role_changes: { manage_sis: false, import_sis: true })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json",
              { controller: "sis_imports_api",
@@ -1146,6 +1164,52 @@ describe SisImportsApiController, type: :request do
                       id: batch.id.to_s })
     expect(json).to have_key("errors_attachment")
     expect(json["errors_attachment"]["id"]).to eq batch.errors_attachment.id
+  end
+
+  describe "pre-attachment workflow" do
+    it "supports direct upload to the file store in a separate request" do
+      json = api_call(:post,
+                      "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                      { controller: "sis_imports_api",
+                        action: "create",
+                        format: "json",
+                        account_id: @account.to_param },
+                      { import_type: "instructure_csv",
+                        pre_attachment: { name: "test_user_1.csv", size: 159 } },
+                      {},
+                      { as: :json })
+
+      expect(json["pre_attachment"]).to be_present
+      expect(json["pre_attachment"]["upload_url"]).to be_present
+      expect(json["pre_attachment"]["upload_params"]).to be_present
+
+      batch = SisBatch.find(json["id"])
+      expect(batch.attachment).to be_nil
+      expect(batch.workflow_state).to eq "initializing"
+
+      # simulate upload success
+      attachment = attachment_model(context: batch,
+                                    folder: nil,
+                                    uploaded_data: fixture_file_upload("sis/test_user_1.csv", "text/csv"))
+      batch.file_upload_success_callback(attachment)
+
+      expect(batch.workflow_state).to eq "created"
+      expect(batch.attachment).to eq attachment
+    end
+
+    it "rejects attachment and pre_attachment parameters provided together" do
+      api_call(:post,
+               "/api/v1/accounts/#{@account.id}/sis_imports.json",
+               { controller: "sis_imports_api",
+                 action: "create",
+                 format: "json",
+                 account_id: @account.id.to_s },
+               { import_type: "instructure_csv",
+                 attachment: fixture_file_upload("/sis/test_user_1.csv", "text/csv"),
+                 pre_attachment: { name: "test_user_1.csv" } },
+               {},
+               { expected_status: 400 })
+    end
   end
 
   shared_examples_for "disable_adding_uuid_verifier_in_api" do

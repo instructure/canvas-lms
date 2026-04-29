@@ -127,6 +127,11 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
     complete(_xhr) {},
     data,
   }
+  if (options && options.headers) {
+    if (typeof options.headers === 'object' && options.headers !== null) {
+      params.headers = options.headers
+    }
+  }
   if (options && options.timeout) {
     params.timeout = options.timeout
   }

@@ -53,6 +53,38 @@ describe Types::AssessmentRequestType do
     expect(submission_type.resolve("assignedAssessments { user { _id } }").first).to eq @assessment_request.user.id.to_s
   end
 
+  it "works for submission" do
+    result = submission_type.resolve("assignedAssessments { submission { _id } }").first
+    expect(result).to eq @assessment_request.asset_id.to_s
+  end
+
+  it "returns submission with correct user association" do
+    result = submission_type.resolve("assignedAssessments { submission { user { _id } } }").first
+    expect(result).to eq @assessment_request.user.id.to_s
+  end
+
+  it "works for submissionComments" do
+    comment = @submission.add_comment(author: @teacher, comment: "Great work!")
+    @assessment_request.submission_comments << comment
+    result = submission_type.resolve("assignedAssessments { submissionComments { _id } }").first
+    expect(result).to include(comment.id.to_s)
+  end
+
+  it "works for rubricAssessment" do
+    rubric_model
+    @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+    @rubric_assessment = @association.assess(
+      user: @assessment_request.user,
+      assessor: @student,
+      artifact: @assessment_request.asset,
+      assessment: { assessment_type: "grading" }
+    )
+    @assessment_request.rubric_assessment = @rubric_assessment
+    @assessment_request.save!
+    result = submission_type.resolve("assignedAssessments { rubricAssessment { _id } }").first
+    expect(result).to eq @rubric_assessment.id.to_s
+  end
+
   it "works for assetSubmissionType" do
     expect(submission_type.resolve("assignedAssessments { assetSubmissionType }").first).to eq @submission.submission_type
   end

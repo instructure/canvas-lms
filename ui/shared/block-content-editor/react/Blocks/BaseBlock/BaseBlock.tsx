@@ -16,34 +16,70 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ComponentProps, PropsWithChildren, useState} from 'react'
-import {BlockContext} from './BaseBlockContext'
-import {useGetRenderMode} from './useGetRenderMode'
+import {ComponentProps, useEffect} from 'react'
+import {useNode} from '@craftjs/core'
+import {useIsInEditor} from '../../hooks/useIsInEditor'
+import {useIsEditingBlock} from '../../hooks/useIsEditingBlock'
 import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
 import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
+import {AccessibilityChecker} from './components/AccessibilityChecker'
+import type {AccessibilityRule} from '../../accessibilityChecker/types'
+import {useAccessibilityChecker} from '../../hooks/useAccessibilityChecker'
 
-const BaseBlockContent = (
-  props: ComponentProps<typeof BaseBlock> & {
-    setIsEditMode: (isEditMode: boolean) => void
-  },
-) => {
-  const renderMode = useGetRenderMode()
-  return renderMode === 'view' ? (
-    <BaseBlockViewLayout>{props.children}</BaseBlockViewLayout>
-  ) : (
-    <BaseBlockEditWrapper {...props} isEditMode={renderMode === 'edit'} />
+function BaseBlockViewerMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
+  const Component = props.ViewComponent
+  return (
+    <BaseBlockViewLayout backgroundColor={props.backgroundColor}>
+      <Component {...props.componentProps} />
+    </BaseBlockViewLayout>
   )
 }
 
-export const BaseBlock = (
-  props: PropsWithChildren<{
-    title: string
-  }>,
-) => {
-  const [isEditMode, setIsEditMode] = useState(false)
+function BaseBlockEditorMode<T extends {}>(props: ComponentProps<typeof BaseBlock<T>>) {
+  const {removeA11yIssues} = useAccessibilityChecker()
+  const {isEditing} = useIsEditingBlock()
+  const {id} = useNode()
+
+  useEffect(() => {
+    return () => {
+      removeA11yIssues(id)
+    }
+  }, [])
+
+  const renderBlockContent = () => {
+    const Component = isEditing ? props.EditComponent : props.EditViewComponent
+
+    if (isEditing) {
+      return <Component {...props.componentProps} />
+    }
+
+    return (
+      <AccessibilityChecker
+        componentProps={props.componentProps}
+        customAccessibilityCheckRules={props.customAccessibilityCheckRules}
+      >
+        <Component {...props.componentProps} />
+      </AccessibilityChecker>
+    )
+  }
+
   return (
-    <BlockContext.Provider value={{isEditMode}}>
-      <BaseBlockContent {...props} setIsEditMode={setIsEditMode} />
-    </BlockContext.Provider>
+    <BaseBlockEditWrapper title={props.title} backgroundColor={props.backgroundColor}>
+      {renderBlockContent()}
+    </BaseBlockEditWrapper>
   )
+}
+
+export function BaseBlock<T extends {}>(props: {
+  ViewComponent: React.ComponentType<T>
+  EditViewComponent: React.ComponentType<T>
+  EditComponent: React.ComponentType<T>
+  componentProps: T
+  title: string
+  backgroundColor?: string
+  customAccessibilityCheckRules?: AccessibilityRule[]
+}) {
+  const isInEditor = useIsInEditor()
+  const Component = isInEditor ? BaseBlockEditorMode : BaseBlockViewerMode
+  return <Component {...props} />
 }

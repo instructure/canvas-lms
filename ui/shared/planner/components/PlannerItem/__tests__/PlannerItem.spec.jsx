@@ -227,7 +227,7 @@ describe('PlannerItem', () => {
   })
 
   it('calls toggleCompletion when checkbox is clicked', async () => {
-    const toggleCompletion = jest.fn()
+    const toggleCompletion = vi.fn()
     const props = defaultProps({toggleCompletion, completed: false})
     const {getByRole} = render(<PlannerItem {...props} />)
 

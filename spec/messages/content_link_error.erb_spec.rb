@@ -38,18 +38,18 @@ describe "content_link_error" do
   context "with a quiz" do
     let(:asset) { @quiz }
 
-    include_examples "a message"
+    it_behaves_like "a message"
   end
 
   context "with a discussion topic" do
     let(:asset) { @dt }
 
-    include_examples "a message"
+    it_behaves_like "a message"
   end
 
   context "with a wiki page" do
     let(:asset) { @page }
 
-    include_examples "a message"
+    it_behaves_like "a message"
   end
 end

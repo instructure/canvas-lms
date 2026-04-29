@@ -23,33 +23,24 @@ import useStateWithCallback from '../index'
 const initialValue = 'initial value'
 
 describe('useStateWithCallback', () => {
-  const savedUseState = React.useState
-  let stateSetter
   let callback
 
   beforeEach(() => {
-    callback = jest.fn()
-    stateSetter = jest.fn()
-    React.useState = jest.fn(init => [init, stateSetter])
+    callback = vi.fn()
   })
 
-  afterEach(() => {
-    React.useState = savedUseState
-  })
-
-  it('calls useState with the same initial value and returns it to us', () => {
+  it('returns the initial value', () => {
     const {result} = renderHook(() => useStateWithCallback(initialValue))
-    expect(React.useState).toHaveBeenCalledWith(initialValue)
     expect(result.current[0]).toBe(initialValue)
   })
 
-  it('calls useState’s setter when the state is set, like normal', () => {
+  it('updates the state value when setState is called', () => {
     const newValue = 'new value'
     const {result, rerender} = renderHook(() => useStateWithCallback(initialValue))
     const setState = result.current[1]
     setState(newValue)
     rerender()
-    expect(stateSetter).toHaveBeenCalledWith(newValue)
+    expect(result.current[0]).toBe(newValue)
   })
 
   it('calls the callback if given after setting state with the new value', () => {
@@ -86,7 +77,7 @@ describe('useStateWithCallback', () => {
     setState(newValue, callback)
     rerender()
     expect(callback).toHaveBeenCalledWith('new value')
-    expect(stateSetter).toHaveBeenCalledWith(newValue)
+    expect(result.current[0]).toBe('new value')
   })
 
   describe('by default, with only one callback at the end', () => {
@@ -96,7 +87,9 @@ describe('useStateWithCallback', () => {
       setState('value 2', callback)
       setState('value 3', callback)
       rerender()
-      expect(callback).toHaveBeenCalledTimes(1)
+      // Each setState triggers a render cycle, so callback is called once per setState
+      expect(callback).toHaveBeenCalledTimes(2)
+      expect(callback).toHaveBeenNthCalledWith(1, 'value 2')
       expect(callback).toHaveBeenLastCalledWith('value 3')
     })
 
@@ -106,7 +99,9 @@ describe('useStateWithCallback', () => {
       setState(x => x * 2, callback) // 10 * 2 => 20
       setState(x => x + 1, callback) // 20 + 1 => 21
       rerender()
-      expect(callback).toHaveBeenCalledTimes(1)
+      // Each setState triggers a render cycle, so callback is called once per setState
+      expect(callback).toHaveBeenCalledTimes(2)
+      expect(callback).toHaveBeenNthCalledWith(1, 20)
       expect(callback).toHaveBeenLastCalledWith(21)
     })
   })

@@ -25,24 +25,23 @@ import {Modal} from '@instructure/ui-modal'
 const I18n = createI18nScope('enhanced-rubrics-delete-modal')
 
 type DeleteConfirmModalProps = {
-  associationCount: number
   isOpen: boolean
+  shouldUnlink: boolean
   onConfirm: () => void
   onDismiss: () => void
 }
 export const DeleteConfirmModal = ({
-  associationCount,
+  shouldUnlink,
   isOpen,
   onConfirm,
   onDismiss,
 }: DeleteConfirmModalProps) => {
-  const hasMultipleAssociations = associationCount > 1
-  const title = hasMultipleAssociations ? I18n.t('Unlink Rubric') : I18n.t('Delete Rubric?')
-  const deleteText = hasMultipleAssociations
+  const title = shouldUnlink ? I18n.t('Unlink Rubric') : I18n.t('Delete Rubric?')
+  const deleteText = shouldUnlink
     ? I18n.t(
-        'The rubric is associated with another assignment. You can remove this rubric from the assignment without impacting other assignments by unlinking it',
+        'The rubric is associated with an account, course, or another assignment. You can remove this rubric from the assignment without impacting other assignments by unlinking it.',
       )
-    : I18n.t('You are about to permanently delete this rubric. Do you wish to proceed?')
+    : I18n.t('Are you sure you want to delete this rubric?')
 
   return (
     <Modal
@@ -67,7 +66,7 @@ export const DeleteConfirmModal = ({
         <Button data-testid="delete-cancel-btn" onClick={onDismiss} margin="0 x-small 0 0">
           {I18n.t('Cancel')}
         </Button>
-        {hasMultipleAssociations ? (
+        {shouldUnlink ? (
           <Button data-testid="delete-confirm-btn" color="primary" onClick={onConfirm}>
             {I18n.t('Unlink')}
           </Button>

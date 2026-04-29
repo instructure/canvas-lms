@@ -32,11 +32,11 @@ MockComponent.displayName = 'MockComponent'
 it('passes trigger property functions and forwards the calls to the dynamic ui manager', async () => {
   const Wrapped = notifier(MockComponent)
   const mockManager = {
-    handleAction: jest.fn(),
-    registerAnimatable: jest.fn(),
-    deregisterAnimatable: jest.fn(),
-    preTriggerUpdates: jest.fn(),
-    triggerUpdates: jest.fn(),
+    handleAction: vi.fn(),
+    registerAnimatable: vi.fn(),
+    deregisterAnimatable: vi.fn(),
+    preTriggerUpdates: vi.fn(),
+    triggerUpdates: vi.fn(),
   }
 
   const ref = React.createRef()

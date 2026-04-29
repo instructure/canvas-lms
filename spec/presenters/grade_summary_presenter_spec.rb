@@ -358,6 +358,40 @@ describe GradeSummaryPresenter do
       expect(submission.submission_comments[0].read?(@student)).to be true
       expect(submission.submission_comments[1].read?(@student)).to be false
     end
+
+    it "properly preloads rubric assessments and their associations" do
+      assignment = @course.assignments.create!(points_possible: 10)
+      rubric = rubric_model(context: @course)
+      rubric_association = rubric.associate_with(assignment, @course, purpose: "grading", use_for_grading: true)
+      submission = assignment.grade_student(@student, grade: 10, grader: @teacher).first
+
+      assessment = RubricAssessment.create!(
+        rubric:,
+        rubric_association:,
+        user: @student,
+        assessor: @teacher,
+        artifact: submission,
+        assessment_type: "grading"
+      )
+
+      presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+
+      # Access the rubric assessment and its associations to ensure they're preloaded
+      # This would raise a strict loading error if not properly preloaded
+      expect do
+        presenter.submissions.each do |s|
+          s.rubric_assessments.each do |ra|
+            ra.user
+            ra.rubric_association.context
+            ra.rubric_association.association_object
+          end
+        end
+      end.not_to raise_error
+
+      # Verify the assessment is actually there
+      submission_with_assessment = presenter.submissions.find { |s| s.id == submission.id }
+      expect(submission_with_assessment.rubric_assessments).to include(assessment)
+    end
   end
 
   describe "#assignments" do
@@ -420,14 +454,14 @@ describe GradeSummaryPresenter do
     end
 
     it "does not return 'Assignment Group' as an option if the course has no assignments" do
-      expect(presenter.sort_options).to_not include assignment_group_option
+      expect(presenter.sort_options).not_to include assignment_group_option
     end
 
     it "does not return 'Assignment Group' as an option if all of the " \
        "assignments belong to the same assignment group" do
       @course.assignments.create!(title: "Math Assignment")
       @course.assignments.create!(title: "Science Assignment")
-      expect(presenter.sort_options).to_not include assignment_group_option
+      expect(presenter.sort_options).not_to include assignment_group_option
     end
 
     it "returns 'Assignment Group' as an option if there are " \
@@ -439,7 +473,7 @@ describe GradeSummaryPresenter do
     end
 
     it "does not return 'Module' as an option if the course does not have any modules" do
-      expect(presenter.sort_options).to_not include module_option
+      expect(presenter.sort_options).not_to include module_option
     end
 
     it "returns 'Module' as an option if the course has any modules" do
@@ -797,6 +831,73 @@ describe GradeSummaryPresenter do
     it "returns true if given plagiarism data and the new_gradebook_plagiarism_indicator flag is enabled" do
       course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
       expect(presenter).to be_show_updated_plagiarism_icons(actual_plagiarism_data)
+    end
+  end
+
+  describe "peer review assignments" do
+    let(:course) { Course.create! }
+    let(:student) { User.create! }
+    let(:enrollment) { course.enroll_student(student, enrollment_state: "active") }
+    let(:assignment) { assignment_model(course:, peer_reviews: true) }
+    let(:peer_review_assignment) do
+      PeerReviewSubAssignment.create!(
+        parent_assignment: assignment,
+        context: course,
+        title: "Peer Review",
+        points_possible: 10
+      )
+    end
+
+    before do
+      course.offer
+      enrollment
+    end
+
+    context "when peer_review_allocation_and_grading feature flag is disabled" do
+      it "does not include peer review assignments" do
+        peer_review_assignment
+        presenter = GradeSummaryPresenter.new(course, student, student.id)
+
+        assignment_ids = presenter.assignments.map(&:id)
+        expect(assignment_ids).not_to include(peer_review_assignment.id)
+      end
+    end
+
+    context "when peer_review_allocation_and_grading feature flag is enabled" do
+      before { course.enable_feature!(:peer_review_allocation_and_grading) }
+
+      it "includes peer review assignments for parent assignments with peer_reviews: true" do
+        peer_review_assignment
+        presenter = GradeSummaryPresenter.new(course, student, student.id)
+
+        assignment_ids = presenter.assignments.map(&:id)
+        expect(assignment_ids).to include(peer_review_assignment.id)
+      end
+
+      it "does not include peer review assignments for parent assignments with peer_reviews: false" do
+        assignment_without_reviews = assignment_model(course:, peer_reviews: false)
+        peer_review_for_no_reviews = PeerReviewSubAssignment.create!(
+          parent_assignment: assignment_without_reviews,
+          context: course,
+          title: "Peer Review",
+          points_possible: 10
+        )
+
+        presenter = GradeSummaryPresenter.new(course, student, student.id)
+        assignment_ids = presenter.assignments.map(&:id)
+
+        expect(assignment_ids).not_to include(peer_review_for_no_reviews.id)
+      end
+
+      it "does not include deleted peer review assignments" do
+        peer_review_assignment
+        peer_review_assignment.destroy
+
+        presenter = GradeSummaryPresenter.new(course, student, student.id)
+        assignment_ids = presenter.assignments.map(&:id)
+
+        expect(assignment_ids).not_to include(peer_review_assignment.id)
+      end
     end
   end
 end

@@ -145,7 +145,7 @@ describe('K-5 Dashboard Card', () => {
   })
 
   it("doesn't display anything in the assignment links section if the user is not a student", async () => {
-    const requestTabChange = jest.fn()
+    const requestTabChange = vi.fn()
     const {queryByText} = render(
       <K5DashboardContext.Provider value={{...defaultContext, isStudent: false}}>
         <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />

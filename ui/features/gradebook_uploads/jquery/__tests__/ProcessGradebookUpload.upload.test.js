@@ -22,8 +22,8 @@ import ProcessGradebookUpload from '../process_gradebook_upload'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock globalUtils module
-jest.mock('@canvas/util/globalUtils', () => ({
-  windowAlert: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  windowAlert: vi.fn(),
 }))
 
 import {windowAlert} from '@canvas/util/globalUtils'
@@ -52,7 +52,7 @@ describe('ProcessGradebookUpload.upload', () => {
 
   beforeEach(() => {
     originalGoToGradebook = ProcessGradebookUpload.goToGradebook
-    goToGradebookStub = jest.fn()
+    goToGradebookStub = vi.fn()
     ProcessGradebookUpload.goToGradebook = goToGradebookStub
 
     fakeENV.setup({
@@ -76,7 +76,7 @@ describe('ProcessGradebookUpload.upload', () => {
     )
 
     // Clear all mock function calls
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -86,7 +86,7 @@ describe('ProcessGradebookUpload.upload', () => {
     fakeENV.teardown()
 
     // Ensure all timers are cleared
-    jest.clearAllTimers()
+    vi.clearAllTimers()
   })
 
   afterAll(() => {
@@ -175,7 +175,7 @@ describe('ProcessGradebookUpload.upload', () => {
   })
 
   test('calls uploadCustomColumnData if custom_columns is non-empty', async () => {
-    const uploadCustomColumnDataStub = jest.fn()
+    const uploadCustomColumnDataStub = vi.fn()
     const originalUploadCustomColumnData = ProcessGradebookUpload.uploadCustomColumnData
     ProcessGradebookUpload.uploadCustomColumnData = uploadCustomColumnDataStub
 
@@ -196,7 +196,7 @@ describe('ProcessGradebookUpload.upload', () => {
   })
 
   test('does not call uploadCustomColumnData if custom_columns is empty', async () => {
-    const uploadCustomColumnDataStub = jest.fn()
+    const uploadCustomColumnDataStub = vi.fn()
     const originalUploadCustomColumnData = ProcessGradebookUpload.uploadCustomColumnData
     ProcessGradebookUpload.uploadCustomColumnData = uploadCustomColumnDataStub
 

@@ -17,7 +17,7 @@
  */
 
 import {useState, useEffect, useRef} from 'react'
-import {isEqual} from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 
 /*
  * React class components can use this.setState() which takes an optional second

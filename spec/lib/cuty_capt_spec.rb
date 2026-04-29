@@ -28,6 +28,25 @@ describe CutyCapt do
     ConfigFile.unstub
   end
 
+  context "credentials" do
+    it "applies credentials with an existing configuration file" do
+      ConfigFile.stub("cutycapt", { path: "not used", timeout: 1000, screencap_service: { url: "http://shouldbeoverridden", key: "oldkey" } })
+      creds = { url: "https://foo.bar/baz", key: "abcdefg" }
+      allow(Rails.application).to receive_message_chain(:credentials, :config).and_return({ screencap_service: creds })
+      expect(CutyCapt.config[:path]).to eq "not used"
+      expect(CutyCapt.config[:timeout]).to eq 1000
+      expect(CutyCapt.config[:screencap_service]).to eq(creds.stringify_keys)
+    end
+
+    it "uses credentials from the configuration file" do
+      creds = { url: "https://foo.bar/baz", key: "abcdefg" }
+      ConfigFile.stub("cutycapt", { path: "not used", timeout: 1000, screencap_service: creds })
+      expect(CutyCapt.config[:path]).to eq "not used"
+      expect(CutyCapt.config[:timeout]).to eq 1000
+      expect(CutyCapt.config[:screencap_service]).to eq(creds.stringify_keys)
+    end
+  end
+
   context "configuration" do
     it "looks up parameters specified by string keys in the config correctly" do
       ConfigFile.stub("cutycapt", { "path" => "not used", "timeout" => 1000 })
@@ -88,6 +107,20 @@ describe CutyCapt do
       user = User.create!
       attachment = CutyCapt.snapshot_attachment_for_url("blah", context: user)
       expect(attachment).not_to be_nil
+    end
+
+    it "returns an attachment with an instfs_uuid if enabled" do
+      secret = "secret"
+      uuid = SecureRandom.uuid
+      allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: [secret], app_host: "http://instfs.test")
+      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+
+      path = file_fixture("instructure.png")
+      expect(CutyCapt).to receive(:snapshot_url).and_yield(path)
+      user = User.create!
+      attachment = CutyCapt.snapshot_attachment_for_url("blah", context: user)
+      expect(attachment).not_to be_nil
+      expect(attachment.instfs_uuid).to eq uuid
     end
   end
 end

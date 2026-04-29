@@ -24,11 +24,25 @@ import TextEntry from '../AttemptType/TextEntry'
 import {render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/client/testing'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import React, {createRef} from 'react'
-import StudentViewContext from '../Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
-jest.mock('@canvas/upload-file')
+vi.mock('@canvas/upload-file')
+
+// Mock LazyLoad to render children immediately in tests
+vi.mock('@canvas/lazy-load', () => ({
+  __esModule: true,
+  default: ({children}) => children,
+  lazy: fn => {
+    let Component
+    fn().then(mod => {
+      Component = mod.default
+    })
+    return props => (Component ? <Component {...props} /> : null)
+  },
+}))
 
 const defaultMocks = (result = {data: {course: {externalToolsConnection: {nodes: []}}}}) => [
   {
@@ -45,14 +59,22 @@ describe('ContentTabs', () => {
     window.INST = window.INST || {}
     window.INST.editorButtons = []
 
-    // Mock URL.createObjectURL for file handling
-    URL.createObjectURL = jest.fn(blob => {
-      return `blob:mock-url-${blob.name || 'unnamed'}`
-    })
+    // Mock URL.createObjectURL for file handling if not already mocked
+    if (typeof URL.createObjectURL !== 'function') {
+      try {
+        Object.defineProperty(URL, 'createObjectURL', {
+          value: vi.fn(blob => `blob:mock-url-${blob?.name || 'unnamed'}`),
+          writable: true,
+          configurable: true,
+        })
+      } catch {
+        // Property may already be defined and non-configurable
+      }
+    }
 
     // Mock Blob.prototype.slice for file handling
     if (!Blob.prototype.slice) {
-      Blob.prototype.slice = jest.fn(function (start, end) {
+      Blob.prototype.slice = vi.fn(function (start, end) {
         return this
       })
     }
@@ -60,9 +82,11 @@ describe('ContentTabs', () => {
 
   const renderAttemptTab = async props => {
     const retval = render(
-      <MockedProvider mocks={defaultMocks()}>
-        <AttemptTab {...props} focusAttemptOnInit={false} />
-      </MockedProvider>,
+      <MockedQueryProvider>
+        <MockedProvider mocks={defaultMocks()}>
+          <AttemptTab {...props} focusAttemptOnInit={false} />
+        </MockedProvider>
+      </MockedQueryProvider>,
     )
 
     if (props.assignment.submissionTypes.includes('online_text_entry')) {
@@ -92,9 +116,11 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
       const {findByText} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       expect(await findByText('Availability Dates')).toBeInTheDocument()
@@ -110,9 +136,11 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
       const {findByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
@@ -133,9 +161,11 @@ describe('ContentTabs', () => {
       props.submitButtonRef = createSubmitButtonRef()
 
       const {findByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
@@ -151,9 +181,11 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
       const {findByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
@@ -166,9 +198,11 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
       const {findByText} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       expect(await findByText('Availability Dates')).toBeInTheDocument()
@@ -181,9 +215,11 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
       const {findByText} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       expect(await findByText('Availability Dates')).toBeInTheDocument()
@@ -197,12 +233,15 @@ describe('ContentTabs', () => {
       })
       props.submitButtonRef = createSubmitButtonRef()
 
-      const {getByTestId} = render(
-        <MockedProvider mocks={defaultMocks()}>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+      const {findByTestId} = render(
+        <MockedQueryProvider>
+          <MockedProvider mocks={defaultMocks()}>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
-      expect(await waitFor(() => getByTestId('upload-pane'))).toBeInTheDocument()
+      // Use findByTestId with extended timeout for lazy-loaded component
+      expect(await findByTestId('upload-pane', {}, {timeout: 5000})).toBeInTheDocument()
     })
 
     it('renders the file preview tab when the submission is submitted', async () => {
@@ -245,9 +284,11 @@ describe('ContentTabs', () => {
       ]
 
       const {findByTestId} = render(
-        <MockedProvider mocks={mocks}>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>,
+        <MockedQueryProvider>
+          <MockedProvider mocks={mocks}>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        </MockedQueryProvider>,
       )
 
       // First wait for the loading spinner to appear
@@ -261,7 +302,7 @@ describe('ContentTabs', () => {
     describe('Uploading a file', () => {
       beforeAll(() => {
         $('body').append('<div role="alert" id="flash_screenreader_holder" />')
-        uploadFileModule.uploadFiles = jest.fn()
+        uploadFileModule.uploadFiles.mockImplementation(vi.fn())
       })
 
       it('shows a file preview for an uploaded file', async () => {
@@ -275,9 +316,11 @@ describe('ContentTabs', () => {
         props.submitButtonRef = createSubmitButtonRef()
 
         const {getAllByText} = render(
-          <MockedProvider mocks={defaultMocks()}>
-            <AttemptTab {...props} focusAttemptOnInit={false} />
-          </MockedProvider>,
+          <MockedQueryProvider>
+            <MockedProvider mocks={defaultMocks()}>
+              <AttemptTab {...props} focusAttemptOnInit={false} />
+            </MockedProvider>
+          </MockedQueryProvider>,
         )
         expect(await waitFor(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
       })

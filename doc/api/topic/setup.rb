@@ -28,6 +28,8 @@ def init
     sections :header, [:topic_doc, :method_details_list, [T("method_details")]]
     @resource = object
     @beta = options[:controllers].any? { |c| c.tag("beta") }
+    @internal = options[:controllers].any? { |c| c.tag("internal") }
+    @show_internal = show_internal?
   end
 end
 
@@ -40,7 +42,7 @@ end
 def topic_doc
   @docstring = options[:controllers].map(&:docstring).join("\n\n")
   @object = @object.dup
-  def @object.source_type; end # rubocop:disable Lint/NestedMethodDefinition -- rubocop bug?
+  def @object.source_type; end
   @json_objects = options[:json_objects][@resource] || []
   erb(:topic_doc)
 end

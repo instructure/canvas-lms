@@ -27,8 +27,8 @@ describe('"Mark as Done" button', () => {
   let props
 
   beforeEach(() => {
-    onError = jest.fn()
-    onToggle = jest.fn()
+    onError = vi.fn()
+    onToggle = vi.fn()
 
     props = {
       done: true,

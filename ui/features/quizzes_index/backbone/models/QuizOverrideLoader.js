@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {some, isNull, isUndefined, first, last, chain} from 'lodash'
+import {some, isNil, first, last, compact, sortBy} from 'es-toolkit/compat'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 
 export default {
@@ -50,11 +50,7 @@ export default {
     return quiz.set('loadingOverrides', false)
   },
   _chooseLatest(dates, type) {
-    if (
-      some(dates, function (d) {
-        return isNull(d[type]) || isUndefined(d[type])
-      })
-    ) {
+    if (some(dates, d => isNil(d[type]))) {
       return null
     }
     const sortedDates = this._sortedDatesOfType(dates, type)
@@ -63,11 +59,7 @@ export default {
     }
   },
   _chooseEarliest(dates, type) {
-    if (
-      some(dates, function (d) {
-        return isNull(d[type]) || isUndefined(d[type])
-      })
-    ) {
+    if (some(dates, d => isNil(d[type]))) {
       return null
     }
     const sortedDates = this._sortedDatesOfType(dates, type)
@@ -76,15 +68,9 @@ export default {
     }
   },
   _sortedDatesOfType(dates, type) {
-    return chain(dates)
-      .map(function (d) {
-        return d[type]
-      })
-      .compact()
-      .sortBy(function (date) {
-        return new Date(date).getTime()
-      })
-      .value()
+    const mapped = dates.map(d => d[type])
+    const compacted = compact(mapped)
+    return sortBy(compacted, date => new Date(date).getTime())
   },
   // Load assignment overridden due/unlock/available dates for a bunch of quizzes.
   //

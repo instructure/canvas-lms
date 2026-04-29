@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
 import {Link} from '@instructure/ui-link'
-import {Pill} from '@instructure/ui-pill'
-import {Outcome} from '../../types/rollup'
+import {Outcome} from '@canvas/outcomes/react/types/rollup'
+import OutcomeContextTag from '@canvas/outcome-context-tag'
 
 const I18n = createI18nScope('OutcomeDescriptionModal')
 
@@ -35,16 +36,13 @@ export interface OutcomeDescriptionModalProps {
 }
 
 const getCalculationMethod = (outcome: Outcome): string => {
-  const calc_int = outcome.calculation_int
-  const other_int = calc_int ? 100 - calc_int : null
-
   switch (outcome.calculation_method) {
     case 'decaying_average':
-      return I18n.t('%{calc_int}/%{other_int} Weighted Average', {calc_int, other_int})
+      return I18n.t('Weighted Average')
     case 'standard_decaying_average':
-      return I18n.t('%{calc_int}/%{other_int} Decaying Average', {calc_int, other_int})
+      return I18n.t('Decaying Average')
     case 'n_mastery':
-      return I18n.t('Number of Times (%{calc_int})', {calc_int})
+      return I18n.t('Number of Times')
     case 'highest':
       return I18n.t('Highest')
     case 'latest':
@@ -54,16 +52,24 @@ const getCalculationMethod = (outcome: Outcome): string => {
   }
 }
 
-const EmptyOutcomeModalBody = ({contextURL}: {contextURL: string}) => (
+const NoDisplayNameAndDescriptionsHelpMessage = ({
+  contextURL,
+}: {
+  contextURL: string | undefined
+}) => (
   <>
     <View display="block" width="100%" padding="0 0 x-small 0" data-testid="outcome-empty-title">
       <Text weight="bold">{I18n.t('There is no description for this outcome.')}</Text>
     </View>
-    <View display="block" width="100%" height="300px" data-testid="outcome-empty-description">
+    <View display="block" width="100%" data-testid="outcome-empty-description">
       <Text>
         {I18n.t('To edit the name, description, or friendly description of an outcome, open the')}
         &nbsp;
-        <Link href={contextURL + '/outcomes'}>{I18n.t('Outcomes')}</Link>
+        {contextURL == undefined ? (
+          <Text>{I18n.t('Outcomes')}</Text>
+        ) : (
+          <Link href={contextURL + '/outcomes'}>{I18n.t('Outcomes')}</Link>
+        )}
         &nbsp;{I18n.t('view, locate the outcome, and click the')}&nbsp;
         <b>{I18n.t('Edit')}</b>
         &nbsp;{I18n.t('button.')}
@@ -75,83 +81,137 @@ const EmptyOutcomeModalBody = ({contextURL}: {contextURL: string}) => (
 const OutcomeModalBody = ({
   outcome,
   outcomesFriendlyDescriptionFF,
-  missingFriendlyDescription,
   calculationMethod,
+  contextURL,
+  accountLevelMasteryScalesFF,
 }: {
   outcome: Outcome
   outcomesFriendlyDescriptionFF: boolean
-  missingFriendlyDescription: boolean
   calculationMethod: string
-}) => (
-  <>
-    <View display="block" width="100%" padding="0 0 medium 0" data-testid="outcome-display-name">
-      <Text wrap="break-word" size="x-large" weight="bold">
-        {outcome.display_name}
-      </Text>
-    </View>
-    <Pill data-testid="calculation-method">{calculationMethod}</Pill>
-    {outcomesFriendlyDescriptionFF && !missingFriendlyDescription && (
-      <View
-        display="block"
-        width="100%"
-        padding="x-small"
-        background="secondary"
-        data-testid="outcome-friendly-description"
-      >
-        <View display="block" width="100%" padding="xx-small x-small x-small x-small">
-          <Text weight="bold">{I18n.t('Friendly Description')}</Text>
+  contextURL: string | undefined
+  accountLevelMasteryScalesFF: boolean
+}) => {
+  // When the feature flag is on, use proficiency context for mastery scale
+  // Otherwise, use outcome context (legacy behavior)
+  const masteryScaleContextType = accountLevelMasteryScalesFF
+    ? outcome.proficiency_context_type
+    : outcome.context_type
+  const masteryScaleContextId = accountLevelMasteryScalesFF
+    ? outcome.proficiency_context_id
+    : outcome.context_id
+
+  return (
+    <>
+      <View display="block" margin="none none medium none">
+        <View display="block" width="100%" data-testid="outcome-title">
+          <Text wrap="break-word" size="large" weight="bold" lineHeight="lineHeight100">
+            {outcome.title}
+          </Text>
         </View>
-        <View display="block" width="100%" padding="0 x-small xx-small x-small">
-          <Text>{outcome.friendly_description}</Text>
-        </View>
+        {outcome.display_name && (
+          <View
+            display="block"
+            width="100%"
+            margin="0 0 medium 0"
+            data-testid="outcome-display-name"
+          >
+            <Text wrap="break-word" size="medium">
+              {outcome.display_name}
+            </Text>
+          </View>
+        )}
       </View>
-    )}
-    <View
-      display="block"
-      width="100%"
-      padding="small 0 small 0"
-      data-testid="outcome-description"
-      dangerouslySetInnerHTML={{__html: outcome.description ?? ''}}
-    />
-  </>
-)
+      {outcomesFriendlyDescriptionFF && outcome.friendly_description && (
+        <View
+          display="block"
+          width="100%"
+          padding="x-small"
+          margin="small none medium none"
+          background="secondary"
+          data-testid="outcome-friendly-description"
+        >
+          <View display="block" width="100%" padding="xx-small x-small x-small x-small">
+            <Text weight="bold">{I18n.t('Friendly Description')}</Text>
+          </View>
+          <View display="block" width="100%" padding="0 x-small xx-small x-small">
+            <Text>{outcome.friendly_description}</Text>
+          </View>
+        </View>
+      )}
+
+      {outcome.description && (
+        <View
+          display="block"
+          margin="small none"
+          width="100%"
+          data-testid="outcome-description"
+          dangerouslySetInnerHTML={{__html: outcome.description ?? ''}}
+        />
+      )}
+
+      {!outcome.description && !outcome.friendly_description && !outcome.display_name && (
+        <NoDisplayNameAndDescriptionsHelpMessage contextURL={contextURL} />
+      )}
+
+      <Flex direction="row" margin="large none none none" gap="x-large">
+        <View>
+          <View as="div">
+            <Text weight="bold">{I18n.t('Calculation Method')}</Text>
+          </View>
+          <Flex gap="x-small" alignItems="center">
+            <Text>{calculationMethod}</Text>
+            <OutcomeContextTag
+              outcomeContextType={outcome.context_type}
+              outcomeContextId={outcome.context_id}
+            />
+          </Flex>
+        </View>
+        <View>
+          <View as="div">
+            <Text weight="bold">{I18n.t('Mastery Scale')}</Text>
+          </View>
+          <Flex gap="x-small" alignItems="center">
+            <Text>
+              {I18n.t('%{points_possible} Point', {points_possible: outcome.points_possible})}
+            </Text>
+            <OutcomeContextTag
+              outcomeContextType={masteryScaleContextType}
+              outcomeContextId={masteryScaleContextId}
+            />
+          </Flex>
+        </View>
+      </Flex>
+    </>
+  )
+}
 
 export const OutcomeDescriptionModal: React.FC<OutcomeDescriptionModalProps> = ({
   outcome,
   isOpen,
   onCloseHandler,
 }) => {
-  const {outcomesFriendlyDescriptionFF, contextURL} = useLMGBContext()
-
-  const missingDisplayName = !outcome.display_name
-  const missingDescription = !outcome.description
-  const missingFriendlyDescription = !outcome.friendly_description
+  const {outcomesFriendlyDescriptionFF, contextURL, accountLevelMasteryScalesFF} = useLMGBContext()
   const calculationMethod = getCalculationMethod(outcome)
-  const shouldDisplayEmptyModal =
-    missingDisplayName && missingDescription && missingFriendlyDescription
 
   return (
     <Modal
-      size="small"
+      size="medium"
       open={isOpen}
       onDismiss={onCloseHandler}
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={false}
       overflow="scroll"
-      label={I18n.t('%{outcomeTitle}', {outcomeTitle: outcome.title})}
+      label={I18n.t('Outcome Info')}
       data-testid="outcome-description-modal"
     >
       <Modal.Body>
-        {shouldDisplayEmptyModal ? (
-          <EmptyOutcomeModalBody contextURL={contextURL ?? ''} />
-        ) : (
-          <OutcomeModalBody
-            outcome={outcome}
-            outcomesFriendlyDescriptionFF={outcomesFriendlyDescriptionFF ?? false}
-            missingFriendlyDescription={missingFriendlyDescription}
-            calculationMethod={calculationMethod}
-          />
-        )}
+        <OutcomeModalBody
+          outcome={outcome}
+          outcomesFriendlyDescriptionFF={outcomesFriendlyDescriptionFF ?? false}
+          calculationMethod={calculationMethod}
+          contextURL={contextURL}
+          accountLevelMasteryScalesFF={accountLevelMasteryScalesFF ?? false}
+        />
       </Modal.Body>
     </Modal>
   )

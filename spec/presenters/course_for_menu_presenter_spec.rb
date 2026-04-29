@@ -57,6 +57,20 @@ describe CourseForMenuPresenter do
                                                     ])
     end
 
+    it "doesn't show youtube migration link in dashboards" do
+      course.enroll_teacher(user).accept
+      course.assignments.create!
+      course.enable_feature!(:youtube_migration)
+      allow(course).to receive(:has_studio_integration?).and_return(true)
+
+      expect(presenter.to_h[:links]).not_to include(
+        a_hash_including({
+                           css_class: "youtube_migration",
+                           label: "YouTube Migration"
+                         })
+      )
+    end
+
     it "only shows the tabs a student has access to to students" do
       course.offer
       course.enroll_student(user).accept

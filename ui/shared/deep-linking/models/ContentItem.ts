@@ -37,7 +37,7 @@ export type ContentItem =
 
 const assertNever = (item: never): void => {
   const errorMessage = 'Could not process content item'
-   
+
   console.error(errorMessage, item)
   captureException(new Error(errorMessage))
 }
@@ -60,6 +60,8 @@ export const contentItemToHtmlString =
         )
       case 'ltiAssetProcessor':
         return '[Asset processor not supported in this context]'
+      case 'ltiAssetProcessorContribution':
+        return '[Asset processor contribution not supported in this context]'
       default:
         assertNever(item)
         return ''

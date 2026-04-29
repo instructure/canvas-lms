@@ -20,9 +20,13 @@ import type {DeepLinkResponse} from '../../DeepLinkResponse'
 import $ from 'jquery'
 import processSingleContentItem from '../processSingleContentItem'
 
-jest.mock('jquery', () => ({
-  flashError: jest.fn(),
-  flashMessage: jest.fn(),
+vi.mock('jquery', () => ({
+  default: {
+    flashError: vi.fn(),
+    flashMessage: vi.fn(),
+  },
+  flashError: vi.fn(),
+  flashMessage: vi.fn(),
 }))
 
 const content_items = [

@@ -17,10 +17,11 @@
  */
 
 #canvas-conditional-release-editor {
-  height: 675px;
+  min-height: 675px;
   padding-top: 12px;
   display: flex;
   overflow-x: scroll;
+  overflow-y: auto;
 }
 
 @import "components/conditional_release_stats";

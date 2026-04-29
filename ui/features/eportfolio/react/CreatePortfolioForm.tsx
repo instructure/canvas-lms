@@ -33,7 +33,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Portal} from '@instructure/ui-portal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ePortfolio} from './types'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {IconAddLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('eportfolio')

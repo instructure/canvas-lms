@@ -69,8 +69,9 @@ export default class TimeBlockList {
   }
 
   split(minutes) {
-    if (minutes && this.validate()) {
-      this.blocksManager.split(minutes)
+    const value = parseFloat(minutes)
+    if (value > 0 && this.validate()) {
+      this.blocksManager.split(value)
       return this.render()
     }
   }

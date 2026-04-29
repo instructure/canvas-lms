@@ -33,7 +33,7 @@ describe Turnitin::Client do
 
   def stub_net_http_to_return(partial_body, return_code = 1)
     body = "<returndata>#{partial_body}<rcode>#{return_code}</rcode></returndata>"
-    expect_any_instance_of(Net::HTTP).to receive(:start).and_return(double(body:))
+    expect_any_instance_of(Net::HTTP).to receive(:start).and_return(instance_double(Net::HTTPResponse, body:))
   end
 
   describe "#state_from_similarity_score" do
@@ -188,7 +188,7 @@ describe Turnitin::Client do
       expect(@submission.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
       expect(@submission.assignment.context).to receive(:turnitin_settings).at_least(1).and_return([:placeholder])
       expect(Turnitin::Client).to receive(:new).at_least(1).with(:placeholder).and_return(@turnitin_api)
-      expect(@turnitin_api).to receive(:enrollStudent).with(@course, @user).and_return(double(success?: true))
+      expect(@turnitin_api).to receive(:enrollStudent).with(@course, @user).and_return(instance_double(Turnitin::Response, success?: true))
       expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ assignment_id: "1234" })
       expect_any_instantiation_of(@attachment).to receive(:open).and_return(:my_stub)
     end

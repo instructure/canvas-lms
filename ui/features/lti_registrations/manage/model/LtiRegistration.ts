@@ -27,9 +27,9 @@ import {ZLtiOverlay, ZLtiOverlayWithVersions} from './LtiOverlay'
 import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZUser} from './User'
-import {ZLtiOverlayVersion} from './LtiOverlayVersion'
 import {ZLtiPrivacyLevel} from './LtiPrivacyLevel'
 import {ZInternalPlacementConfiguration} from './internal_lti_configuration/placement_configuration/InternalPlacementConfiguration'
+import {ZLtiRegistrationUpdateRequestId} from './lti_ims_registration/LtiRegistrationUpdateRequestId'
 
 export const ZLtiRegistration = z.object({
   id: ZLtiRegistrationId,
@@ -38,7 +38,7 @@ export const ZLtiRegistration = z.object({
   inherited: z.boolean().optional(),
   name: z.string(),
   admin_nickname: z.string().nullable(),
-  workflow_state: z.string(),
+  workflow_state: z.enum(['active', 'inactive', 'deleted']),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
   created_by: z.union([ZUser, z.literal('Instructure')]).optional(),
@@ -49,8 +49,13 @@ export const ZLtiRegistration = z.object({
   developer_key_id: ZDeveloperKeyId.nullable(),
   ims_registration_id: ZLtiImsRegistrationId.nullable(),
   manual_configuration_id: ZLtiToolConfigurationId.nullable(),
+  template_registration_id: ZLtiRegistrationId.nullable(),
   account_binding: ZLtiRegistrationAccountBinding.nullable().optional(),
   overlay: ZLtiOverlay.nullable().optional(),
+  pending_update: ZLtiRegistrationUpdateRequestId.nullable().optional(),
+  dynamic_registration_url: z.string().nullable().optional(),
+  reinstall_disabled: z.boolean().nullable().optional(),
+  lock_deploying: z.boolean().nullable().optional(),
 })
 
 export type LtiRegistration = z.infer<typeof ZLtiRegistration>
@@ -104,3 +109,36 @@ export const isForcedOn = (reg: LtiRegistration) =>
   reg.inherited &&
   reg.account_binding?.account_id === reg.account_id &&
   reg.account_binding?.workflow_state == 'on'
+
+/**
+ * Returns true if the registration is inherited from a parent account
+ * Normalize to false if the inherited property is undefined
+ * @param reg
+ * @returns boolean indicating whether or not the given registration is inherited
+ */
+export const isInherited = (reg: LtiRegistration) => reg.inherited || false
+
+/**
+ * Registrations that are inherited but aren't local copies of template registrations can't be edited,
+ * because they point to the site admin registration
+ * @param reg
+ * @returns boolean indicating whether or not the given registration can be edited.
+ */
+export const canEdit = (reg: LtiRegistration) =>
+  reg.ims_registration_id !== null || reg.template_registration_id !== null || !isInherited(reg)
+
+/**
+ * Only Local Template & Dynamic Regs can be restored to default, because those are the only
+ * types of registrations that have overlays
+ * @returns boolean indicating whether or not the given registration can be restored to default
+ */
+export const canRestoreDefault = (reg: LtiRegistration) =>
+  reg.template_registration_id !== null || reg.ims_registration_id !== null
+
+/**
+ * Currently, only Local Manual Registrations can be edited as JSON.
+ * @param reg
+ * @returns boolean indicating whether or not the given registration can be edited as JSON
+ */
+export const canEditAsJson = (reg: LtiRegistration) =>
+  reg.manual_configuration_id !== null && !isInherited(reg) && reg.template_registration_id === null

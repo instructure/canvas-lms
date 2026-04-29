@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::UpdateAssignment do
@@ -79,6 +78,8 @@ describe Mutations::UpdateAssignment do
               intraReviews
               anonymousReviews
               automaticReviews
+              submissionRequired
+              acrossSections
             }
             modules {
               _id
@@ -234,6 +235,121 @@ describe Mutations::UpdateAssignment do
     expect(assignment.intra_group_peer_reviews).to be true
     expect(assignment.anonymous_peer_reviews).to be true
     expect(assignment.automatic_peer_reviews).to be true
+  end
+
+  context "peer review submission_required" do
+    before do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    it "can update submission_required to true" do
+      assignment = Assignment.find(@assignment_id)
+      assignment.update!(peer_review_submission_required: false)
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+          submissionRequired: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "errors")).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "submissionRequired")).to be true
+      expect(Assignment.find(@assignment_id).peer_review_submission_required).to be true
+    end
+
+    it "can update submission_required to false" do
+      assignment = Assignment.find(@assignment_id)
+      assignment.update!(peer_review_submission_required: true)
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+          submissionRequired: false
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "errors")).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "submissionRequired")).to be false
+      expect(Assignment.find(@assignment_id).peer_review_submission_required).to be false
+    end
+
+    it "returns nil for submission_required when feature flag is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      assignment = Assignment.find(@assignment_id)
+      assignment.update!(peer_review_submission_required: true)
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "submissionRequired")).to be_nil
+    end
+  end
+
+  context "peer review across_sections" do
+    before do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    it "can update across_sections to false" do
+      assignment = Assignment.find(@assignment_id)
+      expect(assignment.peer_review_across_sections).to be true
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+          acrossSections: false
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "errors")).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "acrossSections")).to be false
+      expect(Assignment.find(@assignment_id).peer_review_across_sections).to be false
+    end
+
+    it "can update across_sections to true" do
+      Assignment.find(@assignment_id)
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+          acrossSections: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "errors")).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "acrossSections")).to be true
+      expect(Assignment.find(@assignment_id).peer_review_across_sections).to be true
+    end
+
+    it "returns nil for across_sections when feature flag is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      assignment = Assignment.find(@assignment_id)
+      assignment.update!(peer_review_across_sections: true)
+
+      result = execute_with_input <<~GQL
+        id: "#{@assignment_id}"
+        peerReviews: {
+          enabled: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "acrossSections")).to be_nil
+    end
   end
 
   it "enabling moderated grading sticks with other updates" do
@@ -547,7 +663,7 @@ describe Mutations::UpdateAssignment do
       state: deleted
     GQL
     errors = result["errors"]
-    expect(errors).to_not be_nil
+    expect(errors).not_to be_nil
     expect(errors[0]["message"]).to eq "assignment not found: 1234"
   end
 
@@ -563,30 +679,6 @@ describe Mutations::UpdateAssignment do
     ]
   end
 
-  xit "validate errors return correctly with override instrumenter (ADMIN-2407)" do
-    mutation_command = <<~GQL
-      mutation {
-        updateAssignment(input: {
-          id: "#{@assignment_id}"
-          submissionTypes: [ wiki_page ]
-        }) {
-          assignment {
-            _id dueAt lockAt unlockAt
-          }
-          errors {
-            attribute
-            message
-          }
-        }
-      }
-    GQL
-    context = { current_user: @teacher, request: ActionDispatch::TestRequest.create, session: {} }
-    result = CanvasSchema.execute(mutation_command, context:)
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "updateAssignment", "assignment")).to be_nil
-    expect(result.dig("data", "updateAssignment", "errors")).to_not be_nil
-  end
-
   it "cannot update without correct permissions" do
     # bad student! dont delete the assignment
     result = execute_with_input(<<~GQL, @student)
@@ -594,7 +686,7 @@ describe Mutations::UpdateAssignment do
       state: deleted
     GQL
     errors = result["errors"]
-    expect(errors).to_not be_nil
+    expect(errors).not_to be_nil
     expect(errors.length).to be 1
     expect(errors[0]["message"]).to eq "insufficient permission"
   end

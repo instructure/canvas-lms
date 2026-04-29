@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {assignLocation, openWindow} from '@canvas/util/globalUtils'
 import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
 import {waitFor} from '@testing-library/dom'
 import {fireEvent, render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import useManagedCourseSearchApi from '../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi'
 import {Assignment} from '../../../../graphql/Assignment'
 import {Discussion} from '../../../../graphql/Discussion'
@@ -35,27 +36,28 @@ import {
 import {PeerReviews} from '../../../../graphql/PeerReviews'
 import {getSpeedGraderUrl, responsiveQuerySizes} from '../../../utils'
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
+import {ObserverContext} from '../../../utils/ObserverContext'
 
 // mock assignLocation
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
-  openWindow: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
+  openWindow: vi.fn(),
 }))
 
-jest.mock('../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi')
-jest.mock('@canvas/rce/RichContentEditor')
-jest.mock('../../../utils', () => ({
-  ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: jest.fn(),
+vi.mock('../../../../../../shared/direct-sharing/react/effects/useManagedCourseSearchApi')
+vi.mock('@canvas/rce/RichContentEditor')
+vi.mock('../../../utils', async () => ({
+  ...(await vi.importActual('../../../utils')),
+  responsiveQuerySizes: vi.fn(),
 }))
 
 describe('DiscussionTopicContainer', () => {
-  const setOnFailure = jest.fn()
-  const setOnSuccess = jest.fn()
+  const setOnFailure = vi.fn()
+  const setOnSuccess = vi.fn()
   let liveRegion = null
 
   beforeAll(() => {
-    window.ENV = {
+    fakeENV.setup({
       EDIT_URL: 'this_is_the_edit_url',
       PEER_REVIEWS_URL: 'this_is_the_peer_reviews_url',
       context_asset_string: 'course_1',
@@ -70,15 +72,15 @@ describe('DiscussionTopicContainer', () => {
           title: 'Share to Commons',
         },
       ],
-    }
+    })
 
-    window.matchMedia = jest.fn().mockImplementation(() => {
+    window.matchMedia = vi.fn().mockImplementation(() => {
       return {
         matches: true,
         media: '',
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
       }
     })
 
@@ -104,7 +106,7 @@ describe('DiscussionTopicContainer', () => {
   afterEach(() => {
     setOnFailure.mockClear()
     setOnSuccess.mockClear()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterAll(() => {
@@ -117,7 +119,11 @@ describe('DiscussionTopicContainer', () => {
     return render(
       <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
-          <DiscussionTopicContainer {...props} />
+          <ObserverContext.Provider
+            value={{observerRef: {current: undefined}, nodesRef: {current: new Map()}}}
+          >
+            <DiscussionTopicContainer {...props} />
+          </ObserverContext.Provider>
         </AlertManagerContext.Provider>
       </MockedProvider>,
     )
@@ -186,7 +192,7 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('Should be able to delete topic', async () => {
-    window.confirm = jest.fn(() => true)
+    window.confirm = vi.fn(() => true)
     const {getByTestId, getByText} = setup(
       {discussionTopic: Discussion.mock()},
       deleteDiscussionTopicMock(),
@@ -203,7 +209,7 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('Should be able to delete announcement', async () => {
-    window.confirm = jest.fn(() => true)
+    window.confirm = vi.fn(() => true)
     const {getByTestId, getByText} = setup(
       {discussionTopic: Discussion.mock({isAnnouncement: true})},
       deleteDiscussionTopicMock(),
@@ -348,25 +354,8 @@ describe('DiscussionTopicContainer', () => {
     expect(getByText('Send To...')).toBeInTheDocument()
   })
 
-  it('renders a modal to send content', async () => {
-    const container = setup({discussionTopic: Discussion.mock()})
-    const kebob = await container.findByTestId('discussion-post-menu-trigger')
-    fireEvent.click(kebob)
-
-    const sendToButton = await container.findByText('Send To...')
-    fireEvent.click(sendToButton)
-    expect(await container.findByText('Send to:')).toBeInTheDocument()
-  })
-
-  it('renders a modal to copy content', async () => {
-    const container = setup({discussionTopic: Discussion.mock()})
-    const kebob = await container.findByTestId('discussion-post-menu-trigger')
-    fireEvent.click(kebob)
-
-    const copyToButton = await container.findByText('Copy To...')
-    fireEvent.click(copyToButton)
-    expect(await container.findByText('Select a Course')).toBeInTheDocument()
-  })
+  // Modal tests are in DiscussionTopicContainerModal.test.jsx
+  // to properly mock lazy-loaded components
 
   it('can send users to Commons if they can manageContent', async () => {
     const discussionTopic = Discussion.mock()
@@ -631,6 +620,157 @@ describe('DiscussionTopicContainer', () => {
       expect(queryByText('eer review for Morty Smith Due: Mar 31, 2021 5:59am')).toBeNull()
     })
 
+    it('passes disabled=true to PeerReview when user has not posted', () => {
+      const {container} = setup({
+        discussionTopic: Discussion.mock({
+          participant: {posted: false},
+          assignment: {
+            assessmentRequestsForCurrentUser: [
+              {
+                _id: 'assessment1',
+                user: {
+                  _id: 'user1',
+                  displayName: 'Test User',
+                },
+                workflowState: 'assigned',
+              },
+            ],
+          },
+        }),
+      })
+
+      const peerReviewElements = container.querySelectorAll('.discussions-peer-review')
+      expect(peerReviewElements.length).toBeGreaterThan(0)
+
+      const links = container.querySelectorAll(
+        'a[aria-disabled="true"], button[disabled], [data-interaction="disabled"]',
+      )
+      expect(links.length).toBeGreaterThan(0)
+    })
+
+    it('passes disabled=false to PeerReview when user has posted', () => {
+      const {container} = setup({
+        discussionTopic: Discussion.mock({
+          participant: {posted: true},
+          assignment: {
+            assessmentRequestsForCurrentUser: [
+              {
+                _id: 'assessment1',
+                user: {
+                  _id: 'user1',
+                  displayName: 'Test User',
+                },
+                workflowState: 'assigned',
+              },
+            ],
+          },
+        }),
+      })
+
+      const peerReviewElements = container.querySelectorAll('.discussions-peer-review')
+      expect(peerReviewElements.length).toBeGreaterThan(0)
+
+      const enabledLinks = container.querySelectorAll(
+        '.discussions-peer-review a:not([aria-disabled="true"]):not([disabled])',
+      )
+      expect(enabledLinks.length).toBeGreaterThan(0)
+    })
+
+    describe('Checkpointed discussions with peer review', () => {
+      it('passes disabled=true to PeerReview when reply_to_topic checkpoint is not complete', () => {
+        const {container} = setup({
+          discussionTopic: Discussion.mock({
+            participant: {posted: false},
+            assignment: {
+              checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+              assessmentRequestsForCurrentUser: [
+                {
+                  _id: 'assessment1',
+                  user: {
+                    _id: 'user1',
+                    displayName: 'Test User',
+                  },
+                  workflowState: 'assigned',
+                },
+              ],
+            },
+          }),
+          replyToTopicSubmission: {},
+          replyToEntrySubmission: {submissionStatus: 'submitted'},
+        })
+
+        const peerReviewElements = container.querySelectorAll('.discussions-peer-review')
+        expect(peerReviewElements.length).toBeGreaterThan(0)
+
+        const links = container.querySelectorAll(
+          'a[aria-disabled="true"], button[disabled], [data-interaction="disabled"]',
+        )
+        expect(links.length).toBeGreaterThan(0)
+      })
+
+      it('passes disabled=true to PeerReview when reply_to_entry checkpoint is not complete', () => {
+        const {container} = setup({
+          discussionTopic: Discussion.mock({
+            participant: {posted: true},
+            assignment: {
+              checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+              assessmentRequestsForCurrentUser: [
+                {
+                  _id: 'assessment1',
+                  user: {
+                    _id: 'user1',
+                    displayName: 'Test User',
+                  },
+                  workflowState: 'assigned',
+                },
+              ],
+            },
+          }),
+          replyToTopicSubmission: {submissionStatus: 'submitted'},
+          replyToEntrySubmission: {},
+        })
+
+        const peerReviewElements = container.querySelectorAll('.discussions-peer-review')
+        expect(peerReviewElements.length).toBeGreaterThan(0)
+
+        const links = container.querySelectorAll(
+          'a[aria-disabled="true"], button[disabled], [data-interaction="disabled"]',
+        )
+        expect(links.length).toBeGreaterThan(0)
+      })
+
+      it('passes disabled=false to PeerReview when both checkpoints are complete', () => {
+        const {container} = setup({
+          discussionTopic: Discussion.mock({
+            participant: {posted: true},
+            assignment: {
+              checkpoints: [{tag: 'reply_to_topic'}, {tag: 'reply_to_entry'}],
+              assessmentRequestsForCurrentUser: [
+                {
+                  _id: 'assessment1',
+                  user: {
+                    _id: 'user1',
+                    displayName: 'Test User',
+                  },
+                  workflowState: 'assigned',
+                },
+              ],
+            },
+          }),
+          replyToTopicSubmission: {submissionStatus: 'submitted'},
+          replyToEntrySubmission: {submissionStatus: 'submitted'},
+        })
+
+        const peerReviewElements = container.querySelectorAll('.discussions-peer-review')
+        expect(peerReviewElements.length).toBeGreaterThan(0)
+
+        const enabledLinks = container.querySelectorAll(
+          '.discussions-peer-review a:not([aria-disabled="true"]):not([disabled])',
+        )
+        expect(enabledLinks.length).toBeGreaterThan(0)
+      })
+    })
+
     describe('PodcastFeed Button', () => {
       afterEach(() => {
         // Clean up any podcast feed links added to document head
@@ -688,6 +828,77 @@ describe('DiscussionTopicContainer', () => {
           }),
         })
         expect(queryByTestId('add_rubric_url')).toBeNull()
+      })
+
+      describe('Enhanced Rubrics', () => {
+        beforeEach(() => {
+          ENV.enhanced_rubrics_enabled = true
+          ENV.ASSIGNMENT_ID = '1'
+          ENV.COURSE_ID = '1'
+          ENV.ai_rubrics_enabled = false
+          ENV.rubric_self_assessment_ff_enabled = false
+        })
+
+        afterEach(() => {
+          ENV.enhanced_rubrics_enabled = false
+          delete ENV.ASSIGNMENT_ID
+          delete ENV.COURSE_ID
+          delete ENV.ai_rubrics_enabled
+          delete ENV.rubric_self_assessment_ff_enabled
+        })
+
+        it('does not render add_rubric_url when enhanced rubrics is enabled', () => {
+          const {queryByTestId} = setup({discussionTopic: Discussion.mock()})
+          expect(queryByTestId('add_rubric_url')).toBeNull()
+        })
+
+        it('opens DisplayRubricModal when Add Rubric menu item is clicked', async () => {
+          const {getByTestId, getByText, findByTestId} = setup({
+            discussionTopic: Discussion.mock(),
+          })
+
+          fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+          fireEvent.click(getByText('Add Rubric'))
+
+          const modal = await findByTestId('assignment-rubric-modal')
+          expect(modal).toBeInTheDocument()
+        })
+
+        it('opens DisplayRubricModal when Show Rubric menu item is clicked', async () => {
+          const {getByTestId, getByText, findByTestId} = setup({
+            discussionTopic: Discussion.mock({
+              permissions: DiscussionPermissions.mock({
+                addRubric: false,
+                showRubric: true,
+              }),
+            }),
+          })
+
+          fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+
+          await waitFor(() => {
+            expect(getByText('Show Rubric')).toBeInTheDocument()
+          })
+
+          fireEvent.click(getByText('Show Rubric'))
+
+          const modal = await findByTestId('assignment-rubric-modal')
+          expect(modal).toBeInTheDocument()
+        })
+
+        it('does not open modal when clicking rubric menu without proper permissions', () => {
+          const {queryByTestId} = setup({
+            discussionTopic: Discussion.mock({
+              permissions: DiscussionPermissions.mock({
+                addRubric: false,
+                showRubric: false,
+              }),
+            }),
+          })
+
+          // The menu item won't be present, so we just verify no modal appears
+          expect(queryByTestId('assignment-rubric-modal')).not.toBeInTheDocument()
+        })
       })
     })
   })

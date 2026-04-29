@@ -24,7 +24,7 @@ import Conference from '../Conference'
 // we use RichContentEditor.preloadRemoteModule() to consolidate the import of
 // tinymce in the code, but since dynamic loading takes time during tests, we do
 // a static import here and mock out the dynamic
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
 describe('Conference', () => {
   const pluginConference = {
@@ -86,7 +86,7 @@ describe('Conference', () => {
     })
 
     it('shows a remove button if handler provided', () => {
-      const removeConference = jest.fn()
+      const removeConference = vi.fn()
       const {getByText} = render(
         <Conference
           conference={pluginConference}
@@ -99,7 +99,7 @@ describe('Conference', () => {
     })
 
     it('calls remove handler if clicked', () => {
-      const removeConference = jest.fn()
+      const removeConference = vi.fn()
       const {getByText} = render(
         <Conference
           conference={pluginConference}
@@ -123,8 +123,8 @@ describe('Conference', () => {
     })
 
     it('sets removeButtonRef', () => {
-      const removeConference = jest.fn()
-      const ref = jest.fn()
+      const removeConference = vi.fn()
+      const ref = vi.fn()
       render(
         <Conference
           conference={pluginConference}
@@ -187,7 +187,7 @@ describe('Conference', () => {
     })
 
     it('shows a remove button if handler provided', () => {
-      const removeConference = jest.fn()
+      const removeConference = vi.fn()
       const {getByText} = render(
         <Conference
           conference={htmlConference}
@@ -200,7 +200,7 @@ describe('Conference', () => {
     })
 
     it('calls remove handler if clicked', () => {
-      const removeConference = jest.fn()
+      const removeConference = vi.fn()
       const {getByText} = render(
         <Conference
           conference={htmlConference}
@@ -224,8 +224,8 @@ describe('Conference', () => {
     })
 
     it('sets removeButtonRef', () => {
-      const removeConference = jest.fn()
-      const ref = jest.fn()
+      const removeConference = vi.fn()
+      const ref = vi.fn()
       render(
         <Conference
           conference={htmlConference}

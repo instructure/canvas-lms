@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const isLtiRegistrationsUsageEnabled = () => ENV?.FEATURES?.lti_registrations_usage_data ?? false
+export const isLtiRegistrationsUsageEnabled = () =>
+  ENV?.FEATURES?.lti_registrations_usage_data ?? false
 
 export const ltiUsageConfig = () => ENV?.LTI_USAGE ?? {}
 
 export const ltiUsageOptions = () => ({
-    useHighContrast: ENV?.use_high_contrast ?? false
+  useHighContrast: ENV?.use_high_contrast ?? false,
 })

@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./backbone/views/TreeBrowserView.js"
+  "main": "./backbone/views/TreeBrowserView.js",
+  "owner": "RCX"
 }

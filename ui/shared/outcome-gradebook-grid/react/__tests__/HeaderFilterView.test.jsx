@@ -34,7 +34,7 @@ describe('Test redraw function', () => {
 
   beforeEach(() => {
     grid = {}
-    redrawFn = jest.fn()
+    redrawFn = vi.fn()
     averageFn = 'mean'
   })
 

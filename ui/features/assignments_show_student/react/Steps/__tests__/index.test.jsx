@@ -43,7 +43,7 @@ describe('Steps', () => {
         <StepItem label="Phase one" status="complete" />
         <StepItem label="Phase two" status="in-progress" />
         <StepItem label="Phase three" />
-      </Steps>
+      </Steps>,
     )
     expect(container.getByText('Phase one')).toBeInTheDocument()
     expect(container.getByText('Phase two')).toBeInTheDocument()
@@ -56,7 +56,7 @@ describe('Steps', () => {
         <StepItem label="Phase one" status="complete" />
         <StepItem label="Phase two" status="in-progress" />
         <StepItem label="Phase three" />
-      </Steps>
+      </Steps>,
     )
 
     const items = container.getAllByRole('listitem')

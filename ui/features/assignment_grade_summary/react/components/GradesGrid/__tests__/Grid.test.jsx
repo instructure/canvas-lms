@@ -23,25 +23,26 @@ import Grid from '../Grid'
 import {speedGraderUrl} from '../../../assignment/AssignmentApi'
 import {STARTED, SUCCESS} from '../../../grades/GradeActions'
 
-jest.mock('../GridRow', () => {
-  const ActualGridRow = jest.requireActual('../GridRow').default
-  return jest.fn(props => <ActualGridRow {...props} />)
-})
+const MockGridRow = vi.hoisted(() => vi.fn())
+
+vi.mock('../GridRow', () => ({
+  default: MockGridRow,
+}))
 
 describe('GradeSummary Grid', () => {
   let props
-  let MockGridRow
 
   function speedGraderUrlFor(studentId) {
     return speedGraderUrl('1201', '2301', {anonymousStudents: false, studentId})
   }
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   beforeEach(() => {
-    MockGridRow = jest.requireMock('../GridRow')
+    MockGridRow.mockClear()
+    MockGridRow.mockImplementation(({row}) => (
+      <tr data-testid={`grid-row-${row.studentId}`}>
+        <td>{row.studentName}</td>
+      </tr>
+    ))
     props = {
       horizontalScrollRef: () => {},
       disabledCustomGrade: false,
@@ -93,7 +94,7 @@ describe('GradeSummary Grid', () => {
           },
         },
       },
-      onGradeSelect: jest.fn(),
+      onGradeSelect: vi.fn(),
       rows: [
         {speedGraderUrl: speedGraderUrlFor('1111'), studentId: '1111', studentName: 'Adam Jones'},
         {speedGraderUrl: speedGraderUrlFor('1112'), studentId: '1112', studentName: 'Betty Ford'},
@@ -143,7 +144,7 @@ describe('GradeSummary Grid', () => {
   test('sends disabledCustomGrade to each GridRow', () => {
     render(<Grid {...props} />)
     const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
-    const rowCalls = calls.filter(call => !call[0].disabledCustomGrade)
+    const rowCalls = calls.filter(call => call[0].disabledCustomGrade === false)
     expect(rowCalls).toHaveLength(4)
   })
 
@@ -183,9 +184,7 @@ describe('GradeSummary Grid', () => {
   test('sends student-specific select provisional grade statuses to each GridRow', () => {
     render(<Grid {...props} />)
     const calls = MockGridRow.mock.calls.filter(call => call?.[0] && typeof call[0] === 'object')
-    const rowCalls = calls.filter(
-      call => call[0].selectProvisionalGradeStatus == STARTED,
-    )
+    const rowCalls = calls.filter(call => call[0].selectProvisionalGradeStatus == STARTED)
     expect(rowCalls).toHaveLength(1)
   })
 

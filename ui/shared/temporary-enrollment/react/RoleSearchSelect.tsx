@@ -23,7 +23,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {uid} from '@instructure/uid'
 import {string} from 'prop-types'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {MODULE_NAME} from './types'
 
@@ -89,8 +89,7 @@ export default function RoleSearchSelect(props: Props) {
       type: 'newError' | 'hint' | 'success' | 'screenreader-only'
       text: React.ReactNode
     }>
-    // @ts-expect-error
-  >([{}])
+  >([])
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [selectedOptionId, setSelectedOptionId] = useState(null)
   const [highlightedOptionId, setHighlightedOptionId] = useState(null)
@@ -138,8 +137,7 @@ export default function RoleSearchSelect(props: Props) {
       setMessages([{type: 'hint', text: noResultsLabel}])
       return
     }
-    // @ts-expect-error
-    setMessages([{}])
+    setMessages([])
   }
 
   const handleRequestHideOptions = (event: any) => {

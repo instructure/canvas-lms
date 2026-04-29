@@ -21,8 +21,8 @@ import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import K5AppLink from '../K5AppLink'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 describe('K5AppLink', () => {
@@ -91,7 +91,7 @@ describe('K5AppLink', () => {
     }
     const {getByText} = render(<K5AppLink {...getProps(overrides)} />)
     const button = getByText('YouTube')
-    Object.defineProperty(window, 'open', {value: jest.fn()})
+    Object.defineProperty(window, 'open', {value: vi.fn()})
     fireEvent.click(button)
     expect(window.open).toHaveBeenCalledWith(
       '/courses/14/external_tools/1?display=borderless',

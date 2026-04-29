@@ -35,7 +35,7 @@ const defaultProps = {
     visible: true,
   },
   expandCollapseAll: {
-    onExpandCollapseAll: jest.fn(),
+    onExpandCollapseAll: vi.fn(),
     anyModuleExpanded: true,
   },
   addModule: {
@@ -135,6 +135,18 @@ describe('ContextModulesHeader', () => {
       // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...props} />)
       expect(() => getByText(defaultProps.viewProgress.label)).toThrow(/Unable to find an element/)
+    })
+
+    it('Expand All is hidden when no modules present', () => {
+      const props = {
+        ...defaultProps,
+        overrides: {
+          hasModules: false,
+        },
+      }
+      // @ts-expect-error
+      const {queryByText} = render(<ContextModulesHeader {...props} />)
+      expect(queryByText('Expand All')).not.toBeInTheDocument()
     })
 
     it('"Expand All" is visible', () => {

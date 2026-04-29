@@ -70,16 +70,16 @@ describe "master courses - child courses - module item locking for React modules
       wait_for_ajaximations
 
       # Objects inherited from master show the lock
-      expect(blueprint_lock_icon(@locked_tag.id, locked: true)).to be_displayed
-      expect(blueprint_lock_icon(@unlocked_tag.id, locked: false)).to be_displayed
+      expect(module_blueprint_lock_icon(@locked_tag.id, locked: true)).to be_displayed
+      expect(module_blueprint_lock_icon(@unlocked_tag.id, locked: false)).to be_displayed
 
       # Objects added to the child do not have blueprint icons
-      expect(f(module_item_by_id_selector(@normal_tag.id))).not_to contain_css(blueprint_lock_icon_selector(@normal_tag.id, locked: true))
-      expect(f(module_item_by_id_selector(@normal_tag.id))).not_to contain_css(blueprint_lock_icon_selector(@normal_tag.id, locked: false))
+      expect(f(module_item_by_id_selector(@normal_tag.id))).not_to contain_css(blueprint_lock_icon_selector(locked: true))
+      expect(f(module_item_by_id_selector(@normal_tag.id))).not_to contain_css(blueprint_lock_icon_selector(locked: false))
     end
 
     it "disables the title edit input for locked items" do
-      skip "title input is not disabled: LX-2962"
+      skip "2025-07-24 title input is not disabled: LX-2962"
       go_to_modules
 
       # Expand the module to see its items
@@ -134,10 +134,7 @@ describe "master courses - child courses - module item locking for React modules
       click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
       wait_for_ajaximations
 
-      # Select the quiz we created
-      click_INSTUI_Select_option(add_existing_item_select_selector, title)
-
-      # Click Add Item
+      search_and_select_existing_item(title)
       add_item_modal_add_item_button.click
       wait_for_ajaximations
 
@@ -146,7 +143,7 @@ describe "master courses - child courses - module item locking for React modules
       expect(new_tag.content).to eq quiz_copy
 
       # Check that it has the locked icon
-      expect(blueprint_lock_icon(new_tag.id, locked: true)).to be_displayed
+      expect(module_blueprint_lock_icon(new_tag.id, locked: true)).to be_displayed
     end
   end
 
@@ -191,15 +188,15 @@ describe "master courses - child courses - module item locking for React modules
       wait_for_ajaximations
 
       # Check for the appropriate icons
-      expect(blueprint_lock_icon(@assmt_mod_tag.id, locked: false)).to be_displayed
-      expect(blueprint_lock_icon(@page_mod_tag.id, locked: true)).to be_displayed
+      expect(module_blueprint_lock_button(@assmt_mod_tag.id, locked: false)).to be_displayed
+      expect(module_blueprint_lock_button(@page_mod_tag.id, locked: true)).to be_displayed
 
       # Should still have icon even without tag
-      expect(blueprint_lock_icon(@topic_mod_tag.id, locked: false)).to be_displayed
+      expect(module_blueprint_lock_button(@topic_mod_tag.id, locked: false)).to be_displayed
 
       # Header should not have blueprint icon
-      expect(f(module_item_by_id_selector(@header_tag.id))).not_to contain_css("[data-testid='lock-icon-locked']")
-      expect(f(module_item_by_id_selector(@header_tag.id))).not_to contain_css("[data-testid='lock-icon-unlock']")
+      expect(f(module_item_by_id_selector(@header_tag.id))).not_to contain_css(blueprint_lock_icon_selector(locked: true))
+      expect(f(module_item_by_id_selector(@header_tag.id))).not_to contain_css(blueprint_lock_icon_selector(locked: false))
     end
   end
 end

@@ -29,15 +29,13 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')
 
-type SelectHandler = (event: SyntheticEvent, data: {id?: string, value?: string | number}) => void
+type SelectHandler = (event: SyntheticEvent, data: {id?: string; value?: string | number}) => void
 
 interface PeopleFilterProps {
   onOptionSelect: (optionId: string) => void
 }
 
-const PeopleFilter: FC<PeopleFilterProps> = ({
-  onOptionSelect: handleOptionSelect
-}) => {
+const PeopleFilter: FC<PeopleFilterProps> = ({onOptionSelect: handleOptionSelect}) => {
   const {id: defaultId, label: defaultValue} = DEFAULT_OPTION
   const {allRoles = []} = useCoursePeopleContext()
   const [selectedValue, setSelectedValue] = useState<string>(defaultValue)
@@ -64,11 +62,7 @@ const PeopleFilter: FC<PeopleFilterProps> = ({
         {filterOptions.map(role => {
           const label = labelWithCount(role)
           return (
-            <Select.Option
-              key={role.id}
-              id={role.id}
-              value={label}
-            >
+            <Select.Option key={role.id} id={role.id} value={label}>
               {label}
             </Select.Option>
           )

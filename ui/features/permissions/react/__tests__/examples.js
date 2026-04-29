@@ -35,15 +35,24 @@ const PERMISSIONS = [
     permission_name: 'add_course',
     label: 'add course',
     contextType: ACCOUNT,
+    group: 'courses',
     displayed: false,
   },
   {
     permission_name: 'delete_course',
     label: 'delete course',
     contextType: ACCOUNT,
+    group: 'courses',
     displayed: false,
   },
 ]
+
+const PERMISSION_GROUPS = {
+  courses: {
+    label: 'Courses',
+    subtitle: 'Courses - add / delete',
+  },
+}
 
 const BASIC_ROLE_PERMISSION = {
   enabled: ENABLED_FOR_ALL,
@@ -106,4 +115,4 @@ const DEFAULT_PROPS = () => ({
   selectedRoles: [{value: '0', label: 'All Roles'}],
 })
 
-export {DEFAULT_PROPS, PERMISSIONS, ROLES, BASIC_ROLE_PERMISSION}
+export {DEFAULT_PROPS, PERMISSIONS, PERMISSION_GROUPS, ROLES, BASIC_ROLE_PERMISSION}

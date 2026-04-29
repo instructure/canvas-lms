@@ -48,7 +48,13 @@ export const START_DATE_CAPTIONS = {
 
 export const END_DATE_CAPTIONS = {
   default: I18n.t('Determined by course pace'),
-  course: I18n.t('Determined by course end date'),
-  section: I18n.t('Determined by section end date'),
+  course: I18n.t(
+    'Determined by course end date. Changing this date will not save, but you can view the effects of a new end date by changing the date here.',
+  ),
+  section: I18n.t(
+    'Determined by section end date. Changing this date will not save, but you can view the effects of a new end date by changing the date here.',
+  ),
+  enrollment_course: I18n.t('Determined by course end date'),
+  enrollment_section: I18n.t('Determined by section end date'),
   empty: I18n.t('Determined by course pace'),
 }

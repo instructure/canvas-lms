@@ -37,7 +37,6 @@ export const RubricRatingOrderSelect = ({
   return (
     <SimpleSelect
       renderLabel={I18n.t('Rating Order')}
-      width="10.563rem"
       value={ratingOrder}
       onChange={(_e, {value}) => onChange(value !== undefined ? value.toString() : '')}
       data-testid="rubric-rating-order-select"

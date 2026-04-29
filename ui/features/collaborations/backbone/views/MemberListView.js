@@ -18,12 +18,17 @@
 
 import {extend as backboneExtend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {extend, filter, map} from 'lodash'
+import '@canvas/rails-flash-notifications'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {filter, map, extend} from 'es-toolkit/compat'
 import {View} from '@canvas/backbone'
 import Group from '@canvas/groups/backbone/models/Group'
 import User from '@canvas/users/backbone/models/User'
 import CollaboratorCollection from '../collections/CollaboratorCollection'
 import collaboratorTemplate from '../../jst/collaborator.handlebars'
+import {updateCollaboratorFocus} from '../utils'
+
+const I18n = createI18nScope('collaborations')
 
 backboneExtend(MemberListView, View)
 
@@ -36,7 +41,7 @@ function MemberListView() {
 }
 
 MemberListView.prototype.events = {
-  'click li a': 'removeCollaborator',
+  'click li button': 'removeCollaborator',
   'click .remove-all': 'removeAll',
 }
 
@@ -102,14 +107,7 @@ MemberListView.prototype.render = function () {
 //
 // Returns nothing.
 MemberListView.prototype.updateFocus = function () {
-  let $target = $(this.$el.find('li').get(this.currentIndex)).find('a')
-  if ($target.length === 0) {
-    $target = $(this.$el.find('li').get(this.currentIndex - 1)).find('a')
-  }
-  if ($target.length === 0) {
-    $target = this.$el.parents('.collaborator-picker').find('.list-wrapper:first ul:visible')
-  }
-  return $target.focus()
+  updateCollaboratorFocus(this.$el, this.currentIndex)
 }
 
 // Internal: Remove a collaborator from this list.
@@ -118,11 +116,16 @@ MemberListView.prototype.updateFocus = function () {
 //
 // Returns nothing.
 MemberListView.prototype.removeCollaborator = function (e) {
-  e.preventDefault()
-  const id = $(e.currentTarget).attr('data-id')
-  this.currentIndex = $(e.target).parent().index()
+  const $button = $(e.currentTarget)
+  const id = $button.attr('data-id')
+  const name = $button.attr('data-name')
+  this.currentIndex = $button.parent().index()
   this.hasFocus = true
-  return this.collection.remove(id)
+  this.collection.remove(id)
+  // Announce after focus change with polite mode - lets VoiceOver finish reading the button first
+  setTimeout(() => {
+    $.screenReaderFlashMessageExclusive(I18n.t('%{name} removed', {name}), true)
+  }, 1500)
 }
 
 // Internal: Remove all current collaborators.
@@ -134,6 +137,7 @@ MemberListView.prototype.removeAll = function (e) {
   e.preventDefault()
   this.collection.remove(this.collection.models)
   this.currentIndex = 0
+  $.screenReaderFlashMessageExclusive(I18n.t('All collaborators removed'), true)
   return this.updateFocus()
 }
 

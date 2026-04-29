@@ -42,11 +42,11 @@ class ConditionalReleaseObjects
     end
 
     def due_at_exists?
-      element_exists?("//*[contains(@class,'ui-dialog')]//input[@name='due_at']", true)
+      element_exists?("//*[contains(@class,'ui-dialog')]//input[@name='due_at']", xpath: true)
     end
 
     def points_possible_exists?
-      element_exists?("//*[contains(@class,'ui-dialog')]//input[@name='points_possible']", true)
+      element_exists?("//*[contains(@class,'ui-dialog')]//input[@name='points_possible']", xpath: true)
     end
 
     # Quizzes Page
@@ -59,7 +59,7 @@ class ConditionalReleaseObjects
     end
 
     def disabled_cr_editor_exists?
-      element_exists?("//li[@aria-disabled = 'true']/a[@href = '#mastery-paths-editor']", true)
+      element_exists?("//li[@aria-disabled = 'true']/a[@href = '#mastery-paths-editor']", xpath: true)
     end
 
     # Assignment Edit
@@ -91,7 +91,7 @@ class ConditionalReleaseObjects
 
     # Common Selectors
     def conditional_release_link
-      f("#conditional_release_link")
+      fxpath("//*[@role='tab' and contains(text(),'Mastery Paths')]")
     end
 
     def conditional_release_editor_exists?
@@ -147,7 +147,7 @@ class ConditionalReleaseObjects
     end
 
     def assignment_exists_in_scoring_range?(ordered_range, assignment_name)
-      element_exists?("//*[@class = 'cr-scoring-range' and position() = #{ordered_range}]//div[@aria-label = '#{assignment_name}']", true)
+      element_exists?("//*[@class = 'cr-scoring-range' and position() = #{ordered_range}]//div[@aria-label = '#{assignment_name}']", xpath: true)
     end
 
     def assignment_selection_modal

@@ -22,57 +22,57 @@ import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import SlickGridSpecHelper from '../GradebookGrid/GridSupport/__tests__/SlickGridSpecHelper'
 
 // Mock GradebookGrid
-jest.mock('../GradebookGrid', () => {
+vi.mock('../GradebookGrid', () => {
   return {
     __esModule: true,
-    default: jest.fn().mockImplementation(() => ({
-      initialize: jest.fn(),
-      destroy: jest.fn(),
+    default: vi.fn().mockImplementation(() => ({
+      initialize: vi.fn(),
+      destroy: vi.fn(),
       events: {
         onColumnsReordered: {
-          subscribe: jest.fn(),
-          trigger: jest.fn(),
+          subscribe: vi.fn(),
+          trigger: vi.fn(),
         },
         onColumnsResized: {
-          subscribe: jest.fn(),
-          trigger: jest.fn(),
+          subscribe: vi.fn(),
+          trigger: vi.fn(),
         },
       },
       grid: {
-        getColumnIndex: jest.fn().mockReturnValue(0),
-        getColumns: jest.fn().mockReturnValue([
+        getColumnIndex: vi.fn().mockReturnValue(0),
+        getColumns: vi.fn().mockReturnValue([
           {id: 'assignment_2301', width: 150},
           {id: 'assignment_2302', width: 150},
           {id: 'assignment_2303', width: 150},
           {id: 'assignment_2304', width: 150},
         ]),
-        setColumns: jest.fn(),
-        invalidate: jest.fn(),
-        render: jest.fn(),
-        getHeaderRow: jest.fn().mockReturnValue({
-          querySelector: jest.fn().mockReturnValue({
+        setColumns: vi.fn(),
+        invalidate: vi.fn(),
+        render: vi.fn(),
+        getHeaderRow: vi.fn().mockReturnValue({
+          querySelector: vi.fn().mockReturnValue({
             offsetWidth: 150,
             classList: {
-              contains: jest.fn().mockReturnValue(false),
-              add: jest.fn(),
-              remove: jest.fn(),
+              contains: vi.fn().mockReturnValue(false),
+              add: vi.fn(),
+              remove: vi.fn(),
             },
           }),
         }),
-        getCellNode: jest.fn().mockReturnValue({
+        getCellNode: vi.fn().mockReturnValue({
           offsetWidth: 150,
           classList: {
-            contains: jest.fn().mockReturnValue(false),
-            add: jest.fn(),
-            remove: jest.fn(),
+            contains: vi.fn().mockReturnValue(false),
+            add: vi.fn(),
+            remove: vi.fn(),
           },
         }),
       },
       gridSupport: {
         events: {
           onColumnsResized: {
-            subscribe: jest.fn(),
-            trigger: jest.fn(),
+            subscribe: vi.fn(),
+            trigger: vi.fn(),
           },
         },
       },
@@ -90,34 +90,34 @@ jest.mock('../GradebookGrid', () => {
 })
 
 // Mock Gradebook class
-jest.mock('../Gradebook', () => {
+vi.mock('../Gradebook', () => {
   return {
     __esModule: true,
-    default: jest.fn().mockImplementation(function (props) {
+    default: vi.fn().mockImplementation(function (props) {
       return {
-        initialize: jest.fn(),
-        setAssignmentVisibility: jest.fn(),
-        finishRenderingUI: jest.fn(),
+        initialize: vi.fn(),
+        setAssignmentVisibility: vi.fn(),
+        finishRenderingUI: vi.fn(),
         gradebookGrid: null,
         courseContent: {
           contextModules: [],
           modulesById: {},
         },
-        getAssignment: jest.fn(),
-        getEnterGradesAsSetting: jest.fn(),
-        getAssignmentGradingScheme: jest.fn(),
-        getPendingGradeInfo: jest.fn(),
-        student: jest.fn(),
+        getAssignment: vi.fn(),
+        getEnterGradesAsSetting: vi.fn(),
+        getAssignmentGradingScheme: vi.fn(),
+        getPendingGradeInfo: vi.fn(),
+        student: vi.fn(),
         submissionStateMap: {
-          getSubmissionState: jest.fn(),
+          getSubmissionState: vi.fn(),
         },
-        getTotalPointsPossible: jest.fn(),
-        weightedGrades: jest.fn(),
-        getCourseGradingScheme: jest.fn(),
-        listInvalidAssignmentGroups: jest.fn(),
-        listHiddenAssignments: jest.fn(),
-        bindGridEvents: jest.fn(),
-        saveColumnWidthPreference: jest.fn(),
+        getTotalPointsPossible: vi.fn(),
+        weightedGrades: vi.fn(),
+        getCourseGradingScheme: vi.fn(),
+        listInvalidAssignmentGroups: vi.fn(),
+        listHiddenAssignments: vi.fn(),
+        bindGridEvents: vi.fn(),
+        saveColumnWidthPreference: vi.fn(),
         options: {
           custom_grade_statuses_enabled: false,
           show_similarity_score: false,
@@ -294,7 +294,7 @@ describe('Gradebook Grid Column Widths', () => {
     }
 
     // Mock gridSpecHelper methods
-    gridSpecHelper.getColumnHeaderNode = jest.fn().mockImplementation(columnId => {
+    gridSpecHelper.getColumnHeaderNode = vi.fn().mockImplementation(columnId => {
       const column = columnData[columnId]
       if (!column) {
         return null
@@ -302,18 +302,18 @@ describe('Gradebook Grid Column Widths', () => {
       return {
         offsetWidth: column.width,
         classList: {
-          contains: jest.fn().mockImplementation(className => {
+          contains: vi.fn().mockImplementation(className => {
             if (className === 'minimized') {
               return column.width <= 50
             }
             return false
           }),
-          add: jest.fn().mockImplementation(className => {
+          add: vi.fn().mockImplementation(className => {
             if (className === 'minimized') {
               column.minimized = true
             }
           }),
-          remove: jest.fn().mockImplementation(className => {
+          remove: vi.fn().mockImplementation(className => {
             if (className === 'minimized') {
               column.minimized = false
             }
@@ -322,9 +322,14 @@ describe('Gradebook Grid Column Widths', () => {
       }
     })
 
-    gridSpecHelper.getColumn = jest.fn().mockImplementation(columnId => {
+    gridSpecHelper.getColumn = vi.fn().mockImplementation(columnId => {
       return columnData[columnId]
     })
+
+    gridSpecHelper.listColumnIds = vi.fn().mockReturnValue([
+      'assignment_2301',
+      'assignment_2304',
+    ])
 
     // Set up gradebookGrid
     gradebook.gradebookGrid = {
@@ -333,16 +338,36 @@ describe('Gradebook Grid Column Widths', () => {
           definitions: columnData,
         },
       },
+      grid: {
+        getCellNode: vi.fn().mockImplementation((row, columnIndex) => {
+          const columnIds = gridSpecHelper.listColumnIds()
+          const columnId = columnIds[columnIndex]
+          const column = columnData[columnId]
+          if (!column) {
+            return null
+          }
+          return {
+            classList: {
+              contains: vi.fn().mockImplementation(className => {
+                if (className === 'minimized') {
+                  return column.width <= 50
+                }
+                return false
+              }),
+            },
+          }
+        }),
+      },
       events: {
         onColumnsResized: {
-          trigger: jest.fn().mockImplementation((_, columns) => {
+          trigger: vi.fn().mockImplementation((_, columns) => {
             columns.forEach(column => {
               columnData[column.id].width = column.width
             })
           }),
         },
       },
-      destroy: jest.fn(),
+      destroy: vi.fn(),
     }
   }
 
@@ -394,6 +419,16 @@ describe('Gradebook Grid Column Widths', () => {
           width: 150,
           minimized: false,
         },
+        assignment_2302: {
+          id: 'assignment_2302',
+          width: 10,
+          minimized: true,
+        },
+        assignment_2303: {
+          id: 'assignment_2303',
+          width: 54,
+          minimized: false,
+        },
         assignment_2304: {
           id: 'assignment_2304',
           width: 150,
@@ -402,7 +437,7 @@ describe('Gradebook Grid Column Widths', () => {
       }
 
       // Mock gridSpecHelper methods
-      gridSpecHelper.getColumnHeaderNode = jest.fn().mockImplementation(columnId => {
+      gridSpecHelper.getColumnHeaderNode = vi.fn().mockImplementation(columnId => {
         const column = columnData[columnId]
         if (!column) {
           return null
@@ -410,18 +445,18 @@ describe('Gradebook Grid Column Widths', () => {
         return {
           offsetWidth: column.width,
           classList: {
-            contains: jest.fn().mockImplementation(className => {
+            contains: vi.fn().mockImplementation(className => {
               if (className === 'minimized') {
                 return column.width <= 50
               }
               return false
             }),
-            add: jest.fn().mockImplementation(className => {
+            add: vi.fn().mockImplementation(className => {
               if (className === 'minimized') {
                 column.minimized = true
               }
             }),
-            remove: jest.fn().mockImplementation(className => {
+            remove: vi.fn().mockImplementation(className => {
               if (className === 'minimized') {
                 column.minimized = false
               }
@@ -430,9 +465,16 @@ describe('Gradebook Grid Column Widths', () => {
         }
       })
 
-      gridSpecHelper.getColumn = jest.fn().mockImplementation(columnId => {
+      gridSpecHelper.getColumn = vi.fn().mockImplementation(columnId => {
         return columnData[columnId]
       })
+
+      gridSpecHelper.listColumnIds = vi.fn().mockReturnValue([
+        'assignment_2301',
+        'assignment_2302',
+        'assignment_2303',
+        'assignment_2304',
+      ])
 
       // Set up gradebookGrid
       gradebook.gradebookGrid = {
@@ -441,16 +483,36 @@ describe('Gradebook Grid Column Widths', () => {
             definitions: columnData,
           },
         },
+        grid: {
+          getCellNode: vi.fn().mockImplementation((row, columnIndex) => {
+            const columnIds = gridSpecHelper.listColumnIds()
+            const columnId = columnIds[columnIndex]
+            const column = columnData[columnId]
+            if (!column) {
+              return null
+            }
+            return {
+              classList: {
+                contains: vi.fn().mockImplementation(className => {
+                  if (className === 'minimized') {
+                    return column.width <= 50
+                  }
+                  return false
+                }),
+              },
+            }
+          }),
+        },
         events: {
           onColumnsResized: {
-            trigger: jest.fn().mockImplementation((_, columns) => {
+            trigger: vi.fn().mockImplementation((_, columns) => {
               columns.forEach(column => {
                 columnData[column.id].width = column.width
               })
             }),
           },
         },
-        destroy: jest.fn(),
+        destroy: vi.fn(),
       }
     })
 
@@ -459,23 +521,20 @@ describe('Gradebook Grid Column Widths', () => {
       expect(columnNode.offsetWidth).toBeGreaterThan(10)
     })
 
-    // TODO: unskip in FOO-4349
-    it.skip('uses a stored width for assignment column headers', () => {
+    it('uses a stored width for assignment column headers', () => {
       const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2303')
       expect(columnNode.offsetWidth).toBe(54)
     })
 
-    // TODO: unskip in FOO-4349
-    it.skip('hides assignment column header content when the column is minimized', () => {
+    it('hides assignment column header content when the column is minimized', () => {
       const columnNode = gridSpecHelper.getColumnHeaderNode('assignment_2302')
-      expect(columnNode.classList).toContain('minimized')
+      expect(columnNode.classList.contains('minimized')).toBe(true)
     })
 
-    // TODO: unskip in FOO-4349
-    it.skip('hides assignment column cell content when the column is minimized', () => {
+    it('hides assignment column cell content when the column is minimized', () => {
       const columnIndex = gridSpecHelper.listColumnIds().indexOf('assignment_2302')
       const cellNode = gradebook.gradebookGrid.grid.getCellNode(0, columnIndex)
-      expect(cellNode.classList).toContain('minimized')
+      expect(cellNode.classList.contains('minimized')).toBe(true)
     })
   })
 
@@ -488,7 +547,7 @@ describe('Gradebook Grid Column Widths', () => {
 
     beforeEach(() => {
       createGradebookAndAddData()
-      jest.spyOn(gradebook, 'saveColumnWidthPreference')
+      vi.spyOn(gradebook, 'saveColumnWidthPreference')
     })
 
     it('updates the column definitions for resized columns', () => {
@@ -512,21 +571,19 @@ describe('Gradebook Grid Column Widths', () => {
       expect(columnNode.classList.contains('minimized')).toBe(false)
     })
 
-    // TODO: unskip in FOO-4349
-    it.skip('hides assignment column cell content when the column is minimized', () => {
+    it('hides assignment column cell content when the column is minimized', () => {
       resizeColumn('assignment_2304', -100)
       const columnIndex = gridSpecHelper.listColumnIds().indexOf('assignment_2304')
       const cellNode = gradebook.gradebookGrid.grid.getCellNode(0, columnIndex)
-      expect(cellNode.classList).toContain('minimized')
+      expect(cellNode.classList.contains('minimized')).toBe(true)
     })
 
-    // TODO: unskip in FOO-4349
-    it.skip('unhides assignment column cell content when the column is unminimized', () => {
+    it('unhides assignment column cell content when the column is unminimized', () => {
       resizeColumn('assignment_2304', -100)
       resizeColumn('assignment_2304', 1)
       const columnIndex = gridSpecHelper.listColumnIds().indexOf('assignment_2304')
       const cellNode = gradebook.gradebookGrid.grid.getCellNode(0, columnIndex)
-      expect(cellNode.classList).not.toContain('minimized')
+      expect(cellNode.classList.contains('minimized')).toBe(false)
     })
   })
 })

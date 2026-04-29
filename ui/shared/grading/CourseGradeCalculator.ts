@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {reduce, filter, values, map, groupBy, keyBy} from 'lodash'
+import {groupBy, keyBy, reduce, filter, values, map} from 'es-toolkit/compat'
 import AssignmentGroupGradeCalculator from './AssignmentGroupGradeCalculator'
 import {
   bigSum,
@@ -45,7 +45,10 @@ function combineAssignmentGroupGrades(
   options: {
     weightAssignmentGroups: boolean
   },
-) {
+): {
+  score: number | null
+  possible: number
+} {
   const scopedAssignmentGroupGrades = assignmentGroupGrades.map(
     (assignmentGroupGrade: AssignmentGroupGrade) => {
       const gradeVersion = includeUngraded
@@ -61,18 +64,22 @@ function combineAssignmentGroupGrades(
 
     let finalGrade = bigSum(relevantGroupGrades.map(weightedPercent))
     if (fullWeight === 0) {
-      // @ts-expect-error
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - intentionally setting Big.js value to null
       finalGrade = null
     } else if (fullWeight < 100) {
-      // @ts-expect-error
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Big.js to number conversion type mismatch
       finalGrade = toNumber(weightedPercent({score: finalGrade, possible: fullWeight, weight: 100}))
     }
 
     const submissionCount = sumBy(relevantGroupGrades, 'submission_count')
     const possible = submissionCount > 0 || includeUngraded ? 100 : 0
-    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - Big.js to number conversion type mismatch
     let score = finalGrade && totalGradeRound(finalGrade, 2)
-    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - score can be null when finalGrade is null
     score = Number.isNaN(Number(score)) ? null : score
 
     return {score, possible}
@@ -139,9 +146,12 @@ function extractPeriodBasedAssignmentGroups(
   assignmentGroups: AssignmentGroupCriteriaMap,
   effectiveDueDates: UserDueDateMap,
 ): AssignmentGroup[] {
-  // @ts-expect-error
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - reduce type inference issue with es-toolkit
   return reduce(
     assignmentGroups,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - reduce callback type inference issue with es-toolkit
     (periodBasedGroups: AssignmentGroup[], assignmentGroup: AssignmentGroup) => {
       const assignedAssignments = filter(
         assignmentGroup.assignments,
@@ -151,7 +161,8 @@ function extractPeriodBasedAssignmentGroups(
         const groupWithAssignedAssignments = {...assignmentGroup, assignments: assignedAssignments}
         return [
           ...periodBasedGroups,
-          // @ts-expect-error
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore - spread of AssignmentGroup[] type inference
           ...divideGroupByGradingPeriods(groupWithAssignedAssignments, effectiveDueDates),
         ]
       }
@@ -208,11 +219,11 @@ function calculateWithGradingPeriods(
     [periodId: string]: GradingPeriodGrade
   }
   current: {
-    score: number
+    score: number | null
     possible: number
   }
   final: {
-    score: number
+    score: number | null
     possible: number
   }
   scoreUnit: 'points' | 'percentage'
@@ -270,7 +281,8 @@ function calculateWithGradingPeriods(
     }
   }
 
-  // @ts-expect-error
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - map type inference issue with es-toolkit
   const allAssignmentGroupGrades: AssignmentGroupGrade[] = map(
     assignmentGroups,
     (assignmentGroup: AssignmentGroup) =>
@@ -303,16 +315,17 @@ function calculateWithoutGradingPeriods(
 ): {
   assignmentGroups: AssignmentGroupGradeMap
   current: {
-    score: number
+    score: number | null
     possible: number
   }
   final: {
-    score: number
+    score: number | null
     possible: number
   }
   scoreUnit: 'points' | 'percentage'
 } {
-  // @ts-expect-error
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - map type inference issue with es-toolkit
   const assignmentGroupGrades: AssignmentGroupGrade[] = map(
     assignmentGroups,
     (assignmentGroup: AssignmentGroup) =>
@@ -446,11 +459,11 @@ function calculate(
     [periodId: string]: GradingPeriodGrade
   }
   current: {
-    score: number
+    score: number | null
     possible: number
   }
   final: {
-    score: number
+    score: number | null
     possible: number
   }
   scoreUnit: 'points' | 'percentage'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import moment from 'moment-timezone'
-import _ from 'lodash'
+import {partial, isEqual, findKey} from 'es-toolkit/compat'
 import parseLinkHeader from '@canvas/parse-link-header'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -95,6 +95,7 @@ const TYPE_MAPPING = {
   discussion_topic: 'Discussion',
   assignment: 'Assignment',
   sub_assignment: 'Discussion Checkpoint',
+  peer_review_sub_assignment: 'Peer Review Sub Assignment',
   wiki_page: 'Page',
   announcement: 'Announcement',
   planner_note: 'To Do',
@@ -107,7 +108,7 @@ const getItemType = plannableType => {
 }
 
 const getApiItemType = overrideType => {
-  return _.findKey(TYPE_MAPPING, _.partial(_.isEqual, overrideType))
+  return findKey(TYPE_MAPPING, partial(isEqual, overrideType))
 }
 
 export function findNextLink(response) {
@@ -133,7 +134,7 @@ export function transformApiToInternalItem(apiResponse, courses, groups, timeZon
   const contextId = apiResponse[`${context_type.toLowerCase()}_id`]
   if (context_type === 'Course') {
     const course = courses.find(c => c.id === contextId)
-    contextInfo.context = getCourseContext(course)
+    contextInfo.context = getCourseContext(course, apiResponse)
   } else if (context_type === 'Group') {
     const group = groups.find(g => g.id === contextId) || {
       name: 'Unknown Group',
@@ -150,7 +151,7 @@ export function transformApiToInternalItem(apiResponse, courses, groups, timeZon
 
   if (!contextInfo.context && apiResponse.plannable_type === 'planner_note' && details.course_id) {
     const course = courses.find(c => c.id === details.course_id)
-    contextInfo.context = getCourseContext(course)
+    contextInfo.context = getCourseContext(course, apiResponse)
   }
 
   if (details.unread_count) {
@@ -181,7 +182,7 @@ export function transformPlannerNoteApiToInternalItem(plannerItemApiResponse, co
   let context = {}
   if (plannerNote.course_id) {
     const course = courses.find(c => c.id === plannerNote.course_id)
-    context = getCourseContext(course)
+    context = getCourseContext(course, plannerItemApiResponse)
   }
   return {
     id: plannerNote.id,
@@ -263,18 +264,28 @@ export function getContextCodesFromState({courses = []}) {
     : undefined
 }
 
-function getCourseContext(course) {
-  // shouldn't happen, but if the course data is missing, skip it.
-  // this has the effect of a planner note showing up as a vanilla todo not associated with a course
-  if (!course) return undefined
-  return {
-    type: 'Course',
-    id: course.id,
-    title: course.shortName || course.name,
-    image_url: course.image || course.image_url,
-    color: course.color,
-    url: course.href,
+function getCourseContext(course, apiResponse) {
+  if (course) {
+    return {
+      type: 'Course',
+      id: course.id,
+      title: course.shortName || course.name,
+      image_url: course.image || course.image_url,
+      color: course.color,
+      url: course.href,
+    }
   }
+  if (apiResponse?.context_name && apiResponse?.course_id) {
+    return {
+      type: 'Course',
+      id: apiResponse.course_id,
+      title: apiResponse.context_name,
+      image_url: apiResponse.context_image,
+      color: undefined,
+      url: undefined,
+    }
+  }
+  return undefined
 }
 
 function getGroupContext(apiResponse, group) {

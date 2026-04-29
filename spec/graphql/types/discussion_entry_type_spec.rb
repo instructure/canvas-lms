@@ -116,10 +116,11 @@ describe Types::DiscussionEntryType do
         title: "Welcome whoever you are",
         message: "anonymous discussion",
         context: @course,
-        user: @teacher
+        user: @teacher,
+        saving_user: @teacher
       )
 
-      entry_to_translate = discussion_for_translating_tags.discussion_entries.create!(message: %(Hi <img src="/courses/#{@course.id}/files/12/download"<h1>Content</h1>), user: @teacher, editor: @teacher)
+      entry_to_translate = discussion_for_translating_tags.discussion_entries.create!(message: %(Hi <img src="/courses/#{@course.id}/files/12/download"<h1>Content</h1>), user: @teacher, editor: @teacher, saving_user: @teacher)
       type = GraphQLTypeTester.new(entry_to_translate, current_user: @teacher)
 
       expect(
@@ -128,13 +129,56 @@ describe Types::DiscussionEntryType do
     end
   end
 
+  describe "user mentions in messages" do
+    it "handles non-existent user mentions gracefully" do
+      student_in_course(active_all: true)
+      non_existent_user_id = 999_999_999
+
+      # Message with both valid and invalid user mentions
+      message = %(Hello <span class="mceNonEditable mention" data-mention="#{@student.id}">@Student</span> and <span class="mceNonEditable mention" data-mention="#{non_existent_user_id}">@NonExistent</span>!)
+
+      entry = discussion_entry.discussion_topic.discussion_entries.create!(
+        message:,
+        user: @teacher,
+        editor: @teacher,
+        saving_user: @teacher
+      )
+
+      type = GraphQLTypeTester.new(entry, current_user: @teacher)
+
+      # Should not crash and should process the valid mention
+      resolved_message = type.resolve("message", request: ActionDispatch::TestRequest.create)
+      expect(resolved_message).to be_present
+      expect(resolved_message).to include(@student.name) # Valid mention gets name replaced
+      expect(resolved_message).to include("@NonExistent") # Invalid mention stays as-is
+    end
+
+    it "processes valid user mentions correctly" do
+      student_in_course(active_all: true)
+
+      message = %(Hi <span class="mceNonEditable mention" data-mention="#{@student.id}">@Someone</span>!)
+
+      entry = discussion_entry.discussion_topic.discussion_entries.create!(
+        message:,
+        user: @teacher,
+        editor: @teacher,
+        saving_user: @teacher
+      )
+
+      type = GraphQLTypeTester.new(entry, current_user: @teacher)
+
+      resolved_message = type.resolve("message", request: ActionDispatch::TestRequest.create)
+      expect(resolved_message).to include(@student.name)
+    end
+  end
+
   describe "when file_association_access ff is enabled" do
     it "adds attachment location tag to the message" do
       attachment = attachment_model(filename: "test.test", context: @teacher)
-      attachment.root_account.enable_feature!(:file_association_access)
+      Account.site_admin.enable_feature!(:file_association_access)
 
       message = "<img src='/users/#{@teacher.id}/files/#{attachment.id}/download'>"
-      new_entry = discussion_entry.discussion_topic.discussion_entries.create!(message:, user: @teacher, parent_id: discussion_entry.id, editor: @teacher)
+      new_entry = discussion_entry.discussion_topic.discussion_entries.create!(message:, user: @teacher, parent_id: discussion_entry.id, editor: @teacher, saving_user: @teacher)
       discussion_entry.attachment = attachment
       discussion_entry.save!
 
@@ -469,6 +513,24 @@ describe Types::DiscussionEntryType do
       expect(discussion_entry_type.resolve("reportTypeCounts { total }")).to eq 6
     end
 
+    it "returns counts and total if account admin" do
+      account_admin_user(account: @topic.context.account)
+      discussion_entry_type = GraphQLTypeTester.new(@entry, current_user: @admin)
+      expect(discussion_entry_type.resolve("reportTypeCounts { inappropriateCount }")).to eq 3
+      expect(discussion_entry_type.resolve("reportTypeCounts { offensiveCount }")).to eq 2
+      expect(discussion_entry_type.resolve("reportTypeCounts { otherCount }")).to eq 1
+      expect(discussion_entry_type.resolve("reportTypeCounts { total }")).to eq 6
+    end
+
+    it "returns counts and total if site admin" do
+      site_admin_user
+      discussion_entry_type = GraphQLTypeTester.new(@entry, current_user: @admin)
+      expect(discussion_entry_type.resolve("reportTypeCounts { inappropriateCount }")).to eq 3
+      expect(discussion_entry_type.resolve("reportTypeCounts { offensiveCount }")).to eq 2
+      expect(discussion_entry_type.resolve("reportTypeCounts { otherCount }")).to eq 1
+      expect(discussion_entry_type.resolve("reportTypeCounts { total }")).to eq 6
+    end
+
     it "returns nil if student" do
       discussion_entry_type = GraphQLTypeTester.new(@entry, current_user: @user[0])
       expect(discussion_entry_type.resolve("reportTypeCounts { inappropriateCount }")).to be_nil
@@ -610,6 +672,46 @@ describe Types::DiscussionEntryType do
     entry.save!
 
     discussion_entry_versions = discussion_entry_teacher_type.resolve("discussionEntryVersions { message }")
+    expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
+  end
+
+  it "returns discussion entry versions when retrieved by an account admin" do
+    course_with_teacher(active_all: true)
+    student_in_course(course: @course, active_all: true)
+    account_admin_user(account: @course.account)
+
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+    entry = @topic.discussion_entries.create!(message: "Hello!", user: @student, editor: @student)
+
+    discussion_entry_admin_type = GraphQLTypeTester.new(entry, current_user: @admin)
+
+    entry.message = "Hello! 2"
+    entry.save!
+
+    entry.message = "Hello! 3"
+    entry.save!
+
+    discussion_entry_versions = discussion_entry_admin_type.resolve("discussionEntryVersions { message }")
+    expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
+  end
+
+  it "returns discussion entry versions when retrieved by site admin" do
+    course_with_teacher(active_all: true)
+    student_in_course(course: @course, active_all: true)
+    site_admin_user
+
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
+    entry = @topic.discussion_entries.create!(message: "Hello!", user: @student, editor: @student)
+
+    discussion_entry_site_admin_type = GraphQLTypeTester.new(entry, current_user: @admin)
+
+    entry.message = "Hello! 2"
+    entry.save!
+
+    entry.message = "Hello! 3"
+    entry.save!
+
+    discussion_entry_versions = discussion_entry_site_admin_type.resolve("discussionEntryVersions { message }")
     expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
   end
 

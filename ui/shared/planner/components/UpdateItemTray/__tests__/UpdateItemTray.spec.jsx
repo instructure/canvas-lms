@@ -21,7 +21,7 @@ import {within, render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {UpdateItemTray_ as UpdateItemTray} from '../index'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 const defaultProps = {
   onSavePlannerItem: () => {},
@@ -53,7 +53,7 @@ afterAll(() => {
 })
 
 afterEach(() => {
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
   document.body.innerHTML = ''
 })
 
@@ -223,7 +223,7 @@ describe('UpdateItemTray', () => {
   })
 
   it('calls save callback with updated data when save button clicked', async () => {
-    const saveMock = jest.fn()
+    const saveMock = vi.fn()
     const user = userEvent.setup({delay: null})
     const item = simpleItem({title: 'original title'})
 
@@ -247,7 +247,7 @@ describe('UpdateItemTray', () => {
   })
 
   it('handles course selection correctly', async () => {
-    const saveMock = jest.fn()
+    const saveMock = vi.fn()
     const user = userEvent.setup({delay: null})
     const courses = [{id: '42', longName: 'Test Course', enrollmentType: 'StudentEnrollment'}]
     const item = simpleItem({title: 'test item'})
@@ -281,7 +281,7 @@ describe('UpdateItemTray', () => {
   })
 
   it('handles setting course to none correctly', async () => {
-    const saveMock = jest.fn()
+    const saveMock = vi.fn()
     const user = userEvent.setup({delay: null})
     const courses = [{id: '42', longName: 'Test Course', enrollmentType: 'StudentEnrollment'}]
     const item = simpleItem({title: 'test item', courseId: '42'})
@@ -315,11 +315,11 @@ describe('UpdateItemTray', () => {
   })
 
   it('calls delete callback when delete button clicked and confirmed', async () => {
-    const deleteMock = jest.fn()
+    const deleteMock = vi.fn()
     const user = userEvent.setup({delay: null})
     const item = simpleItem({title: 'a title'})
 
-    const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true)
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
 
     const {getByTestId} = render(
       <UpdateItemTray {...defaultProps} noteItem={item} onDeletePlannerItem={deleteMock} />,
@@ -335,11 +335,11 @@ describe('UpdateItemTray', () => {
   })
 
   it('does not call delete callback when delete is cancelled', async () => {
-    const deleteMock = jest.fn()
+    const deleteMock = vi.fn()
     const user = userEvent.setup({delay: null})
     const item = simpleItem({title: 'a title'})
 
-    const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false)
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
 
     const {getByTestId} = render(
       <UpdateItemTray {...defaultProps} noteItem={item} onDeletePlannerItem={deleteMock} />,

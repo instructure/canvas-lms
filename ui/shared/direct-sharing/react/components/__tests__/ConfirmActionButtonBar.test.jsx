@@ -43,8 +43,8 @@ describe('ConfirmActionButtonBar', () => {
   })
 
   it('invokes callbacks', () => {
-    const primaryClick = jest.fn()
-    const secondaryClick = jest.fn()
+    const primaryClick = vi.fn()
+    const secondaryClick = vi.fn()
     const {getByText} = render(
       <ConfirmActionButtonBar
         primaryLabel="primary"

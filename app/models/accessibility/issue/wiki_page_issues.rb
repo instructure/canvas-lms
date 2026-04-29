@@ -33,14 +33,11 @@ module Accessibility
       private
 
       def wiki_page_attributes(page)
-        resource_path = polymorphic_path([context, page])
         {
           title: page.title,
           published: page.published?,
-          updated_at: page.updated_at&.iso8601 || "",
-          url: resource_path,
-          edit_url: "#{resource_path}/edit"
-        }
+          updated_at: page.updated_at&.iso8601 || ""
+        }.merge(resource_urls(page))
       end
     end
   end

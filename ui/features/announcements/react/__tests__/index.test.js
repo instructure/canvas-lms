@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {waitFor} from '@testing-library/react'
 import createAnnIndex from '../index'
 
@@ -40,7 +39,7 @@ describe('Announcements app', () => {
   it('renders the Announcements component', async () => {
     app = createAnnIndex(container, {})
     app.render()
-    
+
     await waitFor(() => {
       expect(container.querySelector('.announcements-v2__wrapper')).toBeInTheDocument()
     })
@@ -49,11 +48,11 @@ describe('Announcements app', () => {
   it('unmounts the Announcements component', async () => {
     app = createAnnIndex(container, {})
     app.render()
-    
+
     await waitFor(() => {
       expect(container.querySelector('.announcements-v2__wrapper')).toBeInTheDocument()
     })
-    
+
     app.unmount()
     expect(container.querySelector('.announcements-v2__wrapper')).not.toBeInTheDocument()
   })

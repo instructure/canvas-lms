@@ -21,12 +21,12 @@ import {User} from './User'
 
 export const ConversationParticipant = {
   fragment: gql`
-    fragment ConversationParticipant on ConversationParticipant {
+    fragment InboxConversationParticipant on ConversationParticipant {
       _id
       id
       label
       user {
-        ...User
+        ...InboxUser
       }
       workflowState
     }

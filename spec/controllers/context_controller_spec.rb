@@ -165,7 +165,6 @@ describe ContextController do
 
     context "allow_manage_differentiation_tags in js_env" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
         @course.account.save!
       end
@@ -179,13 +178,6 @@ describe ContextController do
       it "set to false when differentiation tags are disabled in account settings" do
         @course.account.settings = { allow_assign_to_differentiation_tags: { value: false } }
         @course.account.save!
-        user_session(@teacher)
-        get :roster, params: { course_id: @course.id }
-        expect(assigns[:js_env][:permissions][:allow_assign_to_differentiation_tags]).to be_falsey
-      end
-
-      it "set to false when assign_to_differentiation_tags FF is disabled" do
-        @course.account.disable_feature! :assign_to_differentiation_tags
         user_session(@teacher)
         get :roster, params: { course_id: @course.id }
         expect(assigns[:js_env][:permissions][:allow_assign_to_differentiation_tags]).to be_falsey
@@ -323,7 +315,7 @@ describe ContextController do
         @student.enrollments.first.deactivate
 
         get "roster_user", params: { course_id: @course.id, id: @student.id }
-        expect(response).to_not be_successful
+        expect(response).not_to be_successful
       end
 
       context "hide course sections from students feature enabled" do
@@ -423,6 +415,46 @@ describe ContextController do
         end
       end
     end
+
+    describe "rejected enrollments" do
+      render_views
+
+      before :once do
+        @section1 = @course.course_sections.create!(name: "Section 1")
+        @section2 = @course.course_sections.create!(name: "Section 2")
+
+        @student_with_rejected = user_factory(active_all: true)
+        enrollment1 = @course.enroll_student(@student_with_rejected, section: @section1, enrollment_state: "invited")
+        enrollment1.accept!
+
+        enrollment2 = @course.enroll_student(@student_with_rejected, section: @section2, enrollment_state: "invited", allow_multiple_enrollments: true)
+        enrollment2.reject!
+      end
+
+      it "displays 'Invitation Declined' label when profiles are enabled" do
+        account = Account.default
+        account.settings = { enable_profiles: true }
+        account.save!
+
+        user_session(@teacher)
+        get "roster_user", params: { course_id: @course.id, id: @student_with_rejected.id }
+
+        expect(response).to be_successful
+        expect(response.body).to include("Invitation Declined")
+      end
+
+      it "displays 'Invitation Declined' label when profiles are disabled" do
+        account = Account.default
+        account.settings = { enable_profiles: false }
+        account.save!
+
+        user_session(@teacher)
+        get "roster_user", params: { course_id: @course.id, id: @student_with_rejected.id }
+
+        expect(response).to be_successful
+        expect(response.body).to include("Invitation Declined")
+      end
+    end
   end
 
   describe "POST 'object_snippet'" do
@@ -476,6 +508,23 @@ describe ContextController do
       expect(assigns[:deleted_items]).to include(@assignment)
     end
 
+    it "sorts by deleted_at/updated_at descending" do
+      assignment = assignment_model(course: @course)
+      page = wiki_page_model(course: @course)
+      file = attachment_model(context: @course)
+      discussion = discussion_topic_model(course: @course)
+
+      discussion.update_columns(updated_at: 1.day.ago, workflow_state: "deleted")
+      file.update_columns(deleted_at: 2.days.ago, file_state: "deleted")
+      page.update_columns(updated_at: 3.days.ago, workflow_state: "deleted")
+      assignment.update_columns(updated_at: 4.days.ago, workflow_state: "deleted")
+
+      user_session(@teacher)
+      get :undelete_index, params: { course_id: @course.id }
+      expect(response).to be_successful
+      expect(assigns[:deleted_items]).to eq([discussion, file, page, assignment])
+    end
+
     it "shows group_categories" do
       user_session(@teacher)
       category = GroupCategory.student_organized_for(@course)
@@ -488,7 +537,6 @@ describe ContextController do
 
     context ":differentiation_tags" do
       before :once do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
         @course.account.save!
         @course.account.reload
@@ -691,6 +739,23 @@ describe ContextController do
       user_session(@teacher)
       post :undelete_item, params: { course_id: @course.id, asset_string: association.asset_string }
       expect(association.reload).not_to be_deleted
+    end
+
+    it "does not error undeleting a quiz assignment that somehow has no quiz" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:allow_attachment_association_creation)
+      assignment = @course.assignments.create!(
+        submission_types: "online_quiz",
+        description: "<p><a href='/courses/#{@course.id}/files/1/download'>quiz file link</a></p>",
+        workflow_state: "deleted",
+        updating_user: @teacher
+      )
+
+      expect do
+        post :undelete_item, params: { course_id: @course.id, asset_string: assignment.asset_string }
+      end.not_to raise_error
+
+      expect(assignment.reload).not_to be_deleted
     end
   end
 

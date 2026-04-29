@@ -66,6 +66,7 @@ export function mockAssignment(overrides = {}): TeacherAssignmentType {
     assignmentGroup: {lid: '1', name: 'assignment group'},
     peerReviews: {
       enabled: true,
+      count: 0,
     },
     lockInfo: {
       isLocked: false,

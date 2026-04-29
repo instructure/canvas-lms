@@ -21,7 +21,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import QuizSelect from './QuizSelect'
@@ -38,10 +38,8 @@ type QuizModalProps = {
 }
 
 const QuizModal = ({open, onClose, onSelect}: QuizModalProps) => {
-  // @ts-expect-error
-  const [questions, setQuestions] = useState<QuestionProps | undefined>(null)
-  // @ts-expect-error
-  const [question, setQuestion] = useState<QuestionProps | undefined>(null)
+  const [questions, setQuestions] = useState<QuestionProps[] | null>(null)
+  const [question, setQuestion] = useState<QuestionProps | undefined>(undefined)
   const [quizId, setQuizId] = useState<string | null>(null)
   const [quizTitle, setQuizTitle] = useState<string | null>(null)
 
@@ -94,7 +92,6 @@ const QuizModal = ({open, onClose, onSelect}: QuizModalProps) => {
       </Modal.Header>
       <Modal.Body>
         {quizId ? (
-          // @ts-expect-error
           <QuestionSelect questions={questions} onSelect={handleQuestionSelect} />
         ) : (
           <QuizSelect onSelect={handleQuizSelect} />

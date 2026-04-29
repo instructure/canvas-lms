@@ -19,10 +19,10 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-import get from 'lodash/get'
+import {get} from 'es-toolkit/compat'
 import buildProps from './buildLockProps'
 import ApiClient from '../../apiClient'
 import LockBanner from './LockBanner'
@@ -136,7 +136,7 @@ export default class LockManager {
   renderLockToggle() {
     if (!this.props.toggleWrapperSelector) return
     this.setupToggle(() => {
-      ReactDOM.render(
+      legacyRender(
         <LockToggle
           isLocked={this.state.isLocked}
           isToggleable={this.props.page === 'show' && this.state.isMasterContent}
@@ -150,7 +150,7 @@ export default class LockManager {
   renderBanner() {
     if (!this.bannerNode) this.bannerNode = LockBanner.setupRootNode(this.props?.bannerSelector)
 
-    ReactDOM.render(
+    legacyRender(
       <LockBanner isLocked={this.state.isLocked} itemLocks={this.state.itemLocks} />,
       this.bannerNode,
     )

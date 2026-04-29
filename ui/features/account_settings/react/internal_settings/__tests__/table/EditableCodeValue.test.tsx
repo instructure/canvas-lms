@@ -20,7 +20,7 @@ import React from 'react'
 import {EditableCodeValue} from '../../table/EditableCodeValue'
 import {render} from '@testing-library/react'
 
-const callback = jest.fn()
+const callback = vi.fn()
 
 describe('EditableCodeValue', () => {
   it('has a button with an appropriate screen reader label', () => {

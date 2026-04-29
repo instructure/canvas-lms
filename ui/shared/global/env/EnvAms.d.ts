@@ -22,3 +22,11 @@
 export interface EnvAms {
   context_url?: string
 }
+
+declare global {
+  interface Window {
+    AMS_CONFIG?: {
+      API_URL: string
+    }
+  }
+}

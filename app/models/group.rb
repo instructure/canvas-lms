@@ -18,10 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Group < ActiveRecord::Base
+class Group < ApplicationRecord
   include Context
   include Workflow
   include CustomValidations
+
+  cattr_accessor :MAX_VARIANTS_PER_TAG_CATEGORY
+  self.MAX_VARIANTS_PER_TAG_CATEGORY = 10
 
   validates :context_id, :context_type, :account_id, :root_account_id, :workflow_state, :uuid, presence: true
   validates_allowed_transitions :is_public, false => true
@@ -43,6 +46,7 @@ class Group < ActiveRecord::Base
   belongs_to :group_category
   belongs_to :account
   belongs_to :root_account, class_name: "Account", inverse_of: :all_groups
+  has_many :assignment_overrides, as: :set, dependent: :destroy
   has_many :calendar_events, as: :context, inverse_of: :context, dependent: :destroy
   has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order("discussion_topics.position DESC, discussion_topics.created_at DESC") }, dependent: :destroy, as: :context, inverse_of: :context
   has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, inverse_of: :context, class_name: "DiscussionTopic"
@@ -97,6 +101,7 @@ class Group < ActiveRecord::Base
   end
 
   include StickySisFields
+
   are_sis_sticky :name
 
   validates_each :name do |record, attr, value|
@@ -142,7 +147,7 @@ class Group < ActiveRecord::Base
     users = users.order_by_sortable_name if sort
     return users unless !include_inactive_users && (context.is_a? Course)
 
-    context.participating_users(users.pluck(:id))
+    User.where(id: context.enrollments.active_or_pending_by_date.where(user_id: users.pluck(:id)).select(:user_id))
   end
 
   def all_real_students
@@ -298,6 +303,68 @@ class Group < ActiveRecord::Base
     Group.find(ids)
   end
 
+  # Returns a Set of group IDs that should be hidden from the given user
+  # due to course section restrictions.
+  def self.ids_hidden_by_section_restriction(candidate_group_ids, user, course)
+    return Set.new if candidate_group_ids.empty?
+
+    membership_pairs = GroupMembership.active
+                                      .joins(:user)
+                                      .where(group_id: candidate_group_ids)
+                                      .where("users.workflow_state<>'deleted'")
+                                      .pluck(:group_id, :user_id)
+
+    user_member_group_ids = membership_pairs.filter_map { |(gid, uid)| gid if uid == user.id }.to_set
+
+    group_member_scope = GroupMembership.active
+                                        .joins(:user)
+                                        .where(group_id: candidate_group_ids)
+                                        .where("users.workflow_state<>'deleted'")
+                                        .select(:user_id)
+
+    enrolled_user_ids = course.enrollments
+                              .active_or_pending
+                              .where(user_id: group_member_scope)
+                              .distinct
+                              .pluck(:user_id)
+                              .to_set
+    enrolled_user_ids << user.id
+
+    members_by_group = Hash.new { |h, k| h[k] = Set.new }
+    membership_pairs.each do |(gid, uid)|
+      members_by_group[gid] << uid if enrolled_user_ids.include?(uid)
+    end
+    # The viewer must appear in every group's set because the section check
+    # asks: "is there a section common to all members AND the viewer?"
+    candidate_group_ids.each { |gid| members_by_group[gid] << user.id }
+
+    student_section_pairs = Enrollment
+                            .where(
+                              type: %w[StudentEnrollment StudentViewEnrollment],
+                              course_section_id: course.course_sections.active.select(:id),
+                              user_id: enrolled_user_ids
+                            )
+                            .merge(Enrollment.active_or_pending)
+                            .pluck(:user_id, :course_section_id)
+
+    sections_by_user = Hash.new { |h, k| h[k] = Set.new }
+    student_section_pairs.each { |(uid, sid)| sections_by_user[uid] << sid }
+
+    hidden = Set.new
+    candidate_group_ids.each do |gid|
+      next if user_member_group_ids.include?(gid)
+
+      hidden << gid unless shares_any_section?(members_by_group[gid], sections_by_user)
+    end
+    hidden
+  end
+
+  def self.shares_any_section?(user_ids, sections_by_user)
+    common_sections = user_ids.map { |uid| sections_by_user[uid] }.reduce(:&)
+    common_sections&.any? || false
+  end
+  private_class_method :shares_any_section?
+
   def self.not_in_group_sql_fragment(groups)
     return nil if groups.empty?
 
@@ -322,6 +389,11 @@ class Group < ActiveRecord::Base
   def destroy
     self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
+
+    if non_collaborative?
+      remove_active_overrides
+    end
+
     save
   end
 
@@ -1019,14 +1091,26 @@ class Group < ActiveRecord::Base
     end
   end
 
+  def block_content_editor_enabled?
+    if context.is_a?(Course)
+      context.block_content_editor_enabled?
+    else
+      false
+    end
+  end
+
   private
+
+  def remove_active_overrides
+    assignment_overrides&.each(&:destroy)
+  end
 
   def validate_non_collaborative_constraints
     if non_collaborative?
       errors.add(:base, "Non-collaborative groups must belong to a course") unless context_type == "Course"
       errors.add(:base, "Non-collaborative groups cannot have a leader") if leader_id.present?
       errors.add(:base, "Non-collaborative groups must be private") if is_public
-      errors.add(:base, "Variant limit reached for tag") if new_record? && Group.active.non_collaborative.where(group_category_id:).count >= 10
+      errors.add(:base, "Variant limit reached for tag") if (new_record? || group_category_id_changed?) && Group.active.non_collaborative.where(group_category_id:).count >= self.MAX_VARIANTS_PER_TAG_CATEGORY
       errors.add(:base, "You have reached the tag limit for this course") if new_record? && self.group_category.max_diff_tag_validation_count >= GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE
     end
 

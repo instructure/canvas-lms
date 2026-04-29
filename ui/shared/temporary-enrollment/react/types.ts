@@ -33,7 +33,7 @@ export interface Bookmark {
 export interface Links {
   prev?: Bookmark
   next?: Bookmark
-  current: Bookmark
+  current?: Bookmark
 }
 
 export interface FetchedEnrollments {

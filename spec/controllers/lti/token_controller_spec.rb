@@ -22,6 +22,7 @@ describe Lti::TokenController do
   describe "#advantage_access_token" do
     let_once(:developer_key) do
       key = DeveloperKey.create!(
+        name: "test_key_#{SecureRandom.hex(4)}",
         account: root_account,
         is_lti_key: true,
         public_jwk_url: "http://test.host/jwks"
@@ -136,7 +137,7 @@ describe Lti::TokenController do
 
       context "when non-LTI key is provided" do
         let(:other_key) do
-          key = DeveloperKey.create!(account: root_account)
+          key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", account: root_account)
           enable_developer_key_account_binding!(key)
           key
         end
@@ -151,7 +152,7 @@ describe Lti::TokenController do
 
       context "when non-LTI-1.3 tool is provided" do
         let(:other_key) do
-          key = DeveloperKey.create!(account: root_account)
+          key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", account: root_account)
           enable_developer_key_account_binding!(key)
           key
         end

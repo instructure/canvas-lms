@@ -110,7 +110,7 @@ describe ObserverEnrollment do
       Notification.create!(name: "Enrollment Registration")
       user_with_pseudonym
       e = @course1.enroll_user(@user, "ObserverEnrollment")
-      expect(e.messages_sent).to_not be_empty
+      expect(e.messages_sent).not_to be_empty
     end
   end
 end

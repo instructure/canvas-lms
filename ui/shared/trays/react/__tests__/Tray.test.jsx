@@ -22,7 +22,7 @@ import {render, fireEvent} from '@testing-library/react'
 
 describe('CanvasTray', () => {
   it('renders header, close button, children', () => {
-    const handleDismiss = jest.fn()
+    const handleDismiss = vi.fn()
     const {getByText} = render(
       <CanvasTray open={true} label="Do the thing" onDismiss={handleDismiss}>
         Tray Content
@@ -37,13 +37,22 @@ describe('CanvasTray', () => {
   })
 
   describe('Errors', () => {
+    let originalError
+
     // Don't want to log the expected errors to the console
     beforeEach(() => {
-      jest.spyOn(console, 'error').mockImplementation(() => {})
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+
+      // Also suppress window.onerror to prevent JSDOM from logging errors
+      originalError = window.onerror
+      window.onerror = () => true
     })
 
     afterEach(() => {
       console.error.mockRestore()
+
+      // Restore window.onerror
+      window.onerror = originalError
     })
 
     it('has an error boundary in case the children throw', () => {

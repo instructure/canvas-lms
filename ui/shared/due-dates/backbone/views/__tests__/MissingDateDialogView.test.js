@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
+import {registerFixDialogButtonsPlugin} from '@canvas/enhanced-user-content/jquery'
 import MissingDateDialogView from '../MissingDateDialogView'
 
 const ok = x => expect(x).toBeTruthy()
@@ -27,9 +28,28 @@ const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)
 
+// Mock getClientRects for jQuery UI positioning - must be before any jQuery UI usage
+Element.prototype.getClientRects = function () {
+  return [
+    {
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      width: 0,
+      height: 0,
+    },
+  ]
+}
+
 let dialog
 
 describe('MissingDateDialogView', () => {
+  beforeAll(() => {
+    // Register jQuery plugin needed by dialogs
+    registerFixDialogButtonsPlugin()
+  })
+
   beforeEach(() => {
     $('#fixtures').append(
       '<label for="date">Section one</label><input type="text" id="date" name="date" />',
@@ -49,7 +69,7 @@ describe('MissingDateDialogView', () => {
           return true
         }
       },
-      success: jest.fn(),
+      success: vi.fn(),
     })
   })
 
@@ -61,10 +81,10 @@ describe('MissingDateDialogView', () => {
     $('#fixtures').empty()
   })
 
-  // :visible doesn't work with our jsdom
-  test.skip('should display a dialog if the given fields are invalid', function () {
+  test('should display a dialog if the given fields are invalid', function () {
     ok(dialog.render())
-    ok($('.ui-dialog:visible').length > 0)
+    // Use existence check instead of :visible which doesn't work in JSDOM
+    ok($('.ui-dialog').length > 0)
   })
 
   test('should not display a dialog if the given fields are valid', function () {

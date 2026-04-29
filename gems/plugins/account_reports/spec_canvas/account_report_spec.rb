@@ -61,14 +61,14 @@ describe "Account Reports" do
   end
 
   it "records the job id" do
-    expect(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 1234))
+    expect(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 1234))
     report = run_report("unpublished_courses_csv")
     expect(report.job_ids).to eq [1234]
   end
 
   it "records account report runner job ids for parallelized reports" do
-    expect(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123),
-                                                                double("Delayed::Job", id: 456))
+    expect(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123),
+                                                                instance_double(Delayed::Job, id: 456))
     report = run_report("grade_export_csv")
     expect(report.job_ids).to eq [123]
     expect(report.account_report_runners.first.job_ids).to eq [456]
@@ -88,8 +88,8 @@ describe "Account Reports" do
               end
       }
     }
-    expect(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123),
-                                                                double("Delayed::Job", id: 456))
+    expect(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123),
+                                                                instance_double(Delayed::Job, id: 456))
 
     ar = AccountReport.create!(account: Account.default, user: account_admin_user, report_type: "fake_report")
     ar.run_report
@@ -113,8 +113,8 @@ describe "Account Reports" do
               end
       }
     }
-    expect(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123),
-                                                                double("Delayed::Job", id: 456))
+    expect(Delayed::Worker).to receive(:current_job).and_return(instance_double(Delayed::Job, id: 123),
+                                                                instance_double(Delayed::Job, id: 456))
 
     ar = AccountReport.create!(account: Account.default, user: account_admin_user, report_type: "fake_report")
     ar.run_report
@@ -181,11 +181,34 @@ describe "Account Reports" do
   describe ".failed_report" do
     let(:account_report) { FakeAccountReport.new }
 
-    it "when exception is a RootAccountRequiredError it sets a more descriptive message" do
-      exception = CustomReports::Rubrics::RootAccountRequiredError.new
+    it "sets a generic failure message by default" do
+      exception = StandardError.new("something bad happened")
       AccountReports.failed_report(account_report, exception:)
-      message = "This report can only be run on the root account."
+      message = "Failed, the report failed to generate a file. Please try again."
       expect(account_report.parameters["extra_text"]).to eq message
+    end
+
+    context "when given an error report id" do
+      it "includes the error report id in the message" do
+        AccountReports.failed_report(account_report, error_report_id: 42)
+        message = "Failed, please report the following error code to your system administrator: ErrorReport:42;"
+        expect(account_report.parameters["extra_text"]).to eq message
+      end
+    end
+
+    context "when custom reports is installed" do
+      before do
+        stub_const("CustomReports", Module.new)
+        stub_const("CustomReports::Rubrics", Module.new)
+        stub_const("CustomReports::Rubrics::RootAccountRequiredError", Class.new(RuntimeError))
+      end
+
+      it "when exception is a RootAccountRequiredError it sets a more descriptive message" do
+        exception = CustomReports::Rubrics::RootAccountRequiredError.new
+        AccountReports.failed_report(account_report, exception:)
+        message = "This report can only be run on the root account."
+        expect(account_report.parameters["extra_text"]).to eq message
+      end
     end
   end
 

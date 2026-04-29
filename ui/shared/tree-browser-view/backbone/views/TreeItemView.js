@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
-import {uniqueId} from 'lodash'
+import {uniqueId} from 'es-toolkit/compat'
 import template from '../../jst/TreeItem.handlebars'
 
 extend(TreeItemView, Backbone.View)

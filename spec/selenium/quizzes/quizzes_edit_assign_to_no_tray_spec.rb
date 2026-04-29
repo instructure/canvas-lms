@@ -15,9 +15,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+
 require_relative "../common"
 require_relative "../helpers/quizzes_common"
-require_relative "../../spec_helper"
 require_relative "page_objects/quizzes_edit_page"
 require_relative "page_objects/quizzes_landing_page"
 require_relative "../helpers/items_assign_to_tray"
@@ -68,7 +68,7 @@ describe "quiz edit page assign to" do
 
     expect(@classic_quiz.assignment_overrides.last.assignment_override_students.count).to eq(1)
 
-    due_at_row = retrieve_quiz_due_date_table_row("1 Student")
+    due_at_row = retrieve_quiz_due_date_table_row("1 student")
     expect(due_at_row).not_to be_nil
     expect(due_at_row.text.split("\n").first).to include("Dec 31, 2022")
     expect(due_at_row.text.split("\n").third).to include("Dec 27, 2022")
@@ -112,9 +112,8 @@ describe "quiz edit page assign to" do
     expect(selected_assignee_options.count).to be(1)
   end
 
-  context "assign to differentiaiton tags" do
+  context "assign to differentiation tags" do
     before :once do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: true }
         a.save!
@@ -145,7 +144,7 @@ describe "quiz edit page assign to" do
       expect(override.set_type).to eq("Group")
       expect(override.title).to eq(@diff_tag1.name)
 
-      due_at_row = retrieve_quiz_due_date_table_row("1 Tag")
+      due_at_row = retrieve_quiz_due_date_table_row(@diff_tag1.name)
       expect(due_at_row).not_to be_nil
       expect(due_at_row.text.split("\n").first).to include("Dec 31, 2022")
       expect(due_at_row.text.split("\n").third).to include("Dec 27, 2022")
@@ -178,6 +177,8 @@ describe "quiz edit page assign to" do
         get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}/edit"
         wait_for_ajaximations
         expect(element_exists?(convert_override_alert_selector)).to be_truthy
+        quiz_save_button.click
+        expect(f("body").text).to include "Invalid group selected"
       end
 
       it "clicking convert overrides button converts the override and refreshes the cards" do

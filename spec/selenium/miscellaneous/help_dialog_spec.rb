@@ -67,15 +67,6 @@ describe "help dialog" do
       expect(f("#help_tray a[href='#teacher_feedback']")).to be_displayed
     end
 
-    it "shows the support url link in global nav correctly" do
-      # if @domain_root_account or Account.default have settings[:support_url] set there should be a link to that site
-      support_url = "http://example.com/support"
-      Account.default.update_attribute(:settings, { support_url: })
-      get "/dashboard"
-      link = f("a[href='#{support_url}']")
-      expect(link["id"]).to eq "global_nav_help_link"
-    end
-
     it "allows sending the teacher a message" do
       Setting.set("show_feedback_link", "true")
       course_with_ta(course: @course)
@@ -102,9 +93,6 @@ describe "help dialog" do
       expect(cm.recipients.count).to eq 2
       expect(cm.body).to match(/test message/)
     end
-
-    # TODO: reimplement per CNVS-29608, but make sure we're testing at the right level
-    it "should allow submitting a ticket"
   end
 
   context "help dialog as a teacher" do
@@ -163,7 +151,7 @@ describe "help dialog" do
       wait_for_ajaximations
       f("#global_nav_help_link").click
       wait_for_ajaximations
-      expect(f("#help_tray")).to_not include_text("Customize this menu")
+      expect(f("#help_tray")).not_to include_text("Customize this menu")
     end
   end
 
@@ -215,7 +203,7 @@ describe "help dialog" do
     it "opens up the welcome tour on page load and shows the welcome tour link and opens the tour when clicked" do
       course_with_ta(course: @course)
       get "/"
-      driver.local_storage.clear
+      clear_local_storage
       wait_for_ajaximations
 
       get "/courses/#{@course.id}"
@@ -241,7 +229,7 @@ describe "help dialog" do
     it "shows the welcome tour for Account Admins" do
       Account.default.account_users.create!(user: @user)
       get "/"
-      driver.local_storage.clear
+      clear_local_storage
       wait_for_ajaximations
 
       # Reload so the local storage clearing take effect

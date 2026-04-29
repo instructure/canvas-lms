@@ -17,10 +17,11 @@
  */
 
 import GridEvent from './GridSupport/GridEvent'
+import type {GridColumn, GridDataColumnsWithObjects} from '../grid.d'
 
 export default class Events {
   // Column Changes
-  onColumnsReordered = new GridEvent()
+  onColumnsReordered = new GridEvent<Event, GridDataColumnsWithObjects>()
 
-  onColumnsResized = new GridEvent()
+  onColumnsResized = new GridEvent<Event, GridColumn[]>()
 }

@@ -602,6 +602,36 @@ describe('transformApiToInternalItem', () => {
     expect(result.completed).toBe(false)
   })
 
+  it('extracts and transforms the proper data for a peer review sub-assignment', () => {
+    const apiResponse = makeApiResponse({
+      plannable_type: 'peer_review_sub_assignment',
+      plannable: {
+        id: '42',
+        title: 'Assignment 1 Peer Review (2)',
+        due_at: '2024-10-15T05:59:59Z',
+        points_possible: 10,
+        submission_types: 'peer_review',
+      },
+      html_url: '/courses/1/assignments/10/peer_reviews',
+    })
+
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+
+    expect(result.type).toBe('Peer Review Sub Assignment')
+    expect(result.title).toBe('Assignment 1 Peer Review (2)')
+    expect(result.id).toBe('42')
+    expect(result.uniqueId).toBe('peer_review_sub_assignment-42')
+    expect(result.html_url).toBe('/courses/1/assignments/10/peer_reviews')
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+  })
+
   it('extracts and transforms the proper date for an account calendar event', () => {
     window.ENV = {}
     const apiResponse = makeApiResponse({
@@ -661,7 +691,7 @@ describe('transformApiToInternalItem', () => {
     expect(() => transformApiToInternalItem({}, [])).toThrow()
   })
 
-  it('copes with a non-existent (e.g. concluded) course', () => {
+  it('uses context_name from API response when course is not in local courses array', () => {
     const apiResponse = makeApiResponse({
       course_id: 999,
       plannable_type: 'planner_note',
@@ -678,8 +708,35 @@ describe('transformApiToInternalItem', () => {
     expect(result.id).toBe(10)
     expect(result.uniqueId).toBe('planner_note-10')
     expect(result.course_id).toBe(999)
-    expect(result.context).toBeUndefined() // No course found with id 999
+    expect(result.context).toEqual({
+      type: 'Course',
+      id: 999,
+      title: 'course name for course id 999',
+      image_url: 'https://example.com/course/999/image',
+      color: undefined,
+      url: undefined,
+    })
     expect(result.completed).toBe(false)
+  })
+
+  it('returns undefined context when course is not in local array and no context_name in API response', () => {
+    const apiResponse = {
+      plannable_id: '10',
+      context_type: 'Course',
+      course_id: 999,
+      planner_override: null,
+      plannable_type: 'planner_note',
+      plannable: makePlannerNote({course_id: 999}),
+      submissions: false,
+      new_activity: false,
+      plannable_date: '2018-03-27T18:58:51Z',
+    }
+
+    const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+
+    expect(result.type).toBe('To Do')
+    expect(result.course_id).toBe(999)
+    expect(result.context).toBeUndefined()
   })
 
   it('handles account-level group items', () => {
@@ -915,6 +972,32 @@ describe('transformInternalToApiOverride', () => {
       plannable_type: 'discussion_topic',
       user_id: '1',
       marked_complete: false,
+    })
+  })
+
+  it('correctly maps all item types to API types', () => {
+    const typeMap = [
+      {internal: 'Quiz', api: 'quiz'},
+      {internal: 'Discussion', api: 'discussion_topic'},
+      {internal: 'Assignment', api: 'assignment'},
+      {internal: 'Discussion Checkpoint', api: 'sub_assignment'},
+      {internal: 'Page', api: 'wiki_page'},
+      {internal: 'Announcement', api: 'announcement'},
+      {internal: 'To Do', api: 'planner_note'},
+      {internal: 'Calendar Event', api: 'calendar_event'},
+      {internal: 'Peer Review', api: 'assessment_request'},
+    ]
+
+    typeMap.forEach(({internal, api}) => {
+      const internalItem = {
+        id: '42',
+        overrideId: null,
+        type: internal,
+        overrideAssignId: null,
+        completed: false,
+      }
+      const result = transformInternalToApiOverride(internalItem, '1')
+      expect(result.plannable_type).toBe(api)
     })
   })
 })

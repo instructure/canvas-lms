@@ -149,7 +149,7 @@ describe('Account Course User Search Reducer', () => {
           },
         ],
         xhr: {
-          getResponseHeader: jest.fn().mockReturnValue(LinkHeader),
+          getResponseHeader: vi.fn().mockReturnValue(LinkHeader),
         },
       },
     }
@@ -326,6 +326,28 @@ describe('Account Course User Search Reducer', () => {
 
     const newState = reducer(initialState, action)
     expect(newState.userList.isLoading).toBe(true)
+    expect(newState.userList.errors.requestFailed).toBe(false)
+  })
+
+  test('FAILED_USER_LOAD action reducer', () => {
+    const initialState = {
+      userList: {
+        users: [{id: '1', name: 'someuser'}],
+        isLoading: true,
+        errors: {},
+        links: undefined,
+        searchFilter: {search_term: ''},
+        permissions: [],
+        accountId: '123',
+      },
+    }
+
+    const action = {type: 'FAILED_USER_LOAD'}
+
+    const newState = reducer(initialState, action)
+    expect(newState.userList.isLoading).toBe(false)
+    expect(newState.userList.errors.requestFailed).toBe(true)
+    expect(newState.userList.users).toEqual([])
   })
 
   test('SELECT_TAB action reducer', () => {

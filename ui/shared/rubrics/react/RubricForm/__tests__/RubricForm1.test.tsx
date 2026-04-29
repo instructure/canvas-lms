@@ -16,43 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
-import {queryClient} from '@canvas/query'
-import {MockedQueryProvider} from '@canvas/test-utils/query'
+import {fireEvent, render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {RubricForm, type RubricFormComponentProp} from '../index'
 import {RUBRIC_CRITERIA_IGNORED_FOR_SCORING, RUBRICS_QUERY_RESPONSE} from './fixtures'
-import * as RubricFormQueries from '../queries/RubricFormQueries'
-import * as ProgressHelpers from '@canvas/progress/ProgressHelpers'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import {WarningModal} from '../components/WarningModal'
-import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer as destroyFlashAlertContainer} from '@instructure/platform-alerts'
 import {reorderRatingsAtIndex} from '../../utils'
 
-jest.mock('../queries/RubricFormQueries', () => ({
-  ...jest.requireActual('../queries/RubricFormQueries'),
-  saveRubric: jest.fn(),
-  generateCriteria: jest.fn(),
-}))
+vi.mock('../queries/RubricFormQueries', async importOriginal => {
+  const actual = await importOriginal<typeof import('../queries/RubricFormQueries')>()
+  return {
+    ...actual,
+    saveRubric: vi.fn(),
+  }
+})
 
-jest.mock('@canvas/progress/ProgressHelpers', () => ({
-  monitorProgress: jest.fn(),
+vi.mock('@canvas/progress/ProgressHelpers', () => ({
+  monitorProgress: vi.fn(),
 }))
-
-const mockCriteria = [
-  {
-    id: '1',
-    description: 'Generated Criterion 1',
-    points: 20,
-    ratings: [],
-    longDescription: '',
-    outcome: undefined,
-    learningOutcomeId: undefined,
-    ignoreForScoring: false,
-    criterionUseRange: false,
-    masteryPoints: 0,
-  },
-]
 
 const ROOT_OUTCOME_GROUP = {
   id: '1',
@@ -68,22 +53,34 @@ const ROOT_OUTCOME_GROUP = {
   url: 'https://example.com/root',
 }
 
+let queryClient: QueryClient
+
 describe('RubricForm Tests', () => {
   beforeEach(() => {
     window.ENV = {
       ...window.ENV,
       context_asset_string: 'user_1',
     }
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          staleTime: Infinity,
+          refetchOnMount: false,
+        },
+      },
+    })
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    queryClient.clear()
+    vi.resetAllMocks()
     destroyFlashAlertContainer()
   })
 
   const renderComponent = (props?: Partial<RubricFormComponentProp>) => {
     return render(
-      <MockedQueryProvider>
+      <MockedQueryClientProvider client={queryClient}>
         <RubricForm
           rootOutcomeGroup={ROOT_OUTCOME_GROUP}
           criterionUseRangeEnabled={false}
@@ -95,20 +92,15 @@ describe('RubricForm Tests', () => {
           aiRubricsEnabled={false}
           {...props}
         />
-      </MockedQueryProvider>,
+      </MockedQueryClientProvider>,
     )
   }
 
-  const getSRAlert = () => document.querySelector('#flash_screenreader_holder')?.textContent
-
   describe('without rubricId', () => {
     it('loads rubric data and populates appropriate fields', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
-
       const {getByTestId, getByText} = renderComponent()
       expect(getByText('Create New Rubric')).toBeInTheDocument()
       expect(getByTestId('rubric-form-title')).toHaveValue('')
-      // expect(getByTestId('rubric-hide-points-select')).toBeInTheDocument()
       expect(getByTestId('rubric-rating-order-select')).toBeInTheDocument()
       expect(getByTestId('save-as-draft-button')).toBeInTheDocument()
     })
@@ -116,11 +108,11 @@ describe('RubricForm Tests', () => {
 
   describe('with rubricId', () => {
     afterEach(() => {
-      jest.resetAllMocks()
+      vi.resetAllMocks()
     })
 
     it('loads rubric data and populates appropriate fields', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {getByTestId} = renderComponent({rubricId: '1'})
       expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
@@ -129,7 +121,7 @@ describe('RubricForm Tests', () => {
 
   describe('rubric criteria', () => {
     it('renders all criteria rows for a rubric', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
@@ -141,11 +133,11 @@ describe('RubricForm Tests', () => {
       const criteriaRowPoints = queryAllByTestId('rubric-criteria-row-points')
       const criteriaRowIndexes = queryAllByTestId('rubric-criteria-row-index')
       expect(criteriaRows).toHaveLength(2)
-      expect(criteriaRowDescriptions[0]).toHaveTextContent(criteria[0].description)
-      expect(criteriaRowDescriptions[1]).toHaveTextContent(criteria[1].longDescription ?? '')
-      expect(criteriaRowLongDescriptions[0]).toHaveTextContent(criteria[0].longDescription ?? '')
-      expect(criteriaRowPoints[0]).toHaveTextContent(criteria[0].points.toString())
-      expect(criteriaRowPoints[1]).toHaveTextContent(criteria[1].points.toString())
+      expect(criteriaRowDescriptions[0]).toHaveTextContent(criteria[0]?.description ?? '')
+      expect(criteriaRowDescriptions[1]).toHaveTextContent(criteria[1]?.longDescription ?? '')
+      expect(criteriaRowLongDescriptions[0]).toHaveTextContent(criteria[0]?.longDescription ?? '')
+      expect(criteriaRowPoints[0]).toHaveTextContent(criteria[0]?.points?.toString() ?? '')
+      expect(criteriaRowPoints[1]).toHaveTextContent(criteria[1]?.points?.toString() ?? '')
       expect(criteriaRowIndexes[0]).toHaveTextContent('1.')
       expect(criteriaRowIndexes[1]).toHaveTextContent('2')
       expect(criteriaRowThresholds).toHaveLength(1)
@@ -153,7 +145,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('renders the criteria rows without pill if is ignore for scoring', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRIC_CRITERIA_IGNORED_FOR_SCORING)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRIC_CRITERIA_IGNORED_FOR_SCORING)
 
       const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const criteriaRows = queryAllByTestId('rubric-criteria-row')
@@ -163,8 +155,23 @@ describe('RubricForm Tests', () => {
       expect(criteriaRowPoints).toHaveLength(0)
     })
 
+    it('renders drag handles with aria-label for each criterion', () => {
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
+
+      const {criteria = []} = RUBRICS_QUERY_RESPONSE
+      const {queryAllByTestId} = renderComponent({rubricId: '1'})
+
+      const dragHandles = queryAllByTestId('rubric-criteria-row-drag-handle')
+      expect(dragHandles).toHaveLength(criteria.length)
+      expect(dragHandles[0]).toHaveAttribute(
+        'aria-label',
+        `Reorder ${criteria[0]?.description} Criterion`,
+      )
+      expect(dragHandles[0]).toHaveAttribute('role', 'button')
+    })
+
     it('renders the criterion ratings accordion button', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
@@ -172,15 +179,15 @@ describe('RubricForm Tests', () => {
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
       expect(ratingScaleAccordion).toHaveLength(2)
       expect(ratingScaleAccordion[0]).toHaveTextContent(
-        `Rating Scale: ${criteria[0].ratings.length}`,
+        `Rating Scale: ${criteria[0]?.ratings?.length ?? 0}`,
       )
       expect(ratingScaleAccordion[1]).toHaveTextContent(
-        `Rating Scale: ${criteria[0].ratings.length}`,
+        `Rating Scale: ${criteria[1]?.ratings?.length ?? 0}`,
       )
     })
 
     it('renders the criterion ratings accordion items when button is clicked', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {criteria = []} = RUBRICS_QUERY_RESPONSE
 
@@ -188,11 +195,11 @@ describe('RubricForm Tests', () => {
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
       fireEvent.click(ratingScaleAccordion[0])
       const ratingScaleAccordionItems = queryAllByTestId('rating-scale-accordion-item')
-      expect(ratingScaleAccordionItems).toHaveLength(criteria[0].ratings.length)
+      expect(ratingScaleAccordionItems).toHaveLength(criteria[0]?.ratings?.length ?? 0)
     })
 
     it('does not render the criterion ratings accordion items when accordion is closed', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
@@ -287,19 +294,24 @@ describe('RubricForm Tests', () => {
     })
 
     it('renders a lock icon with a tooltip next to the outcome name', async () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
-      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+      const {queryAllByTestId, getByTestId, getByText} = renderComponent({rubricId: '1'})
 
       const outcomeLockIcons = queryAllByTestId(/^outcome-lock-icon/)
       expect(outcomeLockIcons).toHaveLength(1)
 
-      expect(getByTestId('outcome-lock-icon-2')).toBeInTheDocument()
+      const lockIcon = getByTestId('outcome-lock-icon-2')
+      expect(lockIcon).toBeInTheDocument()
+
+      // Find the tooltip by its text content
+      const outcomeTooltip = getByText("An outcome can't be edited")
+      expect(outcomeTooltip).toBeInTheDocument()
     })
 
     describe('freeFormCriterionComments', () => {
       it('does not render accordion when rubric is free form comments', () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], {
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], {
           ...RUBRICS_QUERY_RESPONSE,
           freeFormCriterionComments: true,
         })
@@ -337,11 +349,11 @@ describe('RubricForm Tests', () => {
             },
           },
         }
-        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
+        vi.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
           // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText, queryAllByTestId} = renderComponent()
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
@@ -376,11 +388,11 @@ describe('RubricForm Tests', () => {
             },
           },
         }
-        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
+        vi.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
           // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText, queryAllByTestId} = renderComponent()
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
@@ -405,11 +417,11 @@ describe('RubricForm Tests', () => {
             },
           },
         }
-        jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
+        vi.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
           // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
         const {getByTestId, getByText, getAllByText} = renderComponent()
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
@@ -422,7 +434,7 @@ describe('RubricForm Tests', () => {
 
     describe('criterion modal', () => {
       it('opens the criterion modal when the add criterion button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
         expect(queryByTestId('rubric-criterion-modal')).toBeNull()
@@ -433,7 +445,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('does not save new criterion when the cancel button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         fireEvent.click(getByTestId('add-criterion-button'))
@@ -447,7 +459,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('saves new criterion when the save button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
@@ -466,7 +478,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('updates existing criterion when the save button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
@@ -485,7 +497,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('does not update existing criterion when the cancel button is clicked', async () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
         expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
@@ -505,407 +517,33 @@ describe('RubricForm Tests', () => {
     })
   })
 
-  describe('generate criteria form', () => {
-    it('shows the generate criteria form when aiRubricsEnabled is true and there is an assignmentId', () => {
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      expect(getByTestId('generate-criteria-form')).toBeInTheDocument()
-      expect(getByTestId('grade-level-input')).toHaveValue('Higher Education')
-      expect(getByTestId('criteria-count-input')).toHaveValue('5')
-      expect(getByTestId('rating-count-input')).toHaveValue('4')
-      expect(getByTestId('points-per-criterion-input')).toHaveValue('20')
-      expect(getByTestId('additional-prompt-info-input')).toBeInTheDocument()
+  describe('assessed rubrics', () => {
+    afterEach(() => {
+      vi.resetAllMocks()
     })
 
-    it('does not show the form when aiRubricsEnabled is false', () => {
-      const {queryByTestId} = renderComponent({
-        aiRubricsEnabled: false,
-        assignmentId: '1',
-      })
+    it('renders appropriate info alert when rubric is assessed', () => {
+      const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, unassessed: false}
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], rubricQueryResponse)
 
-      expect(queryByTestId('generate-criteria-form')).not.toBeInTheDocument()
-    })
-
-    it('does not show the form when there is no assignmentId', () => {
-      const {queryByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-      })
-
-      expect(queryByTestId('generate-criteria-form')).not.toBeInTheDocument()
-    })
-
-    it('validates points per criterion input', async () => {
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      const pointsInput = getByTestId('points-per-criterion-input')
-      fireEvent.change(pointsInput, {target: {value: '-1'}})
-
-      const generateButton = getByTestId('generate-criteria-button')
-      fireEvent.click(generateButton)
-
-      expect(RubricFormQueries.generateCriteria as jest.Mock).not.toHaveBeenCalled()
-      expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
-        'Points per criterion must be a valid number',
-      )
-    })
-
-    it('validates additional prompt info length', async () => {
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      const longText = 'a'.repeat(1001)
-      const additionalPromptInput = getByTestId('additional-prompt-info-input')
-      fireEvent.change(additionalPromptInput, {target: {value: longText}})
-
-      expect(getByTestId('generate-criteria-button')).toBeDisabled()
-      const form = getByTestId('generate-criteria-form')
-      expect(form).toHaveTextContent(
-        'Additional prompt information must be less than 1000 characters',
-      )
-    })
-
-    it('calls generateCriteria with correct parameters when generate button is clicked', async () => {
-      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
-      generateCriteriaMock.mockResolvedValue({
-        id: 1,
-        workflow_state: 'running',
-      })
-
-      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
-      progressUpdateMock.mockImplementation(
-        (
-          progressId: string,
-          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
-          _onFetchError: (error: Error) => void,
-        ) => {
-          setCurrentProgress({
-            id: progressId,
-            workflow_state: 'completed',
-            message: null,
-            completion: 100,
-            results: {criteria: mockCriteria},
-          })
-        },
-      )
-
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      const generateButton = getByTestId('generate-criteria-button')
-      fireEvent.click(generateButton)
-
-      await new Promise(resolve => setTimeout(resolve, 100))
-
-      expect(generateCriteriaMock).toHaveBeenCalledWith('1', '1', {
-        criteriaCount: 5,
-        ratingCount: 4,
-        pointsPerCriterion: '20',
-        useRange: false,
-        additionalPromptInfo: '',
-        gradeLevel: 'higher-ed',
-      })
-      expect(getByTestId('rubric-criteria-container')).toHaveTextContent('Generated Criterion 1')
-    })
-
-    it('renders the ai icon for generated criteria', async () => {
-      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
-      generateCriteriaMock.mockResolvedValue({
-        id: 1,
-        workflow_state: 'running',
-        message: null,
-        completion: 1,
-      })
-
-      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
-      progressUpdateMock.mockImplementation(
-        (
-          progressId: string,
-          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
-          _onFetchError: (error: Error) => void,
-        ) => {
-          setCurrentProgress({
-            id: progressId,
-            workflow_state: 'completed',
-            message: null,
-            completion: 100,
-            results: {criteria: mockCriteria},
-          })
-        },
-      )
-
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      const generateButton = getByTestId('generate-criteria-button')
-      fireEvent.click(generateButton)
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-
-      const criteriaRows = getByTestId('rubric-criteria-container')
-      expect(
-        criteriaRows.querySelector('[data-testid="rubric-criteria-row-ai-icon"]'),
-      ).toBeInTheDocument()
-    })
-
-    it('shows error when generateCriteria fails', async () => {
-      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
-      generateCriteriaMock.mockRejectedValueOnce(new Error('Failed to generate'))
-
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      const generateButton = getByTestId('generate-criteria-button')
-      fireEvent.click(generateButton)
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-
-      expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
-        'Failed to generate criteria',
-      )
-    })
-
-    it('shows error when progress fails', async () => {
-      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
-      generateCriteriaMock.mockResolvedValue({
-        id: 1,
-        workflow_state: 'running',
-        message: null,
-        completion: 1,
-      })
-
-      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
-      progressUpdateMock.mockImplementation(
-        (
-          progressId: string,
-          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
-          _onFetchError: (error: Error) => void,
-        ) => {
-          setCurrentProgress({
-            id: progressId,
-            workflow_state: 'failed',
-            message: null,
-            completion: 1,
-            results: undefined,
-          })
-        },
-      )
-
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      const generateButton = getByTestId('generate-criteria-button')
-      fireEvent.click(generateButton)
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-
-      expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
-        'Failed to generate criteria',
-      )
-    })
-
-    it('shows error when progress errors', async () => {
-      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
-      generateCriteriaMock.mockResolvedValue({
-        id: 1,
-        workflow_state: 'running',
-        message: null,
-        completion: 1,
-      })
-
-      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
-      progressUpdateMock.mockImplementation(
-        (
-          _progressId: string,
-          _setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
-          onFetchError: (error: Error) => void,
-        ) => {
-          onFetchError(new Error('Failed to generate'))
-        },
-      )
-
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      const generateButton = getByTestId('generate-criteria-button')
-      fireEvent.click(generateButton)
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-
-      expect(document.querySelector('#flashalert_message_holder')).toHaveTextContent(
-        'Failed to generate criteria',
-      )
-    })
-
-    it('shows the feedback link after criteria are generated', async () => {
-      window.ENV = {
-        ...window.ENV,
-        AI_FEEDBACK_LINK: 'https://example.com/feedback',
-      }
-
-      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
-      generateCriteriaMock.mockResolvedValue({
-        id: 1,
-        workflow_state: 'running',
-        message: null,
-        completion: 1,
-      })
-
-      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
-      progressUpdateMock.mockImplementation(
-        (
-          progressId: string,
-          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
-          _onFetchError: (error: Error) => void,
-        ) => {
-          setCurrentProgress({
-            id: progressId,
-            workflow_state: 'completed',
-            message: null,
-            completion: 100,
-            results: {criteria: mockCriteria},
-          })
-        },
-      )
-
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      const generateButton = getByTestId('generate-criteria-button')
-      fireEvent.click(generateButton)
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-
-      expect(getByTestId('give-feedback-link')).toHaveTextContent('Give Feedback')
-    })
-
-    it('disables generate button when progress is running', async () => {
-      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
-      generateCriteriaMock.mockResolvedValue({
-        id: 1,
-        workflow_state: 'running',
-      })
-
-      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
-      progressUpdateMock.mockImplementation(
-        (
-          progressId: string,
-          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
-        ) => {
-          setCurrentProgress({
-            id: progressId,
-            workflow_state: 'running',
-            message: null,
-            completion: 50,
-            results: undefined,
-          })
-        },
-      )
-
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      const generateButton = getByTestId('generate-criteria-button')
-      fireEvent.click(generateButton)
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-
-      // Button should be disabled while progress is running
-      expect(generateButton).toBeDisabled()
-    })
-
-    it('enables generate button when progress fails', async () => {
-      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
-      generateCriteriaMock.mockResolvedValue({
-        id: 1,
-        workflow_state: 'running',
-      })
-
-      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
-      progressUpdateMock.mockImplementation(
-        (
-          progressId: string,
-          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
-        ) => {
-          setCurrentProgress({
-            id: progressId,
-            workflow_state: 'failed',
-            message: null,
-            completion: 100,
-            results: undefined,
-          })
-        },
-      )
-
-      const {getByTestId} = renderComponent({
-        aiRubricsEnabled: true,
-        assignmentId: '1',
-        courseId: '1',
-      })
-
-      const generateButton = getByTestId('generate-criteria-button')
-      fireEvent.click(generateButton)
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-
-      // Button should be enabled when progress fails
-      expect(generateButton).not.toBeDisabled()
+      const {queryByTestId} = renderComponent({rubricId: '1'})
+      expect(queryByTestId('rubric-limited-edit-mode-alert')).toBeInTheDocument()
     })
   })
 
-  describe('assessed rubrics', () => {
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
+  describe('cannot update rubric', () => {
+    it('renders appropriate info alert when rubric is assessed', () => {
+      const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, canUpdateRubric: false}
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], rubricQueryResponse)
 
-    it('only renders text inputs for an assessed rubric', () => {
-      const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, unassessed: false}
-      queryClient.setQueryData(['fetch-rubric', '1'], rubricQueryResponse)
-
-      const {getByTestId, queryByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
-      expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
-      // expect(queryByTestId('rubric-hide-points-select')).toBeNull()
-      expect(queryByTestId('rubric-rating-order-select')).toBeNull()
-      expect(queryByTestId('add-criterion-button')).toBeNull()
-      expect(queryAllByTestId('rubric-criteria-row-delete-button')).toHaveLength(0)
-      expect(queryAllByTestId('rubric-criteria-row-duplicate-button')).toHaveLength(0)
+      const {queryByTestId} = renderComponent({rubricId: '1'})
+      expect(queryByTestId('rubric-cannot-update-alert')).toBeInTheDocument()
     })
   })
 
   describe('rubric assessment options', () => {
     it('renders the rubric assessment options', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {getByTestId} = renderComponent({rubricId: '1'})
       expect(getByTestId('rubric-rating-scoring-type-select')).toBeInTheDocument()
@@ -913,7 +551,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('does not display options when showAdditionalOptions is set to false', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {queryByTestId} = renderComponent({rubricId: '1', showAdditionalOptions: false})
 
@@ -950,7 +588,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('hides hideScoreTotal checkbox when useForGrading checkbox checked', () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryByTestId} = renderComponent({rubricId: '1', assignmentId: '1'})
 
@@ -961,7 +599,7 @@ describe('RubricForm Tests', () => {
       })
 
       it('hides use useForGrading and hideScoreTotal checkboxes when scoring type is unscored', () => {
-        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+        queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
 
@@ -975,7 +613,7 @@ describe('RubricForm Tests', () => {
     })
 
     it('hides points when scoring type is set to unscored', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
 
       const {getByTestId, queryByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
 
@@ -988,12 +626,117 @@ describe('RubricForm Tests', () => {
     })
   })
 
+  describe('Accessibility: Criteria Reordering', () => {
+    it('should display a move up menu option for criteria rows', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      expect(criterionPopovers.length).toBeGreaterThan(0)
+
+      await user.click(criterionPopovers[1])
+
+      await waitFor(() => {
+        expect(queryByTestId('move-up-criterion-menu-item')).not.toBeNull()
+      })
+    })
+
+    it('should display a move down menu option for criteria rows', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      expect(criterionPopovers.length).toBeGreaterThan(0)
+
+      await user.click(criterionPopovers[0])
+
+      await waitFor(() => {
+        expect(queryByTestId('move-down-criterion-menu-item')).not.toBeNull()
+      })
+    })
+
+    it('should move a criterion up when move up is clicked', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionDescriptionsBefore = queryAllByTestId('rubric-criteria-row-description')
+      const secondCriterionBefore = criterionDescriptionsBefore[1].textContent
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      await user.click(criterionPopovers[1])
+
+      await waitFor(() => {
+        expect(getByTestId('move-up-criterion-menu-item')).toBeInTheDocument()
+      })
+
+      await user.click(getByTestId('move-up-criterion-menu-item'))
+
+      const criterionDescriptionsAfter = queryAllByTestId('rubric-criteria-row-description')
+      expect(criterionDescriptionsAfter[0].textContent).toEqual(secondCriterionBefore)
+    })
+
+    it('should move a criterion down when move down is clicked', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionDescriptionsBefore = queryAllByTestId('rubric-criteria-row-description')
+      const firstCriterionBefore = criterionDescriptionsBefore[0].textContent
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      await user.click(criterionPopovers[0])
+
+      await waitFor(() => {
+        expect(getByTestId('move-down-criterion-menu-item')).toBeInTheDocument()
+      })
+
+      await user.click(getByTestId('move-down-criterion-menu-item'))
+
+      const criterionDescriptionsAfter = queryAllByTestId('rubric-criteria-row-description')
+      expect(criterionDescriptionsAfter[1].textContent).toEqual(firstCriterionBefore)
+    })
+
+    it('should disable move up for the first criterion', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      await user.click(criterionPopovers[0])
+
+      await waitFor(() => {
+        const moveUpItem = getByTestId('move-up-criterion-menu-item')
+        expect(moveUpItem).toBeInTheDocument()
+        expect(moveUpItem.closest('button')).toHaveAttribute('aria-disabled', 'true')
+      })
+    })
+
+    it('should disable move down for the last criterion', async () => {
+      const user = userEvent.setup()
+      queryClient.setQueryData(['fetch-rubric', '1', '1', ''], RUBRICS_QUERY_RESPONSE)
+      const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
+
+      const criterionPopovers = queryAllByTestId('criterion-options-popover')
+      const lastIndex = criterionPopovers.length - 1
+      await user.click(criterionPopovers[lastIndex])
+
+      await waitFor(() => {
+        const moveDownItem = getByTestId('move-down-criterion-menu-item')
+        expect(moveDownItem).toBeInTheDocument()
+        expect(moveDownItem.closest('button')).toHaveAttribute('aria-disabled', 'true')
+      })
+    })
+  })
+
   describe('WarningModal', () => {
-    const onDismissMock = jest.fn()
-    const onCancelMock = jest.fn()
+    const onDismissMock = vi.fn()
+    const onCancelMock = vi.fn()
 
     beforeEach(() => {
-      jest.clearAllMocks()
+      vi.clearAllMocks()
     })
 
     it('renders correctly when open', () => {

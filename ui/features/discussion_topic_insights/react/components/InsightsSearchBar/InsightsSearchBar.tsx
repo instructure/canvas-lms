@@ -88,7 +88,7 @@ const InsightsSearchBar: React.FC<InsightsSearchBarProps> = ({onSearch, debounce
     <View as="div">
       <TextInput
         renderLabel={<ScreenReaderContent>Search</ScreenReaderContent>}
-        placeholder={I18n.t('Search...')}
+        placeholder={I18n.t('Search students...')}
         value={value}
         onChange={e => handleChange(e.target.value)}
         data-testid="discussion-insights-search-bar"

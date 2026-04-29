@@ -63,7 +63,7 @@ describe('AssessmentAuditTray', () => {
     document.body.appendChild(container)
 
     api = new Api()
-    jest.spyOn(api, 'loadAssessmentAuditTrail').mockImplementation(
+    vi.spyOn(api, 'loadAssessmentAuditTrail').mockImplementation(
       () =>
         new Promise(resolve => {
           onEntered = resolve
@@ -71,7 +71,7 @@ describe('AssessmentAuditTray', () => {
     )
 
     context = {...defaultContext}
-    onExited = jest.fn()
+    onExited = vi.fn()
   })
 
   afterEach(() => {

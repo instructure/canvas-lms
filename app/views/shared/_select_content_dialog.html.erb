@@ -29,7 +29,7 @@
   newquizzes_engine_selected = @context.horizon_course? ? 'true' : newquizzes_engine_selected
   module_links_default_new_tab = @current_user&.get_preference(:module_links_default_new_tab)
 %>
-<% js_env :NEW_QUIZZES_BY_DEFAULT => new_quizzes_by_default %>
+<% js_env({ NEW_QUIZZES_BY_DEFAULT: new_quizzes_by_default }) %>
 <% cache([@context, 'select_context_content_dialog_1', only].cache_key) do %>
   <div id="select_context_content_dialog" style="display: none;">
     <div style="margin-bottom: 5px; <%= hidden if only && only.size == 1 %>">
@@ -109,7 +109,7 @@
       <% end %>
       <% if !only || only.include?(:external_tools) %>
       <div id="context_external_tools_select" class="module_item_option">
-        <div style="font-size: 0.8em;" tabindex="0" role="alert">
+        <div style="font-size: 0.8em;" role="alert">
           <i class="icon-link"></i>
           <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
@@ -238,7 +238,7 @@
             <option value="new"><%= t :create_quiz_option, "[ Create Quiz ]" %></option>
           <% end %>
           <% @combined_active_quizzes.each do |id, title, type| %>
-            <% option_text = "#{title} #{t :classic_quiz_identifier, '(classic)' if @combined_active_quizzes_includes_both_types && type == 'quiz'}" %>
+            <% option_text = @combined_active_quizzes_includes_both_types && type == 'quiz' ? "#{title} #{t :classic_quiz_identifier, '(classic)'}" : title %>
             <option value="<%= type + '_' + id.to_s %>"><%= option_text %></option>
           <% end %>
         </select>
@@ -270,7 +270,18 @@
             <tr>
               <td><%= before_label :quiz_name, "Quiz Name" %></td>
               <td><input type="text" name="quiz[title]" class="item_title" aria-label="<%= before_label :quiz_name, "Quiz Name" %>"/></td>
-            </tr><tr>
+            </tr>
+            <% if new_quizzes_enabled %>
+              <tr id="quiz_type_selector_row" style="display: none;">
+                <td style="vertical-align: top; text-align: left;"><%= before_label :quiz_type, "Quiz Type" %></td>
+                <td><div id="quiz_type_selector_mount_point"></div></td>
+              </tr>
+              <tr id="anonymous_submission_selector_row" style="display: none;">
+                <td style="vertical-align: top; text-align: left; width: 80px;"><%= before_label :anonymous_submission, "Anonymous Submission" %></td>
+                <td><div id="anonymous_submission_selector_mount_point"></div></td>
+              </tr>
+            <% end %>
+            <tr>
               <td><%= before_label :quiz_group, "Group" %></td>
               <td>
                 <select name="quiz[assignment_group_id]" aria-label="<%= before_label :quiz_group, "Group" %>">

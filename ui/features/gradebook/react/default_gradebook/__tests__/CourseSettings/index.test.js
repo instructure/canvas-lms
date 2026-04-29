@@ -68,7 +68,7 @@ describe('Gradebook CourseSettings', () => {
   describe('#handleUpdated()', () => {
     beforeEach(() => {
       buildGradebook()
-      jest.spyOn(gradebook, 'updateColumns')
+      vi.spyOn(gradebook, 'updateColumns')
     })
 
     describe('when "allow final grade override" becomes enabled', () => {

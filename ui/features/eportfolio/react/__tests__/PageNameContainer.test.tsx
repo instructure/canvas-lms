@@ -22,16 +22,16 @@ import PageNameContainer from '../PageNameContainer'
 import userEvent from '@testing-library/user-event'
 
 describe('PageNameContainer', () => {
-  const onSave = jest.fn()
-  const onCancel = jest.fn()
+  const onSave = vi.fn()
+  const onCancel = vi.fn()
 
   const props = {
     pageName: 'Page Name',
-    onPreview: jest.fn(),
+    onPreview: vi.fn(),
     onSave,
     onCancel,
-    onKeepEditing: jest.fn(),
-    setHidden: jest.fn(),
+    onKeepEditing: vi.fn(),
+    setHidden: vi.fn(),
   }
 
   const renderComponent = () => {
@@ -47,7 +47,7 @@ describe('PageNameContainer', () => {
   }
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders correct buttons and input if in preview', () => {

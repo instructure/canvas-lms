@@ -1,0 +1,34 @@
+# to use this add docker-compose.localstack.yml
+# to your COMPOSE_FILE var in .env
+
+services:
+  web:
+    depends_on:
+      - localstack
+
+  localstack:
+    image: localstack/localstack:4.3
+    container_name: canvas-localstack
+    ports:
+      - '4566:4566'
+    environment:
+      - SERVICES=events
+      - DEBUG=1
+      - TMPDIR=/var/lib/localstack
+      - DATA_DIR=/var/lib/localstack
+    volumes:
+      - localstack_data:/var/lib/localstack
+    labels:
+      - traefik.enable=true
+    networks:
+      default:
+        aliases:
+          - canvas-localstack.$INST_DOMAIN
+
+volumes:
+  localstack_data:
+
+networks:
+  default:
+    external: true
+    name: 'inst_shared'

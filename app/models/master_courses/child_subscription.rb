@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class MasterCourses::ChildSubscription < ActiveRecord::Base
+class MasterCourses::ChildSubscription < ApplicationRecord
   # links an associated course to the blueprint (via the master_template)
   # keeps track of the last sync status so future syncs know whether they perform faster selective syncs
   # also links the associated course to child_content_tags to keep track of changes
@@ -48,6 +48,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   include MasterCourses::TagHelper
+
   self.content_tag_association = :child_content_tags
 
   def invalidate_course_cache
@@ -136,7 +137,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   end
 
   def last_migration_id
-    child_course.content_migrations.where(child_subscription_id: self).order("id desc").limit(1).pick(:id)
+    child_course.content_migrations.where(child_subscription_id: self).order(id: :desc).limit(1).pick(:id)
   end
 
   def set_root_account_id

@@ -21,11 +21,12 @@ import './jquery/index'
 import '@canvas/user-sortable-name'
 import './jquery/communication_channels'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import GeneratePairingCode from '@canvas/generate-pairing-code'
 import ready from '@instructure/ready'
 import FeatureFlags from '@canvas/feature-flags'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
+import AvatarModal from '@canvas/avatar-dialog-view/react/AvatarModal'
 
 ready(() => {
   const hiddenFlags = []
@@ -37,13 +38,25 @@ ready(() => {
 
   const featureFlagContainer = document.querySelector('.feature-flag-wrapper') // there is only one of these
   if (featureFlagContainer) {
-    const ffRoot = createRoot(featureFlagContainer)
-    ffRoot.render(<FeatureFlags hiddenFlags={hiddenFlags} disableDefaults={true} />)
+    render(<FeatureFlags hiddenFlags={hiddenFlags} disableDefaults={true} />, featureFlagContainer, {sync: true})
   }
 
   const pairingCodeContainer = document.querySelector('#pairing-code')
   if (pairingCodeContainer) {
-    const pcRoot = createRoot(pairingCodeContainer)
-    pcRoot.render(<GeneratePairingCode userId={ENV.current_user.id} />)
+    render(<GeneratePairingCode userId={ENV.current_user.id} />, pairingCodeContainer, {sync: true})
+  }
+
+  const avatarModalMount = document.getElementById('avatar-modal-mount')
+  const profilePicLink = document.querySelector('#main .profile_pic_link') // don't add event handler to side nav avatar
+  if (profilePicLink && avatarModalMount) {
+    profilePicLink.addEventListener('click', event => {
+      event.preventDefault()
+      let root
+      root = render(
+        <AvatarModal onClose={() => root.unmount()} />,
+        avatarModalMount,
+        {sync: true},
+      )
+    })
   }
 })

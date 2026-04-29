@@ -31,9 +31,9 @@ describe('lti.close handler', () => {
 
   beforeEach(() => {
     responseMessages = {
-      sendUnsupportedSubjectError: jest.fn(),
-      sendError: jest.fn(),
-      sendSuccess: jest.fn(),
+      sendUnsupportedSubjectError: vi.fn(),
+      sendError: vi.fn(),
+      sendSuccess: vi.fn(),
       sendBadRequestError: () => {},
       sendResponse: () => {},
       sendGenericError: () => {},
@@ -65,7 +65,7 @@ describe('lti.close handler', () => {
   })
 
   it('calls callback', () => {
-    callback = jest.fn()
+    callback = vi.fn()
 
     handle()
 
@@ -73,7 +73,7 @@ describe('lti.close handler', () => {
   })
 
   it('sends a success response', () => {
-    callback = jest.fn()
+    callback = vi.fn()
 
     handle()
 

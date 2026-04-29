@@ -39,42 +39,44 @@ describe CalendarEventsApiController, type: :request do
   end
 
   context "events" do
-    expected_fields = %w[
-      all_context_codes
-      all_day
-      all_day_date
-      blackout_date
-      child_events
-      child_events_count
-      comments
-      context_code
-      created_at
-      description
-      duplicates
-      end_at
-      hidden
-      html_url
-      id
-      location_address
-      location_name
-      parent_event_id
-      start_at
-      title
-      type
-      updated_at
-      url
-      workflow_state
-      context_name
-      context_color
-      important_dates
-      series_uuid
-      rrule
-    ]
-    expected_slot_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code])
-    expected_reservation_event_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type])
-    expected_reserved_fields = (expected_slot_fields + ["reserved", "reserve_comments"])
-    expected_reservation_fields = expected_reservation_event_fields - ["child_events"]
-    expected_series_fields = expected_fields + ["series_head", "series_natural_language"]
+    let(:expected_fields) do
+      %w[
+        all_context_codes
+        all_day
+        all_day_date
+        blackout_date
+        child_events
+        child_events_count
+        comments
+        context_code
+        created_at
+        description
+        duplicates
+        end_at
+        hidden
+        html_url
+        id
+        location_address
+        location_name
+        parent_event_id
+        start_at
+        title
+        type
+        updated_at
+        url
+        workflow_state
+        context_name
+        context_color
+        important_dates
+        series_uuid
+        rrule
+      ].freeze
+    end
+    let(:expected_slot_fields) { expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code] }
+    let(:expected_reservation_event_fields) { expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type] }
+    let(:expected_reserved_fields) { expected_slot_fields + ["reserved", "reserve_comments"] }
+    let(:expected_reservation_fields) { expected_reservation_event_fields - ["child_events"] }
+    let(:expected_series_fields) { expected_fields + ["series_head", "series_natural_language"] }
 
     context "returns events" do
       it "when start after and end before the given range dates" do
@@ -642,6 +644,251 @@ describe CalendarEventsApiController, type: :request do
       expect(json.detect { |e| e["id"] == event.child_events.first.id && e["hidden"] == false }).to be_present
     end
 
+    it "does not show section-specific events to students with inactive enrollment in that section" do
+      # Create two sections
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+
+      # Create a student
+      student = user_factory(active_all: true, active_state: "active")
+
+      # Enroll the student in section 1 (active)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "active",
+        course_section: section1,
+        course: @course
+      )
+
+      # Enroll the student in section 2 (inactive)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "inactive",
+        course_section: section2,
+        course: @course
+      )
+
+      # Create an event only for section 2 (where student is inactive)
+      event = @course.calendar_events.build(
+        title: "Section 2 Only Event",
+        child_event_data: {
+          "0" => {
+            start_at: "2012-01-09 12:00:00",
+            end_at: "2012-01-09 13:00:00",
+            context_code: section2.asset_string
+          }
+        }
+      )
+      event.updating_user = @teacher
+      event.save!
+
+      # Create an event for section 1 (where student is active)
+      event_section1 = @course.calendar_events.build(
+        title: "Section 1 Event",
+        child_event_data: {
+          "0" => {
+            start_at: "2012-01-09 12:00:00",
+            end_at: "2012-01-09 13:00:00",
+            context_code: section1.asset_string
+          }
+        }
+      )
+      event_section1.updating_user = @teacher
+      event_section1.save!
+
+      # Make API call as the student
+      json = api_call_as_user(
+        student,
+        :get,
+        "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}",
+        {
+          controller: "calendar_events_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"],
+          start_date: "2012-01-07",
+          end_date: "2012-01-19"
+        }
+      )
+
+      # Student should see the event from section 1 (active enrollment)
+      expect(json.detect { |e| e["id"] == event_section1.child_events.first.id }).to be_present
+
+      # Student should NOT see the event from section 2 (inactive enrollment)
+      expect(json.detect { |e| e["id"] == event.child_events.first.id }).to be_nil
+    end
+
+    it "does not show section-specific events to students with completed enrollment in that section" do
+      # Create two sections
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+
+      # Create a student
+      student = user_factory(active_all: true, active_state: "active")
+
+      # Enroll the student in section 1 (active)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "active",
+        course_section: section1,
+        course: @course
+      )
+
+      # Enroll the student in section 2 (completed/concluded)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "completed",
+        course_section: section2,
+        course: @course
+      )
+
+      # Create an event only for section 2 (where student is concluded)
+      event = @course.calendar_events.build(
+        title: "Section 2 Only Event",
+        child_event_data: {
+          "0" => {
+            start_at: "2012-01-09 12:00:00",
+            end_at: "2012-01-09 13:00:00",
+            context_code: section2.asset_string
+          }
+        }
+      )
+      event.updating_user = @teacher
+      event.save!
+
+      # Make API call as the student
+      json = api_call_as_user(
+        student,
+        :get,
+        "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}",
+        {
+          controller: "calendar_events_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"],
+          start_date: "2012-01-07",
+          end_date: "2012-01-19"
+        }
+      )
+
+      # Student should NOT see the event from section 2 (completed enrollment)
+      expect(json.detect { |e| e["id"] == event.child_events.first.id }).to be_nil
+    end
+
+    it "does not show section-specific events to students with rejected enrollment in that section" do
+      # Create two sections
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+
+      # Create a student
+      student = user_factory(active_all: true, active_state: "active")
+
+      # Enroll the student in section 1 (active)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "active",
+        course_section: section1,
+        course: @course
+      )
+
+      # Enroll the student in section 2 (rejected)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "rejected",
+        course_section: section2,
+        course: @course
+      )
+
+      # Create an event only for section 2 (where student is rejected)
+      event = @course.calendar_events.build(
+        title: "Section 2 Only Event",
+        child_event_data: {
+          "0" => {
+            start_at: "2012-01-09 12:00:00",
+            end_at: "2012-01-09 13:00:00",
+            context_code: section2.asset_string
+          }
+        }
+      )
+      event.updating_user = @teacher
+      event.save!
+
+      # Make API call as the student
+      json = api_call_as_user(
+        student,
+        :get,
+        "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}",
+        {
+          controller: "calendar_events_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"],
+          start_date: "2012-01-07",
+          end_date: "2012-01-19"
+        }
+      )
+
+      # Student should NOT see the event from section 2 (rejected enrollment)
+      expect(json.detect { |e| e["id"] == event.child_events.first.id }).to be_nil
+    end
+
+    it "does not show section-specific events to students with deleted enrollment in that section" do
+      # Create two sections
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+
+      # Create a student
+      student = user_factory(active_all: true, active_state: "active")
+
+      # Enroll the student in section 1 (active)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "active",
+        course_section: section1,
+        course: @course
+      )
+
+      # Enroll the student in section 2 (deleted)
+      StudentEnrollment.create!(
+        user: student,
+        workflow_state: "deleted",
+        course_section: section2,
+        course: @course
+      )
+
+      # Create an event only for section 2 (where student is deleted)
+      event = @course.calendar_events.build(
+        title: "Section 2 Only Event",
+        child_event_data: {
+          "0" => {
+            start_at: "2012-01-09 12:00:00",
+            end_at: "2012-01-09 13:00:00",
+            context_code: section2.asset_string
+          }
+        }
+      )
+      event.updating_user = @teacher
+      event.save!
+
+      # Make API call as the student
+      json = api_call_as_user(
+        student,
+        :get,
+        "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}",
+        {
+          controller: "calendar_events_api",
+          action: "index",
+          format: "json",
+          context_codes: ["course_#{@course.id}"],
+          start_date: "2012-01-07",
+          end_date: "2012-01-19"
+        }
+      )
+
+      # Student should NOT see the event from section 2 (deleted enrollment)
+      expect(json.detect { |e| e["id"] == event.child_events.first.id }).to be_nil
+    end
+
     it "doesn't allow account admins to view events for courses they don't have access to" do
       sub_account1 = Account.default.sub_accounts.create!
       course_with_teacher(active_all: true, account: sub_account1)
@@ -1102,8 +1349,31 @@ describe CalendarEventsApiController, type: :request do
         expect(a2["child_events"]).to be_empty
       end
 
+      it "does not include appointment groups from other courses when context_codes filter is applied" do
+        course1 = course_with_teacher(active_all: true).course
+        teacher = @teacher
+        course2 = course_with_teacher(user: teacher, active_all: true).course
+
+        ag = AppointmentGroup.create!(title: "course1 appointments",
+                                      participants_per_appointment: 4,
+                                      new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]],
+                                      contexts: [course1])
+        ag.publish!
+
+        json = api_call_as_user(teacher, :get, "/api/v1/calendar_events?start_date=2012-01-01&end_date=2012-01-31&context_codes[]=#{course2.asset_string}", {
+                                  controller: "calendar_events_api",
+                                  action: "index",
+                                  format: "json",
+                                  context_codes: [course2.asset_string],
+                                  start_date: "2012-01-01",
+                                  end_date: "2012-01-31"
+                                })
+        ag_ids = json.filter_map { |e| e["appointment_group_id"] }
+        expect(ag_ids).not_to include(ag.id)
+      end
+
       context "reservations" do
-        def prepare(as_student = false)
+        def prepare(as_student: false)
           Notification.create! name: "Appointment Canceled By User", category: "TestImmediately"
 
           if as_student
@@ -1137,7 +1407,7 @@ describe CalendarEventsApiController, type: :request do
         end
 
         context "as a student" do
-          before(:once) { prepare(true) }
+          before(:once) { prepare(as_student: true) }
 
           it "reserves the appointment for @current_user" do
             json = api_call(:post, "/api/v1/calendar_events/#{@event1.id}/reservations", {
@@ -2481,7 +2751,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "apis translate event descriptions" do
       should_translate_user_content(@course) do |content|
-        event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content)
+        event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content, saving_user: @teacher)
         json = api_call(:get,
                         "/api/v1/calendar_events/#{event.id}",
                         controller: "calendar_events_api",
@@ -2493,8 +2763,8 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it "apis translate event descriptions without verifiers" do
-      should_translate_user_content(@course, false) do |content|
-        event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content)
+      should_translate_user_content(@course, include_verifiers: false) do |content|
+        event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content, saving_user: @teacher)
         json = api_call(:get,
                         "/api/v1/calendar_events/#{event.id}",
                         controller: "calendar_events_api",
@@ -2508,8 +2778,8 @@ describe CalendarEventsApiController, type: :request do
 
     it "apis translate event descriptions in ics" do
       allow(HostUrl).to receive(:default_host).and_return("www.example.com")
-      should_translate_user_content(@course, false) do |content|
-        @course.calendar_events.create!(description: content, start_at: 1.hour.from_now, end_at: 2.hours.from_now)
+      should_translate_user_content(@course, include_verifiers: false) do |content|
+        @course.calendar_events.create!(description: content, start_at: 1.hour.from_now, end_at: 2.hours.from_now, saving_user: @teacher)
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}",
                         controller: "courses",
@@ -2951,27 +3221,29 @@ describe CalendarEventsApiController, type: :request do
   end
 
   context "assignments" do
-    expected_fields = %w[
-      all_day
-      all_day_date
-      assignment
-      context_code
-      created_at
-      description
-      end_at
-      html_url
-      id
-      start_at
-      title
-      type
-      updated_at
-      url
-      workflow_state
-      context_name
-      context_color
-      important_dates
-      submission_types
-    ]
+    let(:expected_fields) do
+      %w[
+        all_day
+        all_day_date
+        assignment
+        context_code
+        created_at
+        description
+        end_at
+        html_url
+        id
+        start_at
+        title
+        type
+        updated_at
+        url
+        workflow_state
+        context_name
+        context_color
+        important_dates
+        submission_types
+      ].freeze
+    end
 
     it "returns assignments within the given date range" do
       @course.assignments.create(title: "1", due_at: "2012-01-07 12:00:00")
@@ -3908,21 +4180,6 @@ describe CalendarEventsApiController, type: :request do
           expect(json.first.keys).not_to include("assignment_override")
         end
 
-        it "gets explicit assignment with override info" do
-          skip "not sure what the desired behavior here is"
-          override = assignment_override_model(assignment: @default_assignment,
-                                               set: @course.default_section,
-                                               due_at: Time.zone.parse("2012-01-14 12:00:00"))
-          json = api_call(:get, "/api/v1/calendar_events/assignment_#{@default_assignment.id}", {
-                            controller: "calendar_events_api", action: "show", id: "assignment_#{@default_assignment.id}", format: "json"
-                          })
-          # json.size.should == 2
-          expect(json.slice("id", "override_id", "end_at")).to eql({ "id" => "assignment_#{@default_assignment.id}",
-                                                                     "override_id" => override.id,
-                                                                     "end_at" => "2012-01-14T12:00:00Z" })
-          expect(json.keys).to match_array expected_fields
-        end
-
         context "with sections" do
           before :once do
             @section1 = @course.course_sections.create!(name: "Section A")
@@ -4612,27 +4869,29 @@ describe CalendarEventsApiController, type: :request do
       @checkpoint_2 = create_checkpoint(topic: @topic, type: "reply_to_entry", due_at: "2024-08-02 12:00:00")
     end
 
-    expected_sub_assignment_fields = %w[
-      all_day
-      all_day_date
-      sub_assignment
-      context_code
-      created_at
-      description
-      end_at
-      html_url
-      id
-      start_at
-      title
-      type
-      updated_at
-      url
-      workflow_state
-      context_name
-      context_color
-      important_dates
-      submission_types
-    ]
+    let(:expected_sub_assignment_fields) do
+      %w[
+        all_day
+        all_day_date
+        sub_assignment
+        context_code
+        created_at
+        description
+        end_at
+        html_url
+        id
+        start_at
+        title
+        type
+        updated_at
+        url
+        workflow_state
+        context_name
+        context_color
+        important_dates
+        submission_types
+      ]
+    end
 
     context "discussion_checkpoints feature flag" do
       context "when feature flag is enabled" do
@@ -5381,11 +5640,12 @@ describe CalendarEventsApiController, type: :request do
         <p><img src="/courses/#{@course.id}/files/#{image.id}/preview"></p>
         <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" data-media-id="#{media.media_entry_id}"></iframe></p>
       HTML
-      @event.update(description:)
+      @event.update(description:, saving_user: @teacher)
       @s_event = @event.child_events.create!(
         title: "course event section 1",
         start_at: @time + 1.day,
-        context: @course.course_sections.take
+        context: @course.course_sections.take,
+        saving_user: @teacher
       )
 
       raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.ics", {
@@ -5433,7 +5693,7 @@ describe CalendarEventsApiController, type: :request do
       get "/feeds/calendars/#{@user.feed_code}.ics"
       expect(response).to be_successful
       cal = Icalendar::Calendar.parse(response.body.dup).first
-      all_day_event = (cal.events.select { |e| e.summary.include? "i am all day" }).first
+      all_day_event = cal.events.find { |e| e.summary.include? "i am all day" }
       expect(all_day_event.dtstart).to eq(due_at.to_date)
       expect(all_day_event.dtend).to be_nil
     end
@@ -5919,6 +6179,47 @@ describe CalendarEventsApiController, type: :request do
 
       events = section.calendar_events.for_timetable.to_a
       expect(events.map { |e| { start_at: e.start_at, end_at: e.end_at } }).to match_array(@events)
+    end
+  end
+
+  context "check_restricted_file_access_for_students" do
+    before :once do
+      @student = user_factory(active_all: true, active_state: "active")
+      @course.enroll_student(@student, enrollment_state: "active")
+    end
+
+    it "restricts students from creating calendar events with file attachments in description" do
+      attachment = attachment_model(context: @course, display_name: "restricted_file.pdf")
+      description_with_file = "<p>Event with file: <a href=\"/courses/#{@course.id}/files/#{attachment.id}/preview\">restricted_file.pdf</a></p>"
+
+      api_call_as_user(@student,
+                       :post,
+                       "/api/v1/calendar_events",
+                       { controller: "calendar_events_api", action: "create", format: "json" },
+                       { calendar_event: {
+                         context_code: @course.asset_string,
+                         title: "Event with file",
+                         description: description_with_file
+                       } },
+                       {},
+                       { expected_status: 403 })
+    end
+
+    it "allows teachers to create calendar events with file attachments in description" do
+      attachment = attachment_model(context: @course, display_name: "teacher_file.pdf")
+      description_with_file = "<p>Event with file: <a href=\"/courses/#{@course.id}/files/#{attachment.id}/preview\">teacher_file.pdf</a></p>"
+
+      json = api_call_as_user(@teacher,
+                              :post,
+                              "/api/v1/calendar_events",
+                              { controller: "calendar_events_api", action: "create", format: "json" },
+                              { calendar_event: {
+                                context_code: @course.asset_string,
+                                title: "Teacher Event with file",
+                                description: description_with_file
+                              } })
+      expect(response).to be_successful
+      expect(json["title"]).to eq "Teacher Event with file"
     end
   end
 end

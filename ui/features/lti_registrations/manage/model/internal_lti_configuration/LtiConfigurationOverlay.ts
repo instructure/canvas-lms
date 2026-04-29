@@ -30,6 +30,7 @@ export const ZLtiPlacementOverlay = z.object({
   launch_width: z.string().optional(),
   icon_url: z.string().optional(),
   default: z.enum(['enabled', 'disabled']).optional(),
+  allow_fullscreen: z.boolean().optional(),
 })
 
 export const ZLtiConfigurationOverlay = z.object({
@@ -37,6 +38,7 @@ export const ZLtiConfigurationOverlay = z.object({
   description: z.string().optional(),
   custom_fields: z.record(z.string()).optional(),
   target_link_uri: z.string().optional(),
+  icon_url: z.string().optional(),
   /** @deprecated */
   oidc_initiation_url: z.string().optional(),
   /** @deprecated */

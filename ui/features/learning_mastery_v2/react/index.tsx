@@ -16,20 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState, useCallback, useEffect, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Gradebook} from './components/Gradebook'
-import useRollups from './hooks/useRollups'
 import LMGBContext, {
   getLMGBContext,
   LMGBContextType,
 } from '@canvas/outcomes/react/contexts/LMGBContext'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {showFlashAlert} from '@instructure/platform-alerts'
+import {Gradebook} from './components/Gradebook'
 import {FilterWrapper} from './components/filters/FilterWrapper'
+import {SearchWrapper} from './components/filters/SearchWrapper'
 import {Toolbar} from './components/toolbar/Toolbar'
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {GradebookSettings} from '@canvas/outcomes/react/utils/constants'
+import {
+  DisplayFilter,
+  NameDisplayFormat,
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
+import useRollups from '@canvas/outcomes/react/hooks/useRollups'
+import {useGradebookSettings} from './hooks/useGradebookSettings'
+import {saveLearningMasteryGradebookSettings, saveOutcomeOrder} from './apiClient'
+import {Outcome} from '@canvas/outcomes/react/types/rollup'
+import {useContributingScores} from '@canvas/outcomes/react/hooks/useContributingScores'
+import {StudentAssignmentDetailTray} from './components/trays/StudentAssignmentDetailTray'
+import {useStudentAssignmentTray} from './hooks/useStudentAssignmentTray'
+import {useMasteryDistribution} from './hooks/useMasteryDistribution'
+import {mapSettingsToFilters} from '@canvas/outcomes/react/utils/filter'
+
+const queryClient = new QueryClient()
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -43,77 +62,250 @@ interface LearningMasteryProps {
   courseId: string
 }
 
-const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
-  const contextValues = getLMGBContext() as LMGBContextType
-  const {contextURL, accountLevelMasteryScalesFF} = contextValues.env
+interface LearningMasteryContentProps {
+  courseId: string
+  contextURL: string
+  accountLevelMasteryScalesFF: boolean
+  instuiNavFF?: boolean
+}
+
+const LearningMasteryContent: React.FC<LearningMasteryContentProps> = ({
+  courseId,
+  contextURL,
+  accountLevelMasteryScalesFF,
+  instuiNavFF,
+}) => {
+  const {
+    settings: gradebookSettings,
+    isLoading: isLoadingSettings,
+    updateSettings,
+  } = useGradebookSettings(courseId)
+
+  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([])
 
   const {
-    isLoading,
+    isLoading: isLoadingGradebook,
     error,
     students,
-    outcomes,
+    outcomes: initialOutcomes,
     rollups,
-    gradebookFilters,
-    setGradebookFilters,
     pagination,
     setCurrentPage,
-    setStudentsPerPage,
     sorting,
+    filter,
   } = useRollups({
     courseId,
     accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
+    enabled: !isLoadingSettings,
+    settings: gradebookSettings,
+    selectedUserIds,
   })
 
-  const onGradebookFilterChange = (filterItem: string) => {
-    const filters = new Set(gradebookFilters)
+  const studentAssignmentDetailTray = useStudentAssignmentTray(students)
 
-    if (filters.has(filterItem)) {
-      filters.delete(filterItem)
-    } else {
-      filters.add(filterItem)
-    }
+  const [localOutcomes, setLocalOutcomes] = useState<Outcome[] | null>(null)
+  const outcomes = localOutcomes ?? initialOutcomes
 
-    setGradebookFilters(Array.from(filters))
-  }
+  useEffect(() => {
+    setLocalOutcomes(null)
+  }, [initialOutcomes])
+
+  const {
+    isLoading: isLoadingContributingScores,
+    error: contributingScoresError,
+    contributingScores,
+  } = useContributingScores({
+    enabled: !isLoadingSettings && !isLoadingGradebook,
+    courseId,
+    studentIds: students.map(student => student.id),
+    outcomeIds: outcomes.map(outcome => outcome.id),
+    settings: gradebookSettings,
+  })
+
+  const sortedOutcomeIds = useMemo(
+    () => outcomes.map(outcome => outcome.id.toString()).sort(),
+    [outcomes],
+  )
+
+  const {data: distributionData, isLoading: isLoadingDistribution} = useMasteryDistribution({
+    courseId,
+    filters: mapSettingsToFilters(gradebookSettings),
+    outcomeIds: sortedOutcomeIds,
+    includeAlignments: true,
+    onlyAssignmentAlignments: true,
+    showUnpublishedAssignments: false,
+  })
+
+  const handleGradebookSettingsChange = useCallback(
+    async (settings: GradebookSettings) => {
+      let error = null
+
+      try {
+        const response = await saveLearningMasteryGradebookSettings(courseId, settings)
+
+        if (response.status !== 200) {
+          throw new Error('Failed to save settings')
+        }
+
+        updateSettings(settings)
+
+        // If the "Show students with no results" filter has changed,
+        // reset to the first page to avoid landing on an empty page
+        const showStudentsWithNoResultsChanged =
+          settings.displayFilters.includes(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS) !==
+          gradebookSettings.displayFilters.includes(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)
+        if (showStudentsWithNoResultsChanged) {
+          setCurrentPage(1)
+        }
+      } catch (_) {
+        error = I18n.t('Failed to save settings')
+      }
+
+      return {success: error === null}
+    },
+    [courseId, updateSettings, gradebookSettings.displayFilters, setCurrentPage],
+  )
+
+  const handleNameDisplayFormatChange = useCallback(
+    async (format: NameDisplayFormat) => {
+      const newSettings = {...gradebookSettings, nameDisplayFormat: format}
+      await handleGradebookSettingsChange(newSettings)
+    },
+    [gradebookSettings, handleGradebookSettingsChange],
+  )
+
+  const handleUpdateStudentsPerPage = useCallback(
+    async (studentsPerPage: number) => {
+      const newSettings = {...gradebookSettings, studentsPerPage}
+
+      const result = await handleGradebookSettingsChange(newSettings)
+      if (result.success) {
+        setCurrentPage(1)
+      }
+    },
+    [gradebookSettings, handleGradebookSettingsChange, setCurrentPage],
+  )
+
+  const handleOutcomesReorder = useCallback(
+    async (reorderedOutcomes: Outcome[]) => {
+      const originalOutcomes = outcomes
+      setLocalOutcomes(reorderedOutcomes)
+
+      try {
+        await saveOutcomeOrder(courseId, reorderedOutcomes)
+      } catch {
+        setLocalOutcomes(originalOutcomes === initialOutcomes ? null : originalOutcomes)
+        showFlashAlert({
+          type: 'error',
+          message: I18n.t('Failed to save outcome order'),
+        })
+      }
+    },
+    [courseId, outcomes, initialOutcomes],
+  )
 
   const renderBody = () => {
-    if (error !== null)
+    if (error !== null || contributingScoresError !== null)
       return (
         <GenericErrorPage
-          errorMessage={error}
           imageUrl={errorShipUrl}
+          onReportError={reportError}
+          translations={canvasErrorPageTranslations}
+          errorMessage={error ?? contributingScoresError ?? undefined}
           errorSubject={I18n.t('Error loading rollups')}
           errorCategory={I18n.t('Learning Mastery Gradebook Error Page')}
         />
       )
-    if (isLoading) return renderLoader()
+
+    if (isLoadingGradebook || isLoadingSettings || isLoadingContributingScores)
+      return renderLoader()
+
     return (
       <Gradebook
         courseId={courseId}
         outcomes={outcomes}
         students={students}
         rollups={rollups}
-        gradebookFilters={gradebookFilters}
-        gradebookFilterHandler={onGradebookFilterChange}
+        outcomeDistributions={distributionData?.outcome_distributions}
+        distributionStudents={distributionData?.students}
+        isLoadingDistribution={isLoadingDistribution}
         pagination={pagination}
         setCurrentPage={setCurrentPage}
         sorting={sorting}
+        gradebookSettings={gradebookSettings}
+        onChangeNameDisplayFormat={handleNameDisplayFormatChange}
+        onOutcomesReorder={handleOutcomesReorder}
+        contributingScores={contributingScores}
+        onOpenStudentAssignmentTray={studentAssignmentDetailTray.open}
         data-testid="gradebook-body"
       />
     )
   }
 
   return (
-    <LMGBContext.Provider value={contextValues}>
+    <>
       <Toolbar
         courseId={courseId}
         contextURL={contextURL}
-        gradebookFilters={gradebookFilters}
-        showDataDependentControls={error === null}
+        showDataDependentControls={error === null && !isLoadingSettings}
+        gradebookSettings={gradebookSettings}
+        setGradebookSettings={handleGradebookSettingsChange}
+        hideHeading={instuiNavFF}
       />
-      <FilterWrapper pagination={pagination} onPerPageChange={setStudentsPerPage} />
+      {pagination && (
+        <SearchWrapper
+          courseId={courseId}
+          selectedUserIds={selectedUserIds}
+          onSelectedUserIdsChange={setSelectedUserIds}
+          selectedOutcomes={filter.selectedOutcomeIds}
+          onSelectOutcomes={filter.setSelectedOutcomeIds}
+        />
+      )}
+      <FilterWrapper pagination={pagination} onPerPageChange={handleUpdateStudentsPerPage} />
       {renderBody()}
-    </LMGBContext.Provider>
+      {studentAssignmentDetailTray.isOpen &&
+        studentAssignmentDetailTray.state &&
+        studentAssignmentDetailTray.assignment && (
+          <StudentAssignmentDetailTray
+            open={true}
+            onDismiss={studentAssignmentDetailTray.close}
+            outcome={studentAssignmentDetailTray.state.outcome}
+            courseId={courseId}
+            student={studentAssignmentDetailTray.state.student}
+            assignment={studentAssignmentDetailTray.assignment}
+            assignmentNavigator={{
+              ...studentAssignmentDetailTray.assignmentNavigator,
+              onNext: studentAssignmentDetailTray.handlers.navigateNextAssignment,
+              onPrevious: studentAssignmentDetailTray.handlers.navigatePreviousAssignment,
+            }}
+            studentNavigator={{
+              ...studentAssignmentDetailTray.studentNavigator,
+              onNext: studentAssignmentDetailTray.handlers.navigateNextStudent,
+              onPrevious: studentAssignmentDetailTray.handlers.navigatePreviousStudent,
+            }}
+            rollups={rollups}
+            outcomes={outcomes}
+          />
+        )}
+    </>
+  )
+}
+
+const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
+  const contextValues = getLMGBContext() as LMGBContextType
+  const {contextURL, accountLevelMasteryScalesFF} = contextValues.env
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LMGBContext.Provider value={contextValues}>
+        <LearningMasteryContent
+          courseId={courseId}
+          contextURL={contextURL ?? ''}
+          accountLevelMasteryScalesFF={accountLevelMasteryScalesFF ?? false}
+          instuiNavFF={ENV.FEATURES?.instui_nav}
+        />
+      </LMGBContext.Provider>
+    </QueryClientProvider>
   )
 }
 

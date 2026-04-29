@@ -25,6 +25,7 @@ class WikiPagesController < ApplicationController
   before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   before_action :get_wiki_page, except: [:front_page]
@@ -33,6 +34,7 @@ class WikiPagesController < ApplicationController
   before_action :set_js_rights
   before_action :set_js_wiki_data
   before_action :rce_js_env, only: %i[edit index new]
+  skip_before_action :require_user, only: %i[front_page index show show_redirect]
 
   include K5Mode
 
@@ -52,10 +54,12 @@ class WikiPagesController < ApplicationController
   def set_pandapub_read_token
     if @page&.grants_right?(@current_user, session, :read) && CanvasPandaPub.enabled?
       channel = "/private/wiki_page/#{@page.global_id}/update"
-      js_env WIKI_PAGE_PANDAPUB: {
-        CHANNEL: channel,
-        TOKEN: CanvasPandaPub.generate_token(channel, true)
-      }
+      js_env({
+               WIKI_PAGE_PANDAPUB: {
+                 CHANNEL: channel,
+                 TOKEN: CanvasPandaPub.generate_token(channel, read: true)
+               }
+             })
     end
   end
 
@@ -123,6 +127,26 @@ class WikiPagesController < ApplicationController
         set_master_course_js_env_data(@page, @context)
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
         @padless = true
+        if @context.is_a?(Course) && @context.feature_enabled?(:study_assist) && @context.user_is_student?(@current_user)
+          @show_study_assist = true
+          js_env[:FEATURES][:study_assist] = true
+          js_env({
+                   WIKI_PAGE_ID: @page.url,
+                   JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey"),
+                   STUDY_ASSIST_TOOLS: study_assist_enabled_tools
+                 })
+          js_bundle :study_assist
+        end
+        if @context.is_a?(Course) && @context.account.feature_enabled?(:notebook) && @context.user_is_student?(@current_user)
+          @show_notebook = true
+          js_env[:FEATURES][:notebook] = true
+          js_env({
+                   WIKI_PAGE_ID: @page.url,
+                   WIKI_PAGE_UPDATED_AT: @page.updated_at.iso8601,
+                   JOURNEY_URL: CanvasCareer::Config.new(@domain_root_account).public_app_config(request).dig("hosts", "journey"),
+                 })
+          js_bundle :notebook
+        end
       end
 
       js_bundle :wiki_page_show
@@ -132,7 +156,7 @@ class WikiPagesController < ApplicationController
 
   def new
     GuardRail.activate(:secondary) do
-      unless @context.account.feature_enabled?(:block_content_editor)
+      unless @context.try(:block_content_editor_enabled?)
         return render_unauthorized_action
       end
       unless authorized_action(@context.wiki, @current_user, :update)
@@ -187,7 +211,7 @@ class WikiPagesController < ApplicationController
 
   def determine_editor_feature(context)
     is_block_editor_enabled = context.account.feature_enabled?(:block_editor)
-    is_block_content_editor = context.account.feature_enabled?(:block_content_editor)
+    is_block_content_editor = context.try(:block_content_editor_enabled?)
 
     return :block_content_editor if is_block_content_editor
     return :block_editor if is_block_editor_enabled
@@ -198,7 +222,7 @@ class WikiPagesController < ApplicationController
   def wiki_pages_js_env(context)
     set_k5_mode # we need this to run now, even though we haven't hit the render hook yet
 
-    assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+    assign_to_tags = @context.account.allow_assign_to_differentiation_tags?
 
     editor_feature = determine_editor_feature(context)
 
@@ -233,6 +257,28 @@ class WikiPagesController < ApplicationController
       @wiki_pages_env[:TITLE_AVAILABILITY_PATH] = title_availability_path
     end
     js_env(@wiki_pages_env)
+    set_block_content_editor_ai_alt_text_js_env
     @wiki_pages_env
+  end
+
+  def set_block_content_editor_ai_alt_text_js_env
+    ai_enabled = Account.site_admin.feature_enabled?(:block_content_editor_ai_alt_text) &&
+                 !!@context.try(:block_content_editor_enabled?) &&
+                 !!CedarClient.try(:enabled?)
+
+    ai_alt_text_generation_url = ai_enabled ? ai_alt_text_generation_url_for_context(@context) : nil
+
+    js_env({ ai_alt_text_generation_url: })
+  end
+
+  def ai_alt_text_generation_url_for_context(context)
+    case context
+    when Course
+      "/api/v1/courses/#{context.id}/pages_ai/alt_text"
+    when Group
+      "/api/v1/groups/#{context.id}/pages_ai/alt_text"
+    else
+      nil
+    end
   end
 end

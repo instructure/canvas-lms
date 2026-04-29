@@ -111,6 +111,7 @@ export default function PrerequisiteForm({
             onAddPrerequisite(options[0])
           }}
           renderIcon={<IconAddLine />}
+          data-testid="add-prerequisite-button"
         >
           <AccessibleContent alt={I18n.t('Add Prerequisite')}>
             {I18n.t('Prerequisite')}

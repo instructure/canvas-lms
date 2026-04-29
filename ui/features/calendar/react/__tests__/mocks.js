@@ -61,12 +61,12 @@ const event = {
   important_dates: false,
   blackout_date: false,
   lockedTitle: false,
-  fullDetailsURL: jest.fn(),
+  fullDetailsURL: vi.fn(),
   isNewEvent: () => false,
-  possibleContexts: jest.fn(() => [userContext, courseContext]),
+  possibleContexts: vi.fn(() => [userContext, courseContext]),
   startDate: () => moment(),
-  save: jest.fn(),
-  removeClass: jest.fn(),
+  save: vi.fn(),
+  removeClass: vi.fn(),
   start: null,
   end: null,
   important_info: false,
@@ -84,14 +84,14 @@ export const conference = {
 export const defaultEvent = event
 
 export const eventFormProps = () => {
-  const closeCB = jest.fn()
-  const eventSave = jest.fn(() => closeCB())
+  const closeCB = vi.fn()
+  const eventSave = vi.fn(() => closeCB())
   return {
     formHolder,
     event: {...event, save: eventSave},
     closeCB,
-    contextChangeCB: jest.fn(),
-    setSetContextCB: jest.fn(),
+    contextChangeCB: vi.fn(),
+    setSetContextCB: vi.fn(),
     timezone: 'Etc/UTC',
   }
 }

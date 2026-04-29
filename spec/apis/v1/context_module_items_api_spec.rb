@@ -21,7 +21,8 @@ require_relative "../api_spec_helper"
 
 describe "Module Items API", type: :request do
   before :once do
-    course_factory.offer!
+    course_with_teacher
+    @course.offer!
 
     @module1 = @course.context_modules.create!(name: "module1")
     @assignment = @course.assignments.create!(name: "pls submit", submission_types: ["online_text_entry"], points_possible: 20)
@@ -62,7 +63,8 @@ describe "Module Items API", type: :request do
                                                unlock_at: @christmas,
                                                require_sequential_progress: true)
     @module2.prerequisites = "module_#{@module1.id}"
-    @wiki_page = @course.wiki_pages.create!(title: "wiki title", body: "")
+    @aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+    @wiki_page = @course.wiki_pages.create!(title: "wiki title", body: @aa_test_data.base_html, saving_user: @teacher)
     @wiki_page.workflow_state = "active"
     @wiki_page.save!
     @wiki_page_tag = @module2.add_item(id: @wiki_page.id, type: "wiki_page")
@@ -416,7 +418,7 @@ describe "Module Items API", type: :request do
                            "indent" => 0,
                            "url" => "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@attachment.id}",
                            "published" => false,
-                           "unpublishable" => false,
+                           "unpublishable" => true,
                            "module_id" => @module2.id,
                            "quiz_lti" => false
                          })
@@ -866,6 +868,107 @@ describe "Module Items API", type: :request do
                           { expected_status: 400 })
 
           expect(json["errors"]["completion_requirement"].count).to eq 1
+        end
+
+        context "bulk creation with module_items" do
+          it "creates multiple module items" do
+            assignment1 = @course.assignments.create!(name: "Assignment 1", submission_types: ["online_text_entry"])
+            assignment2 = @course.assignments.create!(name: "Assignment 2", submission_types: ["online_text_entry"])
+            assignment3 = @course.assignments.create!(name: "Assignment 3", submission_types: ["online_text_entry"])
+
+            initial_count = @module1.content_tags.count
+
+            json = api_call(:post,
+                            "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                            { controller: "context_module_items_api",
+                              action: "create",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              module_id: @module1.id.to_s },
+                            { module_items: [
+                              { type: "Assignment", content_id: assignment1.id, indent: 0 },
+                              { type: "Assignment", content_id: assignment2.id, indent: 1 },
+                              { type: "Assignment", content_id: assignment3.id, indent: 0 }
+                            ] })
+
+            expect(json["created"]).to be_an(Array)
+            expect(json["created"].length).to eq 3
+            expect(json["created"][0]["title"]).to eq "Assignment 1"
+            expect(json["created"][1]["title"]).to eq "Assignment 2"
+            expect(json["created"][2]["title"]).to eq "Assignment 3"
+            expect(json["created"][1]["indent"]).to eq 1
+
+            @module1.reload
+            expect(@module1.content_tags.count).to eq initial_count + 3
+          end
+
+          it "returns partial success when some items fail" do
+            assignment1 = @course.assignments.create!(name: "Assignment 1", submission_types: ["online_text_entry"])
+            wiki_page = @course.wiki_pages.create!(title: "Valid Page")
+
+            json = api_call(:post,
+                            "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                            { controller: "context_module_items_api",
+                              action: "create",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              module_id: @module1.id.to_s },
+                            { module_items: [
+                              { type: "Assignment", content_id: assignment1.id },
+                              { type: "Page", page_url: "invalid_page_url" },
+                              { type: "Page", page_url: wiki_page.url }
+                            ] })
+
+            expect(json["created"]).to be_an(Array)
+            expect(json["created"].length).to eq 2
+            expect(json["errors"]).to be_an(Array)
+            expect(json["errors"].length).to eq 1
+            expect(json["errors"][0]["index"]).to eq 1
+            expect(json["errors"][0]["message"]).to include("invalid page_url")
+          end
+
+          it "returns all errors when all items fail" do
+            json = api_call(:post,
+                            "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                            { controller: "context_module_items_api",
+                              action: "create",
+                              format: "json",
+                              course_id: @course.id.to_s,
+                              module_id: @module1.id.to_s },
+                            { module_items: [
+                              { type: "Page", page_url: "invalid1" },
+                              { type: "Page", page_url: "invalid2" }
+                            ] })
+
+            expect(json["created"]).to be_an(Array)
+            expect(json["created"].length).to eq 0
+            expect(json["errors"]).to be_an(Array)
+            expect(json["errors"].length).to eq 2
+          end
+
+          it "wraps operations in a transaction" do
+            assignment1 = @course.assignments.create!(name: "Assignment 1", submission_types: ["online_text_entry"])
+
+            initial_count = @module1.content_tags.count
+
+            allow_any_instance_of(ContentTag).to receive(:save).and_return(true)
+            allow_any_instance_of(ContentTag).to receive(:persisted?).and_return(true, false)
+
+            api_call(:post,
+                     "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                     { controller: "context_module_items_api",
+                       action: "create",
+                       format: "json",
+                       course_id: @course.id.to_s,
+                       module_id: @module1.id.to_s },
+                     { module_items: [
+                       { type: "Assignment", content_id: assignment1.id },
+                       { type: "Assignment", content_id: assignment1.id }
+                     ] })
+
+            @module1.reload
+            expect(@module1.content_tags.count).to be >= initial_count
+          end
         end
       end
     end
@@ -2566,6 +2669,23 @@ describe "Module Items API", type: :request do
                { expected_status: 200 })
     end
 
+    it "duplicates module items with HTML content and attachments" do
+      json_result = api_call(:post,
+                             "/api/v1/courses/#{@course.id}/modules/items/#{@wiki_page_tag.id}/duplicate",
+                             { controller: "context_module_items_api",
+                               action: "duplicate",
+                               format: "json",
+                               course_id: @course.id.to_s,
+                               id: @wiki_page_tag.id.to_s },
+                             {},
+                             {},
+                             { expected_status: 200 })
+      expect(json_result["content_tag"]["title"]).to eq("wiki title Copy")
+      associations = WikiPage.find(json_result["content_tag"]["content_id"]).attachment_associations
+      expect(associations.length).to eq 1
+      expect(associations.first.attachment_id).to eq @aa_test_data.attachment1.id
+    end
+
     it "does not duplicate invalid module item" do
       api_call(:post,
                "/api/v1/courses/#{@course.id}/modules/items/#{@attachment_tag.id}/duplicate",
@@ -2577,6 +2697,58 @@ describe "Module Items API", type: :request do
                {},
                {},
                { expected_status: 400 })
+    end
+
+    context "when the module item is an assignment with a peer review sub assignment" do
+      let(:assignment_with_peer_review) do
+        a = assignment_model(
+          course: @course,
+          title: "PR Module Assignment",
+          points_possible: 10,
+          peer_review_count: 2,
+          peer_reviews: true,
+          submission_types: "online_text_entry"
+        )
+        peer_review_model(parent_assignment: a)
+        a.reload
+      end
+      let(:module_tag) { @module1.add_item(id: assignment_with_peer_review.id, type: "assignment") }
+      let(:original_peer_review_sub) { assignment_with_peer_review.peer_review_sub_assignment }
+      let(:new_assignment) { Assignment.find_by!(duplicate_of: assignment_with_peer_review.id) }
+
+      before do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        api_call(:post,
+                 "/api/v1/courses/#{@course.id}/modules/items/#{module_tag.id}/duplicate",
+                 { controller: "context_module_items_api",
+                   action: "duplicate",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: module_tag.id.to_s },
+                 {},
+                 {},
+                 { expected_status: 200 })
+      end
+
+      it "duplicates the peer review sub assignment" do
+        expect(new_assignment.peer_review_sub_assignment).to be_present
+      end
+
+      it "links the duplicated sub assignment to the new assignment, not the original" do
+        expect(new_assignment.peer_review_sub_assignment.parent_assignment_id).to eq(new_assignment.id)
+        expect(new_assignment.peer_review_sub_assignment.parent_assignment_id).not_to eq(assignment_with_peer_review.id)
+      end
+
+      it "preserves peer_review_count on the duplicated assignment" do
+        expect(new_assignment.peer_review_count).to eq(assignment_with_peer_review.peer_review_count)
+      end
+
+      it "preserves due_at, unlock_at, and lock_at on the duplicated peer review sub assignment" do
+        new_peer_review_sub = new_assignment.peer_review_sub_assignment
+        expect(new_peer_review_sub.due_at).to eq(original_peer_review_sub.due_at)
+        expect(new_peer_review_sub.unlock_at).to eq(original_peer_review_sub.unlock_at)
+        expect(new_peer_review_sub.lock_at).to eq(original_peer_review_sub.lock_at)
+      end
     end
   end
 

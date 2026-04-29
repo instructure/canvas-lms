@@ -21,6 +21,7 @@
 class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
   include OutcomesFeaturesHelper
   include OutcomesServiceAlignmentsHelper
+
   SUPPORTED_OS_ALIGNMENTS = %w[quizzes.quiz quizzes.item].freeze
 
   def initialize(context)

@@ -17,10 +17,26 @@
  */
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
+import type GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import type Gradebook from '../../../Gradebook'
-import {htmlDecode} from '../../../Gradebook.utils'
+import {htmlDecode} from '@canvas/util/TextHelper'
 import useStore from '../../../stores'
 import {gradeOverrideCustomStatus} from '../../../FinalGradeOverrides/FinalGradeOverride.utils'
+
+type EditorOptions = {
+  item: {
+    id: string
+    avatar_url: string
+    name: string
+    enrollments: Array<{
+      id: string | number
+      grades: {
+        html_url: string
+      }
+    }>
+  }
+  activeRow: number
+}
 
 export default class TotalGradeOverrideCellPropFactory {
   _gradebook: Gradebook
@@ -29,8 +45,7 @@ export default class TotalGradeOverrideCellPropFactory {
     this._gradebook = gradebook
   }
 
-  // @ts-expect-error
-  getProps(editorOptions) {
+  getProps(editorOptions: EditorOptions) {
     const {finalGradeOverrides} = this._gradebook
     const {item: student, activeRow} = editorOptions
     const userId = student.id
@@ -40,7 +55,6 @@ export default class TotalGradeOverrideCellPropFactory {
 
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: this._gradebook.getCourseGradingScheme(),
-      // @ts-expect-error
       restrictPointsBasedInput: true,
     })
 
@@ -55,7 +69,7 @@ export default class TotalGradeOverrideCellPropFactory {
       avatarUrl: htmlDecode(student.avatar_url),
       name: htmlDecode(student.name),
       gradesUrl: `${enrollment.grades.html_url}#tab-assignments`,
-      enrollmentId: enrollment.id,
+      enrollmentId: String(enrollment.id),
     }
 
     const {finalGradeOverrideTrayProps, finalGradeOverrides: finalGradeOverrideMap = {}} =
@@ -66,7 +80,6 @@ export default class TotalGradeOverrideCellPropFactory {
         gradeEntry,
         isFirstStudent,
         isLastStudent,
-        // @ts-expect-error
         studentInfo,
       },
     })
@@ -86,8 +99,7 @@ export default class TotalGradeOverrideCellPropFactory {
       gradeInfo,
       gradeIsUpdating: pendingGradeInfo != null && pendingGradeInfo.valid,
 
-      // @ts-expect-error
-      onGradeUpdate: updatedGradeInfo => {
+      onGradeUpdate: (updatedGradeInfo: GradeOverrideInfo) => {
         finalGradeOverrides?.updateGrade(userId, updatedGradeInfo)
       },
 

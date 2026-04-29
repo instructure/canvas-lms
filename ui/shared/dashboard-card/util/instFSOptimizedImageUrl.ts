@@ -16,18 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Network Information API types (experimental API, not in standard TS lib)
+interface NetworkInformation {
+  downlink?: number
+  saveData?: boolean
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection?: NetworkInformation
+}
+
 // feature detect for webp support
 let supportsWebp = false
 const testImg = new Image()
 testImg.onload = () => (supportsWebp = testImg.width === 1)
 testImg.src = 'data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA='
 
+const navigatorWithConnection = navigator as NavigatorWithConnection
 const dpiMultiplier =
   window.devicePixelRatio <= 1 /* device does not have a HighDPI screen */ ||
-  // @ts-expect-error
-  navigator?.connection?.downlink < 5 /* slow (less than 5mbps) connection */ ||
-  // @ts-expect-error
-  navigator?.connection?.saveData /* user has asked to save bandwidth */
+  (navigatorWithConnection.connection?.downlink ?? 10) <
+    5 /* slow (less than 5mbps) connection */ ||
+  navigatorWithConnection.connection?.saveData /* user has asked to save bandwidth */
     ? 1
     : 2
 

@@ -50,7 +50,7 @@ const defaultProps = () => ({
   setId: 1,
   optionIndex: 0,
   selectedOption: null,
-  selectOption: jest.fn(),
+  selectOption: vi.fn(),
 })
 
 describe('PathOption', () => {

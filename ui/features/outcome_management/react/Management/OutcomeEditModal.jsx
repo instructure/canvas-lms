@@ -28,9 +28,9 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Mask} from '@instructure/ui-overlays'
 import {InstUISettingsProvider} from '@instructure/emotion'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {titleValidator, displayNameValidator} from '../../validators/outcomeValidators'
 import {
   UPDATE_LEARNING_OUTCOME,
@@ -247,9 +247,9 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   type="text"
                   size="medium"
                   value={displayName}
-                  messages={invalidDisplayName
-                    ? [{text: invalidDisplayName, type: 'newError'}]
-                    : []}
+                  messages={
+                    invalidDisplayName ? [{text: invalidDisplayName, type: 'newError'}] : []
+                  }
                   renderLabel={I18n.t('Friendly Name')}
                   onChange={displayNameChangeHandler}
                   data-testid="display-name-input"

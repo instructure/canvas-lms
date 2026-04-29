@@ -37,7 +37,12 @@ shared_examples "Gradebook - custom columns" do |ff_enabled|
     gradebook_data_setup
   end
 
-  before { user_session(@teacher) }
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
+    user_session(@teacher)
+  end
 
   def custom_column(opts = {})
     opts.reverse_merge! title: "<b>SIS ID</b>"

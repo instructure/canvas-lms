@@ -188,7 +188,7 @@ describe "new account user search" do
       expect(results_rows.count).to eq 15
       expect(results_rows.first).to include_text("Admin")
       expect(results_rows[1]).to include_text("UserA, Test")
-      expect(all_results_users).to_not include_text("UserO, Test")
+      expect(all_results_users).not_to include_text("UserO, Test")
       expect(results_body).not_to contain_jqcss(page_previous_jqcss)
 
       click_page_number_button("2")

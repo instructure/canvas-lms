@@ -84,25 +84,25 @@ describe "Student Gradebook - Arrange By" do
         click_option("#assignment_sort_order_select_menu", "Name")
         expect_new_page_load { f("#apply_select_menus").click }
 
-        current_list = (ff("#grades_summary tr a").reject { |a| a.text.empty? }).collect(&:text)
+        current_list = ff("#grades_summary tr a").reject { |a| a.text.empty? }.collect(&:text)
         expect(current_list).to eq title_order
 
         click_option("#assignment_sort_order_select_menu", "Due Date")
         expect_new_page_load { f("#apply_select_menus").click }
 
-        current_list = (ff("#grades_summary tr a").reject { |a| a.text.empty? }).collect(&:text)
+        current_list = ff("#grades_summary tr a").reject { |a| a.text.empty? }.collect(&:text)
         expect(current_list).to eq due_date_order
 
         click_option("#assignment_sort_order_select_menu", "Module")
         expect_new_page_load { f("#apply_select_menus").click }
 
-        current_list = (ff("#grades_summary tr a").reject { |a| a.text.empty? }).collect(&:text)
+        current_list = ff("#grades_summary tr a").reject { |a| a.text.empty? }.collect(&:text)
         expect(current_list).to eq module_order
 
         click_option("#assignment_sort_order_select_menu", "Assignment Group")
         expect_new_page_load { f("#apply_select_menus").click }
 
-        current_list = (ff("#grades_summary tr a").reject { |a| a.text.empty? }).collect(&:text)
+        current_list = ff("#grades_summary tr a").reject { |a| a.text.empty? }.collect(&:text)
         expect(current_list).to eq assign_group_order
       end
 
@@ -112,7 +112,7 @@ describe "Student Gradebook - Arrange By" do
         click_option("#assignment_sort_order_select_menu", "Name")
         expect_new_page_load { f("#apply_select_menus").click }
         refresh_page
-        current_list = (ff("#grades_summary tr a").reject { |a| a.text.empty? }).collect(&:text)
+        current_list = ff("#grades_summary tr a").reject { |a| a.text.empty? }.collect(&:text)
         expect(current_list).to eq title_order
       end
     end

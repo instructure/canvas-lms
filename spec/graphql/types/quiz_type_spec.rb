@@ -84,4 +84,16 @@ describe Types::QuizType do
       expect(type.resolve("submissionsConnection { nodes { _id }}")).to be_nil
     end
   end
+
+  describe "assignedToDates field" do
+    it "includes quiz overrides when present" do
+      student = student_in_course(course: @course, active_all: true).user
+      override = assignment_override_model(assignment: quiz, due_at: 2.weeks.from_now)
+      override.assignment_override_students.create!(user: student)
+
+      result = quiz_type.resolve("assignedToDates { id dueAt title base }")
+      expect(result).to be_an(Array)
+      expect(result.length).to be > 0
+    end
+  end
 end

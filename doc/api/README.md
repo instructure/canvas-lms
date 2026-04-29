@@ -83,6 +83,13 @@ be redirected to HTTPS. However, at that point, the credentials
 have already been sent in clear over the internet. Please make
 sure that you are using HTTPS.
 
+Canvas Experiences
+------
+
+Canvas LMS supports several experiences including Canvas Career and Canvas
+for Elementary. The vast majority of these API resources are shared, though
+some are applicable only to certain experiences.
+
 About this Documentation
 ------------------------
 
@@ -93,3 +100,28 @@ Run the following command from your Canvas directory:
 ```bash
 bundle exec rake doc:api
 ```
+
+### OpenAPI 3.0 Specification
+
+Canvas also provides an OpenAPI 3.0 specification that can be generated from the same YARD documentation. This modern format is compatible with tools like Swagger UI, Postman, and various code generators.
+
+To generate the OpenAPI 3.0 specification:
+
+```bash
+bundle exec rake doc:openapi
+```
+
+This will create `public/doc/openapi/canvas.openapi.yaml` containing the OpenAPI 3.0 specification for the Canvas API.
+
+The OpenAPI spec includes:
+- All API endpoints with their HTTP methods and paths
+- Request parameters (path, query, and body)
+- Response schemas
+- Authentication requirements
+- Server configuration
+
+You can view and interact with the generated OpenAPI spec using:
+- [Swagger Editor](https://editor.swagger.io) - Import the YAML file
+- [Swagger UI](https://swagger.io/tools/swagger-ui/) - Interactive API documentation
+- [Postman](https://www.postman.com) - Import as a collection
+- Code generators like [OpenAPI Generator](https://openapi-generator.tech)

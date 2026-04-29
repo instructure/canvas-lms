@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class EnrollmentTerm < ActiveRecord::Base
+class EnrollmentTerm < ApplicationRecord
   DEFAULT_TERM_NAME = "Default Term"
   include Workflow
 
@@ -40,6 +40,7 @@ class EnrollmentTerm < ActiveRecord::Base
   after_save :recompute_course_scores_later, if: :grading_period_group_id_has_changed?
 
   include StickySisFields
+
   are_sis_sticky :name, :start_at, :end_at
 
   def self.ensure_dummy_enrollment_term

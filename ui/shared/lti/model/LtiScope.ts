@@ -56,6 +56,8 @@ export const LtiScopes = {
     'https://canvas.instructure.com/lti/account_external_tools/scope/destroy',
   AccessPageContent: 'https://canvas.instructure.com/lti/page_content/show',
   ReplaceEditorContent: 'https://canvas.instructure.com/lti/replace_editor_contents',
+  RegistrationReadonly: 'https://purl.imsglobal.org/spec/lti-reg/scope/registration.readonly',
+  RegistrationUpdate: 'https://purl.imsglobal.org/spec/lti-reg/scope/registration',
 } as const
 
 export const AllLtiScopes = [
@@ -86,6 +88,8 @@ export const AllLtiScopes = [
   LtiScopes.AccountExternalToolsDestroy,
   LtiScopes.AccessPageContent,
   LtiScopes.ReplaceEditorContent,
+  LtiScopes.RegistrationReadonly,
+  LtiScopes.RegistrationUpdate,
 ] as const
 
 export const ZLtiScope = z.enum(AllLtiScopes)

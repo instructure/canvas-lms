@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react'
 import DefaultGradeInput from '../DefaultGradeInput'
 
 describe('DefaultGradeInput', () => {
-  let onGradeInputChangeMock = jest.fn()
+  let onGradeInputChangeMock = vi.fn()
 
   const defaultProps = (overrides?: any) => ({
     disabled: false,
@@ -35,7 +35,7 @@ describe('DefaultGradeInput', () => {
   })
 
   beforeEach(() => {
-    onGradeInputChangeMock = jest.fn()
+    onGradeInputChangeMock = vi.fn()
   })
 
   it('should render', () => {

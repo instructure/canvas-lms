@@ -16,8 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% location_tag = @submission ? "quiz_submission_#{@submission.id}" : "quiz_#{@quiz.id}" %>
 <% if @quiz.description && !@quiz.description.empty? %>
-  <div class="description user_content teacher-version"><%= user_content(@quiz.description, location: (@quiz.asset_string if @domain_root_account.feature_enabled?(:file_association_access))) %></div>
+  <div class="description user_content teacher-version"><%= user_content(@quiz.description, location: location_tag) %></div>
 <% end %>
 
 <form class="form-horizontal bootstrap-form display-only" style="margin-top:18px;">
@@ -198,7 +199,7 @@
       <% if @quiz.lockdown_browser_use_lti_tool? %>
         <div class="control-group">
           <div class="control-label">
-            <%= t(:require_lockdown_browser_monitor, "Webcam Required") %>
+            <%= t(:require_lockdown_browser_monitor, "Monitor Required") %>
           </div>
           <div class="controls">
             <span class="value">

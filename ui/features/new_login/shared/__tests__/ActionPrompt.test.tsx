@@ -23,20 +23,20 @@ import {MemoryRouter, useNavigate} from 'react-router-dom'
 import {ActionPrompt} from '..'
 import {NewLoginDataProvider, NewLoginProvider} from '../../context'
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: jest.fn(),
+vi.mock('react-router-dom', async () => ({
+  ...await vi.importActual('react-router-dom'),
+  useNavigate: vi.fn(),
 }))
 
 describe('ActionPrompt', () => {
-  const mockNavigate = jest.fn()
+  const mockNavigate = vi.fn()
 
   beforeEach(() => {
-    ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
+    ;(useNavigate as any).mockReturnValue(mockNavigate)
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('mounts without crashing', () => {

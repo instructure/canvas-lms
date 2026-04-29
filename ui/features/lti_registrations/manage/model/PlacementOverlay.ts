@@ -28,6 +28,10 @@ export const ZLtiPlacementOverlay = z.object({
    * See LtiPlacementConfig.default for more information on this obtuse parameter.
    */
   default: z.enum(['enabled', 'disabled']).optional().nullable(),
+  /**
+   * This only applies to the top navigation placement. It allows the tool to be launched in fullscreen mode.
+   */
+  allow_fullscreen: z.boolean().optional().nullable(),
 })
 
 export type LtiPlacementOverlay = z.infer<typeof ZLtiPlacementOverlay>

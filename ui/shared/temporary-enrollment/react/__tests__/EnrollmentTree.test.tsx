@@ -172,14 +172,14 @@ const props: Props = {
       ],
     },
   ],
-  createEnroll: jest.fn(),
+  createEnroll: vi.fn(),
 }
 
 const USER_EVENT_OPTIONS = {pointerEventsCheck: PointerEventsCheckLevel.Never}
 
 describe('EnrollmentTree', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders role groups', async () => {

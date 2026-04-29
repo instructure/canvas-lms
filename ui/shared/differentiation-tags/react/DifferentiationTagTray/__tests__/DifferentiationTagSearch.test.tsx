@@ -23,16 +23,16 @@ import DifferentiationTagSearch from '../DifferentiationTagSearch'
 
 describe('DifferentiationTagSearch', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.runOnlyPendingTimers()
-    jest.useRealTimers()
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
   })
 
   it('renders the text input with the correct placeholder', () => {
-    const onSearchMock = jest.fn()
+    const onSearchMock = vi.fn()
     render(<DifferentiationTagSearch onSearch={onSearchMock} />)
     const inputElement = screen.getByPlaceholderText('Search for Tag')
     expect(inputElement).toBeInTheDocument()
@@ -40,7 +40,7 @@ describe('DifferentiationTagSearch', () => {
 
   it('calls onSearch with the updated input value after the debounce delay', async () => {
     const user = userEvent.setup({delay: null})
-    const onSearchMock = jest.fn()
+    const onSearchMock = vi.fn()
     render(<DifferentiationTagSearch onSearch={onSearchMock} delay={100} />)
     const inputElement = screen.getByPlaceholderText('Search for Tag')
 
@@ -50,7 +50,7 @@ describe('DifferentiationTagSearch', () => {
     expect(onSearchMock).not.toHaveBeenCalled()
 
     act(() => {
-      jest.advanceTimersByTime(100)
+      vi.advanceTimersByTime(100)
     })
 
     expect(onSearchMock).toHaveBeenCalledWith('hello')
@@ -58,7 +58,7 @@ describe('DifferentiationTagSearch', () => {
 
   it('cancels the debounced onSearch call on unmount', async () => {
     const user = userEvent.setup({delay: null})
-    const onSearchMock = jest.fn()
+    const onSearchMock = vi.fn()
     const {unmount} = render(<DifferentiationTagSearch onSearch={onSearchMock} delay={200} />)
     const inputElement = screen.getByPlaceholderText('Search for Tag')
 
@@ -68,7 +68,7 @@ describe('DifferentiationTagSearch', () => {
     unmount()
 
     act(() => {
-      jest.advanceTimersByTime(200)
+      vi.advanceTimersByTime(200)
     })
 
     expect(onSearchMock).not.toHaveBeenCalled()

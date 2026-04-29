@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {OverrideURIsConfirmationWrapper} from '../components/OverrideURIsConfirmationWrapper'
@@ -31,15 +30,11 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -55,15 +50,11 @@ describe('OverrideURIsConfirmation', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -78,15 +69,11 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -110,15 +97,11 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -132,48 +115,16 @@ describe('OverrideURIsConfirmation', () => {
     expect(screen.getByText('Invalid URL')).toBeInTheDocument()
   })
 
-  it('disables the next button if any of the URIs are invalid', async () => {
-    const internalConfig = mockInternalConfiguration({
-      placements: [{placement: LtiPlacements.CourseNavigation}],
-    })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
-    render(
-      <OverrideURIsConfirmationWrapper
-        overlayStore={overlayStore}
-        internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
-        reviewing={false}
-      />,
-    )
-    const input = screen.getByPlaceholderText('https://example.com')
-    await userEvent.click(input)
-    await userEvent.clear(input)
-    await userEvent.paste('invalid-uri^&*&)')
-    await userEvent.tab()
-
-    await userEvent.click(screen.getByText('Next').closest('button')!)
-
-    expect(input).toHaveFocus()
-    expect(onNextClicked).not.toHaveBeenCalled()
-  })
-
   it('allows users to change the message type on placements that support it', async () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: LtiPlacements.ModuleMenuModal}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -189,15 +140,11 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.EditorButton}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -214,15 +161,11 @@ describe('OverrideURIsConfirmation', () => {
       ],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )
@@ -249,15 +192,11 @@ describe('OverrideURIsConfirmation', () => {
       placements: [{placement: LtiPlacements.CourseNavigation}],
     })
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
-    const onNextClicked = jest.fn()
-    const onPreviousClicked = jest.fn()
 
     render(
       <OverrideURIsConfirmationWrapper
         overlayStore={overlayStore}
         internalConfig={internalConfig}
-        onNextClicked={onNextClicked}
-        onPreviousClicked={onPreviousClicked}
         reviewing={false}
       />,
     )

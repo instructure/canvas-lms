@@ -228,12 +228,10 @@ describe('dateRangeString', () => {
 
 describe('isThisWeek', () => {
   it('returns true when given day is during this week', () => {
-     
     const wednesday = new moment().startOf('week').add(3, 'days')
     expect(isThisWeek(wednesday)).toEqual(true)
   })
   it('return false when given day is not during this week', () => {
-     
     const lastFriday = new moment().startOf('week').add(-2, 'days')
     expect(isThisWeek(lastFriday)).toEqual(false)
   })

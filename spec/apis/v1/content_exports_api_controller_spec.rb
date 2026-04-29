@@ -582,6 +582,7 @@ describe ContentExportsApiController, type: :request do
       let_once :page_to_copy do
         page_to_copy = t_course.wiki_pages.create!(title: "other page")
         page_to_copy.body = "<p><a href=\"/courses/#{t_course.id}/files/#{att_to_copy.id}/preview\">hey look a link</a></p>"
+        page_to_copy.saving_user = t_teacher
         page_to_copy.save!
         page_to_copy
       end
@@ -1381,6 +1382,27 @@ describe ContentExportsApiController, type: :request do
         expect(json["export_type"]).to eql "zip"
       end
 
+      it "returns download URLs with the correct host for test environments" do
+        Attachment.current_root_account = @course.root_account
+        user_data_export = past_export(t_student, t_student, "user_data")
+
+        # Override the request host for this test
+        allow_any_instance_of(ContentExportsApiController).to receive(:request).and_wrap_original do |m, *args|
+          req = m.call(*args)
+          allow(req).to receive(:host_with_port).and_return("some-school.beta.instructure.com")
+          req
+        end
+
+        json = api_call_as_user(t_student,
+                                :get,
+                                "/api/v1/users/#{t_student.id}/content_exports/#{user_data_export.id}",
+                                { controller: "content_exports_api", action: "show", format: "json", user_id: t_student.to_param, id: user_data_export.to_param })
+
+        expect(json["id"]).to eql user_data_export.id
+        expect(json["export_type"]).to eql "user_data"
+        expect(json["attachment"]["url"]).to include("some-school.beta.instructure.com")
+      end
+
       it "does not show another user's export" do
         zip_export = past_export(t_student, t_student, "zip")
         api_call_as_user(t_teacher,
@@ -1391,6 +1413,38 @@ describe ContentExportsApiController, type: :request do
                          {},
                          expected_status: 403)
       end
+    end
+  end
+
+  context "unauthenticated user in public course" do
+    before :once do
+      t_course.update!(is_public: true)
+      @user = nil
+    end
+
+    it "allows listing content exports" do
+      raw_api_call(:get,
+                   "/api/v1/courses/#{t_course.id}/content_exports",
+                   { controller: "content_exports_api", action: "index", format: "json", course_id: t_course.to_param })
+      assert_status(200)
+    end
+
+    it "allows creating a zip export" do
+      raw_api_call(:post,
+                   "/api/v1/courses/#{t_course.id}/content_exports?export_type=zip",
+                   { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "zip" })
+      assert_status(200)
+    end
+
+    it "allows showing an export created by an anonymous user" do
+      raw_api_call(:post,
+                   "/api/v1/courses/#{t_course.id}/content_exports?export_type=zip",
+                   { controller: "content_exports_api", action: "create", format: "json", course_id: t_course.to_param, export_type: "zip" })
+      export_id = response.parsed_body["id"]
+      raw_api_call(:get,
+                   "/api/v1/courses/#{t_course.id}/content_exports/#{export_id}",
+                   { controller: "content_exports_api", action: "show", format: "json", course_id: t_course.to_param, id: export_id.to_s })
+      assert_status(200)
     end
   end
 end

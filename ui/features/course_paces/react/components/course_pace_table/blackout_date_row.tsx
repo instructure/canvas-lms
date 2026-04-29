@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {pick} from 'lodash'
+import {pick} from 'es-toolkit/compat'
 
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {Flex} from '@instructure/ui-flex'
@@ -104,10 +104,7 @@ class BlackoutDateRow extends React.Component<PassedProps, LocalState> {
     const labelMargin = this.props.isStacked ? '0 0 0 small' : undefined
     return (
       <InstUISettingsProvider theme={{componentOverrides}}>
-        <Table.Row
-          data-testid="pp-blackout-date-row"
-          {...pick(this.props, ['hover', 'isStacked', 'headers'])}
-        >
+        <Table.Row data-testid="pp-blackout-date-row" {...pick(this.props, ['hover', 'headers'])}>
           <Table.Cell>
             <View margin={labelMargin}>{this.renderTitle()}</View>
           </Table.Cell>

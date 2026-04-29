@@ -22,7 +22,7 @@ import {Set} from 'immutable'
 import IndividualStudentMastery from '../index'
 import fetchOutcomes from '../fetchOutcomes'
 
-jest.mock('../fetchOutcomes')
+vi.mock('../fetchOutcomes')
 
 beforeEach(() => {
   fetchOutcomes.mockImplementation(() => {
@@ -33,7 +33,7 @@ beforeEach(() => {
 const props = {
   studentId: 12,
   courseId: 110,
-  onExpansionChange: jest.fn(),
+  onExpansionChange: vi.fn(),
 }
 
 it('renders the component', () => {

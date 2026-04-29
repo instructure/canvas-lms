@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {pull} from 'lodash'
+import {pull} from 'es-toolkit/compat'
 import FileUploader from './FileUploader'
 import ZipUploader from './ZipUploader'
 

@@ -54,14 +54,6 @@ describe "Screenreader Gradebook" do
     expect(EnhancedSRGB.secondary_id_label).to include_text("hidden")
   end
 
-  it "shows conluded enrollments" do
-    skip "unskip w/ EVAL-3356 BUG student's last name is not shown last, first"
-    EnhancedSRGB.concluded_enrollments.click
-    wait_for_ajaximations
-
-    expect(EnhancedSRGB.student_dropdown).to include_text("Student, Concluded")
-  end
-
   it "shows notes in student info" do
     EnhancedSRGB.show_notes_option.click
     expect(EnhancedSRGB.notes_field).to be_present

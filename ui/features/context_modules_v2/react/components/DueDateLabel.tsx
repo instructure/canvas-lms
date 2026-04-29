@@ -21,166 +21,65 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {ModuleItemContent, DueAtCounts, DueAtCount} from '../utils/types'
+import type {ModuleItemContent} from '../utils/types'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('context_modules_v2')
-
 export interface DueDateLabelProps {
   contentTagId: string
   content: ModuleItemContent
 }
 
-const aoSetDescriber = (dueAtCount: DueAtCount) => {
-  const description: string[] = []
-
-  if (dueAtCount.groups) {
-    description.push(
-      I18n.t(
-        {
-          one: '1 group',
-          other: '%{count} groups',
-        },
-        {count: dueAtCount.groups},
-      ),
-    )
-  }
-
-  if (dueAtCount.students) {
-    description.push(
-      I18n.t(
-        {
-          one: '1 student',
-          other: '%{count} students',
-        },
-        {count: dueAtCount.students},
-      ),
-    )
-  }
-
-  if (dueAtCount.sections) {
-    description.push(
-      I18n.t(
-        {
-          one: '1 section',
-          other: '%{count} sections',
-        },
-        {count: dueAtCount.sections},
-      ),
-    )
-  }
-
-  return description.join(', ')
-}
-
 const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
-  const hasDueOrLockDate =
-    content?.dueAt ||
-    content?.lockAt ||
-    content?.assignmentOverrides?.edges?.some(({node}) => node.dueAt)
-
-  let dueDatesCount =
-    content?.assignmentOverrides?.edges?.filter(({node}) => !!node.dueAt).length || 0
-  if (
-    content?.dueAt &&
-    !content?.assignmentOverrides?.edges?.some(({node}) => node.dueAt === content.dueAt)
-  ) {
-    dueDatesCount += 1
-  }
+  const assignedToDates = content?.assignedToDates
 
   const tooltipContents = useMemo(() => {
-    const dueAtCounts =
-      content?.assignmentOverrides?.edges?.reduce((acc, edge) => {
-        const {node} = edge
-
-        if (node.dueAt) {
-          acc[node.dueAt] ||= {}
-          if (node.set.groupId) {
-            acc[node.dueAt].groups ||= 0
-            acc[node.dueAt].groups! += 1
-          }
-          if (node.set.sectionId) {
-            acc[node.dueAt].sections ||= 0
-            acc[node.dueAt].sections! += 1
-          }
-          if (node.set.students) {
-            acc[node.dueAt].students ||= 0
-            acc[node.dueAt].students! += node.set.students.length
-          }
-        }
-
-        return acc
-      }, {} as DueAtCounts) || {}
-
-    const contents = Object.keys(dueAtCounts).map(dueAt => {
-      return (
-        <Flex justifyItems="center" key={`due_at_${contentTagId}_${dueAt}`}>
-          <Flex.Item margin="0 small">
-            <Text weight="bold">{aoSetDescriber(dueAtCounts[dueAt])}</Text>
-          </Flex.Item>
-          <Flex.Item>
-            <FriendlyDatetime
-              data-testid="due-date"
-              format={I18n.t('#date.formats.date_at_time')}
-              dateTime={dueAt}
-            />
-          </Flex.Item>
-        </Flex>
-      )
-    })
-
-    if (content?.dueAt) {
-      contents.push(
-        <Flex justifyItems="center" key={`due_at_${contentTagId}_default`}>
-          <Flex.Item margin="0 small">
-            <Text weight="bold">{I18n.t('Everyone else')}</Text>
-          </Flex.Item>
-          <Flex.Item>
-            <FriendlyDatetime
-              data-testid="due-date"
-              format={I18n.t('#date.formats.date_at_time')}
-              dateTime={content.dueAt}
-            />
-          </Flex.Item>
-        </Flex>,
-      )
-    }
-
-    return <span data-testid="override-details">{contents}</span>
-  }, [content?.assignmentOverrides?.edges, content?.dueAt, contentTagId])
-
-  if (!content || !hasDueOrLockDate) return null
-
-  if (dueDatesCount == 1) {
     return (
-      <Flex.Item>
-        <Text weight="normal" size="x-small">
-          <FriendlyDatetime
-            data-testid="due-date"
-            format={I18n.t('#date.formats.medium')}
-            dateTime={
-              content.dueAt ||
-              content.lockAt ||
-              content.assignmentOverrides?.edges?.find(({node}) => node.dueAt)?.node?.dueAt ||
-              null
-            }
-          />
-        </Text>
-      </Flex.Item>
+      <span data-testid="override-details">
+        {assignedToDates?.map((dateHash, index) => (
+          <Flex justifyItems="center" key={`${contentTagId}_${index}`}>
+            <Flex.Item margin="0 small">
+              <Text weight="bold">{dateHash.title || 'Unknown'}</Text>
+            </Flex.Item>
+            <Flex.Item>
+              <FriendlyDatetime
+                data-testid="due-date"
+                format={I18n.t('#date.formats.date_at_time')}
+                dateTime={dateHash.dueAt || null}
+                alwaysUseSpecifiedFormat={true}
+              />
+            </Flex.Item>
+          </Flex>
+        ))}
+      </span>
+    )
+  }, [assignedToDates, contentTagId])
+
+  if (assignedToDates?.length === 1) {
+    const singleDate = assignedToDates[0]
+    return (
+      <Text size="x-small">
+        <FriendlyDatetime
+          data-testid="due-date"
+          format={I18n.t('#date.formats.medium')}
+          dateTime={singleDate.dueAt || null}
+          alwaysUseSpecifiedFormat={true}
+        />
+      </Text>
+    )
+  } else if (assignedToDates && assignedToDates.length > 1) {
+    return (
+      <Tooltip renderTip={tooltipContents} on={['hover', 'focus']}>
+        <Link href={`/courses/${ENV.course_id}/modules/items/${contentTagId}`} isWithinText={false}>
+          <Text weight="normal" size="x-small">
+            {I18n.t('Multiple Due Dates')}
+          </Text>
+        </Link>
+      </Tooltip>
     )
   } else {
-    return (
-      <Flex.Item>
-        <Link href={`/courses/${ENV.course_id}/modules/items/${contentTagId}`} isWithinText={false}>
-          <Tooltip renderTip={tooltipContents}>
-            <Text weight="normal" size="x-small">
-              {I18n.t('Multiple Due Dates')}
-            </Text>
-          </Tooltip>
-        </Link>
-      </Flex.Item>
-    )
+    return null
   }
 }
 

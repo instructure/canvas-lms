@@ -51,3 +51,23 @@ CanvasSecurity::JWTWorkflow.register(:ui) do |_, user|
     use_high_contrast: user.try(:prefers_high_contrast?)
   }
 end
+
+CanvasSecurity::JWTWorkflow.register(:scone, requires_context: true) do |context, user|
+  next {} unless context.is_a?(Course)
+
+  {
+    can_manage_course: (
+      user &&
+      context &&
+      context.grants_right?(user, :manage)
+    ) || false
+  }
+end
+
+CanvasSecurity::JWTWorkflow.register(:autopilot, requires_context: true) do |context, user|
+  next {} unless context.is_a?(Account) && user.present?
+
+  %i[manage_rules_view manage_rules_add manage_rules_edit manage_rules_delete].index_with do |permission|
+    context.grants_right?(user, permission)
+  end
+end

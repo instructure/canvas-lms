@@ -22,7 +22,7 @@ import {sharedContentTests, sharedDateParsingTests, sharedFormTests} from './sha
 describe('CanvasCartridgeImporter', () => {
   beforeAll(() => (window.ENV.UPLOAD_LIMIT = 1024))
 
-  afterEach(() => jest.clearAllMocks())
+  afterEach(() => vi.clearAllMocks())
 
   sharedFormTests(CanvasCartridgeImporter)
   sharedContentTests(CanvasCartridgeImporter)

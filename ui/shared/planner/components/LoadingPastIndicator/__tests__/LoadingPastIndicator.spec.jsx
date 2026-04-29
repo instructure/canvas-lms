@@ -19,11 +19,11 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import LoadingPastIndicator from '../index'
 
-jest.mock('../../../utilities/scrollUtils')
+vi.mock('../../../utilities/scrollUtils')
 
 describe('LoadingPastIndicator', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders an empty container when no props are provided', () => {

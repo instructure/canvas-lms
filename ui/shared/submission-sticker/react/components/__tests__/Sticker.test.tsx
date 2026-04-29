@@ -206,7 +206,7 @@ describe('Sticker', () => {
       server.use(
         http.put(updateUrl, () => HttpResponse.json({...props.submission, sticker: 'book'})),
       )
-      props.onStickerChange = jest.fn()
+      props.onStickerChange = vi.fn()
       const {getByTestId} = renderComponent(props)
       const button = getByTestId('sticker-button')
       fireEvent.click(button)
@@ -226,7 +226,7 @@ describe('Sticker', () => {
 
     it('reverts back to the original sticker if the update fails', async () => {
       server.use(http.put(updateUrl, () => new HttpResponse(null, {status: 404})))
-      props.onStickerChange = jest.fn()
+      props.onStickerChange = vi.fn()
       const {getByTestId} = renderComponent(props)
       const button = getByTestId('sticker-button')
       fireEvent.click(button)
@@ -252,7 +252,7 @@ describe('Sticker', () => {
         courseId: '3',
         sticker: 'grad',
       }
-      props.onStickerChange = jest.fn()
+      props.onStickerChange = vi.fn()
       const anonymousUpdateUrl = `${baseUrl}/anonymous_submissions/${props.submission.anonymousId}`
       server.use(
         http.put(anonymousUpdateUrl, () =>
@@ -278,7 +278,7 @@ describe('Sticker', () => {
 
     it('removes stickers', async () => {
       server.use(http.put(updateUrl, () => HttpResponse.json({...props.submission, sticker: null})))
-      props.onStickerChange = jest.fn()
+      props.onStickerChange = vi.fn()
       const {getByTestId} = renderComponent(props)
       const button = getByTestId('sticker-button')
       fireEvent.click(button)

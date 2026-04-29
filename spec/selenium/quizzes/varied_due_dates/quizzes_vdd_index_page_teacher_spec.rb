@@ -35,30 +35,30 @@ describe "viewing a quiz with variable due dates on the quizzes index page" do
     end
 
     it "shows the due dates for Section A", priority: "1" do
-      validate_vdd_quiz_tooltip_dates(
+      validate_quiz_tooltip_dates(
         ".date-due",
-        "Everyone else\n#{format_date_for_view(@due_at_a, :short)}"
+        ["Everyone else", format_date_for_view(@due_at_a, :short).to_s]
       )
     end
 
     it "shows the due dates for Section B", priority: "1" do
-      validate_vdd_quiz_tooltip_dates(
+      validate_quiz_tooltip_dates(
         ".date-due",
-        "#{@section_b.name}\n#{format_date_for_view(@due_at_b, :short)}"
+        [@section_b.name.to_s, format_date_for_view(@due_at_b, :short).to_s]
       )
     end
 
     it "shows the availability dates for Section A", priority: "1" do
-      validate_vdd_quiz_tooltip_dates(
+      validate_quiz_tooltip_dates(
         ".date-available",
-        "Everyone else\nAvailable until #{format_date_for_view(@lock_at_a, :short)}"
+        ["Everyone else", "Available until", format_date_for_view(@lock_at_a, :short).to_s]
       )
     end
 
     it "shows the availability dates for Section B", priority: "1" do
-      validate_vdd_quiz_tooltip_dates(
+      validate_quiz_tooltip_dates(
         ".date-available",
-        "#{@section_b.name}\nNot available until #{format_date_for_view(@unlock_at_b, :short)}"
+        [@section_b.name.to_s, "Not available until", format_date_for_view(@unlock_at_b, :short).to_s]
       )
     end
   end
@@ -79,7 +79,7 @@ describe "viewing a quiz with variable due dates on the quizzes index page" do
     end
 
     it "does not show due dates on index page" do
-      expect(fj("#assignment-quizzes:contains('Test Assignment')")).to be_displayed
+      expect(fj("#assignment-quizzes:contains('Test Quiz')")).to be_displayed
       expect(f("#assignment-quizzes")).not_to contain_css('[data-view="date-available"]')
       expect(f("#assignment-quizzes")).not_to contain_css('[data-view="date-due"]')
     end

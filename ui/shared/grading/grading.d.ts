@@ -182,7 +182,9 @@ export type CamelizedAssignment = {
   moderatedGrading: boolean
   muted: boolean
   name: string
-  pointsPossible: number
+  newQuizzesAnonymousParticipants: boolean
+  parentAssignmentId?: string
+  pointsPossible: number | null
   postManually: boolean
   published: boolean
   hasRubric: boolean | null
@@ -321,13 +323,13 @@ export type GradingPeriodGrade = {
   assignmentGroups: AssignmentGroupGradeMap
   scoreUnit: 'points' | 'percentage'
   final: {
-    score: number
+    score: number | null
     possible: number
     submission_count?: number
     submissions?: Submission[]
   }
   current: {
-    score: number
+    score: number | null
     possible: number
     submission_count?: number
     submissions?: Submission[]
@@ -365,6 +367,7 @@ export type DeprecatedGradingScheme = {
 
 export type GradeEntryOptions = {
   gradingScheme?: {data: GradingStandard[]; pointsBased: boolean; scalingFactor: number} | null
+  restrictPointsBasedInput?: boolean
 }
 
 export type ProvisionalGrade = {

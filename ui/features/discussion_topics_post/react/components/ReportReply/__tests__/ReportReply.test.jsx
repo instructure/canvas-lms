@@ -22,8 +22,8 @@ import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {ReportReply} from '../ReportReply'
 
 const mockProps = ({
-  onCloseReportModal = jest.fn(),
-  onSubmit = jest.fn(),
+  onCloseReportModal = vi.fn(),
+  onSubmit = vi.fn(),
   showReportModal = true,
   isLoading = false,
   errorSubmitting = false,
@@ -59,7 +59,7 @@ describe('Report Reply', () => {
   })
 
   it('should call onCloseReportModal from the cancel button', async () => {
-    const onCloseReportModalMock = jest.fn()
+    const onCloseReportModalMock = vi.fn()
     const container = setup(mockProps({onCloseReportModal: onCloseReportModalMock}))
     const cancelButton = await container.findByTestId('report-reply-cancel-modal-button')
     expect(cancelButton).toBeTruthy()
@@ -68,7 +68,7 @@ describe('Report Reply', () => {
   })
 
   it('should call onCloseReportModal from the close button', async () => {
-    const onCloseReportModalMock = jest.fn()
+    const onCloseReportModalMock = vi.fn()
     const container = setup(mockProps({onCloseReportModal: onCloseReportModalMock}))
     const cancelButton = await container.findByText('Close')
     expect(cancelButton).toBeTruthy()
@@ -77,7 +77,7 @@ describe('Report Reply', () => {
   })
 
   it('should call onSubmit', async () => {
-    const onSubmitMock = jest.fn()
+    const onSubmitMock = vi.fn()
     const container = setup(mockProps({onSubmit: onSubmitMock}))
     const option = await container.findByText('Other')
     expect(option).toBeTruthy()
@@ -110,7 +110,7 @@ describe('Report Reply', () => {
   })
 
   it('should disable options when cancelling', async () => {
-    const container = setup(mockProps({onCloseReportModal: jest.fn()}))
+    const container = setup(mockProps({onCloseReportModal: vi.fn()}))
 
     const option = await container.findByText('Other')
     await userEvent.click(option)

@@ -13,4 +13,8 @@
 <%= hint("warning", "BETA: This API endpoint is not finalized, and there could be breaking changes before its final release.") %>
 <% end %>
 
+<% if @internal && @show_internal %>
+<%= hint("warning", "INTERNAL: This API endpoint is marked as 'internal use only' and is not included in the production version of these docs.") %>
+<% end %>
+
 <%= yieldall %>

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {clone} from 'lodash'
+import {clone} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import template from '../../jst/WikiPageContent.handlebars'

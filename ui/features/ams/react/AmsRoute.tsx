@@ -16,56 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef} from 'react'
-
-interface AmsModule {
-  render: (container: HTMLElement, config: {routerBasename: string}) => void
-  unmount: (container: HTMLElement) => void
-}
+import {AmsLoader} from '../../../shared/ams'
 
 export function Component(): JSX.Element | null {
-  const containerRef = useRef<HTMLDivElement | null>(document.querySelector('#ams_container'))
-  const moduleRef = useRef<AmsModule | null>(null)
-
-  React.useEffect(() => {
-    if (!ENV.FEATURES.ams_service || !containerRef.current) {
-      return
-    }
-
-    let stillMounting = true
-
-    loadAmsModule()
-      .then(module => {
-        if (stillMounting && containerRef.current) {
-          moduleRef.current = module
-          module.render(containerRef.current, {
-            routerBasename: ENV.context_url ?? '',
-            themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
-            useHighContrast: ENV.use_high_contrast ?? false,
-          })
-        }
-      })
-      .catch(err => {
-        console.error('Failed to load AMS: ', err)
-      })
-
-    return () => {
-      stillMounting = false
-      if (containerRef.current && moduleRef.current) {
-        moduleRef.current.unmount(containerRef.current)
-      }
-    }
-  }, [])
-
-  return null
-}
-
-async function loadAmsModule() {
-  const moduleUrl = REMOTES?.ams?.launch_url
-
-  if (!moduleUrl) {
-    throw new Error('AMS module URL not found')
-  }
-
-  return import(/* webpackIgnore: true */ moduleUrl)
+  return <AmsLoader containerId="ams_container" />
 }

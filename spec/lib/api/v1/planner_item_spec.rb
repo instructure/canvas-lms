@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../../spec_helper"
-
 describe Api::V1::PlannerItem do
   before :once do
     course_factory active_all: true
@@ -55,6 +53,19 @@ describe Api::V1::PlannerItem do
 
       def course_assignment_url(*)
         "course_assignment_url"
+      end
+
+      def context_url(context, method_name, *args)
+        case method_name
+        when :context_assignment_peer_reviews_url
+          "/courses/#{context.id}/assignments/#{args.first}/peer_reviews"
+        when :context_assignment_submission_url
+          "course_assignment_submission_url"
+        when :context_assignment_url
+          "course_assignment_url"
+        else
+          "context_url"
+        end
       end
 
       def calendar_url_for(*); end
@@ -108,6 +119,41 @@ describe Api::V1::PlannerItem do
 
       @course.image_url = "path/to/course/image.png"
       expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to eq "path/to/course/image.png"
+    end
+
+    it "returns plannable_date for quizzes with differentiated due dates using cached_due_date" do
+      section = @course.course_sections.create!(name: "Test Section")
+      @student.enrollments.first.update!(course_section: section)
+
+      # Create a quiz with only_visible_to_overrides
+      quiz = Quizzes::Quiz.create!(
+        context: @course,
+        title: "Quiz with Override",
+        quiz_type: "assignment",
+        workflow_state: "available"
+      )
+      assignment = quiz.assignment
+      assignment.update!(
+        only_visible_to_overrides: true,
+        workflow_state: "published"
+      )
+
+      # Create an override for the section with a specific due date
+      override_due_at = 3.days.from_now
+      assignment.assignment_overrides.create!(
+        set_type: "CourseSection",
+        set_id: section.id,
+        due_at: override_due_at,
+        due_at_overridden: true
+      )
+
+      assignment_with_submission = Assignment.with_user_due_date(@student)
+                                             .find(assignment.id)
+
+      quiz_hash = api.planner_item_json(assignment_with_submission, @student, session)
+
+      expect(quiz_hash[:plannable_date]).not_to be_nil
+      expect(quiz_hash[:plannable_date].to_date).to eq override_due_at.to_date
     end
 
     describe "calendar events with an online meeting url" do
@@ -305,6 +351,107 @@ describe Api::V1::PlannerItem do
       it "includes sub assignment tag" do
         json = api.planner_item_json(@checkpoint_topic, @student, session)
         expect(json[:plannable][:sub_assignment_tag]).to eq "reply_to_topic"
+      end
+    end
+
+    context "peer review sub-assignments" do
+      before :once do
+        course_with_student(active_all: true)
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @parent_assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          peer_reviews: true,
+          due_at: 1.week.from_now
+        )
+        @peer_review_sub = PeerReviewSubAssignment.create!(
+          parent_assignment: @parent_assignment,
+          title: "Assignment with Peer Review Peer Review (2)",
+          due_at: 2.weeks.from_now
+        )
+      end
+
+      it "returns peer_review_sub_assignment as plannable_type" do
+        json = api.planner_item_json(@peer_review_sub, @student, session)
+        expect(json[:plannable_type]).to eq "peer_review_sub_assignment"
+      end
+
+      it "includes the title from the peer review sub-assignment" do
+        json = api.planner_item_json(@peer_review_sub, @student, session)
+        expect(json[:plannable][:title]).to eq "Assignment with Peer Review Peer Review (2)"
+      end
+
+      it "includes the due_at from the peer review sub-assignment" do
+        json = api.planner_item_json(@peer_review_sub, @student, session)
+        expect(json[:plannable][:due_at]).to eq @peer_review_sub.due_at
+      end
+
+      it "returns html_url pointing to peer reviews page" do
+        json = api.planner_item_json(@peer_review_sub, @student, session)
+        expect(json[:html_url]).to match "/courses/#{@course.id}/assignments/#{@parent_assignment.id}/peer_reviews"
+      end
+
+      context "feedback and activity" do
+        before :once do
+          @peer_review_submission = @peer_review_sub.submit_homework(@student, body: "Peer review completed")
+          @parent_submission = @parent_assignment.submit_homework(@student, body: "Assignment completed")
+        end
+
+        it "shows has_feedback as true when teacher comments on peer review submission" do
+          teacher = @course.teachers.first
+          @peer_review_submission.add_comment(author: teacher, comment: "Good peer review work!")
+
+          json = api.planner_item_json(@peer_review_sub, @student, session)
+          expect(json[:submissions][:has_feedback]).to be true
+        end
+
+        it "shows has_feedback as false when teacher only comments on parent submission" do
+          teacher = @course.teachers.first
+          @parent_submission.add_comment(author: teacher, comment: "Good assignment work!")
+
+          json = api.planner_item_json(@peer_review_sub, @student, session)
+          expect(json[:submissions][:has_feedback]).to be false
+        end
+
+        it "shows new_activity as true when there are unread comments on peer review submission" do
+          teacher = @course.teachers.first
+          @peer_review_submission.add_comment(author: teacher, comment: "Good peer review!")
+
+          json = api.planner_item_json(@peer_review_sub, @student, session)
+          expect(json[:new_activity]).to be true
+        end
+
+        it "shows new_activity as false when unread comments are only on parent submission" do
+          teacher = @course.teachers.first
+          @parent_submission.add_comment(author: teacher, comment: "Good assignment!")
+
+          json = api.planner_item_json(@peer_review_sub, @student, session)
+          expect(json[:new_activity]).to be false
+        end
+
+        it "includes feedback content from peer review submission, not parent" do
+          teacher = @course.teachers.first
+          @peer_review_submission.add_comment(author: teacher, comment: "Peer review feedback!")
+          @parent_submission.add_comment(author: teacher, comment: "Parent assignment feedback!")
+
+          json = api.planner_item_json(@peer_review_sub, @student, session)
+          expect(json[:submissions][:feedback][:comment]).to eq "Peer review feedback!"
+          expect(json[:submissions][:feedback][:comment]).not_to eq "Parent assignment feedback!"
+        end
+
+        it "shows has_feedback as false when no comments exist on either submission" do
+          json = api.planner_item_json(@peer_review_sub, @student, session)
+          expect(json[:submissions][:has_feedback]).to be false
+        end
+
+        it "shows new_activity as false when all comments on peer review submission are read" do
+          teacher = @course.teachers.first
+          @peer_review_submission.add_comment(author: teacher, comment: "Good work!")
+          @peer_review_submission.mark_item_read("comment")
+          @peer_review_submission.mark_read(@student)
+
+          json = api.planner_item_json(@peer_review_sub, @student, session)
+          expect(json[:new_activity]).to be false
+        end
       end
     end
 
@@ -609,6 +756,28 @@ describe Api::V1::PlannerItem do
       expect(api.planner_item_json(@topic, @student, session)[:new_activity]).to be true
     end
 
+    context "for announcements" do
+      before do
+        @annc = announcement_model(context: @course)
+      end
+
+      it "returns false when announcement is marked complete via planner override" do
+        # Use PlannerOverride.create! so plannable_type uses Announcement.polymorphic_name
+        # ("DiscussionTopic") consistent with how the API creates overrides
+        PlannerOverride.create!(user: @student, plannable: @annc, marked_complete: true)
+        expect(api.planner_item_json(@annc, @student, session)[:new_activity]).to be false
+      end
+
+      it "returns true when announcement is unread and not marked complete" do
+        expect(api.planner_item_json(@annc, @student, session)[:new_activity]).to be true
+      end
+
+      it "returns false when announcement is read and has no replies" do
+        @annc.change_read_state("read", @student)
+        expect(api.planner_item_json(@annc, @student, session)[:new_activity]).to be false
+      end
+    end
+
     it "returns false for items without new activity" do
       student_in_course active_all: true
       expect(api.planner_item_json(@quiz, @student, session)[:new_activity]).to be false
@@ -656,6 +825,12 @@ describe Api::V1::PlannerItem do
         json = api.planner_item_json(@reply_to_topic, @student, session)
         expect(json[:plannable][:unread_count]).to eq 0
         expect(json[:plannable][:read_state]).to eq "unread"
+      end
+
+      it "returns false for sub_assignments when topic is nil" do
+        @reply_to_topic.parent_assignment.update!(discussion_topic: nil)
+        json = api.planner_item_json(@reply_to_topic, @student, session)
+        expect(json[:new_activity]).to be false
       end
     end
   end

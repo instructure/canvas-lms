@@ -23,7 +23,7 @@
 // returns an array of enrollments meant for display on /courses/:course_id/sections/:id.
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 import {underscoreString} from '@canvas/convert-case'
 
 const I18n = createI18nScope('section')

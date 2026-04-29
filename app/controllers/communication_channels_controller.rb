@@ -87,7 +87,7 @@
 #     }
 #
 class CommunicationChannelsController < ApplicationController
-  before_action :require_user, only: %i[create destroy re_send_confirmation delete_push_token]
+  skip_before_action :require_user, only: :confirm
   before_action :reject_student_view_student
 
   include Api::V1::CommunicationChannel
@@ -152,7 +152,7 @@ class CommunicationChannelsController < ApplicationController
   def create
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
 
-    if !has_api_permissions? && params[:communication_channel][:type] != CommunicationChannel::TYPE_PUSH
+    unless can_edit_own_comm_channels? || can_manage_user_details? || params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
       return render_unauthorized_action
     end
 
@@ -199,7 +199,7 @@ class CommunicationChannelsController < ApplicationController
       @pseudonym.generate_temporary_password
 
       unless @pseudonym.valid?
-        return render json: @pseudonym.errors.as_json, status: :bad_request
+        return render json: @pseudonym.errors, status: :bad_request
       end
     end
 
@@ -212,7 +212,7 @@ class CommunicationChannelsController < ApplicationController
 
     if !@cc.new_record? && !@cc.retired? && @cc.path_type != CommunicationChannel::TYPE_PUSH
       @cc.errors.add(:path, "unique!")
-      return render json: @cc.errors.as_json, status: :bad_request
+      return render json: @cc.errors, status: :bad_request
     end
 
     @cc.user = @user
@@ -235,7 +235,7 @@ class CommunicationChannelsController < ApplicationController
       flash[:notice] = t("profile.notices.contact_registered", "Contact method registered!")
       render json: communication_channel_json(@cc, @current_user, session)
     else
-      render json: @cc.errors.as_json, status: :bad_request
+      render json: @cc.errors, status: :bad_request
     end
   end
 
@@ -312,7 +312,7 @@ class CommunicationChannelsController < ApplicationController
         @merge_opportunities = []
         merge_users.each do |user|
           account_to_pseudonyms_hash = {}
-          root_account_pseudonym = SisPseudonym.for(user, @root_account, type: :exact, require_sis: false)
+          root_account_pseudonym = SisPseudonym.for(user, @root_account, type: :exact, require_sis: false, current_user: @current_user)
           if root_account_pseudonym
             @merge_opportunities << [user, [root_account_pseudonym]]
           else
@@ -333,7 +333,7 @@ class CommunicationChannelsController < ApplicationController
         @merge_opportunities = []
       end
 
-      js_env PASSWORD_POLICY: @domain_root_account.password_policy
+      js_env({ PASSWORD_POLICY: @domain_root_account.password_policy })
 
       if @current_user && params[:confirm].present? && @merge_opportunities.find { |opp| opp.first == @current_user }
         @user.transaction do
@@ -384,7 +384,7 @@ class CommunicationChannelsController < ApplicationController
       else
         # Open registration and admin-created users are pre-registered, and have already claimed a CC, but haven't
         # set up a password yet
-        @pseudonym = @root_account.pseudonyms.active_only.where(password_auto_generated: true, user_id: @user).first if @user.pre_registered? || @user.creation_pending?
+        @pseudonym = @root_account.pseudonyms.not_instructure_identity.active_only.where(password_auto_generated: true, user_id: @user).first if @user.pre_registered? || @user.creation_pending?
         # Users implicitly created via course enrollment or account admin creation are creation pending, and don't have a pseudonym yet
         @pseudonym ||= @root_account.pseudonyms.build(user: @user, unique_id: cc.path) if @user.creation_pending?
         # We create the pseudonym with unique_id = cc.path, but if that unique_id is taken, just nil it out and make the user come
@@ -416,11 +416,11 @@ class CommunicationChannelsController < ApplicationController
           valid = @pseudonym.valid?
           valid = @user.valid? && valid # don't want to short-circuit, since we are interested in the errors
           unless valid
-            ps_errors = @pseudonym.errors.as_json[:errors]
+            ps_errors = ::Api::Errors::Reporter.to_json(@pseudonym.errors)[:errors]
             ps_errors.delete(:password_confirmation) unless params[:pseudonym][:password_confirmation]
             return render json: {
                             errors: {
-                              user: @user.errors.as_json[:errors],
+                              user: ::Api::Errors::Reporter.to_json(@user.errors)[:errors],
                               pseudonym: ps_errors
                             }
                           },
@@ -560,10 +560,9 @@ class CommunicationChannelsController < ApplicationController
       @cc = @user.communication_channels.unretired.find(params[:id])
     end
 
-    return render_unauthorized_action unless has_api_permissions?
-    if @cc.imported? && !@domain_root_account.edit_institution_email?
-      return render_unauthorized_action
-    end
+    return render_unauthorized_action unless can_manage_user_details? ||
+                                             (can_edit_own_comm_channels? &&
+                                             (!@cc.imported? || @domain_root_account.edit_institution_email?))
 
     if @cc.destroy
       @user.touch
@@ -653,9 +652,12 @@ class CommunicationChannelsController < ApplicationController
     end
   end
 
-  def has_api_permissions?
-    (@user == @current_user && @current_user&.user_can_edit_comm_channels?) ||
-      @user.grants_right?(@current_user, session, :manage_user_details)
+  def can_edit_own_comm_channels?
+    @user == @current_user && @current_user&.user_can_edit_comm_channels?
+  end
+
+  def can_manage_user_details?
+    @user.grants_right?(@current_user, session, :manage_user_details)
   end
 
   def add_additional_email_if_allowed

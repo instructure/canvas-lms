@@ -45,12 +45,12 @@ describe('Ratings', () => {
   })
 
   beforeEach(() => {
-    onChangeRatingsMock = jest.fn()
-    onChangeMasteryPointsMock = jest.fn()
+    onChangeRatingsMock = vi.fn()
+    onChangeMasteryPointsMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('callbacks', () => {

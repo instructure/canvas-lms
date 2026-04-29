@@ -41,7 +41,7 @@ module Api::V1::Attachment
       options[:master_course_status] = setup_master_course_restrictions(files, options[:context])
     end
 
-    ActiveRecord::Associations::Preloader.new(records: files, associations: [:root_account]).call
+    ActiveRecord::Associations::Preloader.new(records: files, associations: [:root_account, :last_attachment_upload_status]).call
 
     files.map do |f|
       attachment_json(f, user, url_options, options)
@@ -51,7 +51,9 @@ module Api::V1::Attachment
   def attachment_json(attachment, user, url_options = {}, options = {})
     hash = attachment.slice("id", "folder_id", "display_name", "filename")
 
-    hash["uuid"] = attachment.uuid unless Account.site_admin.feature_enabled?(:deprecate_uuid_in_files_api)
+    if (attachment.context_type == "User" && attachment.context_id == user&.id) || !attachment.root_account.feature_enabled?(:deprecate_uuid_in_files_api)
+      hash["uuid"] = attachment.uuid
+    end
 
     hash["upload_status"] = AttachmentUploadStatus.upload_status(attachment)
 
@@ -90,7 +92,7 @@ module Api::V1::Attachment
     downloadable = skip_permission_checks || !attachment.locked_for?(user, check_policies: true)
 
     if downloadable
-      url_options[:location] = nil unless attachment.root_account.feature_enabled?(:file_association_access) || attachment.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+      url_options[:location] = nil unless attachment.root_account.feature_enabled?(:file_association_access)
       # using the multi-parameter form because not every class that mixes in
       # this api helper also mixes in ApplicationHelper (I'm looking at you,
       # DiscussionTopic::MaterializedView), and in those cases we need to
@@ -166,9 +168,7 @@ module Api::V1::Attachment
       hash["user"] = user_display_json(attachment.user, context)
     end
     if includes.include? "preview_url"
-
       url_opts = {
-        moderated_grading_allow_list: options[:moderated_grading_allow_list],
         enable_annotations: options[:enable_annotations],
         enrollment_type: options[:enrollment_type],
         anonymous_instructor_annotations: options[:anonymous_instructor_annotations],
@@ -176,8 +176,7 @@ module Api::V1::Attachment
         access_token: options[:access_token],
         instfs_id: options[:instfs_id]
       }
-      hash["preview_url"] = attachment.crocodoc_url(user, url_opts) ||
-                            attachment.canvadoc_url(user, url_opts)
+      hash["preview_url"] = attachment.canvadoc_url(user, url_opts)
     end
     if includes.include?("canvadoc_document_id")
       hash["canvadoc_document_id"] = attachment&.canvadoc&.document_id
@@ -188,6 +187,7 @@ module Api::V1::Attachment
       }
       url_opts[:verifier] = url_options[:verifier] if url_options[:verifier].present?
       url_opts[:verifier] ||= attachment.uuid if downloadable && !options[:omit_verifier_in_app] && !((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
+      url_opts[:location] = url_options[:location] if url_options[:location].present?
 
       if options[:access_token].present? && options[:instfs_id].present?
         url_opts.merge!(options.slice(:access_token, :instfs_id))
@@ -302,8 +302,10 @@ module Api::V1::Attachment
     params = opts[:params] || request.params
 
     if opts[:submit_assignment]
-      # as: automatically submit
+      # as: auto_submitted
       RequestContext::Generator.add_meta_header("as", "1")
+    else
+      RequestContext::Generator.add_meta_header("as", "0")
     end
 
     # Handle deprecated folder path

@@ -16,15 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, screen} from '@testing-library/react'
+import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import {Card} from '..'
 
 describe('Card', () => {
-  const mockOnClick = jest.fn()
+  const mockOnClick = vi.fn()
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    cleanup()
   })
 
   it('mounts without crashing', () => {
@@ -112,5 +116,18 @@ describe('Card', () => {
     )
     const link = screen.getByTestId('card-link')
     expect(link).toHaveAttribute('aria-label', 'Accessible Label')
+  })
+
+  it('renders without crashing when onClick is not provided', () => {
+    render(
+      <Card
+        href="https://example.com"
+        icon="/mock.svg"
+        label="External Link"
+        testId="card-link"
+        text="Test Card"
+      />,
+    )
+    expect(screen.getByTestId('card-link')).toHaveAttribute('href', 'https://example.com')
   })
 })

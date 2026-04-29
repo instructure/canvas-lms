@@ -19,7 +19,7 @@
 import {gql} from '@apollo/client'
 
 export const GET_ENROLLMENTS_QUERY = gql`
-query getEnrollments($after: String, $courseId: ID!, $userIds: [ID!]) {
+query Gradebook__GetEnrollments($after: String, $courseId: ID!, $userIds: [ID!]) {
   course(id: $courseId) {
     enrollmentsConnection(
       after: $after
@@ -55,7 +55,7 @@ query getEnrollments($after: String, $courseId: ID!, $userIds: [ID!]) {
         course {
           _id
         }
-        grades {
+        grades(gradingPeriodId: null) {
           currentGrade
           currentScore
           finalGrade

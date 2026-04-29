@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import TreeBrowser from './Management/TreeBrowser'
 import FindOutcomesBillboard from './FindOutcomesBillboard'
 import FindOutcomesView from './FindOutcomesView'
@@ -37,7 +37,7 @@ import useResize from '@canvas/outcomes/react/hooks/useResize'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
-import {isEmpty} from 'lodash'
+import {isEmpty} from 'es-toolkit/compat'
 import useOutcomesImport, {
   IMPORT_COMPLETED,
   ROOT_GROUP,

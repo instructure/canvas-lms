@@ -132,7 +132,7 @@ describe ActiveRecord::Base do
       let(:strategy) { :temp_table }
       let(:extra_kwargs) { { ignore_transaction: true } }
 
-      include_examples "batches"
+      it_behaves_like "batches"
 
       it "raises an error when not in a transaction" do
         expect { User.find_in_batches(strategy: :temp_table) { nil } }.to raise_error(ArgumentError)
@@ -140,7 +140,7 @@ describe ActiveRecord::Base do
 
       it "finds all enrollments from course join" do
         e = Course.active.where(id: [@c1, @c2]).select("enrollments.id AS e_id")
-                  .joins(:enrollments).order("e_id asc")
+                  .joins(:enrollments).order(:e_id)
         batch_size = 2
         es = []
         Course.transaction do
@@ -159,7 +159,7 @@ describe ActiveRecord::Base do
     context "with cursor" do
       let(:strategy) { :cursor }
 
-      include_examples "batches"
+      it_behaves_like "batches"
 
       context "sharding" do
         specs_require_sharding
@@ -182,7 +182,7 @@ describe ActiveRecord::Base do
       let(:strategy) { :copy }
       let(:extra_kwargs) { { load: true } }
 
-      include_examples "batches"
+      it_behaves_like "batches"
 
       it "works with load: false" do
         User.in_batches(strategy: :copy) { |r| expect(r.to_a).to match_array([@u1, @u2, @u3]) }
@@ -556,7 +556,7 @@ describe ActiveRecord::Base do
     # in rails 4, the where conditions use bind values for association scopes
     it "does an update all with a join on associations" do
       @u1.pseudonyms.joins(:user).active.where(users: { name: "b" }).update_all(unique_id: "pa3")
-      expect(@p1.reload.unique_id).to_not eq "pa3"
+      expect(@p1.reload.unique_id).not_to eq "pa3"
       @u1.pseudonyms.joins(:user).active.where(users: { name: "a" }).update_all(unique_id: "pa3")
       expect(@p1.reload.unique_id).to eq "pa3"
       expect(@p1_2.reload.unique_id).to eq "pa2"
@@ -953,6 +953,7 @@ describe ActiveRecord::Base do
     it "uses default scope" do
       mock_account = Class.new(Account) do
         include RSpec::Matchers
+
         before_save do
           expect(Account.all.to_sql).not_to match(/callbacks something/)
           expect(self.class.all.to_sql).not_to match(/callbacks something/)
@@ -968,83 +969,6 @@ describe ActiveRecord::Base do
       Setting.set("touch_personal_space", "1")
       group_model
       expect(@group.users.not_recently_touched.to_a).to be_empty
-    end
-  end
-
-  context "polymorphic associations" do
-    it "allows joins to specific classes" do
-      # no error
-      sql = StreamItem.joins(:discussion_topic).to_sql
-      # and the sql
-      expect(sql).to include("asset_type")
-      expect(sql).to include("DiscussionTopic")
-    end
-
-    it "validates the type field" do
-      si = StreamItem.new
-      si.asset_type = "Submission"
-      si.data = {}
-      expect(si.valid?).to be true
-
-      si.context_type = "User"
-      expect(si.valid?).to be false
-    end
-
-    it "doesn't allow mismatched assignment" do
-      si = StreamItem.new
-      expect { si.discussion_topic = Course.new }.to raise_error(ActiveRecord::AssociationTypeMismatch)
-      expect { si.asset = Course.new }.to raise_error(ActiveRecord::AssociationTypeMismatch)
-      si.asset = DiscussionTopic.new
-      si.asset = nil
-    end
-
-    it "has the same backing store for both generic and specific accessors" do
-      si = StreamItem.new
-      dt = DiscussionTopic.new
-      si.discussion_topic = dt
-      expect(si.asset_type).to eq "DiscussionTopic"
-      expect(si.asset_id).to eq dt.id
-      expect(si.asset.object_id).to eq si.discussion_topic.object_id
-    end
-
-    it "returns nil for the specific type if it's not that type" do
-      si = StreamItem.new
-      si.discussion_topic = DiscussionTopic.new
-      expect(si.conversation).to be_nil
-    end
-
-    it "doesn't ignores specific type if we're setting nil" do
-      si = StreamItem.new
-      dt = DiscussionTopic.new
-      si.discussion_topic = dt
-      si.conversation = nil
-      expect(si.asset).to eq dt
-      si.discussion_topic = nil
-      expect(si.asset).to be_nil
-    end
-
-    it "prefixes specific associations" do
-      expect(AssessmentRequest.reflections.keys).to include("assessor_asset_submission")
-    end
-
-    it "prefixes specific associations with an explicit name" do
-      expect(LearningOutcomeResult.reflections.keys).to include("association_assignment")
-    end
-
-    it "passes the correct foreign key down to specific associations" do
-      expect(LearningOutcomeResult.reflections["association_assignment"].foreign_key.to_sym).to eq :association_id
-    end
-
-    it "handles class resolution that doesn't match the association name" do
-      expect(Attachment.reflections["quiz"].klass).to eq Quizzes::Quiz
-    end
-
-    it "doesn't validate the type field for non-exhaustive associations" do
-      u = User.create!
-      v = Version.new
-      v.versionable = u
-      expect(v.versionable_type).to eq "User"
-      expect(v).to be_valid
     end
   end
 
@@ -1106,11 +1030,11 @@ describe ActiveRecord::Base do
       end
 
       it "invokes the create callbacks" do
-        user = User.new(workflow_state: 0)
+        account = Account.new(workflow_state: 0)
 
-        expect(user).to receive(:set_default_feature_flags)
+        expect(account).to receive(:create_default_objects)
 
-        user.insert
+        account.insert
       end
     end
 

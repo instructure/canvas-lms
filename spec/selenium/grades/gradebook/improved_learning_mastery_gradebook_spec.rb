@@ -35,7 +35,7 @@ describe "Improved Learning Mastery Gradebook" do
       @align2 = @outcome2.align(@assignment, @course)
 
       @course.enable_feature!(:outcome_gradebook)
-      Account.site_admin.enable_feature!(:improved_lmgb)
+      @course.enable_feature!(:improved_lmgb)
     end
 
     before do
@@ -119,6 +119,87 @@ describe "Improved Learning Mastery Gradebook" do
       end
     end
 
+    context "settings tray" do
+      it "opens and closes the settings tray" do
+        navigate_to_gradebook
+        LearningMasteryGradebookPage.settings_button.click
+        wait_for_ajaximations
+        expect(LearningMasteryGradebookPage.settings_tray).to be_displayed
+
+        LearningMasteryGradebookPage.close_settings_button.click
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_css(LearningMasteryGradebookPage.settings_tray_selector)
+      end
+
+      it "displays secondary info, display filter, and scoring options" do
+        navigate_to_gradebook
+        LearningMasteryGradebookPage.settings_button.click
+        wait_for_ajaximations
+        tray = LearningMasteryGradebookPage.settings_tray
+
+        expect(tray.text).to include("SIS ID")
+        expect(tray.text).to include("Login ID")
+        expect(tray.text).to include("Integration ID")
+
+        expect(tray.text).to include("Avatars in student list")
+        expect(tray.text).to include("Outcomes with no results")
+        expect(tray.text).to include("Students with no results")
+
+        expect(tray.text).to include("Icons Only")
+        expect(tray.text).to include("Icons + Points")
+        expect(tray.text).to include("Icons + Descriptor")
+      end
+
+      it "applies default settings: avatars shown, no secondary info, icons-only scores" do
+        create_learning_outcome_result(@student_1, 5, { assignment: @assignment, alignment: @align1, context: @course })
+        navigate_to_gradebook
+
+        expect(LearningMasteryGradebookPage.student_avatars.size).to eq(@all_students.size)
+
+        expect(f("body")).not_to contain_css('[data-testid="student-secondary-info"]')
+
+        score_cell = LearningMasteryGradebookPage.student_outcome_cell(@student_1.id, @outcome1.id)
+        expect(score_cell).to contain_css(
+          LearningMasteryGradebookPage.score_icon_selector(LearningMasteryGradebookPage.mastery_icon_id)
+        )
+        expect(score_cell.text).to be_empty
+      end
+    end
+
+    context "filters" do
+      it "filters students by search" do
+        navigate_to_gradebook
+
+        student_search = LearningMasteryGradebookPage.student_search_input
+        student_search.send_keys(@student_1.name)
+        wait_for_ajaximations
+
+        option = fj("[role='option']:contains('#{@student_1.name}')")
+        option.click
+        wait_for_ajaximations
+
+        student_cells = LearningMasteryGradebookPage.student_cells
+        expect(student_cells.size).to eq(1)
+        expect(student_cells[0].text).to include(@student_1.name)
+      end
+
+      it "filters outcomes by search" do
+        navigate_to_gradebook
+
+        outcome_search = LearningMasteryGradebookPage.outcome_search_input
+        outcome_search.send_keys(@outcome1.title)
+        wait_for_ajaximations
+
+        option = fj("[role='option']:contains('#{@outcome1.title}')")
+        option.click
+        wait_for_ajaximations
+
+        outcome_headers = LearningMasteryGradebookPage.outcome_headers
+        expect(outcome_headers.size).to eq(1)
+        expect(outcome_headers[0].text).to include(@outcome1.title)
+      end
+    end
+
     context "pagination" do
       it "renders pagination controls when there are multiple pages" do
         register_and_enroll_students(25)
@@ -142,6 +223,203 @@ describe "Improved Learning Mastery Gradebook" do
         click_INSTUI_Select_option(per_page_dropdown, "30")
         wait_for_ajaximations
         expect(LearningMasteryGradebookPage.student_cells.size).to eq(30)
+      end
+
+      it "resets to page 1 when students per page is changed" do
+        register_and_enroll_students(50)
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.page_button(2).click
+        wait_for_ajaximations
+
+        expect(LearningMasteryGradebookPage.current_page_text).to eq("2")
+
+        per_page_dropdown = LearningMasteryGradebookPage.per_page_dropdown
+        click_INSTUI_Select_option(per_page_dropdown, "30")
+        wait_for_ajaximations
+
+        expect(LearningMasteryGradebookPage.current_page_text).to eq("1")
+        expect(LearningMasteryGradebookPage.student_cells.size).to eq(30)
+      end
+
+      it "navigates between pages" do
+        additional_students = 20
+        register_and_enroll_students(additional_students)
+        navigate_to_gradebook
+
+        per_page = 15
+        expect(LearningMasteryGradebookPage.student_cells.size).to eq(per_page)
+
+        LearningMasteryGradebookPage.page_button(2).click
+        wait_for_ajaximations
+
+        expect(LearningMasteryGradebookPage.current_page_text).to eq("2")
+        expect(LearningMasteryGradebookPage.student_cells.size).to eq(additional_students + @all_students.size - per_page)
+      end
+    end
+
+    context "student header sorting" do
+      it "changes student name display to Last, First" do
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.student_header_options_button.click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item_radio("Last, First Name").click
+        wait_for_ajaximations
+
+        student_cells = LearningMasteryGradebookPage.student_cells
+        expect(student_cells[0].text).to include("last")
+      end
+
+      it "sorts students by name ascending" do
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.student_header_options_button.click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Ascending").click
+        wait_for_ajaximations
+
+        student_cells = LearningMasteryGradebookPage.student_cells
+        expect(student_cells[0].text).to include("student1")
+        expect(student_cells[1].text).to include("student2")
+        expect(student_cells[2].text).to include("student3")
+      end
+
+      it "sorts students by name descending" do
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.student_header_options_button.click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Descending").click
+        wait_for_ajaximations
+
+        student_cells = LearningMasteryGradebookPage.student_cells
+        expect(student_cells[0].text).to include("student3")
+        expect(student_cells[1].text).to include("student2")
+        expect(student_cells[2].text).to include("student1")
+      end
+    end
+
+    context "outcome sorting and contributing scores" do
+      before do
+        create_learning_outcome_result(@student_1, 5, { assignment: @assignment, alignment: @align1, context: @course })
+        create_learning_outcome_result(@student_2, 2, { assignment: @assignment, alignment: @align1, context: @course })
+        create_learning_outcome_result(@student_3, 0, { assignment: @assignment, alignment: @align1, context: @course })
+      end
+
+      it "sorts students by outcome score ascending" do
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.outcome_header_options_button(@outcome1.title).click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Ascending scores").click
+        wait_for_ajaximations
+
+        student_cells = LearningMasteryGradebookPage.student_cells
+        expect(student_cells[0].text).to include(@student_3.name)
+        expect(student_cells[1].text).to include(@student_2.name)
+        expect(student_cells[2].text).to include(@student_1.name)
+      end
+
+      it "sorts students by outcome score descending" do
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.outcome_header_options_button(@outcome1.title).click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Descending scores").click
+        wait_for_ajaximations
+
+        student_cells = LearningMasteryGradebookPage.student_cells
+        expect(student_cells[0].text).to include(@student_1.name)
+        expect(student_cells[1].text).to include(@student_2.name)
+        expect(student_cells[2].text).to include(@student_3.name)
+      end
+
+      it "shows contributing scores for an outcome" do
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.outcome_header_options_button(@outcome1.title).click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Show Contributing Scores").click
+        wait_for_ajaximations
+
+        contributing_headers = LearningMasteryGradebookPage.contributing_score_headers
+        expect(contributing_headers.size).to be >= 1
+      end
+
+      it "hides contributing scores after toggling" do
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.outcome_header_options_button(@outcome1.title).click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Show Contributing Scores").click
+        wait_for_ajaximations
+        expect(LearningMasteryGradebookPage.contributing_score_headers.size).to be >= 1
+
+        LearningMasteryGradebookPage.outcome_header_options_button(@outcome1.title).click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Hide Contributing Scores").click
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_css('[data-testid^="contributing-score-header"]')
+      end
+
+      it "displays contributing score cells for students" do
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.outcome_header_options_button(@outcome1.title).click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Show Contributing Scores").click
+        wait_for_ajaximations
+
+        expect(f("body")).to contain_css(
+          "[data-testid^='student-outcome-score-#{@student_1.id}-#{@outcome1.id}-']"
+        )
+      end
+    end
+
+    context "contributing score sorting" do
+      before do
+        create_learning_outcome_result(@student_1, 5, { assignment: @assignment, alignment: @align1, context: @course })
+        create_learning_outcome_result(@student_2, 2, { assignment: @assignment, alignment: @align1, context: @course })
+        create_learning_outcome_result(@student_3, 0, { assignment: @assignment, alignment: @align1, context: @course })
+      end
+
+      it "sorts by contributing score ascending" do
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.outcome_header_options_button(@outcome1.title).click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Show Contributing Scores").click
+        wait_for_ajaximations
+
+        LearningMasteryGradebookPage.contributing_score_header_options_button(@assignment.name).click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Ascending scores").click
+        wait_for_ajaximations
+
+        student_cells = LearningMasteryGradebookPage.student_cells
+        expect(student_cells[0].text).to include(@student_3.name)
+        expect(student_cells[1].text).to include(@student_2.name)
+        expect(student_cells[2].text).to include(@student_1.name)
+      end
+
+      it "sorts by contributing score descending" do
+        navigate_to_gradebook
+
+        LearningMasteryGradebookPage.outcome_header_options_button(@outcome1.title).click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Show Contributing Scores").click
+        wait_for_ajaximations
+
+        LearningMasteryGradebookPage.contributing_score_header_options_button(@assignment.name).click
+        wait_for_ajaximations
+        LearningMasteryGradebookPage.menu_item("Descending scores").click
+        wait_for_ajaximations
+
+        student_cells = LearningMasteryGradebookPage.student_cells
+        expect(student_cells[0].text).to include(@student_1.name)
+        expect(student_cells[1].text).to include(@student_2.name)
+        expect(student_cells[2].text).to include(@student_3.name)
       end
     end
   end

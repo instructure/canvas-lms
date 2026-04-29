@@ -28,9 +28,10 @@ import {
   removeDownloadListener,
   performRequest,
 } from '../../../utils/downloadUtils'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {type File, type Folder} from '../../../interfaces/File'
+import pluralize from '@canvas/util/stringPluralize'
 
 const I18n = createI18nScope('files_v2')
 
@@ -82,7 +83,7 @@ const CurrentDownloads = ({rows}: CurrentDownloadsProps) => {
       }
       if (
         performRequest({
-          contextType: contextType == 'course' ? 'courses' : 'users',
+          contextType: pluralize(contextType),
           contextId: contextId,
           items: (e as CustomEvent).detail.items,
           rows: rows,

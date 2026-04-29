@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {vi} from 'vitest'
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -23,11 +24,21 @@ import LearningMastery from '../LearningMastery'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import ContentFilterDriver from '@canvas/grading/content-filters/ContentFilterDriver'
+import $ from 'jquery'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
-  destroyContainer: jest.fn(),
-}))
+// Mock jQuery disableWhileLoading plugin
+$.fn.disableWhileLoading = vi.fn(function (promise) {
+  return this
+})
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+    destroyContainer: vi.fn(),
+  }
+})
 
 describe('Learning Mastery > LearningMastery', () => {
   let container
@@ -132,7 +143,7 @@ describe('Learning Mastery > LearningMastery', () => {
   describe('#updateCurrentSectionId()', () => {
     beforeEach(() => {
       learningMastery = new LearningMastery(options)
-      jest.spyOn(learningMastery, 'saveSettings')
+      vi.spyOn(learningMastery, 'saveSettings')
     })
 
     describe('when given a section id', () => {

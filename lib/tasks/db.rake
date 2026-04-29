@@ -40,17 +40,34 @@ namespace :db do
     # ensure ActiveRecord::Base.descendants is populated
     Zeitwerk::Loader.eager_load_all
     model = ActiveRecord::Base.descendants.reject(&:abstract_class).find { |clazz| clazz.table_name == args[:table_name] }
-    # we will happily ignore any columns on tables that don't currently exist, since nothing can depend on them yet
-    columns = args[:columns].split(",")
-    unless model.nil?
-      real_columns = model.column_names & columns
-      if real_columns.size.positive?
-        warn "NOT ignoring column '#{real_columns.join(",")}' from '#{args[:table_name]}' since the column(s) already exist. " \
-             "Has the migration already run?"
-        columns -= real_columns
-      end
+
+    # if model wasn't found or the model was found, but there is no backing table, we just return
+    if model.nil? || !ActiveRecord::Base.connection.table_exists?(model.table_name)
+      warn "Model for table '#{args[:table_name]}' not found or has no backing table; NOT ignoring any columns."
+      next
     end
+
+    # we will happily ignore any columns on tables that don't currently exist, since nothing can depend on them yet
+    delimiter = args[:columns].include?("+") ? "+" : ","
+    columns = if delimiter == "+"
+                args[:columns].split("+")
+              else
+                warn "DEPRECATED: Using comma-separated columns. Use '+' as delimiter instead."
+                args[:columns].split(",")
+              end
+
+    puts "Ignoring columns for #{args[:table_name]}: [#{columns.join(", ")}] (parsed from '#{args[:columns]}' using delimiter '#{delimiter}')"
+
+    real_columns = model.column_names & columns
+
+    if real_columns.size.positive?
+      warn "NOT ignoring column '#{real_columns.join(",")}' from '#{args[:table_name]}' since the column(s) already exist. " \
+           "Has the migration already run?"
+      columns -= real_columns
+    end
+
     key = consul_key(args[:table_name])
+
     if columns.empty?
       warn "No columns set for ignoring; removing all ignored columns for '#{args[:table_name]}' instead."
       Diplomat::Kv.delete(key)

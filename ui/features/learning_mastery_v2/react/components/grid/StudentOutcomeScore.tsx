@@ -16,31 +16,50 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Flex} from '@instructure/ui-flex'
-import SVGWrapper from '@canvas/svg-wrapper'
-import {svgUrl} from '../../utils/icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Outcome, OutcomeRollup} from '../../types/rollup'
+import {Outcome} from '@canvas/outcomes/react/types/rollup'
+import {getTagIcon} from '@canvas/outcomes/react/utils/icons'
+import {ScoreDisplayFormat} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
+import {findRating} from '@canvas/outcomes/react/utils/ratings'
+import {ScoreCellContent} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/ScoreCellContent'
+import {IconExpandStartLine} from '@instructure/ui-icons'
+import type {ViewProps} from '@instructure/ui-view'
 
-const I18n = createI18nScope('learning_mastery_gradebook')
+const I18n = createI18nScope('LearningMasteryGradebook')
 
 export interface StudentOutcomeScoreProps {
   outcome: Outcome
-  rollup?: OutcomeRollup
+  score?: number
+  scoreDisplayFormat?: ScoreDisplayFormat
+  background?: ViewProps['background']
+  onAction?: () => void
+  focus?: boolean
 }
 
-export const StudentOutcomeScore: React.FC<StudentOutcomeScoreProps> = ({outcome, rollup}) => {
+const StudentOutcomeScoreComponent: React.FC<StudentOutcomeScoreProps> = ({
+  outcome,
+  score,
+  scoreDisplayFormat = ScoreDisplayFormat.ICON_ONLY,
+  background,
+  onAction,
+  focus,
+}) => {
+  const rating = score !== undefined ? findRating(outcome.ratings, score) : undefined
+  const masteryLevelResult = getTagIcon(rating?.points, outcome.mastery_points)
+  const masteryLevel = typeof masteryLevelResult === 'string' ? masteryLevelResult : 'unassessed'
+
   return (
-    <Flex width="100%" height="100%" alignItems="center" justifyItems="center">
-      <SVGWrapper
-        fillColor={rollup?.rating?.color}
-        url={svgUrl(rollup?.rating?.points, outcome.mastery_points)}
-        style={{display: 'flex', alignItems: 'center', justifyItems: 'center', padding: '0px'}}
-      />
-      <ScreenReaderContent>
-        {rollup?.rating?.description || I18n.t('Unassessed')}
-      </ScreenReaderContent>
-    </Flex>
+    <ScoreCellContent
+      masteryLevel={masteryLevel}
+      score={score ?? 0}
+      scoreDisplayFormat={scoreDisplayFormat}
+      label={rating?.description || I18n.t('Unassessed')}
+      background={background}
+      onAction={onAction}
+      actionIcon={<IconExpandStartLine />}
+      focus={focus}
+    />
   )
 }
+
+export const StudentOutcomeScore = React.memo(StudentOutcomeScoreComponent)

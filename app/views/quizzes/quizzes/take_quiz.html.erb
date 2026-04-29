@@ -44,7 +44,7 @@
     <%= datetime_string(@submission.started_at) %>
     <h2><%= t('quiz_instructions','Quiz Instructions') %></h2>
     <div id="quiz-instructions" class="user_content">
-      <%= user_content(@quiz.description) %>
+      <%= user_content(@quiz.description, location: "quiz_submission_#{@submission.id}")  %>
     </div>
 
     <% if @quiz.time_limit %>
@@ -85,7 +85,7 @@
       <span class="time_left"><%= @submission.time_left %></span>
     </div>
 
-    <%= render :partial => "display_question", :collection => @quiz_presenter.current_questions, :locals => {:assessing => true } %>
+    <%= render :partial => "display_question", :collection => @quiz_presenter.current_questions, :locals => { assessing: true } %>
 
     <div class="button-container clearfix">
       <% if @quiz_presenter.one_question_at_a_time? %>

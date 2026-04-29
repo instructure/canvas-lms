@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
 require "httparty"
 
 # See also be_a_microsoft_sync_public_error matcher in support/microsoft_sync/errors.rb
@@ -202,7 +201,7 @@ describe MicrosoftSync::Errors do
     subject do
       described_class.for(
         service: "my api",
-        response: double(code:, body:, headers: HTTParty::Response::Headers.new(headers)),
+        response: instance_double(HTTParty::Response, code:, body:, headers: HTTParty::Response::Headers.new(headers)),
         tenant: "mytenant"
       )
     end

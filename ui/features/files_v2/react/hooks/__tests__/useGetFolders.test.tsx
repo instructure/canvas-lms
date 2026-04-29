@@ -18,17 +18,20 @@
 
 import React from 'react'
 import {renderHook} from '@testing-library/react-hooks'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {useGetFolders} from '../useGetFolders'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {resetAndGetFilesEnv} from '../../../utils/filesEnvUtils'
 import {FileContext} from '@canvas/files_v2/react/modules/filesEnvFactory.types'
 import {useParams} from 'react-router-dom'
 
+const server = setupServer()
+
 // Mock the useParams hook
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useParams: jest.fn().mockReturnValue({
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual('react-router-dom')),
+  useParams: vi.fn().mockReturnValue({
     context: '',
     '*': '',
   }),
@@ -63,17 +66,29 @@ const mockSubfolders = [
 ]
 
 describe('useGetFolders', () => {
+  let requestMade = false
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.get(/.*\/folders\/by_path/, mockFolders)
+    requestMade = false
+    server.use(
+      http.get(/\/folders\/by_path/, () => {
+        requestMade = true
+        return HttpResponse.json(mockFolders)
+      }),
+    )
     resetAndGetFilesEnv(USER_FILES_CONTEXT)
-    ;(useParams as jest.Mock).mockReturnValue({
+    ;(useParams as any).mockReturnValue({
       context: 'users_1',
       '*': '',
     })
   })
 
   afterEach(() => {
-    fetchMock.reset()
+    server.resetHandlers()
+    requestMade = false
   })
 
   it('returns root folder without fetching', async () => {
@@ -82,7 +97,7 @@ describe('useGetFolders', () => {
     })
     await waitForNextUpdate()
 
-    expect(fetchMock.called()).toBe(false)
+    expect(requestMade).toBe(false)
     expect(result.current.data).toHaveLength(1)
     expect(result.current.data?.[0]).toMatchObject({
       id: '2',
@@ -101,15 +116,20 @@ describe('useGetFolders', () => {
     })
     await waitForNextUpdate()
 
-    expect(fetchMock.called()).toBe(true)
+    expect(requestMade).toBe(true)
     expect(result.current.data).toHaveLength(1)
     expect(result.current.data).toMatchObject(mockFolders)
   })
 
   describe('in a subfolder', () => {
     beforeEach(() => {
-      fetchMock.get(/.*\/folders\/by_path/, mockSubfolders, {overwriteRoutes: true})
-      ;(useParams as jest.Mock).mockReturnValue({
+      server.use(
+        http.get(/\/folders\/by_path/, () => {
+          requestMade = true
+          return HttpResponse.json(mockSubfolders)
+        }),
+      )
+      ;(useParams as any).mockReturnValue({
         context: 'users_1',
         '*': 'profile pictures',
       })
@@ -121,7 +141,7 @@ describe('useGetFolders', () => {
       })
       await waitForNextUpdate()
 
-      expect(fetchMock.called()).toBe(true)
+      expect(requestMade).toBe(true)
       expect(result.current.data).toHaveLength(2)
       expect(result.current.data).toMatchObject(mockSubfolders)
     })

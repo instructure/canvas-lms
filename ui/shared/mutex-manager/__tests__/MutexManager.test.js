@@ -34,7 +34,7 @@ describe('MutexManager', () => {
   })
 
   it('should create a mutex with a callback', () => {
-    const callback = jest.fn()
+    const callback = vi.fn()
     MutexManager.createMutex(mutexName, callback)
 
     const mutex = MutexManager.mutexes[mutexName]

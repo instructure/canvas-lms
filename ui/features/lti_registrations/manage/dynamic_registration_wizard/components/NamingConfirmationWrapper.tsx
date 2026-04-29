@@ -16,28 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {NamingConfirmation} from '../../registration_wizard_forms/NamingConfirmation'
 import type {DynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
 import {useOverlayStore} from '../hooks/useOverlayStore'
+import {filterPlacementObjectsByFeatureFlags} from '@canvas/lti/model/LtiPlacementFilter'
+import {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 
 export type NamingConfirmationWrapperProps = {
   overlayStore: DynamicRegistrationOverlayStore
   registration: LtiRegistrationWithConfiguration
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
 }
 
 export const NamingConfirmationWrapper = ({
   overlayStore,
   registration,
+  registrationUpdateRequest,
 }: NamingConfirmationWrapperProps) => {
   const [state, actions] = useOverlayStore(overlayStore)
-  const placements = registration.configuration.placements
-    .filter(p => !state.overlay.disabled_placements?.includes(p.placement))
-    .map(p => ({
-      placement: p.placement,
-      label: state.overlay.placements?.[p.placement]?.text ?? '',
-    }))
+
+  const enabledPlacements = registration.configuration.placements.filter(
+    p => !state.overlay.disabled_placements?.includes(p.placement),
+  )
+  const placements = filterPlacementObjectsByFeatureFlags(enabledPlacements).map(p => ({
+    placement: p.placement,
+    label: state.overlay.placements?.[p.placement]?.text ?? '',
+  }))
 
   return (
     <NamingConfirmation
@@ -47,6 +52,7 @@ export const NamingConfirmationWrapper = ({
       description={state.overlay.description ?? registration.configuration.description ?? ''}
       onUpdateDescription={actions.updateDescription}
       placements={placements}
+      registrationUpdateRequest={registrationUpdateRequest}
       onUpdatePlacementLabel={(placement, value) => {
         actions.updatePlacement(placement)(overlay => ({
           ...overlay,

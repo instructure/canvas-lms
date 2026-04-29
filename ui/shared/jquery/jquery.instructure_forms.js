@@ -19,7 +19,8 @@
 import {send} from '@canvas/rce-command-shim'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {uniqueId, find, result} from 'lodash'
+import {find, result} from 'es-toolkit/compat'
+import {uniqueId} from 'es-toolkit/compat'
 import FakeXHR from './FakeXHR'
 import authenticity_token from '@canvas/authenticity-token'
 import htmlEscape, {raw} from '@instructure/html-escape'
@@ -1167,7 +1168,7 @@ $.fn.formErrors = function (data_errors, options) {
 // Pops up a small box containing the given message.  The box is connected to the given form element, and will
 // go away when the element is selected.
 $.fn.errorBox = function (message, scroll, override_position) {
-  if (!this.length) return;
+  if (!this.length) return
 
   const $obj = this,
     $oldBox = $obj.data('associated_error_box')
@@ -1186,11 +1187,11 @@ $.fn.errorBox = function (message, scroll, override_position) {
     $obj.removeData('associated_error_object')
   }
 
-  if($obj.hasClass('labeled-error')) {
+  if ($obj.hasClass('labeled-error')) {
     // error is rendered in a label
     $obj.addClass('ic-Input--has-error')
     const $label = $('<label>').addClass('text-error labeled-error-message').insertAfter($obj)
-    const icon = document.createElement('i');
+    const icon = document.createElement('i')
     icon.setAttribute('aria-hidden', 'true')
     icon.className = 'icon-warning icon-Solid'
     const textNode = document.createTextNode(htmlEscape(message))
@@ -1200,15 +1201,15 @@ $.fn.errorBox = function (message, scroll, override_position) {
     // highlight the label's required symbol (postfix asterisk character)
     let $requiredSymbol = $obj
       .prev('.required_symbol')
-      .add($obj.prev('label').find('.required_symbol'));
-    $requiredSymbol.addClass('text-error');
+      .add($obj.prev('label').find('.required_symbol'))
+    $requiredSymbol.addClass('text-error')
 
     $obj.attr('aria-describedby', $label.attr('id'))
     $obj.data({
       associated_error_box: $label,
       associated_error_object: $obj,
     })
-    $obj.one('keyup', function() {
+    $obj.one('keyup', function () {
       $obj.removeClass('ic-Input--has-error')
       $requiredSymbol.removeClass('text-error')
       cleanup($label)
@@ -1221,9 +1222,9 @@ $.fn.errorBox = function (message, scroll, override_position) {
   if (!$template.length) {
     $template = $(
       "<div id='error_box_template' class='error_box errorBox' style=''>" +
-      "<div class='error_text' style=''></div>" +
-      "<img src='/images/error_bottom.png' class='error_bottom'/>" +
-      '</div>',
+        "<div class='error_text' style=''></div>" +
+        "<img src='/images/error_bottom.png' class='error_bottom'/>" +
+        '</div>',
     ).appendTo('body')
   }
   $.screenReaderFlashError(message)
@@ -1255,7 +1256,9 @@ $.fn.errorBox = function (message, scroll, override_position) {
     .fadeIn('fast')
 
   const fade = function () {
-    $box.stop(true, true).fadeOut('slow', function() {cleanup($box)})
+    $box.stop(true, true).fadeOut('slow', function () {
+      cleanup($box)
+    })
   }
 
   $obj
@@ -1267,7 +1270,9 @@ $.fn.errorBox = function (message, scroll, override_position) {
     .keypress(fade)
 
   $box.click(function () {
-    $(this).fadeOut('fast', function() {cleanup($box)})
+    $(this).fadeOut('fast', function () {
+      cleanup($box)
+    })
   })
 
   $.fn.errorBox.errorBoxes.push($obj)

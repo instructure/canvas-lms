@@ -74,6 +74,17 @@ export default function StatusPill({feature, updatedState}) {
           </Pill>
         </Tooltip>
       )}
+      {feature.early_access_program && (
+        <Tooltip
+          renderTip={I18n.t(
+            'Use of this feature is subject to the Early Access Program Terms and Conditions',
+          )}
+        >
+          <Pill color="info" margin="0 0 0 x-small" themeOverride={{maxWidth: 'none'}}>
+            {I18n.t('Early Access')}
+          </Pill>
+        </Tooltip>
+      )}
     </>
   )
 }

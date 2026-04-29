@@ -18,27 +18,78 @@
 
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import * as FlashAlert from '@instructure/platform-alerts'
+import MockCanvasClient from '@canvas/test-utils/MockCanvasClient'
+
+vi.mock('@instructure/platform-alerts')
+import {gql} from '@canvas/apollo-v3'
 import * as FinalGradeOverrideApi from '../FinalGradeOverrideApi'
 import type {FinalGradeOverrideMap} from '../grading.d'
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(),
-}))
-
 describe('Gradebook FinalGradeOverrideApi', () => {
   const server = setupServer()
-
   beforeAll(() => {
     server.listen()
   })
 
   afterEach(() => {
     server.resetHandlers()
+    vi.clearAllMocks()
   })
 
   afterAll(() => {
     server.close()
+  })
+
+  describe('.updateFinalGradeOverride()', () => {
+    const mutation = gql`
+      mutation SetOverrideScore($input: SetOverrideScoreInput!) {
+        setOverrideScore(input: $input) {
+          grades {
+            customGradeStatusId
+            overrideScore
+          }
+        }
+      }
+    `
+
+    afterEach(() => {
+      MockCanvasClient.uninstall()
+    })
+
+    it('sends null overrideScore when removing an override', async () => {
+      MockCanvasClient.install([
+        {
+          request: {
+            query: mutation,
+            variables: {input: {enrollmentId: '1101', overrideScore: null}},
+          },
+          result: {
+            data: {setOverrideScore: {grades: {overrideScore: null, customGradeStatusId: null}}},
+          },
+        },
+      ])
+      const result = await FinalGradeOverrideApi.updateFinalGradeOverride('1101')
+      expect(result).toBeNull()
+    })
+
+    it('includes gradingPeriodId in variables when provided', async () => {
+      MockCanvasClient.install([
+        {
+          request: {
+            query: mutation,
+            variables: {input: {enrollmentId: '1101', gradingPeriodId: '701', overrideScore: 88.5}},
+          },
+          result: {
+            data: {setOverrideScore: {grades: {overrideScore: 88.5, customGradeStatusId: null}}},
+          },
+        },
+      ])
+      const result = await FinalGradeOverrideApi.updateFinalGradeOverride('1101', '701', {
+        percentage: 88.5,
+      })
+      expect(result).toEqual({percentage: 88.5, customGradeStatusId: null})
+    })
   })
 
   describe('.getFinalGradeOverrides()', () => {
@@ -115,10 +166,6 @@ describe('Gradebook FinalGradeOverrideApi', () => {
             return HttpResponse.json({error: 'Server Error'}, {status: 500})
           }),
         )
-      })
-
-      afterEach(() => {
-        jest.clearAllMocks()
       })
 
       it('shows a flash alert', async () => {

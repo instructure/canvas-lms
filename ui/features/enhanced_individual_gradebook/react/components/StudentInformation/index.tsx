@@ -26,7 +26,7 @@ import type {
   FinalGradeOverride,
 } from '@canvas/grading/grading.d'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {Text} from '@instructure/ui-text'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {
@@ -207,7 +207,7 @@ export default function StudentInformation({
     const showPointsText = !!(!hidePointsText && gradeToDisplay)
     let pointsText = ''
     if (showPointsText) {
-      const scoreText = I18n.n(gradeToDisplay.score, {
+      const scoreText = I18n.n(gradeToDisplay.score ?? 0, {
         precision: gradingStandardPointsBased ? 2 : undefined,
       })
       const possibleText = gradingStandardPointsBased

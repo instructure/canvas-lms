@@ -32,19 +32,23 @@ import fetchMock from 'fetch-mock'
 import {actions as uiActions} from '../../actions/ui'
 import type {APIPaceContextTypes, Pace, PaceContextsState} from '../../types'
 import * as tz from '@instructure/moment-utils'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
-jest.mock('../../actions/ui', () => ({
-  ...jest.requireActual('../../actions/ui'),
-  actions: {
-    setSelectedPaceContext: jest
-      .fn()
-      .mockReturnValue({type: 'UI/SET_SELECTED_PACE_CONTEXT', payload: {newSelectedPace: {}}}),
-    hideLoadingOverlay: jest.fn().mockReturnValue({type: 'UI/HIDE_LOADING_OVERLAY', payload: {}}),
-    setCategoryError: jest
-      .fn()
-      .mockReturnValue({type: 'UI/SET_CATEGORY_ERROR', payload: {category: '', error: ''}}),
-  },
-}))
+vi.mock('@instructure/platform-alerts')
+vi.mock('../../actions/ui', async () => {
+  const actualModule = await vi.importActual<typeof import('../../actions/ui')>('../../actions/ui')
+  return {
+    ...actualModule,
+    actions: {
+      ...actualModule.actions,
+      setSelectedPaceContext: vi.fn().mockReturnValue(() => {}),
+      hideLoadingOverlay: vi.fn().mockReturnValue({type: 'UI/HIDE_LOADING_OVERLAY', payload: {}}),
+      setCategoryError: vi
+        .fn()
+        .mockReturnValue({type: 'UI/SET_CATEGORY_ERROR', payload: {category: '', error: ''}}),
+    },
+  }
+})
 
 const firstSection = PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[0]
 const secondSection = PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[1]
@@ -77,7 +81,7 @@ const generateModifiedPace = (timeAgo: number) => {
 
 describe('PaceContextsContent', () => {
   beforeAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   beforeEach(() => {
@@ -86,7 +90,7 @@ describe('PaceContextsContent', () => {
     fetchMock.get(SEARCH_SECTION_CONTEXTS_API, PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE)
     fetchMock.get(SECTION_PACE_CREATION_API, {course_pace: {}, progress: null})
     fetchMock.get(COURSE_REPORT_LAST_API, {})
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -167,7 +171,9 @@ describe('PaceContextsContent', () => {
 
       expect(queryByText('D-F')).not.toBeInTheDocument()
       expect(queryByText('G-K')).not.toBeInTheDocument()
-      expect(getByText('Showing 1 result below')).toBeInTheDocument()
+      expect(vi.mocked(showFlashAlert)).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'Showing 1 result below'}),
+      )
     })
 
     it("shows no results if there's no contexts for the search", async () => {
@@ -182,14 +188,18 @@ describe('PaceContextsContent', () => {
       fireEvent.change(searchInput, {target: {value: 'A'}})
       act(() => searchButton.click())
       const noResults = await findAllByText('No results found')
-      expect(noResults).toHaveLength(2) // no results label, SR-only alert
+      expect(noResults).toHaveLength(1) // visible no results label only; SR alert verified via mock
+      expect(vi.mocked(showFlashAlert)).toHaveBeenCalledWith(
+        expect.objectContaining({message: 'No results found'}),
+      )
       expect(getByText('Please try another search term')).toBeInTheDocument()
     })
 
     it('provides contextType and contextId to Pace modal', async () => {
+      const user = userEvent.setup({delay: null})
       const {findByRole} = renderConnected(<PaceContent />)
       const sectionLink = await findByRole('button', {name: firstSection.name})
-      act(() => sectionLink.click())
+      await user.click(sectionLink)
       expect(uiActions.setSelectedPaceContext).toHaveBeenCalledWith('Section', firstSection.item_id)
     })
 
@@ -258,6 +268,8 @@ describe('PaceContextsContent', () => {
         const timeAgo = 5 * WEEK
         const modifiedPace = generateModifiedPace(timeAgo)
         const lastModified = new Date(Date.now() - timeAgo)
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
         const formattedDate = tz.format(lastModified, 'date.formats.long')
         fetchMock.get(
           SECTION_CONTEXTS_API,

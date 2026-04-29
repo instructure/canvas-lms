@@ -20,22 +20,8 @@
 require_relative "../common"
 
 module DiscussionsCommon
-  def go_to_topic
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-  end
-
-  def create_and_go_to_topic(title = "new topic", discussion_type = "side_comment", is_locked = false)
-    @topic = @course.discussion_topics.create!(title:, discussion_type:)
-    if is_locked
-      @topic.lock
-      @topic.reload
-    end
-    go_to_topic
-    @topic
-  end
-
-  def create_discussion(discussion_name, discussion_type)
-    @course.discussion_topics.create!(title: discussion_name, discussion_type:, message: "Discussion topic message")
+  def create_discussion(discussion_name, discussion_type, user = @teacher)
+    @course.discussion_topics.create!(title: discussion_name, discussion_type:, message: "Discussion topic message", user:)
   end
 
   def create_graded_discussion(discussion_course, assignment_options = {})
@@ -277,7 +263,7 @@ module DiscussionsCommon
   end
 
   def wait_for_subscription_icon_to_load(expected_class)
-    expect(f(".subscription-toggler")).to be
+    expect(f(".subscription-toggler")).not_to be_nil
     driver.execute_script(%{$('.subscription-toggler').trigger('mouseleave')})
     expect(f(".subscription-toggler")).to have_class(expected_class)
   end

@@ -94,7 +94,6 @@ const BlocksPanel = ({
       event.preventDefault()
       const parentId = getBlockTargetParent()
       if (!parentId) {
-         
         window.alert("I don't know where to put this block")
         return
       }

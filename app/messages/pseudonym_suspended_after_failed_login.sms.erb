@@ -1,0 +1,3 @@
+<% p = asset.is_a?(Pseudonym) ? asset : asset.pseudonym %>
+
+<%= t :body, "Your login at %{account_name} has been suspended for too many failed login attempts. Please contact your institution's administration.", :account_name => p.account.display_name %>

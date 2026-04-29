@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import ConfirmationModal from './ConfirmationModal'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -99,9 +99,9 @@ export const Footer = ({
       >
         {I18n.t('Apply Changes')}
       </Button>
-      {showConfirmation && (
+      {showConfirmation && isModalOpen && (
         <ConfirmationModal
-          isOpen={isModalOpen}
+          isOpen={true}
           onCancel={() => setIsModalOpen(false)}
           onConfirm={onApplyClicked}
         />

@@ -38,6 +38,7 @@ import {Sort} from '../../hooks/useGetPaginatedFiles'
 import {createPortal} from 'react-dom'
 import {getColumnHeaders, setColumnWidths, type ColumnID} from './FileFolderTableUtils'
 import {DragAndDropWrapper} from './DragAndDropWrapper'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -56,6 +57,7 @@ export interface FileFolderTableProps {
   selectionHandler: SelectionHandler
   handleFileDropRef?: (el: HTMLInputElement | null) => void
   selectAllRef?: Ref<Checkbox>
+  onPreviewFile?: (file: File) => void
 }
 
 const FileFolderTable = ({
@@ -73,6 +75,7 @@ const FileFolderTable = ({
   selectionHandler,
   handleFileDropRef,
   selectAllRef,
+  onPreviewFile,
 }: FileFolderTableProps) => {
   const {currentFolder, contextId, contextType} = useFileManagement()
   const isStacked = size !== 'large'
@@ -156,13 +159,14 @@ const FileFolderTable = ({
 
   const showDrop = userCanEditFilesForContext && !isLoading && !searchString && !isStacked
   const isEmpty = rows.length === 0 && !isLoading
+  const isAccessRestricted = getFilesEnv().userFileAccessRestricted
 
   return (
     <>
       {renderModals()}
       <Flex direction="column">
         <DragAndDropWrapper
-          enabled={!isEmpty && showDrop && !!currentFolder}
+          enabled={!isEmpty && showDrop && !!currentFolder && !isAccessRestricted}
           minHeight={420}
           currentFolder={currentFolder!}
           contextId={contextId}
@@ -206,6 +210,7 @@ const FileFolderTable = ({
                 userCanRestrictFilesForContext={userCanRestrictFilesForContext}
                 usageRightsRequiredForContext={usageRightsRequiredForContext}
                 setModalOrTrayOptions={setModalOrTrayOptions}
+                onPreviewFile={onPreviewFile}
               />
             </Table.Body>
           </Table>

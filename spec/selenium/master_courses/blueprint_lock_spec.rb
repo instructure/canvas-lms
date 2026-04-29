@@ -271,7 +271,7 @@ describe "master courses - locked items" do
     end
 
     it "discussions show a lock icon on the show page", priority: "2" do
-      skip "Will be fixed in VICE-5431"
+      skip "Will be fixed in VICE-5431 2025-07-15"
       @tag = @template.create_content_tag_for!(@discussion)
       @tag.update(restrictions: { content: true }) # lock the item. Does not require a migration.
       get "/courses/#{@master.id}/discussion_topics/#{@discussion.id}"

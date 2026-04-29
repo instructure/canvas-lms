@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -74,14 +73,14 @@ describe('GradeSummary', () => {
     }
 
     beforeEach(() => {
-      jest.spyOn(GradeSummary, 'getSelectMenuGroupProps').mockReturnValue(props)
+      vi.spyOn(GradeSummary, 'getSelectMenuGroupProps').mockReturnValue(props)
       fakeENV.setup({context_asset_string: 'course_42', current_user: {}})
       $fixtures.innerHTML = '<div id="GradeSummarySelectMenuGroup"></div>'
     })
 
     afterEach(() => {
       fakeENV.teardown()
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
       $fixtures.innerHTML = ''
     })
 
@@ -223,14 +222,14 @@ describe('GradeSummary', () => {
     afterEach(() => {
       fakeENV.teardown()
       $fixtures.innerHTML = ''
-      jest.restoreAllMocks()
+      vi.restoreAllMocks()
     })
 
     describe('handleSubmissionsCommentTray', () => {
       it('should open tray with no prior assignmentId', () => {
-        jest.spyOn(useStore, 'setState').mockClear()
-        jest.spyOn($.fn, 'addClass')
-        jest.spyOn($.fn, 'removeClass')
+        vi.spyOn(useStore, 'setState').mockClear()
+        vi.spyOn($.fn, 'addClass')
+        vi.spyOn($.fn, 'removeClass')
 
         GradeSummary.handleSubmissionsCommentTray('22')
 
@@ -246,9 +245,9 @@ describe('GradeSummary', () => {
       })
 
       it('should close tray when clicking the same assignment twice', () => {
-        jest.spyOn(useStore, 'setState').mockClear()
-        jest.spyOn($.fn, 'addClass')
-        jest.spyOn($.fn, 'removeClass')
+        vi.spyOn(useStore, 'setState').mockClear()
+        vi.spyOn($.fn, 'addClass')
+        vi.spyOn($.fn, 'removeClass')
 
         // Set initial state
         useStore.setState({
@@ -283,9 +282,9 @@ describe('GradeSummary', () => {
           <div id="submission_23"></div>
         `
 
-        jest.spyOn(useStore, 'setState').mockClear()
-        jest.spyOn($.fn, 'addClass')
-        jest.spyOn($.fn, 'removeClass')
+        vi.spyOn(useStore, 'setState').mockClear()
+        vi.spyOn($.fn, 'addClass')
+        vi.spyOn($.fn, 'removeClass')
 
         // Set initial state
         useStore.setState({
@@ -325,7 +324,7 @@ describe('GradeSummary', () => {
           },
         ]
 
-        jest.spyOn(useStore, 'setState').mockClear()
+        vi.spyOn(useStore, 'setState').mockClear()
 
         GradeSummary.handleSubmissionsCommentTray('22')
 
@@ -347,8 +346,8 @@ describe('GradeSummary', () => {
       })
 
       it('should handle non-existent assignment', () => {
-        jest.spyOn(useStore, 'setState').mockClear()
-        jest.spyOn(console, 'error').mockImplementation(() => {})
+        vi.spyOn(useStore, 'setState').mockClear()
+        vi.spyOn(console, 'error').mockImplementation(() => {})
 
         expect(() => {
           GradeSummary.handleSubmissionsCommentTray('999')

@@ -85,7 +85,7 @@ describe('utils', () => {
         'TA',
         'Teacher',
         'Designer',
-        'Observer'
+        'Observer',
       ])
     })
 

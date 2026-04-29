@@ -53,7 +53,7 @@ describe "discussions overrides" do
     end
 
     it "shows course pace notice when expanding grades in a course with pacing on" do
-      skip "Will be fixed in VICE-5411"
+      skip "Will be fixed in VICE-5411 2025-07-15"
       @course.enable_course_paces = true
       @course.save!
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
@@ -62,7 +62,7 @@ describe "discussions overrides" do
     end
 
     it "toggles between due dates", priority: "2" do
-      skip "Will be fixed in VICE-5412"
+      skip "Will be fixed in VICE-5412 2025-07-15"
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       f(" .toggle_due_dates").click
       wait_for_ajaximations
@@ -85,9 +85,10 @@ describe "discussions overrides" do
 
       it "shows due dates in mouse hover in the assignments index page", priority: "2" do
         get "/courses/#{@course.id}/assignments"
-        hover_text = "Everyone else\n#{@default_due}\nNew Section\n#{@override_due}"
-        hover f(".assignment-date-due .vdd_tooltip_link")
-        expect(f(".ui-tooltip-content")).to include_text(hover_text)
+        hover f(".assignment-date-due")
+        tooltip = f("[role='tooltip']")
+        expect(tooltip).to include_text("Everyone else\n#{@default_due}")
+        expect(tooltip).to include_text("New Section\n#{@override_due}")
       end
 
       it "lists discussions in the syllabus", priority: "2" do
@@ -116,9 +117,7 @@ describe "discussions overrides" do
 
   describe "Differentiation Tags" do
     before do
-      Account.site_admin.enable_feature! :discussion_create
       course_with_teacher_logged_in
-      @course.account.enable_feature!(:assign_to_differentiation_tags)
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: true }
         a.save!
@@ -138,7 +137,7 @@ describe "discussions overrides" do
       @assignment.update!(only_visible_to_overrides: true)
     end
 
-    it "shows convert override message when diff tags setting disabled" do
+    it "shows convert override message when diff tags setting disabled", :ignore_js_errors do
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: false }
         a.save!
@@ -146,6 +145,8 @@ describe "discussions overrides" do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
       wait_for_ajaximations
       expect(element_exists?(convert_override_alert_selector)).to be_truthy
+      f("[data-testid='save-button']").click
+      expect(f("body").text).to include "Invalid group selected"
     end
 
     it "clicking convert overrides button converts the override and refreshes the cards" do

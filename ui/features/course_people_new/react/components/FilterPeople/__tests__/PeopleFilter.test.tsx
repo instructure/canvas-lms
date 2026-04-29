@@ -22,8 +22,9 @@ import userEvent from '@testing-library/user-event'
 import PeopleFilter from '../PeopleFilter'
 import {DEFAULT_OPTION} from '../../../../util/constants'
 import {EnvRole} from '../../../../types'
+import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
 
-jest.mock('../../../hooks/useCoursePeopleContext')
+vi.mock('../../../hooks/useCoursePeopleContext')
 
 const allRoles = [
   {...DEFAULT_OPTION, id: '1', label: 'Teacher', count: 1},
@@ -31,7 +32,7 @@ const allRoles = [
 ]
 
 const useCoursePeopleContextMocks = {
-  allRoles
+  allRoles,
 }
 
 describe('PeopleFilter', () => {
@@ -40,25 +41,23 @@ describe('PeopleFilter', () => {
   const otherRole = filterOptions[1]
   const user = userEvent.setup()
   const defaultProps = {
-    onOptionSelect: jest.fn(),
+    onOptionSelect: vi.fn(),
   }
 
   const renderComponent = () => render(<PeopleFilter {...defaultProps} />)
 
   const labelWithCount = (role: EnvRole) =>
-    role.id === defaultRole.id
-      ? role.label
-      : `${role.label} (${role.count})`
+    role.id === defaultRole.id ? role.label : `${role.label} (${role.count})`
 
   const otherLabel = labelWithCount(otherRole)
 
   beforeEach(() => {
-    require('../../../hooks/useCoursePeopleContext').default.mockReturnValue(useCoursePeopleContextMocks)
+    ;(useCoursePeopleContext as any).mockReturnValue(useCoursePeopleContextMocks)
     renderComponent()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the filter dropdown', () => {
@@ -72,9 +71,7 @@ describe('PeopleFilter', () => {
   it('shows options when clicked', async () => {
     await user.click(screen.getByLabelText('Filter by role'))
     await waitFor(() => {
-      const options = filterOptions.map(role =>
-        screen.getByText(labelWithCount(role))
-      )
+      const options = filterOptions.map(role => screen.getByText(labelWithCount(role)))
       expect(options).toHaveLength(filterOptions.length)
     })
   })

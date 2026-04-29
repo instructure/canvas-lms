@@ -29,7 +29,12 @@ const isGenerating = function (report) {
 
 export default Backbone.Model.extend({
   url() {
-    return config.quizReportsUrl
+    const base = config.quizReportsUrl
+    // If this model has an ID, append it for individual resource fetches
+    if (this.id) {
+      return `${base}/${this.id}`
+    }
+    return base
   },
 
   parse(payload) {

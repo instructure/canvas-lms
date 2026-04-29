@@ -2,7 +2,7 @@
 
 As stated in the [LTI Overview](./01_lti_overview.md), placements are an integral part of the LTI experience in Canvas even though they aren't officially supported by the LTI spec. The list of supported placements in Canvas has grown over the years as both internal and external customers require new functionality.
 
-The officially-documented list of placements is found in the API docs, in the LTI -> Placements section of the sidebar. It can be found [here](/doc/api/placements_overview.md). Note that some of the placements listed are restricted to only Instructure approved tools, such as the submission_type_selection placement.
+The officially-documented list of placements is found in the API docs, in the LTI -> Placements section of the sidebar. It can be found [here](/doc/api/placements_overview.md).
 
 ## Definition and Configuration
 

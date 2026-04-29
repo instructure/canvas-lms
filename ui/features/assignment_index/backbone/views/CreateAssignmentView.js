@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {each, isEmpty, includes, extend as lodashExtend} from 'lodash'
+import {each, includes, isEmpty, extend as lodashExtend} from 'es-toolkit/compat'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DialogFormView, {
   isSmallTablet,
@@ -90,10 +90,24 @@ CreateAssignmentView.prototype.initialize = function (options) {
 CreateAssignmentView.prototype.onSaveSuccess = function () {
   this.shouldPublish = false
   CreateAssignmentView.__super__.onSaveSuccess.apply(this, arguments)
-  ENV.PERMISSIONS.by_assignment_id &&
-    (ENV.PERMISSIONS.by_assignment_id[this.model.id] = {
+  // Calculate manage_assign_to permission for new assignments
+  const calculateManageAssignTo = submissionTypes => {
+    // For legacy assignments, default to basic assignment editing permission
+    if (Array.isArray(submissionTypes) && submissionTypes.includes('discussion_topic')) {
+      return ENV.PERMISSIONS.manage_assignments_edit && ENV.PERMISSIONS.moderate_forum
+    }
+    return ENV.PERMISSIONS.manage_assignments_edit
+  }
+
+  if (ENV.PERMISSIONS.by_assignment_id) {
+    ENV.PERMISSIONS.by_assignment_id[this.model.id] = {
       update: ENV.PERMISSIONS.manage_assignments_edit,
-    })
+      delete: ENV.PERMISSIONS.manage_assignments_delete,
+      manage_assign_to:
+        this.model.get('permissions')?.manage_assign_to ??
+        calculateManageAssignTo(this.model.submissionTypes() || this.model.get('submission_types')),
+    }
+  }
   if (this.assignmentGroup) {
     this.assignmentGroup.get('assignments').add(this.model)
     return (this.model = this.generateNewAssignment())
@@ -367,10 +381,10 @@ CreateAssignmentView.prototype._validateDueDate = function (data, errors) {
   }
   // need to override default error message to focus only on due date field for quick add/edit
   if (errs.lock_at) {
-    errs.due_at = I18n.t('Due date cannot be after lock date')
+    errs.due_at = I18n.t('Due date cannot be after until date')
   }
   if (errs.unlock_at) {
-    errs.due_at = I18n.t('Due date cannot be before unlock date')
+    errs.due_at = I18n.t('Due date cannot be before available from date')
   }
   errors.due_at = [
     {

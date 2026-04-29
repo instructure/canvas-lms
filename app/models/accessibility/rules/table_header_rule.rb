@@ -21,44 +21,31 @@ module Accessibility
   module Rules
     class TableHeaderRule < Accessibility::Rule
       self.id = "table-header"
-      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H51.html"
+      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H43.html"
 
-      def self.test(elem)
+      # Accessibility::Rule methods
+
+      def test(elem)
         return nil if elem.tag_name != "table"
 
         I18n.t("Table shall have a header.") if elem.query_selector("th").nil?
       end
 
-      def self.display_name
-        I18n.t("Table headers aren’t set up")
-      end
-
-      def self.message
-        I18n.t("Table headers aren't set up correctly for screen readers to know which headers apply to which cells.")
-      end
-
-      def self.why
-        I18n.t(
-          "Screen readers use table headers to help students understand what each cell means. " \
-          "Without headers, the data can be confusing or meaningless to someone who can’t see the full layout. " \
-          "Setting row and column headers makes your table clear and accessible for all learners." \
-        )
-      end
-
-      def self.form(_elem)
+      def form(_elem)
         Accessibility::Forms::RadioInputGroupField.new(
           label: I18n.t("Which part of the table should contain the headings?"),
           undo_text: I18n.t("Table headings are now set up"),
           value: I18n.t("The top row"),
           options: [
             I18n.t("The top row"),
-            I18n.t("The left column"),
+            I18n.t("The first column"),
             I18n.t("Both")
-          ]
+          ],
+          action: I18n.t("Set headings")
         )
       end
 
-      def self.fix!(elem, value)
+      def fix!(elem, value)
         elem.query_selector_all("th").each do |th|
           th.name = "td"
         end
@@ -71,10 +58,8 @@ module Accessibility
           end
         end
 
-        if [I18n.t("The left column"), I18n.t("Both")].include?(value)
-          elem.query_selector_all("tr").each_with_index do |row, index|
-            next if index == 0 # Skip the first row
-
+        if [I18n.t("The first column"), I18n.t("Both")].include?(value)
+          elem.query_selector_all("tr").each do |row|
             first_cell = row.query_selector("td")
             if first_cell
               first_cell.name = "th"
@@ -83,7 +68,23 @@ module Accessibility
           end
         end
 
-        elem
+        { changed: elem }
+      end
+
+      def display_name
+        I18n.t("Table headers aren’t set up")
+      end
+
+      def message
+        I18n.t("This table headers isn't set up correctly for screen readers to know which cells it applies to.")
+      end
+
+      def why
+        I18n.t(
+          "Screen readers use table headers to help students understand what each cell means. " \
+          "Without headers, the data can be confusing or meaningless to someone who can’t see the full layout. " \
+          "Setting row and column headers makes your table clear and accessible for all learners." \
+        )
       end
     end
   end

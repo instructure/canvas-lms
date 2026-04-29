@@ -107,13 +107,21 @@ export default new Store(
 
     actions: {
       generate(reportType, resolve, reject) {
-        const quizReport = quizReports.findWhere({reportType})
+        // Match on both reportType and includesAllVersions to avoid duplicates
+        const quizReport = quizReports.findWhere({
+          reportType,
+          includesAllVersions: config.includesAllVersions,
+        })
 
         if (quizReport) {
           if (quizReport.get('isGenerating')) {
             return reject(new Error('report is already being generated'))
           } else if (quizReport.get('isGenerated')) {
             return reject(new Error('report is already generated'))
+          } else if (quizReport.get('progress')?.url) {
+            // Report exists with active progress tracking - likely in transition state
+            // between generation completing and file being loaded
+            return reject(new Error('report is being processed'))
           }
         }
 
@@ -170,7 +178,7 @@ export default new Store(
       return Store.prototype.__reset__.call(this)
     },
 
-    /** @private */
+    // @ts-expect-error Legacy class method parameters not typed
     trackReportGeneration(quizReport, autoDownload) {
       const quizReportId = quizReport.get('id')
       let generationRequest = generationRequests.filter(function (request) {
@@ -223,7 +231,7 @@ export default new Store(
         })
     },
 
-    /** @private */
+    // @ts-expect-error Legacy class method parameters not typed
     stopTracking(quizReportId) {
       const request = generationRequests.filter(function (request) {
         return request.quizReportId === quizReportId

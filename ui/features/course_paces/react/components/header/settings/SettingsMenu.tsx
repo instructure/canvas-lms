@@ -52,7 +52,6 @@ export type MenuPlacement = 'bottom start' | 'bottom end' | 'top start' | 'top e
 export type ComponentProps = StoreProps & PassedProps
 
 export const SettingsMenu = (props: ComponentProps) => {
-
   return window.ENV.FEATURES.course_paces_skip_selected_days ? (
     <SkipSelectedDaysMenu
       margin={props.margin}

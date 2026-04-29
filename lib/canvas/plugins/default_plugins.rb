@@ -300,18 +300,6 @@ module Canvas::Plugins::DefaultPlugins
                               settings: nil
                             })
 
-    Canvas::Plugin.register("crocodoc", :previews, {
-                              name: -> { t :name, "Crocodoc" },
-                              description: -> { t :description, "Enable Crocodoc as a document preview option" },
-                              website: "https://crocodoc.com/",
-                              author: "Instructure",
-                              author_website: "http://www.instructure.com",
-                              version: "1.0.0",
-                              settings_partial: "plugins/crocodoc_settings",
-                              settings: nil,
-                              test_cluster_inherit: false
-                            })
-
     Canvas::Plugin.register("canvadocs", :previews, {
                               name: -> { t :name, "Canvadocs" },
                               description: -> { t :description, "Enable Canvadocs (compatible with Box View) as a document preview option" },
@@ -353,7 +341,7 @@ module Canvas::Plugins::DefaultPlugins
                               settings: {
                                 base_url: "https://app.learnplatform.com",
                               },
-                              encrypted_settings: %i[username password jwt_issuer jwt_secret]
+                              encrypted_settings: [:jwt_issuer, :jwt_secret]
                             })
     Canvas::Plugin.register("pandapub", nil, {
                               name: -> { t :name, "PandaPub" },

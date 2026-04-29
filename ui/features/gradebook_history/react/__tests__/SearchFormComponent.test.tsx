@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
-import {render, screen, cleanup} from '@testing-library/react'
+import {render, screen, cleanup, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {SearchFormComponent} from '../SearchForm'
 import {Button} from '@instructure/ui-buttons'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
-import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
+import {CanvasAsyncSelect} from '@instructure/platform-instui-bindings'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import Fixtures from './Fixtures'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
 const defaultProps = () => ({
   fetchHistoryStatus: 'started',
@@ -102,18 +103,18 @@ describe('SearchForm', () => {
 
     // Clear and set the from date to be after the to date
     await user.clear(fromDateInputs[0])
-    await user.type(fromDateInputs[0], '05/02/2017')
+    await user.type(fromDateInputs[0], 'May 2, 2017')
     await user.tab() // Trigger blur
 
     await user.clear(toDateInputs[0])
-    await user.type(toDateInputs[0], '05/01/2017')
+    await user.type(toDateInputs[0], 'May 1, 2017')
     await user.tab() // Trigger blur
 
     // Wait for the state to update
-    await new Promise(resolve => setTimeout(resolve, 100))
-
     const buttons = screen.getAllByRole('button', {name: 'Filter'})
-    expect(buttons[0]).toBeDisabled()
+    await waitFor(() => {
+      expect(buttons[0]).toBeDisabled()
+    })
   })
 
   test('does not disable the submit button if To date is after From date', async function () {
@@ -123,11 +124,15 @@ describe('SearchForm', () => {
     const fromDateInputs = screen.getAllByLabelText('Start Date')
     const toDateInputs = screen.getAllByLabelText('End Date')
 
-    await user.type(fromDateInputs[0], '05/01/2017')
-    await user.type(toDateInputs[0], '05/02/2017')
+    await user.type(fromDateInputs[0], 'May 1, 2017')
+    await user.tab()
+    await user.type(toDateInputs[0], 'May 2, 2017')
+    await user.tab()
 
     const buttons = screen.getAllByRole('button', {name: 'Filter'})
-    expect(buttons[0]).not.toBeDisabled()
+    await waitFor(() => {
+      expect(buttons[0]).not.toBeDisabled()
+    })
   })
 
   test('does not disable the submit button when there are no dates selected', function () {
@@ -141,10 +146,13 @@ describe('SearchForm', () => {
     mountComponent()
 
     const fromDateInputs = screen.getAllByLabelText('Start Date')
-    await user.type(fromDateInputs[0], '04/08/1994')
+    await user.type(fromDateInputs[0], 'April 8, 1994')
+    await user.tab()
 
     const buttons = screen.getAllByRole('button', {name: 'Filter'})
-    expect(buttons[0]).not.toBeDisabled()
+    await waitFor(() => {
+      expect(buttons[0]).not.toBeDisabled()
+    })
   })
 
   test('does not disable the submit button when only to date is entered', async function () {
@@ -152,14 +160,17 @@ describe('SearchForm', () => {
     mountComponent()
 
     const toDateInputs = screen.getAllByLabelText('End Date')
-    await user.type(toDateInputs[0], '05/01/2017')
+    await user.type(toDateInputs[0], 'May 1, 2017')
+    await user.tab()
 
     const buttons = screen.getAllByRole('button', {name: 'Filter'})
-    expect(buttons[0]).not.toBeDisabled()
+    await waitFor(() => {
+      expect(buttons[0]).not.toBeDisabled()
+    })
   })
 
   test('calls getGradebookHistory prop on mount', () => {
-    const props = {getGradebookHistory: jest.fn()}
+    const props = {getGradebookHistory: vi.fn()}
     render(<SearchFormComponent {...defaultProps()} {...props} />)
     expect(props.getGradebookHistory).toHaveBeenCalledTimes(1)
   })
@@ -167,7 +178,7 @@ describe('SearchForm', () => {
   describe('SearchForm when button is clicked', () => {
     test('dispatches with the state of input', async function () {
       const user = userEvent.setup()
-      const props = {getGradebookHistory: jest.fn()}
+      const props = {getGradebookHistory: vi.fn()}
       mountComponent(props)
 
       const buttons = screen.getAllByRole('button', {name: 'Filter'})
@@ -183,7 +194,7 @@ describe('SearchForm', () => {
       let props: any
 
       beforeEach(() => {
-        props = {...defaultProps(), getSearchOptions: jest.fn()}
+        props = {...defaultProps(), getSearchOptions: vi.fn()}
         assignments = Fixtures.assignmentArray()
         graders = Fixtures.userArray()
         students = Fixtures.userArray()
@@ -267,8 +278,11 @@ describe('SearchForm', () => {
           }
 
           beforeEach(() => {
-            // @ts-expect-error
-            window.ENV = {OVERRIDE_GRADES_ENABLED: true}
+            fakeEnv.setup({OVERRIDE_GRADES_ENABLED: true})
+          })
+
+          afterEach(() => {
+            fakeEnv.teardown()
           })
 
           test('is shown', () => {
@@ -278,7 +292,7 @@ describe('SearchForm', () => {
 
           test('calls clearSearchOptions when checked', async () => {
             const user = userEvent.setup()
-            const mockClearSearchOptions = jest.fn()
+            const mockClearSearchOptions = vi.fn()
             render(
               <SearchFormComponent
                 {...defaultProps()}
@@ -297,10 +311,10 @@ describe('SearchForm', () => {
         })
 
         test('is not shown if the OVERRIDE_GRADES_ENABLED environment variable is set to false', () => {
-          // @ts-expect-error
-          window.ENV = {OVERRIDE_GRADES_ENABLED: false}
+          fakeEnv.setup({OVERRIDE_GRADES_ENABLED: false})
           mountComponent()
           expect(document.querySelector('#show_final_grade_overrides_only')).not.toBeInTheDocument()
+          fakeEnv.teardown()
         })
       })
     })

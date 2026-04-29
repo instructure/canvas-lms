@@ -26,6 +26,7 @@ describe ContentNotices do
       end
 
       include ContentNotices
+
       define_content_notice :foo, text: "foo!"
       define_content_notice :bar, text: "baz", should_show: ->(_thing, user) { user == "bob" }
     end

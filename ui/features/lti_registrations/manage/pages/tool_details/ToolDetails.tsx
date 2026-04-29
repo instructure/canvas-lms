@@ -18,9 +18,15 @@
 
 import {useAppendBreadcrumb} from '@canvas/breadcrumbs/useAppendBreadcrumb'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import GenericErrorPage from '@canvas/generic-error-page/react'
+import {GenericErrorPage, NotFoundPage} from '@instructure/platform-generic-error-page'
+import {
+  reportError,
+  canvasErrorPageTranslations,
+  canvasNotFoundTranslations,
+} from '@canvas/error-page-utils'
+import SVGWrapper from '@canvas/svg-wrapper'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Pill} from '@instructure/ui-pill'
@@ -29,28 +35,41 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {View, type ViewProps} from '@instructure/ui-view'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {IconCopyLine, IconTrashLine} from '@instructure/ui-icons'
+import {
+  IconCopyLine,
+  IconTrashLine,
+  IconRefreshLine,
+  IconLockLine,
+  IconUnlockLine,
+  IconNoLine,
+  IconCompleteLine,
+} from '@instructure/ui-icons'
 import * as React from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
-import {matchApiResultState} from '../../../common/lib/apiResult/matchApiResultState'
-import {useApiResult} from '../../../common/lib/apiResult/useApiResult'
 import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
-import {fetchRegistrationWithAllInfoForId, deleteRegistration} from '../../api/registrations'
-import type {AccountId} from '../../model/AccountId'
 import {
-  isForcedOn,
-  LtiRegistration,
-  type LtiRegistrationWithAllInformation,
-} from '../../model/LtiRegistration'
+  useRegistrationWithAllInfo,
+  useDeleteRegistration,
+  useUnbindRegistration,
+  useUpdateRegistration,
+  bindGlobalLtiRegistration,
+  unbindGlobalLtiRegistration,
+  refreshRegistrationWithAllInfo,
+} from '../../api/registrations'
+import {isForcedOn} from '../../model/LtiRegistration'
+import {FetchApiError} from '@canvas/do-fetch-api-effect'
+import type {AccountId} from '../../model/AccountId'
+import type {LtiRegistrationWithAllInformation} from '../../model/LtiRegistration'
 import {type LtiRegistrationId, ZLtiRegistrationId} from '../../model/LtiRegistrationId'
 import {ltiToolDefaultIconUrl} from '../../model/ltiToolIcons'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
-import {ApiResultErrorPage} from '../../../common/lib/apiResult/ApiResultErrorPage'
+import {showFlashAlert} from '@instructure/platform-alerts'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {InlineList} from '@instructure/ui-list'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import theme from '@instructure/canvas-theme'
-import Header from 'features/assignment_grade_summary/react/components/Header'
+import {TurnitinAPMigrationModal} from './tii_migration/TurnitinAPMigrationModal'
+import {openDynamicRegistrationWizard} from '../../registration_wizard/RegistrationWizardModalState'
+import {useRegistrationUpdateWizardModalState} from '../../registration_update_wizard/RegistrationUpdateWizardModalState'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -65,6 +84,8 @@ export const ToolDetails = (props: {accountId: AccountId}) => {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('LTI Registrations listing error')}
         errorMessage={JSON.stringify(parsed.errors)}
       />
@@ -79,31 +100,39 @@ export const ToolDetailsRequest = ({
   accountId: AccountId
   ltiRegistrationId: LtiRegistrationId
 }) => {
-  const fetchReg = React.useCallback(
-    () => fetchRegistrationWithAllInfoForId({accountId, ltiRegistrationId}),
-    [accountId, ltiRegistrationId],
-  )
+  const result = useRegistrationWithAllInfo(ltiRegistrationId, accountId)
 
-  const {state, refresh} = useApiResult(fetchReg)
-
-  return matchApiResultState(state)({
-    data: (value, stale) => (
-      <ToolDetailsInner
-        registration={value}
-        stale={stale}
-        accountId={accountId}
-        refreshRegistration={refresh}
-      />
-    ),
-    error: error => (
-      <ApiResultErrorPage errorSubject={I18n.t('LTI Tool details fetch error')} error={error} />
-    ),
-    loading: () => (
+  if (result.isPending) {
+    return (
       <Flex direction="column" alignItems="center" padding="large 0">
         <Spinner renderTitle="Loading" />
       </Flex>
-    ),
-  })
+    )
+  } else if (result.isError) {
+    const is404 = result.error instanceof FetchApiError && result.error.response.status === 404
+
+    if (is404) {
+      return (
+        <NotFoundPage
+          artwork={<SVGWrapper url="/images/not_found_page/empty-planet.svg" />}
+          title={canvasNotFoundTranslations.title()}
+          description={canvasNotFoundTranslations.description()}
+        />
+      )
+    }
+
+    return (
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
+        errorSubject={I18n.t('LTI Tool details fetch error')}
+        errorMessage={result.error.message}
+      />
+    )
+  } else {
+    return <ToolDetailsInner registration={result.data.json} accountId={accountId} />
+  }
 }
 
 export type ToolDetailsRoute = 'access' | 'configuration' | 'usage' | 'history'
@@ -118,7 +147,6 @@ const useToolDetailsRoute = () => {
 
 export type ToolDetailsOutletContext = {
   registration: LtiRegistrationWithAllInformation
-  refreshRegistration: () => void
 }
 
 const OverflowThemeOverride = {defaultOverflowY: 'unset'}
@@ -183,16 +211,17 @@ const HeaderDetailFields = (registration: LtiRegistrationWithAllInformation) => 
 export const ToolDetailsInner = ({
   registration,
   accountId,
-  refreshRegistration,
 }: {
   registration: LtiRegistrationWithAllInformation
-  stale: boolean
   accountId: AccountId
-  refreshRegistration: () => void
 }) => {
   const navigate = useNavigate()
 
   const route = useToolDetailsRoute()
+
+  const deleteMutation = useDeleteRegistration()
+  const unbindMutation = useUnbindRegistration()
+  const updateRegistration = useUpdateRegistration()
 
   useAppendBreadcrumb(registration.name, `/accounts/${accountId}/apps/manage/${registration.id}`)
 
@@ -207,9 +236,106 @@ export const ToolDetailsInner = ({
     [navigate, registration.id],
   )
 
-  const outletContext: ToolDetailsOutletContext = {registration, refreshRegistration}
+  const outletContext: ToolDetailsOutletContext = {registration}
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
-  const canDelete = !registration.inherited
+  const [lockTooltipShowing, setLockTooltipShowing] = React.useState(false)
+  const [toggleTooltipShowing, setToggleTooltipShowing] = React.useState(false)
+  const isInherited = registration.inherited && !registration.template_registration_id // and not a local copy
+  const canManageOwnership = !isInherited
+  const canDelete = window.ENV.FEATURES.lti_deactivate_registrations ? true : canManageOwnership
+  const toggleDisabled = !registration.template_registration_id && !!isForcedOn(registration)
+  const isSiteAdmin = window.ENV.ACCOUNT_IS_SITE_ADMIN
+  const [tiiMigrationModalShowing, setTiiMigrationModalShowing] = React.useState(false)
+
+  const isActive = React.useMemo(() => {
+    if (registration.inherited && !registration.template_registration_id) {
+      return registration.account_binding?.workflow_state === 'on'
+    }
+
+    return registration.workflow_state === 'active'
+  }, [registration])
+
+  const pillState = React.useMemo(() => {
+    const on = I18n.t('App is On')
+    const off = I18n.t('App is Off')
+
+    if (isSiteAdmin) {
+      const state = registration.account_binding?.workflow_state
+      if (state === 'allow') {
+        return {
+          color: 'success',
+          icon: <IconCompleteLine />,
+          label: I18n.t('App is Allowed'),
+        } as const
+      }
+      if (state === 'on') {
+        return {color: 'warning', icon: <IconCompleteLine />, label: on} as const
+      }
+      return {color: 'danger', icon: <IconNoLine />, label: off} as const
+    }
+
+    return isActive
+      ? ({color: 'success', icon: <IconCompleteLine />, label: on} as const)
+      : ({color: 'danger', icon: <IconNoLine />, label: off} as const)
+  }, [isSiteAdmin, registration.account_binding?.workflow_state, isActive])
+
+  const handleToggle = React.useCallback(
+    async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
+      e.preventDefault()
+      const confirmed = await showConfirmationDialog({
+        body: isActive
+          ? I18n.t(
+              'This app will no longer be available in your account. You can turn it back on from this page at any time.',
+            )
+          : I18n.t('This app will now be available in your account.'),
+        confirmColor: isActive ? 'danger' : 'primary',
+        confirmText: isActive ? I18n.t('Turn Off') : I18n.t('Turn On'),
+        label: isActive ? I18n.t('Turn App Off') : I18n.t('Turn App On'),
+        size: 'small',
+      })
+
+      if (!confirmed) {
+        return
+      }
+
+      try {
+        if (registration.inherited && !registration.template_registration_id) {
+          // inherited and not a local copy means that active state is stored only on the binding
+          if (isActive) {
+            const result = await unbindGlobalLtiRegistration(accountId, registration.id)
+            if (result._type !== 'Success') {
+              throw new Error('Deactivating app failed')
+            }
+          } else {
+            const result = await bindGlobalLtiRegistration(accountId, registration.id)
+            if (result._type !== 'Success') {
+              throw new Error('Activating app failed')
+            }
+          }
+          refreshRegistrationWithAllInfo(registration.id, accountId)
+        } else {
+          const newState = isActive ? 'inactive' : 'active'
+          await updateRegistration.mutateAsync({
+            accountId,
+            registrationId: registration.id,
+            workflowState: newState,
+          })
+        }
+        showFlashAlert({
+          type: 'success',
+          message: isActive ? I18n.t('App turned off.') : I18n.t('App turned on.'),
+        })
+      } catch {
+        showFlashAlert({
+          type: 'error',
+          message: isActive
+            ? I18n.t('There was an error when attempting to turn off the app.')
+            : I18n.t('There was an error when attempting to turn on the app.'),
+        })
+      }
+    },
+    [registration, updateRegistration, isActive, accountId],
+  )
 
   const handleCopyClientId = React.useCallback(
     async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
@@ -240,6 +366,7 @@ export const ToolDetailsInner = ({
   const handleDelete = React.useCallback(
     async (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps, MouseEvent>) => {
       e.preventDefault()
+
       const confirmed = await showConfirmationDialog({
         body: [
           <Text key="warning" weight="bold">
@@ -259,11 +386,20 @@ export const ToolDetailsInner = ({
       })
 
       if (confirmed) {
-        const result = await deleteRegistration(registration.account_id, registration.id)
-        if (result._type === 'Success') {
-          refreshRegistration()
+        try {
+          if (isInherited) {
+            await unbindMutation.mutateAsync({
+              registrationId: registration.id,
+              accountId,
+            })
+          } else {
+            await deleteMutation.mutateAsync({
+              registrationId: registration.id,
+              accountId: registration.account_id,
+            })
+          }
           navigate('/manage')
-        } else {
+        } catch {
           showFlashAlert({
             type: 'error',
             message: I18n.t('There was an error when attempting to delete the registration.'),
@@ -271,8 +407,57 @@ export const ToolDetailsInner = ({
         }
       }
     },
-    [registration],
+    [registration, navigate, deleteMutation, unbindMutation, isInherited, accountId],
   )
+
+  const handleToggleLock = React.useCallback(async () => {
+    const locked = registration.lock_deploying ?? false
+    const confirmed = await showConfirmationDialog({
+      label: locked ? I18n.t('Unlock App') : I18n.t('Lock App'),
+      body: (
+        <View>
+          {locked ? (
+            <Text>
+              {I18n.t(
+                'This app will become deployable via client ID and through course copy. You may always lock it later to prevent new deployments.',
+              )}
+            </Text>
+          ) : (
+            <Text>
+              {I18n.t(
+                'This app will no longer deployable by client ID or course copy. To deploy it at the root account or control availability, please use Canvas Apps. Existing deployments will not be affected. You will be able to unlock the app on this page at any time.',
+              )}
+            </Text>
+          )}
+        </View>
+      ),
+      confirmText: locked ? I18n.t('Unlock') : I18n.t('Lock'),
+      confirmColor: 'primary',
+      size: 'small',
+    })
+    if (confirmed) {
+      try {
+        await updateRegistration.mutateAsync({
+          accountId,
+          registrationId: registration.id,
+          lock_deploying: !locked,
+        })
+        showFlashAlert({
+          type: 'success',
+          message: locked
+            ? I18n.t('App unlocked successfully.')
+            : I18n.t('App locked successfully.'),
+        })
+      } catch {
+        showFlashAlert({
+          type: 'error',
+          message: locked
+            ? I18n.t('There was an error unlocking the app. Please try again.')
+            : I18n.t('There was an error locking the app. Please try again.'),
+        })
+      }
+    }
+  }, [accountId, registration, updateRegistration])
 
   React.useEffect(() => {
     document.getElementById('drawer-layout-content')?.scrollTo({
@@ -281,142 +466,277 @@ export const ToolDetailsInner = ({
     })
   }, [])
 
-  return (
-    <Flex direction="column">
-      <View
-        borderRadius="large"
-        borderColor="secondary"
-        borderWidth="small"
-        margin="0 0 small"
-        as="div"
-        padding="small"
-      >
-        <Flex direction="column">
-          <Flex direction="row" margin="0 0 small">
-            <img
-              src={
-                registration.icon_url
-                  ? registration.icon_url
-                  : ltiToolDefaultIconUrl({
-                      base: window.location.origin,
-                      toolName: registration.name,
-                      developerKeyId: registration.developer_key_id || undefined,
-                    })
-              }
-              style={{height: '52px'}}
-              alt={registration.name}
-            />
+  const pendingUpdate = registration.pending_update
+  const tiiMigrationAvailable =
+    !!registration.developer_key_id &&
+    window.ENV.turnitinAPClientId === registration.developer_key_id
 
-            <Flex direction="column" margin="0 small">
-              <Text size="large" weight="bold">
-                {registration.name}
-              </Text>
-              <Text size="small">{registration.vendor}</Text>
-            </Flex>
-          </Flex>
-          <Flex margin="0 0 small">
-            <Text>{registration.description}</Text>
-          </Flex>
-          {HeaderDetailFields(registration)}
-          <Flex margin="0 0 small">
-            {/* Todo: change this based on registration info */}
-            <Pill>v1.3</Pill>
-          </Flex>
+  const dynamicRegistrationUrl = registration.dynamic_registration_url
+
+  return (
+    <>
+      {tiiMigrationAvailable && tiiMigrationModalShowing && (
+        <TurnitinAPMigrationModal
+          rootAccountId={accountId}
+          onClose={() => setTiiMigrationModalShowing(false)}
+        />
+      )}
+      <Flex direction="column">
+        <View
+          borderRadius="large"
+          borderColor="secondary"
+          borderWidth="small"
+          margin="0 0 small"
+          as="div"
+          padding="small"
+        >
           <Flex direction="column">
-            <Flex gap="small" margin="0">
-              <Button
-                data-pendo="lti-registrations-copy-client-id"
-                color="secondary"
-                renderIcon={<IconCopyLine />}
-                margin="0"
-                onClick={handleCopyClientId}
-              >
-                {I18n.t('Copy Client ID')}
-              </Button>
-              <Tooltip
-                renderTip={I18n.t(
-                  "This account does not own this app and therefore can't delete it.",
-                )}
-                isShowingContent={tooltipShowing}
-                onShowContent={e => {
-                  // The tooltip should only be shown if they *can't* click the delete button
-                  setTooltipShowing(!canDelete)
-                }}
-                onHideContent={e => {
-                  setTooltipShowing(false)
-                }}
-              >
+            <Flex direction="row" margin="0 0 small">
+              <img
+                src={
+                  registration.icon_url
+                    ? registration.icon_url
+                    : ltiToolDefaultIconUrl({
+                        base: window.location.origin,
+                        toolName: registration.name,
+                        developerKeyId: registration.developer_key_id || undefined,
+                      })
+                }
+                style={{height: '52px'}}
+                alt={registration.name}
+              />
+
+              <Flex direction="column" margin="0 small">
+                <Text size="large" weight="bold">
+                  {registration.name}
+                </Text>
+                <Text size="small">{registration.vendor}</Text>
+              </Flex>
+            </Flex>
+            <Flex margin="0 0 small">
+              <Text>{registration.description}</Text>
+            </Flex>
+            {HeaderDetailFields(registration)}
+            <Flex margin="0 0 small" gap="small">
+              <Pill>v1.3</Pill>
+              {window.ENV.FEATURES?.lock_lti_registrations &&
+                (registration.lock_deploying ? (
+                  <Pill color="info">
+                    <Flex direction="row" gap="xx-small">
+                      <IconLockLine />
+                      {I18n.t('App is locked')}
+                    </Flex>
+                  </Pill>
+                ) : (
+                  <Pill color="info">
+                    <Flex direction="row" gap="xx-small">
+                      <IconUnlockLine />
+                      {I18n.t('App is unlocked')}
+                    </Flex>
+                  </Pill>
+                ))}
+              {window.ENV.FEATURES.lti_deactivate_registrations ? (
+                <Pill color={pillState.color}>
+                  <Flex direction="row" gap="xx-small">
+                    {pillState.icon}
+                    {pillState.label}
+                  </Flex>
+                </Pill>
+              ) : null}
+            </Flex>
+            <Flex direction="column">
+              <Flex gap="small" margin="0" wrap="wrap">
                 <Button
-                  data-pendo="lti-registrations-delete-app"
+                  data-pendo="lti-registrations-copy-client-id"
                   color="secondary"
-                  renderIcon={<IconTrashLine />}
+                  renderIcon={<IconCopyLine />}
                   margin="0"
-                  data-testid="delete-app"
-                  interaction={canDelete ? 'enabled' : 'disabled'}
-                  onClick={handleDelete}
+                  onClick={handleCopyClientId}
                 >
-                  {I18n.t('Delete App')}
+                  {I18n.t('Copy Client ID')}
                 </Button>
-              </Tooltip>
+                <Tooltip
+                  renderTip={I18n.t(
+                    "This account does not own this app and therefore can't delete it.",
+                  )}
+                  isShowingContent={tooltipShowing}
+                  onShowContent={() => {
+                    setTooltipShowing(!canDelete)
+                  }}
+                  onHideContent={() => {
+                    setTooltipShowing(false)
+                  }}
+                >
+                  <Button
+                    data-pendo="lti-registrations-delete-app"
+                    color="secondary"
+                    renderIcon={<IconTrashLine />}
+                    margin="0"
+                    data-testid="delete-app"
+                    interaction={canDelete ? 'enabled' : 'disabled'}
+                    onClick={handleDelete}
+                  >
+                    {I18n.t('Delete App')}
+                  </Button>
+                </Tooltip>
+
+                {window.ENV.FEATURES?.lock_lti_registrations && (
+                  <Tooltip
+                    renderTip={I18n.t(
+                      "This account does not own this app and therefore can't lock it.",
+                    )}
+                    isShowingContent={lockTooltipShowing}
+                    onShowContent={() => {
+                      setLockTooltipShowing(!canManageOwnership)
+                    }}
+                    onHideContent={() => {
+                      setLockTooltipShowing(false)
+                    }}
+                  >
+                    <Button
+                      data-pendo="lti-registrations-toggle-lock"
+                      data-testid="toggle-lock"
+                      renderIcon={
+                        registration.lock_deploying ? <IconUnlockLine /> : <IconLockLine />
+                      }
+                      color="secondary"
+                      margin="0"
+                      interaction={canManageOwnership ? 'enabled' : 'disabled'}
+                      onClick={handleToggleLock}
+                    >
+                      {registration.lock_deploying ? I18n.t('Unlock app') : I18n.t('Lock app')}
+                    </Button>
+                  </Tooltip>
+                )}
+                {window.ENV.FEATURES.lti_deactivate_registrations ? (
+                  <Tooltip
+                    renderTip={I18n.t(
+                      'This app is locked on by Instructure, and cannot be turned off.',
+                    )}
+                    isShowingContent={toggleTooltipShowing}
+                    onShowContent={() => {
+                      setToggleTooltipShowing(toggleDisabled)
+                    }}
+                    onHideContent={() => {
+                      setToggleTooltipShowing(false)
+                    }}
+                  >
+                    <Button
+                      data-pendo="lti-registrations-toggle-app"
+                      data-testid="toggle-app"
+                      color="secondary"
+                      margin="0"
+                      renderIcon={isActive ? <IconNoLine /> : <IconCompleteLine />}
+                      onClick={handleToggle}
+                      interaction={toggleDisabled ? 'disabled' : 'enabled'}
+                    >
+                      {isActive ? I18n.t('Turn App Off') : I18n.t('Turn App On')}
+                    </Button>
+                  </Tooltip>
+                ) : null}
+
+                {window.ENV.LTI_DR_REGISTRATIONS_UPDATE && pendingUpdate ? (
+                  <Button
+                    color="secondary"
+                    data-pendo="lti-registrations-update-available-button"
+                    renderIcon={() => <IconRefreshLine />}
+                    onClick={() => {
+                      useRegistrationUpdateWizardModalState.getState().open(registration)
+                    }}
+                  >
+                    {I18n.t('Update Available')}
+                  </Button>
+                ) : null}
+
+                {tiiMigrationAvailable && (
+                  <Button
+                    data-pendo="lti-registrations-migrate-app"
+                    color="primary"
+                    margin="0"
+                    onClick={() => {
+                      setTiiMigrationModalShowing(true)
+                    }}
+                  >
+                    {I18n.t('Migrate from LTI 2.0')}
+                  </Button>
+                )}
+
+                {typeof dynamicRegistrationUrl === 'string' && !registration.reinstall_disabled ? (
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      openDynamicRegistrationWizard(
+                        dynamicRegistrationUrl,
+                        undefined,
+                        undefined,
+                        registration.id,
+                      )
+                    }}
+                    margin="0 small 0 0"
+                  >
+                    {I18n.t('Reinstall App')}
+                  </Button>
+                ) : null}
+              </Flex>
             </Flex>
           </Flex>
-        </Flex>
-      </View>
-      <Tabs margin="0" padding="medium" onRequestTabChange={onTabClick}>
-        <Tabs.Panel
-          isSelected={route === 'access'}
-          active={route === 'access'}
-          id="access"
-          padding="medium 0"
-          href="/"
-          renderTitle={
-            <Text style={{color: 'initial', textDecoration: 'initial'}}>
-              {I18n.t('Availability and Exceptions')}
-            </Text>
-          }
-          themeOverride={OverflowThemeOverride}
-        >
-          <Outlet context={outletContext} />
-        </Tabs.Panel>
-        <Tabs.Panel
-          isSelected={route === 'configuration'}
-          active={route === 'configuration'}
-          renderTitle={
-            <Text style={{color: 'initial', textDecoration: 'initial'}}>
-              {I18n.t('Configuration')}
-            </Text>
-          }
-          id="configuration"
-          padding="medium 0"
-          themeOverride={OverflowThemeOverride}
-        >
-          <Outlet context={outletContext} />
-        </Tabs.Panel>
-        {window.ENV.FEATURES.lti_registrations_usage_tab ? (
+        </View>
+        <Tabs margin="0" padding="medium" onRequestTabChange={onTabClick}>
           <Tabs.Panel
-            isSelected={route === 'usage'}
-            active={route === 'usage'}
+            isSelected={route === 'access'}
+            active={route === 'access'}
+            id="access"
+            padding="medium 0"
+            href="/"
             renderTitle={
-              <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Usage')}</Text>
+              <Text style={{color: 'initial', textDecoration: 'initial'}}>
+                {I18n.t('Availability and Exceptions')}
+              </Text>
             }
-            id="usage"
+            themeOverride={OverflowThemeOverride}
+          >
+            <Outlet context={outletContext} />
+          </Tabs.Panel>
+          <Tabs.Panel
+            isSelected={route === 'configuration'}
+            active={route === 'configuration'}
+            renderTitle={
+              <Text style={{color: 'initial', textDecoration: 'initial'}}>
+                {I18n.t('Configuration')}
+              </Text>
+            }
+            id="configuration"
+            padding="medium 0"
+            themeOverride={OverflowThemeOverride}
+          >
+            <Outlet context={outletContext} />
+          </Tabs.Panel>
+          {window.ENV.FEATURES.lti_registrations_usage_tab ? (
+            <Tabs.Panel
+              isSelected={route === 'usage'}
+              active={route === 'usage'}
+              renderTitle={
+                <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('Usage')}</Text>
+              }
+              id="usage"
+              padding="medium 0"
+            >
+              <Outlet context={outletContext} />
+            </Tabs.Panel>
+          ) : null}
+          <Tabs.Panel
+            isSelected={route === 'history'}
+            active={route === 'history'}
+            renderTitle={
+              <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('History')}</Text>
+            }
+            id="history"
             padding="medium 0"
           >
             <Outlet context={outletContext} />
           </Tabs.Panel>
-        ) : null}
-        <Tabs.Panel
-          isSelected={route === 'history'}
-          active={route === 'history'}
-          renderTitle={
-            <Text style={{color: 'initial', textDecoration: 'initial'}}>{I18n.t('History')}</Text>
-          }
-          id="history"
-          padding="medium 0"
-        >
-          <Outlet context={outletContext} />
-        </Tabs.Panel>
-      </Tabs>
-    </Flex>
+        </Tabs>
+      </Flex>
+    </>
   )
 }

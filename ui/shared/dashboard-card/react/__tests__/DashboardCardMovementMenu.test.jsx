@@ -25,8 +25,8 @@ describe('DashboardCardMovementMenu', () => {
   const defaultProps = {
     assetString: 'course_1',
     cardTitle: 'Strategery 101',
-    handleMove: jest.fn(),
-    onUnfavorite: jest.fn(),
+    handleMove: vi.fn(),
+    onUnfavorite: vi.fn(),
     isFavorited: true,
     menuOptions: {
       canMoveLeft: true,
@@ -41,7 +41,7 @@ describe('DashboardCardMovementMenu', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('handleMoveCard', () => {

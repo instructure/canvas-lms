@@ -32,4 +32,12 @@ module Factories
     @conversation.update(options.slice(:subscribed, :starred, :workflow_state, :user))
     @conversation.reload
   end
+
+  def conversation_model(sender: nil, recipients: [], **options)
+    sender ||= @me || user_model
+    @conversation = sender.initiate_conversation(recipients, options.delete(:private), options)
+    Attachment.where(id: options[:attachment_ids]).update_all(folder_id: sender.conversation_attachments_folder.id)
+    @message = @conversation.add_message(options[:body] || "test", **options)
+    @conversation
+  end
 end

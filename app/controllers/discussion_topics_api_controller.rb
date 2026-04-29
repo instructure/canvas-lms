@@ -24,6 +24,7 @@ require "benchmark"
 class DiscussionTopicsApiController < ApplicationController
   include Api::V1::DiscussionTopics
   include Api::V1::User
+  include Api::V1::AccessibilityResourceScan
   include SubmittableHelper
   include LocaleSelection
 
@@ -36,7 +37,9 @@ class DiscussionTopicsApiController < ApplicationController
                                                   migrate_disallow
                                                   show
                                                   unsubscribe_topic
-                                                  update_discussion_types]
+                                                  update_discussion_types
+                                                  accessibility_scan
+                                                  accessibility_queue_scan]
   before_action only: %i[replies
                          entries
                          add_entry
@@ -113,12 +116,12 @@ class DiscussionTopicsApiController < ApplicationController
         json: {
           error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.")
         },
-        status: :unprocessable_entity
+        status: :unprocessable_content
       ) and return
     end
 
     current_count = Canvas.redis.get(cache_key).to_i
-    limit = llm_config_raw.rate_limit[:limit]
+    limit = llm_config_raw.rate_limit&.[](:limit)
     summary = @topic.summaries.where(user: @current_user, llm_config_version: llm_config_refined.name).order(created_at: :desc).first
     parent_summary = summary&.parent
 
@@ -163,7 +166,7 @@ class DiscussionTopicsApiController < ApplicationController
         json: {
           error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.")
         },
-        status: :unprocessable_entity
+        status: :unprocessable_content
       ) and return
     end
 
@@ -194,8 +197,10 @@ class DiscussionTopicsApiController < ApplicationController
       @topic.update!(summary_enabled: true)
     end
 
+    InstStatsd::Statsd.distributed_increment("discussion_topic.summary.generated")
+
     current_count = Canvas.redis.get(cache_key).to_i
-    limit = llm_config_raw.rate_limit[:limit]
+    limit = llm_config_raw.rate_limit&.[](:limit)
 
     render(json: { id: refined_summary.id, text: refined_summary.summary, usage: { currentCount: current_count, limit: } })
   rescue => e
@@ -203,18 +208,37 @@ class DiscussionTopicsApiController < ApplicationController
 
     case e
     when InstLLM::ServiceQuotaExceededError
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.quota_exceeded")
       render(json: { error: t("Sorry, we are currently experiencing high demand. Please try again later.") }, status: :service_unavailable)
     when InstLLM::ThrottlingError
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.throttled")
       render(json: { error: t("Sorry, the service is currently busy. Please try again later.") }, status: :service_unavailable)
     when InstLLM::ValidationTooLongError
-      render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_entity)
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.too_long")
+      render(json: { error: t("Sorry, we are unable to summarize this discussion as it is too long.") }, status: :unprocessable_content)
     when InstLLM::ValidationError
-      render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_entity)
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.validation")
+      render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_content)
     when InstLLMHelper::RateLimitExceededError
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.rate_limit_exceeded")
       render(json: { error: t("Sorry, you have reached the maximum number of summary generations allowed (%{limit}) for now. Please try again later.", limit: e.limit) }, status: :too_many_requests)
     else
-      Canvas::Errors.capture_exception(:discussion_summary, e, :error)
-      render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_entity)
+      case e.class.name
+      when "InstructureMiscPlugin::Extensions::CedarClient::ValidationError"
+        InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.validation")
+        render(json: { error: t("Oops! There was an error validating the service request. Please try again later.") }, status: :unprocessable_content)
+      when "InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError"
+        InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.rate_limit_exceeded")
+        render(json: { error: t("Sorry, you have reached the maximum number of summary generations allowed for now. Please try again later.") }, status: :too_many_requests)
+      when "InstructureMiscPlugin::Extensions::CedarClient::CedarClientError"
+        InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.cedar_client")
+        Canvas::Errors.capture_exception(:discussion_summary, e, :error)
+        render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_content)
+      else
+        InstStatsd::Statsd.distributed_increment("discussion_topic.summary.error.unknown")
+        Canvas::Errors.capture_exception(:discussion_summary, e, :error)
+        render(json: { error: t("Sorry, we are unable to summarize this discussion at this time. Please try again later.") }, status: :unprocessable_content)
+      end
     end
   end
 
@@ -248,10 +272,14 @@ class DiscussionTopicsApiController < ApplicationController
   #   - "seen": Marks the summary as seen. This action saves the feedback if it's not already persisted.
   #   - "like": Marks the summary as liked.
   #   - "dislike": Marks the summary as disliked.
+  #   - "add_comment": Adds a written comment to a disliked summary. Requires the "comment" parameter.
   #   - "reset_like": Resets the like status of the summary.
   #   - "regenerate": Regenerates the summary feedback.
   #   - "disable_summary": Disables the summary feedback.
   #   Any other value will result in an error response.
+  #
+  # @argument comment [String] Optional
+  #   A written explanation for the dislike. Only used with the "add_comment" action. Maximum 1024 characters.
   #
   # @example_request
   #
@@ -282,18 +310,31 @@ class DiscussionTopicsApiController < ApplicationController
       feedback.save! unless feedback.persisted?
     when :like
       feedback.like
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.liked")
     when :dislike
       feedback.dislike
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.disliked")
+    when :add_comment
+      render(json: { error: t("Comment is required.") }, status: :bad_request) and return if params[:comment].blank?
+
+      begin
+        feedback.add_comment(params[:comment])
+      rescue ActiveRecord::RecordInvalid => e
+        render(json: { error: e.message }, status: :bad_request) and return
+      end
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.comment_added")
     when :reset_like
       feedback.reset_like
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.reset_like")
     when :disable_summary
       feedback.disable_summary
+      InstStatsd::Statsd.distributed_increment("discussion_topic.summary.feedback.disabled")
     else
       logger.warn("Invalid discussion topic summary feedback action: #{action}")
       render(json: { error: "Invalid action." }, status: :bad_request) and return
     end
 
-    render(json: { liked: feedback.liked, disliked: feedback.disliked })
+    render(json: { liked: feedback.liked, disliked: feedback.disliked, comment: feedback.comment })
   end
 
   def insight
@@ -310,6 +351,10 @@ class DiscussionTopicsApiController < ApplicationController
 
     if DiscussionTopicInsight::TERMINAL_WORKFLOW_STATES.include?(insight.workflow_state)
       data[:needs_processing] = insight.needs_processing?
+      # The needs_processing in the root is obsolete. The reason it's still here is to maintain backward compatibility
+      # with speedgrader's current behaviour. Once the latest speedgrader is deployed, we can remove this.
+
+      data[:student_ids_needs_processing] = insight.student_ids_needs_processing
     end
 
     render(json: data)
@@ -335,7 +380,7 @@ class DiscussionTopicsApiController < ApplicationController
     render json: {}
   rescue => e
     logger.error("Error generating insight for discussion topic: #{e.class} - #{e.message}")
-    render json: { error: "Failed to generate insight for discussion topic." }, status: :unprocessable_entity
+    render json: { error: "Failed to generate insight for discussion topic." }, status: :unprocessable_content
   end
 
   def insight_entries
@@ -598,7 +643,10 @@ class DiscussionTopicsApiController < ApplicationController
 
     return unless authorized_action(@topic, @current_user, :duplicate)
 
+    @topic.updating_user = @current_user
     new_topic = @topic.duplicate({ user: @current_user })
+    new_topic.updating_user = @current_user
+
     if @topic.pinned
       new_topic.position = @topic.context.discussion_topics.maximum(:position) + 1
     end
@@ -692,7 +740,7 @@ class DiscussionTopicsApiController < ApplicationController
   #       "created_at": "2011-11-03T21:33:29Z",
   #       "attachment": {
   #         "content-type": "unknown/unknown",
-  #         "url": "http://www.example.com/files/681/download?verifier=JDG10Ruitv8o6LjGXWlxgOb5Sl3ElzVYm9cBKUT3",
+  #         "url": "http://www.example.com/files/681/download",
   #         "filename": "content.txt",
   #         "display_name": "content.txt" } },
   #     {
@@ -744,6 +792,7 @@ class DiscussionTopicsApiController < ApplicationController
     @parent = all_entries(@topic).find(params[:entry_id])
     @entry = build_entry(@parent.discussion_subentries)
     if authorized_action(@entry, @current_user, :create)
+      @entry.saving_user = @current_user
       save_entry
     end
   end
@@ -815,7 +864,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @response_field user_id The unique identifier for the author of the reply.
   #
-  # @response_field user_name The name of the author of the reply.
+  # @response_field user_name The author's display name, or null for anonymous topics when the author is not an instructor.
   #
   # @response_field message The content of the reply.
   #
@@ -1059,10 +1108,8 @@ class DiscussionTopicsApiController < ApplicationController
                            .in_batches
                            .update_all(discussion_type: DiscussionTopic::DiscussionTypes::THREADED, updated_at: Time.now.utc)
 
-    tags = { institution: @domain_root_account&.name || "unknown" }
-
-    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow.count", tags:)
-    InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow.discussions_updated", update_count, tags:)
+    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow.count")
+    InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow.discussions_updated", update_count)
 
     render json: { update_count: }
   end
@@ -1089,10 +1136,30 @@ class DiscussionTopicsApiController < ApplicationController
       return render(json: { error: "Invalid data", count: side_comment_count }, status: :bad_request)
     end
 
-    to_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::THREADED, updated_at: Time.now.utc)
-    to_not_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::NOT_THREADED, updated_at: Time.now.utc)
+    to_threaded_update_count = to_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::THREADED, updated_at: Time.now.utc)
+    to_not_threaded_update_count = to_not_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::NOT_THREADED, updated_at: Time.now.utc)
+
+    InstStatsd::Statsd.distributed_increment("discussion_topic.migrate_disallow_manage.count")
+    InstStatsd::Statsd.distribution("discussion_topic.migrate_disallow_manage.discussions_updated_count", to_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::THREADED })
+    InstStatsd::Statsd.distribution("discussion_topic.migrate_disallow_manage.discussions_updated_count", to_not_threaded_update_count, tags: { type: DiscussionTopic::DiscussionTypes::NOT_THREADED })
 
     render json: { success: "true" }
+  end
+
+  def accessibility_scan
+    return unless authorized_action(@topic, @current_user, :update)
+    return render_unauthorized_action unless @context.a11y_checker_enabled?
+
+    scan = Accessibility::ResourceScannerService.new(resource: @topic).call_sync
+    render json: accessibility_resource_scan_json(scan)
+  end
+
+  def accessibility_queue_scan
+    return unless authorized_action(@topic, @current_user, :update)
+    return render_unauthorized_action unless @context.a11y_checker_enabled?
+
+    scan = Accessibility::ResourceScannerService.new(resource: @topic).call
+    render json: accessibility_resource_scan_json(scan)
   end
 
   protected
@@ -1129,6 +1196,7 @@ class DiscussionTopicsApiController < ApplicationController
 
   def build_entry(association)
     params[:message] = process_incoming_html_content(params[:message]) if params.key?(:message)
+    @topic.saving_user = @current_user
     @topic.save! if @topic.new_record?
     association.build(message: params[:message], user: @current_user, discussion_topic: @topic)
   end
@@ -1139,6 +1207,7 @@ class DiscussionTopicsApiController < ApplicationController
     return if has_attachment && !@topic.for_assignment? && params[:attachment].size > 1.kilobyte &&
               quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
 
+    @entry.saving_user = @current_user
     if @entry.save
       log_asset_access(@topic, "topics", "topics", "participate")
 
@@ -1150,6 +1219,7 @@ class DiscussionTopicsApiController < ApplicationController
         @attachment = create_attachment
         @attachment.handle_duplicates(:rename)
         @entry.attachment = @attachment
+        @entry.saving_user = @current_user
         @entry.save
       end
       render json: discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name, :display_user]).first, status: :created
@@ -1299,6 +1369,39 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def generate_llm_response(llm_config, prompt, options)
+    root_account = @topic.context.root_account
+
+    if root_account.feature_enabled?(:discussion_summary_with_cedar)
+      generate_llm_response_with_cedar(llm_config, prompt, options, root_account)
+    else
+      generate_llm_response_with_bedrock(llm_config, prompt, options)
+    end
+  end
+
+  def generate_llm_response_with_cedar(llm_config, prompt, _options, root_account)
+    response = nil
+    time = Benchmark.measure do
+      InstLLMHelper.with_rate_limit(user: @current_user, llm_config:) do
+        response = CedarClient.prompt(
+          prompt:,
+          model: llm_config.model_id,
+          feature_slug: "discussion-summary",
+          root_account_uuid: root_account.uuid,
+          current_user: @current_user
+        )
+      end
+    end
+
+    [
+      response.response,
+      # mock out input and outout tokens for cedar since we don't have that data (VICE-5912)
+      0, # input_tokens
+      0, # output_tokens
+      time.real.round(2)
+    ]
+  end
+
+  def generate_llm_response_with_bedrock(llm_config, prompt, options)
     response = nil
     time = Benchmark.measure do
       InstLLMHelper.with_rate_limit(user: @current_user, llm_config:) do

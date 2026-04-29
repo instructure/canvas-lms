@@ -21,16 +21,16 @@ import React from 'react'
 import {responsiveQuerySizes} from '../../../utils'
 import {DiscussionAvailabilityTray} from '../DiscussionAvailabilityTray'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })

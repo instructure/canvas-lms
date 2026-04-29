@@ -19,7 +19,6 @@
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import MockDate from 'mockdate'
 import moment from 'moment-timezone'
 import * as tz from '@instructure/moment-utils'
 import CanvasDateInput2 from '../DateInput2'
@@ -32,8 +31,8 @@ function renderInput(overrides = {}) {
     renderLabel: () => 'label',
     messages: [],
     timezone: 'UTC',
-    formatDate: jest.fn(formatDate),
-    onSelectedDateChange: jest.fn(),
+    formatDate: vi.fn(formatDate),
+    onSelectedDateChange: vi.fn(),
     ...overrides,
   }
   const result = render(<CanvasDateInput2 {...props} />)
@@ -59,16 +58,13 @@ const oldLocale = moment.locale()
 beforeEach(() => {
   // Not directly at midnight so we can test the dates coming from this component are set to the
   // beginning of the day and don't retain the time.
-  MockDate.set('2025-04-09T00:42:00Z', 0)
+  vi.useFakeTimers()
+  vi.setSystemTime(new Date('2025-04-09T00:42:00Z'))
   moment.locale('en-us')
-  jest.useFakeTimers({
-    doNotFake: ['Date'],
-  })
 })
 
 afterEach(() => {
-  MockDate.reset()
-  jest.useRealTimers()
+  vi.useRealTimers()
   moment.locale(oldLocale)
 })
 
@@ -100,7 +96,7 @@ describe('clean input state', () => {
 
   it('displays the formatted date when the initial date is not null', () => {
     const now = new Date()
-    const formatter = jest.fn(() => 'formatted date')
+    const formatter = vi.fn(() => 'formatted date')
     const {getInput} = renderInput({selectedDate: now, formatDate: formatter})
     expect(formatter).toHaveBeenCalledWith(now)
     expect(getInput().value).toBe('formatted date')
@@ -134,7 +130,7 @@ describe('clean input state', () => {
 describe('choosing a day on the calendar', () => {
   it('selects the date when clicked', async () => {
     const user = userEvent.setup({
-      advanceTimers: jest.advanceTimersByTime,
+      advanceTimers: vi.advanceTimersByTime,
     })
     const {props, getInput} = renderInput()
     await user.click(getInput())
@@ -147,7 +143,7 @@ describe('choosing a day on the calendar', () => {
 
   it('hides the calendar when clicked', async () => {
     const user = userEvent.setup({
-      advanceTimers: jest.advanceTimersByTime,
+      advanceTimers: vi.advanceTimersByTime,
     })
     const {queryByText, getInput} = renderInput()
     await user.click(getInput())
@@ -207,7 +203,7 @@ describe('dirty input state', () => {
 
   it('handles the date in the given timezone', () => {
     const tz = 'Pacific/Tarawa' // +12
-    const handleDateChange = jest.fn()
+    const handleDateChange = vi.fn()
     const {getInput} = renderAndDirtyInput('Apr 10, 2025', {
       selectedDate: new Date(),
       timezone: tz,
@@ -256,7 +252,7 @@ describe('messages', () => {
 describe('disabled dates', () => {
   it('renders disabled dates as disabled', async () => {
     const user = userEvent.setup({
-      advanceTimers: jest.advanceTimersByTime,
+      advanceTimers: vi.advanceTimersByTime,
     })
     const {getInput} = renderInput({disabledDates: () => true})
     await user.click(getInput())
@@ -269,7 +265,7 @@ describe('disabled dates', () => {
 
   it('does not select a disabled date when clicked', async () => {
     const user = userEvent.setup({
-      advanceTimers: jest.advanceTimersByTime,
+      advanceTimers: vi.advanceTimersByTime,
     })
     const {props, getInput} = renderInput({disabledDates: () => true})
     await user.click(getInput())

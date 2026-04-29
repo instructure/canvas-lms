@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {assignLocation, windowPathname} from '@canvas/util/globalUtils'
 import {Button} from '@instructure/ui-buttons'
@@ -31,6 +31,8 @@ import {
   ActionPrompt,
   ForgotPasswordLink,
   LoginTroubleLink,
+  MessageAlert,
+  OtherWaysToLogin,
   RememberMeCheckbox,
   SSOButtons,
 } from '../shared'
@@ -43,8 +45,15 @@ const I18n = createI18nScope('new_login')
 const SignIn = () => {
   const {isUiActionPending, otpRequired, rememberMe, setIsUiActionPending, setOtpRequired} =
     useNewLogin()
-  const {authProviders, invalidLoginFaqUrl, isPreviewMode, loginHandleName, selfRegistrationType} =
-    useNewLoginData()
+  const {
+    authProviders,
+    discoveryEnabled,
+    invalidLoginFaqUrl,
+    isPreviewMode,
+    loginHandleName,
+    selfRegistrationType,
+    customMessageLogin,
+  } = useNewLoginData()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -103,7 +112,11 @@ const SignIn = () => {
   const handleFailedLogin = () => {
     setPasswordError('')
     setPassword('')
-    setUsernameError(I18n.t('Please verify your email and password and try again.'))
+    setUsernameError(
+      I18n.t('Please verify your %{loginHandleName} or password and try again.', {
+        loginHandleName: loginHandleName?.toLowerCase(),
+      }),
+    )
     // focus set in useEffect above …
   }
 
@@ -146,11 +159,11 @@ const SignIn = () => {
   }
 
   const handleUsernameChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setUsername(value.trim())
+    setUsername(value)
   }
 
   const handlePasswordChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setPassword(value.trim())
+    setPassword(value)
   }
 
   if (otpRequired && !isPreviewMode) {
@@ -176,6 +189,8 @@ const SignIn = () => {
           </Flex.Item>
         )}
       </Flex>
+
+      {customMessageLogin && <MessageAlert message={customMessageLogin} />}
 
       <form onSubmit={handleLogin} noValidate={true}>
         <Flex direction="column" gap="large">
@@ -238,9 +253,14 @@ const SignIn = () => {
       </form>
 
       {authProviders && authProviders.length > 0 && (
-        <Flex direction="column" gap="large">
-          <SSOButtons />
-        </Flex>
+        <SSOButtons>
+          {discoveryEnabled && (
+            <Flex.Item align="center" overflowX="visible" overflowY="visible">
+              {/* /login hard-redirects server-side to the correct branded login */}
+              <OtherWaysToLogin url="/login" />
+            </Flex.Item>
+          )}
+        </SSOButtons>
       )}
     </Flex>
   )

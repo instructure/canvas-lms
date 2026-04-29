@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {result} from 'lodash'
+import {result} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import 'jqueryui/dialog'
 

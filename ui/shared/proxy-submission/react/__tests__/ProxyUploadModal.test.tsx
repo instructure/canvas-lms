@@ -22,8 +22,8 @@ import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProxyUploadModal, {type ProxyUploadModalProps} from '../ProxyUploadModal'
 
-jest.mock('@canvas/upload-file', () => ({
-  uploadFile: jest.fn(() => Promise.resolve({id: '123', display_name: 'my-image.png'})),
+vi.mock('@canvas/upload-file', () => ({
+  uploadFile: vi.fn(() => Promise.resolve({id: '123', display_name: 'my-image.png'})),
 }))
 
 const defaultProps: ProxyUploadModalProps = {
@@ -58,7 +58,7 @@ describe('ProxyUploadModal', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders', () => {

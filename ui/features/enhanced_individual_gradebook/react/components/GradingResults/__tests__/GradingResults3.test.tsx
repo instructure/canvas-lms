@@ -33,8 +33,8 @@ import type {GradingType} from '../../../../../../api'
 import {setupCanvasQueries} from '../../__tests__/fixtures'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 
-jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
-  executeApiRequest: jest.fn(),
+vi.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
+  executeApiRequest: vi.fn(),
 }))
 
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -50,9 +50,9 @@ const renderGradingResults = (props: GradingResultsComponentProps) => {
 describe('Grading Results Tests', () => {
   beforeEach(() => {
     fakeENV.setup()
-    $.subscribe = jest.fn()
+    $.subscribe = vi.fn()
     setupCanvasQueries()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {

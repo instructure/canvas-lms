@@ -107,7 +107,9 @@ module BasicLTI
 
     class LtiResponse
       include TextHelper
-      attr_accessor :code_major, :severity, :description, :body, :error_code
+      include Lti::GradePassbackEligibility
+
+      attr_accessor :code_major, :severity, :description, :body, :error_code, :assignment, :user
 
       def initialize(lti_request)
         @lti_request = lti_request
@@ -166,10 +168,6 @@ module BasicLTI
         @lti_request&.at_css("imsx_POXBody > replaceResultRequest > submissionDetails > needsAdditionalReview").present?
       end
 
-      def user_enrollment_active?(assignment, user)
-        assignment.context.student_enrollments.where(user_id: user).active_or_pending_by_date.any?
-      end
-
       def to_xml
         xml = LtiResponse.envelope.dup
         xml.at_css("imsx_POXHeader imsx_statusInfo imsx_codeMajor").content = code_major
@@ -222,7 +220,7 @@ module BasicLTI
         source_id = sourcedid
 
         begin
-          assignment, user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
+          self.assignment, self.user = BasicLTI::BasicOutcomes.decode_source_id(tool, source_id)
         rescue Errors::InvalidSourceId => e
           report_failure(e.code, e.to_s)
           self.body = "<#{operation_ref_identifier}Response />"
@@ -235,7 +233,9 @@ module BasicLTI
         InstStatsd::Statsd.distributed_increment("lti.1_1.basic_outcomes.requests", tags: { op:, type: request_type })
 
         # Write results are disabled for concluded users, read results are still allowed
-        if op != "read_result" && !user_enrollment_active?(assignment, user)
+        # If a teacher term access ends after the normal term end date, grading is allowed
+        course = assignment.context
+        if op != "read_result" && !grade_passback_allowed?(course, user)
           report_failure(:course_not_available, "Course not available for student")
           self.body = "<#{operation_ref_identifier}Response />"
           true

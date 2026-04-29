@@ -20,6 +20,8 @@
 class CustomGradeStatus < ApplicationRecord
   include Canvas::SoftDeletable
 
+  AVAILABLE_ICONS = %w[custom-1 custom-2 custom-3].freeze
+
   belongs_to :root_account, class_name: "Account", inverse_of: :custom_grade_statuses
   belongs_to :created_by, class_name: "User"
   belongs_to :deleted_by, class_name: "User"
@@ -29,11 +31,17 @@ class CustomGradeStatus < ApplicationRecord
 
   validates :color, presence: true, length: { maximum: 7 }, format: { with: /\A#([0-9a-fA-F]{3}){1,2}\z/ }
   validates :name, presence: true, length: { maximum: 14 }
+  # Use self[:icon] instead of icon to avoid NameError when attribute accessors aren't initialized
+  validates :icon, length: { maximum: 10 }, inclusion: { in: AVAILABLE_ICONS }, if: -> { self[:icon].present? }
+  validates :icon, presence: true, on: :update
   validates :root_account, :created_by, presence: true
 
   validate :validate_custom_grade_status_limit
   validate :deleted_by_validation
   validate :owned_by_root_account
+  validate :icon_uniqueness_per_active_statuses
+
+  before_create :assign_icon
 
   set_policy do
     given { |user, session| root_account&.grants_right?(user, session, :manage) }
@@ -65,5 +73,27 @@ class CustomGradeStatus < ApplicationRecord
     unless root_account.root_account?
       errors.add(:root_account_id, "must reference a root account")
     end
+  end
+
+  def assign_icon
+    # Use self[:icon] to access attribute hash directly, avoiding potential NameError
+    return if self[:icon].present?
+
+    used_icons = root_account.custom_grade_statuses.active
+                             .where.not(id:)
+                             .pluck(:icon)
+    self.icon = (AVAILABLE_ICONS - used_icons).first
+  end
+
+  def icon_uniqueness_per_active_statuses
+    # Use self[:icon] to access attribute hash directly, avoiding potential NameError
+    return unless self[:icon].present? && root_account_id.present?
+
+    duplicate = root_account.custom_grade_statuses.active
+                            .where(icon: self[:icon])
+                            .where.not(id:)
+                            .exists?
+
+    errors.add(:icon, "is already in use by another active status") if duplicate
   end
 end

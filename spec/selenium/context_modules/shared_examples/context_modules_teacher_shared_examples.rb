@@ -42,7 +42,7 @@ shared_examples_for "context modules for teachers" do
   end
 
   it "expands/collapses module with 0 items", priority: "2" do
-    modules = create_modules(1, true)
+    modules = create_modules(1, published: true)
     get "/courses/#{@course.id}/modules"
     expect(module_content(modules[0].id)).to be_displayed
     f(".collapse_module_link[aria-controls='context_module_content_#{modules[0].id}']").click
@@ -57,7 +57,7 @@ shared_examples_for "context modules for teachers" do
   end
 
   it "rearranges child objects in same module", priority: "1" do
-    modules = create_modules(1, true)
+    modules = create_modules(1, published: true)
     # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
     item1 = modules[0].add_item({ id: @assignment.id, type: "assignment" })
     item2 = modules[0].add_item({ id: @assignment2.id, type: "assignment" })
@@ -74,7 +74,7 @@ shared_examples_for "context modules for teachers" do
   end
 
   it "rearranges child object to new module", priority: "1" do
-    modules = create_modules(2, true)
+    modules = create_modules(2, published: true)
     uncollapse_modules(modules, @user)
     # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
     item1_mod1 = modules[0].add_item({ id: @assignment.id, type: "assignment" })
@@ -234,6 +234,57 @@ shared_examples_for "context modules for teachers" do
     expect(f("#context_module_item_#{tag.id}")).to have_attribute(:class, "context_external_tool")
   end
 
+  it "allows selecting external tool from LTI list by clicking" do
+    @course.context_external_tools.create!(
+      name: "Test LTI Tool",
+      consumer_key: "test_key",
+      shared_secret: "test_secret",
+      url: "http://example.com/lti",
+      settings: {
+        "link_selection" => {
+          "url" => "http://example.com/resource_selection",
+          "selection_width" => 500,
+          "selection_height" => 500
+        }
+      }
+    )
+
+    @course.context_modules.create!(name: "Test Module")
+    get "/courses/#{@course.id}/modules"
+
+    f(".ig-header-admin .al-trigger").click
+    f(".add_module_item_link").click
+    select_module_item("#add_module_item_select", "External Tool")
+    wait_for_ajaximations
+
+    wait_for(method: nil, timeout: 10) do
+      !ff("#context_external_tools_select .tools .tool").empty?
+    end
+
+    tool_element = fj("#context_external_tools_select .tools .tool:contains('Test LTI Tool')")
+    tool_element.click
+    wait_for_ajaximations
+
+    wait_for(method: nil, timeout: 5) do
+      url_field = f("#external_tool_create_url")
+      url_field.attribute("value") != ""
+    end
+
+    url_field = f("#external_tool_create_url")
+    expect(url_field.attribute("value")).to eq("http://example.com/resource_selection")
+
+    title_field = f("#external_tool_create_title")
+    expect(title_field.attribute("value")).to eq("Test LTI Tool")
+
+    submit_btn = f(".add_item_button.ui-button")
+    scroll_to(submit_btn)
+    submit_btn.click
+    wait_for_ajaximations
+
+    expect(f("body")).not_to contain_css(".alert.alert-error")
+    expect(f(".context_module_item")).to include_text("Test LTI Tool")
+  end
+
   it "does not save an invalid external tool", priority: "1" do
     @course.context_modules.create!(name: "Test Module")
 
@@ -322,7 +373,7 @@ shared_examples_for "context modules for teachers" do
 
   describe "expand|collapse all" do
     before do
-      @modules = create_modules(2, true)
+      @modules = create_modules(2, published: true)
       @modules[0].add_item({ id: @assignment.id, type: "assignment" })
       @modules[1].add_item({ id: @assignment2.id, type: "assignment" })
     end
@@ -365,7 +416,7 @@ shared_examples_for "context modules for teachers" do
     end
 
     it "indicates when course sections have multiple due dates" do
-      modules = create_modules(1, true)
+      modules = create_modules(1, published: true)
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
 
       cs1 = @course.default_section
@@ -380,8 +431,8 @@ shared_examples_for "context modules for teachers" do
     end
 
     it "does not indicate multiple due dates if the sections' dates are the same" do
-      skip("needs to ignore base if all visible sections are overridden")
-      modules = create_modules(1, true)
+      skip("2025-04-11 needs to ignore base if all visible sections are overridden LX-3349")
+      modules = create_modules(1, published: true)
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
 
       cs1 = @course.default_section
@@ -398,7 +449,7 @@ shared_examples_for "context modules for teachers" do
     end
 
     it "uses assignment due date if there is no section override" do
-      modules = create_modules(1, true)
+      modules = create_modules(1, published: true)
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
 
       cs1 = @course.default_section
@@ -415,8 +466,8 @@ shared_examples_for "context modules for teachers" do
     end
 
     it "only uses the sections the user is restricted to" do
-      skip("needs to ignore base if all visible sections are overridden")
-      modules = create_modules(1, true)
+      skip("2025-04-11 needs to ignore base if all visible sections are overridden LX-3349")
+      modules = create_modules(1, published: true)
       modules[0].add_item({ id: @assignment.id, type: "assignment" })
 
       cs1 = @course.default_section
@@ -449,7 +500,7 @@ shared_examples_for "context modules for teachers" do
       end
 
       it "does not show due dates" do
-        modules = create_modules(1, true)
+        modules = create_modules(1, published: true)
         modules[0].add_item({ id: @assignment.id, type: "assignment", title: "An Assignment" })
 
         @assignment.due_at = 3.days.from_now
@@ -700,12 +751,29 @@ shared_examples_for "context modules for teachers" do
       end
       expect(ContentTag.last.content.is_a?(Assignment)).to be_truthy
     end
+
+    it "shows quiz type selector without scrolling when creating new quiz" do
+      @course.disable_feature!(:new_quizzes_by_default)
+      get "/courses/#{@course.id}/modules"
+
+      add_new_module_item_and_yield("#quizs_select", "Quiz", "[ Create Quiz ]", "A Graded Quiz") do
+        expect(f("#quizs_select")).to contain_css("input[name=quiz_engine_selection]")
+
+        f("label[for=new_quizzes_radio]").click
+        wait_for_ajaximations
+
+        expect(f("#quiz_type_selector_row")).to be_displayed
+
+        quiz_type_selector = f("#quiz_type_selector_mount_point")
+        expect(quiz_type_selector).to be_displayed
+      end
+    end
   end
 
   context "with discussion_checkpoints enabled" do
     before :once do
       @course.root_account.enable_feature! :discussion_checkpoints
-      @modules = create_modules(1, true)
+      @modules = create_modules(1, published: true)
 
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
     end
@@ -808,14 +876,16 @@ shared_examples_for "context modules for teachers" do
       get "/courses/#{@course.id}/modules"
 
       hover(f(".reply_to_topic_display a"))
-      rtt_tooltip_els = ff("[class*='vdd_tooltip_']")
-      expect(rtt_tooltip_els.first.text).to include "Multiple Due Dates"
-      expect(rtt_tooltip_els.last.text).to eq "Everyone else\n#{datetime_string(c1due_at)}\n#{sec1.name}\n#{datetime_string(c1o1due_at)}\n#{sec2.name}\n#{datetime_string(c1o2due_at)}"
+      tooltip_element = f("[data-testid='vdd_tooltip_0']")
+      tooltip_contents = f("[data-testid='vdd_contents_0']")
+      expect(tooltip_element.text).to include "Multiple Due Dates"
+      expect(tooltip_contents.text).to eq "Everyone else\n#{datetime_string(c1due_at)}\n#{sec1.name}\n#{datetime_string(c1o1due_at)}\n#{sec2.name}\n#{datetime_string(c1o2due_at)}"
 
       hover(f(".reply_to_entry_display a"))
-      rte_tooltip_els = ff("[class*='vdd_tooltip_']")
-      expect(rte_tooltip_els.first.text).to include "Multiple Due Dates"
-      expect(rte_tooltip_els.last.text).to eq "Everyone else\n#{datetime_string(c2due_at)}\n#{sec1.name}\n#{datetime_string(c2o1due_at)}\n#{sec2.name}\n#{datetime_string(c2o2due_at)}"
+      tooltip_element = f("[data-testid='vdd_tooltip_1']")
+      tooltip_contents = f("[data-testid='vdd_contents_1']")
+      expect(tooltip_element.text).to include "Multiple Due Dates"
+      expect(tooltip_contents.text).to eq "Everyone else\n#{datetime_string(c2due_at)}\n#{sec1.name}\n#{datetime_string(c2o1due_at)}\n#{sec2.name}\n#{datetime_string(c2o2due_at)}"
 
       stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 1)
       get "/courses/#{@course.id}/modules"

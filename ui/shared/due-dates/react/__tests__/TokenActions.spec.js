@@ -18,7 +18,7 @@
 
 import TokenActions from '../TokenActions'
 import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 
 describe('TokenActions', () => {
   const assertValuesEqual = (override, keysAndVals) =>

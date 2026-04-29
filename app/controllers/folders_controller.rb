@@ -116,6 +116,8 @@ class FoldersController < ApplicationController
 
   before_action :require_context, except: %i[list_folders_and_files api_index show api_destroy update create create_file copy_folder copy_file]
   before_action :check_limited_access_for_students, only: %i[create_file]
+  before_action :check_restricted_file_access_for_students, only: %i[create_file copy_file copy_folder]
+  skip_before_action :require_user, only: %i[api_index index list_all_folders_and_files list_folders_and_files resolve_path show]
 
   def index
     if authorized_action(@context, @current_user, :read_files)
@@ -154,27 +156,22 @@ class FoldersController < ApplicationController
     return render_json_unauthorized unless Account.site_admin.feature_enabled?(:files_a11y_rewrite)
 
     @folder = Folder.find(params[:id])
-    if authorized_action(@folder, @current_user, :read_contents)
-      items, opts, all_item_count = paginated_folders_and_files(api_v1_list_folders_and_files_url)
-      headers["X-Total-Items"] = all_item_count.to_s
-      render json: folders_or_files_json(items, @current_user, session, opts)
-    else
-      store_location(request.referer)
-    end
+    return unless authorized_action(@folder, @current_user, :read_contents)
+
+    items, opts, all_item_count = paginated_folders_and_files(api_v1_list_folders_and_files_url)
+    headers["X-Total-Items"] = all_item_count.to_s
+    render json: folders_or_files_json(items, @current_user, session, opts)
   end
 
   # internal API
   def list_all_folders_and_files
     return render_json_unauthorized unless Account.site_admin.feature_enabled?(:files_a11y_rewrite)
+    return unless authorized_action(@context, @current_user, :read_files)
 
-    if authorized_action(@context, @current_user, :read_files)
-      base_url = polymorphic_url([:api, :v1, @context, :folders_and_files])
-      items, opts, all_item_count = paginated_folders_and_files(base_url)
-      headers["X-Total-Items"] = all_item_count.to_s
-      render json: folders_or_files_json(items, @current_user, session, opts)
-    else
-      store_location(request.referer)
-    end
+    base_url = polymorphic_url([:api, :v1, @context, :folders_and_files])
+    items, opts, all_item_count = paginated_folders_and_files(base_url)
+    headers["X-Total-Items"] = all_item_count.to_s
+    render json: folders_or_files_json(items, @current_user, session, opts)
   end
 
   # Setup additional options based on context and permissions
@@ -313,12 +310,10 @@ class FoldersController < ApplicationController
     # as long as one granted permission holds true, in most cases :read, user is authorized
     if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS])
       can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
-      folders = Folder.resolve_path(@context, params[:full_path], can_view_hidden_files)
+      folders = Folder.resolve_path(@context, params[:full_path], include_hidden_and_locked: can_view_hidden_files)
       raise ActiveRecord::RecordNotFound if folders.blank?
 
       render json: folders_json(folders, @current_user, session, can_view_hidden_files:, context: @context)
-    else
-      store_location(request.referer)
     end
   end
 
@@ -438,6 +433,8 @@ class FoldersController < ApplicationController
           folder_params[:hidden] = true
         end
         if (parent_folder_id = folder_params.delete(:parent_folder_id))
+          return if check_restricted_file_access_and_return?
+
           parent_folder = @context.folders.active.find(parent_folder_id)
           return unless authorized_action(parent_folder, @current_user, :manage_contents)
 
@@ -792,4 +789,28 @@ class FoldersController < ApplicationController
       render json: folder_json(@folder, @current_user, session)
     end
   end
+
+  # internal API
+  def duplicates
+    return render_json_unauthorized unless Account.site_admin.feature_enabled?(:files_a11y_rewrite) &&
+                                           Account.site_admin.feature_enabled?(:files_a11y_folder_duplicates)
+
+    @folder = Folder.find(params[:id])
+    return render_unauthorized_action unless @folder.context == @context
+    return unless authorized_action(@folder, @current_user, :read_contents)
+
+    duplicate_folders = find_duplicate_folders(@folder)
+
+    render json: { duplicates: folders_json(duplicate_folders, @current_user, session) }
+  end
+
+  def find_duplicate_folders(folder)
+    return [] unless folder.parent_folder_id
+
+    folder.parent_folder.active_sub_folders
+          .where(name: folder.name)
+          .where.not(id: folder.id)
+          .to_a
+  end
+  private :find_duplicate_folders
 end

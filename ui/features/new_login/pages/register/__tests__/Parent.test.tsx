@@ -21,28 +21,44 @@ import {within} from '@testing-library/dom'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import {MemoryRouter} from 'react-router-dom'
+import {MemoryRouter, useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../../context'
 import {createParentAccount} from '../../../services'
 import Parent from '../Parent'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: vi.fn(),
+    useNavigationType: vi.fn(),
+    useLocation: vi.fn(),
+  }
+})
+
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
-jest.mock('../../../services', () => ({
-  createParentAccount: jest.fn(),
+vi.mock('../../../services', () => ({
+  createParentAccount: vi.fn(),
 }))
 
-jest.mock('../../../context', () => {
-  const actualContext = jest.requireActual('../../../context')
+vi.mock('../../../context', async () => {
+  const actualContext = await vi.importActual('../../../context')
   return {
     ...actualContext,
-    useNewLoginData: jest.fn(() => ({
-      ...actualContext.useNewLoginData(),
+    useNewLoginData: vi.fn(() => ({
+      customMessageParent: undefined,
+      isDataLoading: false,
     })),
   }
 })
+const mockUseNewLoginData = vi.mocked(useNewLoginData)
+const mockNavigate = vi.fn()
+const mockedUseNavigate = useNavigate as ReturnType<typeof vi.fn>
+const mockNavigationType = useNavigationType as ReturnType<typeof vi.fn>
+const mockedUseLocation = useLocation as ReturnType<typeof vi.fn>
 
 describe('Parent', () => {
   const setup = () => {
@@ -58,10 +74,14 @@ describe('Parent', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.restoreAllMocks()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
+    mockedUseNavigate.mockReturnValue(mockNavigate)
+    mockNavigationType.mockReturnValue('PUSH')
+    mockedUseLocation.mockReturnValue({key: 'default'})
     // reset the mock implementation to return the default values
-    ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+    mockUseNewLoginData.mockImplementation(() => ({
+      isDataLoading: false,
       loginHandleName: 'Email',
       privacyPolicyUrl: '',
       termsOfUseUrl: '',
@@ -86,8 +106,8 @@ describe('Parent', () => {
     })
 
     it('renders terms checkbox when required', async () => {
-      ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
-        ...jest.requireActual('../../../context').useNewLoginData(),
+      mockUseNewLoginData.mockImplementation(() => ({
+        isDataLoading: false,
         termsRequired: true,
         privacyPolicyUrl: 'http://www.example.com/privacy',
         termsOfUseUrl: 'http://www.example.com/terms',
@@ -159,7 +179,8 @@ describe('Parent', () => {
     })
 
     it('validates the terms checkbox when required', async () => {
-      ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
+      mockUseNewLoginData.mockImplementation(() => ({
+        isDataLoading: false,
         termsRequired: true,
         privacyPolicyUrl: 'http://www.example.com/privacy',
         termsOfUseUrl: 'http://www.example.com/terms',
@@ -194,9 +215,9 @@ describe('Parent', () => {
 
   describe('form submission', () => {
     it('submits successfully with valid inputs', async () => {
-      ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(createParentAccount).mockResolvedValueOnce({
         status: 200,
-        data: {redirect_url: '/dashboard'},
+        data: {success: true, destination: '/dashboard'},
       })
       setup()
       await userEvent.type(screen.getByTestId('email-input'), 'parent@example.com')
@@ -218,7 +239,7 @@ describe('Parent', () => {
     })
 
     it('shows error messages for failed API validation', async () => {
-      ;(createParentAccount as jest.Mock).mockRejectedValueOnce({
+      vi.mocked(createParentAccount).mockRejectedValueOnce({
         response: {
           json: async () => ({
             errors: {
@@ -240,7 +261,7 @@ describe('Parent', () => {
     })
 
     it('handles generic server errors gracefully', async () => {
-      ;(createParentAccount as jest.Mock).mockRejectedValueOnce({
+      vi.mocked(createParentAccount).mockRejectedValueOnce({
         response: {
           status: 500,
           json: async () => ({}),
@@ -263,9 +284,9 @@ describe('Parent', () => {
     })
 
     it('redirects to the provided destination after a successful submission', async () => {
-      ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(createParentAccount).mockResolvedValueOnce({
         status: 200,
-        data: {destination: '/custom-redirect'},
+        data: {success: true, destination: '/custom-redirect'},
       })
       setup()
       await userEvent.type(screen.getByTestId('email-input'), 'parent@example.com')
@@ -280,9 +301,9 @@ describe('Parent', () => {
     })
 
     it('redirects to the course page if course data is provided', async () => {
-      ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(createParentAccount).mockResolvedValueOnce({
         status: 200,
-        data: {course: {course: {id: 42}}},
+        data: {success: true, course: {course: {id: 42}}},
       })
       setup()
       await userEvent.type(screen.getByTestId('email-input'), 'parent@example.com')
@@ -297,9 +318,9 @@ describe('Parent', () => {
     })
 
     it('redirects to the default location if no destination or course is provided', async () => {
-      ;(createParentAccount as jest.Mock).mockResolvedValueOnce({
+      vi.mocked(createParentAccount).mockResolvedValueOnce({
         status: 200,
-        data: {},
+        data: {success: true},
       })
       setup()
       await userEvent.type(screen.getByTestId('email-input'), 'parent@example.com')
@@ -314,12 +335,67 @@ describe('Parent', () => {
     })
   })
 
-  it('navigates back to login when the cancel button is clicked', async () => {
-    setup()
-    const backButton = screen.getByTestId('back-button')
-    await userEvent.click(backButton)
-    await waitFor(() => {
-      expect(assignLocation).toHaveBeenCalledWith('/login')
+  describe('navigation behavior', () => {
+    describe('when the cancel button is clicked', () => {
+      it('navigates back to login when there is no previous history', async () => {
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+      })
+
+      it('navigates back to the previous page when history exists', async () => {
+        mockNavigationType.mockReturnValue('PUSH')
+        mockedUseLocation.mockReturnValue({key: 'abc123'})
+        mockedUseNavigate.mockReturnValue(mockNavigate)
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith(-1)
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
+      })
+
+      it('navigates to fallback when navigationType is POP or key is default', async () => {
+        mockNavigationType.mockReturnValue('POP')
+        mockedUseLocation.mockReturnValue({key: 'default'})
+        mockedUseNavigate.mockReturnValue(mockNavigate)
+        setup()
+        const backButton = screen.getByTestId('back-button')
+        await userEvent.click(backButton)
+        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+      })
+    })
+  })
+
+  describe('custom registration message', () => {
+    it('does not render custom message Alert when customMessageRegistrationParent is undefined', () => {
+      vi.mocked(useNewLoginData).mockImplementation(() => ({
+        isDataLoading: false,
+        loginHandleName: 'Email',
+        privacyPolicyUrl: '',
+        termsOfUseUrl: '',
+        termsRequired: false,
+        customMessageRegistrationParent: undefined,
+      }))
+      setup()
+      expect(screen.queryByTestId('custom-message-alert')).not.toBeInTheDocument()
+    })
+
+    it('renders custom message Alert when customMessageRegistrationParent is set', () => {
+      const customMsg = 'Parent registration info here!'
+      vi.mocked(useNewLoginData).mockImplementation(() => ({
+        isDataLoading: false,
+        loginHandleName: 'Email',
+        privacyPolicyUrl: '',
+        termsOfUseUrl: '',
+        termsRequired: false,
+        customMessageRegistrationParent: customMsg,
+      }))
+      setup()
+      const alert = screen.getByTestId('custom-message-alert')
+      expect(alert).toBeInTheDocument()
+      expect(alert).toHaveTextContent(customMsg)
     })
   })
 })

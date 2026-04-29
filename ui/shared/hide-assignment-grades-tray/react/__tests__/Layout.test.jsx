@@ -40,7 +40,7 @@ const defaultProps = {
 
 describe('HideAssignmentGradesTray Layout', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('unreleased grades message behavior', () => {

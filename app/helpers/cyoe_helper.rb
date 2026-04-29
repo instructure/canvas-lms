@@ -44,8 +44,8 @@ module CyoeHelper
     path_data = conditional_release_assignment_set(rules, assignment_id) if rules.present? && assignment_id.present?
     if path_data.present? && opts[:is_student]
       path_data[:is_student] = true
-      build_path_data(path_data, content_tag.id.to_s)
-      check_if_processing(path_data)
+      build_path_data(path_data, content_tag.id.to_s, opts)
+      check_if_processing(path_data, opts)
     end
     path_data
   end
@@ -89,18 +89,18 @@ module CyoeHelper
 
   private
 
-  def check_if_processing(data)
+  def check_if_processing(data, opts = {})
     if !data[:awaiting_choice] && data[:assignment_sets].length == 1
       set = data[:assignment_sets][0]
-      data[:still_processing] = !ConditionalRelease::AssignmentSetAction.where(assignment_set_id: set[:id], student_id: @current_user.id).exists?
+      data[:still_processing] = !ConditionalRelease::AssignmentSetAction.where(assignment_set_id: set[:id], student_id: (opts[:user] || @current_user).id).exists?
     end
   end
 
-  def build_path_data(data, tag_id)
+  def build_path_data(data, tag_id, opts = {})
     awaiting_choice = data[:selected_set_id].nil? && data[:assignment_sets].present?
-    modules_url = context_url(@context, :context_url) + "/modules"
+    modules_url = context_url(opts[:context] || @context, :context_url) + "/modules"
     choose_url = modules_url + "/items/" + tag_id + "/choose"
-    modules_disabled = @context.tabs_available(@current_user).select { |tabs| tabs[:label] == "Modules" }.blank?
+    modules_disabled = (opts[:context] || @context).tabs_available(opts[:user] || @current_user).select { |tabs| tabs[:label] == "Modules" }.blank?
     data.merge!({
                   awaiting_choice:,
                   modules_url:,

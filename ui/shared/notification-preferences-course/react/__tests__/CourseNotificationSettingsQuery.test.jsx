@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import AlertManager, {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManager, AlertManagerContext} from '@instructure/platform-alerts'
 import CourseNotificationSettingsQuery from '../CourseNotificationSettingsQuery'
 import CourseNotificationSettingsManager from '../CourseNotificationSettingsManager'
 import {COURSE_NOTIFICATIONS_QUERY} from '../../graphql/Queries'
@@ -163,7 +163,7 @@ describe('Course Notification Settings', () => {
     const mocks = await createMutationMocks([
       {UpdateNotificationPreferencesPayload: {errors: null}},
     ])
-    const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+    const mockedSetOnSuccess = vi.fn().mockResolvedValue({})
 
     const {getByText, getAllByRole} = render(
       <AlertManagerContext.Provider

@@ -43,8 +43,8 @@ const renderComponent = (props = {}) =>
 
 describe('UploadButton', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders', () => {

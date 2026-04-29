@@ -290,6 +290,72 @@ describe Lti::ContextToolFinder do
           ]
         end
       end
+
+      context "with account bindings and context controls" do
+        before do
+          context_control
+          # Manually set the tool's workflow_state to match the account binding's
+          # workflow_state. In practice, this will happen in a delayed job when the
+          # developer_key_account_binding is created or updated. There are also tests
+          # for this in create_registration_service_spec.rb.
+          tool.update(workflow_state: (binding_workflow_state == :on) ? "public" : "disabled")
+        end
+
+        let(:registration) do
+          lti_registration_with_tool(account: @root_account, registration_params: { workflow_state: binding_workflow_state })
+        end
+
+        let(:tool) { registration.deployments.first }
+
+        let(:context_control) do
+          Lti::ContextControl.create!(
+            course: @course,
+            deployment: tool,
+            registration:,
+            available: context_control_availability
+          )
+        end
+
+        context "with an 'on' binding" do
+          let(:binding_workflow_state) { :on }
+
+          context "and an 'on' context control" do
+            let(:context_control_availability) { true }
+
+            it "includes the tool" do
+              expect(described_class.all_tools_for(@course)).to include(tool)
+            end
+          end
+
+          context "and an 'off' context control" do
+            let(:context_control_availability) { false }
+
+            it "does not include the tool" do
+              expect(described_class.all_tools_for(@course)).not_to include(tool)
+            end
+          end
+        end
+
+        context "with an 'off' binding" do
+          let(:binding_workflow_state) { :off }
+
+          context "and an 'on' context control" do
+            let(:context_control_availability) { true }
+
+            it "does not include the tool" do
+              expect(described_class.all_tools_for(@course)).not_to include(tool)
+            end
+          end
+
+          context "and an 'off' context control" do
+            let(:context_control_availability) { false }
+
+            it "does not include the tool" do
+              expect(described_class.all_tools_for(@course)).not_to include(tool)
+            end
+          end
+        end
+      end
     end
   end
 

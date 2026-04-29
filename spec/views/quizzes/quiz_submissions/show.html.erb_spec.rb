@@ -24,13 +24,11 @@ describe "quizzes/quiz_submissions/show" do
   it "renders" do
     course_with_student
     view_context
-    @submission = double("Quizzes::QuizSubmission")
-    allow(@submission).to receive_messages(score: 10, data: [])
-    @quiz = double("Quizzes::Quiz")
-    allow(@quiz).to receive_messages(questions: [],
-                                     points_possible: 10,
-                                     stored_questions: [],
-                                     show_correct_answers?: true)
+    @submission = instance_double(Quizzes::QuizSubmission, score: 10, data: [])
+    @quiz = instance_double(Quizzes::Quiz,
+                            points_possible: 10,
+                            stored_questions: [],
+                            show_correct_answers?: true)
     assign(:quiz, @quiz)
     assign(:submission, @submission)
 

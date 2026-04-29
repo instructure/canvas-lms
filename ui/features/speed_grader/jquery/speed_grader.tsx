@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import StatusPill from '@canvas/grading-status-pill'
@@ -47,10 +47,10 @@ import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
 import type JQuery from 'jquery'
 import $ from 'jquery'
-import {filter, find, includes, isEqual, keyBy, map, reject, some, values} from 'lodash'
+import {isEqual, keyBy, filter, find, includes, map, reject, some, values} from 'es-toolkit/compat'
 import qs from 'qs'
 import React, {useRef} from 'react'
-import ReactDOM from 'react-dom'
+import {legacyUnmountComponentAtNode, legacyRender, render} from '@canvas/react'
 import JQuerySelectorCache from '../JQuerySelectorCache'
 import QuizzesNextSpeedGrading from '../QuizzesNextSpeedGrading'
 import {
@@ -68,12 +68,12 @@ import AssessmentAuditTray from '../react/AssessmentAuditTray/index'
 import CommentArea from '../react/CommentArea'
 import GradeLoadingSpinner from '../react/GradeLoadingSpinner'
 import PostPolicies from '../react/PostPolicies/index'
-import RubricAssessmentContainerWrapper from '../react/RubricAssessmentContainerWrapper'
+import RubricAssessmentWrapper from '../react/RubricAssessmentWrapper'
 import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
-import {LtiAssetReportsWrapper} from '@canvas/lti-asset-processor/react/LtiAssetReportsWrapper'
+import {LtiAssetReportsForSpeedgraderWrapper} from '@canvas/lti-asset-processor/react/LtiAssetReportsForSpeedgraderWrapper'
 import useStore from '../stores/index'
 import type {
   Attachment,
@@ -130,7 +130,7 @@ import type {SelectOptionDefinition} from './speed_grader_select_menu'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
 import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
-import {loadDocPreview} from '@instructure/canvas-rce/es/enhance-user-content/doc_previews'
+import {loadDocPreview} from '@instructure/canvas-rce/enhance-user-content'
 import 'jqueryui/dialog'
 import 'jqueryui/menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
@@ -144,7 +144,6 @@ import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import '@canvas/util/jquery/fixDialogButtons'
 import type {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
@@ -157,10 +156,13 @@ import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 import {windowAlert} from '@canvas/util/globalUtils'
 import replaceTags from '@canvas/util/replaceTags'
 import {isPreviewable} from '@instructure/canvas-rce/es/rce/plugins/shared/Previewable'
-import {createRoot} from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {AmsLoader} from '@canvas/ams/react/AmsLoader'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/SpeedGraderCheckpointsWrapper'
 import {SpeedGraderDiscussionsNavigation2} from '../react/SpeedGraderDiscussionsNavigation2'
+import {StudentUserIdOrAnonymousId} from '@canvas/lti-asset-processor/shared-with-sg/replicated/queries/getLtiAssetReports'
+import {ensureCompatibleSubmissionType} from '@canvas/lti-asset-processor/shared-with-sg/replicated/types/LtiAssetReports'
 
 declare global {
   interface Window {
@@ -175,7 +177,7 @@ if (!('INST' in window)) window.INST = {}
 declare const ENV: GlobalEnv & EnvGradebookSpeedGrader
 
 const I18n = createI18nScope('speed_grader')
-
+const STACKED_HEADER_CUTOFF_WIDTH = '800px'
 const selectors = new JQuerySelectorCache()
 const SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT = 'speed_grader_lti_asset_reports_mount_point'
 const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point'
@@ -215,7 +217,8 @@ let $turnitinInfoContainer: JQuery
 let $left_side: JQuery
 let $resize_overlay: JQuery
 let $right_side: JQuery
-let $width_resizer: JQuery
+let $width_resizer_ew: JQuery
+let $width_resizer_ns: JQuery
 let $gradebook_header: JQuery
 let $grading_box_selected_grader: JQuery
 let assignmentUrl: string
@@ -233,6 +236,8 @@ let fileIndex: number
 let $add_attachment: JQuery
 let $submissions_container: JQuery
 let $iframe_holder: JQuery
+let $ams_grading_container: JQuery
+let amsGradingRoot: Root | null = null
 let $avatar_image: JQuery
 let $x_of_x_students: JQuery
 let $grded_so_far: JQuery
@@ -606,7 +611,7 @@ export function initDropdown() {
     defaultDiscussionViewElement.setAttribute('checked', 'checked')
   }
 
-  $('#show_new_sg_ui').on('click', function () {
+  $('#show_new_sg_ui').on('click', () => {
     const searchParams = new URLSearchParams(window.location.search)
 
     if (searchParams.has('platform_sg')) {
@@ -651,37 +656,93 @@ export function initDropdown() {
     const $selectmenu_list = $selectmenu?.data('ui-selectmenu').list
     const $menu = $('#section-menu')
 
-    $menu
-      .find('ul')
-      .append(
-        $.map(
-          window.jsonData.context.active_course_sections,
-          section =>
-            `<li><a class="section_${section.id}" data-section-id="${
-              section.id
-            }" href="#">${htmlEscape(section.name)}</a></li>`,
-        ).join(''),
-      )
-
-    $menu
-      .insertBefore($selectmenu_list)
-      .bind('mouseenter mouseleave', function (event) {
-        $(this)
-          .toggleClass(
-            'ui-selectmenu-item-selected ui-selectmenu-item-focus ui-state-hover',
-            event.type === 'mouseenter',
-          )
-          .find('ul')
-          .toggle(event.type === 'mouseenter')
-      })
-      .find('ul')
-      .hide()
-      .menu()
-      .on('click mousedown', 'a', function (_event) {
-        EG.changeToSection($(this).data('section-id'))
-      })
-
     if (ENV.multiselect_filters_enabled) {
+      $menu
+        .find('ul')
+        .append(
+          $.map(window.jsonData.context.active_course_sections, section => {
+            const $li = $('<li>')
+            const $div = $('<div>', {class: 'sg-sections-menu-item'})
+
+            const $input = $('<input>', {
+              id: `section_box_${section.id}`,
+              type: 'checkbox',
+              'data-section-id': section.id,
+            })
+
+            const $link = $('<a>', {
+              class: `section_${section.id}`,
+              'data-section-id': section.id,
+              href: '#',
+            }).text(section.name)
+
+            $div.append($input, $link)
+            $li.append($div)
+
+            return $li
+          }),
+        )
+        .append(
+          $('<li>', {class: 'ui-menu-item', id: 'sg-section-filter-apply-container'}).append(
+            $('<button>', {text: I18n.t('Apply')}),
+          ),
+        )
+
+      $menu
+        .insertBefore($selectmenu_list)
+        .bind('mouseenter mouseleave', function (event) {
+          $(this)
+            .toggleClass(
+              'ui-selectmenu-item-selected ui-selectmenu-item-focus ui-state-hover',
+              event.type === 'mouseenter',
+            )
+            .find('ul')
+            .toggle(event.type === 'mouseenter')
+        })
+        .find('ul')
+        .hide()
+        .menu()
+        .on('mousedown', 'li', function (event) {
+          event.stopPropagation()
+
+          const $checkbox = $(this).find('input[type="checkbox"]')
+          const isAll = $checkbox.val() === 'all'
+
+          // don't uncheck the "Show All Sections" checkbox if nothing else is selected
+          if (isAll && $checkbox.prop('checked')) {
+            return
+          }
+
+          $checkbox.prop('checked', function (i, val) {
+            return !val
+          })
+
+          if (isAll) {
+            // if "Show All Sections" is checked, uncheck others
+            if ($checkbox.prop('checked')) {
+              $menu.find('ul li input[type="checkbox"]').not($checkbox).prop('checked', false)
+            }
+          } else {
+            // if a specific section is checked, uncheck "Show All Sections"
+            $menu.find('ul li input[type="checkbox"][value="all"]').prop('checked', false)
+
+            // if nothing is checked anymore, fall back to "all"
+            const noneChecked = $menu.find('ul li input[type="checkbox"]:checked').length === 0
+            if (noneChecked) {
+              $menu.find('ul li input[type="checkbox"][value="all"]').prop('checked', true)
+            }
+          }
+        })
+        .on('click', 'button', function (event) {
+          event.stopPropagation()
+          const selectedSections = $menu
+            .find('ul li input[type="checkbox"]:checked')
+            .map((_, el) => $(el).data('section-id')?.toString())
+            .get()
+            .filter(Boolean) as string[]
+          EG.changeToSection(selectedSections.length === 0 ? 'all' : selectedSections)
+        })
+
       if (sectionsToShow && sectionsToShow.length > 0) {
         const text = $.map(window.jsonData.context.active_course_sections, section => {
           if (sectionsToShow?.includes(section.id)) {
@@ -702,8 +763,53 @@ export function initDropdown() {
               : false
           })
           .addClass('selected')
+
+        $menu
+          .find('ul li input[type="checkbox"]')
+          .filter((_, el) => {
+            const sectionId = $(el).data('section-id')?.toString()
+            return Array.isArray(sectionsToShow) && sectionId
+              ? sectionsToShow.includes(sectionId)
+              : false
+          })
+          .prop('checked', true)
+
+        $menu.find('ul li input[type="checkbox"][value="all"]').show().prop('checked', false)
+      } else {
+        $menu.find('ul li input[type="checkbox"][value="all"]').show().prop('checked', true)
+        $menu.find('ul li input[type="checkbox"]').not('[value="all"]').prop('checked', false)
       }
     } else {
+      $menu.find('ul').append(
+        $.map(window.jsonData.context.active_course_sections, section => {
+          return $('<li>').append(
+            $('<a>', {
+              class: `section_${section.id}`,
+              'data-section-id': section.id,
+              href: '#',
+            }).text(section.name),
+          )
+        }),
+      )
+
+      $menu
+        .insertBefore($selectmenu_list)
+        .bind('mouseenter mouseleave', function (event) {
+          $(this)
+            .toggleClass(
+              'ui-selectmenu-item-selected ui-selectmenu-item-focus ui-state-hover',
+              event.type === 'mouseenter',
+            )
+            .find('ul')
+            .toggle(event.type === 'mouseenter')
+        })
+        .find('ul')
+        .hide()
+        .menu()
+        .on('click mousedown', 'a', function (_event) {
+          EG.changeToSection($(this).data('section-id'))
+        })
+
       if (sectionToShow) {
         const text = $.map(window.jsonData.context.active_course_sections, section => {
           if (section.id == sectionToShow) {
@@ -900,7 +1006,7 @@ function renderProgressIcon(attachment: Attachment) {
   }
 
   if (attachment.upload_status === 'success') {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
   } else {
     const {icon, tip} = iconAndTipMap[attachment.upload_status] || iconAndTipMap.default
     const tooltip = (
@@ -913,7 +1019,7 @@ function renderProgressIcon(attachment: Attachment) {
         />
       </Tooltip>
     )
-    ReactDOM.render(tooltip, mountPoint)
+    legacyRender(tooltip, mountPoint)
   }
 }
 
@@ -922,50 +1028,63 @@ function renderHiddenSubmissionPill(submission: Submission) {
   if (!mountPoint) throw new Error('hidden submission pill mount point not found')
 
   if (isPostable(submission)) {
-    ReactDOM.render(
+    legacyRender(
       <Pill color="warning" margin="0 0 small">
         {I18n.t('Hidden')}
       </Pill>,
       mountPoint,
     )
   } else {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
   }
 }
 
-function renderLtiAssetReports(
+export function renderLtiAssetReports(
   submission: Submission,
   historicalSubmission: HistoricalSubmission,
-  jsonData: SpeedGraderResponse,
 ) {
   if (!ENV.FEATURES?.lti_asset_processor) return
-  if (!jsonData.lti_asset_processors) return
-  if (!historicalSubmission.attempt) return
-  if (
-    !historicalSubmission.submission_type ||
-    (historicalSubmission.submission_type !== 'online_text_entry' &&
-      historicalSubmission.submission_type !== 'online_upload')
-  )
-    return
 
   const mountPoint = document.getElementById(SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT)
   if (!mountPoint) throw new Error('LTI Asset Reports mount point not found')
 
-  const props = {
-    versionedAttachments: historicalSubmission?.versioned_attachments,
-    reports: submission.lti_asset_reports,
-    assetProcessors: jsonData.lti_asset_processors,
-    studentId: submission.user_id,
-    attempt: historicalSubmission.attempt.toString(),
-    submissionType: historicalSubmission.submission_type,
+  let student: StudentUserIdOrAnonymousId | undefined = undefined
+  if (submission.user_id) {
+    student = {studentUserId: submission.user_id, studentAnonymousId: null}
+  } else if (submission.anonymous_id) {
+    student = {studentUserId: null, studentAnonymousId: submission.anonymous_id}
   }
-  ReactDOM.render(<LtiAssetReportsWrapper {...props} />, mountPoint)
+
+  const assignmentId = submission.assignment_id
+  let attempt, submissionType
+  const jsonData = window.jsonData
+  // Submissions for checkpointed discussions won't have a submission type
+  // until the student has met both checkpooint criteria, but they can still
+  // have asset reports. So pretend the type is discussion_topic:
+  if (jsonData.submission_types.includes('discussion_topic') && jsonData.has_sub_assignments) {
+    attempt = 1 // dummy value, irrelevant for discussion topics
+    submissionType = 'discussion_topic'
+  } else {
+    attempt = historicalSubmission.attempt
+    submissionType = ensureCompatibleSubmissionType(historicalSubmission.submission_type)
+  }
+
+  if (student && assignmentId && attempt && submissionType) {
+    const attachments = (historicalSubmission.versioned_attachments || []).map(({attachment}) => ({
+      _id: attachment.id,
+      displayName: attachment.display_name,
+    }))
+    const props = {...student, assignmentId, attachments, attempt, submissionType}
+    legacyRender(<LtiAssetReportsForSpeedgraderWrapper {...props} />, mountPoint)
+  } else {
+    legacyUnmountComponentAtNode(mountPoint)
+  }
 }
 
 function renderCheckpoints(submission: Submission) {
   const mountPoint = document.getElementById(SPEED_GRADER_CHECKPOINTS_MOUNT_POINT)
   if (mountPoint) {
-    ReactDOM.render(
+    legacyRender(
       <SpeedGraderCheckpointsWrapper
         EG={EG}
         courseId={ENV.course_id}
@@ -983,7 +1102,7 @@ function renderRubricsCheckpointsInfo() {
   const mountPoint = document.getElementById('rubrics_checkpoints_info')
 
   if (mountPoint) {
-    ReactDOM.render(
+    legacyRender(
       <Alert variant="info" margin="medium none">
         {I18n.t('Rubrics do not auto-populate grades for checkpoints.')}
       </Alert>,
@@ -1010,7 +1129,7 @@ function renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
     } else if (temporaryDiscussionContextView === 'discussion_view_with_context' && mountPoint) {
       const currentUrl = new URL(window.location.href)
       const params = new URLSearchParams(currentUrl.search)
-      ReactDOM.render(
+      legacyRender(
         <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
         mountPoint,
       )
@@ -1019,7 +1138,7 @@ function renderDiscussionsNavigation(temporaryDiscussionContextView = null) {
   } else if (getDefaultDiscussionView() === 'discussion_view_with_context' && mountPoint) {
     const currentUrl = new URL(window.location.href)
     const params = new URLSearchParams(currentUrl.search)
-    ReactDOM.render(
+    legacyRender(
       <SpeedGraderDiscussionsNavigation2 studentId={params.get('student_id')} />,
       mountPoint,
     )
@@ -1033,7 +1152,7 @@ function clearDiscussionsNavigation() {
   const mountPoint = document.getElementById(SPEED_GRADER_DISCUSSIONS_NAVIGATION_MOUNT_POINT)
 
   if (mountPoint) {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+    legacyUnmountComponentAtNode(mountPoint)
   }
 }
 
@@ -1056,7 +1175,7 @@ function renderCommentTextArea(readOnly = false) {
 
   const currentText = $add_a_comment_textarea.data('textarea')
 
-  ReactDOM.render(
+  legacyRender(
     <CommentArea
       getTextAreaRef={getTextAreaRef}
       courseId={ENV.course_id}
@@ -1130,7 +1249,7 @@ function initCommentBox() {
 
     configureRecognition(recognition, messages)
 
-    const processSpeech = function ($this: JQuery<HTMLElement>) {
+    const processSpeech = ($this: JQuery<HTMLElement>) => {
       if ($('#record_button').attr('recording') === 'true') {
         recognition.stop()
         const current_comment = $('#final_results').html() + $('#interim_results').html()
@@ -1147,9 +1266,8 @@ function initCommentBox() {
       }
     }
 
-    const formatComment = function (current_comment: string) {
-      return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n')
-    }
+    const formatComment = (current_comment: string) =>
+      current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n')
 
     $('.speech_recognition_link').click(() => {
       if ($('.speech_recognition_link').hasClass('ui-state-disabled')) {
@@ -1180,7 +1298,7 @@ function initCommentBox() {
             recording: false,
             html: '<div></div>',
             click() {
-              const $this = $(this)
+              const $this = $(this) as unknown as JQuery<HTMLElement>
               processSpeech($this)
             },
           },
@@ -1436,6 +1554,13 @@ EG = {
       $left_side.css('width', '')
       $right_side.css('width', '')
     }
+    function makeFullHeight() {
+      $full_width_container.addClass('full_height')
+      $left_side.css('height', '')
+      $right_side.css('height', '')
+      $width_resizer_ns.css('bottom', '0')
+      $left_side.css('flex', '1 1 100%')
+    }
     $(document).mouseup(_event => {
       $resize_overlay.hide()
     })
@@ -1443,7 +1568,7 @@ EG = {
     $resize_overlay.click(function (this: HTMLElement, _event) {
       $(this).hide()
     })
-    $width_resizer
+    $width_resizer_ew
       .mousedown(_event => {
         $resize_overlay.show()
       })
@@ -1455,15 +1580,15 @@ EG = {
         snap: '#full_width_container',
         appendTo: '#full_width_container',
         helper() {
-          return $width_resizer.clone().addClass('clone')
+          return $width_resizer_ew.clone().addClass('clone')
         },
         snapTolerance: 200,
-        drag(_event: Event, ui) {
+        drag(_event: Event, ui: JQueryUI.DraggableEventUIParams) {
           const offset = ui.offset
           const windowWidth = $window.width() as number
           $left_side.width(`${(offset.left / windowWidth) * 100}%`)
           $right_side.width(`${100 - (offset.left / windowWidth) * 100}%`)
-          $width_resizer.css('left', '0')
+          $width_resizer_ew.css('left', '0')
           if (windowWidth - offset.left < $(this).draggable('option', 'snapTolerance')) {
             makeFullWidth()
           } else {
@@ -1474,7 +1599,7 @@ EG = {
             $right_side.width('100%')
           }
         },
-        stop(event: Event, _ui) {
+        stop(event: Event, _ui: JQueryUI.DraggableEventUIParams) {
           event.stopImmediatePropagation()
           $resize_overlay.hide()
         },
@@ -1485,8 +1610,51 @@ EG = {
           $full_width_container.removeClass('full_width')
         } else {
           makeFullWidth()
-          $(this).addClass('highlight', 100, function (this: HTMLElement) {
-            $(this).removeClass('highlight', 4000)
+          $(this).addClass('highlight')
+          $(this).on('animationend', function () {
+            $(this).removeClass('highlight')
+          })
+        }
+      })
+
+    $width_resizer_ns
+      .mousedown(_event => {
+        $resize_overlay.show()
+      })
+      .draggable({
+        axis: 'y',
+        cursor: 'crosshair',
+        scroll: false,
+        containment: '#full_width_container',
+        snap: '#full_width_container',
+        appendTo: '#full_width_container',
+        helper: 'original',
+        drag(_event: Event, dragBar: JQueryUI.DraggableEventUIParams) {
+          const topContainerDesiredHeight = dragBar.offset.top - $full_width_container.offset()!.top
+          const topContainerDesiredPercent =
+            (topContainerDesiredHeight / $full_width_container.height()!) * 100
+          $left_side.css('flex', `0 0 ${topContainerDesiredPercent}%`)
+          $right_side.css('flex', `0 0 ${100 - topContainerDesiredPercent}%`)
+        },
+        stop(event: Event, _ui: JQueryUI.DraggableEventUIParams) {
+          event.stopImmediatePropagation()
+          $resize_overlay.hide()
+        },
+      })
+      .click(function (this: HTMLElement, event) {
+        event.preventDefault()
+        if ($full_width_container.hasClass('full_height')) {
+          $full_width_container.removeClass('full_height')
+          setDefaultHeightsForLeftRightSideStacked()
+          $width_resizer_ns.css('bottom', '')
+        } else {
+          $left_side.css('flex', '1')
+          $right_side.css('flex', '1')
+          $width_resizer_ns.css('top', '')
+          makeFullHeight()
+          $(this).addClass('highlight')
+          $(this).on('animationend', function () {
+            $(this).removeClass('highlight')
           })
         }
       })
@@ -1498,7 +1666,7 @@ EG = {
       const i =
         // @ts-expect-error
         $('#submission_to_view').val() || EG.currentStudent.submission.submission_history.length - 1
-      EG.currentStudent.submission.currentSelectedIndex = parseInt(String(i), 10)
+      EG.currentStudent.submission.currentSelectedIndex = Number.parseInt(String(i), 10)
       EG.handleSubmissionSelectionChange()
     })
 
@@ -1582,7 +1750,7 @@ EG = {
     } else {
       // unmount spinner
       const spinnerMount = document.getElementById('speed_grader_loading')
-      if (spinnerMount) ReactDOM.unmountComponentAtNode(spinnerMount)
+      if (spinnerMount) legacyUnmountComponentAtNode(spinnerMount)
       $('#speed_grader_loading').hide()
       $('#gradebook_header, #full_width_container').show()
       initDropdown()
@@ -1620,7 +1788,7 @@ EG = {
 
     const attemptParam = utils.getParam('attempt')
     if (attemptParam) {
-      EG.initialVersion = parseInt(attemptParam, 10) - 1
+      EG.initialVersion = Number.parseInt(attemptParam, 10) - 1
     }
 
     // Check if this student ID "resolves" to a different one (e.g., it's an
@@ -1631,9 +1799,9 @@ EG = {
   },
 
   setupGradeLoadingSpinner() {
-    const root = createRoot(document.getElementById('grades-loading-spinner')!)
-    root.render(
+    render(
       <GradeLoadingSpinner onLoadingChange={loading => toggleGradeVisibility(!loading)} />,
+      document.getElementById('grades-loading-spinner')!,
     )
   },
 
@@ -1693,7 +1861,7 @@ EG = {
         resizable: false,
         dialogClass: 'no-close',
         modal: true,
-        create(_e, _ui) {
+        create(_e: Event, _ui: JQueryUI.DialogUIParams) {
           const pane = $(this).dialog('widget').find('.ui-dialog-buttonpane')
           $(
             `<label class='do-not-show-again'><input type='checkbox'/>&nbsp;${I18n.t(
@@ -1752,7 +1920,16 @@ EG = {
   },
 
   addCommentTextAreaFocus() {
-    $add_a_comment_textarea.focus()
+    if (isRceLiteEnabled()) {
+      const rceEditor = $(`#${SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT} .tox-edit-area iframe`)
+      const iframe = rceEditor[0] as HTMLIFrameElement
+      const iframeDoc = iframe.contentDocument
+      if (iframeDoc && iframeDoc.body) {
+        iframeDoc.body.focus()
+      }
+    } else {
+      $add_a_comment_textarea.focus()
+    }
   },
 
   gradeFocus() {
@@ -2162,7 +2339,7 @@ EG = {
     }
 
     const tray = <AssessmentAuditTray ref={bindRef} />
-    ReactDOM.render(tray, document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT))
+    legacyRender(tray, document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT))
 
     const onClick = () => {
       const {submission} = this.currentStudent
@@ -2182,12 +2359,13 @@ EG = {
     }
 
     const button = <AssessmentAuditButton onClick={onClick} />
-    ReactDOM.render(button, document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
+    legacyRender(button, document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
   },
 
   setUpRubricAssessmentContainerWrapper() {
-    ReactDOM.render(
-      <RubricAssessmentContainerWrapper
+    legacyRender(
+      <RubricAssessmentWrapper
+        currentUserId={ENV.current_user_id ?? ''}
         rubric={ENV.rubric as RubricUnderscoreType}
         rubricOutcomeData={ENV.rubric_outcome_data as RubricOutcomeUnderscore[]}
         onDismiss={() => EG.toggleFullRubric('close')}
@@ -2600,7 +2778,7 @@ EG = {
         submissionHistory[currentSelectedIndex]
     }
 
-    renderLtiAssetReports(submissionHolder, submission, window.jsonData)
+    renderLtiAssetReports(submissionHolder, submission)
 
     const turnitinEnabled =
       submission.turnitin_data && typeof submission.turnitin_data.provider === 'undefined'
@@ -2682,10 +2860,7 @@ EG = {
     $vericiteInfoContainer = $('#submission_files_container .turnitin_info_container').empty()
     $.each(submission.versioned_attachments || [], (_i, a) => {
       const attachment: Attachment = a.attachment
-      if (
-        (attachment.crocodoc_url || attachment.canvadoc_url) &&
-        EG.currentStudent.provisional_crocodoc_urls
-      ) {
+      if (attachment.canvadoc_url && EG.currentStudent.provisional_crocodoc_urls) {
         const urlInfo = find(
           EG.currentStudent.provisional_crocodoc_urls,
           (url: ProvisionalCrocodocUrl) => url.attachment_id === attachment.id,
@@ -2698,11 +2873,7 @@ EG = {
         attachment.provisional_crocodoc_url = null
         attachment.provisional_canvadoc_url = null
       }
-      if (
-        attachment.crocodoc_url ||
-        attachment.canvadoc_url ||
-        isPreviewable(attachment.content_type)
-      ) {
+      if (attachment.canvadoc_url || isPreviewable(attachment.content_type)) {
         inlineableAttachments.push(attachment)
       }
 
@@ -2871,7 +3042,7 @@ EG = {
     if (s && s.submission_history && s.submission_history.length > 0) {
       submissionHistory = s.submission_history
       noSubmittedAt = I18n.t('no_submission_time', 'no submission time')
-      selectedIndex = parseInt(
+      selectedIndex = Number.parseInt(
         String($('#submission_to_view').val() || submissionHistory.length - 1),
         10,
       )
@@ -2930,11 +3101,18 @@ EG = {
           grade,
         }
       })
+      // Only show quiz history link if the global flag is true AND the student has actual submissions
+      const hasActualSubmissions = submissionHistory.some((h: any) => {
+        const s = h.submission || h
+        return s.submitted_at != null
+      })
       innerHTML = submissionsDropdownTemplate({
-        showSubmissionStatus: !window.jsonData.anonymize_students || isAdmin,
+        showSubmissionStatus:
+          !window.jsonData.anonymous_participants &&
+          (!window.jsonData.anonymize_students || isAdmin),
         singleSubmission: submissionHistory.length === 1,
         submissions: templateSubmissions,
-        linkToQuizHistory: window.jsonData.too_many_quiz_submissions,
+        linkToQuizHistory: window.jsonData.too_many_quiz_submissions && hasActualSubmissions,
         quizHistoryHref: replaceTags(ENV.quiz_history_url, {
           user_id: this.currentStudent[anonymizableId],
         }),
@@ -3027,15 +3205,15 @@ EG = {
     if (scores.length) {
       // if there are some submissions that have been graded.
       $average_score_wrapper.show()
-      const avg = function (arr: number[]) {
+      const avg = (arr: number[]) => {
         let sum = 0
         for (let i = 0, j = arr.length; i < j; i++) {
           sum += arr[i]
         }
         return sum / arr.length
       }
-      const roundWithPrecision = function (number: number, precision: number) {
-        precision = Math.abs(parseInt(String(precision), 10)) || 0
+      const roundWithPrecision = (number: number, precision: number) => {
+        precision = Math.abs(Number.parseInt(String(precision), 10)) || 0
         const coefficient = 10 ** precision
         return Math.round(number * coefficient) / coefficient
       }
@@ -3106,6 +3284,8 @@ EG = {
       $this_student_has_a_submission.show()
     } else if (attachment) {
       this.renderAttachment(attachment)
+    } else if (submission && submission.submission_type === 'ams') {
+      this.renderAmsGrading(submission)
     } else if (submission && submission.submission_type === 'basic_lti_launch') {
       if (
         !ENV.SINGLE_NQ_SESSION_ENABLED ||
@@ -3119,6 +3299,7 @@ EG = {
         $iframe_holder.show()
       }
     } else {
+      this.unmountAmsGrading()
       this.renderSubmissionPreview()
     }
   },
@@ -3126,6 +3307,7 @@ EG = {
   emptyIframeHolder(elem?: JQuery) {
     elem = elem || $iframe_holder
     elem.empty()
+    this.unmountAmsGrading()
   },
 
   // load in the iframe preview.  if we are viewing a past version of the file pass the version to preview in the url
@@ -3220,6 +3402,52 @@ EG = {
     $div.html(iframe).show()
   },
 
+  renderAmsGrading(submission: HistoricalSubmission) {
+    this.emptyIframeHolder()
+    this.unmountAmsGrading()
+
+    if (!window.REMOTES?.ams?.launch_url) {
+      console.error('AMS not configured')
+      return
+    }
+
+    const container = document.getElementById('ams_grading_container')
+    if (!container) {
+      console.error('AMS grading container not found')
+      return
+    }
+
+    const handleAmsSubmissionUpdate = () => {
+      refreshGrades(() => {
+        this.updateStatsInHeader()
+      })
+    }
+
+    amsGradingRoot = render(
+      <AmsLoader
+        containerId="ams_grading_container"
+        gradingContext={{
+          assignmentId: String(window.jsonData.id),
+          studentId: String(this.currentStudent.id),
+          studentUuid: this.currentStudent.uuid,
+          submissionId: String(submission.id),
+        }}
+        onSubmissionUpdate={handleAmsSubmissionUpdate}
+      />,
+      container,
+    )
+
+    $ams_grading_container.show()
+  },
+
+  unmountAmsGrading() {
+    if (amsGradingRoot) {
+      amsGradingRoot.unmount()
+      amsGradingRoot = null
+    }
+    $ams_grading_container.hide()
+  },
+
   generateWarningTimings(numHours: number): number[] {
     const sessionLimit = numHours * 60 * 60 * 1000
     return [
@@ -3245,7 +3473,7 @@ EG = {
   },
 
   renderAttachment(attachment: Attachment) {
-    // show the crocodoc doc if there is one
+    // show the canvadoc doc if there is one
     // then show the google attachment if there is one
     // then show the first browser viewable attachment if there is one
     this.emptyIframeHolder()
@@ -3254,6 +3482,7 @@ EG = {
       id: 'speedgrader_iframe',
       mimeType: attachment.content_type,
       attachment_id: attachment.id,
+      attachment_name: attachment.display_name,
       // @ts-expect-error
       submission_id: this.currentStudent.submission.id,
       attachment_view_inline_ping_url: attachment.view_inline_ping_url,
@@ -3262,41 +3491,13 @@ EG = {
         attachment.workflow_state === 'processing',
     }
 
-    if (
-      !attachment.hijack_crocodoc_session &&
-      attachment.submitted_to_crocodoc &&
-      !attachment.crocodoc_url
-    ) {
-      $('#crocodoc_pending').show()
-    }
     const canvadocMessage = I18n.t(
       'canvadoc_expiring',
       'Your Canvas DocViewer session is expiring soon.  Please ' +
         'reload the window to avoid losing any work.',
     )
 
-    if (attachment.crocodoc_url) {
-      if (!attachment.hijack_crocodoc_session) {
-        const crocodocMessage = I18n.t(
-          'crocodoc_expiring',
-          'Your Crocodoc session is expiring soon.  Please reload ' +
-            'the window to avoid losing any work.',
-        )
-        const aggressiveWarnings = this.generateWarningTimings(1)
-        this.displayExpirationWarnings(aggressiveWarnings, 1, crocodocMessage)
-      } else {
-        const aggressiveWarnings = this.generateWarningTimings(10)
-        this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage)
-      }
-
-      $iframe_holder.show()
-      loadDocPreview(
-        $iframe_holder[0],
-        $.extend(previewOptions, {
-          crocodoc_session_url: attachment.provisional_crocodoc_url || attachment.crocodoc_url,
-        }),
-      )
-    } else if (attachment.canvadoc_url) {
+    if (attachment.canvadoc_url) {
       const aggressiveWarnings = this.generateWarningTimings(10)
       this.displayExpirationWarnings(aggressiveWarnings, 10, canvadocMessage)
 
@@ -3535,8 +3736,6 @@ EG = {
   },
 
   addCommentSubmissionHandler(commentElement, comment) {
-    const that = this
-
     const isConcluded = isStudentConcluded(
       window.jsonData.studentMap,
       EG.currentStudent[anonymizableId],
@@ -3548,16 +3747,16 @@ EG = {
         let updateUrl = ''
         let updateData = {}
         let updateAjaxOptions = {}
-        const commentUpdateSucceeded = function (data: {submission_comment: SubmissionComment}) {
+        const commentUpdateSucceeded = (data: {submission_comment: SubmissionComment}) => {
           let updatedComments = []
-          const $replacementComment = that.renderComment(data.submission_comment)
+          const $replacementComment = this.renderComment(data.submission_comment)
           // @ts-expect-error
           $replacementComment.show()
           // @ts-expect-error
           commentElement.replaceWith($replacementComment)
 
           updatedComments = map(
-            that.currentStudent.submission.submission_comments,
+            this.currentStudent.submission.submission_comments,
             (item: SubmissionComment) => {
               const submissionComment = item.submission_comment || item
 
@@ -3569,9 +3768,9 @@ EG = {
             },
           )
 
-          that.currentStudent.submission.submission_comments = updatedComments
+          this.currentStudent.submission.submission_comments = updatedComments
         }
-        const commentUpdateFailed = function (_jqXH: JQuery.jqXHR<any>, _textStatus: string) {
+        const commentUpdateFailed = (_jqXH: JQuery.jqXHR<any>, _textStatus: string) => {
           $.flashError(I18n.t('Failed to submit draft comment'))
         }
 
@@ -3597,7 +3796,6 @@ EG = {
   },
 
   renderComment(commentData: SubmissionComment, incomingOpts?: CommentRenderingOptions) {
-    const self = this
     let comment = commentData
     let spokenComment = ''
     let submitCommentButtonText = ''
@@ -3616,8 +3814,13 @@ EG = {
       comment = commentData.submission_comment
     }
 
-    // don't render private comments when viewing a group assignment
-    if (!comment.group_comment_id && window.jsonData.GROUP_GRADING_MODE) return undefined
+    // don't render private comments when viewing a group assignment with actual groups
+    if (
+      !comment.group_comment_id &&
+      window.jsonData.GROUP_GRADING_MODE &&
+      window.jsonData.HAS_GROUPS
+    )
+      return undefined
 
     // For screenreaders
     spokenComment = comment.comment.replace(/\s+/, ' ')
@@ -3682,7 +3885,7 @@ EG = {
     $.each(
       comment.cached_attachments || comment.attachments || [],
       (_index, attachment: Attachment) => {
-        const attachmentElement = self.renderCommentAttachment(comment, attachment, opts)
+        const attachmentElement = this.renderCommentAttachment(comment, attachment, opts)
 
         commentElement.find('.comment_attachments').append($(attachmentElement).show())
       },
@@ -3715,7 +3918,6 @@ EG = {
   },
 
   showDiscussion() {
-    const that = this
     const commentRenderingOptions: CommentRenderingOptions = {
       hideStudentNames: utils.shouldHideStudentNames(),
       commentBlank: $comment_blank,
@@ -3736,7 +3938,7 @@ EG = {
           }
         }
 
-        const commentElement = that.renderComment(comment, commentRenderingOptions)
+        const commentElement = this.renderComment(comment, commentRenderingOptions)
 
         if (commentElement) {
           $comments.append($(commentElement).show())
@@ -4082,7 +4284,10 @@ EG = {
       if (!submissions[0].submission.excused) {
         const outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible)
         if (outlierScoreHelper.hasWarning()) {
-          $.flashWarning(outlierScoreHelper.warningMessage())
+          const warningMessage = outlierScoreHelper.warningMessage()
+          if (warningMessage) {
+            $.flashWarning(warningMessage)
+          }
         }
       }
 
@@ -4332,7 +4537,7 @@ EG = {
     const screenCaptureMountPoint = document.getElementById(SCREEN_CAPTURE_ICON_MOUNT_POINT)
     if (screenCaptureMountPoint) {
       const screen_capture_icon = <ScreenCaptureIcon />
-      ReactDOM.render(screen_capture_icon, screenCaptureMountPoint)
+      legacyRender(screen_capture_icon, screenCaptureMountPoint)
     }
   },
 
@@ -4340,7 +4545,7 @@ EG = {
   compareStudentsBy(f: (student1: StudentWithSubmission) => number) {
     const secondaryAttr = isAnonymous ? 'anonymous_id' : 'sortable_name'
 
-    return function (studentA, studentB) {
+    return (studentA, studentB) => {
       const a = f(studentA)
       const b = f(studentB)
 
@@ -4464,7 +4669,7 @@ EG = {
     $.flashError(errorMessage)
   },
 
-  selectProvisionalGrade(provisionalGradeId?: string, refetchOnSuccess: boolean = false) {
+  selectProvisionalGrade(provisionalGradeId?: string, refetchOnSuccess = false) {
     const selectGradeUrl = replaceTags(ENV.provisional_select_url || '', {
       provisional_grade_id: provisionalGradeId,
     })
@@ -4628,7 +4833,7 @@ EG = {
       this.renderSticker()
     }
 
-    ReactDOM.render(
+    legacyRender(
       <SubmissionSticker
         confetti={false}
         editable={isMostRecentAttempt}
@@ -4649,7 +4854,7 @@ EG = {
     // Only show the selector if the current student has at least one grade from
     // a provisional grader (i.e., not the moderator).
     if (!provisionalGrades.some(grade => grade.readonly)) {
-      ReactDOM.unmountComponentAtNode(mountPoint)
+      legacyUnmountComponentAtNode(mountPoint)
       return
     }
 
@@ -4675,14 +4880,15 @@ EG = {
       provisionalGrades,
     }
 
+    // @ts-expect-error
     const gradeSelector = <SpeedGraderProvisionalGradeSelector {...props} />
-    ReactDOM.render(gradeSelector, mountPoint)
+    legacyRender(gradeSelector, mountPoint)
   },
 
-  changeToSection(sectionId: string) {
+  changeToSection(sectionId: string | string[] | 'all') {
     if (ENV.multiselect_filters_enabled) {
       if (ENV.settings_url) {
-        $.post(ENV.settings_url, {selected_section_ids: sectionId}, () => {
+        $.post(ENV.settings_url, {checkboxed_selected_section_ids: sectionId}, () => {
           SpeedgraderHelpers.reloadPage()
         })
       } else {
@@ -4779,6 +4985,7 @@ function setupSelectors() {
   $grading_box_selected_grader = $('#grading-box-selected-grader')
   $grded_so_far = $('#x_of_x_graded')
   $iframe_holder = $('#iframe_holder')
+  $ams_grading_container = $('#ams_grading_container')
   $left_side = $('#left_side')
   $multiple_submissions = $('#multiple_submissions')
   $new_screen_capture_indicator_wrapper = $('#new-studio-media-indicator-wrapper')
@@ -4801,7 +5008,8 @@ function setupSelectors() {
   $submissions_container = $('#submissions_container')
   $this_student_does_not_have_a_submission = $('#this_student_does_not_have_a_submission').hide()
   $this_student_has_a_submission = $('#this_student_has_a_submission').hide()
-  $width_resizer = $('#width_resizer')
+  $width_resizer_ew = $('#width_resizer_ew')
+  $width_resizer_ns = $('#width_resizer_ns')
   $window = $(window)
   $x_of_x_students = $('#x_of_x_students_frd')
   $word_count = $('#submission_word_count')
@@ -4816,6 +5024,37 @@ function setupSelectors() {
   header = setupHeader()
 }
 
+function setDefaultHeightsForLeftRightSideStacked() {
+  $left_side.css('flex', '0 0 60%')
+  $right_side.css('flex', '0 0 40%')
+}
+
+function handleMediaQueryChange(e: MediaQueryListEvent) {
+  if (e.matches) {
+    // screen is <= STACKED_HEADER_CUTOFF_WIDTH
+    $left_side.css('width', '')
+    $right_side.css('width', '')
+    $full_width_container.removeClass('full_width')
+    setDefaultHeightsForLeftRightSideStacked()
+  } else {
+    // screen is > STACKED_HEADER_CUTOFF_WIDTH
+    $left_side.css('height', '')
+    $right_side.css('height', '')
+    $width_resizer_ns.css('top', '')
+    $full_width_container.removeClass('full_height')
+  }
+}
+
+function setupMediaQueryListener() {
+  const mql = window.matchMedia(`(max-width: ${STACKED_HEADER_CUTOFF_WIDTH})`)
+
+  if (mql?.addEventListener) {
+    mql.addEventListener('change', handleMediaQueryChange)
+  } else if (mql?.addListener) {
+    mql.addListener(handleMediaQueryChange)
+  }
+}
+
 // Helper function that guard against provisional_grades being null, allowing
 // Anonymous Moderated Marking-related moderation code to forgo that check
 // when considering provisional grades.
@@ -4826,6 +5065,7 @@ function currentStudentProvisionalGrades() {
 export default {
   setup() {
     setupSelectors()
+    setupMediaQueryListener()
     renderSettingsMenu(header)
 
     if (ENV.can_view_audit_trail) {

@@ -22,7 +22,7 @@ import {render, fireEvent, act} from '@testing-library/react'
 import useContentShareUserSearchApi from '../../effects/useContentShareUserSearchApi'
 import ContentShareUserSearchSelector from '../ContentShareUserSearchSelector'
 
-jest.mock('../../effects/useContentShareUserSearchApi')
+vi.mock('../../effects/useContentShareUserSearchApi')
 
 describe('ContentShareUserSearchSelector', () => {
   beforeAll(() => {
@@ -38,7 +38,7 @@ describe('ContentShareUserSearchSelector', () => {
   })
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   it('initially searches with an empty search term', () => {
@@ -68,7 +68,7 @@ describe('ContentShareUserSearchSelector', () => {
     fireEvent.click(selectInput)
     fireEvent.change(selectInput, {target: {value: 'abc'}})
     useContentShareUserSearchApi.mockImplementationOnce(({loading}) => loading(true))
-    act(() => jest.runAllTimers()) // let the debounce happen
+    act(() => vi.advanceTimersByTime(1000)) // let the debounce happen
     const loadingTexts = getAllByText(/loading/i)
     const loadingTextForSpinner = loadingTexts.find(loading => loading.closest('svg'))
     expect(loadingTextForSpinner).toBeInTheDocument()
@@ -80,7 +80,7 @@ describe('ContentShareUserSearchSelector', () => {
   })
 
   it('invokes onUserSelected when a user is chosen', () => {
-    const handleUserSelected = jest.fn()
+    const handleUserSelected = vi.fn()
     const {getByText, getByLabelText} = render(
       <ContentShareUserSearchSelector courseId="42" onUserSelected={handleUserSelected} />,
     )
@@ -90,7 +90,7 @@ describe('ContentShareUserSearchSelector', () => {
       success([{id: 'foo', name: 'shrek'}]),
     )
     fireEvent.change(selectInput, {target: {value: 'shr'}})
-    act(() => jest.runAllTimers()) // let the debounce happen
+    act(() => vi.advanceTimersByTime(1000)) // let the debounce happen
     fireEvent.click(getByText('shrek'))
     expect(handleUserSelected).toHaveBeenCalledWith({id: 'foo', name: 'shrek'})
   })
@@ -113,7 +113,7 @@ describe('ContentShareUserSearchSelector', () => {
       ]),
     )
     fireEvent.change(selectInput, {target: {value: 'shr'}})
-    act(() => jest.runAllTimers()) // let the debounce happen
+    act(() => vi.advanceTimersByTime(1000)) // let the debounce happen
     expect(getByText('shrek')).toBeInTheDocument()
     expect(queryByText('extra shrek')).not.toBeInTheDocument()
   })

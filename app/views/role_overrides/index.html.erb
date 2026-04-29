@@ -20,3 +20,5 @@
   add_body_class "full-width"
   provide :page_title, t(:page_title, "Manage Permissions for %{account}", :account => @context.name)
 %>
+
+<div id="permissions_root" data-is-site-admin="<%= Account.site_admin.grants_right?(@current_user, :manage_role_overrides) %>"></div>

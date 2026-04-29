@@ -159,7 +159,8 @@
           <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
         <% end %>
         <% if @submission.can_view_plagiarism_report('vericite', @current_user, session) && @submission.posted? %>
-          <% if (vericite_score = @submission.vericite_data(true)[@submission.asset_string]) && @submission.turnitin_data[:provider] == :vericite && vericite_score[:similarity_score] %>
+          <% vericite_data = @submission.vericite_data(lookup_data: true) %>
+          <% if (vericite_score = vericite_data[@submission.asset_string]) && vericite_data[:provider] == :vericite && vericite_score[:similarity_score] %>
             <% if show_updated_plagiarism_icons %>
               <%=
                 render partial: 'shared/originality_score_icon', locals: {
@@ -196,7 +197,7 @@
             </a>
             <% if unread_comments %>
               <span class="rubric_comment unread_indicator" aria-hidden="true"></span>
-              <% js_env mark_rubric_comments_read_url: api_v1_course_submission_rubric_assessments_mark_read_url(@context.id, @assignment.id, @submission.user.id) %>
+              <% js_env({ mark_rubric_comments_read_url: api_v1_course_submission_rubric_assessments_mark_read_url(@context.id, @assignment.id, @submission.user.id) }) %>
             <% end %>
           </div>
         <% end %>
@@ -237,8 +238,8 @@
         </div>
       </div>
       <div class="ic-Action-header__Secondary ic-Action-header__Secondary--auto">
-        <% if can_do(@context, @current_user, :grade) %>
-          <a class="Button" href="<%= context_url(@context, :speed_grader_context_gradebook_url, assignment_id: @assignment.id, student_id: @submission.user_id) %>">
+        <% if can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :view_all_grades) %>
+          <a class="Button" href="<%= context_url(@context, :speed_grader_context_gradebook_url, assignment_id: @assignment.id, student_id: @submission.user_id) %>" target="_blank" rel="noopener">
             <i class="icon-speed-grader" aria-hidden="true"></i>
             <%= t('speedgrader', 'SpeedGrader') %>
           </a>
@@ -250,13 +251,13 @@
         <% end %>
       </div>
     </div>
-    <% if @submission.submission_type == "online_text_entry" %>
-      <%
-        js_env ASSET_REPORTS: @asset_reports
-        js_env ASSET_PROCESSORS: @asset_processors
-        js_env ASSIGNMENT_NAME: @assignment.title
-      %>
-      <div id="asset_report_text_entry_status_container" data-attempt="<%= @submission.attempt %>"></div>
+    <% if %w[online_text_entry discussion_topic].include?(@submission.submission_type_for_asset_reports) %>
+      <div
+        id="asset_report_status_container"
+        data-attempt="<%= @submission.attempt %>"
+        data-submission-id="<%= @submission.id %>"
+        data-submission-type="<%= @submission.submission_type_for_asset_reports %>"
+      ></div>
     <% end %>
     <% if @assessment_request %>
       <div class="assessment_request_completed_message" style="<%= hidden unless @assessment_request.completed? %>">
@@ -463,4 +464,4 @@
       </div>
     </div>
   </div>
-<% js_env :rubricAssessments => @visible_rubric_assessments.as_json(:include => :assessor, :permissions => {:user => @current_user, :session => session}) %>
+<% js_env({ rubricAssessments: @visible_rubric_assessments.as_json(:include => :assessor, :permissions => {:user => @current_user, :session => session}) }) %>

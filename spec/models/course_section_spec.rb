@@ -272,6 +272,38 @@ describe CourseSection do
       expect(u.favorites.where(context_type: "Course", context_id: course2).exists?).to be true
     end
 
+    context "favorite carryover on crosslist" do
+      let(:course1) { Account.create!(name: "1").courses.create!(workflow_state: "available") }
+      let(:course2) { Account.create!(name: "2").courses.create!.tap(&:assert_section) }
+      let(:cs) { course1.course_sections.create! }
+
+      it "preserves favorites when crosslisting even if the user has no current enrollments in favorited courses" do
+        u = user_factory(active_all: true)
+        enrollment = course1.enroll_user(u, "StudentEnrollment", section: cs, enrollment_state: "active")
+        u.favorites.where(context_type: "Course", context_id: course1).first_or_create!
+        enrollment.conclude
+
+        cs.crosslist_to_course(course2)
+        expect(u.favorites.where(context_type: "Course", context_id: course2).exists?).to be true
+      end
+
+      it "preserves favorites for multiple users when crosslisting" do
+        user1 = user_factory(active_all: true)
+        user2 = user_factory(active_all: true)
+        user3 = user_factory(active_all: true)
+        course1.enroll_user(user1, "StudentEnrollment", section: cs, enrollment_state: "active")
+        course1.enroll_user(user2, "StudentEnrollment", section: cs, enrollment_state: "active")
+        course1.enroll_user(user3, "StudentEnrollment", section: cs, enrollment_state: "active")
+        user1.favorites.where(context_type: "Course", context_id: course1).first_or_create!
+        user2.favorites.where(context_type: "Course", context_id: course1).first_or_create!
+
+        cs.crosslist_to_course(course2)
+        expect(user1.favorites.where(context_type: "Course", context_id: course2).exists?).to be true
+        expect(user2.favorites.where(context_type: "Course", context_id: course2).exists?).to be true
+        expect(user3.favorites.where(context_type: "Course", context_id: course2).exists?).to be false
+      end
+    end
+
     it "removes discussion visibilites on crosslist" do
       course = course_factory({ course_name: "Course 1", active_all: true })
       section = course.course_sections.create!
@@ -302,7 +334,7 @@ describe CourseSection do
       it "must not have any effect when the section's workflow_state is not 'deleted'" do
         section.delete_enrollments_if_deleted
         enrollment_states = section.enrollments.pluck(:workflow_state)
-        expect(enrollment_states).to_not include "deleted"
+        expect(enrollment_states).not_to include "deleted"
       end
 
       it "must mark the enrollments as deleted if the section's workflow_state is 'deleted'" do

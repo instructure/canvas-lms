@@ -1,0 +1,422 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2025 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+require_relative "../helpers/k5_common"
+
+describe NewQuizzesController do
+  include K5Common
+
+  let(:course) { course_model }
+  let(:teacher) { teacher_in_course(course:, active_all: true).user }
+  let(:student) { student_in_course(course:, active_all: true).user }
+  let(:tool) do
+    course.context_external_tools.create!(
+      name: "New Quizzes",
+      url: "http://example.com/launch",
+      consumer_key: "key",
+      shared_secret: "secret",
+      tool_id: "Quizzes 2",
+      course_navigation: { enabled: true }
+    )
+  end
+  let(:assignment) do
+    assignment = assignment_model(context: course, submission_types: "external_tool")
+    assignment.external_tool_tag = ContentTag.create!(
+      context: assignment,
+      content: tool,
+      url: tool.url,
+      content_type: "ContextExternalTool"
+    )
+    assignment.save!
+    assignment
+  end
+
+  before do
+    course.enable_feature!(:new_quizzes_native_experience)
+  end
+
+  describe "#launch" do
+    context "when feature flag is disabled" do
+      before do
+        course.disable_feature!(:new_quizzes_native_experience)
+        user_session(teacher)
+      end
+
+      it "returns unauthorized" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+        assert_unauthorized
+      end
+    end
+
+    context "when user is not logged in" do
+      it "redirects to login" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+        expect(response).to redirect_to(login_url)
+      end
+    end
+
+    context "when user is logged in and feature flag is enabled" do
+      before do
+        user_session(teacher)
+      end
+
+      it "renders the native new quizzes view" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+        expect(response).to render_template("assignments/native_new_quizzes")
+      end
+
+      it "sets the NEW_QUIZZES js_env" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+        expect(assigns[:js_env][:NEW_QUIZZES]).to be_present
+      end
+
+      it "sets the basename in js_env" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+        expect(assigns[:js_env][:NEW_QUIZZES][:basename]).to eq("/courses/#{course.id}/assignments/#{assignment.id}")
+      end
+
+      it "calculates basename correctly when path param is present" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id, path: "settings" }
+        # Basename should NOT include the workflow segment (e.g., /build, /moderation)
+        # React Router uses this as a prefix, and routes are matched after it
+        expect(assigns[:js_env][:NEW_QUIZZES][:basename]).to eq("/courses/#{course.id}/assignments/#{assignment.id}")
+      end
+
+      it "removes workflow segment from basename for subroutes" do
+        # Test that subroutes like moderation, reporting, exports have workflow removed from basename
+        %w[build moderation reporting exports taking observing errors].each do |workflow|
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id, path: "123" }
+          allow(request).to receive(:path).and_return("/courses/#{course.id}/assignments/#{assignment.id}/#{workflow}/123")
+          expect(assigns[:js_env][:NEW_QUIZZES][:basename]).to eq("/courses/#{course.id}/assignments/#{assignment.id}")
+        end
+      end
+
+      context "when assignment is not quiz_lti" do
+        let(:regular_assignment) { assignment_model(context: course) }
+
+        it "returns unauthorized" do
+          get :launch, params: { course_id: course.id, assignment_id: regular_assignment.id }
+          assert_unauthorized
+        end
+      end
+
+      context "with different route actions" do
+        %w[build reporting moderation exports taking observing].each do |action|
+          it "renders native new quizzes for #{action} route" do
+            get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+            expect(response).to render_template("assignments/native_new_quizzes")
+          end
+        end
+      end
+
+      context "with module_item_id" do
+        let(:context_module) { course.context_modules.create!(name: "Test Module") }
+        let(:module_tag) do
+          context_module.add_item(type: "assignment", id: assignment.id)
+        end
+
+        it "uses the specific module tag when module_item_id is provided" do
+          get :launch, params: {
+            course_id: course.id,
+            assignment_id: assignment.id,
+            module_item_id: module_tag.id
+          }
+          expect(response).to render_template("assignments/native_new_quizzes")
+        end
+      end
+
+      context "with content_only param" do
+        it "still sets up content tag context" do
+          get :launch, params: {
+            course_id: course.id,
+            assignment_id: assignment.id,
+            content_only: true
+          }
+          expect(response).to render_template("assignments/native_new_quizzes")
+          expect(assigns[:js_env][:NEW_QUIZZES]).to be_present
+        end
+      end
+
+      context "with sessionless_launch" do
+        it "skips content tag context setup" do
+          get :launch, params: {
+            course_id: course.id,
+            assignment_id: assignment.id,
+            sessionless_launch: true
+          }
+          expect(response).to render_template("assignments/native_new_quizzes")
+          expect(assigns[:module_tag]).to be_nil
+          expect(assigns[:tag]).to be_nil
+          expect(assigns[:resource_url]).to be_nil
+        end
+      end
+
+      context "when assignment is in a module but no module_item_id is provided" do
+        let(:context_module) { course.context_modules.create!(name: "Test Module") }
+
+        before do
+          context_module.add_item(type: "assignment", id: assignment.id)
+        end
+
+        it "auto-resolves the first module tag for the assignment" do
+          get :launch, params: {
+            course_id: course.id,
+            assignment_id: assignment.id
+          }
+          expect(assigns[:module_tag]).to be_present
+          expect(assigns[:module_tag].content).to eq(assignment)
+        end
+      end
+    end
+
+    context "when sessionless_launch param is present" do
+      before do
+        user_session(teacher)
+      end
+
+      it "renders the native new quizzes view" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id, sessionless_launch: true }
+        expect(response).to render_template("assignments/native_new_quizzes")
+      end
+
+      it "does not alter the basename" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id, sessionless_launch: true }
+        expect(assigns[:js_env][:NEW_QUIZZES][:basename])
+          .to eq("/courses/#{course.id}/assignments/#{assignment.id}")
+      end
+    end
+
+    context "when user is a student" do
+      before do
+        course.offer!
+        user_session(student)
+      end
+
+      it "renders the native new quizzes view for authorized students" do
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+        expect(response).to render_template("assignments/native_new_quizzes")
+      end
+
+      context "when assignment is locked" do
+        before do
+          allow(controller).to receive(:taking_action?).and_return(true)
+        end
+
+        it "returns unauthorized when before unlock_at" do
+          assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          assert_unauthorized
+        end
+
+        it "returns unauthorized when after lock_at" do
+          assignment.update!(due_at: 36.hours.ago, unlock_at: 2.days.ago, lock_at: 1.day.ago)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          assert_unauthorized
+        end
+
+        it "renders when within the lock window" do
+          assignment.update!(due_at: Time.zone.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(response).to render_template("assignments/native_new_quizzes")
+        end
+
+        it "does not block non-taking actions" do
+          allow(controller).to receive(:taking_action?).and_call_original
+          assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(response).to render_template("assignments/native_new_quizzes")
+        end
+      end
+
+      context "when assignment has student-specific overrides" do
+        it "respects the override dates" do
+          assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+          override = assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override.assignment_override_students.create!(user: student)
+          override.override_unlock_at(1.day.ago)
+          override.override_lock_at(1.day.from_now)
+          override.save!
+
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(response).to render_template("assignments/native_new_quizzes")
+        end
+      end
+    end
+
+    context "when user is a teacher" do
+      before do
+        course.offer!
+        user_session(teacher)
+      end
+
+      it "renders even when assignment is locked" do
+        assignment.update!(due_at: 36.hours.from_now, unlock_at: 1.day.from_now, lock_at: 2.days.from_now)
+        get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+        expect(response).to render_template("assignments/native_new_quizzes")
+      end
+    end
+
+    context "in a K5 (Canvas for Elementary) course" do
+      before do
+        toggle_k5_setting(course.account)
+        course.offer!
+      end
+
+      context "when user is a student" do
+        before { user_session(student) }
+
+        it "hides the course sidebar (@show_left_side is false)" do
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(assigns(:show_left_side)).to be false
+        end
+      end
+
+      context "when user is a teacher" do
+        before { user_session(teacher) }
+
+        it "keeps the course sidebar visible (@show_left_side is true)" do
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(assigns(:show_left_side)).to be true
+        end
+      end
+
+      context "when account is not K5" do
+        before do
+          toggle_k5_setting(course.account, enable: false)
+          user_session(student)
+        end
+
+        it "does not set @show_left_side" do
+          get :launch, params: { course_id: course.id, assignment_id: assignment.id }
+          expect(assigns(:show_left_side)).to be_nil
+        end
+      end
+    end
+  end
+
+  describe "#banks" do
+    context "when feature flag is disabled" do
+      before do
+        course.disable_feature!(:new_quizzes_native_experience)
+        user_session(teacher)
+      end
+
+      it "returns unauthorized" do
+        get :banks, params: { course_id: course.id }
+        assert_unauthorized
+      end
+    end
+
+    context "when user is not logged in" do
+      it "redirects to login" do
+        get :banks, params: { course_id: course.id }
+        expect(response).to redirect_to(login_url)
+      end
+    end
+
+    context "when user is logged in and feature flag is enabled" do
+      before do
+        user_session(teacher)
+        # Ensure quiz_lti tool exists for the course
+        tool
+      end
+
+      it "renders the native new quizzes view" do
+        get :banks, params: { course_id: course.id }
+        expect(response).to render_template("assignments/native_new_quizzes")
+      end
+
+      it "sets the NEW_QUIZZES js_env" do
+        get :banks, params: { course_id: course.id }
+        expect(assigns[:js_env][:NEW_QUIZZES]).to be_present
+      end
+
+      it "sets the basename in js_env for course context" do
+        get :banks, params: { course_id: course.id }
+        expect(assigns[:js_env][:NEW_QUIZZES][:basename]).to eq("/courses/#{course.id}")
+      end
+
+      context "when no quiz_lti tool is found" do
+        before do
+          tool.destroy
+        end
+
+        it "returns unauthorized" do
+          get :banks, params: { course_id: course.id }
+          assert_unauthorized
+        end
+      end
+
+      context "when only a non-quiz_lti tool with course_navigation exists" do
+        before do
+          tool.destroy
+          course.context_external_tools.create!(
+            name: "Regular Tool",
+            url: "http://example.com/launch",
+            consumer_key: "key",
+            shared_secret: "secret",
+            course_navigation: { enabled: true }
+          )
+        end
+
+        it "returns unauthorized" do
+          get :banks, params: { course_id: course.id }
+          assert_unauthorized
+        end
+      end
+    end
+
+    context "with account context" do
+      let(:account) { Account.default }
+      let(:account_tool) do
+        account.context_external_tools.create!(
+          name: "New Quizzes",
+          url: "http://example.com/launch",
+          consumer_key: "key",
+          shared_secret: "secret",
+          tool_id: "Quizzes 2",
+          account_navigation: { enabled: true }
+        )
+      end
+
+      before do
+        account.enable_feature!(:new_quizzes_native_experience)
+        account_admin_user(account:, active_all: true)
+        user_session(@user)
+        # Ensure quiz_lti tool exists for the account
+        account_tool
+      end
+
+      it "renders the native new quizzes view" do
+        get :banks, params: { account_id: account.id }
+        expect(response).to render_template("assignments/native_new_quizzes")
+      end
+
+      it "sets the basename in js_env for account context" do
+        get :banks, params: { account_id: account.id }
+        expect(assigns[:js_env][:NEW_QUIZZES][:basename]).to eq("/accounts/#{account.id}")
+      end
+
+      it "sets the NEW_QUIZZES js_env" do
+        get :banks, params: { account_id: account.id }
+        expect(assigns[:js_env][:NEW_QUIZZES]).to be_present
+      end
+    end
+  end
+end

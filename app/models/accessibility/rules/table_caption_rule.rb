@@ -23,56 +23,49 @@ module Accessibility
       self.id = "table-caption"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H39.html"
 
-      def self.test(elem)
+      # Accessibility::Rule methods
+
+      def test(elem)
         return nil if elem.tag_name.downcase != "table"
 
         caption = elem.query_selector("caption")
 
-        I18n.t("Table caption should be present.") if !caption || caption.text.gsub(/\s/, "") == ""
+        I18n.t("Table caption should be present.") if !caption || caption.text.gsub(/[[:space:]]/, "") == ""
       end
 
-      def self.display_name
-        I18n.t("Missing table caption")
-      end
-
-      def self.message
-        I18n.t("Tables should include a caption describing the contents of the table.")
-      end
-
-      def self.why
-        I18n.t("Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table.")
-      end
-
-      def self.prepend(parent, child)
-        if parent.first_element_child
-          parent.first_element_child.add_previous_sibling(child)
-        else
-          parent.add_child(child)
-        end
-      end
-
-      def self.form(_elem)
+      def form(_elem)
         Accessibility::Forms::TextInputField.new(
           label: I18n.t("Table caption"),
           undo_text: I18n.t("Caption added"),
           value: "",
-          action: I18n.t("Add caption")
+          action: I18n.t("Add caption"),
+          can_generate_fix: true,
+          generate_button_label: I18n.t("Generate")
         )
       end
 
-      def self.fix!(elem, value)
+      def fix!(elem, value)
         raise StandardError, "Caption cannot be empty." if value.blank?
 
         caption = elem.at_css("caption")
-        if caption
-          return nil if (caption.content = value)
-
-        else
+        unless caption
           caption = elem.document.create_element("caption")
-          prepend(elem, caption)
+          TableCaptionRuleHelper.prepend(elem, caption)
         end
         caption.content = value
-        elem
+        { changed: elem }
+      end
+
+      def display_name
+        I18n.t("Missing table caption")
+      end
+
+      def message
+        I18n.t("Tables should include a caption describing the contents of the table.")
+      end
+
+      def why
+        I18n.t("Tables should have a table caption, a title for the table to help learners understand what the table is about.")
       end
     end
   end

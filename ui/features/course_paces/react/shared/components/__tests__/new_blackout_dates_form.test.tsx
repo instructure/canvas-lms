@@ -22,7 +22,7 @@ import {act, fireEvent, render} from '@testing-library/react'
 
 import NewBlackoutDatesForm from '../new_blackout_dates_form'
 
-const addBlackoutDate = jest.fn()
+const addBlackoutDate = vi.fn()
 
 describe('BlackoutDatesModal', () => {
   beforeAll(() => {
@@ -32,7 +32,7 @@ describe('BlackoutDatesModal', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders', () => {

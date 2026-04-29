@@ -32,7 +32,7 @@ describe('GradeSummary PostToStudentsButton', () => {
         gradesPublished: true,
         muted: true,
       },
-      onClick: jest.fn(),
+      onClick: vi.fn(),
       unmuteAssignmentStatus: null,
     }
   })

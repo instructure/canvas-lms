@@ -12,5 +12,10 @@ services:
   dynamodb:
     image: instructure/dynamo-local-admin:latest
     environment:
-      VIRTUAL_HOST: dynamodb.docker
+      VIRTUAL_HOST: dynamodb.canvas.docker
       VIRTUAL_PORT: 8000
+    volumes:
+      - "dynamo_data:/var/lib/dynamodb"
+
+volumes:
+  dynamo_data:

@@ -55,10 +55,10 @@ const SET_OVERRIDE_STATUS_MUTATION = gql`
 `
 
 describe('TotalGradeOverrideTray Tests', () => {
-  const navigateUp = jest.fn()
-  const navigateDown = jest.fn()
-  const handleDismiss = jest.fn()
-  const handleOnGradeChange = jest.fn()
+  const navigateUp = vi.fn()
+  const navigateDown = vi.fn()
+  const handleDismiss = vi.fn()
+  const handleOnGradeChange = vi.fn()
   const getComponent = (props: Partial<TotalGradeOverrideTrayProps> = {}) => {
     const trayProps: TotalGradeOverrideTrayProps = {
       customGradeStatuses: [
@@ -121,7 +121,7 @@ describe('TotalGradeOverrideTray Tests', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('student carousel tests', () => {

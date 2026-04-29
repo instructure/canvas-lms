@@ -19,6 +19,44 @@
 
 module ActiveRecord
   describe Base do
+    describe ".preserve_overrides" do
+      specs_require_sharding
+
+      around do |example|
+        @shard1.activate do
+          example.run
+        end
+      end
+
+      def current_database_config_hash
+        ::ActiveRecord::Base.configurations.configurations.find do |configuration|
+          configuration.configuration_hash.value? Shard.current.name
+        end
+      end
+
+      it "preserves specified configuration keys across a block", :aggregate_failures do
+        configuration = current_database_config_hash
+        current_username = configuration.configuration_hash[:username]
+        current_service = configuration.configuration_hash[:service]
+
+        ::ActiveRecord::Base.preserve_overrides(preserved_keys: %i[username service]) do
+          configuration.instance_variable_set(
+            :@configuration_hash,
+            configuration.configuration_hash.merge(
+              username: "modified_user",
+              service: "modified_service",
+              password: "modified_password"
+            )
+          )
+        end
+
+        mutated_configuration = current_database_config_hash
+        expect(mutated_configuration.configuration_hash[:username]).to eq current_username
+        expect(mutated_configuration.configuration_hash[:service]).to eq current_service
+        expect(mutated_configuration.configuration_hash[:password]).to eq "modified_password"
+      end
+    end
+
     describe ".serializable_hash" do
       let(:account) { Account.create! }
 
@@ -91,7 +129,7 @@ module ActiveRecord
           expect do
             User.find_each { nil }
             User.find_each { nil } # rubocop:disable Style/CombinableLoops
-          end.to_not raise_error
+          end.not_to raise_error
         end
 
         it "cleans up the temp table for non-DB error" do
@@ -135,7 +173,7 @@ module ActiveRecord
             User.select(:name).find_in_batches do
               User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
             end
-          end.to_not raise_error
+          end.not_to raise_error
         end
 
         it "does not use a temp table for a plain query" do
@@ -167,7 +205,7 @@ module ActiveRecord
           expect do
             User.find_in_batches(strategy: :temp_table) { nil }
             User.find_in_batches(strategy: :temp_table) { nil }
-          end.to_not raise_error
+          end.not_to raise_error
         end
 
         it "cleans up the temp table for non-DB error" do
@@ -260,7 +298,7 @@ module ActiveRecord
                                   "created_at" => 1.month.from_now
                                 })
         ar_type = Auditors::ActiveRecord::AuthenticationRecord
-        expect { ar_type.bulk_insert([attrs_1, attrs_2]) }.to_not raise_error
+        expect { ar_type.bulk_insert([attrs_1, attrs_2]) }.not_to raise_error
         conn = ar_type.connection
         root_partition_count = conn.execute("select count(*) from only #{ar_type.quoted_table_name};")[0]["count"]
         expect(root_partition_count).to eq(0)
@@ -283,7 +321,7 @@ module ActiveRecord
           expect do
             User.joins("INNER JOIN #{User.quoted_table_name} u ON users.sortable_name = u.sortable_name")
                 .where("u.sortable_name <> users.sortable_name").delete_all
-          end.to_not raise_error
+          end.not_to raise_error
         end
       end
 
@@ -548,8 +586,8 @@ module ActiveRecord
         let(:base_s1) { @shard1.activate { User.active } }
         let(:base_s2) { @shard2.activate { User.active } }
 
-        include_examples "query creation"
-        include_examples "query creation sharding"
+        it_behaves_like "query creation"
+        it_behaves_like "query creation sharding"
       end
 
       context "through a relation" do
@@ -557,8 +595,8 @@ module ActiveRecord
         let(:base_s1) { @shard1.activate { Account.create.users } }
         let(:base_s2) { @shard2.activate { Account.create.users } }
 
-        include_examples "query creation"
-        include_examples "query creation sharding"
+        it_behaves_like "query creation"
+        it_behaves_like "query creation sharding"
       end
 
       context "through a where query that references multiple shards" do
@@ -570,7 +608,7 @@ module ActiveRecord
         let(:base_s1) { @shard1.activate { User.where(id: [user_s1, user_s2]) } }
         let(:base_s2) { @shard2.activate { User.where(id: [user_s1, user_s2]) } }
 
-        include_examples "query creation sharding"
+        it_behaves_like "query creation sharding"
       end
     end
 
@@ -696,18 +734,51 @@ describe ActiveRecord::Migration::CommandRecorder do
       r.add_column :accounts, :course_template_id, :integer, limit: 8, if_not_exists: true
       r.add_foreign_key :accounts, :courses, column: :course_template_id, if_not_exists: true
       r.add_index :accounts, :course_template_id, algorithm: :concurrently, if_not_exists: true # rubocop:disable Migration/NonTransactional
+      r.add_reference :accounts, :other_account, foreign_key: { to_table: :accounts }, index: { algorithm: :concurrently, if_not_exists: true }, if_not_exists: true # rubocop:disable Migration/NonTransactional
 
       r.remove_column :courses, :id, :integer, limit: 8, if_exists: true
       r.remove_foreign_key :enrollments, :users, if_exists: true
       r.remove_index :accounts, :id, if_exists: true
+      r.remove_reference :accounts, :parent_account, foreign_key: { to_table: :accounts }, index: { if_exists: true }, if_exists: true
     end
     expect(recorder.commands).to eq([
+                                      [:add_reference, [:accounts, :parent_account, { foreign_key: { to_table: :accounts }, index: { if_not_exists: true }, if_not_exists: true }], nil],
                                       [:add_index, [:accounts, :id, { if_not_exists: true }]],
                                       [:add_foreign_key, [:enrollments, :users, { if_not_exists: true }]],
                                       [:add_column, [:courses, :id, :integer, { limit: 8, if_not_exists: true }], nil],
+                                      [:remove_reference, [:accounts, :other_account, { foreign_key: { to_table: :accounts }, index: { algorithm: :concurrently, if_exists: true }, if_exists: true }], nil],
                                       [:remove_index, [:accounts, :course_template_id, { algorithm: :concurrently, if_exists: true }], nil],
                                       [:remove_foreign_key, [:accounts, :courses, { column: :course_template_id, if_exists: true }], nil],
                                       [:remove_column, [:accounts, :course_template_id, :integer, { limit: 8, if_exists: true }], nil],
                                     ])
+  end
+
+  describe "ValidateDateTimeFormat" do
+    let(:course) { Course.create!(name: "Test Course") }
+
+    context "with invalid datetime formats" do
+      it "adds an error when setting a datetime attribute to an integer" do
+        timestamp = Time.now.to_i
+        course.start_at = timestamp
+        expect(course.errors[:start_at]).to include("must be in ISO8601 format")
+        expect(course.start_at).to be_nil
+      end
+
+      it "adds an error when setting a datetime attribute to a numeric string" do
+        timestamp = Time.now.to_i.to_s
+        course.start_at = timestamp
+        expect(course.errors[:start_at]).to include("must be in ISO8601 format")
+        expect(course.start_at).to be_nil
+      end
+    end
+
+    context "with valid datetime formats" do
+      it "accepts ISO8601 formatted strings" do
+        iso_string = "2025-10-08T12:00:00Z"
+        course.start_at = iso_string
+        expect(course.errors[:start_at]).to be_empty
+        expect(course.start_at).not_to be_nil
+      end
+    end
   end
 end

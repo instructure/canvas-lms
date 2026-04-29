@@ -43,7 +43,7 @@ describe('StudentGroupFilter', () => {
         name: 'Group Set A',
       },
     ],
-    onSelect: jest.fn(),
+    onSelect: vi.fn(),
     selectedStudentGroupId: '0',
   }
 
@@ -52,7 +52,7 @@ describe('StudentGroupFilter', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('labels the filter with "Student Group Filter"', () => {

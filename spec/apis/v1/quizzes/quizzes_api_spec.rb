@@ -25,7 +25,7 @@ require_relative "../../../file_upload_helper"
 describe Quizzes::QuizzesApiController, type: :request do
   include FileUploadHelper
 
-  context "locked api item" do
+  it_behaves_like "a locked api item" do
     let(:item_type) { "quiz" }
 
     let(:locked_item) do
@@ -41,8 +41,6 @@ describe Quizzes::QuizzesApiController, type: :request do
         { controller: "quizzes/quizzes_api", action: "show", format: "json", course_id: @course.id.to_s, id: locked_item.id.to_s }
       )
     end
-
-    include_examples "a locked api item"
   end
 
   describe "GET /courses/:course_id/quizzes (index)" do
@@ -569,7 +567,7 @@ describe Quizzes::QuizzesApiController, type: :request do
   describe "DELETE /courses/:course_id/quizzes/id (destroy)" do
     it "deletes a quiz" do
       teacher_in_course active_all: true
-      quiz = course_quiz true
+      quiz = course_quiz(active: true)
       api_call(:delete,
                "/api/v1/courses/#{@course.id}/quizzes/#{quiz.id}",
                { controller: "quizzes/quizzes_api",

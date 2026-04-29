@@ -57,10 +57,12 @@ module Api::V1::Quiz
   }.freeze
 
   def quizzes_json(quizzes, context, user, session, options = {})
-    # bulk preload all description attachments to prevent N+1 query
-    preloaded_attachments = api_bulk_load_user_content_attachments(quizzes.map(&:description), context)
+    unless options[:skip_description]
+      # bulk preload all description attachments to prevent N+1 query
+      preloaded_attachments = api_bulk_load_user_content_attachments(quizzes.map(&:description), context)
+      options[:description_formatter] = description_formatter(context, user, preloaded_attachments)
+    end
     DatesOverridable.preload_override_data_for_objects(quizzes)
-    options[:description_formatter] = description_formatter(context, user, preloaded_attachments)
     if context.grants_right?(user, session, :manage_assignments_edit)
       options[:master_course_status] = setup_master_course_restrictions(quizzes, context)
     end
@@ -126,7 +128,7 @@ module Api::V1::Quiz
     quiz_params.permit(*API_ALLOWED_QUIZ_INPUT_FIELDS[:only])
   end
 
-  def update_api_quiz(quiz, params, save = true)
+  def update_api_quiz(quiz, params, save: true)
     quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz]
     return nil unless quiz.is_a?(Quizzes::Quiz) && quiz_params.is_a?(ActionController::Parameters)
 
@@ -243,6 +245,15 @@ module Api::V1::Quiz
     quiz.save if save
 
     quiz
+  end
+
+  def quiz_client_ip
+    return request.remote_ip unless Account.site_admin.feature_enabled?(:classic_quizzes_client_ip)
+
+    x_forwarded_for = request.headers["X-Forwarded-For"]
+    client_ip = x_forwarded_for&.split(",")&.first&.strip
+    Rails.logger.info("Using quiz_client_ip for Classic Quizzes: #{client_ip}")
+    client_ip
   end
 
   protected

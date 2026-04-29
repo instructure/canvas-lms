@@ -83,6 +83,8 @@ FilesApp.render = function () {
     ? filesEnv.contextFor({contextType, contextId}).file_index_menu_tools
     : []
 
+  const isAccessRestricted = filesEnv.userFileAccessRestricted
+
   return (
     <div>
       {/* For whatever reason, VO in Safari didn't like just the h1 tag.
@@ -144,11 +146,13 @@ FilesApp.render = function () {
           <FolderTree
             rootTillCurrentFolder={this.state.rootTillCurrentFolder}
             rootFoldersToShow={filesEnv.rootFolders}
-            dndOptions={{
-              onItemDragEnterOrOver: this.onItemDragEnterOrOver,
-              onItemDragLeaveOrEnd: this.onItemDragLeaveOrEnd,
-              onItemDrop: this.onItemDrop,
-            }}
+            {...(!isAccessRestricted && {
+              dndOptions: {
+                onItemDragEnterOrOver: this.onItemDragEnterOrOver,
+                onItemDragLeaveOrEnd: this.onItemDragLeaveOrEnd,
+                onItemDrop: this.onItemDrop,
+              },
+            })}
           />
         </aside>
         <div

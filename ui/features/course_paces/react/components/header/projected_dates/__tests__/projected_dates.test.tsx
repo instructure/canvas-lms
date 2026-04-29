@@ -29,13 +29,13 @@ const defaultProps: StoreProps = {
   assignments: 5,
   paceDuration: {weeks: 2, days: 3},
   compression: 0,
-  compressDates: jest.fn(),
-  uncompressDates: jest.fn(),
+  compressDates: vi.fn(),
+  uncompressDates: vi.fn(),
   plannedEndDate: '2021-12-01',
 }
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('ProjectedDates', () => {

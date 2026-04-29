@@ -20,14 +20,15 @@
 import React, {useEffect, useState} from 'react'
 import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo-v3'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import ErrorBoundary from '@canvas/error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 import GradeSummaryContainer from './GradeSummaryContainer'
 
-import LoadingIndicator from '@canvas/loading-indicator'
-import {queryClient} from '@canvas/query'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
+import {queryClient} from '@instructure/platform-query'
 import {QueryClientProvider} from '@tanstack/react-query'
 
 const I18n = createI18nScope('grade_summary')
@@ -61,6 +62,8 @@ const GradeSummaryManager = () => {
           errorComponent={
             <GenericErrorPage
               imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
               errorCategory={I18n.t('Grade Summary Error Page')}
             />
           }

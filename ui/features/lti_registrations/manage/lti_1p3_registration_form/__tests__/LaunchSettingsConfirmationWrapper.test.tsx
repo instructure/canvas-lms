@@ -16,19 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {LaunchSettingsConfirmationWrapper} from '../components/LaunchSettingsConfirmationWrapper'
 import {mockInternalConfiguration} from './helpers'
 import {createLti1p3RegistrationOverlayStore} from '../../registration_overlay/Lti1p3RegistrationOverlayStore'
-import {getInputIdForField} from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
 
 describe('LaunchSettings', () => {
-  beforeEach(() => {
-    userEvent.setup()
-  })
-
   it('renders the form correctly', () => {
     const config = mockInternalConfiguration({
       redirect_uris: ['https://example.com/launch'],
@@ -40,8 +34,6 @@ describe('LaunchSettings', () => {
       <LaunchSettingsConfirmationWrapper
         internalConfig={config}
         overlayStore={overlayStore}
-        onPreviousClicked={jest.fn()}
-        onNextClicked={jest.fn()}
         reviewing={false}
       />,
     )
@@ -73,6 +65,7 @@ describe('LaunchSettings', () => {
   })
 
   it('handles input changes', async () => {
+    const user = userEvent.setup()
     const config = mockInternalConfiguration({
       redirect_uris: ['https://example.com/launch'],
       domain: 'example.com',
@@ -83,8 +76,6 @@ describe('LaunchSettings', () => {
       <LaunchSettingsConfirmationWrapper
         internalConfig={config}
         overlayStore={overlayStore}
-        onPreviousClicked={jest.fn()}
-        onNextClicked={jest.fn()}
         reviewing={false}
       />,
     )
@@ -94,41 +85,42 @@ describe('LaunchSettings', () => {
       'https://example.com/launch',
       'https://example.com/launch2',
     ]
-    await userEvent.clear(redirectURIs)
-    await userEvent.paste(expectedRedirectUris.join('\n'))
+    await user.clear(redirectURIs)
+    await user.paste(expectedRedirectUris.join('\n'))
 
     expect(redirectURIs).toHaveValue(expectedRedirectUris.join('\n'))
 
     const targetLinkUri = screen.getByLabelText(/Default Target Link URI/i)
-    await userEvent.clear(targetLinkUri)
-    await userEvent.paste('https://otherexample.com')
+    await user.clear(targetLinkUri)
+    await user.paste('https://otherexample.com')
     expect(targetLinkUri).toHaveValue('https://otherexample.com')
 
     const oidcInitiationUrl = screen.getByLabelText(/OpenID Connect Initiation URL/i)
-    await userEvent.clear(oidcInitiationUrl)
-    await userEvent.paste('https://example.com/init')
+    await user.clear(oidcInitiationUrl)
+    await user.paste('https://example.com/init')
 
     expect(oidcInitiationUrl).toHaveValue('https://example.com/init')
 
     const jwkUrl = screen.getByLabelText('JWK URL')
-    await userEvent.clear(jwkUrl)
-    await userEvent.paste('https://example.com/jwk')
+    await user.clear(jwkUrl)
+    await user.paste('https://example.com/jwk')
     expect(jwkUrl).toHaveValue('https://example.com/jwk')
 
     const domain = screen.getByLabelText('Domain')
-    await userEvent.clear(domain)
-    await userEvent.paste('foo.com')
+    await user.clear(domain)
+    await user.paste('foo.com')
     expect(domain).toHaveValue('foo.com')
 
     const customFields = screen.getByTestId('custom-fields')
-    await userEvent.clear(customFields)
-    await userEvent.paste('name=value\n')
+    await user.clear(customFields)
+    await user.paste('name=value\n')
 
     expect(customFields).toHaveValue('name=value\n')
   })
 })
 
 it('renders a popover on hovering over the custom fields info button', async () => {
+  const user = userEvent.setup()
   const config = mockInternalConfiguration({
     redirect_uris: ['https://example.com/launch'],
     domain: 'example.com',
@@ -139,55 +131,27 @@ it('renders a popover on hovering over the custom fields info button', async () 
     <LaunchSettingsConfirmationWrapper
       internalConfig={config}
       overlayStore={overlayStore}
-      onPreviousClicked={jest.fn()}
-      onNextClicked={jest.fn()}
       reviewing={false}
     />,
   )
 
-  await userEvent.hover(document.getElementById('custom_fields_render_trigger')!)
-  expect(screen.getByText(/refer to the for more details\./i)).toBeVisible()
-})
+  // Find the info button - it has the accessible name "Custom Fields Help"
+  const infoButton = screen.getByRole('button', {name: 'Custom Fields Help'})
 
-it('focuses invalid inputs if any fields are invalid', async () => {
-  const config = mockInternalConfiguration({
-    redirect_uris: ['https://example.com/launch'],
-    domain: 'example.com',
-    public_jwk_url: 'https://example.com/jwks',
+  expect(infoButton).toBeInTheDocument()
+  expect(infoButton).toHaveAttribute('id', 'custom_fields_render_trigger')
+
+  await user.hover(infoButton)
+
+  // Wait for popover to appear and check for the documentation link
+  await waitFor(() => {
+    // Get all Canvas documentation links and find the one with the correct href
+    const links = screen.getAllByRole('link', {name: /Canvas documentation/i})
+    const customFieldsDocLink = links.find(
+      link =>
+        link.getAttribute('href') ===
+        'https://canvas.instructure.com/doc/api/file.tools_variable_substitutions.html',
+    )
+    expect(customFieldsDocLink).toBeInTheDocument()
   })
-  const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
-  const onNextClicked = jest.fn()
-  render(
-    <LaunchSettingsConfirmationWrapper
-      internalConfig={config}
-      overlayStore={overlayStore}
-      onPreviousClicked={jest.fn()}
-      onNextClicked={onNextClicked}
-      reviewing={false}
-    />,
-  )
-  const nextButton = screen.getByRole('button', {name: /Next/i})
-  const redirectURIs = screen.getByLabelText(/Redirect URIs/i)
-  await userEvent.clear(redirectURIs)
-  await userEvent.paste('http:<<<>>')
-  await userEvent.tab()
-  await userEvent.click(nextButton)
-  expect(onNextClicked).not.toHaveBeenCalled()
-  expect(redirectURIs).toHaveFocus()
-
-  await userEvent.clear(redirectURIs)
-  await userEvent.paste('https://example.com/launch')
-
-  const domain = screen.getByLabelText('Domain')
-  await userEvent.clear(domain)
-  await userEvent.paste('domain00---.com.')
-  await userEvent.tab()
-  await userEvent.click(nextButton)
-  expect(onNextClicked).not.toHaveBeenCalled()
-  expect(domain).toHaveFocus()
-
-  await userEvent.clear(domain)
-  await userEvent.paste('example.com')
-  await userEvent.click(nextButton)
-  expect(onNextClicked).toHaveBeenCalled()
 })

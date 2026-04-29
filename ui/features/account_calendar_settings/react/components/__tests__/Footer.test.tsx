@@ -17,14 +17,24 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {render, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import {destroyContainer, showFlashError} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    destroyContainer: vi.fn(),
+    showFlashError: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
 
 import {Footer} from '../Footer'
 
-const VISIBLE_CALENDARS_COUNT_MATCHER = /\/api\/v1\/accounts\/1\/visible_calendars_count.*/
+const server = setupServer()
 
 const defaultProps = {
   originAccountId: 1,
@@ -33,23 +43,31 @@ const defaultProps = {
     {id: 2, visible: false},
     {id: 10, visible: true},
   ],
-  onApplyClicked: jest.fn(),
+  onApplyClicked: vi.fn(),
   enableSaveButton: true,
   showConfirmation: false,
 }
 
 describe('Footer', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.get(VISIBLE_CALENDARS_COUNT_MATCHER, {count: 27})
+    server.use(
+      http.get('/api/v1/accounts/1/visible_calendars_count', () => {
+        return HttpResponse.json({count: 27})
+      }),
+    )
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     destroyContainer()
+    vi.clearAllMocks()
   })
 
   it('calls onApplyClicked when apply button is pressed', () => {
-    const onApplyClicked = jest.fn()
+    const onApplyClicked = vi.fn()
     const {getByRole} = render(<Footer {...defaultProps} onApplyClicked={onApplyClicked} />)
     getByRole('button', {name: 'Apply Changes'}).click()
     expect(onApplyClicked).toHaveBeenCalledTimes(1)
@@ -69,13 +87,19 @@ describe('Footer', () => {
   })
 
   it('displays an error if the count fails to fetch', async () => {
-    fetchMock.get(VISIBLE_CALENDARS_COUNT_MATCHER, 500, {overwriteRoutes: true})
-    const {findAllByText} = render(<Footer {...defaultProps} />)
-    expect((await findAllByText('Unable to load calendar count'))[0]).toBeInTheDocument()
+    server.use(
+      http.get('/api/v1/accounts/1/visible_calendars_count', () => {
+        return new HttpResponse(null, {status: 500})
+      }),
+    )
+    render(<Footer {...defaultProps} />)
+    await waitFor(() => {
+      expect(showFlashError).toHaveBeenCalledWith('Unable to load calendar count')
+    })
   })
 
   it('displays the confirmation modal if showConfirmation is enabled', async () => {
-    const onApplyClicked = jest.fn()
+    const onApplyClicked = vi.fn()
     const {getByRole} = render(
       <Footer {...defaultProps} showConfirmation={true} onApplyClicked={onApplyClicked} />,
     )

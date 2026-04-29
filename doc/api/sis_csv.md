@@ -1010,6 +1010,159 @@ G411208,U002,accepted
 G411208,U003,deleted
 </pre>
 
+differentiation_tag_sets.csv
+------------
+
+<table class="sis_csv">
+<tr>
+<th>Field Name</th>
+<th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>tag_set_id</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference a differentiation tag set.
+This identifier must not change for the tag set, and must be globally unique.</td>
+</tr>
+<tr>
+<td>course_id</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>The course identifier from courses.csv the tag set will be attached to.</td>
+</tr>
+<tr>
+<td>set_name</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>The name of the differentiation tag set.</td>
+</tr>
+<tr>
+<td>status</td>
+<td>enum</td>
+<td>✓</td>
+<td></td>
+<td>active, deleted</td>
+</tr>
+</table>
+
+Sample:
+
+<pre>tag_set_id,course_id,set_name,status
+TS08,C001,First Tag Set,active
+TS07,C001,TS7,active
+TS10,C001,TS10,deleted
+</pre>
+
+differentiation_tags.csv
+------------
+
+<table class="sis_csv">
+<tr>
+<th>Field Name</th>
+<th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>tag_id</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>A unique identifier used to reference a differentiation tag.
+This identifier must not change for the tag, and must be globally unique.</td>
+</tr>
+<tr>
+<td>tag_set_id</td>
+<td>text</td>
+<td>&#42;</td>
+<td></td>
+<td>The differentiation tag set identifier from differentiation_tag_sets.csv, if none is 
+specified the tag will be created as a single tag.
+</td>
+</tr>
+<tr>
+<td>course_id</td>
+<td>text</td>
+<td>&#42;</td>
+<td></td>
+<td>The course identifier from courses.csv the tag will be created in.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>text</td>
+<td>✓</td>
+<td>✓</td>
+<td>The name of the differentiation tag.</td>
+</tr>
+<tr>
+<td>status</td>
+<td>enum</td>
+<td>✓</td>
+<td></td>
+<td>available, deleted</td>
+</tr>
+</table>
+
+&#42; tag_set_id or course_id is required for new tags.
+
+Sample:
+
+<pre>tag_id,tag_set_id,course_id,name,status
+T01,TS08,,Tag1,available
+T02,,C001,Tag2,available
+T03,,C001,Tag3,deleted
+</pre>
+
+differentiation_tag_membership.csv
+------------
+
+<table class="sis_csv">
+<tr>
+<th>Field Name</th>
+<th>Data Type</th>
+<th>Required</th>
+<th>Sticky</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>tag_id</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>The differentiation tag identifier from differentiation_tags.csv</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>text</td>
+<td>✓</td>
+<td></td>
+<td>The user identifier from users.csv</td>
+</tr>
+<tr>
+<td>status</td>
+<td>enum</td>
+<td>✓</td>
+<td></td>
+<td>accepted, deleted</td>
+</tr>
+</table>
+
+Sample:
+
+<pre>tag_id,user_id,status
+T01,U001,accepted
+T02,U002,accepted
+T03,U003,deleted
+</pre>
+
 xlists.csv
 ----------
 

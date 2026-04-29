@@ -94,3 +94,6 @@
 
 <% js_bundle :authentication_providers %>
 <% js_bundle :ldap_cert_upload %>
+<% if @account.discovery_page_allowed? %>
+  <% js_bundle :discovery_page %>
+<% end %>

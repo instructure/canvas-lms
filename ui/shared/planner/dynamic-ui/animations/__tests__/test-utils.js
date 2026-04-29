@@ -27,15 +27,15 @@ export function mockRegistryEntry(ids, name, date) {
 
 export function mockApp() {
   return {
-    fixedElementForItemScrolling: jest.fn(),
+    fixedElementForItemScrolling: vi.fn(),
   }
 }
 
 export function mockDocument() {
   return {
     activeElement: 'active-element',
-    querySelector: jest.fn(),
-    getElementById: jest.fn(),
+    querySelector: vi.fn(),
+    getElementById: vi.fn(),
     body: {},
   }
 }
@@ -43,8 +43,8 @@ export function mockDocument() {
 export function mockComponent(name, date) {
   return {
     uniqueId: 'unique-id',
-    getFocusable: jest.fn(() => `${name}-focusable`),
-    getScrollable: jest.fn(() => `${name}-scrollable`),
+    getFocusable: vi.fn(() => `${name}-focusable`),
+    getScrollable: vi.fn(() => `${name}-scrollable`),
     props: {
       associated_item: 'Assignment',
       courseName: 'Course X',
@@ -56,37 +56,37 @@ export function mockComponent(name, date) {
 
 export function mockRegistry() {
   return {
-    getComponent: jest.fn(),
-    getLastComponent: jest.fn(),
-    getAllNewActivityIndicatorsSorted: jest.fn(),
-    getAllItemsSorted: jest.fn(),
+    getComponent: vi.fn(),
+    getLastComponent: vi.fn(),
+    getAllNewActivityIndicatorsSorted: vi.fn(),
+    getAllItemsSorted: vi.fn(),
   }
 }
 
 export function mockAnimator() {
   return {
-    getWindow: jest.fn(() => window),
-    focusElement: jest.fn(),
-    elementPositionMemo: jest.fn(),
-    maintainViewportPositionFromMemo: jest.fn(),
-    scrollTo: jest.fn((scrollable, offset, callback) => {
+    getWindow: vi.fn(() => window),
+    focusElement: vi.fn(),
+    elementPositionMemo: vi.fn(),
+    maintainViewportPositionFromMemo: vi.fn(),
+    scrollTo: vi.fn((scrollable, offset, callback) => {
       callback && callback()
     }),
-    forceScrollTo: jest.fn((scrollable, offset, callback) => {
+    forceScrollTo: vi.fn((scrollable, offset, callback) => {
       callback && callback()
     }),
-    scrollToTop: jest.fn(),
-    isAboveScreen: jest.fn(),
-    isBelowScreen: jest.fn(),
-    isOnScreen: jest.fn(),
-    isOffScreen: jest.fn(),
+    scrollToTop: vi.fn(),
+    isAboveScreen: vi.fn(),
+    isBelowScreen: vi.fn(),
+    isOnScreen: vi.fn(),
+    isOffScreen: vi.fn(),
   }
 }
 
 export function mockStore() {
   return {
-    getState: jest.fn(),
-    dispatch: jest.fn(),
+    getState: vi.fn(),
+    dispatch: vi.fn(),
   }
 }
 

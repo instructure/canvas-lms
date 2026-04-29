@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {confirm} from '@instructure/platform-instui-bindings'
 import {LinkInfo} from '@canvas/parse-link-header/parseLinkHeader'
+import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
@@ -62,21 +63,7 @@ const ControlPageSize = 20
 export const ToolAvailability = (props: ToolAvailabilityProps) => {
   const {registration} = useOutletContext<ToolDetailsOutletContext>()
 
-  const [debug, setDebug] = React.useState(false)
-
-  // TODO: Remove this when debug mode is no longer needed
-  // Add keyboard shortcut for CMD+d to toggle debug mode
-  React.useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      // CMD+d (Mac) or CTRL+d (Windows/Linux)
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'd') {
-        e.preventDefault()
-        setDebug(d => !d)
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [])
+  const [creatingDeployment, setCreatingDeployment] = React.useState(false)
 
   const controlsQuery = useInfiniteQuery({
     queryKey: ['fetchControlsByDeployment', registration.id] as [string, LtiRegistrationId],
@@ -111,11 +98,12 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                 <Text
                   dangerouslySetInnerHTML={{
                     __html: I18n.t(
-                      "Control %{app_name}'s availability and exceptions in Canvas, including setting exceptions for specific sub-accounts or courses. You can *view all of your sub-accounts* or consult the documentation for more information.",
+                      "Control %{app_name}'s availability and exceptions in Canvas, including setting exceptions for specific sub-accounts or courses. You can *view all of your sub-accounts* or **consult the documentation** for more information.",
                       {
                         app_name: registration.name,
                         wrappers: [
                           `<a id='view-subaccount-link' href='/accounts/${registration.account_id}/sub_accounts' style='text-decoration: underline'>$1</a>`,
+                          `<a href='https://community.canvaslms.com/t5/Manage-Sub-Account-and-Course/Canvas-Apps-Sub-account-Management-Documentation/ta-p/654086' style='text-decoration: underline' target='_blank' data-pendo='availability-and-exceptions-doc-link'>$1</a>`,
                         ],
                       },
                     ),
@@ -136,15 +124,55 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                       deleteControl={props.deleteContextControl}
                       editControl={props.editContextControl}
                       deleteDeployment={props.deleteDeployment}
-                      debug={debug}
                     />
                   </List.Item>
                 ))}
               </List>
             ) : (
-              <Text fontStyle="italic">
-                {I18n.t('This tool has not been deployed to any sub-accounts or courses.')}
-              </Text>
+              <Alert variant="info" margin="0" renderCloseButtonLabel="">
+                <Flex as="div" margin="0 0 0 0" direction="column">
+                  <Text>
+                    {I18n.t(
+                      "This tool hasn't been deployed to any sub-accounts or courses. To add availability and exceptions, first create a root account–level deployment. By default, the root account level deployment won’t be available to users, but you can adjust this after creation if needed.",
+                    )}
+                  </Text>
+                  <Flex.Item>
+                    <Button
+                      color="primary"
+                      size="small"
+                      margin="small 0 0 0"
+                      display="inline-block"
+                      interaction={creatingDeployment ? 'disabled' : 'enabled'}
+                      onClick={async () => {
+                        setCreatingDeployment(true)
+                        try {
+                          const result = await createDeployment({
+                            registrationId: registration.id,
+                            accountId: props.accountId,
+                            available: false,
+                          })
+                          if (result._type === 'Success') {
+                            controlsQuery.refetch()
+                            showFlashAlert({
+                              type: 'success',
+                              message: I18n.t('Root-level deployment created'),
+                            })
+                          } else {
+                            showFlashAlert({
+                              type: 'error',
+                              message: I18n.t('There was an error when creating the deployment'),
+                            })
+                          }
+                        } finally {
+                          setCreatingDeployment(false)
+                        }
+                      }}
+                    >
+                      {I18n.t('Create Deployment')}
+                    </Button>
+                  </Flex.Item>
+                </Flex>
+              </Alert>
             )}
             {hasNextPage && (
               <Flex as="div" margin="medium 0 0 0" alignItems="center" justifyItems="center">
@@ -157,38 +185,6 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                   {I18n.t('Show More')}
                 </Button>
               </Flex>
-            )}
-            {debug && (
-              <Button
-                onClick={() => {
-                  confirm({
-                    title: 'Create Deployment',
-                    message: 'Are you sure you want to create a deployment?',
-                    confirmButtonLabel: 'Create',
-                    cancelButtonLabel: 'Cancel',
-                  }).then(confirmed => {
-                    if (confirmed) {
-                      // Call the API to create a deployment
-                      createDeployment({
-                        registrationId: registration.id,
-                        accountId: registration.account_id,
-                      }).then(result => {
-                        if (result._type === 'Success') {
-                          // Handle success (e.g., show a success message or refresh the deployments)
-                          controlsQuery.refetch()
-                        } else {
-                          showFlashAlert({
-                            type: 'error',
-                            message: I18n.t('There was an error when creating the deployment.'),
-                          })
-                        }
-                      })
-                    }
-                  })
-                }}
-              >
-                Create Deployment
-              </Button>
             )}
           </>
         )

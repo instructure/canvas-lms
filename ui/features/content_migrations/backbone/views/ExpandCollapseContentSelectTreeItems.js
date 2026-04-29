@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {each, without} from 'lodash'
+import {without, each} from 'es-toolkit/compat'
 import $ from 'jquery'
 
 const linkedResourceTypes = ['assignments', 'quizzes', 'discussion_topics', 'wiki_pages']

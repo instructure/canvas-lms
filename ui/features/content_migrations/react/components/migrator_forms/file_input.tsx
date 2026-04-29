@@ -106,9 +106,7 @@ const MigrationFileInput = ({
             {formLabelText}
           </RequiredFormLabel>
         ) : (
-          <FormLabel htmlFor="migrationFileUpload">
-            {formLabelText}
-          </FormLabel>
+          <FormLabel htmlFor="migrationFileUpload">{formLabelText}</FormLabel>
         )}
       </View>
       <FileDrop

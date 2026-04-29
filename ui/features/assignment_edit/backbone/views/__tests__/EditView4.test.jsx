@@ -32,42 +32,107 @@ import userSettings from '@canvas/user-settings'
 import React from 'react'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
-import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
-import fetchMock from 'fetch-mock'
-// ReactDOM might be required for dynamic rendering in certain scenarios.
-import ReactDOM from 'react-dom'
-import {waitFor} from '@testing-library/react'
 import {createRoot} from 'react-dom/client'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import {getUrlWithHorizonParams} from '@canvas/horizon/utils'
+import {SETTING_MESSAGES} from '@canvas/assignments/react/hooks/useSettingDependency'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 
-jest.mock('jquery-ui', () => {
+// Mock the horizon utils module
+vi.mock('@canvas/horizon/utils', () => ({
+  getUrlWithHorizonParams: vi.fn(),
+}))
+
+vi.mock('jquery-ui', () => {
   const $ = require('jquery')
-  $.widget = jest.fn()
+  $.widget = vi.fn()
   $.ui = {
     mouse: {
-      _mouseInit: jest.fn(),
-      _mouseDestroy: jest.fn(),
+      _mouseInit: vi.fn(),
+      _mouseDestroy: vi.fn(),
     },
-    sortable: jest.fn(),
+    sortable: vi.fn(),
   }
   return $
 })
 
-jest.mock('../../../react/AssetProcessorsForAssignment', () => ({
-  attach: ({container, initialAttachedProcessors, courseId, secureParams}) => {
-    const initialJson = JSON.stringify(initialAttachedProcessors)
-    const el = (
-      <div>
-        AssetProcessorsForAssignment initialAttachedProcessors={initialJson} courseId={courseId}{' '}
-        secureParams=
-        {secureParams}
-      </div>
-    )
-    createRoot(container).render(el)
-  },
-}))
+vi.mock('../../../react/AssetProcessorsForAssignment', () => {
+  const rootMap = new WeakMap()
+  return {
+    attach: ({container, initialAttachedProcessors, courseId, secureParams}) => {
+      const initialJson = JSON.stringify(initialAttachedProcessors)
+      const el = (
+        <div>
+          AssetProcessorsForAssignment initialAttachedProcessors={initialJson} courseId={courseId}{' '}
+          secureParams=
+          {secureParams}
+        </div>
+      )
+
+      // Reuse existing root or create new one
+      let root = rootMap.get(container)
+      if (!root) {
+        root = createRoot(container)
+        rootMap.set(container, root)
+      }
+      root.render(el)
+    },
+  }
+})
+
+// MSW server setup
+const server = setupServer(
+  // Mock all XMLHttpRequest calls to localhost to return empty responses
+  http.all('http://127.0.0.1:80/*', () => {
+    return HttpResponse.json([])
+  }),
+  http.all('http://localhost:80/*', () => {
+    return HttpResponse.json([])
+  }),
+  http.all('http://localhost/*', () => {
+    return HttpResponse.json([])
+  }),
+  // Mock specific API endpoints that might be called
+  http.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, () => {
+    return HttpResponse.json({})
+  }),
+  http.get('/api/v1/courses/1/settings', () => {
+    return HttpResponse.json({})
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/settings/, () => {
+    return HttpResponse.json({})
+  }),
+  http.get('/api/v1/courses/1/sections', () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/sections/, () => {
+    return HttpResponse.json([])
+  }),
+  // Mock GraphQL endpoint
+  http.post(/.*\/api\/graphql/, () => {
+    return HttpResponse.json({})
+  }),
+  // Default handler for other API calls
+  http.all(/\/api\/.*/, () => {
+    return HttpResponse.json([])
+  }),
+)
+
+// Start server before all tests
+beforeAll(() => {
+  server.listen({onUnhandledRequest: 'bypass'})
+})
+
+// Clean up after all tests
+afterAll(() => {
+  server.close()
+})
 
 const s_params = 'some super secure params'
-const currentOrigin = window.location.origin
 
 // Mock RCE initialization
 EditView.prototype._attachEditorToDescription = () => {}
@@ -124,7 +189,7 @@ const createEditView = (assignmentOpts = {}) => {
   return app.render()
 }
 
-describe('EditView', () => {
+describe('EditView - Peer Reviews and Configuration Tools', () => {
   let fixtures
 
   beforeEach(() => {
@@ -137,7 +202,7 @@ describe('EditView', () => {
       <div id="annotated_document_usage_rights_container"></div>
     `
 
-    window.ENV = {
+    fakeEnv.setup({
       AVAILABLE_MODERATORS: [],
       current_user_roles: ['teacher'],
       HAS_GRADED_SUBMISSIONS: false,
@@ -153,12 +218,21 @@ describe('EditView', () => {
       },
       context_asset_string: 'course_1',
       SETTINGS: {},
-    }
+      FEATURES: {},
+      IN_PACED_COURSE: false,
+      DEEP_LINKING_POST_MESSAGE_ORIGIN: window.origin,
+    })
 
-    fetchMock.get('/api/v1/courses/1/settings', {})
-    fetchMock.get('/api/v1/courses/1/sections?per_page=100', [])
-    fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions*/, [])
-    fetchMock.post(/.*\/api\/graphql/, {})
+    // Setup default mock for getUrlWithHorizonParams
+    vi.mocked(getUrlWithHorizonParams).mockImplementation((url, additionalParams) => {
+      if (additionalParams && Object.keys(additionalParams).length > 0) {
+        const separator = url.includes('?') ? '&' : '?'
+        const params = new URLSearchParams(additionalParams).toString()
+        return `${url}${separator}${params}`
+      }
+      return url
+    })
+
     RCELoader.RCE = null
     return RCELoader.loadRCE()
   })
@@ -168,14 +242,15 @@ describe('EditView', () => {
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
-    fetchMock.reset()
-    jest.resetModules()
-    window.ENV = null
+    server.resetHandlers()
+    vi.resetModules()
+    vi.clearAllMocks()
+    fakeEnv.teardown()
   })
 
   describe('Peer Reviews', () => {
     it('does not appear when reviews are being assigned manually', () => {
-      jest.spyOn(userSettings, 'contextGet').mockReturnValue({
+      vi.spyOn(userSettings, 'contextGet').mockReturnValue({
         peer_reviews: '1',
         group_category_id: 1,
       })
@@ -185,10 +260,130 @@ describe('EditView', () => {
     })
 
     it('toggle does not appear when there is no group', () => {
-      jest.spyOn(userSettings, 'contextGet').mockReturnValue({peer_reviews: '1'})
+      vi.spyOn(userSettings, 'contextGet').mockReturnValue({peer_reviews: '1'})
       const view = createEditView()
       view.$el.appendTo($('#fixtures'))
       expect(view.$('#intra_group_peer_reviews').is(':visible')).toBeFalsy()
+    })
+
+    it('does not send re-enable postMessage from handleSubmissionTypeChange when feature flag is off', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
+      const view = createEditView()
+      view.$el.appendTo($('#fixtures'))
+
+      const postMessageSpy = vi.spyOn(window.top, 'postMessage')
+      view.$submissionType.val('online')
+      view.handleSubmissionTypeChange()
+
+      const calls = postMessageSpy.mock.calls.filter(
+        call =>
+          call[0]?.subject === SETTING_MESSAGES.TOGGLE_PEER_REVIEWS && call[0]?.enabled === true,
+      )
+      expect(calls).toHaveLength(0)
+      postMessageSpy.mockRestore()
+    })
+
+    it('sends re-enable postMessage from handleSubmissionTypeChange when feature flag is on', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+      const view = createEditView({peer_review_sub_assignment: {id: '1'}})
+      view.$el.appendTo($('#fixtures'))
+
+      const postMessageSpy = vi.spyOn(window.top, 'postMessage')
+      view.$submissionType.val('online')
+      view.$('#assignment_grading_type').val('points')
+      view.handleSubmissionTypeChange()
+
+      expect(postMessageSpy).toHaveBeenCalledWith(
+        {subject: SETTING_MESSAGES.TOGGLE_PEER_REVIEWS, enabled: true},
+        '*',
+      )
+      postMessageSpy.mockRestore()
+    })
+  })
+
+  describe('External Tool and Peer Review Helpers', () => {
+    describe('#isExternalToolSubmissionType', () => {
+      it('returns true when submission type is external_tool', () => {
+        const view = createEditView()
+        view.$el.appendTo($('#fixtures'))
+        view.$submissionType.val('external_tool')
+        expect(view.isExternalToolSubmissionType()).toBe(true)
+      })
+
+      it('returns false when submission type is online', () => {
+        const view = createEditView()
+        view.$el.appendTo($('#fixtures'))
+        view.$submissionType.val('online')
+        expect(view.isExternalToolSubmissionType()).toBe(false)
+      })
+    })
+
+    describe('#canEnablePeerReviews', () => {
+      it('returns false when moderated grading is enabled', () => {
+        const view = createEditView({moderated_grading: true})
+        view.$el.appendTo($('#fixtures'))
+        view.$('#assignment_grading_type').val('points')
+        view.$submissionType.val('online')
+        expect(view.canEnablePeerReviews()).toBe(false)
+      })
+
+      it('returns false when grading type is not_graded', () => {
+        const view = createEditView()
+        view.$el.appendTo($('#fixtures'))
+        view.$('#assignment_grading_type').val('not_graded')
+        view.$submissionType.val('online')
+        expect(view.canEnablePeerReviews()).toBe(false)
+      })
+
+      it('returns false when submission type is external_tool', () => {
+        const view = createEditView()
+        view.$el.appendTo($('#fixtures'))
+        view.$('#assignment_grading_type').val('points')
+        view.$submissionType.val('external_tool')
+        expect(view.canEnablePeerReviews()).toBe(false)
+      })
+
+      it('returns true when none of the blocking conditions are met', () => {
+        const view = createEditView()
+        view.$el.appendTo($('#fixtures'))
+        view.$('#assignment_grading_type').val('points')
+        view.$submissionType.val('online')
+        expect(view.canEnablePeerReviews()).toBe(true)
+      })
+    })
+  })
+
+  describe('#showGradedPeerReviewSettings', () => {
+    it('returns false when feature flag is disabled', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = false
+      const view = createEditView({peer_reviews: true})
+      view.$el.appendTo($('#fixtures'))
+      expect(view.showGradedPeerReviewSettings()).toBe(false)
+    })
+
+    it('returns true for a new assignment when feature flag is enabled', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+      const view = createEditView()
+      view.$el.appendTo($('#fixtures'))
+      expect(view.showGradedPeerReviewSettings()).toBe(true)
+    })
+
+    it('returns false for a legacy peer review assignment (peer_reviews with no sub_assignment)', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+      const view = createEditView({id: '1', peer_reviews: true})
+      view.$el.appendTo($('#fixtures'))
+      expect(view.showGradedPeerReviewSettings()).toBe(false)
+    })
+
+    it('returns true for a graded peer review assignment (peer_reviews with sub_assignment)', () => {
+      window.ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = true
+      const view = createEditView({
+        id: '1',
+        peer_reviews: true,
+        peer_review_sub_assignment: {id: '1'},
+      })
+      view.$el.appendTo($('#fixtures'))
+      expect(view.showGradedPeerReviewSettings()).toBe(true)
     })
   })
 
@@ -215,6 +410,7 @@ describe('EditView', () => {
 
     it('attaches assignment configuration component', () => {
       const view = createEditView()
+
       expect(view.$similarityDetectionTools.children()).toHaveLength(1)
     })
 
@@ -260,285 +456,6 @@ describe('EditView', () => {
       view.$('#assignment_online_upload').prop('checked', true)
       view.handleSubmissionTypeChange()
       expect(view.$('#similarity_detection_tools').css('display')).toBe('none')
-    })
-  })
-
-  describe('Assignment External Tools', () => {
-    beforeEach(() => {
-      window.ENV.COURSE_ID = 1
-    })
-
-    it('attaches assignment external tools component', () => {
-      const view = createEditView()
-      expect(view.$assignmentExternalTools.children()).toHaveLength(1)
-    })
-
-    it('submission_type_selection modal opens on tool click', () => {
-      window.ENV.context_asset_string = 'course_1'
-      window.ENV.PERMISSIONS = {can_edit_grades: true}
-
-      const view = createEditView()
-      view.$el.appendTo($('#fixtures'))
-
-      const createElementSpy = jest.spyOn(React, 'createElement')
-
-      view.selectedTool = {
-        id: '1',
-        selection_width: '100%',
-        selection_height: '400',
-        title: 'test',
-      }
-      view.handleSubmissionTypeSelectionLaunch()
-
-      expect(createElementSpy).toHaveBeenCalledWith(
-        ExternalToolModalLauncher,
-        expect.objectContaining({isOpen: true}),
-      )
-      createElementSpy.mockRestore()
-    })
-
-    it('submission_type_selection modal closes on deep link postMessage', () => {
-      window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = window.origin
-      window.ENV.context_asset_string = 'course_1'
-      window.ENV.PERMISSIONS = {can_edit_grades: true}
-
-      const view = createEditView()
-      view.$el.appendTo($('#fixtures'))
-
-      const message = {
-        messageType: 'LtiDeepLinkingResponse',
-        content_items: [
-          {
-            type: 'ltiResourceLink',
-            url: 'http://example.com/launch-url',
-          },
-        ],
-      }
-
-      window.postMessage(message, window.origin)
-
-      expect(view.$el).toBeTruthy()
-    })
-  })
-
-  describe('Asset Processors', () => {
-    function createEditViewOnlineSubmission({textEntry, onlineUpload, onlineUrl} = {}) {
-      const view = createEditView()
-      view.$('#assignment_submission_type').val('online')
-      view.$('#assignment_online_upload').prop('checked', !!onlineUpload)
-      view.$('#assignment_text_entry').prop('checked', !!textEntry)
-      view.$('#assignment_online_url').prop('checked', !!onlineUrl)
-      view.handleSubmissionTypeChange()
-      return view
-    }
-
-    it('attaches AssetProcessors component when FF is on', async () => {
-      window.ENV.FEATURES = {lti_asset_processor: true}
-      const view = createEditViewOnlineSubmission({onlineUpload: true})
-      await waitFor(() => {
-        expect(view.$assetProcessorsContainer.children()).toHaveLength(1)
-      })
-      await waitFor(() => {
-        expect(view.$assetProcessorsContainer.text()).toBe(
-          'AssetProcessorsForAssignment initialAttachedProcessors=[] courseId=1 secureParams=some super secure params',
-        )
-      })
-    })
-
-    it('contains the correct initialAttachedProcessors', async () => {
-      window.ENV.FEATURES = {lti_asset_processor: true}
-      window.ENV.ASSET_PROCESSORS = [{id: 1}] // rest of the fields omitted here for brevity
-      const view = createEditViewOnlineSubmission({onlineUpload: true})
-      await waitFor(() => {
-        expect(view.$assetProcessorsContainer.text()).toBe(
-          'AssetProcessorsForAssignment initialAttachedProcessors=[{"id":1}] courseId=1 secureParams=some super secure params',
-        )
-      })
-    })
-
-    it('does not attach AssetProcessors component when FF is off', async () => {
-      window.ENV.FEATURES = {lti_asset_processor: false}
-      const view = createEditViewOnlineSubmission({onlineUpload: true})
-      await waitFor(() => {
-        expect(view.$assetProcessorsContainer.children()).toHaveLength(0)
-      })
-      // Ensure no children are added after the initial render
-      await new Promise(resolve => setTimeout(resolve, 100))
-      expect(view.$assetProcessorsContainer.children()).toHaveLength(0)
-    })
-
-    it('is hidden if submission type does not include online with a file upload', () => {
-      window.ENV.FEATURES = {lti_asset_processor: true}
-      let view = createEditViewOnlineSubmission({onlineUpload: true})
-      expect(view.$assetProcessorsContainer.css('display')).toBe('block')
-
-      view = createEditViewOnlineSubmission({onlineTextEntry: true, onlineUrl: true})
-      expect(view.$assetProcessorsContainer.css('display')).toBe('none')
-    })
-  })
-
-  describe('Description field', () => {
-    it('does not show the description textarea', () => {
-      const view = createEditView({
-        is_quiz_lti_assignment: true,
-        submission_types: ['external_tool'],
-      })
-      view.$el.appendTo($('#fixtures'))
-      view.render()
-      expect(view.$el.find('#assignment_description')).toHaveLength(0)
-    })
-  })
-
-  // These started failing in master after Jan 1, 2025
-  // cf. EGG-444
-  describe.skip('Quizzes 2', () => {
-    beforeEach(() => {
-      window.ENV = {
-        AVAILABLE_MODERATORS: [],
-        current_user_roles: ['teacher'],
-        HAS_GRADED_SUBMISSIONS: false,
-        LOCALE: 'en',
-        MODERATED_GRADING_ENABLED: true,
-        MODERATED_GRADING_MAX_GRADER_COUNT: 2,
-        VALID_DATE_RANGE: {},
-        COURSE_ID: 1,
-        PERMISSIONS: {
-          can_edit_grades: true,
-        },
-        context_asset_string: 'course_1',
-        NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED: true,
-        HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED: true,
-        CANCEL_TO: currentOrigin + '/cancel',
-      }
-    })
-
-    let view
-
-    beforeEach(() => {
-      view = createEditView({
-        html_url: 'http://foo',
-        submission_types: ['external_tool'],
-        is_quiz_lti_assignment: true,
-        frozen_attributes: ['submission_types'],
-        points_possible: '10',
-      })
-    })
-
-    afterEach(() => {
-      document.getElementById('fixtures').innerHTML = ''
-      window.ENV = null
-    })
-
-    it('does not show the description textarea', () => {
-      expect(view.$description).toHaveLength(0)
-    })
-
-    it('does not show the moderated grading checkbox', () => {
-      expect(document.getElementById('assignment_moderated_grading')).toBeNull()
-    })
-
-    it('does not show the load in new tab checkbox', () => {
-      expect(view.$externalToolsNewTab).toHaveLength(0)
-    })
-
-    it('shows the build button', () => {
-      expect(view.$el.find('button.build_button')).toHaveLength(1)
-    })
-
-    it('does not show the "hide_zero_point_quiz" checkbox when "hide_zero_point_quizzes_option" FF is disabled', () => {
-      window.ENV.HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED = false
-      view = createEditView({
-        html_url: 'http://foo',
-        submission_types: ['external_tool'],
-        is_quiz_lti_assignment: true,
-        frozen_attributes: ['submission_types'],
-      })
-
-      expect(view.$hideZeroPointQuizzesBox).toHaveLength(0)
-    })
-
-    it('shows the "hide_zero_point_quiz" checkbox when points possible is 0', () => {
-      view.$assignmentPointsPossible.val(0)
-      view.$assignmentPointsPossible.trigger('change')
-      expect(view.$hideZeroPointQuizzesOption).toHaveLength(1)
-    })
-
-    it('does not show the "hide_zero_point_quiz" checkbox when points possible is not 0', () => {
-      view.$assignmentPointsPossible.val(10)
-      view.$assignmentPointsPossible.trigger('change')
-      expect(view.$hideZeroPointQuizzesOption).toHaveLength(1)
-      expect(view.$hideZeroPointQuizzesOption.css('display')).toBe('none')
-    })
-
-    it('disables and checks "omit_from_final_grade" checkbox when "hide_zero_point_quiz" checkbox is checked', () => {
-      view.$hideZeroPointQuizzesBox.prop('checked', true)
-      view.$hideZeroPointQuizzesBox.trigger('change')
-      expect(view.$omitFromFinalGradeBox.prop('disabled')).toBe(true)
-      expect(view.$omitFromFinalGradeBox.prop('checked')).toBe(true)
-    })
-
-    it('enables and keeps "omit_from_final_grade" checkbox checked when "hide_zero_point_quiz" checkbox is unchecked', () => {
-      view.$hideZeroPointQuizzesBox.prop('checked', true)
-      view.$hideZeroPointQuizzesBox.trigger('change')
-      view.$hideZeroPointQuizzesBox.prop('checked', false)
-      view.$hideZeroPointQuizzesBox.trigger('change')
-      expect(view.$omitFromFinalGradeBox.prop('disabled')).toBe(false)
-      expect(view.$omitFromFinalGradeBox.prop('checked')).toBe(true)
-    })
-
-    it('enables and keeps "omit_from_final_grade" checkbox checked when "hide_zero_point_quiz" checkbox is hidden', () => {
-      view.$hideZeroPointQuizzesBox.prop('checked', true)
-      view.$hideZeroPointQuizzesBox.trigger('change')
-      view.$assignmentPointsPossible.val(10)
-      view.$assignmentPointsPossible.trigger('change')
-      expect(view.$omitFromFinalGradeBox.prop('disabled')).toBe(false)
-      expect(view.$omitFromFinalGradeBox.prop('checked')).toBe(true)
-    })
-
-    it('displays reason for disabling "omit_from_final_grade" checkbox', () => {
-      view.$hideZeroPointQuizzesBox.prop('checked', true)
-      view.$hideZeroPointQuizzesBox.trigger('change')
-      expect(view.$('.accessible_label').text()).toBe(
-        'This is enabled by default as assignments can not be withheld from the gradebook and still count towards it.',
-      )
-    })
-
-    it('save routes to cancelLocation', () => {
-      view.preventBuildNavigation = true
-      expect(view.locationAfterSave({})).toBe(currentOrigin + '/cancel')
-    })
-
-    it('build adds full_width display param to normal route', () => {
-      expect(view.locationAfterSave({})).toBe('http://foo?display=full_width')
-    })
-
-    it('does not allow user to change submission type', () => {
-      expect(view.$('#assignment_submission_type').prop('disabled')).toBe(true)
-    })
-
-    it('does not allow user to change external tool url', () => {
-      expect(view.$('#assignment_external_tool_tag_attributes_url').prop('disabled')).toBe(true)
-    })
-
-    it('does not allow user to choose a new external tool', () => {
-      expect(view.$('#assignment_external_tool_tag_attributes_url_find').prop('disabled')).toBe(
-        true,
-      )
-    })
-  })
-
-  describe('Quiz LTI Assignment', () => {
-    beforeEach(() => {
-      window.ENV.PERMISSIONS = {can_edit_grades: true}
-    })
-
-    it('does not show the description textarea', () => {
-      const view = createEditView({
-        is_quiz_lti_assignment: true,
-        submission_types: ['external_tool'],
-      })
-      view.$el.appendTo($('#fixtures'))
-      expect(view.$el.find('#assignment_description')).toHaveLength(0)
     })
   })
 })

@@ -24,32 +24,6 @@ module Canvas
       # creation of foreign keys until the end of the migration if the table
       # they reference has not yet been created (and will be later in the migration)
       module DeferForeignKeys
-        module TableDefinition
-          def references(*args, foreign_key: false, **options)
-            super
-
-            if foreign_key
-              column = columns.last
-              to_table = column.foreign_key[:to_table]
-              unless @migration.created_tables.include?(to_table.to_s)
-                @migration.deferred_foreign_keys << [name, column.foreign_key]
-                column.foreign_key = nil
-              end
-            end
-          end
-
-          def foreign_key(to_table, **options)
-            super
-
-            fk = foreign_keys.last
-            unless @migration.created_tables.include?(fk.to_table)
-              foreign_keys.pop
-              @migration.deferred_foreign_keys << [name, fk.options.merge(to_table: fk.to_table)]
-            end
-          end
-        end
-        private_constant :TableDefinition
-
         def self.prepended(klass)
           klass.attr_reader :created_tables, :deferred_foreign_keys
           super
@@ -69,15 +43,25 @@ module Canvas
           end
         end
 
-        private
+        def create_table(...)
+          super do |td|
+            yield td if block_given?
 
-        def compatible_table_definition(table_definition)
-          class << table_definition
-            prepend TableDefinition
+            created_tables << td.name
+
+            td.columns.each do |column|
+              if (to_table = column.foreign_key&.dig(:to_table)) && !created_tables.include?(to_table.to_s)
+                deferred_foreign_keys << [td.name, column.foreign_key]
+                column.foreign_key = nil
+              end
+            end
+            td.foreign_keys.reject! do |fk|
+              unless created_tables.include?(fk.to_table)
+                deferred_foreign_keys << [td.name, fk.options.merge(to_table: fk.to_table)]
+                true
+              end
+            end
           end
-          created_tables << table_definition.name
-          table_definition.instance_variable_set(:@migration, self)
-          super
         end
       end
     end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class BlackoutDate < ActiveRecord::Base
+class BlackoutDate < ApplicationRecord
   belongs_to :context, polymorphic: [:account, :course]
   belongs_to :root_account, class_name: "Account"
 
@@ -29,6 +29,7 @@ class BlackoutDate < ActiveRecord::Base
   validate :end_date_not_before_start_date
 
   extend RootAccountResolver
+
   resolves_root_account through: :context
 
   def end_date_not_before_start_date

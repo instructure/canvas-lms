@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Flex } from "@instructure/ui-flex"
-import { Heading } from "@instructure/ui-heading"
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 
 export const HeaderLayout = (props: {
   size: 'small' | 'medium' | 'large'
@@ -26,18 +26,16 @@ export const HeaderLayout = (props: {
 }) => {
   return (
     <Flex
-      as='div'
-      justifyItems='space-between'
+      as="div"
+      justifyItems="space-between"
       direction={props.size === 'large' ? 'row' : 'column'}
-      gap='small'
+      gap="small"
       wrap="wrap"
     >
-      <Flex.Item as='div'>
-        <Heading level='h1'>
-          {props.title}
-        </Heading>
+      <Flex.Item as="div">
+        <Heading level="h1">{props.title}</Heading>
       </Flex.Item>
-      <Flex.Item as='div' overflowY='visible'>
+      <Flex.Item as="div" overflowY="visible">
         {props.actions}
       </Flex.Item>
     </Flex>

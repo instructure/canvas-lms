@@ -23,6 +23,8 @@ class CanvadocSessionsController < ApplicationController
   include CoursesHelper
   include HmacHelper
 
+  skip_before_action :require_user, only: :show
+
   def token_auth_allowed?
     params[:action] == "show"
   end
@@ -89,7 +91,7 @@ class CanvadocSessionsController < ApplicationController
 
     if attachment.canvadocable?
       opts = {
-        preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
+        preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX],
         enable_annotations: blob["enable_annotations"],
         use_cloudfront: true
       }
@@ -121,7 +123,7 @@ class CanvadocSessionsController < ApplicationController
         return render(plain: "unauthorized", status: :unauthorized) if opts[:enrollment_type].blank?
 
         # If we're doing annotations, DocViewer needs additional information to send notifications
-        opts[:canvas_base_url] = assignment.course.root_account.domain
+        opts[:canvas_base_url] = assignment.course.root_account.environment_specific_domain
         opts[:user_id] = @current_user.id
         opts[:submission_user_ids] = submission.group_id ? submission.group.users.pluck(:id) : [submission.user_id]
         opts[:course_id] = assignment.context_id
@@ -159,7 +161,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:annotation_context] = annotation_context_id
       end
       attachment.submit_to_canvadocs(1, **opts) unless attachment.canvadoc_available?
-      attachment.canvadoc.canvadocs_submissions.find_or_create_by(submission_id: submission.id) if submission
+      attachment.canvadoc.canvadocs_submissions.find_or_create_by(submission_id: submission) if submission
 
       url = attachment.canvadoc.session_url(opts.merge(user_session_params))
       # For the purposes of reporting student viewership, we only

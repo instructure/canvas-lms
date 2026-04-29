@@ -18,9 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Auditors::ActiveRecord
-  class CourseRecord < ActiveRecord::Base
+  class CourseRecord < ApplicationRecord
     include Auditors::ActiveRecord::Attributes
     include CanvasPartman::Concerns::Partitioned
+
     self.partitioning_strategy = :by_date
     self.partitioning_interval = :months
     self.partitioning_field = "created_at"

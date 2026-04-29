@@ -24,7 +24,7 @@ class SearchController < ApplicationController
   include SearchHelper
   include Api::V1::Conversation
 
-  before_action :require_user, except: [:all_courses]
+  skip_before_action :require_user, only: [:all_courses]
   before_action :get_context, except: :recipients
 
   def rubrics
@@ -141,6 +141,9 @@ class SearchController < ApplicationController
         )
         recipients << known if known
       elsif params[:context] || params[:search]
+        if @current_user.has_student_enrollment? && @current_user.account.root_account.feature_enabled?(:restrict_student_access)
+          params[:restrict_to_teacher_recipients] = true
+        end
         collections = search_contexts_and_users(params)
 
         recipients = BookmarkedCollection.concat(*collections)
@@ -171,10 +174,10 @@ class SearchController < ApplicationController
     @courses = Course.where(root_account_id: @domain_root_account)
                      .where(indexed: true)
                      .where(workflow_state: "available")
-                     .order("created_at")
+                     .order(:created_at)
     @search = params[:search]
     if @search.present?
-      @courses = @courses.where(@courses.wildcard("name", @search.to_s))
+      @courses = @courses.name_like(@search.to_s)
     end
     @public_only = params[:public_only]
     if @public_only

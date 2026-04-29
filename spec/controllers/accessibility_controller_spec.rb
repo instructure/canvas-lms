@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe AccessibilityController do
   render_views
 
@@ -36,25 +34,24 @@ describe AccessibilityController do
     context "when tab is enabled" do
       before do
         allow_any_instance_of(AccessibilityController).to receive(:tab_enabled?)
-          .with(Course::TAB_ACCESSIBILITY).and_return(true)
+          .with(Course::TAB_ACCESSIBILITY, { no_render: true }).and_return(true)
       end
 
       it "renders the accessibility checker container" do
         get :index, params: { course_id: 42 }
+        expect(assigns[:js_env][:SCAN_DISABLED]).not_to be_nil
         expect(response).to be_successful
-        expect(response.body).to include("accessibility-checker-container")
       end
     end
 
     context "when tab is disabled" do
       before do
         allow_any_instance_of(AccessibilityController).to receive(:tab_enabled?)
-          .with(Course::TAB_ACCESSIBILITY).and_return(false)
+          .with(Course::TAB_ACCESSIBILITY, { no_render: true }).and_return(false)
       end
 
       it "returns nothing if not allowed" do
         get :index, params: { course_id: 42 }
-        expect(response.body).not_to include("accessibility-checker-container")
       end
     end
   end

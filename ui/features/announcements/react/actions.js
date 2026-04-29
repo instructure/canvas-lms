@@ -18,8 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {createActions} from 'redux-actions'
-import isEqual from 'lodash/isEqual'
-import range from 'lodash/range'
+import {isEqual, range} from 'es-toolkit/compat'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 
@@ -29,7 +28,7 @@ import {notificationActions} from '@canvas/notifications/redux/actions'
 
 const I18n = createI18nScope('announcements_v2')
 
-function fetchAnnouncements(dispatch, getState, payload) {
+function fetchAnnouncements(_dispatch, getState, payload) {
   return (resolve, reject) => {
     apiClient
       .getAnnouncements(getState(), payload)
@@ -301,7 +300,7 @@ actions.markAllAnnouncementRead = function () {
       )
       dispatch(actions.markAllAnnouncementsReadSuccess())
       dispatch(actions.getAnnouncements({page: pageState.currentPage, select: true}))
-    } catch (error) {
+    } catch (_error) {
       dispatch(actions.markAllAnnouncementsReadFail())
       dispatch(
         notificationActions.notifyError({message: I18n.t('Failed to mark announcements as read')}),

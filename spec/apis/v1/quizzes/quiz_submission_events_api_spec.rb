@@ -42,16 +42,18 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       end
     end
 
-    events_data = [{
-      "client_timestamp" => Time.zone.now.iso8601,
-      "event_type" => "question_answered",
-      "event_data" => { "question_id" => 1, "answer" => "1" }
-    },
-                   {
-                     "client_timestamp" => Time.zone.now.iso8601,
-                     "event_type" => "question_flagged",
-                     "event_data" => { "question_id" => 2, "flagged" => true }
-                   }]
+    let(:events_data) do
+      [{
+        "client_timestamp" => Time.zone.now.iso8601,
+        "event_type" => "question_answered",
+        "event_data" => { "question_id" => 1, "answer" => "1" }.freeze
+      }.freeze,
+       {
+         "client_timestamp" => Time.zone.now.iso8601,
+         "event_type" => "question_flagged",
+         "event_data" => { "question_id" => 2, "flagged" => true }.freeze
+       }.freeze].freeze
+    end
 
     before :once do
       course_with_teacher active_all: true
@@ -138,6 +140,14 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         api_create({ raw: true }, {})
         assert_status(204)
       end
+
+      it "allows anonymous event submission" do
+        temp_code = "tmp_#{Digest::SHA256.hexdigest("#{Time.now.to_i}_#{rand}")}"
+        @quiz_submission = @quiz.generate_submission(temp_code)
+        @user = nil
+        api_create({ raw: true }, { "quiz_submission_events" => events_data })
+        assert_status(204)
+      end
     end
   end
 
@@ -190,10 +200,10 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         before(:once) do
           student_in_course(course: @course)
           @quiz_submission = @quiz.generate_submission(@student)
-          @quiz_submission.with_versioning(true, &:save!)
+          @quiz_submission.with_versioning(&:save!)
 
           @quiz_submission.attempt = 2
-          @quiz_submission.with_versioning(true, &:save!)
+          @quiz_submission.with_versioning(&:save!)
 
           @quiz_submission.events.create!({ event_type: "a", attempt: 1 })
           @quiz_submission.events.create!({ event_type: "b", attempt: 2 })

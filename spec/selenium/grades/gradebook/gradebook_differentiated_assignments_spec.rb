@@ -19,6 +19,7 @@
 
 require_relative "../../helpers/gradebook_common"
 require_relative "../pages/gradebook_page"
+require_relative "../pages/gradebook_cells_page"
 
 # NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
 # easiest way to review, and will be the easiest to remove after the feature flag is
@@ -33,6 +34,12 @@ shared_examples "Gradebook" do |ff_enabled|
       Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
     else
       Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
+  end
+
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
     end
   end
 
@@ -56,23 +63,23 @@ shared_examples "Gradebook" do |ff_enabled|
 
     it "grays out cells" do
       Gradebook.visit(@course)
+      expect(f("#gradebook_grid .container_1")).to be_displayed
       # student 3, assignment 4
-      selector = "#gradebook_grid .container_1 .slick-row:nth-child(3) .b4"
-      cell = f(selector)
+      cell = Gradebook::Cells.grading_cell(@student_3, @da_assignment)
       expect(cell.find_element(:css, ".gradebook-cell")).to have_class("grayed-out")
       cell.click
       expect(cell).not_to contain_css(".grade")
       # student 2, assignment 4 (not grayed out)
-      cell = f("#gradebook_grid .container_1 .slick-row:nth-child(2) .b4")
+      cell = Gradebook::Cells.grading_cell(@student_2, @da_assignment)
       expect(cell.find_element(:css, ".gradebook-cell")).not_to have_class("grayed-out")
     end
 
     it "grays out cells after removing an override which removes visibility" do
-      selector = "#gradebook_grid .container_1 .slick-row:nth-child(1) .b4"
       @da_assignment.grade_student(@student_1, grade: 42, grader: @teacher)
       @override.destroy
       Gradebook.visit(@course)
-      cell = f(selector)
+      expect(f("#gradebook_grid .container_1")).to be_displayed
+      cell = Gradebook::Cells.grading_cell(@student_1, @da_assignment)
       expect(cell.find_element(:css, ".gradebook-cell")).to have_class("grayed-out")
     end
 
@@ -89,9 +96,10 @@ shared_examples "Gradebook" do |ff_enabled|
       override.assignment_override_students.create!(user: @student_1)
       module1.add_item(id: assignment.id, type: "assignment")
       Gradebook.visit(@course)
-      student1_cell = f("#gradebook_grid .container_1 .slick-row:nth-child(1) .b5 .gradebook-cell")
-      student2_cell = f("#gradebook_grid .container_1 .slick-row:nth-child(2) .b5 .gradebook-cell")
-      student3_cell = f("#gradebook_grid .container_1 .slick-row:nth-child(3) .b5 .gradebook-cell")
+      expect(f("#gradebook_grid .container_1")).to be_displayed
+      student1_cell = Gradebook::Cells.grading_cell(@student_1, assignment).find_element(:css, ".gradebook-cell")
+      student2_cell = Gradebook::Cells.grading_cell(@student_2, assignment).find_element(:css, ".gradebook-cell")
+      student3_cell = Gradebook::Cells.grading_cell(@student_3, assignment).find_element(:css, ".gradebook-cell")
       expect(student1_cell).not_to have_class("grayed-out")
       expect(student2_cell).to have_class("grayed-out")
       expect(student3_cell).to have_class("grayed-out")

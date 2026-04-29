@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {render, screen} from '@testing-library/react'
 import DiscussionTopicTitleContainer from '../DiscussionTopicTitleContainer'
 
@@ -25,14 +26,13 @@ const defaultProps = () => ({
 
 describe('DiscussionTopicTitleContainer', () => {
   describe('instui_nav feature flag is enabled', () => {
-    const oldEnv = window.ENV
 
     beforeAll(() => {
-      window.ENV = {FEATURES: {instui_nav: true}}
+      fakeENV.setup({FEATURES: {instui_nav: true}})
     })
 
     afterAll(() => {
-      window.ENV = oldEnv
+      fakeENV.teardown()
     })
 
     it('renders title', () => {

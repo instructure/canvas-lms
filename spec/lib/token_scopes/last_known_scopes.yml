@@ -1,5 +1,7 @@
 ---
 - verb: GET
+  path: '/accounts/:account_id/files/:file_id/download'
+- verb: GET
   path: '/api/sis/accounts/:account_id/assignments'
 - verb: GET
   path: '/api/sis/courses/:course_id/assignments'
@@ -15,6 +17,8 @@
   path: '/api/v1/account_calendars/:account_id'
 - verb: GET
   path: '/api/v1/accounts'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/accessibility_issue_summary'
 - verb: GET
   path: '/api/v1/accounts/:account_id/account_calendars'
 - verb: PUT
@@ -40,11 +44,11 @@
 - verb: GET
   path: '/api/v1/accounts/:account_id/app_center/apps'
 - verb: GET
-  path: '/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews'
-- verb: GET
-  path: '/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews/self'
+  path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
 - verb: POST
-  path: '/api/v1/accounts/:account_id/app_center/apps/:app_id/reviews/self'
+  path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/asset_processors/tii_migrations/migrate_all'
 - verb: GET
   path: '/api/v1/accounts/:account_id/authentication_providers'
 - verb: POST
@@ -75,6 +79,8 @@
   path: '/api/v1/accounts/:account_id/bounced_communication_channels.csv'
 - verb: POST
   path: '/api/v1/accounts/:account_id/bounced_communication_channels/reset'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/brand_variables'
 - verb: POST
   path: /api/v1/accounts/:account_id/bulk_enrollment
 - verb: GET
@@ -126,6 +132,8 @@
 - verb: POST
   path: '/api/v1/accounts/:account_id/developer_keys/:developer_key_id/developer_key_account_bindings'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/developer_keys/lookup_utids'
+- verb: GET
   path: '/api/v1/accounts/:account_id/enrollments/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/external_tools'
@@ -151,6 +159,8 @@
   path: '/api/v1/accounts/:account_id/external_tools/top_nav_favorites/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/features'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/features/early_access_program'
 - verb: GET
   path: '/api/v1/accounts/:account_id/features/enabled'
 - verb: DELETE
@@ -180,6 +190,8 @@
 - verb: DELETE
   path: '/api/v1/accounts/:account_id/grading_standards/:grading_standard_id'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/grading_standards/:grading_standard_id'
+- verb: PUT
   path: '/api/v1/accounts/:account_id/grading_standards/:grading_standard_id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/group_categories'
@@ -223,12 +235,24 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:id'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/lti_registrations/:id'
+- verb: DELETE
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/bind'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/bind'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/history'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/install_from_template'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/latest_update_request'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/overlay_history'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/reset'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id'
+- verb: PUT
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/update_requests/:update_request_id/apply'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/controls'
 - verb: DELETE
@@ -251,8 +275,14 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id/controls'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/by_utid/:utid'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/check_domain_duplicates'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/install_status/:client_id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/outcome_group_links'
 - verb: GET
@@ -263,10 +293,6 @@
   path: '/api/v1/accounts/:account_id/outcome_groups/:id'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/outcome_groups/:id'
-- verb: GET
-  path: '/api/v1/accounts/:account_id/outcome_groups/:id/available_outcomes'
-- verb: POST
-  path: '/api/v1/accounts/:account_id/outcome_groups/:id/batch'
 - verb: POST
   path: '/api/v1/accounts/:account_id/outcome_groups/:id/import'
 - verb: GET
@@ -323,6 +349,8 @@
   path: '/api/v1/accounts/:account_id/roles/:id'
 - verb: POST
   path: '/api/v1/accounts/:account_id/roles/:id/activate'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/roles/permissions'
 - verb: GET
   path: '/api/v1/accounts/:account_id/root_outcome_group'
 - verb: GET
@@ -522,11 +550,17 @@
 - verb: POST
   path: '/api/v1/canvadoc_session'
 - verb: GET
+  path: '/api/v1/career/enabled'
+- verb: GET
   path: '/api/v1/career/experience_summary'
 - verb: POST
   path: '/api/v1/career/switch_experience'
 - verb: POST
   path: '/api/v1/career/switch_role'
+- verb: DELETE
+  path: '/api/v1/career/user_experiences'
+- verb: POST
+  path: '/api/v1/career/user_experiences'
 - verb: GET
   path: '/api/v1/collaborations/:id/members'
 - verb: GET
@@ -576,15 +610,47 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/activity_stream/summary'
 - verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations'
+- verb: DELETE
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/evaluation'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages'
+- verb: POST
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages/:message_id/feedback'
+- verb: DELETE
+  path: '/api/v1/courses/:course_id/ai_experiences/:ai_experience_id/conversations/:id/messages/:message_id/feedback/:feedback_id'
+- verb: DELETE
+  path: '/api/v1/courses/:course_id/ai_experiences/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:id'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/ai_experiences/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:id/ai_conversations'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:id/ai_conversations/:conversation_id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/:id/edit'
+- verb: GET
+  path: '/api/v1/courses/:course_id/ai_experiences/new'
+- verb: GET
   path: '/api/v1/courses/:course_id/all_quizzes'
+- verb: POST
+  path: '/api/v1/courses/:course_id/announcements/:announcement_id/accessibility/queue_scan'
+- verb: POST
+  path: '/api/v1/courses/:course_id/announcements/:announcement_id/accessibility/scan'
 - verb: GET
   path: '/api/v1/courses/:course_id/app_center/apps'
-- verb: GET
-  path: '/api/v1/courses/:course_id/app_center/apps/:app_id/reviews'
-- verb: GET
-  path: '/api/v1/courses/:course_id/app_center/apps/:app_id/reviews/self'
-- verb: POST
-  path: '/api/v1/courses/:course_id/app_center/apps/:app_id/reviews/self'
 - verb: PUT
   path: '/api/v1/courses/:course_id/apply_score_to_ungraded_submissions'
 - verb: POST
@@ -605,6 +671,12 @@
   path: '/api/v1/courses/:course_id/assignments'
 - verb: POST
   path: '/api/v1/courses/:course_id/assignments'
+- verb: POST
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/accessibility/queue_scan'
+- verb: POST
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/accessibility/scan'
+- verb: POST
+  path: '/api/v1/courses/:course_id/assignments/:assignment_id/allocate'
 - verb: GET
   path: '/api/v1/courses/:course_id/assignments/:assignment_id/anonymous_provisional_grades/status'
 - verb: GET
@@ -766,9 +838,13 @@
 - verb: PUT
   path: '/api/v1/courses/:course_id/blueprint_templates/:template_id/update_associations'
 - verb: GET
+  path: '/api/v1/courses/:course_id/brand_variables'
+- verb: GET
   path: '/api/v1/courses/:course_id/bulk_student_enrollments/student_bulk_pace_edit_view'
 - verb: GET
   path: '/api/v1/courses/:course_id/bulk_user_progress'
+- verb: GET
+  path: '/api/v1/courses/:course_id/bulk_user_tags'
 - verb: GET
   path: '/api/v1/courses/:course_id/calendar_events/timetable'
 - verb: POST
@@ -885,6 +961,10 @@
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id'
+- verb: POST
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/accessibility/queue_scan'
+- verb: POST
+  path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/accessibility/scan'
 - verb: POST
   path: '/api/v1/courses/:course_id/discussion_topics/:topic_id/duplicate'
 - verb: GET
@@ -1018,6 +1098,8 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/folders/:id'
 - verb: GET
+  path: '/api/v1/courses/:course_id/folders/:id/duplicates'
+- verb: GET
   path: '/api/v1/courses/:course_id/folders/by_path'
 - verb: GET
   path: '/api/v1/courses/:course_id/folders/by_path/*full_path'
@@ -1069,16 +1151,24 @@
   path: '/api/v1/courses/:course_id/grading_standards/:grading_standard_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/grading_standards/:grading_standard_id'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/grading_standards/:grading_standard_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/group_categories'
 - verb: POST
   path: '/api/v1/courses/:course_id/group_categories'
 - verb: POST
   path: '/api/v1/courses/:course_id/group_categories/bulk_manage_differentiation_tag'
+- verb: GET
+  path: '/api/v1/courses/:course_id/group_categories/export_tags'
 - verb: POST
   path: '/api/v1/courses/:course_id/group_categories/import_tags'
 - verb: GET
   path: '/api/v1/courses/:course_id/groups'
+- verb: GET
+  path: '/api/v1/courses/:course_id/learning_mastery_gradebook_settings'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/learning_mastery_gradebook_settings'
 - verb: GET
   path: '/api/v1/courses/:course_id/link_validation'
 - verb: POST
@@ -1195,10 +1285,6 @@
   path: '/api/v1/courses/:course_id/outcome_groups/:id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/outcome_groups/:id'
-- verb: GET
-  path: '/api/v1/courses/:course_id/outcome_groups/:id/available_outcomes'
-- verb: POST
-  path: '/api/v1/courses/:course_id/outcome_groups/:id/batch'
 - verb: POST
   path: '/api/v1/courses/:course_id/outcome_groups/:id/import'
 - verb: GET
@@ -1222,6 +1308,8 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/outcome_imports/:id/created_group_ids'
 - verb: GET
+  path: '/api/v1/courses/:course_id/outcome_mastery_distribution'
+- verb: GET
   path: '/api/v1/courses/:course_id/outcome_proficiency'
 - verb: POST
   path: '/api/v1/courses/:course_id/outcome_proficiency'
@@ -1229,6 +1317,8 @@
   path: '/api/v1/courses/:course_id/outcome_results'
 - verb: GET
   path: '/api/v1/courses/:course_id/outcome_rollups'
+- verb: GET
+  path: '/api/v1/courses/:course_id/outcomes/:outcome_id/contributing_scores'
 - verb: GET
   path: '/api/v1/courses/:course_id/pace_contexts'
 - verb: GET
@@ -1243,6 +1333,10 @@
   path: '/api/v1/courses/:course_id/pages/:url_or_id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/pages/:url_or_id'
+- verb: POST
+  path: '/api/v1/courses/:course_id/pages/:url_or_id/accessibility/queue_scan'
+- verb: POST
+  path: '/api/v1/courses/:course_id/pages/:url_or_id/accessibility/scan'
 - verb: GET
   path: '/api/v1/courses/:course_id/pages/:url_or_id/date_details'
 - verb: PUT
@@ -1259,6 +1353,8 @@
   path: '/api/v1/courses/:course_id/pages/:url_or_id/revisions/:revision_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/pages/:url_or_id/revisions/latest'
+- verb: POST
+  path: '/api/v1/courses/:course_id/pages_ai/alt_text'
 - verb: GET
   path: '/api/v1/courses/:course_id/permissions'
 - verb: POST
@@ -1295,6 +1391,8 @@
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/date_details/convert_tag_overrides'
 - verb: POST
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/extensions'
+- verb: GET
+  path: '/api/v1/courses/:course_id/quizzes/:quiz_id/groups'
 - verb: POST
   path: '/api/v1/courses/:course_id/quizzes/:quiz_id/groups'
 - verb: DELETE
@@ -1363,6 +1461,8 @@
   path: '/api/v1/courses/:course_id/reports/:report_type/:id'
 - verb: POST
   path: '/api/v1/courses/:course_id/reset_content'
+- verb: POST
+  path: '/api/v1/courses/:course_id/restore/:version_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/root_outcome_group'
 - verb: POST
@@ -1443,6 +1543,10 @@
   path: '/api/v1/courses/:course_id/submissions/bulk_mark_read'
 - verb: POST
   path: '/api/v1/courses/:course_id/submissions/update_grades'
+- verb: POST
+  path: '/api/v1/courses/:course_id/syllabus/accessibility/queue_scan'
+- verb: POST
+  path: '/api/v1/courses/:course_id/syllabus/accessibility/scan'
 - verb: GET
   path: '/api/v1/courses/:course_id/tabs'
 - verb: PUT
@@ -1467,6 +1571,8 @@
   path: '/api/v1/courses/:course_id/users'
 - verb: GET
   path: '/api/v1/courses/:course_id/users/:id'
+- verb: GET
+  path: '/api/v1/courses/:course_id/users/:id/lmgb_user_details'
 - verb: PUT
   path: '/api/v1/courses/:course_id/users/:user_id/last_attended'
 - verb: GET
@@ -1477,12 +1583,16 @@
   path: '/api/v1/courses/:course_id/web_zip_exports/:id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/what_if_grades/reset'
+- verb: GET
+  path: '/api/v1/courses/:course_id/youtube_migration/conversion_status'
 - verb: POST
   path: '/api/v1/courses/:course_id/youtube_migration/convert'
 - verb: GET
   path: '/api/v1/courses/:course_id/youtube_migration/scan'
 - verb: POST
   path: '/api/v1/courses/:course_id/youtube_migration/scan'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/youtube_migration/scan/:scan_id'
 - verb: DELETE
   path: '/api/v1/courses/:id'
 - verb: GET
@@ -1500,13 +1610,19 @@
 - verb: PUT
   path: '/api/v1/courses/:id/quizzes'
 - verb: GET
-  path: '/api/v1/crocodoc_session'
-- verb: GET
   path: '/api/v1/dashboard/dashboard_cards'
 - verb: DELETE
   path: '/api/v1/developer_keys/:id'
 - verb: PUT
   path: '/api/v1/developer_keys/:id'
+- verb: GET
+  path: '/api/v1/discovery_pages'
+- verb: PUT
+  path: '/api/v1/discovery_pages'
+- verb: POST
+  path: '/api/v1/discovery_pages/token'
+- verb: POST
+  path: '/api/v1/enqueue_outcome_rollup_calculation'
 - verb: PUT
   path: '/api/v1/eportfolios/:eportfolio_id/moderate'
 - verb: GET
@@ -1548,6 +1664,8 @@
 - verb: POST
   path: '/api/v1/files/capture'
 - verb: POST
+  path: '/api/v1/files/update_word_count'
+- verb: POST
   path: '/api/v1/folders/:dest_folder_id/copy_file'
 - verb: POST
   path: '/api/v1/folders/:dest_folder_id/copy_folder'
@@ -1573,10 +1691,6 @@
   path: '/api/v1/global/outcome_groups/:id'
 - verb: PUT
   path: '/api/v1/global/outcome_groups/:id'
-- verb: GET
-  path: '/api/v1/global/outcome_groups/:id/available_outcomes'
-- verb: POST
-  path: '/api/v1/global/outcome_groups/:id/batch'
 - verb: POST
   path: '/api/v1/global/outcome_groups/:id/import'
 - verb: GET
@@ -1686,6 +1800,10 @@
 - verb: PUT
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id'
 - verb: POST
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/accessibility/queue_scan'
+- verb: POST
+  path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/accessibility/scan'
+- verb: POST
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/duplicate'
 - verb: GET
   path: '/api/v1/groups/:group_id/discussion_topics/:topic_id/entries'
@@ -1766,6 +1884,8 @@
 - verb: GET
   path: '/api/v1/groups/:group_id/folders/:id'
 - verb: GET
+  path: '/api/v1/groups/:group_id/folders/:id/duplicates'
+- verb: GET
   path: '/api/v1/groups/:group_id/folders/by_path'
 - verb: GET
   path: '/api/v1/groups/:group_id/folders/by_path/*full_path'
@@ -1773,10 +1893,6 @@
   path: '/api/v1/groups/:group_id/folders/media'
 - verb: GET
   path: '/api/v1/groups/:group_id/folders_and_files'
-- verb: DELETE
-  path: '/api/v1/groups/:group_id/followers/self'
-- verb: PUT
-  path: '/api/v1/groups/:group_id/followers/self'
 - verb: GET
   path: '/api/v1/groups/:group_id/front_page'
 - verb: PUT
@@ -1817,6 +1933,8 @@
   path: '/api/v1/groups/:group_id/pages/:url_or_id/revisions/:revision_id'
 - verb: GET
   path: '/api/v1/groups/:group_id/pages/:url_or_id/revisions/latest'
+- verb: POST
+  path: '/api/v1/groups/:group_id/pages_ai/alt_text'
 - verb: GET
   path: '/api/v1/groups/:group_id/permissions'
 - verb: GET
@@ -1829,6 +1947,8 @@
   path: '/api/v1/groups/:group_id/usage_rights'
 - verb: PUT
   path: '/api/v1/groups/:group_id/usage_rights'
+- verb: DELETE
+  path: '/api/v1/groups/:group_id/users'
 - verb: GET
   path: '/api/v1/groups/:group_id/users'
 - verb: DELETE
@@ -1837,6 +1957,8 @@
   path: '/api/v1/groups/:group_id/users/:user_id'
 - verb: PUT
   path: '/api/v1/groups/:group_id/users/:user_id'
+- verb: GET
+  path: '/api/v1/horizon_accounts'
 - verb: GET
   path: '/api/v1/immersive_reader/authenticate'
 - verb: POST
@@ -1887,6 +2009,8 @@
   path: '/api/v1/media_attachments'
 - verb: PUT
   path: '/api/v1/media_attachments/:attachment_id'
+- verb: POST
+  path: '/api/v1/media_attachments/:attachment_id/asr'
 - verb: GET
   path: '/api/v1/media_attachments/:attachment_id/media_tracks'
 - verb: PUT
@@ -1897,16 +2021,26 @@
   path: '/api/v1/media_objects'
 - verb: PUT
   path: '/api/v1/media_objects/:media_object_id'
+- verb: POST
+  path: '/api/v1/media_objects/:media_object_id/asr'
 - verb: GET
   path: '/api/v1/media_objects/:media_object_id/media_tracks'
 - verb: PUT
   path: '/api/v1/media_objects/:media_object_id/media_tracks'
+- verb: DELETE
+  path: '/api/v1/microfrontends/release_tag_override'
+- verb: GET
+  path: '/api/v1/microfrontends/release_tag_override'
 - verb: DELETE
   path: '/api/v1/outcomes/:id'
 - verb: GET
   path: '/api/v1/outcomes/:id'
 - verb: PUT
   path: '/api/v1/outcomes/:id'
+- verb: GET
+  path: '/api/v1/permissions/:context_type/:permission/help'
+- verb: GET
+  path: '/api/v1/permissions/groups'
 - verb: GET
   path: '/api/v1/planner/items'
 - verb: GET
@@ -1980,6 +2114,12 @@
 - verb: POST
   path: '/api/v1/progress/:id/cancel'
 - verb: GET
+  path: '/api/v1/question_banks'
+- verb: GET
+  path: '/api/v1/question_banks/:id'
+- verb: GET
+  path: '/api/v1/question_banks/:id/questions'
+- verb: GET
   path: '/api/v1/quiz_submissions/:quiz_submission_id/questions'
 - verb: POST
   path: '/api/v1/quiz_submissions/:quiz_submission_id/questions'
@@ -2009,8 +2149,6 @@
   path: '/api/v1/release_notes/latest'
 - verb: GET
   path: '/api/v1/release_notes/unread_count'
-- verb: POST
-  path: '/api/v1/rich_content/generate'
 - verb: GET
   path: '/api/v1/rubrics/upload_template'
 - verb: GET
@@ -2031,6 +2169,8 @@
   path: '/api/v1/sections/:id/crosslist'
 - verb: POST
   path: '/api/v1/sections/:id/crosslist/:new_course_id'
+- verb: GET
+  path: '/api/v1/sections/:id/users'
 - verb: GET
   path: '/api/v1/sections/:section_id/assignments/:assignment_id/anonymous_submissions/:anonymous_id'
 - verb: PUT
@@ -2101,12 +2241,12 @@
   path: '/api/v1/show_k5_dashboard'
 - verb: PUT
   path: '/api/v1/submissions/:id/what_if_grades'
+- verb: POST
+  path: '/api/v1/support_helpers/asset_processor/bulk_resubmit'
 - verb: GET
   path: '/api/v1/support_helpers/asset_processor/submission_details'
-- verb: GET
-  path: '/api/v1/support_helpers/crocodoc/shard'
-- verb: GET
-  path: '/api/v1/support_helpers/crocodoc/submission'
+- verb: POST
+  path: '/api/v1/support_helpers/asset_processor_discussion/bulk_resubmit'
 - verb: GET
   path: '/api/v1/support_helpers/plagiarism_platform/add_service'
 - verb: GET
@@ -2127,6 +2267,8 @@
   path: '/api/v1/support_helpers/turnitin/refresh_lti_attachment'
 - verb: GET
   path: '/api/v1/support_helpers/turnitin/shard'
+- verb: GET
+  path: '/api/v1/temporary_enrollment_status'
 - verb: DELETE
   path: '/api/v1/users/:id'
 - verb: GET
@@ -2249,6 +2391,10 @@
   path: '/api/v1/users/:user_id/custom_data(/*scope)'
 - verb: PUT
   path: '/api/v1/users/:user_id/custom_data(/*scope)'
+- verb: POST
+  path: '/api/v1/users/:user_id/educator_accessibility_course_scan'
+- verb: GET
+  path: '/api/v1/users/:user_id/educator_accessibility_course_statistics'
 - verb: GET
   path: '/api/v1/users/:user_id/enrollments'
 - verb: GET
@@ -2280,23 +2426,19 @@
 - verb: GET
   path: '/api/v1/users/:user_id/folders/:id'
 - verb: GET
+  path: '/api/v1/users/:user_id/folders/:id/duplicates'
+- verb: GET
   path: '/api/v1/users/:user_id/folders/by_path'
 - verb: GET
   path: '/api/v1/users/:user_id/folders/by_path/*full_path'
 - verb: GET
   path: '/api/v1/users/:user_id/folders_and_files'
-- verb: DELETE
-  path: '/api/v1/users/:user_id/followers/self'
-- verb: PUT
-  path: '/api/v1/users/:user_id/followers/self'
 - verb: GET
   path: '/api/v1/users/:user_id/history'
 - verb: GET
   path: '/api/v1/users/:user_id/logins'
 - verb: DELETE
   path: '/api/v1/users/:user_id/logins/:id'
-- verb: POST
-  path: '/api/v1/users/:user_id/logins/:id/migrate_login_attribute'
 - verb: GET
   path: '/api/v1/users/:user_id/missing_submissions'
 - verb: GET
@@ -2333,6 +2475,12 @@
   path: '/api/v1/users/:user_id/observers/:observer_id'
 - verb: GET
   path: '/api/v1/users/:user_id/page_views'
+- verb: POST
+  path: '/api/v1/users/:user_id/page_views/query'
+- verb: GET
+  path: '/api/v1/users/:user_id/page_views/query/:query_id'
+- verb: GET
+  path: '/api/v1/users/:user_id/page_views/query/:query_id/results'
 - verb: GET
   path: '/api/v1/users/:user_id/planner/items'
 - verb: GET
@@ -2354,9 +2502,17 @@
 - verb: PUT
   path: '/api/v1/users/:user_id/usage_rights'
 - verb: GET
+  path: '/api/v1/users/:user_id/user_generated_tokens'
+- verb: GET
   path: '/api/v1/users/activity_stream'
 - verb: DELETE
   path: '/api/v1/users/mobile_sessions'
+- verb: POST
+  path: '/api/v1/users/page_views/query'
+- verb: GET
+  path: '/api/v1/users/page_views/query/:query_id'
+- verb: GET
+  path: '/api/v1/users/page_views/query/:query_id/results'
 - verb: POST
   path: '/api/v1/users/reset_password'
 - verb: DELETE
@@ -2427,4 +2583,19 @@
   path: '/api/v1/users/self/todo_item_count'
 - verb: GET
   path: '/api/v1/users/self/upcoming_events'
-
+- verb: GET
+  path: '/assessment_questions/:assessment_question_id/files/:file_id/download'
+- verb: GET
+  path: '/assignments/:assignment_id/files/:id/download'
+- verb: GET
+  path: '/courses/:course_id/files/:file_id/download'
+- verb: GET
+  path: '/files/:file_id/download'
+- verb: GET
+  path: '/groups/:group_id/files/:file_id/download'
+- verb: GET
+  path: '/quiz_statistics/:quiz_statistics_id/files/:file_id/download'
+- verb: GET
+  path: '/quizzes/quiz_submissions/:quiz_submission_id/files/:file_id/download'
+- verb: GET
+  path: '/users/:user_id/files/:file_id/download'

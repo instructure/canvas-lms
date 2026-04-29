@@ -140,7 +140,7 @@ describe Conversation do
 
       new_guy = user_factory
       expect { root_convo.add_participants(sender, [new_guy]) }.not_to raise_error
-      expect(root_convo.participants(true).size).to eq 3
+      expect(root_convo.participants(reload: true).size).to eq 3
 
       convo = new_guy.conversations.first
       expect(convo.unread?).to be_truthy
@@ -211,7 +211,7 @@ describe Conversation do
           expect(conversation.conversation_participants.reload.size).to eq 4
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
           expect(users.last.all_conversations.last.shard).to eq @shard1
-          expect(conversation.participants(true).map(&:id)).to eq users.map(&:id)
+          expect(conversation.participants(reload: true).map(&:id)).to eq users.map(&:id)
         end
         @shard2.activate do
           users << user_factory(name: "e")
@@ -219,7 +219,7 @@ describe Conversation do
           expect(conversation.conversation_participants.reload.size).to eq 5
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
           expect(users.last.all_conversations.last.shard).to eq @shard2
-          expect(conversation.participants(true).map(&:id)).to eq users.map(&:id)
+          expect(conversation.participants(reload: true).map(&:id)).to eq users.map(&:id)
         end
       end
     end
@@ -265,11 +265,11 @@ describe Conversation do
       end
     end
 
-    include_examples "message counts"
+    it_behaves_like "message counts"
 
     context "sharding" do
       specs_require_sharding
-      include_examples "message counts"
+      it_behaves_like "message counts"
     end
   end
 
@@ -366,10 +366,10 @@ describe Conversation do
       end
     end
 
-    include_examples "unread counts"
+    it_behaves_like "unread counts"
     context "sharding" do
       specs_require_sharding
-      include_examples "unread counts"
+      it_behaves_like "unread counts"
     end
   end
 
@@ -1124,7 +1124,7 @@ describe Conversation do
     expect(ConversationMessage.where(conversation_id: source)).to eq []
 
     target.reload
-    expect(target.participants(true).map(&:id)).to eq [sender.id, target_user.id]
+    expect(target.participants(reload: true).map(&:id)).to eq [sender.id, target_user.id]
     expect(target_user.reload.all_conversations.map(&:conversation)).to eq [target]
     cp = target_user.all_conversations.first
     expect(cp.messages.length).to eq message_count

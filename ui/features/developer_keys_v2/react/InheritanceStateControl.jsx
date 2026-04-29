@@ -17,12 +17,13 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {getActiveCanvasTheme} from '@canvas/react'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {confirm} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('react_developer_keys')
 
@@ -52,6 +53,9 @@ export default class DeveloperKeyStateControl extends React.Component {
             keyName,
           })
         : I18n.t('Are you sure you want to change the state of this developer key?'),
+      cancelButtonLabel: I18n.t('Cancel'),
+      closeButtonLabel: I18n.t('Close'),
+      theme: getActiveCanvasTheme(),
     })
   }
 
@@ -82,6 +86,15 @@ export default class DeveloperKeyStateControl extends React.Component {
   }
 
   radioGroupValue() {
+    if (
+      ENV.FEATURES?.lti_deactivate_registrations &&
+      this.props.developerKey.is_lti_key &&
+      !this.isSiteAdmin() &&
+      !this.props.inheritedTab
+    ) {
+      return this.props.developerKey.lti_registration_workflow_state === 'active' ? 'on' : 'off'
+    }
+
     const devKeyBinding = this.props.developerKey.developer_key_account_binding
     if (devKeyBinding) {
       return devKeyBinding.workflow_state || 'allow'
@@ -137,7 +150,7 @@ export default class DeveloperKeyStateControl extends React.Component {
             <ScreenReaderContent>{I18n.t('Key state for the current account')}</ScreenReaderContent>
           }
           onChange={(e, val) => this.setBindingState(val)}
-          disabled={this.isDisabled()}
+          disabled={this.isDisabled() || ENV.devKeysReadOnly}
           name={this.props.developerKey.id}
           value={this.radioGroupValue()}
         >
@@ -202,8 +215,8 @@ export default class DeveloperKeyStateControl extends React.Component {
           checked={this.radioGroupValue() === 'on'}
           disabled={this.isDisabled()}
           name={this.props.developerKey.id}
-          onChange={e => {
-            const newValue = e.target.checked ? 'on' : 'off'
+          onChange={() => {
+            const newValue = this.radioGroupValue() === 'on' ? 'off' : 'on'
             this.setBindingState(newValue)
           }}
         />
@@ -222,6 +235,8 @@ DeveloperKeyStateControl.propTypes = {
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
     inherited_to: PropTypes.string,
+    is_lti_key: PropTypes.bool,
+    lti_registration_workflow_state: PropTypes.string,
     workflow_state: PropTypes.string,
     name: PropTypes.string,
     developer_key_account_binding: PropTypes.shape({
@@ -234,6 +249,7 @@ DeveloperKeyStateControl.propTypes = {
       contextId: PropTypes.string.isRequired,
     }),
   }).isRequired,
+  inheritedTab: PropTypes.bool,
 }
 
 DeveloperKeyStateControl.defaultProps = {

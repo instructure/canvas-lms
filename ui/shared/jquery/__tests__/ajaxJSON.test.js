@@ -39,7 +39,7 @@ describe('$.fn.defaultAjaxError', () => {
     expect(window.INST.environment).not.toBe('production')
     expect($.ajaxJSON.unhandledXHRs).toHaveLength(0)
 
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
     $('#fixtures').defaultAjaxError(mockCallback)
 
     const xhr = {
@@ -59,7 +59,7 @@ describe('$.fn.defaultAjaxError', () => {
     }
     $.ajaxJSON.unhandledXHRs.push(xhr)
 
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
     $('#fixtures').defaultAjaxError(mockCallback)
     $.fn.defaultAjaxError.func({}, xhr)
 
@@ -70,7 +70,7 @@ describe('$.fn.defaultAjaxError', () => {
     window.INST.environment = 'production'
     expect($.ajaxJSON.unhandledXHRs).toHaveLength(0)
 
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
     $('#fixtures').defaultAjaxError(mockCallback)
 
     const xhr = {
@@ -115,7 +115,7 @@ describe('$.ajaxJSON.isUnauthenticated', () => {
 
 describe('$.ajaxJSON.abortRequest', () => {
   it('aborts xhr if not done', () => {
-    const mockAbort = jest.fn()
+    const mockAbort = vi.fn()
     const xhr = {abort: mockAbort}
     $.ajaxJSON.abortRequest(xhr)
     expect(mockAbort).toHaveBeenCalled()
@@ -124,10 +124,10 @@ describe('$.ajaxJSON.abortRequest', () => {
   it('does not call callback after aborting', () => {
     const xhr = {
       readyState: 0,
-      abort: jest.fn(),
+      abort: vi.fn(),
       onreadystatechange: null,
     }
-    const mockCallback = jest.fn()
+    const mockCallback = vi.fn()
 
     $.ajaxJSON('/api', 'GET', {}, mockCallback, mockCallback)
     $.ajaxJSON.abortRequest(xhr)
@@ -136,5 +136,40 @@ describe('$.ajaxJSON.abortRequest', () => {
     xhr.onreadystatechange?.()
 
     expect(mockCallback).not.toHaveBeenCalled()
+  })
+})
+
+describe('$.ajaxJSON headers option', () => {
+  it('includes headers in ajax params when provided', () => {
+    const mockAjax = vi.fn().mockReturnValue({then: () => ({fail: () => ({always: () => {}})})})
+    const originalAjax = $.ajax
+    $.ajax = mockAjax
+
+    const customHeaders = {'X-Custom-Header': 'test-value'}
+    $.ajaxJSON('/test', 'GET', {}, undefined, undefined, {headers: customHeaders})
+
+    expect(mockAjax).toHaveBeenCalledWith(
+      expect.objectContaining({
+        headers: customHeaders,
+      }),
+    )
+
+    $.ajax = originalAjax
+  })
+
+  it('ignores invalid headers', () => {
+    const mockAjax = vi.fn().mockReturnValue({then: () => ({fail: () => ({always: () => {}})})})
+    const originalAjax = $.ajax
+    $.ajax = mockAjax
+
+    $.ajaxJSON('/test', 'GET', {}, undefined, undefined, {headers: null})
+
+    expect(mockAjax).toHaveBeenCalledWith(
+      expect.not.objectContaining({
+        headers: expect.anything(),
+      }),
+    )
+
+    $.ajax = originalAjax
   })
 })

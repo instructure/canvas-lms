@@ -23,17 +23,17 @@ import userEvent from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock jQuery
-jest.mock('jquery', () => {
+vi.mock('jquery', () => {
   const jQueryMock = {
-    flashError: jest.fn(),
-    Deferred: jest.fn(() => ({
-      resolve: jest.fn(),
-      reject: jest.fn(),
-      promise: jest.fn(),
+    flashError: vi.fn(),
+    Deferred: vi.fn(() => ({
+      resolve: vi.fn(),
+      reject: vi.fn(),
+      promise: vi.fn(),
     })),
-    when: jest.fn(() => Promise.resolve()),
+    when: vi.fn(() => Promise.resolve()),
   }
-  return jest.fn(() => jQueryMock)
+  return vi.fn(() => jQueryMock)
 })
 
 describe('GraderNamesVisibleToFinalGraderCheckbox', () => {

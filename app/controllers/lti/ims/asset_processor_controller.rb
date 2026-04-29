@@ -20,7 +20,6 @@
 
 module Lti::IMS
   # @API Asset Processor
-  # @internal
   #
   # 1EdTech Asset Processor services: Asset Service and Asset Report Service.
   #
@@ -109,7 +108,7 @@ module Lti::IMS
     #
     # @argument timestamp [String]
     #   An ISO8601 date time value with microsecond precision. Reports with newer
-    #   timetamps for the same asset and report type supersede
+    #   timestamps for the same asset and report type supersede
     #   previously submitted reports with older (or equal) timestamps. Likewise,
     #   if the timestamp provided is older than the latest timestamp for an
     #   existing report (of same asset and type), the new report will be
@@ -187,24 +186,33 @@ module Lti::IMS
     end
 
     def lti_asset_show
-      render_error("not found", :not_found) unless download_asset&.attachment || download_asset&.submission_attempt
-
-      if download_asset.text_entry?
+      case download_asset.asset_type
+      when Lti::Asset::TYPE_TEXT_ENTRY
         text_entry = download_asset.submission.body_for_attempt(download_asset.submission_attempt)
         send_data(
           text_entry,
           disposition: "attachment",
           type: "text/html"
         )
-      else
-        attachment = download_asset&.attachment
+      when Lti::Asset::TYPE_DISCUSSION_ENTRY
+        unless context.root_account.feature_enabled?(:lti_asset_processor_discussions)
+          render_error("not found", :not_found)
+          return
+        end
+        send_data(
+          download_asset.discussion_entry_version.message,
+          disposition: "attachment",
+          type: "text/html"
+        )
+      when Lti::Asset::TYPE_ATTACHMENT
+        attachment = download_asset.attachment
         # Set for sf_verifier token generation
         @advantage_token_developer_key = developer_key
-        @attachment_authorization = {
-          attachment:,
-          permission: "download"
-        }
+        @attachment_authorization = { attachment:, permission: "download" }
         render_or_redirect_to_stored_file(attachment:)
+      else
+        Rails.logger.error("Cannot show asset of type #{download_asset.asset_type}")
+        render_error("not found", :not_found)
       end
     end
 

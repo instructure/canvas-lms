@@ -27,11 +27,16 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
+import {PlacementInfoTooltip} from '../components/PlacementInfoTooltip'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconInfoLine} from '@instructure/ui-icons'
+import {IconAddSolid, IconInfoLine, IconNeutralSolid} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
+import {LtiRegistrationUpdateRequest} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
+import {Pill} from '@instructure/ui-pill'
+import {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
+import {diffPlacements} from '../model/placementDiffer'
 
 export type PlacementsConfirmationProps = {
   /**
@@ -55,6 +60,11 @@ export type PlacementsConfirmationProps = {
   courseNavigationDefaultHidden: boolean
 
   /**
+   * A boolean that determines if the top navigation placement is allowed to toggle fullscreen.
+   */
+  topNavigationAllowFullscreen: boolean
+
+  /**
    * A callback for whenever a placement's checkbox is toggled.
    */
   onTogglePlacement: (placement: LtiPlacement) => void
@@ -62,6 +72,12 @@ export type PlacementsConfirmationProps = {
    * A callback for whenever the default hidden checkbox is toggled. This is only applicable to the course navigation placement.
    */
   onToggleDefaultDisabled: () => void
+  /**
+   * A callback for whenever the top navigation allow fullscreen checkbox is toggled. This is only applicable to the top navigation placement.
+   */
+  onToggleAllowFullscreen: () => void
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
+  existingRegistration?: LtiRegistrationWithConfiguration
 }
 
 const I18n = createI18nScope('lti_registration.wizard')
@@ -80,10 +96,22 @@ export const PlacementsConfirmation = React.memo(
     appName,
     enabledPlacements,
     courseNavigationDefaultHidden,
+    topNavigationAllowFullscreen,
     availablePlacements,
     onTogglePlacement,
     onToggleDefaultDisabled,
+    onToggleAllowFullscreen,
+    registrationUpdateRequest,
+    existingRegistration,
   }: PlacementsConfirmationProps) => {
+    const updateRequestPlacements =
+      registrationUpdateRequest?.internal_lti_configuration?.placements.map(p => p.placement) ?? []
+
+    const {added: newlyAddedPlacements, removed: removedPlacements} = React.useMemo(
+      () => diffPlacements(existingRegistration, registrationUpdateRequest),
+      [existingRegistration, registrationUpdateRequest],
+    )
+
     return (
       <>
         <Heading level="h3" margin="0 0 x-small 0">
@@ -103,27 +131,83 @@ export const PlacementsConfirmation = React.memo(
             ),
           }}
         />
-        {availablePlacements.length === 0 ? (
+        {availablePlacements.length === 0 && updateRequestPlacements.length === 0 ? (
           <Text>
             {I18n.t(
               "This tool has not requested access to any placements. If installed, it will have access to the LTI APIs but won't be visible for users to launch. The app can be managed via the Manage Apps page.",
             )}
           </Text>
         ) : (
-          <Flex gap="medium" direction="column" margin="medium 0 medium 0">
-            {availablePlacements.toSorted().map(p => {
-              return (
-                <PlacementCheckbox
-                  key={p}
-                  placement={p}
-                  enabled={enabledPlacements.includes(p)}
-                  onTogglePlacement={onTogglePlacement}
-                  courseNavigationDefaultHidden={courseNavigationDefaultHidden}
-                  onToggleDefaultDisabled={onToggleDefaultDisabled}
-                />
-              )
-            })}
-          </Flex>
+          <>
+            <Flex gap="medium" direction="column" margin="medium 0 medium 0">
+              {availablePlacements
+                .filter(p => !removedPlacements.includes(p) && !newlyAddedPlacements.includes(p))
+                .toSorted()
+                .map(p => {
+                  return (
+                    <PlacementCheckbox
+                      key={p}
+                      placement={p}
+                      enabled={enabledPlacements.includes(p)}
+                      onTogglePlacement={onTogglePlacement}
+                      courseNavigationDefaultHidden={courseNavigationDefaultHidden}
+                      onToggleDefaultDisabled={onToggleDefaultDisabled}
+                      topNavigationAllowFullscreen={topNavigationAllowFullscreen}
+                      onToggleAllowFullscreen={onToggleAllowFullscreen}
+                    />
+                  )
+                })}
+            </Flex>
+            {newlyAddedPlacements.length > 0 && (
+              <Flex direction="column" alignItems="start" gap="small" margin="small 0 medium 0">
+                <Heading level="h4" margin="0 0 x-small 0">
+                  <Flex direction="row" gap="small">
+                    <IconAddSolid />
+                    {I18n.t('Added')}
+                  </Flex>
+                </Heading>
+                {newlyAddedPlacements.map(p => {
+                  return (
+                    <PlacementCheckbox
+                      key={p}
+                      placement={p}
+                      enabled={enabledPlacements.includes(p)}
+                      onTogglePlacement={onTogglePlacement}
+                      courseNavigationDefaultHidden={courseNavigationDefaultHidden}
+                      onToggleDefaultDisabled={onToggleDefaultDisabled}
+                      topNavigationAllowFullscreen={topNavigationAllowFullscreen}
+                      onToggleAllowFullscreen={onToggleAllowFullscreen}
+                    />
+                  )
+                })}
+              </Flex>
+            )}
+            {removedPlacements.length > 0 && (
+              <Flex direction="column" alignItems="start" gap="small" margin="small 0 medium 0">
+                <Heading level="h4" margin="0 0 x-small 0">
+                  <Flex direction="row" gap="small">
+                    <IconNeutralSolid />
+                    {I18n.t('Removed')}
+                  </Flex>
+                </Heading>
+                {removedPlacements.map(p => {
+                  return (
+                    <PlacementCheckbox
+                      key={p}
+                      placement={p}
+                      enabled={false}
+                      disabled={true}
+                      onTogglePlacement={() => {}}
+                      courseNavigationDefaultHidden={courseNavigationDefaultHidden}
+                      onToggleDefaultDisabled={() => {}}
+                      topNavigationAllowFullscreen={topNavigationAllowFullscreen}
+                      onToggleAllowFullscreen={onToggleAllowFullscreen}
+                    />
+                  )
+                })}
+              </Flex>
+            )}
+          </>
         )}
       </>
     )
@@ -132,10 +216,19 @@ export const PlacementsConfirmation = React.memo(
 
 type PlacementCheckboxProps = {
   placement: LtiPlacement
+  /**
+   * Whether or not the checkbox is checked.
+   */
   enabled: boolean
   onTogglePlacement: (placement: LtiPlacement) => void
   courseNavigationDefaultHidden: boolean
   onToggleDefaultDisabled: () => void
+  topNavigationAllowFullscreen: boolean
+  onToggleAllowFullscreen: () => void
+  /**
+   * Whether or not the html checkbox is disabled.
+   */
+  disabled?: boolean
 }
 
 const PlacementCheckbox = React.memo(
@@ -145,12 +238,16 @@ const PlacementCheckbox = React.memo(
     onTogglePlacement,
     courseNavigationDefaultHidden,
     onToggleDefaultDisabled,
+    topNavigationAllowFullscreen,
+    onToggleAllowFullscreen,
+    disabled,
   }: PlacementCheckboxProps) => {
     const checkbox = (
       <Flex direction="row" gap="x-small" justifyItems="start" alignItems="center" key={placement}>
         <Flex.Item>
           <Checkbox
             data-pendo="lti-placement-checkbox"
+            disabled={disabled}
             data-testid={`placement-checkbox-${placement}`}
             labelPlacement="end"
             label={<Text>{i18nLtiPlacement(placement)}</Text>}
@@ -164,48 +261,7 @@ const PlacementCheckbox = React.memo(
           placement as (typeof UNDOCUMENTED_PLACEMENTS)[number],
         ) && (
           <Flex.Item>
-            <Tooltip
-              placement="top"
-              constrain="parent"
-              renderTip={
-                <Responsive
-                  match="media"
-                  query={{
-                    small: {maxWidth: 500},
-                    medium: {minWidth: 500},
-                    large: {minWidth: 1000},
-                  }}
-                  props={{
-                    small: {width: '15rem'},
-                    medium: {width: '30rem'},
-                    large: {width: '35rem'},
-                  }}
-                  render={props => {
-                    return (
-                      <Img
-                        {...props}
-                        data-testid={`placement-img-${placement}`}
-                        constrain="contain"
-                        src={`/doc/api/images/placements/${placement}.png`}
-                        alt={I18n.t('An image showing the %{placement} placement within Canvas', {
-                          placement: i18nLtiPlacement(placement),
-                        })}
-                      />
-                    )
-                  }}
-                />
-              }
-            >
-              <IconButton
-                withBackground={false}
-                withBorder={false}
-                renderIcon={IconInfoLine}
-                size="small"
-                screenReaderLabel={I18n.t('Tooltip for the %{placement} placement', {
-                  placement,
-                })}
-              />
-            </Tooltip>
+            <PlacementInfoTooltip placement={placement} />
           </Flex.Item>
         )}
       </Flex>
@@ -229,10 +285,41 @@ const PlacementCheckbox = React.memo(
             <View padding="0 0 0 medium" display="block" as="div">
               <Checkbox
                 data-pendo="lti-course-navigation-default-checkbox"
+                disabled={disabled}
                 checked={courseNavigationDefaultHidden}
                 label={I18n.t('Default to Hidden')}
                 onChange={() => {
                   onToggleDefaultDisabled()
+                }}
+              />
+            </View>
+          )}
+        </FormFieldGroup>
+      )
+    }
+    if (placement === LtiPlacements.TopNavigation) {
+      return (
+        <FormFieldGroup
+          rowSpacing="medium"
+          key={placement}
+          name={`${placement}-toggle`}
+          description={
+            <ScreenReaderContent>
+              {I18n.t('Modify the %{placement} placement', {
+                placement: i18nLtiPlacement(placement),
+              })}
+            </ScreenReaderContent>
+          }
+        >
+          {checkbox}
+          {enabled && (
+            <View padding="0 0 0 medium" display="block" as="div">
+              <Checkbox
+                data-pendo="lti-top-navigation-fullscreen-checkbox"
+                checked={topNavigationAllowFullscreen}
+                label={I18n.t('Allow Fullscreen')}
+                onChange={() => {
+                  onToggleAllowFullscreen()
                 }}
               />
             </View>

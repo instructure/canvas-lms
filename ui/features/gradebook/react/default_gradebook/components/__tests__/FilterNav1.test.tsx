@@ -18,16 +18,31 @@
 
 import React from 'react'
 import FilterNav from '../FilterNav'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import store from '../../stores/index'
 import type {FilterNavProps} from '../FilterNav'
 import type {FilterPreset, Filter} from '../../gradebook.d'
 import type {Assignment} from '../../../../../../api'
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
+
+const server = setupServer(
+  http.get('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.post('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.put('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.delete('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+)
 
 const defaultRules = {
   drop_lowest: 0,
@@ -72,6 +87,7 @@ const StudentGroupCategoryProps = {
   self_signup: null,
   sis_group_category_id: null,
   sis_import_id: null,
+  non_collaborative: false,
 }
 
 const defaultProps: FilterNavProps = {
@@ -165,6 +181,16 @@ const defaultProps: FilterNavProps = {
       groups: [
         {id: '3', name: 'Student Group 3'},
         {id: '4', name: 'Student Group 4'},
+      ],
+    },
+    '3': {
+      ...StudentGroupCategoryProps,
+      id: '3',
+      name: 'Non Collaborative Group Category 1',
+      non_collaborative: true,
+      groups: [
+        {id: '5', name: 'Non Collaborative Group 1', non_collaborative: true},
+        {id: '6', name: 'Non Collaborative Group 2', non_collaborative: true},
       ],
     },
   },
@@ -286,11 +312,17 @@ describe('FilterNav', () => {
       filterPresets: defaultFilterPresets,
       appliedFilters: defaultAppliedFilters,
     })
-    fetchMock.mock('*', 200)
+    server.listen({onUnhandledRequest: 'bypass'})
   })
+
   afterEach(() => {
+    cleanup()
     store.setState(originalState, true)
-    fetchMock.restore()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('renders filters button', async () => {
@@ -381,14 +413,16 @@ describe('FilterNav', () => {
   })
 
   it('clicking Create New Filter Preset triggers onChange with filter', async () => {
-    const user = userEvent.setup(USER_EVENT_OPTIONS)
+    const user = userEvent.setup({...USER_EVENT_OPTIONS, delay: null})
     store.setState({filterPresets: []})
-    const {getByText, queryByTestId, getByTestId} = render(<FilterNav {...defaultProps} />)
+    const {getByText, queryByTestId, findByText, findByTestId} = render(
+      <FilterNav {...defaultProps} />,
+    )
     expect(queryByTestId('save-filter-button')).toBeNull()
     await user.click(getByText('Apply Filters'))
     await user.click(getByText('Create & Manage Filter Presets'))
-    await user.click(getByText('Toggle Create Filter Preset'))
-    expect(getByTestId('save-filter-button')).toBeVisible()
+    await user.click(await findByText('Toggle Create Filter Preset'))
+    expect(await findByTestId('save-filter-button')).toBeVisible()
   })
 
   describe('FilterNavPopover', () => {
@@ -465,6 +499,9 @@ describe('FilterNav', () => {
     })
 
     it.skip('clicking on another popover trigger will close the current popover', async () => {
+      // SKIP REASON: Popover auto-close behavior when clicking another trigger doesn't work
+      // in test environment. The modules filter-type popover is not rendered after clicking
+      // the modules applied-filter, suggesting popover state management issues.
       const user = userEvent.setup(USER_EVENT_OPTIONS)
       const {getByText, getByTestId, queryByTestId, getByRole} = render(
         <FilterNav {...filterProps} />,
@@ -495,6 +532,18 @@ describe('FilterNav', () => {
       await user.click(endDateFilter as HTMLElement)
       await user.click(getByTestId('end-date-filter-type'))
       expect(getByTestId(`end-date-input`)).toBeVisible()
+    })
+
+    it('renders menu differentiation tags correctly', async () => {
+      const user = userEvent.setup(USER_EVENT_OPTIONS)
+      const {getByText, getByTestId, getByRole} = render(<FilterNav {...filterProps} />)
+      await user.click(getByText('Apply Filters'))
+      await user.click(getByRole('menuitemradio', {name: 'Differentiation Tags'}))
+      await user.click(getByTestId('Non Collaborative Group 1-sorted-filter'))
+      await user.click(getByTestId('applied-filter-Non Collaborative Group 1'))
+
+      expect(getByTestId('Non Collaborative Group Category 1-sorted-filter-group')).toBeVisible()
+      expect(getByTestId('Non Collaborative Group 1-sorted-filter-group-item')).toBeVisible()
     })
 
     it('renders menu student groups correctly', async () => {

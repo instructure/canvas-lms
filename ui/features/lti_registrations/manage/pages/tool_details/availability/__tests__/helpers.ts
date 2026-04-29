@@ -51,7 +51,7 @@ export function mockContextControl(overrides: Partial<LtiContextControl> = {}): 
   return {
     id: ZLtiContextControlId.parse('default-context-control-id'),
     registration_id: ZLtiRegistrationId.parse('default-registration-id'),
-    deployment_id: 'default-deployment-id',
+    deployment_id: ZLtiDeploymentId.parse('default-deployment-id'),
     account_id: null,
     course_id: null,
     available: true,

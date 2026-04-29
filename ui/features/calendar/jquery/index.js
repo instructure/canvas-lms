@@ -22,11 +22,11 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {map, defaults, filter, omit, each, has, last, includes} from 'lodash'
+import {map, filter, each, last, includes, omit, has, defaults} from 'es-toolkit/compat'
 import * as tz from '@instructure/moment-utils'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 import moment from 'moment'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import decodeFromHex from '@canvas/util/decodeFromHex'
 import withinMomentDates from '../momentDateHelper'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
@@ -510,6 +510,21 @@ export default class Calendar {
       return
     }
 
+    if (
+      ['assignment', 'assignment_override'].includes(event.eventType) &&
+      event.assignment?.peer_review_sub_assignment_enabled
+    ) {
+      revertFunc()
+      showFlashAlert({
+        message: I18n.t(
+          'Assignments with graded peer reviews are not draggable. You can update their due dates by editing the assignment.',
+        ),
+        err: null,
+        type: 'error',
+      })
+      return
+    }
+
     if (this.currentView === 'week' && allDay && event.eventType === 'assignment') {
       revertFunc()
       return
@@ -715,6 +730,10 @@ export default class Calendar {
       return
     }
     event.start = date
+    if (date.hours() === 0 && date.minutes() === 0 && this.currentView === 'month') {
+      event.start.hours(23)
+      event.start.minutes(59)
+    }
     event.addClass('event_pending')
     const revertFunc = () => console.log('could not save date on undated event')
 
@@ -911,6 +930,8 @@ export default class Calendar {
   }
 
   eventSaved = event => {
+    if (!event) return
+
     event.removeClass('event_pending')
 
     // If we just saved a new event then the id field has changed from what it
@@ -1086,6 +1107,11 @@ export default class Calendar {
     }) // use replaceState if view_name wasn't set before
 
     this.currentView = view
+
+    document.dispatchEvent(
+      new CustomEvent('calendar:header:select_view', {detail: {viewName: view}}),
+    )
+
     if (view !== 'scheduler') {
       return userSettings.set('calendar_view', view)
     }

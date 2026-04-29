@@ -59,9 +59,9 @@ describe "LTI integration tests" do
   let_once(:root_account) { Account.create!(name: "root_account") }
 
   let(:controller) do
-    request_mock = double("request")
+    request_mock = instance_double(ActionDispatch::Request)
     allow(request_mock).to receive_messages(host: "/my/url", scheme: "https")
-    m = double("controller")
+    m = instance_double(ApplicationController)
     allow(m).to receive_messages(request: request_mock, logged_in_user: @user || user)
     m
   end
@@ -394,7 +394,7 @@ describe "LTI integration tests" do
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
     end
 
-    def tool_setup(for_student = true)
+    def tool_setup(for_student: true)
       if for_student
         course_with_student(active_all: true)
       else
@@ -426,7 +426,7 @@ describe "LTI integration tests" do
     end
 
     it "includes assignment outcome service params for teacher" do
-      hash = tool_setup(false)
+      hash = tool_setup(for_student: false)
       expect(hash["lis_result_sourcedid"]).to be_nil
       expect(hash["lis_outcome_service_url"]).to eq "/my/test/url"
       expect(hash["ext_ims_lis_basic_outcome_url"]).to eq "/my/other/test/url"
@@ -456,30 +456,6 @@ describe "LTI integration tests" do
 
   context "sharding" do
     specs_require_sharding
-
-    # TODO: Replace this once we have LTIInbound
-    it "roundtrips source ids from mixed shards", :skip do
-      @shard1.activate do
-        @account = Account.create!
-        course_with_teacher(active_all: true, account: @account)
-        @tool = @course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool")
-        assignment_model(submission_types: "external_tool", course: @course)
-        tag = @assignment.build_external_tool_tag(url: "http://example.com/one")
-        tag.content_type = "ContextExternalTool"
-        tag.save!
-      end
-      user_factory
-      @course.enroll_student(@user)
-
-      source_id = @tool.shard.activate do
-        payload = [@tool.id, @course.id, @assignment.id, @user.id].join("-")
-        "#{payload}-#{Canvas::Security.hmac_sha1(payload, @tool.shard.settings[:encryption_key])}"
-      end
-
-      assignment, user = BasicLTI::BasicOutcomes.decode_source_id(@tool, source_id)
-      expect(assignment).to eq @assignment
-      expect(user).to eq @user
-    end
 
     it "provides different user ids for users with the same local id from different shards" do
       user1 = @shard1.activate do

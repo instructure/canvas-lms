@@ -133,7 +133,7 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         }
       }
       mySubAssignmentSubmissions {
-        ...Submission
+        ...DiscussionSubmission
       }
       errors {
         ...Error
@@ -153,6 +153,7 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
     $fileId: ID
     $removeAttachment: Boolean
     $quotedEntryId: ID
+    $pinType: DiscussionEntryPinningType
   ) {
     updateDiscussionEntry(
       input: {
@@ -161,6 +162,7 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
         fileId: $fileId
         removeAttachment: $removeAttachment
         quotedEntryId: $quotedEntryId
+        pinType: $pinType
       }
     ) {
       discussionEntry {
@@ -220,11 +222,11 @@ export const UPDATE_DISCUSSION_READ_STATE = gql`
 
 export const UPDATE_SPLIT_SCREEN_VIEW_DEEPLY_NESTED_ALERT = gql`
   mutation UpdateSplitScreenViewDeeplyNestedAlert($splitScreenViewDeeplyNestedAlert: Boolean!) {
-    UpdateSplitScreenViewDeeplyNestedAlert(
+    updateSplitScreenViewDeeplyNestedAlert(
       input: {splitScreenViewDeeplyNestedAlert: $splitScreenViewDeeplyNestedAlert}
     ) {
       user {
-        ...User
+        ...DiscussionPostUser
       }
     }
   }
@@ -268,9 +270,10 @@ export const UPDATE_DISCUSSION_TOPIC_PARTICIPANT = gql`
     $sortOrder: DiscussionSortOrderType
     $expanded: Boolean
     $summaryEnabled: Boolean
+    $preferredLanguage: PreferredLanguageType
   ) {
     updateDiscussionTopicParticipant(
-      input: {discussionTopicId: $discussionTopicId, sortOrder: $sortOrder, expanded: $expanded, summaryEnabled: $summaryEnabled}
+      input: {discussionTopicId: $discussionTopicId, sortOrder: $sortOrder, expanded: $expanded, summaryEnabled: $summaryEnabled, preferredLanguage: $preferredLanguage}
     ) {
       discussionTopic {
         id
@@ -279,8 +282,28 @@ export const UPDATE_DISCUSSION_TOPIC_PARTICIPANT = gql`
           sortOrder
           expanded
           summaryEnabled
+          preferredLanguage
         }
       }
     }
   }
+`
+
+export const RESTORE_DELETED_DISCUSSION_ENTRY = gql`
+  mutation RestoreDeletedDiscussionEntry($discussionEntryId: ID!) {
+    restoreDeletedDiscussionEntry(input: {discussionEntryId: $discussionEntryId}) {
+      discussionEntry {
+        ...DiscussionEntry
+        anonymousAuthor {
+          ...AnonymousUser
+        }
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${DiscussionEntry.fragment}
+  ${AnonymousUser.fragment}
+  ${Error.fragment}
 `

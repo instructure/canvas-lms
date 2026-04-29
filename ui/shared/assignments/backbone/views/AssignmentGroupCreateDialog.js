@@ -25,7 +25,6 @@ import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/rails-flash-notifications'
-import '@canvas/util/jquery/fixDialogButtons'
 
 const I18n = createI18nScope('AssignmentGroupCreateDialog')
 

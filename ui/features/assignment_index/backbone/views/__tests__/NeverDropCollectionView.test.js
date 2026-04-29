@@ -20,6 +20,19 @@ import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import NeverDropCollection from '../../collections/NeverDropCollection'
 import NeverDropCollectionView from '../NeverDropCollectionView'
+import {fireEvent, waitFor} from '@testing-library/react'
+
+// Mock debounce and defer to make them synchronous for testing
+// NeverDropCollectionView uses es-toolkit/compat for debounce
+// NeverDropView uses es-toolkit/compat for defer
+vi.mock('es-toolkit/compat', async () => {
+  const actual = await vi.importActual('es-toolkit/compat')
+  return {
+    ...actual,
+    debounce: fn => fn,
+    defer: fn => fn(),
+  }
+})
 
 class AssignmentStub extends Backbone.Model {
   name() {
@@ -52,10 +65,22 @@ const addNeverDrop = function () {
   })
 }
 
-// EVAL-3815
 describe('NeverDropCollectionView', () => {
+  beforeAll(() => {
+    // Create the fixtures container
+    const fixtures = document.createElement('div')
+    fixtures.id = 'fixtures'
+    document.body.appendChild(fixtures)
+  })
+
+  afterAll(() => {
+    const fixtures = document.getElementById('fixtures')
+    if (fixtures) {
+      fixtures.remove()
+    }
+  })
+
   beforeEach(() => {
-    jest.useFakeTimers()
     assignments = new Assignments([1, 2, 3].map(i => ({id: `${i}`, name: `Assignment ${i}`})))
     never_drops = new NeverDropCollection([], {
       assignments,
@@ -70,175 +95,195 @@ describe('NeverDropCollectionView', () => {
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    view.remove()
+    $('#fixtures').empty()
   })
 
-  it.skip('possibleValues is set to the range of assignment ids', function () {
-    expect(never_drops.possibleValues).toBe(assignments.map(a => a.id))
+  it('possibleValues is set to the range of assignment ids', function () {
+    expect(never_drops.possibleValues).toEqual(assignments.map(a => a.id))
   })
 
-  it.skip('adding a NeverDrop to the collection reduces availableValues by one', function () {
+  it('adding a NeverDrop to the collection reduces availableValues by one', function () {
     const start_length = never_drops.availableValues.length
-    addNeverDrop.call(this)
-    expect(start_length - 1).toBe(never_drops.availableValues.length)
+    addNeverDrop()
+    expect(never_drops.availableValues).toHaveLength(start_length - 1)
   })
 
-  it.skip('needs rewrite due to debounce hack', () => {
-    test('adding a NeverDrop renders a <select> with the value from the front of the availableValues collection', function () {
-      const expected_val = never_drops.availableValues.slice(0)[0].id
-      addNeverDrop.call(this)
-      jest.advanceTimersByTime(101)
-      const view = $('#fixtures').find('select')
-      // 'a select was rendered'
-      expect(view.length).toBeGreaterThan(1)
-      // 'the selects value is the same as the last available value'
-      expect(expected_val).toBe(view.val())
+  it('adding a NeverDrop renders a <select> with the value from the front of the availableValues collection', async function () {
+    const expected_val = never_drops.availableValues.slice(0)[0].id
+    addNeverDrop()
+    await waitFor(() => {
+      const select = $('#fixtures').find('select')
+      expect(select.length).toBeGreaterThan(0)
+      expect(select.val()).toBe(expected_val)
     })
+  })
 
-    test('the number of <option>s with the value the same as availableValue should equal the number of selects', function () {
-      addNeverDrop.call(this)
-      addNeverDrop.call(this)
-      jest.advanceTimersByTime(101)
+  it('the number of <option>s with the value the same as availableValue should equal the number of selects', async function () {
+    addNeverDrop()
+    addNeverDrop()
+    await waitFor(() => {
       const available_val = never_drops.availableValues.at(0).id
-      expect($('#fixtures').find(`option[value=${available_val}]`)).toHaveLength(2)
+      expect($('#fixtures').find(`option[value="${available_val}"]`)).toHaveLength(2)
+    })
+  })
+
+  it('removing a NeverDrop from the collection increases availableValues by one', function () {
+    addNeverDrop()
+    const current_size = never_drops.availableValues.length
+    const model = never_drops.at(0)
+    never_drops.remove(model)
+    expect(never_drops.availableValues).toHaveLength(current_size + 1)
+  })
+
+  it('removing a NeverDrop from the collection removes the view', function () {
+    addNeverDrop()
+    const model = never_drops.at(0)
+    never_drops.remove(model)
+    const select = $('#fixtures').find('select')
+    expect(select).toHaveLength(0)
+  })
+
+  it('changing a <select> will remove all <option>s with that value from other selects', async function () {
+    addNeverDrop()
+    addNeverDrop()
+    // After adding two NeverDrops, each takes a value (1 and 2), but 3 is available in both
+    const target_id = '3'
+
+    await waitFor(() => {
+      // Both selects have option value="3" available
+      expect($('#fixtures').find(`option[value="${target_id}"]`)).toHaveLength(2)
     })
 
-    test('removing a NeverDrop from the collection increases availableValues by one', function () {
-      addNeverDrop.call(this)
-      jest.advanceTimersByTime(101)
-      const current_size = never_drops.availableValues.length
-      const model = never_drops.at(0)
-      never_drops.remove(model)
-      expect(current_size + 1).toBe(never_drops.availableValues.length)
-    })
+    const selectElement = $('#fixtures').find('select:first')[0]
+    selectElement.value = target_id
+    fireEvent.change(selectElement)
 
-    test('removing a NeverDrop from the collection removes the view', function () {
-      addNeverDrop.call(this)
-      const model = never_drops.at(0)
-      never_drops.remove(model)
-
-      jest.advanceTimersByTime(101)
-      const view = $('#fixtures').find('select')
-      expect(view).toHaveLength(0)
-    })
-
-    test('changing a <select> will remove all <option>s with that value from other selects', function () {
-      addNeverDrop.call(this)
-      addNeverDrop.call(this)
-      const target_id = '1'
-
-      jest.advanceTimersByTime(101)
-      expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(2)
-      // change one of the selects
-      $('#fixtures').find('select:first').val(target_id).trigger('change')
-
-      jest.advanceTimersByTime(101)
-      // should only be one now
-      expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(1)
-      // target_id is now taken
+    await waitFor(() => {
+      // After changing first select to 3, option 3 should only appear in first select
+      expect($('#fixtures').find(`option[value="${target_id}"]`)).toHaveLength(1)
       expect(never_drops.takenValues.find(nd => nd.id === target_id)).toBeTruthy()
     })
+  })
 
-    test('changing a <select> will add all <option>s with the previous value to other selects', function () {
-      addNeverDrop.call(this)
-      addNeverDrop.call(this)
-      const change_id = '1'
-      const target_id = '3'
+  it('changing a <select> will add all <option>s with the previous value to other selects', async function () {
+    addNeverDrop()
+    addNeverDrop()
+    // After adding two NeverDrops: first has 1, second has 2
+    // Option 3 is available in both (2 occurrences)
+    // Option 1 is only in first select (1 occurrence)
 
-      jest.advanceTimersByTime(101)
-      // should just have the selected one
-      expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(1)
-      // change one of the selects
-      $('#fixtures').find('select:first').val(change_id).trigger('change')
-
-      jest.advanceTimersByTime(101)
-      // should now be more than one
-      expect($('#fixtures').find(`option[value=${target_id}]`)).toHaveLength(2)
-
-      // target_id is now available
-      expect(never_drops.availableValues.find(nd => nd.id === target_id)).toBeTruthy()
+    // First, change first select to 3 (takes 3 away from second)
+    await waitFor(() => {
+      expect($('#fixtures').find(`option[value="3"]`)).toHaveLength(2)
     })
 
-    test('resetting NeverDrops with a chosen assignment renders a <span>', function () {
-      const target_id = '1'
-      never_drops.reset([
-        {
-          id: never_drops.length,
-          label_id: 'new',
-          chosen: 'Assignment 1',
-          chosen_id: target_id,
-        },
-      ])
+    const selectElement = $('#fixtures').find('select:first')[0]
+    selectElement.value = '3'
+    fireEvent.change(selectElement)
 
-      jest.advanceTimersByTime(101)
-      expect($('#fixtures').find('span')).toHaveLength(1)
+    await waitFor(() => {
+      // After change: first has 3, so option 1 becomes available to second select
+      // Option 1 should now appear in the second select (2 total: first has it available, second has it available)
+      expect($('#fixtures').find(`option[value="1"]`)).toHaveLength(2)
+      expect(never_drops.availableValues.find(nd => nd.id === '1')).toBeTruthy()
+    })
+  })
+
+  it('resetting NeverDrops with a chosen assignment renders a <span>', async function () {
+    const target_id = '1'
+    never_drops.reset([
+      {
+        id: never_drops.length,
+        label_id: 'new',
+        chosen: 'Assignment 1',
+        chosen_id: target_id,
+      },
+    ])
+
+    await waitFor(() => {
+      expect($('#fixtures').find('[data-testid="chosen-assignment"]')).toHaveLength(1)
       expect(never_drops.takenValues.find(nd => nd.id === target_id)).toBeTruthy()
     })
+  })
 
-    test('when there are no availableValues, the add assignment link is not rendered', function () {
-      addNeverDrop.call(this)
-      addNeverDrop.call(this)
-      addNeverDrop.call(this)
+  it('when there are no availableValues, the add assignment link is not rendered', function () {
+    addNeverDrop()
+    addNeverDrop()
+    addNeverDrop()
+    expect($('#fixtures').find('.add_never_drop')).toHaveLength(0)
+  })
 
-      jest.advanceTimersByTime(101)
-      expect($('#fixtures').find('.add_never_drop')).toHaveLength(0)
-    })
-
-    test("when there is at least one takenValue, the add assignment says 'add another assignment'", function () {
-      addNeverDrop.call(this)
-      jest.advanceTimersByTime(101)
+  it("when there is at least one takenValue, the add assignment says 'add another assignment'", async function () {
+    addNeverDrop()
+    await waitFor(() => {
       const text = $('#fixtures').find('.add_never_drop').text()
-      // 'Add another assignment'
-      expect($.trim(text)).toBeTruthy()
+      expect($.trim(text)).toContain('Add another assignment')
     })
+  })
 
-    test('allows adding never_drop items when canChangeDropRules is true', function () {
-      expect($('#fixtures').find('.add_never_drop').hasClass('disabled')).not.toBeTruthy()
-      $('#fixtures').find('.add_never_drop').trigger('click')
-      jest.advanceTimersByTime(101)
+  it('allows adding never_drop items when canChangeDropRules is true', async function () {
+    expect($('#fixtures').find('.add_never_drop').hasClass('disabled')).not.toBeTruthy()
+    const addButton = $('#fixtures').find('.add_never_drop')[0]
+    fireEvent.click(addButton)
+    await waitFor(() => {
       expect(never_drops).toHaveLength(1)
     })
+  })
 
-    test('allows removing never_drop items when canChangeDropRules is true', function () {
-      addNeverDrop.call(this)
-      jest.advanceTimersByTime(101)
-      $('#fixtures').find('.remove_never_drop').trigger('click')
-      jest.advanceTimersByTime(101)
+  it('allows removing never_drop items when canChangeDropRules is true', async function () {
+    addNeverDrop()
+    await waitFor(() => {
+      expect($('#fixtures').find('.remove_never_drop')).toHaveLength(1)
+    })
+    const removeButton = $('#fixtures').find('.remove_never_drop')[0]
+    fireEvent.click(removeButton)
+    await waitFor(() => {
       expect(never_drops).toHaveLength(0)
     })
+  })
 
-    test('disables adding never_drop items when canChangeDropRules is false', function () {
-      view.canChangeDropRules = false
-      view.render() // force re-render
+  it('disables adding never_drop items when canChangeDropRules is false', async function () {
+    view.canChangeDropRules = false
+    view.render()
+    await waitFor(() => {
       expect($('#fixtures').find('.add_never_drop').hasClass('disabled')).toBeTruthy()
-      $('#fixtures').find('.add_never_drop').trigger('click')
-      jest.advanceTimersByTime(101)
-      expect(never_drops).toHaveLength(0)
     })
+    const addButton = $('#fixtures').find('.add_never_drop')[0]
+    fireEvent.click(addButton)
+    // Should not add because canChangeDropRules is false
+    expect(never_drops).toHaveLength(0)
+  })
 
-    test('disables removing never_drop items when canChangeDropRules is false', function () {
-      addNeverDrop.call(this)
-      view.canChangeDropRules = false
-      jest.advanceTimersByTime(101)
+  it('disables removing never_drop items when canChangeDropRules is false', async function () {
+    addNeverDrop()
+    view.canChangeDropRules = false
+    view.render()
+    await waitFor(() => {
       expect($('#fixtures').find('.remove_never_drop').hasClass('disabled')).toBeTruthy()
-      $('#fixtures').find('.remove_never_drop').trigger('click')
-      jest.advanceTimersByTime(101)
-      expect(never_drops).toHaveLength(1)
     })
+    const removeButton = $('#fixtures').find('.remove_never_drop')[0]
+    fireEvent.click(removeButton)
+    // Should not remove because canChangeDropRules is false
+    expect(never_drops).toHaveLength(1)
+  })
 
-    test('disables changing assignment options when canChangeDropRules is false', function () {
-      addNeverDrop.call(this)
-      view.canChangeDropRules = false
-      jest.advanceTimersByTime(101)
-      expect($('#fixtures').find('select:first').attr('readonly')).toBeTruthy()
-      $('#fixtures').find('select:first').val('2').trigger('change')
-      jest.advanceTimersByTime(101)
-      expect(never_drops.takenValues.find(nd => nd.id === '2')).not.toBeTruthy()
+  it('disables changing assignment options when canChangeDropRules is false', async function () {
+    addNeverDrop()
+    view.canChangeDropRules = false
+    view.render()
+    await waitFor(() => {
+      expect($('#fixtures').find('select:first').attr('disabled')).toBeTruthy()
     })
+    const selectElement = $('#fixtures').find('select:first')[0]
+    selectElement.value = '2'
+    fireEvent.change(selectElement)
+    // Should not change because canChangeDropRules is false
+    expect(never_drops.takenValues.find(nd => nd.id === '2')).not.toBeTruthy()
+  })
 
-    test("when there are no takenValues, the add assignment says 'add an assignment'", () => {
-      const text = $('#fixtures').find('.add_never_drop').text()
-      expect($.trim(text)).toBe('Add an assignment')
-    })
+  it("when there are no takenValues, the add assignment says 'add an assignment'", () => {
+    const text = $('#fixtures').find('.add_never_drop').text()
+    expect($.trim(text)).toContain('Add an assignment')
   })
 })

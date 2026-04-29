@@ -25,74 +25,99 @@ function makeMockTool({
   description,
   url,
   definition_id,
-}: {name: string; description: string; url: string; definition_id: number}): LtiLaunchDefinition {
-  return {
+  contribution = false,
+  context_name,
+}: {
+  name: string
+  description: string
+  url: string
+  definition_id: number
+  contribution?: boolean
+  context_name?: string
+}): LtiLaunchDefinition {
+  const def: LtiLaunchDefinition = {
     definition_type: 'ContextExternalTool',
     definition_id: definition_id.toString(),
     url,
     name,
     description,
     domain: 'http://lti-13-test-tool.inseng.test',
-    placements: {
-      ActivityAssetProcessor: {
-        message_type: 'LtiDeepLinkingRequest',
-        url,
-        title: name,
-        selection_width: 600,
-        selection_height: 500,
-      },
-    },
+    placements: {},
+    context_name,
   }
+  if (contribution) {
+    def.placements.ActivityAssetProcessorContribution = {
+      message_type: 'LtiDeepLinkingRequest',
+      url,
+      title: name,
+      selection_width: 800,
+      selection_height: 400,
+    }
+  } else {
+    def.placements.ActivityAssetProcessor = {
+      message_type: 'LtiDeepLinkingRequest',
+      url,
+      title: name,
+      selection_width: 600,
+      selection_height: 500,
+    }
+  }
+  return def
 }
 
-function makeMockTools(): LtiLaunchDefinition[] {
+function makeMockTools(contribution = false): LtiLaunchDefinition[] {
+  const postfix = contribution ? ` Contribution` : ''
   return [
     makeMockTool({
-      name: 't1',
-      description: 'd1',
+      name: 't1' + postfix,
+      description: 'd1' + postfix,
       url: 'http://t1.instructure.com.com',
       definition_id: 11,
+      contribution,
     }),
     makeMockTool({
-      name: 't2',
-      description: 'd2',
+      name: 't2' + postfix,
+      description: 'd2' + postfix,
       url: 'http://t2.instructure.com.com',
       definition_id: 22,
+      contribution,
     }),
     makeMockTool({
-      name: 't3',
-      description: 'd3',
+      name: 't3' + postfix,
+      description: 'd3' + postfix,
       url: 'http://t3.instructure.com.com',
       definition_id: 33,
+      contribution,
     }),
     makeMockTool({
-      name: 't4',
-      description: 'd4',
+      name: 't4' + postfix,
+      description: 'd4' + postfix,
       url: 'http://t4.instructure.com.com',
       definition_id: 44,
+      contribution,
+      context_name: 'Account A',
     }),
   ]
 }
 
-export function mockDoFetchApi(expectedPath: string, doFetchApi: jest.Mock) {
-  doFetchApi.mockImplementation(async (...args: any[]) => {
-    const {path} = args[0] as any
-    if (path === expectedPath) {
-      return {
-        response: {ok: true, statusText: 'OK'},
-        json: mockTools,
-      }
-    }
-    throw new Error(`Unexpected path: ${path}`)
-  })
+// MSW handler for asset processor tools
+export function createAssetProcessorMswHandler() {
+  return (req: any) => {
+    const url = new URL(req.request.url)
+    const placements = url.searchParams.get('placements[]')
+    return placements === 'ActivityAssetProcessor'
+      ? mockToolsForAssignment
+      : mockToolsForDiscussions
+  }
 }
 
-export const mockTools = makeMockTools()
+export const mockToolsForAssignment = makeMockTools(false)
+export const mockToolsForDiscussions = makeMockTools(true)
 
 // To be used with:
 // useAssetProcessorsToolsList.mockReturnValue(makeMockAssetProcessorsToolsListQuery())
 export const mockAssetProcessorsToolsListQuery = {
-  data: mockTools,
+  data: mockToolsForAssignment,
   loading: false,
   error: null,
 }
@@ -101,6 +126,19 @@ export const mockDeepLinkResponse: DeepLinkResponse = {
   content_items: [
     {
       type: 'ltiAssetProcessor',
+      report: {},
+      text: 'Lti 1.3 Tool Text',
+      title: 'Lti 1.3 Tool Title',
+    },
+  ],
+  reloadpage: false,
+  tool_id: '22',
+}
+
+export const mockContributionDeepLinkResponse: DeepLinkResponse = {
+  content_items: [
+    {
+      type: 'ltiAssetProcessorContribution',
       report: {},
       text: 'Lti 1.3 Tool Text',
       title: 'Lti 1.3 Tool Title',

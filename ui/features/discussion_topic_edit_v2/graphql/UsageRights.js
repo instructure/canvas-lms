@@ -21,7 +21,7 @@ import {shape, string} from 'prop-types'
 
 export const UsageRights = {
   fragment: gql`
-    fragment UsageRights on UsageRights {
+    fragment EditV2UsageRights on UsageRights {
       id
       legalCopyright
       license

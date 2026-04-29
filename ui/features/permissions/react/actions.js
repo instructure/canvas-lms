@@ -22,7 +22,7 @@ import {ALL_ROLES_VALUE} from '@canvas/permissions/react/propTypes'
 
 import * as apiClient from './apiClient'
 
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('permissions')
 
@@ -54,8 +54,9 @@ const types = [
 
 const actions = createActions(...types)
 
-actions.searchPermissions = function searchPermissions({permissionSearchString, contextType}) {
-  return (dispatch, getState) => {
+actions.searchPermissions =
+  ({permissionSearchString, contextType}) =>
+  (dispatch, getState) => {
     dispatch(actions.updatePermissionsSearch({permissionSearchString, contextType}))
     const markedPermissions = getState().permissions
     const numDisplayedPermissions = markedPermissions.filter(p => p.displayed).length
@@ -68,154 +69,132 @@ actions.searchPermissions = function searchPermissions({permissionSearchString, 
     )
     $.screenReaderFlashMessageExclusive(message)
   }
-}
 
-actions.createNewRole = function (label, baseRole, context) {
-  return (dispatch, getState) => {
-    dispatch(actions.addTraySavingStart())
-    const roleContext = context
-    const selectedRoles = getState().selectedRoles
-    apiClient
-      .postNewRole(getState(), label, baseRole)
-      .then(res => {
-        const createdRole = res.data
-        dispatch(actions.addNewRole(createdRole))
-        dispatch(actions.addTraySavingSuccess())
-        dispatch(actions.hideAllTrays())
-        dispatch(actions.displayRoleTray({role: createdRole}))
-        const newSelectedRoles = [...selectedRoles, createdRole]
-        dispatch(
-          actions.updateRoleFilters({selectedRoles: newSelectedRoles, contextType: roleContext}),
-        )
-        dispatch(actions.filterNewRole(createdRole))
-      })
-      .catch(error => {
-        dispatch(actions.addTraySavingFail())
-        showFlashError(I18n.t('Failed to create new role'))(error)
-      })
-  }
-}
-
-actions.updateRoleName = function (id, label, baseType) {
-  return (dispatch, getState) => {
-    apiClient
-      .updateRole(getState().contextId, id, {label, base_role_type: baseType})
-      .then(res => {
-        dispatch(actions.updateRole(res.data))
-      })
-      .catch(error => {
-        showFlashError(I18n.t('Failed to update role name'))(error)
-      })
-  }
-}
-
-actions.setAndOpenRoleTray = function (role) {
-  return dispatch => {
+actions.createNewRole = (label, baseRole, context) => async (dispatch, getState) => {
+  dispatch(actions.addTraySavingStart())
+  const selectedRoles = getState().selectedRoles
+  try {
+    const res = await apiClient.postNewRole(getState(), label, baseRole)
+    const createdRole = res.json
+    dispatch(actions.addNewRole(createdRole))
+    dispatch(actions.addTraySavingSuccess())
     dispatch(actions.hideAllTrays())
-    dispatch(actions.displayRoleTray({role}))
+    dispatch(actions.displayRoleTray({role: createdRole}))
+    const newSelectedRoles = [...selectedRoles, createdRole]
+    dispatch(actions.updateRoleFilters({selectedRoles: newSelectedRoles, contextType: context}))
+    dispatch(actions.filterNewRole(createdRole))
+  } catch (error) {
+    dispatch(actions.addTraySavingFail())
+    showFlashError(I18n.t('Failed to create new role'))(error)
   }
 }
 
-actions.setAndOpenAddTray = function () {
-  return dispatch => {
-    dispatch(actions.hideAllTrays())
-    dispatch(actions.displayAddTray())
+actions.updateRoleName = (id, label, baseType) => async (dispatch, getState) => {
+  try {
+    const res = await apiClient.updateRole(getState().contextId, id, {
+      label,
+      base_role_type: baseType,
+    })
+    dispatch(actions.updateRole(res.json))
+  } catch (error) {
+    showFlashError(I18n.t('Failed to update role name'))(error)
   }
 }
 
-actions.setAndOpenPermissionTray = function (permission) {
-  return dispatch => {
-    dispatch(actions.hideAllTrays())
-    dispatch(actions.displayPermissionTray({permission}))
-  }
+actions.setAndOpenRoleTray = role => dispatch => {
+  dispatch(actions.hideAllTrays())
+  dispatch(actions.displayRoleTray({role}))
 }
 
-actions.filterRoles = function filterRoles({selectedRoles, contextType}) {
-  return (dispatch, _getState) => {
+actions.setAndOpenAddTray = () => dispatch => {
+  dispatch(actions.hideAllTrays())
+  dispatch(actions.displayAddTray())
+}
+
+actions.setAndOpenPermissionTray = permission => dispatch => {
+  dispatch(actions.hideAllTrays())
+  dispatch(actions.displayPermissionTray({permission}))
+}
+
+actions.filterRoles =
+  ({selectedRoles, contextType}) =>
+  dispatch => {
     dispatch(actions.updateSelectedRoles(selectedRoles))
 
     if (selectedRoles.length === 0 || selectedRoles[0].value !== ALL_ROLES_VALUE) {
       dispatch(actions.updateRoleFilters({selectedRoles, contextType}))
     }
   }
+
+actions.filterRemovedRole = contextType => (dispatch, getState) => {
+  dispatch(actions.updateRoleFilters({selectedRoles: getState().selectedRoles, contextType}))
 }
 
-actions.filterRemovedRole = function filterRemovedRole(contextType) {
-  return (dispatch, getState) => {
-    dispatch(actions.updateRoleFilters({selectedRoles: getState().selectedRoles, contextType}))
+actions.tabChanged = newContextType => dispatch => {
+  dispatch(actions.permissionsTabChanged(newContextType))
+}
+
+actions.modifyPermissions = arg => async (dispatch, getState) => {
+  const state = getState()
+  const {id, enabled, locked, explicit, applies_to_self, applies_to_descendants} = arg
+  const role = state.roles.find(r => r.id === id)
+  const permissionPayload = {
+    enabled,
+    locked,
+    explicit,
+    ...(state.isSiteAdmin && {
+      applies_to_self,
+      applies_to_descendants,
+    }),
+  }
+  dispatch(actions.apiPending({id: arg.id, name: arg.name}))
+  try {
+    const res = await apiClient.updateRole(state.contextId, arg.id, {
+      permissions: {[arg.name]: permissionPayload},
+    })
+    const newRes = {...res.json, contextType: role.contextType, displayed: role.displayed}
+    dispatch(actions.updatePermissions({role: newRes}))
+    dispatch(actions.fixButtonFocus({permissionName: arg.name, roleId: arg.id, inTray: arg.inTray}))
+  } catch {
+    setTimeout(() => showFlashError(I18n.t('Failed to update permission'))(), 500)
+  } finally {
+    dispatch(actions.apiComplete({id: arg.id, name: arg.name}))
   }
 }
 
-actions.tabChanged = function tabChanged(newContextType) {
-  return (dispatch, _getState) => {
-    dispatch(actions.permissionsTabChanged(newContextType))
+actions.deleteRole = (role, successCallback, failCallback) => async (dispatch, getState) => {
+  const selectedRoles = getState().selectedRoles
+  try {
+    await apiClient.deleteRole(getState().contextId, role)
+    successCallback()
+    dispatch(actions.deleteRoleSuccess(role))
+    dispatch(actions.filterDeletedRole({role, selectedRoles}))
+    showFlashSuccess(I18n.t('Delete role %{label} succeeded', {label: role.label}))()
+  } catch {
+    failCallback()
+    setTimeout(
+      () => showFlashError(I18n.t('Failed to delete role %{label}', {label: role.label}))(),
+      500,
+    )
   }
 }
 
-actions.modifyPermissions = function modifyPermissions({
-  name,
-  id,
-  enabled,
-  locked,
-  explicit,
-  inTray,
-}) {
-  return (dispatch, getState) => {
-    const role = getState().roles.find(r => r.id === id)
-    dispatch(actions.apiPending({id, name}))
-    apiClient
-      .updateRole(getState().contextId, id, {permissions: {[name]: {enabled, locked, explicit}}})
-      .then(res => {
-        const newRes = {...res.data, contextType: role.contextType, displayed: role.displayed}
-        dispatch(actions.updatePermissions({role: newRes}))
-        dispatch(actions.fixButtonFocus({permissionName: name, roleId: id, inTray}))
-        dispatch(actions.apiComplete({id, name}))
-      })
-      .catch(_error => {
-        setTimeout(() => showFlashError(I18n.t('Failed to update permission'))(), 500)
-        dispatch(actions.apiComplete({id, name}))
-      })
+actions.updateBaseRole = (role, baseRole, onSuccess, onFail) => async (dispatch, getState) => {
+  const state = getState()
+  try {
+    // currently updateBaseRole does not return a Promise because it immediately
+    // throws an error due to the endpoint not existing, but it might some day so
+    // we'll retain this form. It's a no-op for now though.
+    const res = await apiClient.updateBaseRole(state, role, baseRole)
+    const newRes = {...res.json, contextType: role.contextType, displayed: role.displayed}
+    dispatch(actions.updatePermissions({role: newRes}))
+    onSuccess()
+  } catch {
+    onFail()
   }
 }
 
-actions.deleteRole = function (role, successCallback, failCallback) {
-  return (dispatch, getState) => {
-    const selectedRoles = getState().selectedRoles
-    apiClient
-      .deleteRole(getState().contextId, role)
-      .then(_ => {
-        successCallback()
-        dispatch(actions.deleteRoleSuccess(role))
-        dispatch(actions.filterDeletedRole({role, selectedRoles}))
-        showFlashSuccess(I18n.t('Delete role %{label} succeeded', {label: role.label}))()
-      })
-      .catch(_error => {
-        failCallback()
-        setTimeout(
-          () => showFlashError(I18n.t('Failed to delete role %{label}', {label: role.label}))(),
-          500,
-        )
-      })
-  }
-}
-
-actions.updateBaseRole = function updateBaseRole(role, baseRole, onSuccess, onFail) {
-  return (dispatch, getState) => {
-    const state = getState()
-    apiClient
-      .updateBaseRole(state, role, baseRole)
-      .then(res => {
-        const newRes = {...res.data, contextType: role.contextType, displayed: role.displayed}
-        dispatch(actions.updatePermissions({role: newRes}))
-        onSuccess()
-      })
-      .catch(() => {
-        onFail()
-      })
-  }
-}
-
-actions.fixButtonFocus = function fixButtonFocus({permissionName, roleId, inTray}) {
+actions.fixButtonFocus = ({permissionName, roleId, inTray}) => {
   const targetArea = inTray ? 'tray' : 'table'
   return actions.fixFocus({permissionName, roleId, targetArea})
 }

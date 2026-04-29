@@ -20,9 +20,10 @@ import $ from 'jquery'
 import React, {useState} from 'react'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {assignLocation, reloadWindow} from '@canvas/util/globalUtils'
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Link} from '@instructure/ui-link'
@@ -40,27 +41,22 @@ function QuizEngineModal({setOpen, onDismiss}) {
   const [checked, setChecked] = useState(false)
   const authenticity_token = () => getCookie('_csrf_token')
 
+  const newQuizDescription = I18n.t(
+    `This has more question types, enhanced moderation and accommodation features, and supports creating and managing surveys.`,
+  )
+
   const link = (
     <Link href={I18n.t('#community.new_quizzes_feature_comparison')}>
       {I18n.t('Learn more about the differences.')}
     </Link>
   )
-  const newQuizLabel = <Text weight="bold">{I18n.t('New Quizzes')}</Text>
+  const newQuizLabelText = I18n.t('New Quizzes/Surveys')
+
+  const newQuizLabel = <Text weight="bold">{newQuizLabelText}</Text>
   const classicLabel = <Text weight="bold">{I18n.t('Classic Quizzes')}</Text>
   const newDesc = (
     <div style={{paddingLeft: '1.75rem', maxWidth: '23.5rem'}}>
-      <Text weight="light">
-        {I18n.t(`This has more question types like hotspot,
-        categorization, matching, and ordering. It also has
-        more moderation and accommodation features.`)}
-      </Text>
-    </div>
-  )
-  const classicDesc = (
-    <div style={{paddingLeft: '1.75rem', maxWidth: '23.5rem'}}>
-      <Text weight="light">
-        {I18n.t(`Currently, Surveys are available through Classic Quizzes.`)}
-      </Text>
+      <Text weight="light">{newQuizDescription}</Text>
     </div>
   )
   const footer = (
@@ -147,6 +143,8 @@ function QuizEngineModal({setOpen, onDismiss}) {
       label={I18n.t('Choose a Quiz Engine')}
       footer={footer}
       aria-modal={true}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       {description}
       <RadioInputGroup
@@ -167,18 +165,7 @@ function QuizEngineModal({setOpen, onDismiss}) {
           size="large"
         />
         {newDesc}
-        <RadioInput
-          key={CLASSIC}
-          value={CLASSIC}
-          label={
-            <span>
-              {classicLabel}
-              <ScreenReaderContent>- {classicDesc}</ScreenReaderContent>
-            </span>
-          }
-          size="large"
-        />
-        {classicDesc}
+        <RadioInput key={CLASSIC} value={CLASSIC} label={classicLabel} size="large" />
       </RadioInputGroup>
       <hr />
       <Checkbox

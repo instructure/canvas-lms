@@ -63,6 +63,7 @@ describe "discussions" do
       end
 
       it "allows a student to create a discussion", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         get url
         expect_new_page_load { f("#add_discussion").click }
         edit_topic("from a student", "tell me a story")

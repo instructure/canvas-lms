@@ -61,7 +61,7 @@ module Crystalball
 
           File.write(prediction_file_path, prediction.flatten.join(","))
           Crystalball.log :info, "Saved RSpec prediction to #{prediction_file_path}"
-          exit # rubocop:disable Rails/Exit
+          exit
         end
 
         def compress_prediction(prediction)

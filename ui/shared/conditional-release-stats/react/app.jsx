@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {connect, Provider} from 'react-redux'
 import BreakdownGraphs from './components/breakdown-graphs'
 import BreakdownDetails from './components/breakdown-details'
@@ -55,14 +55,17 @@ export default class CRSApp {
       selectRange: this.actions.selectRange,
     }
 
-    if (!this.graphsRoot) {
-      this.graphsRoot = createRoot(root)
-    }
-    this.graphsRoot.render(
+    const component = (
       <Provider store={this.store}>
         <Graphs {...actions} />
-      </Provider>,
+      </Provider>
     )
+
+    if (!this.graphsRoot) {
+      this.graphsRoot = render(component, root)
+    } else {
+      rerender(this.graphsRoot, component)
+    }
   }
 
   renderDetails(root) {
@@ -75,13 +78,16 @@ export default class CRSApp {
       closeSidebar: this.actions.closeSidebar,
     }
 
-    if (!this.detailsRoot) {
-      this.detailsRoot = createRoot(root)
-    }
-    this.detailsRoot.render(
+    const component = (
       <Provider store={this.store}>
         <Details {...detailActions} />
-      </Provider>,
+      </Provider>
     )
+
+    if (!this.detailsRoot) {
+      this.detailsRoot = render(component, root)
+    } else {
+      rerender(this.detailsRoot, component)
+    }
   }
 }

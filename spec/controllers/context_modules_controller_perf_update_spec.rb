@@ -143,6 +143,52 @@ describe ContextModulesController do
         end
       end
     end
+
+    context "when user is an admin" do
+      let(:context_module) { @course.context_modules.create! }
+
+      before do
+        @admin = account_admin_user(account: @course.account)
+        user_session(@admin)
+      end
+
+      describe "EXPANDED_MODULES and COLLAPSED_MODULES" do
+        context "when admin has collapsed a module" do
+          before do
+            post "toggle_collapse", params: { course_id: @course.id, context_module_id: context_module.id, collapse: "1" }, format: :json
+          end
+
+          it "should create progressions for admin users and track collapsed state" do
+            progression = ContextModuleProgression.find_by(user_id: @admin.id, context_module_id: context_module.id)
+            expect(progression).not_to be_nil
+            expect(progression.collapsed).to be true
+          end
+
+          it "should assign collapsed module to @collapsed_modules" do
+            subject
+            expect(assigns(:expanded_modules)).to be_empty
+            expect(assigns(:collapsed_modules)).to eql([context_module.id])
+          end
+        end
+
+        context "when admin has expanded a module" do
+          before do
+            post "toggle_collapse", params: { course_id: @course.id, context_module_id: context_module.id, collapse: "1" }, format: :json
+            post "toggle_collapse", params: { course_id: @course.id, context_module_id: context_module.id, collapse: "0" }, format: :json
+          end
+
+          it "should track expanded state and assign to @expanded_modules" do
+            progression = ContextModuleProgression.find_by(user_id: @admin.id, context_module_id: context_module.id)
+            expect(progression).not_to be_nil
+            expect(progression.collapsed).to be false
+
+            subject
+            expect(assigns(:expanded_modules)).to eql([context_module.id])
+            expect(assigns(:collapsed_modules)).to be_empty
+          end
+        end
+      end
+    end
   end
 
   describe "GET 'module_html'" do
@@ -183,7 +229,7 @@ describe ContextModulesController do
           it "renders the template" do
             subject
             assert_status(200)
-            expect(response.body).to_not be_empty
+            expect(response.body).not_to be_empty
           end
 
           it "does not apply show_student_only_module_id to teachers" do
@@ -221,9 +267,9 @@ describe ContextModulesController do
             end
 
             it "has the @menu_tools variable" do
-              finder_double = double("Lti::ContextToolFinder")
-              tool_double_1 = double("Tool 1", has_placement?: true, cache_key: "key")
-              tool_double_2 = double("Tool 2", has_placement?: false, cache_key: "key")
+              finder_double = instance_double(Lti::ContextToolFinder)
+              tool_double_1 = instance_double(ContextExternalTool, has_placement?: true, cache_key: "key")
+              tool_double_2 = instance_double(ContextExternalTool, has_placement?: false, cache_key: "key")
 
               allow_any_instance_of(ContextExternalToolsHelper)
                 .to receive(:external_tool_menu_item_tag).and_return("mocked_value")
@@ -242,13 +288,13 @@ describe ContextModulesController do
           describe "rights load" do
             before { subject }
 
-            it { expect(assigns(:can_view)).to_not be_nil }
-            it { expect(assigns(:can_add)).to_not be_nil }
-            it { expect(assigns(:can_edit)).to_not be_nil }
-            it { expect(assigns(:can_delete)).to_not be_nil }
-            it { expect(assigns(:can_view_grades)).to_not be_nil }
-            it { expect(assigns(:is_student)).to_not be_nil }
-            it { expect(assigns(:can_view_unpublished)).to_not be_nil }
+            it { expect(assigns(:can_view)).not_to be_nil }
+            it { expect(assigns(:can_add)).not_to be_nil }
+            it { expect(assigns(:can_edit)).not_to be_nil }
+            it { expect(assigns(:can_delete)).not_to be_nil }
+            it { expect(assigns(:can_view_grades)).not_to be_nil }
+            it { expect(assigns(:is_student)).not_to be_nil }
+            it { expect(assigns(:can_view_unpublished)).not_to be_nil }
           end
         end
 
@@ -266,6 +312,7 @@ describe ContextModulesController do
     context "when modules_perf disabled" do
       before do
         @course.account.disable_feature!(:modules_perf)
+        user_session(@user)
       end
 
       it "renders 404" do
@@ -334,9 +381,9 @@ describe ContextModulesController do
           end
 
           it "has the @menu_tools variable" do
-            finder_double = double("Lti::ContextToolFinder")
-            tool_double_1 = double("Tool 1", has_placement?: true)
-            tool_double_2 = double("Tool 2", has_placement?: false)
+            finder_double = instance_double(Lti::ContextToolFinder)
+            tool_double_1 = instance_double(ContextExternalTool, has_placement?: true)
+            tool_double_2 = instance_double(ContextExternalTool, has_placement?: false)
 
             allow(Lti::ContextToolFinder)
               .to receive(:new)
@@ -352,13 +399,13 @@ describe ContextModulesController do
           describe "rights load" do
             before { subject }
 
-            it { expect(assigns(:can_view)).to_not be_nil }
-            it { expect(assigns(:can_add)).to_not be_nil }
-            it { expect(assigns(:can_edit)).to_not be_nil }
-            it { expect(assigns(:can_delete)).to_not be_nil }
-            it { expect(assigns(:can_view_grades)).to_not be_nil }
-            it { expect(assigns(:is_student)).to_not be_nil }
-            it { expect(assigns(:can_view_unpublished)).to_not be_nil }
+            it { expect(assigns(:can_view)).not_to be_nil }
+            it { expect(assigns(:can_add)).not_to be_nil }
+            it { expect(assigns(:can_edit)).not_to be_nil }
+            it { expect(assigns(:can_delete)).not_to be_nil }
+            it { expect(assigns(:can_view_grades)).not_to be_nil }
+            it { expect(assigns(:is_student)).not_to be_nil }
+            it { expect(assigns(:can_view_unpublished)).not_to be_nil }
           end
         end
 
@@ -469,10 +516,133 @@ describe ContextModulesController do
     context "when modules_perf disabled" do
       before do
         @course.account.disable_feature!(:modules_perf)
+        user_session(@user)
       end
 
       it "renders 404" do
         subject
+        assert_status(404)
+      end
+    end
+  end
+
+  describe "GET 'bulk_items_html'" do
+    render_views
+
+    before :once do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
+    let(:page1) { @course.wiki_pages.create! title: "title1" }
+    let(:page2) { @course.wiki_pages.create! title: "title2" }
+
+    let(:module1) do
+      context_module = @course.context_modules.create!
+      context_module.add_item({ type: "wiki_page", id: page1.id }, nil, position: 1)
+      context_module
+    end
+
+    let(:module2) do
+      context_module = @course.context_modules.create!
+      context_module.add_item({ type: "wiki_page", id: page2.id }, nil, position: 1)
+      context_module
+    end
+
+    context "when modules_perf enabled" do
+      before do
+        @course.account.enable_feature!(:modules_perf)
+      end
+
+      context "when there is a user session" do
+        before do
+          user_session(@user)
+        end
+
+        it "returns bad request when module_ids is empty" do
+          get "bulk_items_html", params: { course_id: @course.id, module_ids: [] }
+          assert_status(400)
+        end
+
+        it "returns bad request when module_ids contains non-numeric values" do
+          get "bulk_items_html", params: { course_id: @course.id, module_ids: ["abc", "123"] }
+          assert_status(400)
+          expect(response.parsed_body["error"]).to eq("All module_ids must be numeric")
+        end
+
+        it "returns bad request when module_ids exceeds maximum of 40 modules" do
+          module_ids = (1..41).to_a
+          get "bulk_items_html", params: { course_id: @course.id, module_ids: }
+          assert_status(400)
+          expect(response.parsed_body["error"]).to eq("Cannot request more than 40 modules at once")
+        end
+
+        it "renders items for multiple modules" do
+          get "bulk_items_html", params: { course_id: @course.id, module_ids: [module1.id, module2.id] }
+          assert_status(200)
+
+          result = response.parsed_body
+          expect(result.keys).to contain_exactly(module1.id.to_s, module2.id.to_s)
+          expect(result[module1.id.to_s]["html"]).to include("<ul class=\"ig-list items context_module_items")
+          expect(result[module2.id.to_s]["html"]).to include("<ul class=\"ig-list items context_module_items")
+        end
+
+        it "skips modules that don't exist" do
+          get "bulk_items_html", params: { course_id: @course.id, module_ids: [module1.id, 99_999] }
+          assert_status(200)
+
+          result = response.parsed_body
+          expect(result.keys).to contain_exactly(module1.id.to_s)
+        end
+
+        describe "pagination" do
+          let(:module_with_many_items) do
+            context_module = @course.context_modules.create!
+            30.times do |i|
+              context_module.add_item({ type: "wiki_page", id: page1.id }, nil, position: i)
+            end
+            context_module
+          end
+
+          it "includes pagination info when there are multiple pages" do
+            get "bulk_items_html", params: { course_id: @course.id, module_ids: [module_with_many_items.id], per_page: 10 }
+            assert_status(200)
+
+            result = response.parsed_body
+            pagination = result[module_with_many_items.id.to_s]["pagination"]
+            expect(pagination).not_to be_nil
+            expect(pagination["current_page"]).to eq(1)
+            expect(pagination["total_pages"]).to eq(3)
+            expect(pagination["per_page"]).to eq(10)
+          end
+
+          it "does not include pagination info for single page modules" do
+            get "bulk_items_html", params: { course_id: @course.id, module_ids: [module1.id] }
+            assert_status(200)
+
+            result = response.parsed_body
+            expect(result[module1.id.to_s]["pagination"]).to be_nil
+          end
+
+          it "respects no_pagination parameter" do
+            get "bulk_items_html", params: { course_id: @course.id, module_ids: [module_with_many_items.id], no_pagination: true }
+            assert_status(200)
+
+            result = response.parsed_body
+            expect(result[module_with_many_items.id.to_s]["pagination"]).to be_nil
+          end
+        end
+      end
+    end
+
+    context "when modules_perf disabled" do
+      before do
+        @course.account.disable_feature!(:modules_perf)
+        user_session(@user)
+      end
+
+      it "renders 404" do
+        get "bulk_items_html", params: { course_id: @course.id, module_ids: [module1.id] }
         assert_status(404)
       end
     end

@@ -24,7 +24,8 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useCallback} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
+import {reloadWindow} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('horizon_toggle_page')
 
@@ -45,7 +46,7 @@ export const RevertAccount = ({accountId, isHorizonAccountLocked}: RevertAccount
         },
       })
 
-      window.location.reload()
+      reloadWindow()
     } catch (e) {
       showFlashError(I18n.t('Failed to revert account. Please try again.'))
     }

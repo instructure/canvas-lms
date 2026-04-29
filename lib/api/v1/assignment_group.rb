@@ -53,11 +53,15 @@ module Api::V1::AssignmentGroup
         user_content_attachments ||= api_bulk_load_user_content_attachments(assignments.map(&:description), group.context)
       end
 
-      needs_grading_course_proxy = if group.context.grants_right?(user, session, :manage_grades)
-                                     Assignments::NeedsGradingCountQuery::CourseProxy.new(group.context, user)
-                                   else
-                                     nil
-                                   end
+      # Prewarm the request cache for needs_grading_count so that assignment_json
+      # can read results without triggering per-assignment queries.
+      # Permission check must match the condition in assignment_json:
+      #   include_needs_grading_count && assignment.context.grants_right?(user, :manage_grades)
+      # needs_grading_count_by_section is not passed from here so only count needs warming.
+      if opts[:exclude_response_fields].exclude?("needs_grading_count") &&
+         group.context.grants_right?(user, session, :manage_grades)
+        Assignments::NeedsGradingCountQuery.new(assignments, user).count
+      end
 
       unless includes.include?("module_ids") || group.context.grants_right?(user, session, :read_as_admin)
         Assignment.preload_context_module_tags(assignments) # running this again is fine
@@ -74,6 +78,10 @@ module Api::V1::AssignmentGroup
 
       if includes.include?("checkpoints")
         ActiveRecord::Associations.preload(assignments, :sub_assignments)
+      end
+
+      if includes.include?("peer_review")
+        ActiveRecord::Associations.preload(assignments, :peer_review_sub_assignment)
       end
 
       hash["assignments"] = assignments.map do |assignment|
@@ -99,13 +107,13 @@ module Api::V1::AssignmentGroup
                                exclude_response_fields: exclude_fields,
                                overrides:,
                                include_overrides: opts[:include_overrides],
-                               needs_grading_course_proxy:,
                                submission: includes.include?("submission") ? opts[:submissions][assignment.id] : nil,
                                master_course_status: opts[:master_course_status],
                                include_assessment_requests: includes.include?("assessment_requests"),
                                include_checkpoints: includes.include?("checkpoints"),
                                include_has_rubric: includes.include?("has_rubric"),
-                               preloaded_enrollments_by_user_id:)
+                               preloaded_enrollments_by_user_id:,
+                               include_peer_review: includes.include?("peer_review"))
 
         unless opts[:exclude_response_fields].include?("in_closed_grading_period")
           assignment_closed_grading_period_hash = closed_grading_period_hash[json[:id]] || {}

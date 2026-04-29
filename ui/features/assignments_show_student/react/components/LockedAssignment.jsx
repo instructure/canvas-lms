@@ -20,7 +20,7 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AvailabilityDates from '@canvas/assignments/react/AvailabilityDates'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import lockedSVG from '../../images/Locked.svg'
+import lockedSVG from '@canvas/assignments/react/images/Locked.svg'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 

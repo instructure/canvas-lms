@@ -28,7 +28,8 @@
 # Resource Links can be associated with Assignments, Module Items,
 # Collaborations, and Rich Content embeddings.
 #
-# Use of this API requires the `manage_lti_add` and `manage_assignments_add` permissions.
+# List and Show endpoints require the `manage_assignments_add` permission.
+# Create, Update, and Delete endpoints additionally require `manage_lti_add`.
 #
 # <b>Caution!</b> Resource Links are usually managed by the tool that created them via LTI Deep Linking,
 # and using this API to create or modify links may result in errors when launching the link.
@@ -148,7 +149,8 @@
 #     }
 class Lti::ResourceLinksController < ApplicationController
   before_action :require_context_instrumented
-  before_action :require_permissions
+  before_action :require_manage_assignments_add_permission
+  before_action :require_manage_lti_add_permission, except: [:index, :show]
   before_action :validate_custom, only: [:create, :update]
   before_action :validate_url, only: [:create, :update]
   before_action :validate_tool, only: [:update]
@@ -176,21 +178,11 @@ class Lti::ResourceLinksController < ApplicationController
   #
   # @returns [Lti::ResourceLink]
   def index
-    course_assignment_ids = base_scope(@context.assignments).ids
-    # preload Assignment -> Course, used for launch_url
-    assignment_links = base_scope.where(context_type: "Assignment", context_id: course_assignment_ids).preload(context: :context)
-
-    # includes Module Items, Collaborations, and Rich Content
-    all_other_links = base_scope.where(context: @context).preload(:context)
-
     bookmarker = BookmarkedCollection::SimpleBookmarker.new(Lti::ResourceLink, :created_at, :id)
-    all_links = BookmarkedCollection.merge(
-      ["assignment", BookmarkedCollection.wrap(bookmarker, assignment_links)],
-      ["course", BookmarkedCollection.wrap(bookmarker, all_other_links)]
-    )
+    bookmarked_links = BookmarkedCollection.wrap(bookmarker, base_scope)
 
     per_page = Api.per_page_for(self, default: 50)
-    paginated_links = Api.paginate(all_links, self, url_for, { per_page: })
+    paginated_links = Api.paginate(bookmarked_links, self, url_for, { per_page: })
 
     render json: paginated_links.map { |link| resource_link_json(link) }
   rescue => e
@@ -321,7 +313,7 @@ class Lti::ResourceLinksController < ApplicationController
     end
 
     if errors.present?
-      return render json: { errors: }, status: :unprocessable_entity
+      return render json: { errors: }, status: :unprocessable_content
     end
 
     links = bulk_create_links(possible_links, @context)
@@ -396,6 +388,10 @@ class Lti::ResourceLinksController < ApplicationController
   private
 
   def base_scope(scope = Lti::ResourceLink)
+    # Since the URL for this API endpoint has /course/:course_id in it,
+    # the @context will be a course. We should also search where the context
+    # is an assignment in this course.
+    scope = scope.where(context: [@context, @context.assignments]).preload(:context)
     return scope if params[:include_deleted]
 
     scope.active
@@ -534,9 +530,12 @@ class Lti::ResourceLinksController < ApplicationController
     raise e
   end
 
-  def require_permissions
-    require_context_with_permission(@context, :manage_lti_add)
+  def require_manage_assignments_add_permission
     require_context_with_permission(@context, :manage_assignments_add)
+  end
+
+  def require_manage_lti_add_permission
+    require_context_with_permission(@context, :manage_lti_add)
   end
 
   def render_error(code, message, status: :unprocessable_entity)

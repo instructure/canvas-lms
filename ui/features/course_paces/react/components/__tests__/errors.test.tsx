@@ -21,8 +21,8 @@ import {act, render} from '@testing-library/react'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
 
-const syncUnpublishedChanges = jest.fn()
-afterEach(jest.clearAllMocks)
+const syncUnpublishedChanges = vi.fn()
+afterEach(vi.clearAllMocks)
 
 describe('Errors', () => {
   const defaultProps: ErrorsProps = {

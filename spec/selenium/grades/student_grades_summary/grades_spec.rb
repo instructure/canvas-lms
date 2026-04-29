@@ -138,41 +138,6 @@ describe "grades" do
       user_session(@student_1)
     end
 
-    it "allows student to test modifying grades", priority: "1" do
-      skip_if_chrome("issue with blur")
-      StudentGradesPage.visit_as_student(@course)
-
-      expect_any_instantiation_of(@first_assignment).to receive(:find_or_create_submission).and_return(@submission)
-
-      # check initial total
-      expect(f("#submission_final-grade .assignment_score .grade").text).to eq "33.33%"
-
-      edit_grade = lambda do |field, score|
-        field.click
-        set_value field.find_element(:css, "input"), score.to_s
-        driver.execute_script '$("#grade_entry").blur()'
-      end
-
-      assert_grade = lambda do |grade|
-        wait_for_ajaximations
-        expect(f("#submission_final-grade .grade")).to include_text grade.to_s
-      end
-
-      # test changing existing scores
-      first_row_grade = f("#submission_#{@submission.assignment_id} .assignment_score .grade")
-      edit_grade.call(first_row_grade, 4)
-      assert_grade.call("40%")
-
-      # using find with jquery to avoid caching issues
-
-      # test changing unsubmitted scores
-      third_grade = f("#submission_#{@third_assignment.id} .assignment_score .grade")
-      edit_grade.call(third_grade, 10)
-      assert_grade.call("96.97%")
-
-      driver.execute_script '$("#grade_entry").focus()'
-    end
-
     it "displays rubric on assignment and properly highlight levels", priority: "1" do
       zero_assignment = assignment_model({ title: "zero assignment", course: @course })
       zero_association = @rubric.associate_with(zero_assignment, @course, purpose: "grading")

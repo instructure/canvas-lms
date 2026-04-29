@@ -26,6 +26,7 @@ describe "dashboard" do
   include DashboardPage
   include K5DashboardPageObject
   include DashboardCommon
+
   include_context "in-process server selenium tests"
 
   before :once do

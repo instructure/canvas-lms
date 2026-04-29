@@ -24,6 +24,7 @@ import {View} from '@instructure/ui-view'
 import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
 import type {AssignmentGroupCriteriaMap} from '@canvas/grading/grading.d'
+import type {WorkflowState} from '../../../../api.d'
 import AssignmentInformation from './AssignmentInformation'
 import ContentSelection from './ContentSelection'
 import GlobalSettings from './GlobalSettings'
@@ -80,6 +81,11 @@ export default function EnhancedIndividualGradebook() {
   )
 
   const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
+
+  // Peer review submissions are returned as first-class submissions via the includePeerReviewSubmissions filter.
+  // They are stored in assignmentSubmissionsMap under their own assignment ID, so no extraction is needed.
+  // Note: subAssignmentSubmissions field only works for Discussion Checkpoints (checkpoints_parent? = true),
+  // not for peer review sub assignments (checkpoints_parent? = false).
   const submissionsMap = selectedAssignment ? assignmentSubmissionsMap[selectedAssignment.id] : {}
   const submissionsForSelectedAssignment = Object.values(submissionsMap ?? {})
 
@@ -168,7 +174,14 @@ export default function EnhancedIndividualGradebook() {
         workflow_state: submissionAssignment?.workflowState,
         excused: submission.excused,
         id: submission.id,
-        submission: {assignment_id: submissionAssignment?.id},
+        submission: {
+          score: submission.score,
+          grade: submission.grade,
+          assignment_id: submission.assignmentId,
+          workflow_state: submission.state as WorkflowState,
+          excused: submission.excused,
+          id: submission.id,
+        },
       }
     })
 

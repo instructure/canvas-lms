@@ -21,7 +21,7 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import api from '../gradingPeriodSetsApi'
 
-jest.mock('@canvas/network/NaiveRequestDispatch/index')
+vi.mock('@canvas/network/NaiveRequestDispatch/index')
 
 const deserializedSets = [
   {
@@ -148,7 +148,7 @@ describe('gradingPeriodSetsApi', () => {
     ENV.GRADING_PERIOD_SETS_URL = 'api/grading_period_sets'
     ENV.GRADING_PERIOD_SET_UPDATE_URL = 'api/grading_period_sets/${id}'
 
-    mockGetDepaginated = jest.fn()
+    mockGetDepaginated = vi.fn()
     NaiveRequestDispatch.mockImplementation(() => ({
       getDepaginated: mockGetDepaginated,
     }))
@@ -156,7 +156,7 @@ describe('gradingPeriodSetsApi', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('list', () => {
@@ -242,7 +242,7 @@ describe('gradingPeriodSetsApi', () => {
           },
         },
       }
-      const postSpy = jest.spyOn(axios, 'post').mockResolvedValue(mockResponse)
+      const postSpy = vi.spyOn(axios, 'post').mockResolvedValue(mockResponse)
       await api.create(deserializedSetCreating)
       expect(postSpy).toHaveBeenCalledWith('api/grading_period_sets', {
         enrollment_term_ids: ['1', '2'],

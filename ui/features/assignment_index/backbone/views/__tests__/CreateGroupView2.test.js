@@ -65,13 +65,13 @@ describe('CreateGroupView - Drop Rules', () => {
     }
     document.querySelectorAll('.ui-dialog').forEach(el => el.remove())
     document.body.innerHTML = ''
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   test('it should not save drop rules when none are given', async () => {
     view = createView()
     const deferred = $.Deferred()
-    saveMock = jest.spyOn(view.model, 'save').mockReturnValue(deferred)
+    saveMock = vi.spyOn(view.model, 'save').mockReturnValue(deferred)
     document.getElementById('fixtures').appendChild(view.el)
 
     view.render()
@@ -96,7 +96,7 @@ describe('CreateGroupView - Drop Rules', () => {
   test('it should save drop rules when given', async () => {
     view = createView()
     const deferred = $.Deferred()
-    saveMock = jest.spyOn(view.model, 'save').mockReturnValue(deferred)
+    saveMock = vi.spyOn(view.model, 'save').mockReturnValue(deferred)
     document.getElementById('fixtures').appendChild(view.el)
 
     view.render()

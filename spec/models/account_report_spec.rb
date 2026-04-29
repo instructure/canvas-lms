@@ -94,4 +94,75 @@ describe AccountReport do
       expect(Rails.logger).to have_received(:error).with(/#{error_message}/)
     end
   end
+
+  describe ".last_reports" do
+    let_once(:account) { account_model }
+    let_once(:admin) { user_model }
+
+    it "preloads attachments with upload statuses" do
+      report_type = AccountReport.available_reports.keys.first
+      report = AccountReport.create!(account:, user: admin, report_type:, workflow_state: "complete")
+      report.create_attachment!(context: account, filename: "report.csv", content_type: "text/csv")
+
+      results = AccountReport.last_reports(account:)
+      returned = results[report_type]
+      expect(returned).to eq report
+      expect(returned.association(:attachment)).to be_loaded
+      expect(returned.attachment.association(:last_attachment_upload_status)).to be_loaded
+    end
+  end
+
+  describe ".last_complete_reports" do
+    let_once(:account) { account_model }
+    let_once(:admin) { user_model }
+
+    it "preloads attachments with upload statuses" do
+      report_type = AccountReport.available_reports.keys.first
+      report = AccountReport.create!(account:, user: admin, report_type:, workflow_state: "complete", progress: 100)
+      report.create_attachment!(context: account, filename: "report.csv", content_type: "text/csv")
+
+      results = AccountReport.last_complete_reports(account:)
+      returned = results[report_type]
+      expect(returned).to eq report
+      expect(returned.association(:attachment)).to be_loaded
+      expect(returned.attachment.association(:last_attachment_upload_status)).to be_loaded
+    end
+  end
+
+  describe ".recent_for" do
+    let(:account) { account_model }
+    let(:admin) { user_model }
+
+    it "returns nil when no recent report exists" do
+      expect(AccountReport.recent_for(account:, report_type: "no-such-report")).to be_nil
+    end
+
+    it "finds reports when parameters are provided" do
+      report = AccountReport.create!(account:, user: admin, report_type: "sis", workflow_state: "created", parameters: { "a" => "1" }, created_at: 1.hour.ago)
+      expect(AccountReport.recent_for(account:, report_type: "sis", parameters: { "a" => "1" })).to eq(report)
+    end
+
+    it "returns the most recent report based on created_at" do
+      older = AccountReport.create!(account:, user: admin, report_type: "sis", workflow_state: "created", created_at: 1.hour.ago)
+      newer = AccountReport.create!(account:, user: admin, report_type: "sis", workflow_state: "created", created_at: 30.minutes.ago)
+      expect(AccountReport.recent_for(account:, report_type: "sis")).to eq(newer)
+      expect(AccountReport.recent_for(account:, report_type: "sis")).not_to eq(older)
+    end
+
+    it "ignores reports not in created_or_running states" do
+      AccountReport.create!(account:, user: admin, report_type: "sis", workflow_state: "complete", created_at: 1.hour.ago)
+      recent = AccountReport.create!(account:, user: admin, report_type: "sis", workflow_state: "running", created_at: 30.minutes.ago)
+      expect(AccountReport.recent_for(account:, report_type: "sis")).to eq(recent)
+    end
+
+    it "respects the recent_account_report_window_hours setting" do
+      Setting.set("recent_account_report_window_hours", "1")
+      AccountReport.create!(account:, user: admin, report_type: "sis", workflow_state: "created", created_at: 2.hours.ago)
+      recent = AccountReport.create!(account:, user: admin, report_type: "sis", workflow_state: "created", created_at: 30.minutes.ago)
+      expect(AccountReport.recent_for(account:, report_type: "sis")).to eq(recent)
+
+      Setting.set("recent_account_report_window_hours", "0")
+      expect(AccountReport.recent_for(account:, report_type: "sis")).to be_nil
+    end
+  end
 end

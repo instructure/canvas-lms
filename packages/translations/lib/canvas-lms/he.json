@@ -1,0 +1,150 @@
+{
+    "ConfirmationDialog": {
+        "Cancel": "ביטול",
+        "Confirm": "אישור"
+    },
+    "GradingSchemeManagement": {
+        "Applied": "ייושם",
+        "Apply": "החל",
+        "Archived": "הועבר לארכיון",
+        "Are you sure you want to delete this grading scheme?": "בטוח/ה שרוצה לבטל את סכימת ההערכה הזו?",
+        "Cancel": "ביטול",
+        "Canvas Default": "ברירת המחדל של קנבס",
+        "Close": "סגירה",
+        "Confirm": "אישור",
+        "Delete Grading Scheme": "ביטול סכימת הערכה",
+        "Edit Grading Scheme": "עריכת סכימת הערכה",
+        "Lower limit of range": "גבול תחתון לטווח",
+        "Save": "שמירה",
+        "Search": "חיפוש",
+        "Upper limit of range": "גבול עליון לטווח",
+        "View Grading Scheme": "עיון בסכימת ההערכה",
+        "View/Edit Grading Scheme": "הצגת/עריכת סכימת הערכה",
+        "to": "עבור"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "בטוח/ה שרוצה לבטל את סכימת ההערכה הזו?",
+        "Cancel": "ביטול",
+        "Close": "סגירה",
+        "Delete": "ביטול",
+        "Duplicate": "כפול",
+        "Edit Grading Scheme": "עריכת סכימת הערכה",
+        "Save": "שמירה"
+    },
+    "GradingSchemes": {
+        "Edit Grading Scheme": "עריכת סכימת הערכה",
+        "Letter Grade": "הערכה מילולית",
+        "Looks great!": "נראה טוב מאד!",
+        "Percentage": "אחוז",
+        "Points": "נקודות",
+        "Range": "טווח"
+    },
+    "OutcomeManagement": {
+        "Course": "קורס",
+        "Institution": "ארגון"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "חשבונות",
+        "Close": "סגירה",
+        "Concluded": "נסתיים וסוכם",
+        "Courses": "קורסים",
+        "Loading": "טוען",
+        "Search": "חיפוש"
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "מדיניות שימוש מקובלת",
+        "Close": "סגירה"
+    },
+    "account_reports": {
+        "Close": "סגירה",
+        "Next month": "חודש הבא",
+        "Previous month": "החודש הקודם",
+        "Time": "זמן"
+    },
+    "admin_split": {
+        "Cancel": "ביטול",
+        "OK": "OK"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "תיאור"
+    },
+    "assignment_footer": {
+        "Next": "הבא",
+        "Previous": "קודם"
+    },
+    "assignment_tabs": {
+        "Assignment": "משימה",
+        "Peer Review": "ביקורת עמיתים"
+    },
+    "assignments.grading_type_selector": {
+        "Close": "סגירה",
+        "View": "תצוגה"
+    },
+    "assignments_2": {
+        "Loading": "טוען"
+    },
+    "catalog": {
+        "Course Catalog": "קטלוג הקורס"
+    },
+    "content_copy_redesign": {
+        "Cancel": "ביטול",
+        "Create course": "יצירת קורס",
+        "Creating...": "יוצר...",
+        "Name": "שם",
+        "No results": "אין תוצאות",
+        "Please enter the details for the new course.": "נא להזין את פרטי הקורס החדש",
+        "Term": "מחצית"
+    },
+    "content_share_preview_overlay": {
+        "Close": "סגירה",
+        "Preview": "תצוגה מקדימה"
+    },
+    "course_logging_content": {
+        "No results": "אין תוצאות"
+    },
+    "create_course_modal": {
+        "Cancel": "ביטול",
+        "Course Details": "פרטי קורס: ",
+        "Course Name": "שם קורס",
+        "Create": "יצירה",
+        "Create Course": "יצירת קורס",
+        "No Results": "אין תוצאות"
+    },
+    "feature_flags": {
+        "Accept": "קבלה",
+        "Cancel": "ביטול"
+    },
+    "filter_bar": {
+        "All": "הכל",
+        "Clear": "ניקוי",
+        "Search": "חיפוש"
+    },
+    "jobs": {
+        "Close": "סגירה"
+    },
+    "modules_home_page": {
+        "Create a new Module": "יצירת מודול חדש"
+    },
+    "pages_edit_title": {
+        "Page Title": "כותרת דף"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "ביטול",
+        "Close": "סגירה"
+    },
+    "study_assist": {
+        "Back": "חזרה",
+        "Close": "סגירה"
+    },
+    "submit_online_url_assignment": {
+        "Website URL": "כתובת אתר"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "מדיניות שימוש מקובלת",
+        "Loading...": "טוען...",
+        "Preview": "תצוגה מקדימה"
+    },
+    "tray": {
+        "Close": "סגירה"
+    }
+}

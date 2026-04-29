@@ -19,7 +19,7 @@ import {gql} from '@apollo/client'
 import mockGraphqlQuery from '../index'
 
 const BASIC_QUERY = gql`
-  query TestQuery {
+  query TestQueryMock {
     assignment(id: "1") {
       name
     }
@@ -35,7 +35,7 @@ describe('graphqlMockQuery', () => {
 
     it('lets you use a string instead of gql generated AST to make mack queries', async () => {
       const query = `
-        query TestQuery {
+        query TestQueryMock {
           assignment(id: "1") {
             name
           }
@@ -59,7 +59,7 @@ describe('graphqlMockQuery', () => {
 
     it('works for lists', async () => {
       const query = gql`
-        query TestQuery {
+        query TestQueryMock {
           assignment(id: "1") {
             submissionsConnection {
               nodes {
@@ -88,7 +88,7 @@ describe('graphqlMockQuery', () => {
 
     it('does not let you override non-nullable fileds to null', async () => {
       const query = gql`
-        query TestQuery {
+        query TestQueryMock {
           assignment(id: "1") {
             _id
           }
@@ -102,7 +102,7 @@ describe('graphqlMockQuery', () => {
   describe('deep merging', () => {
     it('merges multiple different overrides', async () => {
       const query = `
-        query TestQuery {
+        query TestQueryMock {
           assignment(id: "1") {
             _id
             name
@@ -117,7 +117,7 @@ describe('graphqlMockQuery', () => {
 
     it('deep merges multiple different overrides', async () => {
       const query = `
-        query TestQuery {
+        query TestQueryMock {
           assignment(id: "1") {
             rubric {
               _id
@@ -137,7 +137,7 @@ describe('graphqlMockQuery', () => {
 
     it('lets you override an already overridden list with an empty list', async () => {
       const query = gql`
-        query TestQuery {
+        query TestQueryMock {
           assignment(id: "1") {
             submissionsConnection {
               nodes {
@@ -157,7 +157,7 @@ describe('graphqlMockQuery', () => {
 
     it('handles deep merging of null', async () => {
       const query = gql`
-        query TestQuery {
+        query TestQueryMock {
           assignment(id: "1") {
             submissionsConnection {
               nodes {
@@ -178,7 +178,7 @@ describe('graphqlMockQuery', () => {
 
     it('handles deep merging of undefined', async () => {
       const query = gql`
-        query TestQuery {
+        query TestQueryMock {
           assignment(id: "1") {
             submissionsConnection {
               nodes {
@@ -211,7 +211,7 @@ describe('graphqlMockQuery', () => {
 
     it('raising an error if querying for a type that does not exist', async () => {
       const query = gql`
-        query TestQuery {
+        query TestQueryMock {
           banana {
             _id
           }
@@ -223,7 +223,7 @@ describe('graphqlMockQuery', () => {
 
     it('raising an error if querying for a leaf node that does not exist', async () => {
       const query = gql`
-        query TestQuery {
+        query TestQueryMock {
           assignment {
             banana
           }
@@ -235,7 +235,7 @@ describe('graphqlMockQuery', () => {
 
     it('raising an error if node type was not properly mocked', async () => {
       const query = gql`
-        query TestQuery {
+        query TestQueryMock {
           node(id: "1") {
             ... on Assignment {
               name
@@ -251,7 +251,7 @@ describe('graphqlMockQuery', () => {
   describe('variables', () => {
     it('can be passed in to a query', async () => {
       const query = gql`
-        query TestQuery($assignmentID: ID!) {
+        query TestQueryMock($assignmentID: ID!) {
           assignment(id: $assignmentID) {
             name
           }
@@ -263,7 +263,7 @@ describe('graphqlMockQuery', () => {
 
     it('will raise an error if misssing', async () => {
       const query = gql`
-        query TestQuery($assignmentID: ID!) {
+        query TestQueryMock($assignmentID: ID!) {
           assignment(id: $assignmentID) {
             name
           }
@@ -277,7 +277,7 @@ describe('graphqlMockQuery', () => {
   describe('resolvers', () => {
     it('can be passed in to a query', async () => {
       const query = gql`
-        query TestQuery {
+        query TestQueryMock {
           assignment(id: "1") {
             name
           }

@@ -63,7 +63,7 @@ describe('GradingPeriodCollection', () => {
     })
 
     // Mock jQuery's getJSON to use native fetch which MSW intercepts
-    $.getJSON = jest.fn(url => {
+    $.getJSON = vi.fn(url => {
       const promise = {
         success: function (callback) {
           fetch(url)
@@ -94,7 +94,7 @@ describe('GradingPeriodCollection', () => {
     })
 
     // Mock jQuery's ajax to use native fetch which MSW intercepts
-    $.ajax = jest.fn(options => {
+    $.ajax = vi.fn(options => {
       const promise = {
         success: function (callback) {
           fetch(options.url, {
@@ -137,14 +137,14 @@ describe('GradingPeriodCollection', () => {
     })
 
     // Mock jQuery plugins
-    $.fn.confirmDelete = jest.fn(({success}) => success())
-    $.flashMessage = jest.fn()
-    $.flashError = jest.fn()
+    $.fn.confirmDelete = vi.fn(({success}) => success())
+    $.flashMessage = vi.fn()
+    $.flashError = vi.fn()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders grading periods from the server', async () => {

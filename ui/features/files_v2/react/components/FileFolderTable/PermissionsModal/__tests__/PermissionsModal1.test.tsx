@@ -18,7 +18,6 @@
 
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {FileManagementProvider} from '../../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
@@ -27,13 +26,15 @@ import {createFilesContexts} from '../../../../../fixtures/fileContexts'
 import {RowsProvider} from '../../../../contexts/RowsContext'
 import PermissionsModal from '../PermissionsModal'
 import {mockRowsContext} from '../../__tests__/testUtils'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const defaultProps = {
   open: true,
   items: FAKE_FOLDERS_AND_FILES,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
 }
 
 const renderComponent = (props?: any) =>
@@ -47,18 +48,24 @@ const renderComponent = (props?: any) =>
 
 describe('PermissionsModal', () => {
   beforeAll(() => {
+    server.listen()
     const filesContexts = createFilesContexts()
     resetAndGetFilesEnv(filesContexts)
   })
 
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    // Set up a default mock implementation for doFetchApi to prevent unhandled rejections
-    ;(doFetchApi as jest.Mock).mockResolvedValue({})
+    server.use(
+      http.put('/api/v1/files/:fileId', () => HttpResponse.json({})),
+      http.put('/api/v1/folders/:folderId', () => HttpResponse.json({})),
+    )
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
-    jest.resetAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders header', async () => {

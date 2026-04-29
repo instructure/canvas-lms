@@ -19,6 +19,7 @@
 #
 
 require "active_support/core_ext/module"
+require "inst_statsd"
 require "json/jwt"
 require "dynamic_settings"
 require "canvas_errors"
@@ -45,7 +46,7 @@ module CanvasSecurity
   # In this instance, it's expected that canvas is going to inject
   # the Setting class, but we want to break depednencies that directly
   # point to canvas.
-  def self.settings_store(safe_invoke = false)
+  def self.settings_store(safe_invoke: false)
     return @@settings_store if @@settings_store
     return nil if safe_invoke
 
@@ -81,6 +82,20 @@ module CanvasSecurity
     @encryption_keys ||= [encryption_key] + Array(config && config["previous_encryption_keys"]).map(&:to_s)
   end
 
+  def self.jwt_encryption_key
+    jwt_encryption_keys.first
+  end
+
+  def self.jwt_encryption_keys
+    @jwt_encryption_keys ||= begin
+      res = Array.wrap(config && config["jwt_encryption_keys"]).map(&:to_s)
+      raise("jwt encryption key required, see config/security.yml") if res.empty?
+      raise("jwt encryption key must be 64 characters") unless res.all? { |r| r.length == 64 }
+
+      res
+    end
+  end
+
   def self.config
     @config ||= begin
       path = Rails.root.join("config/security.yml")
@@ -88,8 +103,16 @@ module CanvasSecurity
 
       result = YAML.safe_load(ERB.new(path.read).result, aliases: true)[Rails.env]
       result["encryption_key"] ||= Rails.application.credentials.security_encryption_key
+      result["jwt_encryption_keys"] ||= Rails.application.credentials.security_jwt_encryption_keys
       result
     end
+  end
+
+  def self.reload
+    @config = nil
+    @encryption_key = nil
+    @encryption_keys = nil
+    @jwt_encryption_keys = nil
   end
 
   def self.encrypt_data(data)
@@ -220,7 +243,7 @@ module CanvasSecurity
     raw_jwt = JSON::JWT.new(jwt_body)
     return raw_jwt.to_s if key == :unsigned
 
-    raw_jwt.sign(key || encryption_key, alg || :autodetect).to_s
+    raw_jwt.sign(key || jwt_encryption_key, alg || :autodetect).to_s
   end
 
   # Creates an encrypted JWT token string
@@ -260,7 +283,7 @@ module CanvasSecurity
   # Raises CanvasSecurity::TokenExpired if the token has expired, and
   # CanvasSecurity::InvalidToken if the token is otherwise invalid.
   def self.decode_jwt(token, keys = [], ignore_expiration: false)
-    keys += encryption_keys
+    keys += jwt_encryption_keys
 
     keys.each do |key|
       body = JSON::JWT.decode(token, key)
@@ -269,12 +292,15 @@ module CanvasSecurity
     rescue JSON::JWS::VerificationFailed
       # Keep looping, to try all the keys. If none succeed,
       # we raise below.
-    rescue CanvasSecurity::TokenExpired
+    rescue CanvasSecurity::TokenExpired => e
+      InstStatsd::Statsd.increment("canvas_security.decode_jwt.failure", tags: { exception: e.class.name })
       raise
     rescue => e
+      InstStatsd::Statsd.increment("canvas_security.decode_jwt.failure", tags: { exception: e.class.name })
       raise CanvasSecurity::InvalidToken, e
     end
 
+    InstStatsd::Statsd.increment("canvas_security.decode_jwt.failure", tags: { exception: JSON::JWS::VerificationFailed.name })
     raise CanvasSecurity::InvalidToken
   end
 
@@ -313,7 +339,7 @@ module CanvasSecurity
     Base64.decode64(utf8_string.encode("ascii-8bit"))
   end
 
-  def self.validate_encryption_key(overwrite = false)
+  def self.validate_encryption_key(overwrite: false)
     begin
       db_hash = settings_store.get("encryption_key_hash", nil)
     rescue
@@ -328,7 +354,7 @@ module CanvasSecurity
         # the db may not exist yet
       end
     else
-      abort "encryption key is incorrect. if you have intentionally changed it, you may want to run `rake db:reset_encryption_key_hash`"
+      abort "encryption key is incorrect. if you have intentionally changed it, you may want to run `rake db:reset_encryption_key_hash`" # rubocop:disable Rails/Exit
     end
   end
 

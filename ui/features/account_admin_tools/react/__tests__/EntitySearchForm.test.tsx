@@ -29,7 +29,7 @@ describe('EntitySearchForm', () => {
       placeholder: 'User ID',
     },
     isDisabled: false,
-    onSubmit: jest.fn(),
+    onSubmit: vi.fn(),
   }
 
   it('should render based on the config', () => {

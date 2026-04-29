@@ -32,12 +32,12 @@ describe('FilesystemObjectThumbnail', () => {
         id: 65,
         thumbnail_url: 'sweet_thumbnail_url',
       })
-      jest.useFakeTimers()
-      jest.advanceTimersByTime(20000)
+      vi.useFakeTimers()
+      vi.advanceTimersByTime(20000)
     })
 
     afterEach(() => {
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('displays the thumbnail image', () => {
@@ -62,12 +62,12 @@ describe('FilesystemObjectThumbnail', () => {
 
     beforeEach(() => {
       folder = new Folder({id: 65})
-      jest.useFakeTimers()
-      jest.advanceTimersByTime(20000)
+      vi.useFakeTimers()
+      vi.advanceTimersByTime(20000)
     })
 
     afterEach(() => {
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('adds mimeClass-folder if its a folder', () => {
@@ -89,32 +89,32 @@ describe('FilesystemObjectThumbnail', () => {
     it('adds className to i tag if set in props', () => {
       const fso = new FilesystemObject({id: 65})
       fso.url = () => 'foo'
-      jest.useFakeTimers()
+      vi.useFakeTimers()
 
       const {container} = render(
         <FilesystemObjectThumbnail model={fso} className="customClassname" />,
       )
-      jest.advanceTimersByTime(20000)
+      vi.advanceTimersByTime(20000)
 
       expect(container.firstChild).toHaveClass('customClassname')
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
   })
 
   describe('checkForThumbnail', () => {
     beforeEach(() => {
-      jest.useFakeTimers()
+      vi.useFakeTimers()
     })
 
     afterEach(() => {
-      jest.useRealTimers()
-      jest.restoreAllMocks()
+      vi.useRealTimers()
+      vi.restoreAllMocks()
     })
 
     it('fetches thumbnail_url and updates the display', async () => {
       const file = new File({id: 65})
       file.url = () => '/api/v1/files/65'
-      file.fetch = jest.fn().mockImplementation(({success}) => {
+      file.fetch = vi.fn().mockImplementation(({success}) => {
         success(file, {thumbnail_url: 'sweet_thumbnail_url'})
       })
 
@@ -125,7 +125,7 @@ describe('FilesystemObjectThumbnail', () => {
 
       // Run timers to trigger fetch
       await act(async () => {
-        jest.runAllTimers()
+        vi.runAllTimers()
       })
 
       // Verify fetch was called

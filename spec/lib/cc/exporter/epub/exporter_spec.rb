@@ -92,7 +92,7 @@ describe "Exporter" do
 
   context "create ePub with content type sorting" do
     let(:exporter) do
-      CC::Exporter::Epub::Exporter.new(@attachment.open, true)
+      CC::Exporter::Epub::Exporter.new(@attachment.open, sort_by_content: true)
     end
 
     it "sorts by content" do

@@ -25,19 +25,21 @@ import {courseAlignmentStatsMocks} from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import useCourseAlignments from '@canvas/outcomes/react/hooks/useCourseAlignments'
 
-jest.mock('@canvas/outcomes/react/hooks/useCourseAlignments', () => jest.fn())
+vi.mock('@canvas/outcomes/react/hooks/useCourseAlignments', () => ({
+  default: vi.fn(),
+}))
 
 describe('AlignmentSummary', () => {
   let cache
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     cache = createCache()
     mockUseCourseAlignments()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const render = (
@@ -62,11 +64,11 @@ describe('AlignmentSummary', () => {
     useCourseAlignments.mockImplementation(() => ({
       rootGroup: {_id: '1', outcomesCount: 10},
       loading,
-      loadMore: jest.fn(),
+      loadMore: vi.fn(),
       searchString: '',
-      onSearchChangeHandler: jest.fn(),
-      onSearchClearHandler: jest.fn(),
-      onFilterChangeHandler: jest.fn(),
+      onSearchChangeHandler: vi.fn(),
+      onSearchClearHandler: vi.fn(),
+      onFilterChangeHandler: vi.fn(),
     }))
 
   it('renders single loader while loading data', () => {
@@ -78,7 +80,7 @@ describe('AlignmentSummary', () => {
 
   it('renders component after data is loaded', async () => {
     const {getByTestId} = render(<AlignmentSummary />)
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     expect(getByTestId('outcome-alignment-summary')).toBeInTheDocument()
   })
 
@@ -86,7 +88,7 @@ describe('AlignmentSummary', () => {
     const {getByTestId} = render(<AlignmentSummary />)
     expect(getByTestId('outcome-alignment-summary-loader')).toBeInTheDocument()
     expect(useCourseAlignments).toHaveBeenCalledWith(true)
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     expect(useCourseAlignments).toHaveBeenCalledWith(false)
     expect(getByTestId('outcome-alignment-summary')).toBeInTheDocument()
   })

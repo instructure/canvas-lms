@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -ex
+printenv | sort | sed -E 's/(.*_(KEY|SECRET))=.*/\1 is present/g'
+
 if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
   # when parent is not in $GERRIT_BRANCH (i.e. master)
   if ! git merge-base --is-ancestor HEAD~1 origin/$GERRIT_BRANCH; then
@@ -9,7 +11,7 @@ if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
   fi
 
   # when modifying Dockerfile, Dockerfile.jenkins, or Dockerfile.production, Dockerfile.template must also be modified.
-  ruby build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile
+  ruby build/dockerfile_writer.rb --env development --compose-file inst-cli/docker-compose/docker-compose.local.dev.yml --in build/Dockerfile.template --out Dockerfile
   ruby build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins
   ruby build/dockerfile_writer.rb --env production --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.production
   if ! git diff --exit-code Dockerfile; then
@@ -47,9 +49,22 @@ if [[ ! "${PRIVATE_PLUGINS[*]}" =~ "$GERRIT_PROJECT" ]]; then
   ruby script/tatl_tael
 fi
 
-if ! git diff HEAD~1 --exit-code -GENV -- 'packages/canvas-rce/**/*.js' 'packages/canvas-rce/**/*.jsx' 'packages/canvas-rce/**/*.ts' 'packages/canvas-rce/**/*.tsx'; then
+if git diff HEAD~1 -- 'packages/canvas-rce/**/*.js' 'packages/canvas-rce/**/*.jsx' 'packages/canvas-rce/**/*.ts' 'packages/canvas-rce/**/*.tsx' | grep -q '^+.*ENV'; then
   message="It looks like you added a reference to a Canvas ENV key inside the RCE. Instead, you should pass this value via a prop the RCEWrapper.\\n"
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
+fi
+
+if ! git diff-tree --no-commit-id --name-only --diff-filter=D -r --find-renames --exit-code HEAD -- 'db/migrate'; then
+  # We have deleted migrations; only check for integrity migration update if
+  # other migrations were also modified (i.e. actual squashing occurred, not
+  # just deleting standalone migrations like DataFixups)
+  if ! git diff-tree --no-commit-id --name-only --diff-filter=M -r --exit-code HEAD -- 'db/migrate'; then
+    if git diff-tree --no-commit-id --name-only --diff-filter=A -r --no-renames --exit-code HEAD -- 'db/migrate/*_validate_migration_integrity.rb'; then
+      # No new migration integrity commit was added
+      message="Migrations were deleted (likely squashed) without the integrity migration being updated. Rename ValidateMigrationIntegrity to a new version and update last_squashed_migration_version to reflect the last removed migration."
+      gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
+    fi
+  fi
 fi
 
 ruby script/stylelint
@@ -57,6 +72,25 @@ ruby script/rlint --no-fail-on-offense
 ruby script/lint_commit_message
 
 bin/rails css:styleguide doc:api
+
+# Regression check for GROW-236: ensure file download routes don't leak into
+# other controllers' API docs (e.g., accounts#index should have exactly 1 scope).
+accounts_html="public/doc/api/accounts.html"
+if [ -f "$accounts_html" ]; then
+  accounts_index_scopes=$(ruby -e "
+    require 'nokogiri'
+    doc = Nokogiri::HTML(File.read('$accounts_html'))
+    h2 = doc.at_css('h2[name=\"method.accounts.index\"]')
+    puts h2 ? h2.parent.css('h3').length : 'missing'
+  " 2>/dev/null || echo "missing")
+  if [ "$accounts_index_scopes" = "missing" ]; then
+    echo "ERROR: accounts#index section not found in API docs" >&2
+    exit 1
+  elif [ "$accounts_index_scopes" != "1" ]; then
+    echo "ERROR: accounts#index has $accounts_index_scopes scopes in API docs, expected 1. File download routes may be leaking into other controllers." >&2
+    exit 1
+  fi
+fi
 
 gergich status
 echo "LINTER OK!"

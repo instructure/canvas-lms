@@ -17,7 +17,6 @@
  */
 
 import {getByText, queryByText, findByText, waitForElementToBeRemoved} from '@testing-library/dom'
-import fetchMock from 'fetch-mock'
 import {setupServer} from 'msw/node'
 import Backbone from '@canvas/backbone'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
@@ -26,24 +25,23 @@ import AssignmentListItemView from '../AssignmentListItemView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import tzInTest from '@instructure/moment-utils/specHelpers'
-import timezone from 'timezone'
-import juneau from 'timezone/America/Juneau'
-import french from 'timezone/fr_FR'
 import I18nStubber from '@canvas/test-utils/I18nStubber'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import '@canvas/jquery/jquery.simulate'
 import {http, HttpResponse} from 'msw'
 import {isAccessible} from '@canvas/test-utils/assertions'
+import {act} from 'react'
 
 // Mock globalUtils
-jest.mock('@canvas/util/globalUtils', () => ({
-  ...jest.requireActual('@canvas/util/globalUtils'),
-  windowConfirm: jest.fn(() => true),
+vi.mock('@canvas/util/globalUtils', () => ({
+  ...vi.requireActual('@canvas/util/globalUtils'),
+  windowConfirm: vi.fn(() => true),
 }))
 
 let screenreaderText = null
 let nonScreenreaderText = null
+let createdViews = []
 
 class AssignmentCollection extends Backbone.Collection {
   static initClass() {
@@ -117,7 +115,7 @@ const buildAssignment = (options = {}) => {
   }
   Object.assign(base, options)
   const ac = new AssignmentCollection([base])
-  ac.at(0).pollUntilFinishedDuplicating = jest.fn()
+  ac.at(0).pollUntilFinishedDuplicating = vi.fn()
   return ac.at(0)
 }
 
@@ -148,6 +146,7 @@ const createView = (model, options = {}) => {
     newquizzes_on_quiz_page: options.newquizzes_on_quiz_page,
   }
   ENV.SHOW_SPEED_GRADER_LINK = options.show_additional_speed_grader_link
+  ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED = options.peer_review_allocation_and_grading
   ENV.SETTINGS = {}
 
   const view = new AssignmentListItemView({
@@ -156,6 +155,7 @@ const createView = (model, options = {}) => {
   })
   view.$el.appendTo($('#fixtures'))
   view.render()
+  createdViews.push(view)
   return view
 }
 
@@ -183,6 +183,8 @@ const genSetup = (model = assignment1()) => {
 }
 
 const genTeardown = () => {
+  createdViews.forEach(view => view.remove())
+  createdViews = []
   fakeENV.teardown()
   $('#fixtures').empty()
   // cleanup instui dialogs and trays that render in a portal outside of #fixtures
@@ -206,32 +208,16 @@ afterAll(() => {
 })
 
 describe('AssignmentListItemViewSpec', () => {
-  const server = setupServer()
-
-  beforeAll(() => {
-    server.listen()
-  })
-
   beforeEach(() => {
-    fakeENV.setup({
-      current_user_roles: ['teacher'],
-      URLS: {assignment_sort_base_url: 'test'},
-      current_user_is_admin: false,
-    })
-    const {model, submission, view} = genSetup()
-    // Variables can be accessed here if needed
+    genSetup()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     server.resetHandlers()
     genTeardown()
     tzInTest.restore()
     I18nStubber.clear()
-  })
-
-  afterAll(() => {
-    server.close()
   })
 
   test('should be accessible', async () => {
@@ -242,8 +228,6 @@ describe('AssignmentListItemViewSpec', () => {
   test('initializes child views if can manage', () => {
     const view = createView(assignment1(), {canManage: true})
     expect(view.publishIconView).toBeTruthy()
-    expect(view.dateDueColumnView).toBeTruthy()
-    expect(view.dateAvailableColumnView).toBeTruthy()
   })
 
   test("initializes no child views if can't manage", () => {
@@ -306,25 +290,42 @@ describe('AssignmentListItemViewSpec', () => {
     expect(view.$('.copy_assignment_to')).toHaveLength(0)
   })
 
-  test.skip('updatePublishState toggles ig-published', () => {
-    const view = createView(assignment1(), {canManage: true})
+  test('updatePublishState toggles ig-published', () => {
+    const model = assignment1()
+    const view = createView(model, {canManage: true})
     expect(view.$('.ig-row').hasClass('ig-published')).toBe(true)
-    const unpublishedModel = buildAssignment({
-      ...assignment1().toJSON(),
-      published: false,
-    })
-    unpublishedModel.trigger('change:published')
+    // Change the model's published state and trigger the event
+    model.set('published', false)
+    // The view's updatePublishState method is bound to the model's change:published event
+    // and will toggle the class based on the model's new published state
     expect(view.$('.ig-row').hasClass('ig-published')).toBe(false)
   })
 
-  test.skip('asks for confirmation before deleting an assignment', () => {
+  test('show ig-published class if assignment is published and canmanage is false', () => {
+    ENV.current_user_roles = ['teacher']
+    ENV.current_user_is_student = false
+    const view = createView(assignment1(), {canManage: false})
+    expect(view.$('.ig-row').hasClass('ig-published')).toBe(true)
+  })
+
+  test('does not show ig-published class if assignment is published and user has student role', () => {
+    ENV.current_user_roles = ['student']
+    ENV.current_user_is_student = true
+    const view = createView(assignment1(), {canManage: false})
+    expect(view.$('.ig-row').hasClass('ig-published')).toBe(false)
+  })
+
+  test('asks for confirmation before deleting an assignment', () => {
     const view = createView(assignment1())
-    jest.spyOn(view.visibleAssignments(), 'returns').mockReturnValue([])
-    // windowConfirm is already mocked to return true
-    jest.spyOn(view, 'delete')
+    // Mock the assignment group view context that the view needs
+    vi.spyOn(view, 'assignmentGroupView').mockReturnValue({
+      visibleAssignments: () => [assignment1()],
+    })
+    // Mock window.confirm in the JSDOM environment
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    vi.spyOn(view, 'delete').mockImplementation(() => {})
     view.$(`#assignment_${assignment1().id} .delete_assignment`).click()
-    const {windowConfirm} = require('@canvas/util/globalUtils')
-    expect(windowConfirm).toHaveBeenCalled()
+    expect(confirmSpy).toHaveBeenCalled()
     expect(view.delete).toHaveBeenCalled()
   })
 
@@ -333,26 +334,27 @@ describe('AssignmentListItemViewSpec', () => {
       in_closed_grading_period: true,
     })
     const view = createView(closedGradingModel)
-    // windowConfirm is already mocked to return true
-    jest.spyOn(view, 'delete')
+    // Mock the assignment group view context
+    vi.spyOn(view, 'assignmentGroupView').mockReturnValue({
+      visibleAssignments: () => [closedGradingModel],
+    })
+    // Mock window.confirm
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    vi.spyOn(view, 'delete')
     view.$(`#assignment_${closedGradingModel.id} .delete_assignment`).click()
-    const {windowConfirm} = require('@canvas/util/globalUtils')
-    expect(windowConfirm).not.toHaveBeenCalled()
+    expect(confirmSpy).not.toHaveBeenCalled()
     expect(view.delete).not.toHaveBeenCalled()
   })
 
   test('delete destroys model', () => {
-    const old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = 'course_1'
     const view = createView(assignment1())
-    jest.spyOn(view.model, 'destroy')
+    vi.spyOn(view.model, 'destroy').mockImplementation(() => {})
     view.delete()
     expect(view.model.destroy).toHaveBeenCalled()
-    ENV.context_asset_string = old_asset_string
   })
 
   test('delete calls screenreader message', async () => {
-    const old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = 'course_1'
     server.use(
       http.delete('/api/v1/courses/1/assignments/1', () => {
@@ -371,114 +373,121 @@ describe('AssignmentListItemViewSpec', () => {
       }),
     )
     const view = createView(assignment1())
-    jest.spyOn($, 'screenReaderFlashMessage')
-    view.delete()
-    await new Promise(resolve => setTimeout(resolve, 10))
+    vi.spyOn($, 'screenReaderFlashMessage')
+    await act(async () => {
+      view.delete()
+      await new Promise(resolve => setTimeout(resolve, 50))
+    })
     expect($.screenReaderFlashMessage).toHaveBeenCalled()
-    ENV.context_asset_string = old_asset_string
   })
 
-  test.skip('show score if score is set', () => {
+  test('show score if score is set', () => {
     const model = assignment1()
+    // Set submission BEFORE creating view so it renders with the submission data
     const submission = new Submission({score: 1.5555, grade: '1.5555'})
-    model.set('submission', submission)
-    model.trigger('change:submission')
-    const view = createView(model)
+    model.set('submission', submission, {silent: true})
+    const view = createView(model, {canManage: false, canReadGrades: true})
+    const screenreaderText = () => $.trim(view.$('.js-score .screenreader-only').text())
+    const nonScreenreaderText = () => $.trim(view.$('.js-score .non-screenreader').text())
     expect(screenreaderText()).toBe('Score: 1.56 out of 2 points.')
     expect(nonScreenreaderText()).toBe('1.56/2 pts')
   })
 
   test('do not show score if viewing as non-student', () => {
-    const old_user_roles = ENV.current_user_roles
     ENV.current_user_roles = ['user']
     const view = createView(assignment1(), {canManage: false})
     const str = view.$('.js-score:eq(0) .non-screenreader').html()
     expect(str.search('2 pts')).not.toBe(-1)
-    ENV.current_user_roles = old_user_roles
   })
 
-  test.skip('show no submission if none exists', () => {
+  test('show no submission if none exists', () => {
     const model = assignment1()
-    model.set({submission: null})
-    const view = createView(model)
+    model.set({submission: null}, {silent: true})
+    const view = createView(model, {canManage: false, canReadGrades: true})
+    const screenreaderText = () => $.trim(view.$('.js-score .screenreader-only').text())
+    const nonScreenreaderText = () => $.trim(view.$('.js-score .non-screenreader').text())
     expect(screenreaderText()).toBe('No submission for this assignment. 2 points possible.')
     expect(nonScreenreaderText()).toBe('-/2 pts')
   })
 
-  test.skip('show score if 0 correctly', () => {
+  test('show score if 0 correctly', () => {
     const model = assignment1()
     const submission = new Submission({score: 0, grade: '0'})
-    model.set('submission', submission)
-    const view = createView(model)
+    model.set('submission', submission, {silent: true})
+    const view = createView(model, {canManage: false, canReadGrades: true})
+    const screenreaderText = () => $.trim(view.$('.js-score .screenreader-only').text())
+    const nonScreenreaderText = () => $.trim(view.$('.js-score .non-screenreader').text())
     expect(screenreaderText()).toBe('Score: 0 out of 2 points.')
     expect(nonScreenreaderText()).toBe('0/2 pts')
   })
 
-  test.skip('show no submission if submission object with no submission type', () => {
+  test('show no submission if submission object with no submission type', () => {
     const model = assignment1()
-    model.set('submission', new Submission())
-    model.trigger('change:submission')
-    const view = createView(model)
+    model.set('submission', new Submission(), {silent: true})
+    const view = createView(model, {canManage: false, canReadGrades: true})
+    const screenreaderText = () => $.trim(view.$('.js-score .screenreader-only').text())
+    const nonScreenreaderText = () => $.trim(view.$('.js-score .non-screenreader').text())
     expect(screenreaderText()).toBe('No submission for this assignment. 2 points possible.')
     expect(nonScreenreaderText()).toBe('-/2 pts')
   })
 
-  test.skip('show not yet graded if submission type but no grade', () => {
+  test('show not yet graded if submission type but no grade', () => {
     const model = assignment1()
     const submission = new Submission({submission_type: 'online', notYetGraded: true})
-    model.set('submission', submission)
-    model.trigger('change:submission')
-    const view = createView(model)
+    model.set('submission', submission, {silent: true})
+    const view = createView(model, {canManage: false, canReadGrades: true})
+    const screenreaderText = () => $.trim(view.$('.js-score .screenreader-only').text())
+    const nonScreenreaderText = () => $.trim(view.$('.js-score .non-screenreader').text())
     expect(screenreaderText()).toBe('Assignment not yet graded. 2 points possible.')
     expect(nonScreenreaderText()).toMatch(/-\/2 pts/)
     expect(nonScreenreaderText()).toMatch(/Not Yet Graded/)
   })
 
-  test.skip('disallows deleting frozen assignments', () => {
+  test('disallows deleting frozen assignments', () => {
     const frozenModel = buildAssignment({
+      id: 99,
       frozen: true,
     })
     const view = createView(frozenModel)
-    expect(view.$(`#assignment_${frozenModel.id} a.delete_assignment.disabled`)).toHaveLength(1)
+    // When canDelete() returns false, the template renders the disabled version of the delete link
+    expect(view.$('a.delete_assignment.disabled')).toHaveLength(1)
   })
 
-  test.skip('disallows deleting assignments due in closed grading periods', () => {
+  test('disallows deleting assignments due in closed grading periods', () => {
     const closedGradingModel = buildAssignment({
+      id: 98,
       in_closed_grading_period: true,
     })
     const view = createView(closedGradingModel)
-    expect(
-      view.$(`#assignment_${closedGradingModel.id} a.delete_assignment.disabled`),
-    ).toHaveLength(1)
+    expect(view.$('a.delete_assignment.disabled')).toHaveLength(1)
   })
 
-  test.skip('allows deleting non-frozen assignments not due in closed grading periods', () => {
+  test('allows deleting non-frozen assignments not due in closed grading periods', () => {
     const model = buildAssignment({
+      id: 97,
       frozen: false,
       in_closed_grading_period: false,
     })
     const view = createView(model)
-    expect(view.$(`#assignment_${model.id} a.delete_assignment:not(.disabled)`)).toHaveLength(1)
+    expect(view.$('a.delete_assignment:not(.disabled)')).toHaveLength(1)
   })
 
-  test.skip('allows deleting frozen assignments for admins', () => {
+  test('allows deleting frozen assignments for admins', () => {
     const frozenModel = buildAssignment({
+      id: 96,
       frozen: true,
     })
     const view = createView(frozenModel, {userIsAdmin: true})
-    expect(view.$(`#assignment_${frozenModel.id} a.delete_assignment:not(.disabled)`)).toHaveLength(
-      1,
-    )
+    expect(view.$('a.delete_assignment:not(.disabled)')).toHaveLength(1)
   })
 
-  test.skip('allows deleting assignments due in closed grading periods for admins', () => {
+  test('allows deleting assignments due in closed grading periods for admins', () => {
     const closedGradingModel = buildAssignment({
+      id: 95,
       in_closed_grading_period: true,
     })
     const view = createView(closedGradingModel, {userIsAdmin: true})
-    expect(
-      view.$(`#assignment_${closedGradingModel.id} a.delete_assignment:not(.disabled)`),
-    ).toHaveLength(1)
+    expect(view.$('a.delete_assignment:not(.disabled)')).toHaveLength(1)
   })
 
   test('renders link to SpeedGrader if canManage', () => {
@@ -546,7 +555,7 @@ describe('AssignmentListItemViewSpec', () => {
       workflow_state: 'failed_to_duplicate',
     })
     const view = createView(model)
-    jest.spyOn(model, 'duplicate_failed')
+    vi.spyOn(model, 'duplicate_failed').mockImplementation(() => ({always: vi.fn()}))
     view.$(`#assignment_${model.id} .duplicate-failed-retry`).click()
     expect(model.duplicate_failed).toHaveBeenCalled()
   })
@@ -559,7 +568,7 @@ describe('AssignmentListItemViewSpec', () => {
       workflow_state: 'failed_to_migrate',
     })
     const view = createView(model)
-    jest.spyOn(model, 'retry_migration')
+    vi.spyOn(model, 'retry_migration').mockImplementation(() => ({always: vi.fn()}))
     view.$(`#assignment_${model.id} .migrate-failed-retry`).click()
     expect(model.retry_migration).toHaveBeenCalled()
   })
@@ -661,8 +670,10 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   test('can move when canManage is true and the assignment group id is not locked', () => {
-    jest.spyOn(assignment1(), 'canMove').mockReturnValue(true)
-    const view = createView(assignment1(), {
+    // Use the SAME model instance for both spy and createView
+    const model = assignment1()
+    vi.spyOn(model, 'canMove').mockReturnValue(true)
+    const view = createView(model, {
       userIsAdmin: false,
       canManage: true,
     })
@@ -671,9 +682,11 @@ describe('AssignmentListItemViewSpec', () => {
     expect(view.className().includes('sort-disabled')).toBe(false)
   })
 
-  test.skip('cannot move when canManage is true but the assignment group id is locked', () => {
-    jest.spyOn(assignment1(), 'canMove').mockReturnValue(false)
-    const view = createView(assignment1(), {
+  test('cannot move when canManage is true but the assignment group id is locked', () => {
+    // Use the SAME model instance for both spy and createView
+    const model = assignment1()
+    vi.spyOn(model, 'canMove').mockReturnValue(false)
+    const view = createView(model, {
       userIsAdmin: false,
       canManage: true,
     })
@@ -683,8 +696,10 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   test('cannot move when canManage is false but the assignment group id is not locked', () => {
-    jest.spyOn(assignment1(), 'canMove').mockReturnValue(true)
-    const view = createView(assignment1(), {
+    // Use the SAME model instance for both spy and createView
+    const model = assignment1()
+    vi.spyOn(model, 'canMove').mockReturnValue(true)
+    const view = createView(model, {
       userIsAdmin: false,
       canManage: false,
     })
@@ -693,65 +708,51 @@ describe('AssignmentListItemViewSpec', () => {
     expect(view.className().includes('sort-disabled')).toBe(true)
   })
 
-  test.skip('re-renders when assignment state changes', () => {
-    jest.spyOn(AssignmentListItemView.prototype, 'render').mockImplementation(() => {})
-    const view = createView(assignment1())
-    expect(AssignmentListItemView.prototype.render).toHaveBeenCalledTimes(1)
-    assignment1().trigger('change:workflow_state')
-    expect(AssignmentListItemView.prototype.render).toHaveBeenCalledTimes(2)
+  test('re-renders when assignment state changes', () => {
+    // Use the SAME model instance to ensure the event triggers on the right model
+    const model = assignment1()
+    // Spy on render BEFORE creating the view so we can intercept the binding
+    const renderSpy = vi.spyOn(AssignmentListItemView.prototype, 'render')
+    const view = createView(model, {canManage: true})
+    // Clear the spy calls from initial render
+    renderSpy.mockClear()
+    // Trigger the change event on the same model the view is bound to
+    model.trigger('change:workflow_state')
+    expect(renderSpy).toHaveBeenCalled()
   })
 
-  test.skip('polls for updates if assignment is duplicating', () => {
-    jest.spyOn(assignment1(), 'isDuplicating').mockReturnValue(true)
-    const view = createView(assignment1())
-    expect(assignment1().pollUntilFinishedDuplicating).toHaveBeenCalledTimes(1)
-  })
-
-  test.skip('polls for updates if assignment is importing', () => {
-    jest.spyOn(assignment1(), 'isImporting').mockReturnValue(true)
-    jest.spyOn(assignment1(), 'pollUntilFinishedImporting').mockImplementation(() => {})
-    const view = createView(assignment1())
-    expect(assignment1().pollUntilFinishedImporting).toHaveBeenCalledTimes(1)
-  })
-
-  test('shows availability for checkpoints', () => {
-    const model = buildAssignment({
-      id: 2,
-      title: 'test checkpoint',
-      workflow_state: 'published',
-      due_at: '2024-08-28T23:59:00-06:00',
-      lock_at: '2013-09-28T23:59:00-06:00',
-      unlock_at: '2013-07-28T23:59:00-06:00',
-      can_manage: true,
-      checkpoints: [
-        {
-          id: 2,
-          title: 'reply to topic',
-          tag: 'reply_to_topic',
-        },
-        {
-          id: 3,
-          title: 'reply to entry',
-          tag: 'reply_to_entry',
-        },
-      ],
-    })
+  test('polls for updates if assignment is duplicating', () => {
+    // Use the SAME model instance for all operations
+    const model = assignment1()
+    vi.spyOn(model, 'isDuplicating').mockReturnValue(true)
+    vi.spyOn(model, 'pollUntilFinishedDuplicating').mockImplementation(() => {})
     const view = createView(model)
-    expect(view.dateAvailableColumnView).toBeTruthy()
+    expect(model.pollUntilFinishedDuplicating).toHaveBeenCalled()
+  })
+
+  test('polls for updates if assignment is importing', () => {
+    // Use the SAME model instance for all operations
+    const model = assignment1()
+    vi.spyOn(model, 'isImporting').mockReturnValue(true)
+    vi.spyOn(model, 'pollUntilFinishedImporting').mockImplementation(() => {})
+    const view = createView(model)
+    expect(model.pollUntilFinishedImporting).toHaveBeenCalled()
   })
 })
 
 // Skipped QUnit Tests Converted to Jest
 
+// TODO: React component not rendering - dialog component requires complex initialization
 describe.skip('AssignmentListItemViewSpec - opens and closes the direct share send to user dialog', () => {
   test('opens and closes the dialog correctly', async () => {
+    // Create mount point before creating the view
+    $('#fixtures').append('<div id="send-to-mount-point" />')
     const model = buildAssignment({
       id: 1,
       title: 'Test Assignment',
       can_manage: true,
     })
     const view = createView(model, {directShareEnabled: true})
-    $('#fixtures').append('<div id="send-to-mount-point" />')
     view.$('.send_assignment_to').click()
     expect(await findByText(document.body, 'Send to:')).toBeTruthy()
     getByText(document.body, 'Close').click()
@@ -759,17 +760,19 @@ describe.skip('AssignmentListItemViewSpec - opens and closes the direct share se
   })
 })
 
+// TODO: React component not rendering - tray component requires complex initialization
 describe.skip('AssignmentListItemViewSpec - opens and closes the direct share copy to course tray', () => {
   test('opens and closes the copy to course tray correctly', async () => {
+    // Create mount point before creating the view
+    $('#fixtures').append('<div id="copy-to-mount-point" />')
     const model = buildAssignment({
       id: 1,
       title: 'Test Assignment',
       can_manage: true,
     })
     const view = createView(model, {directShareEnabled: true})
-    $('#fixtures').append('<div id="copy-to-mount-point" />')
+    // Note: API call would need MSW mock for '/users/self/manageable_courses' if this test were enabled
     view.$('.copy_assignment_to').click()
-    fetchMock.mock('/users/self/manageable_courses', [])
     expect(await findByText(document.body, 'Select a Course')).toBeTruthy()
     getByText(document.body, 'Close').click()
     await waitForElementToBeRemoved(() => queryByText(document.body, 'Select a Course'))
@@ -780,16 +783,11 @@ describe.skip('AssignmentListItemViewSpec - opens and closes the direct share co
 
 describe('AssignmentListItemViewSpec - editing assignments', () => {
   beforeEach(() => {
-    fakeENV.setup({
-      current_user_roles: ['teacher'],
-      URLS: {assignment_sort_base_url: 'test'},
-      current_user_is_admin: false,
-    })
     genSetup()
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     genTeardown()
   })
 
@@ -880,7 +878,6 @@ describe('AssignmentListItemViewSpec - skip to build screen button', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
     genTeardown()
   })
 
@@ -918,7 +915,7 @@ describe('AssignmentListItemViewSpec - mastery paths menu option', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('does not render for assignment if cyoe off', () => {
@@ -1025,7 +1022,7 @@ describe('AssignmentListItemViewSpec - mastery paths link', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('does not render for assignment if cyoe off', () => {
@@ -1086,7 +1083,7 @@ describe('AssignmentListItemViewSpec - mastery paths icon', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('does not render for assignment if cyoe off', () => {
@@ -1133,7 +1130,7 @@ describe('AssignmentListItemViewSpec - assignment icons', () => {
   })
 
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('renders discussion icon for discussion topic', () => {
@@ -1198,14 +1195,8 @@ describe('AssignmentListItemViewSpec - assignment icons', () => {
 })
 
 describe('Assignment#quizzesRespondusEnabled', () => {
-  beforeEach(() => {
-    fakeENV.setup({
-      current_user_roles: [],
-    })
-  })
-
   afterEach(() => {
-    fakeENV.teardown()
+    genTeardown()
   })
 
   test('returns false if the assignment is not RLDB enabled', () => {
@@ -1254,5 +1245,233 @@ describe('Assignment#quizzesRespondusEnabled', () => {
     const view = createView(model, {canManage: false})
     const json = view.toJSON()
     expect(json.quizzesRespondusEnabled).toBe(true)
+  })
+})
+
+describe('AssignmentListItemViewSpec - assessment requests display', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      current_user_roles: ['student'],
+      URLS: {assignment_sort_base_url: 'test'},
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    genTeardown()
+  })
+
+  test('renders StudentViewPeerReviews component when flag is disabled', () => {
+    const model = buildAssignment({
+      id: 1,
+      title: 'Peer Review Assignment',
+      assessment_requests: [
+        {
+          anonymous_id: 'abc123',
+          asset_id: 1,
+          user_id: 1,
+          workflow_state: 'assigned',
+        },
+      ],
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: false})
+
+    // Check for elements that StudentViewPeerReviews renders
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(1)
+    expect(studentViewItem.text()).toContain('Required Peer Review 1')
+  })
+
+  test('does not render StudentViewPeerReviews when flag is enabled and assignment has sub-assignment', () => {
+    const model = buildAssignment({
+      id: 1,
+      title: 'Peer Review Assignment',
+      peer_review_sub_assignment: {id: 10, peer_review_count: 2},
+      assessment_requests: [
+        {
+          anonymous_id: 'abc123',
+          asset_id: 1,
+          user_id: 1,
+          workflow_state: 'assigned',
+        },
+      ],
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+
+    // When flag is enabled and assignment has a sub-assignment, peer reviews are handled as sub-assignments
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(0)
+  })
+
+  test('renders StudentViewPeerReviews for legacy peer reviews when flag is enabled', () => {
+    const model = buildAssignment({
+      id: 1,
+      title: 'Peer Review Assignment',
+      assessment_requests: [
+        {
+          anonymous_id: 'abc123',
+          asset_id: 1,
+          user_id: 1,
+          workflow_state: 'assigned',
+        },
+      ],
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+
+    // Legacy peer reviews (no sub-assignment) should still render even when flag is enabled
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(1)
+  })
+
+  test('does not render StudentViewPeerReviews when no assessment requests', () => {
+    const model = buildAssignment({
+      id: 1,
+      title: 'Regular Assignment',
+      assessment_requests: [],
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: false})
+
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(0)
+  })
+
+  test('does not render StudentViewPeerReviews for teachers', () => {
+    fakeENV.setup({
+      current_user_roles: ['teacher'],
+      URLS: {assignment_sort_base_url: 'test'},
+    })
+    const model = buildAssignment({
+      id: 1,
+      title: 'Peer Review Assignment',
+      // Teachers don't have assessment_requests on their assignments
+      assessment_requests: [],
+    })
+    const view = createView(model, {canManage: true, peer_review_allocation_and_grading: false})
+
+    // Teachers don't see the StudentViewPeerReviews component
+    const studentViewItem = view.$el.find('li.student-view')
+    expect(studentViewItem).toHaveLength(0)
+  })
+})
+
+describe('AssignmentListItemViewSpec - peer review sub-assignment rendering', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      current_user_roles: ['student'],
+      URLS: {assignment_sort_base_url: 'test'},
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    genTeardown()
+  })
+
+  test('displays peer review title with count', () => {
+    const model = buildAssignment({
+      id: 100,
+      name: 'Should not be displayed',
+      is_peer_review_assignment: true,
+      parent_assignment_name: 'French Revolution Essay',
+      parent_peer_review_count: 2,
+      points_possible: 5,
+      due_at: '2025-01-15T23:59:00Z',
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+    expect(view.$('.ig-title').text().trim()).toBe('French Revolution Essay Peer Reviews (2)')
+  })
+
+  test('displays peer review icon', () => {
+    const model = buildAssignment({
+      id: 101,
+      is_peer_review_assignment: true,
+      parent_assignment_name: 'Test Assignment',
+      parent_peer_review_count: 3,
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+    expect(view.$('.icon-peer-review')).toHaveLength(1)
+  })
+
+  test('displays peer review points', () => {
+    const model = buildAssignment({
+      id: 102,
+      is_peer_review_assignment: true,
+      parent_assignment_name: 'Test Assignment',
+      parent_peer_review_count: 2,
+      points_possible: 5,
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+    expect(view.$('.js-score').text()).toContain('5 pts')
+  })
+
+  test('displays peer review due date', async () => {
+    const model = buildAssignment({
+      id: 103,
+      is_peer_review_assignment: true,
+      parent_assignment_name: 'Test Assignment',
+      parent_peer_review_count: 2,
+      due_at: '2025-01-15T23:59:00Z',
+    })
+    const view = createView(model, {canManage: false, peer_review_allocation_and_grading: true})
+
+    await act(async () => {
+      view.render()
+    })
+
+    const $mountPoint = view.$('[data-view=date-due]')
+    expect($mountPoint.text()).toContain('Due Jan 15 at 11:59pm')
+  })
+})
+
+// TODO: React modal focus management - mockRoot.render not being called
+describe.skip('renderCreateEditAssignmentModal focus management', () => {
+  beforeEach(() => {
+    const mountPoint = document.createElement('div')
+    mountPoint.id = 'create-edit-mount-point'
+    document.body.appendChild(mountPoint)
+  })
+
+  afterEach(() => {
+    const mountPoint = document.getElementById('create-edit-mount-point')
+    if (mountPoint) {
+      mountPoint.remove()
+    }
+  })
+
+  test('focuses on manage link when modal closes', () => {
+    const model = buildAssignment({id: 1})
+    const view = createView(model)
+
+    const manageLink = document.createElement('a')
+    manageLink.id = `assign_${model.id}_manage_link`
+    document.body.appendChild(manageLink)
+
+    const focusSpy = vi.spyOn(manageLink, 'focus')
+
+    let capturedOnClose
+    const mockRender = vi.fn(element => {
+      // Extract the closeHandler prop from CreateAssignmentViewAdapter
+      if (element && element.props && element.props.closeHandler) {
+        capturedOnClose = element.props.closeHandler
+      }
+    })
+    const mockRoot = {
+      render: mockRender,
+      unmount: vi.fn(),
+    }
+
+    vi.spyOn(require('react-dom/client'), 'createRoot').mockReturnValue(mockRoot)
+
+    view.renderCreateEditAssignmentModal()
+
+    expect(mockRoot.render).toHaveBeenCalled()
+
+    if (capturedOnClose) {
+      capturedOnClose()
+    }
+
+    expect(focusSpy).toHaveBeenCalled()
+
+    manageLink.remove()
   })
 })

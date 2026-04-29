@@ -18,11 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
-
 describe GradingSchemesJsonController, type: :request do
-  require_relative "../spec_helper"
-
   before(:once) do
     Account.site_admin.disable_feature!(:archived_grading_schemes)
   end

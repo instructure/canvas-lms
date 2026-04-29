@@ -22,10 +22,10 @@
 # RubricAssessments, then, are concrete assessments of the artifacts associated
 # with this idea, such as assignment submissions.
 # The other purpose of this class is just to make rubrics reusable.
-class RubricAssociation < ActiveRecord::Base
+class RubricAssociation < ApplicationRecord
   include Canvas::SoftDeletable
 
-  attr_accessor :skip_updating_points_possible
+  attr_accessor :skip_updating_points_possible, :skip_updating_rubric_association_count
   attr_writer :updating_user
 
   belongs_to :rubric
@@ -241,14 +241,9 @@ class RubricAssociation < ActiveRecord::Base
   end
 
   def update_rubric
-    cnt = rubric.rubric_associations.for_grading.count
-    rubric&.with_versioning(false) do
-      rubric.read_only = cnt > 1
-      rubric.association_count = cnt
-      rubric.save
+    return if skip_updating_rubric_association_count
 
-      rubric.destroy if cnt == 0 && rubric.rubric_associations.count == 0 && !rubric.public
-    end
+    rubric.update_association_count
   end
   protected :update_rubric
 
@@ -415,14 +410,14 @@ class RubricAssociation < ActiveRecord::Base
     assignment&.auditable?
   end
 
-  def restrict_quantitative_data?(user = nil)
+  def restrict_quantitative_data?(user = nil, check_extra_permissions: false)
     return false if user.nil? || assignment.nil?
 
-    assignment.restrict_quantitative_data?(user)
+    assignment.restrict_quantitative_data?(user, check_extra_permissions:)
   end
 
-  def hide_points(user = nil)
-    return true if restrict_quantitative_data?(user)
+  def hide_points(user = nil, check_extra_permissions: false)
+    return true if restrict_quantitative_data?(user, check_extra_permissions:)
 
     super()
   end

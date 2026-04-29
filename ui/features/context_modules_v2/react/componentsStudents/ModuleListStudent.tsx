@@ -20,27 +20,26 @@ import React, {useState, useEffect, useCallback, memo} from 'react'
 import {debounce} from '@instructure/debounce'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Flex} from '@instructure/ui-flex'
 import ModuleStudent from './ModuleStudent'
 import ModulePageActionHeaderStudent from './ModulePageActionHeaderStudent'
 import {handleCollapseAll, handleExpandAll} from '../handlers/modulePageActionHandlers'
-import {useHowManyModulesAreFetchingItems} from '../hooks/queriesStudent/useHowManyModulesAreFetchingItems'
-
+import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
 import {validateModuleStudentRenderRequirements} from '../utils/utils'
-import {useModulesStudent} from '../hooks/queriesStudent/useModulesStudent'
+import {useModules} from '../hooks/queries/useModules'
 import {useToggleCollapse, useToggleAllCollapse} from '../hooks/mutations/useToggleCollapse'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
+import {STUDENT} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
 const MemoizedModuleStudent = memo(ModuleStudent, validateModuleStudentRenderRequirements)
 
 const ModulesListStudent: React.FC = () => {
-  const {courseId} = useContextModule()
-  const {data, isLoading, error, isFetchingNextPage, hasNextPage} = useModulesStudent(courseId)
+  const {courseId, moduleCursorState, setModuleCursorState} = useContextModule()
+  const {data, isLoading, error, isFetchingNextPage, hasNextPage} = useModules(courseId, STUDENT)
   const {moduleFetchingCount, maxFetchingCount, fetchComplete} = useHowManyModulesAreFetchingItems()
   const [expandCollapseButtonDisabled, setExpandCollapseButtonDisabled] = useState(false)
 
@@ -84,8 +83,14 @@ const ModulesListStudent: React.FC = () => {
         }
         return initialExpandedState
       })
+
+      setModuleCursorState(
+        Object.fromEntries(
+          allModules.map(module => [module._id, moduleCursorState[module._id] ?? null]),
+        ),
+      )
     }
-  }, [data?.pages])
+  }, [data?.pages, setModuleCursorState])
 
   useEffect(() => {
     setExpandCollapseButtonDisabled(moduleFetchingCount > 0)
@@ -158,6 +163,8 @@ const ModulesListStudent: React.FC = () => {
     [expandedModules, debouncedToggleCollapse],
   )
 
+  const hasNoModules = (data?.pages[0]?.modules.length || 0) === 0
+
   return (
     <View as="div" margin="medium">
       <ModulePageActionHeaderStudent
@@ -188,9 +195,9 @@ const ModulesListStudent: React.FC = () => {
           <Text color="danger">{I18n.t('Error loading modules')}</Text>
         </View>
       ) : (
-        <Flex direction="column" gap="small">
-          {data?.pages[0]?.modules.length === 0 ? (
-            <View as="div" textAlign="center" padding="large">
+        <View as="div" className="context_module_list">
+          {hasNoModules ? (
+            <View as="div" textAlign="center" padding="large" className="no_modules">
               <Text>{I18n.t('No modules found')}</Text>
             </View>
           ) : (
@@ -202,6 +209,7 @@ const ModulesListStudent: React.FC = () => {
                   id={module._id}
                   name={module.name}
                   completionRequirements={module.completionRequirements}
+                  position={module.position}
                   prerequisites={module.prerequisites}
                   requireSequentialProgress={module.requireSequentialProgress}
                   progression={module.progression}
@@ -213,7 +221,7 @@ const ModulesListStudent: React.FC = () => {
                 />
               ))
           )}
-        </Flex>
+        </View>
       )}
       {hasNextPage && (
         <View as="div" padding="medium" textAlign="center">

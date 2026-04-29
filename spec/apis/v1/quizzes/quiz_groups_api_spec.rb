@@ -179,6 +179,54 @@ describe Quizzes::QuizGroupsController, type: :request do
     end
   end
 
+  describe "GET /courses/:course_id/quizzes/:quiz_id/groups (index)" do
+    let(:path) { "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups" }
+    let(:params) do
+      {
+        controller: "quizzes/quiz_groups",
+        action: "index",
+        format: "json",
+        course_id: @course.id.to_s,
+        quiz_id: @quiz.id.to_s
+      }
+    end
+
+    before :once do
+      @group1 = @quiz.quiz_groups.create name: "Group 1", pick_count: 1, question_points: 10
+      @group2 = @quiz.quiz_groups.create name: "Group 2", pick_count: 2, question_points: 5, assessment_question_bank_id: @bank.id
+    end
+
+    it "returns a list of quiz groups" do
+      res = api_call(:get, path, params)
+      expect(res).to have_key("quiz_groups")
+      expect(res["quiz_groups"].length).to eq(2)
+      expect(res["quiz_groups"].pluck("name")).to match_array(["Group 1", "Group 2"])
+    end
+
+    it "includes assessment_question_bank_id for groups linked to item banks" do
+      res = api_call(:get, path, params)
+      group_with_bank = res["quiz_groups"].find { |g| g["name"] == "Group 2" }
+      expect(group_with_bank["assessment_question_bank_id"]).to eq(@bank.id)
+    end
+
+    it "includes all expected fields" do
+      res = api_call(:get, path, params)
+      group = res["quiz_groups"].first
+      expect(group).to have_key("id")
+      expect(group).to have_key("quiz_id")
+      expect(group).to have_key("name")
+      expect(group).to have_key("pick_count")
+      expect(group).to have_key("question_points")
+      expect(group).to have_key("position")
+    end
+
+    it "is unauthorized for unenrolled users" do
+      @user = User.create!(name: "unenrolled user")
+      raw_api_call(:get, path, params)
+      assert_forbidden
+    end
+  end
+
   describe "GET /courses/:course_id/quizzes/:quiz_id/groups/:id" do
     let(:group) { @quiz.quiz_groups.create name: "Test Group" }
     let(:path) { "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{group.id}" }

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe SentryProxy do
   let(:data) { { a: "b", c: "d" } }
   let(:error_klass) { Class.new(StandardError) }
@@ -47,7 +45,7 @@ describe SentryProxy do
     it "does not send the message if configured as ignorable" do
       SentryProxy.register_ignorable_error(error_klass)
       e = error_klass.new
-      expect(Sentry).to_not receive(:capture_exception)
+      expect(Sentry).not_to receive(:capture_exception)
       SentryProxy.capture(e, data)
     end
 
@@ -73,7 +71,7 @@ describe SentryProxy do
     it "registers strings to skip capture_message" do
       e = "Some Message"
       SentryProxy.register_ignorable_error(e)
-      expect(Sentry).to_not receive(:capture_message)
+      expect(Sentry).not_to receive(:capture_message)
       SentryProxy.capture(e, data)
     end
   end

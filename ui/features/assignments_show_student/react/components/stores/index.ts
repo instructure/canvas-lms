@@ -19,9 +19,9 @@
 import {create} from 'zustand'
 import type {RubricsStore} from '../../../assignments_show_student.d'
 
-// @ts-expect-error
 const store = create<RubricsStore>(() => ({
   displayedAssessment: null,
+  selfAssessment: null,
   isSavingRubricAssessment: false,
 }))
 

@@ -117,7 +117,9 @@ module Importers
         item.send(:"#{attr}=", options[attr])
       end
 
+      item.discussion_type = DiscussionTopic::DiscussionTypes::THREADED if item.discussion_type == DiscussionTopic::DiscussionTypes::SIDE_COMMENT
       item.reply_to_entry_required_count = options[:reply_to_entry_required_count] || 0
+      item.sort_order = DiscussionTopic::SortOrder::DEFAULT unless DiscussionTopic::SortOrder::TYPES.include?(item.sort_order)
 
       type = item.is_a?(Announcement) ? :announcement : :discussion_topic
       item.locked = options[:locked] if !options[:locked].nil? && type == :announcement
@@ -126,9 +128,7 @@ module Importers
                      end
 
       item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
-      if options[:assignment]
-        options[:assignment][:lock_at] ||= options[:lock_at]
-      else
+      unless options[:assignment]
         item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:lock_at])
       end
       item.todo_date       = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:todo_date])

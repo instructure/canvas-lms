@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 # rubocop:disable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
 # these specs needs to work with real constants, because they inherit from a class
 # that asks for the constant's name _in_ the `inherited` hook

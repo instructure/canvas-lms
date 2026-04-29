@@ -53,8 +53,10 @@ module CalendarConferencesHelper
           conf.assign_attributes(valid_params)
         end
       end
-    else
-      context.web_conferences.build(valid_params).tap do |conf|
+    elsif valid_params.values.any?(&:present?)
+      # Build conference if any params provided (even if invalid) to trigger validations
+      conference_context = context.is_a?(CourseSection) ? context.course : context
+      conference_context.web_conferences.build(valid_params).tap do |conf|
         conf.user = @current_user
         conf.settings[:default_return_url] = named_context_url(context, :context_url, include_host: true)
       end
@@ -87,10 +89,10 @@ module CalendarConferencesHelper
     # add contexts at end to preserve object comparison above
     conference_types.each { |t| t["contexts"] = type_to_contexts_map[t] }
 
-    js_env(
-      conferences: {
-        conference_types: conference_types_json(conference_types)
-      }
-    )
+    js_env({
+             conferences: {
+               conference_types: conference_types_json(conference_types)
+             }
+           })
   end
 end

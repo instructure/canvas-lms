@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
 require_relative "../feature_flag_helper"
 
 describe Feature do
@@ -32,7 +31,6 @@ describe Feature do
 
   before do
     silence_undefined_feature_flag_errors
-    allow_any_instance_of(User).to receive(:set_default_feature_flags)
     allow(Feature).to receive(:definitions).and_return({
                                                          "SA" => Feature.new(feature: "SA", applies_to: "SiteAdmin", state: "off"),
                                                          "RA" => Feature.new(feature: "RA", applies_to: "RootAccount", state: "hidden"),

@@ -311,7 +311,7 @@ shared_examples "files_page_old_ui" do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  folder_name = "new folder"
+  let(:folder_name) { "new folder" }
 
   it "allows group members to add a new folder", priority: pick_priority(context, student: "1", teacher: "2") do
     get files_page
@@ -329,7 +329,7 @@ shared_examples "files_page_old_ui" do |context|
 
   it "allows a group member to delete a file", priority: pick_priority(context, student: "1", teacher: "2") do
     skip_if_safari(:alert)
-    add_test_files(false)
+    add_test_files(context_test: false)
     get files_page
     delete_file(0, :cog_icon)
     wait_for_ajaximations
@@ -392,7 +392,7 @@ shared_examples "files_page_files_rewrite_ui" do |context|
   include SharedExamplesCommon
   include FilesPage
 
-  folder_name = "new folder"
+  let(:folder_name) { "new folder" }
 
   it "allows group members to add a new folder on new files UI", priority: pick_priority(context, student: "1", teacher: "2") do
     get files_page
@@ -421,7 +421,7 @@ shared_examples "files_page_files_rewrite_ui" do |context|
 
   it "allows a group member to delete a file on new files UI", priority: pick_priority(context, student: "1", teacher: "2") do
     skip_if_safari(:alert)
-    add_test_files(false)
+    add_test_files(context_test: false)
     get files_page
     expect(all_files_table_rows.count).to eq 2
     delete_file_from(1, :toolbar_menu)
@@ -481,40 +481,5 @@ shared_examples "files_page_files_rewrite_ui" do |context|
     # This checks to make sure there is only one file and it is the group-level one
     expect(all_files_table_rows.count).to eq 1
     expect(get_item_content_files_table(1, 1)).to include("example.pdf")
-  end
-end
-
-#-----------------------------------------------------------------------------------------------------------------------
-shared_examples "conferences_page" do |context|
-  include GroupsCommon
-  include SharedExamplesCommon
-
-  it "allows group users to create a conference", priority: pick_priority(context, student: "1", teacher: "2") do
-    skip_if_chrome("issue with invite_all_but_one_user method")
-    title = "test conference"
-    get conferences_page
-    create_conference(title:)
-    expect(f("#new-conference-list .ig-title").text).to include(title)
-  end
-
-  it "allows group users to delete an active conference", priority: pick_priority(context, student: "1", teacher: "2") do
-    skip_if_safari(:alert)
-    skip_if_chrome("delete_conference method is fragile")
-    WimbaConference.create!(title: "new conference", user: @user, context: @testgroup.first)
-    get conferences_page
-
-    delete_conference
-    expect(f("#new-conference-list")).to include_text("There are no new conferences")
-  end
-
-  it "allows group users to delete a concluded conference", priority: pick_priority(context, student: "1", teacher: "2") do
-    skip_if_safari(:alert)
-    skip_if_chrome("delete_conference method is fragile")
-    cc = WimbaConference.create!(title: "cncluded conference", user: @user, context: @testgroup.first)
-    conclude_conference(cc)
-    get conferences_page
-
-    delete_conference
-    expect(f("#concluded-conference-list")).to include_text("There are no concluded conferences")
   end
 end

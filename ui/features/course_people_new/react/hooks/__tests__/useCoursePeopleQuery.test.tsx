@@ -25,9 +25,12 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {DEFAULT_OPTION, DEFAULT_SORT_FIELD, DEFAULT_SORT_DIRECTION} from '../../../util/constants'
 import type {User} from '../../../types'
 
-jest.mock('../useCoursePeopleContext')
-jest.mock('@canvas/graphql')
-const mockExecuteQuery = executeQuery as jest.Mock
+import useCoursePeopleContext from '../useCoursePeopleContext'
+
+vi.mock('../useCoursePeopleContext')
+vi.mock('@canvas/graphql')
+const mockExecuteQuery = vi.mocked(executeQuery)
+const mockUseCoursePeopleContext = vi.mocked(useCoursePeopleContext)
 
 describe('useCoursePeopleQuery', () => {
   const allRoles = [
@@ -88,13 +91,13 @@ describe('useCoursePeopleQuery', () => {
   )
 
   beforeEach(() => {
-    require('../useCoursePeopleContext').default.mockReturnValue(useCoursePeopleContextMocks)
+    mockUseCoursePeopleContext.mockReturnValue(useCoursePeopleContextMocks as any)
     mockExecuteQuery.mockClear()
     queryClient.clear()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('fetches roster data successfully', async () => {

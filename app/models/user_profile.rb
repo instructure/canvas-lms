@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class UserProfile < ActiveRecord::Base
+class UserProfile < ApplicationRecord
   belongs_to :user
 
   delegate :short_name, :name, :asset_string, :opaque_identifier, to: :user
@@ -96,13 +96,14 @@ class UserProfile < ActiveRecord::Base
             new_tab
           end
         insert_profile_tab(tabs, user, opts)
-        insert_eportfolios_tab(tabs, user)
+        insert_eportfolios_tab(tabs, user, opts)
         insert_content_shares_tab(tabs, user, opts)
         insert_lti_tool_tabs(tabs, user, opts) if user && opts[:root_account]
         tabs = tabs.slice(0, 2) if user&.fake_student?
         insert_observer_tabs(tabs, user)
         insert_qr_mobile_login_tab(tabs, user, opts)
         insert_past_global_announcements(tabs, user, opts)
+        insert_nav_menu_link_tabs(tabs, opts)
         tabs
       end
   end
@@ -122,12 +123,13 @@ class UserProfile < ActiveRecord::Base
     end
   end
 
-  def insert_eportfolios_tab(tabs, user)
+  def insert_eportfolios_tab(tabs, user, opts)
     if user.eportfolios_enabled?
+      deprecated = opts[:root_account]&.feature_enabled?(:eportfolio_deprecation_notice)
       tabs <<
         {
           id: TAB_EPORTFOLIOS,
-          label: I18n.t("#tabs.eportfolios", "ePortfolios"),
+          label: deprecated ? I18n.t("ePortfolios (Legacy)") : I18n.t("ePortfolios"),
           css_class: "eportfolios",
           href: :dashboard_eportfolios_path,
           no_args: true
@@ -198,6 +200,13 @@ class UserProfile < ActiveRecord::Base
           no_args: { include_past: true }
         }
     end
+  end
+
+  def insert_nav_menu_link_tabs(tabs, opts)
+    root_account = opts[:root_account]
+    return unless root_account&.feature_enabled?(:nav_menu_links)
+
+    tabs.concat(NavMenuLinkTabs.user_tabs(root_account))
   end
 end
 

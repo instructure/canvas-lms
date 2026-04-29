@@ -21,7 +21,7 @@ import update from 'immutability-helper'
 import GradingStandard from './gradingStandard'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {map, each, intersection, find} from 'lodash'
+import {intersection, map, each, find} from 'es-toolkit/compat'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 const I18n = createI18nScope('external_toolsgradingStandardCollection')

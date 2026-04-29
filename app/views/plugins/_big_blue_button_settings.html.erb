@@ -49,7 +49,7 @@
         <%= f.check_box :free_trial, checked: Canvas::Plugin.value_to_boolean(settings[:free_trial]) %> <%= f.label :free_trial, :en => "Mark this BigBlueButton instance as a free trial" %>
       </td>
     </tr>
-    <% if @domain_root_account.feature_enabled?(:bbb_avatar) && !@domain_root_account.site_admin? %>
+    <% unless @domain_root_account.site_admin? %>
     <tr>
       <td></td>
       <td>

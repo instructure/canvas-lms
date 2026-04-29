@@ -25,16 +25,16 @@ import {initialize as alertInitialize} from '../../utilities/alertUtils'
 
 const isPromise = obj => obj && typeof obj.then === 'function'
 
-jest.mock('../../utilities/apiUtils', () => ({
-  ...jest.requireActual('../../utilities/apiUtils'),
-  transformApiToInternalItem: jest.fn(response => ({...response, transformedToInternal: true})),
-  transformInternalToApiItem: jest.fn(internal => ({...internal, transformedToApi: true})),
-  transformInternalToApiOverride: jest.fn(internal => ({
+vi.mock('../../utilities/apiUtils', async () => ({
+  ...(await vi.importActual('../../utilities/apiUtils')),
+  transformApiToInternalItem: vi.fn(response => ({...response, transformedToInternal: true})),
+  transformInternalToApiItem: vi.fn(internal => ({...internal, transformedToApi: true})),
+  transformInternalToApiOverride: vi.fn(internal => ({
     ...internal.planner_override,
     marked_complete: internal.marked_complete ?? false,
     transformedToApiOverride: true,
   })),
-  transformPlannerNoteApiToInternalItem: jest.fn(response => ({
+  transformPlannerNoteApiToInternalItem: vi.fn(response => ({
     ...response,
     transformedToInternal: true,
   })),
@@ -85,7 +85,6 @@ describe('api actions', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
-    SidebarActions.maybeUpdateTodoSidebar.reset()
   })
   afterAll(() => server.close())
 
@@ -100,7 +99,7 @@ describe('api actions', () => {
 
   describe('togglePlannerItemCompletion', () => {
     it('dispatches saving, saved, and maybe update sidebar actions', () => {
-      const mockDispatch = jest.fn()
+      const mockDispatch = vi.fn()
       const plannerItem = simpleItem()
       const savingItem = {...plannerItem, show: true, toggleAPIPending: true}
       const savePromise = Actions.togglePlannerItemCompletion(plannerItem)(
@@ -113,8 +112,6 @@ describe('api actions', () => {
         payload: {item: savingItem, isNewItem: false, wasToggled: true},
       })
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise})
-      expect(mockDispatch).toHaveBeenCalledWith(SidebarActions.maybeUpdateTodoSidebar)
-      expect(SidebarActions.maybeUpdateTodoSidebar.args()).toEqual([savePromise])
     })
 
     it('updates marked_complete and sends override data in the request', async () => {
@@ -126,7 +123,7 @@ describe('api actions', () => {
         }),
       )
 
-      const mockDispatch = jest.fn()
+      const mockDispatch = vi.fn()
       const plannerItem = simpleItem({marked_complete: null})
       await Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState)
       expect(capturedRequest).toMatchObject({
@@ -148,7 +145,7 @@ describe('api actions', () => {
         }),
       )
 
-      const mockDispatch = jest.fn()
+      const mockDispatch = vi.fn()
       const plannerItem = simpleItem({id: '42'})
       await Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState)
       expect(capturedRequest.method).toBe('POST')
@@ -172,7 +169,7 @@ describe('api actions', () => {
         }),
       )
 
-      const mockDispatch = jest.fn()
+      const mockDispatch = vi.fn()
       const plannerItem = simpleItem({id: '42', planner_override: {id: '5', marked_complete: true}})
       await Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState)
       expect(capturedRequest.method).toBe('PUT')
@@ -194,7 +191,7 @@ describe('api actions', () => {
         }),
       )
 
-      const mockDispatch = jest.fn()
+      const mockDispatch = vi.fn()
       const plannerItem = simpleItem({planner_override: {id: 'override_id', marked_complete: true}})
       const result = await Actions.togglePlannerItemCompletion(plannerItem)(
         mockDispatch,
@@ -218,8 +215,8 @@ describe('api actions', () => {
         }),
       )
 
-      const fakeAlert = jest.fn()
-      const mockDispatch = jest.fn()
+      const fakeAlert = vi.fn()
+      const mockDispatch = vi.fn()
       alertInitialize({
         visualErrorCallback: fakeAlert,
       })
@@ -242,7 +239,7 @@ describe('api actions', () => {
 
   describe('cancelEditingPlannerItem', () => {
     it('dispatches clearUpdateTodo and canceledEditingPlannerItem actions', () => {
-      const mockDispatch = jest.fn()
+      const mockDispatch = vi.fn()
       Actions.cancelEditingPlannerItem()(mockDispatch, getBasicState)
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CANCELED_EDITING_PLANNER_ITEM'})

@@ -68,12 +68,15 @@ export type GradebookSettings = {
   show_inactive_enrollments: 'false' | 'true'
   show_separate_first_last_names: 'false' | 'true'
   show_unpublished_assignments: 'false' | 'true'
+  show_suppressed_assignments: 'false' | 'true'
   sort_rows_by_column_id: string
   sort_rows_by_direction: SortDirection
   sort_rows_by_setting_key: SortRowsSettingKey
   student_column_display_as: 'last_first' | 'first_last'
   student_column_secondary_info: string
   view_ungraded_as_zero: 'false' | 'true'
+  view_hidden_grades_indicator: 'false' | 'true'
+  view_status_for_colorblindness: 'false' | 'true'
   colors?: StatusColors
 }
 
@@ -178,6 +181,7 @@ export type GradebookOptions = {
   student_groups: StudentGroupCategoryMap
   user_asset_string: string
   performance_improvements_for_gradebook: boolean
+  use_queue_for_rate_limiting_gradebook_requests: boolean
   teacher_notes: {
     hidden: boolean
     id: string
@@ -198,9 +202,12 @@ export type GradebookViewOptions = {
   showNotes: boolean
   showSeparateFirstLastNames: boolean
   showUnpublishedAssignments: boolean
+  showSuppressedAssignments: boolean
   hideAssignmentGroupTotals: boolean
   statusColors: StatusColors
   viewUngradedAsZero: boolean
+  viewHiddenGradesIndicator: boolean
+  viewStatusForColorblindness: boolean
 }
 
 export type LatePolicy = {
@@ -294,6 +301,7 @@ export type FilterType =
   | 'section'
   | 'start-date'
   | 'student-group'
+  | 'non-collaborative-group'
   | 'submissions'
   | 'unposted'
 

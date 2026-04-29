@@ -30,11 +30,13 @@ const getDefaultValues = overrides => {
     moment.tz(TZ).add(2, 'day'),
   ]
   return {
-    days: days.map(d => [
+    days: days.map((d, index) => [
       d.format('YYYY-MM-DD'),
       [
         {
           dateBucketMoment: d,
+          uniqueId: `item-${index}`,
+          title: `Test Item ${index + 1}`,
           context: {
             color: '#5a92de',
             title: 'Test Course',
@@ -57,12 +59,12 @@ beforeAll(() => {
 
 afterAll(() => {
   MockDate.reset()
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('PlannerApp basic rendering', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders base component with days', () => {
@@ -105,7 +107,7 @@ describe('PlannerApp basic rendering', () => {
   })
 
   it('notifies the UI to perform dynamic updates', () => {
-    const mockUpdate = jest.fn()
+    const mockUpdate = vi.fn()
     const {rerender} = render(
       <PlannerApp {...getDefaultValues({isLoading: true})} triggerDynamicUiUpdates={mockUpdate} />,
     )

@@ -285,11 +285,11 @@ module CanvasSanitize # :nodoc:
       "audio" => %w[name src allowfullscreen allow muted poster width height controls playsinline].freeze,
       "font" => %w[face color size].freeze,
       # MathML
-      "annotation" => %w[href xref definitionURL encoding cd name src].freeze,
-      "annotation-xml" => %w[href xref definitionURL encoding cd name src].freeze,
-      "maction" => %w[href xref mathcolor mathbackground actiontype selection].freeze,
-      "maligngroup" => %w[href xref mathcolor mathbackground groupalign].freeze,
-      "malignmark" => %w[href xref mathcolor mathbackground edge].freeze,
+      "annotation" => %w[href xref intent arg definitionURL encoding cd name src].freeze,
+      "annotation-xml" => %w[href xref intent arg definitionURL encoding cd name src].freeze,
+      "maction" => %w[href xref mathcolor mathbackground intent arg actiontype selection].freeze,
+      "maligngroup" => %w[href xref mathcolor mathbackground intent arg groupalign].freeze,
+      "malignmark" => %w[href xref mathcolor mathbackground intent arg edge].freeze,
       "map" => ["name"].freeze,
       "math" => %w[href
                    xref
@@ -302,6 +302,8 @@ module CanvasSanitize # :nodoc:
                    altimg-valign
                    alttext
                    cdgroup
+                   intent
+                   arg
                    mathcolor
                    mathbackground
                    scriptlevel
@@ -342,7 +344,7 @@ module CanvasSanitize # :nodoc:
                    lquote
                    rquote
                    linethickness
-                   munalign
+                   numalign
                    denomalign
                    bevelled
                    voffset
@@ -386,24 +388,28 @@ module CanvasSanitize # :nodoc:
                    mslinethickness
                    selection
                    xmlns].freeze,
-      "menclose" => %w[href xref mathcolor mathbackground notation].freeze,
-      "merror" => %w[href xref mathcolor mathbackground].freeze,
-      "mfenced" => %w[href xref mathcolor mathbackground open close separators].freeze,
+      "menclose" => %w[href xref mathcolor mathbackground intent arg notation].freeze,
+      "merror" => %w[href xref mathcolor mathbackground intent arg].freeze,
+      "mfenced" => %w[href xref mathcolor mathbackground intent arg open close separators].freeze,
       "mfrac" => %w[href
                     xref
                     mathcolor
                     mathbackground
+                    intent
+                    arg
                     linethickness
-                    munalign
+                    numalign
                     denomalign
                     bevelled].freeze,
-      "mglyph" => %w[href xref mathcolor mathbackground src alt width height valign].freeze,
-      "mi" => %w[href xref mathcolor mathbackground mathvariant mathsize].freeze,
-      "mlabeledtr" => %w[href xref mathcolor mathbackground].freeze,
+      "mglyph" => %w[href xref mathcolor mathbackground intent arg src alt width height valign].freeze,
+      "mi" => %w[href xref mathcolor mathbackground intent arg mathvariant mathsize].freeze,
+      "mlabeledtr" => %w[href xref mathcolor mathbackground intent arg].freeze,
       "mlongdiv" => %w[href
                        xref
                        mathcolor
                        mathbackground
+                       intent
+                       arg
                        longdivstyle
                        align
                        stackalign
@@ -413,13 +419,17 @@ module CanvasSanitize # :nodoc:
                             xref
                             mathcolor
                             mathbackground
+                            intent
+                            arg
                             subscriptshift
                             superscriptshift].freeze,
-      "mn" => %w[href xref mathcolor mathbackground mathvariant mathsize].freeze,
+      "mn" => %w[href xref mathcolor mathbackground intent arg mathvariant mathsize].freeze,
       "mo" => %w[href
                  xref
                  mathcolor
                  mathbackground
+                 intent
+                 arg
                  mathvariant
                  mathsize
                  form
@@ -445,47 +455,55 @@ module CanvasSanitize # :nodoc:
                  indentshiftfirst
                  indentalignlast
                  indentshiftlast].freeze,
-      "mover" => %w[href xref mathcolor mathbackground accent align].freeze,
+      "mover" => %w[href xref mathcolor mathbackground intent arg accent align].freeze,
       "mpadded" => %w[href
                       xref
                       mathcolor
                       mathbackground
+                      intent
+                      arg
                       height
                       depth
                       width
                       lspace
                       voffset].freeze,
-      "mphantom" => %w[href xref mathcolor mathbackground].freeze,
-      "mprescripts" => %w[href xref mathcolor mathbackground].freeze,
-      "mroot" => %w[href xref mathcolor mathbackground].freeze,
-      "mrow" => %w[href xref mathcolor mathbackground].freeze,
-      "ms" => %w[href xref mathcolor mathbackground mathvariant mathsize lquote rquote].freeze,
+      "mphantom" => %w[href xref mathcolor mathbackground intent arg].freeze,
+      "mprescripts" => %w[href xref mathcolor mathbackground intent arg].freeze,
+      "mroot" => %w[href xref mathcolor mathbackground intent arg].freeze,
+      "mrow" => %w[href xref mathcolor mathbackground intent arg].freeze,
+      "ms" => %w[href xref mathcolor mathbackground intent arg mathvariant mathsize lquote rquote].freeze,
       "mscarries" => %w[href
                         xref
                         mathcolor
                         mathbackground
+                        intent
+                        arg
                         position
                         location
                         crossout
                         scriptsizemultiplier].freeze,
-      "mscarry" => %w[href xref mathcolor mathbackground location crossout].freeze,
-      "msgroup" => %w[href xref mathcolor mathbackground position shift].freeze,
+      "mscarry" => %w[href xref mathcolor mathbackground intent arg location crossout].freeze,
+      "msgroup" => %w[href xref mathcolor mathbackground intent arg position shift].freeze,
       "msline" => %w[href
                      xref
                      mathcolor
                      mathbackground
+                     intent
+                     arg
                      position
                      length
                      leftoverhang
                      rightoverhang
                      mslinethickness].freeze,
-      "mspace" => %w[href xref mathcolor mathbackground mathvariant mathsize].freeze,
-      "msqrt" => %w[href xref mathcolor mathbackground].freeze,
-      "msrow" => %w[href xref mathcolor mathbackground position].freeze,
+      "mspace" => %w[href xref mathcolor mathbackground intent arg mathvariant mathsize].freeze,
+      "msqrt" => %w[href xref mathcolor mathbackground intent arg].freeze,
+      "msrow" => %w[href xref mathcolor mathbackground intent arg position].freeze,
       "mstack" => %w[href
                      xref
                      mathcolor
                      mathbackground
+                     intent
+                     arg
                      align
                      stackalign
                      charalign
@@ -494,6 +512,8 @@ module CanvasSanitize # :nodoc:
                      xref
                      mathcolor
                      mathbackground
+                     intent
+                     arg
                      scriptlevel
                      displaystyle
                      scriptsizemultiplier
@@ -532,7 +552,7 @@ module CanvasSanitize # :nodoc:
                      lquote
                      rquote
                      linethickness
-                     munalign
+                     numalign
                      denomalign
                      bevelled
                      voffset
@@ -575,13 +595,15 @@ module CanvasSanitize # :nodoc:
                      rightoverhang
                      mslinethickness
                      selection].freeze,
-      "msub" => %w[href xref mathcolor mathbackground subscriptshift].freeze,
-      "msubsup" => %w[href xref mathcolor mathbackground subscriptshift superscriptshift].freeze,
-      "msup" => %w[href xref mathcolor mathbackground superscriptshift].freeze,
+      "msub" => %w[href xref mathcolor mathbackground intent arg subscriptshift].freeze,
+      "msubsup" => %w[href xref mathcolor mathbackground intent arg subscriptshift superscriptshift].freeze,
+      "msup" => %w[href xref mathcolor mathbackground intent arg superscriptshift].freeze,
       "mtable" => %w[href
                      xref
                      mathcolor
                      mathbackground
+                     intent
+                     arg
                      align
                      rowalign
                      columnalign
@@ -604,6 +626,8 @@ module CanvasSanitize # :nodoc:
                   xref
                   mathcolor
                   mathbackground
+                  intent
+                  arg
                   rowspan
                   columnspan
                   rowalign
@@ -613,22 +637,24 @@ module CanvasSanitize # :nodoc:
                     xref
                     mathcolor
                     mathbackground
+                    intent
+                    arg
                     mathvariant
                     mathsize
                     width
                     height
                     depth
                     linebreak].freeze,
-      "mtr" => %w[href xref mathcolor mathbackground rowalign columnalign groupalign].freeze,
-      "munder" => %w[href xref mathcolor mathbackground accentunder align].freeze,
-      "munderover" => %w[href xref mathcolor mathbackground accent accentunder align].freeze,
-      "none" => %w[href xref mathcolor mathbackground].freeze,
-      "semantics" => %w[href xref definitionURL encoding].freeze,
+      "mtr" => %w[href xref mathcolor mathbackground intent arg rowalign columnalign groupalign].freeze,
+      "munder" => %w[href xref mathcolor mathbackground intent arg accentunder align].freeze,
+      "munderover" => %w[href xref mathcolor mathbackground intent arg accent accentunder align].freeze,
+      "none" => %w[href xref mathcolor mathbackground intent arg].freeze,
+      "semantics" => %w[href xref intent arg definitionURL encoding].freeze,
     }.freeze,
 
     protocols: {
       "a" => {
-        "href" => ["ftp", "http", "https", "mailto", "tel", "skype", :relative].freeze,
+        "href" => ["ftp", "http", "https", "mailto", "tel", :relative].freeze,
         "data-url" => DEFAULT_PROTOCOLS,
         "data-item-href" => DEFAULT_PROTOCOLS
       }.freeze,
@@ -699,6 +725,7 @@ module CanvasSanitize # :nodoc:
         text-decoration
         text-indent
         top
+        user-select
         vertical-align
         visibility
         white-space

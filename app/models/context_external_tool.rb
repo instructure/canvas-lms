@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require "redcarpet"
 
-class ContextExternalTool < ActiveRecord::Base
+class ContextExternalTool < ApplicationRecord
   include Workflow
   include SearchTermHelper
   include PermissionsHelper
@@ -37,9 +37,41 @@ class ContextExternalTool < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
   belongs_to :root_account, class_name: "Account"
+  # Can point to a cross-shard registration, is slowly being phased out for app
   belongs_to :lti_registration, class_name: "Lti::Registration"
+  alias_method :old_lti_registration, :lti_registration
+  alias_attribute :old_lti_registration_id, :lti_registration_id
+  # Always points to a local registration
+  belongs_to :app, class_name: "Lti::Registration", optional: true
+
+  def lti_registration
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      app
+    else
+      old_lti_registration
+    end
+  end
+
+  def lti_registration_id
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      app_id
+    else
+      old_lti_registration_id
+    end
+  end
+
+  def lti_registration=(value)
+    super
+    sync_app_id
+  end
+
+  def lti_registration_id=(value)
+    super
+    sync_app_id
+  end
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:name, :description]
   restrict_columns :settings, %i[consumer_key shared_secret url domain settings]
 
@@ -79,6 +111,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
   serialize :settings, coder: SettingsSerializer
 
+  before_validation :sync_app_id
   # add_identity_hash needs to calculate off of other data in the object, so it
   # should always be the last field change callback to run
   before_save :infer_defaults, :add_identity_hash
@@ -87,6 +120,13 @@ class ContextExternalTool < ActiveRecord::Base
   after_commit :update_unified_tool_id, if: :update_unified_tool_id?
   validate :check_for_xml_error
 
+  scope :for_lti_registration, lambda { |lti_registration, root_account|
+    if root_account&.feature_enabled?(:lti_registrations_templates)
+      where(app: lti_registration)
+    else
+      where(lti_registration:)
+    end
+  }
   scope :disabled, -> { where(workflow_state: DISABLED_STATE) }
   scope :quiz_lti, -> { where(tool_id: QUIZ_LTI) }
   scope :lti_1_3, -> { where(lti_version: "1.3") }
@@ -120,7 +160,6 @@ class ContextExternalTool < ActiveRecord::Base
   CUSTOM_EXTENSION_KEYS = {
     file_menu: [:accept_media_types].freeze,
     editor_button: [:use_tray].freeze,
-    ActivityAssetProcessor: [:eula].freeze,
     submission_type_selection: [:description, :require_resource_selection].freeze,
   }.freeze
 
@@ -166,7 +205,7 @@ class ContextExternalTool < ActiveRecord::Base
       Sentry.with_scope do |scope|
         scope.set_tags(context_id: context.global_id)
         scope.set_tags(lti_registration_id: lti_registration.global_id)
-        scope.set_context("tool", global_id)
+        scope.set_context("tool", { global_id: })
         Sentry.capture_message("ContextExternalTool#available_in_context", level: :warning)
       end
     end
@@ -175,6 +214,14 @@ class ContextExternalTool < ActiveRecord::Base
     # have defaulted to "available," if we are missing a context control we assume that
     # the tool is available.
     control.nil? || control.available?
+  end
+
+  def primary_context_control
+    if context_type == "Course"
+      context_controls.find_by(course_id: context_id)
+    elsif context_type == "Account"
+      context_controls.find_by(account_id: context_id)
+    end
   end
 
   class << self
@@ -278,7 +325,7 @@ class ContextExternalTool < ActiveRecord::Base
           canvas_icon_class:,
           width: tool.editor_button(:selection_width),
           height: tool.editor_button(:selection_height),
-          use_tray: tool.editor_button(:use_tray) == "true",
+          use_tray: Canvas::Plugin.value_to_boolean(tool.editor_button(:use_tray)),
           on_by_default: tool.on_by_default?(on_by_default_ids),
           description: if tool.description
                          Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)
@@ -624,7 +671,7 @@ class ContextExternalTool < ActiveRecord::Base
     if tool_hash[:error]
       @config_errors << [error_field, tool_hash[:error]]
     else
-      Importers::ContextExternalToolImporter.import_from_migration(tool_hash, context, nil, self)
+      Importers::ContextExternalToolImporter.import_from_migration(tool_hash, context, item: self, persist: false)
     end
     self.name = real_name unless real_name.blank?
   rescue CC::Importer::BLTIConverter::CCImportError => e
@@ -923,12 +970,14 @@ class ContextExternalTool < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = "deleted"
-    # update all the associated context_control's workflow_state to deleted
-    Lti::ContextControl
-      .where(deployment_id: id)
-      .update_all(workflow_state: "deleted")
-    run_callbacks(:destroy) { save! }
+    transaction do
+      self.workflow_state = "deleted"
+      # update all the associated context_control's workflow_state to deleted
+      Lti::ContextControl
+        .where(deployment_id: id)
+        .update_all(workflow_state: "deleted")
+      run_callbacks(:destroy) { save! }
+    end
   end
 
   def precedence
@@ -943,7 +992,7 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def standard_url(use_environment_overrides = false)
+  def standard_url(use_environment_overrides: false)
     standard_url = ContextExternalTool.standardize_url(url)
 
     if use_environment_overrides
@@ -959,14 +1008,14 @@ class ContextExternalTool < ActiveRecord::Base
   # This method checks both the domain and url
   # host when attempting to match host.
   def matches_host?(url, use_environment_overrides: false)
-    standard_url = standard_url(use_environment_overrides)
+    standard_url = standard_url(use_environment_overrides:)
     matches_tool_domain?(url) ||
       (standard_url.present? &&
         standard_url.host == ContextExternalTool.standardize_url(url)&.host)
   end
 
-  def matches_url?(url, match_queries_exactly = true, use_environment_overrides: false)
-    tool_url = standard_url(use_environment_overrides)
+  def matches_url?(url, match_queries_exactly: true, use_environment_overrides: false)
+    tool_url = standard_url(use_environment_overrides:)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
       url == tool_url
@@ -1151,7 +1200,7 @@ class ContextExternalTool < ActiveRecord::Base
   # @param domain_root_account [Account] The root account to invalidate the cache for
   # @return [void]
   def self.invalidate_nav_tabs_cache(tool, domain_root_account)
-    if tool.has_placement?(:user_navigation) || tool.has_placement?(:course_navigation) || tool.has_placement?(:account_navigation)
+    if tool.uses_cached_placements?
       Lti::NavigationCache.new(domain_root_account).invalidate_cache_key
     end
   end
@@ -1162,6 +1211,12 @@ class ContextExternalTool < ActiveRecord::Base
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
       Lti::V1p1::Asset.set_asset_context_id(asset, lti_context_id, context:)
+    end
+  end
+
+  def uses_cached_placements?
+    %i[user_navigation course_navigation account_navigation].any? do |placement|
+      has_placement?(placement)
     end
   end
 
@@ -1366,20 +1421,6 @@ class ContextExternalTool < ActiveRecord::Base
     )
   end
 
-  def placement_allowed?(placement)
-    return true unless Lti::ResourcePlacement::RESTRICTED_PLACEMENTS.include? placement.to_sym
-
-    allowed_domains = Setting.get("#{placement}_allowed_launch_domains", "").split(",").map(&:strip).reject(&:empty?)
-    allowed_dev_keys = Setting.get("#{placement}_allowed_dev_keys", "").split(",").map(&:strip).reject(&:empty?)
-
-    allowed_dev_keys.include?(global_developer_key_id.to_s) ||
-      allowed_domains.include?(domain) ||
-      allowed_domains.any? do |allowed_domain|
-        # wildcard domains: allowed_domain "*.foo.com" -> domain.end_with? ".foo.com"
-        allowed_domain.start_with?("*.") && domain&.end_with?(allowed_domain[1..])
-      end
-  end
-
   def on_by_default?(on_by_default_ids)
     on_by_default_ids.include?(global_developer_key_id)
   end
@@ -1391,8 +1432,29 @@ class ContextExternalTool < ActiveRecord::Base
     ).delete_suffix("/deployment")
   end
 
+  def message_settings
+    settings[:message_settings]
+  end
+
+  def message_settings=(value)
+    if value.is_a?(Array)
+      value = value.map(&:with_indifferent_access)
+      value.each do |setting|
+        setting["enabled"] = Canvas::Plugin.value_to_boolean(setting["enabled"]) if setting.is_a?(Hash) && setting.key?("enabled")
+      end
+    elsif value.present?
+      raise ArgumentError, "message_settings must be an Array if present"
+    end
+    settings[:message_settings] = value
+  end
+
+  def message_settings_for(message_type)
+    ms = (message_settings || []).select { |ms| ms["type"] == message_type.to_s }
+    ms.is_a?(Array) ? ms.map(&:with_indifferent_access) : ms
+  end
+
   def eula_settings
-    extension_setting(:ActivityAssetProcessor, :eula)
+    message_settings_for(LtiAdvantage::Messages::EulaRequest::MESSAGE_TYPE).first || {}
   end
 
   def eula_enabled?
@@ -1408,6 +1470,43 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   private
+
+  def sync_app_id
+    return if old_lti_registration_id.blank?
+    return unless old_lti_registration_id_changed?
+    return if app_id_changed? && !app_id.nil?
+
+    # root_account may not be set yet (infer_defaults runs before_save,
+    # but this callback runs before_validation), so fall back to context.
+    resolved_root_account = root_account || context&.root_account
+    cross_shard = shard != Shard.shard_for(old_lti_registration_id)
+    # Same-shard but inherited: root accounts that share a shard with Site Admin
+    # (OSS installs, local dev, single-shard multi-tenant) still need their own
+    # local copy for any registration they've inherited from Site Admin.
+    same_shard_inherited = !cross_shard &&
+                           resolved_root_account != Account.site_admin &&
+                           shard == Account.site_admin.shard &&
+                           old_lti_registration&.root_account == Account.site_admin
+
+    if cross_shard || same_shard_inherited
+      local = Lti::Registration.active.find_by(
+        template_registration_id: old_lti_registration_id,
+        account: resolved_root_account
+      )
+      if local
+        self.app_id = local.id
+      else
+        msg = "No local App/Lti::Registration found for lti_registration_id=#{old_lti_registration_id}"
+        if resolved_root_account&.feature_enabled?(:lti_registrations_templates)
+          raise Lti::LocalAppNotFound, msg
+        else
+          Canvas::Errors.capture_exception(:lti_registration_sync, msg, :warn)
+        end
+      end
+    else
+      self.app_id = old_lti_registration_id
+    end
+  end
 
   # Locally and in OSS installations, this can be configured in config/dynamic_settings.yml.
   # Returns an array of strings, each listing a partial or full domain suffix that is considered "internal".

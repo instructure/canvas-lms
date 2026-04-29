@@ -18,15 +18,19 @@
 
 import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {Tray} from '@instructure/ui-tray'
-import {RubricAssessmentContainer, type ViewMode} from './RubricAssessmentContainer'
+import {type ViewMode} from './ViewModeSelect'
 import type {Rubric, RubricAssessmentData} from '../types/rubric'
 import {View} from '@instructure/ui-view'
+import useLocalStorage from '@canvas/local-storage'
+import * as CONSTANTS from './constants'
+import {RubricAssessmentContainerWrapper} from './RubricAssessmentContainerWrapper'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
 export type RubricAssessmentTrayProps = {
+  currentUserId: string
   hidePoints?: boolean
   isLoading?: boolean
   isOpen: boolean
@@ -35,7 +39,12 @@ export type RubricAssessmentTrayProps = {
   isSelfAssessment?: boolean
   rubric?: Pick<
     Rubric,
-    'title' | 'criteria' | 'ratingOrder' | 'freeFormCriterionComments' | 'pointsPossible'
+    | 'title'
+    | 'criteria'
+    | 'ratingOrder'
+    | 'freeFormCriterionComments'
+    | 'pointsPossible'
+    | 'buttonDisplay'
   >
   rubricAssessmentData: RubricAssessmentData[]
   rubricSavedComments?: Record<string, string[]>
@@ -45,6 +54,7 @@ export type RubricAssessmentTrayProps = {
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
 }
 export const RubricAssessmentTray = ({
+  currentUserId,
   hidePoints = false,
   isOpen,
   isLoading = false,
@@ -59,7 +69,10 @@ export const RubricAssessmentTray = ({
   onDismiss,
   onSubmit,
 }: RubricAssessmentTrayProps) => {
-  const [viewMode, setViewMode] = useState<ViewMode>(viewModeOverride ?? 'traditional')
+  const [viewMode, setViewMode] = useLocalStorage<ViewMode>(
+    CONSTANTS.RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY(currentUserId),
+    viewModeOverride ?? CONSTANTS.RUBRIC_VIEW_MODE_DEFAULT,
+  )
 
   return (
     <Tray
@@ -76,8 +89,10 @@ export const RubricAssessmentTray = ({
         <LoadingIndicator />
       ) : (
         <View as="div" padding="medium medium 0 medium" themeOverride={{paddingMedium: '1rem'}}>
-          <RubricAssessmentContainer
+          <RubricAssessmentContainerWrapper
+            buttonDisplay={rubric.buttonDisplay ?? 'level'}
             criteria={rubric.criteria ?? []}
+            currentUserId={ENV.current_user_id ?? ''}
             hidePoints={hidePoints}
             isPreviewMode={isPreviewMode}
             isPeerReview={isPeerReview}

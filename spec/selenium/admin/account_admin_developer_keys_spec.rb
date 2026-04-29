@@ -55,7 +55,6 @@ describe "Developer Keys" do
       f("input[name='developer_key[email]']").send_keys("admin@example.com")
       f("textarea[name='developer_key[redirect_uris]']").send_keys("http://example.com")
       f("input[name='developer_key[icon_url]']").send_keys("/images/delete.png")
-      click_enforce_scopes
       click_scope_group_checkbox
       find_button("Save").click
       expect(ff("#reactContent tbody tr").length).to eq 1
@@ -307,12 +306,11 @@ describe "Developer Keys" do
         )
       end
 
-      it "does not have enforce scopes toggle activated on initial dev key creation" do
+      it "has enforce scopes toggle activated on initial dev key creation" do
         get "/accounts/#{Account.default.id}/developer_keys"
         find_button("Developer Key").click
         find_button("API Key").click
-        expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconX']")
-        expect(f("form")).to contain_jqcss("h2:contains('When scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user.')")
+        expect(f("span[data-automation='enforce_scopes']")).to contain_css("svg[name='IconCheck']")
       end
 
       it "enforce scopes toggle allows scope creation" do
@@ -396,7 +394,6 @@ describe "Developer Keys" do
         get "/accounts/#{Account.default.id}/developer_keys"
         find_button("Developer Key").click
         find_button("API Key").click
-        click_enforce_scopes
         click_select_all_readonly_checkbox
         find_button("Save").click
         wait_for_dev_key_modal_to_close
@@ -418,12 +415,10 @@ describe "Developer Keys" do
         expect(find_button("Save")).to be_present
       end
 
-      it "displays flash alert if scopes aren't selected when enforce scopes toggled" do
+      it "displays flash alert if scopes aren't selected when enforce scopes is on" do
         get "/accounts/#{Account.default.id}/developer_keys"
         find_button("Developer Key").click
         find_button("API Key").click
-        wait_for_ajaximations
-        click_enforce_scopes
         wait_for_ajaximations
         find_button("Save").click
         flash_holder = f("#flash_message_holder")

@@ -113,7 +113,7 @@ module Lti
 
     def self.lookup_mime(text, url)
       mime = MIME::Types.type_for(text || "").first || MIME::Types.type_for(url || "").first
-      mime.present? ? mime.to_s : nil
+      mime.presence&.to_s
     end
 
     private_class_method :lookup_mime

@@ -39,7 +39,25 @@ describe('CanvasRce', () => {
 
   it('supports getCode() and setCode() on its ref', async () => {
     const rceRef = createRef(null)
-    render(<CanvasRce ref={rceRef} textareaId="textarea3" defaultContent="Hello RCE!" />, target)
+    render(
+      <CanvasRce
+        ref={rceRef}
+        textareaId="textarea3"
+        defaultContent="Hello RCE!"
+        trayProps={{
+          canUploadFiles: true,
+          containingContext: {
+            contextType: 'course',
+            contextId: '1',
+            userId: '1',
+          },
+          contextId: '1',
+          contextType: 'course',
+        }}
+        features={{rce_a11y_resize: false}}
+      />,
+      target,
+    )
 
     await waitFor(() => expect(rceRef.current).not.toBeNull())
 
@@ -51,7 +69,25 @@ describe('CanvasRce', () => {
   it('passes autosave prop to child components', async () => {
     const rceRef = createRef(null)
 
-    render(<CanvasRce ref={rceRef} textareaId="textarea3" autosave={false} />, target)
+    render(
+      <CanvasRce
+        ref={rceRef}
+        textareaId="textarea3"
+        autosave={false}
+        trayProps={{
+          canUploadFiles: true,
+          containingContext: {
+            contextType: 'course',
+            contextId: '1',
+            userId: '1',
+          },
+          contextId: '1',
+          contextType: 'course',
+        }}
+        features={{rce_a11y_resize: false}}
+      />,
+      target,
+    )
     await waitFor(() => expect(rceRef.current).not.toBeNull())
 
     expect(rceRef.current.props.autosave.enabled).toEqual(false)
@@ -65,7 +101,24 @@ describe('CanvasRce', () => {
     })
     const rceRef = createRef(null)
 
-    render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+    render(
+      <CanvasRce
+        ref={rceRef}
+        textareaId="textarea3"
+        trayProps={{
+          canUploadFiles: true,
+          containingContext: {
+            contextType: 'course',
+            contextId: '1',
+            userId: '1',
+          },
+          contextId: '1',
+          contextType: 'course',
+        }}
+        features={{rce_a11y_resize: false}}
+      />,
+      target,
+    )
 
     await waitFor(() => expect(rceRef.current).not.toBeNull())
 
@@ -91,7 +144,24 @@ describe('CanvasRce', () => {
       a.href = 'http://www.example.com'
       document.body.appendChild(a)
 
-      render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+      render(
+        <CanvasRce
+          ref={rceRef}
+          textareaId="textarea3"
+          trayProps={{
+            canUploadFiles: true,
+            containingContext: {
+              contextType: 'course',
+              contextId: '1',
+              userId: '1',
+            },
+            contextId: '1',
+            contextType: 'course',
+          }}
+          features={{rce_a11y_resize: false}}
+        />,
+        target,
+      )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
 
@@ -111,7 +181,24 @@ describe('CanvasRce', () => {
       rce_auto_save_max_age_ms: undefined,
     })
     const rceRef = createRef(null)
-    render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+    render(
+      <CanvasRce
+        ref={rceRef}
+        textareaId="textarea3"
+        trayProps={{
+          canUploadFiles: true,
+          containingContext: {
+            contextType: 'course',
+            contextId: '1',
+            userId: '1',
+          },
+          contextId: '1',
+          contextType: 'course',
+        }}
+        features={{rce_a11y_resize: false}}
+      />,
+      target,
+    )
     await waitFor(() => expect(rceRef.current).not.toBeNull())
     expect(rceRef.current.props.autosave.maxAge).toEqual(60 * 60 * 1000) // 60 minutes in milliseconds
   })
@@ -121,7 +208,25 @@ describe('CanvasRce', () => {
       rce_auto_save_max_age_ms: 30 * 60 * 1000, // 30 minutes in milliseconds
     })
     const rceRef = createRef(null)
-    render(<CanvasRce ref={rceRef} textareaId="textarea3" autosave={{enabled: false}} />, target)
+    render(
+      <CanvasRce
+        ref={rceRef}
+        textareaId="textarea3"
+        autosave={false}
+        trayProps={{
+          canUploadFiles: true,
+          containingContext: {
+            contextType: 'course',
+            contextId: '1',
+            userId: '1',
+          },
+          contextId: '1',
+          contextType: 'course',
+        }}
+        features={{rce_a11y_resize: false}}
+      />,
+      target,
+    )
     await waitFor(() => expect(rceRef.current).not.toBeNull())
     expect(rceRef.current.props.autosave.maxAge).toEqual(30 * 60 * 1000) // 30 minutes in milliseconds
   })
@@ -140,6 +245,17 @@ describe('CanvasRce', () => {
           editorOptions={{
             plugins: ['foo', 'bar'],
           }}
+          trayProps={{
+            canUploadFiles: true,
+            containingContext: {
+              contextType: 'course',
+              contextId: '1',
+              userId: '1',
+            },
+            contextId: '1',
+            contextType: 'course',
+          }}
+          features={{rce_a11y_resize: false}}
         />,
         target,
       )
@@ -166,6 +282,17 @@ describe('CanvasRce', () => {
               },
             },
           }}
+          trayProps={{
+            canUploadFiles: true,
+            containingContext: {
+              contextType: 'course',
+              contextId: '1',
+              userId: '1',
+            },
+            contextId: '1',
+            contextType: 'course',
+          }}
+          features={{rce_a11y_resize: false}}
         />,
         target,
       )
@@ -197,6 +324,17 @@ describe('CanvasRce', () => {
               },
             },
           }}
+          trayProps={{
+            canUploadFiles: true,
+            containingContext: {
+              contextType: 'course',
+              contextId: '1',
+              userId: '1',
+            },
+            contextId: '1',
+            contextType: 'course',
+          }}
+          features={{rce_a11y_resize: false}}
         />,
         target,
       )
@@ -230,6 +368,17 @@ describe('CanvasRce', () => {
               },
             ],
           }}
+          trayProps={{
+            canUploadFiles: true,
+            containingContext: {
+              contextType: 'course',
+              contextId: '1',
+              userId: '1',
+            },
+            contextId: '1',
+            contextType: 'course',
+          }}
+          features={{rce_a11y_resize: false}}
         />,
         target,
       )
@@ -261,6 +410,17 @@ describe('CanvasRce', () => {
               },
             ],
           }}
+          trayProps={{
+            canUploadFiles: true,
+            containingContext: {
+              contextType: 'course',
+              contextId: '1',
+              userId: '1',
+            },
+            contextId: '1',
+            contextType: 'course',
+          }}
+          features={{rce_a11y_resize: false}}
         />,
         target,
       )
@@ -283,7 +443,24 @@ describe('CanvasRce', () => {
     const setupRCEWithENV = async env => {
       fakeENV.setup(env)
       const rceRef = createRef(null)
-      render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+      render(
+        <CanvasRce
+          ref={rceRef}
+          textareaId="textarea3"
+          trayProps={{
+            canUploadFiles: true,
+            containingContext: {
+              contextType: 'course',
+              contextId: '1',
+              userId: '1',
+            },
+            contextId: '1',
+            contextType: 'course',
+          }}
+          features={{rce_a11y_resize: false}}
+        />,
+        target,
+      )
       await waitFor(() => expect(rceRef.current).not.toBeNull())
       return rceRef
     }
@@ -359,12 +536,29 @@ describe('CanvasRce', () => {
     it('forwards features prop to underlying RCE component', async () => {
       const rceRef = createRef(null)
       const testFeatures = {
-        rce_a11y_resize: true,
-        new_math_equation_handling: true,
-        rce_find_replace: false,
+        rce_a11y_resize: false,
+        html_view: true,
+        word_count: false,
       }
 
-      render(<CanvasRce ref={rceRef} textareaId="textarea3" features={testFeatures} />, target)
+      render(
+        <CanvasRce
+          ref={rceRef}
+          textareaId="textarea3"
+          features={testFeatures}
+          trayProps={{
+            canUploadFiles: true,
+            containingContext: {
+              contextType: 'course',
+              contextId: '1',
+              userId: '1',
+            },
+            contextId: '1',
+            contextType: 'course',
+          }}
+        />,
+        target,
+      )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
 
@@ -374,18 +568,34 @@ describe('CanvasRce', () => {
     it('uses ENV.FEATURES as default when features prop not provided', async () => {
       fakeENV.setup({
         FEATURES: {
-          rce_a11y_resize: true,
+          rce_a11y_resize: false,
           explicit_latex_typesetting: false,
         },
       })
       const rceRef = createRef(null)
 
-      render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+      render(
+        <CanvasRce
+          ref={rceRef}
+          textareaId="textarea3"
+          trayProps={{
+            canUploadFiles: true,
+            containingContext: {
+              contextType: 'course',
+              contextId: '1',
+              userId: '1',
+            },
+            contextId: '1',
+            contextType: 'course',
+          }}
+        />,
+        target,
+      )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
 
       expect(rceRef.current.props.features).toEqual({
-        rce_a11y_resize: true,
+        rce_a11y_resize: false,
         explicit_latex_typesetting: false,
       })
     })

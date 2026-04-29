@@ -62,5 +62,17 @@
     display: flex;
     flex-direction: row;
     align-items: flex-start;
+
+    &.cr-scoring-range__center--read-only {
+      .cr-scoring-range__assignments {
+        padding-left: 0;
+      }
+    }
+  }
+
+  .cr-scoring-range__lower-bound {
+    &.cr-scoring-range__lower-bound--read-only {
+      padding-top: 20px;
+    }
   }
 }

@@ -15,17 +15,30 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {render, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {Toolbar, ToolbarProps} from '../Toolbar'
+import {DEFAULT_GRADEBOOK_SETTINGS} from '@canvas/outcomes/react/utils/constants'
+import {mapSettingsToFilters} from '@canvas/outcomes/react/utils/filter'
+import * as apiClient from '../../../apiClient'
+
+vi.mock('../../../apiClient', () => ({
+  exportCSV: vi.fn().mockResolvedValue({data: []}),
+}))
 
 const makeProps = (props = {}): ToolbarProps => ({
   courseId: '123',
-  gradebookFilters: ['filter1', 'filter2'],
   showDataDependentControls: true,
+  gradebookSettings: DEFAULT_GRADEBOOK_SETTINGS,
+  setGradebookSettings: vi.fn(),
   ...props,
 })
 
 describe('Toolbar', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('renders the gradebook menu and title', () => {
     const {getByTestId, getByText} = render(<Toolbar {...makeProps()} />)
     expect(getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
@@ -49,6 +62,34 @@ describe('Toolbar', () => {
     getByTestId('lmgb-settings-button').click()
     await waitFor(() => expect(getByTestId('lmgb-settings-tray')).toBeInTheDocument())
     getByTestId('lmgb-close-settings-button').querySelector('button')!.click()
-    await waitFor(() => expect(queryByTestId('lmgb-settings-tray')).toBeNull())
+    // InstUI Tray remains in DOM with transition class, check for exited state
+    await waitFor(() => {
+      const tray = queryByTestId('lmgb-settings-tray')
+      expect(tray?.classList.contains('transition--slide-right-exited')).toBe(true)
+    })
+  })
+
+  it('calls exportCSV with courseId and mapped filters when export button is clicked', async () => {
+    const user = userEvent.setup()
+    render(<Toolbar {...makeProps()} />)
+    await user.click(screen.getByTestId('export-button'))
+    await waitFor(() =>
+      expect(apiClient.exportCSV).toHaveBeenCalledWith(
+        '123',
+        mapSettingsToFilters(DEFAULT_GRADEBOOK_SETTINGS),
+      ),
+    )
+  })
+
+  it('hides data-dependent controls when showDataDependentControls is false', () => {
+    const {queryByTestId} = render(<Toolbar {...makeProps({showDataDependentControls: false})} />)
+    expect(queryByTestId('export-button')).toBeNull()
+    expect(queryByTestId('lmgb-settings-button')).toBeNull()
+  })
+
+  it('shows data-dependent controls when showDataDependentControls is true', () => {
+    const {getByTestId} = render(<Toolbar {...makeProps({showDataDependentControls: true})} />)
+    expect(getByTestId('export-button')).toBeInTheDocument()
+    expect(getByTestId('lmgb-settings-button')).toBeInTheDocument()
   })
 })

@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $, {type} from 'jquery'
-import {map, sortBy, filter, forEach, find} from 'lodash'
+import {sortBy, map, filter, forEach, find} from 'es-toolkit/compat'
 import createStore from './createStoreJestCompatible'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import '@canvas/rails-flash-notifications'
@@ -117,7 +117,7 @@ store.save = function (configurationType, data, success, error) {
   const params = this._generateParams(configurationType, data)
 
   // Don't send shared secret if it hasn't changed //
-  if (params.shared_secret === 'N/A') {
+  if (params.shared_secret === 'N/A' && data.app_id) {
     delete params.shared_secret
   }
 

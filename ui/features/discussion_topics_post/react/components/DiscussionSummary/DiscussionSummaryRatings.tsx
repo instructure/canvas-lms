@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
-import { Text } from '@instructure/ui-text'
+import {Spinner} from '@instructure/ui-spinner'
+import {Text} from '@instructure/ui-text'
+import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 
 interface RatingButtonProps {
   action: 'like' | 'dislike'
@@ -64,6 +66,7 @@ const RatingButton: React.FC<RatingButtonProps> = ({
 interface DiscussionSummaryRatingsProps {
   onLikeClick: () => void
   onDislikeClick: () => void
+  onSubmitFeedbackComment?: (comment: string) => Promise<void> | void
   liked?: boolean
   disliked?: boolean
   isEnabled: boolean
@@ -71,45 +74,115 @@ interface DiscussionSummaryRatingsProps {
 
 export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> = props => {
   const {setOnSuccess} = useContext(AlertManagerContext)
+  const [feedbackComment, setFeedbackComment] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleDislikeClick = () => {
+    if (props.disliked) {
+      setOnSuccess(I18n.t('Dislike summary, deselected'))
+      setFeedbackComment(null)
+    } else {
+      setOnSuccess(I18n.t('Dislike summary, selected'))
+      setFeedbackComment('')
+    }
+    props.onDislikeClick()
+  }
+
+  const handleSubmitComment = async () => {
+    if (!feedbackComment?.trim() || !props.onSubmitFeedbackComment) {
+      setFeedbackComment(null)
+      return
+    }
+    setIsSubmitting(true)
+    await props.onSubmitFeedbackComment(feedbackComment.trim())
+    setIsSubmitting(false)
+    setOnSuccess(I18n.t('Feedback submitted. Thank you!'))
+    setFeedbackComment(null)
+  }
+
   return (
-    <Flex>
-      {props.liked || props.disliked ? (
-        <Flex.Item margin="0 small 0 0"><Text color="secondary" size="small">{I18n.t('Thank you for sharing!')}</Text></Flex.Item>
-      ) : (
-        <Flex.Item margin="0 small 0 0"><Text color="secondary" size="small">{I18n.t('Do you like this summary?')}</Text></Flex.Item>
+    <Flex direction="column">
+      <Flex justifyItems="end">
+        {props.liked || props.disliked ? (
+          <Flex.Item margin="0 small 0 0">
+            <Text color="secondary" size="small">
+              {I18n.t('Thank you for sharing!')}
+            </Text>
+          </Flex.Item>
+        ) : (
+          <Flex.Item margin="0 small 0 0">
+            <Text color="secondary" size="small">
+              {I18n.t('Do you like this summary?')}
+            </Text>
+          </Flex.Item>
+        )}
+        <RatingButton
+          action="like"
+          isActive={!!props.liked}
+          isEnabled={props.isEnabled}
+          onClick={() => {
+            if (props.liked) {
+              setOnSuccess(I18n.t('Like summary, deselected'))
+            } else {
+              setOnSuccess(I18n.t('Like summary, selected'))
+            }
+            setFeedbackComment(null)
+            props.onLikeClick()
+          }}
+          screenReaderText={props.liked ? I18n.t('Like summary, selected') : I18n.t('Like summary')}
+          dataTestId="summary-like-button"
+        />
+        <RatingButton
+          action="dislike"
+          isActive={!!props.disliked}
+          isEnabled={props.isEnabled}
+          onClick={handleDislikeClick}
+          screenReaderText={
+            props.disliked ? I18n.t('Dislike summary, selected') : I18n.t('Dislike summary')
+          }
+          dataTestId="summary-dislike-button"
+        />
+      </Flex>
+      {props.disliked && feedbackComment !== null && (
+        <Flex direction="column" gap="medium" margin="medium 0 0 0">
+          <Text size="small">
+            {I18n.t('Can you please explain why you disapprove of the summary?')}
+          </Text>
+          <Flex gap="small" alignItems="end">
+            <Flex.Item shouldGrow={true}>
+              <TextInput
+                renderLabel={I18n.t('Explanation')}
+                value={feedbackComment}
+                onChange={(_e, value) => setFeedbackComment(value)}
+                placeholder={I18n.t('Start typing...')}
+                data-testid="summary-feedback-comment"
+              />
+            </Flex.Item>
+            <Flex.Item>
+              <Button
+                color="secondary"
+                onClick={handleSubmitComment}
+                interaction={
+                  props.isEnabled && feedbackComment?.trim() && !isSubmitting
+                    ? 'enabled'
+                    : 'disabled'
+                }
+                aria-busy={isSubmitting}
+                data-testid="summary-feedback-submit"
+              >
+                {isSubmitting ? (
+                  <Flex gap="x-small">
+                    <Spinner size="x-small" renderTitle={I18n.t('Sending feedback')} />
+                    <Text>{I18n.t('Sending...')}</Text>
+                  </Flex>
+                ) : (
+                  I18n.t('Send Feedback')
+                )}
+              </Button>
+            </Flex.Item>
+          </Flex>
+        </Flex>
       )}
-      <RatingButton
-        action="like"
-        // @ts-expect-error
-        isActive={props.liked}
-        isEnabled={props.isEnabled}
-        onClick={() => {
-          if(props.liked) {
-            setOnSuccess(I18n.t('Like summary, deselected'))
-          } else {
-            setOnSuccess(I18n.t('Like summary, selected'))
-          }
-          props.onLikeClick()
-        }}
-        screenReaderText={ props.liked ? I18n.t('Like summary, selected') : I18n.t('Like summary')}
-        dataTestId="summary-like-button"
-      />
-      <RatingButton
-        action="dislike"
-        // @ts-expect-error
-        isActive={props.disliked}
-        isEnabled={props.isEnabled}
-        onClick={() => {
-          if(props.disliked) {
-            setOnSuccess(I18n.t('Dislike summary, deselected'))
-          } else {
-            setOnSuccess(I18n.t('Dislike summary, selected'))
-          }
-          props.onDislikeClick()
-        }}
-        screenReaderText={ props.disliked ? I18n.t('Dislike summary, selected') : I18n.t('Dislike summary')}
-        dataTestId="summary-dislike-button"
-      />
     </Flex>
   )
 }

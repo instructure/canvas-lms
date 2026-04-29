@@ -1,0 +1,476 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import React, {useState, useRef, useEffect} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DraggableProvided,
+  DraggableStateSnapshot,
+} from 'react-beautiful-dnd'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {Button, IconButton} from '@instructure/ui-buttons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {
+  IconDragHandleLine,
+  IconExternalLinkLine,
+  IconMoreSolid,
+  IconXSolid,
+  IconPlusSolid,
+  IconUpdownLine,
+  IconLinkLine,
+  IconTrashLine,
+} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
+import {Menu} from '@instructure/ui-menu'
+import classnames from 'classnames'
+import {Flex} from '@instructure/ui-flex'
+import MoveItemTray from '@canvas/move-item-tray/react'
+import {EnvCommon} from '@canvas/global/env/EnvCommon'
+import {
+  CourseNavigationTabToSave,
+  isLinkTab,
+  getLinkTabUrl,
+  useTabListsStore,
+  type MoveItemTrayResult,
+  type NavigationTab,
+} from '../store/useTabListsStore'
+import {AddLinkModal} from '@canvas/nav-menu-links/react/components/AddLinkModal'
+
+const I18n = createI18nScope('course_navigation_settings')
+
+declare const ENV: EnvCommon & {
+  COURSE_SETTINGS_NAVIGATION_TABS?: NavigationTab[]
+  PERMISSIONS?: {
+    manage_nav_menu_links?: boolean
+    manage_course_navigation?: boolean
+  }
+}
+
+/**
+ * Navigation settings in Course Settings, where the teacher can reorder the
+ * items ("tabs") which display in the Course Nav, and add custom `NavMenuLink`s.
+ */
+export default function CourseNavigationSettings({
+  onSubmit,
+}: {
+  onSubmit: (tabs: CourseNavigationTabToSave[]) => void
+}): JSX.Element {
+  const {
+    enabledTabs,
+    disabledTabs,
+    moveTab,
+    toggleTabEnabled,
+    moveUsingTrayResult,
+    tabsToSave,
+    appendNewLinkItemTab,
+    deleteTab,
+  } = useTabListsStore()
+  const [isSaving, setIsSaving] = useState(false)
+  const [moveTrayItemInternalId, setMoveTrayItemId] = useState<string | undefined>(undefined)
+  const [isAddLinkModalOpen, setIsAddLinkModalOpen] = useState(false)
+  const tabRefs = useRef<{[key: string]: HTMLDivElement | null}>({})
+  const [isDragging, setIsDragging] = useState(false)
+
+  // When manage_course_navigation permission is absent, the nav tab is read-only:
+  // no drag-and-drop, no settings menus
+  // The 'Add Link' button is a separate permission
+  const canManageNavigation = ENV.PERMISSIONS?.manage_course_navigation === true
+
+  useUpDownKeysChangeFocusHandler({enabledTabs, disabledTabs, isDragging, tabRefs})
+
+  const handleSave = () => {
+    setIsSaving(true)
+    onSubmit(tabsToSave())
+  }
+
+  const renderTab = (tab: NavigationTab, index: number, isEnabled: boolean) => {
+    const isEffectivelyImmovable = tab.immovable || !canManageNavigation
+    const tabContent = (provided?: DraggableProvided, snapshot?: DraggableStateSnapshot) => (
+      <div
+        key={`tabdiv-${tab.internalId}`}
+        ref={el => {
+          if (provided?.innerRef) provided.innerRef(el)
+          tabRefs.current[`tab-${tab.internalId}`] = el
+        }}
+        {...(provided?.draggableProps || {})}
+        {...(!isEffectivelyImmovable && provided?.dragHandleProps ? provided.dragHandleProps : {})}
+        tabIndex={0}
+        role="button"
+        className={classnames({
+          'course-nav-tab': true,
+          'course-nav-tab-first': index === 0,
+          'course-nav-tab-dragging': snapshot?.isDragging,
+        })}
+      >
+        <NavItem
+          tab={tab}
+          isEnabled={isEnabled}
+          canManageNavigation={canManageNavigation}
+          onToggleEnabled={toggleTabEnabled}
+          onMove={setMoveTrayItemId}
+          onDelete={deleteTab}
+        />
+      </div>
+    )
+
+    return isEffectivelyImmovable ? (
+      tabContent()
+    ) : (
+      <Draggable key={`tab-${tab.internalId}`} draggableId={`tab-${tab.internalId}`} index={index}>
+        {tabContent}
+      </Draggable>
+    )
+  }
+
+  const isMoveTrayItemHidden =
+    moveTrayItemInternalId && disabledTabs.find(t => t.internalId === moveTrayItemInternalId)
+
+  return (
+    <>
+      {moveTrayItemInternalId && (
+        <MoveNavItemTray
+          onExited={() => setMoveTrayItemId(undefined)}
+          tabInternalId={moveTrayItemInternalId}
+          tabsList={isMoveTrayItemHidden ? disabledTabs : enabledTabs}
+          onMoveSuccess={moveUsingTrayResult}
+        />
+      )}
+
+      <DragDropContext
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={result => {
+          setIsDragging(false)
+          moveTab(result)
+        }}
+      >
+        {canManageNavigation && (
+          <View as="div" padding="small 0 small 0">
+            <Text>
+              {ENV.K5_SUBJECT_COURSE
+                ? I18n.t(
+                    'help.edit_navigation_k5',
+                    'Drag and drop items to reorder them in the subject navigation.',
+                  )
+                : I18n.t(
+                    'help.edit_navigation',
+                    'Drag and drop items to reorder them in the course navigation.',
+                  )}
+            </Text>
+          </View>
+        )}
+
+        <ScreenReaderContent as="h3">{I18n.t('Enabled Links')}</ScreenReaderContent>
+        <div>
+          <Droppable droppableId="enabled-tabs">
+            {(provided, _snapshot) => (
+              <View
+                elementRef={provided.innerRef}
+                {...provided.droppableProps}
+                className="course-nav-tabs-list"
+              >
+                {enabledTabs.map((tab, index) => renderTab(tab, index, true))}
+                {provided.placeholder}
+              </View>
+            )}
+          </Droppable>
+        </div>
+
+        {canManageNavigation &&
+          ENV.FEATURES?.nav_menu_links &&
+          ENV.PERMISSIONS?.manage_nav_menu_links && (
+            <View as="div" padding="medium 0 0 0">
+              <Button type="button" onClick={() => setIsAddLinkModalOpen(true)}>
+                {I18n.t('Add a Link')}
+              </Button>
+              {isAddLinkModalOpen && (
+                <AddLinkModal
+                  onDismiss={() => setIsAddLinkModalOpen(false)}
+                  onAdd={appendNewLinkItemTab}
+                />
+              )}
+            </View>
+          )}
+
+        <ScreenReaderContent as="h3">{I18n.t('Disabled Links')}</ScreenReaderContent>
+        <div>
+          <Droppable droppableId="disabled-tabs">
+            {(provided, _snapshot) => (
+              <View
+                elementRef={provided.innerRef}
+                {...provided.droppableProps}
+                className="course-nav-tabs-list"
+              >
+                <View as="div" padding="medium 0 medium 0">
+                  {canManageNavigation && (
+                    <Text>
+                      {I18n.t('drag_to_hide', 'Drag items here to hide them from students.')}
+                    </Text>
+                  )}
+                  <View as="div">
+                    <Text size="small">
+                      {I18n.t(
+                        'drag_details',
+                        'Disabling most pages will cause students who visit those pages to be redirected to the course home page.',
+                      )}
+                    </Text>
+                  </View>
+                </View>
+                {disabledTabs.map((tab, index) => renderTab(tab, index, false))}
+                {provided.placeholder}
+              </View>
+            )}
+          </Droppable>
+        </div>
+
+        {canManageNavigation && (
+          <View as="div" position="sticky" insetBlockEnd="0" background="secondary">
+            <View as="div" textAlign="end" padding="small">
+              <Button
+                type="button"
+                color="primary"
+                onClick={handleSave}
+                interaction={isSaving ? 'disabled' : 'enabled'}
+              >
+                {isSaving ? I18n.t('Saving...') : I18n.t('buttons.save', 'Save')}
+              </Button>
+            </View>
+          </View>
+        )}
+      </DragDropContext>
+    </>
+  )
+}
+
+/**
+ * Item in the list of Course Nav tabs, with drag handle, label, and settings menu.
+ */
+const NavItem = React.memo(
+  ({
+    tab,
+    isEnabled,
+    canManageNavigation,
+    onToggleEnabled,
+    onMove,
+    onDelete,
+  }: {
+    tab: NavigationTab
+    isEnabled: boolean
+    canManageNavigation: boolean
+    onToggleEnabled: (tabInternalId: string) => void
+    onMove: (tabInternalId: string) => void
+    onDelete: (tabInternalId: string) => void
+  }) => {
+    const linkUrl = ENV.FEATURES?.nav_menu_links && getLinkTabUrl(tab)
+    const showControls = !tab.immovable && canManageNavigation
+
+    return (
+      <View
+        id={`nav_edit_tab_id_${tab.internalId}`}
+        aria-label={tab.label}
+        cursor={showControls ? 'grab' : 'default'}
+      >
+        <Flex padding="xxx-small">
+          <View as="div" padding="small" margin="0 medium 0 0" width="1.5rem" minWidth="1.5rem">
+            {showControls ? <IconDragHandleLine size="x-small" /> : <span>&nbsp;</span>}
+          </View>
+          <View as="div" display="inline-block" padding="small 0" margin="0 auto 0 0">
+            <Flex alignItems="center" gap="x-small" wrap="wrap" width="100%">
+              {isLinkTab(tab) && (
+                <Flex.Item>
+                  <IconLinkLine size="x-small" />
+                </Flex.Item>
+              )}
+              <Flex.Item shouldGrow shouldShrink size="0">
+                <Text wrap="break-word">{tab.label}</Text>
+                {linkUrl && (
+                  <Text as="div" size="x-small" color="secondary" wrap="break-word">
+                    <Link
+                      href={linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      renderIcon={IconExternalLinkLine}
+                      iconPlacement="end"
+                      isWithinText={false}
+                      aria-label={I18n.t('%{url} (opens in new tab)', {url: linkUrl})}
+                    >
+                      {linkUrl}
+                    </Link>
+                  </Text>
+                )}
+              </Flex.Item>
+            </Flex>
+            {!isEnabled && tab.disabled_message && (
+              <View as="div">
+                <Text size="small" fontStyle="italic">
+                  {tab.disabled_message}
+                </Text>
+              </View>
+            )}
+          </View>
+          {showControls && (
+            <Menu
+              trigger={
+                <IconButton
+                  screenReaderLabel={I18n.t('Settings for %{tabLabel}', {tabLabel: tab.label})}
+                  size="small"
+                  withBackground={false}
+                  withBorder={false}
+                  onKeyDown={e => {
+                    if (e.key === ' ') {
+                      // make space work to open menu (otherwise it initiates a move)
+                      e.stopPropagation()
+                    }
+                  }}
+                  renderIcon={IconMoreSolid}
+                />
+              }
+            >
+              <Menu.Item
+                data-pendo="navigation-menu-disable-enable"
+                onClick={() => onToggleEnabled(tab.internalId)}
+                type="button"
+              >
+                <Flex>
+                  <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
+                    {isEnabled ? <IconXSolid /> : <IconPlusSolid />}
+                  </Flex.Item>
+                  <Flex.Item>{isEnabled ? I18n.t('Disable') : I18n.t('Enable')}</Flex.Item>
+                </Flex>
+              </Menu.Item>
+              <Menu.Item
+                data-pendo="navigation-menu-move"
+                onClick={() => onMove(tab.internalId)}
+                type="button"
+              >
+                <Flex>
+                  <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
+                    <IconUpdownLine />
+                  </Flex.Item>
+                  <Flex.Item>{I18n.t('Move')}</Flex.Item>
+                </Flex>
+              </Menu.Item>
+              {isLinkTab(tab) && ENV.PERMISSIONS?.manage_nav_menu_links && (
+                <Menu.Item
+                  data-pendo="navigation-menu-delete"
+                  onClick={() => onDelete(tab.internalId)}
+                  disabled={tab.link_context_type === 'account'}
+                  type="button"
+                >
+                  <Flex>
+                    <Flex.Item padding="0 x-small 0 0" margin="0 0 xxx-small 0">
+                      <IconTrashLine />
+                    </Flex.Item>
+                    <Flex.Item>{I18n.t('Delete')}</Flex.Item>
+                  </Flex>
+                </Menu.Item>
+              )}
+            </Menu>
+          )}
+        </Flex>
+      </View>
+    )
+  },
+)
+
+NavItem.displayName = 'NavItem'
+
+// Make up and down change focus in list. Moving items with keyboard is
+// already handled by react-beautiful-dnd.
+function useUpDownKeysChangeFocusHandler({
+  enabledTabs,
+  disabledTabs,
+  isDragging,
+  tabRefs,
+}: {
+  enabledTabs: NavigationTab[]
+  disabledTabs: NavigationTab[]
+  isDragging: boolean
+  tabRefs: React.RefObject<{[key: string]: HTMLDivElement | null}>
+}) {
+  useKeyDownEventHandler(
+    (e: KeyboardEvent) => {
+      if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return
+      if (isDragging) return
+
+      const currentTabInternalId = (e.target as HTMLElement)
+        .closest('.course-nav-tab')
+        ?.querySelector('[id^="nav_edit_tab_id_"]')
+        ?.id?.replace('nav_edit_tab_id_', '')
+
+      if (!currentTabInternalId) return
+
+      const allTabs = [...enabledTabs, ...disabledTabs]
+      const currentIndex = allTabs.findIndex(
+        tab => tab.internalId.toString() === currentTabInternalId,
+      )
+
+      if (currentIndex === -1) return
+
+      e.preventDefault()
+      const nextIndex = currentIndex + (e.key === 'ArrowUp' ? -1 : 1)
+      const nextTabId = allTabs[nextIndex]?.internalId
+      if (nextTabId) {
+        tabRefs.current?.[`tab-${nextTabId}`]?.focus()
+      }
+    },
+    [enabledTabs, disabledTabs, isDragging],
+  )
+}
+
+function useKeyDownEventHandler(handler: (e: KeyboardEvent) => void, deps: any[] = []) {
+  useEffect(() => {
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, deps)
+}
+
+/*
+ * Tray for moving a navigation item within its list (enabled tabs list or disabled tabs list).
+ */
+function MoveNavItemTray({
+  tabsList,
+  tabInternalId,
+  onExited,
+  onMoveSuccess,
+}: {
+  tabsList: NavigationTab[]
+  tabInternalId: string
+  onExited: () => void
+  onMoveSuccess: (result: MoveItemTrayResult) => void
+}) {
+  const makeMoveTrayItem = (tab: NavigationTab) => ({id: tab.internalId, title: tab.label})
+  const tabToMove = tabsList.find(t => t.internalId === tabInternalId)
+  if (!tabToMove) {
+    return null
+  }
+  const siblingTabs = tabsList.filter(t => t.internalId !== tabInternalId && !t.immovable)
+
+  return (
+    <MoveItemTray
+      title={I18n.t('Move Navigation Item')}
+      items={[makeMoveTrayItem(tabToMove)]}
+      moveOptions={{siblings: siblingTabs.map(makeMoveTrayItem)}}
+      onMoveSuccess={onMoveSuccess}
+      onExited={onExited}
+    />
+  )
+}

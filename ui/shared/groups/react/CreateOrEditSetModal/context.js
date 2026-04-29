@@ -17,7 +17,7 @@
  */
 
 import {createContext} from 'react'
-import {pick} from 'lodash'
+import {pick} from 'es-toolkit/compat'
 
 export const GroupContext = createContext({
   name: '',

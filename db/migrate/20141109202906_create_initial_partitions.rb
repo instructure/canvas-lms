@@ -21,7 +21,8 @@ class CreateInitialPartitions < ActiveRecord::Migration[7.0]
   tag :predeploy
 
   def up
-    [Auditors::ActiveRecord::AuthenticationRecord,
+    [Auditors::ActiveRecord::AccountUserRecord,
+     Auditors::ActiveRecord::AuthenticationRecord,
      Auditors::ActiveRecord::CourseRecord,
      Auditors::ActiveRecord::FeatureFlagRecord,
      Auditors::ActiveRecord::GradeChangeRecord,
@@ -30,7 +31,7 @@ class CreateInitialPartitions < ActiveRecord::Migration[7.0]
     end
     CanvasPartman::PartitionManager.create(Message)
                                    .create_initial_partitions(Messages::Partitioner::PRECREATE_TABLES)
-    Quizzes::QuizSubmissionEventPartitioner.process(true)
+    Quizzes::QuizSubmissionEventPartitioner.process(in_migration: true)
     CanvasPartman::PartitionManager.create(SimplyVersioned::Version)
                                    .create_initial_partitions(SimplyVersioned::Partitioner::PRECREATE_TABLES)
   end

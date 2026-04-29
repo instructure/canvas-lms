@@ -22,7 +22,7 @@ import QuestionToggle from '../QuestionToggle'
 import {testSupportedQuestion, testUnsupportedQuestion} from './testQuestions'
 
 describe('QuestionToggle', () => {
-  const mockOnSelect = jest.fn()
+  const mockOnSelect = vi.fn()
 
   const renderComponent = (question = testSupportedQuestion) => {
     return render(<QuestionToggle question={question} onSelect={mockOnSelect} />)

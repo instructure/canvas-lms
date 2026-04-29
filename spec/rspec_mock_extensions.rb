@@ -20,6 +20,9 @@
 # allows setting up mocks/stubs that will be automatically applied any time
 # this AR instance is instantiated, through find or whatever
 # the record must be saved before calling any_instantiation, so that it has an id
+
+require "rspec/mocks"
+
 module RspecMockAnyInstantiation
   module ClassMethods
     def reset_any_instantiation!
@@ -66,7 +69,7 @@ module RspecMockAnyInstantiation
 
   def expect_any_instantiation_of(ar_object)
     ActiveRecord::Base.add_any_instantiation(ar_object)
-    expect(ar_object) # rubocop:disable RSpec/VoidExpect -- we return the expectation object to the caller
+    expect(ar_object)
   end
 end
 ActiveRecord::Base.singleton_class.prepend(RspecMockAnyInstantiation::ClassMethods)

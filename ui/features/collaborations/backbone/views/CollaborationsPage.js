@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {each, reject} from 'lodash'
+import {each, reject} from 'es-toolkit/compat'
 import {View} from '@canvas/backbone'
 import CollaborationView from './CollaborationView'
 import CollaborationFormView from './CollaborationFormView'
@@ -112,19 +112,24 @@ CollaborationsPage.prototype.onFormHide = function () {
 CollaborationsPage.prototype.onFormValidate = function (e, $form, collaborationId) {
   let formValid = true
   const data = $form.getFormData()
-  const titleInputId = collaborationId ? `collaboration_${collaborationId}_title` : 'collaboration_title'
+  const titleInputId = collaborationId
+    ? `collaboration_${collaborationId}_title`
+    : 'collaboration_title'
   const $titleInput = $form.find(`#${titleInputId}`)
   if (!data['collaboration[title]']) {
     $titleInput.focus().errorBox(I18n.t('Please add a document name'))
     formValid = false
   }
   if (ENV.TITLE_MAX_LEN && data['collaboration[title]'].length > ENV.TITLE_MAX_LEN) {
-    $titleInput.focus().errorBox(
-      I18n.t('errors.title_too_long',
-        'Please use %{maxLength} characters or less for the name. Use the description for additional content.',
-        {maxLength: ENV.TITLE_MAX_LEN}
+    $titleInput
+      .focus()
+      .errorBox(
+        I18n.t(
+          'errors.title_too_long',
+          'Please use %{maxLength} characters or less for the name. Use the description for additional content.',
+          {maxLength: ENV.TITLE_MAX_LEN},
+        ),
       )
-    )
     formValid = false
   }
 

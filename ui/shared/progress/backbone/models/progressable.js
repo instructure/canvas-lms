@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import Progress from './Progress'
 
 // # Mixin to models that work with the Progress API.

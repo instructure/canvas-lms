@@ -138,6 +138,7 @@ export const GradedDiscussionOptions = ({
       {(displayGradeAs === 'gpa_scale' || displayGradeAs === 'letter_grade') && (
         <GradingSchemesSelector
           canManage={ENV?.PERMISSIONS?.manage_grading_schemes || false}
+          canSet={ENV?.PERMISSIONS?.set_grading_scheme || false}
           contextId={ENV.COURSE_ID || ''}
           contextType="Course"
           initiallySelectedGradingSchemeId={gradingSchemeId}
@@ -171,10 +172,14 @@ export const GradedDiscussionOptions = ({
           setIntraGroupPeerReviews={setIntraGroupPeerReviews}
         />
       </View>
-      {ENV.FEATURES.lti_asset_processor_discussions && (
+      {ENV.FEATURES.lti_asset_processor_discussions && ENV.FEATURES.lti_asset_processor_course && (
         <AssetProcessorsForDiscussion
           courseId={parseInt(ENV.COURSE_ID!)}
-          secureParams={'' /* TODO in another commit */}
+          secureParams={
+            ENV.DISCUSSION_TOPIC?.ATTRIBUTES?.assignment?.secure_params ||
+            ENV.ASSIGNMENT_SECURE_PARAMS ||
+            ''
+          }
         />
       )}
       {isCheckpoints && <CheckpointsSettings />}

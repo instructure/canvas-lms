@@ -236,7 +236,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                        "points_possible" => "1",
                                                        "question_text" => content,
                                                        "answers" => []
-                                                     })
+                                                     },
+                                                     saving_user: @user)
 
             json = api_call(:get,
                             "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
@@ -252,15 +253,15 @@ describe Quizzes::QuizQuestionsController, type: :request do
         end
 
         it "translates question text without verifiers" do
-          should_translate_user_content(@course, false) do |content|
+          should_translate_user_content(@course, include_verifiers: false) do |content|
             @question = @quiz.quiz_questions.create!(question_data: {
                                                        "question_name" => "Example Question",
                                                        "question_type" => "multiple_choice_question",
                                                        "points_possible" => "1",
                                                        "question_text" => content,
                                                        "answers" => []
-                                                     })
-
+                                                     },
+                                                     saving_user: @user)
             json = api_call(:get,
                             "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
                             controller: "quizzes/quiz_questions",
@@ -284,7 +285,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                        "points_possible" => "1",
                                                        "question_text" => "stuff",
                                                        "answers" => [{ "text" => plain_answer_txt }, { "html" => content }]
-                                                     })
+                                                     },
+                                                     saving_user: @user)
 
             json = api_call(:get,
                             "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
@@ -301,7 +303,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
         end
 
         it "translates answer html without verifiers" do
-          should_translate_user_content(@course, false) do |content|
+          should_translate_user_content(@course, include_verifiers: false) do |content|
             plain_answer_txt = "plz don't & escape me"
             @question = @quiz.quiz_questions.create!(question_data: {
                                                        "question_name" => "Example Question",
@@ -309,7 +311,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                        "points_possible" => "1",
                                                        "question_text" => "stuff",
                                                        "answers" => [{ "text" => plain_answer_txt }, { "html" => content }]
-                                                     })
+                                                     },
+                                                     saving_user: @user)
 
             json = api_call(:get,
                             "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",

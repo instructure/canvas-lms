@@ -29,14 +29,14 @@ import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 import update from 'immutability-helper'
-import {get, isEmpty} from 'lodash'
+import {get, isEmpty} from 'es-toolkit/compat'
 import axios from '@canvas/axios'
 import {datetimeString} from '@canvas/datetime/date-functions'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import preventDefault from '@canvas/util/preventDefault'
 import unflatten from 'obj-unflatten'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('dsr')
 

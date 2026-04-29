@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class ObserverAlert < ActiveRecord::Base
+class ObserverAlert < ApplicationRecord
   belongs_to :student, class_name: "User", inverse_of: :as_student_observer_alerts, foreign_key: :user_id
   belongs_to :observer, class_name: "User", inverse_of: :as_observer_observer_alerts
   belongs_to :observer_alert_threshold, inverse_of: :observer_alerts
@@ -44,7 +44,7 @@ class ObserverAlert < ActiveRecord::Base
     %w[DiscussionTopic Assignment Submission Course].each do |context_type|
       # get distinct context ids
       alert_context_ids = where(context_type:).distinct.reorder(nil).pluck(:context_id)
-      context_class = context_type.classify.constantize
+      context_class = (context_type == "Assignment") ? AbstractAssignment : context_type.classify.constantize
 
       # group context ids by course ids so we don't instantiate the same enrollment multiple times
       alert_context_ids.each do |context_id|
@@ -83,7 +83,7 @@ class ObserverAlert < ActiveRecord::Base
 
   def self.create_assignment_missing_alerts
     alerts = []
-    GuardRail.activate(:secondary) do
+    GuardRail.activate(:report) do
       last_user_id = nil
       now = Time.now.utc
       loop do

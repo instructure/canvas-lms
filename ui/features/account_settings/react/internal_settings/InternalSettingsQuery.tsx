@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import React from 'react'
 import {useQuery} from '@apollo/client'
 import {INTERNAL_SETTINGS_QUERY} from './graphql/Queries'
@@ -36,6 +37,8 @@ export const InternalSettingsQuery = () => {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
+        onReportError={reportError}
+        translations={canvasErrorPageTranslations}
         errorSubject={I18n.t('Internal Settings initial query error')}
         errorCategory={I18n.t('Internal Settings Error Page')}
       />

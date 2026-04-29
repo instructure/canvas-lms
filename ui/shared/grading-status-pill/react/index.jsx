@@ -17,11 +17,23 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {Pill} from '@instructure/ui-pill'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('gradingStatusPill')
+
+// Store roots to prevent multiple render calls on same element
+const rootMap = new WeakMap()
+
+function renderOrRerender(element, component) {
+  if (rootMap.has(element)) {
+    rerender(rootMap.get(element), component)
+  } else {
+    const root = render(component, element)
+    rootMap.set(element, root)
+  }
+}
 
 function forEachNode(nodeList, fn) {
   for (let i = 0; i < nodeList.length; i += 1) {
@@ -46,31 +58,26 @@ export default {
     )
 
     forEachNode(missMountPoints, mountPoint => {
-      const root = createRoot(mountPoint)
-      root.render(<Pill color="danger">{I18n.t('missing')}</Pill>)
+      renderOrRerender(mountPoint, <Pill color="danger">{I18n.t('missing')}</Pill>)
     })
 
     forEachNode(lateMountPoints, mountPoint => {
-      const root = createRoot(mountPoint)
-      root.render(<Pill color="info">{I18n.t('late')}</Pill>)
+      renderOrRerender(mountPoint, <Pill color="info">{I18n.t('late')}</Pill>)
     })
 
     forEachNode(excusedMountPoints, mountPoint => {
-      const root = createRoot(mountPoint)
-      root.render(<Pill color="danger">{I18n.t('excused')}</Pill>)
+      renderOrRerender(mountPoint, <Pill color="danger">{I18n.t('excused')}</Pill>)
     })
 
     forEachNode(extendedMountPoints, mountPoint => {
-      const root = createRoot(mountPoint)
-      root.render(<Pill color="alert">{I18n.t('extended')}</Pill>)
+      renderOrRerender(mountPoint, <Pill color="alert">{I18n.t('extended')}</Pill>)
     })
 
     forEachNode(customGradeStatusMountPoints, mountPoint => {
       const status =
         statusMap[mountPoint.classList[0].substring('submission-custom-grade-status-pill-'.length)]
       if (status) {
-        const root = createRoot(mountPoint)
-        root.render(<Pill>{status.name}</Pill>)
+        renderOrRerender(mountPoint, <Pill>{status.name}</Pill>)
       }
     })
   },

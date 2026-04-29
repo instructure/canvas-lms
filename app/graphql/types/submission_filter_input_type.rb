@@ -34,6 +34,7 @@ module Types
 
     argument :due_between, DateTimeRangeType, required: false
     argument :graded_since, DateTimeType, required: false
+    argument :include_peer_review_submissions, Boolean, required: false, default_value: false
     argument :submitted_since, DateTimeType, required: false
     argument :updated_since, DateTimeType, required: false
   end

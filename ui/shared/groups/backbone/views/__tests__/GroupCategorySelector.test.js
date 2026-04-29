@@ -16,11 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {vi} from 'vitest'
+import $ from 'jquery'
+import 'jquery-migrate'
+
+// Mock the toggleAccessibly plugin module
+vi.mock('@canvas/assignments/jquery/toggleAccessibly', () => {
+  return {
+    default: ($.fn.toggleAccessibly = vi.fn(function (visible) {
+      if (visible) {
+        this.show()
+      } else {
+        this.hide()
+      }
+      return this
+    })),
+  }
+})
+
 import GroupCategorySelector, {GROUP_CATEGORY_SELECT} from '../GroupCategorySelector'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
-import $ from 'jquery'
-import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 const container = document.createElement('div')
@@ -67,14 +83,14 @@ describe('GroupCategorySelector selection', () => {
     $('#fixtures').empty()
   })
 
-  test("groupCategorySelected should set StudentGroupStore's group set", function () {
+  it("groupCategorySelected should set StudentGroupStore's group set", function () {
     strictEqual(StudentGroupStore.getSelectedGroupSetId(), '1')
     groupCategorySelector.$groupCategoryID.val(2)
     groupCategorySelector.groupCategorySelected()
     strictEqual(StudentGroupStore.getSelectedGroupSetId(), '2')
   })
 
-  test('New Group Category button is enabled when can manage groups', () => {
+  it('New Group Category button is enabled when can manage groups', () => {
     fakeENV.setup({PERMISSIONS: {can_manage_groups: true}})
     assignment.canGroup = () => true
     groupCategorySelector.render()
@@ -147,7 +163,7 @@ describe('GroupCategorySelector selection', () => {
       expect(groupCategorySelector.$groupCategoryID.prop('disabled')).toBe(true)
     })
 
-    // fickle
+    // TODO: Flaky test - button disabled state not reliably set in test environment
     it.skip('disables the create new group category button when groupCategoryLocked is true', () => {
       expect($('#create_group_category_id').prop('disabled')).toBe(true)
     })

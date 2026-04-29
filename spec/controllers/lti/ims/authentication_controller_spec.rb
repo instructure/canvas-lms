@@ -194,7 +194,7 @@ describe Lti::IMS::AuthenticationController do
         params["retried"] = "true"
         allow(InstStatsd::Statsd).to receive(:increment)
         expect(authorize).to render_template("lti/ims/authentication/authorize")
-        expect(InstStatsd::Statsd).to have_received(:increment).with("lti.oidc_missing_cookie_retry_worked", tags: { client_id: client_id.to_s })
+        expect(InstStatsd::Statsd).to have_received(:increment).with("lti.oidc_missing_cookie_retry_worked", tags: { cluster: context.shard.database_server&.id })
       end
     end
 
@@ -283,8 +283,20 @@ describe Lti::IMS::AuthenticationController do
         end
 
         it "launches successfully" do
-          authorize
-          expect(id_token["nonce"]).to eq nonce
+          expect(authorize).to render_template("lti/ims/authentication/authorize")
+        end
+      end
+
+      context "when a registered redirect uri has a query string but the requested one does not" do
+        let(:redirect_uris) { ["https://redirect.tool.com?must_be_present=true", "https://redirect.tool.com"] }
+        let(:redirect_uri) { "https://redirect.tool.com" }
+
+        before do
+          developer_key.update!(redirect_uris:)
+        end
+
+        it "launches successfully" do
+          expect(authorize).to render_template("lti/ims/authentication/authorize")
         end
       end
 
@@ -316,19 +328,11 @@ describe Lti::IMS::AuthenticationController do
           it "increments the lti.oidc_login_required_error metric" do
             allow(InstStatsd::Statsd).to receive(:increment)
             authorize
-            expect(InstStatsd::Statsd).to have_received(:increment).with("lti.oidc_login_required_error", tags: {
-                                                                           account: context.global_id,
-                                                                           client_id: client_id.to_s
-                                                                         })
+            expect(InstStatsd::Statsd).to have_received(:increment).with("lti.oidc_login_required_error", tags: { cluster: context.shard.database_server&.id })
           end
         end
 
         context "when hasn't retried yet" do
-          before do
-            account.root_account.settings[:lti_oidc_missing_cookie_retry] = true
-            account.root_account.save!
-          end
-
           it "renders a cookie fix page" do
             authorize
             expect(response).to have_http_status :ok
@@ -338,7 +342,7 @@ describe Lti::IMS::AuthenticationController do
           it "increments the lti.oidc_missing_cookie_retry" do
             allow(InstStatsd::Statsd).to receive(:increment)
             authorize
-            expect(InstStatsd::Statsd).to have_received(:increment).with("lti.oidc_missing_cookie_retry", tags: { client_id: client_id.to_s })
+            expect(InstStatsd::Statsd).to have_received(:increment).with("lti.oidc_missing_cookie_retry", tags: { cluster: context.shard.database_server&.id })
           end
         end
 

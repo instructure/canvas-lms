@@ -42,22 +42,26 @@ describe('loadRCE', () => {
     return editorUtils.resetRCE()
   })
 
-  it('caches the response of get_module when called', done => {
-    RCELoader.RCE = null
-    RCELoader.loadRCE(module => {
-      expect(RCELoader.RCE).toBe(module)
-      done()
+  it('caches the response of get_module when called', () => {
+    return new Promise(resolve => {
+      RCELoader.RCE = null
+      RCELoader.loadRCE(module => {
+        expect(RCELoader.RCE).toBe(module)
+        resolve()
+      })
     })
   })
 
-  it('handles callbacks once module is loaded', done => {
-    const spy = jest.fn()
-    RCELoader.loadRCE(spy)
-    RCELoader.loadRCE(RCE => {
-      expect(RCE).toBe(RCELoader.RCE)
-      expect(spy).toHaveBeenCalledWith(RCELoader.RCE)
-      expect(spy).toHaveBeenCalledTimes(1)
-      done()
+  it('handles callbacks once module is loaded', () => {
+    return new Promise(resolve => {
+      const spy = vi.fn()
+      RCELoader.loadRCE(spy)
+      RCELoader.loadRCE(RCE => {
+        expect(RCE).toBe(RCELoader.RCE)
+        expect(spy).toHaveBeenCalledWith(RCELoader.RCE)
+        expect(spy).toHaveBeenCalledTimes(1)
+        resolve()
+      })
     })
   })
 })
@@ -87,8 +91,8 @@ describe('loadOnTarget', () => {
     $textarea = $div.find('#theTarget')
 
     // Mock jQuery get(0) to return our mock textarea
-    $textarea.get = jest.fn().mockReturnValue(mockTextarea)
-    $div.get = jest.fn().mockReturnValue($div[0])
+    $textarea.get = vi.fn().mockReturnValue(mockTextarea)
+    $div.get = vi.fn().mockReturnValue($div[0])
 
     editor = {
       mceInstance() {
@@ -103,9 +107,9 @@ describe('loadOnTarget', () => {
       },
     }
     rce = {
-      renderIntoDiv: jest.fn((_target, _props, callback) => callback(editor)),
+      renderIntoDiv: vi.fn((_target, _props, callback) => callback(editor)),
     }
-    jest.spyOn(RCELoader, 'loadRCE').mockImplementation(callback => callback(rce))
+    vi.spyOn(RCELoader, 'loadRCE').mockImplementation(callback => callback(rce))
 
     fakeENV.setup()
     ENV.RICH_CONTENT_APP_HOST = 'app-host'
@@ -114,7 +118,7 @@ describe('loadOnTarget', () => {
 
   afterEach(() => {
     fixtures.teardown()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     fakeENV.teardown()
   })
 
@@ -135,22 +139,26 @@ describe('loadOnTarget', () => {
     expect(props.onFocus).toBe(opts.onFocus)
   })
 
-  it('yields both the original textarea and the editor to callback', done => {
-    function cb(_textarea, editorInstance) {
-      expect($textarea.get(0)).toBe(mockTextarea)
-      expect(editorInstance).toBe(editor)
-      done()
-    }
-    RCELoader.loadOnTarget($textarea, {}, cb)
+  it('yields both the original textarea and the editor to callback', () => {
+    return new Promise(resolve => {
+      function cb(_textarea, editorInstance) {
+        expect($textarea.get(0)).toBe(mockTextarea)
+        expect(editorInstance).toBe(editor)
+        resolve()
+      }
+      RCELoader.loadOnTarget($textarea, {}, cb)
+    })
   })
 
-  it('ensures yielded editor has call and focus methods', done => {
-    function cb(_textarea, rce_) {
-      expect(typeof rce_.call).toBe('function')
-      expect(typeof rce_.focus).toBe('function')
-      done()
-    }
-    RCELoader.loadOnTarget($textarea, {}, cb)
+  it('ensures yielded editor has call and focus methods', () => {
+    return new Promise(resolve => {
+      function cb(_textarea, rce_) {
+        expect(typeof rce_.call).toBe('function')
+        expect(typeof rce_.focus).toBe('function')
+        resolve()
+      }
+      RCELoader.loadOnTarget($textarea, {}, cb)
+    })
   })
 
   it('populates externalToolsConfig without context_external_tool_resource_selection_url', () => {

@@ -19,9 +19,12 @@
 import {render, screen, waitFor, within} from '@testing-library/react'
 import LDAPSettingsTest from '../ldap/LDAPSettingsTest'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
+
+const server = setupServer()
 
 describe('LDAPSettingsTest', () => {
   const queryClient = new QueryClient()
@@ -42,40 +45,53 @@ describe('LDAPSettingsTest', () => {
     await screen.findByLabelText('Test LDAP Settings')
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     const sharedProps = {
       account_authorization_config_id: '1',
       errors: [],
     }
-    fetchMock.get(TEST_LDAP_CONNECTION_URL, [
-      {
-        ...sharedProps,
-        ldap_connection_test: true,
-      },
-    ])
-    fetchMock.get(TEST_LDAP_BIND_URL, [
-      {
-        ...sharedProps,
-        ldap_bind_test: true,
-      },
-    ])
-    fetchMock.get(TEST_LDAP_SEARCH_URL, [
-      {
-        ...sharedProps,
-        ldap_search_test: true,
-      },
-    ])
-    fetchMock.post(TEST_LDAP_LOGIN_URL, [
-      {
-        ...sharedProps,
-        ldap_login_test: true,
-      },
-    ])
+    server.use(
+      http.get(TEST_LDAP_CONNECTION_URL, () => {
+        return HttpResponse.json([
+          {
+            ...sharedProps,
+            ldap_connection_test: true,
+          },
+        ])
+      }),
+      http.get(TEST_LDAP_BIND_URL, () => {
+        return HttpResponse.json([
+          {
+            ...sharedProps,
+            ldap_bind_test: true,
+          },
+        ])
+      }),
+      http.get(TEST_LDAP_SEARCH_URL, () => {
+        return HttpResponse.json([
+          {
+            ...sharedProps,
+            ldap_search_test: true,
+          },
+        ])
+      }),
+      http.post(TEST_LDAP_LOGIN_URL, () => {
+        return HttpResponse.json([
+          {
+            ...sharedProps,
+            ldap_login_test: true,
+          },
+        ])
+      }),
+    )
     queryClient.clear()
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   describe('when testing connection', () => {
@@ -83,16 +99,16 @@ describe('LDAPSettingsTest', () => {
       it('should show the correct statuses and error info for the failed row', async () => {
         const connectionErrorFromResponse = 'Failed to connect to LDAP server'
         const connectionErrorDescription = "Canvas can't connect to your LDAP server"
-        fetchMock.get(
-          TEST_LDAP_CONNECTION_URL,
-          [
-            {
-              account_authorization_config_id: '1',
-              ldap_connection_test: false,
-              errors: [{ldap_connection_test: connectionErrorFromResponse}],
-            },
-          ],
-          {overwriteRoutes: true},
+        server.use(
+          http.get(TEST_LDAP_CONNECTION_URL, () => {
+            return HttpResponse.json([
+              {
+                account_authorization_config_id: '1',
+                ldap_connection_test: false,
+                errors: [{ldap_connection_test: connectionErrorFromResponse}],
+              },
+            ])
+          }),
         )
         await renderModal()
         const testConnectionRow = screen.getByTestId('ldap-setting-test-connection')
@@ -121,16 +137,16 @@ describe('LDAPSettingsTest', () => {
       it('should show the correct statuses and error info for the failed row', async () => {
         const bindErrorFromResponse = 'Failed to bind to LDAP server'
         const bindErrorDescription = "Canvas can't bind (login) to your LDAP server"
-        fetchMock.get(
-          TEST_LDAP_BIND_URL,
-          [
-            {
-              account_authorization_config_id: '1',
-              ldap_bind_test: false,
-              errors: [{ldap_bind_test: bindErrorFromResponse}],
-            },
-          ],
-          {overwriteRoutes: true},
+        server.use(
+          http.get(TEST_LDAP_BIND_URL, () => {
+            return HttpResponse.json([
+              {
+                account_authorization_config_id: '1',
+                ldap_bind_test: false,
+                errors: [{ldap_bind_test: bindErrorFromResponse}],
+              },
+            ])
+          }),
         )
         await renderModal()
         const testConnectionRow = screen.getByTestId('ldap-setting-test-connection')
@@ -155,16 +171,16 @@ describe('LDAPSettingsTest', () => {
       it('should show the correct statuses and error info for the failed row', async () => {
         const searchErrorFromResponse = 'Failed to search LDAP server'
         const searchErrorDescription = "Canvas can't search your LDAP instance"
-        fetchMock.get(
-          TEST_LDAP_SEARCH_URL,
-          [
-            {
-              account_authorization_config_id: '1',
-              ldap_search_test: false,
-              errors: [{ldap_search_test: searchErrorFromResponse}],
-            },
-          ],
-          {overwriteRoutes: true},
+        server.use(
+          http.get(TEST_LDAP_SEARCH_URL, () => {
+            return HttpResponse.json([
+              {
+                account_authorization_config_id: '1',
+                ldap_search_test: false,
+                errors: [{ldap_search_test: searchErrorFromResponse}],
+              },
+            ])
+          }),
         )
         await renderModal()
         const testConnectionRow = screen.getByTestId('ldap-setting-test-connection')

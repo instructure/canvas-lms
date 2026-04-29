@@ -52,7 +52,7 @@ describe('UserRestore', () => {
 
   // Describes searching for a user by ID
   test("triggers 'searching' when search is called", function () {
-    const callback = jest.fn()
+    const callback = vi.fn()
     userRestore.on('searching', callback)
     userRestore.search(account_id)
     expect(callback).toHaveBeenCalled()
@@ -83,6 +83,11 @@ describe('UserRestore', () => {
   })
 
   test('responds with a deferred object', function () {
+    server.use(
+      http.put('*/api/v1/accounts/*/users/*/restore', () => HttpResponse.json({}, {status: 404})),
+    )
+
+    userRestore.set('id', user_id)
     const dfd = userRestore.restore()
     expect($.isFunction(dfd.done)).toBeTruthy()
   })

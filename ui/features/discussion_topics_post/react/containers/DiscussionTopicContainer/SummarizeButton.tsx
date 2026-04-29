@@ -42,6 +42,8 @@ export const SummarizeButton: React.FC<SummarizeButtonProps> = ({
     }
   }
 
+  const text = isEnabled ? I18n.t('Close Summary') : I18n.t('Open Summary')
+
   return (
     <Button
       onClick={handleClick}
@@ -49,8 +51,9 @@ export const SummarizeButton: React.FC<SummarizeButtonProps> = ({
       renderIcon={isEnabled ? <IconXSolid /> : <IconAiColoredSolid />}
       data-testid="summarize-button"
       display={isMobile ? 'block' : 'inline-block'}
+      aria-label={I18n.t('Ignite AI %{text}', {text})}
     >
-      {isEnabled ? I18n.t('Close Summary') : I18n.t('Open Summary')}
+      {text}
     </Button>
   )
 }

@@ -266,11 +266,11 @@ describe('keyboard utilities', () => {
   })
 
   describe('addNewNodeAsNextSibling', () => {
-    // requires mocking to much of craft.js
+    it.todo('requires mocking too much of craft.js')
   })
 
   describe('deleteNodeAndSelecctPrevSibling', () => {
-    // requires mocking to much of craft.js
+    it.todo('requires mocking too much of craft.js')
   })
 
   describe('getArrowNext', () => {

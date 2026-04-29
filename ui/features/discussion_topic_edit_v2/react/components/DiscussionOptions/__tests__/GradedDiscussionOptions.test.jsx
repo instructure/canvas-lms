@@ -17,10 +17,13 @@
  */
 
 import {render} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import React from 'react'
 
 import {GradedDiscussionOptions} from '../GradedDiscussionOptions'
+
+const server = setupServer()
 
 const defaultProps = {
   assignmentGroups: [],
@@ -42,10 +45,10 @@ const defaultProps = {
   canManageAssignTo: true,
 }
 
-const SECTIONS_URL = `/api/v1/courses/1/sections?per_page=100`
-const STUDENTS_URL = `api/v1/courses/1/users?per_page=100&enrollment_type=student`
+const SECTIONS_URL = `/api/v1/courses/1/sections`
+const STUDENTS_URL = `/api/v1/courses/1/users`
 const COURSE_SETTINGS_URL = `/api/v1/courses/1/settings`
-const GRAPHQL_URL = `http://localhost/api/graphql`
+const GRAPHQL_URL = `/api/graphql`
 
 const renderGradedDiscussionOptions = (props = {}) => {
   return render(<GradedDiscussionOptions {...defaultProps} {...props} />)
@@ -85,25 +88,38 @@ describe('GradedDiscussionOptions', () => {
   })
 
   describe('with selective release', () => {
+    beforeAll(() => server.listen())
+    afterAll(() => server.close())
+
     beforeEach(() => {
-      fetchMock.get(SECTIONS_URL, [])
-      fetchMock.get(STUDENTS_URL, [])
-      fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
-      fetchMock.post(GRAPHQL_URL, {
-        data: {
-          course: {
-            usersConnection: {
-              pageInfo: {hasNextPage: false, endCursor: null},
-              nodes: [],
+      server.use(
+        http.get(SECTIONS_URL, () => {
+          return HttpResponse.json([])
+        }),
+        http.get(STUDENTS_URL, () => {
+          return HttpResponse.json([])
+        }),
+        http.get(COURSE_SETTINGS_URL, () => {
+          return HttpResponse.json({hide_final_grades: false})
+        }),
+        http.post(GRAPHQL_URL, () => {
+          return HttpResponse.json({
+            data: {
+              course: {
+                usersConnection: {
+                  pageInfo: {hasNextPage: false, endCursor: null},
+                  nodes: [],
+                },
+              },
             },
-          },
-        },
-      })
+          })
+        }),
+      )
       ENV.COURSE_ID = '1'
     })
 
     afterEach(() => {
-      fetchMock.restore()
+      server.resetHandlers()
     })
 
     it('does not render assignment settings if canManageAssignTo is false', () => {

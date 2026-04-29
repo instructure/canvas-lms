@@ -18,12 +18,16 @@
 
 import '@instructure/canvas-theme'
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {cleanup, render, fireEvent} from '@testing-library/react'
 import ConfirmDeleteModal from '../ConfirmDeleteModal'
 
 const defaultProps = () => ({
   pageTitles: ['page_1'],
   onConfirm: () => Promise.resolve({failures: []}),
+})
+
+afterEach(() => {
+  cleanup()
 })
 
 test('renders cancel and delete button', () => {
@@ -37,7 +41,7 @@ test('renders cancel and delete button', () => {
 
 test('closes the ConfirmDeleteModal when cancel pressed', async () => {
   const ref = React.createRef<any>()
-  const onHide = jest.fn()
+  const onHide = vi.fn()
   const {getByText} = render(<ConfirmDeleteModal {...defaultProps()} onHide={onHide} ref={ref} />)
   ref.current?.show()
 

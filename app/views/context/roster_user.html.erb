@@ -132,7 +132,12 @@
             <tr class="enrollment">
               <td>
                 <b><a href="<%= context_url(@context, :context_section_url, enrollment.course_section_id) rescue "#" %>"><%= enrollment.try_rescue(:course_section).try_rescue(:display_name) || enrollment.short_name %></a></b>
-                <div><%= t 'enrolled_as', "Enrolled as: %{enrollment_type}", :enrollment_type => enrollment.readable_role_name %></div>
+                <div>
+                  <%= t 'enrolled_as', "Enrolled as: %{enrollment_type}", :enrollment_type => enrollment.readable_role_name %>
+                  <% if enrollment.rejected? %>
+                    (<%= t('invitation_declined', 'Invitation Declined') %>)
+                  <% end %>
+                </div>
                 <div>created <%= datetime_string(enrollment.created_at) %></div>
                 <% if enrollment.is_a?(ObserverEnrollment) %>
                   <div style="font-size: 0.8em; padding-<%= direction('left') %>: 20px; <%= hidden unless enrollment.associated_user %>" class="associated_user" >
@@ -212,6 +217,13 @@
   </div>
 <% end %>
 
+<% if @user.grants_right?(@current_user, :view_user_generated_access_tokens) %>
+  <fieldset id="access_tokens">
+    <legend><%= t('access_tokens', 'Access Tokens') %></legend>
+    <div id="user_access_tokens_react_mount_point"></div>
+  </fieldset>
+<% end %>
+
 <% if @messages %>
   <h2><%= t('headings.recent_messages', %{Recent Messages}) %></h2>
   <%= t('no_messages', "No Messages") if @messages.empty? %>
@@ -219,4 +231,3 @@
     <%= render :partial => 'discussion_topics/entry', :object => message, :locals => {:out_of_context => true, :show_context => true, :assignment_visible_to_user => message.discussion_topic.visible_for?(@current_user)} %>
   <% end %>
 <% end %>
-

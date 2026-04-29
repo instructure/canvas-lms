@@ -19,7 +19,6 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
 import MoveModal from '../MoveModal'
 import {useFoldersQuery} from '../hooks'
@@ -27,16 +26,20 @@ import {FileManagementProvider} from '../../../../contexts/FileManagementContext
 import {RowFocusProvider} from '../../../../contexts/RowFocusContext'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {mockRowFocusContext} from '../../__tests__/testUtils'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('../hooks', () => ({
-  useFoldersQuery: jest.fn(),
+vi.mock('../hooks', () => ({
+  useFoldersQuery: vi.fn(),
 }))
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
+
+let capturedRequests: Array<{path: string; body: any}> = []
 
 const defaultProps = {
   open: true,
-  onDismiss: jest.fn(),
+  onDismiss: vi.fn(),
   items: FAKE_FOLDERS_AND_FILES,
 }
 
@@ -56,20 +59,42 @@ const renderComponent = (props: any = {}) =>
 describe('MoveModal', () => {
   let flashElements: any
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    ;(useFoldersQuery as jest.Mock).mockReturnValue({
+    capturedRequests = []
+    vi.mocked(useFoldersQuery).mockReturnValue({
       folders: {[FAKE_FOLDERS[1].id]: FAKE_FOLDERS[1]},
       foldersLoading: false,
-      foldersSuccessful: true,
       foldersError: false,
     })
     flashElements = document.createElement('div')
     flashElements.setAttribute('id', 'flash_screenreader_holder')
     flashElements.setAttribute('role', 'alert')
     document.body.appendChild(flashElements)
+    server.use(
+      http.get('/api/v1/folders/:folderId/folders', () => HttpResponse.json([])),
+      http.get('/api/v1/folders/:folderId/all', () => HttpResponse.json([])),
+      http.put('/api/v1/folders/:folderId', async ({request}) => {
+        capturedRequests.push({
+          path: new URL(request.url).pathname,
+          body: await request.json(),
+        })
+        return HttpResponse.json({})
+      }),
+      http.put('/api/v1/files/:fileId', async ({request}) => {
+        capturedRequests.push({
+          path: new URL(request.url).pathname,
+          body: await request.json(),
+        })
+        return HttpResponse.json({})
+      }),
+    )
   })
 
   afterEach(() => {
+    server.resetHandlers()
     document.body.removeChild(flashElements)
     flashElements = undefined
   })
@@ -138,21 +163,14 @@ describe('MoveModal', () => {
   })
 
   it('performs fetch request', async () => {
-    ;(useFoldersQuery as jest.Mock).mockReturnValue({
+    vi.mocked(useFoldersQuery).mockReturnValue({
       folders: {[FAKE_FOLDERS[2].id]: FAKE_FOLDERS[2]},
       foldersLoading: false,
-      foldersSuccessful: true,
       foldersError: false,
     })
 
     const rootFolder = FAKE_FOLDERS[1]
     const childFolder = FAKE_FOLDERS[2]
-    // Fetch inner folders request
-    ;(doFetchApi as jest.Mock).mockResolvedValue([])
-    // Fetch folder data
-    ;(doFetchApi as jest.Mock).mockResolvedValue({
-      json: [],
-    })
 
     renderComponent()
     await userEvent.click(await screen.findByText(childFolder.name))
@@ -161,13 +179,15 @@ describe('MoveModal', () => {
     await waitFor(() => {
       expect(screen.getAllByText(/success/i)[0]).toBeInTheDocument()
 
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: `/api/v1/folders/${rootFolder.id}`,
-        method: 'PUT',
-        body: expect.objectContaining({
+      const folderRequest = capturedRequests.find(
+        req => req.path === `/api/v1/folders/${rootFolder.id}`,
+      )
+      expect(folderRequest).toBeDefined()
+      expect(folderRequest?.body).toEqual(
+        expect.objectContaining({
           parent_folder_id: childFolder.id,
         }),
-      })
+      )
     })
   })
 })

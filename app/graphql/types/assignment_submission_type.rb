@@ -20,6 +20,7 @@
 
 module Types
   SUBMISSION_TYPES = %w[
+    ams
     attendance
     basic_lti_launch
     discussion_topic
@@ -32,6 +33,7 @@ module Types
     online_text_entry
     online_upload
     online_url
+    peer_review
     student_annotation
     wiki_page
   ].to_set

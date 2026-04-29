@@ -23,8 +23,8 @@ import SisButtonView from '../SisButtonView'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 // Mock jQuery extensions
-$.flashWarning = jest.fn()
-$.ajaxJSON = jest.fn()
+$.flashWarning = vi.fn()
+$.ajaxJSON = vi.fn()
 
 class AssignmentStub extends Backbone.Model {
   constructor() {
@@ -135,7 +135,7 @@ describe('SisButtonView', () => {
 
   afterEach(() => {
     view?.$el.remove()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('properly populates initial settings', () => {

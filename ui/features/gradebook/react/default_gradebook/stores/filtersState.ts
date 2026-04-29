@@ -17,7 +17,7 @@
  */
 
 import type {StoreApi} from 'zustand'
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {

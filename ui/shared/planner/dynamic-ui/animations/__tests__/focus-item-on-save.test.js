@@ -25,9 +25,9 @@ let alertMocks = null
 
 beforeEach(() => {
   alertMocks = {
-    visualSuccessCallback: jest.fn(),
-    visualErrorCallback: jest.fn(),
-    srAlertCallback: jest.fn(),
+    visualSuccessCallback: vi.fn(),
+    visualErrorCallback: vi.fn(),
+    srAlertCallback: vi.fn(),
   }
   alertInitialize(alertMocks)
 })

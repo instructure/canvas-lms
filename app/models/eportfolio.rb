@@ -18,8 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Eportfolio < ActiveRecord::Base
+class Eportfolio < ApplicationRecord
   include Workflow
+
   has_many :eportfolio_categories, -> { ordered }, dependent: :destroy
   has_many :eportfolio_entries, dependent: :destroy
   has_many :attachments, as: :context, inverse_of: :context

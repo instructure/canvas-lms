@@ -301,17 +301,21 @@
 #     }
 
 class AccountsController < ApplicationController
-  before_action :require_user, only: %i[index
-                                        help_links
-                                        manually_created_courses_account
-                                        account_calendar_settings
-                                        environment]
+  skip_before_action :require_user, only: %i[acceptable_use_policy
+                                             course_accounts
+                                             course_creation_accounts
+                                             courses_redirect
+                                             horizon_accounts
+                                             manageable_accounts
+                                             terms_of_service]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
 
   include HorizonMode
+
   before_action :load_canvas_career, only: %i[show users sis_import admin_tools settings]
+  around_action :add_career_params, only: [:update]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
@@ -322,6 +326,7 @@ class AccountsController < ApplicationController
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
   EPORTFOLIO_MODERATION_PER_PAGE = 100
+  HORIZON_MAX_ACCOUNTS = 100
 
   # @API List accounts
   # A paginated list of accounts that the current user can view or manage.
@@ -353,9 +358,41 @@ class AccountsController < ApplicationController
 
         # originally had 'includes' instead of 'include' like other endpoints
         includes = params[:include] || params[:includes]
-        render json: @accounts.map { |a| account_json(a, @current_user, session, includes || [], false) }
+        render json: @accounts.map { |a| account_json(a, @current_user, session, includes || []) }
       end
     end
+  end
+
+  # @API List horizon accounts
+  # A paginated list of horizon accounts that the current user can view or manage.
+  # Returns all accounts with the horizon_account setting enabled. If there are any
+  # horizon accounts and the user has access to Site Admin, Site Admin will also be
+  # included in the results.
+  #
+  # Typically, students and even teachers will get an empty list in response,
+  # only account admins can view the accounts that they are in.
+  #
+  # @argument include[] [String, "lti_guid"|"registration_settings"|"services"|"course_count"|"sub_account_count"|"site_admin"]
+  #   Array of additional information to include.
+  #
+  #   "lti_guid":: the 'tool_consumer_instance_guid' that will be sent for this account on LTI launches
+  #   "registration_settings":: returns info about the privacy policy and terms of use
+  #   "services":: returns services and whether they are enabled (requires account management permissions)
+  #   "course_count":: returns the number of courses directly under each account
+  #   "sub_account_count":: returns the number of sub-accounts directly under each account
+  #   "site_admin":: returns true if the account is the Site Admin account (only included if true)
+  #
+  # @returns [Account]
+  def horizon_accounts
+    @accounts = if @current_user
+                  Api.paginate(@current_user.all_paginatable_horizon_accounts, self, api_v1_horizon_accounts_url)
+                else
+                  []
+                end
+    ActiveRecord::Associations.preload(@accounts, :root_account)
+
+    includes = params[:include] || params[:includes]
+    render json: @accounts.map { |a| account_json(a, @current_user, session, includes || []) }
   end
 
   # @API Get accounts that admins can manage
@@ -374,7 +411,7 @@ class AccountsController < ApplicationController
       end
     end
     @all_accounts = Api.paginate(@all_accounts, self, api_v1_manageable_accounts_url)
-    render json: @all_accounts.map { |a| account_json(a, @current_user, session, [], false) }
+    render json: @all_accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
   # @API Get accounts that users can create courses in
@@ -427,7 +464,7 @@ class AccountsController < ApplicationController
     account_active_records = Account.where(id: accounts)
     accounts_json = accounts.map do |a|
       a = account_active_records.find { |ar| ar.id == a }
-      hash = account_json(a, @current_user, session, [], false)
+      hash = account_json(a, @current_user, session, [])
       hash[:adminable] = adminable_accounts.include?(a) if Account.site_admin.feature_enabled?(:enhanced_course_creation_account_fetching)
       hash
     end
@@ -453,7 +490,7 @@ class AccountsController < ApplicationController
       @accounts = []
     end
     ActiveRecord::Associations.preload(@accounts, :root_account)
-    render json: @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], true) }
+    render json: @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], read_only: true) }
   end
 
   # @API Get a single account
@@ -475,7 +512,7 @@ class AccountsController < ApplicationController
                                   @current_user,
                                   session,
                                   params[:includes] || [],
-                                  !@account.grants_right?(@current_user, session, :manage))
+                                  read_only: !@account.grants_right?(@current_user, session, :manage))
       end
     end
   end
@@ -541,7 +578,7 @@ class AccountsController < ApplicationController
   #
   # @argument permissions[] [String]
   #   List of permissions to check against the authenticated user.
-  #   Permission names are documented in the {api:RoleOverridesController#add_role Create a role} endpoint.
+  #   Permission names are documented in the {api:RoleOverridesController#manageable_permissions List assignable permissions} endpoint.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/accounts/self/permissions \
@@ -609,7 +646,7 @@ class AccountsController < ApplicationController
 
     ActiveRecord::Associations.preload(@accounts, [:root_account, :parent_account])
 
-    supported_includes = %w[course_count sub_account_count]
+    supported_includes = %w[course_count sub_account_count horizon_account]
     includes = Array(params[:include])
     includes &= supported_includes
 
@@ -637,12 +674,14 @@ class AccountsController < ApplicationController
   #
   # @returns TermsOfService
   def terms_of_service
-    keys = %w[id terms_type passive account_id]
-    tos = @account.root_account.terms_of_service
-    res = tos.attributes.slice(*keys)
-    res["content"] = tos.terms_of_service_content&.content
-    res["self_registration_type"] = @account.self_registration_type
-    render json: res
+    GuardRail.activate(:secondary) do
+      keys = %w[id terms_type passive account_id]
+      tos = @account.root_account.terms_of_service
+      res = tos.attributes.slice(*keys)
+      res["content"] = tos.terms_of_service_content&.content
+      res["self_registration_type"] = @account.self_registration_type
+      render json: res
+    end
   end
 
   # @API Get help links
@@ -663,12 +702,12 @@ class AccountsController < ApplicationController
   end
 
   # @API Get the manually-created courses sub-account for the domain root account
-  #
+  # Returns the sub-account that contains manually created courses for the domain root account.
   # @returns Account
   def manually_created_courses_account
     account = @domain_root_account.manually_created_courses_account
     read_only = !account.grants_right?(@current_user, session, :read)
-    render json: account_json(account, @current_user, session, [], read_only)
+    render json: account_json(account, @current_user, session, [], read_only:)
   end
 
   include Api::V1::Course
@@ -726,8 +765,9 @@ class AccountsController < ApplicationController
   #   If set, only return courses that are in the given state(s). By default,
   #   all states but "deleted" are returned.
   #
-  # @argument enrollment_term_id [Integer]
-  #   If set, only includes courses from the specified term.
+  # @argument enrollment_term_id[] [Integer]
+  #   If set, only includes courses from the specified terms. Can be either a single ID or
+  #   an array of enrollment term IDs.
   #
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
@@ -804,6 +844,55 @@ class AccountsController < ApplicationController
               "(SELECT #{EnrollmentTerm.best_unicode_collation_key("enrollment_terms.name")}
                 FROM #{EnrollmentTerm.quoted_table_name}
                 WHERE enrollment_terms.id = courses.enrollment_term_id)"
+            when "a11y_active_issue_count"
+              if @account.can_see_accessibility_tab?(@current_user)
+                workflow_state_part = "(SELECT
+                  CASE
+                    WHEN acs.workflow_state = 'active' THEN 1
+                    WHEN acs.workflow_state = 'in_progress' THEN 2
+                    WHEN acs.workflow_state = 'queued' THEN 3
+                    WHEN acs.workflow_state = 'failed' THEN 4
+                    ELSE 5
+                  END
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state <> 'deleted'
+                  LIMIT 1)"
+                issue_count_part = "(SELECT COALESCE(acs.active_issue_count, 0)
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state = 'active'
+                  LIMIT 1)"
+
+                # Active courses always first (workflow_state ASC keeps priority 1 first)
+                # Framework appends direction (DESC/ASC) and id to the last column
+                "#{workflow_state_part}, #{issue_count_part}"
+              else
+                "id"
+              end
+            when "a11y_resolved_issue_count"
+              if @account.can_see_accessibility_tab?(@current_user)
+                null_last_part = "(SELECT
+                  CASE
+                    WHEN acs.resolved_issue_count IS NULL THEN 1
+                    ELSE 0
+                  END
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state <> 'deleted'
+                  LIMIT 1)"
+                count_part = "(SELECT COALESCE(acs.resolved_issue_count, 0)
+                  FROM #{AccessibilityCourseStatistic.quoted_table_name} AS acs
+                  WHERE acs.course_id = courses.id
+                    AND acs.workflow_state <> 'deleted'
+                  LIMIT 1)"
+
+                # Nulls always last, then sort by count
+                # Framework appends direction (DESC/ASC) and id to the last column
+                "#{null_last_part}, #{count_part}"
+              else
+                "id"
+              end
             else
               "id"
             end
@@ -858,6 +947,14 @@ class AccountsController < ApplicationController
       @courses = @courses.homeroom
     end
 
+    if @account.root_account.feature_enabled?(:horizon_learning_library_ms2) && params.key?(:career_learning_library_only)
+      @courses = if value_to_boolean(params[:career_learning_library_only])
+                   @courses.career_learning_library
+                 else
+                   @courses.not_career_learning_library
+                 end
+    end
+
     if starts_before || ends_after
       @courses = @courses.joins(:enrollment_term)
       if starts_before
@@ -887,8 +984,12 @@ class AccountsController < ApplicationController
     end
 
     if params[:enrollment_term_id]
-      term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
-      @courses = @courses.for_term(term)
+      terms = if params[:enrollment_term_id].is_a?(Array)
+                api_find_all(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+              else
+                api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+              end
+      @courses = @courses.for_term(terms)
     end
 
     if params[:search_term]
@@ -910,7 +1011,7 @@ class AccountsController < ApplicationController
         or_clause = Course.where(code).or(Course.where(name))
 
         if search_term =~ Api::ID_REGEX && Api::MAX_ID_RANGE.cover?(search_term.to_i)
-          or_clause = Course.where(id: search_term).or(or_clause)
+          or_clause = Course.shard(@account.shard).where(id: search_term).or(or_clause)
         end
 
         if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
@@ -932,22 +1033,20 @@ class AccountsController < ApplicationController
     includes -= %w[permissions sections needs_grading_count total_scores]
     all_precalculated_permissions = nil
 
-    page_opts = { total_entries: nil }
-    if includes.include?("ui_invoked")
-      page_opts = {} # let Folio calculate total entries
-      includes.delete("ui_invoked")
-    end
+    # Let Folio calculate total entries for pagination when invoked from web interface
+    page_opts = in_app? ? {} : { total_entries: nil }
 
     GuardRail.activate(:secondary) do
       @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
       course_preloads = [:account, :root_account, { course_account_associations: :account }]
       course_preloads << :default_post_policy if includes.include?("post_manually")
+      course_preloads << :active_teachers if includes.include?("active_teachers")
+      course_preloads << :enrollment_term if includes.include?("term") || includes.include?("concluded")
+      course_preloads << :accessibility_course_statistic if includes.include?("accessibility_course_statistic") && @account.can_see_accessibility_tab?(@current_user)
       ActiveRecord::Associations.preload(@courses, course_preloads)
 
       preload_teachers(@courses) if includes.include?("teachers")
-      preload_teachers(@courses) if includes.include?("active_teachers")
-      ActiveRecord::Associations.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?("concluded")
 
       if includes.include?("total_students")
         student_counts = StudentEnrollment.shard(@account.shard).not_fake.active_or_pending
@@ -975,6 +1074,40 @@ class AccountsController < ApplicationController
       paginated_set = Api.paginate(available_filters, self, api_v1_quiz_ip_filters_url)
       renderable = quiz_ip_filters_json(paginated_set, @context, @current_user, session)
       render json: renderable
+    end
+  end
+
+  # Get account accessibility issue summary
+  def accessibility_issue_summary
+    if authorized_action(@account, @current_user, :read)
+      unless @account.can_see_accessibility_tab?(@current_user)
+        return render json: { error: "Not authorized to view accessibility data" }, status: :unauthorized
+      end
+
+      GuardRail.activate(:secondary) do
+        courses = @account.associated_courses.where.not(workflow_state: "deleted")
+
+        if params[:enrollment_term_id]
+          term = api_find(@account.root_account.enrollment_terms, params[:enrollment_term_id])
+          courses = courses.for_term(term)
+        end
+
+        stats_table = AccessibilityCourseStatistic.arel_table
+        active_issues, resolved_issues = courses
+                                         .left_joins(:accessibility_course_statistic)
+                                         .where(stats_table[:workflow_state].eq("active").or(stats_table[:id].eq(nil)))
+                                         .pick(
+                                           Arel.sql("COALESCE(SUM(accessibility_course_statistics.active_issue_count), 0)"),
+                                           Arel.sql("COALESCE(SUM(accessibility_course_statistics.resolved_issue_count), 0)")
+                                         )
+
+        summary_data = {
+          active: active_issues || 0,
+          resolved: resolved_issues || 0
+        }
+
+        render json: summary_data
+      end
     end
   end
 
@@ -1028,6 +1161,9 @@ class AccountsController < ApplicationController
 
       # Set default Dashboard View
       set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
+      # Extract suppress_notifications from raw params before strong params coercion,
+      # since it accepts both boolean and array values
+      suppress_notifications_param = params.dig(:account, :settings)&.delete(:suppress_notifications)
       unauthorized = true if set_course_template == :unauthorized
 
       # account settings (:manage_account_settings)
@@ -1051,10 +1187,38 @@ class AccountsController < ApplicationController
             K5::EnablementService.new(@account).set_k5_settings(value_to_boolean(enable_k5), value_to_boolean(use_classic_font))
 
             enable_horizon = params.dig(:account, :settings, :horizon_account, :value)
-            @account.horizon_account = value_to_boolean(enable_horizon) unless enable_horizon.nil?
+            unless enable_horizon.nil?
+              horizon_enabled = value_to_boolean(enable_horizon)
+              existing_account_ids = @account.root_account.settings[:horizon_account_ids] || []
+
+              if horizon_enabled && existing_account_ids.length + 1 > HORIZON_MAX_ACCOUNTS
+                @account.errors.add(:horizon_account, t("You cannot enable horizon_account on more than %{max_accounts} accounts", max_accounts: HORIZON_MAX_ACCOUNTS))
+              else
+                @account.horizon_account = horizon_enabled
+
+                if horizon_enabled && existing_account_ids.empty?
+                  @account.delay(singleton: "provision_horizon_tenants:#{@domain_root_account.uuid}").provision_horizon_tenants(@domain_root_account, @current_user)
+                elsif !horizon_enabled && existing_account_ids.length == 1
+                  @account.delay(singleton: "delete_horizon_tenants:#{@domain_root_account.uuid}").delete_horizon_tenants(@domain_root_account, @current_user)
+                end
+              end
+            end
 
             account_settings[:settings].slice!(*permitted_api_account_settings)
             account_settings[:settings][:password_policy] = policy_settings if policy_settings
+
+            # suppress_notifications accepts true/false (all/none) or an array of category slugs
+            account_settings[:settings].delete(:suppress_notifications)
+            unless suppress_notifications_param.nil?
+              validated = if suppress_notifications_param.is_a?(Array)
+                            valid_slugs = Notification.all_cached.map(&:category_slug).uniq
+                            suppress_notifications_param.map(&:to_s) & valid_slugs
+                          else
+                            value_to_boolean(suppress_notifications_param)
+                          end
+              @account.settings[:suppress_notifications] = validated.presence || false
+            end
+
             ensure_sis_max_name_length_value!(account_settings)
           end
           @account.errors.add(:name, t(:account_name_required, "The account name cannot be blank")) if account_params.key?(:name) && account_params[:name].blank?
@@ -1201,6 +1365,19 @@ class AccountsController < ApplicationController
   #
   # @argument account[settings][conditional_release][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[settings][enable_course_paces][value] [Boolean]
+  #   Enable or disable course pacing
+  #
+  # @argument account[settings][enable_course_paces][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
+  # @argument account[settings][suppress_notifications] [Boolean|Array]
+  #   Suppress notification messages from being created and sent. When set to
+  #   +true+, all notifications are suppressed. When set to an array of
+  #   notification category slugs (e.g. +["grading", "announcement"]+), only
+  #   notifications in those categories are suppressed. Set to +false+ to
+  #   allow all notifications. Root account setting only.
   #
   # @argument account[settings][password_policy] [Hash]
   #   Hash of optional password policy configuration parameters for a root account
@@ -1359,6 +1536,15 @@ class AccountsController < ApplicationController
           end
         end
 
+        # Handle impact_account_type setting (site admin only)
+        if Account.site_admin.grants_right?(@current_user, :manage)
+          impact_account_type = params[:account][:settings].try(:delete, :impact_account_type)
+          @account.settings[:impact_account_type] = impact_account_type if impact_account_type.present?
+        else
+          # Remove the field from params if user is not a site admin
+          params[:account][:settings].try(:delete, :impact_account_type)
+        end
+
         # For each inheritable setting, if the value for the account is the same as the inheritable value,
         # remove it from the settings hash on the account
         Account.inheritable_settings.each do |setting|
@@ -1387,6 +1573,18 @@ class AccountsController < ApplicationController
         params[:account][:settings][:help_link_name] = nil if help_link_name == default_help_link_name
 
         ensure_sis_max_name_length_value!(params[:account]) if params[:account][:settings]
+
+        # Handle suppress_notifications: accepts "1"/"0" (boolean) or an array of category slugs
+        if params[:account][:settings]&.key?(:suppress_notifications)
+          suppress_val = params[:account][:settings].delete(:suppress_notifications)
+          if suppress_val.is_a?(Array)
+            valid_slugs = Notification.all_cached.map(&:category_slug).uniq
+            validated = suppress_val.map(&:to_s) & valid_slugs
+            @account.settings[:suppress_notifications] = validated.presence || false
+          else
+            @account.settings[:suppress_notifications] = value_to_boolean(suppress_val)
+          end
+        end
 
         if (sis_id = params[:account].delete(:sis_source_id)) &&
            !@account.root_account? && sis_id != @account.sis_source_id &&
@@ -1417,7 +1615,13 @@ class AccountsController < ApplicationController
         set_default_dashboard_view(params.dig(:account, :settings)&.delete(:default_dashboard_view))
         set_course_template
 
-        if @account.update(strong_account_params)
+        nav_menu_links_success = NavMenuLink.sync_with_link_objects_json(
+          context: @account,
+          link_objects_json: params[:account].delete(:nav_menu_links),
+          can_manage_links: @account.grants_right?(@current_user, session, :manage_nav_menu_links)
+        )
+
+        if nav_menu_links_success && @account.update(strong_account_params)
           update_user_dashboards
           format.html { redirect_to account_settings_url(@account) }
           format.json { render json: @account }
@@ -1456,17 +1660,30 @@ class AccountsController < ApplicationController
   end
 
   def acceptable_use_policy
-    TermsOfService.ensure_terms_for_account(@domain_root_account)
-    if request.format.html?
-      # disable navigation_header JavaScript bundle (in _head.html.erb) to
-      # prevent console errors caused by missing DOM elements in this bare layout
-      @headers = false
-      # disable custom js/css
-      @exclude_account_css = @exclude_account_js = true
-    end
-    respond_to do |format|
-      format.html { render html: "", layout: "bare" }
-      format.json { render json: { content: @domain_root_account.terms_of_service.terms_of_service_content&.content }, status: :ok }
+    GuardRail.activate(:secondary) do
+      TermsOfService.ensure_terms_for_account(@domain_root_account)
+      external_url = TermsOfService.external_url(@domain_root_account)
+      respond_to do |format|
+        format.html do
+          if external_url
+            redirect_to external_url, allow_other_host: true, status: :found # HTTP 302
+          else
+            # disable navigation_header JavaScript bundle (in _head.html.erb) to
+            # prevent console errors caused by missing DOM elements in this bare layout
+            @headers = false
+            # disable custom js/css
+            @exclude_account_css = @exclude_account_js = true
+            render html: "", layout: "bare"
+          end
+        end
+        format.json do
+          if external_url
+            render json: { redirectUrl: external_url }, status: :ok
+          else
+            render json: { content: @domain_root_account.terms_of_service.terms_of_service_content&.content }, status: :ok
+          end
+        end
+      end
     end
   end
 
@@ -1505,7 +1722,8 @@ class AccountsController < ApplicationController
         manage_feature_flags: @account.grants_right?(@current_user, session, :manage_feature_flags),
         add_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_add),
         edit_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_edit),
-        delete_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_delete)
+        delete_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_delete),
+        manage_nav_menu_links: @account.grants_right?(@current_user, session, :manage_nav_menu_links)
       }
 
       can_set_token = %i[add_tool_manually edit_tool_manually delete_tool_manually].any? { |perm| js_permissions[perm] }
@@ -1536,7 +1754,19 @@ class AccountsController < ApplicationController
                  account_roles: @account_roles,
                }
              })
-      js_env(edit_help_links_env, true)
+
+      if @account.root_account.feature_enabled?(:nav_menu_links)
+        js_env({
+                 NAV_MENU_LINKS:
+                   NavMenuLink.active.where(context: @account).order(:id).as_existing_link_objects
+               })
+      end
+
+      js_env(edit_help_links_env, overwrite: true)
+      if @account.root_account?
+        js_env({ EARLY_ACCESS_PROGRAM: @account.early_access_program[:value] ||
+                                     @account.grants_right?(@current_user, :manage_site_settings) })
+      end
     end
   end
 
@@ -1554,6 +1784,7 @@ class AccountsController < ApplicationController
 
     authentication_logging = @account.grants_any_right?(@current_user, :view_statistics, :manage_user_logins)
     grade_change_logging = @account.grants_right?(@current_user, :view_grade_changes)
+    search_as_subaccount = !@account.root_account.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
     course_logging = @account.grants_right?(@current_user, :view_course_changes)
     mutation_logging = @account.feature_enabled?(:mutation_audit_log) &&
                        @account.grants_right?(@current_user, :manage_account_settings)
@@ -1561,23 +1792,26 @@ class AccountsController < ApplicationController
       logging = {
         authentication: authentication_logging,
         grade_change: grade_change_logging,
+        grade_change_search_as_subaccount: search_as_subaccount,
         course: course_logging,
         mutation: mutation_logging,
       }
     end
     logging ||= false
 
-    js_env PERMISSIONS: {
-      restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
-      restore_user: @account.grants_right?(@current_user, session, :manage_user_logins),
-      # Permission caching issue makes explicitly checking the account setting
-      # an easier option.
-      view_messages: (@account.settings[:admins_can_view_notifications] &&
-                       @account.grants_right?(@current_user, session, :view_notifications)) ||
-                     Account.site_admin.grants_right?(@current_user, :read_messages),
-      logging:
-    }
-    js_env bounced_emails_admin_tool: @account.grants_right?(@current_user, session, :view_bounced_emails)
+    js_env({
+             PERMISSIONS: {
+               restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
+               restore_user: @account.grants_right?(@current_user, session, :manage_user_logins),
+               # Permission caching issue makes explicitly checking the account setting
+               # an easier option.
+               view_messages: (@account.settings[:admins_can_view_notifications] &&
+                             @account.grants_right?(@current_user, session, :view_notifications)) ||
+                           Account.site_admin.grants_right?(@current_user, :read_messages),
+               logging:
+             },
+             BOUNCED_EMAILS_ADMIN_TOOL: @account.grants_right?(@current_user, session, :view_bounced_emails)
+           })
   end
 
   def confirm_delete_user
@@ -1651,6 +1885,10 @@ class AccountsController < ApplicationController
     return render_unauthorized_action unless @account.grants_right?(@current_user, :manage_users_in_bulk)
 
     user_ids = params[:user_ids]
+    if !user_ids.empty? && user_ids.size > 100
+      return render json: { errors: "Too many users to update at once." }, status: :bad_request
+    end
+
     progress = Progress.create!(context: @context, user: @current_user, tag: :remove_users_from_account)
     process_params = {
       user_ids:
@@ -1683,6 +1921,11 @@ class AccountsController < ApplicationController
 
     allowed_attributes = [:event] # currently only used for suspend/unsuspend
     user_ids = params[:user_ids]
+
+    if !user_ids.empty? && user_ids.size > 100
+      return render json: { errors: "Too many users to update at once." }, status: :bad_request
+    end
+
     user_params = (params[:user] || {}).permit(*allowed_attributes).to_h
     progress = Progress.create!(context: @context, user: @current_user, tag: :update_multiple_users)
     process_params = {
@@ -1835,8 +2078,15 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
 
+      is_site_admin = Account.site_admin.grants_right?(@current_user, :read) &&
+                      !@account.account_users.active.where(user_id: @current_user).exists?
+      js_env({
+               SHOW_SITE_ADMIN_CONFIRMATION: is_site_admin,
+               INSTITUTIONAL_TAGS_ENABLED: @account.root_account.feature_enabled?(:institutional_tags)
+             })
+
       @current_batch = @account.current_sis_batch
-      @last_batch = @account.sis_batches.order("created_at DESC").first
+      @last_batch = @account.sis_batches.order(created_at: :desc).first
       respond_to do |format|
         format.html
         format.json { render json: @current_batch }
@@ -1881,7 +2131,6 @@ class AccountsController < ApplicationController
       can_create_dsr:,
       can_create_courses: @account.grants_right?(@current_user, session, :create_courses),
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
-      analytics: @account.service_enabled?(:analytics),
       can_read_sis: @account.grants_right?(@current_user, session, :read_sis),
       can_masquerade: @account.grants_right?(@current_user, session, :become_user),
       can_message_users: @account.grants_right?(@current_user, session, :send_messages),
@@ -1900,6 +2149,15 @@ class AccountsController < ApplicationController
       can_add_designer: @account.grants_right?(@current_user, session, :add_designer_to_course),
       can_add_observer: @account.grants_right?(@current_user, session, :add_observer_to_course)
     }
+
+    if @account.root_account.feature_enabled?(:institutional_tags)
+      js_permissions[:can_view_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_view)
+      js_permissions[:can_create_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_create)
+      js_permissions[:can_edit_institutional_tags] =
+        @account.root_account.grants_right?(@current_user, session, :manage_institutional_tags_edit)
+    end
 
     if @account.root_account.feature_enabled?(:temporary_enrollments)
       js_permissions[:can_add_temporary_enrollments] =
@@ -2019,6 +2277,7 @@ class AccountsController < ApplicationController
   def remove_account_user
     admin = @context.account_users.find(params[:id])
     if authorized_action(admin, @current_user, :destroy)
+      admin.current_user = @current_user
       admin.destroy
       respond_to do |format|
         format.html { redirect_to account_settings_url(@context, anchor: "tab-users") }
@@ -2102,6 +2361,19 @@ class AccountsController < ApplicationController
     render html: '<div id="account-calendar-settings-container"></div>'.html_safe, layout: true
   end
 
+  def accessibility
+    return render_unauthorized_action unless @account.can_see_accessibility_tab?(@current_user)
+
+    @page_title = t("Accessibility")
+    add_crumb @page_title
+    page_has_instui_topnav
+    set_active_tab "accessibility"
+
+    js_bundle :accessibility_course_statistics
+
+    render html: "", layout: true
+  end
+
   def format_avatar_count(count = 0)
     (count > 99) ? "99+" : count
   end
@@ -2151,17 +2423,17 @@ class AccountsController < ApplicationController
                                    :enable_course_catalog,
                                    :limit_parent_app_web_access,
                                    :limit_personal_access_tokens,
+                                   :restrict_personal_access_tokens_from_students,
                                    { allow_gradebook_show_first_last_names: [:value] }.freeze,
                                    { enable_offline_web_export: [:value] }.freeze,
                                    { disable_rce_media_uploads: [:value] }.freeze,
                                    :enable_profiles,
                                    :enable_gravatar,
                                    :enable_turnitin,
-                                   :equella_endpoint,
-                                   :equella_teaser,
                                    :external_notification_warning,
                                    :global_includes,
                                    :google_docs_domain,
+                                   :has_underage_users,
                                    :help_link_icon,
                                    :help_link_name,
                                    :include_integration_ids_in_gradebook_exports,
@@ -2190,6 +2462,7 @@ class AccountsController < ApplicationController
                                                          common_passwords_folder_id] }.freeze,
                                    :prevent_course_availability_editing_by_teachers,
                                    :prevent_course_renaming_by_teachers,
+                                   :restrict_grading_scheme_editing_to_admins,
                                    :restrict_quiz_questions,
                                    { restrict_student_future_listing: [:value, :locked] }.freeze,
                                    { restrict_student_future_view: [:value, :locked] }.freeze,
@@ -2217,6 +2490,9 @@ class AccountsController < ApplicationController
                                    :turnitin_account_id,
                                    :users_can_edit_name,
                                    :users_can_edit_profile,
+                                   :users_can_edit_bio,
+                                   :users_can_edit_title,
+                                   :users_can_edit_profile_links,
                                    :users_can_edit_comm_channels,
                                    { usage_rights_required: [:value, :locked] }.freeze,
                                    { restrict_quantitative_data: [:value, :locked] }.freeze,
@@ -2229,7 +2505,9 @@ class AccountsController < ApplicationController
                                    :students_can_create_courses_anywhere,
                                    { default_due_time: [:value] }.freeze,
                                    { conditional_release: [:value, :locked] }.freeze,
+                                   { enable_course_paces: [:value, :locked] }.freeze,
                                    { allow_observers_in_appointment_groups: [:value] }.freeze,
+                                   { default_allow_observer_signup: [:value] }.freeze,
                                    :enable_inbox_signature_block,
                                    :disable_inbox_signature_block_for_students,
                                    :enable_inbox_auto_response,
@@ -2272,7 +2550,9 @@ class AccountsController < ApplicationController
        restrict_quantitative_data
        lock_all_announcements
        sis_assignment_name_length_input
-       conditional_release]
+       suppress_notifications
+       conditional_release
+       enable_course_paces]
   end
 
   def permitted_password_policy_settings

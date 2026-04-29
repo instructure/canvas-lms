@@ -58,10 +58,33 @@ describe Types::RubricAssociationType do
       ).to eq [rubric_association.hide_outcome_results]
     end
 
-    it "hide_points" do
-      expect(
-        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { hidePoints } } }")
-      ).to eq [rubric_association.hide_points]
+    describe "hide_points" do
+      let(:query) { "rubricAssessmentsConnection { nodes { rubricAssociation { hidePoints } } }" }
+      let(:query_with_param) { "rubricAssessmentsConnection { nodes { rubricAssociation { hidePoints(checkExtraPermissions: true) } } }" }
+      let(:student_type) { GraphQLTypeTester.new(submission, current_user: student) }
+
+      it "returns false when RQD is not enabled" do
+        expect(submission_type.resolve(query)).to eq [false]
+      end
+
+      context "when restrict_quantitative_data is enabled" do
+        before do
+          course.root_account.enable_feature!(:restrict_quantitative_data)
+          course.update!(restrict_quantitative_data: true)
+        end
+
+        it "returns true for a teacher without check_extra_permissions" do
+          expect(submission_type.resolve(query)).to eq [true]
+        end
+
+        it "returns false for a teacher with check_extra_permissions: true" do
+          expect(submission_type.resolve(query_with_param)).to eq [false]
+        end
+
+        it "returns true for a student with check_extra_permissions: true" do
+          expect(student_type.resolve(query_with_param)).to eq [true]
+        end
+      end
     end
 
     it "hide_score_total" do
@@ -87,6 +110,18 @@ describe Types::RubricAssociationType do
       expect(
         submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { savedComments } } }")
       ).to eq ["{\"1\":[\"comment\"]}"]
+    end
+
+    it "association_type" do
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { associationType } } }")
+      ).to eq [rubric_association.association_type]
+    end
+
+    it "association_id" do
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { associationId } } }")
+      ).to eq [rubric_association.association_id.to_s]
     end
   end
 end

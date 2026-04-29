@@ -127,7 +127,7 @@ const emitPartialRegistration = (path, resourceName) => {
 
 function i18nLinerHandlebarsLoader(source) {
   this.cacheable()
-  const options = loaderUtils.getOptions(this) || {}
+  const options = this.getOptions() || {}
   const name = resourceName(this.resourcePath)
   const dependencies = []
 
@@ -182,6 +182,7 @@ module.exports.compile = (source, path, query) => {
     cacheable: () => {},
     resourcePath: path,
     query,
+    getOptions: () => query || {},
   }
   return i18nLinerHandlebarsLoader.call(context, source)
 }

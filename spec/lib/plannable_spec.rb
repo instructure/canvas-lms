@@ -80,5 +80,215 @@ describe Plannable do
       )
       expect(reply_to_entry.planner_override_for(@student)).to eq reply_to_entry_override
     end
+
+    it "returns overrides for peer_review_sub_assignments" do
+      @course.account.enable_feature!(:peer_review_allocation_and_grading)
+      parent_assignment = @course.assignments.create!(title: "Parent", peer_reviews: true)
+      prsa = PeerReviewSubAssignment.create!(parent_assignment:, context: @course, title: "Peer Review", points_possible: 10)
+      override = PlannerOverride.create!(
+        plannable_id: prsa.id,
+        plannable_type: "PeerReviewSubAssignment",
+        marked_complete: true,
+        user: @student
+      )
+      expect(prsa.planner_override_for(@student)).to eq override
+    end
+  end
+
+  context "complete_for_planner scope" do
+    before :once do
+      course_with_student(active_all: true)
+    end
+
+    it "includes graded quiz with planner override marked complete" do
+      assignment = assignment_model(course: @course, submission_types: "online_quiz", quiz: quiz_model(course: @course))
+      quiz = assignment.quiz
+      quiz.planner_overrides.create!(user: @student, marked_complete: true)
+
+      expect(Assignment.published.complete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes graded discussion with planner override marked complete" do
+      assignment = assignment_model(course: @course, submission_types: "discussion_topic")
+      discussion = assignment.discussion_topic
+      discussion.planner_overrides.create!(user: @student, marked_complete: true)
+
+      expect(Assignment.published.complete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes wiki page assignment with planner override marked complete" do
+      assignment = wiki_page_assignment_model(course: @course)
+      wiki_page = assignment.wiki_page
+      wiki_page.planner_overrides.create!(user: @student, marked_complete: true)
+
+      expect(Assignment.published.complete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes regular assignment with planner override marked complete" do
+      assignment = assignment_model(course: @course)
+      assignment.planner_overrides.create!(user: @student, marked_complete: true)
+
+      expect(Assignment.published.complete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes assignment with submission" do
+      assignment = assignment_model(course: @course)
+      assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test")
+
+      expect(Assignment.published.complete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes submitted graded discussion with no override" do
+      assignment = assignment_model(course: @course, submission_types: "discussion_topic")
+      assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test")
+
+      expect(Assignment.published.complete_for_planner(@student)).to include(assignment)
+    end
+
+    it "excludes submitted graded discussion marked incomplete" do
+      assignment = assignment_model(course: @course, submission_types: "discussion_topic")
+      assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test")
+      assignment.discussion_topic.planner_overrides.create!(user: @student, marked_complete: false)
+
+      expect(Assignment.published.complete_for_planner(@student)).not_to include(assignment)
+    end
+
+    it "excludes submitted graded quiz marked incomplete" do
+      assignment = assignment_model(course: @course, submission_types: "online_quiz", quiz: quiz_model(course: @course))
+      assignment.submit_homework(@student, submission_type: "online_quiz")
+      assignment.quiz.planner_overrides.create!(user: @student, marked_complete: false)
+
+      expect(Assignment.published.complete_for_planner(@student)).not_to include(assignment)
+    end
+  end
+
+  context "incomplete_for_planner scope" do
+    before :once do
+      course_with_student(active_all: true)
+    end
+
+    it "includes graded quiz without a planner override" do
+      assignment = assignment_model(course: @course, submission_types: "online_quiz", quiz: quiz_model(course: @course))
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes quiz with planner override marked_complete: false" do
+      assignment = assignment_model(course: @course, submission_types: "online_quiz", quiz: quiz_model(course: @course))
+      assignment.quiz.planner_overrides.create!(user: @student, marked_complete: false)
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes graded discussion without a planner override" do
+      assignment = assignment_model(course: @course, submission_types: "discussion_topic")
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes graded discussion with planner override marked_complete: false" do
+      assignment = assignment_model(course: @course, submission_types: "discussion_topic")
+      assignment.discussion_topic.planner_overrides.create!(user: @student, marked_complete: false)
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes wiki page assignment without a planner override" do
+      assignment = wiki_page_assignment_model(course: @course)
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes wiki page assignment with planner override marked_complete: false" do
+      assignment = wiki_page_assignment_model(course: @course)
+      assignment.wiki_page.planner_overrides.create!(user: @student, marked_complete: false)
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes submitted assignment with planner override marked_complete: false" do
+      assignment = assignment_model(course: @course)
+      assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test")
+      assignment.planner_overrides.create!(user: @student, marked_complete: false)
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes submitted assignment with redo_request" do
+      assignment = assignment_model(course: @course)
+      submission = assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test")
+      submission.update!(redo_request: true)
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes submitted graded discussion marked incomplete" do
+      assignment = assignment_model(course: @course, submission_types: "discussion_topic")
+      assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test")
+      assignment.discussion_topic.planner_overrides.create!(user: @student, marked_complete: false)
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes submitted graded quiz marked incomplete" do
+      assignment = assignment_model(course: @course, submission_types: "online_quiz", quiz: quiz_model(course: @course))
+      assignment.submit_homework(@student, submission_type: "online_quiz")
+      assignment.quiz.planner_overrides.create!(user: @student, marked_complete: false)
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+    end
+
+    it "includes not_graded assignment until explicitly overridden as complete" do
+      assignment = assignment_model(course: @course, submission_types: "not_graded")
+
+      expect(Assignment.published.incomplete_for_planner(@student)).to include(assignment)
+
+      assignment.planner_overrides.create!(user: @student, marked_complete: true)
+
+      expect(Assignment.published.incomplete_for_planner(@student)).not_to include(assignment)
+    end
+  end
+
+  context "AssessmentRequest planner override on completion" do
+    before :once do
+      course_with_student(active_all: true)
+      @reviewee = course_with_student(course: @course, active_all: true).user
+      @peer_review_assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        peer_reviews: true,
+        due_at: 1.day.from_now
+      )
+      @reviewee_submission = @peer_review_assignment.submit_homework(
+        @reviewee,
+        submission_type: "online_text_entry",
+        body: "reviewee submission"
+      )
+      @assessor_submission = @peer_review_assignment.submit_homework(
+        @student,
+        submission_type: "online_text_entry",
+        body: "assessor submission"
+      )
+      @assessment_request = AssessmentRequest.create!(
+        assessor: @student,
+        assessor_asset: @assessor_submission,
+        asset: @reviewee_submission,
+        user: @reviewee,
+        workflow_state: "assigned"
+      )
+    end
+
+    it "updates planner override marked_complete to true when assessment request transitions to completed" do
+      override = PlannerOverride.create!(
+        plannable_id: @assessment_request.id,
+        plannable_type: "AssessmentRequest",
+        user: @student,
+        marked_complete: false
+      )
+
+      @assessment_request.workflow_state = "completed"
+      @assessment_request.save!
+
+      expect(override.reload.marked_complete).to be true
+    end
   end
 end

@@ -28,6 +28,8 @@ class SVGWrapper extends React.Component {
     url: PropTypes.string.isRequired,
     fillColor: PropTypes.string,
     style: PropTypes.any,
+    ariaHidden: PropTypes.bool,
+    ariaLabel: PropTypes.string,
   }
 
   componentDidMount() {
@@ -37,6 +39,9 @@ class SVGWrapper extends React.Component {
   UNSAFE_componentWillReceiveProps(newProps) {
     if (newProps.url !== this.props.url) {
       this.fetchSVG()
+    }
+    if (newProps.fillColor !== this.props.fillColor) {
+      this.setSVGFillColor(newProps.fillColor)
     }
   }
 
@@ -56,15 +61,25 @@ class SVGWrapper extends React.Component {
           )
         }
 
-        if (this.props.fillColor) {
-          this.svg.setAttribute('style', `fill:${this.props.fillColor}`)
+        if (this.props.ariaHidden !== undefined) {
+          this.svg.setAttribute('aria-hidden', this.props.ariaHidden)
         }
 
+        if (this.props.ariaLabel) {
+          this.svg.setAttribute('aria-label', this.props.ariaLabel)
+        }
+
+        this.setSVGFillColor(this.props.fillColor)
         this.svg.setAttribute('focusable', false)
         this.rootSpan.innerHTML = ''
         this.rootSpan.appendChild(this.svg)
       },
     })
+  }
+
+  setSVGFillColor(color) {
+    if (!color || !this.svg) return
+    this.svg.setAttribute('style', `fill:${color}`)
   }
 
   render() {

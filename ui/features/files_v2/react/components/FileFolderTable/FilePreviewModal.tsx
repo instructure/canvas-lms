@@ -31,30 +31,45 @@ import {type File} from '../../../interfaces/File'
 import {generatePreviewUrlPath} from '../../../utils/fileUtils'
 import {FilePreview} from './FilePreview'
 import {FilePreviewNavigationButtons} from './FilePreviewNavigationButtons'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {FileNotFound} from './FileNotFound'
+import {showFlashAlert} from '@instructure/platform-alerts'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 const I18n = createI18nScope('files_v2')
 
 export interface FilePreviewModalProps {
   isOpen: boolean
   onClose: () => void
-  item: File
+  item: File | null
   collection: File[]
+  showNavigationButtons?: boolean
+  error?: string | null
 }
 
-export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePreviewModalProps) => {
+export const FilePreviewModal = ({
+  isOpen,
+  onClose,
+  item,
+  collection,
+  showNavigationButtons = true,
+  error = null,
+}: FilePreviewModalProps) => {
   const modalBody = useRef<HTMLElement | null>(null)
   const fileInfoButton = useRef<HTMLElement | null>(null)
-  const [currentItem, setCurrentItem] = useState<File>(item)
-  const [currentIndex, setCurrentIndex] = useState<number>(collection.indexOf(item))
+  const shouldPreventDismiss = useRef<boolean>(false)
+  const [currentItem, setCurrentItem] = useState<File | null>(item)
+  const [currentIndex, setCurrentIndex] = useState<number>(
+    item && collection ? collection.indexOf(item) : 0,
+  )
   const [isTrayOpen, setIsTrayOpen] = useState(false)
-  const name = currentItem.display_name
+  const name = currentItem?.display_name || I18n.t('File')
+  const isAccessRestricted = getFilesEnv().userFileAccessRestricted
 
   // Reset state when the modal is opened or item changes
   useEffect(() => {
     if (isOpen) {
       setCurrentItem(item)
-      setCurrentIndex(collection ? collection.indexOf(item) : 0)
+      setCurrentIndex(item && collection ? collection.indexOf(item) : 0)
     }
   }, [isOpen, item, collection])
 
@@ -82,6 +97,44 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
     }
   }, [isOpen, name])
 
+  // Intercept Escape key to check if it originated from within Studio player
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleEscapeCapture = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+
+      const studioPlayer = document.querySelector('[data-media-player]')
+      if (!studioPlayer) {
+        shouldPreventDismiss.current = false
+        return
+      }
+
+      const target = event.target as HTMLElement
+      if (studioPlayer.contains(target)) {
+        shouldPreventDismiss.current = true
+
+        // Find the open menu trigger button and restore focus to it after menu closes
+        const openMenuButton = studioPlayer.querySelector(
+          '[aria-expanded="true"][aria-haspopup="true"]',
+        ) as HTMLElement | null
+        if (openMenuButton) {
+          setTimeout(() => {
+            openMenuButton.focus()
+          }, 0)
+        }
+      } else {
+        shouldPreventDismiss.current = false
+      }
+    }
+
+    document.addEventListener('keydown', handleEscapeCapture, true)
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeCapture, true)
+    }
+  }, [isOpen])
+
   useEffect(() => {
     const handlePopState = () => {
       const searchParams = new URLSearchParams(window.location.search)
@@ -94,7 +147,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
       }
 
       // Only update state if we have a different preview ID
-      if (previewId !== currentItem.id && collection) {
+      if (currentItem && previewId !== currentItem.id && collection) {
         const newItem = collection.find(item => item.id === previewId)
         if (newItem) {
           setCurrentItem(newItem as File)
@@ -110,9 +163,10 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
     return () => {
       window.removeEventListener('popstate', handlePopState)
     }
-  }, [onClose, currentItem.id, collection, isOpen])
+  }, [onClose, currentItem?.id, collection, isOpen])
 
   const handleNext = () => {
+    if (!currentItem || !collection.length) return
     const nextIndex = currentIndex + 1 >= collection.length ? 0 : currentIndex + 1
     setCurrentIndex(nextIndex)
     setCurrentItem(collection[nextIndex] as File)
@@ -120,6 +174,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
   }
 
   const handlePrevious = () => {
+    if (!currentItem || !collection.length) return
     const previousIndex = currentIndex - 1 < 0 ? collection.length - 1 : currentIndex - 1
     setCurrentIndex(previousIndex)
     setCurrentItem(collection[previousIndex] as File)
@@ -127,7 +182,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
   }
 
   const handleKeyboardNavigation = (event: React.KeyboardEvent) => {
-    if (ENV.disable_keyboard_shortcuts) return
+    if (ENV.disable_keyboard_shortcuts || !currentItem || !showNavigationButtons) return
 
     const {key} = event
     if (key === 'ArrowRight') {
@@ -137,16 +192,25 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
     }
   }
 
+  const handleDismiss = () => {
+    if (shouldPreventDismiss.current) {
+      shouldPreventDismiss.current = false
+      return
+    }
+    onClose()
+  }
+
   return (
     <Modal
       open={isOpen}
-      onDismiss={onClose}
+      onDismiss={handleDismiss}
       size={'fullscreen'}
       label={name}
       shouldCloseOnDocumentClick={false}
       variant="inverse"
       overflow="fit"
       onKeyDown={handleKeyboardNavigation}
+      data-testid="file-preview-modal"
     >
       <Modal.Header>
         <Flex>
@@ -177,20 +241,24 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
                   id="file-info-button"
                   onClick={() => handleOverlayTrayChange(true)}
                   ref={e => (fileInfoButton.current = e as HTMLElement | null)}
+                  disabled={!currentItem}
                 />
               </div>
-              <div style={{gridArea: 'download'}}>
-                <IconButton
-                  color="primary-inverse"
-                  withBackground={false}
-                  withBorder={false}
-                  renderIcon={IconDownloadSolid}
-                  screenReaderLabel={I18n.t('Download')}
-                  margin="0 x-small 0 0"
-                  id="download-icon-button"
-                  href={currentItem.url}
-                />
-              </div>
+              {!isAccessRestricted && (
+                <div style={{gridArea: 'download'}}>
+                  <IconButton
+                    color="primary-inverse"
+                    withBackground={false}
+                    withBorder={false}
+                    renderIcon={IconDownloadSolid}
+                    screenReaderLabel={I18n.t('Download')}
+                    margin="0 x-small 0 0"
+                    id="download-icon-button"
+                    href={currentItem?.url}
+                    disabled={!currentItem}
+                  />
+                </div>
+              )}
               <div style={{gridArea: 'close'}}>
                 <IconButton
                   color="primary-inverse"
@@ -207,32 +275,34 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
           </Flex.Item>
         </Flex>
       </Modal.Header>
-      <Modal.Body
-        padding="none"
-        id="file-preview-modal-alert"
-        elementRef={el => (modalBody.current = el as HTMLElement | null)}
-      >
-        <DrawerLayout onOverlayTrayChange={handleOverlayTrayChange}>
-          <DrawerLayout.Content
-            id="file-preview-modal-drawer-layout"
-            label={I18n.t('File Preview')}
-          >
-            <FilePreview item={currentItem} />
-          </DrawerLayout.Content>
-          <DrawerLayout.Tray
-            open={isTrayOpen}
-            onClose={() => setIsTrayOpen(false)}
-            placement="end"
-            label={I18n.t('File Information')}
-          >
-            <FilePreviewTray onDismiss={() => setIsTrayOpen(false)} item={currentItem} />
-          </DrawerLayout.Tray>
-        </DrawerLayout>
+      <Modal.Body padding="none" id="file-preview-modal-alert">
+        {error || !currentItem ? (
+          <FileNotFound />
+        ) : (
+          <DrawerLayout onOverlayTrayChange={handleOverlayTrayChange}>
+            <DrawerLayout.Content
+              id="file-preview-modal-drawer-layout"
+              label={I18n.t('File Preview')}
+            >
+              <FilePreview item={currentItem} />
+            </DrawerLayout.Content>
+            <DrawerLayout.Tray
+              open={isTrayOpen}
+              onClose={() => setIsTrayOpen(false)}
+              placement="end"
+              label={I18n.t('File Information')}
+            >
+              {currentItem && (
+                <FilePreviewTray onDismiss={() => setIsTrayOpen(false)} item={currentItem} />
+              )}
+            </DrawerLayout.Tray>
+          </DrawerLayout>
+        )}
       </Modal.Body>
       <Modal.Footer>
         <Flex justifyItems="space-between" width="100%">
           <Flex.Item>
-            {collection.length > 1 && (
+            {showNavigationButtons && collection.length > 1 && currentItem && (
               <FilePreviewNavigationButtons
                 handleNext={handleNext}
                 handlePrevious={handlePrevious}

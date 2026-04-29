@@ -24,7 +24,6 @@ import type {FilterTrayPresetProps} from '../FilterTrayFilterPreset'
 import type {FilterPreset} from '../../gradebook.d'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import '@testing-library/jest-dom/extend-expect'
 
 const defaultFilterPreset: FilterPreset = {
   id: '123',
@@ -120,14 +119,14 @@ const defaultProps: FilterTrayPresetProps = {
 
 describe('FilterNavFilter', () => {
   it('clicking delete triggers onDelete', async () => {
-    const onDelete = jest.fn()
+    const onDelete = vi.fn()
     const {getByTestId} = render(<FilterNavFilter {...defaultProps} onDelete={onDelete} />)
     await userEvent.click(getByTestId('delete-filter-preset-button'))
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
   it('clicking save after change triggers onSave', async () => {
-    const onUpdate = jest.fn(() => Promise.resolve())
+    const onUpdate = vi.fn(() => Promise.resolve())
     const {getByRole, getByLabelText, getByText} = render(
       <FilterNavFilter {...defaultProps} onUpdate={onUpdate} />,
     )

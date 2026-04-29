@@ -65,16 +65,17 @@ describe "assignments" do
         fill_out_quick_add_modal("Assignment")
         f("[data-testid='more-options-button']").click
 
-        expect(f("#edit_assignment_header")).to be
+        expect(f("#edit_assignment_header")).not_to be_nil
         expect(f("#assignment_name").attribute(:value)).to include(@assignment_name)
         expect(f("#assignment_points_possible").attribute(:value)).to include(@assignment_points)
       end
 
       it "works for discussions and transfer values", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         fill_out_quick_add_modal("Discussion")
         f("[data-testid='more-options-button']").click
 
-        expect(f(".discussion-edit-header")).to be
+        expect(f(".discussion-edit-header")).not_to be_nil
         expect(f("#discussion-title").attribute(:value)).to include(@assignment_name)
         expect(f("#discussion_topic_assignment_points_possible").attribute(:value)).to include(@assignment_points)
       end
@@ -83,7 +84,7 @@ describe "assignments" do
         fill_out_quick_add_modal("Quiz")
         f("[data-testid='more-options-button']").click
 
-        expect(f("#quiz_edit_wrapper")).to be
+        expect(f("#quiz_edit_wrapper")).not_to be_nil
         expect(f("#quiz_title").attribute(:value)).to include(@assignment_name)
       end
     end

@@ -83,7 +83,7 @@ describe('Date', () => {
     for (const offset in examples) {
       const expectedResult = examples[offset]
       const date = new Date()
-      jest.spyOn(date, 'getTimezoneOffset').mockReturnValue(Number(offset))
+      vi.spyOn(date, 'getTimezoneOffset').mockReturnValue(Number(offset))
       expect(date.getUTCOffset()).toBe(expectedResult)
     }
   })

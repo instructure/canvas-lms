@@ -56,24 +56,24 @@ const ProductCard = (props: ProductCardProps) => {
         <Flex direction="column" height="100%">
           <Flex gap="small" margin="0 0 medium 0">
             <div style={{borderRadius: '8px', overflow: 'hidden', minWidth: '48px'}}>
-              <Img src={product.logo_url} width={48} height={48} />
+              <Img src={product.logo_url} width={48} />
             </div>
             <div>
-              <TruncateWithTooltip
-                linesAllowed={1}
-                horizontalOffset={0}
-                backgroundColor="primary-inverse"
-              >
-                <Text weight="bold" size="medium">
-                  <Link
-                    isWithinText={false}
-                    themeOverride={{fontWeight: 700, color: 'black'}}
-                    href={productRoute(product.global_product_id)}
+              <Text weight="bold" size="medium" color="primary">
+                <Link
+                  isWithinText={false}
+                  themeOverride={{fontWeight: 700, color: 'black'}}
+                  href={productRoute(product.global_product_id)}
+                >
+                  <TruncateWithTooltip
+                    linesAllowed={1}
+                    horizontalOffset={0}
+                    backgroundColor="primary"
                   >
                     {product?.name}
-                  </Link>
-                </Text>
-              </TruncateWithTooltip>
+                  </TruncateWithTooltip>
+                </Link>
+              </Text>
               <div>
                 <span style={{fontSize: '14px'}}>by </span>
                 <Text weight="bold" color="secondary" size="small">
@@ -91,7 +91,13 @@ const ProductCard = (props: ProductCardProps) => {
           </View>
           <View as="div" margin="auto 0 0 0">
             {product?.tags?.slice(0, 1).map(tag => (
-              <Tag key={tag.name} text={tag.name} size="small" margin="0 xx-small 0 0" />
+              <Tag
+                key={tag.name}
+                text={tag.name}
+                size="small"
+                margin="0 xx-small 0 0"
+                themeOverride={{maxWidth: 'none'}}
+              />
             ))}
           </View>
           {'organization_tool' in product && product.organization_tool.product_status && (
@@ -105,6 +111,7 @@ const ProductCard = (props: ProductCardProps) => {
                   defaultBackground: 'white',
                   defaultColor: product.organization_tool.product_status?.color,
                   defaultBorderColor: product.organization_tool.product_status?.color,
+                  maxWidth: 'none',
                 }}
               />
             </View>

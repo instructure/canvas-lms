@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
+import type {Root} from 'react-dom/client'
 import {Main} from './react/Main'
 import {initAccountSelectModal} from './react/HorizonModal/InitHorizonModal'
 import {LoadTab} from '../../shared/tabs/react/LoadTab'
@@ -24,7 +25,7 @@ import ready from '@instructure/ready'
 
 ready(() => {
   initAccountSelectModal()
-  let careersTabRoot: ReturnType<typeof createRoot> | null = null
+  let careersTabRoot: Root | null = null
 
   function loadCareersTab(targetId: string) {
     if (targetId !== 'tab-canvas-career-selected') return
@@ -42,10 +43,10 @@ ready(() => {
     if (!mountPoint) return
 
     if (!careersTabRoot) {
-      careersTabRoot = createRoot(mountPoint)
+      careersTabRoot = render(app, mountPoint)
+    } else {
+      rerender(careersTabRoot, app)
     }
-
-    careersTabRoot.render(app)
   }
 
   LoadTab(loadCareersTab)

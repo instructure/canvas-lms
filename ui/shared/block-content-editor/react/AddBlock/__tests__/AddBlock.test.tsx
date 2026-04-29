@@ -18,38 +18,32 @@
 
 import {render, screen} from '@testing-library/react'
 import {AddBlock} from '../AddBlock'
-import {BlockContentEditorContextType} from '../../BlockContentEditorContext'
 
-const openMock = jest.fn()
-const closeMock = jest.fn()
-const setShouldShowMock = jest.fn()
-
-jest.mock('../../BlockContentEditorContext', () => ({
+const openMock = vi.fn()
+vi.mock('../../hooks/useAddBlockModal', () => ({
   __esModule: true,
-  useBlockContentEditorContext: jest.fn(
-    () =>
-      ({
-        addBlockModal: {
-          isOpen: false,
-          insertAfterNodeId: undefined,
-          open: openMock,
-          close: closeMock,
-        },
-        initialAddBlockHandler: {
-          shouldShow: true,
-          setShouldShow: setShouldShowMock,
-        },
-      }) as BlockContentEditorContextType,
-  ),
+  useAddBlockModal: vi.fn(() => ({open: openMock})),
 }))
 
-jest.mock('../../hooks/useAddNode', () => ({
-  useAddNode: jest.fn(),
+vi.mock('../../hooks/useAddNode', () => ({
+  useAddNode: vi.fn(),
+}))
+
+vi.mock('../../hooks/useGetBlocksCount', () => ({
+  useGetBlocksCount: () => ({
+    blocksCount: 0,
+  }),
+}))
+
+vi.mock('../../hooks/useFocusManagement', () => ({
+  useFocusManagement: () => ({
+    elementRef: vi.fn(),
+  }),
 }))
 
 describe('AddBlock', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders', async () => {

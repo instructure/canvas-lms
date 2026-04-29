@@ -80,7 +80,7 @@ GroupCollection.prototype.fetchAllDriver = function (options) {
   if (options == null) {
     options = {}
   }
-   
+
   options.data = Object.assign(
     {
       per_page: 20,

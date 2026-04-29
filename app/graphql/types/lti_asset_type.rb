@@ -23,6 +23,19 @@ module Types
     implements Interfaces::LegacyIDInterface
 
     field :attachment_id, ID, null: true
+    field :attachment_name, String, null: true
+    def attachment_name
+      load_association(:attachment).then do |attachment|
+        attachment&.display_name
+      end
+    end
+
+    field :discussion_entry_version, Types::DiscussionEntryVersionType, null: true
+    def discussion_entry_version
+      load_association(:discussion_entry_version)
+    end
+
     field :submission_attempt, Int, null: true
+    field :submission_id, ID, null: true
   end
 end

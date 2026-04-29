@@ -59,15 +59,22 @@ export const fetchDeployments: FetchDeployments = options =>
 type CreateDeployment = (options: {
   registrationId: LtiRegistrationId
   accountId: AccountId
+  available?: boolean
 }) => Promise<ApiResult<LtiDeployment>>
 
-export const createDeployment: CreateDeployment = options =>
-  parseFetchResult(ZLtiDeployment)(
+export const createDeployment: CreateDeployment = options => {
+  return parseFetchResult(ZLtiDeployment)(
     fetch(
       `/api/v1/accounts/${options.accountId}/lti_registrations/${options.registrationId}/deployments`,
       {
-        ...defaultFetchOptions(),
+        ...defaultFetchOptions({
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+        body: JSON.stringify({available: options.available}),
         method: 'POST',
       },
     ),
   )
+}

@@ -30,20 +30,47 @@ class Lti::AccountBindingService < ApplicationService
 
     @account = account
     @registration = registration
-    @workflow_state = workflow_state
+    @workflow_state = workflow_state&.to_sym
     @user = user
     @overwrite_created_by = overwrite_created_by
   end
 
   def call
     Lti::Registration.transaction do
+      update_registration
       reg_binding = bind_to_registration
       key_binding = bind_to_developer_key(reg_binding)
       { lti_registration_account_binding: reg_binding, developer_key_account_binding: key_binding }
     end
   end
 
+  # Full resolution of all valid workflow_state param values to their
+  # equivalent binding and registration states.
+  WORKFLOW_STATE_RESOLUTION = {
+    on: { binding: "on", registration: "active" },
+    off: { binding: "off", registration: "inactive" },
+    allow: { binding: "allow", registration: "active" },
+    active: { binding: "on", registration: "active" },
+    inactive: { binding: "off", registration: "inactive" },
+  }.freeze
+
+  def self.resolve_workflow_state(workflow_state)
+    WORKFLOW_STATE_RESOLUTION[workflow_state&.to_sym]
+  end
+
   private
+
+  def update_registration
+    return unless registration.account == account
+
+    target_state = WORKFLOW_STATE_RESOLUTION.dig(workflow_state, :registration)&.to_sym
+    return if target_state.nil?
+    return if registration.workflow_state.to_sym == target_state
+
+    registration.workflow_state = target_state
+    registration.updated_by = user
+    registration.save!
+  end
 
   def bind_to_registration
     reg_binding = Lti::RegistrationAccountBinding.find_or_initialize_by(registration:, account:)

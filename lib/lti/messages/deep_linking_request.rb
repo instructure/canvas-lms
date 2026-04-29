@@ -68,6 +68,13 @@ module Lti::Messages
         document_targets: %w[iframe window].freeze,
         media_types: %w[application/vnd.ims.lti.v1.ltilink].freeze
       }.freeze,
+      "ActivityAssetProcessorContribution" => {
+        accept_multiple: true,
+        accept_types: %w[ltiAssetProcessorContribution].freeze,
+        auto_create: true,
+        document_targets: %w[iframe window].freeze,
+        media_types: %w[application/vnd.ims.lti.v1.ltilink].freeze
+      }.freeze,
       "editor_button" => {
         accept_multiple: true,
         accept_types: %w[link file html ltiResourceLink image].freeze,
@@ -135,9 +142,15 @@ module Lti::Messages
     private
 
     def add_asset_processor_request_claims!
-      return if placement != Lti::ResourcePlacement::ASSET_PROCESSOR
+      return unless [Lti::ResourcePlacement::ASSET_PROCESSOR, Lti::ResourcePlacement::ASSET_PROCESSOR_CONTRIBUTION].include?(placement)
+      return unless lti_assignment_id
 
-      @message.activity.id = lti_assignment_id if lti_assignment_id
+      assignment = Assignment.find_by(lti_context_id: lti_assignment_id)
+      if assignment
+        add_activity_claim!(assignment)
+      else # For new Assignments we pregenerate the lti_context_id, but the assignment doesn't exist yet in DB
+        @message.activity.id = lti_assignment_id
+      end
     end
 
     def add_deep_linking_request_claims!

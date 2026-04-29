@@ -16,19 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ReactElement} from 'react'
-import {GroupedSelect} from '../GroupedSelect'
-import {blockData, blockFactory, BlockTypes} from './block-data'
+import {ReactElement, useState} from 'react'
+import {GroupedSelect, GroupedSelectItem} from '../GroupedSelect'
+import {blockData} from './block-data'
+import {previewFactory} from '../BlockPreview'
+import {AddBlockModalBodyLayout} from './AddBlockModalBodyLayout'
+import {components} from '../block-content-editor-components'
 
-export const AddBlockModalBody = (props: {
-  onBlockSelected: (block: ReactElement) => void
-}) => {
+const componentsByName = Object.values(components).reduce(
+  (acc, key) => {
+    acc[key.name] = key
+    return acc
+  },
+  {} as Record<string, React.FC>,
+)
+
+export const AddBlockModalBody = (props: {onBlockSelected: (block: ReactElement) => void}) => {
+  const [selectedItem, setSelectedItem] = useState(blockData[0].items[0])
+  const PreviewComponent = previewFactory[selectedItem.id]
+
   return (
-    <GroupedSelect
-      data={blockData}
-      onChange={(id: BlockTypes) => {
-        props.onBlockSelected(blockFactory[id]())
-      }}
+    <AddBlockModalBodyLayout
+      groupedSelect={
+        <GroupedSelect
+          data={blockData}
+          onChange={(item: GroupedSelectItem) => {
+            setSelectedItem(item)
+            const Component = componentsByName[item.id]
+            props.onBlockSelected(<Component />)
+          }}
+        />
+      }
+      preview={<PreviewComponent />}
     />
   )
 }

@@ -100,11 +100,11 @@ describe "course index" do
       get "/courses"
 
       star = ".course-list-favoritable"
-      ["Classic Course (Current)", "Classic Course (Past)", "Classic Course (Future)"].each do |name|
+      ["Classic Course (Current)", "Classic Course (Future)"].each do |name|
         expect(row_with_text(name)).to contain_css(star)
       end
 
-      ["K5 Course (Current)", "K5 Course (Past)", "K5 Course (Future)"].each do |name|
+      ["Classic Course (Past)", "K5 Course (Current)", "K5 Course (Past)", "K5 Course (Future)"].each do |name|
         expect(row_with_text(name)).not_to contain_css(star)
       end
     end
@@ -113,7 +113,6 @@ describe "course index" do
       get "/courses"
 
       expect(fj('.course-list-favoritable:contains("Click to add Classic Course (Current) to the courses menu.")')).to be_displayed
-      expect(fj('.course-list-favoritable:contains("Classic Course (Past) cannot be added to the courses menu unless the course is active.")')).to be_displayed
       expect(fj('.course-list-favoritable:contains("Click to add Classic Course (Future) to the courses menu.")')).to be_displayed
     end
 
@@ -136,6 +135,135 @@ describe "course index" do
       favorite_icon(course_name).click
       wait_for_ajaximations
       expect(row_with_text(course_name)).not_to contain_css(".icon-star")
+    end
+  end
+
+  context "accessibility column", skip: "2025-10-22 Temporarily disabled until we figure out what to do with this (in scope of RCX-4312)" do
+    before do
+      account = Account.default
+      account.enable_feature!(:a11y_checker)
+      [@current_courses, @past_courses, @future_courses].flatten.each do |course|
+        course.enable_feature!(:a11y_checker_eap)
+      end
+    end
+
+    it "is visible when at least one classic course exists" do
+      get "/courses"
+
+      expect(current_enrollments).to contain_css(accessibility_column_selector)
+      expect(past_enrollments).to contain_css(accessibility_column_selector)
+      expect(future_enrollments).to contain_css(accessibility_column_selector)
+    end
+
+    it "displays no issues when the course has no accessibility issues" do
+      [@current_courses, @past_courses, @future_courses].flatten.each do |course|
+        wiki_page = wiki_page_model(course:, body: "<ul><li>foo</li></ul>")
+        accessibility_resource_scan = AccessibilityResourceScan.where(context: wiki_page).first_or_initialize
+        accessibility_resource_scan.assign_attributes(
+          course:,
+          workflow_state: "completed",
+          resource_name: wiki_page.title,
+          resource_workflow_state: "published",
+          resource_updated_at: wiki_page.updated_at,
+          issue_count: 0,
+          error_message: nil
+        )
+        accessibility_resource_scan.save!
+      end
+
+      get "/courses"
+
+      rows = table_rows(current_enrollments_selector)
+      # remove header row
+      rows.shift
+      rows.each do |row|
+        expect(row).to contain_css(".icon-publish")
+        expect(row.find(".message").text).to eq "No issues"
+      end
+    end
+
+    it "displays status pills when the course has accessibility issues" do
+      [@current_courses, @past_courses, @future_courses].flatten.each do |course|
+        wiki_page = wiki_page_model(course:, body: "<ul><li>foo</li></ul>")
+        accessibility_resource_scan = AccessibilityResourceScan.where(context: wiki_page).first_or_initialize
+        accessibility_resource_scan.assign_attributes(
+          course:,
+          workflow_state: "completed",
+          resource_name: wiki_page.title,
+          resource_workflow_state: "published",
+          resource_updated_at: wiki_page.updated_at,
+          issue_count: 1,
+          error_message: nil
+        )
+        accessibility_resource_scan.save!
+        accessibility_issue_model(course:, accessibility_resource_scan:, wiki_page:)
+      end
+
+      get "/courses"
+
+      rows = table_rows(current_enrollments_selector)
+      # remove header row
+      rows.shift
+      rows.each do |row|
+        expect(row).to contain_css(".status-pill")
+        expect(row.find(".status-pill").text).to eq "1 issue"
+      end
+    end
+
+    it "displays checking spinner when the course is being scanned" do
+      [@current_courses, @past_courses, @future_courses].flatten.each do |course|
+        wiki_page = wiki_page_model(course:, body: "<ul><li>foo</li></ul>")
+        accessibility_resource_scan = AccessibilityResourceScan.where(context: wiki_page).first_or_initialize
+        accessibility_resource_scan.assign_attributes(
+          course:,
+          workflow_state: "in_progress",
+          resource_name: wiki_page.title,
+          resource_workflow_state: "published",
+          resource_updated_at: wiki_page.updated_at,
+          issue_count: 1,
+          error_message: nil
+        )
+        accessibility_resource_scan.save!
+      end
+
+      get "/courses"
+
+      rows = table_rows(current_enrollments_selector)
+      # remove header row
+      rows.shift
+      rows.each do |row|
+        expect(row).to contain_css(".course-list-checking-spinner")
+        expect(row.find(".message").text).to eq "Checking..."
+      end
+    end
+
+    it "displays a question icon when the course exceeds the accessibility scan limit" do
+      stub_const("Course::MAX_ACCESSIBILITY_SCAN_RESOURCES", 0)
+      [@current_courses, @past_courses, @future_courses].flatten.each do |course|
+        wiki_page = wiki_page_model(course:, body: "<ul><li>foo</li></ul>")
+        accessibility_resource_scan = AccessibilityResourceScan.where(context: wiki_page).first_or_initialize
+        accessibility_resource_scan.assign_attributes(
+          course:,
+          workflow_state: "completed",
+          resource_name: wiki_page.title,
+          resource_workflow_state: "published",
+          resource_updated_at: wiki_page.updated_at,
+          issue_count: 1,
+          error_message: nil
+        )
+        accessibility_resource_scan.save!
+        accessibility_issue_model(course:, accessibility_resource_scan:, wiki_page:)
+      end
+
+      get "/courses"
+
+      rows = table_rows(current_enrollments_selector)
+      # remove header row
+      rows.shift
+      rows.each do |row|
+        expect(row).to contain_css(".icon-question")
+        expect(row.find(".message").text).to eq "Unknown"
+      end
     end
   end
 

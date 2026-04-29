@@ -152,6 +152,106 @@ RSpec.describe Lti::DeploymentsController do
         end
       end
     end
+
+    # Tests for lti_registrations_templates flag — same-shard SA scenario.
+    # This covers OSS installs and local dev where Site Admin and tenant accounts
+    # share a shard. The sync_app_id callback detects same-shard inherited
+    # registrations and still looks up the local copy.
+    context "with lti_registrations_templates flag (same-shard SA)" do
+      let(:sa_registration) { lti_registration_with_tool(account: Account.site_admin) }
+      let(:local_copy) do
+        Lti::InstallTemplateRegistrationService.call(
+          account:,
+          user: admin,
+          template: sa_registration
+        )[:local_copy]
+      end
+
+      before do
+        account.enable_feature!(:lti_registrations_templates)
+        local_copy
+      end
+
+      it "returns deployments linked to the SA registration when flag is ON" do
+        deployment = sa_registration.new_external_tool(account, current_user: admin)
+
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{local_copy.id}/deployments"
+
+        expect(response).to be_successful
+        expect(response_json.pluck("id")).to include(deployment.id)
+      end
+
+      it "rollback: deployments created via local_copy are invisible via SA registration when flag is OFF" do
+        pending "rollback not yet implemented — deployments created via the local copy " \
+                "store lti_registration_id = local_copy.id, so they are invisible via " \
+                "the SA registration when the flag goes back off"
+
+        # D1: created by the service via local_copy (lti_registration_id = local_copy.id)
+        deployment_via_local_copy = local_copy.app_deployments.first
+
+        account.disable_feature!(:lti_registrations_templates)
+
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{sa_registration.id}/deployments"
+
+        expect(response).to be_successful
+        expect(response_json.pluck("id")).to include(deployment_via_local_copy.id)
+      end
+    end
+
+    context "with a same-shard non-inherited registration" do
+      it "returns the same deployments regardless of flag state" do
+        subaccount = account_model(parent_account: account)
+        registration.new_external_tool(subaccount)
+
+        account.enable_feature!(:lti_registrations_templates)
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/deployments"
+        expect(response).to be_successful
+        count_flag_on = response_json.length
+
+        account.disable_feature!(:lti_registrations_templates)
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/deployments"
+        expect(response).to be_successful
+        count_flag_off = response_json.length
+
+        expect(count_flag_on).to eq(count_flag_off)
+      end
+    end
+
+    context "with multiple accounts installing the same Site Admin template" do
+      let(:sa_registration) { lti_registration_with_tool(account: Account.site_admin) }
+      let(:account_b) { account_model }
+      let(:admin_b) { account_admin_user(account: account_b) }
+      let(:local_copy_a) do
+        Lti::InstallTemplateRegistrationService.call(
+          account:,
+          user: admin,
+          template: sa_registration
+        )[:local_copy]
+      end
+      let(:local_copy_b) do
+        account_b.enable_feature!(:lti_registrations_next)
+        account_b.enable_feature!(:lti_registrations_templates)
+        Lti::InstallTemplateRegistrationService.call(
+          account: account_b,
+          user: admin_b,
+          template: sa_registration
+        )[:local_copy]
+      end
+
+      before do
+        account.enable_feature!(:lti_registrations_templates)
+        local_copy_a
+        local_copy_b
+      end
+
+      it "does not include account B's deployments when querying account A's local copy" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{local_copy_a.id}/deployments"
+
+        expect(response).to be_successful
+        context_ids = response_json.pluck("context_id")
+        expect(context_ids).not_to include(account_b.id)
+      end
+    end
   end
 
   describe "GET list_controls", type: :request do
@@ -208,7 +308,7 @@ RSpec.describe Lti::DeploymentsController do
 
     it "has the expected fields in the results" do
       subject
-      control = deployment.context_controls.first
+      control = deployment.primary_context_control
       expect(response_json.find { |c| c["id"] == control.id }).to eq(
         {
           account_id: account.id,
@@ -391,6 +491,11 @@ RSpec.describe Lti::DeploymentsController do
       expect(Lti::ContextControl.last.created_by).to eql(admin)
     end
 
+    it "sets the deployment's workflow_state to the registration's privacy level" do
+      subject
+      expect(ContextExternalTool.last.workflow_state).to eq(registration.privacy_level)
+    end
+
     context "for a subaccount" do
       let(:params) { { for_subaccount_id: subaccount.id } }
       let(:subaccount) { account_model(parent_account: account) }
@@ -408,6 +513,30 @@ RSpec.describe Lti::DeploymentsController do
       it "creates a deployment in the course" do
         expect { subject }.to change { ContextExternalTool.count }.by(1)
         expect(ContextExternalTool.last.context.id).to eql(course.id)
+      end
+    end
+
+    context "with available parameter" do
+      context "when available is false" do
+        let(:params) { { available: false } }
+
+        it "creates a deployment with context control available set to false" do
+          subject
+          deployment = ContextExternalTool.last
+          context_control = deployment.primary_context_control
+          expect(context_control.available).to be(false)
+        end
+      end
+
+      context "when available is true" do
+        let(:params) { { available: true } }
+
+        it "creates a deployment with context control available set to true" do
+          subject
+          deployment = ContextExternalTool.last
+          context_control = deployment.primary_context_control
+          expect(context_control.available).to be(true)
+        end
       end
     end
   end

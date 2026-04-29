@@ -22,7 +22,7 @@ import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import Popover from 'jquery-popover'
-import _, {find, every} from 'lodash'
+import {find, every, reject} from 'es-toolkit/compat'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import {renderDeleteCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/DeleteCalendarEventDialog'
@@ -57,9 +57,31 @@ export default class ShowEventDetailsDialog {
     this.contexts = event.contexts
   }
 
+  isUserStudent = () => {
+    return ENV.current_user_roles && ENV.current_user_roles.includes('student')
+  }
+
+  canCreateEvent = () => {
+    return !(ENV?.FEATURES?.restrict_student_access && this.isUserStudent())
+  }
+
   showEditDialog = () => {
+    if (!this.canCreateEvent()) {
+      console.warn('User does not have permission to create events')
+      return
+    }
+
     this.popover.hide()
     new EditEventDetailsDialog(this.event).show()
+  }
+
+  getEventType = () => {
+    if (this.event.isAppointmentGroupEvent()) return I18n.t('Appointment')
+    if (/assignment/.test(this.event.eventType)) return I18n.t('Assignment')
+    if (this.event.eventType === 'planner_note') return I18n.t('Planner')
+    if (this.event.eventType === 'todo_item') return I18n.t('To Do')
+
+    return I18n.t('Event')
   }
 
   deleteChildrenEvents = (deletedEvent, context) => {
@@ -124,6 +146,7 @@ export default class ShowEventDetailsDialog {
       isRepeating: !!event.calendarEvent?.series_uuid,
       isSeriesHead: !!event.calendarEvent?.series_head,
       eventType: event.eventType,
+      isAppointmentGroup: event.isAppointmentGroupEvent() && !event.calendarEvent?.parent_event_id,
     })
   }
 
@@ -272,7 +295,8 @@ export default class ShowEventDetailsDialog {
       },
       prepareData: $dialog => ({cancel_reason: $dialog.find('#cancel_reason').val()}),
       success: () => {
-        this.event.object.child_events = _(this.event.object.child_events).reject(
+        this.event.object.child_events = reject(
+          this.event.object.child_events,
           e => e.url === $appt.data('url'),
         )
         $appt.remove()
@@ -402,6 +426,7 @@ export default class ShowEventDetailsDialog {
         .filter(context => context.length > 0)
     }
 
+    params.eventType = this.getEventType()
     params.use_new_scheduler = ENV.CALENDAR.SHOW_SCHEDULER
     params.is_appointment_group = !!this.event.isAppointmentGroupEvent() // this returns the actual url so make it boolean for clarity
     params.reserve_comments =
@@ -428,7 +453,9 @@ export default class ShowEventDetailsDialog {
     this.popover.el.find('.view_event_link').click(preventDefault(this.openShowPage))
 
     const editButton = this.popover.el.find('.edit_event_link')
-    if (subAssignmentOrOverride(this.event.eventType)) {
+    if (this.event.assignment?.peer_review_sub_assignment_enabled) {
+      editButton.click(preventDefault(this.editSubAssignment))
+    } else if (subAssignmentOrOverride(this.event.eventType)) {
       editButton.click(preventDefault(this.editSubAssignment))
     } else {
       editButton.click(preventDefault(this.showEditDialog))

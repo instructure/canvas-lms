@@ -29,7 +29,7 @@ describe('AssignmentGroupFilter', () => {
       {id: '2201', name: 'In-Class'},
       {id: '2202', name: 'Homework'},
     ],
-    onSelect: jest.fn(),
+    onSelect: vi.fn(),
     selectedAssignmentGroupId: '0',
   }
 
@@ -38,7 +38,7 @@ describe('AssignmentGroupFilter', () => {
   }
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('labels the filter with "Assignment Group Filter"', () => {

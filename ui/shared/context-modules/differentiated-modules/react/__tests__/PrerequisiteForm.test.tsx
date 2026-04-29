@@ -31,7 +31,7 @@ describe('PrerequisiteForm', () => {
       {id: '2', name: 'Module 2'},
       {id: '3', name: 'Module 3'},
     ],
-    onAddPrerequisite: jest.fn(),
+    onAddPrerequisite: vi.fn(),
     onDropPrerequisite: () => {},
     onUpdatePrerequisite: () => {},
   }
@@ -43,7 +43,7 @@ describe('PrerequisiteForm', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders', () => {

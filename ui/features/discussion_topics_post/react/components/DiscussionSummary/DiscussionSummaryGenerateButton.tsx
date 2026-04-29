@@ -19,7 +19,6 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {DiscussionSummaryUsage} from './DiscussionSummary'
 import {IconAiSolid} from '@instructure/ui-icons'
 
@@ -36,27 +35,18 @@ export const DiscussionSummaryGenerateButton: React.FC<
   DiscussionSummaryGenerateButtonProps
 > = props => {
   const buttonText = I18n.t('Summarize')
-  const limitReached = !!props.usage && props.usage.currentCount >= props.usage.limit
-  const toolTipText = limitReached
-    ? !!props.usage &&
-      I18n.t(
-        'Sorry, you have reached the maximum number of summary generations allowed (%{limit}) per day. Please try again tomorrow.',
-        {limit: props.usage.limit},
-      )
-    : buttonText
 
   return (
-    <Tooltip renderTip={toolTipText} width="48px" data-testid="summary-generate-tooltip">
-      <Button
-        display={props.isMobile ? 'block' : 'inline-block'}
-        onClick={props.onClick}
-        color="ai-primary"
-        renderIcon={<IconAiSolid />}
-        data-testid="summary-generate-button"
-        disabled={!props.isEnabled}
-      >
-        {buttonText}
-      </Button>
-    </Tooltip>
+    <Button
+      display={props.isMobile ? 'block' : 'inline-block'}
+      onClick={props.onClick}
+      color="ai-primary"
+      renderIcon={<IconAiSolid />}
+      data-testid="summary-generate-button"
+      disabled={!props.isEnabled}
+      aria-label={I18n.t('Ignite AI Summarize')}
+    >
+      {buttonText}
+    </Button>
   )
 }

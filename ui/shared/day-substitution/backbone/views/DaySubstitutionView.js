@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import I18n from '@canvas/i18n'
 import template from '../../jst/DaySubstitution.handlebars'

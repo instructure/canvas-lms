@@ -21,7 +21,7 @@ import {render, screen} from '@testing-library/react'
 import ConfirmEmailAddress from '../ConfirmEmailAddress'
 
 describe('ConfirmEmailAddress', () => {
-  const onClose = jest.fn()
+  const onClose = vi.fn()
 
   it('should render the email address', () => {
     const email = 'test@test.com'

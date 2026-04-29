@@ -16,17 +16,69 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
-import {IconEyeLine} from '@instructure/ui-icons'
+import {PreviewButton} from './PreviewButton'
+import {RedoButton} from './RedoButton'
+import {UndoButton} from './UndoButton'
+import {AccessibilityCheckerButton} from './AccessibilityCheckerButton'
+import {ReorderBlocksButton} from './ReorderBlocksButton'
+import {useEditHistory} from '../hooks/useEditHistory'
+import {showScreenReaderAlert} from '../utilities/accessibility'
+import {List} from '@instructure/ui-list'
+import {useEditorMode} from '../hooks/useEditorMode'
+import {useAppSelector} from '../store'
+import {useGetBlocksCount} from '../hooks/useGetBlocksCount'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const Toolbar = () => {
+  const {a11yIssueCount, a11yIssues, toolbarReorder} = useAppSelector(state => ({
+    ...state.accessibility,
+    toolbarReorder: state.toolbarReorder,
+  }))
+  const {mode, setMode} = useEditorMode()
+  const {undo, redo, canUndo, canRedo} = useEditHistory()
+  const isPreviewMode = mode === 'preview'
+  const {blocksCount} = useGetBlocksCount()
+
+  const handleUndo = () => {
+    undo()
+    showScreenReaderAlert(I18n.t('Last change undone'))
+  }
+
+  const handleRedo = () => {
+    redo()
+    showScreenReaderAlert(I18n.t('Last change redone'))
+  }
+
+  const menuItems = [
+    <PreviewButton
+      active={isPreviewMode}
+      onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
+    />,
+  ]
+  if (!isPreviewMode) {
+    menuItems.push(
+      <UndoButton active={canUndo} onClick={handleUndo} />,
+      <RedoButton active={canRedo} onClick={handleRedo} />,
+    )
+
+    if (toolbarReorder) {
+      menuItems.push(<ReorderBlocksButton blockCount={blocksCount} />)
+    }
+
+    const allIssues = Array.from(a11yIssues.values()).flat()
+    menuItems.push(<AccessibilityCheckerButton count={a11yIssueCount} issues={allIssues} />)
+  }
+
   return (
-    <Flex direction="row">
-      <IconButton screenReaderLabel={I18n.t('preview')} renderIcon={<IconEyeLine />} />
-    </Flex>
+    <View shadow="resting" display="block">
+      <List isUnstyled margin="none">
+        {menuItems.map((item, index) => (
+          <List.Item key={index}>{item}</List.Item>
+        ))}
+      </List>
+    </View>
   )
 }

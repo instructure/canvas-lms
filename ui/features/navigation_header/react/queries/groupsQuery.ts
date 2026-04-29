@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {AccessibleGroup} from '../../../../api.d'
@@ -29,13 +29,15 @@ export const groupFilter = (group: {can_access?: boolean; concluded: boolean}) =
 async function groupsQuery({signal}: QueryFunctionContext): Promise<AccessibleGroup[]> {
   const data: Array<AccessibleGroup> = []
   const fetchOpts = {signal}
-  let path = GROUPS_PATH
+  let path: string | null = GROUPS_PATH
 
   while (path) {
-    const {json, link} = await doFetchApi<AccessibleGroup[]>({path, fetchOpts})
-    if (json) data.push(...json.filter(groupFilter))
-    // @ts-expect-error
-    path = link?.next?.url || null
+    const result: DoFetchApiResults<AccessibleGroup[]> = await doFetchApi<AccessibleGroup[]>({
+      path,
+      fetchOpts,
+    })
+    if (result.json) data.push(...result.json.filter(groupFilter))
+    path = result.link?.next?.url ?? null
   }
   return data
 }

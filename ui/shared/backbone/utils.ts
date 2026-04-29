@@ -18,20 +18,26 @@
 
 const hasProp = {}.hasOwnProperty
 
-export const extend = function (child: Function, parent: Function) {
+type Constructor = new (...args: unknown[]) => unknown
+
+type ExtendedConstructor<T extends Constructor> = T & {
+  __super__: InstanceType<T>
+}
+
+export const extend = function <C extends Constructor, P extends Constructor>(
+  child: C,
+  parent: P,
+): ExtendedConstructor<C> {
   for (const key in parent) {
-    // @ts-expect-error
-    if (hasProp.call(parent, key)) child[key] = parent[key]
+    if (hasProp.call(parent, key)) {
+      ;(child as Record<string, unknown>)[key] = (parent as Record<string, unknown>)[key]
+    }
   }
-  function ctor() {
-    // @ts-expect-error
+  function Ctor(this: {constructor: C}) {
     this.constructor = child
   }
-  ctor.prototype = parent.prototype
-  // @ts-expect-error
-
-  child.prototype = new ctor()
-  // @ts-expect-error
-  child.__super__ = parent.prototype
-  return child
+  Ctor.prototype = parent.prototype
+  child.prototype = new (Ctor as unknown as Constructor)()
+  ;(child as ExtendedConstructor<C>).__super__ = parent.prototype as InstanceType<C>
+  return child as ExtendedConstructor<C>
 }

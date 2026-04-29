@@ -28,8 +28,8 @@ describe('Alert', () => {
   const props: AlertProps = {
     alert,
     uiMetadata,
-    onEdit: jest.fn(),
-    onDelete: jest.fn(),
+    onEdit: vi.fn(),
+    onDelete: vi.fn(),
   }
 
   it('should render the "Trigger when" section correctly', () => {

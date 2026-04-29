@@ -81,7 +81,7 @@ export const mockOverlay = (
 }
 
 export const renderAppWithRegistration =
-  (registration: LtiRegistrationWithAllInformation, refreshRegistration: () => void = jest.fn()) =>
+  (registration: LtiRegistrationWithAllInformation, refreshRegistration: () => void = vi.fn()) =>
   (element: React.ReactNode) => {
     const queryClient = new QueryClient()
     const router = createMemoryRouter([

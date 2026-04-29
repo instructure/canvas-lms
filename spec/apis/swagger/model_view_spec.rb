@@ -26,7 +26,7 @@ describe ModelView do
     "Example\n{\n \"properties\": [],\n \"deprecated\": true,\n \"deprecation_description\": \"A description.\" }"
   end
 
-  let(:model) { double("Model", text:) }
+  let(:model) { instance_double(YARD::Tags::Tag, text:) }
 
   describe ".new_from_model" do
     it "is created from model" do

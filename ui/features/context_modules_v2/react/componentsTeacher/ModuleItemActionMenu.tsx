@@ -36,13 +36,18 @@ import {
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
+import type {ModuleItemContent} from '../utils/types'
+import {usePublishing} from '@canvas/context-modules/react/publishing/publishingContext'
 
 const I18n = createI18nScope('context_modules_v2')
 
 const basicContentTypes = ['SubHeader', 'ExternalUrl']
 
 export interface ModuleItemActionMenuProps {
+  moduleId: string
   itemType: string
+  content: ModuleItemContent
+  published: boolean
   canDuplicate: boolean
   isMenuOpen: boolean
   setIsMenuOpen: (isOpen: boolean) => void
@@ -67,7 +72,10 @@ export interface ModuleItemActionMenuProps {
 }
 
 const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
+  moduleId,
   itemType,
+  content,
+  published,
   canDuplicate,
   isMenuOpen,
   setIsMenuOpen,
@@ -85,15 +93,50 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   masteryPathsData,
   handleMasteryPaths = () => {},
 }) => {
-  const {permissions} = useContextModule()
+  const isBasic = basicContentTypes.includes(itemType)
   const isFile = itemType === 'File'
+  const isExternalTool = itemType === 'ExternalTool'
+  const {permissions, menuItemLoadingState} = useContextModule()
+  const isModuleLoading = !!menuItemLoadingState?.[moduleId]?.state
+  const canEdit = permissions?.canEdit
+  const canAdd = permissions?.canAdd
+  const canDelete = permissions?.canDelete
+  const canManageSpeedGrader = permissions?.canManageSpeedGrader
+  const canDirectShare = permissions?.canDirectShare
+
+  const isNotSpecialType = !isBasic && !isFile && !isExternalTool
+  const showSpeedGrader =
+    canManageSpeedGrader &&
+    (itemType === 'Assignment' ||
+      itemType === 'Quiz' ||
+      (content?.assignment && itemType === 'Discussion')) &&
+    published
+  const showAssignTo = !!content?.canManageAssignTo
+  const showDirectShare = canDirectShare && !isBasic && !isExternalTool
+
+  const publishingContext = usePublishing()
+  const publishingInProgress = !!publishingContext?.publishingInProgress
+
+  const renderMenuItem = (condition: boolean, handler: () => void, icon: any, label: string) => {
+    if (!condition) return null
+    return (
+      <Menu.Item onClick={isModuleLoading ? undefined : handler} disabled={isModuleLoading}>
+        <Flex>
+          <Flex.Item>{icon}</Flex.Item>
+          <Flex.Item margin="0 0 0 x-small">{label}</Flex.Item>
+        </Flex>
+      </Menu.Item>
+    )
+  }
+
   return (
     <Menu
       onToggle={isOpen => setIsMenuOpen(isOpen)}
       open={isMenuOpen}
+      disabled={publishingInProgress}
       trigger={
         <IconButton
-          screenReaderLabel="Module Item Options"
+          screenReaderLabel={I18n.t('Module Item Options')}
           renderIcon={IconMoreLine}
           withBackground={false}
           withBorder={false}
@@ -103,120 +146,47 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
       }
       data-testid="module-item-action-menu"
     >
-      {permissions?.canEdit && (
-        <Menu.Item onClick={handleEdit}>
-          <Flex>
-            <Flex.Item>
-              <IconEditLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
+      {renderMenuItem(canEdit, handleEdit, <IconEditLine />, I18n.t('Edit'))}
+      {renderMenuItem(
+        !!showSpeedGrader,
+        handleSpeedGrader,
+        <IconSpeedGraderLine />,
+        I18n.t('SpeedGrader'),
       )}
-      {permissions?.canEdit && !basicContentTypes.includes(itemType) && !isFile && (
-        <Menu.Item onClick={handleSpeedGrader}>
-          <Flex>
-            <Flex.Item>
-              <IconSpeedGraderLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('SpeedGrader')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
+      {renderMenuItem(
+        showAssignTo,
+        handleAssignTo,
+        <IconPermissionsSolid />,
+        I18n.t('Assign To...'),
       )}
-      {permissions?.canEdit && !basicContentTypes.includes(itemType) && !isFile && (
-        <Menu.Item onClick={handleAssignTo}>
-          <Flex>
-            <Flex.Item>
-              <IconPermissionsSolid />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Assign To...')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
+      {renderMenuItem(
+        canAdd && canDuplicate && isNotSpecialType,
+        handleDuplicate,
+        <IconDuplicateLine />,
+        I18n.t('Duplicate'),
       )}
-      {permissions?.canAdd && canDuplicate && !basicContentTypes.includes(itemType) && !isFile && (
-        <Menu.Item onClick={handleDuplicate}>
-          <Flex>
-            <Flex.Item>
-              <IconDuplicateLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Duplicate')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
+      {renderMenuItem(canEdit, handleMoveTo, <IconUpdownLine />, I18n.t('Move to...'))}
+      {renderMenuItem(
+        canEdit && indent > 0,
+        handleDecreaseIndent,
+        <IconArrowStartLine />,
+        I18n.t('Decrease indent'),
       )}
-      {permissions?.canEdit && (
-        <Menu.Item onClick={handleMoveTo}>
-          <Flex>
-            <Flex.Item>
-              <IconUpdownLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Move to...')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
+      {renderMenuItem(
+        canEdit && indent < 5,
+        handleIncreaseIndent,
+        <IconArrowEndLine />,
+        I18n.t('Increase indent'),
       )}
-      {permissions?.canEdit && indent > 0 && (
-        <Menu.Item onClick={handleDecreaseIndent}>
-          <Flex>
-            <Flex.Item>
-              <IconArrowStartLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Decrease indent')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
+      {renderMenuItem(showDirectShare, handleSendTo, <IconUserLine />, I18n.t('Send To...'))}
+      {renderMenuItem(showDirectShare, handleCopyTo, <IconDuplicateSolid />, I18n.t('Copy To...'))}
+      {renderMenuItem(
+        isNotSpecialType && !!masteryPathsData?.isCyoeAble,
+        handleMasteryPaths,
+        <IconMasteryPathsLine />,
+        masteryPathsData?.isTrigger ? I18n.t('Edit Mastery Paths') : I18n.t('Add Mastery Paths'),
       )}
-      {permissions?.canEdit && indent < 5 && (
-        <Menu.Item onClick={handleIncreaseIndent}>
-          <Flex>
-            <Flex.Item>
-              <IconArrowEndLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Increase indent')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
-      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && !isFile && (
-        <Menu.Item onClick={handleSendTo}>
-          <Flex>
-            <Flex.Item>
-              <IconUserLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Send To...')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
-      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && !isFile && (
-        <Menu.Item onClick={handleCopyTo}>
-          <Flex>
-            <Flex.Item>
-              <IconDuplicateSolid />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Copy To...')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
-      {!basicContentTypes.includes(itemType) && masteryPathsData?.isCyoeAble && !isFile && (
-        <Menu.Item onClick={handleMasteryPaths}>
-          <Flex>
-            <Flex.Item>
-              <IconMasteryPathsLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">
-              {masteryPathsData.isTrigger
-                ? I18n.t('Edit Mastery Paths')
-                : I18n.t('Add Mastery Paths')}
-            </Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
-      {permissions?.canEdit && (
-        <Menu.Item onClick={handleRemove}>
-          <Flex>
-            <Flex.Item>
-              <IconTrashLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Remove')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
+      {renderMenuItem(canDelete, handleRemove, <IconTrashLine />, I18n.t('Remove'))}
     </Menu>
   )
 }

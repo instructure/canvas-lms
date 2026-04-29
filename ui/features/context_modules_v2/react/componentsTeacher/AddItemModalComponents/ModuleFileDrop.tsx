@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect} from 'react'
+import React, {useCallback} from 'react'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {FileDrop} from '@instructure/ui-file-drop'
@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {sharedHandleFileDrop} from '../../handlers/addItemHandlers'
 import {RocketSVG} from '@instructure/canvas-media'
+import {Action} from 'redux'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -33,34 +34,41 @@ const FILE_DROP_HEIGHT = '350px'
 export interface ModuleFileDropProps {
   itemType: 'file' | 'folder' | string
   onChange: (field: string, value: any) => void
-  setFile?: (file: File | null) => void
+  dispatch?: React.Dispatch<Action>
+  nameError?: string | null
   shouldAllowMultiple?: boolean
 }
 
 export const ModuleFileDrop: React.FC<ModuleFileDropProps> = ({
   itemType,
   onChange,
-  setFile,
+  dispatch,
+  nameError,
   shouldAllowMultiple = true,
 }) => {
   const handleDrop = useCallback(
     (
       accepted: ArrayLike<File | DataTransferItem>,
-      rejected: ArrayLike<File | DataTransferItem>,
-      event: React.DragEvent<Element>,
+      _rejected: ArrayLike<File | DataTransferItem>,
+      _e: React.DragEvent,
     ) => {
-      sharedHandleFileDrop(accepted, rejected, event, {setFile, onChange})
+      sharedHandleFileDrop(accepted, {onChange, dispatch})
     },
-    [setFile, onChange],
+    [onChange, dispatch],
   )
 
+  if (itemType !== 'file') {
+    return null
+  }
+
   return (
-    <View as="form" padding="small" display="block" data-testid="module-file-drop">
-      {itemType === 'file' && (
+    <View as="div" padding="small" display="block">
+      <form data-testid="module-file-drop">
         <FileDrop
           height={FILE_DROP_HEIGHT}
           shouldAllowMultiple={shouldAllowMultiple}
           onDrop={handleDrop}
+          messages={nameError ? [{text: nameError, type: 'newError'}] : []}
           renderLabel={
             <Flex direction="column" height="100%" alignItems="center" justifyItems="center">
               <Billboard
@@ -75,7 +83,7 @@ export const ModuleFileDrop: React.FC<ModuleFileDropProps> = ({
             </Flex>
           }
         />
-      )}
+      </form>
     </View>
   )
 }

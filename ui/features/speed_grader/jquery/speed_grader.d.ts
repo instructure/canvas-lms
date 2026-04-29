@@ -20,14 +20,13 @@ import {z} from 'zod'
 import type JQuery from 'jquery'
 import {ZSubmissionOriginalityData, ZVericiteOriginalityData} from '@canvas/grading/grading.d'
 import type {SubmissionOriginalityData} from '@canvas/grading/grading.d'
-import {ZExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {ZSpeedGraderLtiAssetReports} from '@canvas/lti-asset-processor/model/AssetReport'
 import PostPolicies from '../react/PostPolicies/index'
 import AssessmentAuditTray from '../react/AssessmentAuditTray'
 
 // fields marked as z.null() can be improved in subsequent commits
 
 export const ZSubmissionType = z.union([
+  z.literal('ams'),
   z.literal('basic_lti_launch'),
   z.literal('discussion_topic'),
   z.literal('media_recording'),
@@ -46,15 +45,12 @@ export const ZAttachment = z.object({
   comment_id: z.string().nullable(),
   content_type: z.string(),
   created_at: z.string(),
-  crocodoc_url: z.string().nullable(),
   display_name: z.string(),
   filename: z.string(),
-  hijack_crocodoc_session: z.boolean().nullable(),
   id: z.string(),
   mime_class: z.string(),
   provisional_canvadoc_url: z.string().nullable(),
   provisional_crocodoc_url: z.string().nullable(),
-  submitted_to_crocodoc: z.boolean().nullable(),
   submitter_id: z.string(),
   updated_at: z.string(),
   upload_status: z.union([z.literal('pending'), z.literal('failed'), z.literal('success')]),
@@ -217,7 +213,6 @@ export type SubmissionHistoryEntry = z.infer<typeof ZSubmissionHistoryEntry>
 
 export const ZSubmission = ZBaseSubmission.extend({
   submission_history: z.array(ZSubmissionHistoryEntry),
-  lti_asset_reports: ZSpeedGraderLtiAssetReports,
 })
 
 export type Submission = z.infer<typeof ZSubmission>
@@ -236,6 +231,7 @@ export const ZStudent = z.object({
   sortable_name: z.string(),
   sis_import_id: z.string().nullish(), // not used in SpeedGrader
   sis_user_id: z.string().nullish(), // not used in SpeedGrader
+  uuid: z.string(),
 })
 
 export type Student = z.infer<typeof ZStudent>
@@ -446,7 +442,6 @@ interface Window {
 
 export const ZProvisionalCrocodocUrl = z.object({
   attachment_id: z.string(),
-  crocodoc_url: z.string().nullable(),
   canvadoc_url: z.string().nullable(),
 })
 
@@ -497,7 +492,7 @@ export type SpeedGrader = {
   assessmentAuditTray?: AssessmentAuditTray | null
   attachmentIframeContents: (attachment: Attachment) => string
   beforeLeavingSpeedgrader: (event: BeforeUnloadEvent) => void
-  changeToSection: (sectionId: string) => void
+  changeToSection: (sectionId: string | string[] | 'all') => void
   currentDisplayedSubmission: () => HistoricalSubmission
   currentIndex: () => number
   currentStudent: StudentWithSubmission
@@ -505,11 +500,7 @@ export type SpeedGrader = {
   resetReassignButton: () => void
   updateHistoryForCurrentStudent: (behavior: 'push' | 'replace') => void
   fetchProvisionalGrades: () => void
-  displayExpirationWarnings: (
-    aggressiveWarnings: number[],
-    count: number,
-    crocodocMessage: string,
-  ) => void
+  displayExpirationWarnings: (aggressiveWarnings: number[], count: number, message: string) => void
   setGradeReadOnly: (readOnly: boolean) => void
   showStudent: () => void
   initialVersion?: number
@@ -637,6 +628,8 @@ export type SpeedGrader = {
   ) => void
   setState: (state: any) => void
   submittedAtText: string
+  renderAmsGrading: (submission: HistoricalSubmission) => void
+  unmountAmsGrading: () => void
 }
 
 export type Grade = {
@@ -738,6 +731,7 @@ export const ZSpeedGraderResponse = z
     anonymize_graders: z.boolean(),
     anonymize_students: z.boolean(),
     anonymous_grading: z.boolean(),
+    anonymous_participants: z.boolean(),
     anonymous_instructor_annotations: z.boolean(),
     anonymous_peer_reviews: z.boolean(),
     assignment_group_id: z.string(),
@@ -767,6 +761,7 @@ export const ZSpeedGraderResponse = z
     group_category_id: z.string().nullable(), // not used in SpeedGrader
     group_category: z.null(), // not used in SpeedGrader
     GROUP_GRADING_MODE: z.boolean(),
+    HAS_GROUPS: z.boolean(),
     has_sub_assignments: z.boolean(), // not used in SpeedGrader
     hide_in_gradebook: z.boolean(), // not used in SpeedGrader
     id: z.string(),
@@ -779,7 +774,6 @@ export const ZSpeedGraderResponse = z
     line_item_tag: z.null(), // not used in SpeedGrader
     lock_at: z.null(), // not used in SpeedGrader
     lti_context_id: z.string(), // not used in SpeedGrader
-    lti_asset_processors: z.array(ZExistingAttachedAssetProcessor).optional(),
     lti_resource_link_custom_params: z.null(), // not used in SpeedGrader
     lti_resource_link_lookup_uuid: z.string().nullish(), // not used in SpeedGrader
     lti_resource_link_url: z.null(), // not used in SpeedGrader
@@ -845,7 +839,6 @@ export type DocumentPreviewOptions = {
   attachment_id: string
   attachment_preview_processing: boolean
   attachment_view_inline_ping_url: string | null
-  crocodoc_session_url?: string
   height: string
   id: string
   mimeType: string

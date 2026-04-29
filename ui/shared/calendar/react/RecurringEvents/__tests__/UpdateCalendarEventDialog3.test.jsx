@@ -26,8 +26,8 @@ const eventMock = {
   series_head: false,
 }
 
-const handleCancel = jest.fn()
-const handleUpdate = jest.fn()
+const handleCancel = vi.fn()
+const handleUpdate = vi.fn()
 
 const defaultProps = {
   event: eventMock,
@@ -43,7 +43,7 @@ function renderDialog(overrideProps = {}) {
 
 describe('UpdateCalendarEventDialog', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
@@ -56,7 +56,7 @@ describe('UpdateCalendarEventDialog', () => {
     })
 
     // Reset mocks
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('calls callbacks with selected option', () => {

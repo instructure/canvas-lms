@@ -44,8 +44,6 @@ describe "quizzes regressions" do
     expect(cal.style("z-index")).to be > f("#main").style("z-index")
   end
 
-  it "marks questions as answered when the window loses focus", priority: "1"
-
   it "quiz show page displays the quiz due date", priority: "1" do
     due_date = 4.days.from_now
     create_quiz_with_due_date(due_at: due_date)

@@ -32,6 +32,8 @@ module Lti
       before_action :require_context_update_rights, except: [:deep_linking_cancel]
       before_action :require_tool, except: [:deep_linking_cancel]
       before_action :set_extra_csp_frame_ancestor!
+      skip_before_action :require_user, only: %i[deep_linking_cancel deep_linking_response]
+      skip_before_action :load_user, only: :deep_linking_cancel
 
       def deep_linking_cancel
         js_env({
@@ -48,7 +50,7 @@ module Lti
                  }.compact
                })
         if parent_frame_origin
-          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, overwrite: true)
         end
 
         render :deep_linking_response, layout: "bare"
@@ -75,10 +77,16 @@ module Lti
             return
           end
 
-          # Asset Processor creation is handled by AssignmentApiController
-          # (Assignment Edit page) or GraphQL (Discussion Topic edit page)
+          # Asset Processor creation for Assignments is handled by AssignmentApiController
           if for_placement?(:ActivityAssetProcessor)
             items = content_items.filter { |item| item[:type] == "ltiAssetProcessor" }
+            render_content_items(reload_page: false, extra: { tool_id: tool.id }, items:)
+            return
+          end
+
+          # Asset Processor creation for Discussions is handled by createDiscussionTopic graphql mutation
+          if for_placement?(:ActivityAssetProcessorContribution)
+            items = content_items.filter { |item| item[:type] == "ltiAssetProcessorContribution" }
             render_content_items(reload_page: false, extra: { tool_id: tool.id }, items:)
             return
           end
@@ -140,7 +148,7 @@ module Lti
           # * if a module was created, alert it and then navigate to modules page
           # * reload the page
           context_module = if create_new_module?
-                             @context.context_modules.create!(name: I18n.t("New Content From App"), workflow_state: "unpublished")
+                             @context.context_modules.create!(name: module_name || I18n.t("New Content From App"), workflow_state: "unpublished")
                            else
                              @context.context_modules.not_deleted.find(return_url_parameters[:context_module_id])
                            end
@@ -188,7 +196,7 @@ module Lti
                  }.compact
                })
         if parent_frame_origin
-          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, true)
+          js_env({ DEEP_LINKING_POST_MESSAGE_ORIGIN: parent_frame_origin }, overwrite: true)
         end
 
         render layout: "bare"

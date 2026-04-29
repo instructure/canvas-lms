@@ -20,8 +20,6 @@
 describe AccessibilityIssue do
   subject { described_class.new }
 
-  it_behaves_like "has a single accessibility context"
-
   describe "defaults" do
     it "sets the default workflow_state to active" do
       expect(subject.workflow_state).to eq "active"
@@ -31,29 +29,6 @@ describe AccessibilityIssue do
   describe "factories" do
     it "has a valid factory" do
       expect(accessibility_issue_model).to be_valid
-    end
-  end
-
-  describe "scopes" do
-    describe ".for_context" do
-      context "when context is valid" do
-        let(:wiki_page) { wiki_page_model }
-        let(:subject_for_context) { accessibility_issue_model(wiki_page:) }
-
-        it "returns the correct record" do
-          expect(described_class.for_context(wiki_page)).to contain_exactly(subject_for_context)
-        end
-      end
-
-      context "when context is not valid" do
-        let(:invalid_context) { double("InvalidContext", id: 1) }
-
-        it "raises an error" do
-          expect { described_class.for_context(invalid_context) }.to(
-            raise_error(ArgumentError, "Unsupported context type: RSpec::Mocks::Double")
-          )
-        end
-      end
     end
   end
 
@@ -104,6 +79,95 @@ describe AccessibilityIssue do
           expect(subject).not_to be_valid
           expect(subject.errors[:rule_type]).to include("is not included in the list")
         end
+      end
+    end
+
+    describe "is_syllabus_or_context" do
+      let(:course) { course_model }
+      let(:wiki_page) { wiki_page_model(course:) }
+
+      context "when is_syllabus is true and context is present" do
+        before do
+          subject.course = course
+          subject.is_syllabus = true
+          subject.wiki_page = wiki_page
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:base]).to include("is_syllabus and context must be mutually exclusive")
+        end
+      end
+
+      context "when is_syllabus is true and context is nil" do
+        before do
+          subject.course = course
+          subject.is_syllabus = true
+          subject.rule_type = Accessibility::Rules::ImgAltRule.id
+        end
+
+        it "is valid" do
+          expect(subject).to be_valid
+        end
+      end
+
+      context "when is_syllabus is false and context is present" do
+        before do
+          subject.course = course
+          subject.is_syllabus = false
+          subject.wiki_page = wiki_page
+          subject.rule_type = Accessibility::Rules::ImgAltRule.id
+        end
+
+        it "is valid" do
+          expect(subject).to be_valid
+        end
+      end
+
+      context "when is_syllabus is false and context is nil" do
+        before do
+          subject.course = course
+          subject.is_syllabus = false
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:base]).to include("is_syllabus and context must be mutually exclusive")
+        end
+      end
+    end
+  end
+
+  describe "#allow_nil_param_value?" do
+    let(:course) { course_model }
+
+    context "when rule type is in the allowed list" do
+      subject do
+        described_class.new(
+          course:,
+          rule_type: "allowed-rule"
+        )
+      end
+
+      before do
+        allow(Accessibility::Rules::ImgAltRule).to receive(:id).and_return("allowed-rule")
+      end
+
+      it "returns true" do
+        expect(subject.allow_nil_param_value?).to be true
+      end
+    end
+
+    context "when rule type is not in the allowed list" do
+      subject do
+        described_class.new(
+          course:,
+          rule_type: "not-allowed-rule"
+        )
+      end
+
+      it "returns false" do
+        expect(subject.allow_nil_param_value?).to be false
       end
     end
   end

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {bool, func} from 'prop-types'
 import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -25,6 +24,11 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {
+  ScheduledRelease,
+  ScheduledReleasePolicy,
+} from './ScheduledReleasePolicy/ScheduledReleasePolicy'
+import {useScheduledRelease} from './ScheduledReleasePolicy/hooks/useScheduledRelease'
 
 const I18n = createI18nScope('assignment_posting_policy_tray')
 
@@ -35,13 +39,28 @@ export interface LayoutProps {
   allowAutomaticPosting: boolean
   allowCanceling: boolean
   allowSaving: boolean
+  assignmentId: string
   onDismiss: ButtonProps['onClick']
   onPostPolicyChanged: ({postManually}: {postManually: boolean}) => void
+  onScheduledReleaseChange: (changes: Partial<ScheduledRelease>) => void
   onSave: ButtonProps['onClick']
   selectedPostManually: boolean
 }
 
 export default function Layout(props: LayoutProps) {
+  const {scheduled_feedback_releases: scheduledFeedbackReleasesEnabled} = ENV.FEATURES
+
+  const {
+    scheduledPost,
+    scheduledReleaseErrorMessages,
+    hasScheduledReleaseChanged,
+    handleScheduledReleaseChange,
+    validateScheduledRelease,
+  } = useScheduledRelease({
+    assignmentId: props.assignmentId,
+    onScheduledReleaseChange: props.onScheduledReleaseChange,
+  })
+
   const automaticallyPostLabel = (
     <View as="div">
       <Text as="div">{I18n.t('Automatically')}</Text>
@@ -93,10 +112,21 @@ export default function Layout(props: LayoutProps) {
     </View>
   )
 
-  // @ts-expect-error
-  const handlePostPolicyChanged = event => {
+  const handlePostPolicyChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     props.onPostPolicyChanged({postManually: event.target.value === MANUAL_POST})
   }
+
+  const handleSave: ButtonProps['onClick'] = event => {
+    if (!validateScheduledRelease()) {
+      return
+    }
+    props.onSave?.(event)
+  }
+
+  const canSaveScheduledRelease =
+    hasScheduledReleaseChanged &&
+    scheduledReleaseErrorMessages.grades.length < 1 &&
+    scheduledReleaseErrorMessages.comments.length < 1
 
   return (
     <>
@@ -113,6 +143,7 @@ export default function Layout(props: LayoutProps) {
           value={props.selectedPostManually ? MANUAL_POST : AUTOMATIC_POST}
         >
           <RadioInput
+            data-testid="assignment-posting-policy-automatic-radio"
             className="AssignmentPostingPolicyTray__RadioInput"
             disabled={!props.allowAutomaticPosting}
             name="postPolicy"
@@ -121,12 +152,22 @@ export default function Layout(props: LayoutProps) {
           />
 
           <RadioInput
+            data-testid="assignment-posting-policy-manual-radio"
             className="AssignmentPostingPolicyTray__RadioInput"
             name="postPolicy"
             label={manuallyPostLabel}
             value={MANUAL_POST}
           />
         </RadioInputGroup>
+        {scheduledFeedbackReleasesEnabled && props.selectedPostManually && (
+          <ScheduledReleasePolicy
+            errorMessages={scheduledReleaseErrorMessages}
+            postCommentsAt={scheduledPost?.postCommentsAt}
+            postGradesAt={scheduledPost?.postGradesAt}
+            scheduledPostMode={scheduledPost?.scheduledPostMode}
+            handleChange={handleScheduledReleaseChange}
+          />
+        )}
       </View>
 
       <View as="div" margin="0 medium" className="hr" />
@@ -139,13 +180,22 @@ export default function Layout(props: LayoutProps) {
       >
         <Flex justifyItems="end">
           <Flex.Item margin="0 small 0 0">
-            <Button onClick={props.onDismiss} disabled={!props.allowCanceling}>
+            <Button
+              data-testid="assignment-posting-policy-cancel-button"
+              onClick={props.onDismiss}
+              disabled={!props.allowCanceling}
+            >
               {I18n.t('Cancel')}
             </Button>
           </Flex.Item>
 
           <Flex.Item>
-            <Button onClick={props.onSave} disabled={!props.allowSaving} color="primary">
+            <Button
+              data-testid="assignment-posting-policy-save-button"
+              onClick={handleSave}
+              disabled={!props.allowSaving && !canSaveScheduledRelease}
+              color="primary"
+            >
               {I18n.t('Save')}
             </Button>
           </Flex.Item>

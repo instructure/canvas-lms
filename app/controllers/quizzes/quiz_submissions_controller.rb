@@ -24,9 +24,10 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   include ::Filters::QuizSubmissions
 
   protect_from_forgery except: %i[create backup record_answer], with: :exception
+  skip_before_action :require_user, only: %i[backup create record_answer]
   before_action :require_context
-  before_action :require_quiz, only: %i[index create extensions show update log]
-  before_action :require_quiz_submission, only: [:show, :log]
+  before_action :require_quiz, only: %i[index create extensions show update]
+  before_action :require_quiz_submission, only: :show
   batch_jobs_in_actions only: [:update, :create], batch: { priority: Delayed::LOW_PRIORITY }
 
   def index
@@ -40,17 +41,17 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   # submits the quiz as final
   def create
     delete_session_access_key!
-    if @quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip)
+    if @quiz.ip_filter && !@quiz.valid_ip?(quiz_client_ip)
       flash[:error] = t("errors.protected_quiz", "This quiz is protected and is only available from certain locations.  The computer you are currently using does not appear to be at a valid location for taking this quiz.") # rubocop:disable Rails/ActionControllerFlashBeforeRender
     elsif @quiz.grants_right?(@current_user, :submit)
       # If the submission is a preview, we don't add it to the user's submission history,
       # and it actually gets keyed by the temporary_user_code column instead of
       if @current_user.nil? || is_previewing?
-        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false), user_id: nil).first
-        @submission ||= @quiz.generate_submission(temporary_user_code(false) || @current_user, is_previewing?)
+        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(generate: false), user_id: nil).first
+        @submission ||= @quiz.generate_submission(temporary_user_code(generate: false) || @current_user, preview: is_previewing?)
       else
         @submission = @quiz.quiz_submissions.where(user_id: @current_user).first if @current_user.present?
-        @submission ||= @quiz.generate_submission(@current_user, is_previewing?)
+        @submission ||= @quiz.generate_submission(@current_user, preview: is_previewing?)
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
           flash[:error] = t("errors.invalid_submissions", "This quiz submission could not be verified as belonging to you.  Please try again.")
           return redirect_to course_quiz_url(@context, @quiz, previewing_params)
@@ -66,6 +67,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
         params_hash = hash.deep_merge(sanitized_params)
         @submission.submission_data = params_hash unless @submission.overdue?
         @submission.record_answer(params_hash.dup)
+        @submission.updating_user = @current_user
         flash[:notice] = t("errors.late_quiz", "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
         Quizzes::SubmissionGrader.new(@submission).grade_submission
 
@@ -88,7 +90,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     end
     if authorized_action(@quiz, @current_user, :submit)
       if @current_user.nil? || is_previewing?
-        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(false), user_id: nil).first
+        @submission = @quiz.quiz_submissions.where(temporary_user_code: temporary_user_code(generate: false), user_id: nil).first
       else
         @submission = @quiz.quiz_submissions.where(user_id: @current_user).first
         if @submission.present? && !@submission.valid_token?(params[:validation_token])
@@ -101,9 +103,9 @@ class Quizzes::QuizSubmissionsController < ApplicationController
         end
       end
 
-      if !@submission || (@quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip))
+      if !@submission || (@quiz.ip_filter && !@quiz.valid_ip?(quiz_client_ip))
         # do nothing
-      elsif is_previewing? || (@submission.temporary_user_code == temporary_user_code(false)) ||
+      elsif is_previewing? || (@submission.temporary_user_code == temporary_user_code(generate: false)) ||
             @submission.grants_right?(@current_user, session, :update)
         if !@submission.completed? && (!@submission.overdue? || is_previewing?)
           if params[:action] == "record_answer"
@@ -146,8 +148,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   end
 
   def extensions
-    @student = @context.users_visible_to(@current_user, false, include_inactive: true).find(params[:user_id])
-    @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student, nil, "settings_only")
+    @student = @context.users_visible_to(@current_user, include_inactive: true).find(params[:user_id])
+    @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student, state: "settings_only")
     if authorized_action(@submission, @current_user, :add_attempts)
       @submission.extra_attempts ||= 0
       @submission.extra_attempts = params[:extra_attempts].to_i if params[:extra_attempts]

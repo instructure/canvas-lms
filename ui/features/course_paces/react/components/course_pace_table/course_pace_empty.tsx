@@ -151,7 +151,7 @@ export const CoursePaceEmpty = ({
 
 export default connect(null, {
   setSelectedPaceContext: actions.setSelectedPaceContext,
-  setDefaultPaceContextAsSelected: paceContextsActions.setDefaultPaceContextAsSelected
+  setDefaultPaceContextAsSelected: paceContextsActions.setDefaultPaceContextAsSelected,
 })(
   // @ts-expect-error
   CoursePaceEmpty,

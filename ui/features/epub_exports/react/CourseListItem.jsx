@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {isEmpty} from 'lodash'
+import {isEmpty} from 'es-toolkit/compat'
 import GenerateLink from './GenerateLink'
 import DownloadLink from './DownloadLink'
 import ApiProgressBar from '@canvas/progress/react/components/ApiProgressBar'

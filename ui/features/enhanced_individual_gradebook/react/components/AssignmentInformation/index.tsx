@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useMemo, useState} from 'react'
-import {intersection, some} from 'lodash'
+import React, {useCallback, useMemo, useRef, useState} from 'react'
+import {intersection, some} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
@@ -62,13 +62,14 @@ export default function AssignmentInformation({
   submissions = [],
   handleSetGrades,
 }: AssignmentInformationComponentProps) {
-  const {gradedSubmissions, scores} = useMemo(
-    () => ({
-      gradedSubmissions: submissions.filter(s => s.score !== null && s.score !== undefined),
-      scores: submissions.map(s => s.score ?? 0),
-    }),
-    [submissions],
-  )
+  const {gradedSubmissions, scores} = useMemo(() => {
+    // Exclude ungraded (null/undefined score) submissions from score calculations
+    const gradedSubmissions = submissions.filter(s => s.score != null)
+    return {
+      gradedSubmissions,
+      scores: gradedSubmissions.map(s => s.score as number),
+    }
+  }, [submissions])
 
   if (!assignment) {
     return (
@@ -110,6 +111,7 @@ export default function AssignmentInformation({
     online_upload: I18n.t('Online upload'),
     media_recording: I18n.t('Media recording'),
     student_annotation: I18n.t('Student annotation'),
+    peer_review: I18n.t('Peer review'),
   }
 
   const readableSubmissionTypes = submissionTypes
@@ -164,6 +166,8 @@ export default function AssignmentInformation({
             <Link
               href={speedGraderUrl()}
               isWithinText={false}
+              target="_blank"
+              rel="noopener"
               data-testid="assignment-speedgrader-link"
             >
               {I18n.t('See this assignment in speedgrader')}
@@ -253,6 +257,16 @@ function AssignmentActions({
 }: AssignmentActionsProps) {
   const [showMessageStudentsWhoModal, setShowMessageStudentsWhoModal] = useState(false)
   const [showSetDefaultGradeModal, setShowSetDefaultGradeModal] = useState(false)
+  const defaultGradeButtonRef = useRef<Element | null>(null)
+
+  const focusDefaultGradeButton = useCallback(() => {
+    requestAnimationFrame(() => {
+      const el = defaultGradeButtonRef.current
+      if (el instanceof HTMLElement) {
+        el.focus()
+      }
+    })
+  }, [])
 
   const onSetGrades = useCallback(
     (updatedSubmissions: SubmissionGradeChange[]) => {
@@ -260,9 +274,15 @@ function AssignmentActions({
       if (updatedSubmissions.length) {
         handleSetGrades(updatedSubmissions)
       }
+      focusDefaultGradeButton()
     },
-    [handleSetGrades],
+    [handleSetGrades, focusDefaultGradeButton],
   )
+
+  const handleDefaultGradeClose = useCallback(() => {
+    setShowSetDefaultGradeModal(false)
+    focusDefaultGradeButton()
+  }, [focusDefaultGradeButton])
 
   return (
     <>
@@ -293,6 +313,9 @@ function AssignmentActions({
             onClick={() => setShowSetDefaultGradeModal(true)}
             data-testid="default-grade-button"
             disabled={disableGrading(assignment)}
+            elementRef={el => {
+              defaultGradeButtonRef.current = el
+            }}
           >
             {I18n.t('Set default grade')}
           </Button>
@@ -301,7 +324,7 @@ function AssignmentActions({
             gradebookOptions={gradebookOptions}
             submissions={submissions}
             modalOpen={showSetDefaultGradeModal}
-            handleClose={() => setShowSetDefaultGradeModal(false)}
+            handleClose={handleDefaultGradeClose}
             handleSetGrades={onSetGrades}
           />
         </>

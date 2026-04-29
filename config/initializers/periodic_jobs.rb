@@ -105,18 +105,6 @@ def with_each_shard_by_database(klass, method, *, jitter: nil, local_offset: fal
 end
 
 Rails.configuration.after_initialize do
-  if defined?(ActiveRecord::SessionStore) && Rails.configuration.session_store == ActiveRecord::SessionStore
-    expire_after = (ConfigFile.load("session_store") || {})[:expire_after]
-    expire_after ||= 1.day
-
-    Delayed::Periodic.cron "ActiveRecord::SessionStore::Session.delete_all", "*/5 * * * *" do
-      callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
-      Shard.with_each_shard(exception: callback) do
-        ActiveRecord::SessionStore::Session.where(updated_at: ...expire_after.seconds.ago).delete_all
-      end
-    end
-  end
-
   persistence_token_expire_after = (ConfigFile.load("session_store") || {})[:expire_remember_me_after]
   persistence_token_expire_after ||= 1.month
   Delayed::Periodic.cron "SessionPersistenceToken.delete_all", "35 11 * * *" do
@@ -129,12 +117,6 @@ Rails.configuration.after_initialize do
 
   Delayed::Periodic.cron "SummaryMessageConsolidator.process", "*/15 * * * *" do
     with_each_shard_by_database(SummaryMessageConsolidator, :process)
-  end
-
-  Delayed::Periodic.cron "CrocodocDocument.update_process_states", "*/10 * * * *" do
-    if Canvas::Crocodoc.config && !Canvas::Plugin.value_to_boolean(Canvas::Crocodoc.config["disable_polling"])
-      with_each_shard_by_database(CrocodocDocument, :update_process_states)
-    end
   end
 
   Delayed::Periodic.cron "Reporting::CountsReport.process", "0 11 * * 0" do
@@ -186,6 +168,10 @@ Rails.configuration.after_initialize do
   end
 
   unless ApplicationController.test_cluster?
+    Delayed::Periodic.cron "AccessToken.send_expiration_reminders", "0 6 * * *", priority: Delayed::LOW_PRIORITY do
+      with_each_shard_by_database(AccessToken, :send_expiration_reminders, local_offset: true)
+    end
+
     Delayed::Periodic.cron "Attachments::GarbageCollector::ContentExportAndMigrationContextType.delete_content", "37 1 * * *" do
       with_each_shard_by_database(Attachments::GarbageCollector::ContentExportAndMigrationContextType, :delete_content, jitter: 30.minutes, local_offset: true)
     end
@@ -213,6 +199,10 @@ Rails.configuration.after_initialize do
       :process,
       { run_current_region_asynchronously: true }
     )
+  end
+
+  Delayed::Periodic.cron "YoutubeMigrationService.process_stuck_scans", "*/30 * * * *" do
+    with_each_shard_by_database(YoutubeMigrationService, :process_stuck_scans)
   end
 
   Delayed::Periodic.cron "NotificationFailureProcessor.process", "*/5 * * * *" do
@@ -278,7 +268,8 @@ Rails.configuration.after_initialize do
       Delayed::Periodic.cron "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers", "45 0 * * *" do
         DatabaseServer.send_in_each_region(federation,
                                            :refresh_providers,
-                                           { singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers" })
+                                           { singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers" },
+                                           shard_scope: Shard.in_current_region.where(jobs_held: false))
       end
     end
   end
@@ -363,6 +354,10 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(Feature, :remove_obsolete_flags)
   end
 
+  Delayed::Periodic.cron "BrandConfigReconciler.process", "0 3 * * 6", priority: Delayed::LOWER_PRIORITY do
+    with_each_shard_by_database(BrandConfigReconciler, :process, local_offset: true)
+  end
+
   Delayed::Periodic.cron "Assignment.disable_post_to_sis_if_grading_period_closed", "*/5 * * * *", priority: Delayed::LOWER_PRIORITY do
     with_each_shard_by_database(Assignment, :disable_post_to_sis_if_grading_period_closed)
   end
@@ -401,5 +396,9 @@ Rails.configuration.after_initialize do
       { run_current_region_asynchronously: true,
         singleton: "Canvas::LiveEvents#heartbeat" }
     )
+  end
+
+  Delayed::Periodic.cron "ScheduledPost#process_scheduled_posts", "*/30 * * * *" do
+    with_each_shard_by_database(ScheduledPost, :process_scheduled_posts)
   end
 end

@@ -75,18 +75,7 @@ export default class CourseRestore extends Backbone.Model {
     const setTakingTooLong = () => (takingTooLong = true)
     setTimeout(setTakingTooLong, 60000)
 
-    let restoreError
-    let restoreSuccess
-
-    const ajaxRequest = (url, method = 'GET') =>
-      $.ajax({
-        url,
-        type: method,
-        success: restoreSuccess,
-        error: restoreError,
-      })
-
-    restoreError = (_response = {}) => {
+    const restoreError = (_response = {}) => {
       $.flashError(
         I18n.t(
           'restore_error',
@@ -96,7 +85,7 @@ export default class CourseRestore extends Backbone.Model {
       return deferred.reject()
     }
 
-    restoreSuccess = response => {
+    const restoreSuccess = response => {
       if (takingTooLong) {
         return restoreError()
       }
@@ -113,6 +102,14 @@ export default class CourseRestore extends Backbone.Model {
           return restoreError()
       }
     }
+
+    const ajaxRequest = (url, method = 'GET') =>
+      $.ajax({
+        url,
+        type: method,
+        success: restoreSuccess,
+        error: restoreError,
+      })
 
     ajaxRequest(`${this.baseUrl()}/?course_ids[]=${this.get('id')}&event=undelete`, 'PUT')
     return deferred

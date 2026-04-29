@@ -22,12 +22,12 @@ class BrandConfigsController < ApplicationController
   include Api::V1::Account
 
   before_action :require_account_context
-  before_action :require_user
   before_action :require_account_management
   before_action :require_account_branding, except: [:destroy]
   before_action { |c| c.active_tab = "brand_configs" }
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index]
 
   def index
@@ -42,13 +42,15 @@ class BrandConfigsController < ApplicationController
     base_brand_config ||= BrandConfig.k12_config if k12?
     base_brand_config ||= BrandConfig.new
 
-    js_env brandConfigStuff: {
-      baseBrandableVariables: BrandableCSS.all_brand_variable_values(base_brand_config),
-      brandableVariableDefaults: BrandableCSS.variables_map,
-      accountID: @account.id.to_s,
-      sharedBrandConfigs: visible_shared_brand_configs.as_json(include_root: false, include: "brand_config"),
-      activeBrandConfig: active_brand_config(ignore_parents: true).as_json(include_root: false)
-    }
+    js_env({
+             brandConfigStuff: {
+               baseBrandableVariables: BrandableCSS.all_brand_variable_values(base_brand_config),
+               brandableVariableDefaults: BrandableCSS.variables_map,
+               accountID: @account.id.to_s,
+               sharedBrandConfigs: visible_shared_brand_configs.as_json(include_root: false, include: "brand_config"),
+               activeBrandConfig: active_brand_config(ignore_parents: true).as_json(include_root: false)
+             }
+           })
     render html: "", layout: true
   end
 
@@ -60,29 +62,16 @@ class BrandConfigsController < ApplicationController
 
     variable_schema = default_schema
 
-    # TODO: permanently remove unused theme variables
-    # once the `login_registration_ui_identity` feature is fully adopted and the
-    # new login UI becomes the default:
-    #   1. permanently update the theme editor UI to remove old/unused login
-    #      brand config variables
-    #   2. remove the `login_registration_ui_identity` feature flag check
-    #   3. remove `LoginBrandConfigFilter.filter`, as the filtering will no
-    #      longer be necessary
-    #   4. ensure that only the new login-related brand config variables are
-    #      returned in relevant API responses
-    #   5. update tests
-    # this is a general outline; there may be other areas that need cleanup, so
-    # review the code carefully when making these changes
-    if @domain_root_account.feature_enabled?(:login_registration_ui_identity)
-      variable_schema = Login::LoginBrandConfigFilter.filter(variable_schema)
-    end
+    variable_schema = Login::LoginBrandConfigFilter.filter(variable_schema, @domain_root_account)
 
-    js_env brandConfig: brand_config.as_json(include_root: false),
-           isDefaultConfig: session[:brand_config]&.[](:type) == :default,
-           hasUnsavedChanges: session.key?(:brand_config),
-           variableSchema: variable_schema,
-           allowGlobalIncludes: @account.allow_global_includes?,
-           account_id: @account.id
+    js_env({
+             brandConfig: brand_config.as_json(include_root: false),
+             isDefaultConfig: session[:brand_config]&.[](:type) == :default,
+             hasUnsavedChanges: session.key?(:brand_config),
+             variableSchema: variable_schema,
+             allowGlobalIncludes: @account.allow_global_includes?,
+             account_id: @account.id
+           })
     render html: "", layout: "layouts/bare"
   end
 
@@ -230,8 +219,23 @@ class BrandConfigsController < ApplicationController
     variables.to_unsafe_h.each_with_object({}) do |(key, value), memo|
       next unless value.present? && (config = BrandableCSS.variables_map[key])
 
-      value = process_file(value) if config["type"] == "image"
-      memo[key] = value
+      if config["type"] == "textarea"
+        if value.match?(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/)
+          raise ActionController::BadRequest, "#{key} contains invalid characters"
+        end
+
+        if value.length > 500
+          raise ActionController::BadRequest, "#{key} cannot exceed 500 characters"
+        end
+
+        sanitized_value = Sanitize.clean(value)
+        memo[key] = sanitized_value
+      elsif config["type"] == "image"
+        value = process_file(value)
+        memo[key] = value
+      else
+        memo[key] = value
+      end
     end
   end
 

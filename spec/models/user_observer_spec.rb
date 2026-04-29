@@ -53,7 +53,7 @@ describe UserObservationLink do
     observer_enroll.destroy
 
     UserObservationLink.create_or_restore(observer:, student:, root_account: Account.default)
-    expect(observer_enroll.reload).to_not be_deleted
+    expect(observer_enroll.reload).not_to be_deleted
   end
 
   it 'restores inactive observer enrollments on "restore" (even if nothing about the observee changed)' do
@@ -186,7 +186,9 @@ describe UserObservationLink do
 
     observer = user_with_pseudonym(account: a2)
     allow(@pseudonym).to receive(:works_for_account?).and_return(false)
-    allow(@pseudonym).to receive(:works_for_account?).with(a2, true).and_return(true)
+    allow(@pseudonym).to receive(:works_for_account?)
+      .with(a2, allow_implicit: true)
+      .and_return(true)
     [a1, a2].each do |account|
       UserObservationLink.create_or_restore(observer:, student:, root_account: account)
     end

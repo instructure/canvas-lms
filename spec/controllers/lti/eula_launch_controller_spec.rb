@@ -30,6 +30,10 @@ module Lti
     end
 
     describe "#launch_eula" do
+      before do
+        user_session(@teacher)
+      end
+
       shared_examples "returns 404" do
         it "returns 404" do
           subject
@@ -40,7 +44,7 @@ module Lti
       shared_examples "logs launch with Lti::LogService" do
         before do
           allow(Lti::LogService).to receive(:new) do
-            double("Lti::LogService").tap { |s| allow(s).to receive(:call) }
+            instance_double(Lti::LogService, call: nil)
           end
         end
 
@@ -97,7 +101,6 @@ module Lti
           render_views
           before do
             context.root_account.enable_feature!(:lti_asset_processor)
-            user_session(@teacher)
           end
 
           it_behaves_like "returns 200 with required fields in token"

@@ -51,12 +51,12 @@ export const LtiScopeTranslations: Record<LtiScope, string> = {
     'Can retrieve user data associated with the context the tool is installed in',
   ),
   [LtiScopes.PnsNoticeHandlers]: I18n.t(
-    'Can register event notice handlers using the Platform Notification Service',
+    'Can register to receive asynchronous notifications from Canvas',
   ),
-  [LtiScopes.AssetReadonly]: I18n.t('Can fetch assets from the platform using the Asset Service'),
-  [LtiScopes.AssetReport]: I18n.t('Can create reports using the Asset Report Service'),
-  [LtiScopes.EulaUser]: I18n.t("Can update or remove the tool's EULA accepted flag"),
-  [LtiScopes.EulaDeployment]: I18n.t("Can update or remove the tool's EULA requirement flag"),
+  [LtiScopes.AssetReadonly]: I18n.t('Can retrieve submissions from Document Processor Assignments'),
+  [LtiScopes.AssetReport]: I18n.t('Can send reports for Document Processor Assignments'),
+  [LtiScopes.EulaUser]: I18n.t('Can track if EULA has been accepted'),
+  [LtiScopes.EulaDeployment]: I18n.t('Can reset EULA acceptance status'),
   [LtiScopes.PublicJwkUpdate]: I18n.t('Can update public jwk for LTI services'),
   [LtiScopes.AccountLookupShow]: I18n.t('Can lookup Account information'),
   [LtiScopes.AgsProgressShow]: I18n.t(
@@ -64,6 +64,10 @@ export const LtiScopeTranslations: Record<LtiScope, string> = {
   ),
   [LtiScopes.AccessPageContent]: I18n.t('Can view the content of a page the tool is launched from'),
   [LtiScopes.ReplaceEditorContent]: I18n.t('Can replace the entire contents of the RCE'),
+  [LtiScopes.RegistrationReadonly]: I18n.t('Can view LTI registrations associated with the tool'),
+  [LtiScopes.RegistrationUpdate]: I18n.t(
+    'Can send automatic updates to be approved by an Administrator',
+  ),
 }
 
 /**

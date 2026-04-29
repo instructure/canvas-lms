@@ -28,5 +28,5 @@ describe "rubric_association_created" do
   let(:asset) { @rubric_association }
   let(:notification_name) { :rubric_association_created }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

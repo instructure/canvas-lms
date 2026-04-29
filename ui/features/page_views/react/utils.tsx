@@ -114,12 +114,11 @@ export function formatParticipated({participated}: APIPageView): JSX.Element | n
   return participated ? <IconCheckDarkSolid color="success" /> : null
 }
 
-// TS doesn't know about Intl.DurationFormat yet hence the expect-error notations below
+// Intl.DurationFormat declaration in ui/imports.d.ts
 export function formatInteractionTime({interaction_seconds: time}: APIPageView): string {
   if (time <= 5) return '—'
   const timeArr = hourParts(time)
   // Not all our supported browsers implement Intl.DurationFormat yet
-  // @ts-expect-error
   if (typeof Intl.DurationFormat === 'undefined') {
     const pad = (n: number) => String(n).padStart(2, '0')
 
@@ -128,7 +127,6 @@ export function formatInteractionTime({interaction_seconds: time}: APIPageView):
     return String(timeArr.seconds)
   }
   const locales = ENV.LOCALES || navigator.languages || ['en-US']
-  // @ts-expect-error
   const duration = new Intl.DurationFormat(locales, {style: 'narrow'})
   return duration.format(timeArr)
 }

@@ -311,38 +311,6 @@ describe "calendar2" do
           expect(agenda_item_title).to include_text(test_name)
           expect(f(".agenda-date")).to include_text(date_string(test_date, :short_with_weekday))
         end
-
-        it "allows editing via More Options", priority: "1" do
-          skip("final load_agenda_view is fragile, needs analysis")
-          test_date = 2.days.from_now.change(hours: 13, min: 59, sec: 0, usec: 0)
-          test_title = "Test Title"
-          test_description = "New Description"
-          load_agenda_view
-
-          # Open More Options window
-          agenda_item.click
-          wait_for_ajaximations
-          calendar_edit_event_link.click
-          wait_for_ajaximations
-          f(".event_button").click
-          wait_for_ajaximations
-
-          # Edit title, description, and date
-          replace_content(f("#discussion-title.input-block-level"), test_title + "1")
-          driver.execute_script "tinyMCE.activeEditor.setContent('#{test_description}')"
-          replace_content(f(".DueDateInput"), format_time_for_view(test_date))
-          f(".form-actions.flush .btn.btn-primary").click
-          wait_for_ajaximations
-
-          # Verify edited title, description, and date
-          load_agenda_view
-          expect(all_agenda_items).to have_size(1)
-          agenda_item.click
-          wait_for_ajaximations
-          expect(f(".view_event_link")).to include_text(test_title)
-          expect(f(".event-detail-overflow")).to include_text(test_description)
-          expect(f(".event-details-timestring")).to include_text(format_time_for_view(test_date))
-        end
       end
 
       it "shows all appointment groups" do

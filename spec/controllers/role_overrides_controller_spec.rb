@@ -312,9 +312,8 @@ describe RoleOverridesController do
     describe "manage_catalog permission" do
       context "when catalog is enabled" do
         before do
-          a = Account.default
-          a.settings[:catalog_enabled] = true
-          a.save!
+          @account.settings[:catalog_enabled] = true
+          @account.save!
         end
 
         context "for an admin" do
@@ -347,7 +346,7 @@ describe RoleOverridesController do
       it "returns 400 with an error message" do
         get "check_account_permission", params: { account_id: @account.id, permission: "manage_course_content_add" }
         expect(response.code.to_i).to eq(400)
-        expect(json["message"]).to be
+        expect(json["message"]).not_to be_nil
       end
     end
 
@@ -361,7 +360,7 @@ describe RoleOverridesController do
 
       it "does not load the manage_developer_keys role on sub account" do
         get "index", params: { account_id: @account.id }
-        expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first[:permissions].keys).to_not include(:manage_developer_keys)
+        expect(assigns.dig(:js_env, :ACCOUNT_ROLES).first[:permissions].keys).not_to include(:manage_developer_keys)
         expect(assigns.dig(:js_env, :ACCOUNT_PERMISSIONS, 0, :group_permissions).any? { |g| g[:permission_name] == :manage_developer_keys }).to be false
       end
 
@@ -393,8 +392,7 @@ describe RoleOverridesController do
             end
           end
 
-          expect(wiki_permissions.pluck(:granular_permission_group).uniq).to eq ["manage_wiki"]
-          expect(wiki_permissions.pluck(:granular_permission_group_label).uniq).to eq ["Manage Pages"]
+          expect(wiki_permissions.pluck(:granular_permission_group).uniq).to eq [:manage_wiki]
         end
       end
     end

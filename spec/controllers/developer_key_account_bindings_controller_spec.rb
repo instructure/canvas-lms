@@ -90,6 +90,77 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       post(:create_or_update, params:)
       expect(created_binding.workflow_state).to eq "on"
     end
+
+    it "does not create a local copy for a key in account" do
+      user_session(root_account_admin)
+      params # instantiate registrations
+      expect do
+        post :create_or_update, params:
+      end.not_to change { Lti::Registration.where(account: root_account).count }
+      expect(response).to be_successful
+    end
+
+    context "when the key is inherited" do
+      specs_require_sharding
+
+      let(:root_account) { @shard2.activate { account_model } }
+      let(:parent_admin) { account_admin_user(account: Account.site_admin) }
+      let(:inherited_registration) do
+        Shard.default.activate do
+          lti_registration_with_tool(
+            account: Account.site_admin,
+            created_by: parent_admin,
+            registration_params: { name: "Inherited App" }
+          )
+        end
+      end
+      let(:inherited_dev_key) { inherited_registration.developer_key }
+      let(:params) do
+        {
+          account_id: root_account.id,
+          developer_key_id: inherited_dev_key.global_id,
+          developer_key_account_binding: { workflow_state: "on" }
+        }
+      end
+
+      it "creates a local copy of the inherited registration" do
+        user_session(root_account_admin)
+        @shard2.activate do
+          expect do
+            post(:create_or_update, params:)
+          end.to change { Lti::Registration.where(account: root_account).count }.by(1)
+
+          local_copy = Lti::Registration.find_by(template_registration: inherited_registration, account: root_account)
+          expect(local_copy).to be_present
+          expect(local_copy.name).to eq("Inherited App")
+        end
+      end
+
+      it "creates a binding for the local copy's developer key" do
+        user_session(root_account_admin)
+        @shard2.activate do
+          post(:create_or_update, params:)
+
+          local_copy = Lti::Registration.find_by(template_registration: inherited_registration, account: root_account)
+          binding = DeveloperKeyAccountBinding.find_by(account: root_account, developer_key: local_copy.developer_key)
+          expect(binding).to be_present
+          expect(binding.workflow_state).to eq("on")
+        end
+      end
+
+      context "when the inherited registration is not active" do
+        before { inherited_registration.update!(workflow_state: "deleted") }
+
+        it "returns 422 with an error message" do
+          user_session(root_account_admin)
+          @shard2.activate do
+            post(:create_or_update, params:)
+            expect(response).to have_http_status(:unprocessable_content)
+            expect(json_parse["errors"]).to eq("template registration is off")
+          end
+        end
+      end
+    end
   end
 
   shared_examples "the developer key update endpoint" do
@@ -179,6 +250,103 @@ RSpec.describe DeveloperKeyAccountBindingsController do
       user_session(sub_account_admin)
       post :create_or_update, params: sub_account_params
       expect(response).to be_not_found
+    end
+  end
+
+  describe "modify_site_admin_developer_keys permission" do
+    let(:site_admin) { Account.site_admin }
+    let(:site_admin_admin) { account_admin_user(account: site_admin) }
+    let(:site_admin_without_permission) do
+      user = user_model
+      role = custom_account_role("limited_admin", account: site_admin)
+      # Grant manage_developer_keys but not modify_site_admin_developer_keys
+      site_admin.role_overrides.create!(
+        permission: :manage_developer_keys,
+        role:,
+        enabled: true
+      )
+      site_admin.account_users.create!(user:, role:)
+      user
+    end
+    let(:site_admin_key) { DeveloperKey.create!(name: "Site Admin Key") }
+    let(:site_admin_binding_params) do
+      {
+        account_id: site_admin.id,
+        developer_key_id: site_admin_key.global_id,
+        developer_key_account_binding: {
+          workflow_state: "on"
+        }
+      }
+    end
+
+    before do
+      site_admin.enable_feature!(:modify_site_admin_developer_keys_permission)
+    end
+
+    context "when user has modify_site_admin_developer_keys permission" do
+      before { user_session(site_admin_admin) }
+
+      it "allows creating/updating site admin developer key bindings" do
+        post :create_or_update, params: site_admin_binding_params, format: :json
+        expect(response).to be_successful
+
+        binding = DeveloperKeyAccountBinding.find(json_parse["id"])
+        expect(binding.account).to eq(site_admin)
+        expect(binding.workflow_state).to eq("on")
+      end
+    end
+
+    context "when user lacks modify_site_admin_developer_keys permission" do
+      before { user_session(site_admin_without_permission) }
+
+      it "returns forbidden for site admin developer key bindings" do
+        post :create_or_update, params: site_admin_binding_params, format: :json
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        site_admin.disable_feature!(:modify_site_admin_developer_keys_permission)
+        user_session(site_admin_without_permission)
+      end
+
+      it "allows access when feature flag is off" do
+        post :create_or_update, params: site_admin_binding_params, format: :json
+        expect(response).to be_successful
+      end
+    end
+
+    context "for regular account developer keys" do
+      let(:regular_account) { account_model }
+      let(:regular_account_admin) do
+        user = user_model
+        role = custom_account_role("limited_admin", account: regular_account)
+        regular_account.role_overrides.create!(
+          permission: :manage_developer_keys,
+          role:,
+          enabled: true
+        )
+        regular_account.account_users.create!(user:, role:)
+        user
+      end
+      let(:regular_account_key) { DeveloperKey.create!(name: "Regular Key", account: regular_account) }
+      let(:regular_binding_params) do
+        {
+          account_id: regular_account.id,
+          developer_key_id: regular_account_key.global_id,
+          developer_key_account_binding: {
+            workflow_state: "on"
+          }
+        }
+      end
+
+      before { user_session(regular_account_admin) }
+
+      it "does not require modify_site_admin_developer_keys for regular account keys" do
+        post :create_or_update, params: regular_binding_params, format: :json
+        expect(response).to be_successful
+      end
     end
   end
 end

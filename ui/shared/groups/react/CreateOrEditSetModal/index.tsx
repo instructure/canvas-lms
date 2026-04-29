@@ -17,14 +17,15 @@
  */
 
 import React, {useEffect, useRef, useReducer, useState} from 'react'
-import {createRoot} from 'react-dom/client'
+import type {Root} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {GroupContext, SPLIT, API_STATE, stateToContext} from './context'
 
 import {GroupSetName} from './GroupSetName'
@@ -446,10 +447,10 @@ export const CreateOrEditSetModal: React.FC<CreateOrEditSetModalProps> = ({
 // the API call process. Note that it must return a Promise that resolves to the same data
 // structure that doFetchApi returns.
 export function renderCreateDialog(div: HTMLElement, mockApi?: typeof doFetchApi) {
-  const root = createRoot(div)
+  let root: Root | null = null
   return new Promise(resolve => {
     function onDismiss(result: any) {
-      root.render(
+      root?.render(
         <CreateOrEditSetModal
           allowSelfSignup={(ENV as any).allow_self_signup}
           mockApi={mockApi}
@@ -459,7 +460,7 @@ export function renderCreateDialog(div: HTMLElement, mockApi?: typeof doFetchApi
       resolve(result)
     }
     const context = (ENV as any).context_asset_string.split('_')
-    root.render(
+    root = render(
       <CreateOrEditSetModal
         studentSectionCount={(ENV as any).student_section_count}
         context={context[0]}
@@ -468,6 +469,7 @@ export function renderCreateDialog(div: HTMLElement, mockApi?: typeof doFetchApi
         onDismiss={onDismiss}
         mockApi={mockApi}
       />,
+      div,
     )
   })
 }

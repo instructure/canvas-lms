@@ -59,7 +59,7 @@ export const EditableCodeValue = (props: EditableCodeValueProps) => {
     if (readOnly) return null
 
     return (
-      // @ts-expect-error
+      // @ts-expect-error InstUI component prop type mismatch
       <IconButton
         size="small"
         screenReaderLabel={
@@ -91,15 +91,20 @@ export const EditableCodeValue = (props: EditableCodeValueProps) => {
     onBlur: () => void
     editorRef: LegacyRef<HTMLInputElement>
   }) => (
-    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore InstUI Text component used as input with incompatible event handler types
     <Text
       as="input"
       name={(props.name ? `${props.name} ` : '') + 'value'}
       type={props.secret ? 'password' : 'text'}
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - InstUI Text component event handler type mismatch
       onChange={handleChange}
       onBlur={onBlur}
       autocomplete="off"
       value={editorValue}
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - InstUI Text elementRef prop type mismatch
       elementRef={editorRef}
     />
   )
@@ -109,11 +114,11 @@ export const EditableCodeValue = (props: EditableCodeValueProps) => {
       <InPlaceEdit
         renderViewer={renderView}
         renderEditor={renderEdit}
-        // @ts-expect-error
+        // @ts-expect-error InstUI component prop type mismatch
         renderEditButton={renderEditButton}
         readOnly={props.readonly}
         mode={mode}
-        // @ts-expect-error
+        // @ts-expect-error InstUI component prop type mismatch
         onChangeMode={setMode}
         value={editorValue}
         inline={false}

@@ -81,18 +81,6 @@ describe "observer k5 dashboard" do
       expect(announcement_title(announcement_heading1)).to be_displayed
     end
 
-    it "show the grades progress bar with the appropriate progress" do
-      skip "FOO-3808 (10/6/2023)"
-      subject_grade = "75"
-
-      assignment = create_and_submit_assignment(@subject_course, "Assignment 1", "new assignment", 100)
-      assignment.grade_student(@student, grader: @homeroom_teacher, score: subject_grade, points_deducted: 0)
-
-      get "/#grades"
-
-      expect(grade_progress_bar(subject_grade)).to be_displayed
-    end
-
     it "shows the Important Info for the main resources tab" do
       important_info_text = "Show me what you can do"
       create_important_info_content(@homeroom_course, important_info_text)
@@ -208,7 +196,7 @@ describe "observer k5 dashboard" do
 
       get "/"
       expect(homeroom_tab).to be_displayed # k5 dashboard only
-      toggle_k5_setting(@account, false)
+      toggle_k5_setting(@account, enable: false)
       click_observed_student_option("Classic Student")
       expect(todo_list_header).to be_displayed # classic dashboard only
     end
@@ -227,16 +215,6 @@ describe "observer k5 dashboard" do
       expect(front_page_info.text).to eq(wiki_page_data)
     end
 
-    it "shows schedule info for course items" do
-      skip("LS-2481 Planner work todo")
-      create_dated_assignment(@subject_course, "today assignment1", @now)
-
-      get "/courses/#{@subject_course.id}#schedule"
-
-      expect(today_header).to be_displayed
-      expect(schedule_item.text).to include("today assignment1")
-    end
-
     it "shows the Important Info for subject resources tab" do
       important_info_text = "Show me what you can do"
       create_important_info_content(@subject_course, important_info_text)
@@ -244,20 +222,6 @@ describe "observer k5 dashboard" do
       get "/courses/#{@subject_course.id}#resources"
 
       expect(important_info_content).to include_text(important_info_text)
-    end
-
-    it "shows the observers name first if observer is also a student" do
-      skip("LS-3152: failing about half the time - showing the student not the observer")
-      course_with_student(
-        active_all: true,
-        user: @observer,
-        course: @subject_course
-      )
-
-      get "/courses/#{@subject_course.id}#home"
-
-      expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("Mom")
-      expect(front_page_info.text).to eq(wiki_page_data)
     end
   end
 
@@ -317,5 +281,29 @@ describe "observer k5 dashboard" do
 
   context "schedule shared examples" do
     it_behaves_like "k5 schedule"
+  end
+
+  context "learning mastery gradebook" do
+    before :once do
+      turn_on_learning_mastery_gradebook
+      add_and_assess_rubric_assignment
+    end
+
+    it "shows learning mastery gradebook tab on student subject grades tab when enabled" do
+      get "/courses/#{@subject_course.id}#grades"
+
+      expect(learning_mastery_tab).to be_displayed
+      expect(assignments_tab).to be_displayed
+    end
+
+    it "brings up learning mastery grades when tab is clicked" do
+      get "/courses/#{@subject_course.id}#grades"
+
+      click_learning_mastery_tab
+
+      expect(outcomes_group).to be_displayed
+      expect(outcomes_group).to include_text(@subject_course.name)
+      expect(outcomes_group).to include_text("1 of 1 Mastered")
+    end
   end
 end

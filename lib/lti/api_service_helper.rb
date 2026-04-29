@@ -22,7 +22,7 @@
 # Likewise, all the methods added will be available for all controllers.
 
 require "oauth"
-require "oauth/request_proxy/action_controller_request"
+require "oauth/client/action_controller_request"
 
 module Lti
   module ApiServiceHelper

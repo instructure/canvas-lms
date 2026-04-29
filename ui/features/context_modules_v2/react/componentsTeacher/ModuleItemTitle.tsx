@@ -25,19 +25,43 @@ import {View} from '@instructure/ui-view'
 import {ModuleItemContent} from '../utils/types'
 
 interface ModuleItemTitleProps {
+  moduleItemId: string
   content: ModuleItemContent
   url: string
   title: string
   onClick?: () => void
 }
 
-const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({content, url, title, onClick}) => {
+const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({
+  moduleItemId,
+  content,
+  url,
+  title,
+  onClick,
+}) => {
+  const seamlessRedirectEnabled = window.ENV?.MODULE_FEATURES?.SEAMLESS_EXTERNAL_URL_REDIRECT
+
   const titleText = useMemo(() => {
     if (content?.type === 'ExternalUrl') {
+      const linkTarget = content?.newTab && seamlessRedirectEnabled ? '_blank' : undefined
+      const linkRel = linkTarget ? 'noopener noreferrer' : undefined
+      const linkUrl =
+        content?.newTab && seamlessRedirectEnabled && url.includes('?')
+          ? `${url}&follow_redirect=1`
+          : content?.newTab && seamlessRedirectEnabled
+            ? `${url}?follow_redirect=1`
+            : url
+
       return (
         <Flex direction="row" gap="small" alignItems="center" wrap="no-wrap">
           <Flex.Item>
-            <Link href={url} isWithinText={false} onClick={onClick}>
+            <Link
+              href={linkUrl}
+              isWithinText={false}
+              onClick={onClick}
+              target={linkTarget}
+              rel={linkRel}
+            >
               <Text
                 weight={content?.newTab ? 'normal' : 'bold'}
                 color={content?.newTab ? 'brand' : 'primary'}
@@ -66,6 +90,7 @@ const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({content, url, title, o
           isWithinText={false}
           onClick={onClick}
           data-testid="module-item-title-link"
+          data-module-item-id={moduleItemId}
         >
           <Text weight="bold" color="primary">
             {title || 'Untitled Item'}
@@ -73,10 +98,10 @@ const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({content, url, title, o
         </Link>
       )
     }
-  }, [content, url, onClick, title])
+  }, [content, url, onClick, title, seamlessRedirectEnabled, moduleItemId])
 
   return (
-    <View as="div" padding="xx-small">
+    <View as="div" padding="0 xx-small" className="module-title">
       {titleText}
     </View>
   )

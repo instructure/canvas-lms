@@ -17,9 +17,6 @@
  */
 
 import React, {useState} from 'react'
-import {Flex} from '@instructure/ui-flex'
-import {IconWarningSolid} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {FormMessage} from '@instructure/ui-form-field'
@@ -67,8 +64,8 @@ const ReviewsPerUserInput = ({
 
   return (
     <TextInput
-      id='reviews_per_user_input'
-      data-testid='reviews_per_user_input'
+      id="reviews_per_user_input"
+      data-testid="reviews_per_user_input"
       renderLabel={I18n.t('Reviews per user')}
       defaultValue={initialCount}
       onChange={handleChange}

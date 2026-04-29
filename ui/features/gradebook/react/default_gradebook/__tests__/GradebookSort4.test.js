@@ -37,7 +37,7 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
       },
     }
     gradebook = createGradebook()
-    jest.spyOn(gradebook, 'arrangeColumnsBy').mockImplementation(() => {})
+    vi.spyOn(gradebook, 'arrangeColumnsBy').mockImplementation(() => {})
   })
 
   afterEach(() => {
@@ -45,7 +45,7 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
       gradebook.destroy && gradebook.destroy()
     }
     $fixtures.remove()
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     window.ENV = oldEnv
   })
 

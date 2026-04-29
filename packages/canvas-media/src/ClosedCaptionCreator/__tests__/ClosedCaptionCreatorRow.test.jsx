@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import ClosedCaptionCreatorRow from '../ClosedCaptionCreatorRow'
-import {CC_FILE_MAX_BYTES} from '../../shared/constants'
+import React from 'react'
 import {vi} from 'vitest'
+import {CC_FILE_MAX_BYTES} from '../../shared/constants'
+import ClosedCaptionCreatorRow from '../ClosedCaptionCreatorRow'
 
 function makeProps(overrides = {}) {
   return {

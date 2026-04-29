@@ -27,11 +27,17 @@ import IndexView from '../IndexView'
 import ToggleShowByView from '../ToggleShowByView'
 import $ from 'jquery'
 import 'jquery-migrate'
+import {act} from 'react'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import '@testing-library/jest-dom'
+
+// Mock jQuery tooltip plugin
+$.fn.tooltip = vi.fn(function () {
+  return this
+})
 
 let assignmentGroups = null
 let container = null
+let app = null
 
 const createAssignmentIndex = (opts = {withAssignmentSettings: false}) => {
   container = document.createElement('div')
@@ -85,7 +91,7 @@ const createAssignmentIndex = (opts = {withAssignmentSettings: false}) => {
     })
   }
 
-  const app = new IndexView({
+  app = new IndexView({
     assignmentGroupsView,
     collection: assignmentGroups,
     createGroupView: false,
@@ -100,6 +106,7 @@ const createAssignmentIndex = (opts = {withAssignmentSettings: false}) => {
 
 describe('AssignmentIndex', () => {
   beforeEach(() => {
+    vi.useFakeTimers()
     fakeENV.setup({
       URLS: {
         assignment_sort_base_url: 'test',
@@ -115,11 +122,19 @@ describe('AssignmentIndex', () => {
     })
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    // Clear (don't run) pending timers to prevent React updates after teardown
+    vi.clearAllTimers()
+    // Drain React's scheduler before removing app to prevent "Should not already
+    // be working" errors from concurrent mode updates after DOM teardown
+    await act(async () => {})
+    app?.remove()
+    app = null
     fakeENV.teardown()
     assignmentGroups = null
     container?.remove()
     container = null
+    vi.useRealTimers()
   })
 
   it('should filter by search term', () => {
@@ -149,7 +164,7 @@ describe('AssignmentIndex', () => {
   })
 
   it('enable search handler should only fire on the first reset', () => {
-    const enableSearchSpy = jest.spyOn(IndexView.prototype, 'enableSearch')
+    const enableSearchSpy = vi.spyOn(IndexView.prototype, 'enableSearch')
     createAssignmentIndex()
     assignmentGroups.reset()
     expect(enableSearchSpy).toHaveBeenCalledTimes(1)
@@ -158,7 +173,7 @@ describe('AssignmentIndex', () => {
     enableSearchSpy.mockRestore()
   })
 
-  it('should show modules column correctly', () => {
+  it('should show modules column correctly', async () => {
     fakeENV.setup({
       PERMISSIONS: {manage: true},
       URLS: {
@@ -173,17 +188,14 @@ describe('AssignmentIndex', () => {
     // Assignment with multiple modules
     assignments[0].set({
       id: 1,
-      labelId: 'assign1',
       modules: ['Module One', 'Module Two'],
       has_modules: true,
       module_count: 2,
-      joined_names: 'Module One, Module Two',
     })
 
     // Assignment with one module
     assignments[1].set({
       id: 2,
-      labelId: 'assign2',
       modules: ['Single Module'],
       has_modules: true,
       module_count: 1,
@@ -193,28 +205,26 @@ describe('AssignmentIndex', () => {
     // Assignment with no modules
     assignments[2].set({
       id: 3,
-      labelId: 'assign3',
       modules: [],
       has_modules: false,
       module_count: 0,
-      joined_names: '',
     })
 
-    view.render()
+    await act(async () => {
+      view.render()
+    })
 
-    // Check multiple modules
+    // Check multiple modules - ModuleTooltip renders a "Multiple Modules" link
     const $firstRow = view.$('#assignment_1')
     const $firstModules = $firstRow.find('.ig-details__item--wrap-text.modules')
     expect($firstModules).toHaveLength(1)
-    expect($firstModules.find('a').attr('title')).toBe('Module One,Module Two')
+    expect($firstModules.find('button').text()).toBe('Multiple Modules')
 
     // Check single module
     const $secondRow = view.$('#assignment_2')
     const $secondModules = $secondRow.find('.ig-details__item--wrap-text.modules')
     expect($secondModules).toHaveLength(1)
-    expect($secondModules.text().trim().replace(/\s+/g, ' ')).toBe(
-      'Single Module Module Single Module',
-    )
+    expect($secondModules.text().trim().replace(/\s+/g, ' ')).toBe('Single Module Module')
 
     // Check no modules
     const $thirdRow = view.$('#assignment_3')

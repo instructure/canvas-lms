@@ -20,7 +20,7 @@
 class SisPseudonym
   class << self
     # type: :exact, :trusted, or :implicit
-    def for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil, in_region: false, include_all_pseudonyms: false)
+    def for(user, context, type: :exact, require_sis: true, include_deleted: false, root_account: nil, in_region: false, include_all_pseudonyms: false, current_user: nil)
       raise ArgumentError, "user is required" unless user.present?
       raise ArgumentError, "type must be :exact, :trusted, or :implicit" unless %i[exact trusted implicit].include?(type)
       raise ArgumentError, "invalid root_account" if root_account && !root_account.root_account?
@@ -29,7 +29,7 @@ class SisPseudonym
       raise ArgumentError, "require_sis must be false if context is nil" if context.nil? && require_sis
 
       sis_pseudonym =
-        new(user, context, type, require_sis, include_deleted, root_account, in_region:, include_all_pseudonyms:)
+        new(user, context, type, require_sis, include_deleted, root_account, in_region:, include_all_pseudonyms:, current_user:)
       include_all_pseudonyms ? sis_pseudonym.all_pseudonyms : sis_pseudonym.pseudonym
     end
 
@@ -47,11 +47,30 @@ class SisPseudonym
        Canvas::ICU.collation_key(pseudonym.unique_id),
        pseudonym.position]
     end
+
+    # Batch-preloads enrollment-based SIS pseudonyms for a set of users,
+    # storing the result as a cache on the context.
+    def preload_enrollment_data(context, users)
+      return unless context.is_a?(Course) || context.is_a?(CourseSection)
+      return if users.empty?
+
+      enrollments = context.enrollments.except(:preload)
+                           .where(user_id: users)
+                           .where.not(sis_pseudonym_id: nil)
+                           .order(:id)
+                           .preload(:sis_pseudonym)
+
+      cache = {}
+      users.each { |u| cache[u.id] = nil }
+      enrollments.each { |e| cache[e.user_id] ||= e.sis_pseudonym }
+
+      context.instance_variable_set(:@_sis_enrollment_pseudonym_cache, cache)
+    end
   end
 
-  attr_reader :user, :context, :type, :require_sis, :include_deleted, :include_all_pseudonyms
+  attr_reader :user, :context, :type, :require_sis, :include_deleted, :include_all_pseudonyms, :current_user
 
-  def initialize(user, context, type, require_sis, include_deleted, root_account, in_region: false, include_all_pseudonyms: false)
+  def initialize(user, context, type, require_sis, include_deleted, root_account, in_region: false, include_all_pseudonyms: false, current_user: nil)
     @user = user
     @context = context
     @type = type
@@ -60,6 +79,7 @@ class SisPseudonym
     @root_account = root_account if root_account || context.nil?
     @in_region = in_region
     @include_all_pseudonyms = include_all_pseudonyms
+    @current_user = current_user
   end
 
   def pseudonym
@@ -99,7 +119,18 @@ class SisPseudonym
 
   def find_on_enrollment_for_context
     if @context.is_a?(Course) || @context.is_a?(CourseSection)
-      pseudonym = @context.enrollments.except(:preload).where(user_id: @user).where.not(sis_pseudonym_id: nil).preload(:sis_pseudonym).first&.sis_pseudonym
+      if @context.instance_variable_defined?(:@_sis_enrollment_pseudonym_cache)
+        cache = @context.instance_variable_get(:@_sis_enrollment_pseudonym_cache)
+      end
+      pseudonym = if cache&.key?(@user.id)
+                    cache[@user.id]
+                  else
+                    @context.enrollments.except(:preload)
+                            .where(user_id: @user)
+                            .where.not(sis_pseudonym_id: nil)
+                            .preload(:sis_pseudonym)
+                            .first&.sis_pseudonym
+                  end
       # if the sis user id isn't here, this pointer might
       # no longer be good.  Let the fallback logic work
       # through "find_in_home_account".  It may still return this one,
@@ -125,7 +156,7 @@ class SisPseudonym
 
     if type == :trusted
       trusted_local_account_ids_by_shard = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) }
-                                                       .transform_values { |ids| ids.map { |id| Shard.local_id_for(id).first } }
+                                                                           .transform_values { |ids| ids.map { |id| Shard.local_id_for(id).first } }
     end
 
     # try the user's home shard first if it's fast
@@ -193,6 +224,7 @@ class SisPseudonym
 
   def pick_pseudonym(account_ids)
     relation = Pseudonym.active.where(user_id: user)
+    relation = apply_current_user_scope(relation)
     relation = relation.where(account_id: account_ids) if account_ids
     relation = relation.sis if require_sis
     relation = self.class.order(relation)
@@ -201,21 +233,30 @@ class SisPseudonym
       relation.to_a
     elsif type == :implicit && root_account
       if include_all_pseudonyms
-        return relation.select { |p| p.works_for_account?(root_account, true) }
+        return relation.select { |p| p.works_for_account?(root_account, allow_implicit: true) }
       end
 
-      relation.detect { |p| p.works_for_account?(root_account, true) }
+      relation.detect { |p| p.works_for_account?(root_account, allow_implicit: true) }
     else
       relation.first
     end
   end
 
+  # Extension point for plugins to filter pseudonyms based on current_user
+  # @param relation [ActiveRecord::Relation] The pseudonym relation to filter
+  # @return [ActiveRecord::Relation] The filtered relation
+  def apply_current_user_scope(relation)
+    relation
+  end
+
   def pick_user_pseudonym(collection, account_ids)
+    collection = filter_pseudonym_collection(collection)
+
     if include_all_pseudonyms
       collection.select do |p|
         next if account_ids && !account_ids.include?(p.account_id)
         next true if root_account.nil?
-        next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
+        next if !account_ids && !p.works_for_account?(root_account, allow_implicit: type == :implicit)
         next if require_sis && !p.sis_user_id
 
         true
@@ -226,11 +267,18 @@ class SisPseudonym
       end.detect do |p|
         next if account_ids && !account_ids.include?(p.account_id)
         next true if root_account.nil?
-        next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
+        next if !account_ids && !p.works_for_account?(root_account, allow_implicit: type == :implicit)
         next if require_sis && !p.sis_user_id
 
         include_deleted || p.workflow_state != "deleted"
       end
     end
+  end
+
+  # Extension point for plugins to filter pseudonym collections based on current_user
+  # @param collection [Array<Pseudonym>] The pseudonym collection to filter
+  # @return [Array<Pseudonym>] The filtered collection
+  def filter_pseudonym_collection(collection)
+    collection
   end
 end

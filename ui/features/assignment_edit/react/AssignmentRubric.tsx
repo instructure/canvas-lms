@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
+import type {Root} from 'react-dom/client'
 import {RubricAssignmentContainer} from '@canvas/rubrics/react/RubricAssignment'
 import {
   mapRubricUnderscoredKeysToCamelCase,
@@ -28,6 +29,7 @@ import {
 type ENVType = {
   ACCOUNT_LEVEL_MASTERY_SCALES: boolean
   ASSIGNMENT_ID: string
+  ASSIGNMENT_POINTS?: number
   COURSE_ID: string
   PERMISSIONS: {
     manage_rubrics: boolean
@@ -41,20 +43,22 @@ type ENVType = {
   rubric_association: RubricAssociationUnderscore
   rubric_self_assessment_ff_enabled: boolean
   context_asset_string: string
+  current_user_id: string
 }
 declare const ENV: ENVType
 
-const roots = new Map()
-function createOrUpdateRoot(elementId: string, component: React.ReactNode) {
+const roots = new Map<string, Root>()
+function createOrUpdateRoot(elementId: string, component: React.ReactElement) {
   const container = document.getElementById(elementId)
   if (!container) return
 
   let root = roots.get(elementId)
   if (!root) {
-    root = createRoot(container)
+    root = render(component, container)
     roots.set(elementId, root)
+  } else {
+    rerender(root, component)
   }
-  root.render(component)
 }
 
 export const renderEnhancedRubrics = () => {
@@ -78,10 +82,12 @@ export const renderEnhancedRubrics = () => {
       'enhanced-rubric-assignment-edit-mount-point',
       <RubricAssignmentContainer
         assignmentId={ENV.ASSIGNMENT_ID}
+        assignmentPointsPossible={ENV.ASSIGNMENT_POINTS}
         assignmentRubric={assignmentRubric}
         assignmentRubricAssociation={assignmentRubricAssociation}
         canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
         courseId={ENV.COURSE_ID}
+        currentUserId={ENV.current_user_id}
         rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
         aiRubricsEnabled={ENV.ai_rubrics_enabled}
       />,

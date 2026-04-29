@@ -19,11 +19,8 @@
 #
 
 describe Quizzes::QuizQuestionsController do
-  def course_quiz(active = false)
-    @quiz = @course.quizzes.create
-    @quiz.workflow_state = "available" if active
-    @quiz.save!
-    @quiz
+  def course_quiz
+    @quiz = @course.quizzes.create!
   end
 
   def quiz_question
@@ -43,6 +40,25 @@ describe Quizzes::QuizQuestionsController do
   before :once do
     course_with_teacher(active_all: true)
     course_quiz
+  end
+
+  describe "GET 'index'" do
+    it "requires authorization" do
+      get "index", params: { course_id: @course.id, quiz_id: @quiz.id }
+      assert_unauthorized
+    end
+
+    it "returns quiz questions" do
+      quiz_question
+      user_session(@teacher)
+      get "index", params: { course_id: @course.id, quiz_id: @quiz.id }
+      expect(response).to be_successful
+      expect(assigns[:quiz]).to eq(@quiz)
+      json = json_parse(response.body)
+      expect(json).to be_an(Array)
+      expect(json.length).to eq(1)
+      expect(json.first["id"]).to eq(@question.id)
+    end
   end
 
   describe "POST 'create'" do
@@ -154,6 +170,53 @@ describe Quizzes::QuizQuestionsController do
                                } }
       expect(assigns[:question].question_data[:answers][0][:html]).not_to match(%r{https://test.host})
       expect(assigns[:question].question_data[:answers][0][:html]).to match(%r{href=['"]/courses/#{@course.id}/files/27})
+    end
+
+    it "sets updating_user when creating a quiz question" do
+      user_session(@teacher)
+      post "create", params: { course_id: @course.id,
+                               quiz_id: @quiz,
+                               question: {
+                                 question_type: "multiple_choice_question",
+                                 answers: {
+                                   "0" => {
+                                     answer_text: "answer1",
+                                     weight: 100
+                                   }
+                                 }
+                               } }
+      question = assigns[:question]
+      expect(question).not_to be_nil
+      expect(question.assessment_question).not_to be_nil
+      expect(question.assessment_question.updating_user).to eq(@teacher)
+    end
+
+    context "when adding questions from a bank" do
+      it "add_assessment_questions would create assessment with a cloned attachment" do
+        @bank = @course.assessment_question_banks.create!(title: "Test Bank")
+        @attachment = attachment_with_context(@course)
+        @assessment_question = @bank.assessment_questions.create!(
+          question_data: {
+            question_type: "multiple_choice_question",
+            question_name: "Test Question",
+            question_text: "<p>File ref:<img src='/courses/#{@course.id}/files/#{@attachment.id}'></p>",
+            points_possible: 1
+          }
+        )
+        user_session(@teacher)
+        post "create", params: {
+          course_id: @course.id,
+          quiz_id: @quiz,
+          assessment_question_bank_id: @bank.id,
+          assessment_questions_ids: @assessment_question.id.to_s,
+          existing_questions: "1"
+        }
+
+        quiz_question = assigns[:questions]&.first
+        expect(quiz_question).not_to be_nil
+        expect(quiz_question.assessment_question).not_to be_nil
+        expect(quiz_question.assessment_question.attachments).not_to be_nil
+      end
     end
   end
 
@@ -270,14 +333,15 @@ describe Quizzes::QuizQuestionsController do
       aq = bank.assessment_questions.create!(question_data: {
                                                question_type: "essay_question",
                                                question_text: "File ref:<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">"
-                                             })
+                                             },
+                                             updating_user: @teacher)
 
       translated_text = aq.reload.question_data["question_text"]
       expect(translated_text).to match %r{/assessment_questions/\d+/files/\d+}
       expect(translated_text).to match(/verifier=/)
 
       # add the first question directly onto the quiz, so it shouldn't get "randomly" selected from the group
-      linked_question = @quiz.quiz_questions.build(question_data: aq.question_data)
+      linked_question = @quiz.quiz_questions.build(question_data: aq.question_data, updating_user: @teacher)
       linked_question.assessment_question_id = aq.id
       linked_question.save!
 
@@ -354,6 +418,19 @@ describe Quizzes::QuizQuestionsController do
           @question.reload
         end.not_to change { @question.assessment_question }
       end
+    end
+  end
+
+  describe "DELETE 'destroy'" do
+    before(:once) { quiz_question }
+
+    it "sets updating_user when destroying a quiz question" do
+      user_session(@teacher)
+      expect do
+        delete "destroy", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id }
+      end.to change { Quizzes::QuizQuestion.active.count }.by(-1)
+
+      expect(response).to have_http_status(:no_content)
     end
   end
 end

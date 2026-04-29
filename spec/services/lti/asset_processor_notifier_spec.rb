@@ -75,8 +75,8 @@ describe Lti::AssetProcessorNotifier do
       expect(asset_report_service_url).to eq("http://localhost/api/lti/asset_processors/#{ap.id}/reports")
       expect(submission_lti_id).to eq(submission.lti_attempt_id)
 
-      assets = assets.sort_by { it[:display_name] }
-      expect(assets.pluck(:title)).to eq([assignment.title, assignment.title])
+      assets = assets.sort_by { it[:filename] }
+      expect(assets.pluck(:title)).to eq([attachment, attachment2].map(&:display_name))
       expect(assets.pluck(:filename)).to eq([attachment, attachment2].map(&:display_name))
       expect(assets.pluck(:sha256_checksum)).to eq([
                                                      "LPJNul+wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ=",
@@ -130,7 +130,7 @@ describe Lti::AssetProcessorNotifier do
       expect(Lti::PlatformNotificationService).to have_received(:notify_tools).exactly(3).times
       notice_params = received_notifications.last
       builder_params = notice_params[:builders].first.instance_variable_get(:@params)
-      asset_filenames = builder_params[:assets].map { it[:filename] }
+      asset_filenames = builder_params[:assets].pluck(:filename)
       expect(asset_filenames).to eq([attachment.display_name])
     end
 
@@ -165,11 +165,34 @@ describe Lti::AssetProcessorNotifier do
         builder_params = notice_params[:builders].first.instance_variable_get(:@params)
         asset = builder_params[:assets].first
         expect(asset[:filename]).to be_nil
-        expect(asset[:title]).to eq(assignment.title)
+        expect(asset).not_to have_key(:title)
         expect(asset[:sha256_checksum]).to eq("ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=")
         expect(asset[:content_type]).to eq("text/html")
         expect(asset[:size]).to eq("Hello world".bytesize)
       end
+    end
+
+    it "filters notifications by tool_id when provided" do
+      tool2 = new_valid_external_tool(course)
+      lti_asset_processor_model(tool:, assignment:)
+      lti_asset_processor_model(tool: tool2, assignment:)
+
+      received_notifications = []
+      allow(Lti::PlatformNotificationService).to receive(:notify_tools) do |payload|
+        received_notifications << payload
+      end
+      allow(Rails.application.routes.url_helpers).to receive(:lti_asset_processor_asset_show_url).and_return("http://example.com")
+
+      submission = assignment.submit_homework(student, attachments: [attachment])
+
+      # initial submit notifies both tools
+      expect(received_notifications.size).to eq(2)
+
+      # resubmit filtered to tool2 only
+      Lti::AssetProcessorNotifier.notify_asset_processors(submission, nil, tool2.id)
+
+      expect(received_notifications.size).to eq(3)
+      expect(received_notifications.last[:cet_id_or_ids]).to eq(tool2.id)
     end
   end
 end

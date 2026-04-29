@@ -70,8 +70,8 @@ describe('AssignmentName', () => {
   })
 
   it('saves new value on Enter', () => {
-    const onChange = jest.fn()
-    const onChangeMode = jest.fn()
+    const onChange = vi.fn()
+    const onChangeMode = vi.fn()
     const {getByDisplayValue} = renderAssignmentName({
       mode: 'edit',
       onChange,
@@ -86,8 +86,8 @@ describe('AssignmentName', () => {
   })
 
   it('saves the new value on blur', () => {
-    const onChange = jest.fn()
-    const onChangeMode = jest.fn()
+    const onChange = vi.fn()
+    const onChangeMode = vi.fn()
     const {container, getByDisplayValue} = render(
       <div>
         <AssignmentName

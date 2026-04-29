@@ -37,7 +37,12 @@ shared_examples "Gradebook - total column menu options" do |ff_enabled|
     gradebook_data_setup
   end
 
-  before { user_session(@teacher) }
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
+    user_session(@teacher)
+  end
 
   after { clear_local_storage }
 

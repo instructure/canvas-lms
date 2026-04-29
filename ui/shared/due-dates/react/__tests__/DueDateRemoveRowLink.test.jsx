@@ -28,7 +28,7 @@ describe('DueDateRemoveRowLink', () => {
   })
 
   it('calls handleClick prop when clicked', async () => {
-    const handleClick = jest.fn()
+    const handleClick = vi.fn()
     const {getByRole} = render(<DueDateRemoveRowLink handleClick={handleClick} />)
 
     const removeButton = getByRole('button', {name: 'Remove These Dates'})

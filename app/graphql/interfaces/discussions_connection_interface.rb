@@ -28,9 +28,13 @@ module Interfaces::DiscussionsConnectionInterface
     argument :search_term, String, <<~MD, required: false
       only return discussions whose title matches this search term
     MD
+    argument :is_announcement, Boolean, <<~MD, required: false
+      only return discussions that are announcements (true) or
+      regular discussions (false). If not provided, returns both.
+    MD
   end
 
-  def discussions_scope(course, user_id = nil, search_term = nil)
+  def discussions_scope(course, user_id = nil, search_term = nil, is_announcement = nil)
     scoped_user = user_id.nil? ? current_user : User.find_by(id: user_id)
 
     # If user_id was provided but user not found, return no discussions
@@ -42,15 +46,47 @@ module Interfaces::DiscussionsConnectionInterface
       raise GraphQL::ExecutionError, "You do not have permission to view this course."
     end
 
-    discussions = course.discussion_topics.active
+    discussions = if is_announcement == true
+                    # For announcements, use the same logic as /courses/X/announcements page
+                    # Start with active_announcements scope (just workflow_state <> 'deleted')
+                    course.active_announcements
+                  else
+                    course.discussion_topics.active
+                  end
+
+    # Apply announcement filter for non-announcement-specific queries
+    if is_announcement == false
+      discussions = discussions.where(type: ["DiscussionTopic", nil])
+    end
 
     # Apply search term filter if provided
     if search_term.present?
       discussions = discussions.where(DiscussionTopic.wildcard(:title, search_term))
     end
 
-    # Filter discussions based on user visibility rules
-    DiscussionTopic::ScopedToUser.new(course, scoped_user, discussions).scope
+    if is_announcement == true
+      # Apply the exact same filtering logic as DiscussionTopicsController#index for announcements
+      # For non-admins, apply time constraints just like the official announcements page
+      unless course.grants_any_right?(current_user, :manage, :read_as_admin)
+        current_time = Time.now.utc
+        discussions = discussions.active.where(
+          "((unlock_at IS NULL AND delayed_post_at IS NULL) OR (unlock_at<? OR delayed_post_at<?)) AND (lock_at IS NULL OR lock_at>?)",
+          current_time,
+          current_time,
+          current_time
+        )
+      end
+
+      # Apply section scoping for announcements (matches official logic)
+      course.shard.activate do
+        discussions = DiscussionTopic::ScopedToSections.new(course, scoped_user, discussions).scope
+      end
+    else
+      # For regular discussions, use the standard user scoping
+      discussions = DiscussionTopic::ScopedToUser.new(course, scoped_user, discussions).scope
+    end
+
+    discussions
   end
 
   field :discussions_connection,
@@ -63,12 +99,22 @@ module Interfaces::DiscussionsConnectionInterface
   end
 
   def discussions_connection(course:, filter: {})
-    apply_discussion_order(
-      discussions_scope(course, filter[:user_id], filter[:search_term])
+    discussions = discussions_scope(
+      course,
+      filter[:user_id],
+      filter[:search_term],
+      filter[:is_announcement]
     )
+    apply_discussion_order(discussions, filter[:is_announcement])
   end
 
-  def apply_discussion_order(discussions)
-    discussions.reorder(id: :asc)
+  def apply_discussion_order(discussions, is_announcement = nil)
+    if is_announcement == true
+      # Sort announcements by creation date descending for dashboard widget
+      discussions.reorder(created_at: :desc)
+    else
+      # Keep existing behavior for regular discussions
+      discussions.reorder(id: :asc)
+    end
   end
 end

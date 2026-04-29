@@ -33,8 +33,17 @@ import type {LtiOverlay} from '../../../model/LtiOverlay'
 import {type LtiOverlayVersion, ZLtiOverlayVersionId} from '../../../model/LtiOverlayVersion'
 import {ZLtiOverlayId} from '../../../model/ZLtiOverlayId'
 import type {User} from '../../../model/User'
-import {LtiDeployment} from '../../../model/LtiDeployment'
+import type {LtiDeployment} from '../../../model/LtiDeployment'
 import {ZLtiDeploymentId} from '../../../model/LtiDeploymentId'
+import {http, HttpResponse} from 'msw'
+
+export const mswHandlers = [
+  http.delete('/api/v1/accounts/*/lti_registrations/*', () => {
+    return HttpResponse.json({
+      status: 'ok',
+    })
+  }),
+]
 
 export const mockPageOfRegistrations = (
   ...names: Array<string>
@@ -52,7 +61,11 @@ export const mockUser = ({
   id = '1',
   date = new Date(),
   overrides = {},
-}: {id?: string; date?: Date; overrides?: Partial<User>}) => {
+}: {
+  id?: string
+  date?: Date
+  overrides?: Partial<User>
+}) => {
   return {
     created_at: date,
     id: ZUserId.parse(id),
@@ -82,7 +95,6 @@ export const mockRegistration = (
     created_by: user,
     updated_at: date,
     updated_by: user,
-    workflow_state: 'on',
   }
   return {
     id: id as LtiRegistrationId,
@@ -91,16 +103,20 @@ export const mockRegistration = (
     account_binding: {
       id: id as LtiRegistrationAccountBindingId,
       registration_id: id as unknown as LtiRegistrationId,
+      workflow_state: 'on',
       ...common,
     },
+    workflow_state: 'active',
     developer_key_id: id as DeveloperKeyId,
     internal_service: false,
-    ims_registration_id: ZLtiImsRegistrationId.parse(id),
+    ims_registration_id: null,
     manual_configuration_id: null,
     icon_url: null,
     vendor: null,
     description: null,
     admin_nickname: n,
+    lock_deploying: false,
+    template_registration_id: null,
     configuration: {
       custom_fields: {},
       placements: [],

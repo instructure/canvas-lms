@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
+class Quizzes::QuizSubmissionEvent < ApplicationRecord
   extend RootAccountResolver
   include CanvasPartman::Concerns::Partitioned
 

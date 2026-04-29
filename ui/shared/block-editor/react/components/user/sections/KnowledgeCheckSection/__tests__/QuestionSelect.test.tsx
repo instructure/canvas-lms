@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import QuestionSelect from '../QuestionSelect'
 
 import {type QuestionProps} from '../types'
@@ -129,7 +128,7 @@ const testQuestions: QuestionProps[] = [
 ]
 
 describe('QuestionSelect', () => {
-  const mockOnSelect = jest.fn()
+  const mockOnSelect = vi.fn()
 
   it('renders loading spinner when loading', () => {
     render(<QuestionSelect onSelect={mockOnSelect} questions={null} />)

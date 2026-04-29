@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AppointmentGroupSubContext < ActiveRecord::Base
+class AppointmentGroupSubContext < ApplicationRecord
   belongs_to :appointment_group
   belongs_to :sub_context, polymorphic: [:group_category, :course_section]
 

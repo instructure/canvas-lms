@@ -97,7 +97,7 @@
 #     }
 #
 class GroupCategoriesController < ApplicationController
-  before_action :require_context, only: %i[create index import_tags]
+  before_action :require_context, only: %i[create index import_tags export_tags]
   before_action :get_category_context, only: %i[show update destroy groups users assign_unassigned_members import export]
 
   include Api::V1::Attachment
@@ -397,6 +397,13 @@ class GroupCategoriesController < ApplicationController
         @group_category.update!(name: gc_params[:name])
       end
 
+      delete_ops.each do |group_params|
+        permitted_attrs = group_params.permit(:id)
+        group = @group_category.groups.find(permitted_attrs[:id])
+        group.destroy!
+        results[:deleted] << group
+      end
+
       create_ops.each do |group_params|
         permitted_attrs = group_params.permit(:name)
         group = @group_category.groups.create!(permitted_attrs.merge(context: @group_category.context))
@@ -409,16 +416,9 @@ class GroupCategoriesController < ApplicationController
         group.update!(name: permitted_attrs[:name])
         results[:updated] << group
       end
-
-      delete_ops.each do |group_params|
-        permitted_attrs = group_params.permit(:id)
-        group = @group_category.groups.find(permitted_attrs[:id])
-        group.destroy!
-        results[:deleted] << group
-      end
     end
 
-    render json: results.merge(group_category: @group_category)
+    render json: results.merge(group_category: @group_category.attributes)
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.message }, status: :bad_request
   rescue ActiveRecord::RecordNotFound => e
@@ -473,7 +473,7 @@ class GroupCategoriesController < ApplicationController
   def import_tags
     return unless check_group_authorization(context: @context, current_user: @current_user, action_category: :add, non_collaborative: true)
 
-    unless @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+    unless @context.account.allow_assign_to_differentiation_tags?
       return render(json: { "status" => "unauthorized" }, status: :unauthorized)
     end
 
@@ -713,7 +713,8 @@ class GroupCategoriesController < ApplicationController
       )
 
         include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
-        csv_string = CSV.generate do |csv|
+        csv_options = CSVWithI18n.csv_i18n_settings(@current_user)
+        csv_string = CSVWithI18n.generate(**csv_options.slice(:encoding, :col_sep, :include_bom)) do |csv|
           section_names = @context.course_sections.select(:id, :name).index_by(&:id)
           users = @context.participating_students
                           .select(<<~SQL.squish)
@@ -727,7 +728,7 @@ class GroupCategoriesController < ApplicationController
                           .order("users.sortable_name").group(:id)
           gms_by_user_id = GroupMembership.active.where(group_id: @group_category.groups.active.select(:id))
                                           .joins(:group).select(:user_id, :name, :sis_source_id, :group_id).index_by(&:user_id)
-          csv << export_headers(include_sis_id, gms_by_user_id.any?)
+          csv << export_headers(include_sis_id, groups_exist: gms_by_user_id.any?)
           users.preload(:pseudonyms).find_each { |u| csv << build_row(u, section_names, gms_by_user_id, include_sis_id) }
         end
         # keep inside authorized_action block to avoid
@@ -735,6 +736,55 @@ class GroupCategoriesController < ApplicationController
         respond_to do |format|
           format.csv { send_data csv_string, type: "text/csv", filename: "#{@group_category.name}.csv", disposition: "attachment" }
         end
+      end
+    end
+  end
+
+  # @API export tags and users in course
+  # @beta
+  #
+  # Returns a csv file of users in format ready to import.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/group_categories/export_tags \
+  #          -H 'Authorization: Bearer <token>'
+  def export_tags
+    GuardRail.activate(:secondary) do
+      return unless check_group_authorization(context: @context, current_user: @current_user, action_category: :manage, non_collaborative: true)
+
+      unless @context.account.allow_assign_to_differentiation_tags?
+        return render(json: { "status" => "unauthorized" }, status: :unauthorized)
+      end
+
+      include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
+      csv_options = CSVWithI18n.csv_i18n_settings(@current_user)
+      csv_string = CSVWithI18n.generate(**csv_options.slice(:encoding, :col_sep, :include_bom)) do |csv|
+        users = @context.participating_students
+                        .select(<<~SQL.squish)
+                          users.id, users.sortable_name,
+                          MAX (enrollments.sis_pseudonym_id) AS sis_pseudonym_id
+                        SQL
+                        .where("enrollments.type='StudentEnrollment'")
+                        .order("users.sortable_name").group(:id)
+        gms_by_user_id = GroupMembership.active.where(group_id: @context.differentiation_tags.select(:id))
+                                        .joins(group: :group_category)
+                                        .select(:user_id,
+                                                "groups.name",
+                                                "groups.sis_source_id",
+                                                "groups.id AS group_id",
+                                                "group_categories.name AS group_category_name",
+                                                "group_categories.sis_source_id AS group_category_sis_source_id",
+                                                "group_categories.id AS group_category_id")
+                                        .group_by(&:user_id)
+        csv << export_tags_headers(include_sis_id)
+        users.preload(:pseudonyms).find_each do |u|
+          rows = build_user_rows(u, gms_by_user_id, include_sis_id)
+          rows.each { |row| csv << row }
+        end
+      end
+
+      respond_to do |format|
+        format.csv { send_data csv_string, type: "text/csv", filename: "#{@context.name} Tags.csv", disposition: "attachment" }
       end
     end
   end
@@ -747,7 +797,7 @@ class GroupCategoriesController < ApplicationController
                        root_account_id: @context.root_account_id,
                        sis_pseudonym_id: user.sis_pseudonym_id,
                        course_id: @context.id)
-    p = SisPseudonym.for(user, e, type: :trusted, require_sis: false, root_account: @context.root_account)
+    p = SisPseudonym.for(user, e, type: :trusted, require_sis: false, root_account: @context.root_account, current_user: @current_user)
     row << p&.sis_user_id if include_sis_id
     row << p&.unique_id
     row << section_names.values_at(*user.course_section_ids).map(&:name).to_sentence
@@ -759,7 +809,7 @@ class GroupCategoriesController < ApplicationController
     row
   end
 
-  def export_headers(include_sis_id, groups_exist = true)
+  def export_headers(include_sis_id, groups_exist: true)
     headers = []
     headers << I18n.t("name")
     headers << "canvas_user_id"
@@ -774,7 +824,58 @@ class GroupCategoriesController < ApplicationController
     headers
   end
 
+  def build_user_rows(user, gms_by_user_id, include_sis_id)
+    user_memberships = gms_by_user_id[user.id] || []
+    if user_memberships.count < 2
+      [build_tag_row(user, user_memberships.first, include_sis_id)]
+    else
+      user_memberships.map do |gm|
+        build_tag_row(user, gm, include_sis_id)
+      end
+    end
+  end
+
+  def build_tag_row(user, membership, include_sis_id)
+    row = []
+    row << user.sortable_name
+    row << user.id
+    e = Enrollment.new(user_id: user.id,
+                       root_account_id: @context.root_account_id,
+                       sis_pseudonym_id: user.sis_pseudonym_id,
+                       course_id: @context.id)
+    p = SisPseudonym.for(user, e, type: :trusted, require_sis: false, root_account: @context.root_account, current_user: @current_user)
+    row << p&.sis_user_id if include_sis_id
+    row << p&.unique_id
+
+    if membership
+      row << membership.name
+      row << membership.group_id
+      row << membership.sis_source_id if include_sis_id
+      row << membership.group_category_name
+      row << membership.group_category_id
+      row << membership.group_category_sis_source_id if include_sis_id
+      row
+    end
+    row
+  end
+
+  def export_tags_headers(include_sis_id)
+    headers = []
+    headers << I18n.t("name")
+    headers << "canvas_user_id"
+    headers << "user_id" if include_sis_id
+    headers << "login_id"
+    headers << "tag_name"
+    headers << "canvas_tag_id"
+    headers << "tag_id" if include_sis_id
+    headers << "tag_set_name"
+    headers << "canvas_tag_set_id"
+    headers << "tag_set_id" if include_sis_id
+    headers
+  end
+
   include Api::V1::User
+
   # @API List users in group category
   #
   # Returns a paginated list of users in the group category.
@@ -827,7 +928,7 @@ class GroupCategoriesController < ApplicationController
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_category_users_url)
     UserPastLtiId.manual_preload_past_lti_ids(users, @group_category.groups) if ["uuid", "lti_id"].any? { |id| includes.include? id }
-    user_json_preloads(users, false, { profile: true })
+    user_json_preloads(users, profile: true)
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
     if includes.include?("group_submissions") && @group_category.context_type == "Course"
@@ -947,7 +1048,7 @@ class GroupCategoriesController < ApplicationController
 
     if value_to_boolean(params[:sync])
       # do the distribution and note the changes
-      memberships = @group_category.assign_unassigned_members(by_section, updating_user: @current_user)
+      memberships = @group_category.assign_unassigned_members(by_section:, updating_user: @current_user)
 
       # render the changes
       json = memberships.group_by(&:group_id).map do |group_id, new_members|
@@ -955,7 +1056,7 @@ class GroupCategoriesController < ApplicationController
       end
       render json:
     else
-      @group_category.assign_unassigned_members_in_background(by_section, updating_user: @current_user)
+      @group_category.assign_unassigned_members_in_background(by_section:, updating_user: @current_user)
       render json: progress_json(@group_category.current_progress, @current_user, session)
     end
   end

@@ -26,13 +26,15 @@ module Lti
   #
   # @param unified_tool_id [String | nil] The unique identifier for the tool, used for analytics. If not provided, one will be generated.
   #
-  # @param registration_params [Hash] Attributes for the new Lti::Registration.
+  # @param registration_params [Hash] Attributes for the new Lti::Registration. Valid values for "workflow_state"
+  # temporarily include the binding state values "on"|"off"|"allow" which will resolve to the appropriate workflow state.
   # ```
   # {
   #   name: "string",
   #   admin_nickname: "string",
   #   description: "string",
   #   vendor: "string",
+  #   workflow_state: "active" | "inactive" (| "on" | "off" | "allow"),
   # }
   # ```
   #
@@ -42,17 +44,13 @@ module Lti
   # @param overlay_params [Hash] A Schemas::Lti::Overlay object, stored as `data` in the Lti::Overlay
   # for this Registration and Account. If an invalid hash is provided, an ArgumentError will be raised.
   #
-  # @param binding_params [Hash] Attributes for creating the the Lti::RegistrationAccountBinding.
-  # ```
-  # { workflow_state: "string" }
-  # ```
   # @param developer_key_params [Hash] Attributes for creating the DeveloperKey. These take
   # precedence over any inferred attributes from `configuration_params`.
   #
   # @return [Lti::Registration] the newly created registration
   class CreateRegistrationService < ApplicationService
     ALLOWED_DEVELOPER_KEY_PARAMS = %i[name email notes test_cluster_only client_credentials_audience scopes].freeze
-    ALLOWED_REGISTRATION_PARAMS = %i[name admin_nickname description vendor].freeze
+    ALLOWED_REGISTRATION_PARAMS = %i[name admin_nickname description vendor lock_deploying workflow_state].freeze
 
     attr_reader :account,
                 :created_by,
@@ -61,7 +59,7 @@ module Lti
                 :configuration_params,
                 :overlay_params,
                 :developer_key_params,
-                :binding_params
+                :binding_workflow_state
 
     def initialize(account:,
                    created_by:,
@@ -69,7 +67,6 @@ module Lti
                    configuration_params:,
                    unified_tool_id: nil,
                    overlay_params: {},
-                   binding_params: {},
                    developer_key_params: {})
       unless account.is_a?(Account) && created_by.is_a?(User)
         raise ArgumentError, "Please provide a valid account and user"
@@ -84,40 +81,58 @@ module Lti
       @registration_params = registration_params.slice(*ALLOWED_REGISTRATION_PARAMS)
       @configuration_params = configuration_params.slice(*Schemas::InternalLtiConfiguration.allowed_base_properties)
       @overlay_params = overlay_params&.slice(*Schemas::Lti::Overlay.allowed_base_properties)
-      @binding_params = binding_params&.slice(:workflow_state)
       @developer_key_params = developer_key_params&.slice(*ALLOWED_DEVELOPER_KEY_PARAMS)
+
+      @binding_workflow_state = "on"
+      resolved = Lti::AccountBindingService.resolve_workflow_state(@registration_params[:workflow_state])
+      if resolved
+        @binding_workflow_state = resolved[:binding]
+        @registration_params[:workflow_state] = resolved[:registration]
+      end
+      @binding_workflow_state = "allow" if account.site_admin? && @binding_workflow_state == "on"
+
+      @registration_params[:workflow_state] ||= "active"
       super()
     end
 
     def call
       Lti::Registration.transaction do
         registration = Lti::Registration.create!(
+          lock_deploying: true,
           **registration_params,
           account:,
-          workflow_state: "active",
           created_by:,
           updated_by: created_by
         )
 
+        # For manual registrations (which always have configuration_params),
+        # merge overlay into configuration instead of creating overlay.
+        final_config = configuration_params
         scopes = configuration_params[:scopes]
+
         if overlay_params.present?
-          overlay = Lti::Overlay.create!(
-            registration:,
-            account:,
-            updated_by: created_by,
-            data: overlay_params
-          )
-          scopes = overlay.apply_to(configuration_params)[:scopes]
+          # Validate overlay params before applying
+          validation_errors = Schemas::Lti::Overlay.validation_errors(overlay_params, allow_nil: true)
+          if validation_errors.present?
+            raise ArgumentError, "Invalid overlay parameters: #{validation_errors.to_json}"
+          end
+
+          # Manual registrations: merge overlay into config
+          # (We know this is a manual registration because we're creating a ToolConfiguration,
+          # not linking to an IMS registration)
+          merged_config = Lti::Overlay.apply_to(overlay_params, configuration_params)
+          final_config = merged_config.slice(*Schemas::InternalLtiConfiguration.allowed_base_properties)
+          scopes = final_config[:scopes]
         end
 
         dk = DeveloperKey.create!(
           account: account.site_admin? ? nil : account,
-          icon_url: configuration_params.dig(:launch_settings, :icon_url),
-          name: registration_params[:name] || configuration_params[:title],
-          public_jwk: configuration_params[:public_jwk],
-          public_jwk_url: configuration_params[:public_jwk_url],
-          redirect_uris: configuration_params[:redirect_uris] || [configuration_params[:target_link_uri]],
-          oidc_initiation_url: configuration_params[:oidc_initiation_url],
+          icon_url: final_config.dig(:launch_settings, :icon_url),
+          name: registration_params[:name] || final_config[:title],
+          public_jwk: final_config[:public_jwk],
+          public_jwk_url: final_config[:public_jwk_url],
+          redirect_uris: final_config[:redirect_uris] || [final_config[:target_link_uri]],
+          oidc_initiation_url: final_config[:oidc_initiation_url],
           visible: !account.site_admin?,
           scopes:,
           lti_registration: registration,
@@ -131,17 +146,17 @@ module Lti
           developer_key: dk,
           lti_registration: registration,
           unified_tool_id:,
-          **configuration_params
+          **final_config
         )
 
         Lti::AccountBindingService.call(account:,
                                         registration:,
                                         user: created_by,
                                         overwrite_created_by: true,
-                                        **binding_params)
+                                        workflow_state: binding_workflow_state)
 
         if account.feature_enabled?(:lti_registrations_next)
-          registration.new_external_tool(account, current_user: created_by, available: false)
+          registration.new_external_tool(account, current_user: created_by, available: false, enabled: registration.active?)
         end
 
         registration

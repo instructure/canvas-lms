@@ -113,9 +113,10 @@ describe "context modules", :ignore_js_errors do
 
       # expand all modules
       expand_all_modules_button.click
+      wait_for_ajaximations
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
       expect(module_item_titles[0]).to be_displayed
       expect(module_item_titles[1]).to be_displayed
       expect(module_item_titles[2]).to be_displayed
@@ -135,7 +136,7 @@ describe "context modules", :ignore_js_errors do
       expand_all_modules_button.click
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
 
       # collapse all modules
       collapse_all_modules_button.click
@@ -159,7 +160,7 @@ describe "context modules", :ignore_js_errors do
       expect(student_modules_container).to be_displayed
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
       expect(module_item_titles[0]).to be_displayed
       expect(module_item_titles[1]).to be_displayed
       expect(module_item_titles[2]).to be_displayed
@@ -178,7 +179,7 @@ describe "context modules", :ignore_js_errors do
       expand_all_modules_button.click
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
 
       # collapse all modules
       collapse_all_modules_button.click
@@ -415,7 +416,7 @@ describe "context modules", :ignore_js_errors do
         submission_types: "online_text_entry",
         points_possible: 10,
         workflow_state: "published",
-        due_at: 2.days
+        due_at: 2.days.from_now
       )
       go_to_modules
       module_header_expand_toggles[0].click
@@ -643,9 +644,25 @@ describe "context modules", :ignore_js_errors do
         expect(module_header_due_date_exists?(@module1.id)).to be_falsey
       end
     end
+
+    it "navigates to the module item's URL when clicking the item container" do
+      assignment = @course.assignments.create!(
+        title: "Clickable assignment",
+        submission_types: "online_text_entry",
+        points_possible: 10,
+        workflow_state: "published"
+      )
+      module_item = @module1.add_item(type: "assignment", id: assignment.id)
+
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+      module_header_expand_toggles[0].click
+
+      module_item_by_id(module_item.id).click
+
+      expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{assignment.id}")
+    end
   end
 
-  context "module locking" do
-    include_examples "module unlock dates"
-  end
+  it_behaves_like "module unlock dates"
 end

@@ -29,7 +29,7 @@ describe "new_discussion_entry" do
   let(:asset) { @object }
   let(:notification_name) { :new_discussion_entry }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   describe ".email" do
     let(:path_type) { :email }

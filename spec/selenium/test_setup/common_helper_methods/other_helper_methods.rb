@@ -22,7 +22,7 @@ require_relative "test_file_manager"
 module OtherHelperMethods
   def stub_kaltura
     # trick kaltura into being activated
-    kal = double("CanvasKaltura::ClientV3")
+    kal = instance_double(CanvasKaltura::ClientV3)
     allow(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive_messages(
       config: {
@@ -166,8 +166,16 @@ module OtherHelperMethods
     driver.execute_script "localStorage.clear();"
   end
 
+  def set_local_storage(key, value)
+    driver.execute_script("localStorage.setItem(arguments[0], arguments[1]);", key, value)
+  end
+
   def clear_session_storage
     driver.execute_script "sessionStorage.clear();"
+  end
+
+  def set_session_storage(key, value)
+    driver.execute_script("sessionStorage.setItem('#{key}', '#{value}');")
   end
 
   def scroll_height

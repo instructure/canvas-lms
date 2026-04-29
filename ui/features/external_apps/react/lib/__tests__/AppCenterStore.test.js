@@ -151,7 +151,7 @@ describe('ExternalApps.AppCenterStore', () => {
     expect(store.filteredApps()).toHaveLength(1)
   })
 
-  test('fetch', done => {
+  test('fetch', async () => {
     server.use(
       http.get('/api/v1/courses/1/app_center/apps', () => {
         return HttpResponse.json(apps)
@@ -162,12 +162,20 @@ describe('ExternalApps.AppCenterStore', () => {
       }),
     )
 
+    // Wait for store to update by listening to change events
+    const storeUpdatePromise = new Promise(resolve => {
+      const listener = () => {
+        if (!store.getState().isLoading && store.getState().isLoaded) {
+          store.removeChangeListener(listener)
+          resolve()
+        }
+      }
+      store.addChangeListener(listener)
+    })
+
     store.fetch()
 
-    // Wait for the async operation to complete
-    setTimeout(() => {
-      expect(store.getState().apps).toHaveLength(3)
-      done()
-    }, 100)
+    await storeUpdatePromise
+    expect(store.getState().apps).toHaveLength(3)
   })
 })

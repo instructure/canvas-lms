@@ -47,9 +47,12 @@ class Lti::AssetProcessor < ApplicationRecord
   def self.build_for_assignment(content_item:, context:)
     # Check tool is in the course or account:
     tool = Lti::ToolFinder.from_id(content_item["context_external_tool_id"], context)
-
     return nil unless tool
 
+    build_for_assignment_and_tool(content_item:, tool:)
+  end
+
+  def self.build_for_assignment_and_tool(content_item:, tool:)
     # TODO: add thumbnail to asset_processor model and add it here as well
     new(
       context_external_tool: tool,
@@ -71,8 +74,11 @@ class Lti::AssetProcessor < ApplicationRecord
   end
 
   def icon_or_tool_icon_url
-    icon_url ||
-      context_external_tool.extension_setting(:ActivityAssetProcessor, :icon_url)
+    icon_url || context_external_tool.extension_setting(placement, :icon_url)
+  end
+
+  def tool_placement_label
+    context_external_tool.label_for(placement, I18n.locale)
   end
 
   # Result structure should match with ExistingAttachedAssetProcessor in UI
@@ -88,7 +94,7 @@ class Lti::AssetProcessor < ApplicationRecord
         text: ap.text,
         tool_id: ap.context_external_tool_id,
         tool_name: ap.context_external_tool.name,
-        tool_placement_label: ap.context_external_tool.label_for(:ActivityAssetProcessor, I18n.locale),
+        tool_placement_label: ap.tool_placement_label,
         icon_or_tool_icon_url: ap.icon_or_tool_icon_url,
         iframe: ap.iframe,
         window: ap.window,
@@ -98,5 +104,13 @@ class Lti::AssetProcessor < ApplicationRecord
 
   def report_custom_variables
     (custom || {}).merge(report&.dig("custom") || {})
+  end
+
+  def discussion_ap?
+    assignment.discussion_topic?
+  end
+
+  def placement
+    discussion_ap? ? :ActivityAssetProcessorContribution : :ActivityAssetProcessor
   end
 end

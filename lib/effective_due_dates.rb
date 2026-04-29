@@ -150,23 +150,6 @@ class EffectiveDueDates
     end
   end
 
-  def filter_non_collaborative_groups_sql(table)
-    # Checking the feature flag instead of the account setting for differentiation tags.
-    # Reason: The feature flag is for development and testing purposes. If something happens
-    # during testing and we need to turn the feature off quickly, we can do so
-    # with the feature flag. The feature flag will eventually be removed once the feature is
-    # stable in production. The account setting is for production use and since the rollback plan
-    # states that students need to see the assignments that are assigned to them via a
-    # differentiation tag (non-collaborative) until the AssignmentOverride is deleted,
-    # we do not want to check if the account setting is disabled and will rely purely on the
-    # workflow state.
-    # Given this, we will remove this filter when the feature is stable in production.
-    # REF: https://instructure.atlassian.net/browse/EGG-463
-    unless @context.account.feature_enabled?(:assign_to_differentiation_tags)
-      "#{table}.non_collaborative IS FALSE AND"
-    end
-  end
-
   def active_in_section_sql
     if Account.site_admin.feature_enabled?(:deprioritize_section_overrides_for_nonactive_enrollments)
       "e.workflow_state = 'active'"
@@ -404,7 +387,6 @@ class EffectiveDueDates
             WHERE
               o.set_type = 'Group' AND
               g.workflow_state <> 'deleted' AND
-              #{filter_non_collaborative_groups_sql("g")}
               gm.workflow_state = 'accepted'
               #{filter_students_sql("gm")}
           ),

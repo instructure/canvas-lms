@@ -19,10 +19,7 @@
 import {Flex} from '@instructure/ui-flex'
 import {ReactNode} from 'react'
 
-export const BodyLayout = (props: {
-  title: ReactNode
-  editor: ReactNode
-}) => {
+export const BodyLayout = (props: {title: ReactNode; editor: ReactNode}) => {
   return (
     <Flex direction="column" width="100%">
       <Flex padding="0 0 large">{props.title}</Flex>

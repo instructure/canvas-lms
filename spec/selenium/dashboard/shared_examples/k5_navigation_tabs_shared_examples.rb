@@ -31,6 +31,8 @@ shared_examples_for "k5 subject navigation tabs" do
 
   let(:lti_a) { "LTI Resource A" }
   let(:lti_b) { "LTI Resource B" }
+  # NOTE: AI Experiences tab is dynamically added when feature flag is enabled, but should not appear in K5 subject courses
+  # TODO: See Jira ticket LLMA-94 for proper fix
   let(:navigation_names) { ["Home", "Schedule", "Modules", "Grades", "Groups", lti_a, lti_b] }
 
   before :once do

@@ -23,20 +23,20 @@ describe CanvasCareer::UserPreferenceManager do
   let(:manager) { described_class.new(session) }
 
   describe "experience preferences" do
-    it "defaults to career experience" do
-      expect(manager.prefers_career?).to be true
-      expect(manager.prefers_academic?).to be false
-    end
-
-    it "can switch to academic experience" do
-      manager.save_preferred_experience(CanvasCareer::Constants::Experience::ACADEMIC)
+    it "defaults to academic experience" do
       expect(manager.prefers_academic?).to be true
       expect(manager.prefers_career?).to be false
     end
 
+    it "can switch to career experience" do
+      manager.save_preferred_experience(CanvasCareer::Constants::Experience::CAREER)
+      expect(manager.prefers_career?).to be true
+      expect(manager.prefers_academic?).to be false
+    end
+
     it "ignores invalid experience values" do
       manager.save_preferred_experience("invalid_experience")
-      expect(manager.prefers_career?).to be true # remains default
+      expect(manager.prefers_academic?).to be true # remains default
     end
   end
 

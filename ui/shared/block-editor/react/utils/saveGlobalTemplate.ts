@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import uuid from 'uuid'
+import * as uuid from 'uuid'
 import {type BlockTemplate} from '../types'
 
 type GlobalTemplate = Partial<BlockTemplate>

@@ -96,7 +96,7 @@ describe('DiscussionIndex', () => {
   })
 
   it('calls getDiscussions if hasLoadedDiscussions is false', () => {
-    const getDiscussionsMock = jest.fn()
+    const getDiscussionsMock = vi.fn()
     const overrideProps = {getDiscussions: getDiscussionsMock}
     renderConnectedComponent(overrideProps)
     expect(getDiscussionsMock).toHaveBeenCalled()

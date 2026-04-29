@@ -27,10 +27,10 @@ type ErrorBoundaryState = {
 }
 
 type ErrorBoundaryProps = {
-  children: React.ReactNode[]
+  children: React.ReactNode
 }
 
-class ErrorBoundary extends React.Component {
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   static propTypes = {
     children: PropTypes.node,
   }
@@ -61,7 +61,6 @@ class ErrorBoundary extends React.Component {
         </div>
       )
     }
-    // @ts-expect-error
     return this.props.children
   }
 }

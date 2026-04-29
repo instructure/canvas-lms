@@ -53,7 +53,6 @@ describe "analytics in Canvas" do
       context "with A2 FF enabled" do
         before do
           @course.root_account.enable_feature!(:analytics_2)
-          @course.root_account.enable_feature!(:hide_legacy_course_analytics)
           user_session(@teacher)
 
           visit_course_people_page(@course.id)
@@ -69,7 +68,6 @@ describe "analytics in Canvas" do
       context "with A2 FF disabled" do
         before do
           @course.root_account.disable_feature!(:analytics_2)
-          @course.root_account.disable_feature!(:hide_legacy_course_analytics)
           user_session(@teacher)
 
           visit_course_people_page(@course.id)
@@ -77,28 +75,9 @@ describe "analytics in Canvas" do
           wait_for_student_tray
         end
 
-        it "displays Analytics 1 button on Student Tray" do
-          expect(student_tray_quick_links.text).to include("Analytics")
+        it "does not displays Analytics 1 button on Student Tray" do
+          expect(student_tray_quick_links.text).not_to include("Analytics")
           expect(student_tray_quick_links.text).not_to include("Admin Analytics")
-        end
-      end
-
-      context "with permissions" do
-        context "with A2 FF disabled and view_analytics permission disabled" do
-          before do
-            @course.account.role_overrides.create!(permission: :view_analytics, role: teacher_role, enabled: false)
-            @course.root_account.disable_feature!(:analytics_2)
-            user_session(@teacher)
-
-            visit_course_people_page(@course.id)
-            course_user_link(@student.id).click
-            wait_for_student_tray
-          end
-
-          it "does not display Analytics 1 button" do
-            skip "Flakey spec. Fix via LA-849"
-            expect(student_tray_quick_links.text).not_to include("Analytics")
-          end
         end
       end
     end

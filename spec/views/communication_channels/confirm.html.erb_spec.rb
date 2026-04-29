@@ -190,7 +190,7 @@ describe "communication_channels/confirm" do
         assign(:pseudonym, @user.pseudonyms.build(account: Account.default))
       end
 
-      include_examples "user registration"
+      it_behaves_like "user registration"
     end
   end
 
@@ -254,6 +254,6 @@ describe "communication_channels/confirm" do
       assign(:pseudonym, @user.pseudonyms.create!(unique_id: "johndoe@example.com"))
     end
 
-    include_examples "user registration"
+    it_behaves_like "user registration"
   end
 end

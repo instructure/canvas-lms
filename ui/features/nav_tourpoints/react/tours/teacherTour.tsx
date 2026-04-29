@@ -141,7 +141,7 @@ export default [
         </Text>
         <iframe
           title={I18n.t('Canvas Notifications Tutorial Video')}
-          src="https://community.instructuremedia.com/embed/b515f6d4-40f9-4f14-8051-7ef8b144c9d6"
+          src="https://embed.app.guidde.com/playbooks/gXwHu7sZCQN5kgKQkRTXWR"
           width="100%"
           height="277px"
           style={{marginTop: '1rem'}}
@@ -175,7 +175,7 @@ export default [
         </Text>
         <iframe
           title={I18n.t('Canvas Course Tutorial Video')}
-          src="https://community.instructuremedia.com/embed/bb5eeffe-2c18-4d91-a3be-0845f1ca1890"
+          src="https://embed.app.guidde.com/playbooks/p7Lm8jQBu8Qty9zuuwLWH2"
           width="100%"
           height="277px"
           style={{marginTop: '1rem'}}

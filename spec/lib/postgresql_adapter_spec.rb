@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../spec_helper"
+require "irb"
 
 describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
   it "aborts a query when interrupted" do
@@ -46,8 +46,8 @@ describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
 
   it "differentiates between unique and non-unique indexes" do
     indexes = User.connection.indexes(User.table_name)
-    expect(indexes.select(&:unique)).to_not eq([])
-    expect(indexes.reject(&:unique)).to_not eq([])
+    expect(indexes.select(&:unique)).not_to eq([])
+    expect(indexes.reject(&:unique)).not_to eq([])
   end
 
   it "can handle an array of hosts, falling back to a successful connection" do
@@ -56,6 +56,36 @@ describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
     # host might be nil on purpose so can't use Array(), but it might also be an array,
     # so we need to flatten
     config[:host] = (["nonexistent"] + [config[:host]]).flatten
+    db_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(db_config.env_name, db_config.name, config)
+    conn = db_config.new_connection
+    conn.execute("SELECT 1")
+  ensure
+    conn&.disconnect!
+  end
+
+  it "can handle an array of passwords, falling back to a successful connection" do
+    db_config = ActiveRecord::Base.connection_pool.db_config
+    config = db_config.configuration_hash.dup
+    # password might be nil on purpose so can't use Array(), but it might also be an array,
+    # so we need to flatten
+    config[:password] = (["wrong_password"] + [config[:password]]).flatten
+    db_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(db_config.env_name, db_config.name, config)
+    conn = db_config.new_connection
+    conn.execute("SELECT 1")
+  ensure
+    conn&.disconnect!
+  end
+
+  it "can handle an array of hosts and passwords and prefers the first one" do
+    allow(PG).to receive(:connect).and_call_original
+    expect(PG).not_to receive(:connect).with(hash_including(host: "nonexistent"))
+    expect(PG).not_to receive(:connect).with(hash_including(password: "wrong_password"))
+    db_config = ActiveRecord::Base.connection_pool.db_config
+    config = db_config.configuration_hash.dup
+    # password might be nil on purpose so can't use Array(), but it might also be an array,
+    # so we need to flatten
+    config[:host] = ([config[:host]] + ["nonexistent"]).flatten
+    config[:password] = ([config[:password]] + ["wrong_password"]).flatten
     db_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(db_config.env_name, db_config.name, config)
     conn = db_config.new_connection
     conn.execute("SELECT 1")

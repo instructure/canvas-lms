@@ -16,46 +16,68 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {fetchFolders} from '../folders'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect', () => {
-  return jest.fn(() => ({
-    json: [{id: '123', name: 'Test Folder'}],
-    link: {next: {page: '2'}},
-  }))
-})
+const server = setupServer()
 
 describe('folders', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+  afterEach(() => server.resetHandlers())
+
   describe('fetchFolders', () => {
     const folderId = '235'
-    const expectedFolderPerPage = '25'
     const expectedPath = `/api/v1/folders/${folderId}/folders`
-    const expectedHttpMethod = 'GET'
 
-    beforeEach(() => {
-      ;(doFetchApi as jest.Mock).mockClear()
-    })
+    it('should request page 1 when no page param is provided', async () => {
+      let requestParams: URLSearchParams | undefined
+      server.use(
+        http.get(expectedPath, ({request}) => {
+          requestParams = new URL(request.url).searchParams
+          return HttpResponse.json([{id: '123', name: 'Test Folder'}], {
+            headers: {
+              Link: `<${expectedPath}?page=2>; rel="next"`,
+            },
+          })
+        }),
+      )
 
-    it('should call the doFetchApi with page 1 when no page param is provided', async () => {
       await fetchFolders(folderId, null)
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: expectedPath,
-        method: expectedHttpMethod,
-        params: {per_page: expectedFolderPerPage, page: '1'},
-      })
+      expect(requestParams!.get('page')).toBe('1')
+      expect(requestParams!.get('per_page')).toBe('25')
     })
 
-    it('should call the doFetchApi with page param when is provided', async () => {
+    it('should request the specified page when page param is provided', async () => {
+      let requestParams: URLSearchParams | undefined
+      server.use(
+        http.get(expectedPath, ({request}) => {
+          requestParams = new URL(request.url).searchParams
+          return HttpResponse.json([{id: '123', name: 'Test Folder'}], {
+            headers: {
+              Link: `<${expectedPath}?page=3>; rel="next"`,
+            },
+          })
+        }),
+      )
+
       await fetchFolders(folderId, '2')
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: expectedPath,
-        method: expectedHttpMethod,
-        params: {per_page: expectedFolderPerPage, page: '2'},
-      })
+      expect(requestParams!.get('page')).toBe('2')
+      expect(requestParams!.get('per_page')).toBe('25')
     })
 
-    it('should return the transformed response from doFetchApi response', async () => {
+    it('should return the transformed response with next page', async () => {
+      server.use(
+        http.get(expectedPath, () =>
+          HttpResponse.json([{id: '123', name: 'Test Folder'}], {
+            headers: {
+              Link: `<${expectedPath}?page=2>; rel="next"`,
+            },
+          }),
+        ),
+      )
+
       const result = await fetchFolders(folderId, null)
       expect(result).toEqual({
         json: [{id: '123', name: 'Test Folder'}],

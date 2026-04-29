@@ -228,11 +228,12 @@ describe "conversations new" do
         f("button[data-testid='more-options']").click
         fj("span[class*='-menuItem__label']:contains('Archive')").click
         driver.switch_to.alert.accept
-        expect(fj("span:contains('Message archived!')")).to be_present
         f("button[data-testid='more-options']").click
+        expect(fj("span[class*='-menuItem__label']:contains('Unarchive')")).to be_present
         fj("span[class*='-menuItem__label']:contains('Unarchive')").click
         driver.switch_to.alert.accept
-        expect(fj("span:contains('Message unarchived!')")).to be_present
+        f("button[data-testid='more-options']").click
+        expect(fj("span[class*='-menuItem__label']:contains('Archive')")).to be_present
       end
 
       it "hides selected message while loading" do
@@ -319,6 +320,7 @@ describe "conversations new" do
         expect(f("[data-testid='course-select']").attribute("value")).to eq @course.name
         force_click("[data-testid='delete-course-button'] > button")
         wait_for_ajaximations
+        # After reset, the input value is empty and placeholder shows "All Courses"
         expect(f("[data-testid='course-select']").attribute("value")).to eq ""
       end
     end
@@ -384,6 +386,22 @@ describe "conversations new" do
       it "does not shows the Manage labels button" do
         get "/conversations"
         expect(f("body")).not_to contain_jqcss('button[data-testid="manage-labels"]')
+      end
+    end
+
+    context "nutrition facts functionality" do
+      before do
+        allow(FeatureFlags::Hooks).to receive(:tier_1_visible_on_hook).and_return(true)
+        @course.root_account.enable_feature!(:translate_inbox_messages)
+      end
+
+      context "translations feature flag is enabled" do
+        it "loads nutrition facts element in compose modal" do
+          get "/conversations"
+          f("button[data-testid='compose']").click
+          wait_for_ajaximations
+          expect(f("[data-testid='nutrition-facts-trigger']")).to be_present
+        end
       end
     end
   end

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::CreateAssignment do
@@ -80,6 +79,8 @@ describe Mutations::CreateAssignment do
               intraReviews
               anonymousReviews
               automaticReviews
+              submissionRequired
+              acrossSections
             }
             modules {
               _id
@@ -200,6 +201,145 @@ describe Mutations::CreateAssignment do
     expect(assignment.intra_group_peer_reviews).to be true
     expect(assignment.anonymous_peer_reviews).to be true
     expect(assignment.automatic_peer_reviews).to be true
+  end
+
+  context "peer review submission_required" do
+    before do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    it "creates an assignment with submission_required set to true" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review with submission required"
+        peerReviews: {
+          enabled: true
+          submissionRequired: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "submissionRequired")).to be true
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_submission_required).to be true
+    end
+
+    it "creates an assignment with submission_required set to false" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review without submission required"
+        peerReviews: {
+          enabled: true
+          submissionRequired: false
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "submissionRequired")).to be false
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_submission_required).to be false
+    end
+
+    it "defaults submission_required to true when not specified" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review default submission required"
+        peerReviews: {
+          enabled: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "submissionRequired")).to be true
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_submission_required).to be true
+    end
+  end
+
+  context "peer review across_sections" do
+    before do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    it "creates an assignment with across_sections set to true" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review across sections"
+        peerReviews: {
+          enabled: true
+          acrossSections: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "acrossSections")).to be true
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_across_sections).to be true
+    end
+
+    it "creates an assignment with across_sections set to false" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review not across sections"
+        peerReviews: {
+          enabled: true
+          acrossSections: false
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "acrossSections")).to be false
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_across_sections).to be false
+    end
+
+    it "defaults across_sections to true when not specified" do
+      result = execute_with_input <<~GQL
+        courseId: "#{@course.to_param}"
+        name: "peer review default across sections"
+        peerReviews: {
+          enabled: true
+        }
+      GQL
+
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createAssignment", "errors")).to be_nil
+      expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "acrossSections")).to be true
+
+      assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+      expect(assignment.peer_review_across_sections).to be true
+    end
+
+    context "when feature flag is off" do
+      before do
+        @course.disable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns null for acrossSections in the response" do
+        result = execute_with_input <<~GQL
+          courseId: "#{@course.to_param}"
+          name: "peer review without feature flag"
+          peerReviews: {
+            enabled: true
+            acrossSections: true
+          }
+        GQL
+
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "createAssignment", "errors")).to be_nil
+        expect(result.dig("data", "createAssignment", "assignment", "peerReviews", "acrossSections")).to be_nil
+      end
+    end
   end
 
   it "creates an assignment in an assignment group" do
@@ -370,7 +510,7 @@ describe Mutations::CreateAssignment do
       courseId: "#{@course.to_param}"
     GQL
     errors = result["errors"]
-    expect(errors).to_not be_nil
+    expect(errors).not_to be_nil
     expect(errors.first["message"]).to include "Argument 'name' on InputObject 'CreateAssignmentInput' is required"
   end
 
@@ -388,7 +528,7 @@ describe Mutations::CreateAssignment do
       name: "nope"
     GQL
     errors = result["errors"]
-    expect(errors).to_not be_nil
+    expect(errors).not_to be_nil
     expect(errors[0]["message"]).to include "invalid course"
   end
 
@@ -398,7 +538,7 @@ describe Mutations::CreateAssignment do
       name: "I don't have permission to create this"
     GQL
     errors = result["errors"]
-    expect(errors).to_not be_nil
+    expect(errors).not_to be_nil
     expect(errors[0]["message"]).to include "invalid course"
   end
 
@@ -467,5 +607,29 @@ describe Mutations::CreateAssignment do
 
     assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
     expect(assignment.suppress_assignment).to be true
+  end
+
+  it "uses secureParams to set lti_context_id" do
+    custom_lti_id = "custom-lti-context-123"
+    jwt = Assignment.secure_params(custom_lti_id)
+
+    result = execute_with_input <<~GQL
+      name: "assignment with secure params"
+      courseId: "#{@course.to_param}"
+      secureParams: "#{jwt}"
+    GQL
+
+    assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+    expect(assignment.lti_context_id).to eq(custom_lti_id)
+  end
+
+  it "raises error for invalid secureParams" do
+    expect do
+      execute_with_input <<~GQL
+        name: "assignment with invalid secure params"
+        courseId: "#{@course.to_param}"
+        secureParams: "invalid_jwt_token"
+      GQL
+    end.to raise_error(CanvasSecurity::InvalidToken, /Invalid JWT Format/)
   end
 end

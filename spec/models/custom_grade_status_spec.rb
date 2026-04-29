@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative "../spec_helper"
+
 describe CustomGradeStatus do
   let_once(:root_account) { Account.create! }
   let_once(:user) { User.create! }
@@ -121,6 +121,78 @@ describe CustomGradeStatus do
   it "sets deleted_by to nil by default" do
     status = CustomGradeStatus.create(name: "status", color: "#000000", root_account:, created_by: user)
     expect(status.deleted_by).to be_nil
+  end
+
+  describe "icon assignment" do
+    it "automatically assigns custom-1 to the first status" do
+      status = CustomGradeStatus.create!(name: "status1", color: "#000000", root_account:, created_by: user)
+      expect(status.icon).to eq("custom-1")
+    end
+
+    it "automatically assigns custom-2 to the second status" do
+      CustomGradeStatus.create!(name: "status1", color: "#000000", root_account:, created_by: user)
+      status2 = CustomGradeStatus.create!(name: "status2", color: "#000000", root_account:, created_by: user)
+      expect(status2.icon).to eq("custom-2")
+    end
+
+    it "automatically assigns custom-3 to the third status" do
+      CustomGradeStatus.create!(name: "status1", color: "#000000", root_account:, created_by: user)
+      CustomGradeStatus.create!(name: "status2", color: "#000000", root_account:, created_by: user)
+      status3 = CustomGradeStatus.create!(name: "status3", color: "#000000", root_account:, created_by: user)
+      expect(status3.icon).to eq("custom-3")
+    end
+
+    it "reuses icon from deleted status" do
+      status1 = CustomGradeStatus.create!(name: "first", color: "#000000", root_account:, created_by: user)
+      expect(status1.icon).to eq("custom-1")
+
+      status1.deleted_by = user
+      status1.destroy
+      expect(status1.deleted?).to be_truthy
+
+      status2 = CustomGradeStatus.create!(name: "new", color: "#000000", root_account:, created_by: user)
+      expect(status2.icon).to eq("custom-1")
+    end
+
+    it "validates icon uniqueness among active statuses" do
+      status1 = CustomGradeStatus.create!(name: "first", color: "#000000", root_account:, created_by: user)
+      status2 = CustomGradeStatus.new(name: "second", color: "#000000", root_account:, created_by: user, icon: status1.icon)
+
+      expect(status2.valid?).to be_falsey
+      expect(status2.errors[:icon]).to include("is already in use by another active status")
+    end
+
+    it "allows same icon for different root accounts" do
+      account2 = Account.create!
+      status1 = CustomGradeStatus.create!(name: "status1", color: "#000000", root_account:, created_by: user)
+      status2 = CustomGradeStatus.create(name: "status2", color: "#000000", root_account: account2, created_by: user)
+
+      expect(status1.icon).to eq("custom-1")
+      expect(status2.icon).to eq("custom-1")
+      expect(status1.valid?).to be_truthy
+      expect(status2.valid?).to be_truthy
+    end
+
+    it "doesn't allow invalid icon values" do
+      status = CustomGradeStatus.new(name: "status", color: "#000000", root_account:, created_by: user, icon: "invalid-icon")
+      expect(status.valid?).to be_falsey
+      expect(status.errors[:icon]).to include("is not included in the list")
+    end
+
+    it "requires icon on update" do
+      status = CustomGradeStatus.create!(name: "status", color: "#000000", root_account:, created_by: user)
+      status.icon = nil
+      expect(status.valid?(:update)).to be_falsey
+      expect(status.errors[:icon]).to include("can't be blank")
+    end
+
+    it "preserves icon on update" do
+      status = CustomGradeStatus.create!(name: "status", color: "#000000", root_account:, created_by: user)
+      original_icon = status.icon
+
+      status.update!(name: "updated status", color: "#111111")
+      expect(status.icon).to eq(original_icon)
+    end
   end
 
   describe "soft deletion" do

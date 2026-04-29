@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class GroupCategory < ActiveRecord::Base
+class GroupCategory < ApplicationRecord
   attr_reader :create_group_count
   attr_reader :create_group_member_count
   attr_accessor :group_by_section
@@ -471,15 +471,17 @@ class GroupCategory < ActiveRecord::Base
                  end
 
     if split_type
-      InstStatsd::Statsd.increment("groups.auto_create",
-                                   tags: { split_type:, root_account_id: root_account&.global_id, root_account_name: root_account&.name })
+      InstStatsd::Statsd.increment(
+        "groups.auto_create",
+        tags: { split_type: }.merge(Utils::InstStatsdUtils::Tags.tags_for(root_account.shard))
+      )
     end
 
     by_section = @group_by_section && context.is_a?(Course)
     calculate_group_count_by_membership(by_section:) if @create_group_member_count
     create_groups(@create_group_count) if @create_group_count
     if @assign_unassigned_members && @create_group_count
-      assign_unassigned_members(by_section)
+      assign_unassigned_members(by_section:)
     end
     @create_group_count = @assign_unassigned_members = nil
   end
@@ -508,7 +510,7 @@ class GroupCategory < ActiveRecord::Base
     context.users_not_in_groups(allows_multiple_memberships? ? [] : groups.active)
   end
 
-  def assign_unassigned_members(by_section = false, updating_user: nil)
+  def assign_unassigned_members(by_section: false, updating_user: nil)
     Delayed::Batch.serial_batch do
       SubmissionLifecycleManager.with_executing_user(updating_user) do
         if by_section
@@ -534,9 +536,9 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
-  def assign_unassigned_members_in_background(by_section = false, updating_user: nil)
+  def assign_unassigned_members_in_background(by_section: false, updating_user: nil)
     start_progress
-    delay(priority: Delayed::LOW_PRIORITY).assign_unassigned_members(by_section, updating_user:)
+    delay(priority: Delayed::LOW_PRIORITY).assign_unassigned_members(by_section:, updating_user:)
   end
 
   def clone_groups_and_memberships(new_group_category)
@@ -589,7 +591,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def max_diff_tag_validation_count
-    sql = <<-SQL.squish
+    sql = <<~SQL.squish
       SELECT
         SUM(
           (SELECT COUNT(id) FROM #{Group.quoted_table_name} WHERE group_category_id = parent.id AND workflow_state <> 'deleted')

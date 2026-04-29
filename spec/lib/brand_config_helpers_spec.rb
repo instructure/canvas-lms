@@ -90,4 +90,66 @@ describe BrandConfigHelpers do
       expect(Account.site_admin.first_parent_brand_config).to be_nil
     end
   end
+
+  describe "branding_allowed?" do
+    it "returns true for root accounts" do
+      root_account = Account.create!
+      expect(root_account.branding_allowed?).to be true
+    end
+
+    context "with sub-accounts" do
+      it "returns false when root account has sub_account_includes disabled" do
+        root_account = Account.create!
+        sub_account = Account.create!(parent_account: root_account, root_account:)
+
+        root_account.settings[:sub_account_includes] = false
+        root_account.save!
+
+        expect(sub_account.branding_allowed?).to be_falsey
+      end
+
+      it "returns true when root account has sub_account_includes enabled" do
+        root_account = Account.create!
+        sub_account = Account.create!(parent_account: root_account, root_account:)
+
+        root_account.settings[:sub_account_includes] = true
+        root_account.save!
+
+        expect(sub_account.branding_allowed?).to be true
+      end
+    end
+
+    context "with consortium parent" do
+      specs_require_sharding
+
+      before :once do
+        @consortium_parent = Account.create!(name: "Consortium Parent")
+        @consortium_parent.settings[:consortium_parent_account] = true
+        @consortium_parent.save!
+
+        @consortium_child = Account.create!(name: "Consortium Child")
+        @consortium_parent.add_consortium_child(@consortium_child)
+
+        @sub_account = Account.create!(
+          name: "Sub Account",
+          parent_account: @consortium_child,
+          root_account: @consortium_child
+        )
+      end
+
+      it "returns true when consortium parent has sub_account_includes enabled" do
+        @consortium_parent.settings[:sub_account_includes] = true
+        @consortium_parent.save!
+
+        expect(@sub_account.reload.branding_allowed?).to be true
+      end
+
+      it "returns false when consortium parent has sub_account_includes disabled" do
+        @consortium_parent.settings[:sub_account_includes] = false
+        @consortium_parent.save!
+
+        expect(@sub_account.reload.branding_allowed?).to be false
+      end
+    end
+  end
 end

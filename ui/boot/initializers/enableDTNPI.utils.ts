@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 
 export type PersistentArray<T> = Array<T>
 export type PersistentArrayParameters = {

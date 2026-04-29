@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {sendMessageStudentsWho} from '../api'
 import {hasSubmitted, hasSubmission, hasGraded} from '@canvas/grading/messageStudentsWhoHelper'
 import {TeacherAssignmentShape} from '../assignmentData'

@@ -280,13 +280,55 @@ describe ProfileController do
       expect(@user.profile.title).to eql "!!!"
     end
 
+    it "does not change profile title if not allowed" do
+      account = Account.default
+      account.settings = { users_can_edit_profile: true, users_can_edit_title: false }
+      account.save!
+
+      put "update_profile",
+          params: { user: { short_name: "Monsturd", name: "Jenkins" },
+                    user_profile: { title: "not_allowed" } },
+          format: "json"
+      expect(response).to be_successful
+      @user.reload
+      expect(@user.profile.title).not_to eql "not_allowed"
+    end
+
+    it "does not change profile bio if not allowed" do
+      account = Account.default
+      account.settings = { users_can_edit_profile: true, users_can_edit_bio: false }
+      account.save!
+
+      put "update_profile",
+          params: { user: { short_name: "Monsturd", name: "Jenkins" },
+                    user_profile: { bio: "not_allowed" } },
+          format: "json"
+      expect(response).to be_successful
+      @user.reload
+      expect(@user.profile.bio).not_to eql "not_allowed"
+    end
+
+    it "does not change profile links if not allowed" do
+      account = Account.default
+      account.settings = { users_can_edit_profile: true, users_can_edit_profile_links: false }
+      account.save!
+
+      put "update_profile",
+          params: { link_urls: ["example.com", "foo.com", "", "///////invalid"],
+                    link_titles: ["Example.com", "Foo", "", "invalid"] },
+          format: "json"
+      expect(response).to be_successful
+
+      @user.reload
+      expect(@user.profile.links).to be_empty
+    end
+
     it "does not let you change your short_name information if you are not allowed" do
       account = Account.default
-      account.settings = { users_can_edit_name: false }
+      account.settings = { users_can_edit_name: false, users_can_edit_bio: true, users_can_edit_title: true }
       account.save!
 
       old_name = @user.short_name
-      old_title = @user.profile.title
       put "update_profile",
           params: { user: { short_name: "Monsturd", name: "Jenkins" },
                     user_profile: { bio: "...", title: "!!!" } },
@@ -297,7 +339,7 @@ describe ProfileController do
       expect(@user.short_name).to eql old_name
       expect(@user.name).not_to eql "Jenkins"
       expect(@user.profile.bio).to eql "..."
-      expect(@user.profile.title).to eql old_title
+      expect(@user.profile.title).to eql "!!!"
     end
 
     it "does not let you change your profile information if you are not allowed" do
@@ -317,17 +359,15 @@ describe ProfileController do
     end
 
     it "lets you set visibility on user_services" do
-      @user.user_services.create! service: "skype", service_user_name: "user", service_user_id: "user", visible: true
       @user.user_services.create! service: "diigo", service_user_name: "user", service_user_id: "user", visible: false
 
       put "update_profile",
           params: { user_profile: { bio: "..." },
-                    user_services: { diigo: "1", skype: "false" } },
+                    user_services: { diigo: "1" } },
           format: "json"
       expect(response).to be_successful
 
       @user.reload
-      expect(@user.user_services.where(service: "skype").first.visible?).to be_falsey
       expect(@user.user_services.where(service: "diigo").first.visible?).to be_truthy
     end
 
@@ -444,6 +484,10 @@ describe ProfileController do
       end
     end
 
+    before do
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
+    end
+
     context "when rendering the full view" do
       render_views
 
@@ -479,6 +523,7 @@ describe ProfileController do
 
       context "is_default_account" do
         it "should be 'true' if the domain root account is the default" do
+          allow(LoadAccount).to receive(:default_domain_root_account).and_return(Account.default)
           user_session(@user)
 
           get "settings"
@@ -497,7 +542,6 @@ describe ProfileController do
 
         it "should be 'false' if the user does not have permission to update tokens" do
           @user.account.change_root_account_setting!(:limit_personal_access_tokens, true)
-          @user.account.enable_feature!(:admin_manage_access_tokens)
           user_session(@user)
           get "settings"
 
@@ -506,14 +550,14 @@ describe ProfileController do
       end
 
       it "sets discussions_reporting to falsey if discussions_reporting is off" do
-        Account.default.disable_feature! :discussions_reporting
+        @account.disable_feature! :discussions_reporting
         user_session(@user)
         get "communication"
         expect(assigns[:js_env][:discussions_reporting]).to be_falsey
       end
 
       it "sets discussions_reporting to truthy if discussions_reporting is on" do
-        Account.default.enable_feature! :discussions_reporting
+        @account.enable_feature! :discussions_reporting
         user_session(@user)
         get "communication"
         expect(assigns[:js_env][:discussions_reporting]).to be_truthy

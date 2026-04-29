@@ -23,10 +23,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('theme_editor')
 
-// consider anything other than null or undefined (including '') as "set"
-function isSet(val) {
-  return val === null || val === undefined
-}
+// returns true if the value is not set (null or undefined)
+const isNotSet = val => val === null || val === undefined
 
 export default class ThemeEditorImageRow extends Component {
   static propTypes = {
@@ -53,7 +51,7 @@ export default class ThemeEditorImageRow extends Component {
       // we want to also clear out the value of the <input type=file>
       // but we don't want to mess with its value otherwise
       this.fileInput.value = ''
-      if (isSet(this.props.userInput.val)) {
+      if (isNotSet(this.props.userInput.val)) {
         // In this case, they clicked 'Use Default' so we need to make sure we really do go with the default
         this.props.handleThemeStateChange(this.props.varDef.variable_name, null, {
           resetValue: true,
@@ -74,6 +72,7 @@ export default class ThemeEditorImageRow extends Component {
 
   render() {
     const inputName = `brand_config[variables][${this.props.varDef.variable_name}]`
+    const describedId = `${this.props.varDef.variable_name}-status`
     const imgSrc = this.props.userInput.val || this.props.placeholder
 
     return (
@@ -106,6 +105,11 @@ export default class ThemeEditorImageRow extends Component {
               {}
               <label className="Theme__editor-image_upload-label">
                 <span className="screenreader-only">{this.props.varDef.human_name}</span>
+                <span id={describedId} className="screenreader-only" aria-hidden="true">
+                  {this.props.currentValue || this.props.userInput.val
+                    ? I18n.t('Choose a file to replace the current image.')
+                    : I18n.t('No image currently set. Choose a file to upload an image.')}
+                </span>
                 <input
                   type="file"
                   className="Theme__editor-input_upload"
@@ -113,6 +117,7 @@ export default class ThemeEditorImageRow extends Component {
                   accept={this.props.varDef.accept}
                   onChange={event => this.setValue(event.target)}
                   ref={c => (this.fileInput = c)}
+                  aria-describedby={describedId}
                 />
                 <span
                   className="Theme__editor-button_upload Button Button--link"
@@ -126,9 +131,9 @@ export default class ThemeEditorImageRow extends Component {
                 <button
                   type="button"
                   className="Button Button--link"
-                  onClick={() => this.setValue(isSet(this.props.userInput.val) ? '' : null)}
+                  onClick={() => this.setValue(isNotSet(this.props.userInput.val) ? '' : null)}
                 >
-                  {isSet(this.props.userInput.val) ? I18n.t('Use Default') : I18n.t('Undo')}
+                  {isNotSet(this.props.userInput.val) ? I18n.t('Use Default') : I18n.t('Undo')}
                 </button>
               ) : null}
             </div>

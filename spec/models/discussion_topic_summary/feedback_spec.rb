@@ -47,6 +47,13 @@ describe DiscussionTopicSummary::Feedback do
         expect(@feedback.liked).to be true
         expect(@feedback.disliked).to be false
       end
+
+      it "clears comment when liking" do
+        @feedback.dislike
+        @feedback.add_comment("bad summary")
+        @feedback.like
+        expect(@feedback.comment).to be_nil
+      end
     end
 
     context "when action is dislike" do
@@ -54,6 +61,41 @@ describe DiscussionTopicSummary::Feedback do
         @feedback.dislike
         expect(@feedback.liked).to be false
         expect(@feedback.disliked).to be true
+      end
+    end
+
+    context "when action is add_comment" do
+      it "stores comment on a disliked feedback" do
+        @feedback.dislike
+        @feedback.add_comment("The summary is inaccurate")
+        expect(@feedback.comment).to eq("The summary is inaccurate")
+      end
+
+      it "persists the comment to the database" do
+        @feedback.dislike
+        @feedback.add_comment("The summary is inaccurate")
+        @feedback.reload
+        expect(@feedback.comment).to eq("The summary is inaccurate")
+      end
+
+      it "raises error when feedback is not disliked" do
+        expect do
+          @feedback.add_comment("some comment")
+        end.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it "raises error when feedback is liked" do
+        @feedback.like
+        expect do
+          @feedback.add_comment("some comment")
+        end.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      it "overwrites an existing comment" do
+        @feedback.dislike
+        @feedback.add_comment("first comment")
+        @feedback.add_comment("updated comment")
+        expect(@feedback.comment).to eq("updated comment")
       end
     end
 
@@ -69,6 +111,13 @@ describe DiscussionTopicSummary::Feedback do
         expect(@feedback.liked).to be false
         expect(@feedback.disliked).to be false
       end
+
+      it "clears comment when resetting" do
+        @feedback.dislike
+        @feedback.add_comment("bad summary")
+        @feedback.reset_like
+        expect(@feedback.comment).to be_nil
+      end
     end
 
     context "when action is disable_summary" do
@@ -76,6 +125,27 @@ describe DiscussionTopicSummary::Feedback do
         @feedback.disable_summary
         expect(@feedback.summary_disabled).to be true
       end
+    end
+  end
+
+  describe "validations" do
+    it "allows comment up to 1024 characters" do
+      @feedback.dislike
+      @feedback.add_comment("a" * 1024)
+      expect(@feedback).to be_valid
+    end
+
+    it "rejects comment longer than 1024 characters" do
+      @feedback.dislike
+      expect do
+        @feedback.add_comment("a" * 1025)
+      end.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "allows nil comment" do
+      @feedback.dislike
+      expect(@feedback).to be_valid
+      expect(@feedback.comment).to be_nil
     end
   end
 end

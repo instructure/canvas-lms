@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isEmpty} from 'lodash'
+import {isEmpty} from 'es-toolkit/compat'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
@@ -66,7 +66,7 @@ describe('CreateGroupView', () => {
     }
     document.querySelectorAll('.ui-dialog').forEach(el => el.remove())
     document.body.innerHTML = ''
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   test('it hides drop options for no assignments and undefined assignmentGroup id', async () => {
@@ -109,7 +109,7 @@ describe('CreateGroupView', () => {
   })
 
   test('it should create a new assignment group', () => {
-    jest.spyOn(CreateGroupView.prototype, 'close').mockImplementation()
+    vi.spyOn(CreateGroupView.prototype, 'close').mockImplementation()
     view = createView({newGroup: true})
     view.render()
     view.onSaveSuccess()
@@ -124,7 +124,7 @@ describe('CreateGroupView', () => {
     const deferred = $.Deferred()
 
     // Mock the save method to return our deferred
-    saveMock = jest.spyOn(view.model, 'save').mockReturnValue(deferred)
+    saveMock = vi.spyOn(view.model, 'save').mockReturnValue(deferred)
 
     // Set up the view
     document.getElementById('fixtures').appendChild(view.el)
@@ -190,7 +190,7 @@ describe('CreateGroupView', () => {
   })
 
   test('it should trigger a render event on save success when editing', () => {
-    const triggerSpy = jest.spyOn(AssignmentGroupCollection.prototype, 'trigger')
+    const triggerSpy = vi.spyOn(AssignmentGroupCollection.prototype, 'trigger')
     view = createView()
     view.onSaveSuccess()
     expect(triggerSpy).toHaveBeenCalledWith('render', view.model.collection)
@@ -198,19 +198,19 @@ describe('CreateGroupView', () => {
 
   test('it should call render on save success if adding an assignmentGroup', () => {
     view = createView({newGroup: true})
-    jest.spyOn(view, 'render')
+    vi.spyOn(view, 'render')
     view.onSaveSuccess()
     expect(view.render).toHaveBeenCalledTimes(1)
   })
 
   test('it shows a success message', () => {
-    jest.spyOn(CreateGroupView.prototype, 'close').mockImplementation()
-    jest.spyOn($, 'flashMessage').mockImplementation()
-    jest.useFakeTimers()
+    vi.spyOn(CreateGroupView.prototype, 'close').mockImplementation()
+    vi.spyOn($, 'flashMessage').mockImplementation()
+    vi.useFakeTimers()
     view = createView({newGroup: true})
     view.render()
     view.onSaveSuccess()
-    jest.advanceTimersByTime(101)
+    vi.advanceTimersByTime(101)
     expect($.flashMessage).toHaveBeenCalledWith('Assignment group was saved successfully')
   })
 })

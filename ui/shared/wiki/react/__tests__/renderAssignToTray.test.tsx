@@ -18,8 +18,12 @@
 
 import {render, waitFor} from '@testing-library/react'
 import {renderAssignToTray} from '../renderAssignToTray'
-import {queryClient} from '@canvas/query'
-import fetchMock from 'fetch-mock'
+import {queryClient} from '@instructure/platform-query'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import fakeEnv from '@canvas/test-utils/fakeENV'
+
+const server = setupServer()
 
 const props = {pageId: '1', onSync: () => {}, pageName: 'Test page'}
 
@@ -55,27 +59,36 @@ export const STUDENTS_DATA = [
   },
 ]
 
-// @ts-expect-error
-window.ENV = {
-  COURSE_ID: '1',
-}
-
 describe('renderAssignToTray embedded', () => {
-  const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/1/modules/2/assignment_overrides?per_page=100`
-  const COURSE_SETTINGS_URL = `/api/v1/courses/1/settings`
-  const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
-  const PAGES_URL = `/api/v1/courses/1/pages/1/date_details?per_page=100`
+  beforeAll(() => {
+    server.listen()
+    fakeEnv.setup({COURSE_ID: '1'})
+  })
+  afterAll(() => {
+    server.close()
+    fakeEnv.teardown()
+  })
 
   beforeEach(() => {
-    fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
+    server.use(
+      http.get(/\/api\/v1\/courses\/.+\/sections/, () => {
+        return HttpResponse.json(SECTIONS_DATA)
+      }),
+      http.get('/api/v1/courses/1/modules/2/assignment_overrides', () => {
+        return HttpResponse.json([])
+      }),
+      http.get('/api/v1/courses/1/settings', () => {
+        return HttpResponse.json({hide_final_grades: false})
+      }),
+      http.get('/api/v1/courses/1/pages/1/date_details', () => {
+        return HttpResponse.json([])
+      }),
+    )
     queryClient.setQueryData(['students', '1', {per_page: 100}], STUDENTS_DATA)
-    fetchMock.get(ASSIGNMENT_OVERRIDES_URL, [])
-    fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
-    fetchMock.get(PAGES_URL, [])
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   const container = document.createElement('div')
@@ -88,6 +101,6 @@ describe('renderAssignToTray embedded', () => {
 
     const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
     expect(selectedOptions).toHaveLength(1)
-    waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
+    await waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
   })
 })

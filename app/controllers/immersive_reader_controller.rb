@@ -21,7 +21,6 @@
 # This API requires Immersive Reader to be configured
 
 class ImmersiveReaderController < ApplicationController
-  before_action :require_user
   before_action :require_config
 
   class ServiceError < StandardError; end

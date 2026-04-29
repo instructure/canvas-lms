@@ -124,7 +124,7 @@ module Lti
       }.freeze
     ].freeze
 
-    skip_before_action :load_user
+    skip_before_action :load_user, :require_user
     skip_before_action :verify_authenticity_token
     before_action :authorized_lti2_tool
     before_action :attachment_in_context, only: [:create]
@@ -281,16 +281,12 @@ module Lti
       render_unauthorized_action unless tool_proxy_associated?
     end
 
-    def link_fragment
-      Lti::V1p1::Asset.global_context_id_for(submission)
-    end
-
     def tool_proxy_associated?
       PermissionChecker.authorized_lti2_action?(tool: tool_proxy, context: assignment)
     end
 
     def create_attributes
-      (update_attributes + [:file_id]).freeze # rubocop:disable Rails/ActiveRecordAliases -- not ActiveRecord::Base#update_attributes
+      (update_attributes + [:file_id]).freeze
     end
 
     def update_attributes
@@ -322,17 +318,10 @@ module Lti
     def attachment
       @_attachment ||= begin
         attachment = Attachment.find(params[:file_id]) if params[:file_id].present?
-        if attachment.blank? && params.require(:originality_report)[:file_id].present?
+        if attachment.blank? && params.dig(:originality_report, :file_id).present?
           attachment = Attachment.find(params.require(:originality_report)[:file_id])
         end
         attachment
-      end
-    end
-
-    def attachment_association
-      @_attachment_association ||= begin
-        file = originality_report&.attachment || attachment
-        file.attachment_associations.find { |a| a.context == submission }
       end
     end
 
@@ -349,7 +338,7 @@ module Lti
 
     def update_report_params
       @_update_report_params ||= begin
-        report_attributes = params.require(:originality_report).permit(update_attributes) # rubocop:disable Rails/ActiveRecordAliases -- not ActiveRecord::Base#update_attributes
+        report_attributes = params.require(:originality_report).permit(update_attributes)
         report_attributes[:lti_link_attributes] = lti_link_params
         report_attributes
       end
@@ -387,7 +376,7 @@ module Lti
     end
 
     def attachment_in_context
-      verify_submission_attachment(attachment, submission)
+      params.require(:originality_report) && verify_submission_attachment(attachment, submission)
     end
 
     def report_by_attempt(attempt)
@@ -401,7 +390,7 @@ module Lti
     end
 
     def find_originality_report
-      raise ActiveRecord::RecordNotFound if submission.blank?
+      raise ActiveRecord::RecordNotFound if submission.blank? || submission.assignment != assignment
 
       @report = OriginalityReport.find_by(id: params[:id])
       # NOTE: we could end up looking up by file_id, attachment: nil or attempt
@@ -440,6 +429,9 @@ module Lti
     end
 
     def attachment_in_history?(attachment, submission)
+      # TODO: after GROW-239, change this to:
+      #
+      # submission.attachment_associations.where(attachment:).exists?
       submission.submission_history.any? do |s|
         s.attachment_ids.include?(attachment.id.to_s) ||
           s.attachment_ids.include?(attachment.global_id.to_s)

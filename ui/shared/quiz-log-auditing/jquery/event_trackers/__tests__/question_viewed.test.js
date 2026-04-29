@@ -64,7 +64,7 @@ describe('Quizzes::LogAuditing::EventTrackers::QuestionViewed', () => {
 
   test.skip('capturing: it works', () => {
     const tracker = new Subject({frequency: 0})
-    const capture = jest.fn()
+    const capture = vi.fn()
     tracker.install(capture, scrollSelector)
     const offsetTop = 3500
     const $fakeQuestion = createQuestion('123')

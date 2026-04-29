@@ -52,6 +52,11 @@ module Types
       Include submissions for deactivated students.
     MD
 
+    argument :posting_status, SubmissionPostingStatusType, <<~MD, required: false
+      Filter submissions by their posting status. Valid values: postable, hideable.
+      Ignored if the current user cannot manage or view all grades for the assignment.
+    MD
+
     argument :user_search, String, <<~MD, required: false
       The partial name or full ID of the users to match and return in the
       results list. Must be at least 3 characters.

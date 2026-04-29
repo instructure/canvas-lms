@@ -363,7 +363,7 @@ describe Schemas::InternalLtiConfiguration do
       end
     end
 
-    describe "eula subsettings" do
+    describe "message_settings for eula" do
       let(:eula_settings) do
         {
           enabled: true,
@@ -372,15 +372,12 @@ describe Schemas::InternalLtiConfiguration do
         }
       end
 
-      context "in ActivityAssetProcessor" do
+      context "in message_settings" do
         let(:json) do
-          super().merge(
-            {
-              placements: [
-                { placement: "ActivityAssetProcessor", eula: eula_settings }
-              ]
-            }
-          )
+          internal_lti_configuration.tap do |c|
+            c[:placements] = [{ placement: "ActivityAssetProcessor" }]
+            c[:launch_settings][:message_settings] = [{ type: "LtiEulaRequest", **eula_settings }]
+          end
         end
 
         it "returns no errors" do
@@ -390,13 +387,13 @@ describe Schemas::InternalLtiConfiguration do
         context "with invalid eula custom_fields" do
           let(:eula_settings) { { enabled: true, custom_fields: { "abc" => false } } }
 
-          it { expect(error_message).to include "eula" }
+          it { expect(error_message).to include "message_settings" }
         end
 
         context "with eula missing enabled field" do
           let(:eula_settings) { { custom_fields: { "abc" => "def" } } }
 
-          it { expect(error_message).to include "eula" }
+          it { expect(error_message).to include "message_settings" }
         end
       end
     end
@@ -549,6 +546,35 @@ describe Schemas::InternalLtiConfiguration do
 
     it "transforms as expected" do
       expect(subject).to eq(expected)
+    end
+  end
+
+  describe ".to_sorted" do
+    subject { Schemas::InternalLtiConfiguration.to_sorted(config) }
+
+    let(:config) do
+      c = internal_lti_configuration.deep_dup
+      c[:scopes] = ["second", "first"]
+      c[:redirect_uris] = ["https://second-url.com", "https://first-url.com"]
+      c[:placements] = [
+        {
+          "placement" => "course_navigation",
+          "enabled" => true
+        },
+        {
+          "placement" => "account_navigation",
+          "enabled" => true
+        }
+      ]
+      c.with_indifferent_access
+    end
+
+    it "sorts all necessary properties" do
+      result = subject
+
+      expect(result[:scopes]).to eq(["first", "second"])
+      expect(result[:redirect_uris]).to eq(["https://first-url.com", "https://second-url.com"])
+      expect(result[:placements].pluck(:placement)).to eq(["account_navigation", "course_navigation"])
     end
   end
 end

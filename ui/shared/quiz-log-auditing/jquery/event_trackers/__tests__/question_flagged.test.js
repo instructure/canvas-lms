@@ -58,7 +58,7 @@ describe('Quizzes::LogAuditing::EventTrackers::QuestionFlagged', () => {
   })
 
   test('capturing: it works', () => {
-    const capture = jest.fn()
+    const capture = vi.fn()
     const tracker = new Subject({
       questionSelector: '.question',
       questionMarkedClass: 'marked',

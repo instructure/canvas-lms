@@ -24,13 +24,12 @@ type DroppableSubmission = {
   total: number
   drop?: boolean
   assignment_id?: string
+  submission?: SubmissionGradeCriteria
 }
 
-// @ts-expect-error
-function partition(collection, partitionFn) {
+function partition<T>(collection: T[], partitionFn: (item: T) => boolean): [T[], T[]] {
   return collection.reduce(
-    // @ts-expect-error
-    (result, current) => {
+    (result: [T[], T[]], current: T) => {
       const index = partitionFn(current) ? 0 : 1
       result[index].push(current)
       return result
@@ -47,37 +46,45 @@ function parseScore(score: string | number | null) {
 function sortPairsDescending(
   [scoreA, submissionA]: [number, {submission: SubmissionGradeCriteria}],
   [scoreB, submissionB]: [number, {submission: SubmissionGradeCriteria}],
-) {
+): number {
   const scoreDiff = scoreB - scoreA
   if (scoreDiff !== 0) {
     return scoreDiff
   }
   // To ensure stable sorting, use the assignment id as a secondary sort.
-  // @ts-expect-error
-  return submissionA.submission.assignment_id - submissionB.submission.assignment_id
+  // String IDs are compared numerically for sorting purposes
+  return Number(submissionA.submission.assignment_id) - Number(submissionB.submission.assignment_id)
 }
 
 function sortPairsAscending(
   [scoreA, submissionA]: [number, {submission: SubmissionGradeCriteria}],
   [scoreB, submissionB]: [number, {submission: SubmissionGradeCriteria}],
-) {
+): number {
   const scoreDiff = scoreA - scoreB
   if (scoreDiff !== 0) {
     return scoreDiff
   }
   // To ensure stable sorting, use the assignment id as a secondary sort.
-  // @ts-expect-error
-  return submissionA.submission.assignment_id - submissionB.submission.assignment_id
+  // String IDs are compared numerically for sorting purposes
+  return Number(submissionA.submission.assignment_id) - Number(submissionB.submission.assignment_id)
 }
 
-// @ts-expect-error
-function sortSubmissionsAscending(submissionA, submissionB) {
+type SubmissionDataForSort = {
+  score: number
+  submission: {assignment_id: string}
+}
+
+function sortSubmissionsAscending(
+  submissionA: SubmissionDataForSort,
+  submissionB: SubmissionDataForSort,
+): number {
   const scoreDiff = submissionA.score - submissionB.score
   if (scoreDiff !== 0) {
     return scoreDiff
   }
   // To ensure stable sorting, use the assignment id as a secondary sort.
-  return submissionA.submission.assignment_id - submissionB.submission.assignment_id
+  // String IDs are compared numerically for sorting purposes
+  return Number(submissionA.submission.assignment_id) - Number(submissionB.submission.assignment_id)
 }
 
 function getSubmissionGrade({score, total}: {score: number; total: number}) {
@@ -142,7 +149,6 @@ function keepHelper(submissions, initialKeepCount, sortAsc: boolean, cannotDrop,
   const allSubmissionData = [...submissions, ...cannotDrop]
   const [unpointed, pointed] = partition(
     allSubmissionData,
-    // @ts-expect-error
     submissionDatum => submissionDatum.total === 0,
   )
 
@@ -225,9 +231,8 @@ function dropAssignments(
   let cannotDrop: DroppableSubmission[] = []
   let droppableSubmissionData: DroppableSubmission[] = allSubmissionData
   if (neverDropIds.length > 0) {
-    // @ts-expect-error
     ;[cannotDrop, droppableSubmissionData] = partition(allSubmissionData, submission =>
-      neverDropIds.includes(submission.submission.assignment_id),
+      submission.submission ? neverDropIds.includes(submission.submission.assignment_id) : false,
     )
   }
 

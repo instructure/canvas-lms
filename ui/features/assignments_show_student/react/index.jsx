@@ -16,19 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AlertManager from '@canvas/alerts/react/AlertManager'
+import {AlertManager} from '@instructure/platform-alerts'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
-import ErrorBoundary from '@canvas/error-boundary'
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import ObserverOptions from '@canvas/observer-picker'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@instructure/platform-query'
 import {
   getHandleChangeObservedUser,
   autoFocusObserverPicker,
 } from '@canvas/observer-picker/util/pageReloadHelper'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import StudentViewQuery from './components/StudentViewQuery'
 import {View} from '@instructure/ui-view'
 
@@ -36,32 +39,38 @@ const client = createClient()
 const I18n = createI18nScope('assignments_2')
 
 export default function renderAssignmentsApp(env, elt) {
-  const root = createRoot(elt)
-  root.render(
-    <ApolloProvider client={client}>
-      <ErrorBoundary
-        errorComponent={
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorCategory="Assignments 2 Student Error Page"
-          />
-        }
-      >
-        <AlertManager>
-          <StudentViewQuery
-            assignmentLid={ENV.ASSIGNMENT_ID.toString()}
-            submissionID={ENV.SUBMISSION_ID?.toString()}
-            reviewerSubmissionID={ENV.REVIEWER_SUBMISSION_ID?.toString()}
-          />
-        </AlertManager>
-      </ErrorBoundary>
-    </ApolloProvider>
+  render(
+    <QueryClientProvider client={queryClient}>
+      <ApolloProvider client={client}>
+        <ErrorBoundary
+          errorComponent={({error}) => (
+            <GenericErrorPage
+              imageUrl={errorShipUrl}
+              onReportError={reportError}
+              translations={canvasErrorPageTranslations}
+              errorSubject={error.message}
+              errorCategory="Assignments 2 Student Error Page"
+              errorMessage={error.message}
+              stack={error.stack}
+            />
+          )}
+        >
+          <AlertManager>
+            <StudentViewQuery
+              assignmentLid={ENV.ASSIGNMENT_ID.toString()}
+              submissionID={ENV.SUBMISSION_ID?.toString()}
+              reviewerSubmissionID={ENV.REVIEWER_SUBMISSION_ID?.toString()}
+            />
+          </AlertManager>
+        </ErrorBoundary>
+      </ApolloProvider>
+    </QueryClientProvider>,
+    elt,
   )
 
   const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
   if (observerPickerContainer && ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST) {
-    const observerRoot = createRoot(observerPickerContainer)
-    observerRoot.render(
+    render(
       <View as="div" maxWidth="12em">
         <ObserverOptions
           autoFocus={autoFocusObserverPicker()}
@@ -72,7 +81,8 @@ export default function renderAssignmentsApp(env, elt) {
           observedUsersList={ENV.OBSERVER_OPTIONS.OBSERVED_USERS_LIST}
           renderLabel={I18n.t('Select a student to view. The page will refresh automatically.')}
         />
-      </View>
+      </View>,
+      observerPickerContainer,
     )
   }
 }

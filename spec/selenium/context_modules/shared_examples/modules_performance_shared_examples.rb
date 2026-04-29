@@ -86,7 +86,6 @@ shared_examples_for "module performance with module items" do |context|
       wait_for_ajaximations
 
       keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
-        puts "Previous Trying..."
         expect(module_item_page_button_selector(@module_list[0].id, "Previous")).to be_truthy
       end
 
@@ -268,7 +267,7 @@ shared_examples_for "add module items to list" do |context|
     end
 
     it "paginated list created after refresh when item is added to initiate pagination" do
-      skip "not a valid test now that we save the show all/less state"
+      skip "2025-05-22 not a valid test now that we save the show all/less state LX-3350"
       get @mod_url
       wait_for_dom_ready
 

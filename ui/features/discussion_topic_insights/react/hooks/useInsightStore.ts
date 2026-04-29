@@ -27,6 +27,7 @@ type GlobalEnv = {
   context_type: string
   context_id: string
   discussion_topic_id: string
+  SPEEDGRADER_URL_TEMPLATE: string | null
 }
 
 declare const ENV: GlobalEnv
@@ -35,6 +36,7 @@ type ReadOnlyState = Readonly<{
   context: string
   contextId: string
   discussionId: string
+  SPEEDGRADER_URL_TEMPLATE: string | null
 }>
 
 type State = {
@@ -54,6 +56,7 @@ const useInsightStore = create<ReadOnlyState & State & Action>(set => ({
   context: ENV.context_type === 'Course' ? 'courses' : 'groups',
   contextId: ENV.context_id,
   discussionId: ENV.discussion_topic_id,
+  SPEEDGRADER_URL_TEMPLATE: ENV.SPEEDGRADER_URL_TEMPLATE,
   modalOpen: false,
   entryId: 0,
   entries: [],

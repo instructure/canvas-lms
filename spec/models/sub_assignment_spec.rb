@@ -329,6 +329,34 @@ describe SubAssignment do
       expect(@sub_assignment).not_to receive(:sync_with_parent)
       @sub_assignment.update!(unlock_at: 1.day.from_now)
     end
+
+    it "does not sync with parent during initial checkpoint creation" do
+      new_parent = @course.assignments.create!(has_sub_assignments: false, title: "New Parent")
+
+      expect(new_parent).not_to receive(:update_from_sub_assignment)
+
+      new_sub = new_parent.sub_assignments.create!(
+        context: @course,
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+        title: "New Sub",
+        unlock_at: 1.day.from_now,
+        lock_at: 3.days.from_now
+      )
+
+      expect(new_sub).to be_persisted
+    end
+
+    it "does not sync when saved_by is set to :discussion_topic" do
+      @sub_assignment.saved_by = :discussion_topic
+      expect(@parent_assignment).not_to receive(:update_from_sub_assignment)
+      @sub_assignment.update!(unlock_at: 2.days.from_now)
+    end
+
+    it "does not sync when saved_by is set to :transaction" do
+      @sub_assignment.saved_by = :transaction
+      expect(@parent_assignment).not_to receive(:update_from_sub_assignment)
+      @sub_assignment.update!(unlock_at: 2.days.from_now)
+    end
   end
 
   describe "callbacks: sync_parent_has_sub_flag" do
@@ -440,6 +468,40 @@ describe SubAssignment do
     it "generates correct title for sub_assignment with invalid sub_assignment_tag" do
       @reply_to_topic.sub_assignment_tag = "invalid"
       expect(@reply_to_topic.title_with_required_replies).to eq @reply_to_topic.title.to_s
+    end
+  end
+
+  describe ".not_ignored_by" do
+    before :once do
+      course_with_teacher(active_all: true)
+      @course.account.enable_feature!(:discussion_checkpoints)
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+    end
+
+    it "excludes sub assignments that are ignored with correct asset_type" do
+      Ignore.create!(
+        user: @teacher,
+        asset: @reply_to_topic,
+        purpose: "viewing"
+      )
+
+      result = SubAssignment.where(id: [@reply_to_topic.id, @reply_to_entry.id]).not_ignored_by(@teacher, "viewing")
+      expect(result).to include(@reply_to_entry)
+      expect(result).not_to include(@reply_to_topic)
+    end
+
+    it "uses correct asset_type for SubAssignment class (STI uses base class)" do
+      # STI models use the base class "Assignment" for asset_type
+      ignore = Ignore.create!(
+        user: @teacher,
+        asset: @reply_to_topic,
+        purpose: "viewing"
+      )
+
+      expect(ignore.asset_type).to eq("Assignment")
+
+      result = SubAssignment.where(id: [@reply_to_topic.id, @reply_to_entry.id]).not_ignored_by(@teacher, "viewing")
+      expect(result).not_to include(@reply_to_topic)
     end
   end
 end

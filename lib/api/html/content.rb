@@ -40,10 +40,10 @@ module Api
         content.modified_html
       end
 
-      def self.rewrite_outgoing(html, account, url_helper, include_mobile: false, rewrite_api_urls: true)
+      def self.rewrite_outgoing(html, account, url_helper, include_mobile: false, is_native_mobile_app: false, rewrite_api_urls: true)
         return html if html.blank?
 
-        new(html, account, include_mobile:, rewrite_api_urls:)
+        new(html, account, include_mobile:, is_native_mobile_app:, rewrite_api_urls:)
           .rewritten_html(url_helper)
       end
 
@@ -72,10 +72,11 @@ module Api
         end
       end
 
-      def initialize(html_string, account = nil, include_mobile: false, rewrite_api_urls: true, host: nil, port: nil)
+      def initialize(html_string, account = nil, include_mobile: false, is_native_mobile_app: false, rewrite_api_urls: true, host: nil, port: nil)
         @account = account
         @html = html_string
         @include_mobile = include_mobile
+        @is_native_mobile_app = is_native_mobile_app
         @rewrite_api_urls = rewrite_api_urls
         @host = host
         @port = port
@@ -110,6 +111,9 @@ module Api
         parsed_html.search("*").each do |node|
           APPLICABLE_ATTRS.each do |attr|
             next unless (link = node[attr])
+
+            # only process relative URLs or Canvas URLs
+            next unless canvas_url?(link)
 
             match = link.match ASSOCIABLE_ATTACHMENT_LINKS_REGEXP
             next unless match
@@ -161,6 +165,7 @@ module Api
         end
 
         add_css_and_js_overrides
+        add_youtube_banner_if_needed
         parsed_html.to_s
       end
 
@@ -170,6 +175,19 @@ module Api
 
         overrides = @account.effective_brand_config.css_and_js_overrides
         self.class.add_overrides_to_html(parsed_html, overrides)
+
+        parsed_html
+      end
+
+      def add_youtube_banner_if_needed
+        return parsed_html unless @is_native_mobile_app
+        return parsed_html unless @account.feature_enabled?(:youtube_overlay)
+
+        html_string = parsed_html.to_s
+        updated_html = YoutubeBannerInjectionService.inject_banner_if_needed(html_string, mobile_device: true)
+        if updated_html != html_string
+          @parsed_html = Nokogiri::HTML5.fragment(updated_html, nil, **CanvasSanitize::SANITIZE[:parser_options])
+        end
 
         parsed_html
       end
@@ -228,6 +246,26 @@ module Api
 
       def apply_mathml(node)
         self.class.apply_mathml(node)
+      end
+
+      # check if a URL is a Canvas URL (relative/pointing to a Canvas host)
+      # Returns true for:
+      #   - Relative URLs (no host): /files/123
+      #   - Absolute URLs pointing to Canvas hosts: https://canvas.example.com/files/123
+      # Returns false for:
+      #   - External URLs: https://external.com/files/123
+      def canvas_url?(url)
+        uri = begin
+          URI.parse(url)
+        rescue URI::InvalidURIError
+          nil
+        end
+        return false unless uri
+
+        # Relative URLs (no host) are always Canvas URLs
+        return true unless uri&.host
+
+        LoadAccount.from_host(uri.host).present?
       end
     end
   end

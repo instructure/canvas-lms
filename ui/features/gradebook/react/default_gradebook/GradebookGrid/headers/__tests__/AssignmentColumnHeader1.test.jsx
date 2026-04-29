@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, cleanup, fireEvent} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 
 import AssignmentColumnHeader from '../AssignmentColumnHeader'
 
@@ -302,6 +301,17 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         mountComponent()
         expect(getSecondaryDetailText()).toBe('Unpublished')
       })
+
+      test('displays post policy "Manual" text when manually posted', () => {
+        props.assignment.postManually = true
+        mountComponent()
+        expect(getSecondaryDetailText()).toContain('Manual')
+      })
+
+      test('does not display "Manual" text when auto-posted', () => {
+        mountComponent()
+        expect(getSecondaryDetailText()).not.toContain('Manual')
+      })
     })
 
     describe('when the assignment is manually posted', () => {
@@ -376,7 +386,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
     describe('when closed', () => {
       beforeEach(() => {
-        props.onMenuDismiss = jest.fn()
+        props.onMenuDismiss = vi.fn()
         mountAndOpenOptionsMenu()
         closeOptionsMenu()
       })
@@ -393,6 +403,39 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         const actionContainer = container.querySelector('.Gradebook__ColumnHeaderAction')
         expect(actionContainer.classList).not.toContain('menuShown')
       })
+    })
+  })
+
+  describe('Peer Review Sub Assignments', () => {
+    function getSpeedGraderLink() {
+      return [...document.querySelectorAll('a')].find(
+        link => link.textContent.trim() === 'SpeedGrader',
+      )
+    }
+
+    beforeEach(() => {
+      props.assignment.parentAssignmentId = '2300'
+      props.assignment.htmlUrl = 'http://localhost/assignments/2300'
+    })
+
+    test('SpeedGrader link does not include peer_review parameter for peer review sub assignments', () => {
+      mountAndOpenOptionsMenu()
+      const speedGraderLink = getSpeedGraderLink()
+      expect(speedGraderLink).toBeDefined()
+      expect(speedGraderLink.href).not.toMatch(/peer_review=true/)
+    })
+
+    test('SpeedGrader link uses sub-assignment ID for peer review sub assignments', () => {
+      mountAndOpenOptionsMenu()
+      const speedGraderLink = getSpeedGraderLink()
+      expect(speedGraderLink).toBeDefined()
+      expect(speedGraderLink.href).toMatch(/assignment_id=2301/)
+    })
+
+    test('assignment link points to parent assignment for peer review sub assignments', () => {
+      mountComponent()
+      const assignmentLink = getAssignmentLink()
+      expect(assignmentLink.href).toBe('http://localhost/assignments/2300')
     })
   })
 })

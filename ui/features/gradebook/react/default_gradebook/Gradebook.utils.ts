@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
 import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import getTextWidth from '../shared/helpers/TextMeasure'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import _ from 'lodash'
+import {values, intersection, difference} from 'es-toolkit/compat'
 import htmlEscape, {unescape} from '@instructure/html-escape'
 import filterTypes from './constants/filterTypes'
 import type {
@@ -145,12 +145,6 @@ export function idArraysEqual(idArray1: string[], idArray2: string[]): boolean {
   return [...idArray1].sort().join() === [...idArray2].sort().join()
 }
 
-export function htmlDecode(input?: string): string | null {
-  return input
-    ? new DOMParser().parseFromString(input, 'text/html').documentElement.textContent
-    : null
-}
-
 export function isAdmin() {
   return (ENV.current_user_roles || []).includes('admin')
 }
@@ -182,17 +176,12 @@ export function onGridKeyDown(
   }
 }
 
-export function renderComponent(
-  reactClass: any,
-  mountPoint: Element | null,
-  props = {},
-): HTMLElement | undefined {
+export function renderComponent(reactClass: any, mountPoint: Element | null, props = {}): void {
   if (mountPoint == null) {
     throw new Error('mountPoint is required')
   }
   const component = React.createElement(reactClass, props)
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(component, mountPoint)
+  legacyRender(component, mountPoint)
 }
 
 export async function confirmViewUngradedAsZero({
@@ -224,7 +213,7 @@ export function hiddenStudentIdsForAssignment(
   studentIds: string[],
   assignment: Pick<Assignment, 'assignment_visibility'>,
 ) {
-  return _.difference(studentIds, assignment.assignment_visibility)
+  return difference(studentIds, assignment.assignment_visibility)
 }
 
 export function getColumnTypeForColumnId(columnId: string): string {
@@ -252,7 +241,7 @@ export function getDefaultSettingKeyForColumnType(columnType: string): SortRowsS
 }
 
 export function sectionList(sections: {[id: string]: Pick<Section, 'name' | 'id'>}) {
-  const x: Pick<Section, 'name' | 'id'>[] = _.values(sections)
+  const x: Pick<Section, 'name' | 'id'>[] = values(sections)
   return x
     .sort((a, b) => a.id.localeCompare(b.id))
     .map(section => {
@@ -375,7 +364,7 @@ export const getLabelForFilter = (
       formatGradingPeriodTitleForDisplay(gradingPeriods.find(g => g.id === filter.value)) ||
       I18n.t('Grading Period')
     )
-  } else if (filter.type === 'student-group') {
+  } else if (filter.type === 'student-group' || filter.type === 'non-collaborative-group') {
     const studentGroups: StudentGroup[] = Object.values(studentGroupCategories)
       .map((c: StudentGroupCategory) => c.groups)
       .flat()
@@ -790,7 +779,7 @@ export const filterStudentBySectionFn = (
       .map(enrollment => enrollment.enrollment_state)
     return student.sections
       ? enrollmentStates.length > 0 &&
-          _.intersection(enrollmentStates, includedEnrollmentStates).length > 0
+          intersection(enrollmentStates, includedEnrollmentStates).length > 0
       : false
   }
 }

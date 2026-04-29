@@ -27,8 +27,8 @@ describe('PeopleSearchBar', () => {
     searchTerm: '',
     numberOfResults: 1,
     isLoading: false,
-    onChangeHandler: jest.fn(),
-    onClearHandler: jest.fn(),
+    onChangeHandler: vi.fn(),
+    onClearHandler: vi.fn(),
   }
 
   const renderComponent = (props = {}) => {
@@ -38,7 +38,7 @@ describe('PeopleSearchBar', () => {
   const user = userEvent.setup()
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // Ensure the screenreader message holder exists
     const holder = document.createElement('div')
     holder.id = screenreaderMessageHolderId

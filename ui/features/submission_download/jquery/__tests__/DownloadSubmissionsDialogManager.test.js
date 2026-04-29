@@ -93,7 +93,7 @@ describe('DownloadSubmissionsDialogManager#isDialogEnabled', () => {
 
 describe('DownloadSubmissionsDialogManager#showDialog', () => {
   beforeEach(() => {
-    INST.downloadSubmissions = jest.fn()
+    INST.downloadSubmissions = vi.fn()
   })
 
   afterEach(() => {
@@ -101,7 +101,7 @@ describe('DownloadSubmissionsDialogManager#showDialog', () => {
   })
 
   it('calls submissions downloading callback and opens downloadSubmissions dialog', () => {
-    const submissionsDownloading = jest.fn()
+    const submissionsDownloading = vi.fn()
     const manager = new DownloadSubmissionsDialogManager(
       {
         id: 'the_id',

@@ -20,22 +20,22 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconAddSolid} from '@instructure/ui-icons'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const AddButton = (props: {
   onClicked: () => void
+  elementRef?: (element: Element | null) => void
 }) => {
   return (
     <IconButton
+      elementRef={props.elementRef}
       data-testid="add-block-button"
       data-addbutton
+      data-action-button
       shape="circle"
       color="primary"
       screenReaderLabel={I18n.t('Add a block')}
-      onClick={e => {
-        e.stopPropagation()
-        props.onClicked()
-      }}
+      onClick={props.onClicked}
     >
       <IconAddSolid />
     </IconButton>

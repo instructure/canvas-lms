@@ -107,6 +107,176 @@ describe UserMerge do
       expect(user1.account_users.first.id).to eq admin.id
     end
 
+    context "with conflicting account_users" do
+      let_once(:account1) { account_model }
+
+      it "soft-deletes conflicting account_users and creates audit records" do
+        merger = user_model(name: "merger_user")
+        account1.account_users.create!(user: user1)
+        from_admin = account1.account_users.create!(user: user2)
+
+        UserMerge.from(user2).into(user1, merger:)
+
+        from_admin.reload
+        expect(from_admin.workflow_state).to eq "deleted"
+        audit_record = from_admin.auditor_records.find_by(action: "deleted")
+        expect(audit_record).to be_present
+        expect(audit_record.performing_user_id).to eq merger.id
+      end
+
+      it "reactivates target's deleted admin when from_user has an active record for the same role" do
+        target_admin = account1.account_users.create!(user: user1)
+        target_admin.destroy
+        from_admin = account1.account_users.create!(user: user2)
+
+        UserMerge.from(user2).into(user1)
+
+        target_admin.reload
+        expect(target_admin.workflow_state).to eq "active"
+        from_admin.reload
+        expect(from_admin.workflow_state).to eq "deleted"
+        expect(from_admin.user_id).to eq user2.id
+
+        merge_data = UserMergeData.where(user_id: user1).first
+        record = merge_data.records.find_by(context_type: "AccountUser", context_id: target_admin.id)
+        expect(record).to be_present
+        expect(record.previous_user_id).to eq user1.id
+        expect(record.previous_workflow_state).to eq "deleted"
+      end
+
+      it "keeps target's deleted admin when from_user also has a deleted record for the same role" do
+        target_admin = account1.account_users.create!(user: user1)
+        target_admin.destroy
+        from_admin = account1.account_users.create!(user: user2)
+        from_admin.destroy
+
+        UserMerge.from(user2).into(user1)
+
+        target_admin.reload
+        expect(target_admin.workflow_state).to eq "deleted"
+        from_admin.reload
+        expect(from_admin.workflow_state).to eq "deleted"
+        expect(from_admin.user_id).to eq user2.id
+      end
+
+      it "clears user cache when soft-deleting conflicting account_users" do
+        account1.account_users.create!(user: user1)
+        account1.account_users.create!(user: user2)
+
+        expect_any_instance_of(AccountUser).to receive(:clear_user_cache).at_least(:once)
+        UserMerge.from(user2).into(user1)
+      end
+    end
+
+    context "with institutional tag associations" do
+      let_once(:account1) { account_model }
+      let(:tag) { institutional_tag_model(account: account1) }
+      let(:tag2) { institutional_tag_model(account: account1, name: "Other Tag", description: "Another tag") }
+
+      it "moves source-only tag associations to the target user" do
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        UserMerge.from(user2).into(user1)
+        expect(assoc.reload.user_id).to eq user1.id
+        expect(user1.institutional_tag_associations.active.pluck(:institutional_tag_id)).to include(tag.id)
+      end
+
+      it "records moved associations in the merge audit trail" do
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        UserMerge.from(user2).into(user1)
+        merge_data = UserMergeData.where(user_id: user1).first
+        record = merge_data.records.find_by(context_type: "InstitutionalTagAssociation", context_id: assoc.id)
+        expect(record).to be_present
+        expect(record.previous_user_id).to eq user2.id
+        expect(record.previous_workflow_state).to eq "active"
+      end
+
+      it "soft-deletes conflicting associations when both users share the same tag" do
+        InstitutionalTagAssociation.create!(institutional_tag: tag, context: user1)
+        from_assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        UserMerge.from(user2).into(user1)
+        expect(from_assoc.reload.workflow_state).to eq "deleted"
+        expect(user1.institutional_tag_associations.active.pluck(:institutional_tag_id)).to eq [tag.id]
+      end
+
+      it "records soft-deleted conflict associations in the merge audit trail" do
+        InstitutionalTagAssociation.create!(institutional_tag: tag, context: user1)
+        from_assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        UserMerge.from(user2).into(user1)
+        merge_data = UserMergeData.where(user_id: user1).first
+        record = merge_data.records.find_by(context_type: "InstitutionalTagAssociation", context_id: from_assoc.id)
+        expect(record).to be_present
+        expect(record.previous_user_id).to eq user2.id
+        expect(record.previous_workflow_state).to eq "active"
+      end
+
+      it "ignores inactive (soft-deleted) tag associations on the source user" do
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        assoc.destroy
+        UserMerge.from(user2).into(user1)
+        merge_data = UserMergeData.where(user_id: user1).first
+        expect(merge_data.records.where(context_type: "InstitutionalTagAssociation")).to be_empty
+        expect(user1.institutional_tag_associations.active).to be_empty
+      end
+
+      it "moves both when same-named tags belong to different institutions" do
+        account2 = account_model
+        tag_other_institution = institutional_tag_model(account: account2, name: tag.name, description: tag.description)
+        assoc1 = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user1)
+        assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag_other_institution, context: user2)
+        UserMerge.from(user2).into(user1)
+        expect(assoc1.reload.user_id).to eq user1.id
+        expect(assoc2.reload.user_id).to eq user1.id
+        expect(assoc1.reload.workflow_state).to eq "active"
+        expect(assoc2.reload.workflow_state).to eq "active"
+      end
+
+      it "moves active associations regardless of which institution the tag belongs to" do
+        account2 = account_model
+        sub_acct = account2.sub_accounts.create!
+        tag_other = institutional_tag_model(account: sub_acct)
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag_other, context: user2)
+        UserMerge.from(user2).into(user1)
+        expect(assoc.reload.user_id).to eq user1.id
+        expect(assoc.reload.workflow_state).to eq "active"
+      end
+
+      it "does not change the tag category's account during merge — only the association's user_id is updated" do
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user2)
+        original_tag_name = tag.name
+        original_category_id = tag.category_id
+        original_account_id = tag.category.account_id
+        UserMerge.from(user2).into(user1)
+        expect(assoc.reload.user_id).to eq user1.id
+        expect(tag.reload.name).to eq original_tag_name
+        expect(tag.reload.category_id).to eq original_category_id
+        expect(tag.category.reload.account_id).to eq original_account_id
+      end
+
+      it "detects conflicts by institutional_tag_id, not by name, so same-named tags from different institutions are independent" do
+        account2 = account_model
+        tag_other = institutional_tag_model(account: account2, name: tag.name, description: tag.description)
+        InstitutionalTagAssociation.create!(institutional_tag: tag, context: user1)
+        assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag_other, context: user2)
+        UserMerge.from(user2).into(user1)
+        # Different institutional_tag_id means no conflict even though names match
+        expect(assoc2.reload.workflow_state).to eq "active"
+        # Each tag's root_account_id reflects its own institution, unchanged
+        expect(tag.reload.root_account_id).not_to eq tag_other.reload.root_account_id
+      end
+
+      it "does not modify root_account_id on the association during merge" do
+        root_acct = Account.create!
+        sub_acct = root_acct.sub_accounts.create!
+        sub_tag = institutional_tag_model(account: sub_acct)
+        assoc = InstitutionalTagAssociation.create!(institutional_tag: sub_tag, context: user2)
+        # root_account_id is derived through tag -> category -> account, not set independently
+        expect(assoc.root_account_id).to eq root_acct.id
+        UserMerge.from(user2).into(user1)
+        expect(assoc.reload.root_account_id).to eq root_acct.id
+        expect(assoc.reload.root_account_id).to eq sub_tag.reload.root_account_id
+      end
+    end
+
     it "uses avatar information from merged user if none exists" do
       user2.avatar_image = { "type" => "external", "url" => "https://example.com/image.png" }
       user2.save!
@@ -133,7 +303,7 @@ describe UserMerge do
     end
 
     it "moves access tokens to the new user" do
-      at = AccessToken.create!(user: user2, developer_key: DeveloperKey.default)
+      at = AccessToken.create!(user: user2, developer_key: DeveloperKey.default, purpose: "test")
       UserMerge.from(user2).into(user1)
       at.reload
       expect(at.user_id).to eq user1.id
@@ -524,6 +694,29 @@ describe UserMerge do
       expect(merge_data_record2.previous_workflow_state).to eq "active"
     end
 
+    context "destroy_remaining_from_user_enrollments" do
+      before :once do
+        @enrollment = course1.enroll_student(user2, enrollment_state: "active")
+        @merge_object = UserMerge.from(user2)
+        @merge_object.target_user = user1
+        @merge_object.merge_data = UserMergeData.create!(user: user1, from_user: user2)
+        @merge_object.send(:destroy_remaining_from_user_enrollments, :user_id)
+      end
+
+      it "soft-deletes any from_user enrollments remaining after the move" do
+        expect(@enrollment.reload.workflow_state).to eq "deleted"
+        expect(user2.reload.enrollments.active).to be_empty
+      end
+
+      it "records merge_data for remaining from_user enrollments" do
+        @merge_object.merge_data.bulk_insert_merge_data(@merge_object.data)
+
+        record = @merge_object.merge_data.records.find_by(context_type: "Enrollment", context_id: @enrollment)
+        expect(record).to be_present
+        expect(record.previous_workflow_state).to eq "active"
+      end
+    end
+
     it "removes conflicting module progressions" do
       course1.enroll_user(user1, "StudentEnrollment", enrollment_state: "active")
       course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
@@ -548,7 +741,7 @@ describe UserMerge do
       context_module.update_for(user2, :read, tag)
 
       # it should work
-      expect { UserMerge.from(user1).into(user2) }.to_not raise_error
+      expect { UserMerge.from(user1).into(user2) }.not_to raise_error
 
       # it should have deleted or moved the module progressions for User1 and kept the completed ones for user2
       expect(ContextModuleProgression.where(user_id: user1, context_module_id: [context_module, context_module2]).count).to eq 0
@@ -903,6 +1096,8 @@ describe UserMerge do
       end
 
       it "moves lti ids to the new user if possible" do
+        expect(@user1).to receive(:update_shadow_records_synchronously!).and_call_original
+        expect(@user2).to receive(:update_shadow_records_synchronously!).and_call_original
         UserMerge.from(@user1).into(@user2)
 
         expect(@user1.reload).to be_deleted
@@ -1052,7 +1247,7 @@ describe UserMerge do
         @user2 = user_model
         user_service_model(user: @user2)
       end
-      expect { UserMerge.from(@user2).into(user1) }.to_not raise_error
+      expect { UserMerge.from(@user2).into(user1) }.not_to raise_error
     end
 
     it "merges a user across shards" do
@@ -1280,11 +1475,14 @@ describe UserMerge do
                                                 uploaded_data: StringIO.new("unique_data"))
       end
 
-      UserMerge.from(user1).into(@user2)
+      expect do
+        UserMerge.from(user1).into(@user2)
+      end.to change { Delayed::Job.where(tag: "Attachment.migrate_attachments").count }.by(1)
+
       run_jobs
 
-      # 3 from user1, and 3 from @user2
-      expect(@user2.attachments.not_deleted.count).to eq 6
+      # 2 from user1 (since the identical one didn't copy), and 3 from @user2
+      expect(@user2.attachments.not_deleted.count).to eq 5
 
       new_user2_attachment1 = @user2.attachments.not_deleted.detect { |a| a.md5 == user1_attachment2.md5 && a.id != @user2_attachment2.id }
       expect(new_user2_attachment1.root_attachment).to eq @user2_attachment2

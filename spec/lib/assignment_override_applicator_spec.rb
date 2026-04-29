@@ -378,6 +378,125 @@ describe AssignmentOverrideApplicator do
         expect(@teachers_assignment.due_at.to_i).to eq course_override_due_at.to_i
       end
     end
+
+    context "give teachers the more lenient of base or override due at for PeerReviewSubAssignment" do
+      before do
+        teacher_in_course
+        @section = @course.course_sections.create! name: "Overridden Section"
+        student_in_section(@section)
+        @student = @user
+        @peer_review_sub_assignment = peer_review_model(parent_assignment: @assignment)
+      end
+
+      def create_peer_review_override(set, due_at, parent_override:)
+        peer_review_override = @peer_review_sub_assignment.assignment_overrides.build(
+          set:,
+          parent_override:,
+          dont_touch_assignment: true
+        )
+        peer_review_override.override_due_at(due_at)
+        peer_review_override.save!
+        peer_review_override
+      end
+
+      def create_section_override(section, due_at)
+        parent_override = assignment_override_model(assignment: @assignment, set: section)
+        create_peer_review_override(section, due_at, parent_override:)
+      end
+
+      def create_course_override(course, due_at)
+        parent_override = assignment_override_model(assignment: @assignment, due_at:)
+        parent_override.set = course
+        parent_override.save!
+        create_peer_review_override(course, due_at, parent_override:)
+      end
+
+      it "uses base due_at when it is more lenient than the section override due_at" do
+        section_due_at = 5.days.from_now
+        base_due_at = 1.year.from_now
+        create_section_override(@section, section_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, base_due_at)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+        students_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @student)
+
+        expect(teachers_assignment.due_at.to_i).to eq base_due_at.to_i
+        expect(students_assignment.due_at.to_i).to eq section_due_at.to_i
+      end
+
+      it "uses section override due_at when it is more lenient than base due_at" do
+        section_due_at = 1.year.from_now
+        base_due_at = 5.days.from_now
+        create_section_override(@section, section_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, base_due_at)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+        students_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @student)
+
+        expect(teachers_assignment.due_at.to_i).to eq section_due_at.to_i
+        expect(students_assignment.due_at.to_i).to eq section_due_at.to_i
+      end
+
+      it "uses base due_at when multiple, but not all, sections are overridden" do
+        section2 = @course.course_sections.create! name: "Another Section"
+        section_due_at = 5.days.from_now
+        section2_due_at = 10.days.from_now
+        base_due_at = 1.year.from_now
+        create_section_override(@section, section_due_at)
+        create_section_override(section2, section2_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, base_due_at)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+        students_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @student)
+
+        expect(teachers_assignment.due_at.to_i).to eq base_due_at.to_i
+        expect(students_assignment.due_at.to_i).to eq section_due_at.to_i
+      end
+
+      it "uses most lenient override due_at when all sections are overridden" do
+        base_due_at = 5.days.from_now
+        lenient_due_at = 1.year.from_now
+        stricter_due_at = 6.months.from_now
+        create_section_override(@course.default_section, stricter_due_at)
+        create_section_override(@section, lenient_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, base_due_at)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+
+        expect(teachers_assignment.due_at.to_i).to eq lenient_due_at.to_i
+      end
+
+      it "returns nil when base due_at is nil and only some sections are overridden" do
+        section_due_at = 5.days.from_now
+        create_section_override(@section, section_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, nil)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+
+        expect(teachers_assignment.due_at).to be_nil
+      end
+
+      it "uses course override due_at when it is more lenient than base due_at" do
+        course_override_due_at = 1.year.from_now
+        base_due_at = 5.days.from_now
+        create_course_override(@course, course_override_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, base_due_at)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+
+        expect(teachers_assignment.due_at.to_i).to eq course_override_due_at.to_i
+      end
+
+      it "uses course override due_at when base due_at is nil" do
+        course_override_due_at = 5.days.from_now
+        create_course_override(@course, course_override_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, nil)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+
+        expect(teachers_assignment.due_at.to_i).to eq course_override_due_at.to_i
+      end
+    end
   end
 
   describe "overrides_for_assignment_and_user" do
@@ -489,12 +608,9 @@ describe AssignmentOverrideApplicator do
         expect(overrides.last).to eq @course_override
       end
 
-      it "should order section overrides by position" # see TODO in implementation
-
       context "differentiation tag overrides" do
         before do
           account = @course.account
-          account.enable_feature!(:assign_to_differentiation_tags)
           account.tap do |a|
             a.settings[:allow_assign_to_differentiation_tags] = { value: true }
             a.save!
@@ -733,6 +849,34 @@ describe AssignmentOverrideApplicator do
           expect(result).to eq [@override]
         end
 
+        it "returns group overrides for ungraded group discussions" do
+          @category = group_category(name: "ungraded_discussion_group")
+          @group = @category.groups.create!(context: @course)
+
+          @discussion_topic = @course.discussion_topics.create!(
+            message: "ungraded group discussion",
+            group_category_id: @category.id
+          )
+
+          @override = @discussion_topic.assignment_overrides.create!
+          @override.set = @group
+          @override.save!
+
+          @membership = @group.add_user(@student)
+
+          result = AssignmentOverrideApplicator.group_overrides(@discussion_topic, @student)
+          expect(result).to eq [@override]
+        end
+
+        it "returns nil for ungraded non group discussions" do
+          @discussion_topic = @course.discussion_topics.create!(
+            message: "ungraded discussion without groups"
+          )
+
+          result = AssignmentOverrideApplicator.group_overrides(@discussion_topic, @student)
+          expect(result).to be_nil
+        end
+
         it "does not include group override for groups other than the user's" do
           @override.set = @category.groups.create!(context: @course)
           @override.save!
@@ -783,6 +927,25 @@ describe AssignmentOverrideApplicator do
           result = AssignmentOverrideApplicator.group_overrides(@assignment, @teacher)
           expect(result).to eq [@override]
         end
+
+        it "works for ungraded group discussions" do
+          teacher_in_course
+
+          @category = group_category(name: "ungraded_discussion_group")
+          @group = @category.groups.create!(context: @course)
+
+          @discussion_topic = @course.discussion_topics.create!(
+            message: "ungraded group discussion",
+            group_category_id: @category.id
+          )
+
+          @override = @discussion_topic.assignment_overrides.create!
+          @override.set = @group
+          @override.save!
+
+          result = AssignmentOverrideApplicator.group_overrides(@discussion_topic, @teacher)
+          expect(result).to eq [@override]
+        end
       end
 
       describe "for observers" do
@@ -799,6 +962,26 @@ describe AssignmentOverrideApplicator do
           account_admin_user
           user_session(@admin)
           result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
+          expect(result).to eq [@override]
+        end
+
+        it "works for ungraded group discussions" do
+          account_admin_user
+          user_session(@admin)
+
+          @category = group_category(name: "ungraded_discussion_group")
+          @group = @category.groups.create!(context: @course)
+
+          @discussion_topic = @course.discussion_topics.create!(
+            message: "ungraded group discussion",
+            group_category_id: @category.id
+          )
+
+          @override = @discussion_topic.assignment_overrides.create!
+          @override.set = @group
+          @override.save!
+
+          result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@discussion_topic, @admin)
           expect(result).to eq [@override]
         end
       end
@@ -1301,7 +1484,7 @@ describe AssignmentOverrideApplicator do
             # Assert that it won't call the "<=" method on nil
             expect do
               AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz.assignment, @student)
-            end.to_not raise_error
+            end.not_to raise_error
           end
         end
 
@@ -1332,7 +1515,7 @@ describe AssignmentOverrideApplicator do
             # Assert that it won't call the "<=" method on nil
             expect do
               AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz.assignment, @student)
-            end.to_not raise_error
+            end.not_to raise_error
           end
         end
       end
@@ -1637,6 +1820,12 @@ describe AssignmentOverrideApplicator do
       expect(due_at).to eq @assignment.due_at
     end
 
+    it "does not fall back on assignment's due_at if only module overrides exist" do
+      @override.context_module_id = 123
+      due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
+      expect(due_at).to eq @override.due_at
+    end
+
     it "recognizes overrides with overridden-but-nil due_at" do
       @override.override_due_at(nil)
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
@@ -1862,6 +2051,46 @@ describe AssignmentOverrideApplicator do
       @override.override_lock_at(7.days.from_now)
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@wiki_page, [@override])
       expect(lock_at).to eq @override.lock_at
+    end
+
+    context "adhoc override prioritization for admins" do
+      before do
+        student_in_course(active_all: true)
+        teacher_in_course(active_all: true)
+        @assignment = create_assignment(course: @course, lock_at: 5.days.from_now)
+        @adhoc_override = assignment_override_model(assignment: @assignment)
+        @adhoc_override.assignment_override_students.create!(user: @student)
+        @adhoc_lock_at = 6.days.from_now
+        @adhoc_override.override_lock_at(@adhoc_lock_at)
+        @section_override = assignment_override_model(assignment: @assignment, set: @course.default_section)
+        @section_lock_at = 7.days.from_now
+        @section_override.override_lock_at(@section_lock_at)
+        @overrides = [@adhoc_override, @section_override]
+      end
+
+      it "uses the adhoc lock_at for students" do
+        lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, @overrides, @student)
+        expect(lock_at).to eq @adhoc_lock_at
+      end
+
+      it "uses the most lenient lock_at for teachers" do
+        lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, @overrides, @teacher)
+        expect(lock_at).to eq @section_lock_at
+      end
+
+      it "uses the most lenient adhoc lock_at for teachers with multiple adhoc overrides" do
+        student_in_course(active_all: true)
+        student2 = @student
+        adhoc_override2 = assignment_override_model(assignment: @assignment)
+        adhoc_override2.assignment_override_students.create!(user: student2)
+        adhoc_lock_at2 = 8.days.from_now
+        adhoc_override2.override_lock_at(adhoc_lock_at2)
+
+        all_overrides = @overrides + [adhoc_override2]
+
+        lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, all_overrides, @teacher)
+        expect(lock_at).to eq adhoc_lock_at2
+      end
     end
   end
 

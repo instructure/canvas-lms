@@ -17,19 +17,17 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {TextInput} from '@instructure/ui-text-input'
 import type {TextInputProps} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import type JQuery from 'jquery'
 import type WikiPageEditView from '../backbone/views/WikiPageEditView'
 import {checkForTitleConflictDebounced} from '../utils/titleConflicts'
-
-const I18n = createI18nScope('pages_edit_title')
 
 interface ComponentProps {
   canEdit: boolean
@@ -50,6 +48,7 @@ interface ValidationResult {
 export type Props = TextInputProps & ComponentProps
 
 const EditableContent = (props: Props) => {
+  const {t} = useTranslation('pages_edit_title')
   const [messages, setMessages] = useState<FormMessage[]>([])
   const inputRef = useRef<HTMLInputElement | null>(null)
 
@@ -67,8 +66,7 @@ const EditableContent = (props: Props) => {
         }))
         setMessages(parsedErrors)
         return false
-      }
-      else {
+      } else {
         // we show errors from the server if any
         evt?.result.catch((error: any) => {
           const titleError = error.responseJSON.errors.title[0]
@@ -119,7 +117,7 @@ const EditableContent = (props: Props) => {
         onChange={handleOnChange}
         renderLabel={() => (
           <Text size="small" weight="normal">
-            {I18n.t('Page Title')}
+            {t('Page Title')}
           </Text>
         )}
         {...props}
@@ -140,8 +138,7 @@ const renderWikiPageTitle = (props: Props) => {
   const titleComponent = props.canEdit ? <EditableContent {...props} /> : readOnlyContent()
   const wikiPageTitleContainer = document.getElementById('edit_wikipage_title_container')
   if (wikiPageTitleContainer) {
-    const root = createRoot(wikiPageTitleContainer)
-    root.render(titleComponent)
+    render(titleComponent, wikiPageTitleContainer)
   }
 
   return titleComponent

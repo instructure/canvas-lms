@@ -23,9 +23,19 @@ import useLMGBContext from '../useLMGBContext'
 
 describe('useLMGBContext', () => {
   it('can return values if they are set', () => {
+    const mockProficiency = {ratings: [{points: 3, description: 'Mastery'}]}
     const wrapper = ({children}) => (
       <LMGBContext.Provider
-        value={{env: {accountLevelMasteryScalesFF: true, outcomesFriendlyDescriptionFF: true}}}
+        value={{
+          env: {
+            accountLevelMasteryScalesFF: true,
+            outcomesFriendlyDescriptionFF: true,
+            allowDifferentiationTags: true,
+            lmgbStudentReportingFF: true,
+            contextURL: '/courses/1',
+            outcomeProficiency: mockProficiency,
+          },
+        }}
       >
         {children}
       </LMGBContext.Provider>
@@ -33,8 +43,10 @@ describe('useLMGBContext', () => {
     const {result} = renderHook(() => useLMGBContext(), {wrapper})
     expect(result.current.accountLevelMasteryScalesFF).toBe(true)
     expect(result.current.outcomesFriendlyDescriptionFF).toBe(true)
-    expect(result.current.contextURL).toBe(undefined)
-    expect(result.current.outcomeProficiency).toBe(undefined)
+    expect(result.current.allowDifferentiationTags).toBe(true)
+    expect(result.current.lmgbStudentReportingFF).toBe(true)
+    expect(result.current.contextURL).toBe('/courses/1')
+    expect(result.current.outcomeProficiency).toEqual(mockProficiency)
   })
 
   it('returns undefined if values are not set', () => {
@@ -44,7 +56,40 @@ describe('useLMGBContext', () => {
     const {result} = renderHook(() => useLMGBContext(), {wrapper})
     expect(result.current.accountLevelMasteryScalesFF).toBe(undefined)
     expect(result.current.outcomesFriendlyDescriptionFF).toBe(undefined)
+    expect(result.current.allowDifferentiationTags).toBe(undefined)
     expect(result.current.contextURL).toBe(undefined)
     expect(result.current.outcomeProficiency).toBe(undefined)
+  })
+
+  it('returns false when allowDifferentiationTags is explicitly set to false', () => {
+    const wrapper = ({children}) => (
+      <LMGBContext.Provider
+        value={{
+          env: {
+            allowDifferentiationTags: false,
+          },
+        }}
+      >
+        {children}
+      </LMGBContext.Provider>
+    )
+    const {result} = renderHook(() => useLMGBContext(), {wrapper})
+    expect(result.current.allowDifferentiationTags).toBe(false)
+  })
+
+  it('returns true when allowDifferentiationTags is explicitly set to true', () => {
+    const wrapper = ({children}) => (
+      <LMGBContext.Provider
+        value={{
+          env: {
+            allowDifferentiationTags: true,
+          },
+        }}
+      >
+        {children}
+      </LMGBContext.Provider>
+    )
+    const {result} = renderHook(() => useLMGBContext(), {wrapper})
+    expect(result.current.allowDifferentiationTags).toBe(true)
   })
 })

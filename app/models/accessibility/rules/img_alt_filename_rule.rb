@@ -21,9 +21,11 @@ module Accessibility
   module Rules
     class ImgAltFilenameRule < Accessibility::Rule
       self.id = "img-alt-filename"
-      self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
+      self.link = "https://www.w3.org/TR/WCAG20-TECHS/F30.html"
 
-      def self.test(elem)
+      # Accessibility::Rule methods
+
+      def test(elem)
         return nil if elem.tag_name != "img"
         return nil unless elem.attribute?("alt")
 
@@ -33,73 +35,46 @@ module Accessibility
         return nil if alt == "" && role == "presentation"
         return nil if alt.blank?
 
-        I18n.t("Alt text should not be the filename of the image.") if filename_like?(alt)
+        ImgAltRuleHelper.validation_error_filename if ImgAltRuleHelper.filename_like?(alt)
       end
 
-      def self.message
-        I18n.t("The alt text is just the file name. Add a description for screen readers
-        so people who are blind or have low vision can understand what's in the image.")
-      end
-
-      def self.why
-        I18n.t("Alt text is a description of an image only visible to screen readers.
-        Screen readers are software to help people who are blind or have low vision interact with websites and computers.
-        The filename is not an adequate description of an image.")
-      end
-
-      def self.display_name
-        I18n.t("Alt text is filename")
-      end
-
-      def self.form(elem)
+      def form(elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
-          checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
-          undo_text: I18n.t("Alt text fixed"),
+          checkbox_subtext: I18n.t("Screen readers should skip purely decorative images."),
+          undo_text: I18n.t("Alt text updated"),
           input_label: I18n.t("Alt text"),
-          input_description: I18n.t("Describe what's on the picture."),
-          input_max_length: 120,
+          input_description: I18n.t("Describe what this image is meant to convey."),
+          input_max_length: ImgAltRuleHelper::MAX_LENGTH,
           can_generate_fix: true,
+          is_canvas_image: Accessibility::AiGenerationService.extract_attachment_id_from_element(elem).present?,
           generate_button_label: I18n.t("Generate alt text"),
           value: elem.get_attribute("alt") || ""
         )
       end
 
-      def self.generate_fix(elem)
-        return nil if elem.tag_name != "img"
-        return nil unless elem.attribute?("src")
-
-        src = elem.get_attribute("src")
-        ImgAltRuleHelper.generate_alt_text(src)
+      def fix!(elem, value)
+        ImgAltRuleHelper.fix_alt_text!(elem, value)
       end
 
-      def self.fix!(elem, value)
-        if value == "" || value.nil?
-          elem["role"] = "presentation"
-        else
-          src = elem.get_attribute("src")
-          if src
-            filename = src.split("/").last.split("?").first
-            filename_without_extension = filename.split(".").first
-            if value == filename || value == filename_without_extension
-              raise StandardError, I18n.t("Alt text should not be the filename of the image.")
-            end
-          end
-        end
-
-        return nil if elem["alt"] == value
-
-        elem["alt"] = value
-        elem
+      def display_name
+        I18n.t("Alt text is filename")
       end
 
-      def self.filename_like?(string)
-        return false if string.blank?
+      def message
+        I18n.t("Alt text is just the filename. Replace it with a description that tells users who can't see or load the image what it's meant to convey.")
+      end
 
-        parts = string.split(".")
-        return false if parts.length < 2 || parts.last.empty?
+      def issue_preview(elem)
+        return nil unless elem.tag_name == "img"
 
-        !parts.first.match(/\s+/) && parts.last.match?(/^\w+$/)
+        ImgAltRuleHelper.adjust_img_style(elem)
+      end
+
+      def why
+        I18n.t("Alt text is a description of an image only visible to screen readers.
+        Screen readers are software to help people who are blind or have low vision interact with websites and computers.
+        The filename is not an adequate description of an image.")
       end
     end
   end

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% if association.lock_at || association.unlock_at %>
+<% if (association.lock_at || association.unlock_at) && !@context.enable_course_paces? %>
   <li>
     <span class="title"><%= t('headers.available', "Available") %></span>
     <span class="value">

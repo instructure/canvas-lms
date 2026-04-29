@@ -20,7 +20,7 @@ import React from 'react'
 import {render, fireEvent, act} from '@testing-library/react'
 import OutcomesPopover from '../OutcomesPopover'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('OutcomesPopover', () => {
   let onClearHandlerMock
@@ -46,12 +46,12 @@ describe('OutcomesPopover', () => {
 
   beforeAll(() => {
     window.ENV.LOCALE = 'en'
-    onClearHandlerMock = jest.fn()
+    onClearHandlerMock = vi.fn()
   })
 
   afterEach(() => {
     window.ENV = {}
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the OutcomesPopover component', () => {
@@ -101,7 +101,7 @@ describe('OutcomesPopover', () => {
     )
     const button = getByRole('button')
     fireEvent.click(button)
-    await act(async () => jest.runOnlyPendingTimers())
+    await act(async () => vi.runOnlyPendingTimers())
     const outcomes = await findAllByText(/Outcome /)
     expect(outcomes[0]).toContainHTML('Outcome 1')
     expect(outcomes[1]).toContainHTML('Outcome 2')

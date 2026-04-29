@@ -27,6 +27,10 @@ class Mutations::DeleteConversations < Mutations::BaseMutation
   field :conversation_ids, [ID], null: true
 
   def resolve(input:)
+    if current_user.account.root_account.feature_enabled?(:restrict_student_access)
+      raise GraphQL::ExecutionError, "Insufficient permissions"
+    end
+
     errors = {}
     context[:deleted_models] = { conversations: {} }
     # rubocop:disable Style/BlockDelimiters

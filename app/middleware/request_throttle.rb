@@ -19,7 +19,7 @@
 #
 
 class RequestThrottle
-  attr_accessor :inst_access_token_authentication
+  attr_accessor :inst_access_token_authentication, :access_token
 
   # this @@last_sample data isn't thread-safe, and if canvas ever becomes
   # multi-threaded, we'll have to just get rid of it since we can't measure
@@ -43,6 +43,7 @@ class RequestThrottle
   def initialize(app)
     @app = app
     @inst_access_token_authentication = nil
+    @access_token = nil
   end
 
   def call(env)
@@ -50,6 +51,8 @@ class RequestThrottle
     starting_cpu = Process.times
 
     request = ActionDispatch::Request.new(env)
+    token_string = AuthenticationMethods.access_token(request, :GET)
+    @access_token = token_string ? AccessToken.authenticate(token_string, load_pseudonym_from_access_token: true) : nil
     self.inst_access_token_authentication = ::AuthenticationMethods::InstAccessToken::Authentication.new(
       request
     )
@@ -61,7 +64,7 @@ class RequestThrottle
 
     status, headers, response = nil
     throttled = false
-    bucket = LeakyBucket.new(client_identifier(request))
+    bucket = LeakyBucket.new(client_identifier(request), client_overrides(request))
 
     up_front_cost = bucket.get_up_front_cost_for_path(path)
     pre_judged = approved?(request) || blocked?(request)
@@ -85,10 +88,13 @@ class RequestThrottle
       cost
     end
 
+    limit_remaining = bucket.remaining.to_s
+    limit_remaining = 0.0.to_s if blocked?(request)
+    RequestContext::Generator.add_meta_header("rlr", limit_remaining)
+
     if client_identifier(request) && !client_identifier(request).starts_with?("session")
       headers["X-Request-Cost"] = cost.to_s unless throttled
-      headers["X-Rate-Limit-Remaining"] = bucket.remaining.to_s
-      headers["X-Rate-Limit-Remaining"] = 0.0.to_s if blocked?(request)
+      headers["X-Rate-Limit-Remaining"] = limit_remaining
     end
 
     [status, headers, response]
@@ -116,6 +122,7 @@ class RequestThrottle
 
   def allowed?(request, bucket)
     if approved?(request)
+      Rails.logger.info("approved request, skipping throttling, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
       true
     elsif blocked?(request)
       # blocking is useful even if throttling is disabled, this is left in intentionally
@@ -127,6 +134,13 @@ class RequestThrottle
         if RequestThrottle.enabled?
           InstStatsd::Statsd.distributed_increment("request_throttling.throttled")
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
+
+          if @access_token
+            RequestContext::Generator.add_meta_header("at", @access_token.global_id)
+            RequestContext::Generator.add_meta_header("dk", @access_token.global_developer_key_id)
+            RequestContext::Generator.add_meta_header("utid", @access_token.developer_key.unified_tool_id) if @access_token.developer_key&.unified_tool_id
+          end
+
           return false
         else
           Rails.logger.info("WOULD HAVE throttled request (config disabled), client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
@@ -150,6 +164,35 @@ class RequestThrottle
     client_identifiers(request).first
   end
 
+  def use_client_overrides?
+    Setting.get("request_throttle.use_custom_overrides", "false") == "true"
+  end
+
+  def client_overrides(request)
+    return {} unless use_client_overrides?
+
+    config = OAuthClientConfig.find_by_cached(
+      request.env["canvas.domain_root_account"],
+      client_identifiers_for_overrides(request)
+    )
+    return {} unless config
+
+    config.as_throttle_config
+  end
+
+  def client_identifiers_for_overrides(request)
+    default_identifiers = client_identifiers(request)
+    return default_identifiers unless @access_token
+
+    [
+      # product: a globally unique product id, used to link multiple client_ids for a third-party integration
+      tag_identifier("product", @access_token.developer_key.unified_tool_id),
+      # client_id: the OAuth client_id of a DeveloperKey
+      tag_identifier("client_id", @access_token.global_developer_key_id),
+      *default_identifiers
+    ].compact
+  end
+
   def tag_identifier(tag, identifier)
     return unless identifier
 
@@ -159,15 +202,19 @@ class RequestThrottle
   # This is cached on the request, so a theoretical change to the request
   # object won't be caught.
   def client_identifiers(request)
-    request.env["canvas.request_throttle.user_id"] ||= [
+    return request.env["canvas.request_throttle.user_id"] if request.env["canvas.request_throttle.user_id"]
+
+    token_string = AuthenticationMethods.access_token(request, :GET)
+
+    request.env["canvas.request_throttle.user_id"] = [
       tag_identifier("lti_advantage", lti_advantage_client_id_and_cluster(request)),
       tag_identifier("service_user_key", site_admin_service_user_key(request)),
       tag_identifier("service_user_key", inst_access_token_authentication&.tag_identifier),
-      (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
+      tag_identifier("token", token_string.presence && AccessToken.hashed_token(token_string)),
       tag_identifier("user", AuthenticationMethods.user_id(request).presence),
       tag_identifier("session", session_id(request).presence),
       tag_identifier("tool", tool_id(request)),
-      tag_identifier("ip", request.ip)
+      tag_identifier("ip", request.ip),
     ].compact
   end
 
@@ -211,13 +258,10 @@ class RequestThrottle
 
     return unless (token_string = AuthenticationMethods.access_token(request))
 
-    return unless AccessToken.site_admin?(token_string)
+    access_token = AccessToken.site_admin?(token_string)
+    return unless access_token
 
-    AccessToken.authenticate(token_string).global_developer_key_id
-  end
-
-  def service_user_jwt_key(request)
-    AuthenticationMethods::InstAccessToken.tag_identifier(request)
+    access_token.global_developer_key_id
   end
 
   def self.blocklist
@@ -252,9 +296,12 @@ class RequestThrottle
   end
 
   def rate_limit_exceeded
-    [403,
+    status_code = 403
+    status_code = 429 if Setting.get("request_throttle.send_429_response", "false") == "true"
+
+    [status_code,
      { "Content-Type" => "text/plain; charset=utf-8", "X-Rate-Limit-Remaining" => "0.0" },
-     ["403 #{Rack::Utils::HTTP_STATUS_CODES[403]} (Rate Limit Exceeded)\n"]]
+     ["#{status_code} #{Rack::Utils::HTTP_STATUS_CODES[status_code]} (Rate Limit Exceeded)\n"]]
   end
 
   def report_on_stats(db_runtime, account, starting_mem, ending_mem, user_cpu, system_cpu)
@@ -294,8 +341,10 @@ class RequestThrottle
   # and hwm were equal, then the bucket would always leak at least a tiny bit
   # by the beginning of the next request, and thus would never be considered
   # full.
-  LeakyBucket = Struct.new(:client_identifier, :count, :last_touched) do # rubocop:disable Lint/StructNewOverride
-    def initialize(client_identifier, count = 0.0, last_touched = nil)
+  LeakyBucket = Struct.new(:client_identifier, :client_overrides, :count, :last_touched) do # rubocop:disable Lint/StructNewOverride
+    def initialize(client_identifier, client_overrides = {}, count = 0.0, last_touched = nil)
+      raise ArgumentError, "client_overrides must be a hash" unless client_overrides.is_a?(Hash)
+
       super
     end
 
@@ -319,7 +368,8 @@ class RequestThrottle
       up_front_cost: 50,
     }.each do |(setting, default)|
       define_method(setting) do
-        (self.class.custom_settings_hash[client_identifier]&.[](setting.to_s) ||
+        (client_overrides[setting] ||
+          self.class.custom_settings_hash[client_identifier]&.[](setting.to_s) ||
           Setting.get("request_throttle.#{setting}", default)).to_f
       end
     end
@@ -338,7 +388,7 @@ class RequestThrottle
       @up_front_cost_regex_map ||=
         begin
           hash = RequestThrottle.dynamic_settings["up_front_cost_by_path_regex"] || {}
-          hash.keys.select { |k| k.is_a?(String) }.map { |k| hash[Regexp.new(k)] = hash.delete(k) } # regexify strings
+          hash.keys.grep(String).map { |k| hash[Regexp.new(k)] = hash.delete(k) } # regexify strings
           hash.each do |k, v|
             next if k.is_a?(Regexp) && v.is_a?(Numeric)
 

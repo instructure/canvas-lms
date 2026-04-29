@@ -20,7 +20,7 @@ import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
 import WebcamCapture from '../WebcamCapture'
 
-const onSelectImage = jest.fn()
+const onSelectImage = vi.fn()
 const defaultProps = (props = {}) => ({
   onSelectImage,
   ...props,
@@ -33,26 +33,26 @@ describe('WebcamCapture', () => {
   let tracks
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
-    tracks = {forEach: jest.fn()}
+    tracks = {forEach: vi.fn()}
     fakeStream = {
       getTracks: () => tracks,
       clientWidth: 640,
       clientHeight: 480,
     }
-    getUserMedia = jest.fn()
+    getUserMedia = vi.fn()
     navigator.mediaDevices = {getUserMedia}
     HTMLCanvasElement.prototype.getContext = () => ({
-      drawImage: jest.fn(),
+      drawImage: vi.fn(),
     })
-    HTMLCanvasElement.prototype.toDataURL = jest.fn().mockReturnValue('data:image/png;base64,')
-    HTMLCanvasElement.prototype.toBlob = jest.fn().mockImplementation(cb => cb(new Blob()))
+    HTMLCanvasElement.prototype.toDataURL = vi.fn().mockReturnValue('data:image/png;base64,')
+    HTMLCanvasElement.prototype.toBlob = vi.fn().mockImplementation(cb => cb(new Blob()))
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
-    jest.runAllTimers()
+    vi.resetAllMocks()
+    vi.runAllTimers()
     delete navigator.mediaDevices
   })
 
@@ -60,7 +60,7 @@ describe('WebcamCapture', () => {
     getUserMedia.mockImplementation(() => new Promise(() => {}))
     renderWebcamCapture()
 
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     expect(screen.getByText(/Canvas needs access to your camera/)).toBeInTheDocument()
   })
@@ -117,7 +117,7 @@ describe('WebcamCapture', () => {
 
         fireEvent.click(recordButton)
         await screen.findByTestId('webcam-countdown-container')
-        jest.advanceTimersByTime(10000)
+        vi.advanceTimersByTime(10000)
 
         return {...wrapper}
       }

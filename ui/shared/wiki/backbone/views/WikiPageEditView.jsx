@@ -15,25 +15,25 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import {LATEST_BLOCK_DATA_VERSION} from '@canvas/block-editor/react/utils'
+import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
+import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
+import {redirectWithHorizonParams} from '@canvas/horizon/utils'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
+import RichContentEditor from '@canvas/rce/RichContentEditor'
+import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import $ from 'jquery'
 import React, {lazy, Suspense} from 'react'
-import ReactDOM from 'react-dom'
-import {createRoot} from 'react-dom/client'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
+import {legacyRender, render} from '@canvas/react'
 import template from '../../jst/WikiPageEdit.handlebars'
-import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
+import {renderAssignToTray} from '../../react/renderAssignToTray'
+import renderWikiPageTitle from '../../react/renderWikiPageTitle'
+import {BODY_MAX_LENGTH} from '../../utils/constants'
 import WikiPageDeleteDialog from './WikiPageDeleteDialog'
 import WikiPageReloadView from './WikiPageReloadView'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
-import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
-import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
-import renderWikiPageTitle from '../../react/renderWikiPageTitle'
-import {renderAssignToTray} from '../../react/renderAssignToTray'
-import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
-import {LATEST_BLOCK_DATA_VERSION} from '@canvas/block-editor/react/utils'
-import {BODY_MAX_LENGTH} from '../../utils/constants'
-import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
 
 const I18n = createI18nScope('pages')
 
@@ -66,7 +66,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     })
 
     this.prototype.template = template
-    this.prototype.className = 'form-horizontal edit-form validated-form-view'
+    this.prototype.className = 'form-horizontal-wiki-page edit-form validated-form-view'
     this.prototype.dontRenableAfterSaveSuccess = true
     this.prototype.disablingDfd = new $.Deferred()
     this.prototype.attributes = {
@@ -89,7 +89,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
       ENV.FEATURES.course_pace_pacing_with_mastery_paths
     const redirect = () => {
-      window.location.href = this.model.get('html_url')
+      redirectWithHorizonParams(this.model.get('html_url'))
     }
     let callBack = redirect
     if (this.enableAssignTo) {
@@ -167,9 +167,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
     json.SHOW = {COURSE_ROLES: json.contextName === 'courses'}
 
-    if (!window.ENV.FEATURES.create_wiki_page_mastery_path_overrides) {
-      json.assignment = json.assignment != null ? json.assignment.toView() : undefined
-    }
+    json.assignment = json.assignment != null ? json.assignment.toView() : undefined
 
     json.content_is_locked = this.lockedItems.content
     json.show_assign_to = this.enableAssignTo
@@ -185,7 +183,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       json.edit_with_block_editor = true
     }
 
-    if (this.model.get('editor') === 'block_content_editor') {
+    if (this.isBlockContentEditor()) {
       // used by ui/shared/wiki/jst/WikiPageEdit.handlebars to render block_editor div
       // that will be used as a mount point for the PageContentBlockBuilderEditor
       json.edit_with_block_editor = true
@@ -223,7 +221,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   renderStudentTodoAtDate() {
     const elt = this.$studentTodoAtContainer[0]
     if (elt) {
-      return createRoot(elt).render(
+      return legacyRender(
         <DueDateCalendarPicker
           dateType="todo_date"
           name="student_todo_at"
@@ -237,6 +235,7 @@ export default class WikiPageEditView extends ValidatedFormView {
           labelText="Student Planner Date"
           labelClasses="screenreader-only"
         />,
+        elt,
       )
     }
   }
@@ -263,7 +262,10 @@ export default class WikiPageEditView extends ValidatedFormView {
 
     if (this.enableAssignTo) {
       const pageName = this.model.get('title')
-      const pageId = this.model.id
+      // for Backbone models 0 is required to issue PUT requests instead of POST
+      // see wiki_page_json helper method, but we need to avoid unnecessary HTTP
+      // requests at AssignToTray. That is why '0' should be mapped to undefined
+      const pageId = this.model.id === '0' || this.model.id === 0 ? undefined : this.model.id
       const mountElement = document.getElementById('assign-to-mount-point-edit-page')
       const onSync = payload => {
         this.overrides = payload
@@ -280,7 +282,7 @@ export default class WikiPageEditView extends ValidatedFormView {
         }
       }
 
-      ReactDOM.render(
+      legacyRender(
         React.createElement(MasteryPathToggle, {
           onSync,
           fetchOwnOverrides: true,
@@ -303,7 +305,26 @@ export default class WikiPageEditView extends ValidatedFormView {
         this.model.get('editor') !== 'rce'
     }
 
-    if (
+    if (this.isBlockContentEditor()) {
+      const data = this.model.get('block_editor_attributes')?.['blocks'] ?? null
+      import('@canvas/block-content-editor').then(({BlockContentEditor}) => {
+        const aiAltTextGenerationURL = ENV?.ai_alt_text_generation_url ?? null
+        const blockContentEditorToolbarReorder =
+          ENV?.FEATURES?.block_content_editor_toolbar_reorder ?? false
+
+        render(
+          <BlockContentEditor
+            data={data}
+            onInit={handler => {
+              this.blockEditorHandler = handler
+            }}
+            aiAltTextGenerationURL={aiAltTextGenerationURL}
+            toolbarReorder={blockContentEditorToolbarReorder}
+          />,
+          document.getElementById('block_editor'),
+        )
+      })
+    } else if (
       (this.model.get('editor') === 'block_editor' && this.model.get('block_editor_attributes')) ||
       chose_block_editor
     ) {
@@ -315,8 +336,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       container.style.width = '100%'
       container.style.transition = 'width 0.3s ease-in-out'
 
-      const root = createRoot(document.getElementById('block_editor'))
-      root.render(
+      render(
         <Suspense fallback={<div>{I18n.t('Loading...')}</div>}>
           <BlockEditor
             course_id={ENV.COURSE_ID}
@@ -325,20 +345,8 @@ export default class WikiPageEditView extends ValidatedFormView {
             onCancel={this.cancel.bind(this)}
           />
         </Suspense>,
+        document.getElementById('block_editor'),
       )
-    } else if (this.model.get('editor') === 'block_content_editor') {
-      const data = this.model.get('block_editor_attributes')?.['blocks'] ?? null
-      import('@canvas/block-content-editor').then(({BlockContentEditor}) => {
-        const root = createRoot(document.getElementById('block_editor'))
-        root.render(
-          <BlockContentEditor
-            data={data}
-            onInit={handler => {
-              this.blockEditorHandler = handler
-            }}
-          />,
-        )
-      })
     } else {
       RichContentEditor.loadNewEditor(
         this.$wikiPageBody,
@@ -534,13 +542,26 @@ export default class WikiPageEditView extends ValidatedFormView {
     return errors
   }
 
-  hasUnsavedChanges() {
+  isEditedByRce() {
     const hasEditor = RichContentEditor.callOnRCE(this.$wikiPageBody, 'exists?')
-    let dirty = hasEditor && RichContentEditor.callOnRCE(this.$wikiPageBody, 'is_dirty')
-    if (!dirty && this.toJSON().CAN.EDIT_TITLE) {
-      dirty = (this.model.get('title') || '') !== (this.getFormData().title || '')
+    return hasEditor && RichContentEditor.callOnRCE(this.$wikiPageBody, 'is_dirty')
+  }
+
+  isEditedByBlockContentEditor() {
+    if (this.isBlockContentEditor()) {
+      return this.blockEditorHandler.isEdited()
     }
-    return dirty
+    return false
+  }
+
+  isTitleEdited() {
+    if (this.toJSON().CAN.EDIT_TITLE) {
+      return (this.model.get('title') || '') !== (this.getFormData().title || '')
+    }
+  }
+
+  hasUnsavedChanges() {
+    return this.isTitleEdited() || this.isEditedByRce() || this.isEditedByBlockContentEditor()
   }
 
   unsavedWarning() {
@@ -568,13 +589,10 @@ export default class WikiPageEditView extends ValidatedFormView {
       }
     }
 
-    switch (this.model.get('editor')) {
-      case 'block_editor':
-        this.blockEditorData = window.block_editor().getBlocks()
-        break
-      case 'block_content_editor':
-        this.blockEditorData = this.blockEditorHandler.getContent()
-        break
+    if (this.isBlockContentEditor()) {
+      this.blockEditorData = this.blockEditorHandler.getContent()
+    } else if (this.model.get('editor') === 'block_editor') {
+      this.blockEditorData = window.block_editor().getBlocks()
     }
 
     if (this.reloadView != null) {
@@ -595,18 +613,16 @@ export default class WikiPageEditView extends ValidatedFormView {
   getFormData() {
     const page_data = super.getFormData(...arguments)
 
-    if (!window.ENV.FEATURES.create_wiki_page_mastery_path_overrides) {
-      const assign_data = page_data.assignment
+    const assign_data = page_data.assignment
 
-      if ((assign_data != null ? assign_data.set_assignment : undefined) === '1') {
-        assign_data.only_visible_to_overrides = true
-        page_data.assignment = this.model.get('assignment') || this.model.createAssignment()
-        page_data.assignment.set(assign_data)
-      } else {
-        page_data.assignment = this.model.createAssignment({set_assignment: '0'})
-      }
-      page_data.set_assignment = page_data.assignment.get('set_assignment')
+    if ((assign_data != null ? assign_data.set_assignment : undefined) === '1') {
+      assign_data.only_visible_to_overrides = true
+      page_data.assignment = this.model.get('assignment') || this.model.createAssignment()
+      page_data.assignment.set(assign_data)
+    } else {
+      page_data.assignment = this.model.createAssignment({set_assignment: '0'})
     }
+    page_data.set_assignment = page_data.assignment.get('set_assignment')
 
     page_data.student_planner_checkbox = this.$studentPlannerCheckbox?.is(':checked')
     if (page_data.student_planner_checkbox) {
@@ -650,6 +666,12 @@ export default class WikiPageEditView extends ValidatedFormView {
       wiki_pages_path: this.wiki_pages_path,
     })
     return deleteDialog.open()
+  }
+
+  isBlockContentEditor() {
+    const editorFromQuery = new URLSearchParams(window.location.search).get('editor')
+    const editorFromModel = this.model.get('editor')
+    return editorFromModel === 'block_content_editor' || editorFromQuery === 'block_content_editor'
   }
 }
 WikiPageEditView.initClass()

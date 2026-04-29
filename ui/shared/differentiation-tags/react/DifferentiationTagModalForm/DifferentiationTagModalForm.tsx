@@ -39,9 +39,15 @@ import {
   CREATE_NEW_SET_OPTION,
 } from '../util/constants'
 import {useBulkManageDifferentiationTags} from '../hooks/useBulkManageDifferentiationTags'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
+import type {Course} from '../types.d'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 const I18n = createI18nScope('differentiation_tags')
+
+declare const ENV: GlobalEnv & Course
+
+const variantLimit = ENV?.course?.max_variants_per_tag_category ?? 10
 
 const modeConfig = {
   create: {
@@ -65,10 +71,12 @@ export type DifferentiationTagModalFormProps = {
   mode: ModalMode
   categories?: DifferentiationTagCategory[]
   courseId: number
+  onCreationSuccess?: (newCategoryID: number) => void
 }
 
 export default function DifferentiationTagModalForm(props: DifferentiationTagModalFormProps) {
-  const {isOpen, onClose, mode, categories, differentiationTagSet, courseId} = props
+  const {isOpen, onClose, mode, categories, differentiationTagSet, courseId, onCreationSuccess} =
+    props
 
   const {mutateAsync: bulkManageDifferentiationTags} = useBulkManageDifferentiationTags()
 
@@ -374,7 +382,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
         deleteOps = oldTags.filter(o => !newIds.includes(o.id)).map(o => ({id: o.id}))
       }
 
-      await bulkManageDifferentiationTags({
+      const result = await bulkManageDifferentiationTags({
         courseId,
         groupCategoryId,
         groupCategoryName,
@@ -384,6 +392,10 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
           delete: deleteOps,
         },
       })
+
+      if (result && mode === CREATE_MODE && !groupCategoryId && onCreationSuccess) {
+        onCreationSuccess(result.group_category.id)
+      }
 
       // If mutation succeeds, close the modal
       handleClose()
@@ -455,7 +467,13 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
   }, [tags, categories])
 
   return (
-    <Modal open={isOpen} onDismiss={handleClose} size="small" label={modeConfig[mode].title}>
+    <Modal
+      open={isOpen}
+      onDismiss={handleClose}
+      size="small"
+      label={modeConfig[mode].title}
+      shouldReturnFocus={mode === CREATE_MODE ? false : true}
+    >
       <Modal.Header>
         <CloseButton
           placement="end"
@@ -521,16 +539,28 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
               />
             ))}
 
-            {(tagMode === MULTIPLE_TAGS || (tagMode === SINGLE_TAG && mode === CREATE_MODE)) && (
-              <CondensedButton
-                onClick={handleAddTagClick}
-                margin="0 0 small 0"
-                aria-label={I18n.t('Add another tag')}
+            {(tagMode === MULTIPLE_TAGS || (tagMode === SINGLE_TAG && mode === CREATE_MODE)) &&
+              tags.length < variantLimit && (
+                <CondensedButton
+                  onClick={handleAddTagClick}
+                  margin="0 0 small 0"
+                  aria-label={I18n.t('Add another tag')}
+                >
+                  {I18n.t('+ Add another tag')}
+                </CondensedButton>
+              )}
+            {tags.length >= variantLimit && (
+              <Alert
+                variant="info"
+                liveRegion={() => document.getElementById('flash-messages') as Element}
+                liveRegionPoliteness="assertive"
+                variantScreenReaderLabel={I18n.t('Information')}
               >
-                {I18n.t('+ Add another tag')}
-              </CondensedButton>
+                {I18n.t('Variant limit reached. Current limit is %{limit}', {
+                  limit: variantLimit,
+                })}
+              </Alert>
             )}
-
             {modeConfig[mode].showTagSetSelector && (
               <SimpleSelect
                 value={selectedCategoryId}

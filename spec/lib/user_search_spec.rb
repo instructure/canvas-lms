@@ -48,6 +48,13 @@ describe UserSearch do
       expect(UserSearch.for_user_in_context("steWArt", course, user).size).to eq 3
     end
 
+    it "searches by both name and short_name" do
+      user_with_short_name = User.create!(name: "Nicknamed Student", short_name: "Name is Little")
+      StudentEnrollment.create!(user: user_with_short_name, course:, workflow_state: "active")
+
+      expect(UserSearch.for_user_in_context("little", course, user).size).to eq 2
+    end
+
     it "uses postgres lower(), not ruby downcase()" do
       # ruby 1.9 downcase doesn't handle the downcasing of many multi-byte characters correctly
       expect(UserSearch.for_user_in_context("Ĭńşŧřůćƭǜȑȩ", course, user).size).to eq 1
@@ -414,6 +421,7 @@ describe UserSearch do
         it "doesn't try to query cross-shard when the search term is a foreign global id in account context with include_deleted_users" do
           user = @shard1.activate { user_model }
           course.enroll_student(user)
+          allow(described_class).to receive(:specific_ids).and_return([user.global_id])
           scope = UserSearch.for_user_in_context(user.global_id, Account.default, account_admin_user, nil, include_deleted_users: true)
           sql = scope.to_sql
           expect(sql).to include user.global_id.to_s
@@ -450,6 +458,10 @@ describe UserSearch do
           teacher = User.create!(name:)
           TeacherEnrollment.create!(user: teacher, course: course1, workflow_state: "active")
         end
+      end
+
+      it "constructs an SQL query with materialized CTE" do
+        expect(UserSearch.for_user_in_context("Tyler", course.account, user, nil, enrollment_type: "student").to_sql).to include("WITH inner_user_scope AS MATERIALIZED")
       end
 
       describe "to a single role" do
@@ -1018,41 +1030,6 @@ describe UserSearch do
     end
   end
 
-  describe "Bookmarker" do
-    before :once do
-      @user1 = Account.default.users.create!
-      @user2 = Account.default.users.create!
-    end
-
-    describe "with include_bookmark: false" do
-      it "works with id ascending by default" do
-        bookmarker = UserSearch::Bookmarker.new
-        pager = double(current_bookmark: bookmarker.bookmark_for(@user1), include_bookmark: false)
-        expect(bookmarker.restrict_scope(Account.default.users, pager).first).to eq @user2
-      end
-
-      it "works with id descending" do
-        bookmarker = UserSearch::Bookmarker.new(order: "desc")
-        pager = double(current_bookmark: bookmarker.bookmark_for(@user2), include_bookmark: false)
-        expect(bookmarker.restrict_scope(Account.default.users, pager).first).to eq @user1
-      end
-    end
-
-    describe "with include_bookmark: true" do
-      it "works with id ascending by default" do
-        bookmarker = UserSearch::Bookmarker.new
-        pager = double(current_bookmark: bookmarker.bookmark_for(@user1), include_bookmark: true)
-        expect(bookmarker.restrict_scope(Account.default.users, pager).first(2)).to eq [@user1, @user2]
-      end
-
-      it "works with id descending" do
-        bookmarker = UserSearch::Bookmarker.new(order: "desc")
-        pager = double(current_bookmark: bookmarker.bookmark_for(@user2), include_bookmark: true)
-        expect(bookmarker.restrict_scope(Account.default.users, pager).first(2)).to eq [@user2, @user1]
-      end
-    end
-  end
-
   describe "#differentiation_tag_scope" do
     let(:account) { Account.create! }
     let(:course) { course_model(name: "Differentiation Tag Course", account:) }
@@ -1071,7 +1048,6 @@ describe UserSearch do
       StudentEnrollment.create!(user: user2, course:, workflow_state: "active")
       StudentEnrollment.create!(user: user3, course:, workflow_state: "active")
 
-      account.enable_feature!(:assign_to_differentiation_tags)
       allow(account).to receive(:allow_assign_to_differentiation_tags?).and_return(true)
     end
 
@@ -1114,13 +1090,7 @@ describe UserSearch do
         end
       end
 
-      describe "feature flag or setting not enabled" do
-        it "returns original users scope when assign_to_differentiation_tags feature is disabled" do
-          account.disable_feature!(:assign_to_differentiation_tags)
-          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
-          expect(result).to eq users_scope
-        end
-
+      describe "setting not enabled" do
         it "returns original users scope when account setting for assign to differentiation tags is disabled" do
           allow(account).to receive(:allow_assign_to_differentiation_tags?).and_return(false)
           result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)

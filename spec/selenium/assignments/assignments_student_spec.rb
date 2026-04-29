@@ -213,6 +213,22 @@ describe "assignments" do
       expect(f("#content")).not_to contain_css(".student-assignment-overview")
     end
 
+    it "does not honor unlock dates if course paces is enabled" do
+      @course.enable_course_paces = true
+      @course.save!
+      assignment = @course.assignments.create!(name: "locked assignment", unlock_at: 1.day.from_now)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+      expect(f("#content")).not_to include_text("This assignment is locked until")
+    end
+
+    it "does not honor lock dates if course paces is enabled" do
+      @course.enable_course_paces = true
+      @course.save!
+      assignment = @course.assignments.create!(name: "locked assignment", lock_at: 1.day.ago)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}"
+      expect(f("#content")).not_to include_text("This assignment was locked")
+    end
+
     context "overridden lock_at" do
       before do
         setup_sections_and_overrides_all_future
@@ -221,6 +237,7 @@ describe "assignments" do
 
       it "shows overridden lock dates for student" do
         extend TextHelper
+
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, " ")
         expect(f("#content")).to include_text "locked until #{expected_unlock}."
@@ -251,10 +268,6 @@ describe "assignments" do
     end
 
     context "click_away_accept_alert" do # this context exits to handle the click_away_accept_alert method call after each spec that needs it even if it fails early to prevent other specs from failing
-      after do
-        click_away_accept_alert
-      end
-
       it "expands the comments box on click" do
         @assignment.update(submission_types: "online_upload")
 

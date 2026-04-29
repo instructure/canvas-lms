@@ -22,12 +22,8 @@ export type CanvasStore<A> = {
   setState(newState: Partial<A>): void
   getState(): A
   clearState(): void
-  // @ts-expect-error
-  addChangeListener(listener: () => void)
-
-  // @ts-expect-error
-  removeChangeListener(listener: () => void)
-
+  addChangeListener(listener: () => void): void
+  removeChangeListener(listener: () => void): void
   emitChange(): void
 }
 
@@ -63,10 +59,9 @@ export type CanvasStore<A> = {
  * });
  * ```
  */
-function createStore<A extends {}>(initialState: A): CanvasStore<A> {
+function createStore<A extends Record<string, unknown>>(initialState?: A): CanvasStore<A> {
   const events = {...Backbone.Events}
-  // @ts-expect-error
-  let state: A = initialState || {}
+  let state: A = (initialState ?? {}) as A
 
   return {
     setState(newState) {
@@ -79,8 +74,7 @@ function createStore<A extends {}>(initialState: A): CanvasStore<A> {
     },
 
     clearState() {
-      // @ts-expect-error
-      state = {}
+      state = {} as A
       this.emitChange()
     },
 

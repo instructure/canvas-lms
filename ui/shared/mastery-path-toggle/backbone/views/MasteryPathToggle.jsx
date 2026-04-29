@@ -19,12 +19,13 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render as canvasRender, rerender} from '@canvas/react'
 import MasteryPathToggle from '../../react/MasteryPathToggle'
 
 extend(MasteryPathToggleView, Backbone.View)
 
 function MasteryPathToggleView() {
+  this._root = null
   this.getOverrides = this.getOverrides.bind(this)
   this.setNewOverridesCollection = this.setNewOverridesCollection.bind(this)
   this.render = this.render.bind(this)
@@ -40,13 +41,15 @@ MasteryPathToggleView.prototype.render = function () {
     return
   }
 
-  ReactDOM.render(
-    React.createElement(MasteryPathToggle, {
-      overrides: this.getOverrides(),
-      onSync: this.setNewOverridesCollection
-    }),
-    div,
-  )
+  const element = React.createElement(MasteryPathToggle, {
+    overrides: this.getOverrides(),
+    onSync: this.setNewOverridesCollection,
+  })
+  if (!this._root) {
+    this._root = canvasRender(element, div)
+  } else {
+    rerender(this._root, element)
+  }
 }
 
 // ==============================

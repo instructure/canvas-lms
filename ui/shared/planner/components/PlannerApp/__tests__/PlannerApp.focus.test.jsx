@@ -34,23 +34,14 @@ const getDefaultValues = overrides => {
       d.format('YYYY-MM-DD'),
       [
         {
-          dateBucketMoment: d,
+          id: `item-${index}`,
+          uniqueId: `item-${index}`,
+          title: `Test Item ${index}`,
+          date: d,
           context: {
             color: '#5a92de',
             title: 'Test Course',
           },
-          items: [
-            {
-              id: `item-${index}`,
-              uniqueId: `item-${index}`,
-              title: `Test Item ${index}`,
-              date: d,
-              context: {
-                color: '#5a92de',
-                title: 'Test Course',
-              },
-            },
-          ],
         },
       ],
     ]),
@@ -69,7 +60,7 @@ beforeAll(() => {
 
 afterAll(() => {
   MockDate.reset()
-  jest.restoreAllMocks()
+  vi.restoreAllMocks()
 })
 
 describe('PlannerApp focus handling', () => {
@@ -84,11 +75,11 @@ describe('PlannerApp focus handling', () => {
   afterEach(() => {
     if (originalActiveElement) originalActiveElement.focus()
     if (containerElement) document.body.removeChild(containerElement)
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('calls fallbackFocus when the load prior focus button disappears', () => {
-    const focusFallback = jest.fn()
+    const focusFallback = vi.fn()
 
     // Render with allPastItemsLoaded=false to show the load prior button
     const {rerender, getByText} = render(
@@ -121,7 +112,7 @@ describe('PlannerApp focus handling', () => {
   })
 
   it('maintains focus when items are loaded', () => {
-    const mockScrollToToday = jest.fn()
+    const mockScrollToToday = vi.fn()
 
     // Render with initial state
     const {rerender} = render(
@@ -134,7 +125,18 @@ describe('PlannerApp focus handling', () => {
       ...getDefaultValues().days,
       [
         moment.tz(TZ).add(3, 'day').format('YYYY-MM-DD'),
-        [{dateBucketMoment: moment.tz(TZ).add(3, 'day')}],
+        [
+          {
+            id: 'item-3',
+            uniqueId: 'item-3',
+            title: 'Test Item 3',
+            date: moment.tz(TZ).add(3, 'day'),
+            context: {
+              color: '#5a92de',
+              title: 'Test Course',
+            },
+          },
+        ],
       ],
     ]
 
@@ -148,7 +150,7 @@ describe('PlannerApp focus handling', () => {
   })
 
   it('triggers dynamic UI updates after props change', () => {
-    const mockTriggerUpdates = jest.fn()
+    const mockTriggerUpdates = vi.fn()
 
     // Render with isLoading=true
     const {rerender} = render(
@@ -169,5 +171,26 @@ describe('PlannerApp focus handling', () => {
 
     // Verify the dynamic UI updates were triggered
     expect(mockTriggerUpdates).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not auto-focus items on initial load', () => {
+    const mockScrollToToday = vi.fn()
+
+    const {rerender} = render(
+      <PlannerApp
+        {...getDefaultValues({isLoading: true, isWeekly: false})}
+        scrollToToday={mockScrollToToday}
+      />,
+      {container: containerElement},
+    )
+
+    rerender(
+      <PlannerApp
+        {...getDefaultValues({isLoading: false, isWeekly: false})}
+        scrollToToday={mockScrollToToday}
+      />,
+    )
+
+    expect(mockScrollToToday).toHaveBeenCalledWith({isWeekly: false, autoFocus: false})
   })
 })

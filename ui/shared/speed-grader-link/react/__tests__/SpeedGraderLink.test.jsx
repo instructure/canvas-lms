@@ -81,11 +81,10 @@ describe('SpeedGraderLink', () => {
     strictEqual(event.defaultPrevented, true)
   })
 
-  // fails in Jest, passes in QUnit
-  test.skip('renders a tooltip when disabled', () => {
+  test('renders a tooltip when disabled', async () => {
     context.disabled = true
     context.disabledTip = 'tooltip text'
-    mountComponent()
+    await mountComponent()
     const tooltip = document.getElementById(getLink().getAttribute('aria-describedby'))
     strictEqual(tooltip.innerText, 'tooltip text')
   })

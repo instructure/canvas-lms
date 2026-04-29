@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe "ToDoListPresenter" do
+  include Rails.application.routes.url_helpers
+
   context "moderated assignments" do
     let(:course) { Course.create! }
     let(:student) { course_with_student(course:, active_all: true).user }
@@ -152,7 +152,7 @@ describe "ToDoListPresenter" do
       end
 
       it "returns the correct assignment_path for discussion checkpoints that need submitting" do
-        view_stub = double("view")
+        view_stub = instance_double(ApplicationController)
         allow(view_stub).to receive(:course_assignment_path).and_return("path/to/assignment")
         presenter = ToDoListPresenter.new(view_stub, @user, nil)
         expect(presenter.needs_submitting.last.assignment_path).to eq "path/to/assignment"
@@ -186,7 +186,7 @@ describe "ToDoListPresenter" do
     end
 
     it "returns the assignment path when the assessor has not submitted their assignment" do
-      view_stub = double("view")
+      view_stub = instance_double(ApplicationController)
       @assignment.update({ anonymous_peer_reviews: false })
       presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
       expect(presenter.needs_reviewing.last.submission_path).to eq "/courses/#{course1.id}/assignments/#{@assignment.id}?reviewee_id=#{reviewee.id}"
@@ -194,7 +194,7 @@ describe "ToDoListPresenter" do
 
     it "returns the submission path when the assessor has submitted their assignment" do
       @assignment.submit_homework(reviewer, body: "you say tomato...")
-      view_stub = double("view")
+      view_stub = instance_double(ApplicationController)
       @assignment.update({ anonymous_peer_reviews: false })
       presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
       expect(presenter.needs_reviewing.last.submission_path).to eq "/courses/#{course1.id}/assignments/#{@assignment.id}/submissions/#{reviewee.id}"
@@ -215,13 +215,67 @@ describe "ToDoListPresenter" do
       expect(presenter.needs_reviewing.last.submission_path).to include("anonymous_submissions")
     end
 
+    it "does not filter legacy AssessmentRequest items from needs_reviewing when feature is not enabled" do
+      presenter = ToDoListPresenter.new(nil, reviewer, [course1])
+      expect(presenter.needs_reviewing).not_to be_empty
+    end
+
+    context "with user as teacher in one course and student in another" do
+      let(:teacher_course) { Course.create! }
+      let(:student_course) { Course.create! }
+      let(:mixed_user) do
+        course_with_user("TeacherEnrollment", course: teacher_course, active_all: true).user.tap do |u|
+          course_with_user("StudentEnrollment", course: student_course, user: u, active_all: true)
+        end
+      end
+      let(:reviewee) { course_with_user("StudentEnrollment", course: student_course, active_all: true).user }
+      let(:parent_assignment) do
+        Assignment.create!(
+          context: student_course,
+          title: "PR Assignment",
+          submission_types: "online_text_entry",
+          peer_reviews: true,
+          peer_review_count: 1
+        ).tap(&:publish)
+      end
+      let(:prsa) do
+        student_course.enable_feature!(:peer_review_allocation_and_grading)
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment:,
+          points_possible: 10,
+          grading_type: "points"
+        )
+      end
+
+      before do
+        student_course.offer!
+        prsa # trigger lazy evaluation so PRSA and submissions are created
+      end
+
+      it "includes PRSA items from the student course in needs_submitting on the dashboard" do
+        presenter = ToDoListPresenter.new(nil, mixed_user, nil)
+        expect(presenter.needs_submitting.map { |a| a.assignment.id }).to include(prsa.id)
+      end
+
+      it "does not include PRSA items when scoped to the teacher course" do
+        presenter = ToDoListPresenter.new(nil, mixed_user, [teacher_course])
+        expect(presenter.needs_submitting.map { |a| a.assignment.id }).not_to include(prsa.id)
+      end
+
+      it "links to the peer reviews page for PRSA items" do
+        presenter = ToDoListPresenter.new(self, mixed_user, nil)
+        prsa_presenter = presenter.needs_submitting.find { |a| a.assignment.is_a?(PeerReviewSubAssignment) }
+        expect(prsa_presenter.assignment_path).to eq "/courses/#{student_course.id}/assignments/#{prsa.parent_assignment_id}/peer_reviews"
+      end
+    end
+
     context "Assignment Enhancements FF enabled" do
       before do
         course1.enable_feature!(:assignments_2_student)
       end
 
       it "returns the correct assignment path with reviewee_id for peer reviews" do
-        view_stub = double("view")
+        view_stub = instance_double(ApplicationController)
         course1.assignments.last.update({ anonymous_peer_reviews: false })
         presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
         expect(presenter.needs_reviewing.last.submission_path).to eq "/courses/#{course1.id}/assignments/#{course1.assignments.last.id}?reviewee_id=#{reviewee.id}"
@@ -233,6 +287,48 @@ describe "ToDoListPresenter" do
 
         expect(presenter.needs_reviewing.last.submission_path).to include("anonymous_asset_id")
       end
+    end
+  end
+
+  context "peer review sub assignments for grading" do
+    let(:course) { Course.create! }
+    let(:teacher) { course_with_teacher(course:, active_all: true).user }
+    let(:student1) { course_with_student(course:, active_all: true).user }
+    let(:student2) { course_with_student(course:, active_all: true).user }
+
+    before do
+      course.account.enable_feature!(:peer_review_allocation_and_grading)
+      @assignment = Assignment.create!(
+        context: course,
+        title: "Assignment with Peer Review",
+        submission_types: "online_text_entry",
+        peer_reviews: true,
+        peer_review_count: 2,
+        points_possible: 10
+      )
+      @peer_review_sub_assignment = @assignment.create_peer_review_sub_assignment!(
+        points_possible: 5,
+        due_at: 1.day.from_now
+      )
+      @peer_review_sub_assignment.submit_homework(student1, body: "peer review 1")
+      @peer_review_sub_assignment.submit_homework(student2, body: "peer review 2")
+    end
+
+    it "includes peer review sub assignments in needs_grading when feature flag is enabled" do
+      presenter = ToDoListPresenter.new(nil, teacher, [course])
+      expect(presenter.needs_grading.map(&:assignment)).to include(@peer_review_sub_assignment)
+    end
+
+    it "does not include peer review sub assignments when feature flag is disabled" do
+      course.account.disable_feature!(:peer_review_allocation_and_grading)
+      presenter = ToDoListPresenter.new(nil, teacher, [course])
+      expect(presenter.needs_grading.map(&:assignment)).not_to include(@peer_review_sub_assignment)
+    end
+
+    it "does not include peer review sub assignments without submissions" do
+      @peer_review_sub_assignment.submissions.destroy_all
+      presenter = ToDoListPresenter.new(nil, teacher, [course])
+      expect(presenter.needs_grading.map(&:assignment)).not_to include(@peer_review_sub_assignment)
     end
   end
 end

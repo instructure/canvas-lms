@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AppointmentGroup < ActiveRecord::Base
+class AppointmentGroup < ApplicationRecord
   include Workflow
   include TextHelper
+  include ConversationsHelper
 
-  # rubocop:disable Rails/InverseOf
   has_many :appointments,
            -> { order(:start_at).preload(:child_events).where("calendar_events.workflow_state <> 'deleted'") },
            **(opts = { class_name: "CalendarEvent", as: :context, inverse_of: :context })
@@ -31,7 +31,6 @@ class AppointmentGroup < ActiveRecord::Base
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
   has_many :_appointments, -> { order(:start_at).preload(:child_events).where("_appointments_appointments_participants.workflow_state <> 'deleted'") }, **opts
-  # rubocop:enable Rails/InverseOf
   has_many :appointments_participants, -> { where("calendar_events.workflow_state <> 'deleted'").order(:start_at) }, through: :_appointments, source: :child_events
   has_many :appointment_group_contexts
   has_many :appointment_group_sub_contexts, -> { preload(:sub_context) }
@@ -145,7 +144,7 @@ class AppointmentGroup < ActiveRecord::Base
           @new_contexts.each do |context|
             context_subs = context.course_sections.map(&:asset_string)
             # if context has no selected subcontexts, add all subcontexts
-            if (@new_sub_context_codes & context_subs).count == 0
+            unless @new_sub_context_codes.intersect?(context_subs)
               @new_sub_context_codes += context_subs
             end
           end
@@ -332,7 +331,7 @@ class AppointmentGroup < ActiveRecord::Base
     end
   end
 
-  def possible_participants(registration_status: nil, include_observers: false)
+  def possible_participants(registration_status: nil, include_observers: false, context_code: nil, current_user: nil)
     participants = if participant_type == "User"
                      participant_func = if include_observers
                                           ->(c) { c.participating_students_by_date + c.participating_observers_by_date }
@@ -340,13 +339,13 @@ class AppointmentGroup < ActiveRecord::Base
                                           ->(c) { c.participating_students_by_date }
                                         end
                      if sub_contexts.empty?
-                       contexts.select(&:published?).map(&participant_func).flatten
+                       contexts.select(&:published?).map(&participant_func).flatten.uniq
                      else
-                       sub_contexts.map(&participant_func).flatten
+                       sub_contexts.map(&participant_func).flatten.uniq
                      end
                    else
                      # FIXME?
-                     sub_contexts.map(&:groups).flatten
+                     sub_contexts.map(&:groups).flatten.uniq
                    end
     participant_ids = self.participant_ids
     registered = participants.select { |p| participant_ids.include?(p.id) }
@@ -359,6 +358,22 @@ class AppointmentGroup < ActiveRecord::Base
                    else
                      participants
                    end
+
+    if current_user && participant_type == "User"
+      # Only filter users through normalize_recipients (not groups)
+      recipients = if context_code.is_a?(Array) && context_code.length == 1
+                     normalize_recipients(recipients: participants.map(&:id), context_code: context_code.first, current_user:)
+                   elsif context_code && !context_code.is_a?(Array)
+                     normalize_recipients(recipients: participants.map(&:id), context_code:, current_user:)
+                   else
+                     # Multi-course appointment groups or no context_code:
+                     # Filter without context restriction to include students from all courses
+                     # while still filtering out test students and other unmessageable users
+                     normalize_recipients(recipients: participants.map(&:id), current_user:)
+                   end
+      recipient_ids = recipients.map(&:id)
+      participants = participants.select { |p| recipient_ids.include?(p.id) }
+    end
 
     if participant_type == "User"
       participants.sort_by { |p| [Canvas::ICU.collation_key(p.sortable_name), p.id] }
@@ -413,19 +428,22 @@ class AppointmentGroup < ActiveRecord::Base
     @participant_for ||= {}
     return @participant_for[user.global_id] if @participant_for.key?(user.global_id)
 
-    @participant_for[user.global_id] = begin
-      participant = if participant_type == "User"
-                      user
-                    else
-                      # can't have more than one group_category
-                      group_categories = sub_contexts.find_all { |sc| sc.instance_of? GroupCategory }
-                      raise "inconsistent appointment group: #{id} #{group_categories}" if group_categories.length > 1
+    participant = user.shard.activate do
+      if participant_type == "User"
+        user
+      else
+        # can't have more than one group_category
+        group_categories = sub_contexts.find_all { |sc| sc.instance_of? GroupCategory }
+        raise "inconsistent appointment group: #{id} #{group_categories}" if group_categories.length > 1
 
-                      group_category_id = group_categories.first.id
-                      user.current_groups.detect { |g| g.group_category_id == group_category_id }
-                    end
-      participant if participant && eligible_participant?(participant)
+        group_category_id = group_categories.first.id
+        user.current_groups.detect { |g| g.group_category_id == group_category_id }
+      end
     end
+
+    @participant_for[user.global_id] = if participant && shard.activate { eligible_participant?(participant) }
+                                         participant
+                                       end
   end
 
   def reservations_for(participant)
@@ -470,7 +488,7 @@ class AppointmentGroup < ActiveRecord::Base
       ).update_all(changed)
     end
 
-    @new_appointments.each(&:reload) if @new_appointments.present?
+    @new_appointments&.each(&:reload)
   end
 
   def participant_type
@@ -519,7 +537,7 @@ class AppointmentGroup < ActiveRecord::Base
       save!
       appointments.map do |a|
         a.updating_user = updating_user
-        a.destroy(false)
+        a.destroy(update_context_or_parent: false)
       end
     end
   end

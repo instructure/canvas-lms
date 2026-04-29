@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {some, filter} from 'lodash'
+import {some, filter} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import EditCalendarEventDetails from './EditCalendarEventDetails'
 import EditAssignmentDetails from '../backbone/views/EditAssignmentDetails'
@@ -165,6 +165,14 @@ export default class EditEventDetailsDialog {
     }
   }
 
+  isUserStudent = () => {
+    return ENV.current_user_roles && ENV.current_user_roles.includes('student')
+  }
+
+  canCreateEvent = () => {
+    return !(ENV?.FEATURES?.restrict_student_access && this.isUserStudent())
+  }
+
   canManageAppointments = () => {
     if (
       ENV.CALENDAR.SHOW_SCHEDULER &&
@@ -177,6 +185,10 @@ export default class EditEventDetailsDialog {
   }
 
   show = async () => {
+    if (!this.canCreateEvent()) {
+      return
+    }
+
     if (this.event.isAppointmentGroupEvent()) {
       return new EditApptCalendarEventDialog(this.event).show()
     } else {

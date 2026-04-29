@@ -28,6 +28,12 @@ describe "brandableCss JS integration specs" do
     expect(driver.execute_script("return ENV.ASSET_HOST")).to eq(app_url)
   end
 
+  it "sets ENV.locale_translation_file correctly" do
+    expect(Canvas::Cdn.config).to receive(:host).at_least(:once).and_return(app_url)
+    get "/login/canvas"
+    expect(driver.execute_script("return ENV.LOCALE_TRANSLATION_FILE")).to include("javascripts/translations/en")
+  end
+
   it "loads css from handlebars with variables correctly" do
     course_with_teacher_logged_in
     get "/calendar"

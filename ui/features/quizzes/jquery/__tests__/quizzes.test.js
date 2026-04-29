@@ -17,23 +17,15 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
-
-const $questionContent = {
-  bind: jest.fn().mockReturnValue({change: jest.fn()}),
-}
+import {isChangeMultiFuncBound} from '../utils/changeMultiFunc'
 
 describe('isChangeMultiFuncBound', () => {
-  let isChangeMultiFuncBound
-
-  beforeEach(async () => {
-    $._data = jest.fn()
-    const module = await import('../quizzes')
-    isChangeMultiFuncBound = module.isChangeMultiFuncBound
+  beforeEach(() => {
+    $._data = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('gets events from data on first element', () => {
@@ -58,56 +50,5 @@ describe('isChangeMultiFuncBound', () => {
     }
     $._data.mockReturnValue(events)
     expect(isChangeMultiFuncBound($el)).toBe(false)
-  })
-})
-
-describe('rebindMultiChange', () => {
-  let quiz
-
-  beforeEach(async () => {
-    $._data = jest.fn()
-    const module = await import('../quizzes')
-    quiz = module.quiz
-    quiz.loadJQueryElemById = jest.fn().mockReturnValue($questionContent)
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it('rebinds event on questionContent for multiple dropdowns', () => {
-    const questionType = 'multiple_dropdowns_question'
-    const events = {
-      change: [{handler: {name: 'other'}}],
-    }
-    $._data.mockReturnValue(events)
-
-    quiz.rebindMultiChange(questionType, 'question_content_0', {})
-
-    expect($questionContent.bind).toHaveBeenCalledTimes(1)
-  })
-
-  it('does nothing if change event already exists', () => {
-    const questionType = 'multiple_dropdowns_question'
-    const events = {
-      change: [{handler: {origFuncNm: 'changeMultiFunc'}}],
-    }
-    $._data.mockReturnValue(events)
-
-    quiz.rebindMultiChange(questionType, 'question_content_0', {})
-
-    expect($questionContent.bind).not.toHaveBeenCalled()
-  })
-
-  it('does nothing for non-multiple dropdown question types', () => {
-    const questionType = 'other_question'
-    const events = {
-      change: [{handler: {name: 'other'}}],
-    }
-    $._data.mockReturnValue(events)
-
-    quiz.rebindMultiChange(questionType, 'question_content_0', {})
-
-    expect($questionContent.bind).not.toHaveBeenCalled()
   })
 })

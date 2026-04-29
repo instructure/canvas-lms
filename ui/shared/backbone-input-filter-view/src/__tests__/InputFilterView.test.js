@@ -19,7 +19,6 @@
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import InputFilterView from '../index'
-import '@testing-library/jest-dom'
 import {act} from '@testing-library/react'
 
 describe('InputFilterView', () => {
@@ -27,14 +26,14 @@ describe('InputFilterView', () => {
   let container
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     container = document.createElement('div')
     container.id = 'fixtures'
     document.body.appendChild(container)
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
     view?.remove()
     container.remove()
   })
@@ -53,13 +52,13 @@ describe('InputFilterView', () => {
     const event = new KeyboardEvent('keyup', {bubbles: true})
     view.el.dispatchEvent(event)
     act(() => {
-      jest.advanceTimersByTime(inputDelay)
+      vi.advanceTimersByTime(inputDelay)
     })
   }
 
   it('fires input event and sends value', () => {
     createAndRenderView()
-    const inputHandler = jest.fn()
+    const inputHandler = vi.fn()
     view.on('input', inputHandler)
 
     setValue('foo')
@@ -70,7 +69,7 @@ describe('InputFilterView', () => {
 
   it('delays firing the event until input delay has passed', () => {
     createAndRenderView({onInputDelay: 150})
-    const inputHandler = jest.fn()
+    const inputHandler = vi.fn()
     view.on('input', inputHandler)
 
     setValue('foo')
@@ -81,7 +80,7 @@ describe('InputFilterView', () => {
 
   it('does not fire input event if value has not changed', () => {
     createAndRenderView()
-    const inputHandler = jest.fn()
+    const inputHandler = vi.fn()
     view.on('input', inputHandler)
 
     setValue('foo')

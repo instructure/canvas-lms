@@ -18,12 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
 require "rotp"
 
 describe Login::CasController do
-  def stubby(stub_response, use_mock = true)
-    cas_client = use_mock ? double(:cas_client).as_null_object : controller.client
+  def stubby(stub_response)
+    cas_client = instance_double(CASClient::Client).as_null_object
     cas_client.instance_variable_set(:@stub_response, stub_response)
     def cas_client.validate_service_ticket(st)
       response = CASClient::ValidationResponse.new(@stub_response)
@@ -31,7 +30,7 @@ describe Login::CasController do
       st.success = response.is_success?
       st
     end
-    allow_any_instance_of(AuthenticationProvider::CAS).to receive(:client).and_return(cas_client) if use_mock
+    allow_any_instance_of(AuthenticationProvider::CAS).to receive(:client).and_return(cas_client)
   end
 
   it "logouts with specific cas ticket" do
@@ -218,7 +217,7 @@ describe Login::CasController do
       ap.update_attribute(:jit_provisioning, true)
       unique_id = "foo@example.com"
 
-      expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
+      expect(account.pseudonyms.active.by_unique_id(unique_id)).not_to be_exists
       get "new", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       expect(session[:cas_session]).to eq "ST-abcd"
@@ -231,7 +230,7 @@ describe Login::CasController do
     account_with_cas(account: Account.default)
     ap = Account.default.authentication_providers.detect { |a| a.auth_type == "cas" }
     Setting.set("service_cas:#{ap.global_id}_timeout", "0.01")
-    cas_client = double
+    cas_client = instance_double(CASClient::Client)
     allow(controller).to receive(:client).and_return(cas_client)
     start = Time.now.utc
     allow(Canvas::Errors).to receive(:capture_exception).and_return(true)
@@ -240,7 +239,7 @@ describe Login::CasController do
     session[:sentinel] = true
     get "new", params: { ticket: "ST-abcd" }
     expect(response).to redirect_to(login_url)
-    expect(flash[:delegated_message]).to_not be_blank
+    expect(flash[:delegated_message]).not_to be_blank
     expect(Time.now.utc - start).to be < 1
     expect(session[:sentinel]).to be true
     expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(

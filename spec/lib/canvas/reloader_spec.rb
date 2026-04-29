@@ -25,4 +25,30 @@ describe Canvas::Reloader do
     Canvas::Reloader.reload!
     expect(callback_count).to eq 1
   end
+
+  describe ".reload" do
+    after do
+      Canvas::Reloader.instance_variable_set(:@reload_at, nil)
+    end
+
+    it "defers reloading until reload_at has passed" do
+      expect(Canvas::Reloader).not_to receive(:reload!)
+      Canvas::Reloader.instance_variable_set(:@reload_at, Process.clock_gettime(Process::CLOCK_MONOTONIC) + 60)
+
+      Canvas::Reloader.reload
+    end
+
+    it "reloads once reload_at has passed" do
+      expect(Canvas::Reloader).to receive(:reload!)
+      Canvas::Reloader.instance_variable_set(:@reload_at, Process.clock_gettime(Process::CLOCK_MONOTONIC) - 10)
+
+      Canvas::Reloader.reload
+    end
+
+    it "does not reload when no reload is pending" do
+      expect(Canvas::Reloader).not_to receive(:reload!)
+
+      Canvas::Reloader.reload
+    end
+  end
 end

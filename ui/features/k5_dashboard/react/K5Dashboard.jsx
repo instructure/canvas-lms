@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {CardDashboardLoader} from '@canvas/dashboard-card'
 import {useFetchDashboardCards} from '@canvas/dashboard-card/dashboardCardQueries'
 import {handleDashboardCardError} from '@canvas/dashboard-card/util/dashboardUtils'
@@ -27,7 +27,6 @@ import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
-import {getK5ThemeOverrides} from '@canvas/k5/react/k5-theme'
 import {
   MOBILE_NAV_BREAKPOINT_PX,
   TAB_IDS,
@@ -36,12 +35,10 @@ import {
 } from '@canvas/k5/react/utils'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import ObserverOptions, {ObservedUsersListShape} from '@canvas/observer-picker'
-import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {responsiviser, store} from '@canvas/planner'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {reloadWindow} from '@canvas/util/globalUtils'
-import {InstUISettingsProvider} from '@instructure/emotion'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -65,8 +62,7 @@ import {GradesPage} from './GradesPage'
 import HomeroomPage from './HomeroomPage'
 import ImportantDates from './ImportantDates'
 import {TodosPage} from './TodosPage'
-
-const componentOverrides = getK5ThemeOverrides()
+import {isUserObservingStudent, getObservedUserId} from './utils'
 
 const I18n = createI18nScope('k5_dashboard')
 
@@ -123,22 +119,32 @@ const K5DashboardOptionsMenu = ({onDisableK5Dashboard}) => {
   )
 }
 
-const toRenderTabs = (currentUserRoles, hideGradesTabForStudents, selectedSelfUser) =>
-  DASHBOARD_TABS.filter(({id}) => {
+const toRenderTabs = (currentUserRoles, hideGradesTabForStudents, userIsObservingStudent) => {
+  const roles = new Set(currentUserRoles)
+
+  const isTeacher = roles.has('teacher')
+  const isAdmin = roles.has('admin')
+  const isStudent = roles.has('student')
+  const isObserver = roles.has('observer')
+
+  const canSeeTodo = isTeacher
+  const canSeeGrades =
+    isTeacher ||
+    isAdmin ||
+    (isStudent && !hideGradesTabForStudents) ||
+    (isObserver && userIsObservingStudent)
+
+  return DASHBOARD_TABS.filter(({id}) => {
     switch (id) {
       case TAB_IDS.TODO:
-        return currentUserRoles.includes('teacher')
+        return canSeeTodo
       case TAB_IDS.GRADES:
-        return (
-          currentUserRoles.includes('teacher') ||
-          currentUserRoles.includes('admin') ||
-          (currentUserRoles.includes('student') && !hideGradesTabForStudents) ||
-          (currentUserRoles.includes('observer') && !selectedSelfUser)
-        )
+        return canSeeGrades
       default:
         return true
     }
   })
+}
 
 const getWindowSize = () => ({
   width: window.innerWidth,
@@ -151,6 +157,7 @@ const K5Dashboard = ({
   assignmentsCompletedForToday,
   createPermission,
   restrictCourseCreation,
+  viewableAccountIds,
   currentUser,
   currentUserRoles,
   timeZone,
@@ -166,14 +173,12 @@ const K5Dashboard = ({
   loadingOpportunities,
   accountCalendarContexts,
 }) => {
-  const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
-    ? savedObservedId(currentUser.id)
-    : undefined
+  const initialObservedId = getObservedUserId(observedUsersList)
   const [observedUserId, setObservedUserId] = useState(initialObservedId)
   const observerMode = currentUserRoles.includes('observer')
-  const selectedSelfUser = observerMode && currentUser.id === observedUserId
+  const isObservingStudent = isUserObservingStudent(observedUserId, currentUserRoles)
 
-  const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents, selectedSelfUser)
+  const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents, isObservingStudent)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
   const [cards, setCards] = useState(null)
   const [cardsSettled, setCardsSettled] = useState(false)
@@ -393,6 +398,7 @@ const K5Dashboard = ({
     .concat(
       accountCalendarContexts.map(c => ({
         assetString: c.asset_string,
+        color: c.color,
         name: c.name,
       })),
     )
@@ -443,6 +449,7 @@ const K5Dashboard = ({
               cards={cards}
               createPermission={createPermission}
               restrictCourseCreation={restrictCourseCreation}
+              viewableAccountIds={viewableAccountIds}
               homeroomAnnouncements={homeroomAnnouncements}
               loadingAnnouncements={loadingAnnouncements}
               visible={currentTab === TAB_IDS.HOMEROOM}
@@ -511,6 +518,7 @@ K5Dashboard.propTypes = {
   loadingOpportunities: PropTypes.bool.isRequired,
   createPermission: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
   restrictCourseCreation: PropTypes.bool.isRequired,
+  viewableAccountIds: PropTypes.arrayOf(PropTypes.string),
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,
@@ -538,9 +546,7 @@ K5Dashboard.propTypes = {
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))
 
 export default props => (
-  <InstUISettingsProvider theme={{componentOverrides}}>
-    <Provider store={store}>
-      <WrappedK5Dashboard {...props} />
-    </Provider>
-  </InstUISettingsProvider>
+  <Provider store={store}>
+    <WrappedK5Dashboard {...props} />
+  </Provider>
 )

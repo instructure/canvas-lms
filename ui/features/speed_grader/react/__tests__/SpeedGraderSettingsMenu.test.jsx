@@ -37,12 +37,12 @@ describe('Webzip export app', () => {
   beforeEach(() => {
     $container = document.createElement('div')
     document.body.appendChild($container)
-    jest.spyOn(SpeedGraderSettingsMenu, 'setURL').mockImplementation(() => {})
-    jest.spyOn(window, 'open').mockImplementation(() => {})
+    vi.spyOn(SpeedGraderSettingsMenu, 'setURL').mockImplementation(() => {})
+    vi.spyOn(window, 'open').mockImplementation(() => {})
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
     $container.remove()
   })
 
@@ -56,7 +56,7 @@ describe('Webzip export app', () => {
   })
 
   test('calls the openOptionsModal prop when "Options" is clicked', async () => {
-    props.openOptionsModal = jest.fn()
+    props.openOptionsModal = vi.fn()
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     await waitFor(() => {
@@ -82,7 +82,7 @@ describe('Webzip export app', () => {
 
   test('calls the openKeyboardShortcutsModal prop when "Keyboard Shortcuts" is clicked', async () => {
     props.showKeyboardShortcutsMenuItem = true
-    props.openKeyboardShortcutsModal = jest.fn()
+    props.openKeyboardShortcutsModal = vi.fn()
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     wrapper.getByText('Keyboard Shortcuts').click()

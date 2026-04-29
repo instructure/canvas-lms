@@ -18,13 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Login::ExternalAuthObserversController < ApplicationController
+  skip_before_action :require_user, only: %i[redirect_login]
+
   def redirect_login
     if observer_email_taken?
-      render json: { error: { input_name: "pseudonym[unique_id]", message: t("Email already in use") } }, status: :unprocessable_entity
+      render json: { error: { input_name: "pseudonym[unique_id]", message: t("Email already in use") } }, status: :unprocessable_content
       return
     end
     unless valid_observee_unique_id?
-      render json: { error: { input_name: "observee[unique_id]", message: t("Username could not be found") } }, status: :unprocessable_entity
+      render json: { error: { input_name: "observee[unique_id]", message: t("Username could not be found") } }, status: :unprocessable_content
       return
     end
     session[:parent_registration] = {}

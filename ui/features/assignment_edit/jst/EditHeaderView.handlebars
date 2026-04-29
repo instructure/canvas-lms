@@ -43,7 +43,7 @@
           <ul class="al-options">
             {{#if showSpeedGraderLink}}
               <li class="speed-grader-link-container">
-                <a class="icon-speed-grader" href="/courses/{{courseId}}/gradebook/speed_grader?assignment_id={{id}}">
+                <a class="icon-speed-grader" href="/courses/{{courseId}}/gradebook/speed_grader?assignment_id={{id}}" target="_blank" rel="noopener">
                   {{#t}}SpeedGrader{{/t}}
                 </a>
               </li>
@@ -68,16 +68,9 @@
 
 {{#if CONDITIONAL_RELEASE_SERVICE_ENABLED}}
     <div class='edit-assignment-header-cr'>
-        <div id="edit-assignment-header-cr-tabs" class="ui-tabs-minimal">
-            <ul id="edit-assignment-header-cr-tab-nav">
-                <li><a href="#edit_assignment_wrapper" id="edit_assignment_link">{{#t}}Details{{/t}}</a></li>
-                <li><a href="#mastery-paths-editor" id="conditional_release_link">{{#t}}Mastery Paths{{/t}}</a></li>
-            </ul>
-            <div id="edit-assignment-header-cr-tab-content">
-                <form id="edit_assignment_form" class="form-horizontal bootstrap-form" novalidate></form>
-            </div>
-        </div>
-    </div
+        <div id="conditional-release-tabs-mount"></div>
+        <form id="edit_assignment_form" novalidate></form>
+    </div>
 {{else}}
-    <form id="edit_assignment_form" class="form-horizontal bootstrap-form" novalidate></form>
+    <form id="edit_assignment_form" novalidate></form>
 {{/if}}

@@ -27,3 +27,4 @@ RSpec.configure do |config|
 end
 
 require "webmock/rspec"
+require "debug"

@@ -65,7 +65,7 @@ describe('.populate', function () {
     // Spy on document.createElement to detect iframe creation
     const originalCreateElement = document.createElement.bind(document)
     let iframeCreated = false
-    document.createElement = jest.fn(tagName => {
+    document.createElement = vi.fn(tagName => {
       if (tagName.toLowerCase() === 'iframe') {
         iframeCreated = true
       }

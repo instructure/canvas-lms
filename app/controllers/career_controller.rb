@@ -21,27 +21,36 @@
 class CareerController < ApplicationController
   include HorizonMode
 
-  before_action :require_user, :get_context
+  before_action :get_context
+  allow_public_horizon_access :show
 
   def show
-    app = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session).resolve
-    return redirect_to(root_path) if app == CanvasCareer::Constants::App::ACADEMIC
+    app = CanvasCareer::Constants::App::CAREER_LEARNER
+
+    if @current_user
+      app = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session).resolve
+      return redirect_to(add_horizon_params_to_url(root_path)) if app == CanvasCareer::Constants::App::ACADEMIC
+    end
 
     env = {
       FEATURES: features_env,
     }
-    js_env(CANVAS_CAREER: env)
-    js_env(MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size)
+    js_env({
+             CANVAS_CAREER: env,
+             MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
+           })
 
-    config = CanvasCareer::Config.new(@domain_root_account)
+    config = CanvasCareer::Config.new(@domain_root_account, session)
     if app == CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER
       remote_env(canvas_career_learning_provider: config.learning_provider_app_launch_url)
     elsif app == CanvasCareer::Constants::App::CAREER_LEARNER
       remote_env(canvas_career_learner: config.learner_app_launch_url)
     end
 
-    remote_env(canvas_career_config: config.public_app_config(request)) if @domain_root_account.feature_enabled?(:horizon_injected_config)
+    remote_env(canvas_career_config: config.public_app_config(request))
     deferred_js_bundle(:canvas_career)
+
+    @include_masquerade_layout = true
 
     respond_to do |format|
       format.html { render html: "", layout: "bare" }
@@ -52,14 +61,18 @@ class CareerController < ApplicationController
 
   def features_env
     %i[
-      horizon_crm_integration
-      horizon_leader_dashboards
-      horizon_admin_dashboards
-      horizon_roles_and_permissions
-      horizon_agent
-      horizon_content_library
-      horizon_program_management
-      horizon_skill_management
+      horizon_hris_integrations
+      horizon_user_profile_page
+      horizon_manual_dashboard_builder
+      horizon_learning_library
+      horizon_learning_library_ms2
+      horizon_learning_library_ms3
+      horizon_chart_view
+      horizon_native_permissions_page
+      horizon_block_content_editor
+      horizon_native_inbox
+      horizon_study_tools
+      horizon_autopilot
     ].index_with { |feature| @domain_root_account.feature_enabled?(feature) }
   end
 end

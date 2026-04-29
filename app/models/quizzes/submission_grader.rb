@@ -54,7 +54,8 @@ module Quizzes
         assignment_submission = @submission.assignment.find_or_create_submission(@submission.user_id)
         @submission.submission = assignment_submission
       end
-      @submission.with_versioning(true) do |s|
+      @submission.with_versioning do |s|
+        s.updating_user = @submission.updating_user
         original_score = s.kept_score
         original_workflow_state = s.workflow_state
         if s.save && outcomes_require_update(s, original_score, original_workflow_state)

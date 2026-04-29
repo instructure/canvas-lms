@@ -25,6 +25,7 @@ class Checkpoints::DiscussionCheckpointUpdaterService < Checkpoints::DiscussionC
     checkpoint = find_checkpoint
     compute_due_dates_and_create_submissions(checkpoint)
     checkpoint.saved_by = @saved_by
+    checkpoint.updating_user = @updating_user
     checkpoint.save!
     checkpoint.saved_by = nil
     checkpoint
@@ -38,7 +39,10 @@ class Checkpoints::DiscussionCheckpointUpdaterService < Checkpoints::DiscussionC
 
     raise Checkpoints::CheckpointNotFoundError, "Checkpoint '#{@checkpoint_label}' not found" unless checkpoint
 
-    checkpoint.assign_attributes(checkpoint_attributes)
+    # Only assign attributes that have actually changed to avoid triggering
+    # Master Course validation on unchanged restricted columns
+    changed_attributes = checkpoint_attributes_for_update(checkpoint)
+    checkpoint.assign_attributes(changed_attributes) if changed_attributes.any?
 
     update_overrides = override_dates.select { |override| override[:id].present? }
     new_overrides = override_dates.select { |override| override[:id].nil? }

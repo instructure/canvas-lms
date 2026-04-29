@@ -20,7 +20,7 @@ import axios from '@canvas/axios'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {type MouseEventHandler, useCallback, useEffect, useRef, useState} from 'react'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {assignLocation} from '@canvas/util/globalUtils'
 import type {ConnectDragSource, ConnectDropTarget} from 'react-dnd'
 import instFSOptimizedImageUrl from '../util/instFSOptimizedImageUrl'
@@ -118,8 +118,8 @@ export const DashboardCard = ({
   hideColorOverlays,
   isDragging,
   isFavorited,
-  connectDragSource = c => c,
-  connectDropTarget = c => c,
+  connectDragSource = (c: any) => c,
+  connectDropTarget = (c: any) => c,
   moveCard = () => {},
   onConfirmUnfavorite,
   totalCards = 0,
@@ -134,8 +134,7 @@ export const DashboardCard = ({
   onPublishedCourse = () => {},
   headingLevel = 'h3',
 }: DashboardCardProps) => {
-  // @ts-expect-error
-  const handleNicknameChange = nickname => setNicknameInfo(getNicknameInfo(nickname))
+  const handleNicknameChange = (nickname: string) => setNicknameInfo(getNicknameInfo(nickname))
 
   const getNicknameInfo = (nickname: string) => ({
     nickname,
@@ -251,7 +250,7 @@ export const DashboardCard = ({
       const screenReaderLabel = `${link.label} - ${nicknameInfo.nickname}`
       return (
         <DashboardCardAction
-          // @ts-expect-error
+          // @ts-expect-error InstUI component prop type mismatch
           unreadCount={unreadCount(link.icon, course?.stream)}
           iconClass={link.icon}
           linkClass={link.css_class}
@@ -282,7 +281,7 @@ export const DashboardCard = ({
           nicknameInfo={nicknameInfo}
           assetString={assetString}
           onUnfavorite={handleUnfavorite}
-          // @ts-expect-error
+          // @ts-expect-error InstUI component prop type mismatch
           isFavorited={isFavorited}
           {...reorderingProps}
           trigger={
@@ -306,7 +305,7 @@ export const DashboardCard = ({
     )
   }
 
-  const CardHeading = headingLevel as keyof JSX.IntrinsicElements;
+  const CardHeading = headingLevel as keyof JSX.IntrinsicElements
 
   const dashboardCard = (
     <div
@@ -352,10 +351,15 @@ export const DashboardCard = ({
           </div>
         </a>
         {!published && canChangeCoursePublishState && (
-          // @ts-expect-error
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore InstUI component type issue
           <PublishButton
             courseNickname={nicknameInfo.nickname}
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore InstUI component prop type mismatch
             defaultView={defaultView}
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore InstUI component prop type mismatch
             pagesUrl={pagesUrl}
             frontPageTitle={frontPageTitle}
             courseId={id}

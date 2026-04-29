@@ -41,7 +41,7 @@ module SIS
         output_path = output_file.path
         output_file.close!
         row_count = 0
-        Zip::File.open(output_path, Zip::File::CREATE) do |zip|
+        Zip::File.open(output_path, create: true) do |zip|
           output_csvs.each do |csv|
             row_count += csv[:row_count] if csv[:row_count]
             zip.add(csv[:file], csv[:fullpath])

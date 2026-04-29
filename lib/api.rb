@@ -187,12 +187,18 @@ module Api
       is_not_scoped_to_account: ["id"].freeze,
       root_account_id_column: "root_account_id"
     }.freeze,
+    "assessment_questions" => {
+      lookups: { "id" => "id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze
   }.freeze
 
   MAX_ID = ((2**63) - 1)
   MAX_ID_LENGTH = MAX_ID.to_s.length
   MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = /\A\d{1,#{MAX_ID_LENGTH}}\z/
+  SHARDID_REGEX = /\d+(?:~\d+)?/
   UUID_REGEX = /\Auuid:([\w|-]{36,})\z/
 
   def self.not_scoped_to_account?(columns, sis_mapping)
@@ -462,6 +468,13 @@ module Api
         # pages beyond the end of an ordinal collection, rather than a 404.
         paginated = Folio::Ordinal::Page.create
         paginated.current_page = pagination_args[:page].to_i
+        paginated.next_page = nil
+        paginated.per_page = pagination_args[:per_page] if pagination_args.key?(:per_page)
+        paginated.total_entries = if collection.is_a?(Array)
+                                    collection.size
+                                  else
+                                    pagination_args[:total_entries]
+                                  end
       else
         # we're not dealing with a simple out-of-bounds on an ordinal
         # collection, let the exception propagate (and turn into a 404)
@@ -581,7 +594,7 @@ module Api
       attachments = if context.is_a?(User) || context.nil?
                       Attachment.where(id: attachment_ids)
                     else
-                      context.attachments.where(id: attachment_ids)
+                      context.attachments.not_deleted.where(id: attachment_ids)
                     end
 
       attachments.preload(:context).index_by(&:id)
@@ -620,7 +633,7 @@ module Api
                        user = @current_user,
                        preloaded_attachments = {},
                        options = {},
-                       is_public = false,
+                       is_public: false,
                        location: nil)
     return html if html.blank?
 
@@ -638,7 +651,16 @@ module Api
       protocol = HostUrl.protocol
     end
     domain_root_account = @domain_root_account || options[:domain_root_account]
+
+    is_course_syllabus = location&.include?("course_syllabus_") && domain_root_account&.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+    render_location_tag = if is_course_syllabus || (location && domain_root_account&.feature_enabled?(:file_association_access))
+                            location
+                          else
+                            nil
+                          end
+
     no_verifiers = domain_root_account&.feature_enabled?(:disable_adding_uuid_verifier_in_api) || (params[:no_verifiers] if defined?(params))
+
     html = context.shard.activate do
       rewriter = UserContent::HtmlRewriter.new(context, user)
       file_handler = proc do |match|
@@ -650,12 +672,11 @@ module Api
           is_public:,
           in_app: respond_to?(:in_app?, true) && in_app?,
           no_verifiers:,
-          location: (location if domain_root_account&.feature_enabled?(:file_association_access))
+          location: render_location_tag
         ).processed_url
       end
       rewriter.set_handler("files", &file_handler)
       rewriter.set_handler("media_attachments_iframe", &file_handler)
-
       rewriter.translate_content(html)
     end
 
@@ -666,11 +687,14 @@ module Api
                                     target_shard:)
     account = Context.get_account(context) || @domain_root_account
     include_mobile = !(respond_to?(:in_app?, true) && in_app?)
+    # Native mobile apps are detected via User-Agent strings
+    is_native_mobile_app = respond_to?(:native_app?, true) && native_app?
     Html::Content.rewrite_outgoing(
       html,
       account,
       url_helper,
       include_mobile:,
+      is_native_mobile_app:,
       rewrite_api_urls: options[:rewrite_api_urls]
     )
   end

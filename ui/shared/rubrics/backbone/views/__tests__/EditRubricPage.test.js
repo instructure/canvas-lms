@@ -17,17 +17,17 @@
  */
 
 import EditRubricPage from '../EditRubricPage'
-import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 describe('RubricEdit', () => {
-  test('should be accessible', done => {
+  test('should be accessible', async () => {
     const view = new EditRubricPage()
-    isAccessible(view, done, {a11yReport: true})
+    await isAccessible(view, {a11yReport: true})
   })
 
   test('does not immediately create the dialog', () => {
-    const clickSpy = jest.spyOn(EditRubricPage.prototype, 'attachInitialEvent')
-    const dialogSpy = jest.spyOn(EditRubricPage.prototype, 'createDialog')
+    const clickSpy = vi.spyOn(EditRubricPage.prototype, 'attachInitialEvent')
+    const dialogSpy = vi.spyOn(EditRubricPage.prototype, 'createDialog')
 
     new EditRubricPage()
 
@@ -36,6 +36,6 @@ describe('RubricEdit', () => {
 
     // 'does not immediately create the dialog'
     expect(dialogSpy.mock.calls).toHaveLength(0)
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 })

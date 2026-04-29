@@ -22,9 +22,11 @@ import userEvent from '@testing-library/user-event'
 import EditExternalToolButton from '../EditExternalToolButton'
 import store from '../../lib/ExternalAppsStore'
 
-jest.mock('../../lib/ExternalAppsStore', () => ({
-  fetchWithDetails: jest.fn(),
-  fetch: jest.fn(),
+vi.mock('../../lib/ExternalAppsStore', () => ({
+  default: {
+    fetchWithDetails: vi.fn(),
+    fetch: vi.fn(),
+  },
 }))
 
 describe('EditExternalToolButton', () => {
@@ -39,7 +41,7 @@ describe('EditExternalToolButton', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('allows editing of tools when canEdit is true', () => {

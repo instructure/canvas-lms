@@ -267,20 +267,20 @@ describe('buildAssignmentOverrides', () => {
                   unassignItem: false,
                   contextModule: null,
                   set: {
-                      __typename: "AdhocStudents",
-                      students: [
-                          {
-                              _id: "1",
-                              name: "First Student",
-                          },
-                          {
-                              _id: "2",
-                              name: "Second Student",
-                          }
-                      ]
+                    __typename: 'AdhocStudents',
+                    students: [
+                      {
+                        _id: '1',
+                        name: 'First Student',
+                      },
+                      {
+                        _id: '2',
+                        name: 'Second Student',
+                      },
+                    ],
                   },
-                  "__typename": "AssignmentOverride"
-                }
+                  __typename: 'AssignmentOverride',
+                },
               ],
             },
           },
@@ -296,20 +296,20 @@ describe('buildAssignmentOverrides', () => {
                   unassignItem: false,
                   contextModule: null,
                   set: {
-                      __typename: "AdhocStudents",
-                      students: [
-                          {
-                              _id: "1",
-                              name: "First Student",
-                          },
-                          {
-                              _id: "2",
-                              name: "Second Student",
-                          }
-                      ]
+                    __typename: 'AdhocStudents',
+                    students: [
+                      {
+                        _id: '1',
+                        name: 'First Student',
+                      },
+                      {
+                        _id: '2',
+                        name: 'Second Student',
+                      },
+                    ],
                   },
-                  "__typename": "AssignmentOverride"
-                }
+                  __typename: 'AssignmentOverride',
+                },
               ],
             },
           },
@@ -320,8 +320,8 @@ describe('buildAssignmentOverrides', () => {
 
       const overrides = buildAssignmentOverrides(discussion)
       expect(overrides[0].students).toEqual([
-        { _id: '1', name: 'First Student' },
-        { _id: '2', name: 'Second Student' },
+        {_id: '1', name: 'First Student'},
+        {_id: '2', name: 'Second Student'},
       ])
     })
 
@@ -344,13 +344,13 @@ describe('buildAssignmentOverrides', () => {
                   unassignItem: false,
                   contextModule: null,
                   set: {
-                      __typename: "Group",
-                      id: "1",
-                      name: "Group Name",
-                      nonCollaborative: true,
+                    __typename: 'Group',
+                    id: '1',
+                    name: 'Group Name',
+                    nonCollaborative: true,
                   },
-                  "__typename": "AssignmentOverride"
-                }
+                  __typename: 'AssignmentOverride',
+                },
               ],
             },
           },
@@ -366,13 +366,13 @@ describe('buildAssignmentOverrides', () => {
                   unassignItem: false,
                   contextModule: null,
                   set: {
-                      __typename: "Group",
-                      _id: "1",
-                      name: "Group Name",
-                      nonCollaborative: true,
+                    __typename: 'Group',
+                    _id: '1',
+                    name: 'Group Name',
+                    nonCollaborative: true,
                   },
-                  "__typename": "AssignmentOverride"
-                }
+                  __typename: 'AssignmentOverride',
+                },
               ],
             },
           },
@@ -405,12 +405,12 @@ describe('buildAssignmentOverrides', () => {
                   unassignItem: false,
                   contextModule: null,
                   set: {
-                      __typename: "Section",
-                      id: "1",
-                      name: "Section 1",
+                    __typename: 'Section',
+                    id: '1',
+                    name: 'Section 1',
                   },
-                  "__typename": "AssignmentOverride"
-                }
+                  __typename: 'AssignmentOverride',
+                },
               ],
             },
           },
@@ -426,12 +426,12 @@ describe('buildAssignmentOverrides', () => {
                   unassignItem: false,
                   contextModule: null,
                   set: {
-                      __typename: "Section",
-                      _id: "1",
-                      name: "Section 1",
+                    __typename: 'Section',
+                    _id: '1',
+                    name: 'Section 1',
                   },
-                  "__typename": "AssignmentOverride"
-                }
+                  __typename: 'AssignmentOverride',
+                },
               ],
             },
           },

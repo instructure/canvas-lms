@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class StreamItem < ActiveRecord::Base
+class StreamItem < ApplicationRecord
   serialize :data
 
   has_many :stream_item_instances
@@ -188,8 +188,22 @@ class StreamItem < ActiveRecord::Base
     when DiscussionTopic
       res = object.attributes
       res["user_ids_that_can_see_responses"] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
-      res["total_root_discussion_entries"] = object.root_discussion_entries.active.count
-      res[:root_discussion_entries] = object.root_discussion_entries.active.order(created_at: :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse.map do |entry|
+      res["total_root_discussion_entries"] = if object.association(:root_discussion_entries).loaded?
+                                               object.root_discussion_entries.count { |e| e.workflow_state != "deleted" }
+                                             else
+                                               object.root_discussion_entries.active.size
+                                             end
+      entries = if object.association(:root_discussion_entries).loaded?
+                  object.root_discussion_entries
+                        .reject { |e| e.workflow_state == "deleted" }
+                        .sort_by(&:created_at)
+                        .reverse
+                        .take(LATEST_ENTRY_LIMIT)
+                        .reverse
+                else
+                  object.root_discussion_entries.active.order(created_at: :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse
+                end
+      res[:root_discussion_entries] = entries.map do |entry|
         hash = entry.attributes
         hash["user_short_name"] = entry.user.short_name if entry.user
         hash["message"] = hash["message"][0, 4.kilobytes] if hash["message"].present?
@@ -330,9 +344,9 @@ class StreamItem < ActiveRecord::Base
   def self.prepare_object_for_unread(object)
     case object
     when DiscussionEntry
-      ActiveRecord::Associations.preload(object, :discussion_entry_participants)
+      ActiveRecord::Associations.preload(object, :discussion_entry_participants) unless object.association(:discussion_entry_participants).loaded?
     when DiscussionTopic
-      ActiveRecord::Associations.preload(object, :discussion_topic_participants)
+      ActiveRecord::Associations.preload(object, :discussion_topic_participants) unless object.association(:discussion_topic_participants).loaded?
     end
   end
 
@@ -359,12 +373,12 @@ class StreamItem < ActiveRecord::Base
     # we pass false for the touch_users argument, on the assumption that these
     # stream items that we delete aren't visible on the user's dashboard anymore
     # anyway, so there's no need to invalidate all the caches.
-    destroy_stream_items(ttl, false)
+    destroy_stream_items(ttl, touch_users: false)
   end
 
   # delete old stream items and the corresponding instances before a given date
   # returns the number of destroyed stream items
-  def self.destroy_stream_items(before_date, touch_users = true)
+  def self.destroy_stream_items(before_date, touch_users: true)
     user_ids = Set.new
     count = 0
 
@@ -406,8 +420,8 @@ class StreamItem < ActiveRecord::Base
     count
   end
 
-  scope :before, ->(id) { where("id<?", id).order("updated_at DESC").limit(21) }
-  scope :after, ->(start_at) { where("updated_at>?", start_at).order("updated_at DESC").limit(21) }
+  scope :before, ->(id) { where("id<?", id).order(updated_at: :desc).limit(21) }
+  scope :after, ->(start_at) { where("updated_at>?", start_at).order(updated_at: :desc).limit(21) }
 
   def associated_shards
     if self.context.try(:respond_to?, :associated_shards)

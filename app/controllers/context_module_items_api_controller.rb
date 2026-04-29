@@ -242,12 +242,12 @@
 #
 class ContextModuleItemsApiController < ApplicationController
   before_action :require_context
-  before_action :require_user, only: [:select_mastery_path]
+  skip_before_action :require_user, only: %i[index item_sequence show]
   before_action :find_student, only: %i[index show select_mastery_path]
-  before_action :disable_escape_html_entities, only: [:index, :show]
-  after_action :enable_escape_html_entities, only: [:index, :show]
   include Api::V1::ContextModule
   include PlannerApiHelper
+
+  PAGE_TYPES = ["Page", "WikiPage"].freeze
 
   # @API List module items
   #
@@ -412,35 +412,67 @@ class ContextModuleItemsApiController < ApplicationController
   def create
     @module = @context.context_modules.not_deleted.find(params[:module_id])
     if authorized_action(@module, @current_user, :update)
-      return render json: { message: "missing module item parameter" }, status: :bad_request unless params[:module_item]
+      return render json: { message: "missing module item parameter" }, status: :bad_request unless params[:module_item] || params[:module_items]
 
-      item_params = params[:module_item].slice(:title, :type, :indent, :new_tab, :position)
-      item_params[:id] = params[:module_item][:content_id]
-      if ["Page", "WikiPage"].include?(item_params[:type])
-        if (page_url = params[:module_item][:page_url])
-          if (wiki_page = @context.wiki_pages.not_deleted.where(url: page_url).first)
-            item_params[:id] = wiki_page.id
-          else
-            return render json: { message: "invalid page_url parameter" }, status: :bad_request
+      module_items = params[:module_items] || [params[:module_item]]
+      created_items = []
+      errors = []
+
+      ContextModule.transaction do
+        module_items.each_with_index do |module_item_params, index|
+          item_params = module_item_params.slice(:title, :type, :indent, :new_tab, :position)
+          item_params[:id] = module_item_params[:content_id]
+
+          if PAGE_TYPES.include?(item_params[:type])
+            if (page_url = module_item_params[:page_url])
+              if (wiki_page = @context.wiki_pages.not_deleted.where(url: page_url).first)
+                item_params[:id] = wiki_page.id
+              else
+                errors << { index:, message: "invalid page_url parameter" }
+                next
+              end
+            else
+              errors << { index:, message: "missing page_url parameter" }
+              next
+            end
           end
-        else
-          return render json: { message: "missing page_url parameter" }, status: :bad_request
+
+          item_params[:url] = module_item_params[:external_url]
+
+          if (iframe = module_item_params[:iframe])
+            item_params[:link_settings] = { selection_width: iframe[:width], selection_height: iframe[:height] }
+          end
+
+          @tag = @module.add_item(item_params, nil, resolve_conflicts: true)
+          if @tag&.persisted?
+            original_params = params[:module_item]
+            params[:module_item] = module_item_params
+            if set_position && set_completion_requirement
+              created_items << module_item_json(@tag, @current_user, session, @module, nil)
+            elsif @tag.errors.any?
+              errors << { index:, message: @tag.errors.full_messages.join(", ") }
+            end
+            params[:module_item] = original_params
+          elsif @tag
+            errors << { index:, message: @tag.errors.full_messages.join(", ") }
+          else
+            errors << { index:, message: t(:invalid_content, "Could not find content") }
+          end
         end
+
+        @module.touch if created_items.any?
       end
 
-      item_params[:url] = params[:module_item][:external_url]
-
-      if (iframe = params[:module_item][:iframe])
-        item_params[:link_settings] = { selection_width: iframe[:width], selection_height: iframe[:height] }
-      end
-
-      if (@tag = @module.add_item(item_params, nil, position: item_params[:position].to_i)) && set_position && set_completion_requirement
-        @module.touch
-        render json: module_item_json(@tag, @current_user, session, @module, nil)
+      if params[:module_items]
+        response = { created: created_items }
+        response[:errors] = errors if errors.any?
+        render json: response
+      elsif created_items.any?
+        render json: created_items.first
       elsif @tag
         render json: @tag.errors, status: :bad_request
       else
-        render status: :bad_request, json: { message: t(:invalid_content, "Could not find content") }
+        render json: { message: errors.first[:message] }, status: :bad_request
       end
     end
   end
@@ -528,7 +560,7 @@ class ContextModuleItemsApiController < ApplicationController
           if module_item_publishable?(@tag)
             @tag.publish
           else
-            return render json: { message: "item can't be published" }, status: :unprocessable_entity
+            return render json: { message: "item can't be published" }, status: :unprocessable_content
           end
         elsif module_item_unpublishable?(@tag)
           @tag.unpublish
@@ -536,7 +568,7 @@ class ContextModuleItemsApiController < ApplicationController
           return render json: { message: "item can't be unpublished" }, status: :forbidden
         end
         @tag.save
-        @tag.update_asset_workflow_state!
+        @tag.update_asset_workflow_state!(user: @current_user)
         @tag.context_module.save
       end
 
@@ -730,11 +762,13 @@ class ContextModuleItemsApiController < ApplicationController
   #       -H 'Authorization: Bearer <token>'
   #
   include ContextModulesHelper
+
   def duplicate
     original_tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(original_tag.context_module, @current_user, :update)
       if original_tag.duplicate_able?
-        new_content = original_tag.content.duplicate
+        new_content = original_tag.content.duplicate({ user: @current_user })
+        new_content.saving_user = @current_user if new_content.respond_to?(:saving_user)
         new_content.save!
         new_tag = original_tag.context_module.add_item({
                                                          type: original_tag.content_type,
@@ -765,16 +799,6 @@ class ContextModuleItemsApiController < ApplicationController
       end
     end
   end
-
-  def disable_escape_html_entities
-    ActiveSupport.escape_html_entities_in_json = false
-  end
-  private :disable_escape_html_entities
-
-  def enable_escape_html_entities
-    ActiveSupport.escape_html_entities_in_json = true
-  end
-  private :enable_escape_html_entities
 
   def set_position
     return true unless @tag && params[:module_item][:position]

@@ -34,37 +34,70 @@ import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import React from 'react'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/rce/serviceRCELoader')
-jest.mock('@canvas/external-tools/react/components/ExternalToolModalLauncher')
-jest.mock('../../../react/AssignmentSubmissionTypeContainer')
-jest.mock('@canvas/jquery/jquery.instructure_misc_helpers', () => ({}))
-jest.mock('@canvas/common/activateTooltips', () => ({
+// MSW server setup
+const server = setupServer(
+  http.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/settings/, () => {
+    return HttpResponse.json({})
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/sections/, () => {
+    return HttpResponse.json([])
+  }),
+  http.post('http://localhost/api/graphql', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          id: '1',
+          name: 'Test Course',
+          enrollmentsConnection: {
+            edges: [],
+          },
+        },
+      },
+    })
+  }),
+)
+
+vi.mock('@canvas/rce/serviceRCELoader')
+vi.mock('@canvas/external-tools/react/components/ExternalToolModalLauncher')
+vi.mock('../../../react/AssignmentSubmissionTypeContainer')
+vi.mock('@canvas/jquery/jquery.instructure_misc_helpers', () => ({}))
+vi.mock('@canvas/common/activateTooltips', () => ({
   __esModule: true,
-  default: jest.fn(),
+  default: vi.fn(),
+}))
+vi.mock('@canvas/grading-scheme', () => ({
+  GradingSchemesSelector: vi.fn(() => null),
 }))
 
 // Mock jQuery UI components
-$.fn.dialog = jest.fn()
-$.fn.tooltip = jest.fn()
+$.fn.dialog = vi.fn()
+$.fn.tooltip = vi.fn()
 
 // Mock jQuery Widget Factory
 const widgetPrototype = {
-  _createWidget: jest.fn(),
-  destroy: jest.fn(),
-  option: jest.fn(),
+  _createWidget: vi.fn(),
+  destroy: vi.fn(),
+  option: vi.fn(),
 }
 
-$.Widget = jest.fn(() => widgetPrototype)
+$.Widget = vi.fn(() => widgetPrototype)
 $.Widget.prototype = widgetPrototype
 
 // Mock widget creation
-$.widget = jest.fn((name, base, prototype = {}) => {
+$.widget = vi.fn((name, base, prototype = {}) => {
   const [namespace, widgetName] = name.split('.')
   $[namespace] = $[namespace] || {}
-  $[namespace][widgetName] = jest.fn()
-  $.fn[widgetName] = jest.fn()
+  $[namespace][widgetName] = vi.fn()
+  $.fn[widgetName] = vi.fn()
 })
 
 const s_params = 'some super secure params'
@@ -146,16 +179,9 @@ const disableCheckbox = id => {
   document.getElementById(id).disabled = true
 }
 
-beforeEach(() => {
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, [])
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, [])
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/settings/, {})
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/sections/, [])
-})
-
-afterEach(() => {
-  fetchMock.reset()
-})
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+afterEach(() => server.resetHandlers())
 
 describe('EditView#handleModeratedGradingChanged', () => {
   let view
@@ -216,7 +242,7 @@ describe('EditView#handleModeratedGradingChanged', () => {
   })
 
   it('calls togglePeerReviewsAndGroupCategoryEnabled', () => {
-    const toggleSpy = jest.spyOn(view, 'togglePeerReviewsAndGroupCategoryEnabled')
+    const toggleSpy = vi.spyOn(view, 'togglePeerReviewsAndGroupCategoryEnabled')
     view.handleModeratedGradingChanged(true)
     expect(toggleSpy).toHaveBeenCalledTimes(1)
   })
@@ -235,7 +261,7 @@ describe('EditView#handleModeratedGradingChanged', () => {
   })
 
   it('calls uncheckAndHideGraderAnonymousToGraders when passed false', () => {
-    const uncheckSpy = jest.spyOn(view, 'uncheckAndHideGraderAnonymousToGraders')
+    const uncheckSpy = vi.spyOn(view, 'uncheckAndHideGraderAnonymousToGraders')
     view.handleModeratedGradingChanged(false)
     expect(uncheckSpy).toHaveBeenCalledTimes(1)
   })
@@ -306,8 +332,6 @@ describe('EditView#handleMessageEvent', () => {
       USAGE_RIGHTS_REQUIRED: false,
       ROOT_FOLDER_ID: '1',
     })
-
-    fetchMock.mock(/^\/api\/v1\/courses\/\d+\/assignments\/\d+$/, [])
 
     view = createEditView()
   })
@@ -415,7 +439,7 @@ describe('EditView#handlesuppressFromGradebookChange', () => {
   })
 
   it('calls suppressAssignment on the model when checkbox is changed', () => {
-    const spy = jest.spyOn(view.model, 'suppressAssignment').mockImplementation(() => {})
+    const spy = vi.spyOn(view.model, 'suppressAssignment').mockImplementation(() => {})
 
     view.$suppressAssignment = view.$el.find('#assignment_suppress_from_gradebook')
     expect(view.$suppressAssignment).toHaveLength(1)
@@ -427,7 +451,7 @@ describe('EditView#handlesuppressFromGradebookChange', () => {
   })
 
   it('sets model.suppressAssignment to false when unchecked', () => {
-    const spy = jest.spyOn(view.model, 'suppressAssignment').mockImplementation(() => {})
+    const spy = vi.spyOn(view.model, 'suppressAssignment').mockImplementation(() => {})
 
     view.$suppressAssignment = view.$el.find('#assignment_suppress_from_gradebook')
     expect(view.$suppressAssignment).toHaveLength(1)

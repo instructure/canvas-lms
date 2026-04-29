@@ -31,6 +31,7 @@ interface IndentSelectorProps {
 const IndentSelector: React.FC<IndentSelectorProps> = ({value, onChange, label}) => {
   return (
     <SimpleSelect
+      data-testid="add-item-indent-selector"
       renderLabel={label || I18n.t('Indentation')}
       value={value}
       onChange={(_e, {value}) => onChange(value as number)}

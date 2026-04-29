@@ -35,6 +35,7 @@ describe('ExternalToolSubmission', () => {
       ASSIGNMENT_ID: '200',
       DEEP_LINKING_POST_MESSAGE_ORIGIN: windowOrigin,
       COURSE_ID: '100',
+      LTI_LAUNCH_FRAME_ALLOWANCES: ['geolocation *', 'microphone *', 'camera *'],
     }
 
     tool = {name: 'some external tool', _id: '1'}
@@ -55,13 +56,25 @@ describe('ExternalToolSubmission', () => {
         'http://localhost/courses/100/external_tools/retrieve?assignment_id=200&display=borderless&resource_link_lookup_uuid=some_uuid&url=%2Fsubmitted-lti-launch',
       )
     })
+
+    it('sets iframe allow attribute at render time for microphone and camera permissions', () => {
+      const submission = SubmissionMocks.basicLtiLaunchSubmitted
+      const {getByTestId} = render(<ExternalToolSubmission submission={submission} tool={tool} />)
+
+      const iframe = getByTestId('lti-launch-frame')
+      expect(iframe).toHaveAttribute('allow', ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+    })
   })
 
   describe('when a draft exists with content for this external tool', () => {
     it('shows the URL and content using the values specified in the draft', () => {
       const submission = {...SubmissionMocks.basicLtiLaunchReadyToSubmit}
       const {getByTestId, getByText} = render(
-        <ExternalToolSubmission submission={submission} tool={tool} submitButtonRef={createRef()} />,
+        <ExternalToolSubmission
+          submission={submission}
+          tool={tool}
+          submitButtonRef={createRef()}
+        />,
       )
 
       const iframe = getByTestId('lti-launch-frame')
@@ -76,7 +89,11 @@ describe('ExternalToolSubmission', () => {
     it('shows the original resource-selection launch frame if the user clicks the "Change" button', () => {
       const submission = SubmissionMocks.basicLtiLaunchReadyToSubmit
       const {getByRole, getByTestId} = render(
-        <ExternalToolSubmission submission={submission} tool={tool} submitButtonRef={createRef()} />,
+        <ExternalToolSubmission
+          submission={submission}
+          tool={tool}
+          submitButtonRef={createRef()}
+        />,
       )
 
       const changeButton = getByRole('button', {name: /Change/})
@@ -95,7 +112,11 @@ describe('ExternalToolSubmission', () => {
       const otherTool = {name: 'some other external tool', _id: '2'}
       const submission = SubmissionMocks.basicLtiLaunchReadyToSubmit
       const {getByTestId} = render(
-        <ExternalToolSubmission submission={submission} tool={otherTool} submitButtonRef={createRef()} />,
+        <ExternalToolSubmission
+          submission={submission}
+          tool={otherTool}
+          submitButtonRef={createRef()}
+        />,
       )
 
       const iframe = getByTestId('lti-launch-frame')
@@ -109,7 +130,13 @@ describe('ExternalToolSubmission', () => {
   describe('when nothing has been submitted and no draft is present', () => {
     it('shows the resource-selection launch frame for the current tool', () => {
       const submission = {state: 'unsubmitted'}
-      const {getByTestId} = render(<ExternalToolSubmission submission={submission} tool={tool} submitButtonRef={createRef()} />)
+      const {getByTestId} = render(
+        <ExternalToolSubmission
+          submission={submission}
+          tool={tool}
+          submitButtonRef={createRef()}
+        />,
+      )
 
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
@@ -124,8 +151,8 @@ describe('ExternalToolSubmission', () => {
     let onFileUploadRequested
 
     beforeEach(() => {
-      createSubmissionDraft = jest.fn()
-      onFileUploadRequested = jest.fn()
+      createSubmissionDraft = vi.fn()
+      onFileUploadRequested = vi.fn()
     })
 
     function postMessage(subject, contents) {
@@ -197,7 +224,7 @@ describe('ExternalToolSubmission', () => {
             submission={submissionProps}
             tool={tool}
             submitButtonRef={submitButtonRef}
-          />
+          />,
         )
         fireEvent.click(submitButtonRef.current)
         expect(getByText(EXTERNAL_TOOL_ERROR_MESSAGE)).toBeInTheDocument()
@@ -216,7 +243,7 @@ describe('ExternalToolSubmission', () => {
             submission={submissionProps}
             tool={tool}
             submitButtonRef={submitButtonRef}
-          />
+          />,
         )
         fireEvent.click(submitButtonRef.current)
         expect(getByText(EXTERNAL_TOOL_ERROR_MESSAGE)).toBeInTheDocument()

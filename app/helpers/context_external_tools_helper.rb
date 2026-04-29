@@ -24,7 +24,7 @@ module ContextExternalToolsHelper
     end
     return markup if options[:raw_output]
 
-    raw(markup.join)
+    markup.inject(&:<<)
   end
 
   def external_tool_menu_item_tag(tool, options = {})
@@ -82,7 +82,7 @@ module ContextExternalToolsHelper
       link = content_tag(:li, li_attrs) { link }
     end
 
-    raw(link)
+    link
   end
 
   def external_tools_menu_items_raw_with_modules(tools, modules = [])

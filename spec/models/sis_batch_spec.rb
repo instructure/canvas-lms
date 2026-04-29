@@ -36,7 +36,7 @@ describe SisBatch do
         File.write(path, data.first)
       else
         path = "#{tmpdir}/sisfile.zip"
-        Zip::File.open(path, Zip::File::CREATE) do |z|
+        Zip::File.open(path, create: true) do |z|
           Array(data).each do |dat|
             z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
             i += 1
@@ -150,7 +150,7 @@ describe SisBatch do
     batch = process_csv_data([%(user_id,login_id,status
                         user_1,user_1,active)])
 
-    expect(Delayed::Worker).to receive(:current_job).at_least(:once).and_return(double("Delayed::Job", id: 789))
+    expect(Delayed::Worker).to receive(:current_job).at_least(:once).and_return(instance_double(Delayed::Job, id: 789))
     allow_any_instance_of(SisBatch).to receive(:roll_back_data).and_raise "no roll back data for you"
     batch.restore_states_later
     run_jobs
@@ -232,6 +232,74 @@ describe SisBatch do
     expect(@row).to eq({ "user_id" => "user_1", "login_id" => "user_1", "status" => "active" })
   end
 
+  it "does not deduplicate CSVs if the number of duplicates are below threshold" do
+    batch = create_csv_data([%(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active
+                               course_1,course_1,course_1,term_1,active)])
+    batch.process_without_send_later
+    atts = Attachment.where(context: batch)
+    expect(atts.pluck(:filename)).to match_array %w[csv_0.csv]
+    expect(atts.last.open.read).to eq(%(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active
+                               course_1,course_1,course_1,term_1,active))
+  end
+
+  it "deduplicates standalone csvs" do
+    stub_const("SIS::CSV::ImportRefactored::DEDUP_THRESHOLD", 1)
+    batch = create_csv_data([%(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active
+                               course_1,course_1,course_1,term_1,active)])
+    batch.process_without_send_later
+    atts = Attachment.where(context: batch)
+    expect(atts.pluck(:filename)).to match_array %w[csv_0.csv csv_0_deduplicated.csv]
+    expect(atts.last.open.read).to eq(%(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active\n))
+  end
+
+  it "deduplicates csvs in zip files" do
+    stub_const("SIS::CSV::ImportRefactored::DEDUP_THRESHOLD", 1)
+    batch = create_csv_data([%(user_id,login_id,status
+                               user_1,user_1,active),
+                             %(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active
+                               course_1,course_1,course_1,term_1,active)])
+    batch.process_without_send_later
+    atts = Attachment.where(context: batch)
+    expect(atts.pluck(:filename)).to match_array %w[sisfile.zip csv_0.csv csv_1_deduplicated.csv]
+    expect(atts.last.open.read).to eq(%(course_id,short_name,long_name,term_id,status
+                               course_1,course_1,course_1,term_1,active\n))
+  end
+
+  it "deduplicates csvs in subdirectories within zip files" do
+    stub_const("SIS::CSV::ImportRefactored::DEDUP_THRESHOLD", 1)
+    Dir.mktmpdir("sis_rspec") do |tmpdir|
+      path = "#{tmpdir}/sisfile.zip"
+      Zip::File.open(path, create: true) do |z|
+        z.get_output_stream("Apps/Zips/users.csv") do |f|
+          f.puts(<<~CSV)
+            user_id,login_id,status
+            user_1,user_1,active
+            user_1,user_1,active
+          CSV
+        end
+      end
+
+      batch = File.open(path, "rb") do |tmp|
+        def tmp.original_filename
+          File.basename(path)
+        end
+        SisBatch.create_with_attachment(@account, "instructure_csv", tmp, user_factory)
+      end
+      batch.process_without_send_later
+      atts = Attachment.where(context: batch)
+      expect(atts.pluck(:filename)).to match_array ["sisfile.zip", "users_deduplicated.csv"]
+      expect(atts.last.open.read).to eq(<<~CSV)
+        user_id,login_id,status
+        user_1,user_1,active
+      CSV
+    end
+  end
+
   it "is able to preload downloadable attachments" do
     batch1 = process_csv_data([%(user_id,password,login_id,status,ssha_password
                                 user_1,supersecurepwdude,user_1,active,hunter2),
@@ -244,6 +312,31 @@ describe SisBatch do
     atts = batch1.instance_variable_get(:@downloadable_attachments)
     expect(atts.count).to eq 2
     expect(atts.map(&:id)).to match_array(batch1.data[:downloadable_attachment_ids])
+  end
+
+  it "preloads last_attachment_upload_status on downloadable attachments" do
+    batch = process_csv_data([%(user_id,login_id,status
+                                user_1,user_1,active)])
+    SisBatch.load_downloadable_attachments([batch])
+
+    atts = batch.instance_variable_get(:@downloadable_attachments)
+    expect(atts).to be_present
+    atts.each do |att|
+      expect(att.association(:last_attachment_upload_status)).to be_loaded
+    end
+  end
+
+  it "sets context association on preloaded downloadable attachments" do
+    batch = process_csv_data([%(user_id,login_id,status
+                                user_1,user_1,active)])
+    SisBatch.load_downloadable_attachments([batch])
+
+    atts = batch.instance_variable_get(:@downloadable_attachments)
+    expect(atts).to be_present
+    atts.each do |att|
+      expect(att.association(:context)).to be_loaded
+      expect(att.context).to eq batch
+    end
   end
 
   it "keeps the batch in initializing state during create_with_attachment" do
@@ -486,7 +579,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
 
     it "enqueue a job to clean up the account associations" do
       job = created_jobs.find { |j| j.tag == "Account#update_account_associations" }
-      expect(job).to_not be_nil
+      expect(job).not_to be_nil
     end
 
     it "must fail itself" do
@@ -791,9 +884,7 @@ s2,test_1,section2,active),
       )
       expect(@user.reload).to be_registered
       expect(@section.reload).to be_deleted
-      @section.enrollments.not_fake.each do |e|
-        expect(e).to be_deleted
-      end
+      expect(@section.enrollments.not_fake).to all(be_deleted)
       expect(@course.reload).to be_claimed
       expect(b.data[:counts][:batch_sections_deleted]).to eq 1
 
@@ -1139,7 +1230,7 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
       expect(b3.generated_diff_id).to be_nil
       expect(b4.data[:diffed_against_sis_batch_id]).to eq b2.id
-      expect(b4.generated_diff_id).to_not be_nil
+      expect(b4.generated_diff_id).not_to be_nil
     end
 
     it "does not diff outside of diff row count threshold" do
@@ -1195,7 +1286,7 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b3.data[:diffed_against_sis_batch_id]).to be_nil
       expect(b3.generated_diff_id).to be_nil
       expect(b4.data[:diffed_against_sis_batch_id]).to eq b2.id
-      expect(b4.generated_diff_id).to_not be_nil
+      expect(b4.generated_diff_id).not_to be_nil
     end
 
     it "requires a remaster after too many skipped over-threshold batches" do

@@ -97,4 +97,17 @@ describe Mutations::DeleteDiscussionEntry do
       expect(result.dig("data", "deleteDiscussionEntry", "errors", 0, "message")).to eq "Insufficient permissions"
     end
   end
+
+  context "LTI asset processor notifications" do
+    before(:once) do
+      @graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion")
+      @graded_entry = @graded_topic.discussion_entries.create!(message: "Message to delete", user: @teacher)
+    end
+
+    it "calls notify_asset_processors_of_discussion for graded discussion deletions" do
+      expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion)
+
+      run_mutation(id: @graded_entry.id)
+    end
+  end
 end

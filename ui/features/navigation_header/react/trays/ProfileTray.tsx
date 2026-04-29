@@ -26,6 +26,7 @@ import {Avatar} from '@instructure/ui-avatar'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
+import {IconExternalLinkLine} from '@instructure/ui-icons'
 import LogoutButton from '../LogoutButton'
 import HighContrastModeToggle from './HighContrastModeToggle'
 import DyslexicFontToggle from './UseDyslexicFontToggle'
@@ -34,7 +35,7 @@ import profileQuery from '../queries/profileQuery'
 import {getUnreadCount} from '../queries/unreadCountQuery'
 import type {ProfileTab, TabCountsObj} from '../../../../api.d'
 import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
+import {sessionStoragePersister} from '@instructure/platform-query'
 
 const I18n = createI18nScope('ProfileTray')
 
@@ -61,16 +62,15 @@ function CountBadge({counts, id}: {counts: TabCountsObj; id: string}) {
   )
 }
 
-function ProfileTabLink({id, html_url, label, counts}: ProfileTab) {
-  const target =
-    window.ENV.FEATURES?.open_tools_in_new_tab && html_url.includes('display=borderless')
-      ? '_blank'
-      : undefined
+function ProfileTabLink({id, html_url, label, counts, type}: ProfileTab) {
+  const isNavMenuLink = type === 'external' && id?.startsWith('nav_menu_link_')
+  const target = isNavMenuLink || html_url.includes('display=borderless') ? '_blank' : undefined
   return (
     <View className={`profile-tab-${id}`} as="div" margin="small 0">
       <Link isWithinText={false} href={html_url} target={target}>
         {label}
         <CountBadge counts={counts} id={id} />
+        {isNavMenuLink && <IconExternalLinkLine size="x-small" style={{paddingLeft: '0.3em'}} />}
       </Link>
     </View>
   )
@@ -84,7 +84,7 @@ export default function ProfileTray() {
   } = useQuery<ProfileTab[], Error>({
     queryKey: ['profile'],
     queryFn: profileQuery,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   const countsEnabled = Boolean(
@@ -96,7 +96,7 @@ export default function ProfileTray() {
     queryFn: getUnreadCount,
     staleTime: 60 * 60 * 1000, // 1 hour
     enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
-    persister: sessionStoragePersister,
+    persister: sessionStoragePersister.persisterFn,
   })
 
   const counts: TabCountsObj = {
@@ -108,6 +108,10 @@ export default function ProfileTray() {
   const userAvatarURL = window.ENV.current_user.avatar_is_fallback
     ? ''
     : window.ENV.current_user.avatar_image_url
+
+  // Check if we have any accessibility settings to show
+  const hasAccessibilitySettings = true // High contrast is always available
+  const hasDyslexicFont = 'use_dyslexic_font' in window.ENV
 
   return (
     <View as="div" padding="medium">
@@ -149,9 +153,17 @@ export default function ProfileTray() {
             </List.Item>
           ))}
       </List>
-      <hr role="presentation" />
-      <HighContrastModeToggle />
-      {'use_dyslexic_font' in window.ENV && <DyslexicFontToggle />}
+
+      {hasAccessibilitySettings && (
+        <>
+          <hr role="presentation" />
+          <Heading level="h3" as="h3" margin="small 0">
+            {I18n.t('Accessibility Settings')}
+          </Heading>
+          <HighContrastModeToggle />
+          {hasDyslexicFont && <DyslexicFontToggle />}
+        </>
+      )}
     </View>
   )
 }

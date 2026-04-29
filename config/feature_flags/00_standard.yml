@@ -1,4 +1,12 @@
 ---
+ada_chatbot:
+  type: setting
+  state: hidden
+  display_name: Panda Bot Integration
+  description: Enable Panda Bot virtual assistant in the help menu
+  applies_to: RootAccount
+  shadow: true
+  after_state_change_proc: sync_with_salesforce
 allow_opt_out_of_inbox:
   type: setting
   state: hidden
@@ -144,13 +152,6 @@ include_byte_order_mark_in_gradebook_exports:
   description: Optionally include a byte-order mark in compatible spreadsheet exports
     so they can be imported into Excel for users in some locales.
   applies_to: User
-international_sms:
-  state: hidden
-  display_name: International SMS
-  description: Allows users with international phone numbers to receive text messages
-    from Canvas.
-  applies_to: RootAccount
-  root_opt_in: true
 javascript_csp:
   type: setting
   state: allowed
@@ -222,7 +223,7 @@ new_user_tutorial:
   root_opt_in: true
 new_user_tutorial_on_off:
   type: setting
-  state: allowed
+  state: allowed_on
   display_name: Course Set-up Tutorial
   description: Course set-up tutorial provides tips on how to leverage the feature
     opportunities on each page in Canvas. It is especially useful when you are new
@@ -282,10 +283,10 @@ quizzes_next:
   display_name:
     features.quizzes.next: New Quizzes
   description:
-    wrapper: <a href="https://community.canvaslms.com/t5/New-Quizzes-Users/gh-p/quizzes">\1</a>
+    wrapper: <a target="blank" href="https://community.instructure.com/en/kb/articles/664245-faq-new-quizzes?utm_source=community-search&utm_medium=organic-search&utm_term=new+quizzes">\1</a>
     new_quizzes_description: This feature enhances the Canvas experience for quizzing.
       When this flag is enabled, the New Quizzes tool will be available. For full details,
-      please see the *New Quizzes user group* in the Canvas Community.
+      please see the *New Quizzes FAQ* in the Instructure Community.
   applies_to: Course
   visible_on: quizzes_next_visible_on_hook
 quizzes_next_submission_history:
@@ -374,6 +375,18 @@ send_usage_metrics:
   applies_to: RootAccount
   visible_on: usage_metrics_allowed_hook
   shadow: true
+send_usage_metrics_after_consent:
+  state: hidden
+  display_name: Send usage metrics after consent
+  description: Send usage metrics only after user has given consent to data processing
+  applies_to: RootAccount
+  shadow: true
+cookie_consent_necessary:
+  state: hidden
+  display_name: Cookie Consent Necessary
+  description: Indicates if cookie consent is necessary
+  applies_to: RootAccount
+  shadow: true
 new_quiz_public_api:
   applies_to: SiteAdmin
   state: hidden
@@ -384,8 +397,22 @@ new_quiz_public_api:
       state: allowed_on
     development:
       state: allowed_on
-pkce:
+restrict_student_access:
   state: hidden
+  display_name: Restricted Inbox, Files and Calendar Functionality
+  description: Enable restricted functionalities for students so that inbox communications, file movements and calendar events can be restricted.
+  applies_to: RootAccount
+  shadow: true
+classic_quizzes_client_ip:
+  state: hidden
+  display_name: Classic Quizzes Use quiz_client_ip
+  description: |-
+    In regions where Cloudfront is active we can't use the request.remote_ip method, it returns the Cloudfront IP.
+    We need to use the quiz_client_ip method to get the real IP of the user.
+  applies_to: RootAccount
+  shadow: true
+enable_kafka_events:
+  state: hidden
+  display_name: Emit Events to Kafka
+  description: Allow emitting events to Kafka
   applies_to: SiteAdmin
-  display_name: PKCE in OAuth2 Authorization Code Flow
-  description: Enable PKCE in OAuth2 Authorization Code Flow

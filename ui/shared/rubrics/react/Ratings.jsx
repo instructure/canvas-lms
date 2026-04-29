@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {find, sortBy, findIndex, last, isNil} from 'es-toolkit/compat'
 import $ from 'jquery'
 import React from 'react'
 import classNames from 'classnames'
@@ -109,14 +109,14 @@ export const Rating = props => {
 }
 
 const getCustomColor = (points, pointsPossible, customRatings) => {
-  const sortedRatings = _.sortBy(customRatings, 'points').reverse()
+  const sortedRatings = sortBy(customRatings, 'points').reverse()
   const scaledPoints =
     pointsPossible > 0 ? points * (sortedRatings[0].points / pointsPossible) : points
-  const selectedRating = _.find(sortedRatings, rating => scaledPoints >= rating.points)
+  const selectedRating = find(sortedRatings, rating => scaledPoints >= rating.points)
   if (selectedRating) {
     return `#${selectedRating.color}`
   } else {
-    return `#${_.last(sortedRatings).color}`
+    return `#${last(sortedRatings).color}`
   }
 }
 
@@ -160,7 +160,7 @@ const Ratings = props => {
 
   const currentIndex = () => {
     if (selectedRatingId) {
-      return _.findIndex(
+      return findIndex(
         tiers,
         tier => tier.id === selectedRatingId && (useRange || tier.points === points),
       )
@@ -272,7 +272,7 @@ const Ratings = props => {
   )
 
   const fullFooter = () =>
-    isSummary || _.isNil(footer) ? null : <div className="rating-all-footer">{footer}</div>
+    isSummary || isNil(footer) ? null : <div className="rating-all-footer">{footer}</div>
 
   return (
     <div>

@@ -21,10 +21,10 @@ module Importers
   class LearningOutcomeGroupImporter < Importer
     self.item_class = LearningOutcomeGroup
 
-    def self.import_from_migration(hash, migration, item = nil, skip_import = false)
+    def self.import_from_migration(hash, migration, item = nil, skip_import: false)
       hash = hash.with_indifferent_access
       if skip_import
-        Importers::LearningOutcomeGroupImporter.process_children(hash, hash[:parent_group], migration, skip_import)
+        Importers::LearningOutcomeGroupImporter.process_children(hash, hash[:parent_group], migration, skip_import:)
         return
       end
       if hash[:is_global_standard]
@@ -64,10 +64,12 @@ module Importers
       item.workflow_state = "active" # restore deleted ones
       item.migration_id = hash[:migration_id]
       item.title = hash[:title]
-      item.description = hash[:description]
+      item.description = migration.convert_html(hash[:description], :learning_outcome_group, hash[:migration_id], :description)
       item.vendor_guid = hash[:vendor_guid]
       item.low_grade = hash[:low_grade]
       item.high_grade = hash[:high_grade]
+
+      item.importing = true
 
       if hash[:source_outcome_group_id]
         source_group = LearningOutcomeGroup.active.find_by(id: hash[:source_outcome_group_id])
@@ -110,15 +112,14 @@ module Importers
       item
     end
 
-    def self.process_children(hash, item, migration, skip_import = false)
+    def self.process_children(hash, item, migration, skip_import: false)
       hash[:outcomes]&.each do |child|
         if child[:type] == "learning_outcome_group"
           child[:parent_group] = item
           Importers::LearningOutcomeGroupImporter.import_from_migration(
             child,
             migration,
-            nil,
-            skip_import && !migration.import_object?("learning_outcome_groups", child["migration_id"])
+            skip_import: skip_import && !migration.import_object?("learning_outcome_groups", child["migration_id"])
           )
         else
           child[:learning_outcome_group] = item

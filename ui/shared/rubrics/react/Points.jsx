@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import _ from 'lodash'
+import {get} from 'es-toolkit/compat'
 import PropTypes from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
@@ -24,8 +24,8 @@ import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {assessmentShape} from './types'
-import {IconWarningSolid} from "@instructure/ui-icons";
-import {Text} from "@instructure/ui-text";
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('edit_rubricPoints')
 
@@ -43,7 +43,7 @@ export const possibleString = possible =>
   })
 
 export const possibleStringRange = (min, possible) =>
-  I18n.t('%{min} to %{possible} pts', {
+  I18n.t('%{possible} to >%{min} pts', {
     possible: I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true}),
     min: I18n.toNumber(min, {precision: 2, strip_insignificant_zeros: true}),
   })
@@ -54,16 +54,24 @@ export const scoreString = (points, possible) =>
     possible: possibleString(possible),
   })
 
-const invalid = () => [{text: (
-    <Flex justifyItems="start" gap="xx-small">
-      <Flex.Item align="start">
-        <IconWarningSolid color="error" />
-      </Flex.Item>
-      <Flex.Item>
-        <Text color="danger">{I18n.t('Invalid score')}</Text>
-      </Flex.Item>
-    </Flex>
-  ), type: 'error'}]
+export const possibleStringValue = possible =>
+  I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true})
+
+const invalid = () => [
+  {
+    text: (
+      <Flex justifyItems="start" gap="xx-small">
+        <Flex.Item align="start">
+          <IconWarningSolid color="error" />
+        </Flex.Item>
+        <Flex.Item>
+          <Text color="danger">{I18n.t('Invalid score')}</Text>
+        </Flex.Item>
+      </Flex>
+    ),
+    type: 'error',
+  },
+]
 const pointError = points => (points.valid ? [] : invalid())
 
 const noExtraCredit = () => [{text: I18n.t('Cannot give outcomes extra credit'), type: 'error'}]
@@ -76,7 +84,7 @@ const Points = props => {
   if (assessment === null) {
     return <div className="react-rubric-cell graded-points">{possibleString(pointsPossible)}</div>
   } else {
-    const points = _.get(assessment, 'points')
+    const points = get(assessment, 'points')
     if (!assessing) {
       return (
         <div className="react-rubric-cell graded-points">{scoreString(points, pointsPossible)}</div>

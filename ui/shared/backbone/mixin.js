@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {extend, flatten} from 'lodash'
+import {extend, flatten} from 'es-toolkit/compat'
 
 // Merges mixins into target, being mindful of certain properties (like
 // events) that need to be merged also.

@@ -147,7 +147,7 @@ class SubmissionList
     end
   end
 
-  SubmissionEntry = Struct.new(*VALID_KEYS, keyword_init: true)
+  SubmissionEntry = Struct.new(*VALID_KEYS)
   # A filtered list of hashes of all submission versions that change the
   # grade with all the meta data finally included. This list can be sorted
   # and displayed.

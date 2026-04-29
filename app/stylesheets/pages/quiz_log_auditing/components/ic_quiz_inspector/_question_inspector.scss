@@ -46,7 +46,7 @@
     background-color: $inactiveBg;
     color: $inactiveFg;
     padding: $whitespace*0.5 0;
-    margin-left: -$counter-w -$whitespace;
+    margin-left: -$counter-w - $whitespace;
     width: $counter-w;
     text-align: center;
     line-height: 1.4;

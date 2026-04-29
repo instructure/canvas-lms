@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import {View} from '@canvas/backbone'
-import {extend as lodashExtend, each, map, filter, find} from 'lodash'
+import {each, map, filter, find, extend as lodashExtend} from 'es-toolkit/compat'
 import Popover from 'jquery-popover'
 import Outcome from '@canvas/grade-summary/backbone/models/Outcome'
 import d3 from 'd3'

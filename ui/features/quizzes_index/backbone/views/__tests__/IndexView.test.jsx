@@ -24,9 +24,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
-import ReactDOM from 'react-dom'
-
-jest.useFakeTimers()
+import * as CanvasReact from '@canvas/react'
 
 describe('IndexView', () => {
   let fixtures
@@ -88,7 +86,10 @@ describe('IndexView', () => {
     return view.render()
   }
 
+  let mockRenderSpy = null
+
   beforeEach(() => {
+    vi.useFakeTimers()
     fixtures = document.createElement('div')
     fixtures.id = 'fixtures'
     document.body.appendChild(fixtures)
@@ -107,13 +108,20 @@ describe('IndexView', () => {
         new_assignment_url: '/courses/1/assignments/new',
         question_banks_url: '/courses/1/question_banks',
       },
+      NEW_QUIZZES_SELECTED: null,
+      horizon_course: false,
     })
   })
 
   afterEach(() => {
+    if (mockRenderSpy) {
+      mockRenderSpy.mockRestore()
+      mockRenderSpy = null
+    }
+    vi.useRealTimers()
     fakeENV.teardown()
     document.body.removeChild(fixtures)
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('has no quizzes if assignment and open quizzes are empty', () => {
@@ -170,11 +178,10 @@ describe('IndexView', () => {
 
   it('renders choose quiz engine modal', () => {
     ENV.flags.quiz_lti_enabled = true
-    const mockRender = jest.spyOn(ReactDOM, 'render').mockImplementation(() => {})
+    const mockRender = vi.spyOn(CanvasReact, 'legacyRender').mockImplementation(() => {})
     view = createIndexView()
-    view.$('.choose-quiz-engine').simulate('click')
+    view.$('.choose-quiz-engine')[0].click()
     expect(mockRender.mock.calls[0][0].props.setOpen).toBe(true)
-    mockRender.mockRestore()
   })
 
   it('should render the view', () => {

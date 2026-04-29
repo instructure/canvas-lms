@@ -16,13 +16,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AccessibilityResourceScan < ActiveRecord::Base
+class AccessibilityResourceScan < ApplicationRecord
+  include Accessibility::Concerns::ResourceResolvable
   extend RootAccountResolver
-  include Accessibility::HasContext
 
   resolves_root_account through: :course
 
   belongs_to :course
+  belongs_to :context, polymorphic: %i[assignment attachment wiki_page discussion_topic announcement], separate_columns: true, optional: true
+
   has_many :accessibility_issues, dependent: :destroy
 
   enum :workflow_state, %i[queued in_progress completed failed], validate: true
@@ -32,4 +34,103 @@ class AccessibilityResourceScan < ActiveRecord::Base
   validates :wiki_page_id, uniqueness: true, allow_nil: true
   validates :assignment_id, uniqueness: true, allow_nil: true
   validates :attachment_id, uniqueness: true, allow_nil: true
+  validates :discussion_topic_id, uniqueness: true, allow_nil: true
+  validates :announcement_id, uniqueness: true, allow_nil: true
+  validates :course_id, uniqueness: { scope: :is_syllabus }, if: :is_syllabus?
+  validate :validate_syllabus_or_context
+
+  scope :running, -> { where(workflow_state: %w[queued in_progress]) }
+  scope :for_course, ->(course) { where(course:) }
+  scope :open, -> { where(closed_at: nil) }
+  scope :closed, -> { where.not(closed_at: nil) }
+
+  # This is necessary because Canvas's polymorphic associations don't correctly handle STI types.
+  # In case of Announcements, the discussion_topic_id is filled Instead of the announcement_id
+  # This is because Rails always uses the base_class to determine the type of the resource
+  # Which is DiscussionTopic for Announcements because of the STI.
+  def self.for_resource(resource)
+    if resource.is_a?(Announcement)
+      where(announcement_id: resource.id)
+    elsif resource.is_a?(Accessibility::SyllabusResource)
+      where(course_id: resource.course.id, is_syllabus: true)
+    elsif resource.is_a?(Course)
+      where(course_id: resource.id, is_syllabus: true)
+    else
+      where(context: resource)
+    end
+  end
+
+  def closed?
+    closed_at.present?
+  end
+
+  def open?
+    closed_at.nil?
+  end
+
+  def update_issue_count!
+    update!(issue_count: accessibility_issues.active.count)
+  end
+
+  # Bulk close all active issues for this scan without triggering callbacks (performance optimization)
+  # WARNING: This uses update_all which skips validations and callbacks.
+  # If you add callbacks that MUST run when closing issues, refactor this to use find_each with update!
+  def bulk_close_issues!(user_id:)
+    raise "Resource is already closed" if closed?
+
+    ActiveRecord::Base.transaction do
+      accessibility_issues.active.update_all(
+        workflow_state: "closed",
+        updated_by_id: user_id,
+        updated_at: Time.current
+      )
+
+      update!(
+        closed_at: Time.current,
+        issue_count: 0
+      )
+    end
+  end
+
+  def context_url
+    url_helpers = Rails.application.routes.url_helpers
+
+    # Handle syllabus separately since it doesn't have a context_id
+    return url_helpers.syllabus_course_assignments_path(course_id) if is_syllabus?
+
+    context_id = self.context_id
+    return unless context_id
+
+    case context_type
+    when "WikiPage"
+      url_helpers.course_wiki_page_path(course_id, context_id)
+    when "Assignment"
+      url_helpers.course_assignment_path(course_id, context_id)
+    when "Attachment"
+      url_helpers.course_files_path(course_id, preview: context_id)
+    when "Announcement"
+      url_helpers.course_announcement_path(course_id, context_id)
+    when "DiscussionTopic"
+      url_helpers.course_discussion_topic_path(course_id, context_id)
+    end
+  end
+
+  # Returns the API path for scanning this resource (only for syllabus)
+  # This is separate from context_url because syllabus has a different API path pattern
+  # Returns nil for non-syllabus resources
+  def resource_scan_path
+    # Only syllabus needs a different API path
+    return "/courses/#{course_id}/syllabus" if is_syllabus?
+
+    # For all other resources, return nil (they'll use context_url)
+    nil
+  end
+
+  private
+
+  def validate_syllabus_or_context
+    if is_syllabus == context.present?
+      errors.add(:base, "is_syllabus and context must be mutually exclusive")
+    end
+  end
 end

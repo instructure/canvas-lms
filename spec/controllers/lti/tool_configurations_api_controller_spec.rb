@@ -99,7 +99,8 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
   shared_examples_for "an endpoint that accepts a settings_url" do
     let(:ok_response) do
-      double(
+      instance_double(
+        Net::HTTPSuccess,
         :body => canvas_lti_configuration.to_json,
         :is_a? => true,
         "[]" => "application/json"
@@ -187,7 +188,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       end
 
-      it { is_expected.to have_http_status :unprocessable_entity }
+      it { is_expected.to have_http_status :unprocessable_content }
 
       it "responds with helpful error message" do
         subject
@@ -198,7 +199,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     context "when the response is not a success" do
       subject { json_parse["errors"].first["message"] }
 
-      let(:stubbed_response) { double }
+      let(:stubbed_response) { instance_double(Net::HTTPResponse) }
 
       before do
         allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
@@ -656,6 +657,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
           tos_uri: "http://example.com/tos",
           policy_uri: "http://example.com/policy",
           lti_tool_configuration: {
+            target_link_uri: "https://example.com/launch",
             domain: "example.com",
             messages: [],
             claims: [
@@ -665,15 +667,20 @@ RSpec.describe Lti::ToolConfigurationsApiController do
           },
           scopes: [],
           developer_key:,
-          lti_registration: developer_key.lti_registration,
-          registration_overlay: {
-            "privacy_level" => "anonymous"
-          }
+          lti_registration: developer_key.lti_registration
         )
+      end
+
+      let(:overlay) do
+        Lti::Overlay.create!(updated_by: account_admin_user,
+                             registration: developer_key.lti_registration,
+                             account:,
+                             data: { privacy_level: "anonymous" })
       end
 
       before do
         ims_registration
+        overlay
       end
 
       it "returns the registration with its overlay applied" do
@@ -681,27 +688,6 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         expect(json_parse.with_indifferent_access
           .dig(:tool_configuration, :settings, :extensions)[0][:privacy_level])
           .to eq "anonymous"
-      end
-
-      context "when the overlay is stored on an Lti::Overlay" do
-        let(:overlay) do
-          Lti::Overlay.create!(updated_by: account_admin_user,
-                               registration: developer_key.lti_registration,
-                               account:,
-                               data: { privacy_level: "anonymous" })
-        end
-
-        before do
-          overlay
-          ims_registration.update!(registration_overlay: nil)
-        end
-
-        it "still returns the registration with its overlay applied" do
-          subject
-          expect(json_parse.with_indifferent_access
-            .dig(:tool_configuration, :settings, :extensions)[0][:privacy_level])
-            .to eq "anonymous"
-        end
       end
     end
   end
@@ -722,13 +708,143 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     end
 
     context "when the tool configuration exists" do
-      it "destroys the tool configuration" do
-        id = tool_configuration.id
+      it "soft deletes the tool configuration" do
         subject
-        expect(Lti::ToolConfiguration.find_by(id:)).to be_nil
+        expect(tool_configuration.reload).to be_deleted
       end
 
       it { is_expected.to be_no_content }
+    end
+  end
+
+  describe "modify_site_admin_developer_keys permission" do
+    let(:site_admin_admin) { account_admin_user(account: Account.site_admin) }
+    let(:site_admin_without_permission) do
+      user = user_model
+      role = custom_account_role("limited_admin", account: Account.site_admin)
+      # Grant manage_developer_keys but not modify_site_admin_developer_keys
+      Account.site_admin.role_overrides.create!(
+        permission: :manage_developer_keys,
+        role:,
+        enabled: true
+      )
+      Account.site_admin.account_users.create!(user:, role:)
+      user
+    end
+    let(:site_admin_params) do
+      {
+        developer_key: dev_key_params,
+        account_id: Account.site_admin.id,
+        tool_configuration: {
+          settings: canvas_lti_configuration
+        }
+      }
+    end
+
+    describe "POST 'create'" do
+      subject { post :create, params: site_admin_params, format: :json }
+
+      context "when user has modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_admin) }
+
+        it "allows creating a site admin tool configuration" do
+          subject
+          expect(response).to be_successful
+          key = DeveloperKey.find(json_parse.dig("developer_key", "id"))
+          expect(key.account).to be_nil
+        end
+      end
+
+      context "when user lacks modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_without_permission) }
+
+        it "returns forbidden" do
+          subject
+          expect(response).to be_forbidden
+          expect(json_parse["errors"].first["message"]).to include("Site Admin developer keys")
+        end
+
+        context "when modify_site_admin_developer_keys_permission FF is off" do
+          before { Account.site_admin.disable_feature!(:modify_site_admin_developer_keys_permission) }
+
+          it "allows creating a site admin tool configuration" do
+            subject
+            expect(response).to be_successful
+            key = DeveloperKey.find(json_parse.dig("developer_key", "id"))
+            expect(key.account).to be_nil
+          end
+        end
+      end
+    end
+
+    describe "PUT 'update'" do
+      subject { put :update, params: update_params, format: :json }
+
+      let(:site_admin_key) { lti_developer_key_model(account: Account.site_admin) }
+      let(:site_admin_tool_config) { lti_tool_configuration_model(developer_key: site_admin_key, lti_registration: site_admin_key.lti_registration) }
+      let(:update_params) do
+        {
+          developer_key_id: site_admin_key.id,
+          developer_key: { name: "Updated Name" },
+          tool_configuration: {
+            settings: canvas_lti_configuration
+          }
+        }
+      end
+
+      before { site_admin_tool_config }
+
+      context "when user has modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_admin) }
+
+        it "allows updating a site admin tool configuration" do
+          subject
+          expect(response).to be_successful
+        end
+      end
+
+      context "when user lacks modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_without_permission) }
+
+        it "returns forbidden" do
+          subject
+          expect(response).to be_forbidden
+          expect(json_parse["errors"].first["message"]).to include("Site Admin developer keys")
+        end
+      end
+    end
+
+    describe "DELETE 'destroy'" do
+      subject { delete :destroy, params: destroy_params, format: :json }
+
+      let(:site_admin_key) { lti_developer_key_model(account: Account.site_admin) }
+      let(:site_admin_tool_config) { lti_tool_configuration_model(developer_key: site_admin_key, lti_registration: site_admin_key.lti_registration) }
+      let(:destroy_params) do
+        {
+          developer_key_id: site_admin_key.id
+        }
+      end
+
+      before { site_admin_tool_config }
+
+      context "when user has modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_admin) }
+
+        it "allows deleting a site admin tool configuration" do
+          subject
+          expect(response).to be_no_content
+        end
+      end
+
+      context "when user lacks modify_site_admin_developer_keys permission" do
+        before { user_session(site_admin_without_permission) }
+
+        it "returns forbidden" do
+          subject
+          expect(response).to be_forbidden
+          expect(json_parse["errors"].first["message"]).to include("Site Admin developer keys")
+        end
+      end
     end
   end
 end

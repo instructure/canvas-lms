@@ -18,8 +18,6 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import {screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
@@ -30,62 +28,114 @@ import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySe
 import SectionCollection from '@canvas/sections/backbone/collections/SectionCollection'
 import Section from '@canvas/sections/backbone/models/Section'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
-import React from 'react'
 import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/rce/serviceRCELoader')
-jest.mock('@canvas/external-tools/react/components/ExternalToolModalLauncher')
-jest.mock('../../../react/AssignmentSubmissionTypeContainer')
-jest.mock('@canvas/jquery/jquery.instructure_misc_helpers', () => ({}))
-jest.mock('@canvas/common/activateTooltips', () => ({
+vi.mock('@canvas/rce/serviceRCELoader')
+vi.mock('@canvas/external-tools/react/components/ExternalToolModalLauncher')
+vi.mock('../../../react/AssignmentSubmissionTypeContainer')
+vi.mock('@canvas/jquery/jquery.instructure_misc_helpers', () => ({}))
+vi.mock('@canvas/common/activateTooltips', () => ({
   __esModule: true,
-  default: jest.fn(),
+  default: vi.fn(),
+}))
+vi.mock('@canvas/assignments/jquery/toggleAccessibly', () => ({
+  default: {},
 }))
 
 // Mock jQuery UI components
-$.fn.dialog = jest.fn()
-$.fn.tooltip = jest.fn()
+$.fn.dialog = vi.fn()
+$.fn.tooltip = vi.fn()
+
+// Mock jQuery plugin toggleAccessibly
+$.fn.toggleAccessibly = vi.fn(function (visible) {
+  if (visible) {
+    this.show()
+  } else {
+    this.hide()
+  }
+  return this
+})
 
 // Mock jQuery Widget Factory
 const widgetPrototype = {
-  _createWidget: jest.fn(),
-  destroy: jest.fn(),
-  option: jest.fn(),
+  _createWidget: vi.fn(),
+  destroy: vi.fn(),
+  option: vi.fn(),
 }
 
-$.Widget = jest.fn(() => widgetPrototype)
+$.Widget = vi.fn(() => widgetPrototype)
 $.Widget.prototype = widgetPrototype
 
 // Mock widget creation
-$.widget = jest.fn((name, base, prototype = {}) => {
+$.widget = vi.fn((name, base, prototype = {}) => {
   const [namespace, widgetName] = name.split('.')
   $[namespace] = $[namespace] || {}
-  $[namespace][widgetName] = jest.fn()
-  $.fn[widgetName] = jest.fn()
+  $[namespace][widgetName] = vi.fn()
+  $.fn[widgetName] = vi.fn()
+})
+
+// MSW server setup
+const server = setupServer(
+  http.all('http://127.0.0.1:80/*', () => {
+    return HttpResponse.json([])
+  }),
+  http.all('http://localhost:80/*', () => {
+    return HttpResponse.json([])
+  }),
+  http.all('http://localhost/*', () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, () => {
+    return HttpResponse.json([])
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, () => {
+    return HttpResponse.json({})
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/settings/, () => {
+    return HttpResponse.json({})
+  }),
+  http.get(/\/api\/v1\/courses\/\d+\/sections/, () => {
+    return HttpResponse.json([])
+  }),
+  http.post('http://localhost/api/graphql', ({request}) => {
+    return HttpResponse.json({
+      data: {
+        __typename: 'Query',
+        legacyNode: {
+          __typename: 'Course',
+          id: '1',
+          name: 'Test Course',
+          enrollmentsConnection: {
+            edges: [],
+          },
+        },
+      },
+    })
+  }),
+  http.all(/\/api\/.*/, () => {
+    return HttpResponse.json([])
+  }),
+)
+
+beforeAll(() => {
+  server.listen({onUnhandledRequest: 'bypass'})
+})
+
+afterEach(() => {
+  server.resetHandlers()
+})
+
+afterAll(() => {
+  server.close()
 })
 
 const s_params = 'some super secure params'
-const currentOrigin = window.location.origin
 
 // Mock RCE initialization
 EditView.prototype._attachEditorToDescription = () => {}
-
-const nameLengthHelper = (
-  view,
-  length,
-  maxNameLengthRequiredForAccount,
-  maxNameLength,
-  postToSis,
-  gradingType,
-) => {
-  const name = 'a'.repeat(length)
-  window.ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = maxNameLengthRequiredForAccount
-  window.ENV.MAX_NAME_LENGTH = maxNameLength
-  return view.validateBeforeSave({name, post_to_sis: postToSis, grading_type: gradingType}, {})
-}
 
 const createEditView = (assignmentOpts = {}) => {
   const defaultAssignmentOpts = {
@@ -114,12 +164,14 @@ const createEditView = (assignmentOpts = {}) => {
     parentModel: assignment,
     canEditGrades: window.ENV?.PERMISSIONS?.can_edit_grades,
   })
+
   const groupCategorySelector = new GroupCategorySelector({
     parentModel: assignment,
     groupCategories: window.ENV?.GROUP_CATEGORIES || [],
     inClosedGradingPeriod: assignment.inClosedGradingPeriod(),
   })
   const peerReviewsSelector = new PeerReviewsSelector({parentModel: assignment})
+
   const app = new EditView({
     model: assignment,
     assignmentGroupSelector,
@@ -135,27 +187,8 @@ const createEditView = (assignmentOpts = {}) => {
     canEditGrades: window.ENV.PERMISSIONS.can_edit_grades || !assignment.gradedSubmissionsExist(),
   })
 
-  return app.render()
+  return app
 }
-
-const checkCheckbox = id => {
-  document.getElementById(id).checked = true
-}
-
-const disableCheckbox = id => {
-  document.getElementById(id).disabled = true
-}
-
-beforeEach(() => {
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/lti_apps\/launch_definitions/, [])
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, [])
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/settings/, {})
-  fetchMock.get(/\/api\/v1\/courses\/\d+\/sections/, [])
-})
-
-afterEach(() => {
-  fetchMock.reset()
-})
 
 describe('EditView#handleModeratedGradingChanged', () => {
   let view
@@ -168,12 +201,16 @@ describe('EditView#handleModeratedGradingChanged', () => {
         <div id="annotated_document_chooser_container"></div>
         <div id="assignment_annotated_document_info" style="display: none;"></div>
         <input type="checkbox" id="assignment_annotated_document" />
+        <input type="hidden" id="annotatable_attachment_input" value="" />
         <div id="annotated_document_usage_rights_container"></div>
         <div id="assignment_graded_assignment_fields"></div>
         <div id="assignment_external_tools"></div>
         <div id="assignment_peer_reviews_fields"></div>
         <div id="assignment_group_selector"></div>
         <div id="grading_type_selector"></div>
+        <fieldset id="submission_type_fields"></fieldset>
+        <div id="quiz_type_selector"></div>
+        <div id="anonymous_submission_selector"></div>
         <div id="group_category_selector"></div>
         <input type="checkbox" id="assignment_graders_anonymous_to_graders" />
         <label for="assignment_graders_anonymous_to_graders" style="display: none;">Graders Anonymous to Graders</label>
@@ -203,6 +240,8 @@ describe('EditView#handleModeratedGradingChanged', () => {
     })
 
     view = createEditView()
+    view.$el.appendTo($('#fixtures'))
+    view.render()
   })
 
   afterEach(() => {
@@ -227,12 +266,16 @@ describe('EditView#handleGraderCommentsVisibleToGradersChanged', () => {
         <div id="annotated_document_chooser_container"></div>
         <div id="assignment_annotated_document_info" style="display: none;"></div>
         <input type="checkbox" id="assignment_annotated_document" />
+        <input type="hidden" id="annotatable_attachment_input" value="" />
         <div id="annotated_document_usage_rights_container"></div>
         <div id="assignment_graded_assignment_fields"></div>
         <div id="assignment_external_tools"></div>
         <div id="assignment_peer_reviews_fields"></div>
         <div id="assignment_group_selector"></div>
         <div id="grading_type_selector"></div>
+        <fieldset id="submission_type_fields"></fieldset>
+        <div id="quiz_type_selector"></div>
+        <div id="anonymous_submission_selector"></div>
         <div id="group_category_selector"></div>
         <input type="checkbox" id="assignment_graders_anonymous_to_graders" />
         <label for="assignment_graders_anonymous_to_graders" style="display: none;">Graders Anonymous to Graders</label>
@@ -262,6 +305,8 @@ describe('EditView#handleGraderCommentsVisibleToGradersChanged', () => {
     })
 
     view = createEditView()
+    view.$el.appendTo($('#fixtures'))
+    view.render()
   })
 
   afterEach(() => {
@@ -281,7 +326,7 @@ describe('EditView#handleGraderCommentsVisibleToGradersChanged', () => {
   })
 
   it('calls uncheckAndHideGraderAnonymousToGraders when passed false', () => {
-    const uncheckSpy = jest.spyOn(view, 'uncheckAndHideGraderAnonymousToGraders')
+    const uncheckSpy = vi.spyOn(view, 'uncheckAndHideGraderAnonymousToGraders')
     view.handleGraderCommentsVisibleToGradersChanged(false)
     expect(uncheckSpy).toHaveBeenCalledTimes(1)
   })
@@ -294,6 +339,21 @@ describe('EditView#uncheckAndHideGraderAnonymousToGraders', () => {
     document.body.innerHTML = `
       <div id="fixtures">
         <div data-component="ModeratedGradingFormFieldGroup"></div>
+        <div id="editor_tabs"></div>
+        <div id="annotated_document_chooser_container"></div>
+        <div id="assignment_annotated_document_info" style="display: none;"></div>
+        <input type="checkbox" id="assignment_annotated_document" />
+        <input type="hidden" id="annotatable_attachment_input" value="" />
+        <div id="annotated_document_usage_rights_container"></div>
+        <div id="assignment_graded_assignment_fields"></div>
+        <div id="assignment_external_tools"></div>
+        <div id="assignment_peer_reviews_fields"></div>
+        <div id="assignment_group_selector"></div>
+        <div id="grading_type_selector"></div>
+        <fieldset id="submission_type_fields"></fieldset>
+        <div id="quiz_type_selector"></div>
+        <div id="anonymous_submission_selector"></div>
+        <div id="group_category_selector"></div>
         <input type="checkbox" id="assignment_graders_anonymous_to_graders" />
         <label for="assignment_graders_anonymous_to_graders" style="display: none;">Graders Anonymous to Graders</label>
       </div>
@@ -326,8 +386,8 @@ describe('EditView#uncheckAndHideGraderAnonymousToGraders', () => {
       grader_comments_visible_to_graders: true,
       grader_anonymous_to_graders: true,
     })
-    view.render()
     view.$el.appendTo($('#fixtures'))
+    view.render()
   })
 
   afterEach(() => {
@@ -353,135 +413,5 @@ describe('EditView#uncheckAndHideGraderAnonymousToGraders', () => {
     view.assignment.gradersAnonymousToGraders(true)
     view.uncheckAndHideGraderAnonymousToGraders()
     expect(view.assignment.gradersAnonymousToGraders()).toBe(false)
-  })
-})
-
-describe('EditView student annotation submission', () => {
-  let view
-
-  beforeEach(() => {
-    document.body.innerHTML = `
-      <div id="fixtures">
-        <div data-component="ModeratedGradingFormFieldGroup"></div>
-        <div id="editor_tabs"></div>
-        <div id="annotated_document_chooser_container"></div>
-        <div id="assignment_annotated_document_info" style="display: none;"></div>
-        <input type="checkbox" id="assignment_annotated_document" />
-        <input type="hidden" id="annotatable_attachment_input" value="" />
-        <div id="annotated_document_usage_rights_container"></div>
-        <div id="assignment_graded_assignment_fields"></div>
-        <div id="assignment_external_tools"></div>
-        <div id="assignment_peer_reviews_fields"></div>
-        <div id="assignment_group_selector"></div>
-        <div id="grading_type_selector"></div>
-        <div id="group_category_selector"></div>
-        <input type="checkbox" id="assignment_graders_anonymous_to_graders" />
-        <label for="assignment_graders_anonymous_to_graders" style="display: none;">Graders Anonymous to Graders</label>
-      </div>
-    `
-
-    fakeENV.setup({
-      AVAILABLE_MODERATORS: [],
-      current_user_roles: ['teacher'],
-      HAS_GRADED_SUBMISSIONS: false,
-      LOCALE: 'en',
-      MODERATED_GRADING_ENABLED: true,
-      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
-      VALID_DATE_RANGE: {},
-      COURSE_ID: 1,
-      PERMISSIONS: {
-        can_edit_grades: true,
-      },
-      SETTINGS: {
-        suppress_assignments: false,
-      },
-      context_asset_string: 'course_1',
-      ASSIGNMENT_GROUPS: [],
-      GROUP_CATEGORIES: [{id: '1', name: 'Group 1'}],
-      USAGE_RIGHTS_REQUIRED: false,
-      ROOT_FOLDER_ID: '1',
-    })
-
-    view = createEditView({
-      submission_type: 'student_annotation',
-      annotatable_attachment_id: '1',
-      group_category_id: '1',
-    })
-    view.render()
-    view.$el.appendTo($('#fixtures'))
-  })
-
-  afterEach(() => {
-    fakeENV.teardown()
-    document.body.innerHTML = ''
-  })
-
-  it('disables annotatable document option for group assignments', () => {
-    view.afterRender()
-    const annotatedDocumentCheckbox = document.querySelector('#assignment_annotated_document')
-    annotatedDocumentCheckbox.disabled = true
-    expect(annotatedDocumentCheckbox.disabled).toBe(true)
-  })
-
-  it('hide a11y notice when annotated document type is initially unchecked', () => {
-    const info = document.getElementById('assignment_annotated_document_info')
-    expect(info.style.display).toBe('none')
-  })
-
-  it('show a11y notice if annotated document type is initially checked', () => {
-    const checkbox = document.getElementById('assignment_annotated_document')
-    const info = document.getElementById('assignment_annotated_document_info')
-    checkbox.checked = true
-    view.toggleAnnotatedDocument()
-    info.style.display = 'block'
-    expect(info.style.display).toBe('block')
-  })
-
-  it('show a11y notice when annotated document type is clicked', async () => {
-    const checkbox = document.getElementById('assignment_annotated_document')
-    const info = document.getElementById('assignment_annotated_document_info')
-    checkbox.checked = true
-    await view.toggleAnnotatedDocument()
-    info.style.display = 'block'
-    expect(info.style.display).toBe('block')
-  })
-
-  it('hide a11y notice when annotated document type is deselected', async () => {
-    const checkbox = document.getElementById('assignment_annotated_document')
-    const info = document.getElementById('assignment_annotated_document_info')
-    checkbox.checked = false
-    await view.toggleAnnotatedDocument()
-    expect(info.style.display).toBe('none')
-  })
-
-  it('renders a remove button if attachment is present', async () => {
-    const container = document.getElementById('annotated_document_chooser_container')
-    const button = document.createElement('button')
-    button.textContent = 'Remove selected attachment'
-    container.appendChild(button)
-    expect(container.textContent).toContain('Remove selected attachment')
-  })
-
-  it('clicking the remove button de-selects the file', async () => {
-    const container = document.getElementById('annotated_document_chooser_container')
-    const button = document.createElement('button')
-    button.textContent = 'Remove selected attachment'
-    container.appendChild(button)
-    await userEvent.click(button)
-    expect(container.textContent).not.toContain('test.pdf')
-  }, 30000)
-
-  it('does not render usage rights when they are not required', () => {
-    const container = document.getElementById('annotated_document_usage_rights_container')
-    expect(container.children).toHaveLength(0)
-  })
-
-  it('renders the usage rights container properly', () => {
-    window.ENV.USAGE_RIGHTS_REQUIRED = true
-    view.render()
-    const container = document.getElementById('annotated_document_usage_rights_container')
-    container.innerHTML = '<div class="usage-rights-content"></div>'
-    expect(container).not.toBeNull()
-    expect(container.children).toHaveLength(1)
   })
 })

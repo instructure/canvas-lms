@@ -39,8 +39,14 @@ shared_examples "Gradebook with grading periods" do |ff_enabled|
     end
   end
 
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:graphql_usage_rate).and_return(100)
+    end
+  end
+
   context "with close and end dates" do
-    now = Time.zone.now
+    let_once(:now) { Time.zone.now }
 
     before(:once) do
       term_name = "First Term"

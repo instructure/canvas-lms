@@ -59,11 +59,11 @@
 #         },
 #         "last_error": {
 #            "description": "The last error encountered during an attempted sync",
-#            "type": "string",
+#            "type": "string"
 #         },
 #         "last_error_report_id": {
 #            "description": "The ErrorReport ID for the last_error. Only returned for site admins",
-#            "type": "integer",
+#            "type": "integer"
 #         },
 #         "root_account_id": {
 #            "description": "The root account the MicrosoftSync::Group belongs to",
@@ -83,7 +83,7 @@
 #         "debug_info": {
 #           "description": "List of strings with debugging info (localized). Only returned for site admins.",
 #           "type": "array",
-#           "items": {"type": "object"}
+#           "items": {"type": "object"},
 #           "example": [
 #             {
 #               "timestamp": "2024-01-03T11:50:07Z",
@@ -91,12 +91,11 @@
 #               "user_ids": [1, 3]
 #             }
 #           ]
-#         ]
+#         }
 #       }
 #     }
 class MicrosoftSync::GroupsController < ApplicationController
   before_action :require_context
-  before_action :require_user
   before_action :validate_user_permissions
   before_action :require_feature
   before_action :require_integration_available
@@ -175,7 +174,7 @@ class MicrosoftSync::GroupsController < ApplicationController
       )
     end
 
-    render json: { message: error_msg }, status: :unprocessable_entity if error_msg
+    render json: { message: error_msg }, status: :unprocessable_content if error_msg
   end
 
   # Don't allow scheduling a new job

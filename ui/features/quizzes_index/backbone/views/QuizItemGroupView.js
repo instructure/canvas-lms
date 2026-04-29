@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {filter} from 'lodash'
+import {filter} from 'es-toolkit/compat'
 import CollectionView from '@canvas/backbone-collection-view'
 import template from '../../jst/QuizItemGroupView.handlebars'
 import QuizItemView from './QuizItemView'

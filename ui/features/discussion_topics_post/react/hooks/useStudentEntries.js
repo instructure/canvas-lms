@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useAllPages} from '@canvas/query'
+import {useInfiniteQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('student_entries')
 
 export const STUDENT_DISCUSSION_QUERY = gql`
-  query GetDiscussionQuery(
+  query GetStudentEntriesDiscussionQuery(
     $discussionID: ID!
     $perPage: Int!
     $discussionPageAmount: Int!
@@ -101,11 +101,12 @@ export function useStudentEntries(
   discussionPageAmount = 50,
   userSearchId,
 ) {
-  return useAllPages({
+  return useInfiniteQuery({
     queryKey: ['studentEntries', discussionID, perPage, discussionPageAmount, userSearchId],
     queryFn: getStudentEntries,
     getNextPageParam: lastPage =>
       lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
+    initialPageParam: null,
     enabled: !!discussionID,
   })
 }

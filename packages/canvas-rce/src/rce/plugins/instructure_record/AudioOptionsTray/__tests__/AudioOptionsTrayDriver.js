@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {queryAllByLabelText, queryByTestId} from '@testing-library/dom'
+import {
+  getByPlaceholderText,
+  getByText,
+  queryAllByLabelText,
+  queryByTestId,
+} from '@testing-library/dom'
 
 export default class AudioOptionsTrayDriver {
   static find() {
@@ -47,5 +52,41 @@ export default class AudioOptionsTrayDriver {
 
   get doneButtonDisabled() {
     return this.$doneButton.disabled
+  }
+
+  get $manualCaptionsAddNewButton() {
+    return getByText(this.$closedCaptionPanel, /Add new/i)
+  }
+
+  get $manualCaptionsLanguageSelect() {
+    return getByPlaceholderText(this.$closedCaptionPanel, /Select Language/i)
+  }
+
+  get $manualCaptionsFileInput() {
+    return this.$closedCaptionPanel.querySelector('input[type="file"]')
+  }
+
+  get $manualCaptionsCancelButton() {
+    return getByText(this.$closedCaptionPanel, 'Cancel')
+  }
+
+  get $manualCaptionsUploadButton() {
+    return getByText(this.$closedCaptionPanel, 'Upload')
+  }
+
+  get $automaticCaptionsAddNewButton() {
+    return getByText(this.$closedCaptionPanel, 'Request')
+  }
+
+  get $automaticCaptionsLanguageSelect() {
+    return getByPlaceholderText(this.$closedCaptionPanel, /Select Language/i)
+  }
+
+  get $automaticCaptionsCancelButton() {
+    return getByText(this.$closedCaptionPanel, 'Cancel')
+  }
+
+  get $automaticCaptionsRequestButton() {
+    return getByText(this.$closedCaptionPanel, 'Request')
   }
 }

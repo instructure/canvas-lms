@@ -82,13 +82,13 @@
 }
 
 .font1 {
-  font-family: "Balsamiq Sans", lato, "Helvetica Neue", Helvetica, Arial,
-    sans-serif;
+  font-family:
+    "Balsamiq Sans", lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .font2 {
-  font-family: "Architects Daughter", lato, "Helvetica Neue", Helvetica, Arial,
-    sans-serif;
+  font-family:
+    "Architects Daughter", lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .font4 {
@@ -138,7 +138,7 @@
   .toolbar-separator {
     display: inline-block;
     box-sizing: border-box;
-    border-inline-end: 1px solid #E8EAEC;
+    border-inline-end: 1px solid #e8eaec;
     width: 1px;
     height: 1.5rem;
     background: #ababab;
@@ -157,8 +157,9 @@
   /* need to find css vars */
   box-sizing: border-box;
   border-radius: 0.25rem;
-  box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.2), 0 0.0625rem 0.1875rem
-    rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 0.0625rem 0.125rem rgba(0, 0, 0, 0.2),
+    0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.1);
   z-index: 9999;
 }
 
@@ -278,7 +279,7 @@
   flex-wrap: wrap;
   gap: 16px; */
   position: relative;
-  padding: .25rem;
+  padding: 0.25rem;
   min-height: 2.5rem;
   min-width: 2.5rem;
 }
@@ -320,7 +321,7 @@
 
 /* the <li>s in course nav are .section also */
 .block-editor-editor .section {
-  margin-block-end: .5rem;
+  margin-block-end: 0.5rem;
 }
 
 .resources-section__inner {
@@ -689,8 +690,8 @@
     min-height: 100px;
     background: repeating-linear-gradient(
       45deg,
-      #F2F4F4,
-      #F2F4F4 10px,
+      #f2f4f4,
+      #f2f4f4 10px,
       #a5a5a5 10px,
       #a5a5a5 20px
     );
@@ -764,7 +765,7 @@
     #fff 100%
   );
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  transition: all .5s ease;
+  transition: all 0.5s ease;
 }
 
 .curl:before,

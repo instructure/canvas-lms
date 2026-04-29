@@ -20,7 +20,7 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import GroupDescriptionModal from '../GroupDescriptionModal'
 
-jest.mock('@canvas/outcomes/graphql/Management')
+vi.mock('@canvas/outcomes/graphql/Management')
 
 describe('GroupDescriptionModal', () => {
   let onCloseHandlerMock
@@ -36,11 +36,11 @@ describe('GroupDescriptionModal', () => {
   })
 
   beforeEach(() => {
-    onCloseHandlerMock = jest.fn()
+    onCloseHandlerMock = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('shows modal if isOpen prop true', () => {

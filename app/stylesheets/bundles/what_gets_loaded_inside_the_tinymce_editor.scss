@@ -126,11 +126,6 @@ body#tinyrce {
   font-size: 0;
 }
 
-[data-mce-p-data-media-id],
-iframe[data-media-id] {
-  background-color: #eee;
-}
-
 /* TinyMCE noneditable plugin overrides for discussion mentions */
 .mceNonEditable.mention {
   cursor: default;

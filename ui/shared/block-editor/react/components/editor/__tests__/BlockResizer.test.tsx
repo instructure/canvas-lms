@@ -28,26 +28,22 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 let props: Sz
 let maintainAspectRatio: boolean
 let nodeDomNode: HTMLDivElement
-let mockSetProp: jest.Mock
+let mockSetProp: ReturnType<typeof vi.fn>
 
-jest.mock('@craftjs/core', () => {
-  const module = jest.requireActual('@craftjs/core')
-  return {
-    ...module,
-    useNode: jest.fn(() => {
-      return {
-        actions: {
-          setProp: mockSetProp,
-        },
-        node: {
-          dom: nodeDomNode,
-        },
-        nodeProps: props,
-        maintainAspectRatio,
-      }
-    }),
-  }
-})
+vi.mock('@craftjs/core', () => ({
+  useNode: vi.fn(() => {
+    return {
+      actions: {
+        setProp: mockSetProp,
+      },
+      node: {
+        dom: nodeDomNode,
+      },
+      nodeProps: props,
+      maintainAspectRatio,
+    }
+  }),
+}))
 
 describe('BlockResizer', () => {
   let mountNode: HTMLDivElement
@@ -63,7 +59,7 @@ describe('BlockResizer', () => {
     nodeDomNode = document.createElement('div')
     nodeDomNode.style.width = '100px'
     nodeDomNode.style.height = '125px'
-    nodeDomNode.getBoundingClientRect = jest.fn(() => {
+    nodeDomNode.getBoundingClientRect = vi.fn(() => {
       return {top: 0, left: 0, ...props} as DOMRect
     })
     document.body.appendChild(nodeDomNode)
@@ -72,7 +68,7 @@ describe('BlockResizer', () => {
     mountNode.id = 'mountNode'
     document.body.appendChild(mountNode)
 
-    mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
+    mockSetProp = vi.fn((callback: (props: Record<string, any>) => void) => {
       callback(props)
     })
 
@@ -82,7 +78,7 @@ describe('BlockResizer', () => {
   afterEach(() => {
     cleanup()
     document.body.innerHTML = ''
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeENV.teardown()
   })
 

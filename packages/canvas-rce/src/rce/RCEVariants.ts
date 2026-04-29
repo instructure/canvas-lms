@@ -33,7 +33,6 @@ interface ToolbarGroupSetting {
 }
 
 type StatusBarFeature =
-  | 'ai_tools'
   | 'keyboard_shortcuts'
   | 'a11y_checker'
   | 'word_count'
@@ -42,12 +41,17 @@ type StatusBarFeature =
   | 'resize_handle'
   | 'a11y_resize_handlers'
 
-export const RCEVariantValues = ['full', 'lite', 'text-only', 'text-block'] as const
+export const RCEVariantValues = [
+  'full',
+  'lite',
+  'text-only',
+  'text-block',
+  'block-content-editor',
+] as const
 
 export type RCEVariant = (typeof RCEVariantValues)[number]
 
 export type StatusBarOptions = {
-  aiTextTools?: boolean
   isDesktop?: boolean
   a11yResizers?: boolean
 }
@@ -163,6 +167,43 @@ export function getToolbarForVariant(
     ]
   }
 
+  if (variant === 'block-content-editor') {
+    return [
+      {
+        name: formatMessage('Styles'),
+        items: ['fontsizeselect', 'formatselect'],
+      },
+      {
+        name: formatMessage('Formatting'),
+        items: [
+          'bold',
+          'italic',
+          'underline',
+          'instructure_color',
+          'inst_subscript',
+          'inst_superscript',
+        ],
+      },
+      {
+        name: formatMessage('Content'),
+        items: ['instructure_links'],
+      },
+      {
+        name: formatMessage('Alignment and Lists'),
+        items: ['align', 'bullist', 'inst_indent', 'inst_outdent'],
+      },
+      {
+        name: formatMessage('Miscellaneous'),
+        items: [
+          'removeformat',
+          'instructure_equation',
+          'instructure_keyboard_shortcuts_header',
+          'instructure_wordcount_header',
+        ],
+      },
+    ]
+  }
+
   return [
     {
       name: formatMessage('Styles'),
@@ -213,12 +254,15 @@ const A11Y_RESIZERS: StatusBarFeature[] = ['a11y_resize_handlers']
 export function getStatusBarFeaturesForVariant(
   variant: RCEVariant,
   options: StatusBarOptions = {
-    aiTextTools: false,
     isDesktop: true,
     a11yResizers: false,
   },
 ): StatusBarFeature[] {
   if (variant === 'text-block') {
+    return []
+  }
+
+  if (variant === 'block-content-editor') {
     return []
   }
 
@@ -232,6 +276,5 @@ export function getStatusBarFeaturesForVariant(
     ...platformFeatures,
     ...EXTENDED_FEATURES,
     ...(options.a11yResizers ? A11Y_RESIZERS : []),
-    ...(options.aiTextTools ? ['ai_tools'] : []),
   ] as StatusBarFeature[]
 }

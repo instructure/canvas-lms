@@ -33,7 +33,7 @@ class JobsController < ApplicationController
   end
 
   def index
-    @flavor = params[:flavor] || "current"
+    @flavor = params[:flavor].presence || "current"
 
     GuardRail.activate(:secondary) do
       respond_to do |format|

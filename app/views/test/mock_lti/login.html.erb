@@ -1,0 +1,20 @@
+<html>
+  <body>
+    <%= form_tag(@authorization_redirect, method: 'post', id: 'redirect-form') do %>
+      <%= hidden_field_tag(:scope, 'openid') %>
+      <%= hidden_field_tag(:response_type, 'id_token') %>
+      <%= hidden_field_tag(:client_id, @client_id) %>
+      <%= hidden_field_tag(:redirect_uri, @redirect_uri) %>
+      <%= hidden_field_tag(:login_hint, params[:login_hint]) %>
+      <%= hidden_field_tag(:lti_message_hint, params[:lti_message_hint]) %>
+      <%= hidden_field_tag(:state, @state) %>
+      <%= hidden_field_tag(:response_mode, 'form_post') %>
+      <%= hidden_field_tag(:nonce, @nonce) %>
+      <%= hidden_field_tag(:prompt, 'none') %>
+    <% end %>
+
+    <script type="text/javascript">
+      document.getElementById('redirect-form').submit();
+    </script>
+  </body>
+</html>

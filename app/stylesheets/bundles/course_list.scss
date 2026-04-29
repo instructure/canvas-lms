@@ -18,6 +18,9 @@
 
 @import "base/environment";
 
+// clamping font size for a more readable table
+$responsive-font: clamp(0.6rem, 1.5vw, 1rem);
+
 .page_header {
   @include page_header;
 }
@@ -26,8 +29,14 @@
 }
 
 .course-list-table {
+  min-width: 600px;
+  width: 100%;
   table-layout: fixed;
   white-space: nowrap;
+
+  .course-list-table-row {
+    font-size: $responsive-font;
+  }
 
   /* Column widths are based on these cells */
   .course-list-star-column {
@@ -53,7 +62,7 @@
     width: 15%;
   }
   .course-list-published-column {
-    width: 7%;
+    width: 10%;
   }
   .course-list-nickname-column {
     width: 25%;
@@ -63,12 +72,30 @@
   .course-list-group-column {
     width: 35%;
   }
+  .course-list-accessibility-column {
+    width: 12%;
+  }
   .course-list-no-left-border {
     border-#{direction(left)}: 0;
   }
   .course-list-table-row:hover {
     background-color: $lightBackground;
   }
+
+  th {
+    // required to prevent sort icon from overflowing
+    padding-right: 1.2rem;
+    a, i[class*="icon-"] {
+      font-size: $responsive-font;
+    }
+  }
+}
+
+.table-overflow-container {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+  contain: layout;
 }
 
 .course-list-table td {
@@ -98,4 +125,8 @@
   @include fontSize(21px);
   padding-#{direction(right)}: $ic-sp*0.5;
   vertical-align: baseline;
+}
+
+.icon-publish.icon-Solid {
+  color: $ic-color-success;
 }

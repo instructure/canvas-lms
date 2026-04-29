@@ -22,7 +22,6 @@
 class Lti::AssetReport < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
-  self.ignored_columns += %i[score_given score_maximum]
 
   resolves_root_account through: :asset_processor
 
@@ -107,7 +106,9 @@ class Lti::AssetReport < ApplicationRecord
   }
 
   def validate_asset_compatible_with_processor
-    unless asset&.compatible_with_processor?(asset_processor)
+    return if asset&.submission.nil? # submission can be hard-deleted (test student reset)
+
+    unless asset.compatible_with_processor?(asset_processor)
       errors.add(:asset, "internal error, asset (e.g. asset's submission) not compatible with processor")
     end
   end
@@ -129,25 +130,6 @@ class Lti::AssetReport < ApplicationRecord
     if extensions.inspect.length > MAX_EXTENSIONS_SIZE
       errors.add(:extensions, "size limit exceeded")
     end
-  end
-
-  # See also fields in graphql/types/lti_asset_report_type.rb (used
-  # in New Speedgrader)
-  def info_for_display
-    {
-      _id: id,
-      title:,
-      comment:,
-      result:,
-      resultTruncated: result_truncated,
-      indicationColor: indication_color,
-      indicationAlt: indication_alt,
-      errorCode: error_code,
-      processingProgress: effective_processing_progress,
-      priority:,
-      launchUrlPath: launch_url_path,
-      resubmitAvailable: resubmit_available?,
-    }.compact
   end
 
   def effective_processing_progress
@@ -181,57 +163,9 @@ class Lti::AssetReport < ApplicationRecord
   end
 
   def visible_to_user?(user)
+    return false if asset.submission.nil?
+
     (visible_to_owner && asset.submission.user_id == user.id) ||
       asset.submission.assignment.context.grants_any_right?(user, :manage_grades, :view_all_grades)
-  end
-
-  # Returns all reports for the given asset processor and submission IDs.
-  # Returns reports by submission, hash of form:
-  #   submission_id: {
-  #     by_attachment: {
-  #       <attachment_id>: {
-  #         <lti_asset_processor_id>: [
-  #           { id: report1.id, title: report1.title, ... },
-  #           { id: report2.id, title: report2.title, ... },
-  #         ]
-  #     },
-  #     by_attempt: {
-  #       <attempt>: {
-  #         <lti_asset_processor_id>: [
-  #           { id: report1.id, title: report1.title, ... },
-  #         ]
-  #       }
-  #     }
-  #   }
-  def self.info_for_display_by_submission(submission_ids:, for_student: false)
-    reports_by_submission = {}
-
-    if submission_ids.present?
-      scope =
-        active
-        .for_active_processors
-        .for_submissions(submission_ids)
-        .select("lti_asset_reports.*, lti_assets.submission_id as asset_sub_id, lti_assets.attachment_id as asset_att_id, lti_assets.submission_attempt as asset_submission_attempt")
-
-      scope = scope.where(visible_to_owner: true) if for_student
-
-      scope.find_each do |report|
-        submission_reports = (reports_by_submission[report.asset_sub_id] ||= {})
-
-        if report.asset_att_id
-          by_attachment = (submission_reports[:by_attachment] ||= {})
-          by_processor = (by_attachment[report.asset_att_id] ||= {})
-          report_list = (by_processor[report.lti_asset_processor_id] ||= [])
-          report_list << report.info_for_display
-        elsif report.asset_submission_attempt
-          by_attempt = (submission_reports[:by_attempt] ||= {})
-          by_processor = (by_attempt[report.asset_submission_attempt] ||= {})
-          report_list = (by_processor[report.lti_asset_processor_id] ||= [])
-          report_list << report.info_for_display
-        end
-      end
-    end
-
-    reports_by_submission
   end
 end

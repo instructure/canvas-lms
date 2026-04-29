@@ -20,7 +20,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../../utils/apiUtils'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {Alert} from '@instructure/ui-alerts'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -40,6 +40,7 @@ import {
   defaultCopyright,
   defaultCCValue,
   defaultSelectedRight,
+  hasDifferentUsageRights,
   parseNewRows,
 } from './UsageRightsModalUtils'
 
@@ -75,10 +76,7 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
   const {currentRows, setCurrentRows, setSessionExpired} = useRows()
 
   const showCreativeCommonsOptions = useMemo(() => usageRight === 'creative_commons', [usageRight])
-  const showDifferentRightsMessage = useMemo(
-    () => (copyrightHolder == null || usageRight === 'choose') && items.length > 1,
-    [copyrightHolder, items.length, usageRight],
-  )
+  const showDifferentRightsMessage = useMemo(() => hasDifferentUsageRights(items), [items])
 
   const resetState = useCallback(() => {
     setIsRequestInFlight(false)

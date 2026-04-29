@@ -21,14 +21,14 @@
 describe Canvas do
   describe ".timeout_protection" do
     it "wraps the block in a timeout" do
-      expect(Timeout).to receive(:timeout).with(15.0).and_yield
+      expect(Timeout).to receive(:timeout).with(15.0, nil).and_yield
       ran = false
       Canvas.timeout_protection("spec") { ran = true }
       expect(ran).to be true
 
       # service-specific timeout
       Setting.set("service_spec_timeout", "1")
-      expect(Timeout).to receive(:timeout).with(1).and_yield
+      expect(Timeout).to receive(:timeout).with(1, nil).and_yield
       ran = false
       Canvas.timeout_protection("spec") { ran = true }
       expect(ran).to be true
@@ -40,20 +40,20 @@ describe Canvas do
     end
 
     it "uses the timeout argument over the generic default" do
-      expect(Timeout).to receive(:timeout).with(23)
+      expect(Timeout).to receive(:timeout).with(23, nil)
       Canvas.timeout_protection("foo", fallback_timeout_length: 23)
     end
 
     it "uses the settings timeout over the timeout argument" do
       Setting.set("service_foo_timeout", "1")
-      expect(Timeout).to receive(:timeout).with(1)
+      expect(Timeout).to receive(:timeout).with(1, nil)
       Canvas.timeout_protection("foo", fallback_timeout_length: 23)
     end
 
     if Canvas.redis_enabled?
       it "skips calling the block after X failures" do
         Setting.set("service_spec_cutoff", "2")
-        expect(Timeout).to receive(:timeout).with(15).twice.and_raise(Timeout::Error)
+        expect(Timeout).to receive(:timeout).with(15, nil).twice.and_raise(Timeout::Error)
         Canvas.timeout_protection("spec") { nil }
         Canvas.timeout_protection("spec") { nil }
         ran = false
@@ -66,7 +66,7 @@ describe Canvas do
         expect(Canvas.redis.ttl(key)).to be_present
         # delete the redis key and it'll try again
         Canvas.redis.del(key)
-        expect(Timeout).to receive(:timeout).with(15).and_yield
+        expect(Timeout).to receive(:timeout).with(15, nil).and_yield
         Canvas.timeout_protection("spec") { ran = true }
         expect(ran).to be true
       end
@@ -84,6 +84,29 @@ describe Canvas do
         expect(Canvas).to receive(:percent_short_circuit_timeout).once
         Canvas.timeout_protection("spec") { nil }
       end
+
+      it "uses custom cutoff option to override default cutoff" do
+        Setting.set("service_spec_cutoff", "5")
+        Canvas.redis.set("service:timeouts:spec:error_count", "2")
+        ran = false
+        result = Canvas.timeout_protection("spec", cutoff: 2) { ran = true }
+        expect(ran).to be false
+        expect(result).to be_nil
+      end
+
+      it "uses custom cutoff of 0 to always short-circuit" do
+        Canvas.redis.set("service:timeouts:spec:error_count", "0")
+        ran = false
+        result = Canvas.timeout_protection("spec", cutoff: 0) { ran = true }
+        expect(ran).to be false
+        expect(result).to be_nil
+      end
+
+      it "uses custom cutoff with raise_on_timeout option" do
+        Canvas.redis.set("service:timeouts:spec:error_count", "2")
+        expect { Canvas.timeout_protection("spec", cutoff: 1, raise_on_timeout: true) { nil } }
+          .to raise_error(Timeout::Error)
+      end
     end
   end
 
@@ -98,22 +121,22 @@ describe Canvas do
 
     describe ".short_circuit_timeout" do
       it "wraps the block in a timeout" do
-        expect(Timeout).to receive(:timeout).with(15).and_yield
+        expect(Timeout).to receive(:timeout).with(15, nil).and_yield
         ran = false
-        Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true }
+        Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil) { ran = true }
         expect(ran).to be true
       end
 
       it "skips calling the block after X failures" do
         Setting.set("service_spec_cutoff", "2")
-        expect(Timeout).to receive(:timeout).with(15).twice.and_raise(Timeout::Error)
-        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { nil } }
+        expect(Timeout).to receive(:timeout).with(15, nil).twice.and_raise(Timeout::Error)
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil) { nil } }
           .to raise_error(Timeout::Error)
-        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { nil } }
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil) { nil } }
           .to raise_error(Timeout::Error)
         ran = false
         # third time, won't call timeout
-        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true } }
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil) { ran = true } }
           .to raise_error(Timeout::Error)
         expect(ran).to be false
         # verify the redis key has a ttl
@@ -122,8 +145,8 @@ describe Canvas do
         expect(Canvas.redis.ttl(key)).to be_present
         # delete the redis key and it'll try again
         Canvas.redis.del(key)
-        expect(Timeout).to receive(:timeout).with(15).and_yield
-        Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true }
+        expect(Timeout).to receive(:timeout).with(15, nil).and_yield
+        Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil) { ran = true }
         expect(ran).to be true
       end
 
@@ -131,9 +154,31 @@ describe Canvas do
         Setting.set("service_spec_cutoff", "2")
         key = "service:timeouts:spec:error_count"
         Canvas.redis.set(key, 42)
-        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { nil } }
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil) { nil } }
           .to raise_error(Canvas::TimeoutCutoff)
         expect(Canvas.redis.get(key)).to eq "42"
+      end
+
+      it "uses custom cutoff parameter to override Setting" do
+        Setting.set("service_spec_cutoff", "10")
+        Canvas.redis.set("service:timeouts:spec:error_count", "3")
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil, cutoff: 3) { nil } }
+          .to raise_error(Canvas::TimeoutCutoff)
+      end
+
+      it "uses nil cutoff to fall back to Setting" do
+        Setting.set("service_spec_cutoff", "2")
+        Canvas.redis.set("service:timeouts:spec:error_count", "2")
+        expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil, cutoff: nil) { nil } }
+          .to raise_error(Canvas::TimeoutCutoff)
+      end
+
+      it "allows execution when error count is below custom cutoff" do
+        Canvas.redis.set("service:timeouts:spec:error_count", "1")
+        expect(Timeout).to receive(:timeout).with(15, nil).and_yield
+        ran = false
+        Canvas.short_circuit_timeout(Canvas.redis, "spec", 15, nil, cutoff: 5) { ran = true }
+        expect(ran).to be true
       end
     end
 
@@ -141,7 +186,7 @@ describe Canvas do
       it "raises TimeoutCutoff when the protection key is present" do
         Canvas.redis.set("service:timeouts:spec:percent_counter:protection_activated", "true")
         Canvas.redis.expire("service:timeouts:spec:percent_counter:protection_activated", 1)
-        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) { nil } }
+        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15, nil) { nil } }
           .to raise_error(Canvas::TimeoutCutoff)
       end
 
@@ -150,14 +195,14 @@ describe Canvas do
                                                     "service:timeouts:spec:percent_counter")
         expect(counter).to receive(:failure_rate).and_return(0.2)
         expect(Canvas::FailurePercentCounter).to receive(:new).and_return(counter)
-        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) { nil } }
+        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15, nil) { nil } }
           .to raise_error(Canvas::TimeoutCutoff)
       end
 
       it "wraps the block in a timeout" do
-        expect(Timeout).to receive(:timeout).with(15).and_yield
+        expect(Timeout).to receive(:timeout).with(15, nil).and_yield
         ran = false
-        Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true }
+        Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15, nil) { ran = true }
         expect(ran).to be true
       end
 
@@ -167,12 +212,12 @@ describe Canvas do
         expect(counter).to receive(:failure_rate).and_return(0.0)
         expect(counter).to receive(:increment_count)
         expect(Canvas::FailurePercentCounter).to receive(:new).and_return(counter)
-        Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) { nil }
+        Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15, nil) { nil }
       end
 
       it "raises Timeout::Error on timeout" do
         expect(Timeout).to receive(:timeout).and_raise(Timeout::Error)
-        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) { nil } }
+        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15, nil) { nil } }
           .to raise_error(Timeout::Error)
       end
 
@@ -184,7 +229,7 @@ describe Canvas do
         expect(counter).to receive(:increment_count)
         expect(counter).to receive(:increment_failure)
         expect(Canvas::FailurePercentCounter).to receive(:new).and_return(counter)
-        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) { nil } }
+        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15, nil) { nil } }
           .to raise_error(Timeout::Error)
       end
 
@@ -193,7 +238,7 @@ describe Canvas do
                                                     "service:timeouts:spec:percent_counter")
         expect(counter).to receive(:failure_rate).and_return(0.2)
         expect(Canvas::FailurePercentCounter).to receive(:new).and_return(counter)
-        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) { nil } }
+        expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15, nil) { nil } }
           .to raise_error(Timeout::Error)
         key = "service:timeouts:spec:percent_counter:protection_activated"
         expect(Canvas.redis.get(key)).to eq "true"
@@ -212,6 +257,239 @@ describe Canvas do
       user = user_model
       pseudonym_model(user:, account: root_account, unique_id: "someuser")
       expect(Canvas.infer_user("someuser")).to eq(user)
+    end
+  end
+
+  describe ".load_config_from_consul" do
+    let(:sample_config) do
+      {
+        "key" => "value",
+        "nested" => { "data" => "test" }
+      }
+    end
+
+    before do
+      allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("production"))
+    end
+
+    it "loads config from Consul when available" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).with("test_config.yml", any_args).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul("test_config")
+      expect(config).to eq({ "key" => "value", "nested" => { "data" => "test" } })
+    end
+
+    it "falls back to ConfigFile when Consul returns empty" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).with("test_config.yml", any_args).and_return(nil)
+      allow(ConfigFile).to receive(:load).with("test_config", "production").and_return({ "fallback" => "data" })
+
+      config = Canvas.load_config_from_consul("test_config")
+      expect(config).to eq({ "fallback" => "data" })
+    end
+
+    it "falls back to ConfigFile when Consul raises an error" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).and_raise(StandardError, "Consul connection failed")
+      allow(ConfigFile).to receive(:load).with("test_config", "production").and_return({ "fallback" => "data" })
+
+      config = Canvas.load_config_from_consul("test_config")
+      expect(config).to eq({ "fallback" => "data" })
+    end
+
+    it "uses failsafe_cache when specified" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      expect(proxy).to receive(:[]).with("test_config.yml", failsafe_cache: Rails.root.join("config")).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul("test_config", failsafe_cache: true)
+      expect(config).to eq({ "key" => "value", "nested" => { "data" => "test" } })
+    end
+
+    it "accepts cluster parameter" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      expect(DynamicSettings).to receive(:find).with(tree: :private, cluster: "cluster21", default_ttl: 5.minutes).and_return(proxy)
+      allow(proxy).to receive(:[]).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul("test_config", cluster: "cluster21")
+      expect(config).to eq({ "key" => "value", "nested" => { "data" => "test" } })
+    end
+
+    it "accepts custom TTL" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      expect(DynamicSettings).to receive(:find).with(tree: :private, cluster: nil, default_ttl: 10.minutes).and_return(proxy)
+      allow(proxy).to receive(:[]).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul("test_config", default_ttl: 10.minutes)
+      expect(config).to eq({ "key" => "value", "nested" => { "data" => "test" } })
+    end
+
+    it "returns config with indifferent access" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul("test_config")
+      expect(config[:key]).to eq("value")
+      expect(config["key"]).to eq("value")
+    end
+  end
+
+  describe ".load_config_from_consul_only" do
+    let(:sample_config) do
+      {
+        "key" => "value",
+        "nested" => { "data" => "test" }
+      }
+    end
+
+    it "loads config from Consul when available" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).with("test_config.yml", failsafe_cache: false).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul_only("test_config")
+      expect(config).to eq({ "key" => "value", "nested" => { "data" => "test" } })
+    end
+
+    it "returns nil when Consul has no config" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).with("test_config.yml", failsafe_cache: false).and_return(nil)
+
+      config = Canvas.load_config_from_consul_only("test_config")
+      expect(config).to be_nil
+    end
+
+    it "does not fall back to ConfigFile" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).with("test_config.yml", failsafe_cache: false).and_return(nil)
+      expect(ConfigFile).not_to receive(:load)
+
+      Canvas.load_config_from_consul_only("test_config")
+    end
+
+    it "returns config with indifferent access" do
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      allow(DynamicSettings).to receive(:find).and_return(proxy)
+      allow(proxy).to receive(:[]).and_return(YAML.dump(sample_config))
+
+      config = Canvas.load_config_from_consul_only("test_config")
+      expect(config[:key]).to eq("value")
+      expect(config["key"]).to eq("value")
+    end
+  end
+
+  describe ".load_config_file_or_consul" do
+    let(:sample_config) do
+      {
+        "key" => "value",
+        "nested" => { "data" => "test" }
+      }
+    end
+
+    it "loads from ConfigFile when available" do
+      allow(ConfigFile).to receive(:load).with("test_config").and_return(sample_config)
+      config = Canvas.load_config_file_or_consul("test_config")
+      expect(config).to eq(sample_config)
+    end
+
+    it "does not query Consul when ConfigFile returns data" do
+      allow(ConfigFile).to receive(:load).with("test_config").and_return(sample_config)
+      expect(DynamicSettings).not_to receive(:find)
+      Canvas.load_config_file_or_consul("test_config")
+    end
+
+    it "falls back to Consul when ConfigFile returns nil" do
+      allow(ConfigFile).to receive(:load).with("test_config").and_return(nil)
+      stub_consul_config("test_config", sample_config)
+      config = Canvas.load_config_file_or_consul("test_config")
+      expect(config).to eq(sample_config)
+    end
+
+    it "returns nil when neither ConfigFile nor Consul has the config" do
+      allow(ConfigFile).to receive(:load).with("test_config").and_return(nil)
+      stub_consul_unavailable("test_config")
+      config = Canvas.load_config_file_or_consul("test_config")
+      expect(config).to be_nil
+    end
+
+    it "passes keyword arguments to load_config_from_consul_only" do
+      allow(ConfigFile).to receive(:load).with("test_config").and_return(nil)
+      proxy = instance_double(DynamicSettings::PrefixProxy)
+      expect(DynamicSettings).to receive(:find).with(hash_including(tree: :private, cluster: "cluster21")).and_return(proxy)
+      allow(proxy).to receive(:[]).and_return(nil)
+
+      Canvas.load_config_file_or_consul("test_config", cluster: "cluster21")
+    end
+  end
+
+  describe ".load_consul_subtree" do
+    let(:proxy) { instance_double(DynamicSettings::PrefixProxy) }
+
+    before do
+      allow(DynamicSettings).to receive(:find)
+        .with("outgoing_mail", tree: :private, default_ttl: 5.minutes)
+        .and_return(proxy)
+      allow(FileUtils).to receive(:mkdir_p)
+    end
+
+    it "fetches each key and parses values as YAML" do
+      allow(proxy).to receive(:[]).with("smtp.yml", failsafe_cache: Rails.root.join("config/outgoing_mail"))
+                                  .and_return("domain: example.com\nport: 25\n")
+      allow(proxy).to receive(:[]).with("reply_to", failsafe_cache: Rails.root.join("config/outgoing_mail"))
+                                  .and_return("reply@example.com")
+      allow(proxy).to receive(:[]).with("delivery_method", failsafe_cache: Rails.root.join("config/outgoing_mail"))
+                                  .and_return("test")
+      allow(proxy).to receive(:[]).with("reply_to_disabled", failsafe_cache: Rails.root.join("config/outgoing_mail"))
+                                  .and_return("true")
+
+      result = Canvas.load_consul_subtree("outgoing_mail",
+                                          keys: %w[smtp.yml reply_to delivery_method reply_to_disabled])
+
+      expect(result).to eq(
+        smtp: { "domain" => "example.com", "port" => 25 },
+        reply_to: "reply@example.com",
+        delivery_method: "test",
+        reply_to_disabled: true
+      )
+    end
+
+    it "returns nil for absent keys" do
+      allow(proxy).to receive(:[]).and_return(nil)
+
+      result = Canvas.load_consul_subtree("outgoing_mail",
+                                          keys: %w[smtp.yml reply_to])
+
+      expect(result).to eq(smtp: nil, reply_to: nil)
+    end
+
+    it "creates the per-prefix cache subdirectory when failsafe_cache is enabled" do
+      allow(proxy).to receive(:[]).and_return(nil)
+
+      expect(FileUtils).to receive(:mkdir_p).with(Rails.root.join("config/outgoing_mail"))
+
+      Canvas.load_consul_subtree("outgoing_mail", keys: ["reply_to"])
+    end
+
+    it "passes failsafe_cache: false to the proxy when disabled" do
+      expect(proxy).to receive(:[]).with("reply_to", failsafe_cache: false).and_return(nil)
+      expect(FileUtils).not_to receive(:mkdir_p)
+
+      Canvas.load_consul_subtree("outgoing_mail", keys: ["reply_to"], failsafe_cache: false)
+    end
+
+    it "lets Consul errors propagate" do
+      allow(proxy).to receive(:[]).and_raise(StandardError, "boom")
+
+      expect do
+        Canvas.load_consul_subtree("outgoing_mail", keys: %w[smtp.yml reply_to])
+      end.to raise_error(StandardError, "boom")
     end
   end
 end

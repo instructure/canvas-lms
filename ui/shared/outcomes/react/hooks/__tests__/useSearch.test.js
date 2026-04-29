@@ -19,7 +19,7 @@
 import {renderHook, act} from '@testing-library/react-hooks/dom'
 import useSearch from '../useSearch'
 
-jest.useFakeTimers()
+vi.useFakeTimers()
 
 describe('useSearch', () => {
   const event = {
@@ -38,14 +38,14 @@ describe('useSearch', () => {
     act(() => result.current.onChangeHandler(event))
     expect(result.current.search).toBe('123')
     expect(result.current.debouncedSearch).toBe('')
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.debouncedSearch).toBe('123')
   })
 
   test('should clear state to empty string when second returned fn is called', async () => {
     const {result} = renderHook(() => useSearch())
     act(() => result.current.onClearHandler())
-    await act(async () => jest.runAllTimers())
+    await act(async () => vi.runAllTimers())
     expect(result.current.search).toBe('')
   })
 
@@ -54,11 +54,11 @@ describe('useSearch', () => {
     act(() => result.current.onChangeHandler(event))
     expect(result.current.search).toBe('123')
     expect(result.current.debouncedSearch).toBe('')
-    await act(async () => jest.advanceTimersByTime(100))
+    await act(async () => vi.advanceTimersByTime(100))
     expect(result.current.debouncedSearch).toBe('')
-    await act(async () => jest.advanceTimersByTime(100))
+    await act(async () => vi.advanceTimersByTime(100))
     expect(result.current.debouncedSearch).toBe('')
-    await act(async () => jest.advanceTimersByTime(300))
+    await act(async () => vi.advanceTimersByTime(300))
     expect(result.current.debouncedSearch).toBe('123')
   })
 })

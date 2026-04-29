@@ -108,13 +108,9 @@ module CanvasPartman
       def maximum_foreign_id
         reflection = base_class.reflections.detect { |_, r| r.belongs_to? && base_class.partitioning_field.to_s }.last
         klasses =
-          if reflection.polymorphic?
-            reflection.options[:polymorphic].map do |type|
-              if type.is_a?(Hash)
-                type.values.map(&:constantize)
-              else
-                type.to_s.classify.constantize
-              end
+          if reflection.options[:polymorphic].is_a?(Hash)
+            reflection.options[:polymorphic].keys.map do |type|
+              type.constantize
             rescue NameError
               nil
             end.flatten.compact

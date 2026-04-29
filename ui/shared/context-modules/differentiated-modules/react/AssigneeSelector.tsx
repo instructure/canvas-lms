@@ -23,15 +23,14 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {debounce} from 'lodash'
+import {debounce} from 'es-toolkit/compat'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {setContainScrollBehavior} from '../utils/assignToHelper'
 import useFetchAssignees from '../utils/hooks/useFetchAssignees'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, AlertManager} from '@instructure/platform-alerts'
 import type {AssigneeOption} from './Item/types'
 import type {ItemType} from './types'
-import AlertManager from '@canvas/alerts/react/AlertManager'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
@@ -58,6 +57,7 @@ interface Props {
   disabledWithGradingPeriod?: boolean
   disabledOptionIdsRef?: React.MutableRefObject<string[]>
   itemType?: ItemType
+  disabled?: boolean
 }
 
 const AssigneeSelector = ({
@@ -81,6 +81,7 @@ const AssigneeSelector = ({
   disabledWithGradingPeriod,
   disabledOptionIdsRef,
   itemType,
+  disabled = false,
 }: Props) => {
   const listElementRef = useRef<HTMLElement | null>(null)
   const [options, setOptions] = useState<AssigneeOption[]>(defaultValues)
@@ -207,9 +208,9 @@ const AssigneeSelector = ({
   }, [itemType])
 
   return (
-    <AlertManager breakpoints={{}}>
+    <AlertManager>
       <CanvasMultiSelect
-        disabled={disabledWithGradingPeriod || shouldDisableSelector}
+        disabled={disabled || disabledWithGradingPeriod || shouldDisableSelector}
         data-testid="assignee_selector"
         messages={messages}
         label={showVisualLabel ? label : <ScreenReaderContent>{label}</ScreenReaderContent>}

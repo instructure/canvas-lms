@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type Root} from 'react-dom/client'
+import {NEW_ITEM_FIELDS} from '../utils/constants'
+
 export interface MasteryPathsData {
   isCyoeAble: boolean
   isTrigger: boolean
@@ -27,6 +30,67 @@ export interface Checkpoint {
   dueAt?: string
   name?: string
   tag?: string
+  assignedToDates?: StandardizedDateHash[]
+  assignmentOverrides?: AssignmentOverrideGraphQLResult
+}
+
+export interface StandardizedDateHash {
+  id?: string
+  dueAt?: string
+  unlockAt?: string
+  lockAt?: string
+  title?: string
+  base?: boolean
+  set?: {
+    id?: string
+    type?: string
+  }
+}
+
+export type ExternalUrl = {
+  url: string
+  name: string
+  newTab: boolean
+  isUrlValid?: boolean
+}
+
+export type ExternalToolUrl = {
+  url: string
+  name: string
+  newTab: boolean
+  selectedToolId?: string
+  isUrlValid?: boolean
+}
+
+export type NewItem = {
+  name: string
+  assignmentGroup: string
+  file: File | null
+  folder: string
+}
+
+export type FormState = {
+  indentation: number
+  textHeader: string
+  externalUrl: ExternalUrl
+  externalTool: ExternalToolUrl
+  newItem: NewItem
+  selectedItemId: string
+  selectedItem: any | null
+  selectedItemIds: string[]
+  selectedItems: any[]
+  tabIndex: number
+  isLoading: boolean
+}
+
+// Add new menu actions here (e.g., 'delete', 'sendTo', 'copyTo')
+type MenuAction = 'duplicate'
+
+type PerModuleState<T> = Record<ModuleId, T>
+
+type MenuItemActionState = {
+  type: MenuAction
+  state: boolean
 }
 
 export type ModuleItemContent = {
@@ -44,9 +108,10 @@ export type ModuleItemContent = {
     | 'ModuleExternalTool'
     | 'ExternalTool'
   pointsPossible?: number
-  published?: boolean
+  title?: string
   canUnpublish?: boolean
   canDuplicate?: boolean
+  canManageAssignTo?: boolean
   dueAt?: string
   lockAt?: string
   unlockAt?: string
@@ -76,6 +141,13 @@ export type ModuleItemContent = {
   locked?: boolean
   graded?: boolean
   assignmentOverrides?: AssignmentOverrideGraphQLResult
+  assignedToDates?: StandardizedDateHash[]
+  assignment?: {
+    _id: string
+    dueAt?: string
+    assignmentOverrides?: AssignmentOverrideGraphQLResult
+    assignedToDates?: StandardizedDateHash[]
+  }
   isNewQuiz?: boolean
 } | null
 
@@ -98,16 +170,6 @@ export interface AssignmentOverride {
   }
 }
 
-export type DueAtCount = {
-  groups?: number
-  sections?: number
-  students?: number
-}
-
-export type DueAtCounts = {
-  [key: string]: DueAtCount
-}
-
 export interface CompletionRequirement {
   id: string
   type: string
@@ -121,24 +183,22 @@ export interface ModuleRequirement {
   type: string
   minScore?: number
   minPercentage?: number
-  completed?: boolean
+  score?: number
 }
 
 export interface ModuleProgression {
   id: string
   _id: string
-  workflowState: string
+  workflowState?: string
   completedAt?: string
   currentPosition?: number
   collapsed?: boolean
   requirementsMet: ModuleRequirement[]
   incompleteRequirements?: ModuleRequirement[]
-  current?: boolean
-  evaluatedAt?: string
-  completed: boolean
-  locked: boolean
-  unlocked: boolean
-  started: boolean
+  completed?: boolean
+  locked?: boolean
+  unlocked?: boolean
+  started?: boolean
 }
 
 export interface Prerequisite {
@@ -153,6 +213,7 @@ export interface ModuleStatistics {
 }
 
 export interface Module {
+  moduleItemsTotalCount: number
   id: string
   _id: string
   name: string
@@ -239,29 +300,27 @@ interface GraphQLResult {
   }>
 }
 
-export interface ModuleItemsResponse {
-  moduleItems: ModuleItem[]
-}
-
-interface ModuleItemsGraphQLResult {
-  legacyNode?: {
-    moduleItems?: ModuleItem[]
-  }
-  errors?: Array<{
-    message: string
-    [key: string]: any
-  }>
-}
-
 export interface ModuleItem {
   id: string
   _id: string
   url: string
+  moduleItemUrl: string | null
   title: string
   indent: number
   position: number
   content: ModuleItemContent
   masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
+  newTab?: boolean
+  published?: boolean
+  masteryPaths?: ModuleItemMasteryPath
+}
+
+export interface ModuleItemMasteryPath {
+  awaitingChoice?: boolean
+  chooseUrl?: string
+  locked?: boolean
+  stillProcessing?: boolean
+  assignmentSetCount?: number
 }
 
 export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'
@@ -306,15 +365,17 @@ export interface ExternalToolModalItem {
   description?: string
   domain?: string | null
   placements: {
-    assignment_selection?: ExternalToolPlacement
-    link_selection?: ExternalToolPlacement
-    module_group_menu?: ExternalToolPlacement
-    module_menu_modal?: ExternalToolPlacement
-    module_menu?: ExternalToolPlacement
-    module_index_menu_modal?: ExternalToolPlacement
+    assignmentSelection?: ExternalToolPlacement
+    linkSelection?: ExternalToolPlacement
+    moduleGroupMenu?: ExternalToolPlacement
+    moduleMenuModal?: ExternalToolPlacement
+    moduleMenu?: ExternalToolPlacement
+    moduleIndexMenuModal?: ExternalToolPlacement
     [key: string]: ExternalToolPlacement | undefined
   }
 }
+
+export type ModuleCursorState = Record<string, string | null>
 
 export type ExternalTool = ExternalToolTrayItem | ExternalToolModalItem
 
@@ -332,4 +393,92 @@ export interface ModuleItemMasterCourseRestrictionType {
   dueDates: boolean | null
   points: boolean | null
   settings: boolean | null
+}
+
+export interface GraphQLError {
+  message: string
+  [key: string]: any
+}
+
+export interface PageInfo {
+  hasNextPage: boolean
+  endCursor: string | null
+}
+
+interface LegacyNodeModuleItemsConnection {
+  moduleItemsTotalCount?: number
+  moduleItemsConnection?: {
+    edges: Array<{
+      cursor: string
+      node: ModuleItem
+    }>
+    pageInfo: PageInfo
+  }
+}
+
+export interface PaginatedNavigationResponse {
+  moduleItems: ModuleItem[]
+  pageInfo: PageInfo
+}
+
+interface PaginatedNavigationGraphQLResult {
+  legacyNode?: LegacyNodeModuleItemsConnection
+  errors?: GraphQLError[]
+}
+
+export type QuizEngine = 'new' | 'classic'
+
+export type ModuleKBActionEvent = 'module-action'
+export type ModuleKBAction = 'edit' | 'delete' | 'new'
+export type ModuleItemKBAction = 'edit' | 'remove' | 'indent' | 'outdent'
+export interface ModuleActionEventDetail {
+  action: ModuleKBAction | ModuleItemKBAction
+  courseId: string
+  moduleId?: string
+  moduleItemId?: string
+  [key: string]: unknown
+}
+
+export type ModulePageNavigationEvent = 'module-page-navigation'
+export interface ModulePageNavigationDetail {
+  moduleId: string
+  pageNumber: number
+}
+
+export interface HTMLElementWithRoot extends HTMLElement {
+  reactRoot?: Root
+}
+
+export type DragStateChangeEvent = 'drag-state-change'
+export interface DragStateChangeDetail {
+  isDragging: boolean
+}
+
+declare global {
+  interface Document {
+    addEventListener(
+      type: ModuleKBActionEvent,
+      listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
+    ): void
+    addEventListener(
+      type: ModulePageNavigationEvent,
+      listener: (event: CustomEvent<ModulePageNavigationDetail>) => void,
+    ): void
+    addEventListener(
+      type: DragStateChangeEvent,
+      listener: (event: CustomEvent<DragStateChangeDetail>) => void,
+    ): void
+    removeEventListener(
+      type: ModuleKBActionEvent,
+      listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
+    ): void
+    removeEventListener(
+      type: ModulePageNavigationEvent,
+      listener: (event: CustomEvent<ModulePageNavigationDetail>) => void,
+    ): void
+    removeEventListener(
+      type: DragStateChangeEvent,
+      listener: (event: CustomEvent<DragStateChangeDetail>) => void,
+    ): void
+  }
 }

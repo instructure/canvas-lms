@@ -507,6 +507,9 @@ SwaggerModel.prototype.createJSONSample = function(modelsToIgnore) {
 var SwaggerModelProperty = function(name, obj) {
   this.name = name;
   this.dataType = obj.type || obj.dataType || obj["$ref"];
+  if (Array.isArray(this.dataType)) {
+    this.dataType = this.dataType.join('|');
+  }
   this.isCollection = this.dataType && (this.dataType.toLowerCase() === 'array' || this.dataType.toLowerCase() === 'list' || this.dataType.toLowerCase() === 'set');
   this.descr = obj.description;
   this.required = obj.required;

@@ -88,9 +88,7 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
   end
 
   def scope_for(object)
-    if @filter == "drafts"
-      object.discussion_entry_drafts.where(user: @current_user, discussion_entry_id: nil)
-    elsif object.is_a?(DiscussionTopic)
+    if object.is_a?(DiscussionTopic)
       object.discussion_entries
     elsif object.is_a?(DiscussionEntry)
       if object.root_entry_id.nil?

@@ -1,15 +1,17 @@
 <div class="edit-content">
+  {{#if page_id}}
+    <h1 class="title">{{#t "edit_page_title"}}Edit {{title}}{{/t}}</h1>
+  {{else}}
+    <h1 class="title">{{#t "create_page_title"}}New Page{{/t}}</h1>
+  {{/if}}
   <div id="edit_wikipage_title_container" class="edit-header">
     {{#if CAN.EDIT_TITLE}}
       {{#if content_is_locked}}
-        <h1>{{title}}</h1>
         <input name="title" type="hidden" value="{{title}}">
       {{else}}
         <label for="title">{{#t "title_label"}}Page Title{{/t}}</label>
         <input id="title" name="title" type="text" class="span4 title" value="{{title}}" maxlength="255" autofocus>
       {{/if}}
-    {{else}}
-      <h2>{{title}}</h2>
     {{/if}}
   </div>
 

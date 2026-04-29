@@ -16,17 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {canUseMediaCapture, ScreenCapture} from '@instructure/media-capture'
 
 import {Alert} from '@instructure/ui-alerts'
-import {canUseMediaCapture, MediaCapture} from '@instructure/media-capture'
 import {func, object, string} from 'prop-types'
+import React from 'react'
 
 export default function MediaRecorder(props) {
   return (
     <div>
       {canUseMediaCapture() ? (
-        <MediaCapture translations={props.MediaCaptureStrings} onCompleted={props.onSave} />
+        // In @instructure/media-capture v11, MediaCapture was replaced by ScreenCapture (ARC-9172).
+        // noScreenSharing preserves the original webcam-only behavior.
+        <ScreenCapture
+          translations={props.MediaCaptureStrings}
+          onCompleted={props.onSave}
+          noScreenSharing={true}
+        />
       ) : (
         <Alert variant="info" margin="small">
           {props.errorMessage}
@@ -39,5 +45,5 @@ export default function MediaRecorder(props) {
 MediaRecorder.propTypes = {
   onSave: func.isRequired,
   errorMessage: string.isRequired,
-  MediaCaptureStrings: object
+  MediaCaptureStrings: object,
 }

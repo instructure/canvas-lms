@@ -186,7 +186,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
       quiz_overrides[:due_dates] = quiz.dates_hash_visible_to(user)
 
       if include_all_dates
-        quiz_overrides[:all_dates] = Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting) ? quiz.dates_hash_visible_to_v2(user, include_all_dates: true) : quiz.formatted_dates_hash(quiz.all_due_dates)
+        quiz_overrides[:all_dates] = quiz.dates_hash_visible_to(user, include_all_dates: true)
       end
     end
   end

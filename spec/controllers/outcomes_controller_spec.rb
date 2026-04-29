@@ -18,7 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "feature_flag_helper"
+
 describe OutcomesController do
+  include FeatureFlagHelper
+
   def context_outcome(context)
     @outcome_group ||= context.root_outcome_group
     @outcome = context.created_learning_outcomes.create!(title: "outcome")
@@ -150,17 +154,9 @@ describe OutcomesController do
 
     context "outcomes_friendly_description" do
       it "returns true if outcomes_friendly_description feature flag is enabled" do
-        Account.site_admin.enable_feature!(:outcomes_friendly_description)
         user_session(@admin)
         get "index", params: { account_id: @account.id }
         expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to be true
-      end
-
-      it "returns false if outcomes_friendly_description feature flag is disabled" do
-        Account.site_admin.disable_feature!(:outcomes_friendly_description)
-        user_session(@admin)
-        get "index", params: { account_id: @account.id }
-        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to be false
       end
     end
 
@@ -177,6 +173,22 @@ describe OutcomesController do
         user_session(@admin)
         get "index", params: { account_id: @account.id }
         expect(assigns[:js_env][:ARCHIVE_OUTCOMES]).to be false
+      end
+    end
+
+    context "lmgb_student_reporting" do
+      it "returns true if lmgb_student_reporting feature flag is enabled for course" do
+        @course.enable_feature!(:lmgb_student_reporting)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:LMGB_STUDENT_REPORTING]).to be true
+      end
+
+      it "returns false if lmgb_student_reporting feature flag is disabled for course" do
+        @course.disable_feature!(:lmgb_student_reporting)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:LMGB_STUDENT_REPORTING]).to be false
       end
     end
   end
@@ -199,17 +211,23 @@ describe OutcomesController do
 
   context "menu_option_for_outcome_details_page" do
     it "returns true if menu_option_for_outcome_details_page feature flage is enabled" do
-      Account.site_admin.enable_feature!(:menu_option_for_outcome_details_page)
       user_session(@admin)
       get "index", params: { account_id: @account.id }
       expect(assigns[:js_env][:MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE]).to be true
     end
 
     it "returns false if menu_option_for_outcome_details_page feature flage is disabled" do
-      Account.site_admin.disable_feature!(:menu_option_for_outcome_details_page)
+      mock_feature_flag_on_account(:menu_option_for_outcome_details_page, false)
       user_session(@admin)
       get "index", params: { account_id: @account.id }
       expect(assigns[:js_env][:MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE]).to be false
+    end
+
+    it "returns true if menu_option_for_outcome_details_page feature flag is enabled" do
+      allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
+      user_session(@admin)
+      get "index", params: { account_id: @account.id }
+      expect(assigns[:js_env][:MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE]).to be true
     end
   end
 

@@ -153,7 +153,7 @@ describe WebConference do
       conference.add_attendee(@user)
       allow(conference).to receive(:conference_status).and_return(:closed)
       expect(conference.ended_at).to be_nil
-      expect(conference.active?(true)).to be(false)
+      expect(conference.active?(force_check: true)).to be(false)
       expect(conference.ended_at).to be_nil
     end
 
@@ -164,7 +164,7 @@ describe WebConference do
       conference.end_at = 20.minutes.ago
       conference.save!
       expect(conference.ended_at).to be_nil
-      expect(conference.active?(true)).to be(false)
+      expect(conference.active?(force_check: true)).to be(false)
       expect(conference.ended_at).not_to be_nil
       expect(conference.ended_at).to be < Time.zone.now
     end
@@ -176,7 +176,7 @@ describe WebConference do
       conference.start_at = 30.minutes.ago
       conference.end_at = 20.minutes.ago
       conference.save!
-      expect(conference.active?(true)).to be(false)
+      expect(conference.active?(force_check: true)).to be(false)
       expect(conference.conference_status).to be(:active)
       expect(conference.ended_at).not_to be_nil
       expect(conference.ended_at).to be < Time.zone.now
@@ -523,6 +523,44 @@ describe WebConference do
       conference.save!
 
       expect(conference.root_account_id).to eq @course.root_account_id
+    end
+  end
+
+  describe "invite_all settings" do
+    let(:course) { course_model }
+    let(:conference) { course.web_conferences.create!(title: "Test", conference_type: "BigBlueButton", user: @teacher) }
+
+    describe "#invite_all_enabled?" do
+      it "returns false by default" do
+        expect(conference.invite_all_enabled?).to be false
+      end
+
+      it "returns true when set" do
+        conference.invite_all_enabled = true
+        expect(conference.invite_all_enabled?).to be true
+      end
+    end
+
+    describe "#add_new_enrollment_user" do
+      let(:student) { user_model }
+
+      it "adds user when invite_all is enabled" do
+        conference.invite_all_enabled = true
+        conference.save!
+        course.enroll_student(student, enrollment_state: "active")
+
+        conference.add_new_enrollment_user(student.id)
+
+        expect(conference.reload.invitees.include?(student)).to be true
+      end
+
+      it "does not add when invite_all is disabled" do
+        course.enroll_student(student, enrollment_state: "active")
+
+        expect do
+          conference.add_new_enrollment_user(student.id)
+        end.not_to change { conference.invitees.count }
+      end
     end
   end
 end

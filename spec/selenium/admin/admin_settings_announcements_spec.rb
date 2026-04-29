@@ -114,6 +114,17 @@ describe "settings tabs" do
       expect(notification.end_at).not_to eq initial_notification_end
     end
 
+    it "stays on the Announcements tab when navigating" do
+      11.times { account_notification(user: @user) }
+      get "/accounts/#{Account.default.id}/settings"
+
+      f("#tab-announcements").click
+      expect(f("a.next_page")).to have_attribute("href", /page=2#tab-announcements/)
+
+      f("a.next_page").click
+      expect(f("a.previous_page")).to have_attribute("href", /page=1#tab-announcements/)
+    end
+
     it "copies and saves an announcement" do
       notification = account_notification(user: @user)
       get "/accounts/#{Account.default.id}/settings"
@@ -219,7 +230,7 @@ describe "settings tabs" do
       end
 
       it "does not show option for site admins" do
-        skip("VICE-5335")
+        skip("VICE-5335 2025-06-18")
         user_session(site_admin_user)
         get "/accounts/#{Account.site_admin.id}/settings"
         wait_for_ajaximations
@@ -228,7 +239,7 @@ describe "settings tabs" do
         fj(".element_toggler:visible").click
         wait_for_ajaximations
         notification_form = f("#add_notification_form")
-        expect(notification_form).to_not contain_css("label[for=account_notification_send_message]")
+        expect(notification_form).not_to contain_css("label[for=account_notification_send_message]")
       end
 
       it "is able to send messages for an existing announcement" do

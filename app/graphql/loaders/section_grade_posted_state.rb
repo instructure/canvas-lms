@@ -25,6 +25,10 @@ class Loaders::SectionGradePostedState < GraphQL::Batch::Loader
     @root_account_id = root_account_id
   end
 
+  def cache_key(section)
+    [self.class, @assignment_id, @root_account_id, section.id]
+  end
+
   def perform(sections)
     assignment = Assignment.find_by!(id: @assignment_id, root_account_id: @root_account_id)
 
@@ -34,10 +38,10 @@ class Loaders::SectionGradePostedState < GraphQL::Batch::Loader
     section_grade_post_status = assignment.submissions
                                           .where(enrollments: { course_id: assignment.context_id })
                                           .joins("INNER JOIN #{Enrollment.quoted_table_name} ON submissions.user_id = enrollments.user_id")
-                                          .merge(Enrollment.active)
+                                          .merge(Enrollment.active.not_fake)
                                           .group("enrollments.course_section_id")
-                                          .pluck("enrollments.course_section_id", Arel.sql("bool_and(submissions.posted_at IS NOT NULL)"))
+                                          .pluck("enrollments.course_section_id", Arel.sql("NOT bool_or(((submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') OR submissions.excused = true) AND submissions.posted_at IS NULL)"))
                                           .to_h
-    sections.each { |section| fulfill(section, section_grade_post_status.fetch(section.id, false)) }
+    sections.each { |section| fulfill(section, !!section_grade_post_status[section.id]) }
   end
 end

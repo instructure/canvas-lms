@@ -15,16 +15,11 @@ verify_ldap_certs:
   display_name: Verify LDAP TLS certificates
   description: Verify TLS certificates presented by LDAP authentication providers.
   applies_to: Account
-admin_manage_access_tokens:
-  state: hidden
-  display_name: Admin Manage Access Tokens
-  description: Limit the ability to manage access tokens to admins only.
-  applies_to: RootAccount
 login_registration_ui_identity:
   state: hidden
   applies_to: RootAccount
-  display_name: New Login/Registration UI for Identity
-  description: Rework the Login/Registration UI to support Identity changes, ensuring a uniform login experience and transparent auth migration.
+  display_name: New Canvas Login UI
+  description: Enable the new Login/Registration UI.  This change is part of our ongoing transition to Instructure Identity Services and represents an important step in modernizing our authentication infrastructure.
   environments:
     development:
       state: allowed
@@ -33,9 +28,92 @@ login_registration_ui_identity:
     production:
       state: hidden
 force_login_after_logout:
-  state: allowed
+  state: hidden
   applies_to: RootAccount
   display_name: Force Login After Delegated Logout
   description:
     After logging out of Canvas, instruct identity providers to re-authenticate the user on their next login attempt.
     This can prevent unexpected login loops.
+site_admin_access_token_expiration:
+  state: allowed_on
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Site Admin Access Token Expiration
+  description: >-
+    Enforce expiration limits on access tokens issued to site admin users.
+enforce_service_token_tenant_matching:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Enforce Service Token Tenant Matching
+  description: |-
+    Enforce that service tokens can only be used within the tenant they were issued for.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
+new_login_ui_custom_labels:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "New Canvas Login UI: Custom Labels"
+  description: Enable custom labels for the new Canvas Login/Registration UI.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
+record_saml_certificates:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Record SAML Certificates
+  description: >-
+    Persist SAML signing certificates from authentication responses
+    when using fingerprint-based certificate matching.
+  environments:
+    development:
+      state: allowed
+new_login_ui_identity_discovery_page:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: "New Canvas Login UI: Identity Service Discovery Page"
+  description: Enable Identity Service Discovery Page for the new Canvas Login/Registration UI.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
+new_login_ui_identity_discovery_page_root_account:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: "New Canvas Login UI: Identity Service Discovery Page"
+  description: >-
+    Enable Identity Service Discovery Page for the new Canvas
+    Login/Registration UI at the root account level.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
+log_session_token_failures:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Log Session Token Failures
+  description: |-
+    If enabled, session token parsing and validation will emit events to DataDog
+    when validation or parsing fails
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden

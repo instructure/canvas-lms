@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ErrorReport < ActiveRecord::Base
+class ErrorReport < ApplicationRecord
   belongs_to :user
   belongs_to :account
   serialize :http_env
@@ -46,6 +46,7 @@ class ErrorReport < ActiveRecord::Base
     IGNORED_CATEGORIES = %w[404 ActionDispatch::RemoteIp::IpSpoofAttackError Turnitin::Errors::SubmissionNotScoredError PG::ConnectionBad].freeze
 
     include ActiveSupport::Callbacks
+
     define_callbacks :on_log_error
 
     attr_reader :opts, :exception

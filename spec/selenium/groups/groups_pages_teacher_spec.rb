@@ -40,6 +40,7 @@ describe "groups" do
   include GroupsCommon
   include WikiAndTinyCommon
   include FilesPage
+
   setup_group_page_urls
 
   context "as a teacher" do
@@ -74,6 +75,7 @@ describe "groups" do
       end
 
       it "allows teachers to create an announcement" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         # Checks that initial user can create an announcement
         AnnouncementNewEdit.create_group_announcement(@testgroup.first,
                                                       "Announcement by #{@teacher.name}",
@@ -141,6 +143,7 @@ describe "groups" do
       end
 
       it "edit page should succeed for their own announcements" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         announcement = @testgroup.first.announcements.create!(
           title: "Announcement by #{@user.name}",
           message: "The Force Awakens",
@@ -175,6 +178,7 @@ describe "groups" do
       end
 
       it "edit page should succeed for group member announcements" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         announcement = @testgroup.first.announcements.create!(
           title: "Announcement by #{@user.name}",
           message: "The Force Awakens",
@@ -219,6 +223,7 @@ describe "groups" do
       it_behaves_like "discussions_page", :teacher
 
       it "allows teachers to create discussions within a group", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
         # This creates the discussion and also tests its creation
@@ -226,6 +231,7 @@ describe "groups" do
       end
 
       it "has three options when creating a discussion", priority: "1" do
+        skip "Will be fixed in VICE-5634 2025-11-11"
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
         expect(f('[name="allow_rating"]')).to be_present
@@ -328,15 +334,6 @@ describe "groups" do
       end
 
       it_behaves_like "files_page_files_rewrite_ui", :teacher
-    end
-
-    #-------------------------------------------------------------------------------------------------------------------
-    describe "conferences page" do
-      before(:once) do
-        PluginSetting.create!(name: "wimba", settings: { "domain" => "wimba.instructure.com" })
-      end
-
-      it_behaves_like "conferences_page", :teacher
     end
   end
 end

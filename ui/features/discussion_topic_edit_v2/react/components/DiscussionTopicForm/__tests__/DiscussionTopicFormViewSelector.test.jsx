@@ -24,7 +24,7 @@ import React from 'react'
 describe('DiscussionTopicFormViewSelector', () => {
   const setup = ({
     selectedView = Views.Details,
-    setSelectedView = jest.fn(),
+    setSelectedView = vi.fn(),
     breakpoints = {mobileOnly: false},
     shouldMasteryPathsBeVisible = true,
     shouldMasteryPathsBeEnabled = true,
@@ -71,7 +71,7 @@ describe('DiscussionTopicFormViewSelector', () => {
   })
 
   it('should correctly call setSelectedView when Mastery Paths is clicked', () => {
-    const setSelectedView = jest.fn()
+    const setSelectedView = vi.fn()
     const {queryByText} = setup({setSelectedView})
 
     fireEvent.click(queryByText('Mastery Paths'))
@@ -80,7 +80,7 @@ describe('DiscussionTopicFormViewSelector', () => {
   })
 
   it('should correctly call setSelectedView when Details is clicked', () => {
-    const setSelectedView = jest.fn()
+    const setSelectedView = vi.fn()
     const {queryByText} = setup({setSelectedView})
 
     fireEvent.click(queryByText('Details'))

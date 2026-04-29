@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {map} from 'es-toolkit/compat'
 import OverrideStudentStore from '../OverrideStudentStore'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {setupServer} from 'msw/node'
@@ -28,9 +28,23 @@ describe('OverrideStudentStore', () => {
   let response2
   let requestCount = 0
 
-  const server = setupServer()
+  const server = setupServer(
+    http.get(/^http:\/\/coursepage\d+\/?/, () => {
+      return HttpResponse.json([])
+    }),
+    http.options(/^http:\/\/coursepage\d+\/?/, () => {
+      return new HttpResponse(null, {
+        status: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, OPTIONS',
+          'Access-Control-Allow-Headers': '*',
+        },
+      })
+    }),
+  )
 
-  beforeAll(() => server.listen())
+  beforeAll(() => server.listen({onUnhandledRequest: 'bypass'}))
   afterEach(() => {
     server.resetHandlers()
     requestCount = 0
@@ -185,7 +199,7 @@ describe('OverrideStudentStore', () => {
         return HttpResponse.json([])
       }),
 
-      http.get('http://coursepage2', () => {
+      http.get(/^http:\/\/coursepage2\/?$/, () => {
         requestCount++
         if (requestCount === 1) {
           return HttpResponse.json(response2)
@@ -206,7 +220,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8])
     await waitFor(() => {
-      const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
+      const results = map(OverrideStudentStore.getStudents(), student => student.id)
       expect(results).toEqual(['2', '5', '8'])
     })
   })
@@ -228,7 +242,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8])
     await waitFor(() => {
-      const sections = _.map(OverrideStudentStore.getStudents(), student => student.sections)
+      const sections = map(OverrideStudentStore.getStudents(), student => student.sections)
       expect(sections).toEqual([['2'], ['4'], ['4']])
     })
   })
@@ -237,7 +251,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8])
     await waitFor(() => {
-      const groups = _.map(OverrideStudentStore.getStudents(), student => student.group_ids)
+      const groups = map(OverrideStudentStore.getStudents(), student => student.group_ids)
       expect(groups).toEqual([['1', '9'], ['3'], ['4']])
     })
   })
@@ -246,7 +260,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8, 7, 9])
     await waitFor(() => {
-      const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
+      const results = map(OverrideStudentStore.getStudents(), student => student.id)
       expect(results).toEqual(['2', '5', '7', '8', '9'])
     })
   })
@@ -305,7 +319,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByName('publiu')
     await waitFor(() => {
-      const sections = _.map(OverrideStudentStore.getStudents(), student => student.sections)
+      const sections = map(OverrideStudentStore.getStudents(), student => student.sections)
       expect(sections).toEqual([['2'], ['4'], ['4']])
     })
   })
@@ -314,7 +328,7 @@ describe('OverrideStudentStore', () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByName('publiu')
     await waitFor(() => {
-      const groups = _.map(OverrideStudentStore.getStudents(), student => student.group_ids)
+      const groups = map(OverrideStudentStore.getStudents(), student => student.group_ids)
       expect(groups).toEqual([['1', '9'], ['3'], ['4']])
     })
   })
@@ -354,13 +368,13 @@ describe('OverrideStudentStore', () => {
   test('fetching by course: saves results from all pages', async () => {
     setupServerResponses()
     server.use(
-      http.get('http://coursepage2', () => {
+      http.get(/^http:\/\/coursepage2\/?$/, () => {
         return HttpResponse.json(response2)
       }),
     )
     OverrideStudentStore.fetchStudentsForCourse()
     await waitFor(() => {
-      const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
+      const results = map(OverrideStudentStore.getStudents(), student => student.id)
       expect(results.sort()).toEqual(['2', '5', '7', '8', '9'])
     })
   })
@@ -368,7 +382,7 @@ describe('OverrideStudentStore', () => {
   test('fetching by course: if all users returned, sets allStudentsFetched to true', async () => {
     setupServerResponses()
     server.use(
-      http.get('http://coursepage2', () => {
+      http.get(/^http:\/\/coursepage2\/?$/, () => {
         return HttpResponse.json([])
       }),
     )
@@ -412,7 +426,7 @@ describe('OverrideStudentStore', () => {
   test('fetching by course: shows secondary info for students with matching names (ignoring case)', async () => {
     setupServerResponses()
     server.use(
-      http.get('http://coursepage2', () => {
+      http.get(/^http:\/\/coursepage2\/?$/, () => {
         return HttpResponse.json(response2)
       }),
     )
@@ -434,7 +448,7 @@ describe('OverrideStudentStore', () => {
     response[2].email = null
     setupServerResponses()
     server.use(
-      http.get('http://coursepage2', () => {
+      http.get(/^http:\/\/coursepage2\/?$/, () => {
         return HttpResponse.json(response2)
       }),
     )
@@ -455,7 +469,7 @@ describe('OverrideStudentStore', () => {
   test('fetching by course: does not show secondary info if the same student is returned more than once', async () => {
     setupServerResponses()
     server.use(
-      http.get('http://coursepage2', () => {
+      http.get(/^http:\/\/coursepage2\/?$/, () => {
         return HttpResponse.json(response2)
       }),
     )
@@ -475,7 +489,7 @@ describe('OverrideStudentStore', () => {
     response2[2].name = ' !Pu%bliüß *scîpiœ&'
     setupServerResponses()
     server.use(
-      http.get('http://coursepage2', () => {
+      http.get(/^http:\/\/coursepage2\/?$/, () => {
         return HttpResponse.json(response2)
       }),
     )
@@ -497,7 +511,7 @@ describe('OverrideStudentStore', () => {
     response[1].sis_user_id = '@!'
     setupServerResponses()
     server.use(
-      http.get('http://coursepage2', () => {
+      http.get(/^http:\/\/coursepage2\/?$/, () => {
         return HttpResponse.json(response2)
       }),
     )

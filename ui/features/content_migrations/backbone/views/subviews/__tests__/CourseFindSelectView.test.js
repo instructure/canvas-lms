@@ -82,7 +82,7 @@ describe('CourseFindSelectView: #setSourceCourseId', () => {
     courseFindSelectView.courses = [course]
     courseFindSelectView.render()
 
-    const triggerSpy = jest.spyOn(courseFindSelectView, 'trigger')
+    const triggerSpy = vi.spyOn(courseFindSelectView, 'trigger')
     courseFindSelectView.setSourceCourseId(42)
     expect(triggerSpy).toHaveBeenCalledWith('course_changed', course)
   })

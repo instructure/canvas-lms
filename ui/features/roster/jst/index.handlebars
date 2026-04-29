@@ -1,7 +1,4 @@
 <div id="group_categories_tabs" class="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all" style="display: block;">
-  {{#unless isHorizonCourse}}
-    <ul class="collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist" data-view="rosterTabs"></ul>
-  {{/unless}}
   {{#if canAddCategories}}
   <div class='pull-right group-categories-actions'>
     {{#if permissions.can_add_groups}}
@@ -13,20 +10,29 @@
     {{/if}}
   </div>
   {{/if}}
-  <div id="tab-0" class="roster-tab tab-panel ui-tabs-panel form-inline" style="min-height: 800px;">
-    <span id="search_input_container"></span>
-    <input
-      type="hidden"
-      name="search_term"
-      data-view="inputFilter"
-      placeholder='{{#t "search_people"}}Search people{{/t}}'
-      aria-label='{{#t "filter_field_description"}}Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.{{/t}}'
-      >
-    <select
-      name="enrollment_role_id"
-      data-view="roleSelect"
-      aria-label='{{#t "role_to_search"}}Limit search to role{{/t}}'
-      ></select>
+  {{#unless isHorizonCourse}}
+    <ul class="collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist" aria-label="{{#t}}People navigation tabs{{/t}}" data-view="rosterTabs"></ul>
+  {{/unless}}
+  <div tabindex="0" id="tab-0" class="roster-tab tab-panel ui-tabs-panel" style="min-height: 800px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 0.4em; align-items: stretch; margin-bottom: 0.5em;">
+      <span id="search_input_container"></span>
+      <input
+        type="hidden"
+        name="search_term"
+        data-view="inputFilter"
+        placeholder='{{#t "search_people"}}Search people{{/t}}'
+        aria-label='{{#t "filter_field_description"}}Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.{{/t}}'
+        >
+      {{#ifAll permissions.can_manage_differentiation_tags permissions.allow_assign_to_differentiation_tags}}
+      <div id="peopleFilterContainer"></div>
+      {{else}}
+      <select
+        name="enrollment_role_id"
+        data-view="roleSelect"
+        aria-label='{{#t "role_to_search"}}Limit search to role{{/t}}'
+        ></select>
+      {{/ifAll}}
+    </div>
     {{#if permissions.add_users_to_course}}
     {{#if course.concluded}}
     <a
@@ -63,4 +69,6 @@
   <div id="differentiationTagTray"></div>
   <div id="userTagsModalContainer"></div>
   <div id="link_to_students_mount_point"></div>
+  <div id="edit_sections_mount_point"></div>
+  <div id="edit_roles_mount_point"></div>
 </div>

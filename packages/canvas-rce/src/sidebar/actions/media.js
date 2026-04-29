@@ -80,12 +80,29 @@ export function fetchInitialMedia() {
   }
 }
 
-// update the media object.
-export function updateMediaObject({media_object_id, attachment_id, title, subtitles}) {
+/**
+ * Update a media object's title and optionally its closed captions
+ * @param {Object} params
+ * @param {string} params.media_object_id - Media object ID
+ * @param {string} params.attachment_id - Attachment ID (if video from file upload)
+ * @param {string} params.title - New title for the media
+ * @param {Array} params.subtitles - Subtitle/caption data (optional)
+ * @param {boolean} params.skipCaptionUpdate - If true, skip updating captions even if subtitles provided (default: false)
+ * @param {Object} params.viewerRestrictions - Viewer restrictions to apply for this media (default: {})
+ * @returns {Function} Redux thunk
+ */
+export function updateMediaObject({
+  media_object_id,
+  attachment_id,
+  title,
+  subtitles,
+  skipCaptionUpdate = false,
+  viewerRestrictions,
+}) {
   return (dispatch, getState) => {
     const state = getState()
     const moUpdate = state.source
-      .updateMediaObject(state, {media_object_id, title, attachment_id})
+      .updateMediaObject(state, {media_object_id, title, attachment_id, viewerRestrictions})
       .catch(e => {
         alertHandler.handleAlert({
           text: formatMessage(
@@ -100,7 +117,9 @@ export function updateMediaObject({media_object_id, attachment_id, title, subtit
     if (attachment_id) {
       ccData.attachment_id = attachment_id
     }
-    const ccUpdate = state.source.updateClosedCaptions(state, ccData)
+    const ccUpdate = skipCaptionUpdate
+      ? Promise.resolve()
+      : state.source.updateClosedCaptions(state, ccData)
     return Promise.all([moUpdate, ccUpdate])
   }
 }

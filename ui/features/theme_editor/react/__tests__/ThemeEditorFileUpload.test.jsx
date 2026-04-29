@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import ThemeEditorFileUpload from '../ThemeEditorFileUpload'
 
 describe('ThemeEditorFileUpload', () => {
-  const mockCreateObjectURL = jest.fn()
+  const mockCreateObjectURL = vi.fn()
   const originalURL = window.URL
 
   beforeAll(() => {
@@ -44,8 +44,8 @@ describe('ThemeEditorFileUpload', () => {
 
   const renderComponent = (props = {}) => {
     const defaultProps = {
-      onChange: jest.fn(),
-      handleThemeStateChange: jest.fn(),
+      onChange: vi.fn(),
+      handleThemeStateChange: vi.fn(),
       name: 'test-upload',
     }
     return render(<ThemeEditorFileUpload {...defaultProps} {...props} />)
@@ -82,8 +82,8 @@ describe('ThemeEditorFileUpload', () => {
 
   describe('reset functionality', () => {
     it('resets when user input has a value', async () => {
-      const onChange = jest.fn()
-      const handleThemeStateChange = jest.fn()
+      const onChange = vi.fn()
+      const handleThemeStateChange = vi.fn()
       renderComponent({userInput: {val: 'foo'}, onChange, handleThemeStateChange, name: 'test'})
       const button = screen.getByRole('button', {name: /Undo/})
       await userEvent.click(button)
@@ -96,8 +96,8 @@ describe('ThemeEditorFileUpload', () => {
     })
 
     it('resets when user input is empty string', async () => {
-      const onChange = jest.fn()
-      const handleThemeStateChange = jest.fn()
+      const onChange = vi.fn()
+      const handleThemeStateChange = vi.fn()
       renderComponent({userInput: {val: ''}, onChange, handleThemeStateChange, name: 'test'})
       const button = screen.getByRole('button', {name: /Undo/})
       await userEvent.click(button)
@@ -110,8 +110,8 @@ describe('ThemeEditorFileUpload', () => {
     })
 
     it('resets when there is a current value', async () => {
-      const onChange = jest.fn()
-      const handleThemeStateChange = jest.fn()
+      const onChange = vi.fn()
+      const handleThemeStateChange = vi.fn()
       renderComponent({currentValue: 'foo', onChange, handleThemeStateChange, name: 'test'})
       const button = screen.getByRole('button', {name: /Clear/})
       await userEvent.click(button)
@@ -126,8 +126,8 @@ describe('ThemeEditorFileUpload', () => {
 
   describe('file handling', () => {
     it('calls onChange with file data when file is selected', async () => {
-      const onChange = jest.fn()
-      const handleThemeStateChange = jest.fn()
+      const onChange = vi.fn()
+      const handleThemeStateChange = vi.fn()
       renderComponent({onChange, handleThemeStateChange, name: 'test'})
       const file = new File(['test'], 'test.jpg', {type: 'image/jpeg'})
       const input = screen.getByLabelText(/Select/i)

@@ -24,7 +24,7 @@ import {Course} from './Course'
 
 export const SubmissionComment = {
   fragment: gql`
-    fragment SubmissionComment on SubmissionComment {
+    fragment InboxSubmissionComment on SubmissionComment {
       _id
       id
       submissionId
@@ -32,15 +32,15 @@ export const SubmissionComment = {
       attempt
       canReply
       author {
-        ...User
+        ...InboxUser
       }
       assignment {
-        ...Assignment
+        ...InboxAssignment
       }
       comment
       htmlComment
       course {
-        ...Course
+        ...InboxCourse
       }
       read
     }

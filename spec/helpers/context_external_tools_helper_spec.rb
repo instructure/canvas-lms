@@ -103,16 +103,16 @@ describe ContextExternalToolsHelper do
       ]
     end
 
-    it "includes data-tool-launch-method" do
-      expect(@parsed_html.css("[data-tool-launch-method='tray']").count).to eq 1
+    it_behaves_like "#external_tools_menu_items" do
+      it "includes data-tool-launch-method" do
+        expect(@parsed_html.css("[data-tool-launch-method='tray']").count).to eq 1
+      end
     end
-
-    include_examples "#external_tools_menu_items"
-    include_examples "#external_tools_menu_items_raw"
+    it_behaves_like "#external_tools_menu_items_raw"
   end
 
   context "With tools" do
-    def tool_settings(setting, include_class = false)
+    def tool_settings(setting, include_class: false)
       settings_hash = {
         url: "http://example.dev/launch",
         icon_url: "http://example.dev/icon.png",
@@ -146,7 +146,7 @@ describe ContextExternalToolsHelper do
         shared_secret: "secret"
       )
 
-      tool_1_settings = tool_settings(:course_home_sub_navigation, true)
+      tool_1_settings = tool_settings(:course_home_sub_navigation, include_class: true)
       tool_1_settings.delete(:icon_url)
       tool_1.course_home_sub_navigation = tool_1_settings
       tool_1.save!
@@ -170,12 +170,12 @@ describe ContextExternalToolsHelper do
         shared_secret: "secret"
       )
 
-      tool_3.course_home_sub_navigation = tool_settings(:course_home_sub_navigation, true)
+      tool_3.course_home_sub_navigation = tool_settings(:course_home_sub_navigation, include_class: true)
       tool_3.save!
     end
 
-    include_examples "#external_tools_menu_items"
-    include_examples "#external_tools_menu_items_raw"
+    it_behaves_like "#external_tools_menu_items"
+    it_behaves_like "#external_tools_menu_items_raw"
   end
 
   context "external_tools_menu_items_grouped_json" do

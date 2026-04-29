@@ -30,6 +30,7 @@ shared_examples "Grade Detail Tray:" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookCommon
   include FilesCommon
+
   include_context "late_policy_course_setup"
 
   before :once do
@@ -48,6 +49,12 @@ shared_examples "Grade Detail Tray:" do |ff_enabled|
     @custom_status = CustomGradeStatus.create!(name: "Custom Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
     @a5 = @course.assignments.create!(name: "Assignment 5", points_possible: 10, submission_types: "online_text_entry")
     @course.students.first.submissions.find_by(assignment_id: @a5.id).update!(custom_grade_status: @custom_status)
+  end
+
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
   end
 
   context "status" do
@@ -175,11 +182,14 @@ shared_examples "Grade Detail Tray:" do |ff_enabled|
         Gradebook.visit(@course)
       end
 
-      it "speedgrader link navigates to speedgrader page", priority: "1" do
+      it "speedgrader link opens in a new tab", priority: "1" do
         Gradebook::Cells.open_tray(@course.students[0], @a1)
-        Gradebook::GradeDetailTray.speedgrader_link.click
 
-        expect(driver.current_url).to include "courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@a1.id}"
+        speedgrader_link = Gradebook::GradeDetailTray.speedgrader_link
+        expect(speedgrader_link.attribute("target")).to eq("_blank")
+        expect(speedgrader_link.attribute("href")).to include(
+          "courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@a1.id}"
+        )
       end
 
       it "clicking assignment name navigates to assignment page", priority: "2" do
@@ -585,6 +595,44 @@ shared_examples "Grade Detail Tray:" do |ff_enabled|
         expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "Late")
         expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "Late")
       end
+    end
+  end
+
+  context "peer review grading" do
+    before(:once) do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      @pra = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        points_possible: 10,
+        submission_types: "online_text_entry",
+        peer_reviews: true,
+        peer_review_count: 3
+      )
+
+      @pra.submit_homework(@students[0], body: "Student 1 submission")
+      @pra.submit_homework(@students[1], body: "Student 2 submission")
+
+      @pra.assign_peer_review(@students[0], @students[1])
+
+      peer_review_model(parent_assignment: @pra)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    let(:peer_review_column_name) { "#{@pra.title} Peer Review (#{@pra.peer_review_count})" }
+
+    it "displays peer review sub-assignment column in gradebook" do
+      Gradebook.visit(@course)
+      expect(Gradebook.assignment_header_cell_element(peer_review_column_name)).to be_displayed
+    end
+
+    it "does not display peer review sub-assignment column in gradebook when FF is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      Gradebook.visit(@course)
+      expect(f("body")).not_to contain_css(Gradebook.assignment_header_cell_selector(peer_review_column_name))
     end
   end
 end

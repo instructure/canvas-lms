@@ -34,10 +34,13 @@ export default handleActions(
       if (action.payload.singleCourse) {
         return [action.payload.env.COURSE]
       }
-      return []
+      return action.payload.env.STUDENT_PLANNER_COURSES || []
     },
     GOT_COURSE_LIST: (state, action) => {
-      // Ensure we always return an array
+      // If courses were already populated from STUDENT_PLANNER_COURSES, keep them
+      if (state.length > 0) {
+        return state
+      }
       return Array.isArray(action.payload) ? action.payload : []
     },
     GOT_GRADES_SUCCESS: mergeGradesIntoCourses,

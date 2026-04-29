@@ -23,7 +23,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import {extend as lodashExtend} from 'lodash'
+import {extend as lodashExtend} from 'es-toolkit/compat'
 import Section from '@canvas/sections/backbone/models/Section'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'

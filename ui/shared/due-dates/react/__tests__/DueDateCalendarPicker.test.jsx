@@ -29,7 +29,7 @@ describe('DueDateCalendarPicker', () => {
     dateType: 'unlock_at',
     dateValue: new Date(Date.UTC(2012, 1, 1, 7, 1, 0)),
     disabled: false,
-    handleUpdate: jest.fn(),
+    handleUpdate: vi.fn(),
     inputClasses: 'date_field datePickerDateField DueDateInput',
     isFancyMidnight: false,
     labelText: 'bar',
@@ -40,14 +40,14 @@ describe('DueDateCalendarPicker', () => {
   beforeEach(() => {
     fakeENV.setup()
     ENV.context_asset_string = 'course_1'
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
     fakeENV.teardown()
     tzInTest.restore()
-    jest.clearAllMocks()
-    jest.useRealTimers()
+    vi.clearAllMocks()
+    vi.useRealTimers()
   })
 
   const renderComponent = (props = {}) => {

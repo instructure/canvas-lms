@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
 import $ from 'jquery'
 import 'jquery-migrate'
 import DeveloperKey from '../DeveloperKey'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('DeveloperKey', () => {
   const defaultProps = {
@@ -45,21 +45,21 @@ describe('DeveloperKey', () => {
       visible: false,
     },
     store: {
-      dispatch: jest.fn(),
+      dispatch: vi.fn(),
     },
     actions: {
-      makeVisibleDeveloperKey: jest.fn(),
-      makeInvisibleDeveloperKey: jest.fn(),
-      activateDeveloperKey: jest.fn(),
-      deactivateDeveloperKey: jest.fn(),
-      deleteDeveloperKey: jest.fn(),
-      editDeveloperKey: jest.fn(),
-      developerKeysModalOpen: jest.fn(),
-      setBindingWorkflowState: jest.fn(),
-      ltiKeysSetLtiKey: jest.fn(),
+      makeVisibleDeveloperKey: vi.fn(),
+      makeInvisibleDeveloperKey: vi.fn(),
+      activateDeveloperKey: vi.fn(),
+      deactivateDeveloperKey: vi.fn(),
+      deleteDeveloperKey: vi.fn(),
+      editDeveloperKey: vi.fn(),
+      developerKeysModalOpen: vi.fn(),
+      setBindingWorkflowState: vi.fn(),
+      ltiKeysSetLtiKey: vi.fn(),
     },
     ctx: {params: {contextId: 'context'}},
-    onDelete: jest.fn(),
+    onDelete: vi.fn(),
   }
 
   const renderComponent = (props = defaultProps) => {
@@ -71,6 +71,19 @@ describe('DeveloperKey', () => {
       </table>,
     )
   }
+
+  beforeEach(() => {
+    fakeENV.setup({
+      ...fakeENV.ENV,
+      FEATURES: {
+        lti_link_to_apps_from_developer_keys: false,
+      },
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
 
   beforeEach(() => {
     document.body.innerHTML = '<div id="fixtures"></div>'
@@ -230,6 +243,56 @@ describe('DeveloperKey', () => {
     it('does not display developer key secret', () => {
       const {container} = renderComponent(inheritedProps)
       expect(container).not.toHaveTextContent(defaultProps.developerKey.api_key)
+    })
+  })
+
+  describe('when key is LTI', () => {
+    describe('and flag is enabled', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES.lti_link_to_apps_from_developer_keys = true
+      })
+
+      it('displays link to Canvas Apps', () => {
+        const props = {
+          ...defaultProps,
+          developerKey: {...defaultProps.developerKey, is_lti_key: true},
+        }
+        const {getByText} = renderComponent(props)
+        expect(getByText('View in Canvas Apps')).toBeInTheDocument()
+      })
+
+      it('does not display developer key secret', () => {
+        const props = {
+          ...defaultProps,
+          developerKey: {...defaultProps.developerKey, is_lti_key: true},
+        }
+        const {queryByTestId} = renderComponent(props)
+        expect(queryByTestId('show-key')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('and flag is disabled', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES.lti_link_to_apps_from_developer_keys = false
+      })
+
+      it('does not display link to Canvas Apps', () => {
+        const props = {
+          ...defaultProps,
+          developerKey: {...defaultProps.developerKey, is_lti_key: true},
+        }
+        const {queryByText} = renderComponent(props)
+        expect(queryByText('View in Canvas Apps')).not.toBeInTheDocument()
+      })
+
+      it('displays developer key secret', () => {
+        const props = {
+          ...defaultProps,
+          developerKey: {...defaultProps.developerKey, is_lti_key: true},
+        }
+        const {getByTestId} = renderComponent(props)
+        expect(getByTestId('show-key')).toBeInTheDocument()
+      })
     })
   })
 

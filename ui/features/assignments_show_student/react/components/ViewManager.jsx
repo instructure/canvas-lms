@@ -23,7 +23,7 @@ import {
 } from '@canvas/assignments/graphql/student/Assignment'
 import React from 'react'
 import StudentContent from './StudentContent'
-import StudentViewContext from './Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 
 // Helper functions used by this component

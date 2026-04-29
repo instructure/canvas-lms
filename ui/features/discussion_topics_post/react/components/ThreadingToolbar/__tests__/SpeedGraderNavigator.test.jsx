@@ -21,15 +21,15 @@ import {render, fireEvent, screen} from '@testing-library/react'
 import {SpeedGraderNavigator} from '../SpeedGraderNavigator'
 import useSpeedGrader from '../../../hooks/useSpeedGrader'
 
-jest.mock('../../../hooks/useSpeedGrader')
+vi.mock('../../../hooks/useSpeedGrader')
 
 describe('SpeedGraderNavigator', () => {
   beforeEach(() => {
     useSpeedGrader.mockImplementation(() => ({
       isInSpeedGrader: true,
-      handlePreviousStudentReply: jest.fn(),
-      handleNextStudentReply: jest.fn(),
-      handleJumpFocusToSpeedGrader: jest.fn(),
+      handlePreviousStudentReply: vi.fn(),
+      handleNextStudentReply: vi.fn(),
+      handleJumpFocusToSpeedGrader: vi.fn(),
     }))
   })
 
@@ -48,8 +48,8 @@ describe('SpeedGraderNavigator', () => {
     useSpeedGrader.mockImplementation(() => ({
       isInSpeedGrader: true,
       handlePreviousStudentReply: null,
-      handleNextStudentReply: jest.fn(),
-      handleJumpFocusToSpeedGrader: jest.fn(),
+      handleNextStudentReply: vi.fn(),
+      handleJumpFocusToSpeedGrader: vi.fn(),
     }))
     setup()
     expect(screen.queryByTestId('previous-in-speedgrader')).not.toBeInTheDocument()
@@ -60,9 +60,9 @@ describe('SpeedGraderNavigator', () => {
   it('does not render Next button when handleNextStudentReply is null', () => {
     useSpeedGrader.mockImplementation(() => ({
       isInSpeedGrader: true,
-      handlePreviousStudentReply: jest.fn(),
+      handlePreviousStudentReply: vi.fn(),
       handleNextStudentReply: null,
-      handleJumpFocusToSpeedGrader: jest.fn(),
+      handleJumpFocusToSpeedGrader: vi.fn(),
     }))
     setup()
     expect(screen.getByTestId('previous-in-speedgrader')).toBeInTheDocument()
@@ -71,12 +71,12 @@ describe('SpeedGraderNavigator', () => {
   })
 
   it('calls handlePreviousStudentReply when Previous button is clicked', () => {
-    const mockHandlePrevious = jest.fn()
+    const mockHandlePrevious = vi.fn()
     useSpeedGrader.mockImplementation(() => ({
       isInSpeedGrader: true,
       handlePreviousStudentReply: mockHandlePrevious,
-      handleNextStudentReply: jest.fn(),
-      handleJumpFocusToSpeedGrader: jest.fn(),
+      handleNextStudentReply: vi.fn(),
+      handleJumpFocusToSpeedGrader: vi.fn(),
     }))
     setup()
     fireEvent.click(screen.getByTestId('previous-in-speedgrader'))
@@ -84,12 +84,12 @@ describe('SpeedGraderNavigator', () => {
   })
 
   it('calls handleNextStudentReply when Next button is clicked', () => {
-    const mockHandleNext = jest.fn()
+    const mockHandleNext = vi.fn()
     useSpeedGrader.mockImplementation(() => ({
       isInSpeedGrader: true,
-      handlePreviousStudentReply: jest.fn(),
+      handlePreviousStudentReply: vi.fn(),
       handleNextStudentReply: mockHandleNext,
-      handleJumpFocusToSpeedGrader: jest.fn(),
+      handleJumpFocusToSpeedGrader: vi.fn(),
     }))
     setup()
     fireEvent.click(screen.getByTestId('next-in-speedgrader'))
@@ -97,11 +97,11 @@ describe('SpeedGraderNavigator', () => {
   })
 
   it('calls handleJumpFocusToSpeedGrader when Jump button is clicked', () => {
-    const mockHandleJump = jest.fn()
+    const mockHandleJump = vi.fn()
     useSpeedGrader.mockImplementation(() => ({
       isInSpeedGrader: true,
-      handlePreviousStudentReply: jest.fn(),
-      handleNextStudentReply: jest.fn(),
+      handlePreviousStudentReply: vi.fn(),
+      handleNextStudentReply: vi.fn(),
       handleJumpFocusToSpeedGrader: mockHandleJump,
     }))
     setup()

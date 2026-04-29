@@ -28,5 +28,5 @@ describe "new_event_created" do
   let(:asset) { @event }
   let(:notification_name) { :new_event_created }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

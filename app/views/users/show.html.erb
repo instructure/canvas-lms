@@ -25,6 +25,9 @@
     </a>
     <div id="dsr-modal-mount-point"></div>
     <div id="manage-temp-enrollments-mount-point"></div>
+    <% if @domain_root_account.feature_enabled?(:user_session_termination) && @user.grants_right?(@current_user, :terminate_sessions) %>
+      <div id="terminate-sessions-mount-point"></div>
+    <% end %>
     <% if @context_account.is_a?(Account) &&
           @user.grants_right?(@current_user, :generate_observer_pairing_code) &&
           @user.has_student_enrollment? &&
@@ -68,11 +71,11 @@
 </style>
 
 <% css_bundle :roster_user, :context_list, :pairing_code %>
-<% js_env user_suspend_status: {
+<% js_env({ user_suspend_status: {
   pseudonyms: @user.all_active_pseudonyms.reject do |p|
       p.sis_user_id.present? && !can_do(p, @current_user, :manage_sis)
   end.map { |p| { id: p.id, workflow_state: p.workflow_state, unique_id: p.unique_id } }
-} %>
+} }) %>
 
 <div id="user-info-fieldsets">
   <%= render :partial => 'users/name', locals: { login_history: true } %>
@@ -167,8 +170,16 @@
     <% end %>
 
     </div>
+
   </fieldset>
+  <% if @user.grants_right?(@current_user, :view_user_generated_access_tokens) %>
+  <fieldset id="access_tokens">
+    <legend><%= t('access_tokens', 'Access Tokens') %></legend>
+    <div id="user_access_tokens_react_mount_point"></div>
+  </fieldset>
+  <% end %>
   </div>
+
 
   <% if @show_page_views %>
     <h3>

@@ -26,6 +26,17 @@ class Login::SamlController < ApplicationController
   before_action :forbid_on_files_domain
   before_action :run_login_hooks, only: [:new, :create]
   before_action :fix_ms_office_redirects, only: :new
+  before_action :parse_response, only: :create
+  skip_before_action :require_user, only: %i[new create destroy metadata observee_validation]
+
+  attr_reader :relay_state, :issuer
+
+  # Backed by a non-`@saml_response` ivar because the `saml2` gem's
+  # `saml2/http_post` template treats `@saml_response` as the outgoing
+  # message to forward — collisions break the proxy SAML flow.
+  def saml_response
+    @saml_login_response
+  end
 
   def new
     aac
@@ -47,26 +58,13 @@ class Login::SamlController < ApplicationController
     login_error_message = t("There was a problem logging in at %{institution}",
                             institution: @domain_root_account.display_name)
 
-    response, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
-    unless response.is_a?(SAML2::Response)
-      # something confusing and wrong has happened
-      logger.error "[SAML] Attempted invalid SAML operation via login endpoint... #{response.class.name}"
-      return render status: :bad_request, plain: "Invalid SAML operation for this endpoint: #{response.class.name}"
-    end
-
-    issuer = response.issuer&.id || response.assertions.first&.issuer&.id
-
-    aac = @domain_root_account.authentication_providers.active
-                              .where(auth_type: "saml")
-                              .where(idp_entity_id: issuer)
-                              .first
-    tags = { idp_initiated: true } unless response.in_response_to
+    tags = { idp_initiated: true } unless saml_response.in_response_to
     increment_statsd(:attempts, tags:)
     if aac.nil?
       logger.error "Attempted SAML login for #{issuer} on account without that IdP"
       flash[:delegated_message] = if @domain_root_account.auth_discovery_url
                                     t("Canvas did not recognize your identity provider")
-                                  elsif response.issuer
+                                  elsif saml_response.issuer
                                     t("Canvas is not configured to receive logins from %{issuer}.", issuer:)
                                   else
                                     t("The institution you logged in from is not configured on this account.")
@@ -76,15 +74,17 @@ class Login::SamlController < ApplicationController
     end
 
     debugging = if aac.debugging?
-                  if response.in_response_to
-                    aac.debug_get(:request_id) == response.in_response_to
+                  if saml_response.in_response_to
+                    aac.debug_get(:request_id) == saml_response.in_response_to
                   else
                     aac.debug_set(:request_id, t("IdP Initiated"), overwrite: false)
                   end
                 end
-    encrypted_xml = response.to_s if debugging
+    encrypted_xml = saml_response.to_s if debugging
 
-    aac.sp_metadata(request.host_with_port).valid_response?(response,
+    # NOTE: `valid_response?` decrypts and mutates the response object with decrypted versions
+    # of encrypted elements (`saml2:EncryptedAssertion` elements, for example)
+    aac.sp_metadata(request.host_with_port).valid_response?(saml_response,
                                                             aac.idp_metadata,
                                                             ignore_audience_condition: aac.settings["ignore_audience_condition"])
 
@@ -92,13 +92,15 @@ class Login::SamlController < ApplicationController
       aac.debug_set(:debugging, t("debug.redirect_from_idp", "Received LoginResponse from IdP"))
       aac.debug_set(:idp_response_encoded, params[:SAMLResponse])
       aac.debug_set(:idp_response_xml_encrypted, encrypted_xml)
-      aac.debug_set(:idp_response_xml_decrypted, response.to_s)
-      aac.debug_set(:idp_in_response_to, response.try(:in_response_to))
-      aac.debug_set(:idp_login_destination, response.destination)
+      aac.debug_set(:idp_response_xml_decrypted, saml_response.to_s)
+      aac.debug_set(:idp_in_response_to, saml_response.try(:in_response_to))
+      aac.debug_set(:idp_login_destination, saml_response.destination)
       aac.debug_set(:login_to_canvas_success, "false")
     end
 
-    assertion = response.assertions.first
+    aac.collect_response(saml_response, request.request_parameters[:SAMLResponse])
+
+    assertion = saml_response.assertions.first
     begin
       provider_attributes = assertion&.attribute_statements&.first.to_h
     rescue
@@ -115,20 +117,24 @@ class Login::SamlController < ApplicationController
       unique_id = unique_id.split("@", 2)[0]
     end
 
+    failure_reason = handle_one_time_use(aac, saml_response)
+
     logger.info "Attempting SAML2 login for #{aac.login_attribute} #{unique_id} in account #{@domain_root_account.id}"
 
-    unless response.errors.empty?
+    unless saml_response.errors.empty?
       if debugging
         aac.debug_set(:is_valid_login_response, "false")
-        aac.debug_set(:login_response_validation_error, response.errors.join("\n"))
+        aac.debug_set(:login_response_validation_error, saml_response.errors.join("\n"))
       end
-      logger.error "Failed to verify SAML signature: #{response.errors.join("\n")}"
+      logger.error "Failed to verify SAML signature: #{saml_response.errors.join("\n")}"
       flash[:delegated_message] = login_error_message
-      increment_statsd(:failure, reason: :invalid)
+      increment_statsd(:failure, reason: failure_reason || :invalid)
       return redirect_to login_url
     end
 
     aac.debug_set(:is_valid_login_response, "true") if debugging
+
+    persist_saml_signing_certificates(aac, saml_response)
 
     # for parent using self-registration to observe a student
     # the student is logged out after validation
@@ -136,7 +142,7 @@ class Login::SamlController < ApplicationController
     if session[:parent_registration]
       expected_unique_id = session[:parent_registration][:observee][:unique_id]
       session[:parent_registration][:unique_id_match] = (expected_unique_id == unique_id)
-      saml = ExternalAuthObservation::SAML.new(@domain_root_account, request, response)
+      saml = ExternalAuthObservation::SAML.new(@domain_root_account, request, saml_response)
       redirect_to saml.logout_url
       return
     end
@@ -194,10 +200,14 @@ class Login::SamlController < ApplicationController
 
   def saml_config_error(error)
     Canvas::Errors.capture_exception(:saml, error, :warn)
-    render status: :unprocessable_entity, plain: error.to_s
+    render status: :unprocessable_content, plain: error.to_s
   end
 
   def destroy
+    # allow this to be in an IFrame, since some IdPs (like Okta) will do that,
+    # and we want the process to process our redirect response
+    @embeddable = true
+
     @aac = message = nil
     key_to_certificate = {}
     log_key_used = lambda do |key|
@@ -279,8 +289,8 @@ class Login::SamlController < ApplicationController
         aac.debug_set(:debugging, t("debug.logout_response_redirect_from_idp", "Received LogoutResponse from IdP"))
       end
 
-      unless message.status.code == SAML2::Status::SUCCESS
-        logger.error "Failed SAML LogoutResponse: #{message.status.code}: #{message.status.message}"
+      unless message.status.success?
+        logger.error "Failed SAML LogoutResponse: #{message.status.codes.inspect}: #{message.status.message} #{message.status.detail}"
         flash[:delegated_message] = t("There was a failure logging out at your IdP")
         increment_statsd(:failure, action: :slo_response)
         return redirect_to login_url
@@ -379,7 +389,7 @@ class Login::SamlController < ApplicationController
     # Seperate the debugging out because we want it to log the request even if the response dies.
     if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
       aac.debug_set(:idp_logout_response_xml_encrypted, logout_response.to_s)
-      aac.debug_set(:idp_logout_response_status_code, logout_response.status.code)
+      aac.debug_set(:idp_logout_response_status_code, logout_response.status.codes.inspect)
       aac.debug_set(:idp_logout_response_destination, logout_response.destination)
       aac.debug_set(:idp_logout_response_in_response_to, logout_response.in_response_to)
       aac.debug_set(:debugging, t("debug.logout_response_redirect_to_idp", "Sending LogoutResponse to IdP"))
@@ -419,8 +429,26 @@ class Login::SamlController < ApplicationController
 
   protected
 
+  def parse_response
+    @saml_login_response, @relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
+    unless saml_response.is_a?(SAML2::Response)
+      # something confusing and wrong has happened
+      logger.error "[SAML] Attempted invalid SAML operation via login endpoint... #{saml_response.class.name}"
+      return render status: :bad_request, plain: "Invalid SAML operation for this endpoint: #{saml_response.class.name}"
+    end
+
+    @issuer = saml_response.issuer&.id || saml_response.assertions.first&.issuer&.id
+
+    @aac = @domain_root_account.authentication_providers.active
+                               .where(auth_type: "saml")
+                               .where(idp_entity_id: issuer)
+                               .first
+  end
+
   def aac
-    @aac ||= begin
+    return @aac if instance_variable_defined?(:@aac)
+
+    @aac = begin
       scope = @domain_root_account.authentication_providers.active.where(auth_type: "saml")
       id = params[:id] || params[:entityID]
 
@@ -432,6 +460,30 @@ class Login::SamlController < ApplicationController
         scope.find(id)
       end
     end
+  end
+
+  def persist_saml_signing_certificates(aac, response)
+    return unless Account.site_admin.feature_enabled?(:record_saml_certificates)
+    return unless aac.synthetic_metadata? && aac.certificate_fingerprint.present?
+
+    signing_keys = [response, *response.assertions].filter_map(&:signing_key).select(&:certificate)
+    return unless signing_keys.any?
+
+    stored_fingerprints = aac.certificate_fingerprint.split.map { |fp| SAML2::KeyInfo.format_fingerprint(fp) }
+    existing_certs, existing_fingerprints = (aac.settings["signing_certificates"] || []).map do |cert_b64|
+      cert = OpenSSL::X509::Certificate.new(Base64.decode64(cert_b64))
+      [cert_b64, SAML2::KeyInfo.format_fingerprint(Digest::SHA1.hexdigest(cert.to_der))]
+    end.select { |_, fp| stored_fingerprints.include?(fp) }.transpose
+    existing_certs ||= []
+    existing_fingerprints ||= []
+    new_certs = signing_keys
+                .select { |key| stored_fingerprints.include?(key.fingerprint) && !existing_fingerprints.include?(key.fingerprint) }
+                .map(&:x509)
+                .uniq
+    return unless new_certs.any?
+
+    aac.settings["signing_certificates"] = existing_certs + new_certs
+    aac.save!
   end
 
   def complete_observee_addition(registration_data)
@@ -485,5 +537,21 @@ class Login::SamlController < ApplicationController
 
   def auth_type
     AuthenticationProvider::SAML.sti_name
+  end
+
+  def handle_one_time_use(aac, response)
+    assertion = response.assertions.first
+    # SAML2 Library can't validate OneTimeUse on its own, so we have to do it here.
+    if assertion&.conditions&.grep(SAML2::Conditions::OneTimeUse)&.any? && duplicate_response?(aac, response)
+      response.errors << "OneTimeUse condition violated"
+      return :one_time_use_violation
+    end
+    nil
+  end
+
+  def duplicate_response?(aac, response)
+    response_id_key = "saml_one_time_use_#{aac.global_id}_#{Digest::MD5.new.update(response.id).hexdigest}"
+    exat = ((response.assertions.first.conditions&.not_on_or_after || Time.zone.now) + 5.minutes).to_i
+    CanvasCache::Redis.enabled? && !Canvas.redis.set(response_id_key, true, nx: true, exat:)
   end
 end

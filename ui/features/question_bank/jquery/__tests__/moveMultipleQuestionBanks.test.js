@@ -36,7 +36,7 @@ describe('Move Multiple Question Banks', () => {
 
   afterEach(() => {
     $('#fixtures').empty()
-    jest.restoreAllMocks() // Restore all mocks to their original value
+    vi.restoreAllMocks() // Restore all mocks to their original value
   })
 
   test('is an object', () => {
@@ -45,9 +45,9 @@ describe('Move Multiple Question Banks', () => {
 
   test('set focus to the delete button when dialog opens', () => {
     // Mocking methods inside moveMultipleQuestionBanks
-    jest.spyOn(moveMultipleQuestionBanks, 'prepDialog').mockImplementation(() => {})
-    jest.spyOn(moveMultipleQuestionBanks, 'showDialog').mockImplementation(() => {})
-    jest.spyOn(moveMultipleQuestionBanks, 'loadData').mockImplementation(() => {})
+    vi.spyOn(moveMultipleQuestionBanks, 'prepDialog').mockImplementation(() => {})
+    vi.spyOn(moveMultipleQuestionBanks, 'showDialog').mockImplementation(() => {})
+    vi.spyOn(moveMultipleQuestionBanks, 'loadData').mockImplementation(() => {})
 
     const focusesButton = $modal.find('.ui-dialog-titlebar-close')[0]
     moveMultipleQuestionBanks.onClick({preventDefault: () => {}})

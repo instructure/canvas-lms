@@ -21,7 +21,7 @@ import GroupMembershipInput from '../GroupMembershipInput'
 
 describe('GroupMembershipInput', () => {
   it('handles input value change', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByLabelText} = render(<GroupMembershipInput onChange={onChange} value="" />)
     const input = getByLabelText(/Group Membership/i)
     fireEvent.input(input, {target: {value: '5'}})
@@ -29,7 +29,7 @@ describe('GroupMembershipInput', () => {
   })
 
   it('handles incrementing the number input', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {container} = render(<GroupMembershipInput onChange={onChange} value="" />)
     const upArrow = container.querySelector("svg[name='IconArrowOpenUp']").parentElement
     await userEvent.click(upArrow)
@@ -37,7 +37,7 @@ describe('GroupMembershipInput', () => {
   })
 
   it('handles decrementing the number input', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {container} = render(<GroupMembershipInput onChange={onChange} value="3" />)
     const downArrow = container.querySelector("svg[name='IconArrowOpenDown']").parentElement
     await userEvent.click(downArrow)
@@ -45,7 +45,7 @@ describe('GroupMembershipInput', () => {
   })
 
   it('allows deletion of input if value is less than 10', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByPlaceholderText} = render(<GroupMembershipInput onChange={onChange} value="" />)
     const input = getByPlaceholderText('Number')
     fireEvent.input(input, {target: {value: '9'}})
@@ -54,7 +54,7 @@ describe('GroupMembershipInput', () => {
   })
 
   it('allows deletion of prior input if value is less than 10', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const {getByPlaceholderText} = render(<GroupMembershipInput onChange={onChange} value="2" />)
     fireEvent.keyDown(getByPlaceholderText('Number'), {key: 'Backspace', code: 8})
     expect(onChange).toHaveBeenNthCalledWith(1, '')
@@ -62,7 +62,7 @@ describe('GroupMembershipInput', () => {
 
   describe('errors', () => {
     it('returns an error if input is greater than set maximum', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByText, getByLabelText} = render(
         <GroupMembershipInput onChange={onChange} value="" />,
       )
@@ -72,7 +72,7 @@ describe('GroupMembershipInput', () => {
     })
 
     it('returns an error if input is less than set minimum', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByText, getByLabelText} = render(
         <GroupMembershipInput onChange={onChange} value="" />,
       )
@@ -82,7 +82,7 @@ describe('GroupMembershipInput', () => {
     })
 
     it('returns an error if input is not a number', () => {
-      const onChange = jest.fn()
+      const onChange = vi.fn()
       const {getByText, getByLabelText} = render(
         <GroupMembershipInput onChange={onChange} value="" />,
       )

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import _, {isEmpty} from 'lodash'
+import {isEmpty, groupBy, zip, forEach} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {windowAlert} from '@canvas/util/globalUtils'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -110,7 +110,7 @@ const ProcessGradebookUpload = {
       return accumulator
     }, {})
 
-    if (!_.isEmpty(customColumnData)) {
+    if (!isEmpty(customColumnData)) {
       const parsedData = this.parseCustomColumnData(customColumnData)
       return this.submitCustomColumnData(parsedData)
     }
@@ -171,7 +171,7 @@ const ProcessGradebookUpload = {
     // with the default gradebook export but could happen if someone uploads a
     // CSV with multiple "Override Score" columns--send off one request to the
     // endpoint for each grading period.
-    const scoresByGradingPeriod = _.groupBy(
+    const scoresByGradingPeriod = groupBy(
       changedOverrideScores,
       score => score.grading_period_id || 'course',
     )
@@ -272,13 +272,12 @@ const ProcessGradebookUpload = {
 
     const assignmentMap = {}
 
-    _(newAssignments)
-      .zip(responsesLists)
-      .forEach(fakeAndCreated => {
-        const [assignmentStub, response] = fakeAndCreated
-        const [createdAssignment] = response
-        assignmentMap[assignmentStub.id] = createdAssignment.id
-      })
+    const zipped = zip(newAssignments, responsesLists)
+    forEach(zipped, fakeAndCreated => {
+      const [assignmentStub, response] = fakeAndCreated
+      const [createdAssignment] = response
+      assignmentMap[assignmentStub.id] = createdAssignment.id
+    })
 
     return assignmentMap
   },

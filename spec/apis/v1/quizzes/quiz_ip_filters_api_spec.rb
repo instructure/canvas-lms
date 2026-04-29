@@ -29,7 +29,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
   end
 
   context "index" do
-    def get_index(raw = false, data = {})
+    def get_index(data = {}, raw: false)
       url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/ip_filters"
       params = { controller: "quizzes/quiz_ip_filters",
                  action: "index",
@@ -74,7 +74,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
     it "restricts access to itself" do
       student_in_course
 
-      get_index(true)
+      get_index(raw: true)
       assert_forbidden
     end
 
@@ -89,20 +89,20 @@ describe Quizzes::QuizIpFiltersController, type: :request do
         @quiz.context.account.ip_filters = account_filters
         @quiz.context.account.save
 
-        page1 = get_index false, { per_page: 25 }
+        page1 = get_index({ per_page: 25 })
         expect(page1["quiz_ip_filters"].size).to eq 25
 
-        page1 = get_index false, { page: 2, per_page: 25 }
+        page1 = get_index({ page: 2, per_page: 25 })
         expect(page1["quiz_ip_filters"].size).to eq 15
       end
 
       it "returns an empty array with a cursor past the end" do
-        page = get_index false, { page: 2 }
+        page = get_index({ page: 2 })
         expect(page["quiz_ip_filters"]).to eq []
       end
 
       it "bails out on an invalid cursor" do
-        get_index true, { page: "invalid" }
+        get_index({ page: "invalid" }, raw: true)
         assert_status(404)
       end
     end
@@ -117,15 +117,6 @@ describe Quizzes::QuizIpFiltersController, type: :request do
         expect(json["quiz_ip_filters"][0]["name"]).to eq "Current Filter"
         expect(json["quiz_ip_filters"][0]["account"]).to eq @quiz.title
         expect(json["quiz_ip_filters"][0]["filter"]).to eq "192.168.1.101"
-      end
-
-      context "JSON-API compliance" do
-        it "renders as JSON-API" do
-          skip "CNVS-8978: JSON-API compliance API spec helper"
-
-          json = get_index
-          assert_jsonapi_compliance(json, "quiz_ip_filters")
-        end
       end
     end
   end

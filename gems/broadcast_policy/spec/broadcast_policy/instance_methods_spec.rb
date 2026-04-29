@@ -17,12 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../spec_helper"
-
 describe BroadcastPolicy::InstanceMethods do
   let(:harness_class) do
     Class.new do
       include BroadcastPolicy::InstanceMethods
+
       attr_accessor :attributes, :changed_attributes
 
       def initialize

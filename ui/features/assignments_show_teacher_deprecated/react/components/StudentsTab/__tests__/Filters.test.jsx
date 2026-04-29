@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {mockOverride} from '../../../test-utils'
 import Filters from '../Filters'
 
@@ -29,61 +30,91 @@ import Filters from '../Filters'
  *  resumes on A2.
  */
 
+// These tests are skipped because InstUI Select v7+ doesn't open dropdowns properly in jsdom.
+// The component itself notes that tests should be skipped until A2 work resumes.
 describe.skip('choosing filter options', () => {
-  const onChangeFunc = jest.fn()
+  const onChangeFunc = vi.fn()
   const override = mockOverride()
 
-  it('sends override ID when chosen in assignTo filter', () => {
+  beforeEach(() => {
+    onChangeFunc.mockClear()
+  })
+
+  it('sends override ID when chosen in assignTo filter', async () => {
+    const user = userEvent.setup()
     const {getByText, getByTestId} = render(
       <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
-    fireEvent.click(getByTestId('assignToFilter'))
-    fireEvent.click(getByText(override.title))
+    await user.click(getByTestId('assignToFilter'))
+    await waitFor(() => {
+      expect(getByText(override.title)).toBeInTheDocument()
+    })
+    await user.click(getByText(override.title))
     expect(onChangeFunc).toHaveBeenCalledWith('assignTo', override.lid)
   })
 
-  it('sends null when everyone is chosen in assignTo filter', () => {
+  it('sends null when everyone is chosen in assignTo filter', async () => {
+    const user = userEvent.setup()
     const {getByText, getByTestId} = render(
       <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
-    fireEvent.click(getByTestId('assignToFilter'))
-    fireEvent.click(getByText('Everyone'))
+    await user.click(getByTestId('assignToFilter'))
+    await waitFor(() => {
+      expect(getByText('Everyone')).toBeInTheDocument()
+    })
+    await user.click(getByText('Everyone'))
     expect(onChangeFunc).toHaveBeenCalledWith('assignTo', null)
   })
 
-  it('sends attempt number when specific attempt is chosen in attempt filter', () => {
+  it('sends attempt number when specific attempt is chosen in attempt filter', async () => {
+    const user = userEvent.setup()
     const {getByText, getByTestId} = render(
       <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
-    fireEvent.click(getByTestId('attemptFilter'))
-    fireEvent.click(getByText('Attempt 1'))
+    await user.click(getByTestId('attemptFilter'))
+    await waitFor(() => {
+      expect(getByText('Attempt 1')).toBeInTheDocument()
+    })
+    await user.click(getByText('Attempt 1'))
     expect(onChangeFunc).toHaveBeenCalledWith('attempt', 1)
   })
 
-  it('sends null when all is chosen in attempt filter', () => {
+  it('sends null when all is chosen in attempt filter', async () => {
+    const user = userEvent.setup()
     const {getByText, getByTestId} = render(
       <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
-    fireEvent.click(getByTestId('attemptFilter'))
-    fireEvent.click(getByText('All'))
+    await user.click(getByTestId('attemptFilter'))
+    await waitFor(() => {
+      expect(getByText('All')).toBeInTheDocument()
+    })
+    await user.click(getByText('All'))
     expect(onChangeFunc).toHaveBeenCalledWith('attempt', null)
   })
 
-  it('sends correct status when chosen in status filter', () => {
+  it('sends correct status when chosen in status filter', async () => {
+    const user = userEvent.setup()
     const {getByText, getByTestId} = render(
       <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
-    fireEvent.click(getByTestId('statusFilter'))
-    fireEvent.click(getByText('Excused'))
+    await user.click(getByTestId('statusFilter'))
+    await waitFor(() => {
+      expect(getByText('Excused')).toBeInTheDocument()
+    })
+    await user.click(getByText('Excused'))
     expect(onChangeFunc).toHaveBeenCalledWith('status', 'excused')
   })
 
-  it('sends null when all is chosen in status filter', () => {
+  it('sends null when all is chosen in status filter', async () => {
+    const user = userEvent.setup()
     const {getByText, getByTestId} = render(
       <Filters overrides={[override]} numAttempts={2} onChange={onChangeFunc} />,
     )
-    fireEvent.click(getByTestId('statusFilter'))
-    fireEvent.click(getByText('All'))
+    await user.click(getByTestId('statusFilter'))
+    await waitFor(() => {
+      expect(getByText('All')).toBeInTheDocument()
+    })
+    await user.click(getByText('All'))
     expect(onChangeFunc).toHaveBeenCalledWith('status', null)
   })
 })

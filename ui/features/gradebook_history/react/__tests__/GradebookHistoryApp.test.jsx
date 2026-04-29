@@ -20,20 +20,20 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import GradebookHistoryApp from '../GradebookHistoryApp'
 
-jest.mock('../SearchForm', () => {
-  return function MockSearchForm() {
+vi.mock('../SearchForm', () => ({
+  default: function MockSearchForm() {
     return <div data-testid="search-form">SearchForm</div>
-  }
-})
+  },
+}))
 
-jest.mock('../SearchResults', () => {
-  return function MockSearchResults() {
+vi.mock('../SearchResults', () => ({
+  default: function MockSearchResults() {
     return <div data-testid="search-results">SearchResults</div>
-  }
-})
+  },
+}))
 
-jest.mock('@canvas/gradebook-menu', () => {
-  return function MockGradebookMenu(props) {
+vi.mock('@canvas/gradebook-menu', () => ({
+  default: function MockGradebookMenu(props) {
     return (
       <div
         data-testid="gradebook-menu"
@@ -43,8 +43,8 @@ jest.mock('@canvas/gradebook-menu', () => {
         GradebookMenu
       </div>
     )
-  }
-})
+  },
+}))
 
 describe('GradebookHistoryApp', () => {
   it('renders the heading', () => {

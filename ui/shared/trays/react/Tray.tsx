@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import React from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -25,11 +25,10 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import ErrorBoundary from '@canvas/error-boundary'
-import GenericErrorPage from '@canvas/generic-error-page'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-
-const I18n = createI18nScope('tray')
+import {ErrorBoundary} from '@instructure/platform-error-boundary'
+import {GenericErrorPage} from '@instructure/platform-generic-error-page'
+import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
+import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
 
 /**
 This is a wrapper around an InstUi Tray component that provides:
@@ -62,11 +61,15 @@ type Props = {
   // specify this if the header text should be different than the modal's label
   title?: string
 
+  shouldCloseOnDocumentClick?: boolean
+
   // Optional props to pass to the GenericErrorPage in ErrorBoundary
   errorSubject?: string
   errorCategory?: string
   errorImageUrl?: string
+
   onDismiss: () => void
+  onClose?: () => void
 }
 
 export default function CanvasTray({
@@ -82,6 +85,7 @@ export default function CanvasTray({
   children,
   ...otherTrayProps
 }: Props) {
+  const {t} = useTranslation('tray')
   if (headerPadding == null) {
     headerPadding = `0 0 ${padding} 0` as ViewProps['padding']
   }
@@ -96,7 +100,7 @@ export default function CanvasTray({
           </Heading>
         </Flex.Item>
         <Flex.Item>
-          <CloseButton onClick={onDismiss} size="small" screenReaderLabel={I18n.t('Close')} />
+          <CloseButton onClick={onDismiss} size="small" screenReaderLabel={t('Close')} />
         </Flex.Item>
       </Flex>
     )
@@ -107,7 +111,9 @@ export default function CanvasTray({
       <ErrorBoundary
         errorComponent={
           <GenericErrorPage
-            imageUrl={errorImageUrl}
+            imageUrl={errorImageUrl || errorShipUrl}
+            onReportError={reportError}
+            translations={canvasErrorPageTranslations}
             errorSubject={errorSubject}
             errorCategory={errorCategory}
           />

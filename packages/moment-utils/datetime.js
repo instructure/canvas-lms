@@ -71,7 +71,7 @@ export function createDateTimeMoment(input, format, locale) {
   // of formats
   if (typeof input !== 'string' || !(typeof format === 'string' || Array.isArray(format))) {
     throw new Error(
-      'createDateTimeMoment only works on string+format(s). just use moment() directly for any other signature'
+      'createDateTimeMoment only works on string+format(s). just use moment() directly for any other signature',
     )
   }
 
@@ -209,9 +209,8 @@ export function format(value, format, zone) {
   const usingOtherZone = arguments.length === 3 && zone
 
   if (usingOtherZone && !(zone in state.tzData)) {
-    // eslint-disable-next-line no-console
     console.warn(
-      `You are asking to format DateTime into a timezone that is not supported -- ${zone}`
+      `You are asking to format DateTime into a timezone that is not supported -- ${zone}`,
     )
 
     return null

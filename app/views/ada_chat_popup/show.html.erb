@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panda Bot</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+      #ada-chat-container {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="ada-chat-container"></div>
+
+    <%# Load the Ada Embed2 SDK in lazy mode so it does not auto-initialize.
+        adaEmbed.start() is called only after receiving user metadata via
+        postMessage from the Canvas page that opened this popup. %>
+    <script
+      data-lazy
+      id="__ada"
+      data-handle="instructure-gen"
+      src="https://static.ada.support/embed2.js"
+    ></script>
+
+    <script>
+      <%# Message type strings must stay in sync with ADA_MSG_* constants
+          in ui/shared/help-dialog/react/AdaChatbot.tsx %>
+      var metaFieldsListener = function(event) {
+        if (event.origin !== window.location.origin) return;
+        if (!event.data || event.data.type !== "ADA_META_FIELDS") return;
+
+        window.removeEventListener("message", metaFieldsListener);
+        window.adaEmbed.start({
+          handle: "instructure-gen",
+          parentElement: "ada-chat-container",
+          metaFields: event.data.metaFields,
+          sensitiveMetaFields: event.data.sensitiveMetaFields
+        });
+      };
+      window.addEventListener("message", metaFieldsListener);
+
+      if (window.opener) {
+        window.opener.postMessage(
+          { type: "ADA_POPUP_READY" },
+          window.location.origin
+        );
+      } else {
+        window.location.replace("/");
+      }
+    </script>
+  </body>
+</html>

@@ -16,10 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import React from 'react'
 import {NewLoginDataProvider, NewLoginProvider} from '../../context'
 import ContentLayout from '../ContentLayout'
+
+afterEach(() => {
+  cleanup()
+})
 
 describe('ContentLayout', () => {
   it('mounts without crashing', () => {

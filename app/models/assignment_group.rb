@@ -18,8 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssignmentGroup < ActiveRecord::Base
+class AssignmentGroup < ApplicationRecord
   include Workflow
+
   # Unlike our other soft-deletable models, assignment groups use 'available' instead of 'active'
   # to indicate a not-deleted state. This means we have to add the 'available' state here before
   # Canvas::SoftDeletable adds the 'active' and 'deleted' states, so that 'available' becomes the
@@ -28,6 +29,7 @@ class AssignmentGroup < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   include MasterCourses::Restrictor
+
   restrict_columns :content, [:group_weight, :rules]
 
   attr_readonly :context_id, :context_type
@@ -40,7 +42,7 @@ class AssignmentGroup < ActiveRecord::Base
   serialize :integration_data, type: Hash
 
   has_many :scores, -> { active }
-  has_many :assignments, -> { order("position, due_at, title") }
+  has_many :assignments, -> { order(:position, :due_at, :title) }
 
   has_many :active_assignments,
            lambda {
@@ -115,7 +117,7 @@ class AssignmentGroup < ActiveRecord::Base
     can :delete
   end
 
-  def restore(try_to_selectively_undelete_assignments = true)
+  def restore(try_to_selectively_undelete_assignments: true)
     to_restore = assignments.include_submittables
     if try_to_selectively_undelete_assignments
       # It's a pretty good guess that if an assignment was modified at the same

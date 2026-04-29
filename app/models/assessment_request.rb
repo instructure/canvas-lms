@@ -18,22 +18,25 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AssessmentRequest < ActiveRecord::Base
+class AssessmentRequest < ApplicationRecord
   include Workflow
   include SendToStream
   include Plannable
 
   belongs_to :user
   belongs_to :asset, polymorphic: [:submission]
+  belongs_to :submission, foreign_key: :asset_id, optional: true, inverse_of: false
   belongs_to :assessor_asset, polymorphic: [:submission], polymorphic_prefix: true
   belongs_to :assessor, class_name: "User"
   belongs_to :rubric_association
+  belongs_to :peer_review_sub_assignment, optional: true
   has_many :submission_comments, -> { published }
   has_many :ignores, dependent: :destroy, as: :asset
   belongs_to :rubric_assessment
   validates :user_id, :asset_id, :asset_type, :workflow_state, presence: true
 
   before_save :infer_uuid
+  after_destroy :update_peer_review_submission
   after_save :delete_ignores
   after_save :update_planner_override
   has_a_broadcast_policy
@@ -85,6 +88,11 @@ class AssessmentRequest < ActiveRecord::Base
                                  current_enrollments = course.current_enrollments.pluck(:user_id)
                                  where(assessor_id: current_enrollments)
                                }
+  scope :completed_for_assignment, lambda { |assignment_id|
+    complete
+      .joins(:submission)
+      .where(submissions: { assignment_id: })
+  }
 
   scope :not_ignored_by, lambda { |user, purpose|
     where.not(
@@ -143,7 +151,13 @@ class AssessmentRequest < ActiveRecord::Base
 
   def available?
     assignment = (assessor_asset || asset).assignment
-    assignment&.submitted?(submission: asset) && assignment.submitted?(submission: assessor_asset)
+    return false unless assignment&.submitted?(submission: asset)
+
+    if assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      return true unless assignment.peer_review_submission_required?
+    end
+
+    assignment.submitted?(submission: assessor_asset)
   end
 
   on_create_send_to_streams do
@@ -181,11 +195,23 @@ class AssessmentRequest < ActiveRecord::Base
   def update_planner_override
     if saved_change_to_workflow_state? && workflow_state_before_last_save == "assigned" && workflow_state == "completed"
       override = PlannerOverride.find_by(plannable_id: id, plannable_type: "AssessmentRequest", user: assessor)
-      override.update(marked_complete: true) if override.present?
+      override.presence&.update(marked_complete: true)
     end
   end
 
   def active_rubric_association?
     !!rubric_association&.active?
+  end
+
+  def update_peer_review_submission
+    # To maintain backward compatibility, we update peer review submissions when
+    # an assessment request is deleted in both legacy and peer review modes
+    return unless peer_review_sub_assignment_id.present?
+    return unless workflow_state == "completed"
+
+    PeerReview::SubmissionUpdaterService.new(
+      parent_assignment: asset.assignment,
+      assessor:
+    ).call
   end
 end

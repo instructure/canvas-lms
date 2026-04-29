@@ -19,30 +19,31 @@
 import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
 import {DiscussionSummary, DiscussionSummaryProps} from '../DiscussionSummary'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {MockedProvider} from '@apollo/client/testing'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {DiscussionSummaryRatings} from '../DiscussionSummaryRatings'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const server = setupServer()
 
 const I18n = createI18nScope('discussion_posts')
 
 const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
   const defaultProps: DiscussionSummaryProps = {
-    onDisableSummaryClick: jest.fn(),
+    onDisableSummaryClick: vi.fn(),
     isMobile: false,
     summary: null,
-    onSetSummary: jest.fn(),
+    onSetSummary: vi.fn(),
     isFeedbackLoading: false,
-    onSetIsFeedbackLoading: jest.fn(),
+    onSetIsFeedbackLoading: vi.fn(),
     liked: false,
-    onSetLiked: jest.fn(),
+    onSetLiked: vi.fn(),
     disliked: false,
-    onSetDisliked: jest.fn(),
-    postDiscussionSummaryFeedback: jest.fn().mockResolvedValue(Promise.resolve()),
+    onSetDisliked: vi.fn(),
+    postDiscussionSummaryFeedback: vi.fn().mockResolvedValue(Promise.resolve()),
     ...props,
   }
 
@@ -50,7 +51,7 @@ const setup = (props: Partial<DiscussionSummaryProps> = {}) => {
     <MockedProvider>
       <AlertManagerContext.Provider
         // @ts-expect-error
-        value={{setOnFailure: props.setOnFailure || jest.fn(), setOnSuccess: jest.fn()}}
+        value={{setOnFailure: props.setOnFailure || vi.fn(), setOnSuccess: vi.fn()}}
       >
         <DiscussionSummary {...defaultProps} />
       </AlertManagerContext.Provider>
@@ -66,27 +67,28 @@ describe('DiscussionSummary', () => {
     usage: {currentCount: 3, limit: 5},
   }
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup({
       discussion_topic_id: '5678',
       context_id: '1234',
       context_type: 'Course',
     })
-    // Reset mock for each test
-    jest.clearAllMocks()
-    ;(doFetchApi as jest.Mock).mockReset()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    ;(doFetchApi as jest.Mock).mockClear()
+    server.resetHandlers()
   })
   describe('DiscussionSummaryUsagePill', () => {
     it('should display a pill with summary usage information and an enabled Generate button if some usage left', async () => {
-      ;(doFetchApi as jest.Mock).mockImplementationOnce(() =>
-        Promise.resolve({
-          json: expectedSummary,
-        }),
+      server.use(
+        http.get('/api/v1/courses/1234/discussion_topics/5678/summaries', () =>
+          HttpResponse.json(expectedSummary),
+        ),
       )
 
       const {getByTestId} = setup({
@@ -105,10 +107,14 @@ describe('DiscussionSummary', () => {
     })
 
     it('should display a pill with summary usage information and a disabled Generate button if no usage left', async () => {
-      ;(doFetchApi as jest.Mock).mockImplementationOnce(() =>
-        Promise.resolve({
-          json: {id: 1, text: 'This is a discussion summary', usage: {currentCount: 5, limit: 5}},
-        }),
+      server.use(
+        http.get('/api/v1/courses/1234/discussion_topics/5678/summaries', () =>
+          HttpResponse.json({
+            id: 1,
+            text: 'This is a discussion summary',
+            usage: {currentCount: 5, limit: 5},
+          }),
+        ),
       )
 
       const {getByTestId} = setup({
@@ -129,11 +135,18 @@ describe('DiscussionSummary', () => {
 
   describe('Interactions', () => {
     beforeEach(() => {
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: expectedSummary})
+      server.use(
+        http.get('/api/v1/courses/1234/discussion_topics/5678/summaries', () =>
+          HttpResponse.json(expectedSummary),
+        ),
+        http.post('/api/v1/courses/1234/discussion_topics/5678/summaries', () =>
+          HttpResponse.json(expectedSummary),
+        ),
+      )
     })
 
     it('should call onDisableSummaryClick when disable button is clicked', async () => {
-      const onDisableSummaryClick = jest.fn()
+      const onDisableSummaryClick = vi.fn()
       const {getByTestId} = setup({
         summary: expectedSummary,
         onDisableSummaryClick: onDisableSummaryClick,
@@ -151,6 +164,14 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call fetchSummary with correct parameters when generate button is clicked', async () => {
+      let capturedUrl = ''
+      server.use(
+        http.post('/api/v1/courses/1234/discussion_topics/5678/summaries', ({request}) => {
+          capturedUrl = request.url
+          return HttpResponse.json(expectedSummary)
+        }),
+      )
+
       const {getByTestId} = setup({
         summary: expectedSummary,
       })
@@ -168,20 +189,15 @@ describe('DiscussionSummary', () => {
         fireEvent.click(generateButton!)
       })
 
-      expect(doFetchApi).toHaveBeenCalledWith({
-        method: 'POST',
-        // @ts-expect-error
-        path: `/api/v1/courses/${ENV.context_id}/discussion_topics/${ENV.discussion_topic_id}/summaries`,
-        params: {userInput: 'focus on student feedback'},
+      await waitFor(() => {
+        expect(capturedUrl).toContain('/api/v1/courses/1234/discussion_topics/5678/summaries')
+        expect(capturedUrl).toContain('userInput=focus')
       })
     })
 
     it('should call postDiscussionSummaryFeedback with like when like button is clicked', async () => {
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: false, disliked: false}})
-      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({json: {liked: true, disliked: false}})
-
-      const setLiked = jest.fn()
-      const postDiscussionSummaryFeedback = jest.fn()
+      const setLiked = vi.fn()
+      const postDiscussionSummaryFeedback = vi.fn()
       const {getByTestId} = setup({
         summary: expectedSummary,
         postDiscussionSummaryFeedback,
@@ -202,14 +218,8 @@ describe('DiscussionSummary', () => {
     })
 
     it('should call postDiscussionSummaryFeedback with dislike when dislike button is clicked', async () => {
-      // Setup mocks specifically for this test
-      const mockFetchApi = doFetchApi as jest.Mock
-      mockFetchApi.mockImplementation(() =>
-        Promise.resolve({json: {liked: false, disliked: false}}),
-      )
-
-      const setDisliked = jest.fn()
-      const postDiscussionSummaryFeedback = jest.fn().mockResolvedValue({})
+      const setDisliked = vi.fn()
+      const postDiscussionSummaryFeedback = vi.fn().mockResolvedValue({})
 
       const {getByTestId} = setup({
         summary: expectedSummary,
@@ -233,13 +243,38 @@ describe('DiscussionSummary', () => {
       expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('dislike')
     })
 
-    it('should call postDiscussionSummaryFeedback with reset_like when dislike is true and dislike button is clicked', async () => {
-      // Setup mocks specifically for this test
-      const mockFetchApi = doFetchApi as jest.Mock
-      mockFetchApi.mockImplementation(() => Promise.resolve({json: {liked: false, disliked: true}}))
+    it('should not show feedback form on mount even when already disliked', async () => {
+      const postDiscussionSummaryFeedback = vi.fn().mockResolvedValue({})
 
-      const setDisliked = jest.fn()
-      const postDiscussionSummaryFeedback = jest.fn().mockResolvedValue({})
+      const {queryByTestId} = setup({
+        summary: expectedSummary,
+        postDiscussionSummaryFeedback,
+        liked: false,
+        disliked: true,
+      })
+
+      expect(queryByTestId('summary-feedback-comment')).not.toBeInTheDocument()
+    })
+
+    it('should call postDiscussionSummaryFeedback with dislike when dislike button is clicked', async () => {
+      const postDiscussionSummaryFeedback = vi.fn().mockResolvedValue({})
+
+      const {getByTestId} = setup({
+        summary: expectedSummary,
+        postDiscussionSummaryFeedback,
+        liked: false,
+        disliked: false,
+      })
+
+      const dislikeButton = await waitFor(() => getByTestId('summary-dislike-button'))
+      fireEvent.click(dislikeButton)
+
+      expect(postDiscussionSummaryFeedback).toHaveBeenCalledWith('dislike')
+    })
+
+    it('should call postDiscussionSummaryFeedback with reset_like when dislike is true and dislike button is clicked', async () => {
+      const setDisliked = vi.fn()
+      const postDiscussionSummaryFeedback = vi.fn().mockResolvedValue({})
 
       const {getByTestId} = setup({
         summary: expectedSummary,
@@ -266,8 +301,9 @@ describe('DiscussionSummary', () => {
 
   describe('DiscussionSummaryRatings', () => {
     const defaultProps = {
-      onLikeClick: jest.fn(),
-      onDislikeClick: jest.fn(),
+      onLikeClick: vi.fn(),
+      onDislikeClick: vi.fn(),
+      onSubmitFeedbackComment: vi.fn(),
       liked: false,
       disliked: false,
       isEnabled: true,
@@ -286,6 +322,102 @@ describe('DiscussionSummary', () => {
     it('should display "Thank you for sharing!" when disliked is true', () => {
       const {getByText} = render(<DiscussionSummaryRatings {...defaultProps} disliked={true} />)
       expect(getByText(I18n.t('Thank you for sharing!'))).toBeInTheDocument()
+    })
+
+    it('should not show feedback form when not disliked', () => {
+      const {queryByTestId} = render(<DiscussionSummaryRatings {...defaultProps} />)
+      expect(queryByTestId('summary-feedback-comment')).not.toBeInTheDocument()
+    })
+
+    it('should show feedback form after clicking dislike', () => {
+      const onDislikeClick = vi.fn()
+      const {getByTestId, rerender} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings {...defaultProps} onDislikeClick={onDislikeClick} />
+        </AlertManagerContext.Provider>,
+      )
+
+      // Click dislike
+      fireEvent.click(getByTestId('summary-dislike-button'))
+      expect(onDislikeClick).toHaveBeenCalled()
+
+      // Rerender with disliked=true to simulate parent state update
+      rerender(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings
+            {...defaultProps}
+            disliked={true}
+            onDislikeClick={onDislikeClick}
+          />
+        </AlertManagerContext.Provider>,
+      )
+
+      expect(getByTestId('summary-feedback-comment')).toBeInTheDocument()
+      expect(getByTestId('summary-feedback-submit')).toBeInTheDocument()
+    })
+
+    it('should disable Send Feedback button when comment is empty', () => {
+      const onDislikeClick = vi.fn()
+      const {getByTestId, rerender} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings {...defaultProps} onDislikeClick={onDislikeClick} />
+        </AlertManagerContext.Provider>,
+      )
+
+      // Click dislike
+      fireEvent.click(getByTestId('summary-dislike-button'))
+
+      // Rerender with disliked=true
+      rerender(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings
+            {...defaultProps}
+            disliked={true}
+            onDislikeClick={onDislikeClick}
+          />
+        </AlertManagerContext.Provider>,
+      )
+
+      // Send Feedback button should be disabled when no text entered
+      expect(getByTestId('summary-feedback-submit')).toBeDisabled()
+    })
+
+    it('should call onSubmitFeedbackComment with comment text when submitted', () => {
+      const onSubmitFeedbackComment = vi.fn()
+      const onDislikeClick = vi.fn()
+      const {getByTestId, rerender} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings
+            {...defaultProps}
+            onDislikeClick={onDislikeClick}
+            onSubmitFeedbackComment={onSubmitFeedbackComment}
+          />
+        </AlertManagerContext.Provider>,
+      )
+
+      // Click dislike to show form
+      fireEvent.click(getByTestId('summary-dislike-button'))
+
+      // Rerender with disliked=true
+      rerender(
+        <AlertManagerContext.Provider value={{setOnFailure: vi.fn(), setOnSuccess: vi.fn()}}>
+          <DiscussionSummaryRatings
+            {...defaultProps}
+            disliked={true}
+            onDislikeClick={onDislikeClick}
+            onSubmitFeedbackComment={onSubmitFeedbackComment}
+          />
+        </AlertManagerContext.Provider>,
+      )
+
+      // Type feedback
+      fireEvent.change(getByTestId('summary-feedback-comment'), {
+        target: {value: 'The summary missed key points'},
+      })
+
+      // Submit
+      fireEvent.click(getByTestId('summary-feedback-submit'))
+      expect(onSubmitFeedbackComment).toHaveBeenCalledWith('The summary missed key points')
     })
   })
 })

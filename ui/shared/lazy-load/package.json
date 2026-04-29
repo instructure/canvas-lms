@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "name",
-  "main": "./react/LazyLoad.jsx"
+  "main": "./react/LazyLoad.jsx",
+  "owner": "CFA"
 }

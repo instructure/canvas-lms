@@ -19,88 +19,26 @@
 import groovy.transform.Field
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
-@Field static final SUCCESS_NOT_BUILT = [buildResult: 'SUCCESS', stageResult: 'NOT_BUILT']
-@Field static final SUCCESS_UNSTABLE = [buildResult: 'SUCCESS', stageResult: 'UNSTABLE']
-
-def createDistribution(nestedStages) {
-  def rspecqNodeTotal = commitMessageFlag('rspecq-ci-node-total') as Integer
-  def setupNodeHook = this.&setupNode
-
-  def baseEnvVars = [
-    "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
-    'POSTGRES_PASSWORD=sekret'
-  ]
-
-  def rspecqEnvVars = baseEnvVars + [
-    'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
-    'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)',
-    "FORCE_FAILURE=${commitMessageFlag('force-failure-rspec').asBooleanInteger()}",
-    "RERUNS_RETRY=${commitMessageFlag('rspecq-max-requeues') as Integer}",
-    "RSPEC_PROCESSES=${commitMessageFlag('rspecq-processes') as Integer}",
-    "RSPECQ_MAX_REQUEUES=${commitMessageFlag('rspecq-max-requeues') as Integer}",
-  ]
-
-  if(env.CRYSTALBALL_MAP == '1') {
-    rspecqEnvVars = rspecqEnvVars + ['RSPECQ_FILE_SPLIT_THRESHOLD=9999', 'CRYSTALBALL_MAP=1']
-  } else {
-    rspecqEnvVars = rspecqEnvVars + ["RSPECQ_FILE_SPLIT_THRESHOLD=${commitMessageFlag('rspecq-file-split-threshold') as Integer}"]
-  }
-
-  if(env.ENABLE_AXE_SELENIUM == '1') {
-    rspecqEnvVars = rspecqEnvVars + ['TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium']
-  } else {
-    rspecqEnvVars = rspecqEnvVars + ['TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/']
-  }
-
-  extendedStage('RSpecQ Reporter for Rspec')
-    .envVars(rspecqEnvVars)
-    .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook])
-    .nodeRequirements([label: nodeLabel()])
-    .timeout(15)
-    .queue(nestedStages, this.&runReporter)
-
-  rspecqNodeTotal.times { index ->
-    extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
-      .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
-      .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode() }])
-      .nodeRequirements([label: nodeLabel()])
-      .timeout(15)
-      .queue(nestedStages, this.&runRspecqSuite)
-  }
-}
-
 def setupNode() {
   try {
-    env.AUTO_CANCELLED = env.AUTO_CANCELLED ?: ''
     distribution.unstashBuildScripts()
-    if (queue_empty()) {
-      env.AUTO_CANCELLED += "${env.CI_NODE_INDEX},"
-      cancel_node(SUCCESS_NOT_BUILT, 'Test queue is empty, releasing node.')
-      return
-    }
     libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-    credentials.withStarlordCredentials { ->
-      sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-    }
+    sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
 
     sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
   } catch (err) {
     if (!(err instanceof FlowInterruptedException)) {
       send_slack_alert(err)
-      env.AUTO_CANCELLED += "${env.CI_NODE_INDEX},"
-      cancel_node(SUCCESS_UNSTABLE, "RspecQ node setup failed!: ${err}")
-      return
+      echo "RspecQ node ${env.CI_NODE_INDEX} setup failed: ${err}"
+      currentBuild.result = 'UNSTABLE'
+      // Fail loudly to prevent confusing downstream failures
+      error "RspecQ node ${env.CI_NODE_INDEX} setup failed - aborting to prevent confusing failures in Run Tests stage"
     }
     throw err
   }
 }
 
 def tearDownNode() {
-  if (env.AUTO_CANCELLED?.split(',')?.contains("${env.CI_NODE_INDEX}")) {
-    cancel_node(SUCCESS_NOT_BUILT, 'Node cancelled!')
-    return
-  }
-
   def destDir = "tmp/${env.CI_NODE_INDEX}"
   def srcDir = "${env.COMPOSE_PROJECT_NAME}-canvas-1:/usr/src/app"
   def uploadDockerLogs = commitMessageFlag('upload-docker-logs') as Boolean
@@ -109,10 +47,13 @@ def tearDownNode() {
     set -ex
 
     rm -rf ./tmp && mkdir -p $destDir ${destDir}_rspec_results
+    tar cfz $destDir/worker_logs.tgz worker_logs/${env.CI_NODE_INDEX}/ 2>/dev/null || true
+    rm -rf worker_logs/${env.CI_NODE_INDEX}
     docker cp ${srcDir}/log/results ${destDir}_rspec_results/ || true
     docker cp ${srcDir}/log/spec_failures ${destDir}/spec_failures/ || true
+    docker cp ${srcDir}/log/skipped ${destDir}/skipped/ || true
 
-    tar cvfz ${destDir}/rspec_results.tgz ${destDir}_rspec_results/
+    tar cfz ${destDir}/rspec_results.tgz ${destDir}_rspec_results/
 
     if [[ "\$COVERAGE" == "1" ]]; then
       docker cp ${srcDir}/coverage ${destDir}/coverage/ || true
@@ -143,7 +84,7 @@ def tearDownNode() {
     def specTitle = splitPath.toList().subList(4, splitPath.size() - 2).join('/')
     def errorClass = splitPath[splitPath.size() - 2]
 
-    def finalCategory = reruns_retry.toInteger() == 0 ? 'Initial' : "Rerun_${reruns_retry.toInteger()}"
+    def finalCategory = env.RERUNS_RETRY.toInteger() == 0 ? 'Initial' : "Rerun_${env.RERUNS_RETRY.toInteger()}"
     def artifactsPath = "${currentBuild.getAbsoluteUrl()}artifact/${file.getPath()}"
 
     buildSummaryReport.addFailurePath(specTitle, artifactsPath, pathCategory)
@@ -155,83 +96,97 @@ def tearDownNode() {
       buildSummaryReport.setFailureCategoryUnlessExists(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_PASSED_ON_RETRY)
     }
   }
+
+  // Find and process skipped tests
+  findFiles(glob: "$destDir/skipped/**/*.json").each { skipFile ->
+    // Skip empty files to avoid JSON parse errors
+    if (skipFile.length == 0) {
+      echo "Skipping empty file: ${skipFile.path}"
+      return
+    }
+
+    try {
+      def skipReport = readJSON file: skipFile.path
+
+      skipReport.pending?.each { test ->
+        buildSummaryReport.addSkippedTest(test.location, test)
+      }
+
+      // Explicitly extract fields to avoid Jenkins readJSON LazyMap serialization issues
+      def eventData = [
+        summary: [
+          total_examples: skipReport.summary?.total_examples,
+          total_pending: skipReport.summary?.total_pending,
+          generated_at: skipReport.summary?.generated_at
+        ],
+        pending: skipReport.pending?.collect { test ->
+          [
+            description: test.description,
+            location: test.location,
+            file_path: test.file_path,
+            line_number: test.line_number,
+            execution_result: test.execution_result,
+            reason: test.reason,
+            pending_fixed: test.pending_fixed,
+            jira_number: test.jira_number,
+            skip_date: test.skip_date,
+            timestamp: test.timestamp
+          ]
+        } ?: []
+      ]
+
+      reportBuildLog("rspecq_test_data", eventData, "observe-test-tracking-token")
+    } catch (Exception e) {
+      echo "Failed to process skip report file ${skipFile.path}: ${e.message}"
+      // Continue processing other files
+    }
+  }
 }
 
 def runRspecqSuite() {
   try {
-    if (env.AUTO_CANCELLED?.split(',')?.contains("${env.CI_NODE_INDEX}")) {
-      cancel_node(SUCCESS_NOT_BUILT, 'Node cancelled!')
-      return
-    }
-    sh(script: 'docker compose exec -T -e ENABLE_AXE_SELENIUM \
-                                       -e SENTRY_DSN \
-                                       -e RSPECQ_UPDATE_TIMINGS \
-                                       -e JOB_NAME \
-                                       -e COVERAGE \
-                                       -e BUILD_NAME \
-                                       -e BUILD_NUMBER \
-                                       -e CRYSTALBALL_MAP \
-                                       -e CI_NODE_INDEX \
-                                       -e CRYSTAL_BALL_SPECS canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
-  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-    if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      /* groovylint-disable-next-line GStringExpressionWithinString */
-      sh '''#!/bin/bash
-        ids=( $(docker ps -aq --filter "name=canvas-") )
-        for i in "${ids[@]}"
-        do
-          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
-        done
-      '''
-    }
+    sh(script: """#!/bin/bash
+      set -o nounset -o errexit -o errtrace -o pipefail
 
-    throw e
+      PROCESSES=\$(( \${RSPEC_PROCESSES:-1} - 1 ))
+      mkdir -p worker_logs/${env.CI_NODE_INDEX}
+
+      worker_pids=()
+      for i in \$(seq 0 \$PROCESSES); do
+        (
+          set +e
+          docker compose exec -T \\
+            -e PARALLEL_INDEX=\$i \\
+            -e RAILS_DB_NAME_TEST=canvas_test_\$i \\
+            -e "RSPEC_SKIP_TRACKER_OUTPUT=log/skipped/skip_report_${env.CI_NODE_INDEX}_\$i.json" \\
+            -e ENABLE_AXE_SELENIUM -e SENTRY_DSN -e RSPECQ_UPDATE_TIMINGS \\
+            -e RSPECQ_WORKER_LIVENESS_SEC -e JOB_NAME -e COVERAGE \\
+            -e BUILD_NAME -e BUILD_NUMBER -e CRYSTALBALL_MAP \\
+            -e CI_NODE_INDEX -e CRYSTAL_BALL_SPECS \\
+            -e TEST_PATTERN -e EXCLUDE_TESTS \\
+            canvas bash -c 'build/new-jenkins/rspecq-tests.sh' 2>&1 | \\
+            tee worker_logs/${env.CI_NODE_INDEX}/worker_\$i.log | \\
+            awk -v prefix="[worker-\$i]" '{ print prefix " " \$0; fflush() }'
+          exit \${PIPESTATUS[0]}
+        ) &
+        worker_pids+=(\$!)
+      done
+
+      EXIT_CODE=0
+      for pid in "\${worker_pids[@]}"; do
+        wait \$pid || EXIT_CODE=\$?
+      done
+
+      exit \$EXIT_CODE
+    """, label: 'Run RspecQ Tests')
   } catch (err) {
     if (err instanceof FlowInterruptedException) {
       throw err
     }
     send_slack_alert(err)
-    env.AUTO_CANCELLED += "${env.CI_NODE_INDEX},"
-    cancel_node(SUCCESS_UNSTABLE, "RspecQ node failed!: ${err}")
-    /* groovylint-disable-next-line ReturnNullFromCatchBlock */
-    return
+    echo "RspecQ node ${env.CI_NODE_INDEX} failed: ${err}"
+    throw err
   }
-}
-
-def runReporter() {
-  try {
-    sh(script: "docker compose exec -e SENTRY_DSN -T canvas bundle exec rspecq \
-                                            --build=${JOB_NAME}_build${BUILD_NUMBER} \
-                                            --queue-wait-timeout 120 \
-                                            --redis-url $RSPECQ_REDIS_URL \
-                                            --report", label: 'Reporter')
-  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-    if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      /* groovylint-disable-next-line GStringExpressionWithinString */
-      sh '''#!/bin/bash
-        ids=( $(docker ps -aq --filter "name=canvas-") )
-        for i in "${ids[@]}"
-        do
-          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
-        done
-      '''
-    }
-
-    throw e
-  }
-}
-
-def queue_empty() {
-  env.REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
-  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $REGISTRY_BASE/redis:alpine"
-  def queueInfo = sh(script: "docker run -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
-                                      redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:unprocessed;\
-                                      redis-cli -h $TEST_QUEUE_HOST -p 6379 scard ${JOB_NAME}_build${BUILD_NUMBER}:queue:processed;\
-                                      redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}:queue:status'", returnStdout: true).split('\n')
-  def queueUnprocessed = queueInfo[0].split(' ')[1].trim()
-  def queueProcessed = queueInfo[1].split(' ')[1].trim()
-  def queueStatus = queueInfo[2].trim()
-  return queueStatus == '\"ready\"' && queueUnprocessed.toInteger() == 0 && queueProcessed.toInteger() > 1
 }
 
 def send_slack_alert(error) {
@@ -242,8 +197,41 @@ def send_slack_alert(error) {
   )
 }
 
-def cancel_node(buildResult, errorMessage) {
-  catchError(buildResult) {
-    error errorMessage
+def runRspecQWorkerNode(index, additionalEnvVars = []) {
+  def stageName = "RSpecQ ${index}"
+  node(nodeLabel()) {
+    def stageStartTime = System.currentTimeMillis()
+    try {
+      stage("${index} Cleanup") {
+        pipelineHelpers.cleanupWorkspace()
+      }
+
+      stage("${index} Setup") {
+        setupNode()
+      }
+
+      def baseEnvVars = [
+        "CI_NODE_INDEX=${index}",
+        "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}"
+      ]
+      def envVars = baseEnvVars + additionalEnvVars
+
+      withEnv(envVars) {
+        stage("${index} Run Tests") {
+          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+            runRspecqSuite()
+          }
+        }
+
+        stage("${index} Collect Results") {
+          tearDownNode()
+        }
+      }
+    } finally {
+      buildSummaryReport.trackStage(stageName, stageStartTime)
+      pipelineHelpers.cleanupDocker()
+    }
   }
 }
+
+return this

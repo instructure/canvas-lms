@@ -21,14 +21,14 @@ import useDebouncedSearchTerm from '../useDebouncedSearchTerm'
 
 describe('useDebouncedSearchTerm', () => {
   beforeAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   it('debounces updates to the searchTerm state', () => {
     const {result} = renderHook(() => useDebouncedSearchTerm('default'))
     act(() => result.current.setSearchTerm('updated'))
     expect(result.current.searchTerm).toBe('default')
-    act(() => jest.runAllTimers())
+    act(() => vi.runAllTimers())
     expect(result.current.searchTerm).toBe('updated')
   })
 
@@ -36,10 +36,10 @@ describe('useDebouncedSearchTerm', () => {
     const isSearchableTerm = term => term === 'searchable'
     const {result} = renderHook(() => useDebouncedSearchTerm('default', {isSearchableTerm}))
     act(() => result.current.setSearchTerm('blah'))
-    act(() => jest.runAllTimers())
+    act(() => vi.runAllTimers())
     expect(result.current.searchTerm).toBe('default')
     act(() => result.current.setSearchTerm('searchable'))
-    act(() => jest.runAllTimers())
+    act(() => vi.runAllTimers())
     expect(result.current.searchTerm).toBe('searchable')
   })
 
@@ -48,7 +48,7 @@ describe('useDebouncedSearchTerm', () => {
     expect(result.current.searchTermIsPending).toBe(false)
     act(() => result.current.setSearchTerm('updated'))
     expect(result.current.searchTermIsPending).toBe(true)
-    act(() => jest.runAllTimers())
+    act(() => vi.runAllTimers())
     expect(result.current.searchTermIsPending).toBe(false)
   })
 
@@ -56,7 +56,7 @@ describe('useDebouncedSearchTerm', () => {
     const {result} = renderHook(() => useDebouncedSearchTerm('default'))
     act(() => result.current.setSearchTerm('updated'))
     act(() => result.current.cancelCallback())
-    act(() => jest.runAllTimers())
+    act(() => vi.runAllTimers())
     expect(result.current.searchTerm).toBe('default')
     expect(result.current.searchTermIsPending).toBe(false)
   })

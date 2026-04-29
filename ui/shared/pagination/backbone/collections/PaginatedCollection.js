@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
@@ -94,7 +92,6 @@ PaginatedCollection.prototype.fetch = function (opts) {
           _this.trigger('fetch:' + options.page, _this, response, options)
         }
         if (!((ref1 = _this.urls) != null ? ref1.next : void 0)) {
-           
           _this.trigger.apply(_this, ['fetched:last'].concat(slice.call(arguments)))
         }
         if (_this.loadAll && _this.urls.next != null) {

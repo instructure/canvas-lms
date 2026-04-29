@@ -20,12 +20,15 @@ import React from 'react'
 import {renderConnected} from './utils'
 import {PRIMARY_PACE} from './fixtures'
 import {App, type ResponsiveComponentProps} from '../app'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-const pollForPublishStatus = jest.fn()
-const setBlueprintLocked = jest.fn()
-const setResponsiveSize = jest.fn()
+const server = setupServer()
+
+const pollForPublishStatus = vi.fn()
+const setBlueprintLocked = vi.fn()
+const setResponsiveSize = vi.fn()
 
 const defaultProps: ResponsiveComponentProps = {
   loadingMessage: '',
@@ -37,8 +40,11 @@ const defaultProps: ResponsiveComponentProps = {
   unpublishedChanges: [],
   modalOpen: false,
   coursePace: PRIMARY_PACE,
-  hidePaceModal: jest.fn(),
+  hidePaceModal: vi.fn(),
 }
+
+beforeAll(() => server.listen())
+afterAll(() => server.close())
 
 beforeEach(() => {
   fakeENV.setup({
@@ -50,14 +56,18 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
   fakeENV.teardown()
-  fetchMock.reset()
+  server.resetHandlers()
 })
 
 describe('App', () => {
   it('renders empty state if supplied shell course pace', () => {
-    fetchMock.get(/\/api\/v1\/courses\/30\/pace_contexts.*/, {})
+    server.use(
+      http.get('/api/v1/courses/:courseId/pace_contexts', () => {
+        return HttpResponse.json({})
+      }),
+    )
     const {getByRole} = renderConnected(
       <App
         {...defaultProps}

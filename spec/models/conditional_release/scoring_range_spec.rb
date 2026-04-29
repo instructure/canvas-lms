@@ -78,12 +78,21 @@ module ConditionalRelease
         expect(@rule.scoring_ranges.for_score(30).count).to eq 0
       end
 
-      it "must apply upper bound as > score" do
+      it "must apply upper bound as > score (exclusive)" do
         @range.upper_bound = 90
         @range.save!
         expect(@rule.scoring_ranges.for_score(90.001).count).to eq 0
         expect(@rule.scoring_ranges.for_score(90).count).to eq 0
         expect(@rule.scoring_ranges.for_score(89.999).count).to eq 1
+      end
+
+      it "must include score of 1.0 when upper bound is 1.0 (100% special case)" do
+        @range.lower_bound = 0.8
+        @range.upper_bound = 1.0
+        @range.save!
+        expect(@rule.scoring_ranges.for_score(1.0).count).to eq 1
+        expect(@rule.scoring_ranges.for_score(0.999).count).to eq 1
+        expect(@rule.scoring_ranges.for_score(0.8).count).to eq 1
       end
 
       it "must apply lower bound as <= score" do
@@ -138,6 +147,16 @@ module ConditionalRelease
         @range.save!
         expect(@rule.scoring_ranges.first.contains_score(2)).to be false
         expect(@rule.scoring_ranges.last.contains_score(1)).to be true
+      end
+
+      it "must include upper bound in range for 100% scores" do
+        @range.lower_bound = 0.8
+        @range.upper_bound = 1.0
+        @range.save!
+        expect(@range.contains_score(1.0)).to be true
+        expect(@range.contains_score(0.999)).to be true
+        expect(@range.contains_score(0.8)).to be true
+        expect(@range.contains_score(0.79)).to be false
       end
     end
 

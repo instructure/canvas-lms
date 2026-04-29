@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
 import {optionsForGradingType} from '../../../shared/EnterGradesAsSetting'
 import AssignmentColumnHeader from './AssignmentColumnHeader'
@@ -114,11 +114,15 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
       courseId: assignment.course_id,
       // @ts-expect-error
       dueDate: assignment.due_at,
-      htmlUrl: assignment.html_url,
+      htmlUrl: assignment.parent_assignment
+        ? assignment.parent_assignment.html_url
+        : assignment.html_url,
       gradingType: assignment.grading_type,
       id: assignment.id,
       muted: assignment.muted,
       name: assignment.name,
+      newQuizzesAnonymousParticipants: assignment.new_quizzes_anonymous_participants,
+      parentAssignmentId: assignment.parent_assignment_id,
       pointsPossible: assignment.points_possible,
       postManually: assignment.post_manually,
       published: assignment.published,
@@ -230,11 +234,11 @@ export default class AssignmentColumnHeaderRenderer {
   // @ts-expect-error
   render(column: Column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
-     
-    ReactDOM.render(<AssignmentColumnHeader {...props} />, $container)
+
+    legacyRender(<AssignmentColumnHeader {...props} />, $container)
   }
 
   destroy(_column: Column, $container: HTMLElement, _gridSupport: GridSupport) {
-    ReactDOM.unmountComponentAtNode($container)
+    legacyUnmountComponentAtNode($container)
   }
 }

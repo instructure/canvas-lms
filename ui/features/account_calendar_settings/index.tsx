@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 
 import ready from '@instructure/ready'
 
@@ -31,7 +31,6 @@ declare const ENV: GlobalEnv & EnvAccountsAdminTools
 ready(() => {
   const container = document.getElementById('account-calendar-settings-container')
   if (container) {
-    const root = createRoot(container)
-    root.render(<AccountCalendarSettings accountId={parseInt(ENV.ACCOUNT_ID, 10)} />)
+    render(<AccountCalendarSettings accountId={parseInt(ENV.ACCOUNT_ID, 10)} />, container)
   }
 })

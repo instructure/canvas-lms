@@ -121,7 +121,7 @@ describe('SearchResults', () => {
       'Current',
     ]
     const wrapper = render(<SearchResultsComponent {...defaultProps()} />)
-    const headers = [...wrapper.container.querySelectorAll('thead tr th')].map(n => n.textContent)
+    const headers = [...Array.from(wrapper.container.querySelectorAll('thead tr th'))].map(n => n.textContent)
 
     expect(headers).toEqual(expectedHeaders)
   })
@@ -140,7 +140,7 @@ describe('SearchResults', () => {
   })
 
   test('shows a Spinner if requestingResults true', () => {
-    $.screenReaderFlashMessage = jest.fn()
+    $.screenReaderFlashMessage = vi.fn()
     renderComponent({requestingResults: true})
     expect(screen.getByRole('img', {name: /loading/i})).toBeInTheDocument()
   })
@@ -165,7 +165,7 @@ describe('SearchResults', () => {
     // fake to test that there's not a vertical scrollbar
     window.innerHeight = document.body.clientHeight + 1
     const historyItems = defaultHistoryItems()
-    const props = {...defaultProps(), nextPage: 'example.com', getNextPage: jest.fn()}
+    const props = {...defaultProps(), nextPage: 'example.com', getNextPage: vi.fn()}
     const wrapper = render(<SearchResultsComponent {...props} />)
     wrapper.rerender(<SearchResultsComponent {...props} historyItems={historyItems} />)
     expect(props.getNextPage).toHaveBeenCalledTimes(1)
@@ -177,7 +177,7 @@ describe('SearchResults', () => {
     const props = {
       ...defaultProps(),
       nextPage: 'example.com',
-      getNextPage: jest.fn(),
+      getNextPage: vi.fn(),
     }
     render(<SearchResultsComponent {...props} />)
     window.innerHeight = document.body.clientHeight - 1
@@ -192,7 +192,7 @@ describe('SearchResults', () => {
       ...defaultProps(),
       historyItems,
       nextPage: 'example.com',
-      getNextPage: jest.fn(),
+      getNextPage: vi.fn(),
     }
     render(<SearchResultsComponent {...props} />)
     window.innerHeight = document.body.clientHeight

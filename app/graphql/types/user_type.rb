@@ -19,12 +19,48 @@
 #
 
 module Types
+  class CourseWorkSubmissionsOrderField < BaseEnum
+    graphql_name "CourseWorkSubmissionsOrderField"
+    description "Fields to order course work submissions by"
+    value "graded_at", value: :graded_at, description: "Order by graded date"
+    value "due_at", value: :due_at, description: "Order by due date"
+  end
+
   class DashboardObserveeFilterInputType < BaseInputObject
     graphql_name "DashboardObserveeFilter"
     argument :observed_user_id,
              ID,
              "Only view filtered user",
              required: false
+  end
+
+  class DiscussionParticipantFilterInputType < BaseInputObject
+    graphql_name "DiscussionParticipantFilter"
+    argument :is_announcement, Boolean, <<~MD, required: false
+      only return participants for discussions that are announcements (true) or
+      regular discussions (false). If not provided, returns both.
+    MD
+    argument :course_id, ID, <<~MD, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      only return participants for discussions in the specified course
+    MD
+    argument :read_state, String, <<~MD, required: false
+      only return participants with specific read state: 'read', 'unread', or 'all' (default)
+    MD
+  end
+
+  class PeerReviewStatusType < ApplicationObjectType
+    description "Peer review status for a student on an assignment"
+
+    field :completed_reviews_count, Int, null: false, description: "Number of peer reviews the student has completed"
+    field :must_review_count, Int, null: false, description: "Number of peer reviews the student has been allocated"
+
+    def must_review_count
+      object[:must_review_count] || 0
+    end
+
+    def completed_reviews_count
+      object[:completed_reviews_count] || 0
+    end
   end
 
   class UserType < ApplicationObjectType
@@ -45,17 +81,19 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
+    connection_type_class TotalCountConnection
+
     global_id_field :id
 
-    field :first_name, HtmlEncodedStringType, null: true
-    field :last_name, HtmlEncodedStringType, null: true
-    field :name, HtmlEncodedStringType, null: true
+    field :first_name, String, null: true
+    field :last_name, String, null: true
+    field :name, String, null: true
     field :short_name,
-          HtmlEncodedStringType,
+          String,
           "A short name the user has selected, for use in conversations or other less formal places through the site.",
           null: true
     field :sortable_name,
-          HtmlEncodedStringType,
+          String,
           "The name of the user that is should be used for sorting groups of users, such as in the gradebook.",
           null: true
 
@@ -66,14 +104,18 @@ module Types
       object.discussions_splitscreen_view?
     end
 
-    field :avatar_url, UrlType, null: true
+    field :widget_dashboard_config, String, null: true
+    def widget_dashboard_config
+      config = object.get_preference(:widget_dashboard_config)
+      config&.to_json
+    end
 
+    field :avatar_url, UrlType, null: true
     def avatar_url
-      Loaders::AssociationLoader.for(User, :pseudonym).load(object).then do
-        if object.account.service_enabled?(:avatars)
-          AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false)
-        else
-          nil
+      load_association(:pseudonym).then do
+        load_association(:associated_root_accounts).then do
+          root_account = context[:domain_root_account]
+          AvatarHelper.avatar_url_for_user(object, context[:request], root_account:, use_fallback: false)
         end
       end
     end
@@ -103,7 +145,19 @@ module Types
     field :email, String, null: true
 
     def email
-      return nil unless object.grants_all_rights?(context[:current_user], :read_profile, :read_email_addresses)
+      # Check account/course permissions before user-level to avoid N+1 queries.
+      # In course context, skip expensive object.grants_right? that loads all user enrollments.
+      domain_root_account = context[:domain_root_account]
+      unless domain_root_account.grants_right?(context[:current_user], :read_email_addresses)
+        course = context[:course]
+        has_permission = if course
+                           course.grants_right?(context[:current_user], :read_email_addresses)
+                         else
+                           object.grants_right?(context[:current_user], :read_email_addresses)
+                         end
+
+        return unless has_permission
+      end
 
       return object.email if object.email_cached?
 
@@ -116,47 +170,67 @@ module Types
 
     field :sis_id, String, null: true
     def sis_id
+      # Check account/course permissions before user-level to avoid N+1 queries.
+      # In course context, skip expensive object.grants_any_right? that loads all user enrollments.
       domain_root_account = context[:domain_root_account]
-      if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
-         context[:course]&.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
-         object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
-        Loaders::AssociationLoader.for(User, :pseudonyms)
-                                  .load(object)
-                                  .then do
-          pseudonym = SisPseudonym.for(object,
-                                       domain_root_account,
-                                       type: :implicit,
-                                       require_sis: false,
-                                       root_account: domain_root_account,
-                                       in_region: true)
-          pseudonym&.sis_user_id
-        end
+      unless domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+        course = context[:course]
+        has_permission = if course
+                           course.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+                         else
+                           object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+                         end
+
+        return unless has_permission
+      end
+
+      load_association(:pseudonyms).then do
+        pseudonym = SisPseudonym.for(object,
+                                     domain_root_account,
+                                     type: :implicit,
+                                     require_sis: false,
+                                     root_account: domain_root_account,
+                                     in_region: true,
+                                     current_user:)
+        pseudonym&.sis_user_id
       end
     end
 
     field :integration_id, String, null: true
     def integration_id
+      # Check account/course permissions before user-level to avoid N+1 queries.
+      # In course context, skip expensive object.grants_any_right? that loads all user enrollments.
       domain_root_account = context[:domain_root_account]
-      if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
-         context[:course]&.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
-         object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
-        Loaders::AssociationLoader.for(User, :pseudonyms)
-                                  .load(object)
-                                  .then do
-          pseudonym = SisPseudonym.for(object,
-                                       domain_root_account,
-                                       type: :implicit,
-                                       require_sis: false,
-                                       root_account: domain_root_account,
-                                       in_region: true)
-          pseudonym&.integration_id
-        end
+      unless domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+        course = context[:course]
+        has_permission = if course
+                           course.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+                         else
+                           object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+                         end
+
+        return unless has_permission
+      end
+
+      load_association(:pseudonyms).then do
+        pseudonym = SisPseudonym.for(object,
+                                     domain_root_account,
+                                     type: :implicit,
+                                     require_sis: false,
+                                     root_account: domain_root_account,
+                                     in_region: true,
+                                     current_user:)
+        pseudonym&.integration_id
       end
     end
 
     ALLOWED_ORDER_BY_VALUES = %w[id user_id course_id created_at start_at end_at completed_at courses.id courses.name courses.course_code courses.start_at courses.conclude_at].to_set
 
     field :enrollments, [EnrollmentType], null: false do
+      argument :career_learning_library_only,
+               Boolean,
+               "Whether or not to only filter for or exclude Canvas Career learning library only courses",
+               required: false
       argument :course_id,
                ID,
                "only return enrollments for this course",
@@ -185,27 +259,27 @@ module Types
                required: false
     end
 
-    # TODO: handle N+1
     field :login_id, String, null: true
     def login_id
       course = context[:course]
       return nil unless course
       return nil unless course.grants_right?(current_user, session, :view_user_logins)
 
-      pseudonym = SisPseudonym.for(
-        object,
-        course,
-        type: :implicit,
-        require_sis: false,
-        root_account: context[:domain_root_account],
-        in_region: true
-      )
-      return nil unless pseudonym
-
-      pseudonym.unique_id
+      load_association(:pseudonyms).then do
+        pseudonym = SisPseudonym.for(
+          object,
+          course,
+          type: :implicit,
+          require_sis: false,
+          root_account: context[:domain_root_account],
+          in_region: true,
+          current_user:
+        )
+        pseudonym&.unique_id
+      end
     end
 
-    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {})
+    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, career_learning_library_only: nil, sort: {})
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
         course_ids:,
@@ -213,6 +287,7 @@ module Types
         current_only:,
         exclude_concluded:,
         horizon_courses:,
+        career_learning_library_only:,
         sort:
       ).load(object.id).then do |enrollments|
         (enrollments || []).select do |enrollment|
@@ -220,6 +295,105 @@ module Types
             enrollment.grants_right?(context[:current_user], context[:session], :read)
         end
       end
+    end
+
+    field :enrollments_connection, EnrollmentType.connection_type, null: true do
+      argument :course_id,
+               ID,
+               "only return enrollments for this course",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :course_ids,
+               [ID],
+               "only return enrollments for these courses",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Course")
+      argument :current_only,
+               Boolean,
+               "Whether or not to restrict results to `active` enrollments in `available` courses",
+               required: false
+      argument :enrollment_types,
+               [EnrollmentTypeType],
+               "Filter by enrollment types (e.g., TeacherEnrollment, TaEnrollment)",
+               required: false
+      argument :exclude_concluded,
+               Boolean,
+               "Whether or not to exclude `completed` enrollments",
+               required: false
+      argument :horizon_courses,
+               Boolean,
+               "Whether or not to include or exclude Canvas Career courses",
+               required: false
+      argument :order_by,
+               [String],
+               "The fields to order the results by",
+               required: false,
+               validates: { all: { inclusion: { in: ALLOWED_ORDER_BY_VALUES } } }
+      argument :sort,
+               EnrollmentsSortInputType,
+               "The sort field and direction for the results. Secondary sort is by section name",
+               required: false
+    end
+    def enrollments_connection(course_id: nil, course_ids: nil, current_only: false, order_by: [], exclude_concluded: false, horizon_courses: nil, sort: {}, enrollment_types: nil)
+      unless object == current_user ||
+             object.grants_right?(current_user, session, :read_profile) ||
+             object.grants_right?(current_user, session, :read)
+        return Enrollment.none
+      end
+
+      enrollments = object.enrollments.shard(object.in_region_associated_shards).joins(:course)
+
+      if object != current_user
+        domain_root_account = context[:domain_root_account]
+        has_manage_students = domain_root_account&.grants_right?(current_user, session, :manage_students)
+
+        if has_manage_students
+          enrollments = enrollments.where(root_account_id: domain_root_account.id)
+        else
+          permitted_course_ids = current_user.enrollments
+                                             .shard(current_user.in_region_associated_shards)
+                                             .joins(:course)
+                                             .where(courses: { workflow_state: ["available", "completed"] })
+                                             .distinct
+                                             .pluck(:course_id)
+
+          observer_course_ids = current_user.observer_enrollments
+                                            .shard(current_user.in_region_associated_shards)
+                                            .active
+                                            .where(associated_user: object)
+                                            .distinct
+                                            .pluck(:course_id)
+
+          all_permitted_course_ids = (permitted_course_ids | observer_course_ids)
+
+          if all_permitted_course_ids.any?
+            enrollments = enrollments.where(course_id: all_permitted_course_ids)
+          else
+            return Enrollment.none
+          end
+        end
+      end
+
+      if course_id
+        enrollments = enrollments.where(course_id:)
+      elsif course_ids.present?
+        enrollments = enrollments.where(course_id: course_ids)
+      end
+
+      if current_only
+        enrollments = enrollments.where(workflow_state: "active")
+                                 .where(courses: { workflow_state: "available" })
+      end
+
+      if exclude_concluded
+        enrollments = enrollments.where.not(workflow_state: "completed")
+      end
+
+      if enrollment_types.present?
+        enrollments = enrollments.where(type: enrollment_types.map(&:to_s))
+      end
+
+      enrollments.order(:id)
     end
 
     field :notification_preferences_enabled, Boolean, null: false do
@@ -334,14 +508,21 @@ module Types
           base_url: self.context[:request].base_url
         )
 
-        collections = search_contexts_and_users(
+        search_options = {
           search:,
           context:,
           synthetic_contexts: true,
           messageable_only: true,
           base_url: self.context[:request].base_url,
           include_concluded: false
-        )
+        }
+
+        # Only allow students to search for teachers to prevent them from messaging other students
+        if object.has_student_enrollment? && object.account.root_account.feature_enabled?(:restrict_student_access)
+          search_options[:restrict_to_teacher_recipients] = true
+        end
+
+        collections = search_contexts_and_users(**search_options)
 
         contexts_collection = collections.select { |c| c[0] == "contexts" }
         users_collection = collections.select { |c| c[0] == "participants" }
@@ -393,7 +574,14 @@ module Types
       argument :filter, Types::UserGroupMembershipsFilterInputType, required: false
     end
     def group_memberships(filter: {})
-      Loaders::UserLoaders::GroupMembershipsLoader.for(filter:).load(object.id)
+      Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: current_user, filter:).load(object.id)
+    end
+
+    field :differentiation_tags_connection, GroupMembershipType.connection_type, null: true do
+      argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+    end
+    def differentiation_tags_connection(course_id: nil)
+      Loaders::UserLoaders::DifferentiationTagsLoader.for(current_user, course_id).load(object.id)
     end
 
     # TODO: deprecate this
@@ -500,6 +688,132 @@ module Types
       end
     end
 
+    field :course_work_submissions_connection, Types::SubmissionType.connection_type, null: true do
+      description "All actionable submissions for the current user across enrolled courses, for course work widget"
+      argument :course_filter, String, required: false
+      argument :end_date, GraphQL::Types::ISO8601DateTime, required: false, description: "End date for due date range filter"
+      argument :include_no_due_date, Boolean, required: false, description: "Include assignments with no due date"
+      argument :include_overdue, Boolean, required: false, description: "Include overdue assignments"
+      argument :observed_user_id, ID, required: false, description: "ID of the observed user"
+      argument :only_current_grading_period, Boolean, required: false, default_value: true, description: "Only include missing submissions from current grading period (default: true)"
+      argument :only_graded_or_with_feedback, Boolean, required: false, description: "Show only graded submissions or submissions with instructor feedback"
+      argument :only_submitted, Boolean, required: false, description: "Show only submitted assignments"
+      argument :order_by, CourseWorkSubmissionsOrderField, required: false, description: "Field to order results by"
+      argument :start_date, GraphQL::Types::ISO8601DateTime, required: false, description: "Start date for due date range filter"
+    end
+    def course_work_submissions_connection(course_filter: nil, start_date: nil, end_date: nil, include_overdue: false, include_no_due_date: false, only_submitted: false, only_graded_or_with_feedback: false, observed_user_id: nil, order_by: nil, only_current_grading_period: true)
+      return [] unless object == current_user
+
+      # Get active course enrollments using the same filtering as dashboard
+      active_course_ids = if observed_user_id.present?
+                            observed_user = User.find_by(id: observed_user_id)
+                            return [] unless observed_user
+
+                            # For observers, get the observed user's current courses
+                            observer_course_ids = object.cached_course_ids_for_observed_user(observed_user)
+                            observed_user_current_ids = observed_user.cached_current_course_ids_for_dashboard(domain_root_account: context[:domain_root_account])
+                            observer_course_ids & observed_user_current_ids
+                          else
+                            object.cached_current_course_ids_for_dashboard(domain_root_account: context[:domain_root_account])
+                          end
+
+      if active_course_ids.empty?
+        return []
+      end
+
+      # Apply course filter if provided
+      if course_filter.present?
+        active_course_ids = [course_filter.to_i] & active_course_ids
+        return [] if active_course_ids.empty?
+      end
+
+      # Build a more efficient query for submissions instead of loading everything
+      # Start with submissions for the user
+      user_for_submissions = observed_user_id.present? ? User.find_by(id: observed_user_id) : object
+      return [] unless user_for_submissions
+
+      return user_for_submissions.recent_feedback(course_ids: active_course_ids) if only_graded_or_with_feedback
+
+      submissions_query = Submission
+                          .joins(assignment: :course)
+                          .where(user: user_for_submissions)
+                          .where(assignments: { context_id: active_course_ids, context_type: "Course" })
+                          .where(assignments: { workflow_state: "published" })
+                          .where(courses: { workflow_state: "available" })
+                          .where.not(workflow_state: "deleted")
+                          .where(assignments: { has_sub_assignments: false })
+
+      # Filter by submission status
+      submissions_query = if only_submitted
+                            # Include submitted, graded, or excused submissions
+                            # BUT exclude missing submissions (teacher marked or calculated)
+                            submissions_query.where(<<~SQL.squish)
+                              (submissions.excused = true
+                              OR submissions.workflow_state IN ('submitted', 'pending_review')
+                              OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded'))
+                            SQL
+                                             .where.not(id: Submission.missing.where(user: user_for_submissions).select(:id))
+                          elsif include_overdue
+                            # For missing filter: only apply basic non-excused filter
+                            # The Submission.missing scope will handle the rest
+                            # Don't pre-filter graded submissions as they may be marked missing
+                            submissions_query.where("excused = FALSE OR excused IS NULL")
+                          else
+                            # Default: show unsubmitted, non-excused, non-graded assignments (actionable items)
+                            # Match the logic in SubmissionStatisticsType.submissions_due_count
+                            submissions_query.where(submitted_at: nil)
+                                             .where("excused = FALSE OR excused IS NULL")
+                                             .where("(submissions.score IS NULL OR submissions.workflow_state != 'graded')")
+                          end
+
+      # Apply date filtering using flexible date parameters (skip for submitted items)
+      unless only_submitted
+        conditions = []
+        params = []
+
+        # Add date range filter if provided
+        if start_date.present? && end_date.present?
+          conditions << "((cached_due_date IS NOT NULL AND cached_due_date BETWEEN ? AND ?) OR (cached_due_date IS NULL AND assignments.due_at IS NOT NULL AND assignments.due_at BETWEEN ? AND ?))"
+          params += [start_date, end_date, start_date, end_date]
+        elsif start_date.present?
+          conditions << "((cached_due_date IS NOT NULL AND cached_due_date >= ?) OR (cached_due_date IS NULL AND assignments.due_at IS NOT NULL AND assignments.due_at >= ?))"
+          params += [start_date, start_date]
+        elsif end_date.present?
+          conditions << "((cached_due_date IS NOT NULL AND cached_due_date <= ?) OR (cached_due_date IS NULL AND assignments.due_at IS NOT NULL AND assignments.due_at <= ?))"
+          params += [end_date, end_date]
+        end
+
+        # Add overdue filter if requested
+        if include_overdue
+          submissions_query = submissions_query.merge(Submission.missing)
+          if only_current_grading_period
+            submissions_query = submissions_query.merge(Submission.in_current_grading_period_for_courses(active_course_ids))
+          end
+        end
+
+        # Add no due date filter if requested
+        if include_no_due_date
+          conditions << "(cached_due_date IS NULL AND assignments.due_at IS NULL)"
+        end
+
+        # Apply the combined conditions
+        if conditions.any?
+          submissions_query = submissions_query.where(conditions.join(" OR "), *params)
+        end
+      end
+
+      # Order submissions based on order_by parameter
+      submissions_query = case order_by
+                          when :graded_at
+                            submissions_query.order(graded_at: :desc)
+                          when :due_at, nil
+                            submissions_query.order(:cached_due_date, assignments: { due_at: :asc })
+                          end
+
+      # Use eager_load for essential associations to avoid N+1 queries
+      submissions_query.eager_load(assignment: :course)
+    end
+
     field :viewable_submissions_connection, Types::SubmissionType.connection_type, null: true do
       description "All submissions with comments that the current_user is able to view"
       argument :filter, [String], required: false
@@ -555,28 +869,102 @@ module Types
       argument :query, String, <<~MD, required: false
         Only include comments that match the query string.
       MD
-      argument :limit, Integer, required: false
+      argument :assignment_id, ID, required: false
+      argument :course_id, ID, required: false
     end
-    def comment_bank_items_connection(query: nil, limit: nil)
+    def comment_bank_items_connection(query: nil, course_id: nil, assignment_id: nil)
       return unless object == current_user
 
-      comments = current_user.comment_bank_items.shard(object)
-
+      comments = current_user.comment_bank_items
       comments = comments.where(ActiveRecord::Base.wildcard("comment", query.strip)) if query&.strip.present?
-      # .to_a gets around the .shard() bug documented in FOO-1989 so that it can be properly limited.
-      # After that bug is fixed and Switchman is upgraded in Canvas, we can remove the block below
-      # and use the 'first' argument on the connection instead of 'limit'.
-      # Note that limit: 5 is currently being used by the Comment Library.
-      if limit.present?
-        comments = comments.limit(limit).to_a.first(limit)
-      end
+      comments = comments.where(course_id:) if course_id.present?
+      comments = comments.where(assignment_id:) if assignment_id.present?
 
       comments
     end
 
-    field :comment_bank_items_count, Integer, null: true
-    def comment_bank_items_count
-      Loaders::CommentBankItemCountLoader.load(object)
+    field :discussion_participants_connection, Types::DiscussionParticipantType.connection_type, null: true do
+      description "All discussion topic participants for the user, optionally filtered by announcement status"
+      argument :filter, DiscussionParticipantFilterInputType, required: false
+      argument :observed_user_id, ID, "ID of the observed user", required: false
+    end
+    def discussion_participants_connection(filter: {}, observed_user_id: nil)
+      return unless object == current_user
+
+      user_for_participants = observed_user_id.present? ? User.find_by(id: observed_user_id) : object
+      return DiscussionTopicParticipant.none unless user_for_participants
+
+      # Start with user's discussion topic participants, joining discussion_topic for filtering
+      participants = user_for_participants.discussion_topic_participants
+                                          .joins(:discussion_topic)
+
+      # Filter by announcement status if specified
+      if filter[:is_announcement] == true
+        participants = participants.where(discussion_topics: { type: "Announcement" })
+      elsif filter[:is_announcement] == false
+        participants = participants.where(discussion_topics: { type: ["DiscussionTopic", nil] })
+      end
+
+      # Filter by course if specified
+      if filter[:course_id].present?
+        participants = participants.where(discussion_topics: { context_id: filter[:course_id], context_type: "Course" })
+      end
+
+      # Filter by read state if specified
+      if filter[:read_state] == "read"
+        participants = participants.where(workflow_state: "read")
+      elsif filter[:read_state] == "unread"
+        participants = participants.where(workflow_state: "unread")
+      end
+      # For 'all' or no filter, include both read and unread
+
+      # Apply visibility filtering - only active/unpublished discussions
+      participants = participants.where(
+        discussion_topics: {
+          workflow_state: ["active", "unpublished"]
+        }
+      )
+
+      # Filter to only discussions in courses where user has active enrollment
+      # Use cached_current_course_ids_for_dashboard for consistent filtering
+      active_course_ids = if observed_user_id.present?
+                            observed_user = User.find_by(id: observed_user_id)
+                            return DiscussionTopicParticipant.none unless observed_user
+
+                            # For observers, get the observed user's current courses
+                            observer_course_ids = current_user.cached_course_ids_for_observed_user(observed_user)
+                            observed_user_current_ids = observed_user.cached_current_course_ids_for_dashboard(domain_root_account: context[:domain_root_account])
+                            observer_course_ids & observed_user_current_ids
+                          else
+                            current_user.cached_current_course_ids_for_dashboard(domain_root_account: context[:domain_root_account])
+                          end
+
+      return DiscussionTopicParticipant.none if active_course_ids.empty?
+
+      participants = participants.where(
+        discussion_topics: {
+          context_id: active_course_ids,
+          context_type: "Course"
+        }
+      )
+
+      # Apply time-based filtering for announcements (similar to official announcements page)
+      if filter[:is_announcement] == true
+        current_time = Time.now.utc
+        participants = participants.where(
+          "(discussion_topics.unlock_at IS NULL OR discussion_topics.unlock_at < :current_time) AND
+           (discussion_topics.delayed_post_at IS NULL OR discussion_topics.delayed_post_at < :current_time) AND
+           (discussion_topics.lock_at IS NULL OR discussion_topics.lock_at > :current_time)",
+          current_time:
+        )
+      end
+
+      # Order by discussion topic creation date (newest first) for announcements
+      if filter[:is_announcement] == false
+        participants.order("discussion_topics.id ASC")
+      else
+        participants.order("discussion_topics.created_at DESC")
+      end
     end
 
     field :course_roles, [String], null: true do
@@ -618,6 +1006,23 @@ module Types
       object.inbox_labels
     end
 
+    field :peer_review_status, PeerReviewStatusType, null: true do
+      description "Peer review status for assignments where peer reviews are enabled"
+    end
+    def peer_review_status
+      assignment_id = context[:assignment_id]
+      return nil unless assignment_id
+
+      assignment = Assignment.find_by(id: assignment_id)
+      return nil unless assignment
+
+      return nil unless assignment.grants_right?(current_user, :grade) &&
+                        assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
+                        assignment.peer_reviews
+
+      Loaders::PeerReviewStatusLoader.for(assignment_id).load(object.id)
+    end
+
     field :activity_stream, ActivityStreamType, null: true do
       argument :only_active_courses, Boolean, required: false
     end
@@ -628,40 +1033,107 @@ module Types
       context.scoped_set!(:context_type, "User")
       object
     end
+
+    field :institutional_tags_connection,
+          Types::InstitutionalTagType.connection_type,
+          null: true do
+      argument :account_id,
+               ID,
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
+    end
+    def institutional_tags_connection(account_id:)
+      Loaders::UserLoaders::InstitutionalTagsLoader.for(current_user, session, account_id).load(object.id)
+    end
   end
 end
 
 module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
-    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true, horizon_courses: nil, sort: {})
-      scope = if horizon_courses
+    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false, exclude_pending_enrollments: true, horizon_courses: nil, career_learning_library_only: nil, sort: {})
+      @course_ids = course_ids
+      @order_by = order_by
+      @current_only = current_only
+      @exclude_concluded = exclude_concluded
+      @exclude_pending_enrollments = exclude_pending_enrollments
+      @horizon_courses = horizon_courses
+      @career_learning_library_only = career_learning_library_only
+      @sort = sort
+
+      scope = build_scope
+
+      super(scope, :user_id)
+    end
+
+    def perform(user_ids)
+      users = User.where(id: user_ids).index_by { |u| Shard.global_id_for(u.id) }
+
+      users_by_shard = users.each_value.with_object({}) do |user, hash|
+        user.in_region_associated_shards.each do |shard|
+          hash[shard] ||= []
+          hash[shard] << user
+        end
+      end
+
+      all_enrollments = []
+      users_by_shard.each do |shard, shard_users|
+        shard.activate do
+          scope = build_scope
+          local_user_ids = shard_users.map(&:id)
+          all_enrollments.concat(scope.where(user_id: local_user_ids).to_a)
+        end
+      end
+
+      enrollments_by_user = all_enrollments.group_by { |e| Shard.global_id_for(e.user_id) }
+
+      user_ids.each do |id|
+        if users[id]
+          fulfill(id, enrollments_by_user[id] || [])
+        else
+          fulfill(id, nil)
+        end
+      end
+    end
+
+    private
+
+    def build_scope
+      scope = if @horizon_courses
                 Enrollment.horizon
-              elsif horizon_courses == false
+              elsif @horizon_courses == false
                 Enrollment.not_horizon
               else
                 Enrollment.joins(:course)
               end
 
-      scope = if current_only
+      scope = if @career_learning_library_only
+                scope.career_learning_library
+              elsif @career_learning_library_only == false
+                scope.not_career_learning_library
+              else
+                scope
+              end
+
+      scope = if @current_only
                 scope.current.active_by_date
               else
                 scope.where.not(enrollments: { workflow_state: "deleted" })
                      .where.not(courses: { workflow_state: "deleted" })
               end
 
-      scope = scope.where(course_id: course_ids) if course_ids.present?
+      scope = scope.where(course_id: @course_ids) if @course_ids.present?
 
-      scope = scope.where.not(enrollments: { workflow_state: "completed" }) if exclude_concluded
+      scope = scope.where.not(enrollments: { workflow_state: "completed" }) if @exclude_concluded
 
-      scope = scope.excluding_pending if exclude_pending_enrollments
+      scope = scope.excluding_pending if @exclude_pending_enrollments
 
-      order_by.each { |o| scope = scope.order(o) }
+      @order_by.each { |o| scope = scope.order(o) }
 
-      if sort.present?
-        sort_direction = (sort[:direction] == "desc") ? "DESC" : "ASC"
-        reversed_sort_direction = (sort[:direction] == "desc") ? "ASC" : "DESC"
+      if @sort.present?
+        sort_direction = (@sort[:direction] == "desc") ? "DESC" : "ASC"
+        reversed_sort_direction = (@sort[:direction] == "desc") ? "ASC" : "DESC"
 
-        case sort[:field]
+        case @sort[:field]
         when "last_activity_at"
           # The order for last_activity_at is intentionally reversed because last activity is
           # a timestamp and we want the most recent activity to appear first in ascending order
@@ -688,7 +1160,7 @@ module Loaders
         end
       end
 
-      super(scope, :user_id)
+      scope
     end
   end
 end

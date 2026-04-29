@@ -27,12 +27,12 @@ describe('The Comments component', () => {
     assessment: assessments.freeForm.data[1],
     savedComments: ['I award you no points', 'May god have mercy on your soul'],
     saveLater: false,
-    setComments: jest.fn(),
-    setSaveLater: jest.fn(),
+    setComments: vi.fn(),
+    setSaveLater: vi.fn(),
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the root component with a textarea when editing', () => {
@@ -75,7 +75,7 @@ describe('The Comments component', () => {
   })
 
   it('can use saved comments from before', () => {
-    const setComments = jest.fn()
+    const setComments = vi.fn()
     const {getByLabelText, getByText} = render(<Comments {...{...props, setComments}} />)
 
     // Open the dropdown
@@ -106,7 +106,7 @@ describe('The Comments component', () => {
   })
 
   it('allows entering comments in the textarea', () => {
-    const setComments = jest.fn()
+    const setComments = vi.fn()
     const {getByLabelText} = render(<Comments {...{...props, setComments}} />)
 
     // Get the textarea and trigger a change event
@@ -118,7 +118,7 @@ describe('The Comments component', () => {
   })
 
   it('can check / uncheck save for later', () => {
-    const setSaveLater = jest.fn()
+    const setSaveLater = vi.fn()
     const {getByLabelText} = render(<Comments {...{...props, setSaveLater}} />)
 
     // Click the checkbox

@@ -35,7 +35,7 @@ test('placeholder test', () => {})
 //   })
 
 //   it('fires onFileUpload on file upload', async () => {
-//     const onFileUploadSpy = jest.fn()
+//     const onFileUploadSpy = vi.fn()
 //     const {getByText, getByLabelText} = setup({onFileUpload: onFileUploadSpy})
 //     const uploadFilesTab = getByText('Upload Media')
 //     fireEvent.click(uploadFilesTab)
@@ -53,7 +53,7 @@ test('placeholder test', () => {})
 //   })
 
 //   it('fires onClose when modal is closed', () => {
-//     const onCloseSpy = jest.fn()
+//     const onCloseSpy = vi.fn()
 //     const {getByText} = setup({
 //       onClose: onCloseSpy
 //     })
@@ -63,7 +63,7 @@ test('placeholder test', () => {})
 //   })
 
 //   it('fires onOpen when modal is opened', () => {
-//     const onOpenSpy = jest.fn()
+//     const onOpenSpy = vi.fn()
 //     const {rerender} = setup({onOpen: onOpenSpy, open: false})
 //     rerender(
 //       <MediaUploadModal

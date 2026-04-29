@@ -31,12 +31,12 @@ const defaultProps = {
       },
     },
   ],
-  onChange: jest.fn(),
+  onChange: vi.fn(),
 }
 
 describe('TimeBlockSelector', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders the component', () => {
@@ -122,7 +122,7 @@ describe('TimeBlockSelector', () => {
   })
 
   it('calls onChange when modifications are made', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const ref = React.createRef()
     render(<TimeBlockSelector {...defaultProps} onChange={onChange} ref={ref} />)
 

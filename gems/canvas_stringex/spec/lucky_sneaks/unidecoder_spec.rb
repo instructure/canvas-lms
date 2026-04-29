@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe "Unidecoder" do
   # Silly phrases courtesy of Frank da Cruz
   # http://www.columbia.edu/kermit/utf8.html
@@ -69,21 +67,13 @@ describe "Unidecoder" do
   end
 
   it "unidecoder_decode" do
-    dont_convert.each do |ascii|
-      expect(ascii).to eq LuckySneaks::Unidecoder.decode(ascii)
-    end
-    convert_pairs.each do |unicode, ascii|
-      expect(ascii).to eq LuckySneaks::Unidecoder.decode(unicode)
-    end
+    expect(dont_convert).to all(satisfy { |ascii| ascii == LuckySneaks::Unidecoder.decode(ascii) })
+    expect(convert_pairs).to all(satisfy { |unicode, ascii| ascii == LuckySneaks::Unidecoder.decode(unicode) })
   end
 
   it "to_ascii" do
-    dont_convert.each do |ascii|
-      expect(ascii).to eq ascii.to_ascii
-    end
-    convert_pairs.each do |unicode, ascii|
-      expect(ascii).to eq unicode.to_ascii
-    end
+    expect(dont_convert).to all(satisfy { |ascii| ascii == ascii.to_ascii })
+    expect(convert_pairs).to all(satisfy { |unicode, ascii| ascii == unicode.to_ascii })
   end
 
   it "unidecoder_encode" do

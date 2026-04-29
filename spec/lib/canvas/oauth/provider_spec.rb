@@ -65,12 +65,12 @@ module Canvas::OAuth
 
     describe "#has_valid_key?" do
       it "is true when there is a key and the key is active" do
-        stub_dev_key(double(active?: true))
+        stub_dev_key(instance_double(DeveloperKey, active?: true))
         expect(provider.has_valid_key?).to be_truthy
       end
 
       it "is false when there is a key that is not active" do
-        stub_dev_key(double(active?: false))
+        stub_dev_key(instance_double(DeveloperKey, active?: false))
         expect(provider.has_valid_key?).to be_falsey
       end
 
@@ -121,19 +121,19 @@ module Canvas::OAuth
       end
 
       it "is true when the redirect url is kosher for the developerKey" do
-        stub_dev_key(double(redirect_domain_matches?: true))
+        stub_dev_key(instance_double(DeveloperKey, redirect_domain_matches?: true))
         expect(provider.has_valid_redirect?).to be_truthy
       end
 
       it "is false otherwise" do
-        stub_dev_key(double(redirect_domain_matches?: false))
+        stub_dev_key(instance_double(DeveloperKey, redirect_domain_matches?: false))
         expect(provider.has_valid_redirect?).to be_falsey
       end
     end
 
     describe "#icon_url" do
       it "delegates to the key" do
-        stub_dev_key(double(icon_url: "unique_url"))
+        stub_dev_key(instance_double(DeveloperKey, icon_url: "unique_url"))
         expect(provider.icon_url).to eq "unique_url"
       end
     end
@@ -144,35 +144,72 @@ module Canvas::OAuth
       end
 
       it "delegates to the class level finder on DeveloperKey" do
-        key = double
+        key = instance_double(DeveloperKey)
         stub_dev_key(key)
         expect(provider.key).to eq key
       end
     end
 
     describe "authorized_token?" do
-      let(:developer_key) { DeveloperKey.create! }
+      let(:developer_key) { DeveloperKey.create!(name: "test_key") }
       let(:user) { User.create! }
 
       it "finds a pre existing token with the same scope" do
         user.access_tokens.create!(developer_key:, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], remember_access: true)
-        expect(Provider.new(developer_key.id, "", ["userinfo"]).authorized_token?(user)).to be true
+        expect(Provider.new(developer_key.id, "", ["userinfo"], developer_key.name).authorized_token?(user)).to be true
       end
 
       it "ignores tokens unless access is remembered" do
         user.access_tokens.create!(developer_key:, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"])
-        expect(Provider.new(developer_key.id, "", ["userinfo"]).authorized_token?(user)).to be false
+        expect(Provider.new(developer_key.id, "", ["userinfo"], developer_key.name).authorized_token?(user)).to be false
       end
 
       it "ignores tokens for out of band requests" do
         user.access_tokens.create!(developer_key:, scopes: ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], remember_access: true)
-        expect(Provider.new(developer_key.id, Canvas::OAuth::Provider::OAUTH2_OOB_URI, ["userinfo"]).authorized_token?(user)).to be false
+        expect(Provider.new(developer_key.id, Canvas::OAuth::Provider::OAUTH2_OOB_URI, ["userinfo"], developer_key.name).authorized_token?(user)).to be false
+      end
+    end
+
+    describe "#can_issue_token?" do
+      let_once(:developer_key) { DeveloperKey.create!(name: "test_key") }
+      let_once(:trusted_key) { DeveloperKey.create!(name: "trusted_key").tap { |k| k.update!(trusted: true) } }
+      let_once(:regular_user) { user_model }
+
+      it "returns true for trusted developer keys regardless of user permissions" do
+        provider = Provider.new(trusted_key.id, "https://example.com")
+        expect(provider.can_issue_token?(regular_user, regular_user)).to be true
+      end
+
+      it "returns true for non-site-admin users with untrusted keys" do
+        provider = Provider.new(developer_key.id, "https://example.com")
+        expect(provider.can_issue_token?(regular_user, regular_user)).to be true
+      end
+
+      context "when user is a site admin" do
+        let_once(:site_admin) { site_admin_user }
+
+        it "returns false when user lacks site_admin_self_token_create permission" do
+          account_with_role_changes(account: Account.site_admin, role_changes: { site_admin_self_token_create: false })
+          provider = Provider.new(developer_key.id, "https://example.com")
+          expect(provider.can_issue_token?(site_admin, site_admin)).to be false
+        end
+
+        it "returns true when user has site_admin_self_token_create permission" do
+          provider = Provider.new(developer_key.id, "https://example.com")
+          expect(provider.can_issue_token?(site_admin, site_admin)).to be true
+        end
+
+        it "returns true for trusted keys even without the permission" do
+          account_with_role_changes(account: Account.site_admin, role_changes: { site_admin_self_token_create: false })
+          provider = Provider.new(trusted_key.id, "https://example.com")
+          expect(provider.can_issue_token?(site_admin, site_admin)).to be true
+        end
       end
     end
 
     describe "#app_name" do
       let(:key_attrs) { { name: "some app", user_name: "some user", email: "some email" } }
-      let(:key) { double(key_attrs) }
+      let(:key) { instance_double(DeveloperKey, **key_attrs) }
 
       it "prefers the key name" do
         stub_dev_key(key)
@@ -202,7 +239,7 @@ module Canvas::OAuth
     end
 
     describe "#session_hash" do
-      before { stub_dev_key(double(id: 123)) }
+      before { stub_dev_key(instance_double(DeveloperKey, id: 123)) }
 
       it "uses the key id for a client id" do
         expect(provider.session_hash[:client_id]).to eq "123"

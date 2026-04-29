@@ -21,8 +21,8 @@ import {render} from '@testing-library/react'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import AssignmentDescription from '../AssignmentDescription'
 
-jest.mock('@canvas/util/jquery/apiUserContent')
-apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
+vi.mock('@canvas/util/jquery/apiUserContent')
+apiUserContent.convert = vi.fn(arg => `converted ${arg}`)
 
 it('renders readOnly', () => {
   const text = 'Hello world'

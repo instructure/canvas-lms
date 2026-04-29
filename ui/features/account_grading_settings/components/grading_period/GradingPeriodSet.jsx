@@ -19,7 +19,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import {map, some, every, head, tail, sortBy, reject, isNaN, filter, isEmpty, each} from 'lodash'
+import {
+  isEmpty,
+  sortBy,
+  map,
+  some,
+  every,
+  head,
+  tail,
+  reject,
+  isNaN,
+  filter,
+  each,
+} from 'es-toolkit/compat'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine, IconPlusLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
@@ -152,7 +164,6 @@ export default class GradingPeriodSet extends React.Component {
         saving: false,
       },
     }
-    this._refs = {}
     this.editButtonRef = React.createRef()
     this.deleteButtonRef = React.createRef()
     this.addPeriodButtonRef = React.createRef()
@@ -165,7 +176,7 @@ export default class GradingPeriodSet extends React.Component {
     this.periodRefs = {}
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(_prevProps, prevState) {
     if (prevState.newPeriod.period && !this.state.newPeriod.period) {
       if (this.addPeriodButtonRef.current) {
         this.addPeriodButtonRef.current.focus()
@@ -174,7 +185,7 @@ export default class GradingPeriodSet extends React.Component {
       const period = {id: prevState.editPeriod.id}
       const refKey = getShowGradingPeriodRef(period)
       if (this.periodRefs[refKey] && this.periodRefs[refKey].current) {
-        this.periodRefs[refKey].current._refs.editButton.focus()
+        this.periodRefs[refKey].current.editButtonRef.current.focus()
       }
     }
   }

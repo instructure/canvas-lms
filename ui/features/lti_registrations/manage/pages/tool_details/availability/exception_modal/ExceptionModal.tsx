@@ -38,6 +38,8 @@ import {ContextSearchOption} from './ContextSearchOption'
 import {Spinner} from '@instructure/ui-spinner'
 import {ContextBrowse} from './ContextBrowse'
 import {LtiRegistrationId} from '../../../../model/LtiRegistrationId'
+import {showFlashAlert} from '@instructure/platform-alerts'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -56,6 +58,7 @@ export type ExceptionModalProps = {
   openState: ExceptionModalOpenState
   onClose: () => void
   onConfirm: (controls: ContextControlParameter[]) => Promise<void>
+  onSettled?: () => void
 }
 
 type ContextControlFormState = Array<{
@@ -69,11 +72,13 @@ export const ExceptionModal = ({
   accountId,
   onConfirm,
   registrationId,
+  onSettled,
 }: ExceptionModalProps) => {
   const [contextControlForm, setContextControlForm] = React.useState<ContextControlFormState>([])
 
   const confirmHandler = useMutation({
     mutationFn: onConfirm,
+    onSettled,
   })
 
   const close = () => {
@@ -98,7 +103,16 @@ export const ExceptionModal = ({
       control => control.context.context.id === context.context.id,
     )
     if (!existingControl) {
-      setContextControlForm(prev => [...prev, {context, available: false}])
+      const maxControlsSelectable = 100
+      if (contextControlForm.length >= maxControlsSelectable) {
+        alert(
+          I18n.t('Sorry, only %{maxControlsSelectable} exceptions can be loaded at one time.', {
+            maxControlsSelectable,
+          }),
+        )
+      } else {
+        setContextControlForm(prev => [...prev, {context, available: false}])
+      }
     }
     setBrowserOpen(false)
   }
@@ -106,13 +120,31 @@ export const ExceptionModal = ({
   const [browserOpen, setBrowserOpen] = React.useState(false)
 
   return (
-    <Modal open={openState.open} label={I18n.t('Add Availability and Exceptions')} size="medium">
+    <Modal
+      open={openState.open}
+      label={I18n.t('Add Availability and Exceptions')}
+      size="medium"
+      onExited={() => {
+        // We have to do the flash alert here and it must be polite, otherwise Modal's
+        // built-in focus management will trample over our alert and it won't get
+        // read out.
+        if (confirmHandler.isSuccess) {
+          showFlashAlert({
+            message: I18n.t('%{count} exception(s) were successfully added.', {
+              count: contextControlForm.length,
+            }),
+            type: 'success',
+            politeness: 'polite',
+          })
+        }
+      }}
+    >
       <Modal.Header>
         <CloseButton placement="end" offset="small" onClick={close} screenReaderLabel="Close" />
         <Heading>{I18n.t('Add Availability and Exceptions')}</Heading>
       </Modal.Header>
-      <Modal.Body>
-        <View minHeight="20em" as="div">
+      <Modal.Body overflow="scroll">
+        <View height="25rem" as="div">
           <Flex gap="small" margin="0 0 medium 0">
             <Flex.Item shouldGrow>
               {openState.open ? (
@@ -188,17 +220,31 @@ export const ExceptionModal = ({
                           </SimpleSelect>
                         </Flex.Item>
                         <Flex.Item>
-                          <IconButton
-                            screenReaderLabel={I18n.t('Delete exception for %{context_name}', {
-                              context_name: control.context.context.name,
-                            })}
-                            onClick={() => {
-                              // Remove the context from the context control form
-                              setContextControlForm(prev => prev.filter((_c, i) => i !== index))
-                            }}
+                          <Tooltip
+                            renderTip={
+                              <Text
+                                dangerouslySetInnerHTML={{
+                                  __html: I18n.t('Delete exception for *%{context_name}*', {
+                                    context_name: control.context.context.name,
+                                    wrapper: ['<strong>$1</strong>'],
+                                  }),
+                                }}
+                              />
+                            }
+                            on={['hover', 'focus']}
                           >
-                            <IconTrashLine />
-                          </IconButton>
+                            <IconButton
+                              screenReaderLabel={I18n.t('Delete exception for %{context_name}', {
+                                context_name: control.context.context.name,
+                              })}
+                              onClick={() => {
+                                // Remove the context from the context control form
+                                setContextControlForm(prev => prev.filter((_c, i) => i !== index))
+                              }}
+                            >
+                              <IconTrashLine />
+                            </IconButton>
+                          </Tooltip>
                         </Flex.Item>
                       </Flex>
                     </List.Item>
@@ -218,6 +264,7 @@ export const ExceptionModal = ({
       <Modal.Footer>
         <Button
           color="primary"
+          data-pendo="lti-registrations-save-exception"
           type="submit"
           disabled={disableView}
           onClick={() => {
@@ -232,7 +279,7 @@ export const ExceptionModal = ({
             }
           }}
         >
-          {I18n.t('Done')}
+          {I18n.t('Save')}
         </Button>
       </Modal.Footer>
     </Modal>

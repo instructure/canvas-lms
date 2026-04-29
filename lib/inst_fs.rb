@@ -21,6 +21,8 @@ module InstFS
   LONG_JWT_EXPIRATION = 10.minutes
   SHORT_JWT_EXPIRATION = 5.minutes
   class << self
+    include ActionView::Helpers::TagHelper
+
     def enabled?
       # true if plugin is enabled AND all settings values are set
       Canvas::Plugin.find("inst_fs").enabled? && !!app_host && !!jwt_secret
@@ -45,7 +47,7 @@ module InstFS
       if !session[:shown_instfs_pixel] && user && enabled?
         session[:shown_instfs_pixel] = true
         pixel_url = login_pixel_url(token: session_jwt(user, oauth_host))
-        %(<img src="#{pixel_url}" alt="" role="presentation" />).html_safe
+        tag.img src: pixel_url, alt: "", role: "presentation"
       end
     end
 
@@ -182,14 +184,23 @@ module InstFS
       data = {}
       data[file_name] = file_object
 
+      intervals = []
+      if file_object.respond_to?(:rewind)
+        intervals << (Rails.env.test? ? 0 : 0.5)
+        intervals << (Rails.env.test? ? 0 : 4.5) if Delayed::Worker.current_job
+      end
+      on_retry = ->(*) { file_object.rewind }
+      response = nil
+
       begin
-        retries ||= 0
-        response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
-      rescue Timeout::Error
-        if file_object.respond_to?(:rewind) && (retries += 1) < 2
-          file_object.rewind
-          retry
+        Canvas.retriable(on: [Timeout::Error, InstFS::RetriableError], intervals:, on_retry:) do |try|
+          response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
+          # retry 5xx errors such as gateway timeouts
+          if try <= intervals.size && response.code.to_i >= 500
+            raise InstFS::RetriableError, "retrying response with code \"#{response.code}\", message \"#{response.body}\""
+          end
         end
+      rescue Timeout::Error
         raise InstFS::ServiceError, "timed out communicating with instfs"
       rescue CanvasHttp::CircuitBreakerError
         raise InstFS::ServiceError, "unable to communicate with instfs"
@@ -405,12 +416,11 @@ module InstFS
         iat:,
         user_id: options[:user]&.global_id&.to_s,
         resource:,
-        jti: SecureRandom.uuid,
         host: options[:oauth_host]
       }
+      claims[:jti] = SecureRandom.uuid unless options[:no_jti]
       claims[:tenant_auth] = @token.tenant_auth if @token&.tenant_auth.present?
-      original_url = parse_original_url(options[:original_url])
-      claims[:original_url] = original_url if original_url.present?
+      claims[:fallback_url] = options[:fallback_url] if options[:fallback_url].present?
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
       end
@@ -503,23 +513,6 @@ module InstFS
       service_jwt(jwt_contents, SHORT_JWT_EXPIRATION)
     end
 
-    def parse_original_url(url)
-      if url
-        uri = Addressable::URI.parse(url)
-        query = (uri.query_values || {}).with_indifferent_access
-        # We only want to redirect once, if the redirect param is present then we already redirected.
-        # In which case we don't send the original_url param again
-        if Canvas::Plugin.value_to_boolean(query[:redirect])
-          nil
-        else
-          query[:redirect] = true
-          query[:no_cache] = true
-          uri.query_values = query
-          uri.to_s
-        end
-      end
-    end
-
     def amend_claims_for_access_token(claims, access_token, root_account)
       return unless access_token
 
@@ -558,6 +551,8 @@ module InstFS
       400
     end
   end
+
+  class RetriableError < StandardError; end
 
   class ExportReferenceError < StandardError; end
 

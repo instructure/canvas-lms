@@ -1,0 +1,132 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Flex} from '@instructure/ui-flex'
+import {IconPublishSolid, IconUnpublishedSolid} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
+import {Table, TableCellProps} from '@instructure/ui-table'
+import {Text} from '@instructure/ui-text'
+import {canvas} from '@instructure/ui-themes'
+
+import {AccessibilityResourceScan, ResourceWorkflowState} from '../../../../shared/react/types'
+import {ContentTypeCell} from './Cells/ContentTypeCell'
+import {ScanStateCell} from './Cells/ScanStateCell'
+import {useQueueScanResource} from '../../../../shared/react/hooks/useQueueScanResource'
+import {ActionsMenuCell} from './Cells/ActionsMenuCell'
+
+const I18n = createI18nScope('accessibility_checker')
+
+const baseCellThemeOverride: TableCellProps['themeOverride'] = _componentTheme => ({
+  padding: '1.0625rem 0.75rem', // Make cell height a total of 3.75rem at minimum
+})
+
+type ActiveTableRowProps = {
+  children: React.ReactNode
+  'data-testid'?: string
+}
+
+const ActiveTableRow = ({children, ...rest}: ActiveTableRowProps) => (
+  <tr
+    style={{
+      borderBottom: `0.0625rem solid ${canvas.colors.primitives.grey30}`,
+      outline: `2px solid ${canvas.colors.primitives.blue45}`,
+      outlineOffset: '-1px',
+    }}
+    {...rest}
+  >
+    {children}
+  </tr>
+)
+
+type Props = {
+  item: AccessibilityResourceScan
+  isMobile: boolean
+  isSelected: boolean
+}
+
+export const AccessibilityIssuesTableRow = ({item, isMobile, isSelected}: Props) => {
+  const {mutate: queueRescan} = useQueueScanResource()
+
+  const handleRescan = (scanItem: AccessibilityResourceScan) => {
+    queueRescan({item: scanItem})
+  }
+
+  const cells = (
+    <>
+      <Table.Cell themeOverride={baseCellThemeOverride} textAlign="start">
+        <Link data-pendo="navigate-to-resource-url" href={item.resourceUrl}>
+          <Text lineHeight="lineHeight150">{item.resourceName}</Text>
+        </Link>
+      </Table.Cell>
+      <Table.Cell>
+        <ScanStateCell item={item} isMobile={isMobile} onRescan={handleRescan} />
+      </Table.Cell>
+      <Table.Cell>
+        <ContentTypeCell item={item} />
+      </Table.Cell>
+      <Table.Cell>
+        <Flex alignItems="center" gap="x-small">
+          {item.resourceWorkflowState === ResourceWorkflowState.Published ? (
+            <>
+              <Flex.Item>
+                <Flex>
+                  <IconPublishSolid color="success" aria-hidden="true" />
+                </Flex>
+              </Flex.Item>
+              <Flex.Item>
+                <Text>{I18n.t('Published')}</Text>
+              </Flex.Item>
+            </>
+          ) : (
+            <>
+              <Flex.Item>
+                <Flex>
+                  <IconUnpublishedSolid color="secondary" aria-hidden="true" />
+                </Flex>
+              </Flex.Item>
+              <Flex.Item>
+                <Text>{I18n.t('Unpublished')}</Text>
+              </Flex.Item>
+            </>
+          )}
+        </Flex>
+      </Table.Cell>
+      <Table.Cell themeOverride={baseCellThemeOverride}>
+        <Text lineHeight="lineHeight150">
+          {item.resourceUpdatedAt
+            ? new Intl.DateTimeFormat('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: '2-digit',
+              }).format(new Date(item.resourceUpdatedAt))
+            : '-'}
+        </Text>
+      </Table.Cell>
+      <Table.Cell>
+        <ActionsMenuCell scan={item} />
+      </Table.Cell>
+    </>
+  )
+
+  if (isSelected) {
+    return <ActiveTableRow data-testid={`issue-row-${item.id}`}>{cells}</ActiveTableRow>
+  }
+
+  return <Table.Row data-testid={`issue-row-${item.id}`}>{cells}</Table.Row>
+}

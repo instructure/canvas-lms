@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "abort_exception_matcher" # we can't rely on autoloading since this is running during boot
 require "active_record/pg_extensions/all"
 
 class QuotedValue < String
@@ -376,14 +377,6 @@ module PostgreSQLAdapterExtensions
     @collations = nil
   end
 
-  class AbortExceptionMatcher
-    def self.===(other)
-      return true if defined?(IRB::Abort) && other.is_a?(IRB::Abort)
-
-      false
-    end
-  end
-
   def execute(...)
     super
   rescue AbortExceptionMatcher
@@ -396,6 +389,36 @@ module PostgreSQLAdapterExtensions
   rescue AbortExceptionMatcher
     @raw_connection.cancel
     raise
+  end
+
+  def non_empty_tables
+    non_empty_tables = tables.select do |t|
+      select_value("SELECT COUNT(*) FROM #{quote_table_name(t)}") > 0
+    end
+    non_empty_tables.delete(ActiveRecord::Base.schema_migrations_table_name)
+    non_empty_tables.delete(ActiveRecord::Base.internal_metadata_table_name)
+    non_empty_tables.delete(Shard.table_name)
+    non_empty_tables.delete(Account.table_name) if non_empty_tables.include?(Account.table_name) && !Account.where.not(id: 0).exists?
+    non_empty_tables.delete(Setting.table_name) if non_empty_tables.include?(Setting.table_name) && !Setting.where.not(name: ["session_secret_key", "encryption_key_hash"]).exists?
+    non_empty_tables
+  end
+
+  def non_empty_tables_message(non_empty_tables)
+    message = "Test database is not empty! Tables with data: #{non_empty_tables.join(", ")}"
+    non_empty_tables.each do |table|
+      model = ActiveRecord::Base.descendants.find { |m| m.table_name == table }
+      records = model.limit(5).to_a
+      count = model.count
+
+      message += records.map do |record|
+        "\n  #{record.inspect}"
+      end.join
+
+      if count > 5
+        message += "\n ... #{count - 5} more #{model.name} records"
+      end
+    end
+    message
   end
 
   BLOCKED_INSPECT_IVS = %i[
@@ -526,8 +549,9 @@ module IndexDefinitionExtensions
     super(*, **)
   end
 
-  def defined_for?(*, replica_identity: nil, **)
+  def defined_for?(*, replica_identity: nil, **options)
     return false unless replica_identity.nil? || self.replica_identity == replica_identity
+    return false unless !options.key?(:where) || where == options[:where]
 
     super
   end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {filter, keyBy} from 'lodash'
+import {keyBy, filter} from 'es-toolkit/compat'
 import createStore from '@canvas/backbone/createStore'
 import $ from 'jquery'
 import splitAssetString from '@canvas/util/splitAssetString'

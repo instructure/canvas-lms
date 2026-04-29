@@ -19,9 +19,9 @@
 #
 
 RSpec.describe ContentExportApiHelper do
-  let(:context) { double("Context", content_exports:, quizzes:) }
-  let(:content_exports) { double("ContentExports", build: export) }
-  let(:quizzes) { double("Quizzes", exists?: true) }
+  let(:context) { instance_double(Course, content_exports:, quizzes:) }
+  let(:content_exports) { instance_double(ActiveRecord::Relation, build: export) }
+  let(:quizzes) { instance_double(ActiveRecord::Relation, exists?: true) }
   let(:course) { Course.build }
   let(:export) { ContentExport.build(course:) }
   let(:current_user) { User.build }

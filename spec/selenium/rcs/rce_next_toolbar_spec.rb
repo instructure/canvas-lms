@@ -87,18 +87,6 @@ describe "RCE Next toolbar features", :ignore_js_errors do
         link_count = count_elems_by_tagname("a")
         expect(link_count).to eq(0)
       end
-
-      it "shows links popup toolbar" do
-        skip "routinely fails flakey spec catcher 1/10 times with 'no such window', but passes flakey spec catcher locally"
-        rce_wysiwyg_state_setup(@course, 'this is <a href="http://example.com">a link</a>.', html: true)
-
-        driver.switch_to.frame("wiki_page_body_ifr")
-        f("a").click
-
-        driver.switch_to.default_content
-        expect(fj('.tox-pop__dialog button:contains("Link Options")')).to be_displayed
-        expect(fj('.tox-pop__dialog button:contains("Remove Link")')).to be_displayed
-      end
     end
 
     context "list types" do
@@ -360,7 +348,7 @@ describe "RCE Next toolbar features", :ignore_js_errors do
 
     context "math equations" do
       it "renders math equation from math modal" do
-        skip("RCX-2486")
+        skip("RCX-2486 2024-10-10")
         page_title = "math_rendering"
         create_wiki_page_with_text(page_title)
         visit_existing_wiki_edit(@course, page_title)

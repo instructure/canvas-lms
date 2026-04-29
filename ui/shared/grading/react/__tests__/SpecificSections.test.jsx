@@ -79,7 +79,7 @@ describe('SpecificSections', () => {
   })
 
   test('clicking the section toggle calls onCheck', () => {
-    const onCheckSpy = jest.fn()
+    const onCheckSpy = vi.fn()
     context.onCheck = onCheckSpy
     mountComponent()
     getSectionToggleInput().click()
@@ -87,7 +87,7 @@ describe('SpecificSections', () => {
   })
 
   test('selecting a section calls sectionSelectionChanged', () => {
-    const sectionSelectionChangedSpy = jest.fn()
+    const sectionSelectionChangedSpy = vi.fn()
     context.checked = true
     context.sectionSelectionChanged = sectionSelectionChangedSpy
     mountComponent()
@@ -112,7 +112,7 @@ describe('SpecificSections', () => {
     })
 
     test('clicking the section toggle does not call onCheck', () => {
-      const onCheckSpy = jest.fn()
+      const onCheckSpy = vi.fn()
       context.onCheck = onCheckSpy
       mountComponent()
       getSectionToggleInput().click()

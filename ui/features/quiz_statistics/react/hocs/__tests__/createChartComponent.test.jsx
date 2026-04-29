@@ -38,8 +38,8 @@ describe('canvas_quizzes/statistics/createChartComponent', () => {
 
   it('calls updateChart with new props', () => {
     const chartNode = document.createElement('svg')
-    const createChart = jest.fn(() => chartNode)
-    const updateChart = jest.fn()
+    const createChart = vi.fn(() => chartNode)
+    const updateChart = vi.fn()
     const Chart = createChartComponent({
       createChart,
       updateChart,
@@ -63,7 +63,7 @@ describe('canvas_quizzes/statistics/createChartComponent', () => {
   })
 
   it('calls removeChart on removal', () => {
-    const removeChart = jest.fn()
+    const removeChart = vi.fn()
     const Chart = createChartComponent({
       createChart: () => document.createElement('svg'),
       removeChart,

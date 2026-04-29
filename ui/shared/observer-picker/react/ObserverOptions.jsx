@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -26,8 +26,8 @@ import {IconAddLine} from '@instructure/ui-icons'
 import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
 
-import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {CanvasAsyncSelect} from '@instructure/platform-instui-bindings'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {savedObservedId, saveObservedId} from '../ObserverGetObservee'
@@ -121,22 +121,6 @@ const ObserverOptions = ({
 
   const selectAvatar = userAvatar(selectedUser)
 
-  const addStudentOption = (
-    <CanvasAsyncSelect.Option
-      key="new"
-      id={ADD_STUDENT_OPTION_ID}
-      value="new"
-      renderBeforeLabel={props => <IconAddLine color={!props.isHighlighted ? 'brand' : null} />}
-      // according to the documentation the next line should override the default color
-      // on inst-ui 8.7.0, but it doesn't seem to work on inst-ui 7.9.0
-      // themeOverride={{color: k5ThemeVariables.colors.brand}}
-    >
-      <Text color={highlightedOption !== ADD_STUDENT_OPTION_ID ? 'brand' : null}>
-        {I18n.t('Add Student')}
-      </Text>
-    </CanvasAsyncSelect.Option>
-  )
-
   const handleClose = () => {
     setNewStudentModalOpen(false)
   }
@@ -148,26 +132,47 @@ const ObserverOptions = ({
     }
   }
 
+  const userPickerOptions = useMemo(
+    function () {
+      if (!(observedUsers.length > 1 || canAddObservee)) return []
+      const options = observedUsers
+        .filter(
+          u =>
+            u.name.toLowerCase().includes(selectSearchValue.toLowerCase()) ||
+            selectedUser.name.toLowerCase() === selectSearchValue.toLowerCase(),
+        )
+        .map(u => (
+          <CanvasAsyncSelect.Option
+            key={u.id}
+            id={u.id}
+            value={u.id}
+            renderBeforeLabel={userAvatar(u)}
+          >
+            {u.name}
+          </CanvasAsyncSelect.Option>
+        ))
+      if (canAddObservee) {
+        options.push(
+          <CanvasAsyncSelect.Option
+            key="new"
+            id={ADD_STUDENT_OPTION_ID}
+            value="new"
+            renderBeforeLabel={props => (
+              <IconAddLine color={!props.isHighlighted ? 'brand' : undefined} />
+            )}
+          >
+            <Text color={highlightedOption !== ADD_STUDENT_OPTION_ID ? 'brand' : undefined}>
+              {I18n.t('Add Student')}
+            </Text>
+          </CanvasAsyncSelect.Option>,
+        )
+      }
+      return options
+    },
+    [observedUsers, selectSearchValue, selectedUser, canAddObservee, highlightedOption],
+  )
+
   if (observedUsers.length > 1 || canAddObservee) {
-    const userPickerOptions = observedUsers
-      .filter(
-        u =>
-          u.name.toLowerCase().includes(selectSearchValue.toLowerCase()) ||
-          selectedUser.name.toLowerCase() === selectSearchValue.toLowerCase(),
-      )
-      .map(u => (
-        <CanvasAsyncSelect.Option
-          key={u.id}
-          id={u.id}
-          value={u.id}
-          renderBeforeLabel={userAvatar(u)}
-        >
-          {u.name}
-        </CanvasAsyncSelect.Option>
-      ))
-    if (canAddObservee) {
-      userPickerOptions.push(addStudentOption)
-    }
     return (
       <View as="div" margin={margin}>
         <CanvasAsyncSelect

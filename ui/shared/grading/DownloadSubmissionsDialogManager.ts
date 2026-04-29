@@ -30,8 +30,7 @@ class DownloadSubmissionsDialogManager {
 
   constructor(
     assignment: Pick<Assignment, 'id' | 'submission_types' | 'has_submitted_submissions'>,
-    // @ts-expect-error
-    downloadUrlTemplate,
+    downloadUrlTemplate: string,
     submissionsDownloading: (assignmentId: string) => void,
   ) {
     this.assignment = assignment
@@ -48,12 +47,12 @@ class DownloadSubmissionsDialogManager {
     )
   }
 
-  // @ts-expect-error
-  showDialog(cb) {
+  showDialog(cb: () => void) {
     this.submissionsDownloading(this.assignment.id)
 
-    // @ts-expect-error
-    INST.downloadSubmissions(this.downloadUrl, cb)
+    ;(
+      window as unknown as {INST: {downloadSubmissions: (url: string, cb: () => void) => void}}
+    ).INST.downloadSubmissions(this.downloadUrl, cb)
   }
 }
 

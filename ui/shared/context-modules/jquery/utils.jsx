@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import {some} from 'lodash'
+import {some} from 'es-toolkit/compat'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
@@ -151,12 +151,12 @@ export function initPublishButton($el, data) {
       render: () => {
         const model = $el.data('view').model
         const elem = $el[0]
+        const element = <PublishCloud {...props} model={model} disabled={model.get('disabled')} />
         if (!elem.reactRoot) {
-          elem.reactRoot = createRoot(elem)
+          elem.reactRoot = render(element, elem)
+        } else {
+          rerender(elem.reactRoot, element)
         }
-        elem.reactRoot.render(
-          <PublishCloud {...props} model={model} disabled={model.get('disabled')} />,
-        )
         // to look disable, we need to add the class here
         elem.classList[model.get('disabled') ? 'add' : 'remove']('disabled')
       },
@@ -235,10 +235,15 @@ export function setExpandAllButton() {
 }
 
 export function setExpandAllButtonHandler(lazy_load_callback) {
-  $('#expand_collapse_all').click(function () {
+  $('#expand_collapse_all').click(function (event) {
+    if ($(this).attr('aria-disabled') === 'true') {
+      event.preventDefault()
+      return false
+    }
+
     const shouldExpand = $(this).data('expand')
     if (shouldExpand) {
-      $('#expand_collapse_all').prop('disabled', true)
+      $('#expand_collapse_all').attr('aria-disabled', 'true')
     }
 
     if (ENV.FEATURES.instui_header) {
@@ -256,6 +261,20 @@ export function setExpandAllButtonHandler(lazy_load_callback) {
     )
     $(this).data('expand', !shouldExpand)
     $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
+
+    const collapsedModuleIds = []
+    if (shouldExpand) {
+      $('.context_module.collapsed_module:not(#context_module_blank)').each(function () {
+        const $module = $(this)
+        // Only fetch if module has no items loaded yet (same logic as individual expand)
+        const hasNoItems =
+          $module.find('.content .context_module_items').children().length === 0 &&
+          $module.find('.module_dnd').length === 0
+        if (hasNoItems) {
+          collapsedModuleIds.push($module.data('module-id'))
+        }
+      })
+    }
 
     $('.context_module:not(#context_module_blank)').each(function () {
       const $module = $(this)
@@ -285,9 +304,9 @@ export function setExpandAllButtonHandler(lazy_load_callback) {
     const collapse = shouldExpand ? '0' : '1'
     $.ajaxJSON(url, 'POST', {collapse}, _data => {
       if (shouldExpand && lazy_load_callback) {
-        lazy_load_callback(shouldExpand)
+        lazy_load_callback(shouldExpand, collapsedModuleIds)
       } else {
-        $(this).prop('disabled', false)
+        $(this).attr('aria-disabled', 'false')
       }
     })
   })
@@ -576,7 +595,7 @@ export function openExternalTool(ev) {
 let externalToolRoot = null
 const getExternalToolRoot = function () {
   if (!externalToolRoot) {
-    externalToolRoot = createRoot($('#external-tool-mount-point')[0])
+    externalToolRoot = render(<span />, $('#external-tool-mount-point')[0])
   }
   return externalToolRoot
 }
@@ -591,7 +610,8 @@ function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', 
   }
 
   const root = getExternalToolRoot()
-  root.render(
+  rerender(
+    root,
     <ContentTypeExternalToolTray
       tool={tool}
       placement={placement}
@@ -643,7 +663,8 @@ function setExternalToolModal({
   }
 
   const root = getExternalToolRoot()
-  root.render(
+  rerender(
+    root,
     <ExternalToolModalLauncher
       tool={tool}
       launchType={launchType}

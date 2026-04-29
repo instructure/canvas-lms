@@ -23,7 +23,7 @@ const clientId = 10000000009
 const createUrl = 'https://www.test.com/accounts/1/tool_configuration'
 
 beforeEach(() => {
-  axios.post = jest.fn()
+  axios.post = vi.fn()
   axios.post.mockReturnValue({data: {}})
 })
 

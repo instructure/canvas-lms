@@ -32,9 +32,7 @@ export const genericCarouselSettings = (): Settings => {
   }
 }
 
-export const responsiveCarouselSettings = (
-  items: string[] | Product[],
-): Settings => {
+export const responsiveCarouselSettings = (items: string[] | Product[]): Settings => {
   return {
     dots: false,
     infinite: false,

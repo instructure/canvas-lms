@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash'
+import {isEqual} from 'es-toolkit/compat'
 
 interface IconMakerSettings {
   name: string
@@ -117,7 +117,7 @@ export class IconMakerFormHasChanges {
   hasImageSettingsChange(): boolean {
     return (
       'imageSettings' in this.currentSettings &&
-      !_.isEqual(this.initialSettings.imageSettings, this.currentSettings.imageSettings)
+      !isEqual(this.initialSettings.imageSettings, this.currentSettings.imageSettings)
     )
   }
 

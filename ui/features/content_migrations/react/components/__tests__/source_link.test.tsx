@@ -181,7 +181,7 @@ describe('SourceLink', () => {
     })
 
     it('renders text with ellipsis style when link is not available', () => {
-      const component = renderComponent({ settings: undefined, attachment: undefined }, true)
+      const component = renderComponent({settings: undefined, attachment: undefined}, true)
       const textElement = component.getByText('File not available')
 
       expect(textElement).toBeInTheDocument()

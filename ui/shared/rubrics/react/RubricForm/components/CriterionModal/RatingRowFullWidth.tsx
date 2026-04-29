@@ -45,7 +45,6 @@ export const RatingRowFullWidth = ({
   setPointsInputText,
   showRemoveButton,
   onRemove,
-  unassessed,
 }: RatingRowProps) => {
   return (
     <Flex>
@@ -67,33 +66,25 @@ export const RatingRowFullWidth = ({
                   {criterionUseRange && (
                     <Flex.Item width="4.5rem" textAlign="end" margin="0 0 x-small 0">
                       <View as="span" margin="0 small 0 0" data-testid="range-start">
-                        {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
+                        {rangeStart != null ? I18n.t('>%{rangeStart} to ', {rangeStart}) : `--`}
                       </View>
                     </Flex.Item>
                   )}
-                  {unassessed ? (
-                    <Flex.Item>
-                      <RatingPointsInput
-                        index={index}
-                        isRange={criterionUseRange}
-                        pointsInputText={pointsInputText}
-                        rating={rating}
-                        ratingInputRefs={ratingInputRefs}
-                        onPointsBlur={onPointsBlur}
-                        setNewRating={(newNumber, textValue) => {
-                          setRatingForm('points', newNumber)
-                          setPointsInputText(textValue)
-                        }}
-                        shouldRenderLabel={false}
-                      />
-                    </Flex.Item>
-                  ) : (
-                    <Flex.Item margin="0 0 x-small 0">
-                      <View as="span" data-testid="rating-points-assessed">
-                        {rating.points}
-                      </View>
-                    </Flex.Item>
-                  )}
+                  <Flex.Item>
+                    <RatingPointsInput
+                      index={index}
+                      isRange={criterionUseRange}
+                      pointsInputText={pointsInputText}
+                      rating={rating}
+                      ratingInputRefs={ratingInputRefs}
+                      onPointsBlur={onPointsBlur}
+                      setNewRating={(newNumber, textValue) => {
+                        setRatingForm('points', newNumber)
+                        setPointsInputText(textValue)
+                      }}
+                      shouldRenderLabel={false}
+                    />
+                  </Flex.Item>
                 </Flex>
               </View>
             </Flex.Item>
@@ -107,7 +98,7 @@ export const RatingRowFullWidth = ({
             return (
               <div ref={provided.innerRef} {...provided.draggableProps}>
                 <Flex>
-                  <Flex.Item align="start" draggable={unassessed} data-testid="rating-drag-handle">
+                  <Flex.Item align="start" draggable data-testid="rating-drag-handle">
                     <View
                       as="div"
                       width="3rem"
@@ -115,9 +106,18 @@ export const RatingRowFullWidth = ({
                       cursor="pointer"
                       margin="xx-small 0 0 0"
                     >
-                      <div className="drag-handle" {...provided.dragHandleProps}>
-                        <IconDragHandleLine />
-                      </div>
+                      <View
+                        as="div"
+                        role="button"
+                        aria-label={I18n.t('Reorder %{ratingName} Rating', {
+                          ratingName: rating.description,
+                        })}
+                        className="drag-handle"
+                        data-testid="rubric-criterion-rating-row-drag-handle"
+                        {...provided.dragHandleProps}
+                      >
+                        <IconDragHandleLine aria-hidden="true" />
+                      </View>
                     </View>
                   </Flex.Item>
                   <Flex.Item align="start">
@@ -140,23 +140,21 @@ export const RatingRowFullWidth = ({
                       />
                     </View>
                   </Flex.Item>
-                  {unassessed && (
-                    <Flex.Item align="start">
-                      <View as="div" width="2.375rem">
-                        {showRemoveButton && (
-                          <IconButton
-                            screenReaderLabel={I18n.t('Remove %{ratingName} Rating', {
-                              ratingName: rating.description,
-                            })}
-                            onClick={onRemove}
-                            data-testid="remove-rating"
-                          >
-                            <IconTrashLine />
-                          </IconButton>
-                        )}
-                      </View>
-                    </Flex.Item>
-                  )}
+                  <Flex.Item align="start">
+                    <View as="div" width="2.375rem">
+                      {showRemoveButton && (
+                        <IconButton
+                          screenReaderLabel={I18n.t('Remove %{ratingName} Rating', {
+                            ratingName: rating.description,
+                          })}
+                          onClick={onRemove}
+                          data-testid="remove-rating"
+                        >
+                          <IconTrashLine />
+                        </IconButton>
+                      )}
+                    </View>
+                  </Flex.Item>
                 </Flex>
               </div>
             )

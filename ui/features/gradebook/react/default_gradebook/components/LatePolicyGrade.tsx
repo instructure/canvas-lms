@@ -26,7 +26,7 @@ const I18n = createI18nScope('gradebook')
 
 type Props = {
   assignment: {
-    pointsPossible: number
+    pointsPossible: number | null
   }
   enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme'
   gradingScheme: Array<Array<string | number>>
@@ -36,8 +36,7 @@ type Props = {
 }
 
 export default function LatePolicyGrade(props: Props) {
-  // @ts-expect-error
-  const pointsDeducted = I18n.n(-props.submission.pointsDeducted)
+  const pointsDeducted = I18n.n(-(props.submission.pointsDeducted ?? 0))
   const formatOptions = {
     formatType: props.enterGradesAs,
     pointsPossible: props.assignment.pointsPossible,

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
 require_relative "../../models/student_visibility/student_visibility_common"
 
 # need tests for:
@@ -279,7 +278,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
 
           context "user is non-collaborative group" do
             before do
-              @course.account.enable_feature!(:assign_to_differentiation_tags)
               @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
               @course.account.save
 
@@ -306,18 +304,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
 
               visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map { |x| x.assignment_id.to_i }
               expect(visible_assignment_ids.include?(@assignment.id)).to be_falsy
-            end
-
-            it "does not see the assignment if the feature flag is disabled" do
-              @course.account.disable_feature!(:assign_to_differentiation_tags)
-
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @student.id, course_ids: @course.id).map { |x| x.assignment_id.to_i }
-              expect(visible_assignment_ids.include?(@assignment.id)).to be_falsy
-            end
-
-            it "does not show the assignment if course_ids is not present" do
-              visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: @user.id, assignment_ids: @assignment.id, course_ids: nil).map(&:assignment_id)
-              expect(visible_assignment_ids.map(&:to_i).include?(@assignment.id)).to be_falsy
             end
           end
         end
@@ -561,7 +547,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           end
 
           it "applies context module tags overrides" do
-            @course.account.enable_feature!(:assign_to_differentiation_tags)
             @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
             @course.account.save
             assignment_with_false_only_visible_to_overrides
@@ -579,7 +564,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           end
 
           it "does not show Assignment in the module if user does not belong to the tag" do
-            @course.account.enable_feature!(:assign_to_differentiation_tags)
             @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
             @course.account.save
 
@@ -990,6 +974,95 @@ describe AssignmentVisibility::AssignmentVisibilityService do
       let(:second_student) { User.create! }
       let(:fake_student) { User.create! }
 
+      describe ".visible_assignment_ids_in_course_by_user" do
+        let(:assignment_only_visible_to_overrides) do
+          assignment = course.assignments.create!({
+                                                    only_visible_to_overrides: true,
+                                                    points_possible: 5,
+                                                    submission_types: "online_text_entry",
+                                                    title: "assignment only visible to overrides"
+                                                  })
+          override = assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override.assignment_override_students.create!(user: first_student)
+          assignment.publish
+          assignment.save!
+          assignment
+        end
+
+        let(:third_assignment) do
+          assignment = course.assignments.create!({
+                                                    only_visible_to_overrides: false,
+                                                    points_possible: 10,
+                                                    submission_types: "online_text_entry",
+                                                    title: "third assignment"
+                                                  })
+          assignment.publish
+          assignment.save!
+          assignment
+        end
+
+        it "returns all visible assignment ids when assignment_ids parameter is not provided" do
+          assignment
+          assignment_only_visible_to_overrides
+          third_assignment
+
+          result = AssignmentVisibility::AssignmentVisibilityService
+                   .visible_assignment_ids_in_course_by_user(
+                     user_ids: [first_student.id, second_student.id],
+                     course_ids: course.id
+                   )
+
+          expect(result[first_student.id]).to match_array([assignment.id, assignment_only_visible_to_overrides.id, third_assignment.id])
+          expect(result[second_student.id]).to match_array([assignment.id, third_assignment.id])
+        end
+
+        it "filters visible assignment ids when assignment_ids parameter is provided" do
+          assignment
+          assignment_only_visible_to_overrides
+          third_assignment
+
+          result = AssignmentVisibility::AssignmentVisibilityService
+                   .visible_assignment_ids_in_course_by_user(
+                     user_ids: [first_student.id, second_student.id],
+                     course_ids: course.id,
+                     assignment_ids: [assignment.id, assignment_only_visible_to_overrides.id]
+                   )
+
+          expect(result[first_student.id]).to match_array([assignment.id, assignment_only_visible_to_overrides.id])
+          expect(result[second_student.id]).to match_array([assignment.id])
+          expect(result[first_student.id]).not_to include(third_assignment.id)
+          expect(result[second_student.id]).not_to include(third_assignment.id)
+        end
+
+        it "returns empty arrays for users with no visibility to requested assignments" do
+          assignment_only_visible_to_overrides
+
+          result = AssignmentVisibility::AssignmentVisibilityService
+                   .visible_assignment_ids_in_course_by_user(
+                     user_ids: [second_student.id],
+                     course_ids: course.id,
+                     assignment_ids: [assignment_only_visible_to_overrides.id]
+                   )
+
+          expect(result[second_student.id]).to eq([])
+        end
+
+        it "handles users with access to some but not all requested assignments" do
+          assignment
+          assignment_only_visible_to_overrides
+
+          result = AssignmentVisibility::AssignmentVisibilityService
+                   .visible_assignment_ids_in_course_by_user(
+                     user_ids: [first_student.id, second_student.id],
+                     course_ids: course.id,
+                     assignment_ids: [assignment.id, assignment_only_visible_to_overrides.id]
+                   )
+
+          expect(result[first_student.id]).to match_array([assignment.id, assignment_only_visible_to_overrides.id])
+          expect(result[second_student.id]).to match_array([assignment.id])
+        end
+      end
+
       describe ".assignments_with_user_visibilities" do
         let(:assignment_only_visible_to_overrides) do
           assignment = course.assignments.create!({
@@ -1033,6 +1106,27 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           assignment_only_visible_to_overrides.only_visible_to_overrides = false
           assignment_only_visible_to_overrides.save!
           assignments_with_visibilities
+        end
+
+        it "works correctly with preloaded override data" do
+          # Manually preload the data first
+          assignments = [assignment, assignment_only_visible_to_overrides]
+          DatesOverridable.preload_override_data_for_objects(assignments)
+
+          # Verify that the assignments have preloaded data
+          expect(assignment.preloaded_overrides).not_to be_nil
+          expect(assignment_only_visible_to_overrides.preloaded_overrides).not_to be_nil
+
+          # The method should still return correct results with preloaded data
+          expected_visibilities = {
+            assignment.id => [],
+            assignment_only_visible_to_overrides.id => [first_student.id]
+          }
+
+          result = AssignmentVisibility::AssignmentVisibilityService
+                   .assignments_with_user_visibilities(course, assignments)
+
+          expect(result).to eq expected_visibilities
         end
       end
     end

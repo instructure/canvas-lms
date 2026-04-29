@@ -18,9 +18,8 @@
 
 import React, {useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import type {
   DateDetailsPayload,
   ItemAssignToCardSpec,
@@ -29,8 +28,6 @@ import {
   generateDateDetailsPayload,
   generateDefaultCard,
 } from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
-
-const I18n = createI18nScope('pages_edit')
 
 interface Props {
   pageName?: string
@@ -130,8 +127,7 @@ const AssignToOption = (props: Props) => {
 
 export const renderAssignToTray = (el: HTMLElement, props: Props) => {
   if (el) {
-    const root = createRoot(el)
-    root.render(<AssignToOption {...props} />)
+    render(<AssignToOption {...props} />, el)
   }
   return <AssignToOption {...props} />
 }

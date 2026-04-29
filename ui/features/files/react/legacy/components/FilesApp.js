@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {sortedUniqBy} from 'lodash'
+import {sortedUniqBy} from '@canvas/util/sortedUniqBy'
 import MultiselectableMixin from '../mixins/MultiselectableMixin'
 import dndMixin from '../mixins/dndMixin'
 

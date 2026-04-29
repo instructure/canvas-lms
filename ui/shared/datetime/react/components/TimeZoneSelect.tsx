@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
-import type {CanvasSelectProps} from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
+import type {CanvasSelectProps} from '@instructure/platform-instui-bindings'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/react'
 
@@ -33,10 +33,12 @@ type Props = {
   label: string
   timezones: Timezone[]
   priority_zones: Timezone[]
+  name?: string
   onChange: (event: React.ChangeEvent<HTMLSelectElement>, value: string) => void
-} & CanvasSelectProps
+} & Omit<CanvasSelectProps, 'children'> // exclude children prop since we don't use it
 
 const TimeZoneSelect: React.FC<Props> = ({
+  name,
   label,
   timezones,
   priority_zones,
@@ -51,7 +53,12 @@ const TimeZoneSelect: React.FC<Props> = ({
     onChange(event, value) // so it works either way, instui Select callback, or traditional
   }
   return (
-    <CanvasSelect label={label} onChange={onChangeTimezone} {...otherPropsToPassOnToSelect}>
+    <CanvasSelect
+      name={name}
+      label={label}
+      onChange={onChangeTimezone}
+      {...otherPropsToPassOnToSelect}
+    >
       <CanvasSelect.Option id={`${++idval}`} value="">
         &nbsp;
       </CanvasSelect.Option>

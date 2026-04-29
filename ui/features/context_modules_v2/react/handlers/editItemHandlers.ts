@@ -22,20 +22,25 @@ export interface ItemData {
   title: string
   indentation: number
   url?: string
+  newTab?: boolean
 }
 
 export const prepareItemData = (
   itemData: ItemData,
 ): Record<string, string | number | string[] | undefined | boolean> => {
-  const {title, indentation, url} = itemData
+  const {title, indentation, url, newTab} = itemData
 
   const result: Record<string, string | number | string[] | undefined | boolean> = {
     'content_tag[title]': title,
     'content_tag[indent]': indentation,
-    'content_tag[url]': url,
+    'content_tag[new_tab]': newTab ? 1 : 0,
     new_tab: 0,
     graded: 0,
     _method: 'PUT',
+  }
+
+  if (url) {
+    result['content_tag[url]'] = url
   }
 
   return result

@@ -22,8 +22,9 @@ import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import ViewAssignTo, {ViewAssignToProps} from '../ViewAssignTo'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../../hooks/useModuleContext'
+import {MODULES} from '../../../utils/constants'
 
 const server = setupServer(
   graphql.query('GetModulesQuery', () => {
@@ -112,7 +113,6 @@ describe('ViewAssignTo', () => {
     moduleName: 'Test Module',
     expanded: true,
     isMenuOpen: true,
-    prerequisites: [],
     ...overrides,
   })
 
@@ -158,7 +158,7 @@ describe('ViewAssignTo', () => {
 
   it('disables the link when module items are loading', () => {
     // Don't set module items data to simulate loading state
-    queryClient.setQueryData(['modules', '123'], {
+    queryClient.setQueryData([MODULES, '123'], {
       pages: [
         {
           modules: [

@@ -55,7 +55,7 @@ describe('StudentLastAttended', () => {
     const newDate = new Date('2018-03-05T07:00:00.000Z')
 
     ref.current.state.selectedDate = new Date('2018-03-04T07:00:00.000Z')
-    jest.spyOn(ref.current, 'postDateToBackend')
+    vi.spyOn(ref.current, 'postDateToBackend')
 
     ref.current.onDateSubmit(newDate)
 

@@ -19,8 +19,42 @@
 import React from 'react'
 import {render, cleanup, fireEvent} from '@testing-library/react'
 import BreadcrumbCollapsedContainer from '../BreadcrumbCollapsedContainer'
-import Folder from '@canvas/files/backbone/models/Folder'
 import stubRouterContext from '../../../../../shared/test-utils/stubRouterContext'
+
+// Mock filesEnv to avoid Backbone model loading issues in Vitest
+vi.mock('@canvas/files/react/modules/filesEnv', () => ({
+  default: {
+    contexts: [],
+    userFileAccessRestricted: false,
+    contextsDictionary: {},
+    showingAllContexts: false,
+    contextType: undefined,
+    contextId: undefined,
+    rootFolders: [],
+    enableVisibility: false,
+    contextFor: vi.fn(),
+    userHasPermission: vi.fn(() => false),
+    baseUrl: '/files',
+  },
+}))
+
+// Mock Folder class
+class MockFolder {
+  constructor(attrs) {
+    this.attrs = attrs
+  }
+  get(key) {
+    return this.attrs[key]
+  }
+  url() {
+    return this.attrs.url || 'stupid'
+  }
+  urlPath() {
+    return this.attrs.urlPath || this.attrs.url || 'test_url'
+  }
+}
+
+const Folder = MockFolder
 
 describe('BreadcrumbsCollapsedContainer', () => {
   let Component
@@ -50,22 +84,22 @@ describe('BreadcrumbsCollapsedContainer', () => {
   })
 
   it('closes breadcrumbs on mouse leave', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     const {getByText} = render(<Component />)
     const ellipsis = getByText('…').closest('li')
     fireEvent.mouseLeave(ellipsis)
-    jest.advanceTimersByTime(200)
+    vi.advanceTimersByTime(200)
     expect(ellipsis.querySelector('.closed')).toBeTruthy()
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it('closes breadcrumbs on blur', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     const {getByText} = render(<Component />)
     const ellipsis = getByText('…').closest('li')
     fireEvent.blur(ellipsis)
-    jest.advanceTimersByTime(200)
+    vi.advanceTimersByTime(200)
     expect(ellipsis.querySelector('.closed')).toBeTruthy()
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 })

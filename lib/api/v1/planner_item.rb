@@ -67,7 +67,7 @@ module Api::V1::PlannerItem
         hash[:plannable_date] = item.start_at || item.created_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: CALENDAR_PLANNABLE_FIELDS)
         hash[:html_url] = calendar_url_for(item.effective_context, event: item)
-      elsif item.is_a?(SubAssignment)
+      elsif item.is_a?(SubAssignment) && item.parent_assignment&.discussion_topic
         topic = item.parent_assignment&.discussion_topic
         unread_count, read_state = topics_status_for(user, topic.id, opts[:topics_status])[topic.id]
         unread_attributes = { unread_count:, read_state: }
@@ -75,7 +75,7 @@ module Api::V1::PlannerItem
           reply_to_entry_required_count: item.parent_assignment&.discussion_topic&.reply_to_entry_required_count || 1
         }
         hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
-        hash[:plannable_date] = item[:user_due_date] || item.due_at
+        hash[:plannable_date] = item[:cached_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes.merge(unread_attributes), extra_fields: SUB_ASSIGNMENT_FIELDS + GRADABLE_FIELDS)
         hash[:html_url] = assignment_html_url(item.parent_assignment, user, hash[:submissions])
       elsif item.is_a?(::PlannerNote)
@@ -84,7 +84,7 @@ module Api::V1::PlannerItem
         # TODO: We don't currently have an html_url for individual planner items.
         # hash[:html_url] = ???
       elsif item.is_a?(Quizzes::Quiz) || (item.respond_to?(:quiz?) && item.quiz?)
-        hash[:plannable_date] = item[:user_due_date] || item.due_at
+        hash[:plannable_date] = item[:cached_due_date] || item[:user_due_date] || item.due_at
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_id] = quiz.id
         hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(quiz.class_name)
@@ -110,11 +110,16 @@ module Api::V1::PlannerItem
         unread_count, read_state = topics_status_for(user, topic.id, opts[:topics_status])[topic.id]
         unread_attributes = { unread_count:, read_state: }
         hash[:plannable_id] = topic.id
-        hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
+        hash[:plannable_date] = item[:cached_due_date] || topic.todo_date || topic.posted_at || topic.created_at
         hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(topic.class_name)
         hash[:plannable] = plannable_json(unread_attributes.merge(item.attributes).merge(topic.attributes), extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session, topic.class_name)
+      elsif item.is_a?(PeerReviewSubAssignment)
+        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
+        hash[:plannable_date] = item[:cached_due_date] || item.due_at
+        hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)
+        hash[:html_url] = context_url(item.context, :context_assignment_peer_reviews_url, item.parent_assignment_id)
       elsif item.is_a?(AssessmentRequest)
         hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
         hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at || item.assessor_asset.cached_due_date
@@ -123,7 +128,7 @@ module Api::V1::PlannerItem
         submission = item.asset
         hash[:html_url] = student_peer_review_url(submission.context, submission.assignment, item, user)
       else
-        hash[:plannable_date] = item[:user_due_date] || item.due_at
+        hash[:plannable_date] = item[:cached_due_date] || item[:user_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = assignment_html_url(item, user, hash[:submissions])
       end
@@ -157,8 +162,8 @@ module Api::V1::PlannerItem
     notes, context_items = plannable_items.partition { |i| i.is_a?(::PlannerNote) }
     ActiveRecord::Associations.preload(notes, user: { pseudonym: :account }) if notes.any?
     ActiveRecord::Associations.preload(context_items, { context: :root_account }) if context_items.any?
-    ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) || i.is_a?(::SubAssignment) }, user, opts:)
-    discussions = context_items.select { |i| i.is_a?(::DiscussionTopic) }
+    ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) || i.is_a?(::SubAssignment) || i.is_a?(::PeerReviewSubAssignment) }, user, opts:)
+    discussions = context_items.grep(::DiscussionTopic)
     topics_status = topics_status_for(user, discussions.map(&:id))
 
     items = items.reject do |item|
@@ -185,7 +190,7 @@ module Api::V1::PlannerItem
 
   def submission_statuses_for(user, item, opts = {})
     submission_status = { submissions: false }
-    return submission_status unless item.is_a?(Assignment) || item.is_a?(SubAssignment)
+    return submission_status unless item.is_a?(Assignment) || item.is_a?(SubAssignment) || item.is_a?(PeerReviewSubAssignment)
 
     ss = opts[:submission_statuses] || submission_statuses(item, user)
     submission_status[:submissions] = ss[item.id]&.except(:new_activity)
@@ -199,7 +204,7 @@ module Api::V1::PlannerItem
     subs_data_hash = {}
 
     parent_assignment_ids = Array(assignments)
-                            .filter { |a| a.is_a?(SubAssignment) }
+                            .grep(SubAssignment)
                             .map(&:parent_assignment_id)
                             .uniq
     parent_subs = Submission.where(assignment_id: parent_assignment_ids, user:)
@@ -275,15 +280,28 @@ module Api::V1::PlannerItem
     end
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
+      # For announcements: marking done in planner always clears new activity,
+      # regardless of unread counts (announcements have no replies to read).
+      return false if item.is_a?(Announcement) && item.planner_override_for(user)&.marked_complete?
+
       unread_count, read_state = opts.dig(:topics_status, topic.id)
-      return read_state == "unread" || unread_count > 0 if unread_count && read_state
+      if unread_count && read_state
+        return read_state == "unread" || unread_count > 0
+      end
       return topic.unread?(user) || topic.unread_count(user) > 0 if topic
     end
     if item.is_a?(SubAssignment)
       topic = item.parent_assignment&.discussion_topic
-      unread_count, read_state = opts.dig(:topics_status, topic.id)
+
+      if topic
+        unread_count, read_state = opts.dig(:topics_status, topic.id)
+        ss = opts[:submission_statuses] || submission_statuses(item, user)
+        return true if ss.dig(item.id, :new_activity) || (unread_count && read_state && (read_state == "unread" || unread_count > 0)) || (topic && (topic.unread?(user) || topic.unread_count(user) > 0))
+      end
+    end
+    if item.is_a?(PeerReviewSubAssignment)
       ss = opts[:submission_statuses] || submission_statuses(item, user)
-      return true if ss.dig(item.id, :new_activity) || (unread_count && read_state && (read_state == "unread" || unread_count > 0)) || (topic && (topic.unread?(user) || topic.unread_count(user) > 0))
+      return true if ss.dig(item.id, :new_activity)
     end
     false
   end

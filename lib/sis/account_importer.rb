@@ -79,7 +79,7 @@ module SIS
         # only update the name on new records, and ones that haven't been changed since the last sis import
         account.name = name if name.present? && (account.new_record? || !account.stuck_sis_fields.include?(:name))
 
-        account.integration_id = integration_id
+        account.integration_id = integration_id if integration_id.present?
         account.sis_source_id = account_id
 
         if status.present?

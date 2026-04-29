@@ -70,8 +70,8 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
       entry.attachment = attachment
     end
 
+    entry.saving_user = current_user
     entry.save!
-    entry.delete_draft
 
     obj = { discussion_entry: entry, my_sub_assignment_submissions: [] }
 

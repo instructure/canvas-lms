@@ -18,17 +18,64 @@
 
 import React from 'react'
 import {render, fireEvent, waitFor, act} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import useContentShareUserSearchApi from '../../effects/useContentShareUserSearchApi'
 import DirectShareUserModal from '../DirectShareUserModal'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('../../effects/useContentShareUserSearchApi')
+const server = setupServer()
+
+vi.mock('../../effects/useContentShareUserSearchApi')
+
+// Mock the lazy-loaded component to avoid issues with React.lazy and fake timers
+function MockDirectShareUserPanel({
+  selectedUsers,
+  onUserSelected,
+  onUserRemoved,
+  selectedUsersError,
+  userSelectInputRef,
+}) {
+  const inputRef = React.useRef(null)
+
+  React.useEffect(() => {
+    if (userSelectInputRef && inputRef.current) {
+      userSelectInputRef(inputRef.current)
+    }
+  }, [userSelectInputRef])
+
+  return (
+    <div data-testid="mock-user-panel">
+      <label>
+        Send to:
+        <input
+          ref={inputRef}
+          data-testid="user-search-input"
+          onChange={e => {
+            if (e.target.value === 'abc') {
+              onUserSelected({id: 'abc', name: 'abc'})
+            }
+          }}
+        />
+      </label>
+      {selectedUsersError && <div>You must select at least one user</div>}
+      {selectedUsers.map(user => (
+        <button type="button" key={user.id} onClick={() => onUserRemoved(user)}>
+          {user.name}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+vi.mock('../DirectShareUserPanel', () => ({
+  default: MockDirectShareUserPanel,
+}))
 
 const flushAllTimersAndPromises = async () => {
-  while (jest.getTimerCount() > 0) {
+  while (vi.getTimerCount() > 0) {
     await act(async () => {
-      jest.runAllTimers()
+      vi.runAllTimers()
     })
   }
 }
@@ -37,6 +84,7 @@ describe('DirectShareUserModal', () => {
   let ariaLive
 
   beforeAll(() => {
+    server.listen()
     fakeENV.setup({COURSE_ID: '42'})
     ariaLive = document.createElement('div')
     ariaLive.id = 'flash_screenreader_holder'
@@ -45,12 +93,13 @@ describe('DirectShareUserModal', () => {
   })
 
   afterAll(() => {
+    server.close()
     fakeENV.teardown()
     if (ariaLive) ariaLive.remove()
   })
 
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     useContentShareUserSearchApi.mockImplementationOnce(({success}) => {
       success([
@@ -62,13 +111,11 @@ describe('DirectShareUserModal', () => {
 
   afterEach(async () => {
     await flushAllTimersAndPromises()
-    fetchMock.restore()
+    server.resetHandlers()
   })
 
   async function selectUser(getByText, findByLabelText, name = 'abc') {
     fireEvent.change(await findByLabelText(/send to:/i), {target: {value: name}})
-    await act(async () => jest.runAllTimers()) // let the debounce happen
-    fireEvent.click(getByText(name))
   }
 
   describe('Validation call to action', () => {
@@ -85,15 +132,21 @@ describe('DirectShareUserModal', () => {
         expect(getByText('Send').closest('button').getAttribute('disabled')).toBeNull()
       })
 
-      // fickle
-      it.skip('displays an error message when no user is selected', async () => {
-        const {getByText} = render(<DirectShareUserModal open={true} courseId="1" />)
+      it('displays an error message when no user is selected', async () => {
+        const {getByText, findByLabelText} = render(
+          <DirectShareUserModal open={true} courseId="1" />,
+        )
+        await findByLabelText(/send to:/i)
         fireEvent.click(getByText('Send'))
         expect(getByText('You must select at least one user')).toBeInTheDocument()
       })
 
       it('disables the send button when a search has started UNDER TEST', async () => {
-        fetchMock.postOnce('/api/v1/users/self/content_shares', 200)
+        server.use(
+          http.post('/api/v1/users/self/content_shares', () => {
+            return new HttpResponse(null, {status: 200})
+          }),
+        )
         const {getByText, findByLabelText} = render(
           <DirectShareUserModal open={true} courseId="1" onDismiss={Function.prototype} />,
         )
@@ -103,20 +156,16 @@ describe('DirectShareUserModal', () => {
       })
 
       it('focuses on user select after error', async () => {
-        const {getByText, getByLabelText} = render(
+        const {getByText, findByLabelText} = render(
           <DirectShareUserModal open={true} courseId="1" />,
         )
-        // Wait for component to fully render
-        await act(async () => jest.runAllTimers())
+        const input = await findByLabelText(/send to:/i)
         // Click the send button to trigger the error
         fireEvent.click(getByText('Send'))
         // Wait for the focus to be applied
-        await waitFor(
-          () => {
-            expect(getByLabelText(/send to:/i)).toHaveFocus()
-          },
-          {timeout: 1000},
-        )
+        await waitFor(() => {
+          expect(input).toHaveFocus()
+        })
       })
     })
 

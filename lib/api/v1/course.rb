@@ -26,6 +26,7 @@ module Api::V1::Course
   include Api::V1::PostGradesStatus
   include Api::V1::User
   include Api::V1::Tab
+  include Api::V1::AccessibilityCourseStatistic
 
   def course_settings_json(course)
     settings = {}
@@ -35,6 +36,8 @@ module Api::V1::Course
     settings[:allow_student_discussion_editing] = course.allow_student_discussion_editing?
     settings[:allow_student_discussion_reporting] = course.allow_student_discussion_reporting?
     settings[:allow_student_anonymous_discussion_topics] = course.allow_student_anonymous_discussion_topics?
+    settings[:use_default_discussion_settings] = course.use_default_discussion_settings?
+    settings[:default_discussion_settings] = course.default_discussion_settings || {}
     settings[:filter_speed_grader_by_student_group] = course.filter_speed_grader_by_student_group?
     settings[:grading_standard_enabled] = course.grading_standard_enabled?
     settings[:grading_standard_id] = course.grading_standard_id
@@ -62,6 +65,7 @@ module Api::V1::Course
     settings[:friendly_name] = course.friendly_name
     settings[:default_due_time] = course.default_due_time || "23:59:59"
     settings[:conditional_release] = course.conditional_release?
+    settings[:default_student_gradebook_view] = course.default_student_gradebook_view
 
     settings
   end
@@ -141,12 +145,7 @@ module Api::V1::Course
       end
       # undocumented; used in AccountCourseUserSearch
       if includes.include?("active_teachers")
-        course.shard.activate do
-          scope =
-            TeacherEnrollment.where.not(workflow_state: %w[rejected completed deleted inactive]).where(course_id: course.id).distinct.select(:user_id)
-          hash["teachers"] =
-            User.where(id: scope).map { |teacher| user_display_json(teacher) }
-        end
+        hash["teachers"] = course.active_teachers.uniq(&:id).map { |teacher| user_display_json(teacher) }
       end
       hash["tabs"] = tabs_available_json(course, user, session, ["external"], precalculated_permissions:) if includes.include?("tabs")
       hash["locale"] = course.locale unless course.locale.nil?
@@ -176,6 +175,12 @@ module Api::V1::Course
       if includes.include?("post_manually")
         hash["post_manually"] = course.post_manually?
       end
+      if course.account.feature_enabled?(:syllabus_versioning) && includes.include?("syllabus_versions") && course.grants_right?(user, :manage_course_content_edit)
+        hash["syllabus_versions"] = syllabus_versions_json(course)
+      end
+      if includes.include?("accessibility_course_statistic") && course.account.can_see_accessibility_tab?(user)
+        hash["accessibility_course_statistic"] = accessibility_course_statistic_json(course.accessibility_course_statistic, user, session)
+      end
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash
     end
@@ -203,6 +208,34 @@ module Api::V1::Course
     hash["html_url"] = course_url(course, host: HostUrl.context_host(course, request.try(:host_with_port))) if builder.include_url
     hash["time_zone"] = course.time_zone&.tzinfo&.name
     hash
+  end
+
+  def syllabus_versions_json(course)
+    versions = course.versions.limit(5).order(number: :desc).to_a
+    version_count = versions.count
+    max_version_number = versions.first&.number
+    Rails.cache.fetch(["syllabus_versions", course, course.updated_at, version_count, max_version_number]) do
+      user_ids = versions.filter_map do |version|
+        version_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+        version_data["user_id"]
+      end
+      users_by_id = User.where(id: user_ids.uniq).index_by(&:id)
+
+      versions.map do |version|
+        version_data = YAML.safe_load(version.yaml, permitted_classes: [Time, Date, Symbol, ActiveSupport::TimeWithZone, ActiveSupport::TimeZone])
+        result = {
+          version: version.number,
+          syllabus_body: api_user_content(version_data["syllabus_body"], course),
+          created_at: version.created_at,
+          updated_at: version_data["updated_at"]
+        }
+        if version_data["user_id"]
+          user = users_by_id[version_data["user_id"]]
+          result[:edited_by] = { id: user.id, name: user.name } if user
+        end
+        result
+      end
+    end
   end
 
   def apply_nickname(hash, course, user, prefer_friendly_name: true)

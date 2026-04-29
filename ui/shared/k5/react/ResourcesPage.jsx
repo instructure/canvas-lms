@@ -17,16 +17,22 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React, {useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import PropTypes from 'prop-types'
 
 import {InstUISettingsProvider} from '@instructure/emotion'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
+import {IconExternalLinkLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 import StaffContactInfoLayout from './StaffContactInfoLayout'
 import useImmediate from '@canvas/use-immediate-hook'
 import {fetchCourseInstructors, fetchCourseApps, fetchImportantInfos} from './utils'
 import AppsList from './AppsList'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import ImportantInfoLayout from './ImportantInfoLayout'
 import {getResourcesTheme} from './k5-theme'
 
@@ -77,7 +83,14 @@ const fetchApps = cards => {
   )
 }
 
-export default function ResourcesPage({cards, cardsSettled, visible, showStaff, isSingleCourse}) {
+export default function ResourcesPage({
+  cards,
+  cardsSettled,
+  visible,
+  showStaff,
+  isSingleCourse,
+  customLinks = [],
+}) {
   const [infos, setInfos] = useState([])
   const [apps, setApps] = useState([])
   const [staff, setStaff] = useState([])
@@ -87,6 +100,9 @@ export default function ResourcesPage({cards, cardsSettled, visible, showStaff, 
   const [isStaffLoading, setStaffLoading] = useState(true)
   const [alreadyLoaded, setAlreadyLoaded] = useState(false)
   const homerooms = cards.filter(c => c.isHomeroom)
+  // external_links.js auto-adds icons to external links; exclude them here
+  // so our explicit IconExternalLinkLine is used for all custom nav menu links.
+  const excludeExternalIcon = useCallback(el => el?.classList.add('exclude_external_icon'), [])
 
   useImmediate(
     () => {
@@ -138,6 +154,46 @@ export default function ResourcesPage({cards, cardsSettled, visible, showStaff, 
         {(isSingleCourse || homerooms?.length > 0) && showStaff && staffAuthorized && (
           <StaffContactInfoLayout isLoading={isStaffLoading} staff={staff} />
         )}
+        {customLinks.length > 0 && (
+          <View as="section" data-testid="custom-links-section">
+            <Heading level="h2" margin="large 0 0">
+              {I18n.t('Other Resources')}
+            </Heading>
+            <View as="div">
+              {customLinks.map(link => (
+                <View
+                  key={link.id}
+                  as="div"
+                  display="inline-block"
+                  margin="small"
+                  shadow="resting"
+                  borderWidth="small"
+                  borderColor="primary"
+                  borderRadius="medium"
+                >
+                  <Link
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    display="block"
+                    isWithinText={false}
+                    data-pendo="custom_external_course_link"
+                    elementRef={excludeExternalIcon}
+                  >
+                    <Flex alignItems="center" padding="small">
+                      <Flex.Item>
+                        <Text size="small">{link.label}</Text>
+                      </Flex.Item>
+                      <Flex.Item padding="0 0 0 x-small">
+                        <IconExternalLinkLine />
+                      </Flex.Item>
+                    </Flex>
+                  </Link>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
       </section>
     </InstUISettingsProvider>
   )
@@ -149,4 +205,11 @@ ResourcesPage.propTypes = {
   visible: PropTypes.bool.isRequired,
   showStaff: PropTypes.bool.isRequired,
   isSingleCourse: PropTypes.bool.isRequired,
+  customLinks: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+    }),
+  ),
 }

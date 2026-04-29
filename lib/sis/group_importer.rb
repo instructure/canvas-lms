@@ -40,52 +40,135 @@ module SIS
         @success_count = 0
         @roll_back_data = []
         @accounts_cache = {}
+        @courses_cache = {}
       end
 
+      private
+
+      def type_display_name(type)
+        type.tr("_", " ")
+      end
+
+      def invalid_import_item?(id, name, status, type)
+        raise ImportError, "No #{(type == "group") ? type : "tag"}_id given for a #{type_display_name(type)}." unless id
+        raise ImportError, "No name given for #{type_display_name(type)} #{id}." if name.blank?
+        raise ImportError, "Improper status \"#{status}\" for #{type_display_name(type)} #{id}." unless /\A(available|closed|completed|deleted)/i.match?(status)
+        return true if @batch.skip_deletes? && status =~ /deleted/i
+
+        false
+      end
+
+      def find_context(id, id_type, type, item_id)
+        context = nil
+        cache = (id_type == :course_id) ? @courses_cache : @accounts_cache
+
+        if id
+          context = cache[id]
+          context ||= if id_type == :course_id
+                        @root_account.all_courses.active.find_by(sis_source_id: id)
+                      else
+                        @root_account.all_accounts.active.find_by(sis_source_id: id)
+                      end
+
+          unless context
+            raise ImportError, "#{id_type.to_s.sub("_id", "").titleize} with sis id #{id} didn't exist for #{type_display_name(type)} #{item_id}."
+          end
+
+          cache[context.sis_source_id] = context if context
+        end
+
+        context
+      end
+
+      def find_category(category_id, context, category_type, item_type, item_id)
+        return nil unless category_id.present?
+
+        category_display_name = if category_type.to_s == "differentiation_tag_category"
+                                  "Differentiation Tag Set"
+                                else
+                                  "Group Category"
+                                end
+
+        category = nil
+        if context
+          category = context.send(category_type.to_s.pluralize).find_by(sis_source_id: category_id)
+          unless category
+            context_name = context.class.name.downcase
+            raise ImportError, "#{category_display_name} #{category_id} didn't exist in #{context_name} #{context.sis_source_id} for #{type_display_name(item_type)} #{item_id}."
+          end
+        else
+          method_name = "all_#{category_type.to_s.pluralize}"
+          category = @root_account.send(method_name).find_by(deleted_at: nil, sis_source_id: category_id)
+          unless category
+            raise ImportError, "#{category_display_name} #{category_id} didn't exist for #{type_display_name(item_type)} #{item_id}."
+          end
+        end
+
+        category
+      end
+
+      def save_and_process_memberships(item, item_type, status)
+        if item.save
+          data = SisBatchRollBackData.build_data(sis_batch: @batch, context: item)
+          @roll_back_data << data if data
+
+          if status == "deleted"
+            gms = SisBatchRollBackData.build_dependent_data(
+              sis_batch: @batch,
+              contexts: item.group_memberships,
+              updated_state: "deleted"
+            )
+            @roll_back_data.push(*gms) if gms
+          end
+
+          @success_count += 1
+          true
+        else
+          msg = "A #{type_display_name(item_type)} did not pass validation "
+          msg += "(" + "#{item_type}: #{item.sis_source_id}, error: "
+          msg += item.errors.full_messages.join(",") + ")"
+          raise ImportError, msg
+        end
+      end
+
+      def can_change_context?(item, new_context, item_type, item_id)
+        if item_type == "differentiation_tag"
+          raise ImportError, "Differentiation Tags are not enabled for Account #{context.account.id}." unless new_context.account.allow_assign_to_differentiation_tags?
+        end
+
+        return true unless item&.group_memberships&.exists?
+
+        same_context = new_context.id == item.context_id &&
+                       new_context.class.base_class.name == item.context_type
+
+        # For groups, we only block moves between courses, but allow other context changes
+        if !same_context &&
+           ((item.context.is_a?(Course) || new_context.is_a?(Course)) || item_type == "differentiation_tag")
+          raise ImportError, "Cannot move #{type_display_name(item_type)} #{item_id} because it has #{item_type}_memberships."
+        end
+
+        true
+      end
+
+      public
+
       def add_group(group_id, group_category_id, account_id, course_id, name, status)
-        raise ImportError, "No group_id given for a group." unless group_id
-        raise ImportError, "No name given for group #{group_id}." if name.blank?
-        # closed and completed are no longer valid states. Leaving these for
-        # backwards compatibility. It is not longer a documented status
-        raise ImportError, "Improper status \"#{status}\" for group #{group_id}." unless /\A(available|closed|completed|deleted)/i.match?(status)
-        return if @batch.skip_deletes? && status =~ /deleted/i
+        return if invalid_import_item?(group_id, name, status, "group")
 
         if course_id && account_id
           raise ImportError, "Only one context is allowed and both course_id and account_id where provided for group #{group_id}."
         end
 
-        context = nil
-        if account_id
-          context = @accounts_cache[account_id]
-          context ||= @root_account.all_accounts.active.find_by(sis_source_id: account_id)
-          raise ImportError, "Account with sis id #{account_id} didn't exist for group #{group_id}." unless context
+        context = find_context(account_id, :account_id, "group", group_id) if account_id
+        context ||= find_context(course_id, :course_id, "group", group_id) if course_id
 
-          @accounts_cache[context.sis_source_id] = context
-        end
-
-        if course_id
-          context = @root_account.all_courses.active.find_by(sis_source_id: course_id)
-          raise ImportError, "Course with sis id #{course_id} didn't exist for group #{group_id}." unless context
-        end
-
-        # if the account_id is present and didn't error then look for group_category in account
-        if account_id && group_category_id
-          group_category = context.group_categories.find_by(sis_source_id: group_category_id)
-          raise ImportError, "Group Category #{group_category_id} didn't exist in account #{account_id} for group #{group_id}." unless group_category
-        elsif course_id && group_category_id
-          group_category = context.group_categories.find_by(sis_source_id: group_category_id)
-          raise ImportError, "Group Category #{group_category_id} didn't exist in course #{course_id} for group #{group_id}." unless group_category
-        # look for group_category, account and course don't exist
-        elsif group_category_id.present?
-          group_category = @root_account.all_group_categories.find_by(deleted_at: nil, sis_source_id: group_category_id)
-          raise ImportError, "Group Category #{group_category_id} didn't exist for group #{group_id}." unless group_category
+        group_category = nil
+        if group_category_id.present?
+          group_category = find_category(group_category_id, context, :group_category, "group", group_id)
         end
 
         group = @root_account.all_groups.find_by(sis_source_id: group_id)
 
-        # if the group_category exists it is in the correct context or the
-        # context is blank, but it should be consistent with the
-        # group_category's context, so assign context
         if group_category
           context = group_category.context
           if group
@@ -94,47 +177,77 @@ module SIS
             group = group_category.groups.new(name:, sis_source_id: group_id)
           end
         end
-        # no account_id, course_id, or group_category, use the group's existing context if present,
-        # otherwise assign context to root_account
+
         context ||= group&.context || @root_account
 
-        if group&.group_memberships&.exists? &&
-           !(context.id == group.context_id && context.class.base_class.name == group.context_type) &&
-           (group.context.is_a?(Course) || context.is_a?(Course))
-          raise ImportError, "Cannot move group #{group_id} because it has group_memberships."
-        end
+        can_change_context?(group, context, "group", group_id)
 
         group ||= context.groups.new(name:, sis_source_id: group_id)
-        # only update the name on groups that haven't had their name changed since the last sis import
         group.name = name if name.present? && !group.stuck_sis_fields.include?(:name)
         group.context = context
         group.sis_batch_id = @batch.id
         group.workflow_state = (status == "deleted") ? "deleted" : "available"
 
-        # ensure that the assigned group.group_category corresponds to the same context_id as the group
-        # in the case of an SIS import, the group.group_category may not be set (unless group_category_id was passed)
+        # Ensure group category context matches group context
         if group&.group_category &&
            group.group_category.context_id != context.id &&
            group.group_category.context_type == context.class_name
           group.group_category.update!(context_id: context.id)
         end
 
-        if group.save
-          data = SisBatchRollBackData.build_data(sis_batch: @batch, context: group)
-          @roll_back_data << data if data
-          if status == "deleted"
-            gms = SisBatchRollBackData.build_dependent_data(sis_batch: @batch,
-                                                            contexts: group.group_memberships,
-                                                            updated_state: "deleted")
-          end
-          @roll_back_data.push(*gms) if gms
-          @success_count += 1
-        else
-          msg = "A group did not pass validation "
-          msg += "(" + "group: #{group_id}, error: "
-          msg += group.errors.full_messages.join(",") + ")"
-          raise ImportError, msg
+        save_and_process_memberships(group, "group", status)
+      end
+
+      def add_tag(tag_id, tag_set_id, course_id, name, status)
+        return if invalid_import_item?(tag_id, name, status, "differentiation_tag")
+
+        context = find_context(course_id, :course_id, "differentiation_tag", tag_id) if course_id
+        if context
+          raise ImportError, "Differentiation Tags are not enabled for Account #{context.account.id}." unless context.account.allow_assign_to_differentiation_tags?
         end
+
+        tag_set = nil
+        if tag_set_id.present?
+          tag_set = find_category(tag_set_id, context, :differentiation_tag_category, "differentiation_tag", tag_id)
+        end
+
+        tag = @root_account.all_differentiation_tags.find_by(sis_source_id: tag_id)
+
+        if tag_set
+          context = tag_set.context
+          raise ImportError, "Differentiation Tags are not enabled for Account #{context.account.id}." unless context.account.allow_assign_to_differentiation_tags?
+
+          if tag
+            tag.group_category = tag_set
+          else
+            tag = tag_set.groups.non_collaborative.new(name:, sis_source_id: tag_id)
+          end
+        end
+
+        context ||= tag&.context
+        raise ImportError, "No tag_set_id or course_id given for differentiation tag #{tag_id}. At least one is required for new tags." unless context
+
+        can_change_context?(tag, context, "differentiation_tag", tag_id)
+
+        tag ||= context.groups.new(name:, non_collaborative: true, sis_source_id: tag_id)
+        tag.name = name if name.present? && !tag.stuck_sis_fields.include?(:name)
+        tag.context = context
+        tag.sis_batch_id = @batch.id
+        tag.workflow_state = (status == "deleted") ? "deleted" : "available"
+
+        # Ensure tag category context matches tag context
+        if tag&.group_category &&
+           tag.group_category.context_id != context.id &&
+           tag.group_category.context_type == context.class_name
+          tag.group_category.update!(context_id: context.id)
+        else
+          tag_set ||= context.differentiation_tag_categories.create!(name:, non_collaborative: true)
+          # If adding as a single tag, have the tag set match the single tag status
+          tag_set.destroy if status == "deleted"
+          tag.group_category = tag_set
+        end
+
+        save_and_process_memberships(tag, "differentiation_tag", status)
       end
     end
   end

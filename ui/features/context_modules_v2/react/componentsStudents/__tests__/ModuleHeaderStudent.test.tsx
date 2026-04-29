@@ -17,9 +17,11 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import ModuleHeaderStudent, {ModuleHeaderStudentProps} from '../ModuleHeaderStudent'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
+import {MODULES} from '../../utils/constants'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,10 +32,37 @@ const queryClient = new QueryClient({
   },
 })
 
-const setUp = (props: ModuleHeaderStudentProps) => {
+const setUp = (props: ModuleHeaderStudentProps, itemCount: number = 10) => {
+  // Set up modules data for the useModules hook
+  const modulePage = {
+    pageInfo: {
+      hasNextPage: false,
+      endCursor: null,
+    },
+    modules: [
+      {
+        _id: props.id,
+        moduleItemsTotalCount: itemCount,
+      },
+    ],
+    getModuleItemsTotalCount: (moduleId: string) => (moduleId === props.id ? itemCount : 0),
+    isFetching: false,
+  }
+
+  const modulesData = {
+    pages: [modulePage],
+    pageParams: [null],
+    getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
+    isFetching: false,
+  }
+
+  queryClient.setQueryData([MODULES, 'course123'], modulesData)
+
   return render(
     <QueryClientProvider client={queryClient}>
-      <ModuleHeaderStudent {...props} />
+      <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+        <ModuleHeaderStudent {...props} />
+      </ContextModuleProvider>
     </QueryClientProvider>,
   )
 }
@@ -43,7 +72,7 @@ const buildDefaultProps = (overrides = {}) => {
     id: '1',
     name: 'Test Module',
     expanded: true,
-    onToggleExpand: jest.fn(),
+    onToggleExpand: vi.fn(),
     progression: {
       id: '1',
       _id: '1',
@@ -146,7 +175,7 @@ describe('ModuleHeaderStudent', () => {
 
       const toggleButton = getByTestId('module-header-expand-toggle')
       expect(toggleButton).toHaveAttribute('aria-expanded', 'true')
-      expect(toggleButton).toHaveTextContent('Collapse "Test Module"')
+      expect(toggleButton).toHaveAttribute('aria-label', 'Collapse "Test Module"')
     })
 
     it('Module items collapsed', () => {
@@ -154,7 +183,43 @@ describe('ModuleHeaderStudent', () => {
 
       const toggleButton = getByTestId('module-header-expand-toggle')
       expect(toggleButton).toHaveAttribute('aria-expanded', 'false')
-      expect(toggleButton).toHaveTextContent('Expand "Test Module"')
+      expect(toggleButton).toHaveAttribute('aria-label', 'Expand "Test Module"')
+    })
+  })
+
+  describe('Keyboard navigation', () => {
+    it('toggles expand when Enter key is pressed', () => {
+      const onToggleExpand = vi.fn()
+      const {getByTestId} = setUp(buildDefaultProps({expanded: false, onToggleExpand}))
+
+      const toggleButton = getByTestId('module-header-expand-toggle')
+      fireEvent.keyDown(toggleButton, {key: 'Enter', code: 'Enter'})
+
+      expect(onToggleExpand).toHaveBeenCalledWith('1')
+      expect(onToggleExpand).toHaveBeenCalledTimes(1)
+    })
+
+    it('toggles expand when Space key is pressed', () => {
+      const onToggleExpand = vi.fn()
+      const {getByTestId} = setUp(buildDefaultProps({expanded: false, onToggleExpand}))
+
+      const toggleButton = getByTestId('module-header-expand-toggle')
+      fireEvent.keyDown(toggleButton, {key: ' ', code: 'Space'})
+
+      expect(onToggleExpand).toHaveBeenCalledWith('1')
+      expect(onToggleExpand).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not toggle expand when other keys are pressed', () => {
+      const onToggleExpand = vi.fn()
+      const {getByTestId} = setUp(buildDefaultProps({expanded: false, onToggleExpand}))
+
+      const toggleButton = getByTestId('module-header-expand-toggle')
+      fireEvent.keyDown(toggleButton, {key: 'a', code: 'KeyA'})
+      fireEvent.keyDown(toggleButton, {key: 'Escape', code: 'Escape'})
+      fireEvent.keyDown(toggleButton, {key: 'Tab', code: 'Tab'})
+
+      expect(onToggleExpand).not.toHaveBeenCalled()
     })
   })
 })

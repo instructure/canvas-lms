@@ -5,11 +5,7 @@
       <div class="page-toolbar-start">
         <div class="page-heading">
           {{#if course_home}}
-            {{#if recent_announcements_enabled}}
-              <h2 class="course-title" title="{{course_title}}">{{course_title}}</h2>
-            {{else}}
               <h1 class="course-title" title="{{course_title}}">{{course_title}}</h1>
-            {{/if}}
           {{else}}
             {{#if CAN.VIEW_ALL_PAGES}}
               <a class="btn view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
@@ -46,6 +42,7 @@
           </div>
           {{/unless}}
           <div class="buttons">
+
             {{#if show_assign_to}}
               {{#if CAN.MANAGE_ASSIGN_TO}}
                 <button class="btn assign-to-button"><i class="icon-permissions"></i><span class="hide-when-small"> {{#t 'buttons.assign_to'}}Assign To{{/t}}</span></button>

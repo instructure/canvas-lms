@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../../spec_helper"
-
 module Api
   module Html
     describe Content do
@@ -75,7 +73,7 @@ module Api
           host = "somelink.com"
           port = 80
           expect(Html::Link).to receive(:new).with("http://somelink.com", host:, port:).and_return(
-            double(to_corrected_s: "http://otherlink.com")
+            instance_double(Html::Link, to_corrected_s: "http://otherlink.com")
           )
           html = Content.new(string, host:, port:).modified_html
           expect(html).to match(/otherlink.com/)
@@ -97,7 +95,7 @@ module Api
               <li><img class='nothing_special'></li>
             </ul></div>
           HTML
-          url_helper = double(rewrite_api_urls: nil)
+          url_helper = instance_double(UrlProxy, rewrite_api_urls: nil)
           html = Content.new(string).rewritten_html(url_helper)
           expected = <<~HTML
             <div><ul>
@@ -111,21 +109,21 @@ module Api
 
         it "inserts css/js if it is supposed to" do
           string = "<div>stuff</div>"
-          url_helper = double
+          url_helper = instance_double(UrlProxy)
           html = Content.new(string).rewritten_html(url_helper)
           expect(html).to eq("<div>stuff</div>")
         end
 
         it "re-writes root-relative urls to be absolute" do
           string = "<p><a href=\"/blah\"></a></p><source srcset=\"/img.src\">"
-          url_helper = UrlProxy.new(double, double(shard: nil), "example.com", "https")
+          url_helper = UrlProxy.new(instance_double(ApplicationController), instance_double(Course, shard: nil), "example.com", "https")
           html = Content.new(string).rewritten_html(url_helper)
           expect(html).to eq("<p><a href=\"https://example.com/blah\"></a></p><source srcset=\"https://example.com/img.src\">")
         end
 
         it "does not re-write root-relative urls to be absolute if requested not to" do
           string = "<p><a href=\"/blah\"></a></p>"
-          url_helper = UrlProxy.new(double, double(shard: nil), "example.com", "https")
+          url_helper = UrlProxy.new(instance_double(ApplicationController), instance_double(Course, shard: nil), "example.com", "https")
           html = Content.new(string, rewrite_api_urls: false).rewritten_html(url_helper)
           expect(html).to eq("<p><a href=\"/blah\"></a></p>")
         end
@@ -204,7 +202,7 @@ module Api
                 <a href="/users/4567282/files/15~8723/download?verifier=123">link</a>
                 <a href="/files/3/download?wrap=1">link</a>
                 <iframe src="/media_attachments_iframe/4">
-                <a href="#">/files/no1/download</a>
+                <a href="#">/users/3/files/no1/download</a>
                 <div src="files/9/preview"></div>
               </div>
               </body>
@@ -213,7 +211,7 @@ module Api
 
           results = Content.collect_attachment_ids(string)
 
-          expect(results).to include("1", "3", "4", "15~8723")
+          expect(results).to include("1", "4", "3", "15~8723")
           expect(results).not_to include("no1", "9")
         end
 
@@ -240,6 +238,150 @@ module Api
 
           notastring = { bob: "is your uncle" }
           expect(Content.collect_attachment_ids(notastring)).to eq([])
+        end
+
+        it "filters out external URLs that happen to have Canvas-like paths" do
+          string = <<~HTML
+            <html>
+              <body>
+                <a href="/files/123/download">link</a>
+                <a href="https://external.example.edu/files/456/document.pdf">link</a>
+                <a href="https://another-site.com/files/789/download">link</a>
+                <iframe src="/media_attachments_iframe/111">
+              </body>
+            </html>
+          HTML
+
+          results = Content.collect_attachment_ids(string)
+
+          expect(results).to include("123", "111")
+          expect(results).not_to include("456", "789")
+        end
+
+        it "includes absolute Canvas URLs" do
+          allow(HostUrl).to receive(:default_host).and_return("canvas.example.com")
+          ad = Account.default.account_domains.find_or_initialize_by(host: "canvas.example.com")
+          ad.save(validate: false) if ad.new_record?
+          AccountDomain.reload
+          MultiCache.delete(AccountDomain.domain_lookup_cache_key("canvas.example.com", force_current_test_cluster: false))
+
+          string = <<~HTML
+            <html>
+              <body>
+                <a href="/files/123/download">Relative Canvas link</a>
+                <a href="https://canvas.example.com/files/456/download">Absolute Canvas link</a>
+                <a href="https://external.edu/files/789/document.pdf">External link</a>
+              </body>
+            </html>
+          HTML
+
+          results = Content.collect_attachment_ids(string)
+
+          expect(results).to include("123", "456")
+          expect(results).not_to include("789")
+        end
+      end
+
+      describe "#add_youtube_banner_if_needed" do
+        let(:account) { Account.default }
+
+        before do
+          account.enable_feature!(:youtube_overlay)
+        end
+
+        let(:html_with_youtube) do
+          '<p>Here is some content with a YouTube video:</p><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="560" height="315"></iframe>'
+        end
+
+        let(:html_without_youtube) do
+          '<p>This is regular content without any videos.</p><img src="/images/test.jpg" alt="test">'
+        end
+
+        context "when is_native_mobile_app is false" do
+          it "does nothing and returns original HTML" do
+            content = Content.new(html_with_youtube, account, is_native_mobile_app: false)
+            result = content.add_youtube_banner_if_needed.to_s
+            expect(result).to eq(html_with_youtube)
+            expect(result).not_to include("embedded YouTube content")
+          end
+        end
+
+        context "when is_native_mobile_app is true" do
+          context "with YouTube embeds present" do
+            it "injects banner at the top of the content" do
+              content = Content.new(html_with_youtube, account, is_native_mobile_app: true)
+              result = content.add_youtube_banner_if_needed.to_s
+
+              expect(result).to include("This page has embedded YouTube content that may display advertisements.")
+              expect(result).to include('role="alert"')
+              expect(result).to include(html_with_youtube)
+            end
+
+            it "updates the HTML when banner is injected" do
+              content = Content.new(html_with_youtube, account, is_native_mobile_app: true)
+              result = content.add_youtube_banner_if_needed.to_s
+
+              # Should have updated the HTML to include banner
+              expect(result).not_to eq(html_with_youtube)
+              expect(result).to include("embedded YouTube content")
+              expect(result).to include(html_with_youtube)
+            end
+          end
+
+          context "without YouTube embeds" do
+            it "does nothing and returns original HTML" do
+              content = Content.new(html_without_youtube, account, is_native_mobile_app: true)
+              result = content.add_youtube_banner_if_needed.to_s
+
+              expect(result).to eq(html_without_youtube)
+              expect(result).not_to include("embedded YouTube content")
+            end
+
+            it "does not modify the parsed HTML structure" do
+              content = Content.new(html_without_youtube, account, is_native_mobile_app: true)
+              # Force parsing by calling the method first
+              original_html_string = content.add_youtube_banner_if_needed.to_s
+
+              # Call again to ensure it's stable and doesn't change
+              updated_html_string = content.add_youtube_banner_if_needed.to_s
+
+              # Should be identical since no banner was injected
+              expect(updated_html_string).to eq(original_html_string)
+              expect(updated_html_string).to eq(html_without_youtube)
+            end
+          end
+
+          context "with banner already present" do
+            it "does not inject duplicate banners" do
+              html_with_existing_banner = '<div role="alert">This page has embedded YouTube content that may display advertisements.</div>' + html_with_youtube
+              content = Content.new(html_with_existing_banner, account, is_native_mobile_app: true)
+              result = content.add_youtube_banner_if_needed.to_s
+
+              banner_count = result.scan("embedded YouTube content").length
+              expect(banner_count).to eq(1)
+            end
+          end
+        end
+
+        context "integration with rewritten_html" do
+          it "includes YouTube banner in the final output for native mobile app" do
+            url_helper = instance_double(UrlProxy, rewrite_api_urls: nil)
+            content = Content.new(html_with_youtube, account, is_native_mobile_app: true)
+            result = content.rewritten_html(url_helper)
+
+            expect(result).to include("embedded YouTube content")
+            expect(result).to include("This page has embedded YouTube content that may display advertisements.")
+            expect(result).to include(html_with_youtube)
+          end
+
+          it "does not include YouTube banner for non-native mobile app" do
+            url_helper = instance_double(UrlProxy, rewrite_api_urls: nil)
+            content = Content.new(html_with_youtube, account, is_native_mobile_app: false)
+            result = content.rewritten_html(url_helper)
+
+            expect(result).not_to include("embedded YouTube content")
+            expect(result).to include(html_with_youtube)
+          end
         end
       end
     end

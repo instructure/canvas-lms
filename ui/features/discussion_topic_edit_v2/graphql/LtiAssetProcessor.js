@@ -21,7 +21,7 @@ import {gql} from '@apollo/client'
 
 export const LtiAssetProcessor = {
   fragment: gql`
-    fragment LtiAssetProcessor on LtiAssetProcessor {
+    fragment EditV2LtiAssetProcessor on LtiAssetProcessor {
       _id
       title
       text
@@ -45,7 +45,7 @@ export const LtiAssetProcessor = {
   `,
   shape: () => ({
     // See ExistingAttachedAssetProcessorGraphql in
-    // ui/features/discussion_topic_edit_v2/react/util/assetProcessorGraphqlTypes.ts
+    // ui/shared/lti/model/AssetProcessor.ts
     // for the types.
     _id: string,
     title: string,

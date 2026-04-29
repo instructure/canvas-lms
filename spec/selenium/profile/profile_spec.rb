@@ -28,12 +28,24 @@ describe "profile" do
     edit_form
   end
 
-  def add_skype_service
-    f("#unregistered_service_skype > a").click
-    skype_dialog = f("[role=dialog][aria-label='Register Skype']")
-    skype_dialog.find_element(:name, "username").send_keys("jakesorce")
-    wait_for_new_page_load { submit_form(skype_dialog) }
-    expect(f("#registered_services")).to include_text("Skype")
+  def add_diigo_service
+    f("#unregistered_service_diigo > a").click
+    diigo_dialog = f("[role=dialog][aria-label='Diigo login']")
+    diigo_dialog.find_element(:name, "username").send_keys("diigo")
+    diigo_dialog.find_element(:name, "password").send_keys("password")
+    wait_for_new_page_load { submit_form(diigo_dialog) }
+    expect(f("#registered_services")).to include_text("Diigo")
+  end
+
+  def set_up_diigo_service
+    # Mock Diigo connection and API calls
+    allow(Diigo::Connection).to receive_messages(
+      config: { api_key: "test_key" },
+      verify_credentials: true,
+      diigo_get_bookmarks: []
+    )
+    allow_any_instance_of(UserService).to receive(:verify_diigo_credentials).and_return(true)
+    @user.account.enable_service(:diigo)
   end
 
   def generate_access_token(expiration: nil, purpose: "testing", close_dialog: true)
@@ -352,24 +364,27 @@ describe "profile" do
     end
 
     it "registers a service" do
+      set_up_diigo_service
       get "/profile/settings"
-      add_skype_service
+      add_diigo_service
     end
 
     it "deletes a service" do
+      set_up_diigo_service
       get "/profile/settings"
-      add_skype_service
+      add_diigo_service
       driver.action.move_to(f(".service")).perform
       f(".delete_service_link").click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      expect(f("#unregistered_services")).to include_text("Skype")
+      expect(f("#unregistered_services")).to include_text("Diigo")
     end
 
     it "toggles user services visibility" do
+      set_up_diigo_service
       get "/profile/settings"
-      add_skype_service
+      add_diigo_service
       selector = "#show_user_services"
       expect(f(selector).selected?).to be_truthy
       f(selector).click
@@ -454,7 +469,6 @@ describe "profile" do
 
     context "when access token restrictions are enabled" do
       before do
-        @course.root_account.enable_feature!(:admin_manage_access_tokens)
         @course.root_account.settings[:limit_personal_access_tokens] = true
         @course.root_account.save!
       end
@@ -482,7 +496,7 @@ describe "profile" do
     context "google drive" do
       it "links back to profile/settings in oauth callbacks" do
         allow(Canvas::Plugin).to receive(:find).and_call_original
-        allow(Canvas::Plugin).to receive(:find).with(:google_drive).and_return(double(enabled?: true))
+        allow(Canvas::Plugin).to receive(:find).with(:google_drive).and_return(instance_double(Canvas::Plugin, enabled?: true))
         @user.account.enable_service(:google_drive)
         @user.account.save!
         get "/profile/settings"
@@ -512,9 +526,6 @@ describe "profile" do
       expect(is_checked("#account_services_avatars")).to be_truthy
     end
 
-    # TODO: reimplement per CNVS-29610, but make sure we're testing at the right level
-    it "should successfully upload profile pictures"
-
     it "allows users to choose an avatar from their profile page" do
       course_with_teacher_logged_in
 
@@ -529,7 +540,7 @@ describe "profile" do
       f(".profile-edit-link").click
       wait_for_ajaximations
 
-      expect(ff(".avatar-content").length).to eq 1
+      expect(f("[data-testid='avatar-modal']")).to be_truthy
     end
   end
 
@@ -555,9 +566,87 @@ describe "profile" do
     expect(f("#links_empty_message").text).to eq "No links have been added"
   end
 
-  describe "profile pictures s3 tests" do
-    # TODO: reimplement per CNVS-29611, but make sure we're testing at the right level
-    it "should successfully upload profile pictures"
+  describe "profile field permissions" do
+    def show_edit_form
+      f("[data-event='editProfile']").click
+
+      # assert we are actually in edit mode
+      expect(f("[data-event='cancelEditProfile']")).to be_displayed
+    end
+
+    before :once do
+      @account = Account.default
+      @account.settings[:enable_profiles] = true
+    end
+
+    it "can edit title when profiles and title setting are enabled" do
+      user_logged_in
+      # set to false to assert that we aren't relying on the name setting
+      # which was the original setting check
+      @account.settings[:users_can_edit_name] = false
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_title] = true
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(f("[name='user_profile[title]']")).to be_displayed
+    end
+
+    it "can edit biography when profiles and biography setting are enabled" do
+      user_logged_in
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_bio] = true
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(f("[name='user_profile[bio]']")).to be_displayed
+    end
+
+    it "can edit profile links when profiles and profile links setting are enabled" do
+      user_logged_in
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_profile_links] = true
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(f("#edit_links_table")).to be_displayed
+    end
+
+    it "cannot edit biography when biography setting is disabled" do
+      user_logged_in
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_bio] = false
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(element_exists?("[name='user_profile[bio]']")).to be false
+    end
+
+    it "cannot edit title when title setting is disabled" do
+      user_logged_in
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_title] = false
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(element_exists?("[name='user_profile[title]']")).to be false
+    end
+
+    it "cannot edit profile links when profile links setting is disabled" do
+      user_logged_in
+      @account.settings[:users_can_edit_profile] = true
+      @account.settings[:users_can_edit_profile_links] = false
+      @account.save!
+      get "/profile"
+
+      show_edit_form
+      expect(element_exists?("#edit_links_table")).to be false
+    end
   end
 
   describe "avatar reporting" do

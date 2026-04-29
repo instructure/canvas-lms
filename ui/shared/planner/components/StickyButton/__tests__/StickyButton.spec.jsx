@@ -47,7 +47,7 @@ it('renders', () => {
 })
 
 it('calls the onClick prop when clicked', () => {
-  const fakeOnClick = jest.fn()
+  const fakeOnClick = vi.fn()
   const {getByRole} = render(
     <StickyButton id="sb" onClick={fakeOnClick}>
       Click me
@@ -59,7 +59,7 @@ it('calls the onClick prop when clicked', () => {
 })
 
 it('does not call the onClick prop when disabled', () => {
-  const fakeOnClick = jest.fn()
+  const fakeOnClick = vi.fn()
   const {getByRole} = render(
     <StickyButton id="sb" onClick={fakeOnClick} disabled={true}>
       Disabled button

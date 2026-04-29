@@ -21,7 +21,9 @@ import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {MediaAttachment} from '../MediaAttachment'
 
-jest.mock('@canvas/canvas-media-player', () => () => <div>Media Content</div>)
+vi.mock('@canvas/canvas-media-player', () => ({
+  default: () => <div>Media Content</div>,
+}))
 
 describe('MediaAttachment', () => {
   let props
@@ -29,7 +31,7 @@ describe('MediaAttachment', () => {
   beforeEach(() => {
     props = {
       file: {mediaID: '123', title: 'my-awesome-video.mp4', src: 'somesrc.test', type: 'video'},
-      onRemoveMediaComment: jest.fn(),
+      onRemoveMediaComment: vi.fn(),
     }
   })
 

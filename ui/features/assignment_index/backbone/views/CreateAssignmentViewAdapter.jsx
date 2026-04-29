@@ -22,7 +22,7 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 import axios from '@canvas/axios'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 
 const I18n = createI18nScope('CreateEditAssignmentModalAdapter')
 
@@ -84,13 +84,27 @@ const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}
     try {
       const saveOpts = {wait: true}
       await assignmentModel.save(mappedData, saveOpts)
-      ENV.PERMISSIONS.by_assignment_id &&
-        (ENV.PERMISSIONS.by_assignment_id[assignmentModel.get('id')] = {
+      // Calculate manage_assign_to permission for new assignments
+      const calculateManageAssignTo = submissionTypes => {
+        if (Array.isArray(submissionTypes) && submissionTypes.includes('discussion_topic')) {
+          return ENV.PERMISSIONS.manage_assignments_edit && ENV.PERMISSIONS.moderate_forum
+        }
+        return ENV.PERMISSIONS.manage_assignments_edit
+      }
+
+      if (ENV.PERMISSIONS.by_assignment_id) {
+        ENV.PERMISSIONS.by_assignment_id[assignmentModel.get('id')] = {
           update: ENV.PERMISSIONS.manage_assignments_edit,
           delete: ENV.PERMISSIONS.manage_assignments_delete,
-        })
+          manage_assign_to:
+            assignmentModel.get('permissions')?.manage_assign_to ??
+            calculateManageAssignTo(
+              mappedData.submission_types || assignmentModel.get('submission_types'),
+            ),
+        }
+      }
       assignmentGroup?.get('assignments').add(assignmentModel)
-    } catch (e) {
+    } catch (_e) {
       showFlashAlert({
         message: I18n.t('Unable to save assignment'),
         type: 'error',
@@ -110,6 +124,8 @@ const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}
     isPublished: assignment.published(),
     multipleDueDates: assignment.multipleDueDates(),
     differentiatedAssignment: assignment.nonBaseDates(),
+    peerReviewInGradedMode:
+      !!ENV.PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED && !!assignment.peerReviewSubAssignment(),
     frozenFields: getFrozenFields(assignment),
   })
 

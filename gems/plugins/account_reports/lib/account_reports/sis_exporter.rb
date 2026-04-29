@@ -34,7 +34,10 @@ module AccountReports
                          group_categories
                          xlist
                          user_observers
-                         admins].freeze
+                         admins
+                         institutional_tag_categories
+                         institutional_tags
+                         institutional_tag_associations].freeze
 
     def initialize(account_report, params = {})
       @account_report = account_report
@@ -592,7 +595,11 @@ module AccountReports
 
     def enrollment_query_options(enrol)
       if @include_deleted
-        enrol.where!("enrollments.workflow_state<>'deleted' OR enrollments.sis_batch_id IS NOT NULL")
+        conditions = +"enrollments.workflow_state<>'deleted' OR enrollments.sis_batch_id IS NOT NULL"
+        if @temp_enroll_feature_enabled && !@sis_format
+          conditions << " OR enrollments.temporary_enrollment_source_user_id IS NOT NULL"
+        end
+        enrol.where!(conditions)
       else
         enrol.where!("enrollments.workflow_state<>'deleted' AND enrollments.workflow_state<>'completed'
                         AND es.state<>'completed'")
@@ -963,14 +970,16 @@ module AccountReports
         headers << "created_by_sis"
       end
 
-      observers = root_account.pseudonyms
+      is_inst_id = Pseudonym.column_names.include?("is_inst_id")
+      observers = root_account.pseudonyms.not_instructure_identity
                               .select("pseudonyms.*,
                 p2.sis_user_id AS observer_sis_id,
                 p2.user_id AS observer_id,
                 user_observers.workflow_state AS ob_state,
                 user_observers.sis_batch_id AS o_batch_id")
                               .joins("INNER JOIN #{UserObservationLink.quoted_table_name} ON pseudonyms.user_id=user_observers.user_id
-               INNER JOIN #{Pseudonym.quoted_table_name} AS p2 ON p2.user_id=user_observers.observer_id")
+               INNER JOIN #{Pseudonym.quoted_table_name} AS p2 ON p2.user_id=user_observers.observer_id
+                 #{"AND p2.is_inst_id = false" if is_inst_id}")
                               .where("p2.account_id=pseudonyms.account_id")
                               .where(user_observers: { root_account_id: root_account })
 
@@ -1069,6 +1078,166 @@ module AccountReports
       admins = admins.where.not(account_users: { sis_batch_id: nil }) if @sis_format
       admins = admins.where.not(account_users: { workflow_state: "deleted" }) unless @include_deleted
       admins
+    end
+
+    def institutional_tag_categories
+      return generate_and_run_report([]) unless root_account.feature_enabled?(:institutional_tags)
+
+      headers = if @sis_format
+                  %w[category_id name description status]
+                else
+                  %w[canvas_category_id category_id name description status created_by_sis]
+                end
+
+      categories = institutional_tag_category_query
+      categories = institutional_tag_category_query_options(categories)
+
+      generate_and_run_report headers do |csv|
+        categories.find_each do |c|
+          row = []
+          row << c.id unless @sis_format
+          row << c.sis_source_id
+          row << c.name
+          row << c.description
+          row << c.workflow_state
+          row << c.sis_batch_id? unless @sis_format
+          csv << row
+        end
+      end
+    end
+
+    def institutional_tag_category_query
+      InstitutionalTagCategory.where(root_account:)
+    end
+
+    def institutional_tag_category_query_options(categories)
+      categories = categories.where.not(sis_source_id: nil) if @sis_format
+      categories = categories.where.not(sis_batch_id: nil) if @created_by_sis
+
+      if @include_deleted
+        categories.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
+      else
+        categories.where("workflow_state<>'deleted'")
+      end
+    end
+
+    def institutional_tags
+      return generate_and_run_report([]) unless root_account.feature_enabled?(:institutional_tags)
+
+      headers = if @sis_format
+                  %w[institutional_tag_id category_id name description status]
+                else
+                  %w[canvas_tag_id
+                     institutional_tag_id
+                     canvas_category_id
+                     category_id
+                     name
+                     description
+                     status
+                     created_by_sis]
+                end
+
+      tags = institutional_tag_query
+      tags = institutional_tag_query_options(tags)
+
+      generate_and_run_report headers do |csv|
+        tags.find_each do |t|
+          row = []
+          row << t.id unless @sis_format
+          row << t.sis_source_id
+          row << t.category_id unless @sis_format
+          row << t.category_sis_id
+          row << t.name
+          row << t.description
+          row << t.workflow_state
+          row << t.sis_batch_id? unless @sis_format
+          csv << row
+        end
+      end
+    end
+
+    def institutional_tag_query
+      InstitutionalTag
+        .select("institutional_tags.*,
+                 institutional_tag_categories.sis_source_id AS category_sis_id")
+        .joins(:category)
+        .where(root_account:)
+    end
+
+    def institutional_tag_query_options(tags)
+      if @sis_format
+        tags = tags.where.not(institutional_tags: { sis_source_id: nil })
+                   .where.not(institutional_tag_categories: { sis_source_id: nil })
+      end
+      tags = tags.where.not(institutional_tags: { sis_batch_id: nil }) if @created_by_sis
+
+      if @include_deleted
+        tags.where("institutional_tags.workflow_state<>'deleted' OR institutional_tags.sis_source_id IS NOT NULL")
+      else
+        tags.where("institutional_tags.workflow_state<>'deleted'")
+      end
+    end
+
+    def institutional_tag_associations
+      return generate_and_run_report([]) unless root_account.feature_enabled?(:institutional_tags)
+
+      headers = if @sis_format
+                  %w[institutional_tag_id user_id status]
+                else
+                  %w[canvas_tag_id
+                     institutional_tag_id
+                     canvas_user_id
+                     user_id
+                     status
+                     created_by_sis]
+                end
+
+      assocs = institutional_tag_association_query
+      assocs = institutional_tag_association_query_options(assocs)
+
+      generate_and_run_report headers do |csv|
+        assocs.find_in_batches do |batch|
+          users = batch.filter_map { |a| User.new(id: a.user_id) }.uniq
+          users_by_id = users.index_by(&:id)
+          pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
+
+          batch.each do |a|
+            p = loaded_pseudonym(pseudonyms,
+                                 users_by_id[a.user_id],
+                                 include_deleted: @include_deleted)
+            next unless p
+
+            row = []
+            row << a.institutional_tag_id unless @sis_format
+            row << a.tag_sis_id
+            row << a.user_id unless @sis_format
+            row << p.sis_user_id
+            row << a.workflow_state
+            row << a.sis_batch_id? unless @sis_format
+            csv << row
+          end
+        end
+      end
+    end
+
+    def institutional_tag_association_query
+      InstitutionalTagAssociation
+        .select("institutional_tag_associations.*,
+                 institutional_tags.sis_source_id AS tag_sis_id")
+        .joins(:institutional_tag)
+        .where(root_account:)
+        .where.not(user_id: nil)
+    end
+
+    def institutional_tag_association_query_options(assocs)
+      assocs = assocs.where.not(institutional_tags: { sis_source_id: nil }) if @sis_format
+      assocs = assocs.where.not(institutional_tag_associations: { sis_batch_id: nil }) if @created_by_sis || @sis_format
+
+      if @include_deleted
+        assocs.where("institutional_tag_associations.workflow_state<>'deleted' OR institutional_tag_associations.sis_batch_id IS NOT NULL")
+      else
+        assocs.where("institutional_tag_associations.workflow_state<>'deleted'")
+      end
     end
   end
 end

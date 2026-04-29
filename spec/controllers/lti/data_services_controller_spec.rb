@@ -38,12 +38,12 @@ describe Lti::DataServicesController do
   end
 
   def service_response(sub)
-    double(body: sub.merge(Id: "testid"), code: 200)
+    instance_double(HTTParty::Response, body: sub.merge(Id: "testid"), code: 200)
   end
 
   before do
     allow(CanvasSecurity::ServicesJwt).to receive_messages(encryption_secret: "setecastronomy92" * 2, signing_secret: "donttell" * 10)
-    allow(HTTParty).to receive(:send).and_return(double(body: subscription, code: 200))
+    allow(HTTParty).to receive(:send).and_return(instance_double(HTTParty::Response, body: subscription, code: 200))
     allow(DynamicSettings).to receive(:find).and_call_original
     allow(DynamicSettings).to receive(:find)
       .with("live-events-subscription-service", default_ttl: 5.minutes)
@@ -111,7 +111,7 @@ describe Lti::DataServicesController do
 
         it "raises an unprocessable_entity" do
           send_request
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
 
@@ -196,7 +196,7 @@ describe Lti::DataServicesController do
 
         it "raises an unprocessable_entity" do
           send_request
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
 
@@ -227,17 +227,6 @@ describe Lti::DataServicesController do
       let(:action) { :destroy }
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/destroy" }
-      let(:params_overrides) do
-        { account_id: root_account.lti_context_id, id: "testid" }
-      end
-    end
-  end
-
-  describe "#event_types_index" do
-    it_behaves_like "lti services" do
-      let(:action) { :event_types_index }
-      let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/list_event_types" }
       let(:params_overrides) do
         { account_id: root_account.lti_context_id, id: "testid" }
       end

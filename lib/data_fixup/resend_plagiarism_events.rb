@@ -69,10 +69,10 @@ module DataFixup
     end
 
     def self.missing_report_scope(scope)
-      "(#{scope.joins(:attachment_associations)
+      "(#{scope.where.not(submission_type: "online_text_entry")
+      .joins(:attachment_associations)
       .joins("LEFT JOIN #{OriginalityReport.quoted_table_name}
               AS ors ON submissions.id = ors.submission_id
-                    AND submissions.submitted_at = ors.submission_time
                     AND attachment_associations.attachment_id = ors.attachment_id")
       .where("ors.id IS NULL OR ors.workflow_state = 'pending'").to_sql})
       UNION
@@ -85,10 +85,10 @@ module DataFixup
     end
 
     def self.errors_report_scope(scope)
-      "(#{scope.joins(:attachment_associations)
+      "(#{scope.where.not(submission_type: "online_text_entry")
+      .joins(:attachment_associations)
       .joins("INNER JOIN #{OriginalityReport.quoted_table_name}
               AS ors ON submissions.id = ors.submission_id
-                    AND submissions.submitted_at = ors.submission_time
                     AND attachment_associations.attachment_id = ors.attachment_id
                     AND ors.workflow_state = 'error'").to_sql})
       UNION
@@ -104,7 +104,7 @@ module DataFixup
       DataFixup::ResendPlagiarismEvents.delay(priority: Delayed::LOWER_PRIORITY,
                                               strand: "plagiarism_event_resend",
                                               run_at: 1.year.from_now)
-                                       .trigger_plagiarism_resubmit_by_time(start_time, end_time, only_errors)
+                                       .trigger_plagiarism_resubmit_by_time(start_time, end_time, only_errors:)
     end
 
     def self.schedule_next_job
@@ -114,7 +114,7 @@ module DataFixup
 
     # Retriggers the plagiarism resubmit event for the given
     # submission scope.
-    def self.trigger_plagiarism_resubmit_by_time(start_time, end_time, only_errors = false)
+    def self.trigger_plagiarism_resubmit_by_time(start_time, end_time, only_errors: false)
       # Since we set all of the jobs to be run in a year, we need to schedule the next job to run
       # so they run every few minutes
       schedule_next_job

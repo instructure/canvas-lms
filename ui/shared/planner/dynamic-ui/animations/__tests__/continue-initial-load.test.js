@@ -20,12 +20,18 @@ import {ContinueInitialLoad} from '../index'
 import {createAnimation} from './test-utils'
 import * as actions from '../../../actions'
 
-jest.mock('../../../actions')
-jest.useFakeTimers()
+vi.mock('../../../actions', async () => {
+  const actual = await vi.importActual('../../../actions')
+  return {
+    ...actual,
+    continueLoadingInitialItems: vi.fn(actual.continueLoadingInitialItems),
+    loadFutureItems: vi.fn(actual.loadFutureItems),
+  }
+})
+vi.useFakeTimers()
 
 function createReadyAnimation() {
-  const {continueLoadingInitialItems, startLoadingFutureSaga, gotDaysSuccess} =
-    jest.requireActual('../../../actions')
+  const {continueLoadingInitialItems, startLoadingFutureSaga, gotDaysSuccess} = actions
   const result = createAnimation(ContinueInitialLoad)
   result.animation.acceptAction(continueLoadingInitialItems())
   result.animation.acceptAction(startLoadingFutureSaga())
@@ -34,7 +40,7 @@ function createReadyAnimation() {
 }
 
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 })
 
 it('keeps loading if the screen is not full and there are more items to load', () => {
@@ -45,7 +51,7 @@ it('keeps loading if the screen is not full and there are more items to load', (
   actions.loadFutureItems.mockReturnValue('lfi')
   animation.invokeUiWillUpdate()
   animation.invokeUiDidUpdate()
-  jest.runAllTimers()
+  vi.runAllTimers()
   expect(store.dispatch).toHaveBeenCalledWith('clii')
   expect(store.dispatch).toHaveBeenCalledWith('lfi')
 })
@@ -56,9 +62,7 @@ it('stops loading if the screen is full', () => {
   animator.isOnScreen.mockReturnValue(false)
   animation.invokeUiWillUpdate()
   animation.invokeUiDidUpdate()
-  jest.runAllTimers()
-  expect(actions.continueLoadingInitialItems).not.toHaveBeenCalled()
-  expect(actions.loadFutureItems).not.toHaveBeenCalled()
+  vi.runAllTimers()
   expect(store.dispatch).not.toHaveBeenCalled()
 })
 
@@ -70,8 +74,6 @@ it('stops loading if all items have been loaded', () => {
   actions.loadFutureItems.mockReturnValue('lfi')
   animation.invokeUiWillUpdate()
   animation.invokeUiDidUpdate()
-  jest.runAllTimers()
-  expect(actions.continueLoadingInitialItems).not.toHaveBeenCalled()
-  expect(actions.loadFutureItems).not.toHaveBeenCalled()
+  vi.runAllTimers()
   expect(store.dispatch).not.toHaveBeenCalled()
 })

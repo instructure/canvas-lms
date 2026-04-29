@@ -29,7 +29,7 @@ function renderTable(canAdd = true, canEdit = true, canDelete = true, FEATURES =
     FEATURES,
   }
 
-  const setFocusAbove = jest.fn()
+  const setFocusAbove = vi.fn()
   return render(
     <ExternalToolsTable
       canAdd={canAdd}

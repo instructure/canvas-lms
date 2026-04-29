@@ -282,7 +282,7 @@ describe "course pace page" do
       click_remove_pace_button
       click_remove_pace_modal_cancel
 
-      expect(element_exists?(remove_pace_modal_selector(:section))).to be_falsey
+      wait_for_no_such_element { f(remove_pace_modal_selector(:section)) }
       expect(publish_status.text).to eq("No pending changes")
     end
 
@@ -297,7 +297,7 @@ describe "course pace page" do
       click_remove_pace_button
       click_remove_pace_modal_x
 
-      expect(element_exists?(remove_pace_modal_selector(:student))).to be_falsey
+      wait_for_no_such_element { f(remove_pace_modal_selector(:student)) }
       expect(publish_status.text).to eq("No pending changes")
     end
 
@@ -348,10 +348,6 @@ describe "course pace page" do
       click_create_default_pace_button
 
       expect(pace_info.text).to include("2")
-    end
-
-    it "shows the actual number of students in published default pace" do
-      skip("LS-3608 this is broken right now")
     end
 
     it "shows the actual number of students in a section pace" do

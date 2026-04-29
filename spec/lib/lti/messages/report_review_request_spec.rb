@@ -61,6 +61,20 @@ describe Lti::Messages::ReportReviewRequest do
     expect(subject["#{IMS_CLAIM_PREFIX}/submission"]["id"]).to eq(asset_report.asset.submission.lti_attempt_id)
   end
 
+  context "when asset is a discussion entry" do
+    let(:submission) { submission_model(assignment:) }
+    let(:topic) { assignment.context.discussion_topics.create! }
+    let(:entry) { topic.discussion_entries.create!(message: "hello", user: submission.user) }
+    let(:dev) { entry.discussion_entry_versions.first }
+    let(:asset) { lti_asset_model(submission:, discussion_entry_version: dev) }
+    let(:asset_report) { lti_asset_report_model(asset_processor:, asset:) }
+
+    it "uses discussion submission claim format matching contribution notice" do
+      expected = "#{submission.lti_id}:#{dev.id}:#{entry.attachment_id}"
+      expect(subject["#{IMS_CLAIM_PREFIX}/submission"]["id"]).to eq(expected)
+    end
+  end
+
   it "includes assetreport type claim" do
     expect(subject["#{IMS_CLAIM_PREFIX}/assetreport_type"]).to eq(asset_report.report_type)
   end
@@ -96,6 +110,30 @@ describe Lti::Messages::ReportReviewRequest do
 
     it "message is invalid" do
       expect { subject }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe "legacy_custom_sourcedid extension" do
+    context "when extensions does not contain custom_sourcedid" do
+      before do
+        asset_report.update!(extensions: { "https://example.com/other" => "value" })
+      end
+
+      it "does not include legacy_custom_sourcedid extension" do
+        extension_key = "https://www.instructure.com/legacy_custom_sourcedid"
+        expect(subject).not_to have_key(extension_key)
+      end
+    end
+
+    context "when extensions contains custom_sourcedid" do
+      before do
+        asset_report.update!(extensions: { "https://www.instructure.com/legacy_custom_sourcedid" => "test-sourcedid-123" })
+      end
+
+      it "includes legacy_custom_sourcedid extension" do
+        extension_key = "https://www.instructure.com/legacy_custom_sourcedid"
+        expect(subject[extension_key]).to eq("test-sourcedid-123")
+      end
     end
   end
 end

@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {assignIn, map} from 'lodash'
+import {assignIn, map} from 'es-toolkit/compat'
 import Backbone from '@canvas/backbone'
 import template from '../jst/index.handlebars'
 import htmlEscape from '@instructure/html-escape'

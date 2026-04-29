@@ -25,6 +25,15 @@ module Lti
         { jwt: sign_jwt(default_claims(tool).merge(custom_claims(tool))) }
       end
 
+      def info_log(tool)
+        {
+          notice_type:,
+          notice_id: notice_claim[:id],
+          tool_id: tool.id,
+          user_id: user&.id
+        }
+      end
+
       private
 
       def default_claims(tool)
@@ -69,8 +78,12 @@ module Lti
           {
             current_user: user,
             tool:
-          }
+          }.merge!(expander_opts)
         )
+      end
+
+      def expander_opts
+        {}
       end
 
       def custom_ims_claims(_tool)

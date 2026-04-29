@@ -50,18 +50,18 @@ describe('SpeedGrader Options Menu', () => {
     }
 
     userSettings = {
-      get: jest.fn(),
-      set: jest.fn(),
+      get: vi.fn(),
+      set: vi.fn(),
     }
 
     saveUserSettings = Promise.resolve()
 
     SpeedGraderHelpers = {
-      reloadPage: jest.fn(),
+      reloadPage: vi.fn(),
     }
 
     QuizzesNextSpeedGrading = {
-      postGradeByQuestionChangeMessage: jest.fn(),
+      postGradeByQuestionChangeMessage: vi.fn(),
     }
 
     // Mock the form submission handler
@@ -150,7 +150,7 @@ describe('SpeedGrader Options Menu', () => {
 
   it('sends a postMessage only when "grade_by_question" changes', async () => {
     await awhile()
-    const postMessageStub = jest.spyOn(QuizzesNextSpeedGrading, 'postGradeByQuestionChangeMessage')
+    const postMessageStub = vi.spyOn(QuizzesNextSpeedGrading, 'postGradeByQuestionChangeMessage')
     const checkbox = document.getElementById('enable_speedgrader_grade_by_question')
     const form = document.getElementById('settings_form')
 

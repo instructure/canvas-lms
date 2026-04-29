@@ -22,25 +22,33 @@ import axios from 'axios'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {render, within, fireEvent} from '@testing-library/react'
 import {setGradebookOptions, setupCanvasQueries} from './fixtures'
-import {queryClient} from '@canvas/query'
+import {queryClient} from '@instructure/platform-query'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import EnhancedIndividualGradebook from '../EnhancedIndividualGradebook'
 import userSettings from '@canvas/user-settings'
 import {GradebookSortOrder} from '../../../types/gradebook.d'
 import * as ReactRouterDom from 'react-router-dom'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
+import {showFlashSuccess} from '@instructure/platform-alerts'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {type Mocked} from 'vitest'
 
-jest.mock('axios') // mock axios for final grade override helper API call
-jest.mock('@canvas/do-fetch-api-effect', () => jest.fn()) // mock doFetchApi for final grade override helper API call
-jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
-  executeApiRequest: jest.fn(),
+vi.mock('axios') // mock axios for final grade override helper API call
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn().mockReturnValue(vi.fn()),
+  }
+})
+vi.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
+  executeApiRequest: vi.fn(),
 }))
-const mockedAxios = axios as jest.Mocked<typeof axios>
-const mockedExecuteApiRequest = executeApiRequest as jest.MockedFunction<typeof executeApiRequest>
+const mockedAxios = axios as Mocked<typeof axios>
+const mockedExecuteApiRequest = executeApiRequest as Mocked<typeof executeApiRequest>
 const mockUserSettings = (mockGet = true) => {
   if (mockGet) {
-    jest.spyOn(userSettings, 'contextGet').mockImplementation(input => {
+    vi.spyOn(userSettings, 'contextGet').mockImplementation(input => {
       switch (input) {
         case 'sort_grade_columns_by':
           return {sortType: GradebookSortOrder.DueDate}
@@ -51,16 +59,17 @@ const mockUserSettings = (mockGet = true) => {
       }
     })
   }
-  const mockedContextSet = jest.spyOn(userSettings, 'contextSet')
+  const mockedContextSet = vi.spyOn(userSettings, 'contextSet')
   return {mockedContextSet}
 }
 
 const mockSearchParams = (defaultSearchParams = {}) => {
-  const setSearchParamsMock = jest.fn()
+  const setSearchParamsMock = vi.fn()
   const searchParamsMock = new URLSearchParams(defaultSearchParams)
-  jest
-    .spyOn(ReactRouterDom, 'useSearchParams')
-    .mockReturnValue([searchParamsMock, setSearchParamsMock])
+  vi.spyOn(ReactRouterDom, 'useSearchParams').mockReturnValue([
+    searchParamsMock,
+    setSearchParamsMock,
+  ])
   return {searchParamsMock, setSearchParamsMock}
 }
 
@@ -78,15 +87,16 @@ describe('Enhanced Individual Gradebook', () => {
     mockedAxios.get.mockResolvedValue({
       data: [],
     })
-    $.subscribe = jest.fn()
+    $.subscribe = vi.fn()
 
     setupCanvasQueries()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
-    jest.resetAllMocks()
+    vi.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
+    vi.clearAllMocks()
+    vi.mocked(showFlashSuccess).mockReturnValue(vi.fn())
   })
 
   const renderEnhancedIndividualGradebook = (mockOverrides = []) => {
@@ -137,9 +147,9 @@ describe('Enhanced Individual Gradebook', () => {
 
     it('does not render another flash message when switching students after setting default grades for the assignment', async () => {
       mockUserSettings()
-      const {getByTestId, getByRole} = renderEnhancedIndividualGradebook()
+      const {getByTestId} = renderEnhancedIndividualGradebook()
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
-      mockedExecuteApiRequest.mockResolvedValue({
+      vi.mocked(executeApiRequest).mockResolvedValue({
         data: [],
         status: 201,
       })
@@ -150,9 +160,7 @@ describe('Enhanced Individual Gradebook', () => {
       fireEvent.click(getByTestId('default-grade-submit-button'))
       await new Promise(resolve => setTimeout(resolve, 0))
       fireEvent.change(getByTestId('content-selection-student-select'), {target: {value: '5'}})
-      const parentElement = getByRole('alert')
-      const childElements = parentElement?.children
-      expect(childElements?.length).toBe(1)
+      expect(vi.mocked(showFlashSuccess)).toHaveBeenCalledTimes(1)
     })
   })
 })

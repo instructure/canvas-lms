@@ -36,7 +36,7 @@ describe('PeopleSearch', () => {
     searchType: 'unique_id',
     nameList: 'foo, bar, baz',
     canReadSIS: true,
-    onChange: jest.fn(),
+    onChange: vi.fn(),
     ...overrides,
   })
 

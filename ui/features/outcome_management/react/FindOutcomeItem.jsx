@@ -39,6 +39,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {IMPORT_PENDING, IMPORT_COMPLETED} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 import {ratingsShape} from './Management/shapes'
 import descriptionType from './shared/descriptionType'
+import OutcomeContextTag from '@canvas/outcome-context-tag'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -173,7 +174,7 @@ const FindOutcomeItem = ({
             {isMobileView && checkbox}
           </div>
           {shouldShowDescription && (
-            <div style={{paddingBottom: '0.75rem'}}>
+            <div style={{paddingBottom: '0.3rem'}}>
               <OutcomeDescription
                 description={description}
                 friendlyDescription={friendlyDescription}
@@ -186,6 +187,12 @@ const FindOutcomeItem = ({
               />
             </div>
           )}
+          <View as="div" margin="0 0 x-small 0">
+            <OutcomeContextTag
+              outcomeContextType={sourceContextType ?? undefined}
+              outcomeContextId={sourceContextId ?? undefined}
+            />
+          </View>
         </Flex.Item>
         {!isMobileView && checkbox}
       </Flex>

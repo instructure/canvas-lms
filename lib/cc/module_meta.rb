@@ -81,6 +81,10 @@ module CC
 
             m_node.items do |items_node|
               cm.content_tags.not_deleted.each do |ct|
+                if Account.site_admin.feature_enabled?(:selective_content_tag_export) && @course.horizon_course?
+                  next unless export_object?(ct)
+                end
+
                 ct_migration_id = create_key(ct)
                 ct_id_map[ct.id] = ct_migration_id
                 items_node.item(identifier: ct_migration_id) do |item_node|
@@ -118,6 +122,10 @@ module CC
             if cm.completion_requirements.present?
               m_node.completionRequirements do |crs_node|
                 cm.completion_requirements.each do |c_req|
+                  if Account.site_admin.feature_enabled?(:selective_content_tag_export) && @course.horizon_course?
+                    next unless ct_id_map[c_req[:id]].present?
+                  end
+
                   crs_node.completionRequirement(type: c_req[:type]) do |cr_node|
                     cr_node.min_score c_req[:min_score] unless c_req[:min_score].blank?
                     cr_node.min_percentage c_req[:min_percentage] unless c_req[:min_percentage].blank?

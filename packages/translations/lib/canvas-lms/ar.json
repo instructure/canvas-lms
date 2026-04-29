@@ -1,0 +1,306 @@
+{
+    "ConfirmationDialog": {
+        "Cancel": "إلغاء",
+        "Confirm": "تأكيد"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "تمييز كتاريخ هام وإظهار على الشريط الجانبي لجلسة التسجيل"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "مخطط التقييم الافتراضي للحساب",
+        "Account default grading scheme was successfully saved.": "تم حفظ مخطط التقييم الافتراضي للحساب بنجاح.",
+        "Active Grading Schemes": "مخططات التقييم النشطة",
+        "Applied": "تم التطبيق",
+        "Apply": "تطبيق",
+        "Archive Grading Scheme": "أرشفة نظام تقييم الدرجات",
+        "Archived": "مؤرشف",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "لا يزال بالإمكان استخدام مخططات التقييم المؤرشفة، لكن لا يمكن إضافتها إلى مساقات أو مهام جديدة.",
+        "Are you sure you want to delete this grading scheme?": "هل ترغب بالتأكيد في حذف نظام التقييم هذا؟",
+        "Cancel": "إلغاء",
+        "Canvas Default": "الوضع الافتراضي لـ Canvas",
+        "Close": "إغلاق",
+        "Confirm": "تأكيد",
+        "Confirm Default Grading Scheme Change": "تأكيد تغيير مخطط التقييم الافتراضي",
+        "Delete Grading Scheme": "حذف نظام تقييم الدرجات",
+        "Duplicate Grading Scheme": "تكرار نظام تقييم الدرجات",
+        "Edit Grading Scheme": "تحرير نظام تقييم الدرجات",
+        "Grading Scheme Name": "اسم نظام التقييم",
+        "Grading scheme was successfully archived.": "تم أرشفة مخطط التقييم بنجاح.",
+        "Grading scheme was successfully created.": "تم إنشاء نظام التقييم بنجاح.",
+        "Grading scheme was successfully removed.": "تمت إزالة نظام التقييم بنجاح.",
+        "Grading scheme was successfully saved.": "تم حفظ نظام التقييم بنجاح.",
+        "Grading scheme was successfully unarchived.": "تم إلغاء أرشفة مخطط التقييم بنجاح.",
+        "Locations Used": "المواقع المستخدمة",
+        "Lower limit of range": "الحد الأدنى للنطاق",
+        "New Grading Scheme": "نظام تقييم جديد",
+        "Next Page": "الصفحة التالية",
+        "No account default": "بلا حساب افتراضي",
+        "Previous Page": "الصفحة السابقة",
+        "Save": "حفظ",
+        "Search": "بحث",
+        "Search...": "بحث...",
+        "Show courses and assignments": "إظهار المساقات والمهام",
+        "Show locations used": "إظهار المواقع المستخدمة",
+        "Sort by": "الفزر حسب",
+        "There was an error while archiving the grading scheme": "حدث خطأ أثناء أرشفة مخطط التقييم",
+        "There was an error while creating the grading scheme": "حدث خطأ أثناء إنشاء نظام التقييم",
+        "There was an error while loading grading schemes": "حدث خطأ أثناء تحميل أنظمة التقييم",
+        "There was an error while loading the default canvas grading scheme": "حدث خطأ أثناء تحميل نظام تقييم Canvas الافتراضي",
+        "There was an error while loading the default grading scheme": "حدث خطأ أثناء تحميل نظام التقييم الافتراضي",
+        "There was an error while removing the grading scheme": "حدث خطأ أثناء إزالة نظام التقييم",
+        "There was an error while unarchiving the grading scheme": "حدث خطأ أثناء إلغاء أرشفة مخطط التقييم",
+        "There was an error while updating the default grading scheme": "حدث خطأ أثناء تحديث نظام التقييم الافتراضي",
+        "There was an error while updating the grading scheme": "حدث خطأ أثناء تحديث نظام التقييم",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "سيؤثر هذا التغيير على كل المساقات والمهام النشطة التي ترث حاليًا الإعدادات الافتراضية للحساب. سيستغرق هذا التغيير بعض الوقت حتى ينتهي حيث يتم إعادة حساب جميع درجات المساقات والمهام فيما يتعلق بمخطط التقييم الافتراضي للحساب الجديد.",
+        "Unarchive Grading Scheme": "إلغاء أرشفة مخطط التقييم",
+        "Upper limit of range": "الحد الأقصى للنطاق",
+        "View Grading Scheme": "عرض نظام التقييم",
+        "View/Copy Grading Scheme": "عرض/نسخ نظام التقييم",
+        "View/Edit Grading Scheme": "عرض/تحرير نظام التقييم",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "لا يمكنك أرشفة نظام التقييم هذا حيث تم تعيينه كنظام افتراضي لمساق أو لحساب.",
+        "You can't delete this grading scheme because it is in use.": "لا يمكنك حذف مخطط التقييم هذا لأنه قيد الاستخدام.",
+        "You have no active grading schemes.": "ليس لديك مخططات تقييم نشطة.",
+        "You have no archived grading schemes.": "ليس لديك مخططات تقييم مؤرشفة.",
+        "to": "إلى"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "هل ترغب بالتأكيد في حذف نظام التقييم هذا؟",
+        "Are you sure you want to duplicate this grading scheme?": "هل ترغب بالتأكيد في نسخ مخطط التقييم هذا؟",
+        "Cancel": "إلغاء",
+        "Close": "إغلاق",
+        "Delete": "حذف",
+        "Delete ": "حذف ",
+        "Duplicate": "تكرار",
+        "Duplicate ": "تكرار ",
+        "Edit Grading Scheme": "تحرير نظام تقييم الدرجات",
+        "New Grading Scheme": "نظام تقييم جديد",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "لا يمكن تحرير النسب المئوية والنقاط لأنه نظام تقييم على مستوى الحساب.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "لا يمكن تحرير النسب المئوية والنقاط لأنه قيد الاستخدام حاليًا كنظام تقييم افتراضي.",
+        "Percentages and points can't be edited because it is currently being used.": "لا يمكن تحرير النسب المئوية والنقاط لأنه قيد الاستخدام حاليًا.",
+        "Save": "حفظ"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "جدول يحتوي على بيانات نظام تقييم Canvas الافتراضي.  يحتوي كل صف على اسم ونسبة مئوية قصوى ونسبة مئوية دنيا.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "جدول يحتوي على بيانات نظام التقييم.  يحتوي كل صف على اسم ونسبة مئوية قصوى ونسبة مئوية دنيا.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "لا يمكن أن يحتوي على أسماء صفوف مكررة أو فارغة. أصلح الأسماء وحاول النقر فوق \\\"حفظ\\\" مرة أخرى.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "لا يمكن أن يحتوي على نطاقات متداخلة أو فارغة. أصلح النطاقات وحاول النقر فوق \\\"حفظ\\\" مرة أخرى.",
+        "Delete grading scheme": "حذف نظام التقييم",
+        "Edit Grading Scheme": "تحرير نظام تقييم الدرجات",
+        "Edit a copy of this grading scheme": "تحرير نسخة من نظام التقييم هذا",
+        "Edit grading scheme": "تحرير نظام التقييم",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "مطلوب توفير اسم نظام التقييم. أضف اسمًا وحاول النقر فوق \\\"حفظ\\\" مرة أخرى.",
+        "Grading scheme title": "عنوان نظام التقييم",
+        "Invalid grading scheme": "نظام تقييم غير صالح",
+        "Letter Grade": "الدرجة بالأحرف",
+        "Looks great!": "يبدو جيداً!",
+        "Percentage": "النسبة المئوية",
+        "Points": "النقاط",
+        "Range": "النطاق",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "يجب أن يكون النطاق رقمًا صالحًا. لا يمكن أن يحتوي على أرقام سلبية أو أرقام أكبر من 100. أصلح النطاقات وحاول النقر فوق \\\"حفظ\\\" مرة أخرى.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "يجب أن يكون النطاق رقمًا صالحًا. لا يمكن أن يحتوي على أرقام سلبية أو أرقام أكبر من نطاق النقاط العليا. أصلح النطاقات وحاول النقر فوق \\\"حفظ\\\" مرة أخرى.",
+        "edit a copy": "تحرير نسخة"
+    },
+    "OutcomeManagement": {
+        "Course": "المساق",
+        "Institution": "المؤسسة"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "الحسابات",
+        "Close": "إغلاق",
+        "Concluded": "تم الانتهاء",
+        "Courses": "المساقات",
+        "Failed to load account used locations": "فشل تحميل المواقع المستخدمة للحساب",
+        "Failed to load assignments used locations": "فشل تحميل المواقع المستخدمة للمهام",
+        "Failed to load used locations": "فشل تحميل المواقع المستخدمة",
+        "Load Assignments ...": "تحميل المهام ...",
+        "Load More Assignments ...": "تحميل المزيد من المهام ...",
+        "Loading": "يتم الآن التحميل...",
+        "Locations Used": "المواقع المستخدمة",
+        "Search": "بحث",
+        "Search...": "بحث..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "سياسة الاستخدام المقبولة",
+        "Close": "إغلاق",
+        "Loading page": "جار تحميل الصفحة",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "سياسة الاستخدام المقبول غير متاح حاليًا. يرجى التحقق لاحقًا أو الاتصال بالدعم إذا كنت بحاجة لمزيد من الدعم.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "يتعذر تحميل سياسة الاستخدام المقبول. يرجى إعادة المحاولة لاحقًا أو التواصل مع الدعم إذا استمرت المشكلة."
+    },
+    "account_reports": {
+        "Close": "إغلاق",
+        "Invalid date and time.": "التاريخ والوقت غير صالحين.",
+        "Next month": "الشهر القادم",
+        "Previous month": "الشهر السابق",
+        "Time": "الوقت"
+    },
+    "admin_split": {
+        "Cancel": "إلغاء",
+        "Failed to split users.": "فشل تقسيم المستخدمين.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "ملاحظة: سيؤدي هذا إلى محاولة التراجع عن الدمج على أكمل وجه ممكن، ولكن قد لا يتم استعادة المستخدمين المدموجين بشكل مثالي إلى حالتهم السابقة.",
+        "OK": "موافق",
+        "Split": "تقسيم",
+        "The following users will be split into separate user accounts:": "سيتم تقسيم المستخدمين التالين إلى حسابات مستخدمين منفصلة:",
+        "There are no user accounts to split from this user.": "لا توجد حسابات مستخدمين للتقسيم من هذا المستخدم.",
+        "User split complete. Links to split user accounts follow:": "اكتمل تقسيم المستخدمين. روابط تقسيم حسابات المستخدمين أدناه:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "الوصف"
+    },
+    "assignment_footer": {
+        "Next": "التالي",
+        "Previous": "السابق"
+    },
+    "assignment_tabs": {
+        "Assignment": "المهمة",
+        "Peer Review": "مراجعة الأقران"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(افتراضي المساق)",
+        "Account Level": "مستوى الحساب",
+        "Canvas Grading Scheme (course default)": "نظام التقييم Canvas (المخطط الافتراضي للمساق)",
+        "Close": "إغلاق",
+        "Course Level": "مستوى المساق",
+        "Default Canvas Grading Scheme": "نظام تقييم Canvas الافتراضي",
+        "Grading scheme was successfully removed.": "تمت إزالة نظام التقييم بنجاح.",
+        "Grading scheme was successfully updated.": "تم تحديث مخطط التقييم بنجاح.",
+        "Manage All Grading Schemes": "إدارة كل أنظمة التقييم",
+        "New Grading Scheme": "نظام تقييم جديد",
+        "Select a grading scheme": "حدد نظام تقييم",
+        "There was an error while loading grading schemes": "حدث خطأ أثناء تحميل أنظمة التقييم",
+        "There was an error while loading the grading scheme": "حدث خطأ أثناء تحميل نظام التقييم",
+        "There was an error while refreshing grading schemes": "حدث خطأ أثناء تحديث أنظمة التقييم",
+        "There was an error while removing the grading scheme": "حدث خطأ أثناء إزالة نظام التقييم",
+        "View": "عرض"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "صفحة خطأ مهام 2 للمعلم",
+        "Assignments 2 Teacher initial query error": "خطأ في الاستعلام الأولي لإرسال مهام 2 للمعلم",
+        "Loading": "يتم الآن التحميل..."
+    },
+    "catalog": {
+        "Course Catalog": "كتالوج المساق"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "عمل رائع! من مطوري Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "إلغاء",
+        "Copy course": "نسخ المساق",
+        "Course code": "رمز المساق",
+        "Course code must be 255 characters or less": "يجب ألا يتجاوز رمز المساق 255 حرفًا",
+        "Course name must be 255 characters or less": "يجب ألا يتجاوز اسم المساق 255 حرفًا",
+        "Create course": "إنشاء مساق",
+        "Creating...": "جارٍ الإنشاء...",
+        "End date": "تاريخ الانتهاء",
+        "End date must be after start date": "يجب أن يكون تاريخ الانتهاء بعد تاريخ البدء",
+        "Name": "الاسم",
+        "No results": "بلا نتائج",
+        "Please enter the details for the new course.": "أدخل التفاصيل التالية لبدء إنشاء نسخة من هذا المساق.",
+        "Select a new beginning date": "حدد تاريخ بدء جديد",
+        "Select a new end date": "حدد تاريخ انتهاء جديد",
+        "Select end date": "حدد تاريخ الانتهاء",
+        "Select start date": "حدد تاريخ البدء",
+        "Start date": "تاريخ البدء",
+        "Start date must be before end date": "يجب أن يكون تاريخ البدء قبل تاريخ الانتهاء",
+        "Start typing to search...": "ابدأ الكتابة للبحث...",
+        "Term": "الفصل الدراسي",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "لا يمكن تعديل تاريخي بدء ونهاية الفصل الدراسي من هنا، ولا يمكن تعديلهما إلا من صفحة تفاصيل الفصل الدراسي تحت \\\"المسؤول\\\".",
+        "Use arrow keys to navigate options.": "استخدم مفاتيح الأسهم للتنقل بين الخيارات."
+    },
+    "content_share_preview_overlay": {
+        "Close": "إغلاق",
+        "Content Share Preview": "معاينة مشاركة المحتوى",
+        "Preview": "معاينة"
+    },
+    "copy_warnings_modal": {
+        "Attention": "انتباه"
+    },
+    "course_logging_content": {
+        "No results": "بلا نتائج",
+        "Type to search": "اكتب للبحث"
+    },
+    "create_course_modal": {
+        "Cancel": "إلغاء",
+        "Course Details": "تفاصيل المساق",
+        "Course Name": "اسم المساق",
+        "Create": "إنشاء",
+        "Create Course": "إنشاء مساق",
+        "Create Subject": "إنشاء الموضوع",
+        "Creating new course...": "جارٍ إنشاء مساق جديد...",
+        "Creating new subject...": "جارٍ إنشاء موضوع جديد...",
+        "Error creating new course": "حدث خطأ أثناء إنشاء مساق جديد",
+        "Error creating new subject": "حدث خطأ أثناء إنشاء موضوع جديد",
+        "Loading accounts...": "جارٍ تحميل الحسابات...",
+        "Name...": "الاسم...",
+        "No Results": "لا توجد نتائج",
+        "Select a homeroom": "حدد جلسة تسجيل",
+        "Subject Name": "اسم الموضوع",
+        "Unable to get accounts": "يتعذر الحصول على حسابات",
+        "Unable to get homerooms": "يتعذر الحصول على جلسة تسجيل",
+        "Use arrow keys to navigate options.": "استخدم مفاتيح الأسهم للتنقل بين الخيارات.",
+        "Which account will this course be associated with?": "ما الحساب الذي سيقترن به هذا المساق؟",
+        "Which account will this subject be associated with?": "ما الحساب الذي سيقترن به هذا الموضوع؟"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "تجاوز الدرجة النهائية"
+    },
+    "feature_flags": {
+        "Accept": "قبول",
+        "Cancel": "إلغاء"
+    },
+    "filter_bar": {
+        "All": "الكل",
+        "Clear": "مسح",
+        "Filter by": "التصفية حسب",
+        "Search": "بحث",
+        "Use arrow keys to navigate options.": "استخدم مفاتيح الأسهم للتنقل بين الخيارات."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "حدد مجموعة",
+        "Use arrow keys to navigate options.": "استخدم مفاتيح الأسهم للتنقل بين الخيارات."
+    },
+    "jobs": {
+        "Close": "إغلاق"
+    },
+    "modules_home_page": {
+        "Create a new Module": "إنشاء وحدة نمطية جديدة"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "باندا مجتهد بالدراسة",
+        "Moves:": "الحركات:"
+    },
+    "overview_page": {
+        "Edit home page": "تحرير الصفحة الرئيسية",
+        "Subject Home Page": "الصفحة الرئيسية للموضوع"
+    },
+    "pages_edit_title": {
+        "Page Title": "عنوان الصفحة"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "إلغاء",
+        "Close": "إغلاق"
+    },
+    "study_assist": {
+        "Back": "عودة",
+        "Close": "إغلاق",
+        "Page": "صفحة"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "مطلوب عنوان URL صالح",
+        "Website URL": "عنوان URL لموقع ويب"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "سياسة الاستخدام المقبولة",
+        "Loading...": "جارٍ التحميل...",
+        "Preview": "معاينة"
+    },
+    "todos_page": {
+        "Failed to load todos": "فشل تحميل قوائم المهام",
+        "Loading Additional Todo Details": "جارٍ تحميل تفاصيل إضافية لقائمة المهام",
+        "Loading Todo Course Name": "جارٍ تحميل اسم مساق قائمة المهام",
+        "Loading Todo Title": "جارٍ تحميل عنوان قائمة المهام"
+    },
+    "tray": {
+        "Close": "إغلاق"
+    }
+}

@@ -256,7 +256,7 @@ describe('ExternalToolsTableRow', () => {
       expect(getByLabelText('RCE Favorite')).toBeInTheDocument()
       expect(getByLabelText('Top Navigation Favorite')).toBeInTheDocument()
       const setAsFav = store.setAsFavorite
-      store.setAsFavorite = jest.fn()
+      store.setAsFavorite = vi.fn()
 
       const checkbox = getByLabelText('RCE Favorite').closest('input[type="checkbox"]')
       fireEvent.click(checkbox)

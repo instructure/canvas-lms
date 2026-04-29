@@ -200,6 +200,7 @@ describe Lti::Overlay do
       let(:data) do
         {
           # If we ever overlay more launch_settings, they should be added here for testing
+          icon_url: "https://example.com/different-icon.png",
           custom_fields: { "foo" => "totally rad" },
           target_link_uri: "https://example.com/neato"
         }
@@ -210,15 +211,15 @@ describe Lti::Overlay do
       end
     end
 
-    context "adding additional placements" do
+    context "with placements not in the original configuration" do
       let(:data) do
         super().tap do |s|
           s[:placements] = { global_navigation: { enabled: true, icon_url: "https://example.com/global" } }
         end
       end
 
-      it "should add the new placements" do
-        expect(subject[:placements].pluck(:placement)).to include("global_navigation")
+      it "should not add the new placements" do
+        expect(subject[:placements].pluck(:placement)).not_to include("global_navigation")
       end
     end
 

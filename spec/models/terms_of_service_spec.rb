@@ -61,4 +61,46 @@ describe TermsOfService do
       expect(sub.terms_of_service).to be_nil
     end
   end
+
+  describe ".external_url" do
+    before do
+      # required by some plugin gems
+      Setting.set("terms_of_service_content_default_v2_global_id", @terms_of_service_content.global_id.to_s)
+      Setting.set("terms_of_service_content_internet2_global_id", @terms_of_service_content.global_id.to_s)
+    end
+
+    it "returns nil in test environment even if there's a setting" do
+      @terms_of_service.update!(terms_type: "built_in:default_v2")
+      Setting.set("external_aup_url_for_default_v2", "https://example.com/terms")
+      expect(TermsOfService.external_url(@ac)).to be_nil
+    end
+
+    describe "in non-test environment" do
+      before do
+        allow(Rails.env).to receive(:test?).and_return(false)
+      end
+
+      it "returns nil when no setting exists" do
+        ac2 = Account.new
+        expect(TermsOfService.external_url(ac2)).to be_nil
+      end
+
+      it "returns nil when terms_type doesn't fit the 'built_in:' pattern" do
+        @terms_of_service.update!(terms_type: "deffo-not-built-in")
+        expect(TermsOfService.external_url(@ac)).to be_nil
+      end
+
+      it "returns setting value when a match is found" do
+        @terms_of_service.update!(terms_type: "built_in:internet2")
+        Setting.set("external_aup_url_for_internet2", "https://example.com/internet2")
+        expect(TermsOfService.external_url(@ac)).to eq "https://example.com/internet2"
+      end
+
+      it "returns nil when a setting exists but doesn't match" do
+        @terms_of_service.update!(terms_type: "built_in:default_v2")
+        Setting.set("external_aup_url_for_default_v2", nil)
+        expect(TermsOfService.external_url(@ac)).to be_nil
+      end
+    end
+  end
 end

@@ -28,6 +28,7 @@ require "active_record"
 module ActiveModel
   class FakeController
     include Rails.application.routes.url_helpers
+
     def default_url_options
       { host: "example.com" }
     end
@@ -49,12 +50,4 @@ module ActiveModel
       !!stringify_json_ids
     end
   end
-end
-
-require_relative "../app/serializers/canvas/api_serialization"
-require_relative "../app/serializers/canvas/api_serializer"
-require_relative "../app/serializers/canvas/api_array_serializer"
-
-Dir[File.expand_path(File.dirname(__FILE__) + "/../app/serializers/*.rb")].each do |file|
-  require file
 end

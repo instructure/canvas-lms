@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {ProfileTab} from '../../../../api.d'
@@ -26,13 +26,15 @@ const PROFILE_TABS_PATH = '/api/v1/users/self/tabs'
 export default async function profileQuery({signal}: QueryFunctionContext): Promise<ProfileTab[]> {
   const data: Array<ProfileTab> = []
   const fetchOpts = {signal}
-  let path = PROFILE_TABS_PATH
+  let path: string | null = PROFILE_TABS_PATH
 
   while (path) {
-    const {json, link} = await doFetchApi<ProfileTab[]>({path, fetchOpts})
-    if (json) data.push(...json)
-    // @ts-expect-error
-    path = link?.next?.url || null
+    const result: DoFetchApiResults<ProfileTab[]> = await doFetchApi<ProfileTab[]>({
+      path,
+      fetchOpts,
+    })
+    if (result.json) data.push(...result.json)
+    path = result.link?.next?.url ?? null
   }
   return data
 }

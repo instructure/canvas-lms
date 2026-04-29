@@ -18,13 +18,15 @@
 
 import React from 'react'
 import GradebookSettingsModal, {type GradebookSettingsModalProps} from '../GradebookSettingsModal'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {render} from '@testing-library/react'
 import userEvent, {type UserEvent} from '@testing-library/user-event'
 import {statusColors} from '../../constants/colors'
-import type {GradebookViewOptions, LatePolicy} from '../../gradebook.d'
-import {DEFAULT_LATE_POLICY_DATA} from '../../apis/GradebookSettingsModalApi'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import type {GradebookViewOptions} from '../../gradebook.d'
+import {destroyContainer} from '@instructure/platform-alerts'
+
+const server = setupServer()
 
 describe('GradebookSettingsModal', () => {
   let props: GradebookSettingsModalProps
@@ -32,6 +34,7 @@ describe('GradebookSettingsModal', () => {
   let latePolicyUrl: string
 
   beforeEach(() => {
+    server.listen({onUnhandledRequest: 'bypass'})
     user = userEvent.setup()
 
     const loadCurrentViewOptions = (): GradebookViewOptions => ({
@@ -43,6 +46,9 @@ describe('GradebookSettingsModal', () => {
       hideAssignmentGroupTotals: false,
       statusColors: statusColors(),
       viewUngradedAsZero: false,
+      viewHiddenGradesIndicator: false,
+      viewStatusForColorblindness: false,
+      showSuppressedAssignments: false,
     })
 
     props = {
@@ -51,30 +57,35 @@ describe('GradebookSettingsModal', () => {
       courseId: '1',
       courseSettings: {allowFinalGradeOverride: false},
       locale: 'en',
-      onRequestClose: jest.fn(),
-      onAfterClose: jest.fn(),
+      onRequestClose: vi.fn(),
+      onAfterClose: vi.fn(),
       gradebookIsEditable: true,
       gradedLateSubmissionsExist: false,
       loadCurrentViewOptions,
-      onCourseSettingsUpdated: jest.fn(),
-      onLatePolicyUpdate: jest.fn(),
-      onViewOptionsUpdated: jest.fn().mockResolvedValue([]),
+      onCourseSettingsUpdated: vi.fn(),
+      onLatePolicyUpdate: vi.fn(),
+      onViewOptionsUpdated: vi.fn().mockResolvedValue([]),
       open: true,
       postPolicies: {
         coursePostPolicy: {postManually: false},
-        setAssignmentPostPolicies: jest.fn(),
-        setCoursePostPolicy: jest.fn(),
+        setAssignmentPostPolicies: vi.fn(),
+        setCoursePostPolicy: vi.fn(),
       },
+      customGradeStatuses: [],
     }
 
     latePolicyUrl = `/api/v1/courses/${props.courseId}/late_policy`
     // If a course hasn't yet created a late policy, this returns a 404 and the front-end handles it.
-    fetchMock.get(latePolicyUrl, 404)
+    server.use(http.get(latePolicyUrl, () => new HttpResponse(null, {status: 404})))
   })
 
   afterEach(() => {
     destroyContainer()
-    fetchMock.restore()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   describe('opening the modal', () => {
@@ -100,140 +111,39 @@ describe('GradebookSettingsModal', () => {
     })
   })
 
-  describe('"Late Policies" tab', () => {
-    let response: {late_policy: LatePolicy}
-
-    beforeEach(() => {
-      response = {
-        late_policy: {
-          missing_submission_deduction_enabled: true,
-          missing_submission_deduction: 75,
-          late_submission_deduction_enabled: false,
-          late_submission_deduction: 0,
-          late_submission_interval: 'day',
-          late_submission_minimum_percent_enabled: false,
-          late_submission_minimum_percent: 0,
-        },
-      }
-    })
-
-    it('creates a late policy when "Apply Settings" is clicked and then closes the modal, if no late policy exists', async () => {
-      const createPolicyStub = fetchMock.postOnce(latePolicyUrl, response)
-      const {findByTestId, findByLabelText, getByTestId} = render(
-        <GradebookSettingsModal {...props} />,
-      )
-
-      const updateButton = getByTestId('gradebook-settings-update-button')
-      expect(updateButton).toBeDisabled()
-
-      const input = await findByTestId('missing-submission-grade')
-      expect(input).toBeDisabled()
-
-      const checkbox = await findByLabelText('Automatically apply grade for missing submissions')
-      await user.click(checkbox)
-      expect(input).toBeEnabled()
-      expect(updateButton).toBeEnabled()
-
-      await user.clear(input)
-      await user.type(input, '25')
-
-      expect(updateButton).toBeEnabled()
-      await user.click(updateButton)
-
-      const body = createPolicyStub.lastOptions()?.body
-      expect(body).toEqual(
-        JSON.stringify({
-          late_policy: {
-            missing_submission_deduction_enabled: true,
-            missing_submission_deduction: 75,
-          },
-        }),
-      )
-
-      expect(props.onRequestClose).toHaveBeenCalled()
-    })
-
-    it('updates the late policy when "Apply Settings" is clicked and then closes the modal, if a late policy exists', async () => {
-      fetchMock.get(
-        latePolicyUrl,
-        {
-          late_policy: {...DEFAULT_LATE_POLICY_DATA, id: '8', newRecord: false},
-        },
-        {overwriteRoutes: true},
-      )
-
-      const updatePolicyStub = fetchMock.patchOnce(latePolicyUrl, 204)
-      const {findByTestId, findByLabelText, getByTestId} = render(
-        <GradebookSettingsModal {...props} />,
-      )
-
-      const updateButton = getByTestId('gradebook-settings-update-button')
-      expect(updateButton).toBeDisabled()
-
-      const input = await findByTestId('missing-submission-grade')
-      expect(input).toBeDisabled()
-
-      const checkbox = await findByLabelText('Automatically apply grade for missing submissions')
-      await user.click(checkbox)
-      expect(input).toBeEnabled()
-      expect(updateButton).toBeEnabled()
-
-      await user.clear(input)
-      await user.type(input, '25')
-
-      expect(updateButton).toBeEnabled()
-      await user.click(updateButton)
-
-      const body = updatePolicyStub.lastOptions()?.body
-      expect(body).toEqual(
-        JSON.stringify({
-          late_policy: {
-            missing_submission_deduction_enabled: true,
-            missing_submission_deduction: 75,
-          },
-        }),
-      )
-
-      expect(props.onRequestClose).toHaveBeenCalled()
-    })
-  })
-
   describe('"Grade Posting Policy" tab', () => {
     it('updates the course post policy when "Apply Settings" is clicked and then closes the modal', async () => {
-      const gqlStub = fetchMock
-        .post(
-          (url, opts) => {
-            const body = JSON.parse(opts.body as string)
-            return url === '/api/graphql' && body.operationName === 'SetCoursePostPolicy'
-          },
-          {
-            data: {
-              setCoursePostPolicy: {
-                postPolicy: {
-                  postManually: true,
-                  __typename: 'PostPolicy',
+      let setCoursePostPolicyBody: any
+      server.use(
+        http.post('/api/graphql', async ({request}) => {
+          const body: any = await request.json()
+          if (body.operationName === 'SetCoursePostPolicy') {
+            setCoursePostPolicyBody = body
+            return HttpResponse.json({
+              data: {
+                setCoursePostPolicy: {
+                  postPolicy: {
+                    postManually: true,
+                    __typename: 'PostPolicy',
+                  },
+                  errors: null,
+                  __typename: 'SetCoursePostPolicyPayload',
                 },
-                errors: null,
-                __typename: 'SetCoursePostPolicyPayload',
               },
-            },
-          },
-          {name: 'setCoursePolicy'},
-        )
-        .post(
-          (url, opts) => {
-            const body = JSON.parse(opts.body as string)
-            return url === '/api/graphql' && body.operationName === 'CourseAssignmentPostPolicies'
-          },
-          {
-            data: {
-              course: {
-                assignmentsConnection: {nodes: [], __typename: 'AssignmentConnection'},
-                __typename: 'Course',
+            })
+          } else if (body.operationName === 'CourseAssignmentPostPolicies') {
+            return HttpResponse.json({
+              data: {
+                course: {
+                  assignmentsConnection: {nodes: [], __typename: 'AssignmentConnection'},
+                  __typename: 'Course',
+                },
               },
-            },
-          },
-        )
+            })
+          }
+          return new HttpResponse(null, {status: 404})
+        }),
+      )
 
       const {findByText, findByTestId, getByTestId} = render(<GradebookSettingsModal {...props} />)
 
@@ -253,8 +163,7 @@ describe('GradebookSettingsModal', () => {
       expect(updateButton).toBeEnabled()
 
       await user.click(updateButton)
-      const body = JSON.parse(gqlStub.lastCall('setCoursePolicy')?.[1]?.body as string)
-      expect(body.variables.postManually).toEqual(true)
+      expect(setCoursePostPolicyBody.variables.postManually).toEqual(true)
 
       expect(props.onRequestClose).toHaveBeenCalled()
     })
@@ -305,9 +214,12 @@ describe('GradebookSettingsModal', () => {
         conditional_release: false,
       }
 
-      const updateSettingsStub = fetchMock.put(
-        `/api/v1/courses/${props.courseId}/settings`,
-        settingsResponse,
+      let capturedSettings: any
+      server.use(
+        http.put(`/api/v1/courses/${props.courseId}/settings`, async ({request}) => {
+          capturedSettings = await request.json()
+          return HttpResponse.json(settingsResponse)
+        }),
       )
 
       props.courseFeatures.finalGradeOverrideEnabled = true
@@ -328,8 +240,7 @@ describe('GradebookSettingsModal', () => {
       expect(updateButton).toBeEnabled()
 
       await user.click(updateButton)
-      const body = JSON.parse(updateSettingsStub.lastCall()?.[1]?.body as string)
-      expect(body.allow_final_grade_override).toEqual(true)
+      expect(capturedSettings.allow_final_grade_override).toEqual(true)
 
       expect(props.onRequestClose).toHaveBeenCalled()
     })

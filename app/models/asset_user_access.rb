@@ -21,7 +21,7 @@
 # asset_code is used to specify the 'asset' or idea being accessed
 # asset_group_code is for the group
 # so, for example, the asset could be an assignment, the group would be the assignment_group
-class AssetUserAccess < ActiveRecord::Base
+class AssetUserAccess < ApplicationRecord
   extend RootAccountResolver
 
   belongs_to :context, polymorphic: %i[account course group user], polymorphic_prefix: true
@@ -36,7 +36,7 @@ class AssetUserAccess < ActiveRecord::Base
   scope :for_context, ->(context) { where(context_id: context, context_type: context.class.to_s) }
   scope :for_user, ->(user) { where(user_id: user) }
   scope :participations, -> { where(action_level: "participate") }
-  scope :most_recent, -> { order("updated_at DESC") }
+  scope :most_recent, -> { order(updated_at: :desc) }
 
   def infer_root_account_id(asset_for_root_account_id = nil)
     self.root_account_id ||= if context_type != "User"

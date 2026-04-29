@@ -17,10 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Lti::RegistrationAccountBinding < ActiveRecord::Base
+class Lti::RegistrationAccountBinding < ApplicationRecord
   extend RootAccountResolver
 
   include Workflow
+
   workflow do
     state :off
     state :on
@@ -43,6 +44,8 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   validate :restrict_federated_child_accounts
   validate :require_root_account
   validate :validate_inherited_registration_in_chain
+
+  scope :enabled, -> { where(workflow_state: "on") }
 
   after_update :clear_cache_if_site_admin
 
@@ -143,8 +146,8 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   # Federated children can make their own registrations, but for now we are not letting
   # them bind any registrations inherited from either site admin or the federated parent root account.
   def restrict_federated_child_accounts
+    return if registration.account == account # not inherited
     return if account.primary_settings_root_account?
-    return unless registration.inherited_for?(account)
 
     errors.add(:account, :ineligible_account, message: I18n.t("Federated child accounts cannot bind inherited registrations"))
   end
@@ -152,7 +155,7 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   # When enabling an inherited registration, the registration must be from an account in the account chain
   # (ie, either Site Admin or a federated parent root account).
   def validate_inherited_registration_in_chain
-    return unless registration.inherited_for?(account)
+    return if registration.account == account # not inherited
     return if account.account_chain(include_site_admin: true).include?(registration.account)
 
     errors.add(:registration, :registration_not_found, message: I18n.t("Registration does not belong to a related account"))

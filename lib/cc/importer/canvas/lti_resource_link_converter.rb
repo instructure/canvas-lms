@@ -21,9 +21,6 @@ module CC::Importer::Canvas
   module LtiResourceLinkConverter
     include CC::Importer
 
-    FLOAT_REGEX = /^[-+]?\d+[.]\d+$/
-    INTEGER_REGEX = /^[-+]?(?:0|[1-9]\d*)$/
-
     def convert_lti_resource_links
       resource_links = []
 
@@ -41,6 +38,7 @@ module CC::Importer::Canvas
         custom = {}
         lookup_uuid = nil
         resource_link_url = nil
+        assignment_migration_id = nil
 
         document.xpath("//blti:custom//lticm:property").each do |el|
           key = el.attributes["name"].value
@@ -49,12 +47,8 @@ module CC::Importer::Canvas
           next if key.empty?
 
           # As `el.content` returns a String, we're trying to convert the
-          # custom parameter value to the orignal data type
-          value = if Account.site_admin.feature_enabled?(:import_numeric_lti_custom_params_as_string)
-                    convert_bool_custom_param(value)
-                  else
-                    convert_custom_param(value)
-                  end
+          # custom parameter value to the original data type
+          value = convert_bool_custom_param(value)
 
           custom[key.to_sym] = value
         end
@@ -62,6 +56,7 @@ module CC::Importer::Canvas
         document.xpath("//blti:extensions//lticm:property").each do |el|
           lookup_uuid = el.content if el.attributes["name"].value == "lookup_uuid"
           resource_link_url = el.content if el.attributes["name"].value == "resource_link_url"
+          assignment_migration_id = el.content if el.attributes["name"].value == "assignment_migration_id"
         end
 
         launch_url = (document.xpath("//blti:launch_url").first || document.xpath("//blti:secure_launch_url").first)&.content
@@ -72,25 +67,12 @@ module CC::Importer::Canvas
           custom:,
           launch_url:,
           lookup_uuid:,
-          resource_link_url:
+          resource_link_url:,
+          assignment_migration_id:
         }
       end
 
       resource_links
-    end
-
-    def convert_custom_param(value)
-      if FLOAT_REGEX.match? value
-        value.to_f
-      elsif INTEGER_REGEX.match? value
-        value.to_i
-      elsif value == "true"
-        true
-      elsif value == "false"
-        false
-      else
-        value
-      end
     end
 
     def convert_bool_custom_param(value)

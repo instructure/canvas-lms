@@ -18,49 +18,46 @@
 <%= form_tag update_profile_profile_path, { method: :put, id: :edit_profile_form, class: "ic-Form-control", novalidate: true } do %>
   <div class="content-block">
     <div class="profileContent__Block">
+      <h2 class="hide-if-editing"><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
       <% if @user_data[:can_edit_name] %>
-        <h2 class="hide-if-editing"><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
         <label class="show-if-editing ic-Label"><%= t('name', 'Name') %>
           <span aria-hidden="true" title="<%= t('is_required', 'This field is required') %>" class="required_symbol"> *</span>
           <input id="name_input" class="ic-Input labeled-error" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required aria-required="true">
         </label>
-        <% if @user.can_change_pronunciation?(@domain_root_account) %>
-          <p class="show-if-editing">
-            <label class="ic-Label"><%= t('name_pronunciation_label', 'Name Pronunciation') %>
-              <input id="name_pronunciation_input" class="ic-Input" type="text" name="user_profile[pronunciation]" value="<%= @user_data[:pronunciation] %>">
-            </label>
-            <span class="profile-tip"><%= t('name_pronunciation_label_tip', 'To confirm the correct pronunciation of your name, enter a phonetic pronunciation.') %></span>
-            </p>
-        <% end %>
-        <%# even if @domain_root_account.settings[:can_add_pronouns] is false, we still want to let someone that has pronouns set to see this so they can unset them  %>
-        <% if @user.pronouns || @domain_root_account.settings[:can_add_pronouns] %>
-          <label for="pronouns"class="show-if-editing ic-Label"><%= t('Pronouns') %></label>
-          <%= select_tag :pronouns,
-                         options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns),
-                         class:"show-if-editing",
-                         disabled:!@domain_root_account.can_change_pronouns? && (!@domain_root_account.can_add_pronouns? || !@domain_root_account.grants_right?(@current_user, :manage_courses_admin))
-          %>
-        <% end %>
-        <div class="profileDetails">
-          <span class="hide-if-editing"><%= @user_data[:title] %></span>
+      <% else %>
+        <h2 class="show-if-editing"><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
+      <% end %>
+
+      <% if @user.can_change_pronunciation?(@domain_root_account) %>
+        <p class="show-if-editing">
+          <label class="ic-Label"><%= t('name_pronunciation_label', 'Name Pronunciation') %>
+            <input id="name_pronunciation_input" class="ic-Input" type="text" name="user_profile[pronunciation]" value="<%= @user_data[:pronunciation] %>">
+          </label>
+          <span class="profile-tip"><%= t('name_pronunciation_label_tip', 'To confirm the correct pronunciation of your name, enter a phonetic pronunciation.') %></span>
+        </p>
+      <% end %>
+
+      <%# even if @domain_root_account.settings[:can_add_pronouns] is false, we still want to let someone that has pronouns set to see this so they can unset them  %>
+      <% if @user.pronouns || @domain_root_account.settings[:can_add_pronouns] %>
+        <label for="pronouns"class="show-if-editing ic-Label"><%= t('Pronouns') %></label>
+        <%= select_tag :pronouns,
+                        options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns),
+                        class:"show-if-editing",
+                        disabled:!@domain_root_account.can_change_pronouns? && (!@domain_root_account.can_add_pronouns? || !@domain_root_account.grants_right?(@current_user, :manage_courses_admin))
+        %>
+      <% end %>
+
+      <div class="profileDetails">
+        <span class="hide-if-editing"><%= @user_data[:title] %></span>
+        <% if @user_data[:can_edit_title] %>
           <%# Do not convert these to inferred-key translations, "title" is most often used in canvas for things like document titles, but personal titles can be translated differently in some languages. %>
           <label class="show-if-editing ic-Label"><%= t('title', 'Title') %>
             <input class="ic-Input labeled-error" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
           </label>
-        </div>
-      <% else %>
-        <h2><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
-        <% if @user.can_change_pronunciation?(@domain_root_account) %>
-          <div class="show-if-editing">
-            <h3 id="profile_name_pronunciation_label" class="profileHeader"><%= t('name_pronunciation_header', 'Name Pronunciation') %></h3>
-            <input id="name_pronunciation_input" class="ic-Input labeled-error" type="text" name="user_profile[pronunciation]" value="<%= @user_data[:pronunciation] %>">
-            <span class="profile-tip"><%= t('name_pronunciation_header_tip', 'To confirm the correct pronunciation of your name, enter a phonetic pronunciation.') %></span>
-          </div>
+        <% else %>
+          <span class="show-if-editing"><%= @user_data[:title] %></span>
         <% end %>
-        <% if @user_data[:title] %>
-          <p><%= @user_data[:title] %></p>
-        <% end %>
-      <% end %>
+      </div>
 
       <% if @user != @current_user %>
         <% if can_do(@user, @current_user, :remove_avatar) %>
@@ -138,7 +135,7 @@
             <p id="biography_empty_message"><%= t('user_has_no_bio', "No biography has been added") %></p>
           <% end %>
         </div>
-        <% if @user_data[:can_edit] %>
+        <% if @user_data[:can_edit_bio] %>
           <div class="show-if-editing">
             <label class="ic-Label"><%= t(:bio, "Biography") %>
               <textarea class="ic-Input labeled-error" id="profile_bio" name="user_profile[bio]" aria-labelledby="profile_bio_label"><%= @user_data[:bio] %></textarea>
@@ -181,7 +178,7 @@
           <% end %>
         </div>
 
-        <% if @user_data[:can_edit] %>
+        <% if @user_data[:can_edit_profile_links] %>
           <input type="hidden" name="delete_links" value="1">
           <div class="show-if-editing">
             <table id="edit_links_table">
@@ -193,6 +190,21 @@
               <tbody id="profile_link_fields"></tbody>
             </table>
             <button data-event="addLinkField" class="btn btn-small"><%= t :add_link_field, "Add another link" %></button>
+          </div>
+        <% else %>
+          <div class="show-if-editing">
+            <% if @user_data[:links].length > 0 %>
+              <ul class="profileLink">
+                <% @user_data[:links].each do |link| %>
+                  <li class="profileLink__Item">
+                    <i class="icon-link" role="presentation"></i>
+                    <a href="<%= add_uri_scheme_name(link[:url]) %>"><%= link[:title] %></a>
+                  </li>
+                <% end %>
+              </ul>
+            <% else %>
+              <p id="links_empty_message"><%= t  :no_links, "No links have been added" %></p>
+            <% end %>
           </div>
         <% end %>
       </div>

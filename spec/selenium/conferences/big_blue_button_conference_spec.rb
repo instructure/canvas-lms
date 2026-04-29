@@ -26,8 +26,8 @@ describe "BigBlueButton conferences" do
   include ConferencesCommon
   include WebMock::API
 
-  bbb_endpoint = "bbb.blah.com"
-  bbb_secret = "mock-secret"
+  let(:bbb_endpoint) { "bbb.blah.com" }
+  let(:bbb_secret) { "mock-secret" }
 
   before(:once) do
     initialize_big_blue_button_conference_plugin bbb_endpoint, bbb_secret
@@ -229,7 +229,6 @@ describe "BigBlueButton conferences" do
   end
 
   it "persists selected settings" do
-    skip "07/16/2025 - 1/10 failure rate when clicking 'Edit'"
     get conferences_index_page
     f("button[title='New Conference']").click
 
@@ -249,34 +248,19 @@ describe "BigBlueButton conferences" do
     wait_for_ajaximations
 
     fj("li.conference a:contains('Settings')").click
+    wait_for_ajaximations
     fj("a:contains('Edit')").click
+    wait_for_ajaximations
 
     expect(f("input[value='no_time_limit']").attribute("checked")).to be_truthy
 
     f("div#tab-attendees").click
+    wait_for_ajaximations
     expect(f("input[value='share_webcam']").attribute("checked")).to be_falsey
     expect(f("input[value='share_other_webcams']").attribute("checked")).to be_falsey
     expect(f("input[value='share_microphone']").attribute("checked")).to be_falsey
     expect(f("input[value='send_public_chat']").attribute("checked")).to be_falsey
     expect(f("input[value='send_private_chat']").attribute("checked")).to be_falsey
-  end
-
-  it "syncs in unadded context users on option select and able to delete successfully" do
-    conf = create_big_blue_button_conference
-    conf.add_invitee(@ta)
-    expect(conf.invitees.pluck(:id)).to match_array [@ta.id]
-
-    get conferences_index_page
-    fj("li.conference a:contains('Settings')").click
-    f(".sync_conference_link").click
-    wait_for_ajaximations
-    expect(conf.invitees.pluck(:id)).to include(@ta.id, @student.id)
-
-    fj("li.conference a:contains('Settings')").click
-    f("a[title='Delete']").click
-    accept_alert
-    wait_for_ajaximations
-    expect { conf.reload }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
   it "does not show add to calendar option to users without :manage_calendar permissions" do

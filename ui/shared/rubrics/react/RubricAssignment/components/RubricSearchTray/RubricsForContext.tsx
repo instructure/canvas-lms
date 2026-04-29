@@ -16,17 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useState} from 'react'
 import {RubricAssociation, Rubric} from '../../../types/rubric'
 import {useQuery} from '@tanstack/react-query'
 import {getGradingRubricsForContext} from '../../queries'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
+import {Pagination} from '@instructure/ui-pagination'
 import {RubricSearchRow} from './RubricSearchRow'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('rubrics_for_context')
 
 type RubricsForContextProps = {
   courseId: string
   selectedAssociation?: RubricAssociation
   selectedContext: string
   search: string
+  paginationEnabled: boolean
   onPreview: (rubric: Rubric) => void
   onSelect: (rubricAssociation: RubricAssociation, rubricId: string) => void
 }
@@ -35,25 +41,44 @@ export const RubricsForContext = ({
   selectedAssociation,
   selectedContext,
   search,
+  paginationEnabled,
   onPreview,
   onSelect,
 }: RubricsForContextProps) => {
-  const {data: rubricsForContext = [], isLoading: isRubricsLoading} = useQuery({
-    queryKey: ['fetchGradingRubricsForContext', courseId, selectedContext],
+  const [currentPage, setCurrentPage] = useState(1)
+  const [prevSearch, setPrevSearch] = useState(search)
+  const [prevContext, setPrevContext] = useState(selectedContext)
+
+  if (paginationEnabled && (search !== prevSearch || selectedContext !== prevContext)) {
+    setPrevSearch(search)
+    setPrevContext(selectedContext)
+    setCurrentPage(1)
+  }
+
+  const queryKey = paginationEnabled
+    ? ['fetchGradingRubricsForContext', courseId, selectedContext, currentPage, search]
+    : ['fetchGradingRubricsForContext', courseId, selectedContext]
+
+  const {data, isLoading} = useQuery({
+    queryKey,
     queryFn: getGradingRubricsForContext,
   })
 
-  if (isRubricsLoading) {
+  if (isLoading) {
     return <LoadingIndicator />
   }
 
-  const filteredContextRubrics = rubricsForContext?.filter(({rubric}) =>
-    rubric.title.toLowerCase().includes(search.toLowerCase()),
-  )
+  const allRubrics = data?.rubrics ?? []
+  const rubrics =
+    paginationEnabled || !search
+      ? allRubrics
+      : allRubrics.filter(({rubric}) => rubric.title.toLowerCase().includes(search.toLowerCase()))
+
+  const totalPages = data?.totalPages ?? 1
 
   return (
     <>
-      {filteredContextRubrics?.map(({rubricAssociation, rubric}) => (
+      {rubrics.map(({rubricAssociation, rubric}) => (
         <RubricSearchRow
           key={rubricAssociation.id}
           rubric={rubric}
@@ -65,6 +90,19 @@ export const RubricsForContext = ({
           }}
         />
       ))}
+      {paginationEnabled && totalPages > 1 && (
+        <Pagination
+          as="nav"
+          data-testid="rubric-search-pagination"
+          margin="small"
+          variant="compact"
+          labelNext={I18n.t('Next Page')}
+          labelPrev={I18n.t('Previous Page')}
+          currentPage={currentPage}
+          totalPageNumber={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </>
   )
 }

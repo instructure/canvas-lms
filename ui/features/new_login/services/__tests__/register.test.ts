@@ -16,38 +16,50 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {createParentAccount, createStudentAccount, createTeacherAccount} from '../register'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/authenticity-token', () => jest.fn(() => 'testCsrfToken'))
-
-jest.mock('@canvas/do-fetch-api-effect', () => ({
-  __esModule: true,
-  default: jest.fn(),
+vi.mock('@canvas/authenticity-token', () => ({
+  default: vi.fn(() => 'testCsrfToken'),
 }))
 
+const server = setupServer()
+
+let capturedRequest: {path: string; body: any} | null = null
+
 describe('Register Service', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    capturedRequest = null
+    vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   it('should call doFetchApi with correct parameters and handle success', async () => {
-    const mockResponse = {
-      json: {success: true},
-      response: {status: 200},
-    }
-    ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+    server.use(
+      http.post('/users', async ({request}) => {
+        capturedRequest = {
+          path: new URL(request.url).pathname,
+          body: await request.json(),
+        }
+        return HttpResponse.json({success: true})
+      }),
+    )
     const result = await createTeacherAccount({
       name: 'Test Teacher',
       email: 'test@example.com',
       termsAccepted: true,
       captchaToken: 'mock-captcha-token',
     })
-    expect(doFetchApi).toHaveBeenCalledWith({
+    expect(capturedRequest).toEqual({
       path: '/users',
-      method: 'POST',
       body: {
-        authenticity_token: 'testCsrfToken',
         user: {
           initial_enrollment_type: 'teacher',
           name: 'Test Teacher',
@@ -57,29 +69,33 @@ describe('Register Service', () => {
           unique_id: 'test@example.com',
         },
         'g-recaptcha-response': 'mock-captcha-token',
+        authenticity_token: 'testCsrfToken',
       },
     })
     expect(result).toEqual({status: 200, data: {success: true}})
   })
 
   it('should handle missing JSON in response', async () => {
-    const mockResponse = {json: null, response: {status: 400}}
-    ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+    server.use(http.post('/users', () => new HttpResponse(null, {status: 200})))
     const result = await createTeacherAccount({
       name: 'Test Teacher',
       email: 'test@example.com',
       termsAccepted: false,
     })
-    expect(result).toEqual({status: 400, data: {success: false}})
+    expect(result).toEqual({status: 200, data: {success: false}})
   })
 
   describe('createParentAccount', () => {
     it('should call doFetchApi with correct parameters and handle success', async () => {
-      const mockResponse = {
-        json: {success: true},
-        response: {status: 201},
-      }
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(
+        http.post('/users', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          }
+          return HttpResponse.json({success: true}, {status: 201})
+        }),
+      )
       const result = await createParentAccount({
         name: 'Test Parent',
         email: 'parent@example.com',
@@ -88,11 +104,9 @@ describe('Register Service', () => {
         pairingCode: 'PAIR123',
         termsAccepted: true,
       })
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequest).toEqual({
         path: '/users',
-        method: 'POST',
         body: {
-          authenticity_token: 'testCsrfToken',
           user: {
             name: 'Test Parent',
             terms_of_use: '1',
@@ -110,14 +124,14 @@ describe('Register Service', () => {
           communication_channel: {
             skip_confirmation: '1',
           },
+          authenticity_token: 'testCsrfToken',
         },
       })
       expect(result).toEqual({status: 201, data: {success: true}})
     })
 
     it('should handle missing JSON in response', async () => {
-      const mockResponse = {json: null, response: {status: 400}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(http.post('/users', () => new HttpResponse(null, {status: 200})))
       const result = await createParentAccount({
         name: 'Test Parent',
         email: 'parent@example.com',
@@ -126,17 +140,21 @@ describe('Register Service', () => {
         pairingCode: 'PAIR123',
         termsAccepted: false,
       })
-      expect(result).toEqual({status: 400, data: {success: false}})
+      expect(result).toEqual({status: 200, data: {success: false}})
     })
   })
 
   describe('createStudentAccount', () => {
     it('should call doFetchApi with correct parameters and handle success with email', async () => {
-      const mockResponse = {
-        json: {success: true},
-        response: {status: 201},
-      }
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(
+        http.post('/users', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          }
+          return HttpResponse.json({success: true}, {status: 201})
+        }),
+      )
       const result = await createStudentAccount({
         name: 'Test Student',
         username: 'testStudent',
@@ -146,11 +164,9 @@ describe('Register Service', () => {
         email: 'student@example.com',
         termsAccepted: true,
       })
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequest).toEqual({
         path: '/users',
-        method: 'POST',
         body: {
-          authenticity_token: 'testCsrfToken',
           user: {
             name: 'Test Student',
             terms_of_use: '1',
@@ -165,17 +181,22 @@ describe('Register Service', () => {
           },
           self_enrollment: '1',
           pseudonym_type: 'username',
+          authenticity_token: 'testCsrfToken',
         },
       })
       expect(result).toEqual({status: 201, data: {success: true}})
     })
 
     it('should call doFetchApi without email and handle success', async () => {
-      const mockResponse = {
-        json: {success: true},
-        response: {status: 201},
-      }
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(
+        http.post('/users', async ({request}) => {
+          capturedRequest = {
+            path: new URL(request.url).pathname,
+            body: await request.json(),
+          }
+          return HttpResponse.json({success: true}, {status: 201})
+        }),
+      )
       const result = await createStudentAccount({
         name: 'Test Student',
         username: 'testStudent',
@@ -184,11 +205,9 @@ describe('Register Service', () => {
         joinCode: 'JOIN123',
         termsAccepted: true,
       })
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(capturedRequest).toEqual({
         path: '/users',
-        method: 'POST',
         body: {
-          authenticity_token: 'testCsrfToken',
           user: {
             name: 'Test Student',
             terms_of_use: '1',
@@ -202,14 +221,14 @@ describe('Register Service', () => {
           },
           self_enrollment: '1',
           pseudonym_type: 'username',
+          authenticity_token: 'testCsrfToken',
         },
       })
       expect(result).toEqual({status: 201, data: {success: true}})
     })
 
     it('should handle missing JSON in response', async () => {
-      const mockResponse = {json: null, response: {status: 400}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+      server.use(http.post('/users', () => new HttpResponse(null, {status: 200})))
       const result = await createStudentAccount({
         name: 'Test Student',
         username: 'testStudent',
@@ -218,7 +237,7 @@ describe('Register Service', () => {
         joinCode: 'JOIN123',
         termsAccepted: false,
       })
-      expect(result).toEqual({status: 400, data: {success: false}})
+      expect(result).toEqual({status: 200, data: {success: false}})
     })
   })
 })

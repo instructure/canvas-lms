@@ -72,6 +72,22 @@ describe CommunicationChannelsController do
       expect(response).not_to be_successful
     end
 
+    it "renders ActiveModel::Errors via ApplicationController#render json casting" do
+      existing = @user.communication_channels.create!(path: "dup@example.com", path_type: "email", workflow_state: "active")
+      expect(existing).to be_active
+      user_session(@user)
+
+      post "create", params: { user_id: @user.id, communication_channel: { address: "dup@example.com", type: "email" } }
+
+      expect(response).to have_http_status(:bad_request)
+      body = response.parsed_body
+      expect(body).to have_key("errors")
+      expect(body["errors"]).to have_key("path")
+      expect(body["errors"]["path"]).to be_an(Array)
+      # One of the error messages should indicate uniqueness (via existing active channel)
+      expect(body["errors"]["path"].join).to match(/unique/i)
+    end
+
     it "prevents CC from being created if at the maximum number of CCs allowed" do
       domain_root_account = Account.default
       domain_root_account.settings[:max_communication_channels] = 1
@@ -521,6 +537,22 @@ describe CommunicationChannelsController do
         get "confirm", params: { nonce: @not_logged_user.email_channel.confirmation_code }
         expect(response).to render_template("confirm")
         expect(assigns[:merge_opportunities]).to eq [[@user, [@pseudonym]]]
+      end
+
+      # This test ensures that the current_user is properly passed through to the SisPseudonym extension, which is
+      # necessary for correct filtering of instructure identity pseudonyms for the multiple_root_accounts plugin.
+      it "passes current_user to SisPseudonym.for when building merge opportunities" do
+        user_with_pseudonym(username: "jt+1@instructure.com")
+        @not_logged_user = @user
+        user_with_pseudonym(username: "jt@instructure.com", active_all: 1)
+        @logged_user = @user
+        user_session(@logged_user, @pseudonym)
+
+        allow(SisPseudonym).to receive(:for).and_call_original
+        expect(SisPseudonym).to receive(:for)
+          .with(@logged_user, anything, hash_including(current_user: @logged_user))
+          .and_call_original
+        get "confirm", params: { nonce: @not_logged_user.email_channel.confirmation_code }
       end
 
       it "merges with an already-logged-in user" do
@@ -1206,7 +1238,7 @@ describe CommunicationChannelsController do
             expect(response).to have_http_status(:ok)
             # can't expect to eq because we get stray channels for the users we created
             expect(included_channels).to include(@c1, @c2, @c5)
-            expect(included_channels).to_not include(@c3, @c4)
+            expect(included_channels).not_to include(@c3, @c4)
           end
 
           it "filters by path type" do
@@ -1214,7 +1246,7 @@ describe CommunicationChannelsController do
 
             expect(response).to have_http_status(:ok)
             expect(included_channels).to include(@c5)
-            expect(included_channels).to_not include(@c1, @c2, @c3, @c4)
+            expect(included_channels).not_to include(@c1, @c2, @c3, @c4)
           end
         end
 
@@ -1394,8 +1426,9 @@ describe CommunicationChannelsController do
   end
 
   context "push token deletion" do
-    let(:sns_response) { double(:[] => { endpoint_arn: "endpointarn" }, :attributes => { endpoint_arn: "endpointarn" }) }
-    let(:sns_client) { double(create_platform_endpoint: sns_response, get_endpoint_attributes: sns_response) }
+    let(:sns_create_response) { instance_double(Aws::SNS::Types::CreateEndpointResponse, :[] => { endpoint_arn: "endpointarn" }, :endpoint_arn => "endpointarn") }
+    let(:sns_get_attrs_response) { instance_double(Aws::SNS::Types::GetEndpointAttributesResponse, attributes: { "Enabled" => "true" }) }
+    let(:sns_client) { instance_double(Aws::SNS::Client, create_platform_endpoint: sns_create_response, get_endpoint_attributes: sns_get_attrs_response) }
     let(:sns_developer_key_sns_field) { sns_client }
 
     let(:sns_developer_key) do
@@ -1403,7 +1436,7 @@ describe CommunicationChannelsController do
       DeveloperKey.default
     end
 
-    let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
+    let(:sns_access_token) { @user.access_tokens.create!(purpose: "Test Access Token", developer_key: sns_developer_key) }
     let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: "push") }
 
     it "404s if there is no communication channel", type: :request do
@@ -1440,7 +1473,7 @@ describe CommunicationChannelsController do
         DeveloperKey.default
       end
 
-      let(:second_sns_access_token) { @user.access_tokens.create!(developer_key: second_sns_developer_key) }
+      let(:second_sns_access_token) { @user.access_tokens.create!(purpose: "Test Access Token", developer_key: second_sns_developer_key) }
       let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: "push") }
 
       before { sns_channel }
@@ -1494,7 +1527,6 @@ describe CommunicationChannelsController do
               token: "asdasd123123", type: "push"
             }
           }
-          ap(response.parsed_body)
           expect(response).to be_successful
         end
 

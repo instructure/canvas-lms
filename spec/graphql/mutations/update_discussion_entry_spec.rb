@@ -35,7 +35,8 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     message: nil,
     remove_attachment: nil,
     file_id: nil,
-    quoted_entry_id: nil
+    quoted_entry_id: nil,
+    pin_type: nil
   )
     <<~GQL
       mutation {
@@ -45,10 +46,15 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
           #{"removeAttachment: #{remove_attachment}" unless remove_attachment.nil?}
           #{"fileId: #{file_id}" unless file_id.nil?}
           #{"quotedEntryId: #{quoted_entry_id}" unless quoted_entry_id.nil?}
+          #{"pinType: #{pin_type}" unless pin_type.nil?}
         }) {
           discussionEntry {
             _id
             message
+            pinType
+            pinnedBy {
+              _id
+            }
             attachment {
               _id
             }
@@ -88,19 +94,6 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
     expect(result.dig("data", "updateDiscussionEntry", "discussionEntry", "message")).to eq("<p>Howdy</p>")
     expect(@entry.reload.message).to eq "<p>Howdy</p>"
-  end
-
-  it "deletes discussion_entry_drafts for an edit" do
-    delete_me = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: "Howdy Hey", entry: @entry)
-    run_mutation(discussion_entry_id: @entry.id, message: "New message")
-    expect(DiscussionEntryDraft.where(id: delete_me)).to eq []
-  end
-
-  it "deletes discussion_entry_drafts for an edit for a non author" do
-    delete_me = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: "talk to me", entry: @entry)
-    keeper = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: "Howdy Hey", entry: @entry)
-    run_mutation({ discussion_entry_id: @entry.id, message: "New message" }, @teacher)
-    expect(DiscussionEntryDraft.where(id: [delete_me, keeper].flatten).pluck(:id)).to eq keeper
   end
 
   it "removes a discussion entry attachment" do
@@ -242,6 +235,47 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
       expect(result.dig("data", "updateDiscussionEntry", "errors", 0, "message")).to eq "Insufficient attach permissions"
       expect(result.dig("data", "updateDiscussionEntry", "discussionEntry", "attachment", "_id")).to be_nil
       expect(@entry.reload.attachment_id).to eq current_attachment_id
+    end
+  end
+
+  describe "pin_type functionality" do
+    it "allows teachers to pin a discussion entry" do
+      result = run_mutation({ discussion_entry_id: @entry.id, pin_type: "thread" }, @teacher)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "discussionEntry", "pinType")).to eq "thread"
+      expect(@entry.reload.pin_type).to eq "thread"
+      expect(@entry.pinned_by).to eq @teacher
+    end
+
+    it "allows teachers to unpin a discussion entry" do
+      @entry.update!(pin_type: "thread", pinned_by: @teacher)
+
+      result = run_mutation({ discussion_entry_id: @entry.id, pin_type: "none" }, @teacher)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "discussionEntry", "pinType")).to be_nil
+      expect(@entry.reload.pin_type).to be_nil
+      expect(@entry.pinned_by).to be_nil
+    end
+
+    it "does not allow students to pin discussion entries" do
+      result = run_mutation({ discussion_entry_id: @entry.id, pin_type: "reply" }, @student)
+      expect(result.dig("data", "updateDiscussionEntry", "errors")).not_to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "errors", 0, "message")).to include("Insufficient pin permissions")
+    end
+  end
+
+  context "LTI asset processor notifications" do
+    before(:once) do
+      @graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion")
+      @graded_entry = @graded_topic.discussion_entries.create!(message: "Original message", user: @student)
+    end
+
+    it "calls notify_asset_processors_of_discussion for graded discussion updates" do
+      expect(Lti::AssetProcessorDiscussionNotifier).to receive(:notify_asset_processors_of_discussion)
+
+      run_mutation(discussion_entry_id: @graded_entry.id, message: "Updated message")
     end
   end
 end

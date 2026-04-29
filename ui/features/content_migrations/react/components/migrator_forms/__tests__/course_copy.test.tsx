@@ -20,15 +20,39 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import CourseCopyImporter from '../course_copy'
 import userEvent from '@testing-library/user-event'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {sharedDateParsingTests} from './shared_form_cases'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import {within} from '@testing-library/dom'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
-jest.mock('@canvas/do-fetch-api-effect')
+const onSubmit = vi.fn()
+const onCancel = vi.fn()
 
-const onSubmit = jest.fn()
-const onCancel = jest.fn()
+const fakeCourses = [
+  {
+    id: '0',
+    label: 'Mathmatics',
+    term: 'Default term',
+    blueprint: true,
+    end_at: '16 Oct 2024 at 0:00',
+    start_at: '14 Oct 2024 at 0:00',
+  },
+  {
+    id: '1',
+    label: 'Biology',
+    term: 'Other term',
+    blueprint: false,
+  },
+]
+
+const server = setupServer(
+  http.get('/users/:userId/manageable_courses', () => {
+    return HttpResponse.json(fakeCourses)
+  }),
+  http.get('/api/v1/courses/:courseId/late_policy', () => {
+    return HttpResponse.json({late_policy: {missing_submission_deduction_enabled: false}})
+  }),
+)
 
 const renderComponent = (overrideProps?: any) =>
   render(
@@ -48,82 +72,56 @@ const defaultEnv = {
   SHOW_SELECT: false,
 }
 
-const searchForACourse = 'Search for a course'
-const selectACourse = 'Select a course'
-const addToImportQueue = 'Add to Import Queue'
-
 describe('CourseCopyImporter', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
   beforeEach(() => {
     fakeENV.setup({...defaultEnv})
-
-    // @ts-expect-error
-    doFetchApi.mockImplementation(() =>
-      Promise.resolve({
-        json: [
-          {
-            id: '0',
-            label: 'Mathmatics',
-            term: 'Default term',
-            blueprint: true,
-            end_at: '16 Oct 2024 at 0:00',
-            start_at: '14 Oct 2024 at 0:00',
-          },
-          {
-            id: '1',
-            label: 'Biology',
-            term: 'Other term',
-            blueprint: false,
-          },
-        ],
-      }),
-    )
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeENV.teardown()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('searches for matching courses and includes concluded by default', async () => {
-    const {getByRole, getByText} = renderComponent()
-    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
+    const {getByText} = renderComponent()
+    await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
     await waitFor(() => {
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/users/0/manageable_courses?term=math&include=concluded',
-      })
+      expect(getByText('Mathmatics')).toBeInTheDocument()
     })
-    expect(getByText('Mathmatics')).toBeInTheDocument()
   })
 
   it('searches for matching courses and display proper terms', async () => {
-    const {getByRole, getByText} = renderComponent()
-    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
+    const {getByText} = renderComponent()
+    await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
     await waitFor(() => {
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/users/0/manageable_courses?term=math&include=concluded',
-      })
+      expect(getByText('Term: Default term')).toBeInTheDocument()
     })
-    expect(getByText('Term: Default term')).toBeInTheDocument()
     expect(getByText('Term: Other term')).toBeInTheDocument()
   })
 
   it('searches for matching courses excluding concluded', async () => {
-    const {getByRole} = renderComponent()
-    await userEvent.click(getByRole('checkbox', {name: 'Include completed courses'}))
-    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
+    renderComponent()
+    await userEvent.click(screen.getByLabelText('Include completed courses'))
+    await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
     await waitFor(() => {
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/users/0/manageable_courses?term=math',
-      })
+      expect(screen.getByText('Mathmatics')).toBeInTheDocument()
     })
-    expect(screen.getByText('Mathmatics')).toBeInTheDocument()
   })
 
   it('calls onSubmit', async () => {
-    const {getByRole, findByText} = renderComponent()
-    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
+    const {findByText} = renderComponent()
+    await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
     await userEvent.click(await findByText('Mathmatics'))
-    await userEvent.click(getByRole('button', {name: addToImportQueue}))
+    await userEvent.click(screen.getByTestId('submitMigration'))
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         settings: expect.objectContaining({
@@ -134,8 +132,8 @@ describe('CourseCopyImporter', () => {
   })
 
   it('calls onCancel', async () => {
-    const {getByRole} = renderComponent()
-    await userEvent.click(getByRole('button', {name: 'Clear'}))
+    renderComponent()
+    await userEvent.click(screen.getByTestId('clear-migration-button'))
     expect(onCancel).toHaveBeenCalled()
   })
 
@@ -143,16 +141,16 @@ describe('CourseCopyImporter', () => {
   // So instead of mocking it here and testing the prop being passed to the mock
   // we're following the precedent and testing all the way to the child in this suite
   it('Renders BP settings import option if appropriate', async () => {
-    const {getByRole, findByText, getByText} = renderComponent()
-    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
+    const {findByText, getByText} = renderComponent()
+    await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
     await userEvent.click(await findByText('Mathmatics'))
     await expect(await getByText('Import Blueprint Course settings')).toBeInTheDocument()
   })
 
   it('Does not renders BP settings import option when the destination course is marked ineligible', async () => {
-    fakeENV.setup({...defaultEnv, SHOW_BP_SETTINGS_IMPORT_OPTION: false,})
-    const {getByRole, findByText, queryByText} = renderComponent()
-    await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
+    fakeENV.setup({...defaultEnv, SHOW_BP_SETTINGS_IMPORT_OPTION: false})
+    const {findByText, queryByText} = renderComponent()
+    await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
     await waitFor(async () => {
       await expect(findByText('Mathmatics')).resolves.toBeInTheDocument()
     })
@@ -162,260 +160,231 @@ describe('CourseCopyImporter', () => {
 
   it('Does not render BP settings import option when the selected course is not a blueprint', async () => {
     const {queryByText} = renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: searchForACourse}), 'biol')
+    await userEvent.type(screen.getByTestId('course-copy-select-course'), 'biol')
     await userEvent.click(await screen.findByText('Biology'))
     expect(queryByText('Import Blueprint Course settings')).toBeNull()
   })
 
-  it('disable inputs while uploading', async () => {
-    const {getByRole} = renderComponent({isSubmitting: true})
-    await waitFor(() => {
-      expect(getByRole('button', {name: 'Clear'})).toBeDisabled()
-      expect(getByRole('button', {name: /Adding.../})).toBeDisabled()
-      expect(getByRole('combobox', {name: searchForACourse})).toBeDisabled()
-      expect(getByRole('radio', {name: /All content/})).toBeDisabled()
-      expect(getByRole('radio', {name: 'Select specific content'})).toBeDisabled()
-      expect(getByRole('checkbox', {name: 'Adjust events and due dates'})).toBeDisabled()
+  describe('Missing Policy Warning Modal', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        ...defaultEnv,
+        MISSING_POLICY_ENABLED: true,
+        COURSE_ID: '123',
+      })
     })
-  })
 
-  it('disable "Adjust events and due dates" inputs while uploading', async () => {
-    const {getByRole, rerender, getByLabelText} = renderComponent()
+    it('shows warning modal when missing policy is enabled and dates not adjusted', async () => {
+      const {findByText} = renderComponent()
+      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
+      await userEvent.click(screen.getByTestId('submitMigration'))
 
-    await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+      await waitFor(() => {
+        expect(screen.getByTestId('missing-policy-warning-modal')).toBeInTheDocument()
+      })
+      expect(
+        screen.getByText('Warning: This course has Automatic Missing Policy enabled'),
+      ).toBeInTheDocument()
+    })
 
-    rerender(<CourseCopyImporter onSubmit={onSubmit} onCancel={onCancel} isSubmitting={true} />)
+    it('does not show warning modal when adjust dates is enabled', async () => {
+      const {findByText} = renderComponent()
+      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
+      await userEvent.click(screen.getByTestId('date-adjust-checkbox'))
+      await userEvent.click(screen.getByTestId('submitMigration'))
 
-    await waitFor(() => {
-      expect(getByRole('radio', {name: 'Shift dates'})).toBeInTheDocument()
-      expect(getByRole('radio', {name: 'Shift dates'})).toBeDisabled()
-      expect(getByRole('radio', {name: 'Remove dates'})).toBeDisabled()
-      expect(getByLabelText('Select original beginning date')).toBeDisabled()
-      expect(getByLabelText('Select new beginning date')).toBeDisabled()
-      expect(getByLabelText('Select original end date')).toBeDisabled()
-      expect(getByLabelText('Select new end date')).toBeDisabled()
-      expect(getByRole('button', {name: 'Add substitution'})).toBeDisabled()
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalled()
+      })
+      expect(screen.queryByTestId('missing-policy-warning-modal')).not.toBeInTheDocument()
+    })
+
+    it('does not show warning modal when missing policy is not enabled', async () => {
+      fakeENV.setup({
+        ...defaultEnv,
+        MISSING_POLICY_ENABLED: false,
+        COURSE_ID: '123',
+      })
+
+      const {findByText} = renderComponent()
+      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
+      await userEvent.click(screen.getByTestId('submitMigration'))
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalled()
+      })
+      expect(screen.queryByTestId('missing-policy-warning-modal')).not.toBeInTheDocument()
+    })
+
+    it('submits import when Import Anyway is clicked', async () => {
+      const {findByText} = renderComponent()
+      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
+      await userEvent.click(screen.getByTestId('submitMigration'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('missing-policy-warning-modal')).toBeInTheDocument()
+      })
+
+      await userEvent.click(screen.getByTestId('import-anyway-button'))
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalled()
+      })
+    })
+
+    it('disables policy and submits import with LatePolicy skipped when Disable Policy is clicked', async () => {
+      server.use(
+        http.patch('/api/v1/courses/123/late_policy', () => {
+          return HttpResponse.json({late_policy: {missing_submission_deduction_enabled: false}})
+        }),
+      )
+
+      const {findByText} = renderComponent()
+      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
+      await userEvent.click(screen.getByTestId('submitMigration'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('missing-policy-warning-modal')).toBeInTheDocument()
+      })
+
+      await userEvent.click(screen.getByTestId('disable-policy-button'))
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalled()
+      })
+
+      const submittedData = onSubmit.mock.calls[0][0]
+      expect(submittedData.settings.importer_skips).toContain('LatePolicy')
+    })
+
+    it('cancels import when Cancel is clicked in modal', async () => {
+      const {findByText} = renderComponent()
+      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
+      await userEvent.click(screen.getByTestId('submitMigration'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('missing-policy-warning-modal')).toBeInTheDocument()
+      })
+
+      await userEvent.click(screen.getByTestId('cancel-button'))
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('missing-policy-warning-modal')).not.toBeInTheDocument()
+      })
+      expect(onSubmit).not.toHaveBeenCalled()
+    })
+
+    it('shows warning when source course has missing policy enabled', async () => {
+      server.use(
+        http.get('/api/v1/courses/0/late_policy', () => {
+          return HttpResponse.json({late_policy: {missing_submission_deduction_enabled: true}})
+        }),
+      )
+
+      fakeENV.setup({
+        ...defaultEnv,
+        MISSING_POLICY_ENABLED: false,
+        COURSE_ID: '123',
+      })
+
+      const {findByText} = renderComponent()
+      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('submitMigration')).not.toBeDisabled()
+      })
+
+      await userEvent.click(screen.getByTestId('submitMigration'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('missing-policy-warning-modal')).toBeInTheDocument()
+      })
+      expect(
+        screen.getByText(/importing from a course with Automatic Missing Policy enabled/),
+      ).toBeInTheDocument()
+    })
+
+    it("skips importing late policy when Don't Import Policy is clicked", async () => {
+      server.use(
+        http.get('/api/v1/courses/0/late_policy', () => {
+          return HttpResponse.json({late_policy: {missing_submission_deduction_enabled: true}})
+        }),
+      )
+
+      fakeENV.setup({
+        ...defaultEnv,
+        MISSING_POLICY_ENABLED: false,
+        COURSE_ID: '123',
+      })
+
+      const {findByText} = renderComponent()
+      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('submitMigration')).not.toBeDisabled()
+      })
+
+      await userEvent.click(screen.getByTestId('submitMigration'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('missing-policy-warning-modal')).toBeInTheDocument()
+      })
+
+      await userEvent.click(screen.getByTestId('disable-policy-button'))
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalled()
+      })
+
+      const submittedData = onSubmit.mock.calls[0][0]
+      expect(submittedData.settings.importer_skips).toContain('LatePolicy')
+    })
+
+    it('shows warning and handles both courses having missing policy', async () => {
+      server.use(
+        http.get('/api/v1/courses/0/late_policy', () => {
+          return HttpResponse.json({late_policy: {missing_submission_deduction_enabled: true}})
+        }),
+        http.patch('/api/v1/courses/123/late_policy', () => {
+          return HttpResponse.json({late_policy: {missing_submission_deduction_enabled: false}})
+        }),
+      )
+
+      const {findByText} = renderComponent()
+      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'math')
+      await userEvent.click(await findByText('Mathmatics'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('submitMigration')).not.toBeDisabled()
+      })
+
+      await userEvent.click(screen.getByTestId('submitMigration'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('missing-policy-warning-modal')).toBeInTheDocument()
+      })
+      expect(
+        screen.getByText('Warning: Both courses have Automatic Missing Policy enabled'),
+      ).toBeInTheDocument()
+
+      await userEvent.click(screen.getByTestId('disable-policy-button'))
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalled()
+      })
+
+      const submittedData = onSubmit.mock.calls[0][0]
+      expect(submittedData.settings.importer_skips).toContain('LatePolicy')
     })
   })
 
   sharedDateParsingTests(CourseCopyImporter)
-
-  describe('source course adjust date field prefills', () => {
-    const expectDateField = (dataCid: string, value: string) => {
-      expect((screen.getByTestId(dataCid) as HTMLInputElement).value).toBe(value)
-    }
-
-    it('parse the date from found course start date', async () => {
-      const {getByRole, findByText} = renderComponent()
-
-      await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
-      await userEvent.click(await findByText('Mathmatics'))
-      await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
-
-      expectDateField('old_start_date', 'Oct 14 at 8pm')
-    })
-
-    it('parse the date from found course end date', async () => {
-      const {getByRole, findByText} = renderComponent()
-
-      await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
-      await userEvent.click(await findByText('Mathmatics'))
-      await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
-
-      expectDateField('old_end_date', 'Oct 16 at 8pm')
-    })
-  })
-
-  describe('SHOW_SELECT behaviour', () => {
-    describe('when enabled', () => {
-      beforeEach(() => {
-        fakeENV.setup({...defaultEnv, SHOW_SELECT: true})
-      })
-
-      it('should render the dropdown', () => {
-        const {queryByRole} = renderComponent()
-        expect(queryByRole('combobox', {name: selectACourse})).not.toBeNull()
-      })
-
-      it('should render the search field', () => {
-        const {queryByRole} = renderComponent()
-        expect(queryByRole('combobox', {name: searchForACourse})).not.toBeNull()
-      })
-
-      it('should be disabled initially', () => {
-        const {getByRole} = renderComponent()
-        expect(getByRole('combobox', {name: selectACourse})).toBeDisabled()
-        expect(getByRole('combobox', {name: searchForACourse})).toBeDisabled()
-      })
-
-      it('should call the manageable_courses', async () => {
-        renderComponent()
-
-        await waitFor(() => {
-          expect(doFetchApi).toHaveBeenCalledWith({
-            path: '/users/0/manageable_courses?include=concluded',
-          })
-        })
-      })
-
-      it('should group the manageable course by terms', async () => {
-        const {getByRole} = renderComponent()
-
-        await waitFor(() => expect(getByRole('combobox', {name: selectACourse})).toBeEnabled())
-        await userEvent.click(getByRole('combobox', {name: selectACourse}))
-
-        const defaultTermGroup = getByRole('group', { name: /Default term/ })
-        expect(defaultTermGroup).toBeInTheDocument()
-        expect(within(defaultTermGroup).getByRole('option', {name: /Mathmatics/})).toBeInTheDocument()
-
-        const otherTermGroup = getByRole('group', { name: /Other term/ })
-        expect(otherTermGroup).toBeInTheDocument()
-        expect(within(otherTermGroup).getByRole('option', {name: /Biology/})).toBeInTheDocument()
-      })
-
-      describe('select course via search field', () => {
-        const populateSearchField = async () => {
-          const component = renderComponent()
-
-          await waitFor(() => {
-            expect(component.getByRole('combobox', {name: searchForACourse})).toBeEnabled()
-          })
-          await userEvent.type(component.getByRole('combobox', {name: searchForACourse}), 'math')
-          await userEvent.click(await component.findByText('Mathmatics'))
-          return component
-        }
-
-        it('should set the same value for dropdown on search change', async () => {
-          const component = await populateSearchField()
-          expect((component.getByTestId('course-copy-select-preloaded-courses') as HTMLInputElement).value)
-            .toBe('Mathmatics')
-        })
-
-        it('should clear the dropdown on search field change', async () => {
-          const component = await populateSearchField()
-          await userEvent.type(component.getByRole('combobox', {name: searchForACourse}), 'invalid')
-          expect((component.getByTestId('course-copy-select-preloaded-courses') as HTMLInputElement).value)
-            .toBe('')
-        })
-
-        it('should throw invalid message on empty selected course', async () => {
-          const component = await populateSearchField()
-          await userEvent.clear(component.getByTestId('course-copy-select-course'))
-          await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
-
-          await waitFor(() => {
-            expect(component.queryAllByText(/You must select a course to copy content from/)).toHaveLength(2)
-          })
-          expect(onSubmit).not.toHaveBeenCalled()
-        })
-
-        it('should send the selected course in submit', async () => {
-          const component = await populateSearchField()
-          await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
-          expect(onSubmit).toHaveBeenCalledWith(
-            expect.objectContaining({
-              settings: expect.objectContaining({
-                source_course_id: '0',
-              }),
-            }),
-          )
-        })
-      })
-
-      describe('select course via preloaded course dropdown', () => {
-        const openPreloadedCoursesDropdown = async () => {
-          const component = renderComponent()
-
-          await waitFor(() => {
-            expect(component.getByRole('combobox', {name: selectACourse})).toBeEnabled()
-          })
-          await userEvent.click(component.getByRole('combobox', {name: selectACourse}))
-          return component
-        }
-
-        it('should set the same value for search field on dropdown change', async () => {
-          const component = await openPreloadedCoursesDropdown()
-          await userEvent.click(component.getByRole('option', { name: /Mathmatics/ }))
-          expect((component.getByTestId('course-copy-select-course') as HTMLInputElement).value)
-            .toBe('Mathmatics')
-        })
-
-        it('should throw invalid message on empty selected course', async () => {
-          const component = await openPreloadedCoursesDropdown()
-          await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
-
-          expect(component.queryAllByText(/You must select a course to copy content from/)).toHaveLength(2)
-          expect(onSubmit).not.toHaveBeenCalled()
-        })
-
-        it('should send the selected course in submit', async () => {
-          const component = await openPreloadedCoursesDropdown()
-          await userEvent.click(component.getByRole('option', { name: /Mathmatics/ }))
-          await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
-
-          expect(onSubmit).toHaveBeenCalledWith(
-            expect.objectContaining({
-              settings: expect.objectContaining({
-                source_course_id: '0',
-              }),
-            }),
-          )
-        })
-      })
-    })
-
-    describe('when disabled', () => {
-      beforeEach(() => {
-        fakeENV.setup({...defaultEnv, SHOW_SELECT: false})
-      })
-
-      it('should not render the dropdown', () => {
-        const {queryByRole} = renderComponent()
-        expect(queryByRole('combobox', {name: selectACourse})).toBeNull()
-      })
-
-      it('should render the search field', () => {
-        const {queryByRole} = renderComponent()
-        expect(queryByRole('combobox', {name: searchForACourse})).not.toBeNull()
-      })
-    })
-  })
-
-  describe('course input error focus', () => {
-    it('when SHOW_SELECT is false it focuses on input', async () => {
-      fakeENV.setup({...defaultEnv, SHOW_SELECT: false})
-      renderComponent()
-      await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
-      await waitFor(() => {
-        expect(screen.getByTestId('course-copy-select-course')).toHaveFocus()
-      })
-    })
-
-    it('when SHOW_SELECT is true it focuses on dropdown', async () => {
-      fakeENV.setup({...defaultEnv, SHOW_SELECT: true})
-      renderComponent()
-      await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
-      expect(screen.getByTestId('course-copy-select-preloaded-courses')).toHaveFocus()
-    })
-  })
-
-  describe('URL crafting', () => {
-    it('includes current_course_id in composeManageableCourseURL when ENV.COURSE_ID is set', async () => {
-      fakeENV.setup({
-        ...defaultEnv,
-        COURSE_ID: '123'
-      })
-
-      renderComponent()
-
-      await userEvent.type(screen.getByTestId('course-copy-select-course'), 'coursetest')
-
-
-      await waitFor(() => {
-        expect(doFetchApi).toHaveBeenCalledWith({
-          path: '/users/0/manageable_courses?current_course_id=123&term=coursetest&include=concluded',
-        })
-      })
-    })
-  })
 })

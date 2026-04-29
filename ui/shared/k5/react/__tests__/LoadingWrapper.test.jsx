@@ -58,7 +58,7 @@ describe('LoadingWrapper', () => {
   })
 
   it('renders custom skeletons if renderCustomSkeleton is provided', () => {
-    const renderCustomSkeleton = jest.fn(props => <View {...props}>Custom Loading...</View>)
+    const renderCustomSkeleton = vi.fn(props => <View {...props}>Custom Loading...</View>)
     const {getAllByText} = render(
       <LoadingWrapper
         {...getProps({
@@ -76,7 +76,7 @@ describe('LoadingWrapper', () => {
   })
 
   it('passes the skeletons to renderSkeletonsContainer when provided and shows it when loading', () => {
-    const renderSkeletonsContainer = jest.fn(c => <div className="container">{c}</div>)
+    const renderSkeletonsContainer = vi.fn(c => <div className="container">{c}</div>)
     const {getByText, container, rerender} = render(
       <LoadingWrapper {...getProps({isLoading: true, renderSkeletonsContainer})} />,
     )
@@ -92,7 +92,7 @@ describe('LoadingWrapper', () => {
   })
 
   it('passes the loaded content to renderLoadedContainer when provided and shows it when finish loading', () => {
-    const renderLoadedContainer = jest.fn(content => <div className="container">{content}</div>)
+    const renderLoadedContainer = vi.fn(content => <div className="container">{content}</div>)
     const {getByText, container, rerender} = render(
       <LoadingWrapper {...getProps({isLoading: true, renderLoadedContainer})} />,
     )

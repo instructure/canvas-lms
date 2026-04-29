@@ -20,7 +20,7 @@ import {screen, waitFor} from '@testing-library/react'
 import userEvent, {UserEvent} from '@testing-library/user-event'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
 import {renderComponent, defaultProps} from './testUtils'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashSuccess, showFlashError} from '@instructure/platform-alerts'
 import {getUniqueId} from '../../../../utils/fileFolderUtils'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {setupServer} from 'msw/node'
@@ -33,10 +33,14 @@ const selectionHandlers = (handlers: any = {}) => {
   }
 }
 
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: jest.fn(),
-  showFlashError: jest.fn(),
-}))
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashSuccess: vi.fn(),
+    showFlashError: vi.fn(),
+  }
+})
 
 const server = setupServer(
   // Mock any potential API calls
@@ -73,7 +77,7 @@ describe('FileFolderTable', () => {
   afterEach(() => {
     document.body.removeChild(flashElements)
     flashElements = undefined
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     fakeENV.teardown()
   })
 
@@ -198,17 +202,17 @@ describe('FileFolderTable', () => {
 
   describe('selection behavior', () => {
     let user: UserEvent
-    let toggleSelection: jest.Mock
-    let toggleSelectAll: jest.Mock
-    let selectAll: jest.Mock
-    let deselectAll: jest.Mock
+    let toggleSelection: ReturnType<typeof vi.fn>
+    let toggleSelectAll: ReturnType<typeof vi.fn>
+    let selectAll: ReturnType<typeof vi.fn>
+    let deselectAll: ReturnType<typeof vi.fn>
 
     beforeEach(() => {
       user = userEvent.setup()
-      toggleSelection = jest.fn()
-      toggleSelectAll = jest.fn()
-      selectAll = jest.fn()
-      deselectAll = jest.fn()
+      toggleSelection = vi.fn()
+      toggleSelectAll = vi.fn()
+      selectAll = vi.fn()
+      deselectAll = vi.fn()
     })
 
     describe('keyboard shortcuts', () => {
@@ -423,7 +427,6 @@ describe('FileFolderTable', () => {
   })
 
   describe('FileFolderTable - delete behavior', () => {
-    // TODO: the scope of this test overextends unit test
     it.skip('opens delete modal when delete button is clicked', async () => {
       const user = userEvent.setup()
       renderComponent({rows: [FAKE_FILES[0]]})
@@ -439,10 +442,13 @@ describe('FileFolderTable', () => {
       ).toBeInTheDocument()
     })
 
-    // TODO: the scope of this test overextends unit test
     it.skip('renders flash success when items are deleted successfully', async () => {
       const user = userEvent.setup()
-      //fetchMock.delete(/.*\/folders\/46\?force=true/, 200, {overwriteRoutes: true})
+      server.use(
+        http.delete(/.*\/folders\/46/, () => {
+          return new HttpResponse(null, {status: 200})
+        }),
+      )
       renderComponent()
 
       const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
@@ -457,10 +463,13 @@ describe('FileFolderTable', () => {
       expect(showFlashSuccess).toHaveBeenCalledWith('1 item deleted successfully.')
     })
 
-    // TODO: the scope of this test overextends unit test
     it.skip('renders flash error when delete fails', async () => {
       const user = userEvent.setup()
-      //fetchMock.delete(/.*\/folders\/46\?force=true/, 500, {overwriteRoutes: true})
+      server.use(
+        http.delete(/.*\/folders\/46/, () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
       renderComponent()
 
       const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')

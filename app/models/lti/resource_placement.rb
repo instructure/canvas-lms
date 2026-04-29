@@ -25,7 +25,7 @@ require "lti_advantage"
 module Lti
   class InvalidMessageTypeForPlacementError < StandardError; end
 
-  class ResourcePlacement < ActiveRecord::Base
+  class ResourcePlacement < ApplicationRecord
     # *** Placements and messages constants & helpers: ***
 
     CANVAS_PLACEMENT_EXTENSION_PREFIX = "https://canvas.instructure.com/lti/"
@@ -48,20 +48,15 @@ module Lti
     RICH_TEXT_EDITOR = "RichTextEditor"
 
     ASSET_PROCESSOR = "ActivityAssetProcessor"
+    ASSET_PROCESSOR_CONTRIBUTION = "ActivityAssetProcessorContribution"
 
     SIMILARITY_DETECTION_LTI2 = "Canvas.placements.similarityDetection"
 
     # Default placements for LTI 1 and LTI 2, ignored for LTI 1.3
     LEGACY_DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
 
-    # Placements restricted so not advertised in the UI
-    NON_PUBLIC_PLACEMENTS = %i[submission_type_selection].freeze
-
-    # These placements require tools to be on an allow list
-    RESTRICTED_PLACEMENTS = %i[submission_type_selection top_navigation].freeze
-
     # These placements don't need the CANVAS_PLACEMENT_EXTENSION_PREFIX
-    STANDARD_PLACEMENTS = %i[ActivityAssetProcessor].freeze
+    STANDARD_PLACEMENTS = %i[ActivityAssetProcessor ActivityAssetProcessorContribution].freeze
 
     PLACEMENTS_BY_MESSAGE_TYPE = {
       LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE => %i[
@@ -108,6 +103,7 @@ module Lti
       LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE => %i[
         assignment_selection
         ActivityAssetProcessor
+        ActivityAssetProcessorContribution
         collaboration
         conference_selection
         course_assignments_menu
@@ -124,6 +120,7 @@ module Lti
 
     PLACEMENTS = PLACEMENTS_BY_MESSAGE_TYPE.values.flatten.uniq.freeze
 
+    # Should match with LtiPlacementlessMessageType in frontend lti_registration/manage/model/LtiMessageType.ts
     PLACEMENTLESS_MESSAGE_TYPES = [
       LtiAdvantage::Messages::EulaRequest::MESSAGE_TYPE,
     ].freeze
@@ -146,11 +143,9 @@ module Lti
       PLACEMENTS.dup.tap do |p|
         p.delete(:conference_selection) unless Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
         p.delete(:ActivityAssetProcessor) unless root_account&.feature_enabled?(:lti_asset_processor)
+        p.delete(:ActivityAssetProcessorContribution) unless root_account&.feature_enabled?(:lti_asset_processor_discussions)
+        p.delete(:top_navigation) unless root_account&.feature_enabled?(:top_navigation_placement)
       end
-    end
-
-    def self.public_placements(root_account)
-      valid_placements(root_account) - NON_PUBLIC_PLACEMENTS
     end
 
     def self.update_tabs_and_return_item_banks_tab(tabs, new_label = nil)

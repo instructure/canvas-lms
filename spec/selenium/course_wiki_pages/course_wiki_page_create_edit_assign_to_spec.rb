@@ -173,7 +173,6 @@ describe "wiki pages edit page assign to" do
 
   context "differentiation tags" do
     before :once do
-      @course.account.enable_feature! :assign_to_differentiation_tags
       @course.account.tap do |a|
         a.settings[:allow_assign_to_differentiation_tags] = { value: true }
         a.save!
@@ -194,6 +193,8 @@ describe "wiki pages edit page assign to" do
       visit_wiki_edit_page(@course.id, @page.title)
       wait_for_ajaximations
       expect(element_exists?(convert_override_alert_selector)).to be_truthy
+      save_wiki_page
+      expect(f("body").text).to include "Invalid group selected"
     end
 
     it "clicking convert overrides button converts the override and refreshes the cards" do

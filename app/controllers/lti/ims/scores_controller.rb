@@ -20,7 +20,7 @@
 module Lti::IMS
   # @API Score
   #
-  # Score API for 1EdTech (IMS) <a href="/doc/api/file.assignment_tools.html">Assignment and Grade Services</a>.
+  # Score API for 1EdTech (IMS) <a href="file.assignment_tools.html">Assignment and Grade Services</a>.
   #
   # @model Score
   #     {
@@ -161,7 +161,7 @@ module Lti::IMS
     #  Contains metadata about the submission attempt. Supported fields listed below.
     #
     # @argument submission[submittedAt] [Optional, String]
-    #  Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision.
+    #  Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision. If the submittedAt time has not changed from its current value, the submission attempt number will not be incremented.
     #
     # @argument https://canvas.instructure.com/lti/submission [Optional, Object]
     #   (EXTENSION) Optional submission type and data. Fields listed below.
@@ -260,9 +260,14 @@ module Lti::IMS
       end
       submit_homework(attachments) if new_submission? && trigger_submission?
       update_or_create_result
+      @context = context
+      @current_user = user
+      log_asset_access(line_item.assignment, "assignments", line_item.assignment.assignment_group, "participate")
       json[:resultUrl] = result_url
 
       render json:, content_type: MIME_TYPE
+    rescue Assignment::GradeError => e
+      render_error(e.message, :unprocessable_entity)
     end
 
     private
@@ -378,6 +383,7 @@ module Lti::IMS
       # if attempts_left is 0, trying to submit will fail
       # attempts_left will be nil for non-limited assignments
       return if submission.attempts_left.nil? || submission.attempts_left > 0
+      return if submission.submitted_at && submission.submitted_at == submitted_at
 
       render_error("The maximum number of allowed attempts has been reached for this submission", :unprocessable_entity)
     end
@@ -607,11 +613,7 @@ module Lti::IMS
     end
 
     def trigger_submission?
-      if context.root_account.feature_enabled?(:ags_score_trigger_needs_grading_after_submitted)
-        Lti::Result::ACTIVITY_PROGRESSES_NEEDS_GRADING.include?(params[:activityProgress])
-      else
-        params[:activityProgress] != "Initialized"
-      end
+      Lti::Result::ACTIVITY_PROGRESSES_NEEDS_GRADING.include?(params[:activityProgress])
     end
   end
 end

@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {extend, isEmpty} from 'lodash'
+import {extend, isEmpty} from 'es-toolkit/compat'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/rails-flash-notifications'

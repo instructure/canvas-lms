@@ -20,10 +20,10 @@
 
 # @API Enrollment Terms
 #
-# API for viewing enrollment terms.  For all actions, the specified account
-# must be a root account and the caller must have permission to manage the
-# account (when called on non-root accounts, the errorwill be indicate the
-# appropriate root account).
+# API for viewing and managing enrollment terms.  For all actions, the specified account
+# must be a root account. To manage enrollment terms, the caller must have permission to
+# manage the account. To view enrollment terms, the caller must have an active teacher enrollment
+# in at least one course.
 #
 # @model EnrollmentTerm
 #     {
@@ -98,6 +98,7 @@ class TermsApiController < ApplicationController
   before_action :require_context, :require_root_account, :require_account_access
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index]
 
   include Api::V1::EnrollmentTerm
@@ -152,6 +153,10 @@ class TermsApiController < ApplicationController
   #
   # @returns EnrollmentTermsList
   def index
+    if request.format.html?
+      return unless require_root_account_management
+    end
+
     add_crumb(t("Terms"))
     page_has_instui_topnav
     @terms = @context.enrollment_terms
@@ -177,10 +182,18 @@ class TermsApiController < ApplicationController
         state = nil if Array(state).include?("all")
 
         @terms = @terms.where(workflow_state: state) if state.present?
-        @terms = @terms.order("start_at DESC, end_at DESC, id ASC")
+        @terms = @terms.order(start_at: :desc, end_at: :desc, id: :asc)
         @terms = Api.paginate(@terms,
                               self,
                               api_v1_enrollment_terms_url)
+
+        subaccount = if (subaccount_id = params[:subaccount_id]&.to_i)
+                       if subaccount_id == @context.id
+                         @context
+                       else
+                         @context.all_accounts.find(subaccount_id)
+                       end
+                     end
 
         render json: { enrollment_terms:
                          enrollment_terms_json(
@@ -190,7 +203,7 @@ class TermsApiController < ApplicationController
                            @context.root_account,
                            nil,
                            Array(params[:include]),
-                           params[:subaccount_id] || nil
+                           subaccount
                          ) }
       end
     end

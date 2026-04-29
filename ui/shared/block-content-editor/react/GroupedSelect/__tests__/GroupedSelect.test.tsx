@@ -20,28 +20,29 @@ import {render, screen} from '@testing-library/react'
 import {GroupedSelect} from '../GroupedSelect'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
+import {type Mock} from 'vitest'
 
 describe('GroupedSelect', () => {
-  let onChangeMock: jest.Mock
+  let onChangeMock: Mock
   const data: React.ComponentProps<typeof GroupedSelect>['data'] = [
     {
       groupName: 'G1',
       items: [
-        {itemName: 'G1-I1', id: 'image'},
+        {itemName: 'G1-I1', id: 'fullWidthImage'},
         {itemName: 'G1-I2', id: 'imageText'},
       ],
     },
     {
       groupName: 'G2',
       items: [
-        {itemName: 'G2-I1', id: 'simpleText'},
-        {itemName: 'G2-I2', id: 'imageText'},
+        {itemName: 'G2-I1', id: 'textColumn'},
+        {itemName: 'G2-I2', id: 'video'},
       ],
     },
   ]
 
   beforeEach(() => {
-    onChangeMock = jest.fn()
+    onChangeMock = vi.fn()
   })
 
   it('renders grouped select with initial data', () => {
@@ -56,20 +57,20 @@ describe('GroupedSelect', () => {
 
   it('selects first item by default', () => {
     render(<GroupedSelect data={data} onChange={onChangeMock} />)
-    expect(onChangeMock).toHaveBeenCalledWith(data[0].items[0].id)
+    expect(onChangeMock).toHaveBeenCalledWith(data[0].items[0])
   })
 
   it('changes group and selects first item of that group', async () => {
     render(<GroupedSelect data={data} onChange={onChangeMock} />)
     const group = screen.getByText(data[1].groupName)
     await userEvent.click(group)
-    expect(onChangeMock).toHaveBeenCalledWith(data[1].items[0].id)
+    expect(onChangeMock).toHaveBeenCalledWith(data[1].items[0])
   })
 
   it('selects item on click and calls onChange', async () => {
     render(<GroupedSelect data={data} onChange={onChangeMock} />)
     const item = screen.getByText(data[0].items[1].itemName)
     await userEvent.click(item)
-    expect(onChangeMock).toHaveBeenCalledWith(data[0].items[1].id)
+    expect(onChangeMock).toHaveBeenCalledWith(data[0].items[1])
   })
 })

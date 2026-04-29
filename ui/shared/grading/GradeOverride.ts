@@ -38,8 +38,8 @@ export default class GradeOverride {
     return this._attr.schemeKey
   }
 
-  // @ts-expect-error
-  equals(gradeOverride) {
+  equals(gradeOverride: GradeOverride | null) {
+    if (!gradeOverride) return false
     return (
       this.percentage === gradeOverride.percentage && this.schemeKey === gradeOverride.schemeKey
     )

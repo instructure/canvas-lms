@@ -96,7 +96,7 @@ describe LiveEvents do
 
     context "Files" do
       def course_file
-        data = fixture_file_upload("docs/doc.doc", "application/msword", true)
+        data = fixture_file_upload("docs/doc.doc", "application/msword", binary: true)
         @course.attachments.create!(uploaded_data: data)
       end
 

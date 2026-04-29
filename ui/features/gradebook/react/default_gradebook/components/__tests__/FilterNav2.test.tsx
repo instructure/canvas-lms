@@ -18,14 +18,14 @@
 
 import React from 'react'
 import FilterNav from '../FilterNav'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import store from '../../stores/index'
 import type {FilterNavProps} from '../FilterNav'
 import type {FilterPreset, Filter} from '../../gradebook.d'
 import type {Assignment} from '../../../../../../api'
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import '@testing-library/jest-dom/extend-expect'
 
 beforeEach(() => {
   // Ensure a live region for screenreader alerts exists for Alert component
@@ -83,6 +83,7 @@ const StudentGroupCategoryProps = {
   self_signup: null,
   sis_group_category_id: null,
   sis_import_id: null,
+  non_collaborative: false,
 }
 
 const defaultProps: FilterNavProps = {
@@ -178,6 +179,16 @@ const defaultProps: FilterNavProps = {
         {id: '4', name: 'Student Group 4'},
       ],
     },
+    '3': {
+      ...StudentGroupCategoryProps,
+      id: '3',
+      name: 'Differentiation Tag Group Category 1',
+      non_collaborative: true,
+      groups: [
+        {id: '3', name: 'Differentiation Tag Group 1', non_collaborative: true},
+        {id: '4', name: 'Differentiation Tag Group 2', non_collaborative: true},
+      ],
+    },
   },
   customStatuses: [
     {
@@ -267,6 +278,21 @@ const mockPostResponse = {
   },
 }
 
+const server = setupServer(
+  http.get('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.post('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.put('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+  http.delete('*', () => {
+    return new HttpResponse(null, {status: 200})
+  }),
+)
+
 const USER_EVENT_OPTIONS = {
   pointerEventsCheck: PointerEventsCheckLevel.Never,
 }
@@ -280,6 +306,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  cleanup()
   window.ENV.FEATURES = oldEnv
 })
 
@@ -289,11 +316,14 @@ describe('Filter dropdown', () => {
       filterPresets: defaultFilterPresets,
       appliedFilters: [],
     })
-    fetchMock.mock('*', 200)
+    server.listen({onUnhandledRequest: 'bypass'})
   })
   afterEach(() => {
     store.setState(originalState, true)
-    fetchMock.restore()
+    server.resetHandlers()
+  })
+  afterAll(() => {
+    server.close()
   })
 
   it('Shows filter menu items', async () => {
@@ -307,6 +337,7 @@ describe('Filter dropdown', () => {
     expect(getByText('Grading Periods')).toBeVisible()
     expect(getByText('Assignment Groups')).toBeVisible()
     expect(getByText('Student Groups')).toBeVisible()
+    expect(getByText('Differentiation Tags')).toBeVisible()
     expect(getByText('Status')).toBeVisible()
     expect(getByText('Submissions')).toBeVisible()
     expect(getByText('Start & End Date')).toBeVisible()
@@ -429,11 +460,19 @@ describe('FilterNav (save)', () => {
       filterPresets: defaultFilterPresets,
       appliedFilters: defaultAppliedFilters,
     })
-    fetchMock.post('/api/v1/courses/0/gradebook_filters', mockPostResponse)
+    server.use(
+      http.post('/api/v1/courses/0/gradebook_filters', () => {
+        return HttpResponse.json(mockPostResponse)
+      }),
+    )
+    server.listen({onUnhandledRequest: 'bypass'})
   })
   afterEach(() => {
     store.setState(originalState, true)
-    fetchMock.restore()
+    server.resetHandlers()
+  })
+  afterAll(() => {
+    server.close()
   })
 
   it('Save button is disabled if filter preset name is blank', async () => {
@@ -446,6 +485,8 @@ describe('FilterNav (save)', () => {
   })
 
   it.skip('clicking Save saves new filter', async () => {
+    // SKIP REASON: Test times out (>16s) due to slow userEvent.type on the filter preset
+    // name input. CI timeout is 10s. Would need optimization of user event interactions.
     const user = userEvent.setup({...USER_EVENT_OPTIONS, delay: null})
     const {getByText, getByPlaceholderText, getByTestId, queryByTestId} = render(
       <FilterNav {...defaultProps} />,

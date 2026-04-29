@@ -70,18 +70,12 @@ export interface ConfigurationFormManualState {
   isNameValid: boolean
   isUrlValid: boolean
   isDomainValid: boolean
-  isUrlRequired: boolean
 }
 
 export interface ConfigurationFormManualFormData
   extends Omit<
     ConfigurationFormManualState,
-    | 'allowMembershipServiceAccess'
-    | 'isNameValid'
-    | 'isUrlValid'
-    | 'isDomainValid'
-    | 'showMessages'
-    | 'isUrlRequired'
+    'allowMembershipServiceAccess' | 'isNameValid' | 'isUrlValid' | 'isDomainValid' | 'showMessages'
   > {
   allow_membership_service_access?: boolean
   verifyUniqueness: 'true'
@@ -105,7 +99,6 @@ export default class ConfigurationFormManual extends React.Component<
     isNameValid: true,
     isUrlValid: true,
     isDomainValid: true,
-    isUrlRequired: true,
   }
 
   nameRef = createRef<TextInput>()
@@ -130,10 +123,6 @@ export default class ConfigurationFormManual extends React.Component<
     fieldRef: React.RefObject<TextInput>,
     isUrl: boolean,
   ) => {
-    if (fieldStateKey === 'isDomainValid' && this.state.isUrlValid) {
-      this.setState(prevState => ({...prevState, [fieldStateKey]: true}))
-      return
-    }
     if (!fieldValue || (isUrl && !URL.canParse(fieldValue))) {
       this.invalidate(fieldStateKey, fieldRef)
       return
@@ -160,10 +149,9 @@ export default class ConfigurationFormManual extends React.Component<
     const {name, url, domain} = this.state
 
     this.validateField(name, 'isNameValid', this.nameRef, false)
-    if (this.state.isUrlRequired || url.length > 0) {
+    if (url && url.length > 0) {
       this.validateField(url, 'isUrlValid', this.urlRef, true)
-    }
-    if (!url) {
+    } else {
       this.validateField(domain, 'isDomainValid', this.domainRef, false)
     }
 
@@ -221,7 +209,6 @@ export default class ConfigurationFormManual extends React.Component<
           this.validateField(value, 'isUrlValid', this.urlRef, true)
           break
         case 'domain':
-          if (value !== '') this.setState({isUrlRequired: false})
           this.validateField(value, 'isDomainValid', this.domainRef, false)
           break
       }
@@ -271,7 +258,6 @@ export default class ConfigurationFormManual extends React.Component<
       customFields,
       description,
       showMessages,
-      isUrlRequired,
       isNameValid,
     } = this.state
 
@@ -338,7 +324,6 @@ export default class ConfigurationFormManual extends React.Component<
                 value={url}
                 renderLabel={I18n.t('Launch URL')}
                 ref={this.urlRef}
-                isRequired={isUrlRequired}
                 messages={
                   this.props.hasBeenSubmitted && showMessages
                     ? this.showUrlValidationError(domain)

@@ -25,7 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('course_people')
 
-const UserRole: FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
+const UserRole: FC<{enrollments: Enrollment[]}> = ({enrollments}) =>
   enrollments.map(enrollment => {
     const {_id: id, sisRole, associatedUser, temporaryEnrollmentSourceUserId} = enrollment
 
@@ -35,7 +35,7 @@ const UserRole: FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
       roleName = I18n.t('Temporary: %{roleName}', {roleName})
     }
 
-    if (sisRole === OBSERVER_ROLE){
+    if (sisRole === OBSERVER_ROLE) {
       if (associatedUser) {
         roleName = I18n.t('Observing: %{userName}', {userName: associatedUser.name})
       } else {
@@ -49,6 +49,5 @@ const UserRole: FC<{enrollments: Enrollment[]}> = ({enrollments}) => (
       </Text>
     )
   })
-)
 
 export default UserRole

@@ -21,5 +21,5 @@
 require_relative("web_conference_spec_helper")
 
 describe LtiConference do
-  include_examples "WebConference"
+  it_behaves_like "WebConference"
 end

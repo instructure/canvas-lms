@@ -70,6 +70,7 @@ type PublishMenuProps = {
 
 type OverridesProps = {
   hideTitle?: boolean
+  hasModules?: boolean
   publishMenu?: {
     onPublishComplete?: () => void
   }
@@ -79,12 +80,14 @@ type OverridesProps = {
     disabled?: boolean
   }
   handleAddModule?: () => void
+  renderIconLegend?: () => JSX.Element
 }
 
 type Props = {
   title: string
   hideTitle?: boolean
   publishMenu: PublishMenuProps
+  hasModules?: boolean
   viewProgress: {
     label: string
     url: string
@@ -175,6 +178,8 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
 
   const expandCollapseAll = {...props.expandCollapseAll, ...props.overrides?.expandCollapseAll}
 
+  const showExpandAll = props.overrides?.hasModules ?? true
+
   return (
     <>
       <Flex
@@ -205,7 +210,8 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
           overflowY="visible"
           margin={responsive.matches.includes('large') ? 'x-small 0 0 0' : '0'}
         >
-          <Flex gap="small" wrap="wrap" withVisualDebug={false}>
+          <Flex gap="small" wrap="wrap" justifyItems="end" withVisualDebug={false}>
+            {props.overrides?.renderIconLegend?.()}
             {props.moreMenu.menuTools.visible && (
               <Flex.Item overflowY="visible">
                 <View
@@ -239,23 +245,24 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
                 </View>
               </Flex.Item>
             )}
-
-            <Flex.Item overflowY="visible">
-              <Button
-                id="expand_collapse_all"
-                onClick={expandCollapseAll.onExpandCollapseAll}
-                aria-label={
-                  expandCollapseAll.anyModuleExpanded
-                    ? I18n.t('Collapse All Modules')
-                    : I18n.t('Expand All Modules')
-                }
-                interaction={expandCollapseAll.disabled ? 'disabled' : 'enabled'}
-              >
-                {expandCollapseAll.anyModuleExpanded
-                  ? I18n.t('Collapse All')
-                  : I18n.t('Expand All')}
-              </Button>
-            </Flex.Item>
+            {showExpandAll && (
+              <Flex.Item overflowY="visible">
+                <Button
+                  id="expand_collapse_all"
+                  onClick={expandCollapseAll.onExpandCollapseAll}
+                  aria-label={
+                    expandCollapseAll.anyModuleExpanded
+                      ? I18n.t('Collapse All Modules')
+                      : I18n.t('Expand All Modules')
+                  }
+                  interaction={expandCollapseAll.disabled ? 'disabled' : 'enabled'}
+                >
+                  {expandCollapseAll.anyModuleExpanded
+                    ? I18n.t('Collapse All')
+                    : I18n.t('Expand All')}
+                </Button>
+              </Flex.Item>
+            )}
 
             {props.viewProgress.visible && (
               <Flex.Item overflowY="visible">
@@ -285,6 +292,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
               <Flex.Item overflowY="visible">
                 <View
                   id="context-modules-publish-menu"
+                  data-testid="context-modules-publish-menu"
                   as="div"
                   display={responsive.props.display}
                   maxHeight="2.375rem"

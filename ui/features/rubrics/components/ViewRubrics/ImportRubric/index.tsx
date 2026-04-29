@@ -17,19 +17,17 @@
  */
 
 import React, {useState} from 'react'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useMutation} from '@tanstack/react-query'
 import {ImportRubricTray} from './ImportRubricTray'
 import {ImportFailuresModal} from './ImportFailuresModal'
-// @ts-expect-error
-import type {RubricImport} from '../../../types/Rubric'
+import type {RubricImport, Rubric} from '@canvas/rubrics/react/types/rubric'
 import {
   fetchRubricImport,
   getImportedRubrics,
   importRubric,
 } from '../../../queries/ViewRubricQueries'
-import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 
 const I18n = createI18nScope('rubrics-import')
 

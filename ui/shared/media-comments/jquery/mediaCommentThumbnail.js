@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {mediaCommentThumbnail} from '@instructure/canvas-rce'
+import {mediaCommentThumbnail} from '@instructure/canvas-rce/enhance-user-content'
 
 // public API
 export default ($.fn.mediaCommentThumbnail = function (size = 'normal', keepOriginalText) {

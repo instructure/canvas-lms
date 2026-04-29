@@ -45,7 +45,7 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
   include ::Filters::Quizzes
   include ::Filters::QuizSubmissions
 
-  before_action :require_user, only: [:index]
+  skip_before_action :require_user, only: :create
   before_action :require_context,
                 :require_quiz,
                 :require_active_quiz_submission
@@ -132,7 +132,7 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
                                        attempt: @quiz_submission.attempt,
                                        started_at: @quiz_submission.started_at
                                      })
-                              .order("created_at ASC")
+                              .order(:created_at)
 
       api_route = api_v1_course_quiz_submission_events_url(@context, @quiz, @quiz_submission)
       events = Api.paginate(scope, self, api_route)

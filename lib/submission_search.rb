@@ -79,10 +79,25 @@ class SubmissionSearch
       # return all submissions for the selected group
       search_scope = search_scope.where(user_id: group_selection.initial_group.user_ids) if group_selection.initial_group.present?
     end
-    search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades) || @course.participating_observers.map(&:id).include?(@searcher.id)
+
+    can_manage_or_view_grades = @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades)
+
+    if @options[:posting_status].present? && can_manage_or_view_grades
+      case @options[:posting_status]
+      when :postable
+        search_scope = search_scope.postable.unposted
+      when :hideable
+        search_scope = search_scope.posted
+      else
+        raise "posting_status '#{@options[:posting_status]}' is not supported"
+      end
+    end
+
+    search_scope = if can_manage_or_view_grades || @course.participating_observers.map(&:id).include?(@searcher.id)
                      # a user with manage_grades, view_all_grades, or an observer can see other users' submissions
                      # TODO: may want to add a preloader for this
-                     search_scope.where(user_id: allowed_users)
+                     user_scope = filter_section_enrollment_states(allowed_users)
+                     search_scope.where(user_id: user_scope.select(:id))
                    elsif @course.grants_right?(@searcher, @session, :read_grades)
                      # a user can see their own submission
                      search_scope.where(user_id: @searcher.id)
@@ -165,7 +180,7 @@ class SubmissionSearch
   end
 
   def order_by_needs_grading(search_scope:, direction:)
-    ComputedSubmissionColumnBuilder.add_needs_grading_column(search_scope) => { scope:, column: needs_grading_column }
+    ComputedSubmissionColumnBuilder.add_needs_grading_column(search_scope, @searcher) => { scope:, column: needs_grading_column }
     # students needing grading come first when sorting ascending, last when sorting descending
     direction = reverse_direction(direction)
     scope.order(Arel.sql("#{needs_grading_column} #{direction}"))
@@ -182,7 +197,9 @@ class SubmissionSearch
   end
 
   def order_by_username(search_scope:, direction:, sortable_name: false)
-    return order_by_anonymous_username(search_scope:, direction:) if @assignment.anonymize_students?
+    if @assignment.anonymize_students? || @assignment.new_quizzes_anonymous_participants?
+      return order_by_anonymous_username(search_scope:, direction:)
+    end
 
     order_clause = sortable_name ? User.sortable_name_order_by_clause("users") : User.name_order_by_clause("users")
     search_scope.joins(:user).order(Arel.sql("#{order_clause} #{direction}"))
@@ -214,14 +231,9 @@ class SubmissionSearch
 
   def allowed_users
     users = if @options[:apply_gradebook_enrollment_filters]
-              if @assignment.only_visible_to_overrides? && @assignment.active_assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).none?
-                section_ids = @assignment.active_assignment_overrides.where(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).pluck(:set_id)
-                @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings, section_ids:)
-              else
-                @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
-              end
+              @course.users_visible_to(@searcher, include_priors: true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
             elsif @options[:include_concluded] || @options[:include_deactivated]
-              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
+              @course.users_visible_to(@searcher, include_priors: true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
             else
               @course.users_visible_to(@searcher)
             end
@@ -232,6 +244,27 @@ class SubmissionSearch
     end
 
     users
+  end
+
+  def user_ids_by_enrollment_section_filters(section_ids)
+    # Use base enrollments association to avoid default scope that excludes inactive enrollments
+    @course.enrollments
+           .where(course_section_id: section_ids)
+           .where.not(workflow_state: excluded_enrollment_states_from_gradebook_settings)
+           .select(:user_id)
+  end
+
+  def filter_section_enrollment_states(user_scope)
+    return user_scope unless @options[:apply_gradebook_enrollment_filters]
+    return user_scope unless @assignment.only_visible_to_overrides?
+    return user_scope unless @assignment.active_assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).none?
+
+    section_ids = @assignment.active_assignment_overrides.where(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).pluck(:set_id)
+    return user_scope if section_ids.empty?
+
+    enrollment_scope = user_ids_by_enrollment_section_filters(section_ids)
+
+    user_scope.where(id: enrollment_scope)
   end
 
   def representative_id(user_id)
@@ -246,13 +279,16 @@ class SubmissionSearch
   end
 
   def representatives
-    @representatives ||= @assignment.representatives(user: @searcher, ignore_student_visibility: true, include_others: true)
+    includes = [:inactive]
+    settings = @searcher.get_preference(:gradebook_settings, @course.global_id) || {}
+    includes << :completed if settings["show_concluded_enrollments"] == "true" || @course.completed?
+    @representatives ||= @assignment.representatives(user: @searcher, includes:, ignore_student_visibility: true, include_others: true)
   end
 
   def excluded_enrollment_states_from_gradebook_settings
     settings = @searcher.get_preference(:gradebook_settings, @course.global_id) || {}
     excluded_enrollment_states(
-      completed: settings["show_concluded_enrollments"] != "true",
+      completed: settings["show_concluded_enrollments"] != "true" && !@course.completed?,
       inactive: settings["show_inactive_enrollments"] != "true"
     )
   end

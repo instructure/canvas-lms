@@ -19,8 +19,8 @@
 import {assignLocation} from '@canvas/util/globalUtils'
 import {createErrorMessage, handleRegistrationRedirect} from '../helpers'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 describe('Helpers', () => {

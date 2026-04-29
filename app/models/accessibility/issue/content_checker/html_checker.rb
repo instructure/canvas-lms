@@ -27,29 +27,49 @@ module Accessibility
           return NO_ACCESSIBILITY_ISSUES.dup if html_content.blank? || !html_content.include?("<")
 
           begin
-            doc = Nokogiri::HTML5.fragment(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
-            extend_nokogiri_with_dom_adapter(doc)
+            _, body = parse_html_content(html_content)
 
             issues = []
 
-            Rule.registry.each_value do |rule_class|
-              doc.children.each do |node|
+            Rule.registry.each_value do |rule|
+              body.children.each do |node|
                 next unless node.is_a?(Nokogiri::XML::Element)
 
                 walk_dom_tree(node) do |element|
-                  next if rule_class.test(element).nil?
+                  next if rule.test(element).nil?
 
-                  issues << build_issue(rule_class, element: element.name, form: rule_class.form(element).to_h, path: element_path(element))
+                  # Use built-in .path and strip /html/body prefix
+                  xpath = element.path.sub(%r{^/html/body}, ".")
+
+                  issues << build_issue(rule, element: element.name, form: rule.form(element).to_h, path: xpath)
                 rescue => e
-                  log_rule_error(rule_class, element, e)
+                  report_exception(e, { rule_id: rule.class.id, element: }, "accessibility_rule_error")
                 end
               end
             end
 
             process_issues(issues)
           rescue => e
-            log_general_error(e)
+            report_exception(e, {}, "accessibility_html_parse_error")
             NO_ACCESSIBILITY_ISSUES.dup
+          end
+        end
+
+        def report_exception(error, info, tag)
+          return if @resource.nil?
+
+          resource_context = @resource.is_a?(Accessibility::SyllabusResource) ? @resource.course : @resource.context
+          info.merge!(
+            context_type: resource_context.class.name,
+            context_id: resource_context.global_id,
+            account_id: resource_context.account.global_id,
+            resource_type: @resource.class.name,
+            resource_id: @resource.global_id
+          )
+
+          Sentry.with_scope do |scope|
+            scope.set_context(tag, info)
+            Sentry.capture_exception(error, level: :error)
           end
         end
       end

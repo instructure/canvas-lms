@@ -29,6 +29,6 @@ describe('ModuleItemsLoadingSpinner', () => {
   it('renders loading text', () => {
     const result = render(<ModuleItemsLoadingSpinner isLoading={true} />)
 
-    expect(result.getByText('Loading items')).toBeInTheDocument()
+    expect(result.getAllByText('Loading items')).toHaveLength(2)
   })
 })

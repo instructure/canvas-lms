@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AccountNotification < ActiveRecord::Base
+class AccountNotification < ApplicationRecord
   include Canvas::SoftDeletable
   include LinkedAttachmentHandler
 
@@ -50,7 +50,7 @@ class AccountNotification < ActiveRecord::Base
     %w[message]
   end
 
-  def access_for_attachment_association?(user, _session, association, _location_param)
+  def access_for_attachment_association?(user, _session, association)
     notification_ids = AccountNotification.for_user_and_account_cached(user, association.root_account).pluck(:id)
     notification_ids.include?(id)
   end
@@ -221,8 +221,12 @@ class AccountNotification < ActiveRecord::Base
     end
   end
 
-  def self.cache_key_for_root_account(root_account_id, date)
-    ["root_account_notifications2", Shard.global_id_for(root_account_id), date.strftime("%Y-%m-%d")].cache_key
+  def self.cache_key_for_root_account(root_account_id, date, include_all: false)
+    # This is a semantic sugar for the cache key, because this key also
+    # present when calling #for_user_and_account
+    # using include_all=false could sound we filter important records
+    map_key_for_include_all = include_all ? "extended-for-admins" : "filtered-by-date"
+    ["root_account_notifications2", Shard.global_id_for(root_account_id), date.strftime("%Y-%m-%d"), map_key_for_include_all].cache_key
   end
 
   def self.for_account(root_account, all_visible_account_ids = nil, include_near_past: false, include_all: false)
@@ -250,7 +254,7 @@ class AccountNotification < ActiveRecord::Base
         load_by_account = lambda do |slice_account_ids|
           scope = AccountNotification.active
                                      .where(account_id: slice_account_ids)
-                                     .order("start_at DESC")
+                                     .order(start_at: :desc)
                                      .preload({ account: :root_account }, account_notification_roles: :role)
           scope = if include_all
                     scope.preload(:user)
@@ -277,7 +281,7 @@ class AccountNotification < ActiveRecord::Base
                                       end
         if (sharded_account_ids - this_shard_root_account_ids).empty? && !include_near_past
           sharded_account_ids.map do |single_root_account_id|
-            MultiCache.fetch(cache_key_for_root_account(single_root_account_id, end_at)) do
+            MultiCache.fetch(cache_key_for_root_account(single_root_account_id, end_at, include_all:)) do
               load_by_account.call([single_root_account_id])
             end
           end.flatten
@@ -360,7 +364,10 @@ class AccountNotification < ActiveRecord::Base
     # yes, I could be smarter about only clearing this if the date is in range, and a relevant field changed,
     # but that is several complicated conditions, and these rarely change, so shouldn't be a big deal
     # to just let the cache clear
-    MultiCache.delete(self.class.cache_key_for_root_account(account_id, Time.now.utc)) if account.root_account?
+    if account.root_account?
+      MultiCache.delete(self.class.cache_key_for_root_account(account_id, Time.now.utc, include_all: true))
+      MultiCache.delete(self.class.cache_key_for_root_account(account_id, Time.now.utc, include_all: false))
+    end
   end
 
   def broadcast_messages
@@ -413,7 +420,16 @@ class AccountNotification < ActiveRecord::Base
       end
 
       if roles.include?(nil)
-        users_with_no_enrollments_from_given_accounts = User.joins(:user_account_associations).where(user_account_associations: { account_id: all_account_ids }).where.not(id: Enrollment.active_or_pending_by_date.select(:user_id))
+        users_with_no_enrollments_from_given_accounts = User.joins(:user_account_associations)
+                                                            .where(user_account_associations: { account_id: all_account_ids })
+                                                            .where("NOT EXISTS (
+                                                              SELECT 1
+                                                              FROM #{Enrollment.quoted_table_name} AS e
+                                                              INNER JOIN #{EnrollmentState.quoted_table_name} AS es ON es.enrollment_id = e.id
+                                                              WHERE e.user_id = #{User.quoted_table_name}.id
+                                                                AND es.restricted_access = FALSE
+                                                                AND es.state IN ('active', 'invited', 'pending_invited', 'pending_active')
+                                                            )")
         user_ids += users_with_no_enrollments_from_given_accounts.pluck(:id)
       end
 

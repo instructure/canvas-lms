@@ -18,17 +18,21 @@
 
 require_relative "../common"
 require_relative "../helpers/outcome_common"
+require "feature_flag_helper"
 
 describe "account admin outcomes" do
+  include FeatureFlagHelper
+
   let(:account) { Account.default }
   let(:who_to_login) { "admin" }
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
 
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   include OutcomeCommon
 
   describe "state level outcomes" do
     before do
+      mock_feature_flag_on_account(:improved_outcomes_management, false)
       course_with_admin_logged_in
       @root_account = Account.site_admin
       account_admin_user(account: @root_account, active_all: true)
@@ -109,7 +113,7 @@ describe "account admin outcomes" do
       include ImprovedOutcomeManagementPage
 
       before do
-        enable_improved_outcomes_management(account)
+        mock_feature_flag_on_account(:improved_outcomes_management, true)
         @cm.export_content
         run_jobs
       end
@@ -138,8 +142,10 @@ describe "account admin outcomes" do
         create_outcome("Test Outcome")
 
         # Verify by titles that the outcomes are imported into current root account
-        account_outcomes = LearningOutcome.where(root_account_ids: [account.id])
-        expect(account_outcomes[0].short_description).to eq("Test Outcome")
+        keep_trying_until do
+          account_outcomes = LearningOutcome.where(root_account_ids: [account.id])
+          expect(account_outcomes[0].short_description).to eq("Test Outcome")
+        end
       end
 
       it "searches across state standards in the Find modal and aligns a result" do
@@ -167,6 +173,7 @@ describe "account admin outcomes" do
 
     describe "state standard pagination" do
       it "does not fail while filtering the common core group", priority: "2" do
+        mock_feature_flag_on_account(:improved_outcomes_management, false)
         # setup fake state data, so that it has to paginate
         root_group = LearningOutcomeGroup.global_root_outcome_group
         root_group.child_outcome_groups.create!(title: "Fake Common Core")

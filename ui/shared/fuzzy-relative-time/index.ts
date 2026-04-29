@@ -95,14 +95,18 @@ function timeDistance(
 
 export function fromNow(date: unknown, opts = {}) {
   const now = Date.now()
-  let thence
-  if (date instanceof Date) {
+  let thence: number
+  if (typeof date === 'string') {
+    thence = Date.parse(date)
+    if (thence === null || Number.isNaN(thence))
+      throw new RangeError('argument string could not be parsed as Date')
+  } else if (date instanceof Date) {
     thence = date.getTime()
-    if (Number.isNaN(thence)) throw new RangeError('argument Date is invalid')
+    if (thence === null || Number.isNaN(thence)) throw new RangeError('argument Date is invalid')
   } else if (typeof date === 'number') {
     thence = date
   } else {
-    throw new RangeError('argument must be Date object or numeric msec')
+    throw new RangeError('argument must be Date object, parseable string, or numeric msec')
   }
   return timeDistance(buildTime(thence - now), opts)
 }

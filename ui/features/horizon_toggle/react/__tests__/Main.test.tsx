@@ -20,8 +20,8 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {Main} from '../Main'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 describe('Main', () => {

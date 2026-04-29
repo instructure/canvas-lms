@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {map} from 'lodash'
+import {map} from 'es-toolkit/compat'
 
 /*
 xsslint xssable.receiver.whitelist builder

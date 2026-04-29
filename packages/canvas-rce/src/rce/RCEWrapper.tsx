@@ -21,7 +21,7 @@ import {Editor} from '@tinymce/tinymce-react'
 
 import tinymce from 'tinymce'
 import type {Editor as TinyMCEEditor} from 'tinymce'
-import _ from 'lodash'
+import {uniqBy} from 'es-toolkit/compat'
 import {StoreProvider} from './plugins/shared/StoreContext'
 
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
@@ -144,7 +144,7 @@ const editorWrappers = new WeakMap()
 // determines if localStorage is available for our use.
 // see https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
 export function storageAvailable() {
-  let storage
+  let storage: Storage | null = null
   try {
     storage = window.localStorage
     const x = '__storage_test__'
@@ -176,7 +176,6 @@ function renderLoading() {
 let alertIdValue = 0
 
 interface RCEWrapperProps {
-  ai_text_tools?: boolean
   autosave?: {
     enabled?: boolean
     maxAge?: number
@@ -205,13 +204,13 @@ interface RCEWrapperProps {
   tinymce: typeof tinymce
   trayProps: RCETrayProps
   use_rce_icon_maker?: boolean
+  useHighContrast?: boolean
+  fontFamily?: string
   userCacheKey?: string
 }
 
 interface RCEWrapperState {
   a11yErrorsCount: number
-  AIToolsOpen: boolean
-  AITToolsFocusReturn: unknown
   alertId?: number
   announcement: string | null
   autoSavedContent: string
@@ -244,7 +243,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   _statusBarId: string
   _textareaEl?: HTMLTextAreaElement
   _effectiveContainingContext: RCETrayProps['containingContext']
-  AIToolsTray?: ReactNode
   editor: TinyMCEEditor | null
   initialContent?: string
   intersectionObserver?: IntersectionObserver
@@ -285,7 +283,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
 
   constructor(props: RCEWrapperProps) {
     super(props)
-    this.style = buildStyle()
+    this.style = buildStyle(!!props.useHighContrast, props.fontFamily)
 
     // Set up some limited global state that can be referenced
     // as needed in RCE's components and function / plugin definitions
@@ -358,7 +356,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         typeof IntersectionObserver === 'undefined' ||
         maxInitRenderedRCEs <= 0 ||
         currentRCECount < maxInitRenderedRCEs,
-      AIToolsOpen: false,
     }
     this._statusBarId = `${this.state.id}_statusbar`
 
@@ -389,8 +386,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     this.resizeObserver = new ResizeObserver(() => {
       this._handleFullscreenResize()
     })
-
-    this.AIToolsTray = undefined
 
     this._effectiveContainingContext = normalizeContainingContext(
       this.props.trayProps?.containingContext,
@@ -423,17 +418,19 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
       rce_find_replace = false,
+      rce_studio_embed_improvements = false,
+      rce_asr_captioning_improvements = false,
       file_verifiers_for_quiz_links = false,
-      consolidated_media_player = false,
     } = this.props.features
 
     return {
       new_math_equation_handling,
       explicit_latex_typesetting,
       rce_transform_loaded_content,
+      rce_studio_embed_improvements,
+      rce_asr_captioning_improvements,
       file_verifiers_for_quiz_links,
       rce_find_replace,
-      consolidated_media_player,
     }
   }
 
@@ -861,9 +858,13 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       window.visualViewport?.addEventListener('resize', this._handleFullscreenResize)
       this._handleFullscreenResize()
       // @ts-expect-error
-      this._focusRegion = FocusRegionManager.activateRegion(document[FS_ELEMENT], {
-        shouldContainFocus: true,
-      })
+      this._focusRegion = FocusRegionManager.activateRegion(
+        // @ts-expect-error
+        document[FS_ELEMENT],
+        {
+          shouldContainFocus: true,
+        },
+      )
     } else {
       event.target.removeEventListener(FS_CHANGEEVENT, this._onFullscreenChange)
       this.resizeObserver.unobserve(event.target)
@@ -1009,10 +1010,12 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           return
         }
 
-        const activeClass = document.activeElement && document.activeElement.getAttribute('class')
+        const activeClass = document.activeElement?.getAttribute('class')
         if (
           // @ts-expect-error
-          (event.focusedEditor === undefined || event.target.id === event.focusedEditor?.id) &&
+          (event.focusedEditor === undefined ||
+            // @ts-expect-error
+            event.target.id === event.focusedEditor?.id) &&
           activeClass?.includes('tox-')
         ) {
           // if a toolbar button has focus, then the user clicks on the "more" button
@@ -1154,6 +1157,35 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       tinyapp.setAttribute('aria-label', formatMessage('Rich Content Editor'))
       tinyapp.setAttribute('role', 'document')
       tinyapp.setAttribute('tabIndex', '-1')
+
+      // tinyMCE browser detection is wrong for Edge tinymce.Env.browser.isEdge
+      const isEdge = /edg/i.test(navigator.userAgent)
+      if (isEdge) {
+        // Edge translation service breaks the editor
+        tinyapp.setAttribute('translate', 'no')
+      }
+    }
+
+    // remove role="aplication" attribute from the iframe body
+    // tinymce adds this when the editor is wrapped in an iframe
+    // which makes RCE input fields inaccessible to screen readers
+    const iframe = tinyapp?.querySelector('iframe')
+    const body = iframe?.contentDocument?.body
+    if (body) {
+      const observer = new MutationObserver(() => {
+        try {
+          if (body && body.getAttribute('role') === 'application') {
+            body.removeAttribute('role')
+          }
+        } catch (_) {
+          /* pass */
+        }
+      })
+
+      observer.observe(body, {attributes: true, childList: false, subtree: false})
+      body.setAttribute('data-role-checked', 'true') // to trigger observer
+
+      setTimeout(() => observer.disconnect(), 10000)
     }
 
     // Probably should do this in tinymce.scss, but we only want it in new rce
@@ -1312,9 +1344,12 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   announcing = 0
+  _isMounted = false
 
   announceContextToolbars(editor: TinyMCEEditor) {
     editor.on('NodeChange', () => {
+      if (!this._isMounted) return
+
       const node = editor.selection.getNode()
       // @ts-expect-error
       if (isImageEmbed(node, editor)) {
@@ -1353,7 +1388,8 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     })
 
     editor.on('ResizeEditor', ({deltaY}) => {
-      if (!deltaY) return
+      if (!this._isMounted || !deltaY) return
+
       if (deltaY < 0) {
         this.setState({
           announcement: formatMessage('The height of Rich Content Area is decreased.'),
@@ -1387,7 +1423,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           if (autosavedContent !== editorContent) {
             this.setState({
               confirmAutoSave: true,
-              // @ts-expect-error
               autoSavedContent: patchAutosavedContent(autosaved.content),
             })
           } else {
@@ -1495,9 +1530,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
   /* *********** end autosave support *************** */
 
-  onWordCountUpdate = (e: {
-    wordCount: {words: number}
-  }) => {
+  onWordCountUpdate = (e: {wordCount: {words: number}}) => {
     if (!this.editor) return
     const shouldIgnore = countShouldIgnore(this.editor, 'body', 'words')
     const updatedCount = e.wordCount.words - shouldIgnore
@@ -1617,76 +1650,8 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     }
   }
 
-  handleAIClick = () => {
-    import('./plugins/shared/ai_tools')
-      .then(module => {
-        // @ts-expect-error
-        this.AIToolsTray = module.AIToolsTray
-
-        this.setState({
-          AIToolsOpen: true,
-          AITToolsFocusReturn: document.activeElement,
-        })
-      })
-      .catch(ex => {
-        console.error('Failed loading the AIToolsTray', ex)
-      })
-  }
-
-  closeAITools = () => {
-    this.setState({AIToolsOpen: false})
-  }
-
-  AIToolsExited = () => {
-    if (this.state.AITToolsFocusReturn === this.iframe) {
-      // launched using a kb shortcut
-      // the iframe has focus so we need to forward it on to tinymce editor
-      if (this.editor) {
-        this.editor.focus(false)
-      }
-    } else if (
-      this.state.AITToolsFocusReturn === document.getElementById(`show-on-focus-btn-${this.id}`)
-    ) {
-      // launched from showOnFocus button
-      // edge case where focusing KBShortcutFocusReturn doesn't work
-      this._showOnFocusButton?.focus()
-    } else {
-      // launched from kb shortcut button on status bar
-      // @ts-expect-error
-      this.state.AITToolsFocusReturn?.focus()
-    }
-  }
-
-  handleInsertAIContent = (content: string) => {
-    const editor = this.mceInstance()
-    contentInsertion.insertContent(editor, content)
-  }
-
-  handleReplaceAIContent = (content: string) => {
-    const ed = this.mceInstance()
-    const selection = ed.selection
-    if (selection.getContent().length > 0) {
-      selection.setContent(content)
-    } else {
-      ed.selection.select(ed.getBody(), true)
-      selection.setContent(content)
-    }
-  }
-
-  getCurrentContentForAI = () => {
-    const selected = this.mceInstance().selection.getContent()
-    return selected
-      ? {
-          type: 'selection',
-          content: selected,
-        }
-      : {
-          type: 'full',
-          content: this.mceInstance().getContent(),
-        }
-  }
-
   componentWillUnmount() {
+    this._isMounted = false
     if (this.state.shouldShowEditor) {
       window.clearTimeout(this.blurTimer)
       if (!this._destroyCalled) {
@@ -1839,6 +1804,8 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
           'a11y_checker',
           'wordcount',
           'instructure_wordcount',
+          'instructure_wordcount_header',
+          'instructure_keyboard_shortcuts_header',
           'instructure_studio_media_options',
           'instructure_rce_external_tools',
           ...pastePlugins,
@@ -1846,7 +1813,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
         ],
         // filter out the plugins designated for removal
         // @ts-expect-error
-        sanitizePlugins(options.plugins)?.filter(p => p.length > 0 && p[0] !== '-'),
+        sanitizePlugins(options.plugins)?.filter((p: string) => p.length > 0 && p[0] !== '-'),
         this.pluginsToExclude,
       ),
       textpattern_patterns: [
@@ -1904,6 +1871,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
   }
 
   componentDidMount() {
+    this._isMounted = true
     if (this.state.shouldShowEditor) {
       this.editorReallyDidMount()
     } else {
@@ -1979,7 +1947,7 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
     alert.id = alertIdValue++
     this.setState(state => {
       let messages = state.messages.concat(alert)
-      messages = _.uniqBy(messages, 'text') // Don't show the same message twice
+      messages = uniqBy(messages, 'text') // Don't show the same message twice
       return {messages}
     })
   }
@@ -2053,7 +2021,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
       )
     }
     const statusBarOptions: StatusBarOptions = {
-      aiTextTools: this.props.ai_text_tools,
       isDesktop: tinymce.Env.deviceType.isDesktop(),
       a11yResizers: !!this.props.features?.rce_a11y_resize,
     }
@@ -2152,7 +2119,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                     }
                     disabledPlugins={this.pluginsToExclude}
                     features={statusBarFeatures}
-                    onAI={this.handleAIClick}
                   />
                 )}
                 {this._effectiveContainingContext && (
@@ -2175,20 +2141,6 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                   onDismiss={this.closeKBShortcutModal}
                   open={this.state.KBShortcutModalOpen}
                 />
-                {this.props.ai_text_tools && this.AIToolsTray && (
-                  // @ts-expect-error
-                  <this.AIToolsTray
-                    open={this.state.AIToolsOpen}
-                    container={document.querySelector('[role="main"]')}
-                    mountNode={instuiPopupMountNodeFn}
-                    contextId={trayProps.contextId}
-                    contextType={trayProps.contextId}
-                    currentContent={this.getCurrentContentForAI()}
-                    onClose={this.closeAITools}
-                    onInsertContent={this.handleInsertAIContent}
-                    onReplaceContent={this.handleReplaceAIContent}
-                  />
-                )}
                 {this.state.confirmAutoSave ? (
                   <Suspense fallback={<Spinner renderTitle={renderLoading} size="small" />}>
                     <RestoreAutoSaveModal
@@ -2199,9 +2151,8 @@ class RCEWrapper extends React.Component<RCEWrapperProps, RCEWrapperState> {
                     />
                   </Suspense>
                 ) : null}
-                {/* @ts-expect-error */}
                 <Alert screenReaderOnly={true} liveRegion={this.props.liveRegion}>
-                  {this.state.announcement}
+                  {this.state.announcement || null}
                 </Alert>
               </div>
             )

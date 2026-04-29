@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 describe LtiOutbound::LTIModel do
   let(:dummy) do
     Class.new(LtiOutbound::LTIModel) do
@@ -46,11 +44,11 @@ describe LtiOutbound::LTIModel do
 
     it "caches the result of the executed proc" do
       model = dummy.new
-      obj = double(message: "message")
-      model.attribute = -> { obj.message }
+      called = 0
+      model.attribute = -> { called += 1 }
       2.times { model.attribute }
 
-      expect(obj).to have_received(:message).once
+      expect(called).to be 1
     end
   end
 end

@@ -83,6 +83,10 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
     padding: 0 1em 1em;
   }
 
+  body.content-only & {
+    padding: 0;
+  }
+
   body.ic-framed-lti-tool & {
     padding: 0 $ic-sp * 2;
 
@@ -244,11 +248,11 @@ body:not(.course-menu-expanded) {
   }
 
   @include desktop-only {
-    body:not(.no-headers):not(.content-only) & {
+    body:not(.no-headers):not(.content-only):not(.hide-global-nav) & {
       margin-#{direction(left)}: $ic-header-primary-width - 30;
     }
 
-    body:not(.no-headers):not(.content-only).primary-nav-expanded & {
+    body:not(.no-headers):not(.content-only):not(.hide-global-nav).primary-nav-expanded & {
       margin-#{direction(left)}: $ic-header-primary-width;
     }
   }
@@ -377,6 +381,11 @@ body:not(.course-menu-expanded) {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
+  }
+
+  .right-of-crumbs.right-of-crumbs-no-reverse {
+    flex-direction: unset;
+    justify-content: flex-end;
   }
 
   .right-of-crumbs>* {

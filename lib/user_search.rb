@@ -19,6 +19,16 @@
 
 module UserSearch
   class << self
+    def validate_enrollment_types(enrollment_types)
+      enrollment_types.map do |e|
+        ce = e.camelize
+        ce += "Enrollment" unless ce.end_with?("Enrollment")
+        raise RequestError.new("Invalid enrollment type: #{e}", 400) unless Enrollment.readable_types.key?(ce)
+
+        ce
+      end
+    end
+
     def for_user_in_context(search_term, context, searcher, session = nil, options = {})
       search_term = search_term.to_s
       return User.none if search_term.strip.empty?
@@ -33,8 +43,8 @@ module UserSearch
       @include_deleted_users = options[:include_deleted_users]
 
       context.shard.activate do
-        users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments))
-        users_scope = users_scope.from("(#{conditions_statement(search_term, context.root_account, users_scope)}) AS users")
+        users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments, :section_ids))
+        users_scope = users_scope.from("(#{conditions_statement(search_term, context, users_scope, searcher)}) AS users")
         users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
         users_scope = roles_scope(users_scope, context, options.slice(:enrollment_type,
                                                                       :enrollment_role,
@@ -42,12 +52,6 @@ module UserSearch
                                                                       :exclude_groups))
         differentiation_tag_scope(users_scope, context, searcher, options.slice(:differentiation_tag_id))
       end
-    end
-
-    def conditions_statement(search_term, root_account, users_scope)
-      pattern = like_string_for(search_term)
-      params = { pattern:, account: root_account, path_type: CommunicationChannel::TYPE_EMAIL, db_id: search_term }
-      complex_sql(users_scope, params)
     end
 
     def like_string_for(search_term)
@@ -63,12 +67,11 @@ module UserSearch
       users_scope = context_scope(context, searcher, options.slice(:enrollment_state,
                                                                    :include_inactive_enrollments,
                                                                    :enrollment_role_id,
-                                                                   :ui_invoked))
+                                                                   :section_ids))
       users_scope = roles_scope(users_scope, context, options.slice(:enrollment_role,
                                                                     :enrollment_role_id,
                                                                     :enrollment_type,
                                                                     :exclude_groups,
-                                                                    :ui_invoked,
                                                                     :temporary_enrollment_recipients,
                                                                     :temporary_enrollment_providers))
       users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
@@ -82,17 +85,36 @@ module UserSearch
       include_inactive_enrollments = !!options[:include_inactive_enrollments]
       case context
       when Account
-        users = User.of_account(context).active
-        users = users.union(context.pseudonym_users) if @include_deleted_users
-        users
+        account_scope(context, include_deleted_users: @include_deleted_users)
       when Course
         context.users_visible_to(searcher,
-                                 include_prior_enrollments,
+                                 include_priors: include_prior_enrollments,
                                  enrollment_state: enrollment_states,
-                                 include_inactive: include_inactive_enrollments).distinct
+                                 include_inactive: include_inactive_enrollments,
+                                 section_ids: options[:section_ids]).distinct
       else
         context.users_visible_to(searcher, include_inactive: include_inactive_enrollments).distinct
       end
+    end
+
+    def account_scope(account, include_deleted_users:)
+      uaa_user_ids = UserAccountAssociation.select(:user_id).where(account:).to_sql
+      pseudonym_user_ids = Pseudonym.select(:user_id).where(account:).to_sql
+
+      user_ids = include_deleted_users ? "#{uaa_user_ids} UNION #{pseudonym_user_ids}" : uaa_user_ids
+      user_filter = include_deleted_users ? { delete_me_frd: true } : { workflow_state: "deleted" }
+
+      User
+        .with(user_scope: Arel.sql(
+          <<~SQL.squish
+            WITH inner_user_scope AS MATERIALIZED (
+              #{user_ids}
+            )
+            SELECT user_id FROM inner_user_scope
+          SQL
+        ))
+        .joins("INNER JOIN user_scope ON users.id = user_scope.user_id")
+        .where.not(users: user_filter)
     end
 
     def order_scope(users_scope, context, options = {})
@@ -270,19 +292,13 @@ module UserSearch
         users_scope =
           if context.is_a?(Account)
             users_scope.where(id: Enrollment.select(:user_id)
-                       .where.not(enrollments: { workflow_state: %i[rejected inactive deleted] })
-                       .where(role_id: role_ids))
+                                  .where.not(enrollments: { workflow_state: %i[rejected inactive deleted] })
+                                  .where(role_id: role_ids))
           else
             users_scope.where(enrollments: { role_id: role_ids }).distinct
           end
       elsif enrollment_types
-        enrollment_types = enrollment_types.map do |e|
-          ce = e.camelize
-          ce += "Enrollment" unless ce.end_with?("Enrollment")
-          raise RequestError.new("Invalid enrollment type: #{e}", 400) unless Enrollment.readable_types.key?(ce)
-
-          ce
-        end
+        enrollment_types = validate_enrollment_types(enrollment_types)
 
         if context.is_a?(Account)
           # for example, one user can have multiple teacher enrollments, but
@@ -327,7 +343,6 @@ module UserSearch
 
       return users_scope unless differentiation_tag_ids&.any? &&
                                 context.is_a?(Course) &&
-                                context.account.feature_enabled?(:assign_to_differentiation_tags) &&
                                 context.account.allow_assign_to_differentiation_tags? &&
                                 context.grants_any_right?(searcher, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
 
@@ -342,6 +357,22 @@ module UserSearch
     end
 
     private
+
+    def conditions_statement(search_term, context, users_scope, searcher)
+      pattern = like_string_for(search_term)
+      params = { pattern:,
+                 account: context.root_account,
+                 path_type: CommunicationChannel::TYPE_EMAIL,
+                 db_id: search_term,
+                 searcher: }
+
+      if context.is_a?(Account)
+        # if the context is an Account, the scope is determined by the outer CTE
+        complex_sql(User.shard(context.shard).joins("INNER JOIN user_scope ON users.id = user_scope.user_id"), params)
+      else
+        complex_sql(users_scope, params)
+      end
+    end
 
     def value_to_boolean(value)
       Canvas::Plugin.value_to_boolean(value)
@@ -365,8 +396,6 @@ module UserSearch
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           #{"AND pseudonyms.workflow_state = 'active'" unless @include_deleted_users}")
                  .where(id: params[:db_id])
-                 .shard(Shard.current)
-                 .group(:id)
     end
 
     def ids_sql(users_scope, params)
@@ -386,11 +415,12 @@ module UserSearch
     end
 
     def name_sql(users_scope, params)
+      name_condition = ActiveRecord::Base.coalesced_wildcard("users.name", "users.short_name", params[:db_id])
       users_scope.select("users.*, MAX(pseudonyms.current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           #{"AND pseudonyms.workflow_state = 'active'" unless @include_deleted_users}")
-                 .where(like_condition("users.name"), pattern: params[:pattern])
+                 .where(name_condition)
     end
 
     def login_sql(users_scope, params)
@@ -443,38 +473,6 @@ module UserSearch
 
     def raise_context_error(field)
       raise RequestError.new("Sorting by #{field} is only available within a course context", 400)
-    end
-  end
-
-  class Bookmarker
-    attr_accessor :order
-
-    def initialize(order: nil)
-      self.order = (order.to_s == "desc") ? :desc : :asc
-    end
-
-    def bookmark_for(user)
-      user.id.to_s
-    end
-
-    def validate(bookmark)
-      bookmark =~ /^\d+$/
-    end
-
-    def restrict_scope(scope, pager)
-      if pager.current_bookmark
-        id = pager.current_bookmark.to_i
-        scope = scope.where("users.id #{comparison(pager.include_bookmark)} ?", id)
-      end
-      scope.order("users.id #{order}")
-    end
-
-    def comparison(include_bookmark)
-      if include_bookmark
-        (order == :desc) ? "<=" : ">="
-      else
-        (order == :desc) ? "<" : ">"
-      end
     end
   end
 end

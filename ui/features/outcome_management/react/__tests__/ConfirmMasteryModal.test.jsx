@@ -28,8 +28,8 @@ const defaultProps = () => ({
 })
 
 it('calls onClose and does not call onConfirm when canceled', () => {
-  const onConfirm = jest.fn()
-  const onClose = jest.fn()
+  const onConfirm = vi.fn()
+  const onClose = vi.fn()
   const {getByText} = render(
     <ConfirmMasteryModal {...defaultProps()} onConfirm={onConfirm} onClose={onClose} />,
   )
@@ -39,7 +39,7 @@ it('calls onClose and does not call onConfirm when canceled', () => {
 })
 
 it('does call onConfirm when saved', () => {
-  const onConfirm = jest.fn()
+  const onConfirm = vi.fn()
   const {getByText} = render(<ConfirmMasteryModal {...defaultProps()} onConfirm={onConfirm} />)
   fireEvent.click(getByText('Save'))
   expect(onConfirm).toHaveBeenCalled()

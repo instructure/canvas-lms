@@ -43,6 +43,7 @@ module Lti
 
       skip_before_action :load_user, only: :authorize_redirect
       skip_before_action :verify_authenticity_token, only: :authorize_redirect
+      skip_before_action :require_user, only: %i[authorize authorize_redirect]
 
       # Redirect the "authorize" action for the domain specified
       # in the lti_message_hint
@@ -96,15 +97,14 @@ module Lti
               account = context.account
             end
 
-            if !account.root_account.feature_enabled?(:lti_oidc_missing_cookie_retry) || params[:retried] == "true"
-              InstStatsd::Statsd.increment("lti.oidc_login_required_error", tags: {
-                                             account: account&.global_id,
-                                             client_id: oidc_params[:client_id],
-                                           })
+            if params[:retried] == "true"
+              Rails.logger.info("[LTI] OIDC login required error for account #{account&.global_id}, client_id #{oidc_params[:client_id]}")
+              InstStatsd::Statsd.increment("lti.oidc_login_required_error", tags: Utils::InstStatsdUtils::Tags.tags_for(account&.shard || Shard.current))
               render("lti/ims/authentication/login_required_error_screen", status: :unauthorized, layout: "borderless_lti", formats: :html)
             else
               # In some cases resubmitting the request from within Canvas can fix the missing cookie problem (see INTEROP-8868)
-              InstStatsd::Statsd.increment("lti.oidc_missing_cookie_retry", tags: { client_id: oidc_params[:client_id] })
+              Rails.logger.info("[LTI] OIDC missing cookie retry for account #{account&.global_id}, client_id #{oidc_params[:client_id]}")
+              InstStatsd::Statsd.increment("lti.oidc_missing_cookie_retry", tags: Utils::InstStatsdUtils::Tags.tags_for(account&.shard || Shard.current))
               @oidc_params = oidc_params
               render("lti/ims/authentication/missing_cookie_fix", status: :ok, layout: "borderless_lti", formats: :html)
             end
@@ -115,7 +115,8 @@ module Lti
           validate_launch_eligibility!
 
           if params[:retried] == "true"
-            InstStatsd::Statsd.increment("lti.oidc_missing_cookie_retry_worked", tags: { client_id: oidc_params[:client_id] })
+            Rails.logger.info("[LTI] OIDC missing cookie retry worked for client_id #{oidc_params[:client_id]}")
+            InstStatsd::Statsd.increment("lti.oidc_missing_cookie_retry_worked", tags: Utils::InstStatsdUtils::Tags.tags_for(account&.shard || Shard.current))
           end
 
           render(
@@ -135,7 +136,7 @@ module Lti
       def validate_client_id!
         binding_context = context.respond_to?(:account) ? context.account : context
 
-        unless developer_key.usable? && developer_key.account_binding_for(binding_context)&.workflow_state == "on"
+        unless developer_key.usable_in_context?(binding_context)
           set_oidc_error!("unauthorized_client", "Client not authorized in requested context")
         end
       end
@@ -175,7 +176,7 @@ module Lti
 
       def public_course?
         # Is the context published and public?
-        context.is_a?(Course) && context&.available? && context&.is_public?
+        context.is_a?(Course) && context&.available? && context.is_public?
       end
 
       def verifier
@@ -243,8 +244,12 @@ module Lti
             if uri.include? "?"
               # Verify the required query params are present
               required_params = CGI.parse(uri.split("?").last).to_a
-              requested_params = CGI.parse(requested_query_string).to_a
-              (required_params - requested_params).empty?
+              if requested_query_string.nil?
+                required_params.empty?
+              else
+                requested_params = CGI.parse(requested_query_string).to_a
+                (required_params - requested_params).empty?
+              end
             else
               uri == requested_redirect_base
             end

@@ -17,9 +17,12 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import type {QueryClient} from '@tanstack/react-query'
+import type {InfiniteData, QueryClient} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
+import {MODULE_ITEMS, MODULE_ITEMS_ALL, MODULES} from '../utils/constants'
+import {handleOpeningModuleUpdateTray} from './modulePageActionHandlers'
+import {ModulesResponse} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -28,8 +31,9 @@ export const handlePublishComplete = (
   moduleId: string,
   courseId: string,
 ) => {
-  queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
-  queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})
+  queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
+  queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+  queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, moduleId || '']})
 }
 
 export const handleDelete = (
@@ -50,7 +54,7 @@ export const handleDelete = (
             name: name,
           }),
         )
-        queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
+        queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
       })
       .catch(() => {
         showFlashError(I18n.t('Failed to remove module'))
@@ -78,7 +82,9 @@ export const handleDuplicate = (
           name: name,
         }),
       )
-      queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
+      queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, id]})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_ALL, id]})
     })
     .catch(() => {
       showFlashError(I18n.t('Failed to duplicate module'))
@@ -95,4 +101,11 @@ export const handleSendTo = (setIsDirectShareOpen: (isOpen: boolean) => void) =>
 
 export const handleCopyTo = (setIsDirectShareCourseOpen: (isOpen: boolean) => void) => {
   setIsDirectShareCourseOpen(true)
+}
+
+export const handleAddModule = (
+  courseId: string,
+  data: InfiniteData<ModulesResponse, unknown> | undefined,
+) => {
+  handleOpeningModuleUpdateTray(data, courseId, undefined)
 }

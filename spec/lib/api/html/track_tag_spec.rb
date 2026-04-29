@@ -27,13 +27,13 @@ module Api
         end
 
         let(:url_helper) do
-          double({
-                   show_media_tracks_url: "media/track/vtt"
-                 })
+          instance_double(Api::Html::UrlProxy,
+                          show_media_tracks_url: "media/track/vtt")
         end
 
         let(:media_track) do
-          double(
+          instance_double(
+            MediaTrack,
             kind: "subtitles",
             locale: "en",
             id: 1,

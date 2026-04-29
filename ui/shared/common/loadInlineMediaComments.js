@@ -42,7 +42,7 @@ const inlineMediaComment = {
   },
 
   getMediaAttachmentId($link) {
-    let attachmentId = $link.data('api-endpoint').split('/').pop()
+    let attachmentId = $link.data('api-endpoint')?.split('/').pop()
     if (!attachmentId || isNaN(attachmentId)) {
       const href = $link.attr('href')
       const regex = /\/files\/(\d+)/

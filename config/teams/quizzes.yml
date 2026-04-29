@@ -29,3 +29,5 @@ owned_globs:
   - ui/shared/quiz-legacy-client-apps/**/*
   - ui/shared/quiz-log-auditings/**/*
   - ui/shared/quizzes/**/*
+github:
+  team: ''

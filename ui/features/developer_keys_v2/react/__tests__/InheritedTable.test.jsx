@@ -21,6 +21,7 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import InheritedTable from '../InheritedTable'
 import 'jquery-migrate'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('InheritedTable', () => {
   let container
@@ -29,12 +30,20 @@ describe('InheritedTable', () => {
     container = document.createElement('div')
     container.id = 'fixtures'
     document.body.appendChild(container)
+
+    fakeENV.setup({
+      ...fakeENV.ENV,
+      FEATURES: {
+        lti_link_to_apps_from_developer_keys: false,
+      },
+    })
   })
 
   afterEach(() => {
     container.remove()
     window.ENV = {}
-    jest.clearAllMocks()
+    vi.clearAllMocks()
+    fakeENV.teardown()
   })
 
   const idFor = n => `1000000000000${n}`
@@ -57,17 +66,17 @@ describe('InheritedTable', () => {
       <InheritedTable
         label="Inherited Keys"
         prefix="inherited"
-        store={{dispatch: jest.fn()}}
+        store={{dispatch: vi.fn()}}
         actions={{
-          makeVisibleDeveloperKey: jest.fn(),
-          makeInvisibleDeveloperKey: jest.fn(),
-          activateDeveloperKey: jest.fn(),
-          deactivateDeveloperKey: jest.fn(),
-          deleteDeveloperKey: jest.fn(),
-          editDeveloperKey: jest.fn(),
-          developerKeysModalOpen: jest.fn(),
-          setBindingWorkflowState: jest.fn(),
-          updateDeveloperKey: jest.fn(),
+          makeVisibleDeveloperKey: vi.fn(),
+          makeInvisibleDeveloperKey: vi.fn(),
+          activateDeveloperKey: vi.fn(),
+          deactivateDeveloperKey: vi.fn(),
+          deleteDeveloperKey: vi.fn(),
+          editDeveloperKey: vi.fn(),
+          developerKeysModalOpen: vi.fn(),
+          setBindingWorkflowState: vi.fn(),
+          updateDeveloperKey: vi.fn(),
         }}
         developerKeysList={keyList || devKeyList()}
         ctx={{

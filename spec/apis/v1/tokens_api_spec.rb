@@ -25,7 +25,7 @@ describe TokensController, type: :request do
 
   describe "#destroy" do
     let_once(:user) { User.create!(workflow_state: "registered") }
-    let_once(:token) { user.access_tokens.create! }
+    let_once(:token) { user.access_tokens.create! purpose: "Test Access Token" }
 
     it "allows a user to delete their own tokens" do
       @user = user
@@ -67,9 +67,7 @@ describe TokensController, type: :request do
         Account.default.pseudonyms.create!(user:, unique_id: "unique@email.com")
       end
 
-      context "with admin_manage_access_tokens feature flag" do
-        before { Account.default.enable_feature!(:admin_manage_access_tokens) }
-
+      shared_examples_for "admin successfully deleting access tokens" do
         it "allows them to delete tokens" do
           api_call(:delete,
                    "/api/v1/users/#{user.id}/tokens/#{token.id}",
@@ -108,19 +106,7 @@ describe TokensController, type: :request do
         end
       end
 
-      context "without admin_manage_access_tokens feature flag" do
-        it "doesn't allow them to delete tokens" do
-          api_call(:delete,
-                   "/api/v1/users/#{user.id}/tokens/#{token.id}",
-                   controller: "tokens",
-                   action: "destroy",
-                   format: "json",
-                   user_id: user.id,
-                   id: token.id)
-          assert_status(404)
-          expect(token.reload).not_to be_deleted
-        end
-      end
+      it_behaves_like "admin successfully deleting access tokens"
     end
   end
 end

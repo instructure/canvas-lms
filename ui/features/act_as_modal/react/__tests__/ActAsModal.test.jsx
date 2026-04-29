@@ -19,9 +19,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import ActAsModal from '../ActAsModal'
-import ActAsMask from '../svg/ActAsMask'
-import ActAsPanda from '../svg/ActAsPanda'
-import {Button} from '@instructure/ui-buttons'
 
 const props = {
   user: {
@@ -91,7 +88,7 @@ describe('ActAsModal', () => {
 
   test('it should only display loading spinner if state is loading', async () => {
     const ref = React.createRef()
-    const {queryByText, getByText, rerender} = render(<ActAsModal {...props} ref={ref} />)
+    const {queryByText} = render(<ActAsModal {...props} ref={ref} />)
     expect(queryByText('Loading')).not.toBeInTheDocument()
 
     expect(queryByText('Loading')).not.toBeInTheDocument()

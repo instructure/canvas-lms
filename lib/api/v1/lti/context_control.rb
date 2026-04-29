@@ -43,7 +43,7 @@ module Api::V1::Lti::ContextControl
   # @return [Hash] the JSON representation of the context control
   def lti_context_control_json(context_control, user, session, context, calculated_attrs: {}, include_users: false)
     api_json(context_control, user, session, only: JSON_ATTRS).tap do |json|
-      json["context_name"] = context_control.context_name
+      json["context_name"] = calculated_attrs[:context_name] || context_control.context_name
       json["child_control_count"] = calculated_attrs[:child_control_count] || context_control.child_control_count
       json["subaccount_count"] = calculated_attrs[:subaccount_count] || context_control.subaccount_count
       json["course_count"] = calculated_attrs[:course_count] || context_control.course_count

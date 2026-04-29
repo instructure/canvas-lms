@@ -37,7 +37,7 @@ module UserLearningObjectScopes
     param_values
   end
 
-  def ignore_item!(asset, purpose, permanent = false)
+  def ignore_item!(asset, purpose, permanent: false)
     asset.ignores.upsert(
       { user_id: id, purpose:, permanent: },
       unique_by: %i[asset_id asset_type user_id purpose],
@@ -79,7 +79,7 @@ module UserLearningObjectScopes
                  end
 
         result &= course_ids if course_ids
-        result &= Array.wrap(contexts).select { |c| c.is_a?(Course) }.map(&:id) if contexts
+        result &= Array.wrap(contexts).grep(Course).map(&:id) if contexts
         result
       end
     end
@@ -93,7 +93,7 @@ module UserLearningObjectScopes
     shard.activate do
       result = cached_current_group_memberships_by_date.map(&:group_id)
       result &= group_ids if group_ids
-      result &= Array.wrap(contexts).select { |g| g.is_a?(Group) }.map(&:id) if contexts
+      result &= Array.wrap(contexts).grep(Group).map(&:id) if contexts
       result
     end
   end
@@ -185,16 +185,20 @@ module UserLearningObjectScopes
   )
     scope = object_type.constantize
     scope = scope.not_ignored_by(self, purpose) unless include_ignored
-    scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz"].include?(object_type)
+    scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz", "PeerReviewSubAssignment"].include?(object_type)
 
-    course_ids_by_account_id = Course.where(id: shard_course_ids).group(:account_id).pluck(Arel.sql("account_id, ARRAY_AGG(id)")).to_h
-    accounts_with_checkpoints, accounts_without_checkpoints = Account.where(id: course_ids_by_account_id.keys).partition(&:discussion_checkpoints_enabled?)
-    course_ids_with_checkpoints_enabled = accounts_with_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] }
-    course_ids_with_checkpoints_disabled = accounts_without_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] }
+    checkpoint_data = checkpoint_data_for_courses(shard_course_ids)
+    course_ids_with_checkpoints_enabled = checkpoint_data[:enabled]
+    course_ids_with_checkpoints_disabled = checkpoint_data[:disabled]
 
     scope = scope.for_course(course_ids_with_checkpoints_enabled) if object_type == "SubAssignment"
 
-    if ["Assignment", "SubAssignment"].include?(object_type)
+    if object_type == "PeerReviewSubAssignment"
+      courses_with_feature = Course.where(id: shard_course_ids).select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }.map(&:id)
+      scope = scope.for_course(courses_with_feature)
+    end
+
+    if %w[Assignment SubAssignment PeerReviewSubAssignment].include?(object_type)
       scope = (participation_type == :student) ? scope.published : scope.active
       scope = scope.expecting_submission unless include_ungraded
 
@@ -208,6 +212,27 @@ module UserLearningObjectScopes
     [scope, shard_course_ids, shard_group_ids]
   end
 
+  # Memoize to avoid repeating these queries for each of the 9 planner collections.
+  # Cache lives on the user instance but is keyed by course IDs, so it's safe
+  # across different course sets. Call clear_checkpoint_data_cache! if feature
+  # flags change mid-request (primarily relevant in tests).
+  def checkpoint_data_for_courses(shard_course_ids)
+    @checkpoint_data_cache ||= {}
+    cache_key = shard_course_ids.sort
+    @checkpoint_data_cache[cache_key] ||= begin
+      course_ids_by_account_id = Course.where(id: shard_course_ids).group(:account_id).pluck(Arel.sql("account_id, ARRAY_AGG(id)")).to_h
+      accounts_with_checkpoints, accounts_without_checkpoints = Account.where(id: course_ids_by_account_id.keys).partition(&:discussion_checkpoints_enabled?)
+      {
+        enabled: accounts_with_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] },
+        disabled: accounts_without_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] }
+      }
+    end
+  end
+
+  def clear_checkpoint_data_cache!
+    @checkpoint_data_cache = nil
+  end
+
   def assignments_for_student(
     purpose,
     limit: ULOS_DEFAULT_LIMIT,
@@ -216,10 +241,17 @@ module UserLearningObjectScopes
     cache_timeout: 120.minutes,
     include_locked: false,
     is_sub_assignment: false,
+    is_peer_review_sub_assignment: false,
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    object_type = is_sub_assignment ? "SubAssignment" : "Assignment"
+    object_type = if is_peer_review_sub_assignment
+                    "PeerReviewSubAssignment"
+                  elsif is_sub_assignment
+                    "SubAssignment"
+                  else
+                    "Assignment"
+                  end
     objects_needing(object_type,
                     purpose,
                     :student,
@@ -239,7 +271,7 @@ module UserLearningObjectScopes
       assignments = assignments.having_submissions_for_user(id) if purpose == "submitted"
       assignments = assignments.without_suppressed_assignments
       if purpose == "submitting"
-        assignments = assignments.submittable.or(assignments.where("assignments.user_due_date > ?", Time.zone.now))
+        assignments = assignments.submittable.or(assignments.where("submissions.cached_due_date > ?", Time.zone.now))
       end
       assignments = assignments.not_locked unless include_locked
       assignments
@@ -320,6 +352,13 @@ module UserLearningObjectScopes
       ar_scope = ar_scope.incomplete unless scope_only
       ar_scope = ar_scope.for_courses(shard_course_ids)
 
+      # Exclude courses using the new peer review allocation feature since
+      # those surface peer reviews via PeerReviewSubAssignment instead.
+      praa_course_ids = Course.where(id: shard_course_ids)
+                              .select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }
+                              .map(&:id)
+      ar_scope = ar_scope.where.not(assessor_asset: { course_id: praa_course_ids }) if praa_course_ids.any?
+
       # The below merging of scopes mimics a portion of the behavior for checking the access policy
       # for the submissions, ensuring that the user has access and can read & comment on them.
       # The check for making sure that the user is a participant in the course is already made
@@ -340,6 +379,39 @@ module UserLearningObjectScopes
       else
         result = limit ? ar_scope.take(limit) : ar_scope.to_a
         result
+      end
+    end
+  end
+
+  def peer_review_sub_assignments_needing_submitting(
+    limit: ULOS_DEFAULT_LIMIT,
+    due_after: 2.weeks.ago,
+    due_before: 2.weeks.from_now,
+    scope_only: false,
+    include_ignored: false,
+    **opts
+  )
+    params = _params_hash(binding)
+    opts.merge!(params.slice(:limit, :scope_only, :include_ignored))
+    objects_needing("PeerReviewSubAssignment", "submitting", :student, params, 15.minutes, **opts) do |prsa_scope, shard_course_ids|
+      courses_with_peer_review_feature = Course.where(id: shard_course_ids)
+                                               .select { |c| c.feature_enabled?(:peer_review_allocation_and_grading) }
+                                               .map(&:id)
+
+      prsa_scope = prsa_scope
+                   .for_course(courses_with_peer_review_feature)
+                   .published
+                   .need_submitting_info(id, nil)
+
+      prsa_scope = prsa_scope.where("assignments.due_at IS NULL OR assignments.due_at > ?", due_after) if due_after
+      prsa_scope = prsa_scope.where("assignments.due_at IS NULL OR assignments.due_at <= ?", due_before) if due_before
+
+      if scope_only
+        prsa_scope
+      elsif limit
+        prsa_scope.take(limit)
+      else
+        prsa_scope.to_a
       end
     end
   end
@@ -368,16 +440,29 @@ module UserLearningObjectScopes
               ).count
   end
 
-  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, is_sub_assignment: false, **opts)
+  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, is_sub_assignment: false, is_peer_review_sub_assignment: false, **opts)
     if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
-      scope = is_sub_assignment ? SubAssignment.none : Assignment.none
+      scope = if is_peer_review_sub_assignment
+                PeerReviewSubAssignment.none
+              elsif is_sub_assignment
+                SubAssignment.none
+              else
+                Assignment.none
+              end
       return scope_only ? scope : []
     end
 
     params = _params_hash(binding)
     params.delete(:is_sub_assignment)
+    params.delete(:is_peer_review_sub_assignment)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
-    object_type = is_sub_assignment ? "SubAssignment" : "Assignment"
+    object_type = if is_peer_review_sub_assignment
+                    "PeerReviewSubAssignment"
+                  elsif is_sub_assignment
+                    "SubAssignment"
+                  else
+                    "Assignment"
+                  end
     objects_needing(object_type, "grading", :manage_grades, params, 120.minutes, **params) do |assignment_scope|
       if Setting.get("assignments_needing_grading_new_style", "true") == "true"
         submissions_needing_grading = Submission.select(:assignment_id, :user_id)
@@ -403,7 +488,10 @@ module UserLearningObjectScopes
         as # This needs the below `select` somehow to work
       else
         GuardRail.activate(:secondary) do
-          as.lazy.reject { |a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
+          # improvement idea: restore laziness if necessary
+          assignments_arr = as.to_a
+          counts = Assignments::NeedsGradingCountQuery.new(assignments_arr, self).count
+          assignments_arr.reject { |a| counts[a.global_id] == 0 }.first(limit)
         end
       end
     end
@@ -433,8 +521,8 @@ module UserLearningObjectScopes
                               .where(final_grader: self, moderated_grading: true)
                               .where(assignments: { grades_published_at: nil })
                               .where(id: ModeratedGrading::ProvisionalGrade.joins(:submission)
-          .where("submissions.assignment_id=assignments.id")
-          .where(Submission.needs_grading_conditions).distinct.select(:assignment_id))
+                                         .where("submissions.assignment_id=assignments.id")
+                                         .where(Submission.needs_grading_conditions).distinct.select(:assignment_id))
                               .preload(:context)
       if scope_only
         scope # Also need to check the rights like below
@@ -470,10 +558,11 @@ module UserLearningObjectScopes
   )
     params = _params_hash(binding)
     objects_needing("WikiPage", "viewing", :student, params, 120.minutes, **opts) do |wiki_pages_context, shard_course_ids, shard_group_ids|
-      wiki_pages_context
-        .available_to_planner
-        .visible_to_user_in_courses_and_groups(self, shard_course_ids, shard_group_ids)
-        .todo_date_between(due_after, due_before)
+      # Filter by todo_date FIRST to reduce the dataset before expensive visibility check
+      scope = wiki_pages_context
+              .available_to_planner
+              .todo_date_between(due_after, due_before)
+      scope.visible_to_user_in_courses_and_groups(self, shard_course_ids, shard_group_ids)
     end
   end
   # rubocop:enable Style/ArgumentsForwarding

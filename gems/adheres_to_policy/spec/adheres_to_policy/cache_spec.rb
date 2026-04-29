@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
-
 # rubocop:disable Style/RedundantFetchBlock -- it's a cache, not a Hash
 describe AdheresToPolicy::Cache do
   def cached
@@ -29,7 +27,7 @@ describe AdheresToPolicy::Cache do
   describe "#fetch" do
     it "tries to read the key value" do
       AdheresToPolicy::Cache.write(:key, "value")
-      expect(AdheresToPolicy::Cache).to_not receive(:write)
+      expect(AdheresToPolicy::Cache).not_to receive(:write)
       value = AdheresToPolicy::Cache.fetch(:key) { "new_value" }
       expect(value).to eq ["value", :in_proc]
     end
@@ -42,7 +40,7 @@ describe AdheresToPolicy::Cache do
 
     it "does not write the key if the value is 'false'" do
       AdheresToPolicy::Cache.write(:key, false)
-      expect(AdheresToPolicy::Cache).to_not receive(:write)
+      expect(AdheresToPolicy::Cache).not_to receive(:write)
       value = AdheresToPolicy::Cache.fetch(:key) { "new_value" }
       expect(value).to eq [false, :in_proc]
     end
@@ -50,7 +48,7 @@ describe AdheresToPolicy::Cache do
     it "times generating the value and sets Thread.current[:last_cache_generate]" do
       Thread.current[:last_cache_generate] = nil
       AdheresToPolicy::Cache.fetch(:key) { "new_value" }
-      expect(Thread.current[:last_cache_generate]).to_not be_nil
+      expect(Thread.current[:last_cache_generate]).not_to be_nil
     end
 
     it "must forward the value pased for use_rails_cache to .read and .write" do
@@ -71,7 +69,7 @@ describe AdheresToPolicy::Cache do
     end
 
     it "must not write to the Rails cache when use_rails_cache is passed as false" do
-      expect(Rails.cache).to_not receive(:write)
+      expect(Rails.cache).not_to receive(:write)
       AdheresToPolicy::Cache.write("foo", "bar", use_rails_cache: false)
     end
   end
@@ -91,7 +89,7 @@ describe AdheresToPolicy::Cache do
     end
 
     it "must not attempt to read from the rails cache when use_rails_cache is passed as false" do
-      expect(Rails.cache).to_not receive(:read)
+      expect(Rails.cache).not_to receive(:read)
       expect(AdheresToPolicy::Cache.read(:key2, use_rails_cache: false)).to eq [nil, :out_of_proc]
     end
   end

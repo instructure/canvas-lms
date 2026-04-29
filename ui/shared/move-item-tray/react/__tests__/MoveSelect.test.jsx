@@ -22,6 +22,15 @@ import {screen as testScreen, render, waitFor} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import MoveSelect from '../MoveSelect'
+import {showFlashAlert} from '@instructure/platform-alerts'
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: vi.fn(),
+  }
+})
 
 const server = setupServer()
 
@@ -54,8 +63,8 @@ afterAll(() => {
 })
 
 const stubs = {
-  onSelect: jest.fn(),
-  onClose: jest.fn(),
+  onSelect: vi.fn(),
+  onClose: vi.fn(),
 }
 const defaultProps = (props = {}) => ({
   items: [
@@ -129,7 +138,7 @@ const setupRefForMultipleItems = () => {
 
 describe('MoveSelect', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     server.resetHandlers()
     window.ENV = {COURSE_ID: '123'}
 
@@ -206,9 +215,9 @@ describe('MoveSelect', () => {
       render(<MoveSelect {...props} />)
 
       await waitFor(() => {
-        const alert = testScreen.getByRole('alert')
-        expect(alert).toBeInTheDocument()
-        expect(alert).toHaveTextContent('Failed loading module items')
+        expect(showFlashAlert).toHaveBeenCalledWith(
+          expect.objectContaining({message: 'Failed loading module items'}),
+        )
       })
     })
   })

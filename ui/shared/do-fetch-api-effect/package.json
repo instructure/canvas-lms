@@ -1,7 +1,9 @@
 {
+  "type": "module",
   "name": "@canvas/do-fetch-api-effect",
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "index.ts"
+  "main": "index.ts",
+  "owner": "CFA"
 }

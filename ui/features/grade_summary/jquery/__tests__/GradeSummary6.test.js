@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import _ from 'lodash'
 import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -178,10 +177,10 @@ describe('GradeSummary - Revert Score', () => {
     $.fn.showIf = function () {
       return this
     }
-    $.screenReaderFlashMessageExclusive = jest.fn()
-    $.ajaxJSON = jest.fn()
+    $.screenReaderFlashMessageExclusive = vi.fn()
+    $.ajaxJSON = vi.fn()
     $.ajaxJSON.unhandledXHRs = []
-    $.ajaxJSON.storeRequest = jest.fn()
+    $.ajaxJSON.storeRequest = vi.fn()
 
     fakeENV.setup({
       submissions: createSubmissions(),
@@ -206,7 +205,7 @@ describe('GradeSummary - Revert Score', () => {
   afterEach(() => {
     fakeENV.teardown()
     $fixtures.innerHTML = ''
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('sets the .what_if_score text to the .original_score text', () => {

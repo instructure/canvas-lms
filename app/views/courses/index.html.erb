@@ -34,9 +34,13 @@ end %>
 <% load_enrollments_for_index %>
 <% @visible_groups ||= @current_user.visible_groups %>
 
-<% @favorite_course_ids =
-  @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
+<% @favorite_course_ids = @current_user.favorite_context_ids("Course") %>
 <% @show_star_column = show_favorites_col_for_index?(:current) %>
+<%
+  # TODO TEMPORARY TURNED OFF
+  @show_accessibility_column = false
+%>
+
 <div class="header-bar">
   <h1><%= all_courses_title %></h1>
 </div>
@@ -71,6 +75,7 @@ end %>
 <% if enrollments_for_index(:current).empty? %>
   <%= t("You are not enrolled in any courses.") %>
 <% else %>
+  <div class="table-overflow-container">
   <table
     id="my_courses_table"
     class="ic-Table ic-Table--bordered course-list-table"
@@ -122,6 +127,15 @@ end %>
           css:
             "course-list-published-column course-list-column-header course-list-no-left-border",
         ) %>
+        <% if @show_accessibility_column %>
+          <%= sortable_th(
+            table: "cc",
+            column: "accessibility",
+            label: t("Accessibility"),
+            css:
+              "course-list-accessibility-column course-list-column-header course-list-no-left-border",
+          ) %>
+        <% end %>
       </tr>
     </thead>
     <tbody>
@@ -134,6 +148,7 @@ end %>
       <% end %>
     </tbody>
   </table>
+  </div>
 <% end %>
 
 <% @show_star_column = show_favorites_col_for_index?(:past) %>
@@ -141,6 +156,7 @@ end %>
   <div class="content--hasMarginTop">
     <h2><%= t("headings.past_enrollments", "Past Enrollments") %></h2>
   </div>
+  <div class="table-overflow-container">
   <table
     id="past_enrollments_table"
     class="ic-Table ic-Table--bordered course-list-table"
@@ -192,6 +208,15 @@ end %>
           css:
             "course-list-published-column course-list-column-header course-list-no-left-border",
         ) %>
+        <% if @show_accessibility_column %>
+          <%= sortable_th(
+            table: "pc",
+            column: "accessibility",
+            label: t("Accessibility"),
+            css:
+              "course-list-accessibility-column course-list-column-header course-list-no-left-border",
+          ) %>
+        <% end %>
       </tr>
     </thead>
 
@@ -201,6 +226,7 @@ end %>
       <% end %>
     </tbody>
   </table>
+  </div>
 <% end %>
 
 <% @show_star_column = show_favorites_col_for_index?(:future) %>
@@ -259,6 +285,15 @@ end %>
           css:
             "course-list-published-column course-list-column-header course-list-no-left-border",
         ) %>
+        <% if @show_accessibility_column %>
+          <%= sortable_th(
+            table: "fc",
+            column: "accessibility",
+            label: t("Accessibility"),
+            css:
+              "course-list-accessibility-column course-list-column-header course-list-no-left-border",
+          ) %>
+        <% end %>
       </tr>
     </thead>
     <tbody>

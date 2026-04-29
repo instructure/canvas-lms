@@ -21,7 +21,7 @@ module Accessibility
   class Issue
     module AssignmentIssues
       def generate_assignment_resources(skip_scan: false)
-        assignments = context.assignments.active.order(updated_at: :desc)
+        assignments = context.assignments.active.not_excluded_from_accessibility_scan.order(updated_at: :desc)
         return assignments.map { |assignment| assignment_attributes(assignment) } if skip_scan
 
         assignments.each_with_object({}) do |assignment, issues|
@@ -34,14 +34,11 @@ module Accessibility
       private
 
       def assignment_attributes(assignment)
-        resource_path = polymorphic_path([context, assignment])
         {
           title: assignment.title,
           published: assignment.published?,
-          updated_at: assignment.updated_at&.iso8601 || "",
-          url: resource_path,
-          edit_url: "#{resource_path}/edit"
-        }
+          updated_at: assignment.updated_at&.iso8601 || ""
+        }.merge(resource_urls(assignment))
       end
     end
   end

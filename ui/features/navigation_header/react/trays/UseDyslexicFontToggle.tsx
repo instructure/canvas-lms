@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {bool} from 'prop-types'
 import React, {useEffect, useState, useRef} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@instructure/platform-alerts'
 import {canvasHighContrast} from '@instructure/ui-themes'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -131,17 +131,15 @@ export default function DyslexicFontToggle({isMobile}: DyslexicFontToggleProps) 
     const newState = enabled ? 'off' : 'on'
     setLoading(true)
     try {
-      const {json} = await doFetchApi({
+      const {json} = await doFetchApi<{feature: string; state: string}>({
         path,
         method: 'PUT',
         body: {feature: 'use_dyslexic_font', state: newState},
       })
-      // @ts-expect-error
-      if (json.feature !== 'use_dyslexic_font') throw new Error('Unexpected response from API call')
-      // @ts-expect-error
+      if (json?.feature !== 'use_dyslexic_font')
+        throw new Error('Unexpected response from API call')
       setEnabled(json.state === 'on')
-      // @ts-expect-error
-      ENV.use_dyslexic_font = json.state === 'on'
+      ;(ENV as {use_dyslexic_font: boolean}).use_dyslexic_font = json.state === 'on'
     } catch (err) {
       if (err instanceof Error) {
         showFlashAlert({
@@ -165,9 +163,10 @@ export default function DyslexicFontToggle({isMobile}: DyslexicFontToggleProps) 
         checked={enabled}
         readOnly={loading}
         onChange={toggleDyslexicFont}
+        aria-describedby={changed ? 'dyslexic-font-toggle-explainer' : undefined}
       />
       {changed && (
-        <Text size="small">
+        <Text id="dyslexic-font-toggle-explainer" size="small">
           {I18n.t('Reload the page or navigate to a new page for this change to take effect.')}
         </Text>
       )}

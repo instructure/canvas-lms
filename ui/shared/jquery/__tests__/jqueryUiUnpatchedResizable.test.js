@@ -39,7 +39,7 @@ describe('Resizable Widget', () => {
 
   it('triggers resize event', () => {
     const $resizableElement = $('#resizable-element')
-    const resizeHandler = jest.fn()
+    const resizeHandler = vi.fn()
 
     $resizableElement.on('resize', resizeHandler)
     $resizableElement.trigger('resize')

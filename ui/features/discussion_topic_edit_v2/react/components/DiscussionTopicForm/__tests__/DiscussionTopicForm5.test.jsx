@@ -21,7 +21,7 @@ import React from 'react'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
 import DiscussionTopicForm from '../DiscussionTopicForm'
 
-jest.mock('@canvas/rce/react/CanvasRce')
+vi.mock('@canvas/rce/react/CanvasRce')
 
 describe('DiscussionTopicForm', () => {
   const setup = ({
@@ -79,10 +79,11 @@ describe('DiscussionTopicForm', () => {
   })
 
   describe('Todo Date', () => {
+    // TODO: vi->vitest - test times out waiting for form submission, needs investigation
     it('clears todo date in submission when switching to graded', async () => {
-      const mockOnSubmit = jest.fn()
+      const mockOnSubmit = vi.fn()
       const todoDate = '2024-12-31T23:59:00Z'
-      const {getByRole, getByLabelText} = setup({
+      const {getByTestId} = setup({
         onSubmit: mockOnSubmit,
         currentDiscussionTopic: DiscussionTopic.mock({
           todoDate,
@@ -91,10 +92,10 @@ describe('DiscussionTopicForm', () => {
       })
 
       // Switch to graded
-      getByLabelText('Graded').click()
+      getByTestId('graded-checkbox').querySelector('input').click()
 
       // Submit form
-      getByRole('button', {name: 'Save'}).click()
+      getByTestId('save-button').click()
 
       // Verify submission
       expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -107,9 +108,9 @@ describe('DiscussionTopicForm', () => {
     })
 
     it('preserves todo date in ungraded mode', async () => {
-      const mockOnSubmit = jest.fn()
+      const mockOnSubmit = vi.fn()
       const todoDate = '2024-12-31T23:59:00Z'
-      const {getByRole} = setup({
+      const {getByTestId} = setup({
         onSubmit: mockOnSubmit,
         currentDiscussionTopic: DiscussionTopic.mock({
           todoDate,
@@ -118,7 +119,7 @@ describe('DiscussionTopicForm', () => {
       })
 
       // Submit form
-      getByRole('button', {name: 'Save'}).click()
+      getByTestId('save-button').click()
 
       // Verify submission
       expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -131,12 +132,14 @@ describe('DiscussionTopicForm', () => {
     })
   })
 
-  // returns 12:00 AM in jsdom 25
+  // FIXME: jsdom 25 changed how DateTimeInput generates timestamps when selecting dates,
+  // causing the midnight detection in isFancyMidnightNeeded to fail. The date picker now
+  // returns a different time value that doesn't trigger the 00:00:00 -> 23:59:00 conversion.
   it.skip('applies fancy midnight to assign reviews when needed', () => {
-    const {getByTestId, getByLabelText, getByText} = setup()
+    const {getByTestId, getByText} = setup()
 
-    getByLabelText('Graded').click()
-    getByLabelText('Automatically assign').click()
+    getByTestId('graded-checkbox').querySelector('input').click()
+    getByTestId('peer_review_auto').click()
 
     const dueDate = getByTestId('reviews-due-date')
     const dueTime = getByTestId('reviews-due-time')
@@ -151,10 +154,10 @@ describe('DiscussionTopicForm', () => {
   })
 
   it('does not apply fancy midnight to assign reviews when the user have other time set', () => {
-    const {getByTestId, getByLabelText, getByText} = setup()
+    const {getByTestId, getByText} = setup()
 
-    getByLabelText('Graded').click()
-    getByLabelText('Automatically assign').click()
+    getByTestId('graded-checkbox').querySelector('input').click()
+    getByTestId('peer_review_auto').click()
 
     const dueDate = getByTestId('reviews-due-date')
     const dueTime = getByTestId('reviews-due-time')
@@ -197,7 +200,7 @@ describe('DiscussionTopicForm', () => {
     })
 
     it('sets delayedPostAt and lockAt to null when checkpoints are enabled in a blueprint course', async () => {
-      const mockOnSubmit = jest.fn()
+      const mockOnSubmit = vi.fn()
       const availableFrom = '2024-12-31T10:00:00Z'
       const availableUntil = '2024-12-31T23:59:00Z'
 
@@ -224,7 +227,7 @@ describe('DiscussionTopicForm', () => {
     it('sets dates normally when checkpoints are disabled in a blueprint course', async () => {
       window.ENV.FEATURES.discussion_checkpoints = false
       window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
-      const mockOnSubmit = jest.fn()
+      const mockOnSubmit = vi.fn()
       const availableFrom = '2024-12-31T10:00:00Z'
       const availableUntil = '2024-12-31T23:59:00Z'
 

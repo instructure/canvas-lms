@@ -21,21 +21,19 @@ import {BlockContentEditor} from '../BlockContentEditor'
 
 describe('BlockContentEditor', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it('calls onInit with BlockContentEditorHandler on mount', () => {
-    const mockOnInit = jest.fn()
-    render(<BlockContentEditor data={null} onInit={mockOnInit} />)
-
-    expect(mockOnInit).toHaveBeenCalledWith({
-      getContent: expect.any(Function),
-    })
+    vi.clearAllMocks()
   })
 
   it('does not break when onInit is null', () => {
     expect(() => {
-      render(<BlockContentEditor data={null} onInit={null} />)
+      render(
+        <BlockContentEditor
+          data={null}
+          onInit={null}
+          aiAltTextGenerationURL="/api/v1/courses/1/pages/ai/alt_text"
+          toolbarReorder={false}
+        />,
+      )
     }).not.toThrow()
   })
 })

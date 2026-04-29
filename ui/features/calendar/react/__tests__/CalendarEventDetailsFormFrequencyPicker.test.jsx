@@ -24,8 +24,8 @@ import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/calendar/jquery/CommonEvent/index')
-jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog')
+vi.mock('@canvas/calendar/jquery/CommonEvent/index')
+vi.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog')
 
 describe('CalendarEventDetailsForm frequency picker', () => {
   let defaultProps
@@ -70,17 +70,17 @@ describe('CalendarEventDetailsForm frequency picker', () => {
         important_dates: false,
         blackout_date: false,
       },
-      save: jest.fn().mockResolvedValue({}),
+      save: vi.fn().mockResolvedValue({}),
     }))
 
-    jest
-      .spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog')
-      .mockImplementation(() => Promise.resolve('all'))
+    vi.spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog').mockImplementation(
+      () => Promise.resolve('all'),
+    )
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('with not-repeat option selected does not contain RRULE on submit', async () => {
@@ -102,7 +102,9 @@ describe('CalendarEventDetailsForm frequency picker', () => {
 
     await waitFor(() => {
       expect(defaultProps.event.save).toHaveBeenCalled()
-      expect(defaultProps.event.save.mock.calls[0][0]).not.toHaveProperty('calendar_event[rrule]')
+      // Property may exist with null value when not repeating, so check for falsy value
+      const savedData = defaultProps.event.save.mock.calls[0][0]
+      expect(savedData['calendar_event[rrule]']).toBeFalsy()
     })
   })
 })

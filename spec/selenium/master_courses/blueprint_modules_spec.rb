@@ -136,7 +136,7 @@ describe "master courses - child courses - module item locking" do
       expect(f("#context_module_item_#{@page_mod_tag.id} .lock-icon")).to contain_css(".icon-blueprint-lock")
       # should still have icon even without tag
       expect(f("#context_module_item_#{@topic_mod_tag.id} .lock-icon")).to contain_css(".icon-blueprint")
-      expect(f("#context_module_item_#{@header_tag.id}")).to_not contain_css(".icon-blueprint")
+      expect(f("#context_module_item_#{@header_tag.id}")).not_to contain_css(".icon-blueprint")
     end
   end
 end

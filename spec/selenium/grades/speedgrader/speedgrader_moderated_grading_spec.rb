@@ -81,6 +81,8 @@ describe "SpeedGrader" do
       time2 = 10.minutes.from_now
       Timecop.freeze(time2) do
         submit_comment "srsly"
+        # wait for comment to save and submission to update
+        expect { SubmissionComment.where(submission: @submission, comment: "srsly").any? }.to become(true)
       end
       @submission.reload
       expect(@submission.updated_at.to_i).to eq time2.to_i
@@ -93,7 +95,7 @@ describe "SpeedGrader" do
       expect(pg.submission_comments.map(&:comment)).to include "srsly"
     end
 
-    it "creates rubric assessments for the provisional grade" do
+    it "creates rubric assessments for the provisional grade", :ignore_js_errors do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       comment = "some silly comment"
@@ -125,7 +127,7 @@ describe "SpeedGrader" do
       @is_moderator = true
     end
 
-    include_examples "moderated grading"
+    it_behaves_like "moderated grading"
   end
 
   context "as a provisional grader" do
@@ -134,7 +136,7 @@ describe "SpeedGrader" do
       @is_moderator = false
     end
 
-    include_examples "moderated grading"
+    it_behaves_like "moderated grading"
 
     it "does not lock a provisional grader out if graded by self" do
       @assignment.moderation_graders.create!(user: @ta, anonymous_id: "12345")
@@ -142,7 +144,7 @@ describe "SpeedGrader" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(f("#grading-box-extended")).to be_displayed
-      expect(f("#not_gradeable_message")).to_not be_displayed
+      expect(f("#not_gradeable_message")).not_to be_displayed
     end
 
     it "locks a provisional grader out if graded by someone else" do
@@ -162,7 +164,7 @@ describe "SpeedGrader" do
       f("#speedgrader_iframe")
       # not locked yet
       expect(f("#grading-box-extended")).to be_displayed
-      expect(f("#not_gradeable_message")).to_not be_displayed
+      expect(f("#not_gradeable_message")).not_to be_displayed
 
       # go to next student
       f("#next-student-button").click
@@ -176,7 +178,7 @@ describe "SpeedGrader" do
       wait_for_ajaximations
 
       # should be locked now
-      expect(f("#grading-box-extended")).to_not be_displayed
+      expect(f("#grading-box-extended")).not_to be_displayed
       expect(f("#not_gradeable_message")).to be_displayed
     end
 
@@ -188,7 +190,7 @@ describe "SpeedGrader" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(f("#grading-box-extended")).to be_displayed
-      expect(f("#not_gradeable_message")).to_not be_displayed
+      expect(f("#not_gradeable_message")).not_to be_displayed
     end
 
     it "does not lock a provisional grader out if someone else graded but grader is final grader" do
@@ -199,7 +201,7 @@ describe "SpeedGrader" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       expect(f("#grading-box-extended")).to be_displayed
-      expect(f("#not_gradeable_message")).to_not be_displayed
+      expect(f("#not_gradeable_message")).not_to be_displayed
     end
   end
 end

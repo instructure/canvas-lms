@@ -16,57 +16,55 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {legacyRender} from '@canvas/react'
 
 import K5Course from './react/K5Course'
-import {registerK5Theme} from '@canvas/k5/react/k5-theme'
+import {K5ThemeProvider} from '@canvas/k5/react/K5ThemeProvider'
 import ready from '@instructure/ready'
-
-registerK5Theme()
 
 ready(() => {
   const courseContainer = document.getElementById('course-dashboard-container')
   if (courseContainer) {
-    ReactDOM.render(
-      <K5Course
-        canManage={ENV.PERMISSIONS.manage}
-        canManageGroups={ENV.PERMISSIONS.manage_groups}
-        canReadAsAdmin={ENV.PERMISSIONS.read_as_admin}
-        canReadAnnouncements={ENV.PERMISSIONS.read_announcements}
-        currentUser={ENV.current_user}
-        id={ENV.COURSE.id}
-        bannerImageUrl={ENV.COURSE.banner_image_url}
-        cardImageUrl={ENV.COURSE.image_url}
-        color={ENV.COURSE.color}
-        name={ENV.COURSE.name}
-        plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
-        timeZone={ENV.TIMEZONE}
-        courseOverview={ENV.COURSE.course_overview}
-        userIsStudent={ENV.COURSE.is_student_or_fake_student}
-        hideFinalGrades={ENV.COURSE.hide_final_grades}
-        showLearningMasteryGradebook={
-          ENV.COURSE.student_outcome_gradebook_enabled && ENV.COURSE.is_student_or_fake_student
-        }
-        outcomeProficiency={ENV.COURSE.outcome_proficiency}
-        showStudentView={ENV.COURSE.show_student_view}
-        studentViewPath={ENV.COURSE.student_view_path}
-        tabs={ENV.TABS}
-        settingsPath={ENV.COURSE.settings_path}
-        groupsPath={ENV.COURSE.groups_path}
-        latestAnnouncement={ENV.COURSE.latest_announcement}
-        pagesPath={ENV.COURSE.pages_url}
-        hasWikiPages={ENV.COURSE.has_wiki_pages}
-        hasSyllabusBody={ENV.COURSE.has_syllabus_body}
-        observedUsersList={ENV.OBSERVED_USERS_LIST}
-        selfEnrollment={ENV.COURSE.self_enrollment}
-        tabContentOnly={ENV.TAB_CONTENT_ONLY}
-        isMasterCourse={ENV.BLUEPRINT_COURSES_DATA?.isMasterCourse}
-        showImmersiveReader={ENV.SHOW_IMMERSIVE_READER}
-        gradingScheme={ENV.GRADING_SCHEME}
-        pointsBasedGradingScheme={ENV.POINTS_BASED}
-        restrictQuantitativeData={ENV.RESTRICT_QUANTITATIVE_DATA}
-        scalingFactor={ENV.SCALING_FACTOR}
-      />,
+    legacyRender(
+      <K5ThemeProvider>
+        <K5Course
+          canManage={ENV.PERMISSIONS.manage}
+          canManageGroups={ENV.PERMISSIONS.manage_groups}
+          canReadAsAdmin={ENV.PERMISSIONS.read_as_admin}
+          canReadAnnouncements={ENV.PERMISSIONS.read_announcements}
+          currentUser={ENV.current_user}
+          id={ENV.COURSE.id}
+          bannerImageUrl={ENV.COURSE.banner_image_url}
+          cardImageUrl={ENV.COURSE.image_url}
+          color={ENV.COURSE.color}
+          name={ENV.COURSE.name}
+          plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
+          timeZone={ENV.TIMEZONE}
+          courseOverview={ENV.COURSE.course_overview}
+          userIsStudent={ENV.COURSE.is_student_or_fake_student}
+          hideFinalGrades={ENV.COURSE.hide_final_grades}
+          showLearningMasteryGradebook={ENV.COURSE.student_outcome_gradebook_enabled}
+          outcomeProficiency={ENV.COURSE.outcome_proficiency}
+          showStudentView={ENV.COURSE.show_student_view}
+          studentViewPath={ENV.COURSE.student_view_path}
+          tabs={ENV.TABS}
+          settingsPath={ENV.COURSE.settings_path}
+          groupsPath={ENV.COURSE.groups_path}
+          latestAnnouncement={ENV.COURSE.latest_announcement}
+          pagesPath={ENV.COURSE.pages_url}
+          hasWikiPages={ENV.COURSE.has_wiki_pages}
+          hasSyllabusBody={ENV.COURSE.has_syllabus_body}
+          observedUsersList={ENV.OBSERVED_USERS_LIST}
+          selfEnrollment={ENV.COURSE.self_enrollment}
+          tabContentOnly={ENV.TAB_CONTENT_ONLY}
+          isMasterCourse={ENV.BLUEPRINT_COURSES_DATA?.isMasterCourse}
+          showImmersiveReader={ENV.SHOW_IMMERSIVE_READER}
+          gradingScheme={ENV.GRADING_SCHEME}
+          pointsBasedGradingScheme={ENV.POINTS_BASED}
+          restrictQuantitativeData={ENV.RESTRICT_QUANTITATIVE_DATA}
+          scalingFactor={ENV.SCALING_FACTOR}
+        />
+      </K5ThemeProvider>,
       courseContainer,
     )
   }

@@ -23,10 +23,10 @@ import Actions from '../../actions'
 import CourseImageSelector from '../CourseImageSelector'
 import initialState from '../../store/initialState'
 
-jest.mock('../../actions')
+vi.mock('../../actions')
 
 afterEach(() => {
-  jest.resetAllMocks()
+  vi.resetAllMocks()
 })
 
 describe('CourseImageSelector', () => {
@@ -37,8 +37,8 @@ describe('CourseImageSelector', () => {
   }
 
   const fakeStore = () => ({
-    subscribe: jest.fn(),
-    dispatch: jest.fn(),
+    subscribe: vi.fn(),
+    dispatch: vi.fn(),
     getState: () => initialState,
   })
 
@@ -49,7 +49,7 @@ describe('CourseImageSelector', () => {
 
   it('sets the background image style properly', () => {
     const store = fakeStore()
-    store.getState = jest.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
+    store.getState = vi.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
     const {container} = render(<CourseImageSelector {...defaultProps} store={store} />)
 
     const element = container.querySelector('.CourseImageSelector')
@@ -64,11 +64,11 @@ describe('CourseImageSelector', () => {
       gettingImage: false,
       removingImage: false,
     }
-    store.getState = jest.fn().mockReturnValue(mockState)
+    store.getState = vi.fn().mockReturnValue(mockState)
 
     // Mock the subscribe callback to trigger state updates
     let subscribeCallback
-    store.subscribe = jest.fn(callback => {
+    store.subscribe = vi.fn(callback => {
       subscribeCallback = callback
     })
 
@@ -86,7 +86,7 @@ describe('CourseImageSelector', () => {
 
   it('adds the wide classname if the wide prop is true', () => {
     const store = fakeStore()
-    store.getState = jest.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
+    store.getState = vi.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
     const {container} = render(<CourseImageSelector {...defaultProps} store={store} wide={true} />)
 
     const wrapper = container.querySelector('.CourseImageSelectorWrapper')
@@ -95,9 +95,10 @@ describe('CourseImageSelector', () => {
 
   it('passes the setting prop to actions', () => {
     const store = fakeStore()
-    store.getState = jest.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
+    store.getState = vi.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
+    const getCourseImageSpy = vi.spyOn(Actions, 'getCourseImage').mockReturnValue({})
     render(<CourseImageSelector {...defaultProps} setting="banner_image" store={store} />)
 
-    expect(Actions.getCourseImage).toHaveBeenCalledWith('1', 'banner_image')
+    expect(getCourseImageSpy).toHaveBeenCalledWith('1', 'banner_image')
   })
 })

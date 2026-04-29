@@ -40,7 +40,7 @@ const setUp = (propOverrides = {}) => {
 
 describe('AssignmentHeader', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('title', () => {
@@ -59,6 +59,23 @@ describe('AssignmentHeader', () => {
       expect(queryByTestId('assignment-heading')).toBeInTheDocument()
       // @ts-expect-error
       expect(queryByTestId('assignment-heading')).toHaveTextContent(mockAssignment().name)
+    })
+  })
+
+  describe('Grading Progress', () => {
+    it('renders grading progress in saved view', () => {
+      const {getByTestId} = setUp()
+      expect(getByTestId('submission-grading-progress')).toBeInTheDocument()
+    })
+
+    it('does not render grading progress in create view', () => {
+      const {queryByTestId} = setUp({type: 'create'})
+      expect(queryByTestId('submission-grading-progress')).not.toBeInTheDocument()
+    })
+
+    it('does not render grading progress in edit view', () => {
+      const {queryByTestId} = setUp({type: 'edit'})
+      expect(queryByTestId('submission-grading-progress')).not.toBeInTheDocument()
     })
   })
 

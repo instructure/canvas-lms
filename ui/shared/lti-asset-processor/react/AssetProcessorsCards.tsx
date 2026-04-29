@@ -20,7 +20,6 @@ import type {AssetProcessorWindowSettings} from '@canvas/lti/model/AssetProcesso
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDefault'
-import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
 import type {IframeDimensions} from '@canvas/lti/model/common'
 import type {Spacing} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
@@ -29,7 +28,7 @@ import {IconExternalLinkLine, IconMoreLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {isNil} from 'lodash'
+import {isNil} from 'es-toolkit/compat'
 import {useState} from 'react'
 
 const I18n = createI18nScope('asset_processors_selection')
@@ -38,7 +37,7 @@ type AttachedAssetProcessorsMenuProps = {
   modifyInNewWindow: boolean
   nameForScreenReader: string
   onModify?: () => void
-  onDelete: () => void
+  onRemove: () => void
 }
 
 type AssetProcessorsCardCommonProps = {
@@ -60,7 +59,7 @@ type AssetProcessorsCardProps = AssetProcessorsCardCommonProps & {
 
 type AssetProcessorsAttachedProcessorCardProps = AssetProcessorsCardCommonProps & {
   assetProcessorId?: number
-  onDelete: () => void
+  onRemove: () => void
   iframeSettings?: IframeDimensions
   windowSettings?: AssetProcessorWindowSettings
 }
@@ -69,7 +68,7 @@ const AttachedAssetProcessorsMenu = ({
   modifyInNewWindow,
   nameForScreenReader,
   onModify,
-  onDelete,
+  onRemove,
 }: AttachedAssetProcessorsMenuProps) => {
   return (
     <Menu
@@ -86,8 +85,8 @@ const AttachedAssetProcessorsMenu = ({
         />
       }
       onSelect={(_e, value) => {
-        if (value === 'delete') {
-          onDelete()
+        if (value === 'remove') {
+          onRemove()
         } else if (value === 'modify') {
           onModify?.()
         }
@@ -107,8 +106,8 @@ const AttachedAssetProcessorsMenu = ({
           </View>
         </Menu.Item>
       )}
-      <Menu.Item data-pendo="asset-processor-delete-button" value="delete">
-        <View padding="0 x-large 0 small">{I18n.t('Delete')}</View>
+      <Menu.Item data-pendo="asset-processor-remove-button" value="remove">
+        <View padding="0 x-large 0 small">{I18n.t('Remove')}</View>
       </Menu.Item>
     </Menu>
   )
@@ -117,7 +116,7 @@ const AttachedAssetProcessorsMenu = ({
 export const AssetProcessorsAttachedProcessorCard = ({
   assetProcessorId,
   iframeSettings,
-  onDelete,
+  onRemove,
   windowSettings,
   ...commonProps
 }: AssetProcessorsAttachedProcessorCardProps) => {
@@ -153,7 +152,7 @@ export const AssetProcessorsAttachedProcessorCard = ({
     <>
       <ExternalToolModalLauncher
         isOpen={settingsLaunchModalVisible}
-        title={I18n.t('Modify settings for %{documentProcessingAppName}', {
+        title={I18n.t('Modify Settings for %{documentProcessingAppName}', {
           documentProcessingAppName: title,
         })}
         onRequestClose={() => setSettingsLaunchModalVisible(false)}
@@ -169,7 +168,7 @@ export const AssetProcessorsAttachedProcessorCard = ({
               nameForScreenReader={title}
               onModify={isNil(assetProcessorId) ? undefined : onModify}
               modifyInNewWindow={modifyInNewWindow}
-              onDelete={onDelete}
+              onRemove={onRemove}
             />
           </div>
         }
@@ -186,67 +185,65 @@ export const AssetProcessorsCard = ({
   onClick,
   extraColumns,
   margin,
-}: AssetProcessorsCardProps) => (
-  <View
-    data-pendo="asset-processor-add-modal-tool"
-    data-testid="asset-processor-card"
-    aria-label={title}
-    as="div"
-    background="secondary"
-    borderRadius="medium"
-    borderWidth="none"
-    {...(onClick ? {cursor: 'pointer'} : undefined)}
-    margin={margin}
-    onClick={onClick}
-    padding="mediumSmall"
-    position="relative"
-    role={onClick ? 'button' : undefined}
-    tabIndex={onClick ? 0 : undefined}
-  >
-    <Flex direction="column" height="100%">
-      <Flex
-        margin="0"
-        {...{
-          alignItems: description ? 'start' : undefined,
-        }}
-      >
-        <div style={{borderRadius: '8px', overflow: 'hidden', flex: 'none'}}>
-          <ToolIconOrDefault
-            size={36}
-            toolId={icon.toolId}
-            margin={1}
-            marginRight="1.4em"
-            toolName={icon.toolName}
-            iconUrl={icon.url}
-          />
-        </div>
-        <div style={{overflow: 'hidden', flex: 1}}>
-          <div style={{marginRight: '1.4em'}}>
-            <TruncateWithTooltip
-              linesAllowed={2}
-              horizontalOffset={0}
-              backgroundColor="primary-inverse"
-            >
-              <Text weight="bold" size="medium">
+}: AssetProcessorsCardProps) => {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (onClick && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault()
+      onClick()
+    }
+  }
+
+  return (
+    <View
+      data-pendo="asset-processor-add-modal-tool"
+      data-testid="asset-processor-card"
+      aria-label={title}
+      as="div"
+      background="secondary"
+      borderRadius="medium"
+      borderWidth="none"
+      {...(onClick ? {cursor: 'pointer'} : undefined)}
+      margin={margin}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      padding="mediumSmall"
+      position="relative"
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
+      <Flex direction="column" height="100%">
+        <Flex
+          margin="0"
+          {...{
+            alignItems: description ? 'start' : undefined,
+          }}
+        >
+          <div style={{borderRadius: '8px', overflow: 'hidden', flex: 'none'}}>
+            <ToolIconOrDefault
+              size={36}
+              toolId={icon.toolId}
+              margin={1}
+              marginRight="1.4em"
+              toolName={icon.toolName}
+              iconUrl={icon.url}
+            />
+          </div>
+          <div style={{flex: 1}}>
+            <div style={{marginRight: '1.4em'}}>
+              <Text weight="bold" size="medium" wrap="break-word">
                 {title}
               </Text>
-            </TruncateWithTooltip>
-          </div>
-          {description ? (
-            <div style={{marginTop: '0.75em', marginRight: '1.4em'}}>
-              <TruncateWithTooltip
-                linesAllowed={4}
-                horizontalOffset={0}
-                backgroundColor="primary-inverse"
-              >
-                {description}
-              </TruncateWithTooltip>
             </div>
-          ) : null}
-          {children}
-        </div>
-        {extraColumns}
+            {description ? (
+              <div style={{marginRight: '1.4em'}}>
+                <Text wrap="break-word">{description}</Text>
+              </div>
+            ) : null}
+            {children}
+          </div>
+          {extraColumns}
+        </Flex>
       </Flex>
-    </Flex>
-  </View>
-)
+    </View>
+  )
+}

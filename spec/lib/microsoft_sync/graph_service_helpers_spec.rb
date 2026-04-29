@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../spec_helper"
-
 describe MicrosoftSync::GraphServiceHelpers do
   subject { described_class.new("mytenant123", extra_tag: "abc") }
 
@@ -192,7 +190,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       course_model(public_description: "classic", name: "algebra", sis_source_id: "ALG-101")
       # force generation of lti context id (normally done lazily)
       lti_context_id = Lti::V1p1::Asset.opaque_identifier_for(@course)
-      expect(lti_context_id).to_not be_nil
+      expect(lti_context_id).not_to be_nil
       expect(graph_service.groups).to receive(:update).with(
         "msgroupid",
         microsoft_EducationClassLmsExt: {

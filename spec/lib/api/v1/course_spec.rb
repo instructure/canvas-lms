@@ -119,5 +119,65 @@ describe Api::V1::Course do
         expect(hash["post_manually"]).not_to be_present
       end
     end
+
+    describe "accessibility_course_statistic" do
+      before :once do
+        account_model
+        course_factory(account: @account)
+      end
+
+      before do
+        @account.enable_feature!(:a11y_checker)
+        Account.site_admin.enable_feature!(:a11y_checker_account_statistics)
+      end
+
+      it "is included when requested and feature flags are enabled" do
+        account_admin_user(account: @account)
+        statistic = AccessibilityCourseStatistic.create!(
+          course: @course,
+          active_issue_count: 5,
+          workflow_state: "active"
+        )
+        hash = course_json(@course, @user, nil, ["accessibility_course_statistic"], nil)
+        expect(hash["accessibility_course_statistic"]).to be_present
+        expect(hash["accessibility_course_statistic"]["id"]).to eq statistic.id
+        expect(hash["accessibility_course_statistic"]["active_issue_count"]).to eq 5
+      end
+
+      it "is not included when accessibility_course_statistic is not present in includes parameter" do
+        account_admin_user(account: @account)
+        AccessibilityCourseStatistic.create!(
+          course: @course,
+          active_issue_count: 5,
+          workflow_state: "active"
+        )
+        hash = course_json(@course, @user, nil, [], nil)
+        expect(hash["accessibility_course_statistic"]).not_to be_present
+      end
+
+      it "does not include accessibility_course_statistic when a11y_checker_account_statistics is disabled" do
+        Account.site_admin.disable_feature!(:a11y_checker_account_statistics)
+        account_admin_user(account: @account)
+        AccessibilityCourseStatistic.create!(
+          course: @course,
+          active_issue_count: 5,
+          workflow_state: "active"
+        )
+        hash = course_json(@course, @user, nil, ["accessibility_course_statistic"], nil)
+        expect(hash["accessibility_course_statistic"]).not_to be_present
+      end
+
+      it "does not include accessibility_course_statistic when a11y_checker is disabled" do
+        @account.disable_feature!(:a11y_checker)
+        account_admin_user(account: @account)
+        AccessibilityCourseStatistic.create!(
+          course: @course,
+          active_issue_count: 5,
+          workflow_state: "active"
+        )
+        hash = course_json(@course, @user, nil, ["accessibility_course_statistic"], nil)
+        expect(hash["accessibility_course_statistic"]).not_to be_present
+      end
+    end
   end
 end

@@ -22,7 +22,7 @@ import {ExportProgressBar, type ExportProgressBarProps} from '../ExportProgressB
 import {render, fireEvent} from '@testing-library/react'
 import GradebookExportManager from '../../../shared/GradebookExportManager'
 
-jest.mock('../../../shared/GradebookExportManager')
+vi.mock('../../../shared/GradebookExportManager')
 
 describe('ExportProgressBar', () => {
   const defaultParams: ExportProgressBarProps = {
@@ -68,7 +68,7 @@ describe('ExportProgressBar', () => {
   })
 
   it('handles cancel export on click', () => {
-    $.flashWarning = jest.fn()
+    $.flashWarning = vi.fn()
     const exportManager: GradebookExportManager = new GradebookExportManager('', '', '')
     const params = {...defaultParams, exportManager}
     const {container} = render(<ExportProgressBar {...params} />)

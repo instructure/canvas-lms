@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, { useCallback, useEffect, useState } from 'react'
-import { SimpleSelect } from '@instructure/ui-simple-select'
-import { ScreenReaderContent } from '@instructure/ui-a11y-content'
-import { useScope as createI18nScope } from '@canvas/i18n'
-import { IconCheckLine } from '@instructure/ui-icons'
+import React, {useCallback, useEffect, useState} from 'react'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {IconCheckLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('discussions_posts')
 const getSortConfig = () => {
@@ -38,28 +38,32 @@ interface SortFilterDropDownProps {
   width?: string
 }
 
-const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({ isLocked, selectedSortType, onSortClick, width }) => {
+const SortOrderDropDown: React.FC<SortFilterDropDownProps> = ({
+  isLocked,
+  selectedSortType,
+  onSortClick,
+  width,
+}) => {
   const [actualSortType, setActualSortType] = useState(selectedSortType)
 
   useEffect(() => {
     setActualSortType(selectedSortType)
   }, [selectedSortType])
 
-  const handleSortOrderTypeChange =
-    (
-      _event: React.SyntheticEvent,
-      data: {
-        value?: string | number
-        id?: string
-      },
-    ) => {
-      if (data.value !== actualSortType) {
-        setActualSortType(data.value as string)
-        if (onSortClick) {
-          onSortClick()
-        }
+  const handleSortOrderTypeChange = (
+    _event: React.SyntheticEvent,
+    data: {
+      value?: string | number
+      id?: string
+    },
+  ) => {
+    if (data.value !== actualSortType) {
+      setActualSortType(data.value as string)
+      if (onSortClick) {
+        onSortClick()
       }
     }
+  }
 
   return (
     <span data-testid="sort-order-dropdown">

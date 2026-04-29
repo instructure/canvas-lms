@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CommunicationChannel < ActiveRecord::Base
+class CommunicationChannel < ApplicationRecord
   # You should start thinking about communication channels
   # as independent of pseudonyms
   include ManyRootAccounts
@@ -151,7 +151,7 @@ class CommunicationChannel < ActiveRecord::Base
 
     p.dispatch :merge_email_communication_channel
     p.to { self }
-    p.whenever { @send_merge_notification && path_type == TYPE_EMAIL }
+    p.whenever { @send_merge_notification && path_type == TYPE_EMAIL && !user.all_active_pseudonyms.empty? }
     p.data { broadcast_data }
 
     p.dispatch :confirm_sms_communication_channel
@@ -246,7 +246,7 @@ class CommunicationChannel < ActiveRecord::Base
 
     @request_password = true
     Rails.cache.write(["recent_password_reset", global_id].cache_key, true, expires_in: RESEND_PASSWORD_RESET_TIME)
-    set_confirmation_code(true, 2.hours.from_now)
+    set_confirmation_code(reset: true, expires_at: 2.hours.from_now)
     save!
     @request_password = false
   end
@@ -317,15 +317,19 @@ class CommunicationChannel < ActiveRecord::Base
         InstStatsd::Statsd.increment("message.deliver.sms.one_time_password",
                                      short_stat: "message.deliver",
                                      tags: { path_type: "sms", notification_name: "one_time_password" })
-        InstStatsd::Statsd.increment("message.deliver.sms.#{account.global_id}",
-                                     short_stat: "message.deliver_per_account",
-                                     tags: { path_type: "sms", root_account_id: account.global_id })
+        InstStatsd::Statsd.increment(
+          "message.deliver.sms.#{account.global_id}",
+          short_stat: "message.deliver_per_account",
+          tags: { path_type: "sms" }.merge(
+            Utils::InstStatsdUtils::Tags.tags_for(account.shard)
+          )
+        )
         Services::NotificationService.process(
           "otp:#{global_id}",
           message,
           "sms",
           e164_path,
-          true
+          priority: true
         )
       else
         delay_if_production(priority: Delayed::HIGH_PRIORITY).send_otp_via_sms_gateway!(message)
@@ -347,9 +351,9 @@ class CommunicationChannel < ActiveRecord::Base
 
   # If you are creating a new communication_channel, do nothing, this just
   # works.  If you are resetting the confirmation_code, call @cc.
-  # set_confirmation_code(true), or just save the record to leave the old
+  # set_confirmation_code(reset: true), or just save the record to leave the old
   # confirmation code in place.
-  def set_confirmation_code(reset = false, expires_at = nil)
+  def set_confirmation_code(reset: false, expires_at: nil)
     self.confirmation_code = nil if reset
     self.confirmation_code ||= if path_type == TYPE_EMAIL || path_type.nil?
                                  CanvasSlug.generate(nil, 25)
@@ -457,7 +461,7 @@ class CommunicationChannel < ActiveRecord::Base
     [Shard.default]
   end
 
-  def merge_candidates(break_on_first_found = false)
+  def merge_candidates(break_on_first_found: false)
     return [] if path_type == "push"
 
     shards = self.class.associated_shards(path) if Enrollment.cross_shard_invitations?
@@ -472,7 +476,7 @@ class CommunicationChannel < ActiveRecord::Base
 
       ccs.map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
-          merge_candidates[u.global_id] = !u.all_active_pseudonyms.empty?
+          merge_candidates[u.global_id] = !u.all_active_pseudonyms(reload: true).empty?
         end
         return [u] if result && break_on_first_found
 
@@ -482,7 +486,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def has_merge_candidates?
-    !merge_candidates(true).empty?
+    !merge_candidates(break_on_first_found: true).empty?
   end
 
   def bouncing?

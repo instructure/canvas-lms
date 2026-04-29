@@ -18,7 +18,18 @@
 
 import $ from 'jquery'
 import processMigrationContentItem from '../processMigrationContentItem'
+import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
+import {
+  postMessageExternalContentReady,
+  postMessageExternalContentCancel,
+} from '@canvas/external-tools/messages'
 import fakeENV from '@canvas/test-utils/fakeENV'
+
+vi.mock('@canvas/deep-linking/processors/processSingleContentItem')
+vi.mock('@canvas/external-tools/messages', () => ({
+  postMessageExternalContentReady: vi.fn(),
+  postMessageExternalContentCancel: vi.fn(),
+}))
 
 interface ContentItem {
   type: string
@@ -48,8 +59,18 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
-  jest.spyOn($, 'flashMessage').mockImplementation(() => {})
-  jest.spyOn($, 'flashError').mockImplementation(() => {})
+  vi.clearAllMocks()
+  vi.spyOn($, 'flashMessage').mockImplementation(() => {})
+  vi.spyOn($, 'flashError').mockImplementation(() => {})
+  vi.mocked(processSingleContentItem).mockReturnValue({
+    type: 'file' as any,
+    url: 'http://example.com/file.txt',
+    text: 'Test File',
+  })
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 afterAll(() => {
@@ -82,9 +103,12 @@ function event(overrides: EventOptions = {}): MessageEvent {
   } as MessageEvent
 }
 
-it('process the content item', () => {
+it('processes the content item and posts external content ready message', () => {
   processMigrationContentItem(event())
-  expect($.flashMessage).toHaveBeenCalled()
+  expect(postMessageExternalContentReady).toHaveBeenCalledWith(window, {
+    contentItems: [{text: 'Test File', url: 'http://example.com/file.txt'}],
+  })
+  expect(postMessageExternalContentCancel).not.toHaveBeenCalled()
   expect($.flashError).not.toHaveBeenCalled()
 })
 
@@ -110,8 +134,13 @@ describe('when the message type is not "LtiDeepLinkingResponse"', () => {
 
 describe('when the content item type is not "file"', () => {
   beforeEach(() => {
-    jest.spyOn(console, 'error').mockImplementation(() => {})
-    processMigrationContentItem(event({type: 'unkown_type'}))
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.mocked(processSingleContentItem).mockReturnValue({
+      type: 'unknown_type' as any,
+      url: 'http://example.com/file.txt',
+      text: 'Test File',
+    })
+    processMigrationContentItem(event({type: 'unknown_type'}))
   })
 
   it('displays a warning to the user', () => {

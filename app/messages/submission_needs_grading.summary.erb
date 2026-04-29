@@ -1,9 +1,15 @@
+<%
+  # For discussion checkpoints, use the parent assignment instead of the sub-assignment
+  # to ensure correct assignment IDs and URLs in notifications
+  assignment = asset.assignment
+  assignment = assignment.parent_assignment if assignment.checkpoint? && assignment.parent_assignment
+%>
 <% define_content :link do %>
   <%= course_quiz_history_url(asset.quiz.context, asset.quiz, quiz_submission_id: asset.id) %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Quiz Submitted: %{quiz}, %{context}", :quiz => asset.assignment.title, :context => asset.assignment.context.name %>
+  <%= t :subject, "Quiz Submitted: %{quiz}, %{context}", :quiz => assignment.title, :context => assignment.context.name %>
 <% end %>
 
 <%= t :body, "A submission has been turned in for your quiz, *%{title}*, and it requires manual grading.", :title => asset.quiz.title, :wrapper => "<b><a href=\"#{content :link}\">\\1</a></b>" %>

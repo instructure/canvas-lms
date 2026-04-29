@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import DashboardCardBackgroundStore from '../DashboardCardBackgroundStore'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
@@ -36,31 +37,31 @@ DashboardCardBackgroundStore.reset = function () {
   })
 }
 
+const server = setupServer()
+
+// Track API calls
+const apiCalls = []
+
 describe('DashboardCardBackgroundStore', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
+    apiCalls.length = 0
     DashboardCardBackgroundStore.reset()
     fakeENV.setup()
     ENV.PREFERENCES = {custom_colors: TEST_COLORS}
     ENV.current_user_id = 22
-    fetchMock.put('path:/api/v1/users/22/colors/course_1', {
-      status: 200,
-      headers: {'Content-Type': 'application/json'},
-      body: '',
-    })
-    fetchMock.put('path:/api/v1/users/22/colors/course_2', {
-      status: 200,
-      headers: {'Content-Type': 'application/json'},
-      body: '',
-    })
-    fetchMock.put('path:/api/v1/users/22/colors/course_3', {
-      status: 200,
-      headers: {'Content-Type': 'application/json'},
-      body: '',
-    })
+    server.use(
+      http.put('/api/v1/users/22/colors/:assetString', ({params}) => {
+        apiCalls.push(`/api/v1/users/22/colors/${params.assetString}`)
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
   })
 
   afterEach(() => {
-    fetchMock.restore()
+    server.resetHandlers()
     DashboardCardBackgroundStore.reset()
     fakeENV.teardown()
   })
@@ -89,17 +90,19 @@ describe('DashboardCardBackgroundStore', () => {
 
   test('PUTs to the server when a default is set', async function () {
     DashboardCardBackgroundStore.setDefaultColor('course_1')
-    await fetchMock.flush()
-    ok(fetchMock.lastUrl().match(/course_1/))
-    equal(fetchMock.calls().length, 1)
+    // Wait for async operation
+    await new Promise(resolve => setTimeout(resolve, 50))
+    ok(apiCalls.some(url => url.includes('course_1')))
+    equal(apiCalls.length, 1)
   })
 
   test('sets multiple defaults properly', async function () {
     DashboardCardBackgroundStore.setDefaultColors(['course_2', 'course_3'])
-    await fetchMock.flush()
-    ok(fetchMock.calls()[0][0].match(/course_2/))
-    ok(fetchMock.calls()[1][0].match(/course_3/))
-    equal(fetchMock.calls().length, 2)
+    // Wait for async operations
+    await new Promise(resolve => setTimeout(resolve, 100))
+    ok(apiCalls.some(url => url.includes('course_2')))
+    ok(apiCalls.some(url => url.includes('course_3')))
+    equal(apiCalls.length, 2)
   })
 
   // ==========================

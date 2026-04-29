@@ -15,6 +15,9 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+// Unmock the module since it's globally mocked in setup-vitests.tsx
+vi.unmock('@canvas/brandable-css')
+
 import BrandableCSS from '..'
 import stubEnv from '@canvas/stub-env'
 
@@ -41,15 +44,15 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
   let loadStylesheet
 
   beforeEach(() => {
-    loadStylesheet = jest.spyOn(BrandableCSS, 'loadStylesheet').mockImplementation(() => null)
+    loadStylesheet = vi.spyOn(BrandableCSS, 'loadStylesheet').mockImplementation(() => null)
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    vi.restoreAllMocks()
   })
 
   it('works', () => {
-    jest.spyOn(BrandableCSS, 'getHandlebarsIndex').mockImplementation(() => [
+    vi.spyOn(BrandableCSS, 'getHandlebarsIndex').mockImplementation(() => [
       ['first_variant', 'second_variant'],
       {
         fa0: ['xxx'],
@@ -66,10 +69,11 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
   })
 
   it('resolves references', () => {
-    jest.spyOn(BrandableCSS, 'getCssVariant').mockImplementation(() => 'second_variant')
-    jest
-      .spyOn(BrandableCSS, 'getHandlebarsIndex')
-      .mockImplementation(() => [['first_variant', 'second_variant'], {fa0: ['xxx', 0]}])
+    vi.spyOn(BrandableCSS, 'getCssVariant').mockImplementation(() => 'second_variant')
+    vi.spyOn(BrandableCSS, 'getHandlebarsIndex').mockImplementation(() => [
+      ['first_variant', 'second_variant'],
+      {fa0: ['xxx', 0]},
+    ])
 
     subject({id: 'fa0', bundle: 'asdfasdf'})
 
@@ -82,10 +86,11 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
   })
 
   it('marks as "includesNoVariables" if only one checksum is provided', () => {
-    jest.spyOn(BrandableCSS, 'getCssVariant').mockImplementation(() => 'second_variant')
-    jest
-      .spyOn(BrandableCSS, 'getHandlebarsIndex')
-      .mockImplementation(() => [['first_variant', 'second_variant'], {fa0: ['xxx']}])
+    vi.spyOn(BrandableCSS, 'getCssVariant').mockImplementation(() => 'second_variant')
+    vi.spyOn(BrandableCSS, 'getHandlebarsIndex').mockImplementation(() => [
+      ['first_variant', 'second_variant'],
+      {fa0: ['xxx']},
+    ])
 
     subject({id: 'fa0', bundle: 'asdfasdf'})
 

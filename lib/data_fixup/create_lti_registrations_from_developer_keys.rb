@@ -23,6 +23,8 @@ module DataFixup
       DeveloperKey.where(is_lti_key: true, lti_registration: nil).preload(:tool_configuration, :ims_registration).find_each do |developer_key|
         next if (developer_key.account_id || 0) > Shard::IDS_PER_SHARD
 
+        workflow_state = "active"
+        workflow_state = "deleted" if developer_key.workflow_state == "deleted"
         lti_registration = ::Lti::Registration.create!(
           {
             admin_nickname: developer_key.name,
@@ -30,6 +32,7 @@ module DataFixup
             internal_service: developer_key.internal_service,
             name: developer_key.tool_configuration.internal_lti_configuration[:title],
             ims_registration: developer_key.ims_registration, # can be nil
+            workflow_state:
           }
         )
 

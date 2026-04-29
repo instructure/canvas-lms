@@ -71,7 +71,10 @@ interface FileContextOptions {
 }
 
 export const createFilesContexts = (options?: FileContextOptions): FileContext[] => {
-  const contexts = options?.isMultipleContexts ? MULITPLE_CONTEXTS : SINGLE_CONTEXT
+  const sourceContexts = options?.isMultipleContexts ? MULITPLE_CONTEXTS : SINGLE_CONTEXT
+  // Create a deep copy to avoid mutating the shared source arrays
+  const contexts = sourceContexts.map(context => ({...context}))
+
   if (options?.hasNoTools) {
     contexts.forEach(context => {
       context.file_menu_tools = []

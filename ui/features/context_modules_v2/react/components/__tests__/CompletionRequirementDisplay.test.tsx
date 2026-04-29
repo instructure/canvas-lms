@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {cleanup, render} from '@testing-library/react'
 import CompletionRequirementDisplay from '../CompletionRequirementDisplay'
 import {CompletionRequirement, ModuleItemContent} from '../../utils/types'
 
@@ -27,6 +27,10 @@ const defaultContent: ModuleItemContent = {
 }
 
 describe('CompletionRequirementDisplay', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('renders null if no completion requirement is provided', () => {
     const {container} = render(
       <CompletionRequirementDisplay

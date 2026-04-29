@@ -64,11 +64,11 @@ describe('GroupSelectionDrillDown', () => {
   })
 
   beforeEach(() => {
-    mockOnCollectionClick = jest.fn()
+    mockOnCollectionClick = vi.fn()
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders component with root group as selected group', () => {

@@ -22,11 +22,12 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import EditItemModal, {type EditItemModalProps} from '../EditItemModal'
 
 const buildDefaultProps = (overrides: Partial<EditItemModalProps> = {}): EditItemModalProps => ({
   isOpen: true,
-  onRequestClose: jest.fn(),
+  onRequestClose: vi.fn(),
   itemName: 'Test Item',
   itemType: 'assignment',
   itemIndent: 1,
@@ -68,14 +69,16 @@ const server = setupServer()
 
 describe('EditItemModal', () => {
   beforeAll(() => server.listen())
-  afterEach(() => server.resetHandlers())
+  afterEach(() => {
+    server.resetHandlers()
+    fakeENV.teardown()
+  })
   afterAll(() => server.close())
 
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       TIMEZONE: 'UTC',
-    }
+    })
 
     server.use(
       http.post('/courses/:courseId/modules/items/:itemId', () => {
@@ -100,6 +103,26 @@ describe('EditItemModal', () => {
     const titleInput = screen.getByTestId('edit-modal-title')
     fireEvent.change(titleInput, {target: {value: 'New Title'}})
     expect(titleInput).toHaveValue('New Title')
+  })
+
+  it('shows error if title is empty', () => {
+    setUp(buildDefaultProps())
+
+    const titleInput = screen.getByTestId('edit-modal-title')
+    fireEvent.change(titleInput, {target: {value: ''}})
+    fireEvent.click(screen.getByText('Update'))
+    expect(screen.getByText('Name is required')).toBeInTheDocument()
+  })
+
+  it('removes name error when valid title is entered', () => {
+    setUp(buildDefaultProps())
+
+    const titleInput = screen.getByTestId('edit-modal-title')
+    fireEvent.change(titleInput, {target: {value: ''}})
+    fireEvent.click(screen.getByText('Update'))
+    expect(screen.getByText('Name is required')).toBeInTheDocument()
+    fireEvent.change(titleInput, {target: {value: 'Valid Title'}})
+    expect(screen.queryByText('Name is required')).not.toBeInTheDocument()
   })
 
   it('updates indent when changed', () => {
@@ -179,16 +202,27 @@ describe('EditItemModal', () => {
     const defaultProps = buildDefaultProps({
       itemType: 'external',
       itemURL: 'http://example.com',
+      itemNewTab: true,
     })
 
-    it('renders external URL fields when itemType is external', () => {
+    it('renders external URL field when itemType is external', () => {
       setUp(defaultProps)
       expect(screen.getByLabelText('URL')).toBeInTheDocument()
+    })
+
+    it('renders new Tab field when itemType is external', () => {
+      setUp(defaultProps)
+      expect(screen.getByLabelText('Load in a new tab')).toBeInTheDocument()
     })
 
     it('does not render external URL fields when itemType is not external', () => {
       setUp(buildDefaultProps())
       expect(screen.queryByLabelText('URL')).not.toBeInTheDocument()
+    })
+
+    it('does not render new Tab fields when itemType is not external', () => {
+      setUp(buildDefaultProps())
+      expect(screen.queryByLabelText('Load in a new tab')).not.toBeInTheDocument()
     })
   })
 })

@@ -306,6 +306,7 @@ module Qti
 
     def self.create_instructure_question(opts)
       extend Canvas::Migration::XMLHelper
+
       manifest_node = opts[:manifest_node]
 
       if manifest_node

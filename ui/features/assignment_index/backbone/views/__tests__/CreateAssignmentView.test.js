@@ -227,4 +227,32 @@ describe('CreateAssignmentView', () => {
       expect(errors.name).toBeFalsy()
     })
   })
+
+  describe('permissions setup', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        PERMISSIONS: {
+          manage_assignments_edit: true,
+          manage_assignments_delete: true,
+          by_assignment_id: {},
+        },
+        SETTINGS: {
+          suppress_assignments: false,
+        },
+      })
+    })
+
+    it('sets manage_assign_to permission when assignment is saved successfully', () => {
+      const view = createView(group)
+      view.model.set('id', 123)
+
+      view.onSaveSuccess()
+
+      expect(ENV.PERMISSIONS.by_assignment_id[123]).toEqual({
+        update: true,
+        delete: true,
+        manage_assign_to: true,
+      })
+    })
+  })
 })

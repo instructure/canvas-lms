@@ -20,6 +20,7 @@
 
 class RubricCSVImporter
   include RubricImporterErrors
+
   def initialize(attachment)
     @attachment = attachment
   end

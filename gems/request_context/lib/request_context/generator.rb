@@ -67,6 +67,8 @@ module RequestContext
       # logged here to get as close to the beginning of the request being
       # processed as possible
       RequestContext::Generator.store_request_queue_time(env["HTTP_X_REQUEST_START"])
+      RequestContext::Generator.store_cloudfront_id(env["HTTP_X_AMZ_CF_ID"])
+      RequestContext::Generator.store_alb_trace_id(env["HTTP_X_AMZN_TRACE_ID"])
 
       status, headers, body = @app.call(env)
 
@@ -93,10 +95,9 @@ module RequestContext
       meta_headers << "#{name}=#{value};"
     end
 
-    def self.store_interaction_seconds_update(token, interaction_seconds)
-      data = CanvasSecurity::PageViewJwt.decode(token)
-      if data
-        add_meta_header("r", "#{data[:request_id]}|#{data[:created_at]}|#{interaction_seconds}")
+    def self.store_interaction_seconds_update(page_view, interaction_seconds)
+      if page_view
+        add_meta_header("r", "#{page_view.request_id}|#{page_view.created_at.utc.iso8601(2)}|#{interaction_seconds}")
       end
     end
 
@@ -110,17 +111,28 @@ module RequestContext
       end
     end
 
-    def self.store_request_meta(request, context, sentry_trace = nil)
+    def self.store_cloudfront_id(header_val)
+      add_meta_header("cfid", header_val) if header_val.present?
+    end
+
+    def self.store_alb_trace_id(header_val)
+      add_meta_header("tid", header_val) if header_val.present?
+    end
+
+    def self.store_request_meta(request, sentry_trace = nil)
       add_meta_header("o", request.path_parameters[:controller])
       add_meta_header("n", request.path_parameters[:action])
       if request.request_parameters && request.request_parameters["operationName"]
         add_meta_header("on", request.request_parameters["operationName"])
       end
+      add_meta_header("st", sentry_trace) if sentry_trace.present?
+    end
+
+    def self.store_context_meta(context)
       if context
         add_meta_header("t", context.class)
         add_meta_header("i", context.id)
       end
-      add_meta_header("st", sentry_trace) if sentry_trace.present?
     end
 
     ##

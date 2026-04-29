@@ -81,16 +81,16 @@ describe('SpeedGrader Grade Refresh', () => {
 
     window.isAnonymous = window.jsonData.isAnonymous
 
-    jest.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
-    jest.spyOn(SpeedGrader.EG, 'showGrade').mockImplementation(() => {})
-    jest.spyOn(SpeedGrader.EG, 'setOrUpdateSubmission').mockImplementation(() => {})
-    jest.spyOn(SpeedGrader.EG, 'updateSelectMenuStatus').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'showGrade').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'setOrUpdateSubmission').mockImplementation(() => {})
+    vi.spyOn(SpeedGrader.EG, 'updateSelectMenuStatus').mockImplementation(() => {})
   })
 
   afterEach(() => {
     fakeENV.teardown()
     fixtures.remove()
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   describe('#refreshGrades', () => {
@@ -111,7 +111,7 @@ describe('SpeedGrader Grade Refresh', () => {
     })
 
     it('fetches and updates submission data', async () => {
-      const callbackSpy = jest.fn()
+      const callbackSpy = vi.fn()
       SpeedGrader.EG.refreshGrades(callbackSpy)
       await new Promise(resolve => setTimeout(resolve, 10))
 

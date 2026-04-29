@@ -25,7 +25,7 @@
 import serviceRCELoader from './serviceRCELoader'
 import {RCELOADED_EVENT_NAME, send, destroy, focus} from '@canvas/rce-command-shim/RceCommandShim'
 import $ from 'jquery'
-import {escape} from 'lodash'
+import {escape} from 'es-toolkit/compat'
 
 function loadServiceRCE(target, tinyMCEInitOptions, callback) {
   target.css('display', 'none')
@@ -115,9 +115,8 @@ const RichContentEditor = {
    * hopefully done by the time loadNewEditor is called.
    * should typically be called at the top of any source file that calls one
    * of those.
-   *
-   * @public
    */
+  // @ts-expect-error - JS file with object method syntax not recognized by TS
   preloadRemoteModule(cb = () => {}) {
     return serviceRCELoader.preload(cb)
   },
@@ -155,9 +154,8 @@ const RichContentEditor = {
    *
    *
    * Be sure to call RichContentEditor.closeRCE(target) if the user cleanly exits the page
-   *
-   * @public
    */
+  // @ts-expect-error - JS file with object method syntax not recognized by TS
   loadNewEditor(target, tinyMCEInitOptions = {}, cb) {
     let $target = node2jquery(target)
     if ($target.length <= 0) {
@@ -194,9 +192,8 @@ const RichContentEditor = {
 
   /**
    * call a function on the target editor.
-   *
-   * @public
    */
+  // @ts-expect-error - JS file with object method syntax not recognized by TS
   callOnRCE(target, methodName, ...args) {
     let $target = node2jquery(target)
     $target = this.freshNode($target)
@@ -205,9 +202,8 @@ const RichContentEditor = {
 
   /**
    * remove the target editor.
-   *
-   * @public
    */
+  // @ts-expect-error - JS file with object method syntax not recognized by TS
   destroyRCE(target) {
     let $target = node2jquery(target)
     $target = this.freshNode($target)
@@ -216,18 +212,16 @@ const RichContentEditor = {
 
   /**
    * Tell the RCE we're closing
-   *
-   * @public
    */
+  // @ts-expect-error - JS file with object method syntax not recognized by TS
   closeRCE(target) {
     this.callOnRCE(target, 'RCEClosed')
   },
 
   /**
    * make the target the active editor
-   *
-   * @private
    */
+  // @ts-expect-error - JS file with object method syntax not recognized by TS
   activateRCE(target) {
     let $target = node2jquery(target)
     $target = this.freshNode($target)

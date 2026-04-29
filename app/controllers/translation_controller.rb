@@ -17,85 +17,114 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class TranslationController < ApplicationController
-  require "pragmatic_segmenter"
-  require "aws-sdk-translate"
-
-  before_action :require_context, only: :translate
-  before_action :require_user
+  before_action :require_context, only: %i[translate translation_feedback]
+  before_action :require_user, only: %i[translation_feedback]
   before_action :require_inbox_translation, only: %i[translate_paragraph]
 
   # Skip the authenticity token as this is an API endpoint.
-  skip_before_action :verify_authenticity_token, only: [:translate]
+  skip_before_action :verify_authenticity_token, only: %i[translate translation_feedback]
 
-  rescue_from Translation::SameLanguageTranslationError, with: :handle_same_language_error
-  rescue_from Aws::Translate::Errors::ServiceError, with: :handle_generic_error
+  rescue_from Translation::TranslationError, with: :handle_translation_error
 
   def translate
-    start_time = Time.zone.now
     # Don't allow users that can't access, or if translation is not available
-    translation_flags = Translation.get_translation_flags(@context.feature_enabled?(:translation), @domain_root_account)
-    return render_unauthorized_action unless Translation.available?(translation_flags) && user_can_read?
+    return render_unauthorized_action unless Translation.available? && user_can_read? && @context.feature_enabled?(:translation)
 
+    start_time = Time.zone.now
     translated_text = Translation.translate_html(html_string: required_params[:text],
                                                  tgt_lang: required_params[:tgt_lang],
-                                                 flags: translation_flags,
                                                  options: {
                                                    root_account_uuid: @domain_root_account.uuid,
-                                                   feature_slug: required_params[:feature_slug]
+                                                   feature_slug: required_params[:feature_slug],
+                                                   current_user: @current_user
                                                  })
 
+    duration = Time.zone.now - start_time
+    InstStatsd::Statsd.timing("translation.discussions.duration", duration)
     render json: { translated_text: }
-    if Translation.current_translation_provider_type(translation_flags) == Translation::TranslationType::AWS_TRANSLATE
-      duration = Time.zone.now - start_time
-      InstStatsd::Statsd.timing("translation.discussions.duration", duration)
-    end
   end
 
   def translate_paragraph
-    start_time = Time.zone.now
     # Right now course is always undefined
-    translation_flags = Translation.get_translation_flags(@domain_root_account.feature_enabled?(:translate_inbox_messages), @domain_root_account)
+    start_time = Time.zone.now
     translated_text = Translation.translate_text(
       text: required_params[:text],
       tgt_lang: required_params[:tgt_lang],
-      flags: translation_flags,
       options: {
         root_account_uuid: @domain_root_account.uuid,
-        feature_slug: required_params[:feature_slug]
+        feature_slug: required_params[:feature_slug],
+        current_user: @current_user
       }
     )
-    if Translation.current_translation_provider_type(translation_flags) == Translation::TranslationType::AWS_TRANSLATE
-      duration = Time.zone.now - start_time
-      InstStatsd::Statsd.timing("translation.inbox_compose.duration", duration)
-    end
+    duration = Time.zone.now - start_time
+    InstStatsd::Statsd.timing("translation.inbox_compose.duration", duration)
     render json: { translated_text: }
   end
 
-  def handle_same_language_error
-    InstStatsd::Statsd.distributed_increment("translation.errors", tags: ["error:same_language"])
-    render json: { translationError: { type: "info", message: I18n.t("Looks like you're trying to translate into the same language.") } }, status: :unprocessable_entity
+  def translation_feedback
+    return render_unauthorized_action unless Translation.available? &&
+                                             user_can_read? &&
+                                             @context.feature_enabled?(:translation) &&
+                                             @context.feature_enabled?(:translation_feedback)
+
+    content_type = params[:content_type]
+    unless %w[DiscussionTopic DiscussionEntry].include?(content_type)
+      return render(json: { error: "Invalid content type." }, status: :bad_request)
+    end
+
+    return render(json: { error: "Missing content_id." }, status: :bad_request) if params[:content_id].blank?
+    return render(json: { error: "Missing target_language." }, status: :bad_request) if params[:target_language].blank?
+
+    action = params[:_action]&.to_sym
+    unless %i[like dislike reset_like].include?(action)
+      return render(json: { error: "Invalid action." }, status: :bad_request)
+    end
+
+    find_params = {
+      user: @current_user,
+      context: @context,
+      target_language: params[:target_language]
+    }
+    if content_type == "DiscussionTopic"
+      find_params[:discussion_topic_id] = params[:content_id]
+    else
+      find_params[:discussion_entry_id] = params[:content_id]
+    end
+    feedback = TranslationFeedback.find_or_initialize_by(find_params)
+    feedback.feature_slug = params[:feature_slug] if params[:feature_slug].present?
+
+    begin
+      case action
+      when :like
+        feedback.like
+        InstStatsd::Statsd.distributed_increment("translation.feedback.liked")
+      when :dislike
+        feedback.dislike(notes: params[:notes])
+        InstStatsd::Statsd.distributed_increment("translation.feedback.disliked")
+      when :reset_like
+        feedback.reset_like
+        InstStatsd::Statsd.distributed_increment("translation.feedback.reset_like")
+      end
+    rescue ActiveRecord::RecordInvalid => e
+      return render(json: { error: e.message }, status: :unprocessable_content)
+    end
+
+    render(json: { liked: feedback.liked, disliked: feedback.disliked })
   end
 
-  def handle_generic_error(exception)
-    translation_flags = Translation.get_translation_flags(@context, @domain_root_account)
+  def handle_translation_error(exception)
     tags = []
     case exception
-    when Aws::Translate::Errors::UnsupportedLanguagePairException
-      error_data = JSON.parse(exception.context.http_response.body.read)
-      source_lang_code = error_data["SourceLanguageCode"]
-      target_lang_code = error_data["TargetLanguageCode"]
-      tags = ["error:unsupported_language_pair", "source_language:#{source_lang_code}", "dest_language:#{target_lang_code}"]
-      source_lang = Translation.languages(translation_flags).find { |lang| lang[:id] == source_lang_code }
-      target_lang = Translation.languages(translation_flags).find { |lang| lang[:id] == target_lang_code }
-      message = I18n.t("Translation from %{source_lang} to %{target_lang} is not supported.", { source_lang: source_lang[:name], target_lang: target_lang[:name] })
+    when Translation::SameLanguageTranslationError
+      tags = ["error:same_language"]
+      message = I18n.t("Translation is identical to source language.")
       status = :unprocessable_entity
-    when Aws::Translate::Errors::DetectedLanguageLowConfidenceException
-      tags = ["error:low_confidence"]
-      message = I18n.t("Couldn’t identify source language.")
-      status = :unprocessable_entity
-    when Aws::Translate::Errors::TextSizeLimitExceededException
+    when Translation::TextTooLongError
       tags = ["error:text_size_limit"]
       message = I18n.t("Couldn’t translate because the text is too long.")
+      status = :unprocessable_entity
+    when Translation::UnsupportedLanguageError
+      message = I18n.t("The source or target language is not supported by the translation service.")
       status = :unprocessable_entity
     else
       # Generic response for all other ServiceErrors
@@ -108,7 +137,8 @@ class TranslationController < ApplicationController
 
     render(json: { translationErrorTextTooLong: { type: "error", message: } }, status:) and return if action_name == "translate_paragraph" && tags == ["error:text_size_limit"]
 
-    render json: { translationError: { type: "error", message: } }, status:
+    error_type = tags.include?("error:rate_limit") ? "rateLimitError" : "error"
+    render json: { translationError: { type: error_type, message: } }, status:
   end
 
   private
@@ -122,6 +152,6 @@ class TranslationController < ApplicationController
   end
 
   def require_inbox_translation
-    render_unauthorized_action unless Translation.available?(Translation.get_translation_flags(@domain_root_account.feature_enabled?(:translate_inbox_messages), @domain_root_account))
+    render_unauthorized_action unless Translation.available? && @domain_root_account.feature_enabled?(:translate_inbox_messages)
   end
 end

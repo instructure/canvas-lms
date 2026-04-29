@@ -129,7 +129,7 @@ end
 
 touches_brandable_variables_file = commit_files.any? { |f| f.start_with?("app/stylesheets/brandable_variables") }
 if touches_brandable_variables_file
-  comment "warn", nil, "Changes were made to the brandable variables file. You you will need to rename the corresponding database migration file that runs brand_configs. See the following migration file for more info: #{BrandableCSS::MIGRATION_NAME.underscore}_predeploy.rb."
+  comment "warn", nil, "Changes were made to the brandable variables file. You you will need to rename the corresponding database migration file that runs brand_configs. See the following migration file for more info: regenerate_brand_files_based_on_new_defaults_predeploy.rb."
 end
 
 touches_lti_variable_expander_file = commit_files.any? { |f| f.start_with?("lib/lti/variable_expander") }

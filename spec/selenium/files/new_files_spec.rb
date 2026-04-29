@@ -265,41 +265,6 @@ describe "better_file_browsing" do
         expect(fln(file)).to be_displayed
       end
     end
-
-    context "Search Results" do
-      def search_and_move(file_name: "", destination: "My Files")
-        f("input[type='search']").send_keys file_name, :return
-        expect(f(".ef-item-row")).to include_text file_name
-        move(file_name, 0, :cog_icon, destination)
-        final_destination = destination.split("/").pop
-        expect(f("#flash_message_holder")).to include_text "#{file_name} moved to #{final_destination}"
-        fj("a.treeLabel span:contains('#{final_destination}')").click
-        expect(fln(file_name)).to be_displayed
-      end
-
-      before(:once) do
-        user_files = ["a_file.txt", "b_file.txt"]
-        user_files.map { |text_file| add_file(fixture_file_upload(text_file.to_s, "text/plain"), @teacher, text_file) }
-        # Course file
-        add_file(fixture_file_upload("c_file.txt", "text/plain"), @course, "c_file.txt")
-      end
-
-      let(:folder_name) { "destination_folder" }
-
-      it "moves a file to a destination if contexts are different", upgrade_files_v2: "done" do
-        skip_if_chrome("research")
-        folder_model(name: folder_name)
-        get "/files"
-        search_and_move(file_name: "a_file.txt", destination: "#{@course.name}/#{folder_name}")
-      end
-
-      it "moves a file to a destination if the contexts are the same", upgrade_files_v2: "done" do
-        skip_if_chrome("research")
-        folder_model(name: folder_name, context: @user)
-        get "/files"
-        search_and_move(file_name: "a_file.txt", destination: folder_name)
-      end
-    end
   end
 
   context "Publish Cloud Dialog" do
@@ -345,54 +310,17 @@ describe "better_file_browsing" do
       expect(@kaltura).to receive(:media_sources).and_return([{ attachment_id: @att.id, content_type: "video/mp4", url: "/a.mp4" }])
     end
 
-    context "when consolidated_media_player feature is disabled" do
-      before do
-        Account.site_admin.disable_feature! :consolidated_media_player
-      end
-
-      it "will show CC options normally", upgrade_files_v2: "waiting for deployment (RCX-2974)" do
-        get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
-        wait_for_ajaximations
-        expect(f('[title="Captions/Subtitles"]')).to be_present
-      end
-
-      it "shows caption inheritance tooltip", upgrade_files_v2: "waiting for deployment (RCX-2974)" do
-        @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "subs")
-        @another_att = Attachment.create! filename: "file.mp4", context: @course, media_entry_id: "mediaentryid", uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4")
-        get "/courses/#{@course.id}/files/#{@another_att.id}/file_preview"
-        wait_for_ajaximations
-        expect(f(".mejs-captions-selector .track-tip-container")).to be_present
-      end
-
-      it "will hide CC options for locked attachments", upgrade_files_v2: "waiting for deployment (RCX-2974)" do
-        mt = MasterCourses::MasterTemplate.set_as_master_course(@bp_course)
-        cs = MasterCourses::ChildSubscription.create! child_course: @course, master_template: mt
-        MasterCourses::ChildContentTag.create! content_type: "Attachment", content_id: @att.id, migration_id: "matchedmigid", child_subscription: cs
-        mct = MasterCourses::MasterContentTag.create! master_template: mt, content: @bogus_parent_att, restrictions: { content: true }
-        mct.update! migration_id: "matchedmigid"
-        get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
-        wait_for_ajaximations
-        expect(f(".mejs-controls")).not_to contain_jqcss('[title="Captions/Subtitles"]')
-      end
+    it "will not show CC button when no CC is uploaded" do
+      get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
+      wait_for_selector('[aria-label="Video Player"]')
+      expect(f("#media_preview")).not_to contain_jqcss('[aria-label="Captions"]')
     end
 
-    context "when consolidated_media_player feature is enabled" do
-      before do
-        Account.site_admin.enable_feature! :consolidated_media_player
-      end
-
-      it "will not show CC button when no CC is uploaded" do
-        get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
-        wait_for_selector('[aria-label="Video Player"]')
-        expect(f("#media_preview")).not_to contain_jqcss('[aria-label="Enable Captions"]')
-      end
-
-      it "will show CC button when a CC is uploaded" do
-        @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "subs")
-        get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
-        wait_for_selector('[aria-label="Video Player"]')
-        expect(f('[aria-label="Enable Captions"]')).to be_present
-      end
+    it "will show CC button when a CC is uploaded" do
+      @mo.media_tracks.create!(kind: "subtitles", locale: "en", content: "subs")
+      get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
+      wait_for_selector('[aria-label="Video Player"]')
+      expect(f('[aria-label="Captions"]')).to be_present
     end
   end
 
@@ -422,46 +350,18 @@ describe "better_file_browsing" do
         stub_kaltura
       end
 
-      context "when consolidated_media_player feature is enabled" do
-        before do
-          Account.site_admin.enable_feature! :consolidated_media_player
-        end
-
-        it "works in the user's files page", upgrade_files_v2: "waiting for deployment (RCX-2530)" do
-          file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @teacher, "292.mp3")
-          get "/files?preview=#{file.id}"
-          wait_for_ajaximations
-          expect(ff(".ef-file-studio-player-container")[0]).to include_text("Your media has been uploaded and will appear here after processing.")
-        end
-
-        it "works in the course's files page", upgrade_files_v2: "waiting for deployment (RCX-2530)" do
-          file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @course, "292.mp3")
-          get "/courses/#{@course.id}/files?preview=#{file.id}"
-          wait_for_ajaximations
-          expect(ff(".ef-file-studio-player-container")[0]).to include_text("Your media has been uploaded and will appear here after processing.")
-        end
+      it "works in the user's files page", upgrade_files_v2: "waiting for deployment (RCX-2530)" do
+        file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @teacher, "292.mp3")
+        get "/files?preview=#{file.id}"
+        wait_for_ajaximations
+        expect(ff(".ef-file-studio-player-container")[0]).to include_text("Your media has been uploaded and will appear here after processing.")
       end
 
-      context "when consolidated_media_player feature is disabled" do
-        before do
-          Account.site_admin.disable_feature! :consolidated_media_player
-        end
-
-        it "works in the user's files page", upgrade_files_v2: "done" do
-          file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @teacher, "292.mp3")
-          get "/files?preview=#{file.id}"
-          wait_for_ajaximations
-          driver.switch_to.frame(ff(".ef-file-preview-frame")[0])
-          expect(ff("#media_preview")[0]).to include_text("Media has been queued for conversion, please try again in a little bit.")
-        end
-
-        it "works in the course's files page", upgrade_files_v2: "done" do
-          file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @course, "292.mp3")
-          get "/courses/#{@course.id}/files?preview=#{file.id}"
-          wait_for_ajaximations
-          driver.switch_to.frame(ff(".ef-file-preview-frame")[0])
-          expect(ff("#media_preview")[0]).to include_text("Media has been queued for conversion, please try again in a little bit.")
-        end
+      it "works in the course's files page", upgrade_files_v2: "waiting for deployment (RCX-2530)" do
+        file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @course, "292.mp3")
+        get "/courses/#{@course.id}/files?preview=#{file.id}"
+        wait_for_ajaximations
+        expect(ff(".ef-file-studio-player-container")[0]).to include_text("Your media has been uploaded and will appear here after processing.")
       end
     end
   end

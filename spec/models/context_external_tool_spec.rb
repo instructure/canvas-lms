@@ -67,11 +67,7 @@ describe ContextExternalTool do
 
   describe "available_in_context?" do
     let_once(:account) { account_model }
-    let_once(:registration) do
-      lti_developer_key_model(account:).tap do |k|
-        lti_tool_configuration_model(account: k.account, developer_key: k, lti_registration: k.lti_registration)
-      end.lti_registration
-    end
+    let_once(:registration) { lti_registration_with_tool(account:) }
     let_once(:tool) { registration.new_external_tool(account) }
 
     context "with the lti_registrations_next flag off" do
@@ -84,7 +80,7 @@ describe ContextExternalTool do
       end
 
       it "returns true even if the tool is not set to available" do
-        tool.context_controls.first.update!(available: false)
+        tool.primary_context_control.update!(available: false)
         expect(tool.available_in_context?(account)).to be true
       end
     end
@@ -99,14 +95,14 @@ describe ContextExternalTool do
     end
 
     it "returns false if the tool is set to unavailable" do
-      tool.context_controls.first.update!(available: false)
+      tool.primary_context_control.update!(available: false)
 
       expect(tool.available_in_context?(account)).to be false
     end
 
     it "ignores context controls associated with other tools from the same registration" do
       duplicate_tool = registration.new_external_tool(account)
-      duplicate_tool.context_controls.first.update!(available: false)
+      duplicate_tool.primary_context_control.update!(available: false)
 
       expect(tool.available_in_context?(account)).to be true
     end
@@ -116,13 +112,51 @@ describe ContextExternalTool do
         control.suspend_callbacks { control.destroy_permanently! }
       end
 
-      sentry_scope = double(Sentry::Scope)
+      sentry_scope = instance_double(Sentry::Scope)
       expect(Sentry).to receive(:with_scope).and_yield(sentry_scope)
       expect(sentry_scope).to receive(:set_tags).with(context_id: account.global_id)
       expect(sentry_scope).to receive(:set_tags).with(lti_registration_id: tool.lti_registration.global_id)
-      expect(sentry_scope).to receive(:set_context).with("tool", tool.global_id)
+      expect(sentry_scope).to receive(:set_context).with("tool", { global_id: tool.global_id })
 
       expect(tool.available_in_context?(account)).to be true
+    end
+  end
+
+  describe "#primary_context_control" do
+    subject { tool.primary_context_control }
+
+    let_once(:account) { account_model }
+    let_once(:registration) { lti_registration_with_tool(account:) }
+    let_once(:tool) { registration.deployments.first }
+
+    it { is_expected.to be_present }
+
+    it "returns the primary control for the tool" do
+      expect(subject).to be_present
+      expect(subject.account_id).to eq account.id
+    end
+
+    context "when the contexts are not in order" do
+      before do
+        primary_control = tool.primary_context_control.dup
+        Lti::ContextControl.suspend_callbacks do
+          tool.primary_context_control.destroy_permanently!
+        end
+
+        subaccount = account_model(parent_account: account)
+        Lti::ContextControl.create!(
+          account: subaccount,
+          registration:,
+          deployment: tool
+        )
+        primary_control.save!
+      end
+
+      it "returns the primary control for the tool" do
+        expect(subject).to be_present
+        expect(subject.account_id).to eq account.id
+        expect(subject.workflow_state).to eq "active"
+      end
     end
   end
 
@@ -2397,6 +2431,28 @@ describe ContextExternalTool do
       end
     end
 
+    describe "#uses_cached_placements?" do
+      it "returns true when tool has course_navigation placement" do
+        tool = external_tool_model(context: @course, placements: [:course_navigation])
+        expect(tool.uses_cached_placements?).to be true
+      end
+
+      it "returns true when tool has account_navigation placement" do
+        tool = external_tool_model(context: @course, placements: [:account_navigation])
+        expect(tool.uses_cached_placements?).to be true
+      end
+
+      it "returns true when tool has user_navigation placement" do
+        tool = external_tool_model(context: @course, placements: [:user_navigation])
+        expect(tool.uses_cached_placements?).to be true
+      end
+
+      it "returns false when tool has no navigation placements" do
+        tool = external_tool_model(context: @course, placements: [:assignment_selection, :editor_button])
+        expect(tool.uses_cached_placements?).to be false
+      end
+    end
+
     describe ".visible?" do
       let(:u) { user_factory }
       let(:admin) { account_admin_user(account: c.root_account) }
@@ -2944,7 +3000,7 @@ describe ContextExternalTool do
           a.external_tool_tag = ContentTag.create!(context: a, content: old_tool)
           a
         end
-        let(:scope) { double("scope") }
+        let(:scope) { instance_double(Sentry::Scope) }
 
         before do
           valid_assignment
@@ -3140,76 +3196,6 @@ describe ContextExternalTool do
       sk2 = external_tool_model(opts: { name: "A" }).sort_key
       sk3 = external_tool_model(opts: { name: "a" }).sort_key
       expect([sk1, sk2, sk3].sort).to eq([sk1, sk3, sk2])
-    end
-  end
-
-  describe "#placement_allowed?" do
-    subject { tool.placement_allowed?(placement) }
-
-    let(:developer_key) { DeveloperKey.create! }
-    let(:domain) { "http://www.example.com" }
-    let(:tool) { external_tool_1_3_model(developer_key:, opts: { domain: }) }
-
-    %w[submission_type_selection top_navigation].each do |restricted_placement|
-      context "when the tool has a #{restricted_placement} placement" do
-        let(:placement) { restricted_placement.to_sym }
-
-        context "when the placement is not on any allow list" do
-          it { is_expected.to be false }
-        end
-
-        context "when the placement is allowed by developer_key_id" do
-          before do
-            Setting.set("#{restricted_placement}_allowed_dev_keys", Shard.global_id_for(developer_key.id).to_s)
-          end
-
-          it { is_expected.to be true }
-        end
-
-        context "when the placement is allowed by the domain" do
-          before do
-            Setting.set("#{restricted_placement}_allowed_launch_domains", domain)
-          end
-
-          it { is_expected.to be true }
-        end
-
-        context "when the placement is allowed by a wildcard domain" do
-          before do
-            Setting.set("#{restricted_placement}_allowed_launch_domains", "*.example.com")
-          end
-
-          it { is_expected.to be true }
-
-          it "doesn't match a different domain that happens to end with the wildcard domain" do
-            %w[fooexample.com http://fooexample.com https://fooexample.com].each do |domain|
-              tool.update!(domain:)
-              expect(tool.placement_allowed?(placement)).to be false
-            end
-          end
-
-          context "and the tool's domain is nil" do
-            before { tool.update!(domain: nil) }
-
-            it { is_expected.to be false }
-          end
-        end
-
-        context "when the tool has no domain and domain list is containing an empty space" do
-          before do
-            tool.update!(domain: "")
-            tool.update!(developer_key: nil)
-            Setting.set("#{restricted_placement}_allowed_launch_domains", ", ,,")
-            Setting.set("#{restricted_placement}_allowed_dev_keys", ", ,,")
-          end
-
-          it { is_expected.to be false }
-        end
-      end
-    end
-
-    it "return true for all other placements" do
-      expect(tool.placement_allowed?(:collaboration)).to be true
     end
   end
 
@@ -3455,6 +3441,26 @@ describe ContextExternalTool do
           .to all(eq("deleted"))
       end
     end
+
+    context "when save! fails during destroy" do
+      let(:original_state) { deployment.workflow_state }
+
+      before do
+        # capture the original state before attempting destroy
+        original_state
+        allow(deployment).to receive(:save!).and_raise(
+          ActiveRecord::RecordInvalid.new(deployment)
+        )
+      end
+
+      it "rolls back context control deletions" do
+        expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
+
+        expect(deployment.reload.workflow_state).to eq(original_state)
+        expect(deployment.context_controls.reload.pluck(:workflow_state))
+          .to all(eq("active"))
+      end
+    end
   end
 
   describe "#can_access_content_tag?" do
@@ -3514,7 +3520,8 @@ describe ContextExternalTool do
         shared_secret: "secret",
         url: "http://www.tool.com/main_launch",
         settings: {
-          ActivityAssetProcessor: { enabled: true, eula: }.compact
+          ActivityAssetProcessor: { enabled: true },
+          message_settings: eula ? [eula] : []
         }
       )
     end
@@ -3529,6 +3536,7 @@ describe ContextExternalTool do
     context "when eula fields are present" do
       let(:eula) do
         {
+          type: "LtiEulaRequest",
           enabled: true,
           target_link_uri: "http://www.tool.com/eula_launch",
           custom_fields: { "field1" => "value1" }
@@ -3538,6 +3546,75 @@ describe ContextExternalTool do
       it { expect(tool.eula_enabled?).to be true }
       it { expect(tool.eula_launch_url).to eq "http://www.tool.com/eula_launch" }
       it { expect(tool.eula_custom_fields).to eq({ "field1" => "value1" }) }
+    end
+  end
+
+  describe "#sync_app_id" do
+    let(:account) { account_model }
+    let(:registration) { lti_registration_with_tool(account:) }
+    let(:tool) { registration.deployments.first }
+
+    context "when lti_registration_id is blank" do
+      let(:tool) { external_tool_model(context: account) }
+
+      it "does not set app_id" do
+        tool.save!
+        expect(tool.app).to be_nil
+      end
+    end
+
+    context "when lti_registration_id is on the current shard" do
+      it "sets app_id to lti_registration_id" do
+        tool.lti_registration = registration
+        tool.save!
+        expect(tool.app).to eql(registration)
+      end
+    end
+
+    context "when lti_registration_id is cross-shard" do
+      specs_require_sharding
+
+      let(:registration) do
+        Account.site_admin.shard.activate { lti_registration_with_tool(account: Account.site_admin) }
+      end
+      let(:account) { @shard2.activate { account_model } }
+      let(:admin) { @shard2.activate { user_model } }
+      let(:tool) do
+        @shard2.activate do
+          registration.new_external_tool(account, current_user: admin)
+        end
+      end
+
+      context "when a local registration exists" do
+        let(:local_copy) do
+          @shard2.activate do
+            Lti::InstallTemplateRegistrationService.call(
+              account:,
+              user: admin,
+              template: registration
+            )[:local_copy]
+          end
+        end
+
+        it "sets app_id to the local copy's id" do
+          local_copy
+          tool.save!
+          expect(tool.reload.app).to eql(local_copy)
+        end
+      end
+
+      context "when no local registration exists" do
+        it "raises" do
+          # Create then destroy a local copy to simulate bad DB state
+          local_reg = @shard2.activate do
+            Lti::InstallTemplateRegistrationService.call(
+              account:, user: admin, template: registration
+            )[:local_copy]
+          end
+          local_reg.destroy!
+          expect { tool }.to raise_error(Lti::LocalAppNotFound)
+        end
+      end
     end
   end
 end

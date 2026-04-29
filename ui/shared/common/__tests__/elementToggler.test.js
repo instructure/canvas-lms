@@ -33,7 +33,7 @@ $.fn.dialog = function (action, option) {
   return this
 }
 
-$.fn.fixDialogButtons = jest.fn()
+$.fn.fixDialogButtons = vi.fn()
 
 // Override jQuery's is method for our tests
 const originalIs = $.fn.is
@@ -71,7 +71,7 @@ describe('elementToggler', () => {
 
   afterEach(() => {
     fixtures.remove()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const waitForElementState = async (element, state) => {
@@ -209,7 +209,7 @@ describe('elementToggler', () => {
     form.append(buttonContainer)
     const target = form.appendTo('#fixtures')
 
-    const fixDialogButtonsSpy = jest.spyOn($.fn, 'fixDialogButtons')
+    const fixDialogButtonsSpy = vi.spyOn($.fn, 'fixDialogButtons')
     trigger.trigger('click')
     await waitForElementState(target, 'visible')
 

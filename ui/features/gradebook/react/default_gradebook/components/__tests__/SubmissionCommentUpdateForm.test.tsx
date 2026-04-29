@@ -170,9 +170,9 @@ describe('SubmissionCommentUpdateForm', () => {
     })
 
     test('the default action is prevented when the button is clicked', async () => {
-      props.updateSubmissionComment = jest.fn(() => Promise.resolve())
+      props.updateSubmissionComment = vi.fn(() => Promise.resolve())
       wrapper = mountComponent()
-      const preventDefault = jest.fn()
+      const preventDefault = vi.fn()
       fireEvent.change(await getTextarea(), {
         target: {value: 'A changed comment'},
       })
@@ -185,8 +185,8 @@ describe('SubmissionCommentUpdateForm', () => {
     })
 
     test('clicking the "Submit" button calls setProcessing (with true) and updateSubmissionComment', async () => {
-      props.updateSubmissionComment = jest.fn(() => Promise.resolve())
-      props.setProcessing = jest.fn()
+      props.updateSubmissionComment = vi.fn(() => Promise.resolve())
+      props.setProcessing = vi.fn()
       wrapper = mountComponent()
       fireEvent.change(await getTextarea(), {target: {value: 'A changed comment'}})
       fireEvent.click(getSubmitButton())
@@ -197,7 +197,7 @@ describe('SubmissionCommentUpdateForm', () => {
     })
 
     test('clicking the "Cancel" button triggers cancelCommenting', async () => {
-      props.cancelCommenting = jest.fn()
+      props.cancelCommenting = vi.fn()
       wrapper = mountComponent()
       fireEvent.change(await getTextarea(), {target: {value: 'A changed comment'}})
       fireEvent.click(getCancelButton())

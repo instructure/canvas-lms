@@ -53,6 +53,7 @@ module AuthenticationMethods
 
     auth_context = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(@token, @domain_root_account)
 
+    raise AccessTokenError unless ::AuthenticationMethods::InstAccessToken.token_matches_tenant?(@token, @domain_root_account)
     raise AccessTokenError unless ::AuthenticationMethods::InstAccessToken.usable_developer_key?(@token, @domain_root_account)
 
     @current_user = auth_context[:current_user]
@@ -171,6 +172,7 @@ module AuthenticationMethods
 
       RequestContext::Generator.add_meta_header("at", @access_token.global_id)
       RequestContext::Generator.add_meta_header("dk", @access_token.global_developer_key_id) if @access_token.developer_key_id
+      RequestContext::Generator.add_meta_header("utid", @access_token.developer_key.unified_tool_id) if @access_token.developer_key&.unified_tool_id
     end
   end
 
@@ -328,10 +330,17 @@ module AuthenticationMethods
       end
     end
 
+    FederatedPseudonymAttributes.load_from(session) if @current_pseudonym
+
     logger.info "[AUTH] final user: #{@current_user&.id}"
     if Sentry.initialized? && !Rails.env.test?
       Sentry.set_user({ id: @current_user&.global_id, ip_address: request.remote_ip }.compact)
     end
+
+    if @current_user
+      @current_user.impersonated = @real_current_user.present? && @current_user != @real_current_user
+    end
+
     @current_user
   end
   private :load_user
@@ -374,7 +383,7 @@ module AuthenticationMethods
     redirect_to url
   end
 
-  def store_location(uri = nil, overwrite = true)
+  def store_location(uri = nil, overwrite: true)
     if overwrite || !session[:return_to]
       uri ||= request.get? ? request.fullpath : request.referer
       session[:return_to] = clean_return_to(uri)
@@ -386,10 +395,6 @@ module AuthenticationMethods
     session.delete(:return_to) || default
   end
   protected :redirect_back_or_default
-
-  def redirect_to_referrer_or_default(default)
-    redirect_back(fallback_location: default)
-  end
 
   def redirect_to_login
     return unless fix_ms_office_redirects

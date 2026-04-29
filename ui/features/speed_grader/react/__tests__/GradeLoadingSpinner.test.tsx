@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -19,17 +17,18 @@
  */
 
 import GradeLoadingSpinner from '../GradeLoadingSpinner'
-import {act, render} from '@testing-library/react'
+import {act, cleanup, render} from '@testing-library/react'
 import React from 'react'
 import store from '../../stores/index'
 
 describe('GradeLoadingSpinner', () => {
-  let props
+  let props: {onLoadingChange: ReturnType<typeof vi.fn>}
   beforeEach(() => {
-    props = {onLoadingChange: jest.fn()}
+    props = {onLoadingChange: vi.fn()}
   })
 
   afterEach(() => {
+    cleanup()
     store.setState({currentStudentId: '', gradesLoading: {}})
   })
 

@@ -20,7 +20,6 @@
 describe DifferentiationTag::OverrideConverterService do
   describe "convert_tags_to_adhoc_overrides_for" do
     def enable_differentiation_tags_for_context
-      @course.account.enable_feature!(:assign_to_differentiation_tags)
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
     end

@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {parse, format as format_} from '@instructure/moment-utils'
-import {isDate, memoize} from 'lodash'
+import {isDate, memoize} from 'es-toolkit/compat'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
   fudgeDateForProfileTimezone,
@@ -73,7 +73,7 @@ class FriendlyDatetime extends Component<Props> {
       const fudged = fudgeDateForProfileTimezone(datetime)
       let friendly
       if (this.props.format) {
-        friendly = format_(datetime, this.props.format)
+        friendly = format_(datetime, this.props.format, undefined)
       } else if (showTime) {
         friendly = datetimeString(datetime)
       } else {

@@ -81,7 +81,7 @@ describe('SelectPosition', () => {
   })
 
   it('calls setPosition when you choose a position', () => {
-    const selectPosition = jest.fn()
+    const selectPosition = vi.fn()
     const {getByTestId} = render(
       <SelectPosition
         items={[{id: '1', title: 'Item 1', groupId: '1'}]}
@@ -98,7 +98,7 @@ describe('SelectPosition', () => {
   })
 
   it('calls setSibling when you choose a sibling', () => {
-    const selectSibling = jest.fn()
+    const selectSibling = vi.fn()
     const {getByTestId} = render(
       <SelectPosition
         items={[{id: '1', title: 'Item 1', groupId: '1'}]}

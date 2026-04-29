@@ -38,5 +38,5 @@ describe "blueprint_content_added" do
   let(:asset) { @cm }
   let(:notification_name) { :blueprint_content_added }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

@@ -30,7 +30,7 @@ describe('RceCommandShim - send', () => {
     remoteEditor = {
       hidden: false,
       isHidden: () => remoteEditor.hidden,
-      call: jest.fn().mockReturnValue('methodResult'),
+      call: vi.fn().mockReturnValue('methodResult'),
     }
   })
 
@@ -96,7 +96,7 @@ describe('RceCommandShim - focus', () => {
     fixtures.setup()
     $target = fixtures.create('<textarea />')
     const editor = {
-      focus: jest.fn(),
+      focus: vi.fn(),
     }
     const tinymce = {
       get: () => editor,
@@ -109,7 +109,7 @@ describe('RceCommandShim - focus', () => {
   })
 
   it("just forwards through target's remoteEditor if set", () => {
-    remoteEditor = {focus: jest.fn()}
+    remoteEditor = {focus: vi.fn()}
     $target.data('remoteEditor', remoteEditor)
     RceCommandShim.focus($target)
     expect(remoteEditor.focus).toHaveBeenCalled()
@@ -129,21 +129,21 @@ describe('RceCommandShim - destroy', () => {
   })
 
   it("forwards through target's remoteEditor if set", () => {
-    remoteEditor = {destroy: jest.fn()}
+    remoteEditor = {destroy: vi.fn()}
     $target.data('remoteEditor', remoteEditor)
     RceCommandShim.destroy($target)
     expect(remoteEditor.destroy).toHaveBeenCalled()
   })
 
   it("clears target's remoteEditor afterwards if set", () => {
-    remoteEditor = {destroy: jest.fn()}
+    remoteEditor = {destroy: vi.fn()}
     $target.data('remoteEditor', remoteEditor)
     RceCommandShim.destroy($target)
     expect($target.data('remoteEditor')).toBeNull()
   })
 
   it('does not throw an exception if remoteEditor is not set', () => {
-    const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     $target.data('remoteEditor', null)
     expect(() => {
       RceCommandShim.destroy($target)

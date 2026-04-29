@@ -21,7 +21,7 @@ import ErrorAlert from '../index'
 
 describe('ErrorAlert', () => {
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('renders an alert with error message', () => {

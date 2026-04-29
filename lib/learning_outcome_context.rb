@@ -81,12 +81,12 @@ module LearningOutcomeContext
       end
     end
 
-    def root_outcome_group(force = true)
+    def root_outcome_group(force: true)
       LearningOutcomeGroup.find_or_create_root(self, force)
     end
 
     def update_root_outcome_group_name
-      root = root_outcome_group(false)
+      root = root_outcome_group(force: false)
       return unless root
 
       self.class.connection.after_transaction_commit do

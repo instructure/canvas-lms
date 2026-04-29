@@ -18,12 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
-
 describe AuthenticationProvider::PluginSettings do
   let(:klass) do
     Class.new(AuthenticationProvider) do
       include AuthenticationProvider::PluginSettings
+
       self.plugin = :custom_plugin
 
       def noninherited_method

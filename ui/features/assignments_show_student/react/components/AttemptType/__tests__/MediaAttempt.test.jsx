@@ -19,20 +19,9 @@
 import {render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MediaAttempt from '../MediaAttempt'
-// eslint-disable-next-line import/default
-import MediaPlayer from '@instructure/ui-media-player'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React, {createRef} from 'react'
-import StudentViewContext from '../../Context'
-
-// We need to set up a mock, as for some reason, jest.spyOn does not work on the original MediaPlayer
-jest.mock('@instructure/ui-media-player', () => {
-  const mockPlayer = jest.fn(() => null)
-  mockPlayer.propTypes = {}
-  return {
-    MediaPlayer: mockPlayer,
-  }
-})
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 
 const submissionDraftOverrides = {
   Submission: {
@@ -57,21 +46,18 @@ const makeProps = async overrides => {
   const assignmentAndSubmission = await mockAssignmentAndSubmission(overrides)
   return {
     ...assignmentAndSubmission,
-    createSubmissionDraft: jest.fn(),
-    updateUploadingFiles: jest.fn(),
-    setIframeURL: jest.fn(),
+    createSubmissionDraft: vi.fn(),
+    updateUploadingFiles: vi.fn(),
+    setIframeURL: vi.fn(),
     uploadingFiles: false,
     focusOnInit: false,
     submitButtonRef: createRef(),
   }
 }
 
-// LS-1339  created to figure out why these are failing
 describe('MediaAttempt', () => {
   beforeEach(() => {
     global.ENV = {current_user: {id: '1'}}
-    global.ENV.FEATURES = {}
-    global.ENV.FEATURES.consolidated_media_player = false
   })
 
   describe('unsubmitted', () => {
@@ -80,6 +66,17 @@ describe('MediaAttempt', () => {
       const {getByTestId} = render(<MediaAttempt {...props} />)
       expect(getByTestId('open-record-media-modal-button')).toBeInTheDocument()
       expect(getByTestId('open-upload-media-modal-button')).toBeInTheDocument()
+    })
+
+    it('renders images without alt text', async () => {
+      const props = await makeProps()
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+
+      const pandaImage = getByTestId('record-media-image')
+      expect(pandaImage).toHaveAttribute('alt', '')
+
+      const rockImage = getByTestId('upload-media-image')
+      expect(rockImage).toHaveAttribute('alt', '')
     })
 
     it('moves focus to the record media modal button after render if focusOnInit is true', async () => {
@@ -146,7 +143,10 @@ describe('MediaAttempt', () => {
     describe('validation', () => {
       it('displays an error if the user has not uploaded media and tries to submit', async () => {
         const props = await makeProps()
-        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
+        props.submission = {
+          ...props.submission,
+          submissionDraft: {meetsMediaRecordingCriteria: false},
+        }
         const submitButton = document.createElement('button')
         props.submitButtonRef.current = submitButton
         const {getByText} = render(<MediaAttempt {...props} />)
@@ -156,7 +156,10 @@ describe('MediaAttempt', () => {
 
       it('clears the error when the user clicks the record media button', async () => {
         const props = await makeProps()
-        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
+        props.submission = {
+          ...props.submission,
+          submissionDraft: {meetsMediaRecordingCriteria: false},
+        }
         const submitButton = document.createElement('button')
         props.submitButtonRef.current = submitButton
         const {getByText, queryByText, getByTestId} = render(<MediaAttempt {...props} />)
@@ -168,7 +171,10 @@ describe('MediaAttempt', () => {
 
       it('clears the error when the user clicks the upload media button', async () => {
         const props = await makeProps()
-        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
+        props.submission = {
+          ...props.submission,
+          submissionDraft: {meetsMediaRecordingCriteria: false},
+        }
         const submitButton = document.createElement('button')
         props.submitButtonRef.current = submitButton
         const {getByText, queryByText, getByTestId} = render(<MediaAttempt {...props} />)
@@ -198,40 +204,6 @@ describe('MediaAttempt', () => {
       expect(queryByTestId('remove-media-recording')).not.toBeInTheDocument()
       expect(getByTestId('media-recording')).toBeInTheDocument()
     })
-
-    it('sets default cc when auto_show_cc is enabled', async () => {
-      const playerSpy = jest.spyOn(MediaPlayer, 'MediaPlayer')
-      const props = await makeProps({
-        Submission: {
-          mediaObject: {
-            _id: 'm-123456',
-            id: '1',
-            title: 'dope_vid.mov',
-            mediaTracks: [
-              {
-                _id: 3,
-                locale: 'fr',
-                kind: 'captions',
-              },
-              {
-                _id: 1,
-                locale: 'en',
-                kind: 'captions',
-              },
-              {
-                _id: 2,
-                locale: 'es',
-                kind: 'captions',
-              },
-            ],
-          },
-          state: 'submitted',
-        },
-      })
-      global.ENV = {auto_show_cc: true, current_user: {id: '1'}}
-      render(<MediaAttempt {...props} uploadingFiles={false} />)
-      expect(playerSpy).toHaveBeenCalledWith(expect.objectContaining({autoShowCaption: 'en'}), {})
-    })
   })
 
   describe('graded', () => {
@@ -248,48 +220,8 @@ describe('MediaAttempt', () => {
     })
   })
 
-  describe('MediaPlayer', () => {
-    it('renders MediaPlayer', async () => {
-      const props = await makeProps({
-        Submission: {
-          mediaObject: {
-            _id: 'm-123456',
-            id: '1',
-            title: 'dope_vid.mov',
-            mediaTracks: [
-              {
-                _id: 1,
-                locale: 'en',
-                kind: 'captions',
-              },
-              {
-                _id: 2,
-                locale: 'es',
-                kind: 'captions',
-              },
-            ],
-          },
-          state: 'submitted',
-        },
-      })
-      const {getByTestId} = render(<MediaAttempt {...props} />)
-      expect(getByTestId('media-recording')).toBeInTheDocument()
-    })
-
-    it('does not render MediaPlayer when mediaObject is null', async () => {
-      const props = await makeProps({
-        Submission: {
-          mediaObject: null,
-        },
-      })
-      const {queryByTestId} = render(<MediaAttempt {...props} />)
-      expect(queryByTestId('media-recording')).not.toBeInTheDocument()
-    })
-  })
-
   describe('StudioPlayer', () => {
     it('renders StudioPlayer', async () => {
-      global.ENV.FEATURES.consolidated_media_player = true
       const props = await makeProps({
         Submission: {
           mediaObject: {

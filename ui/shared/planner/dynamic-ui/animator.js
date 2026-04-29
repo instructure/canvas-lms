@@ -45,7 +45,7 @@ export class Animator {
   focusElement(elt) {
     // focusing an element causes it to scroll into view, so do the focus first so it doesn't
     // override maintaining the viewport position.
-     
+
     if (!elt) console.error(`${elt} passed to Animator#focusElement`)
     else
       this.queueAnimation(() => {

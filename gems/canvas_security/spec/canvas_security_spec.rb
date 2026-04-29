@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require "canvas_cache"
 require "timecop"
 
@@ -33,7 +32,7 @@ describe CanvasSecurity do
 
             expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." \
                              "eyJhIjoxLCJleHAiOjEzNjMxNjk1MjB9." \
-                             "VwDKl46gfjFLPAIDwlkVPze1UwC6H_ApdyWYoUXFT8M"
+                             "5n8PzbRU3Ejb3EuhcI3vCCGurwXQzuZ2U65jcgNWb8k"
             expect(token).to eq(expected_token)
           end
         end
@@ -42,26 +41,26 @@ describe CanvasSecurity do
           token = CanvasSecurity.create_jwt({ a: 1 })
           expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9." \
                            "eyJhIjoxfQ." \
-                           "Pr4RQfnytL0LMwQ0pJXiKoHmEGAYw2OW3pYJTQM4d9I"
+                           "h9l6iD7t8inSVex5Z1v19AlLcTqds6ufvlow9eqGGdM"
           expect(token).to eq(expected_token)
         end
 
         it "encodes with configured encryption key" do
-          jwt = double
-          expect(jwt).to receive(:sign).with(CanvasSecurity.encryption_key, :autodetect).and_return("sometoken")
+          jwt = instance_double(JSON::JWT)
+          expect(jwt).to receive(:sign).with(CanvasSecurity.jwt_encryption_key, :autodetect).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 })
         end
 
         it "encodes with the supplied key" do
-          jwt = double
+          jwt = instance_double(JSON::JWT)
           expect(jwt).to receive(:sign).with("mykey", :autodetect).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 }, nil, "mykey")
         end
 
         it "encodes with supplied algorithm" do
-          jwt = double
+          jwt = instance_double(JSON::JWT)
           expect(jwt).to receive(:sign).with("mykey", :HS512).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 }, nil, "mykey", :HS512)
@@ -175,6 +174,34 @@ describe CanvasSecurity do
         not_a_jwt = CanvasSecurity.base64_decode("1050~LvwezC5Dd3ZK9CR1lusJTRv24dN0263txia3KF3mU6pDjOv5PaoX8Jv4ikdcvoiy")
         expect { CanvasSecurity.decode_jwt(not_a_jwt, [key]) }.to raise_error(CanvasSecurity::InvalidToken)
       end
+
+      describe "failure instrumentation" do
+        it "reports a metric tagged with JSON::JWS::VerificationFailed when no key verifies the signature" do
+          expect(InstStatsd::Statsd).to receive(:increment)
+            .with("canvas_security.decode_jwt.failure", tags: { exception: "JSON::JWS::VerificationFailed" })
+          expect { CanvasSecurity.decode_jwt(test_jwt, ["wrongkey"]) }.to raise_error(CanvasSecurity::InvalidToken)
+        end
+
+        it "reports a metric tagged with CanvasSecurity::TokenExpired when the token is expired" do
+          expired_jwt = test_jwt(exp: 1.hour.ago)
+          expect(InstStatsd::Statsd).to receive(:increment)
+            .with("canvas_security.decode_jwt.failure", tags: { exception: "CanvasSecurity::TokenExpired" })
+          expect { CanvasSecurity.decode_jwt(expired_jwt, [key]) }.to raise_error(CanvasSecurity::TokenExpired)
+        end
+
+        it "reports a metric tagged with the underlying exception class for other decode failures" do
+          not_a_jwt = CanvasSecurity.base64_decode("1050~LvwezC5Dd3ZK9CR1lusJTRv24dN0263txia3KF3mU6pDjOv5PaoX8Jv4ikdcvoiy")
+          expect(InstStatsd::Statsd).to receive(:increment)
+            .with("canvas_security.decode_jwt.failure", tags: { exception: "JSON::JWT::InvalidFormat" })
+          expect { CanvasSecurity.decode_jwt(not_a_jwt, [key]) }.to raise_error(CanvasSecurity::InvalidToken)
+        end
+
+        it "does not report a metric on successful decode" do
+          expect(InstStatsd::Statsd).not_to receive(:increment)
+            .with("canvas_security.decode_jwt.failure", anything)
+          CanvasSecurity.decode_jwt(test_jwt, [key])
+        end
+      end
     end
   end
 
@@ -208,18 +235,27 @@ describe CanvasSecurity do
     after  { described_class.instance_variable_set(:@config, nil) }
 
     it "loads config as erb from config/security.yml" do
-      config = "test:\n  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>"
+      config = <<~YAML
+        test:
+          encryption_key: <%= ENV['ENCRYPTION_KEY'] %>
+          jwt_encryption_keys:
+          - <%= ENV['JWT_ENCRYPTION_KEY'] %>
+      YAML
       expect(File).to receive(:read).with(Rails.root.join("config/security.yml").to_s).and_return(config)
       expect(ENV).to receive(:[]).with("ENCRYPTION_KEY").and_return("secret")
-      expect(CanvasSecurity.config).to eq("encryption_key" => "secret")
+      expect(ENV).to receive(:[]).with("JWT_ENCRYPTION_KEY").and_return("secret2")
+      expect(CanvasSecurity.config).to eq("encryption_key" => "secret", "jwt_encryption_keys" => ["secret2"])
     end
 
     it "falls back to Vault for the encryption key if not defined in the config file" do
-      config = "test:\n  another_key: true"
+      config = <<~YAML
+        test:
+          another_key: true
+      YAML
       expect(File).to receive(:read).with(Rails.root.join("config/security.yml").to_s).and_return(config)
-      credentials = double(security_encryption_key: "secret")
-      expect(Rails).to receive(:application).and_return(instance_double(Rails::Application, credentials:))
-      expect(CanvasSecurity.config).to eq("encryption_key" => "secret", "another_key" => true)
+      credentials = ActiveSupport::InheritableOptions.new(security_encryption_key: "secret", security_jwt_encryption_keys: ["secret2"])
+      expect(Rails).to receive(:application).twice.and_return(instance_double(Rails::Application, credentials:))
+      expect(CanvasSecurity.config).to eq("encryption_key" => "secret", "jwt_encryption_keys" => ["secret2"], "another_key" => true)
     end
   end
 end

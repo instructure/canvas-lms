@@ -28,5 +28,5 @@ describe "enrollment_invitation" do
   let(:asset) { @enrollment }
   let(:notification_name) { :enrollment_invitation }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

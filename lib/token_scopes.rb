@@ -33,6 +33,10 @@ class TokenScopes
 
   ### LTI SCOPE URLS ###
 
+  # LTI: 1Edtech Registration scopes
+  LTI_REGISTRATION_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-reg/scope/registration.readonly"
+  LTI_REGISTRATION_SCOPE = "https://purl.imsglobal.org/spec/lti-reg/scope/registration"
+
   # LTI: 1EdTech AGS (Assignment and Grade Services) and NRPS (Names and Role Provisioning Services)
   LTI_AGS_LINE_ITEM_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"
   LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
@@ -69,6 +73,10 @@ class TokenScopes
   ### LTI SCOPES DESCRIPTIONS HASHES -- Must match lti_scopes.yml and front-end  ###
   # "Public" / documented LTI scopes
   LTI_SCOPES = {
+    # Registrations
+    LTI_REGISTRATION_READ_ONLY_SCOPE => I18n.t("Can view LTI registrations associated with the tool."),
+    LTI_REGISTRATION_SCOPE => I18n.t("Can send automatic updates to be approved by an Administrator."),
+
     # AGS + NRPS
     LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
     LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the gradebook associated with the tool."),
@@ -77,17 +85,17 @@ class TokenScopes
     LTI_NRPS_V2_SCOPE => I18n.t("Can retrieve user data associated with the context the tool is installed in."),
 
     # PNS + Asset Processor
-    LTI_PNS_SCOPE => I18n.t("Can register event notice handlers using the Platform Notification Service."),
-    LTI_ASSET_READ_ONLY_SCOPE => I18n.t("Can fetch assets from the platform using the Asset Service."),
-    LTI_ASSET_REPORT_SCOPE => I18n.t("Can create reports using the Asset Report Service."),
-    LTI_EULA_DEPLOYMENT_SCOPE => I18n.t("Can update or remove the tool's EULA requirement flag."),
-    LTI_EULA_USER_SCOPE => I18n.t("Can update or remove the tool's EULA accepted flag."),
+    LTI_PNS_SCOPE => I18n.t("Can register to receive asynchronous notifications from Canvas."),
+    LTI_ASSET_READ_ONLY_SCOPE => I18n.t("Can retrieve submissions from Document Processor Assignments."),
+    LTI_ASSET_REPORT_SCOPE => I18n.t("Can send reports for Document Processor Assignments."),
+    LTI_EULA_DEPLOYMENT_SCOPE => I18n.t("Can reset EULA acceptance status."),
+    LTI_EULA_USER_SCOPE => I18n.t("Can track if EULA has been accepted."),
 
     # Canvas Extensions
     LTI_UPDATE_PUBLIC_JWK_SCOPE => I18n.t("Can update public jwk for LTI services."),
     LTI_ACCOUNT_LOOKUP_SCOPE => I18n.t("Can lookup Account information."),
     LTI_AGS_SHOW_PROGRESS_SCOPE => I18n.t("Can view Progress records associated with the context the tool is installed in."),
-    LTI_PAGE_CONTENT_SHOW_SCOPE => I18n.t("Can view the content of a page the tool is launched from.")
+    LTI_PAGE_CONTENT_SHOW_SCOPE => I18n.t("Can view the content of a page the tool is launched from."),
   }.freeze
 
   # Undocumented LTI scopes
@@ -161,7 +169,10 @@ class TokenScopes
   def self.api_routes
     return @_api_routes if @_api_routes
 
-    routes = Rails.application.routes.routes.select { |route| %r{^/api/(v1|sis|quiz/v1)} =~ route.path.spec.to_s }.map do |route|
+    regex = %r{^/(api/(v1|sis|quiz/v1).+|.*files/:(file_)?id/download)(\(\.:format\))?$}
+    routes = Rails.application.routes.routes.filter_map do |route|
+      next unless regex.match?(route.path.spec.to_s)
+
       {
         controller: route.defaults[:controller]&.to_sym,
         action: route.defaults[:action]&.to_sym,
@@ -171,6 +182,20 @@ class TokenScopes
       }
     end
     @_api_routes = routes.uniq { |route| route[:scope] }.freeze
+  end
+
+  # Returns the same info as api_routes but in a format that is useable by
+  # swagger_yard.
+  def self.api_routes_for_openapi_docs
+    api_routes_with_action = TokenScopes.api_routes.map do |route|
+      {
+        name: route[:controller].to_s + "#" + route[:action].to_s,
+        method: route[:verb],
+        path: route[:path],
+      }
+    end
+
+    api_routes_with_action.group_by { |route| route[:name] }
   end
 
   def self.hidden_scopes_for_account(root_account)

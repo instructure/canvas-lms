@@ -20,8 +20,8 @@ import {useEffect, useState, useRef, useMemo} from 'react'
 
 import {useGetAssigneeOptions} from './useGetAssigneeOptions'
 import {getCourseSettings, CourseSettings} from './queryFn'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {uniqBy} from 'lodash'
+import {showFlashError} from '@instructure/platform-alerts'
+import {uniqBy} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {type AssigneeOption} from '../../react/Item/types'
 import {useQuery} from '@tanstack/react-query'
@@ -39,6 +39,7 @@ interface Props {
   customIsLoading?: boolean
   customSetSearchTerm?: (term: string) => void
   onError?: () => void
+  onGroupCategoryNotFound?: () => void
 }
 
 const useFetchAssignees = ({
@@ -50,6 +51,7 @@ const useFetchAssignees = ({
   customAllOptions,
   customSetSearchTerm,
   onError = () => {},
+  onGroupCategoryNotFound = () => {},
 }: Props) => {
   // FIXME: This search term should be needs to be used
   const [searchTerm, setSearchTerm] = useState('')
@@ -63,12 +65,16 @@ const useFetchAssignees = ({
     return {per_page: 100}
   }, [])
 
-  const {data: fetchedCourseSettings, isSuccess: courseSettingsIsSuccess} =
-    useQuery<CourseSettings>({
-      queryKey: ['courseSettings', courseId],
-      queryFn: getCourseSettings,
-      enabled: shouldFetch && checkMasteryPaths,
-    })
+  const {
+    data: fetchedCourseSettings,
+    isSuccess: courseSettingsIsSuccess,
+    isError: courseSettingsIsError,
+    error: courseSettingsError,
+  } = useQuery<CourseSettings>({
+    queryKey: ['courseSettings', courseId],
+    queryFn: getCourseSettings,
+    enabled: shouldFetch && checkMasteryPaths,
+  })
 
   const {baseFetchedOptions, isLoading} = useGetAssigneeOptions({
     allOptions,
@@ -78,6 +84,7 @@ const useFetchAssignees = ({
     shouldFetch,
     params,
     setHasErrors,
+    onGroupCategoryNotFound,
   })
 
   const baseDefaultOptions = useMemo(() => {
@@ -87,14 +94,17 @@ const useFetchAssignees = ({
       if (courseSettings?.conditional_release) {
         defaultOptions.push({id: 'mastery_paths', value: I18n.t('Mastery Paths')})
       }
-    } else if (fetchedCourseSettings) {
-      // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
-      showFlashError(I18n.t('Failed to load course settings'))(fetchedCourseSettings?.reason)
-      setHasErrors(true)
     }
 
     return defaultOptions
   }, [courseSettingsIsSuccess, everyoneOption, fetchedCourseSettings])
+
+  useEffect(() => {
+    if (courseSettingsIsError) {
+      showFlashError(I18n.t('Failed to load course settings'))(courseSettingsError)
+      setHasErrors(true)
+    }
+  }, [courseSettingsIsError, courseSettingsError])
 
   useEffect(() => {
     const newOptions = uniqBy([...baseDefaultOptions, ...baseFetchedOptions], 'id')

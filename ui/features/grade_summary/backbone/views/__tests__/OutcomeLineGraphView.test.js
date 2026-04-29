@@ -77,7 +77,7 @@ describe('OutcomeLineGraphView', () => {
   })
 
   it('should render correctly', () => {
-    const renderSpy = jest.spyOn(outcomeLineGraphView, 'render')
+    const renderSpy = vi.spyOn(outcomeLineGraphView, 'render')
     expect(outcomeLineGraphView.render()).toBeTruthy()
     expect(outcomeLineGraphView.svg).toBeUndefined()
     outcomeLineGraphView.collection.trigger('fetched:last')

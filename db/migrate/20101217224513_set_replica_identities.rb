@@ -24,9 +24,17 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     return if connection.index_exists?(:content_tags, replica_identity: true)
 
     set_replica_identity :access_tokens
+    set_replica_identity :accessibility_course_statistics
+    set_replica_identity :accessibility_issues
+    set_replica_identity :accessibility_resource_scans
     set_replica_identity :account_users
     set_replica_identity :accounts
+    set_replica_identity :ai_conversations
+    set_replica_identity :ai_experiences
+    set_replica_identity :allocation_rules
     set_replica_identity :asset_user_accesses
+    set_replica_identity :auditor_account_user_records
+    set_replica_identity :auto_grade_results
     set_replica_identity :blackout_dates
     set_replica_identity :block_editors
     set_replica_identity :comment_bank_items
@@ -35,6 +43,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :course_account_associations
     set_replica_identity :course_pace_module_items
     set_replica_identity :course_paces
+    set_replica_identity :course_reports
     set_replica_identity :course_sections
     set_replica_identity :courses
     set_replica_identity :custom_grade_statuses
@@ -43,6 +52,8 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :discussion_entries
     set_replica_identity :discussion_entry_versions
     set_replica_identity :discussion_entry_participants
+    set_replica_identity :discussion_topic_insight_entries
+    set_replica_identity :discussion_topic_insights
     set_replica_identity :discussion_topic_participants
     set_replica_identity :discussion_topics
     set_replica_identity :discussion_topic_summaries
@@ -51,15 +62,20 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :enrollment_states
     set_replica_identity :enrollment_terms
     set_replica_identity :enrollments
+    set_replica_identity :estimated_durations
     set_replica_identity :favorites
     set_replica_identity :folders
     set_replica_identity :group_categories
     set_replica_identity :group_memberships
     set_replica_identity :groups
     set_replica_identity :inbox_settings
+    set_replica_identity :llm_responses
     set_replica_identity :lti_assets
+    set_replica_identity :lti_asset_processor_eula_acceptances
     set_replica_identity :lti_asset_processors
     set_replica_identity :lti_asset_reports
+    set_replica_identity :lti_context_controls
+    set_replica_identity :lti_import_histories
     set_replica_identity :lti_ims_registrations
     set_replica_identity :lti_line_items
     set_replica_identity :lti_notice_handlers
@@ -67,20 +83,26 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :lti_overlay_versions
     set_replica_identity :lti_registrations
     set_replica_identity :lti_registration_account_bindings
+    set_replica_identity :lti_registration_history_entries
+    set_replica_identity :lti_registration_update_requests
     set_replica_identity :lti_resource_links
     set_replica_identity :lti_results
     set_replica_identity :mentions
     set_replica_identity :microsoft_sync_groups
     set_replica_identity :microsoft_sync_partial_sync_changes
     set_replica_identity :microsoft_sync_user_mappings
+    set_replica_identity :oauth_client_configs
     set_replica_identity :originality_reports
+    set_replica_identity :outcome_rollups
     set_replica_identity :pseudonyms
     set_replica_identity :role_overrides
     set_replica_identity :roles
     set_replica_identity :rubric_assessment_imports
     set_replica_identity :rubric_criteria
     set_replica_identity :rubric_imports
+    set_replica_identity :scheduled_posts
     set_replica_identity :standard_grade_statuses
+    set_replica_identity :submission_texts
     set_replica_identity :temporary_enrollment_pairings
     set_replica_identity :user_account_associations
     set_replica_identity :user_lmgb_outcome_orderings

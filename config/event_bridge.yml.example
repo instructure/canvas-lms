@@ -1,0 +1,20 @@
+development:
+  region: us-east-1
+  vault_credential_path: sts/testaccount/sts/canvas-eventbridge-dev
+  # endpoint: http://localstack:4566  # for local development with LocalStack
+  event_buses:
+    cloudfront: canvas-cd-cloudfront-tenant-manager-event-bus-dev
+    # Add more event bus mappings as needed
+    # example: another-event-bus-dev
+
+test:
+  region: us-east-1
+  vault_credential_path: sts/testaccount/sts/canvas-eventbridge-test
+  event_buses:
+    cloudfront: canvas-cd-cloudfront-tenant-manager-event-bus-test
+
+production:
+  region: us-east-1
+  vault_credential_path: sts/testaccount/sts/canvas-eventbridge-prod
+  event_buses:
+    cloudfront: canvas-cd-cloudfront-tenant-manager-event-bus-prod

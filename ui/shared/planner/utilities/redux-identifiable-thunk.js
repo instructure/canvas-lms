@@ -21,14 +21,14 @@
 // Normally in tests, you can check that an action was dispatched by comparing
 // the action object:
 //
-// mockDispatch = jest.fn() mockDispatch(someAction(42))
+// mockDispatch = vi.fn() mockDispatch(someAction(42))
 // expect(mockDispatch).toHaveBeenCalledWith({type: 'SOME_ACTION', payload: 42})
 //
 // This utility lets you assert that the action's thunk was passed to a mock
 // dispatch function without having to invoke the thunk and check for side
 // effects. For example:
 //
-// mockDispatch = jest.fn()
+// mockDispatch = vi.fn()
 // const someComplexAction =
 //   identifiableThunk((num) => (dispatch, getState) => { dispatch(someAction(num)) })
 // mockDispatch(someComplexAction(42));

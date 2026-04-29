@@ -18,12 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class WebConference < ActiveRecord::Base
+class WebConference < ApplicationRecord
   include SendToStream
   include TextHelper
+
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: %i[course group account]
-  has_one :calendar_event, -> { order("updated_at desc") }, inverse_of: :web_conference, dependent: :nullify
+  has_one :calendar_event, -> { order(updated_at: :desc) }, inverse_of: :web_conference, dependent: :nullify
   has_many :web_conference_participants
   has_many :users, through: :web_conference_participants
   has_many :invitees, -> { where(web_conference_participants: { participation_type: "invitee" }) }, through: :web_conference_participants, source: :user
@@ -96,6 +97,37 @@ class WebConference < ActiveRecord::Base
 
   def lti_settings
     settings&.[](:lti_settings)
+  end
+
+  def invite_all_enabled?
+    settings[:invite_all] == true
+  end
+
+  def invite_all_enabled=(value)
+    settings[:invite_all] = value
+    settings_will_change!
+  end
+
+  def remove_observers_enabled?
+    settings[:remove_observers] == true
+  end
+
+  def remove_observers_enabled=(value)
+    settings[:remove_observers] = value
+    settings_will_change!
+  end
+
+  def add_new_enrollment_user(user_id)
+    return unless invite_all_enabled?
+    return unless user_id
+
+    # Respect remove_observers if enabled
+    if remove_observers_enabled? && context.is_a?(Course)
+      observer_ids = context.observers.pluck(:id)
+      return if observer_ids.include?(user_id)
+    end
+
+    invite_users_from_context([user_id])
   end
 
   def lti_tool_valid
@@ -373,7 +405,7 @@ class WebConference < ActiveRecord::Base
     nil
   end
 
-  def active?(force_check = false, allow_check = true)
+  def active?(force_check: false, allow_check: true)
     unless force_check
       return false if ended_at && Time.zone.now > ended_at
       return true if self.start_at && (self.end_at.nil? || (self.end_at && Time.zone.now > self.start_at && Time.zone.now < self.end_at))

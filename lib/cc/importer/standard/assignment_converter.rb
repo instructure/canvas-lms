@@ -113,8 +113,41 @@ module CC::Importer::Standard
         similarity_settings = node.attributes.transform_values(&:value)
         assignment[:similarity_detection_tool] = similarity_settings
       end
+      if meta_doc.at_css("lti_context_id")
+        node = meta_doc.at_css("lti_context_id")
+        lti_context_id = node.text.strip
+        assignment[:lti_context_id] = lti_context_id if lti_context_id.present?
+      end
 
-      %w[title allowed_extensions grading_type submission_types external_tool_url external_tool_data_json external_tool_link_settings_json turnitin_settings time_zone_edited].each do |string_type|
+      if meta_doc.at_css("asset_processors")
+        fields = %w[url title text custom icon window iframe report context_external_tool_url]
+        asset_processors = meta_doc.css("asset_processors asset_processor").map do |ap_node|
+          asset_processor_data = {}
+          asset_processor_data[:migration_id] = ap_node["identifier"]
+          fields.each do |field|
+            val = get_node_val(ap_node, field)
+            next if val.blank?
+
+            asset_processor_data[field.to_sym] = val
+          end
+          global_id_val = get_node_val(ap_node, "context_external_tool_global_id")
+          if global_id_val.present?
+            asset_processor_data[:context_external_tool_global_id] = global_id_val.to_i
+          end
+          asset_processor_data
+        end
+        assignment[:asset_processors] = asset_processors if asset_processors.any?
+      end
+
+      %w[title
+         allowed_extensions
+         grading_type
+         submission_types
+         external_tool_url
+         external_tool_data_json
+         external_tool_link_settings_json
+         turnitin_settings
+         time_zone_edited].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end
@@ -215,8 +248,8 @@ module CC::Importer::Standard
       {
         product_code: meta_doc.at_css("tool_setting tool_proxy").attribute("product_code").value,
         vendor_code: meta_doc.at_css("tool_setting tool_proxy").attribute("vendor_code").value,
-        custom: meta_doc.css("tool_setting custom property").each_with_object({}) { |el, hash| hash[el.attr("name")] = el.text },
-        custom_parameters: meta_doc.css("tool_setting custom_parameters property").each_with_object({}) { |el, hash| hash[el.attr("name")] = el.text }
+        custom: meta_doc.css("tool_setting custom property").to_h { |el| [el.attr("name"), el.text] },
+        custom_parameters: meta_doc.css("tool_setting custom_parameters property").to_h { |el| [el.attr("name"), el.text] }
       }
     end
   end

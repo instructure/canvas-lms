@@ -935,6 +935,7 @@ describe ExternalToolsController, type: :request do
     et.course_navigation = { :url => "http://www.example.com/ims/lti/course", :visibility => "admins", :text => "Course nav", "default" => "disabled" }
     et.account_navigation = { url: "http://www.example.com/ims/lti/account", text: "Account nav", custom_fields: { "key" => "value" } }
     et.ActivityAssetProcessor = { url: "http://www.example.com/ims/lti/resource", text: "assignment document processor", display_type: "full_width" }
+    et.ActivityAssetProcessorContribution = { url: "http://www.example.com/ims/lti/resource", text: "discussion document processor", display_type: "full_width" }
     et.analytics_hub = { url: "http://www.example.com/ims/lti/resource", text: "analytics hub", display_type: "full_width", visibility: "admins" }
     et.user_navigation = { url: "http://www.example.com/ims/lti/user", text: "User nav" }
     et.editor_button = { url: "http://www.example.com/ims/lti/editor", icon_url: "/images/delete.png", selection_width: 50, selection_height: 50, text: "editor button" }
@@ -970,6 +971,7 @@ describe ExternalToolsController, type: :request do
     et.allow_membership_service_access = opts[:allow_membership_service_access] if opts[:allow_membership_service_access]
     et.conference_selection = { url: "http://www.example.com/ims/lti/conference", icon_url: "/images/delete.png", text: "conference selection" }
     et.unified_tool_id = "utid_12345"
+    et.message_settings = [{ type: "LtiEulaRequest", enabled: true, target_link_uri: "http://www.example.com/ims/lti/eula" }]
     et.save!
     et
   end
@@ -1040,6 +1042,7 @@ describe ExternalToolsController, type: :request do
       "workflow_state" => "public",
       "version" => "1.1",
       "unified_tool_id" => "utid_12345",
+      "message_settings" => [{ "type" => "LtiEulaRequest", "enabled" => true, "target_link_uri" => "http://www.example.com/ims/lti/eula" }],
       "deployment_id" => et&.deployment_id,
       "resource_selection" => {
         "enabled" => true,
@@ -1101,6 +1104,15 @@ describe ExternalToolsController, type: :request do
         "text" => "assignment document processor",
         "url" => "http://www.example.com/ims/lti/resource",
         "label" => "assignment document processor",
+        "display_type" => "full_width",
+        "selection_height" => 400,
+        "selection_width" => 800
+      },
+      "ActivityAssetProcessorContribution" => {
+        "enabled" => true,
+        "text" => "discussion document processor",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "label" => "discussion document processor",
         "display_type" => "full_width",
         "selection_height" => 400,
         "selection_width" => 800

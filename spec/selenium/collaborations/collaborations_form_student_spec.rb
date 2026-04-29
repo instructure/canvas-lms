@@ -29,10 +29,10 @@ describe "collaborations" do
   include GoogleDriveCommon
 
   context "a student's" do
-    title = "Google Docs"
-    type = "google_docs"
+    let(:title) { "Google Docs" }
+    let(:type) { "google_docs" }
 
-    context "#{title} collaboration" do
+    context "Google Docs collaboration" do
       before do
         course_with_student_logged_in
         setup_google_drive
@@ -98,8 +98,8 @@ describe "collaborations" do
         move_to_click("label[for=groups-filter-btn-new]")
         wait_for_ajaximations
 
-        expect(ffj(".available-groups:visible a").count).to eq 1
-        expect(fj(".available-groups:visible a")).to include_text(group1)
+        expect(ffj(".available-groups:visible button").count).to eq 1
+        expect(fj(".available-groups:visible button")).to include_text(group1)
       end
     end
   end

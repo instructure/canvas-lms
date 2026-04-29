@@ -45,7 +45,7 @@ describe('setDefaultToolValues', () => {
       '<input id="assignment_external_tool_tag_attributes_iframe_height" type="hidden" value="888"/>' +
       '<input id="assignment_external_tool_tag_attributes_iframe_width" type="hidden" value="999"/>'
 
-    window.postMessage = jest.fn()
+    window.postMessage = vi.fn()
 
     setDefaultToolValues(result, tool)
   })

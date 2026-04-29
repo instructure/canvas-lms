@@ -18,13 +18,12 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import '@testing-library/jest-dom'
 import userEvent from '@testing-library/user-event'
 import GradingPeriodSet from '../GradingPeriodSet'
 import gradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 
-jest.mock('@canvas/grading/jquery/gradingPeriodsApi')
-jest.mock('axios')
+vi.mock('@canvas/grading/jquery/gradingPeriodsApi')
+vi.mock('axios')
 
 describe('GradingPeriodSet', () => {
   let props
@@ -38,10 +37,10 @@ describe('GradingPeriodSet', () => {
         displayTotalsForAllGradingPeriods: false,
       },
       terms: [],
-      onEdit: jest.fn(),
-      onDelete: jest.fn(),
-      onPeriodsChange: jest.fn(),
-      onToggleBody: jest.fn(),
+      onEdit: vi.fn(),
+      onDelete: vi.fn(),
+      onPeriodsChange: vi.fn(),
+      onToggleBody: vi.fn(),
       gradingPeriods: [
         {
           id: '1',
@@ -70,7 +69,7 @@ describe('GradingPeriodSet', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   const renderComponent = (overrideProps = {}) => {

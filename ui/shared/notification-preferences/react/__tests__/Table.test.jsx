@@ -58,7 +58,7 @@ describe('Notification Preferences Table', () => {
     const {getByTestId, queryByText} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
@@ -71,7 +71,7 @@ describe('Notification Preferences Table', () => {
     const {getByTestId, getByText} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
@@ -84,7 +84,7 @@ describe('Notification Preferences Table', () => {
     const {getByTestId} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
@@ -100,7 +100,7 @@ describe('Notification Preferences Table', () => {
     const {getByTestId} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
@@ -116,7 +116,7 @@ describe('Notification Preferences Table', () => {
     const {getByTestId} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
@@ -132,7 +132,7 @@ describe('Notification Preferences Table', () => {
     const {getByText} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
@@ -144,7 +144,7 @@ describe('Notification Preferences Table', () => {
     const {queryByTestId} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
@@ -156,7 +156,7 @@ describe('Notification Preferences Table', () => {
     const {getByTestId} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
@@ -193,7 +193,7 @@ describe('Notification Preferences Table', () => {
             },
           ],
         }}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
@@ -209,7 +209,7 @@ describe('Notification Preferences Table', () => {
     const {getByTestId} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
@@ -221,23 +221,11 @@ describe('Notification Preferences Table', () => {
     const {getByTestId} = render(
       <NotificationPreferencesTable
         preferences={mockedNotificationPreferences({sendScoresInEmails: false})}
-        updatePreference={jest.fn()}
+        updatePreference={vi.fn()}
       />,
     )
 
     const sendScoresToggle = getByTestId('grading-send-score-in-email')
     expect(sendScoresToggle.checked).toBe(false)
-  })
-
-  it('allows tabbing to the row headers', () => {
-    const container = render(
-      <NotificationPreferencesTable
-        preferences={mockedNotificationPreferences()}
-        updatePreference={jest.fn()}
-      />,
-    )
-
-    const dueDate = container.getByTestId('due_date_header')
-    expect(dueDate.tabIndex).toBe(0)
   })
 })

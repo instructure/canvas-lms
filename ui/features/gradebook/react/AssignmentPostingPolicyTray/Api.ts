@@ -19,8 +19,8 @@
 import {createClient, gql} from '@canvas/apollo-v3'
 
 export const SET_ASSIGNMENT_POST_POLICY_MUTATION = gql`
-  mutation SetAssignmentPostPolicy($assignmentId: ID!, $postManually: Boolean!) {
-    setAssignmentPostPolicy(input: {assignmentId: $assignmentId, postManually: $postManually}) {
+  mutation SetAssignmentPostPolicy($assignmentId: ID!, $postManually: Boolean!, $postCommentsAt: String, $postGradesAt: String) {
+    setAssignmentPostPolicy(input: {assignmentId: $assignmentId, postManually: $postManually, postCommentsAt: $postCommentsAt, postGradesAt: $postGradesAt}) {
       postPolicy {
         postManually
       }
@@ -32,13 +32,24 @@ export const SET_ASSIGNMENT_POST_POLICY_MUTATION = gql`
   }
 `
 
-// @ts-expect-error
-export function setAssignmentPostPolicy({assignmentId, postManually}) {
+type SetAssignmentPostPolicyInput = {
+  assignmentId: string
+  postManually?: boolean
+  postCommentsAt?: string | null
+  postGradesAt?: string | null
+}
+
+export function setAssignmentPostPolicy({
+  assignmentId,
+  postManually,
+  postCommentsAt,
+  postGradesAt,
+}: SetAssignmentPostPolicyInput) {
   return (
     createClient()
       .mutate({
         mutation: SET_ASSIGNMENT_POST_POLICY_MUTATION,
-        variables: {assignmentId, postManually},
+        variables: {assignmentId, postManually, postCommentsAt, postGradesAt},
       })
       // @ts-expect-error
       .then(response => {

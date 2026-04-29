@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {type ITopNavProps} from './TopNav'
-import {createRoot} from 'react-dom/client'
+import {render} from '@canvas/react'
 import {TopNavPortalBase, getMountPoint} from './TopNavPortalBase'
 
 const TopNavPortal: React.FC<ITopNavProps> = props => {
@@ -28,8 +28,7 @@ const TopNavPortal: React.FC<ITopNavProps> = props => {
 export const initializeTopNavPortal = (props?: ITopNavProps): void => {
   const mountPoint = getMountPoint()
   if (mountPoint) {
-    const root = createRoot(mountPoint)
-    root.render(<TopNavPortal {...props} />)
+    render(<TopNavPortal {...props} />, mountPoint)
   }
 }
 

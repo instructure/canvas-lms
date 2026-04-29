@@ -22,41 +22,41 @@ import gradebook_uploads from '../index'
 import * as waitForProcessing from '../wait_for_processing'
 
 // Mock jQuery UI and SlickGrid
-jest.mock('jquery-ui', () => {
+vi.mock('jquery-ui', () => {
   const $ = require('jquery')
-  $.widget = jest.fn()
+  $.widget = vi.fn()
   $.ui = {
     mouse: {
-      _mouseInit: jest.fn(),
-      _mouseDestroy: jest.fn(),
+      _mouseInit: vi.fn(),
+      _mouseDestroy: vi.fn(),
     },
-    sortable: jest.fn(),
+    sortable: vi.fn(),
   }
   return $
 })
 
-jest.mock('slickgrid', () => {
-  const Grid = jest.fn().mockImplementation(function ($container, data, columns, options) {
-    this.init = jest.fn()
-    this.setData = jest.fn()
-    this.render = jest.fn()
-    this.setCellCssStyles = jest.fn()
+vi.mock('slickgrid', () => {
+  const Grid = vi.fn().mockImplementation(function ($container, data, columns, options) {
+    this.init = vi.fn()
+    this.setData = vi.fn()
+    this.render = vi.fn()
+    this.setCellCssStyles = vi.fn()
   })
-  Grid.prototype.init = jest.fn()
-  Grid.prototype.setData = jest.fn()
-  Grid.prototype.render = jest.fn()
-  Grid.prototype.setCellCssStyles = jest.fn()
+  Grid.prototype.init = vi.fn()
+  Grid.prototype.setData = vi.fn()
+  Grid.prototype.render = vi.fn()
+  Grid.prototype.setCellCssStyles = vi.fn()
   global.Slick = {Grid}
   return {}
 })
 
-jest.mock('slickgrid/slick.editors', () => {
+vi.mock('slickgrid/slick.editors', () => {
   global.Slick = global.Slick || {}
   global.Slick.Editors = {}
   return {}
 })
 
-jest.mock('../wait_for_processing')
+vi.mock('../wait_for_processing')
 
 describe('gradebook_uploads#handleThingsNeedingToBeResolved', () => {
   let defaultUploadedGradebook
@@ -102,7 +102,7 @@ describe('gradebook_uploads#handleThingsNeedingToBeResolved', () => {
 
   afterEach(() => {
     document.body.innerHTML = ''
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it.skip('recognizes that there are no changed assignments when the grades are the same', async () => {

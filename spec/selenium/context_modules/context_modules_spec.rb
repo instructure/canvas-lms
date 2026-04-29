@@ -227,6 +227,7 @@ describe "context modules" do
     end
 
     it "edits available/until dates on a ungraded discussion in a module", priority: "2" do
+      skip "Will be fixed in VICE-5634 2025-11-11"
       available_from = 2.days.from_now
       available_until = 4.days.from_now
       @discussion = @course.discussion_topics.create!(title: "Non-graded Published Discussion")

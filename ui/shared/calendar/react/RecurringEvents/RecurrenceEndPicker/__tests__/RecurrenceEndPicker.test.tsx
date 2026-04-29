@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {vi} from 'vitest'
 import {render, act, fireEvent} from '@testing-library/react'
 import moment from 'moment-timezone'
 import type {UnknownSubset, FrequencyValue} from '../../types'
@@ -33,7 +34,7 @@ import {formatDate, changeUntilDate, makeSimpleIsoDate} from './utils'
 const defaultTZ = 'Asia/Tokyo'
 const today = moment().tz(defaultTZ)
 
-type messageSpy = jest.SpyInstance<InstuiMessage[], []>
+type messageSpy = ReturnType<typeof vi.spyOn>
 
 const defaultProps = (
   overrides: UnknownSubset<RecurrenceEndPickerProps> = {},
@@ -72,7 +73,7 @@ describe('RecurrenceEndPicker', () => {
   })
 
   it('fires onChange when the radio buttons are clicked', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const enddate = today.clone().add(5, 'days').format('YYYY-MM-DD')
     const {getByDisplayValue} = render(
       <RecurrenceEndPicker {...defaultProps({onChange, until: enddate})} />,
@@ -86,7 +87,7 @@ describe('RecurrenceEndPicker', () => {
   })
 
   it('fires onChange when the date input is changed', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const enddate = today.clone().add(5, 'days')
     const props = {...defaultProps({onChange, until: makeSimpleIsoDate(enddate)})}
     render(<RecurrenceEndPicker {...props} />)
@@ -101,7 +102,7 @@ describe('RecurrenceEndPicker', () => {
   })
 
   it('fires onChange when the count input is changed', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const props = {...defaultProps({onChange, count: 5})}
     const {getByDisplayValue} = render(<RecurrenceEndPicker {...props} />)
 
@@ -117,7 +118,7 @@ describe('RecurrenceEndPicker', () => {
   })
 
   it('fires onChange with undefined pos if the count input is invalid', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const props = {...defaultProps({onChange, count: 5})}
     const {getByDisplayValue} = render(<RecurrenceEndPicker {...props} />)
 
@@ -190,35 +191,35 @@ describe('RecurrenceEndPicker', () => {
 
     describe('getCountMessage', () => {
       afterEach(() => {
-        jest.resetAllMocks()
+        vi.resetAllMocks()
       })
 
       it('returns the hint count is undefined', () => {
-        const hintSpy: messageSpy = jest.spyOn(CountValidator, 'hint')
+        const hintSpy: messageSpy = vi.spyOn(CountValidator, 'hint')
         CountValidator.getCountMessage(undefined)
         expect(hintSpy).toHaveBeenCalled()
       })
 
       it('returns the invalidCount message if the count is NaN', () => {
-        const invalidCountSpy: messageSpy = jest.spyOn(CountValidator, 'invalidCount')
+        const invalidCountSpy: messageSpy = vi.spyOn(CountValidator, 'invalidCount')
         CountValidator.getCountMessage(NaN)
         expect(invalidCountSpy).toHaveBeenCalled()
       })
 
       it('returns the countTooSmall message if the count is too small', () => {
-        const countTooSmallSpy: messageSpy = jest.spyOn(CountValidator, 'countTooSmall')
+        const countTooSmallSpy: messageSpy = vi.spyOn(CountValidator, 'countTooSmall')
         CountValidator.getCountMessage(0)
         expect(countTooSmallSpy).toHaveBeenCalled()
       })
 
       it('returns the countTooLarge message if the count is too large', () => {
-        const countTooLargeSpy: messageSpy = jest.spyOn(CountValidator, 'countTooLarge')
+        const countTooLargeSpy: messageSpy = vi.spyOn(CountValidator, 'countTooLarge')
         CountValidator.getCountMessage(MAX_COUNT + 1)
         expect(countTooLargeSpy).toHaveBeenCalled()
       })
 
       it('returns the countNotWhole message if the count is not a whole number', () => {
-        const countNotWholeSpy: messageSpy = jest.spyOn(CountValidator, 'countNotWhole')
+        const countNotWholeSpy: messageSpy = vi.spyOn(CountValidator, 'countNotWhole')
         CountValidator.getCountMessage(1.5)
         expect(countNotWholeSpy).toHaveBeenCalled()
       })
@@ -251,25 +252,23 @@ describe('RecurrenceEndPicker', () => {
       }
 
       afterEach(() => {
-        jest.resetAllMocks()
+        vi.resetAllMocks()
       })
 
       it('returns the hint count end mode is "AFTER"', () => {
-        const hintSpy: jest.SpyInstance<InstuiMessage[], [CourseEndAt: string | undefined]> =
-          jest.spyOn(UntilValidator, 'hint')
+        const hintSpy = vi.spyOn(UntilValidator, 'hint')
         UntilValidator.getUntilMessage.apply(null, defaultGetUntilMessageProps({mode: 'AFTER'}))
         expect(hintSpy).toHaveBeenCalled()
       })
 
       it('returns the hint if until is undefined', () => {
-        const hintSpy: jest.SpyInstance<InstuiMessage[], [CourseEndAt: string | undefined]> =
-          jest.spyOn(UntilValidator, 'hint')
+        const hintSpy = vi.spyOn(UntilValidator, 'hint')
         UntilValidator.getUntilMessage.apply(null, defaultGetUntilMessageProps())
         expect(hintSpy).toHaveBeenCalled()
       })
 
       it('returns too soon message if until is before event start', () => {
-        const tooSoonSpy: messageSpy = jest.spyOn(UntilValidator, 'tooSoon')
+        const tooSoonSpy: messageSpy = vi.spyOn(UntilValidator, 'tooSoon')
         UntilValidator.getUntilMessage.apply(
           null,
           defaultGetUntilMessageProps({
@@ -281,7 +280,7 @@ describe('RecurrenceEndPicker', () => {
       })
 
       it('returns too many message if until is too far in the future', () => {
-        const tooManySpy: messageSpy = jest.spyOn(UntilValidator, 'tooMany')
+        const tooManySpy: messageSpy = vi.spyOn(UntilValidator, 'tooMany')
         UntilValidator.getUntilMessage.apply(
           null,
           defaultGetUntilMessageProps({

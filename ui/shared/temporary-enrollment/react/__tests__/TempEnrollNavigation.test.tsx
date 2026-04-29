@@ -22,7 +22,7 @@ import {TempEnrollNavigation} from '../TempEnrollNavigation'
 
 describe('TempEnrollNavigation', () => {
   const defaultProps = {
-    onPageClick: jest.fn(),
+    onPageClick: vi.fn(),
   }
 
   const prevPage = {page: 'prev'}

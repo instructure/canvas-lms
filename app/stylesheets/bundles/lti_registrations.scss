@@ -1,0 +1,65 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base/environment";
+
+$addition: rgba(54, 255, 128, 0.3);
+$removal: rgba(255, 65, 65, 0.3);
+
+.diff-container-addition {
+  background-color: $addition;
+}
+
+.diff-container-removal {
+  background-color: $removal;
+}
+
+.diff-two-column-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 1fr;
+  gap: 0;
+
+  .no-change {
+    background-color: transparent;
+    text-decoration: none;
+    font-style: italic;
+  }
+
+  del,ins {
+    text-decoration: none;
+    display: inline-block;
+    padding: 0.12rem 0;
+  }
+
+  code {
+    display: block;
+  }
+
+  del {
+    background-color: $removal;
+  }
+
+  ins {
+    background-color: $addition;
+  }
+
+  pre {
+    border-radius: 0;
+  }
+}

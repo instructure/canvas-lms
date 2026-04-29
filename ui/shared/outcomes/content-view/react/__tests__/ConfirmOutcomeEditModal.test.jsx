@@ -19,7 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {render, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {merge} from 'lodash'
+import {merge} from 'es-toolkit/compat'
 import ConfirmOutcomeEditModal, {showConfirmOutcomeEdit} from '../ConfirmOutcomeEditModal'
 
 const defaultProps = (props = {}) =>
@@ -109,7 +109,7 @@ it('renders the scoring method text if scoring method modified', async () => {
 })
 
 it('does not call onConfirm when canceled', async () => {
-  const onConfirm = jest.fn()
+  const onConfirm = vi.fn()
   const modalRef = React.createRef()
   const {getByRole} = render(
     <ConfirmOutcomeEditModal
@@ -140,7 +140,7 @@ it('does not call onConfirm when canceled', async () => {
 })
 
 it('calls onConfirm when saved', async () => {
-  const onConfirm = jest.fn()
+  const onConfirm = vi.fn()
   const modalRef = React.createRef()
   const {getByRole} = render(
     <ConfirmOutcomeEditModal
@@ -161,23 +161,23 @@ it('calls onConfirm when saved', async () => {
   expect(saveButton).toBeInTheDocument()
 
   // Call onConfirm directly to test the behavior
-  jest.useFakeTimers()
+  vi.useFakeTimers()
   act(() => {
     if (modalRef.current) {
       modalRef.current.onConfirm()
     }
   })
-  jest.runAllTimers()
+  vi.runAllTimers()
 
   expect(onConfirm).toHaveBeenCalled()
-  jest.useRealTimers()
+  vi.useRealTimers()
 })
 
 describe('showConfirmOutcomeEdit', () => {
   afterEach(() => {
     const parent = document.querySelector('.confirm-outcome-edit-modal-container')
     if (parent) {
-      const skipScroll = jest.spyOn(window, 'scroll').mockImplementation(() => {})
+      const skipScroll = vi.spyOn(window, 'scroll').mockImplementation(() => {})
       ReactDOM.unmountComponentAtNode(parent)
       parent.remove()
       skipScroll.mockRestore()
@@ -185,11 +185,11 @@ describe('showConfirmOutcomeEdit', () => {
   })
 
   const doesNotRenderFor = props => {
-    const onConfirm = jest.fn()
+    const onConfirm = vi.fn()
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     showConfirmOutcomeEdit({...props, onConfirm})
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     expect(onConfirm).toHaveBeenCalled()
     expect(document.querySelector('.confirm-outcome-edit-modal-container')).toBeNull()
@@ -200,11 +200,11 @@ describe('showConfirmOutcomeEdit', () => {
     app.setAttribute('id', 'application')
     document.body.appendChild(app)
 
-    const onConfirm = jest.fn()
+    const onConfirm = vi.fn()
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     showConfirmOutcomeEdit({...props, onConfirm})
-    jest.runAllTimers()
+    vi.runAllTimers()
 
     expect(onConfirm).not.toHaveBeenCalled()
     expect(document.querySelector('.confirm-outcome-edit-modal-container')).not.toBeNull()

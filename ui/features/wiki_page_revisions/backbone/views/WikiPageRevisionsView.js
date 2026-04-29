@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {each} from 'lodash'
+import {each} from 'es-toolkit/compat'
 import CollectionView from '@canvas/backbone-collection-view'
 import WikiPageRevisionView from './WikiPageRevisionView'
 import template from '../../jst/WikiPageRevisions.handlebars'

@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "Spencer Olson <solson@instructure.com>",
-  "main": "./react/CanvasMediaPlayer.jsx"
+  "main": "./react/CanvasMediaPlayer.jsx",
+  "owner": "RCX"
 }

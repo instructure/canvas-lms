@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {map, filter, sortBy} from 'lodash'
+import {sortBy, map, filter} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('EnrollmentTermsDropdown')

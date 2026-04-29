@@ -3,5 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./renderRecorder.jsx"
+  "main": "./renderRecorder.jsx",
+  "owner": "RCX"
 }

@@ -29,7 +29,9 @@ import {
   TempEnrollAssign,
   tempEnrollAssignData,
 } from '../TempEnrollAssign'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   type Enrollment,
   MAX_ALLOWED_COURSES_PER_PAGE,
@@ -43,11 +45,13 @@ import * as localStorageUtils from '../util/helpers'
 import {getDayBoundaries} from '../util/helpers'
 import MockDate from 'mockdate'
 
-const backCall = jest.fn()
+const server = setupServer()
 
-jest.mock('../api/enrollment', () => ({
-  deleteEnrollment: jest.fn(),
-  getTemporaryEnrollmentPairing: jest.fn(),
+const backCall = vi.fn()
+
+vi.mock('../api/enrollment', () => ({
+  deleteEnrollment: vi.fn(),
+  getTemporaryEnrollmentPairing: vi.fn(),
 }))
 
 const falsePermissions = {
@@ -114,7 +118,7 @@ const props: Props = {
     },
   ],
   goBack: backCall,
-  setEnrollmentStatus: jest.fn(),
+  setEnrollmentStatus: vi.fn(),
   doSubmit: () => false,
   isInAssignEditMode: false,
   enrollmentType: PROVIDER,
@@ -133,26 +137,26 @@ function formatDateToLocalString(utcDateStr: string) {
 }
 
 describe('TempEnrollAssign', () => {
+  beforeAll(() => server.listen())
+
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV = {
+    fakeENV.setup({
       ACCOUNT_ID: '1',
       CONTEXT_TIMEZONE: 'Asia/Brunei',
       context_asset_string: 'account_1',
-    }
+    })
   })
 
   afterEach(() => {
-    fetchMock.reset()
-    fetchMock.restore()
-    jest.clearAllMocks()
+    server.resetHandlers()
+    vi.clearAllMocks()
     // ensure a clean state before each tests
     localStorage.clear()
   })
 
   afterAll(() => {
-    // @ts-expect-error
-    window.ENV = {}
+    server.close()
+    fakeENV.teardown()
   })
 
   describe('getEnrollmentAndUserProps', () => {
@@ -195,12 +199,12 @@ describe('TempEnrollAssign', () => {
     ] as Enrollment[]
 
     beforeEach(() => {
-      fetchMock.get(ENROLLMENTS_URI, enrollmentsByCourse)
+      server.use(http.get(ENROLLMENTS_URI, () => HttpResponse.json(enrollmentsByCourse)))
       tempProps = {
         ...props,
         tempEnrollmentsPairing: tempEnrollmentsPairingMock,
       }
-      ;(getTemporaryEnrollmentPairing as jest.Mock).mockResolvedValue({
+      ;(getTemporaryEnrollmentPairing as any).mockResolvedValue({
         response: {status: 204, ok: true},
         json: {
           temporary_enrollment_pairing: {
@@ -400,7 +404,7 @@ describe('TempEnrollAssign', () => {
           role_id: '20',
         },
       ]
-      ;(deleteEnrollment as jest.Mock).mockResolvedValue({
+      ;(deleteEnrollment as any).mockResolvedValue({
         response: {status: 204, ok: true},
         json: [],
       })
@@ -442,11 +446,9 @@ describe('TempEnrollAssign', () => {
     let mockRoles: Role[]
 
     function mockGetFromLocalStorage<T extends object>(data: T | undefined) {
-      jest
-        .spyOn(localStorageUtils, 'getFromLocalStorage')
-        .mockImplementation((storageKey: string) =>
-          storageKey === tempEnrollAssignData ? data : undefined,
-        )
+      vi.spyOn(localStorageUtils, 'getFromLocalStorage').mockImplementation((storageKey: string) =>
+        storageKey === tempEnrollAssignData ? data : undefined,
+      )
     }
 
     beforeEach(() => {

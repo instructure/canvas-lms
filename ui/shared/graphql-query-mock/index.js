@@ -20,7 +20,7 @@ import {makeExecutableSchema} from '@graphql-tools/schema'
 import {addTypenameToDocument} from 'apollo-utilities'
 import {graphql} from 'graphql'
 import {gql} from '@apollo/client'
-import {mergeWith} from 'lodash'
+import {mergeWith} from 'es-toolkit/compat'
 import {print} from 'graphql/language/printer'
 
 // If file is not present locally, run `bundle exec rails graphql:schema`. This

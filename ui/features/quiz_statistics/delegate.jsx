@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {extend} from 'lodash'
+import {extend} from 'es-toolkit/compat'
 import config from './config'
 import controller from './controller'
 import initialize from './config/initializer'
 import Layout from './react/components/app'
 import React from 'react'
-import {createRoot} from 'react-dom/client'
+import {render, rerender} from '@canvas/react'
 
 let root
 let container
@@ -54,8 +54,7 @@ export const mount = function (node, options) {
   container = node
 
   return initialize().then(function () {
-    root = createRoot(container)
-    root.render(<Layout />)
+    root = render(<Layout />, container)
     return controller.start(update)
   })
 }
@@ -63,7 +62,7 @@ export const mount = function (node, options) {
 export const isMounted = () => !!container
 
 export const update = props => {
-  root.render(<Layout {...props} />)
+  rerender(root, <Layout {...props} />)
 }
 
 export const reload = () => controller.load()

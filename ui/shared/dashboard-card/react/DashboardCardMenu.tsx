@@ -208,8 +208,7 @@ export default class DashboardCardMenu extends React.Component<Props, State> {
                 padding="none"
                 renderTitle={I18n.t('Color')}
                 isSelected={selectedIndex === 0}
-                // @ts-expect-error TODO: change to elementRef
-                tabRef={(c: unknown) => (this._colorTab = c)}
+                elementRef={(c: Element | null) => (this._colorTab = c)}
               >
                 {colorPicker}
               </Tabs.Panel>

@@ -23,6 +23,7 @@ class OAuth2ProviderController < ApplicationController
   protect_from_forgery with: :exception, unless: :skip_csrf?
   before_action :run_login_hooks, only: %i[token]
   skip_before_action :require_reacceptance_of_terms, only: %i[token destroy]
+  skip_before_action :require_user, only: %i[accept auth confirm deny token]
 
   include Lti::Concerns::ParentFrame # allow_trusted_tools_to_embed_this_page!
   include Login::Shared
@@ -118,6 +119,13 @@ class OAuth2ProviderController < ApplicationController
   def confirm
     if session[:oauth2]
       @provider = Canvas::OAuth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes], session[:oauth2][:purpose])
+      unless @provider.can_issue_token?(@current_user, logged_in_user)
+        return redirect_to Canvas::OAuth::Provider.final_redirect(self,
+                                                                  state: params[:state],
+                                                                  error: "client_not_allowed_for_user",
+                                                                  error_description: "The current user is logged in but does not have permission to authorize this application.")
+      end
+
       @special_confirm_message = special_confirm_message(@provider)
       @custom_csrf_token = SecureRandom.hex(24)
       session[:oauth2][:custom_csrf_token] = @custom_csrf_token
@@ -127,26 +135,39 @@ class OAuth2ProviderController < ApplicationController
         render layout: "mobile_auth", action: "confirm_mobile"
       end
     else
+      Rails.logger.error { "OAUTH_SESSION_FAIL[confirm]: session[:oauth2] is nil | #{loggable_session.inspect}" }
       flash[:error] = t("Must submit new OAuth2 request")
       redirect_to login_url
     end
   end
 
   def accept
+    unless session[:oauth2]
+      Rails.logger.error { "OAUTH_SESSION_FAIL[accept]: session[:oauth2] is nil | #{loggable_session.inspect}" }
+    end
     return render plain: t("Invalid or missing session for oauth"), status: :bad_request unless session[:oauth2]
 
-    if Account.site_admin.feature_enabled?(:csrf_oauth2_fix)
-      return render plain: t("Missing custom CSRF token"), status: :bad_request unless session[:oauth2][:custom_csrf_token].present?
-      return render plain: t("Invalid custom CSRF token"), status: :bad_request unless params[:custom_csrf_token] == session[:oauth2][:custom_csrf_token]
-
-      session[:oauth2][:custom_csrf_token] = nil
+    unless session[:oauth2][:custom_csrf_token].present?
+      Rails.logger.error { "OAUTH_SESSION_FAIL[accept-csrf-missing]: #{loggable_session.inspect}" }
     end
+    return render plain: t("Missing custom CSRF token"), status: :bad_request unless session[:oauth2][:custom_csrf_token].present?
+
+    unless params[:custom_csrf_token] == session[:oauth2][:custom_csrf_token]
+      Rails.logger.error { "OAUTH_SESSION_FAIL[accept-csrf-invalid]: expected=#{session[:oauth2][:custom_csrf_token]} | got=#{params[:custom_csrf_token]} | #{loggable_session.inspect}" }
+    end
+    return render plain: t("Invalid custom CSRF token"), status: :bad_request unless params[:custom_csrf_token] == session[:oauth2][:custom_csrf_token]
+
+    session[:oauth2][:custom_csrf_token] = nil
 
     redirect_params = Canvas::OAuth::Provider.final_redirect_params(session[:oauth2], @current_user, logged_in_user, remember_access: params[:remember_access])
     redirect_to Canvas::OAuth::Provider.final_redirect(self, redirect_params)
   end
 
   def deny
+    if @domain_root_account&.feature_enabled?(:oauth2_deny_post) && request.get?
+      return render plain: t("This endpoint requires a POST request"), status: :method_not_allowed
+    end
+
     return render plain: t("Invalid or missing session for oauth"), status: :bad_request unless session[:oauth2]
 
     params = { error: "access_denied" }
@@ -213,8 +234,8 @@ class OAuth2ProviderController < ApplicationController
   private
 
   def skip_csrf?
-    return true if %w[token destroy].include?(action_name)
-    return true if Account.site_admin.feature_enabled?(:csrf_oauth2_fix) && %w[accept].include?(action_name)
+    return true if %w[token destroy accept].include?(action_name)
+    return true if @domain_root_account&.feature_enabled?(:oauth2_deny_post) && action_name == "deny"
 
     false
   end
@@ -246,5 +267,9 @@ class OAuth2ProviderController < ApplicationController
         mt "Instructure hosts Canvas Commons in the region chosen by your institution, which is the US. This means that when you use Canvas Commons your personal data will be stored and processed in the United States. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url}).", url: "https://www.instructure.com/policies/privacy"
       end
     end
+  end
+
+  def loggable_session
+    session.to_h.except("pseudonym_credentials")
   end
 end

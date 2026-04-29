@@ -62,16 +62,16 @@ describe('gradebook/SectionMenuView', () => {
     expect(view.$el.find('button').text()).toMatch(/Section One/)
   })
 
-  // FOO-4485
+  // FOO-4485 - jQuery event binding error with fake timers
   test.skip('it displays given sections', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     view.$el.find('button').click()
-    jest.advanceTimersByTime(101)
+    vi.advanceTimersByTime(101)
     const html = $('.section-select-menu:visible').html()
     expect(html).toMatch(/All Sections/)
     expect(html).toMatch(/Section One/)
     expect(html).toMatch(/Section Two/)
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   // FOO-4485

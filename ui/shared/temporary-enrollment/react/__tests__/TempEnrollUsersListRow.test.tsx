@@ -18,9 +18,12 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {type EnrollmentType, PROVIDER, RECIPIENT} from '../types'
 import TempEnrollUsersListRow, {generateIcon, generateTooltipText} from '../TempEnrollUsersListRow'
+
+const server = setupServer()
 
 describe('TempEnrollUsersListRow', () => {
   const defaultProps = {
@@ -44,6 +47,10 @@ describe('TempEnrollUsersListRow', () => {
   }
 
   const STATUS_URL = `/api/v1/users/${defaultProps.user.id}/temporary_enrollment_status`
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   describe('helper functions', () => {
     describe('generateTooltipText', () => {
@@ -82,18 +89,22 @@ describe('TempEnrollUsersListRow', () => {
   })
 
   describe('render tooltips', () => {
-    afterEach(() => {
-      fetchMock.restore()
-    })
-
     it('no icons', async () => {
-      fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: false, can_provide: false})
+      server.use(
+        http.get(STATUS_URL, () =>
+          HttpResponse.json({is_provider: false, is_recipient: false, can_provide: false}),
+        ),
+      )
       const {queryByTestId} = render(<TempEnrollUsersListRow {...defaultProps} />)
       await waitFor(() => expect(queryByTestId('user-list-row-tooltip')).toBeNull())
     })
 
     it('only can provide', async () => {
-      fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: false, can_provide: true})
+      server.use(
+        http.get(STATUS_URL, () =>
+          HttpResponse.json({is_provider: false, is_recipient: false, can_provide: true}),
+        ),
+      )
       const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
       expect(
         await findAllByText(`Create Temporary Enrollment Pairing for ${defaultProps.user.name}`),
@@ -101,7 +112,11 @@ describe('TempEnrollUsersListRow', () => {
     })
 
     it('only recipient', async () => {
-      fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: true, can_provide: false})
+      server.use(
+        http.get(STATUS_URL, () =>
+          HttpResponse.json({is_provider: false, is_recipient: true, can_provide: false}),
+        ),
+      )
       const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
       expect(
         await findAllByText(`Manage Temporary Enrollment Providers for ${defaultProps.user.name}`),
@@ -109,7 +124,11 @@ describe('TempEnrollUsersListRow', () => {
     })
 
     it('can provide and is providing', async () => {
-      fetchMock.get(STATUS_URL, {is_provider: true, is_recipient: false, can_provide: true})
+      server.use(
+        http.get(STATUS_URL, () =>
+          HttpResponse.json({is_provider: true, is_recipient: false, can_provide: true}),
+        ),
+      )
       const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
       expect(
         await findAllByText(`Manage Temporary Enrollment Recipients for ${defaultProps.user.name}`),
@@ -117,7 +136,11 @@ describe('TempEnrollUsersListRow', () => {
     })
 
     it('can provide and is recipient', async () => {
-      fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: true, can_provide: true})
+      server.use(
+        http.get(STATUS_URL, () =>
+          HttpResponse.json({is_provider: false, is_recipient: true, can_provide: true}),
+        ),
+      )
       const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
       expect(
         await findAllByText(`Create Temporary Enrollment Pairing for ${defaultProps.user.name}`),
@@ -128,7 +151,11 @@ describe('TempEnrollUsersListRow', () => {
     })
 
     it('is providing and is recipient', async () => {
-      fetchMock.get(STATUS_URL, {is_provider: true, is_recipient: true, can_provide: true})
+      server.use(
+        http.get(STATUS_URL, () =>
+          HttpResponse.json({is_provider: true, is_recipient: true, can_provide: true}),
+        ),
+      )
       const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
       expect(
         await findAllByText(`Manage Temporary Enrollment Recipients for ${defaultProps.user.name}`),
@@ -139,18 +166,61 @@ describe('TempEnrollUsersListRow', () => {
     })
   })
 
-  describe('permissions', () => {
-    afterEach(() => {
-      fetchMock.restore()
+  describe('with pre-fetched temporaryEnrollmentStatus', () => {
+    it('uses pre-fetched status without making an API call', async () => {
+      let apiCalled = false
+      server.use(
+        http.get(STATUS_URL, () => {
+          apiCalled = true
+          return HttpResponse.json({is_provider: false, is_recipient: false, can_provide: false})
+        }),
+      )
+      const {findAllByText} = render(
+        <TempEnrollUsersListRow
+          {...defaultProps}
+          temporaryEnrollmentStatus={{is_provider: true, is_recipient: false, can_provide: true}}
+        />,
+      )
+      // 2 matches: one from Tooltip content, one from ScreenReaderContent label
+      expect(
+        await findAllByText(`Manage Temporary Enrollment Recipients for ${defaultProps.user.name}`),
+      ).toHaveLength(2)
+      expect(apiCalled).toBe(false)
     })
 
+    it('renders both provider and recipient tooltips from pre-fetched status', async () => {
+      const {findAllByTestId} = render(
+        <TempEnrollUsersListRow
+          {...defaultProps}
+          temporaryEnrollmentStatus={{is_provider: true, is_recipient: true, can_provide: true}}
+        />,
+      )
+      expect(await findAllByTestId('user-list-row-tooltip')).toHaveLength(2)
+    })
+
+    it('renders nothing when pre-fetched status has no roles', () => {
+      const {queryByTestId} = render(
+        <TempEnrollUsersListRow
+          {...defaultProps}
+          temporaryEnrollmentStatus={{is_provider: false, is_recipient: false, can_provide: false}}
+        />,
+      )
+      expect(queryByTestId('user-list-row-tooltip')).toBeNull()
+    })
+  })
+
+  describe('permissions', () => {
     beforeEach(() => {
-      fetchMock.get(STATUS_URL, {is_provider: true, can_provide: true, is_recipient: true})
+      server.use(
+        http.get(STATUS_URL, () =>
+          HttpResponse.json({is_provider: true, can_provide: true, is_recipient: true}),
+        ),
+      )
     })
 
     it('renders all tooltips when permissions true', async () => {
       const {findAllByTestId} = render(<TempEnrollUsersListRow {...defaultProps} />)
-      expect((await findAllByTestId('user-list-row-tooltip'))).toHaveLength(2)
+      expect(await findAllByTestId('user-list-row-tooltip')).toHaveLength(2)
     })
 
     it('renders no tooltips when permissions are false', async () => {
@@ -181,9 +251,9 @@ describe('TempEnrollUsersListRow', () => {
           avatar_url: 'http://someurl',
         },
         roles: [{id: '19', label: 'Teacher', base_role_name: 'TeacherEnrollment'}],
-        handleOpenEditUserDialog: jest.fn(),
-        handleSubmitEditUserForm: jest.fn(),
-        handleCloseEditUserDialog: jest.fn(),
+        handleOpenEditUserDialog: vi.fn(),
+        handleSubmitEditUserForm: vi.fn(),
+        handleCloseEditUserDialog: vi.fn(),
         permissions: {
           can_add_temporary_enrollments: false,
           can_edit_temporary_enrollments: false,
@@ -208,16 +278,6 @@ describe('TempEnrollUsersListRow', () => {
       let temporaryEnrollmentProps
 
       beforeEach(() => {
-        // enrollment providers
-        // fetchMock.get(`/api/v1/users/${defaultProps.user.id}/temporary_enrollment_status`, {
-        //   is_provider: true,
-        //   is_recipient: false,
-        // })
-        // enrollment recipients
-        // fetchMock.get(`/api/v1/users/${defaultProps.user.id}/temporary_enrollment_status`, {
-        //   is_provider: false,
-        //   is_recipient: true,
-        // })
         // ensures these props are reset before each test
         temporaryEnrollmentProps = {
           ...defaultProps,
@@ -233,7 +293,7 @@ describe('TempEnrollUsersListRow', () => {
       })
 
       afterEach(() => {
-        fetchMock.restore()
+        server.resetHandlers()
       })
 
       describe('SVG Icons for temporary enrollments', () => {

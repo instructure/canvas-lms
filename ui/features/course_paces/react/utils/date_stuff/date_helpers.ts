@@ -23,7 +23,7 @@ import {weekendIntegers} from '../../shared/api/backend_serializer'
 import * as tz from '@instructure/moment-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {START_DATE_CAPTIONS, END_DATE_CAPTIONS} from '../../../constants'
-import { CoursePace, OptionalDate, Pace } from '../../types'
+import {CoursePace, OptionalDate, Pace} from '../../types'
 
 const I18n = createI18nScope('course_paces_app')
 
@@ -96,8 +96,9 @@ export const addDays = (
   excludeWeekends: boolean,
   selectedDaysToSkip: string[] = [],
   blackoutDates: BlackoutDate[] = [],
+  timezone?: string,
 ): string => {
-  const date = moment(start)
+  const date = timezone ? moment.tz(start, timezone) : moment(start)
 
   while (dayIsDisabled(date, excludeWeekends, selectedDaysToSkip, blackoutDates)) {
     date.add(1, 'day')
@@ -128,11 +129,11 @@ export const inBlackoutDate = (
   date: moment.Moment | string,
   blackoutDates: BlackoutDate[],
 ): boolean => {
-  date = moment(date)
+  date = moment(date).startOf('day')
 
   return blackoutDates.some(blackoutDate => {
-    const blackoutStart = blackoutDate.start_date
-    const blackoutEnd = blackoutDate.end_date
+    const blackoutStart = moment(blackoutDate.start_date).startOf('day')
+    const blackoutEnd = moment(blackoutDate.end_date).startOf('day')
     return date >= blackoutStart && date <= blackoutEnd
   })
 }
@@ -158,7 +159,8 @@ const dayIsDisabled = (
   )
 }
 
-// @ts-expect-error
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore - untyped function parameter
 export const formatTimeAgoDate = date => {
   if (typeof date === 'string') {
     date = Date.parse(date)
@@ -186,6 +188,8 @@ export const formatTimeAgoDate = date => {
   if (weeks < 4) {
     return I18n.t({one: '1 week ago', other: '%{count} weeks ago'}, {count: weeks})
   }
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
   return tz.format(date, 'date.formats.long')
 }
 
@@ -199,22 +203,32 @@ export const getEndDateValue = (coursePace: CoursePace, plannedEndDate: Optional
   }
 }
 
-const getStartDateCaption = (startDateValue: OptionalDate, coursePace: CoursePace, contextType: string) => {
+const getStartDateCaption = (
+  startDateValue: OptionalDate,
+  coursePace: CoursePace,
+  contextType: string,
+) => {
   if (startDateValue && coursePace.start_date_context !== 'hypothetical') {
+    const contextTypeValue: string =
+      contextType === 'enrollment' && window.ENV.FEATURES.course_pace_time_selection
+        ? 'enrollment_time_selection'
+        : contextType
 
-    const contextTypeValue: string = contextType === 'enrollment' && window.ENV.FEATURES.course_pace_time_selection
-      ? 'enrollment_time_selection'
-      : contextType
-
-    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - dynamic object property access
     return START_DATE_CAPTIONS[contextTypeValue]
   }
   return START_DATE_CAPTIONS.empty
 }
 
-const getEndDateCaption = (endDateValue: OptionalDate, coursePace: CoursePace, contextType: string) => {
+const getEndDateCaption = (
+  endDateValue: OptionalDate,
+  coursePace: CoursePace,
+  contextType: string,
+) => {
   if (endDateValue && coursePace.end_date_context !== 'hypothetical') {
-    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - dynamic object property access
     return END_DATE_CAPTIONS[contextType]
   }
   return END_DATE_CAPTIONS.empty
@@ -224,16 +238,16 @@ export const generateDatesCaptions = (
   coursePace: CoursePace,
   startDateValue: OptionalDate,
   endDateValue: OptionalDate,
-  appliedPace: Pace
+  appliedPace: Pace,
 ) => {
   const contextType = coursePace.context_type.toLocaleLowerCase()
-  const captions = { startDate: START_DATE_CAPTIONS.empty, endDate: END_DATE_CAPTIONS.empty }
+  const captions = {startDate: START_DATE_CAPTIONS.empty, endDate: END_DATE_CAPTIONS.empty}
   captions.startDate = getStartDateCaption(startDateValue, coursePace, contextType)
 
   if (contextType === 'enrollment') {
     const appliedPaceContextType = appliedPace?.type.toLocaleLowerCase()
     const paceType = ['course', 'section'].includes(appliedPaceContextType)
-      ? appliedPaceContextType
+      ? `enrollment_${appliedPaceContextType}`
       : 'default'
     captions.endDate = getEndDateCaption(endDateValue, coursePace, paceType)
     return captions

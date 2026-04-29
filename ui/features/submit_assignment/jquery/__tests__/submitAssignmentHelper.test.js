@@ -23,19 +23,19 @@ describe('SubmitAssignmentHelper', () => {
 
   beforeEach(() => {
     document.body.innerHTML = '<div id="fixtures"></div>'
-    alertMock = jest.spyOn(window, 'alert').mockImplementation(() => {})
+    alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {})
   })
 
   afterEach(() => {
     document.body.innerHTML = ''
-    jest.clearAllMocks()
-    jest.useRealTimers()
+    vi.clearAllMocks()
+    vi.useRealTimers()
   })
 
   describe('recordEulaAgreement', () => {
     it('sets the input value to current time when checked is true', () => {
       const now = new Date('2024-01-01')
-      jest.useFakeTimers().setSystemTime(now)
+      vi.useFakeTimers().setSystemTime(now)
 
       document.getElementById('fixtures').innerHTML = `
         <input type='checkbox' name='test' class='checkbox-test'>
@@ -52,7 +52,7 @@ describe('SubmitAssignmentHelper', () => {
 
     it('clears the value when checked is false', () => {
       const now = new Date('2024-01-01')
-      jest.useFakeTimers().setSystemTime(now)
+      vi.useFakeTimers().setSystemTime(now)
 
       document.getElementById('fixtures').innerHTML = `
         <input type='checkbox' name='test' class='checkbox-test'>

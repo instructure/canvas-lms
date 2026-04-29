@@ -19,18 +19,18 @@
 import React from 'react'
 
 interface Props {
-    children: React.ReactNode
+  children: React.ReactNode
 }
 
 const RenderGuard = ({children}: Props) => {
-    const isMountSafe = !!document.getElementById('new_login_safe_to_mount')
+  const isMountSafe = !!document.getElementById('new_login_safe_to_mount')
 
-    if (!isMountSafe) {
-        console.warn('RenderGuard blocked mount: #new_login_safe_to_mount not found')
-        return null
-    }
+  if (!isMountSafe) {
+    console.warn('RenderGuard blocked mount: #new_login_safe_to_mount not found')
+    return null
+  }
 
-    return <>{children}</>
+  return <>{children}</>
 }
 
 export default RenderGuard

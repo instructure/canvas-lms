@@ -1,0 +1,8 @@
+<% for tag in object.tags(:hint) %>
+<% parts = tag.text.split("\n", 2) %>
+<% hint_style = parts[0].strip %>
+<% hint_text = parts[1]&.strip || "" %>
+<div class="<%= hint_style %>-message">
+  <%= htmlify hint_text %>
+</div>
+<% end %>

@@ -21,15 +21,15 @@ import {fireEvent, render} from '@testing-library/react'
 import {ImportRubric, type ImportRubricProps} from '..'
 import * as ViewRubricQueries from '../../../../queries/ViewRubricQueries'
 
-jest.mock('../../../../queries/ViewRubricQueries', () => ({
-  ...jest.requireActual('../../../../queries/ViewRubricQueries'),
-  importRubric: jest.fn(),
-  fetchRubricImport: jest.fn(),
+vi.mock('../../../../queries/ViewRubricQueries', async () => ({
+  ...await vi.importActual('../../../../queries/ViewRubricQueries'),
+  importRubric: vi.fn(),
+  fetchRubricImport: vi.fn(),
 }))
 
 describe('ImportRubric Tests', () => {
   afterEach(() => {
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   const renderComponent = (props?: Partial<ImportRubricProps>) => {
@@ -37,8 +37,8 @@ describe('ImportRubric Tests', () => {
       <MockedQueryProvider>
         <ImportRubric
           isTrayOpen={true}
-          handleImportSuccess={jest.fn()}
-          handleTrayClose={jest.fn()}
+          handleImportSuccess={vi.fn()}
+          handleTrayClose={vi.fn()}
           accountId="123"
           importFetchInterval={100}
           {...props}
@@ -61,7 +61,7 @@ describe('ImportRubric Tests', () => {
 
   describe('ImportRubricTray tests', () => {
     beforeEach(() => {
-      jest.spyOn(ViewRubricQueries, 'importRubric').mockImplementation(() =>
+      vi.spyOn(ViewRubricQueries, 'importRubric').mockImplementation(() =>
         Promise.resolve({
           attachment: {
             id: '1',
@@ -87,7 +87,7 @@ describe('ImportRubric Tests', () => {
 
     // TODO: unskip fickle test (cf. EVAL-4893)
     it.skip('successfully imports the rubric csv and displays rubric import data in ImportTable', async () => {
-      jest.spyOn(ViewRubricQueries, 'fetchRubricImport').mockImplementation(() =>
+      vi.spyOn(ViewRubricQueries, 'fetchRubricImport').mockImplementation(() =>
         Promise.resolve({
           attachment: {
             id: '1',
@@ -114,7 +114,7 @@ describe('ImportRubric Tests', () => {
 
     // TODO: unskip fickle test (cf. EVAL-4893)
     it.skip('displays the ImportFailuresModal if the rubric import failed', async () => {
-      jest.spyOn(ViewRubricQueries, 'fetchRubricImport').mockImplementation(() =>
+      vi.spyOn(ViewRubricQueries, 'fetchRubricImport').mockImplementation(() =>
         Promise.resolve({
           attachment: {
             id: '1',

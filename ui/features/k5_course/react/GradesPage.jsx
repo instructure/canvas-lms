@@ -24,7 +24,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import GradingPeriodSelect from './GradingPeriodSelect'
 import GradesEmptyPage from './GradesEmptyPage'
@@ -136,7 +136,7 @@ export const GradesPage = ({
       <div id="outcomes">
         <IndividualStudentMastery
           courseId={courseId}
-          studentId={currentUser.id}
+          studentId={observedUserId || currentUser.id}
           outcomeProficiency={outcomeProficiency}
         />
       </div>

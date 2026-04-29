@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {each, filter} from 'lodash'
+import {each, filter} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import assignmentUtils from './assignmentUtils'

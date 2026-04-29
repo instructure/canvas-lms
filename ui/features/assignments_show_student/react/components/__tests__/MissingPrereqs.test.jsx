@@ -34,6 +34,8 @@ afterEach(() => {
 })
 
 it('renders normally', () => {
-  const container = render(<MissingPrereqs moduleUrl="TEST" />, { container: document.getElementById('fixtures') })
+  const container = render(<MissingPrereqs moduleUrl="TEST" />, {
+    container: document.getElementById('fixtures'),
+  })
   expect(container.getByTestId('assignments-2-pre-req-title')).toBeInTheDocument()
 })

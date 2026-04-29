@@ -22,7 +22,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
-import {IconImageLine} from '@instructure/ui-icons'
+import {IconImageLine, IconAddSolid} from '@instructure/ui-icons'
 import {isValidHttpUrl} from '../../common/lib/validators/isValidHttpUrl'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {useDebouncedCallback} from 'use-debounce'
@@ -38,6 +38,9 @@ import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import {ltiToolDefaultIconUrl} from '../model/ltiToolIcons'
 import {getInputIdForField} from '../registration_overlay/validateLti1p3RegistrationOverlayState'
+import type {LtiRegistrationUpdateRequest} from '../model/lti_ims_registration/LtiRegistrationUpdateRequest'
+import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
+import {diffPlacements} from '../model/placementDiffer'
 
 const I18n = createI18nScope('lti_registration.wizard')
 export interface IconConfirmationProps {
@@ -47,7 +50,11 @@ export interface IconConfirmationProps {
   allPlacements: readonly LtiPlacement[]
   placementIconOverrides: Partial<Record<LtiPlacementWithIcon, string>>
   setPlacementIconUrl: (placement: LtiPlacementWithIcon, iconUrl: string) => void
+  defaultIconUrl?: string
+  setDefaultIconUrl: (iconUrl: string) => void
   hasSubmitted: boolean
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
+  existingRegistration?: LtiRegistrationWithConfiguration
 }
 
 export const IconConfirmation = React.memo(
@@ -58,7 +65,11 @@ export const IconConfirmation = React.memo(
     allPlacements,
     placementIconOverrides,
     setPlacementIconUrl,
+    defaultIconUrl,
+    setDefaultIconUrl,
     hasSubmitted,
+    registrationUpdateRequest,
+    existingRegistration,
   }: IconConfirmationProps) => {
     const [blurStatus, setBlurStatus] = React.useState<
       Partial<Record<LtiPlacementWithIcon, boolean>>
@@ -72,6 +83,12 @@ export const IconConfirmation = React.memo(
       [setBlurStatus],
     )
 
+    // Compute added and removed placements using the differ utility
+    const {added: addedPlacements} = React.useMemo(
+      () => diffPlacements(existingRegistration, registrationUpdateRequest),
+      [existingRegistration, registrationUpdateRequest],
+    )
+
     const placementsWithIcons = React.useMemo(
       () =>
         allPlacements
@@ -82,14 +99,34 @@ export const IconConfirmation = React.memo(
       [allPlacements],
     )
 
+    const existingPlacementsWithIcons = React.useMemo(
+      () => placementsWithIcons.filter(p => !addedPlacements.includes(p)),
+      [placementsWithIcons, addedPlacements],
+    )
+
+    const newlyAddedPlacementsWithIcons = React.useMemo(
+      () => placementsWithIcons.filter(p => addedPlacements.includes(p)),
+      [placementsWithIcons, addedPlacements],
+    )
+
     const [placementImgValues, setPlacementImgValues] =
       React.useState<Partial<Record<LtiPlacementWithIcon, string>>>(placementIconOverrides)
+
+    const [defaultIconImgValue, setDefaultIconImgValue] = React.useState<string | undefined>(
+      defaultIconUrl,
+    )
+
+    const [defaultIconBlurred, setDefaultIconBlurred] = React.useState(false)
 
     const debouncedImgUrlsUpdate = useDebouncedCallback(
       (placement: LtiPlacementWithIcon, value: string) =>
         setPlacementImgValues(prev => ({...prev, [placement]: value})),
       500,
     )
+
+    const debouncedDefaultIconUpdate = useDebouncedCallback((value: string) => {
+      setDefaultIconImgValue(value)
+    }, 500)
 
     const updateIconUrl = React.useCallback(
       (placement: LtiPlacementWithIcon, value: string) => {
@@ -99,42 +136,101 @@ export const IconConfirmation = React.memo(
       [debouncedImgUrlsUpdate, setPlacementIconUrl],
     )
 
+    const updateDefaultIconUrl = React.useCallback(
+      (value: string) => {
+        setDefaultIconUrl(value)
+        debouncedDefaultIconUpdate(value)
+      },
+      [debouncedDefaultIconUpdate, setDefaultIconUrl],
+    )
+
     React.useEffect(() => {
       return () => {
         debouncedImgUrlsUpdate.flush()
+        debouncedDefaultIconUpdate.flush()
       }
-    }, [debouncedImgUrlsUpdate])
+    }, [debouncedImgUrlsUpdate, debouncedDefaultIconUpdate])
 
     return (
       <>
         <Heading level="h3" margin="0 0 x-small 0">
-          {I18n.t('Icon URLs')}
+          {I18n.t('Tool Icon URL')}
+        </Heading>
+        <Text>
+          {I18n.t("Choose the tool's default icon and its icon on the Apps page (optional).")}
+        </Text>
+        <div style={{marginTop: '1rem', marginBottom: '1rem'}}>
+          <DefaultIconUrlInput
+            defaultIconUrl={internalConfig.launch_settings?.icon_url}
+            inputUrl={defaultIconUrl}
+            imageUrl={defaultIconImgValue}
+            onInputUrlChange={updateDefaultIconUrl}
+            showErrors={defaultIconBlurred || hasSubmitted}
+            onBlur={() => setDefaultIconBlurred(true)}
+          />
+        </div>
+        <Heading level="h3" margin="medium 0 x-small 0">
+          {I18n.t('Placement Icon URLs')}
         </Heading>
         {placementsWithIcons.length > 0 ? (
           <>
             <Text>{I18n.t('Choose what icon displays in each placement (optional).')}</Text>
-            <Flex direction="column" gap="medium" margin="medium 0 medium 0">
-              {placementsWithIcons.map(placement => {
-                // prefer the placement-specific icon, but fall back to the top-level default
-                const defaultIcon =
-                  internalConfig.placements?.find(p => p.placement === placement)?.icon_url ??
-                  internalConfig.launch_settings?.icon_url
-                return (
-                  <IconOverrideInput
-                    handleBlur={handleBlur}
-                    showErrors={(blurStatus[placement] ?? false) || hasSubmitted}
-                    key={placement}
-                    placement={placement}
-                    toolName={name}
-                    defaultIconUrl={defaultIcon}
-                    developerKeyId={developerKeyId}
-                    inputUrl={placementIconOverrides[placement]}
-                    imageUrl={placementImgValues[placement]}
-                    onInputUrlChange={updateIconUrl}
-                  />
-                )
-              })}
-            </Flex>
+            {existingPlacementsWithIcons.length > 0 && (
+              <Flex direction="column" gap="medium" margin="medium 0 medium 0">
+                {existingPlacementsWithIcons.map(placement => {
+                  // prefer the placement-specific icon, but fall back to the top-level default
+                  const defaultIcon =
+                    internalConfig.placements?.find(p => p.placement === placement)?.icon_url ||
+                    defaultIconUrl
+                  return (
+                    <IconOverrideInput
+                      handleBlur={handleBlur}
+                      showErrors={(blurStatus[placement] ?? false) || hasSubmitted}
+                      key={placement}
+                      placement={placement}
+                      toolName={name}
+                      defaultIconUrl={defaultIcon}
+                      developerKeyId={developerKeyId}
+                      inputUrl={placementIconOverrides[placement]}
+                      imageUrl={placementImgValues[placement]}
+                      onInputUrlChange={updateIconUrl}
+                    />
+                  )
+                })}
+              </Flex>
+            )}
+            {newlyAddedPlacementsWithIcons.length > 0 && (
+              <Flex direction="column" alignItems="start" gap="small" margin="small 0 medium 0">
+                <Heading level="h4" margin="0 0 x-small 0">
+                  <Flex direction="row" gap="small">
+                    <IconAddSolid />
+                    {I18n.t('Added')}
+                  </Flex>
+                </Heading>
+                <Flex direction="column" gap="medium" width="100%">
+                  {newlyAddedPlacementsWithIcons.map(placement => {
+                    // prefer the placement-specific icon, but fall back to the top-level default
+                    const defaultIcon =
+                      internalConfig.placements?.find(p => p.placement === placement)?.icon_url ||
+                      defaultIconUrl
+                    return (
+                      <IconOverrideInput
+                        handleBlur={handleBlur}
+                        showErrors={(blurStatus[placement] ?? false) || hasSubmitted}
+                        key={placement}
+                        placement={placement}
+                        toolName={name}
+                        defaultIconUrl={defaultIcon}
+                        developerKeyId={developerKeyId}
+                        inputUrl={placementIconOverrides[placement]}
+                        imageUrl={placementImgValues[placement]}
+                        onInputUrlChange={updateIconUrl}
+                      />
+                    )
+                  })}
+                </Flex>
+              </Flex>
+            )}
           </>
         ) : (
           <Text>{I18n.t("This tool doesn't have any placements with configurable icons.")}</Text>
@@ -157,6 +253,78 @@ type IconOverrideInputProps = {
   ) => (event: React.FocusEvent<HTMLInputElement>) => void
   showErrors: boolean
 }
+
+type DefaultIconUrlInputProps = {
+  defaultIconUrl?: string
+  inputUrl?: string
+  imageUrl?: string
+  onInputUrlChange: (value: string) => void
+  onBlur: () => void
+  showErrors: boolean
+}
+
+const DefaultIconUrlInput = React.memo(
+  ({
+    defaultIconUrl,
+    inputUrl,
+    imageUrl,
+    onInputUrlChange,
+    onBlur,
+    showErrors,
+  }: DefaultIconUrlInputProps) => {
+    let messages: FormMessage[] = []
+    if (inputUrl && !isValidHttpUrl(inputUrl) && showErrors) {
+      messages = [{type: 'error', text: I18n.t('Invalid URL')}]
+    }
+
+    const imgTitle = I18n.t('Tool icon')
+    const renderedImageUrl = imageUrl?.trim() || defaultIconUrl
+
+    return (
+      <TextInput
+        id={getInputIdForField('default_icon_url')}
+        onBlur={onBlur}
+        renderLabel={I18n.t('Tool Icon URL')}
+        placeholder={defaultIconUrl}
+        renderAfterInput={
+          renderedImageUrl && isValidHttpUrl(renderedImageUrl) ? (
+            <div
+              style={{
+                overflow: 'hidden',
+                margin: '0.5rem 0',
+                padding: '0.25rem',
+              }}
+            >
+              <Img
+                src={renderedImageUrl}
+                data-testid="img-default-icon"
+                alt={imgTitle}
+                loading="lazy"
+                height="2rem"
+                width="2rem"
+              />
+            </div>
+          ) : (
+            <div
+              style={{
+                padding: '0.25rem',
+                color: 'white',
+                backgroundColor: 'gray',
+                borderRadius: '0.25rem',
+                margin: '0.75rem 0.25rem',
+              }}
+            >
+              <IconImageLine width="1.5rem" height="1.5rem" title={imgTitle} />
+            </div>
+          )
+        }
+        value={inputUrl ?? ''}
+        onChange={e => onInputUrlChange(e.target.value)}
+        messages={messages}
+      />
+    )
+  },
+)
 
 const IconOverrideInput = React.memo(
   ({

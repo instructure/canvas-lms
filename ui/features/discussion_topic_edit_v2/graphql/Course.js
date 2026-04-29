@@ -24,20 +24,20 @@ import {gql} from '@apollo/client'
 
 export const Course = {
   fragment: gql`
-    fragment Course on Course {
+    fragment EditV2Course on Course {
       _id
       id
       name
       groupSets {
-        ...GroupSet
+        ...EditV2GroupSet
       }
       assignmentGroupsConnection {
         nodes {
-          ...AssignmentGroup
+          ...EditV2AssignmentGroup
         }
       }
       assignmentGroups {
-        ...AssignmentGroup
+        ...EditV2AssignmentGroup
       }
       usersConnection(filter: {enrollmentTypes: StudentEnrollment, enrollmentStates: active}) {
         nodes {
@@ -47,7 +47,7 @@ export const Course = {
       }
       groupSetsConnection {
         nodes {
-          ...GroupSet
+          ...EditV2GroupSet
         }
       }
       sectionsConnection {

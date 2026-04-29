@@ -16,19 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Rubric} from '@canvas/rubrics/react/types/rubric'
+import type {RubricQueryResponse} from '../queries/RubricFormQueries'
 
-export const RUBRICS_QUERY_RESPONSE: Rubric = {
+export const RUBRICS_QUERY_RESPONSE: RubricQueryResponse = {
+  __typename: 'Rubric',
   id: '1',
   title: 'Rubric 1',
-  criteriaCount: 2,
   pointsPossible: 10,
   workflowState: 'active',
   buttonDisplay: 'numeric',
   ratingOrder: 'ascending',
   freeFormCriterionComments: false,
+  hasRubricAssociations: false,
+  unassessed: true,
+  canUpdateRubric: true,
+  rubricAssociationForContext: {
+    __typename: 'RubricAssociation',
+    associationId: '1',
+    associationType: 'Assignment',
+    hidePoints: false,
+    hideScoreTotal: false,
+    hideOutcomeResults: false,
+    id: 'association-1',
+    useForGrading: false,
+  },
   criteria: [
     {
+      __typename: 'RubricCriterion',
       id: '1',
       points: 5,
       description: 'Criterion 1',
@@ -36,14 +50,18 @@ export const RUBRICS_QUERY_RESPONSE: Rubric = {
       ignoreForScoring: false,
       masteryPoints: 3,
       criterionUseRange: false,
+      learningOutcomeId: null,
+      outcome: null,
       ratings: [
         {
+          __typename: 'RubricRating',
           id: '1',
           description: 'Rating 1',
           longDescription: 'Long description for rating 1',
           points: 5,
         },
         {
+          __typename: 'RubricRating',
           id: '2',
           description: 'Rating 2',
           longDescription: 'Long description for rating 2',
@@ -52,6 +70,7 @@ export const RUBRICS_QUERY_RESPONSE: Rubric = {
       ],
     },
     {
+      __typename: 'RubricCriterion',
       id: '2',
       points: 5,
       description: 'Outcome Criterion 2',
@@ -66,12 +85,14 @@ export const RUBRICS_QUERY_RESPONSE: Rubric = {
       learningOutcomeId: '12345',
       ratings: [
         {
+          __typename: 'RubricRating',
           id: '1',
           description: 'Outcome Rating 1',
           longDescription: '',
           points: 5,
         },
         {
+          __typename: 'RubricRating',
           id: '2',
           description: 'Outcome Rating 2',
           longDescription: '',
@@ -80,20 +101,33 @@ export const RUBRICS_QUERY_RESPONSE: Rubric = {
       ],
     },
   ],
-  unassessed: true,
 }
 
-export const RUBRIC_CRITERIA_IGNORED_FOR_SCORING: Rubric = {
+export const RUBRIC_CRITERIA_IGNORED_FOR_SCORING: RubricQueryResponse = {
+  __typename: 'Rubric',
   id: '1',
   title: 'Rubric 1',
-  criteriaCount: 1,
   pointsPossible: 10,
   workflowState: 'active',
   buttonDisplay: 'numeric',
   ratingOrder: 'ascending',
   freeFormCriterionComments: false,
+  hasRubricAssociations: false,
+  unassessed: true,
+  canUpdateRubric: true,
+  rubricAssociationForContext: {
+    __typename: 'RubricAssociation',
+    associationId: '1',
+    associationType: 'Assignment',
+    hidePoints: false,
+    hideScoreTotal: false,
+    hideOutcomeResults: false,
+    id: 'association-1',
+    useForGrading: false,
+  },
   criteria: [
     {
+      __typename: 'RubricCriterion',
       id: '1',
       points: 5,
       description: 'Criterion 1',
@@ -101,14 +135,18 @@ export const RUBRIC_CRITERIA_IGNORED_FOR_SCORING: Rubric = {
       ignoreForScoring: true,
       masteryPoints: 3,
       criterionUseRange: false,
+      learningOutcomeId: null,
+      outcome: null,
       ratings: [
         {
+          __typename: 'RubricRating',
           id: '1',
           description: 'Rating 1',
           longDescription: 'Long description for rating 1',
           points: 5,
         },
         {
+          __typename: 'RubricRating',
           id: '2',
           description: 'Rating 2',
           longDescription: 'Long description for rating 2',

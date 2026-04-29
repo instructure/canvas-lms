@@ -37,6 +37,8 @@ module Factories
     }
   end
 
+  # @deprecated Please use `lti_registration_with_tool` instead, as it will give you everything you need for LTI 1.3 testing
+  # in a single call.
   def lti_developer_key_model(opts = {})
     opts[:account] ||= Account.default
     opts[:account] = nil if opts[:account].site_admin?
@@ -61,6 +63,7 @@ module Factories
     tos_uri = "http://example.com/tos"
     policy_uri = "http://example.com/policy"
     lti_tool_configuration = {
+      target_link_uri: "http://example.com/launch",
       domain: "example.com",
       messages: [
         {

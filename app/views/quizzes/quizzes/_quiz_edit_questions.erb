@@ -41,12 +41,12 @@
       <% if question[:entry_type] == "quiz_group" %>
         <%= render :partial => "question_group", :object => question %>
       <% else %>
-        <%= render :partial => (@quiz.quiz_questions.active.size > Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT ? "question_teaser" : "display_question"), :object => question, :locals => {:editing => true, :asset_string => "quiz_question_#{question['id']}"} %>
+        <%= render :partial => (@quiz.quiz_questions.active.size > Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT ? "question_teaser" : "display_question"), :object => question, :locals => { editing: true, asset_string: "quiz_question_#{question['id']}"} %>
       <% end %>
     <% end %>
   </div>
-  <%= render :partial => "question_teaser", :object => nil, :locals => {:editing => true } %>
-  <%= render :partial => "display_question", :object => nil, :locals => {:editing => true } %>
+  <%= render :partial => "question_teaser", :object => nil, :locals => { editing: true } %>
+  <%= render :partial => "display_question", :object => nil, :locals => { editing: true } %>
   <%= render :partial => "display_answer", :object => nil %>
   <%= render :partial => "form_answer", :object => nil %>
   <%= render :partial => "form_question", :object => nil %>

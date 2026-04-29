@@ -7,9 +7,11 @@ fi
 
 if [ -z "$2" ]; then
   $0 "$CANVAS_ROOT" $CANVAS_ROOT".git" "."
-  for plugin in $(find $CANVAS_ROOT"gems/plugins" -name .git | sort); do
-    $0 "$CANVAS_ROOT" $plugin "../../.."
-  done
+  if [ -d "$CANVAS_ROOT"gems/plugins ]; then
+    for plugin in $(find $CANVAS_ROOT"gems/plugins" -name .git | sort); do
+      $0 "$CANVAS_ROOT" $plugin "../../.."
+    done
+  fi
   exit 0
 fi
 

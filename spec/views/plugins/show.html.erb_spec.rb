@@ -21,7 +21,8 @@ require_relative "../views_helper"
 
 describe "plugins/show" do
   it "renders without exploding" do
-    plugin = double(
+    plugin = instance_double(
+      Canvas::Plugin,
       id: "some_plugin",
       name: "Some Plugin",
       settings_partial: "settings_header",

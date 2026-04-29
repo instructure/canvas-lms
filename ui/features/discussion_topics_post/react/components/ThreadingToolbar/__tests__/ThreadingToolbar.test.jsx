@@ -22,17 +22,19 @@ import {render, fireEvent, waitFor} from '@testing-library/react'
 import {responsiveQuerySizes} from '../../../utils'
 import {ThreadingToolbar} from '../ThreadingToolbar'
 
-jest.mock('../../../utils')
-jest.mock('../../../hooks/useSpeedGrader', () => jest.fn(() => false))
+vi.mock('../../../utils')
+vi.mock('../../../hooks/useSpeedGrader', () => ({
+  default: vi.fn(() => false),
+}))
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })
@@ -79,7 +81,7 @@ describe('ThreadingToolbar', () => {
 
   describe('when rootEntryId is present', () => {
     it('calls the onOpenSplitView callback with the parent entry id', async () => {
-      const onOpenSplitView = jest.fn()
+      const onOpenSplitView = vi.fn()
       const container = render(
         <ThreadingToolbar
           discussionEntry={DiscussionEntry.mock({
@@ -100,7 +102,7 @@ describe('ThreadingToolbar', () => {
 
   describe('when rootEntryId is not present', () => {
     it('calls the onOpenSplitView callback with the entry id', async () => {
-      const onOpenSplitView = jest.fn()
+      const onOpenSplitView = vi.fn()
       const container = render(
         <ThreadingToolbar
           discussionEntry={DiscussionEntry.mock({
@@ -119,7 +121,7 @@ describe('ThreadingToolbar', () => {
   })
 
   it('calls the onOpenSplitView callback with its own id if it is a root entry', async () => {
-    const onOpenSplitView = jest.fn()
+    const onOpenSplitView = vi.fn()
     const container = render(
       <ThreadingToolbar
         discussionEntry={DiscussionEntry.mock({

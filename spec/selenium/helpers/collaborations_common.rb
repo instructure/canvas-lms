@@ -58,8 +58,8 @@ module CollaborationsCommon
   #
   # Returns nothing.
   def validate_collaborations(urls = %W[/courses/#{@course.id}/collaborations],
-                              form_visible = true,
-                              execute_script = false)
+                              form_visible: true,
+                              execute_script: false)
     Array(urls).each do |url|
       get url
 
@@ -98,7 +98,7 @@ module CollaborationsCommon
 
     f("#collaboration_title").send_keys(collaboration_name)
 
-    fj(".available-users:visible a").click
+    fj(".available-users:visible button").click
     expect(ff(".members-list li")).to have_size(1)
 
     f('button[type="submit"]').click

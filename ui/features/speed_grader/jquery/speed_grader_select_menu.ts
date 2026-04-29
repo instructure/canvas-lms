@@ -207,7 +207,6 @@ export default class SpeedgraderSelectMenu {
     this.$el = $(buildHtml(this.options_array))
       .appendTo(selector)
       .selectmenu({
-        // @ts-expect-error
         style: 'dropdown',
         format: () => this.formatSelectText(),
         open: () => this.our_open(),
@@ -232,9 +231,7 @@ export default class SpeedgraderSelectMenu {
     return this.$el.data(str)
   }
 
-  // @ts-expect-error
-  selectmenu(...args) {
-    // @ts-expect-error
+  selectmenu(...args: any[]) {
     return this.$el.selectmenu(...args)
   }
 

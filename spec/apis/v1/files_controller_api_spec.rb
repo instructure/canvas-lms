@@ -22,16 +22,14 @@ require_relative "../api_spec_helper"
 require_relative "../locked_examples"
 require "webmock/rspec"
 
-RSpec.configure do |config|
-  config.include ApplicationHelper
-end
-
 describe "Files API", type: :request do
+  include ApplicationHelper
+
   before :once do
     course_with_teacher(active_all: true, user: user_with_pseudonym)
   end
 
-  context "locked api item" do
+  it_behaves_like "a locked api item" do
     let(:item_type) { "file" }
 
     let(:locked_item) do
@@ -46,8 +44,6 @@ describe "Files API", type: :request do
         { controller: "files", action: "api_show", format: "json", id: locked_item.id.to_s }
       )
     end
-
-    include_examples "a locked api item"
   end
 
   describe "create file" do
@@ -230,7 +226,7 @@ describe "Files API", type: :request do
     def upload_data
       @attachment.workflow_state = nil
       @content = Tempfile.new(["test", ".txt"])
-      def @content.content_type # rubocop:disable Lint/NestedMethodDefinition
+      def @content.content_type
         "text/plain"
       end
       @content.write("test file")
@@ -282,7 +278,6 @@ describe "Files API", type: :request do
                              "mime_class" => @attachment.mime_class,
                              "media_entry_id" => @attachment.media_entry_id,
                              "canvadoc_session_url" => nil,
-                             "crocodoc_session_url" => nil,
                              "category" => "uncategorized",
                              "visibility_level" => @attachment.visibility_level
                            })
@@ -323,7 +318,6 @@ describe "Files API", type: :request do
                              "mime_class" => @attachment.mime_class,
                              "media_entry_id" => @attachment.media_entry_id,
                              "canvadoc_session_url" => nil,
-                             "crocodoc_session_url" => nil,
                              "category" => "uncategorized",
                              "visibility_level" => @attachment.visibility_level
                            })
@@ -693,7 +687,7 @@ describe "Files API", type: :request do
         json = api_call(:get, @files_path, @files_path_options, {})
         res = json.pluck("display_name")
         expect(res).to eq %w[atest3.txt mtest2.txt ztest.txt]
-        json.pluck("url").each { |url| expect(url).to include "verifier=" } unless disable_adding_uuid_verifier_in_api
+        expect(json.pluck("url")).to all(include "verifier=") unless disable_adding_uuid_verifier_in_api
       end
 
       it "does not omit verifiers using session auth if params[:use_verifiers] is given" do
@@ -701,7 +695,38 @@ describe "Files API", type: :request do
         get @files_path + "?use_verifiers=1"
         expect(response).to be_successful
         json = json_parse
-        json.pluck("url").each { |url| expect(url).to include "verifier=" } unless disable_adding_uuid_verifier_in_api
+        expect(json.pluck("url")).to all(include "verifier=") unless disable_adding_uuid_verifier_in_api
+      end
+    end
+
+    context "uuid removal for file verifier project" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "returns the file uuid when the deprecate_uuid_in_files_api flag is disabled" do
+        @course.root_account.disable_feature!(:deprecate_uuid_in_files_api)
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/files", @files_path_options.merge(course_id: @course.id.to_param), {})
+        expect(json.pluck("uuid")).to match_array([@a1.uuid, @a2.uuid, @a3.uuid])
+      end
+
+      context "with deprecate_uuid_in_files_api feature enabled" do
+        before do
+          @course.root_account.enable_feature!(:deprecate_uuid_in_files_api)
+        end
+
+        it "doesn't return the file uuid when the context is not the file owner" do
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/files", @files_path_options.merge(course_id: @course.id.to_param), {})
+          json.each do |f|
+            expect(f["uuid"]).to be_nil
+          end
+        end
+
+        it "returns the file uuid when the context is the file owner" do
+          user_att = @teacher.attachments.create(id: 100_000_000_001, uploaded_data: fixture_file_upload("cn_image.jpg"))
+          json = api_call(:get, "/api/v1/users/#{@teacher.id}/files", @files_path_options.merge(user_id: @teacher.id.to_param), {})
+          expect(json.pluck("uuid")).to match_array([user_att.uuid])
+        end
       end
     end
 
@@ -1165,7 +1190,6 @@ describe "Files API", type: :request do
         "mime_class" => @att.mime_class,
         "media_entry_id" => @att.media_entry_id,
         "canvadoc_session_url" => nil,
-        "crocodoc_session_url" => nil,
         "category" => "uncategorized",
         "visibility_level" => @att.visibility_level
       }
@@ -1231,21 +1255,43 @@ describe "Files API", type: :request do
       expect(json["url"]).to eq file_download_url(@att, download: "1", download_frd: "1")
     end
 
-    it "omits verifiers in the enhanced preview when using session auth" do
-      user_session(@user)
-      get @file_path + "?include[]=enhanced_preview_url"
-      expect(response).to be_successful
-      json = json_parse
-      expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0)
-    end
+    context "with enhanced preview" do
+      it "omits verifiers in the enhanced preview when using session auth" do
+        user_session(@user)
+        get @file_path + "?include[]=enhanced_preview_url"
+        expect(response).to be_successful
+        json = json_parse
+        expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0)
+      end
 
-    it "passes along given verifiers when creating the enhanced_preview_url" do
-      user_session(@user)
-      @att.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
-      get @file_path + "?include[]=enhanced_preview_url&verifier=#{@att.uuid}"
-      expect(response).to be_successful
-      json = json_parse
-      expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0, verifier: @att.uuid)
+      it "passes along given verifiers when creating the enhanced_preview_url" do
+        user_session(@user)
+        @att.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
+        get @file_path + "?include[]=enhanced_preview_url&verifier=#{@att.uuid}"
+        expect(response).to be_successful
+        json = json_parse
+        expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0, verifier: @att.uuid)
+      end
+
+      it "passes along given location tags when creating the enhanced_preview_url" do
+        @att.root_account.enable_feature!(:file_association_access)
+        user_session(@user)
+        get @file_path + "?include[]=enhanced_preview_url&location=whatever_12"
+        expect(response).to be_successful
+        json = json_parse
+        expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0, location: "whatever_12")
+      end
+
+      it "works with assessment question context" do
+        assessment_question_bank_with_questions(course: @course, count: 1)
+        @att.context = @q1
+        @att.save!
+        user_session(@user)
+        get @file_path + "?include[]=enhanced_preview_url"
+        expect(response).to be_successful
+        json = json_parse
+        expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0)
+      end
     end
 
     describe "with JWT access token" do
@@ -1634,7 +1680,7 @@ describe "Files API", type: :request do
       course_with_student(active_all: true)
       quiz_model(course: @course)
       @quiz.update_attribute :one_question_at_a_time, true
-      @qs = @quiz.generate_submission(@student, false)
+      @qs = @quiz.generate_submission(@student)
 
       account_admin_user(account: @account)
       @att.context = @qs
@@ -1794,7 +1840,7 @@ describe "Files API", type: :request do
       old_uuid = @att.uuid
       account_admin_user(account: @account)
       api_call(:post, @file_path, @file_path_options, {}, {}, expected_status: 200)
-      expect(@att.reload.uuid).to_not eq old_uuid
+      expect(@att.reload.uuid).not_to eq old_uuid
     end
 
     it "does not let non-admin users reset verifiers" do
@@ -1994,6 +2040,29 @@ describe "Files API", type: :request do
 
       json = JSON.parse(response.body)
       expect(json).to eq({ "errors" => [{ "message" => "Too many file links requested.  A maximum of 100 file links can be processed per request." }] })
+    end
+
+    it "returns the display name and instfs uuid when include_display_name is passed" do
+      doc = attachment_model(context: @course, display_name: "test.docx", uploaded_data: fixture_file_upload("test.docx"), instfs_uuid: "doc")
+
+      file_urls = ["/files/#{doc.id}/download?download_frd=1", "/files/#{doc.id}", "http://example.canvas.edu/files/#{doc.id}/download"]
+      body = { user_uuid: @teacher.uuid, file_urls:, include_display_name: true }
+
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
+      json = JSON.parse(response.body)
+      expect(json).to eq({
+                           "canvas_instfs_ids" => {
+                             "/files/#{doc.id}/download?download_frd=1" =>
+                                { "instfs_uuid" => "doc",
+                                  "display_name" => "test.docx" },
+                             "/files/#{doc.id}" =>
+                                { "instfs_uuid" => "doc",
+                                  "display_name" => "test.docx" },
+                             "http://example.canvas.edu/files/#{doc.id}/download" =>
+                                { "instfs_uuid" => "doc",
+                                  "display_name" => "test.docx" }
+                           }
+                         })
     end
   end
 

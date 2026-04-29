@@ -49,6 +49,8 @@ module Types
     implements Interfaces::SubmissionInterface
     implements Interfaces::LegacyIDInterface
 
+    connection_type_class TotalCountConnection
+
     def initialize(object, context)
       super
       anonymous_grading_scoped_context(object)
@@ -83,7 +85,7 @@ module Types
           :manage_grades
         )
 
-        scope = course.apply_enrollment_visibility(course.all_enrollments, current_user, include: :inactive)
+        scope = course.apply_enrollment_visibility(course.enrollments, current_user, include: :inactive)
         scope.where(user_id: submission.user_id)
       end
     end
@@ -125,15 +127,18 @@ module Types
     field :lti_asset_reports_connection,
           LtiAssetReportType.connection_type,
           "Lti Asset Reports with active processors, with assets preloaded",
-          null: true
-    def lti_asset_reports_connection
+          null: true do
+      argument :latest, Boolean, required: false, default_value: false, description: "When true, returns only the asset reports of the latest submission attempt (as students would see them)"
+    end
+    def lti_asset_reports_connection(latest: false)
       load_association(:root_account).then do |root_account|
         next unless root_account.feature_enabled?(:lti_asset_processor)
+        next if object.submission_type == "discussion_topic" && !root_account.feature_enabled?(:lti_asset_processor_discussions)
 
         if object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
-          Loaders::SubmissionLtiAssetReportsLoader.load(object.id)
-        elsif object.user_can_read_grade?(current_user)
-          Loaders::SubmissionLtiAssetReportsStudentLoader.load(object.id)
+          Loaders::SubmissionLtiAssetReportsLoader.for(for_student: false, latest:).load(object.id)
+        else
+          Loaders::SubmissionLtiAssetReportsLoader.for(for_student: true, latest:).load(object.id)
         end
       end
     end
@@ -161,9 +166,31 @@ module Types
       end
     end
 
-    field :auto_grade_submission_errors, [String], null: false, description: "Issues related to the submission"
+    field :auto_grade_submission_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the submission", deprecation_reason: "Use autoGradeEligibility instead"
+    def auto_grade_submission_issues
+      load_association(:course).then do |course|
+        next nil unless course.feature_enabled?(:project_lhotse)
+
+        GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:).first
+      end
+    end
+
+    field :auto_grade_submission_errors, [String], null: false, description: "Errors related to the submission", deprecation_reason: "Use autoGradeEligibility instead"
     def auto_grade_submission_errors
-      GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
+      load_association(:course).then do |course|
+        next [] unless course.feature_enabled?(:project_lhotse)
+
+        GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:).pluck(:message)
+      end
+    end
+
+    field :auto_grade_eligibility, Types::AutoGradeEligibilityType, null: true, description: "Eligibility for auto-grading"
+    def auto_grade_eligibility
+      load_association(:course).then do |course|
+        next nil unless course.feature_enabled?(:project_lhotse)
+
+        { issues: GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:) }
+      end
     end
 
     field :provisional_grades_connection, Types::ProvisionalGradeType.connection_type, null: true
@@ -183,6 +210,17 @@ module Types
           end
         else
           nil
+        end
+      end
+    end
+
+    field :submission_quiz_histories_connection, Types::QuizSubmissionType.connection_type, null: true
+    def submission_quiz_histories_connection
+      load_association(:quiz_submission).then do |quiz_submission|
+        next nil unless quiz_submission
+
+        Loaders::AssociationLoader.for(Quizzes::QuizSubmission, :versions).load(quiz_submission).then do |versions|
+          quiz_submission.quiz_submission_histories(versions:)
         end
       end
     end

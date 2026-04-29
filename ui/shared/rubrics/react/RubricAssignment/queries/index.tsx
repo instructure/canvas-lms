@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import getCookie from '@instructure/get-cookie'
+import {getCookie} from '@instructure/platform-get-cookie'
 import {gql} from '@apollo/client'
 import qs from 'qs'
 import type {GradingRubricContext} from '../types/rubricAssignment'
@@ -27,11 +27,14 @@ import {
 } from '../../utils'
 import type {QueryOptions} from '@tanstack/react-query'
 import {executeQuery} from '@canvas/graphql'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+export const RUBRIC_FOR_CONTEXT_PAGINATION_LIMIT = 100
 
 export const removeRubricFromAssignment = async (courseId: string, rubricAssociationId: string) => {
   return fetch(`/courses/${courseId}/rubric_associations/${rubricAssociationId}`, {
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
     method: 'POST',
@@ -41,7 +44,10 @@ export const removeRubricFromAssignment = async (courseId: string, rubricAssocia
   })
 }
 
-export type AssignmentRubric = Rubric & {can_update?: boolean; association_count?: number}
+export type AssignmentRubric = Rubric & {
+  association_count?: number
+  public?: boolean
+}
 export const addRubricToAssignment = async (
   courseId: string,
   assignmentId: string,
@@ -52,7 +58,7 @@ export const addRubricToAssignment = async (
 
   const response = await fetch(`/courses/${courseId}/rubric_associations`, {
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     },
     method: 'POST',
@@ -83,11 +89,15 @@ export const addRubricToAssignment = async (
   )
 
   return {
-    rubricAssociation: mappedRubricAssociation,
+    rubricAssociation: {
+      ...mappedRubricAssociation,
+      canUpdate: result.rubric_association.permissions?.update,
+      canDelete: result.rubric_association.permissions?.delete,
+    },
     rubric: {
       ...mappedRubric,
-      can_update: result.rubric.permissions?.update,
-      association_count: result.rubric.association_count,
+      canUpdateRubric: result.rubric.permissions?.update,
+      association_count: result.rubric_association?.association_count ?? 0,
     } as AssignmentRubric,
   }
 }
@@ -103,7 +113,7 @@ export const getGradingRubricContexts = async ({
 
   const contexts = await fetch(`/courses/${courseId}/grading_rubrics`, {
     headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
+      'X-CSRF-Token': getCookie('_csrf_token') ?? '',
     },
   })
 
@@ -114,41 +124,52 @@ export const getGradingRubricContexts = async ({
   return (await contexts.json()) as GradingRubricContext[]
 }
 
-type GradingRubricForContextResponse = {
+export type GradingRubricForContextResponse = {
   rubricAssociation: RubricAssociation
   rubric: Rubric
 }
+export type GradingRubricsForContextResult = {
+  rubrics: GradingRubricForContextResponse[]
+  totalPages: number
+}
 export const getGradingRubricsForContext = async ({
   queryKey,
-}: QueryOptions): Promise<GradingRubricForContextResponse[]> => {
+}: QueryOptions): Promise<GradingRubricsForContextResult> => {
   if (!queryKey) {
     throw Error('Query key is required')
   }
 
-  const [_, courseId, contextCode] = queryKey
+  const [_, courseId, contextCode, page, searchTerm] = queryKey
 
   if (!contextCode) {
     throw Error('Context code is required')
   }
 
-  const contexts = await fetch(`/courses/${courseId}/grading_rubrics?context_code=${contextCode}`, {
-    headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
-    },
-  })
+  const params: Record<string, string | number> = {
+    context_code: contextCode as string,
+  }
+  if (page) {
+    params.page = page as number
+    params.per_page = RUBRIC_FOR_CONTEXT_PAGINATION_LIMIT
 
-  if (!contexts.ok) {
-    throw new Error('Failed to get grading rubric contexts')
+    if (searchTerm) {
+      params.search_term = searchTerm as string
+    }
   }
 
-  const results = await contexts.json()
-
-  return results.map((result: {rubric_association: any}) => {
-    return {
-      rubricAssociation: mapRubricAssociationUnderscoredKeysToCamelCase(result.rubric_association),
-      rubric: mapRubricUnderscoredKeysToCamelCase(result.rubric_association?.rubric),
-    }
+  const {json, link} = await doFetchApi<{rubric_association: any}[]>({
+    path: `/courses/${courseId}/grading_rubrics`,
+    params,
   })
+
+  const totalPages = link?.last?.page ? parseInt(link.last.page, 10) : 1
+
+  const rubrics = (json ?? []).map((result: {rubric_association: any}) => ({
+    rubricAssociation: mapRubricAssociationUnderscoredKeysToCamelCase(result.rubric_association),
+    rubric: mapRubricUnderscoredKeysToCamelCase(result.rubric_association?.rubric),
+  }))
+
+  return {rubrics, totalPages}
 }
 
 const SET_RUBRIC_SELF_ASSESSMENT = gql`

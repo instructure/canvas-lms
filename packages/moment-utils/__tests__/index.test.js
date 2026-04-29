@@ -110,22 +110,22 @@ describe('specifiesTimezone', () => {
   it('is true when format contains Z and input contains a timezone', () => {
     expect(
       specifiesTimezone(
-        createDateTimeMoment('June 24, 2015 at 10:00pm -06:00', 'MMMM D, YYYY h:mmA Z')
-      )
+        createDateTimeMoment('June 24, 2015 at 10:00pm -06:00', 'MMMM D, YYYY h:mmA Z'),
+      ),
     ).toEqual(true)
   })
 
   it('is false when format contains Z but input has no timezone', () => {
     expect(
-      specifiesTimezone(createDateTimeMoment('June 24, 2015 at 10:00pm', 'MMMM D, YYYY h:mmA Z'))
+      specifiesTimezone(createDateTimeMoment('June 24, 2015 at 10:00pm', 'MMMM D, YYYY h:mmA Z')),
     ).toEqual(false)
   })
 
   it('is false when format does not contain Z even if the input contains a timezone', () => {
     expect(
       specifiesTimezone(
-        createDateTimeMoment('June 24, 2015 at 10:00pm -06:00', 'MMMM D, YYYY h:mmA')
-      )
+        createDateTimeMoment('June 24, 2015 at 10:00pm -06:00', 'MMMM D, YYYY h:mmA'),
+      ),
     ).toEqual(false)
   })
 })

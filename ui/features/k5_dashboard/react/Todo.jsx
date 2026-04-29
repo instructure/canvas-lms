@@ -30,7 +30,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEndSolid} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError} from '@instructure/platform-alerts'
 import {ignoreTodo} from '@canvas/k5/react/utils'
 import * as tz from '@instructure/moment-utils'
 
@@ -52,9 +52,9 @@ const Todo = ({
 
   // Only assignments are supported (ungraded_quizzes are not)
   if (!assignment || ignored) return null
-  const {id, all_dates, name, points_possible} = assignment
+  const {id, all_dates, all_dates_count, name, points_possible} = assignment
   const baseDueAt = getBaseDueAt(assignment)
-  const hasMultipleDueDates = all_dates.length > 1
+  const hasMultipleDueDates = all_dates_count ? all_dates_count > 1 : all_dates.length > 1
 
   const handleIgnoreTodo = () => {
     ignoreTodo(ignore)
@@ -109,18 +109,26 @@ const Todo = ({
           {context_name}
         </Text>
         <Text color="secondary">
-          <View>
-            {I18n.t({one: '1 point', other: '%{count} points'}, {count: points_possible})}
-          </View>
+          {points_possible != null && (
+            <View>
+              {I18n.t({one: '1 point', other: '%{count} points'}, {count: points_possible})}
+            </View>
+          )}
           {/* The dot is tiny in Balsamiq Sans, which is why we're forcing Lato here */}
           <PresentationContent>
             <View margin="0 small" themeOverride={{fontFamily: 'Lato, Arial, sans-serif'}}>
               •
             </View>
           </PresentationContent>
-          <View>{dueDate}</View>
-          {hasMultipleDueDates && (
-            <View margin="0 0 0 x-small">{I18n.t('(Multiple Due Dates)')}</View>
+          {all_dates_count > 1 && all_dates.length === 0 ? (
+            <View>{I18n.t('Multiple Due Dates')}</View>
+          ) : (
+            <>
+              <View>{dueDate}</View>
+              {hasMultipleDueDates && (
+                <View margin="0 0 0 x-small">{I18n.t('(Multiple Due Dates)')}</View>
+              )}
+            </>
           )}
         </Text>
       </Flex>
@@ -148,9 +156,10 @@ Todo.propTypes = {
         due_at: PropTypes.string,
       }),
     ).isRequired,
+    all_dates_count: PropTypes.number,
     due_at: PropTypes.string,
     name: PropTypes.string.isRequired,
-    points_possible: PropTypes.number.isRequired,
+    points_possible: PropTypes.number,
   }),
   context_name: PropTypes.string.isRequired,
   html_url: PropTypes.string.isRequired,

@@ -18,15 +18,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class LearningOutcome < ActiveRecord::Base
+class LearningOutcome < ApplicationRecord
   include ManyRootAccounts
   include Workflow
   include MasterCourses::Restrictor
+
   restrict_columns :state, [:workflow_state]
   include LinkedAttachmentHandler
+  include CanvasOutcomesHelper
 
   def self.html_fields
     %w[description]
+  end
+
+  def attachment_associations_creation_enabled?
+    return context.root_account.feature_enabled?(:allow_attachment_association_creation) if context&.root_account
+
+    Account.site_admin.feature_enabled?(:allow_attachment_association_creation)
   end
 
   def attachment_associations_enabled?
@@ -61,6 +69,7 @@ class LearningOutcome < ActiveRecord::Base
   before_save :infer_defaults
   before_save :infer_root_account_ids
   after_save :propagate_changes_to_rubrics
+  after_commit :rollup_calculation, on: :update, if: :rollup_relevant_changes?
 
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :short_description, length: { maximum: maximum_string_length }
@@ -514,11 +523,11 @@ class LearningOutcome < ActiveRecord::Base
     # Find all unassessed, active rubrics aligned to this outcome, referenced by no more than one assignment
     Rubric.where(
       id: Rubric
-        .active
-        .joins(:learning_outcome_alignments)
-        .where(content_tags: conds)
-        .with_at_most_one_association
-        .select("rubrics.id")
+          .active
+          .joins(:learning_outcome_alignments)
+          .where(content_tags: conds)
+          .with_at_most_one_association
+          .select("rubrics.id")
     ).unassessed
   end
 
@@ -545,6 +554,49 @@ class LearningOutcome < ActiveRecord::Base
       SELECT DISTINCT id FROM children order by id desc
     SQL
     LearningOutcome.joins("JOIN (#{sql}) children ON children.id = #{LearningOutcome.quoted_table_name}.id").pluck(:id)
+  end
+
+  def rollup_relevant_changes?
+    return true if saved_changes.keys.intersect?(%w[calculation_method calculation_int])
+
+    # Check for rubric_criterion changes that affect scoring
+    if saved_changes.key?("data")
+      old_data = saved_changes["data"][0] || {}
+      new_data = saved_changes["data"][1] || {}
+
+      old_criterion = old_data[:rubric_criterion] || {}
+      new_criterion = new_data[:rubric_criterion] || {}
+
+      # Check for changes in ratings, mastery_points, or points_possible
+      return true if old_criterion[:ratings] != new_criterion[:ratings]
+      return true if old_criterion[:mastery_points] != new_criterion[:mastery_points]
+      return true if old_criterion[:points_possible] != new_criterion[:points_possible]
+    end
+
+    false
+  end
+
+  def rollup_calculation
+    return unless context.is_a?(Course) || context.is_a?(Account)
+    return unless Account.site_admin.feature_enabled?(:outcomes_rollup_propagation)
+
+    begin
+      if context.is_a?(Account) && Account.site_admin.feature_enabled?(:account_outcome_rollup_orchestrator)
+        Outcomes::AccountOutcomeRollupOrchestrator.process_account_outcome_change(
+          account_id: context.id,
+          outcome_id: id
+        )
+      elsif context.is_a?(Course)
+        enqueue_rollup_calculation(course_id: context.id)
+      end
+    rescue => e
+      Canvas::Errors.capture_exception(:outcome_rollup_callback, e, {
+                                         context_type: context.class.name,
+                                         context_id: context.id,
+                                         learning_outcome_id: id,
+                                         calculation_method:
+                                       })
+    end
   end
 
   private
@@ -642,7 +694,6 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   # set color defaults for ratings in an outcome
-  # rubocop:disable Lint/DuplicateBranch
   def find_or_set_default_mastery_colors(ratings, mastery_index)
     length = ratings.length
     # apply appropriate defaults for each length if
@@ -681,7 +732,6 @@ class LearningOutcome < ActiveRecord::Base
       ratings[5][:color] ||= "555555"
     end
   end
-  # rubocop:enable Lint/DuplicateBranch
 
   def set_mastery_level(ratings, mastery_index)
     ratings.each_with_index do |rating, i|

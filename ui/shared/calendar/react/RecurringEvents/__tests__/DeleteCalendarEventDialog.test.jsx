@@ -29,10 +29,10 @@ import {
 
 const server = setupServer()
 
-const handleCancel = jest.fn()
-const handleDeleting = jest.fn()
-const handleDeleted = jest.fn()
-const handleUpdated = jest.fn()
+const handleCancel = vi.fn()
+const handleDeleting = vi.fn()
+const handleDeleted = vi.fn()
+const handleUpdated = vi.fn()
 
 const defaultProps = {
   isOpen: true,
@@ -74,7 +74,7 @@ describe('DeleteCalendarEventDialog', () => {
   afterEach(() => {
     // Clean up after each test
     cleanup() // Clean up any rendered components
-    jest.resetAllMocks()
+    vi.resetAllMocks()
   })
 
   it('renders single event dialog', () => {
@@ -261,6 +261,38 @@ describe('DeleteCalendarEventDialog', () => {
       // Instead of looking for the spinner, which is hard to test,
       // we'll verify that the deleting state was triggered
       expect(handleDeleting).toHaveBeenCalled()
+    })
+  })
+
+  describe('appointment group deletion', () => {
+    it('renders appointment group warning text when isAppointmentGroup is true', () => {
+      const testIdPrefix = 'appointment-group-test-'
+      const {getByTestId, getByText} = renderDialog({
+        isRepeating: false,
+        isAppointmentGroup: true,
+        testIdPrefix,
+      })
+      expect(getByText('Delete for everyone?')).toBeInTheDocument()
+      expect(getByTestId(`${testIdPrefix}dialog`)).toBeInTheDocument()
+      expect(getByTestId(`${testIdPrefix}dialog-content`)).toHaveTextContent(
+        'If you delete this appointment, all course teachers will lose access, and all student signups will be permanently deleted.',
+      )
+    })
+
+    it('renders standard dialog when isAppointmentGroup is false', () => {
+      const testIdPrefix = 'standard-test-'
+      const {getByTestId} = renderDialog({
+        isRepeating: false,
+        isAppointmentGroup: false,
+        testIdPrefix,
+      })
+      expect(getByTestId(`${testIdPrefix}dialog-content`)).toHaveTextContent(
+        'Are you sure you want to delete this event?',
+      )
+      const cancelButton = getByTestId(`${testIdPrefix}cancel-button`)
+      expect(cancelButton).toHaveTextContent('Cancel')
+      const deleteButton = getByTestId(`${testIdPrefix}delete-button`)
+      expect(deleteButton).toHaveTextContent('Delete')
     })
   })
 

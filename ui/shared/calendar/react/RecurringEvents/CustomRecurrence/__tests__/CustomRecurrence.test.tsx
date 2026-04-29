@@ -101,7 +101,7 @@ describe('CustomRecurrence', () => {
   })
 
   it('fires onChange when interval changes', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const props = {...defaultProps({onChange}, {count: 5})}
     const {getByDisplayValue} = render(<CustomRecurrence {...props} />)
 
@@ -115,7 +115,7 @@ describe('CustomRecurrence', () => {
   })
 
   it('fires onChange when freq changes', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const props = {...defaultProps({onChange}, {count: 5})}
     render(<CustomRecurrence {...props} />)
 
@@ -129,7 +129,7 @@ describe('CustomRecurrence', () => {
   })
 
   it('fires onChange when count changes', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const props = {...defaultProps({onChange}, {count: 5})}
     const {getByDisplayValue} = render(<CustomRecurrence {...props} />)
 
@@ -145,7 +145,7 @@ describe('CustomRecurrence', () => {
   })
 
   it('fires onChange when until changes', async () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const endDate = today.clone().add(1, 'year')
     const props = {...defaultProps({onChange}, {until: makeSimpleIsoDate(endDate)})}
     render(<CustomRecurrence {...props} />)
@@ -160,7 +160,7 @@ describe('CustomRecurrence', () => {
   })
 
   it('fires onChange when end type changes', () => {
-    const onChange = jest.fn()
+    const onChange = vi.fn()
     const props = {...defaultProps({onChange}, {count: 5})}
     const {getByDisplayValue} = render(<CustomRecurrence {...props} />)
 

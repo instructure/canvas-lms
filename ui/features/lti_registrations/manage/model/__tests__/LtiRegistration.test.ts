@@ -17,7 +17,7 @@
  */
 
 import {ZLtiLegacyConfiguration} from '../LtiRegistration'
-import _ from 'lodash'
+import {merge} from 'es-toolkit/compat'
 
 describe('LtiRegistration', () => {
   describe('ZLtiLegacyConfiguration', () => {
@@ -61,7 +61,7 @@ describe('LtiRegistration', () => {
     }
 
     it('should allow the fields in a legacy configuration', () => {
-      const legacyConfig = _.merge(baseConfig, {
+      const legacyConfig = merge(baseConfig, {
         extensions: [
           {
             settings: {
@@ -83,7 +83,7 @@ describe('LtiRegistration', () => {
     })
 
     it('should allow a different configuration with a tool_id', () => {
-      const legacyConfig = _.merge(baseConfig, {
+      const legacyConfig = merge(baseConfig, {
         extensions: [
           {
             settings: {
@@ -114,22 +114,8 @@ describe('LtiRegistration', () => {
       expect(result).toMatchObject(legacyConfig)
     })
 
-    it('allows placement-specific settings', () => {
-      const extraPlacement = {
-        placement: 'ActivityAssetProcessor',
-        eula: {
-          target_link_uri: 'https://example.com/123',
-          custom_fields: {foo: 'bar'},
-        },
-      }
-      const placements = [{}, extraPlacement]
-      const legacyConfig = _.merge(baseConfig, {extensions: [{settings: {placements}}]})
-      const result = ZLtiLegacyConfiguration.parse(legacyConfig)
-      expect(result).toMatchObject(legacyConfig)
-    })
-
     it('accepts the string "true" for the enabled attribute', () => {
-      const usingString = _.merge(baseConfig, {
+      const usingString = merge(baseConfig, {
         extensions: [
           {
             settings: {

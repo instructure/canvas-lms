@@ -51,7 +51,7 @@ export enum Constants {
   OPEN_BULK_EDIT_MODAL = 'UI/OPEN_BULK_EDIT_MODAL',
   CLOSE_BULK_EDIT_MODAL = 'UI/CLOSE_BULK_EDIT_MODAL',
   SET_SELECTED_BULK_STUDENTS = 'UI/SET_SELECTED_STUDENTS',
-  GET_SELECTED_BULK_STUDENTS = 'UI/GET_SELECTED_STUDENTS'
+  GET_SELECTED_BULK_STUDENTS = 'UI/GET_SELECTED_STUDENTS',
 }
 
 /* Action creators */
@@ -85,7 +85,8 @@ export const regularActions = {
   hideWeightedAssignmentsTray: () => createAction(Constants.HIDE_WEIGHTING_ASSIGNMENTS_MODAL),
   openBulkEditModal: (students: string[]) => createAction(Constants.OPEN_BULK_EDIT_MODAL, students),
   closeBulkEditModal: () => createAction(Constants.CLOSE_BULK_EDIT_MODAL),
-  setSelectedBulkStudents: (students: string[]) => createAction(Constants.SET_SELECTED_BULK_STUDENTS, students),
+  setSelectedBulkStudents: (students: string[]) =>
+    createAction(Constants.SET_SELECTED_BULK_STUDENTS, students),
 }
 
 export const thunkActions = {
@@ -104,7 +105,13 @@ export const thunkActions = {
 
       if (contextType == 'BulkEnrollment') {
         dispatch(
-          coursePaceActions.loadLatestPaceByContext('Enrollment', contextId.split(',')[0], afterLoadActionCreator, true, true),
+          coursePaceActions.loadLatestPaceByContext(
+            'Enrollment',
+            contextId.split(',')[0],
+            afterLoadActionCreator,
+            true,
+            true,
+          ),
         )
       } else {
         dispatch(

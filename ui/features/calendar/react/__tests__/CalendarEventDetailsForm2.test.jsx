@@ -27,8 +27,8 @@ import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-jest.mock('@canvas/calendar/jquery/CommonEvent/index')
-jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog')
+vi.mock('@canvas/calendar/jquery/CommonEvent/index')
+vi.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog')
 
 let defaultProps = eventFormProps()
 
@@ -41,10 +41,11 @@ const changeValue = (component, testid, value) => {
   return child
 }
 
-const setTime = (component, testid, time) => {
+const setTime = async (component, testid, time) => {
   const clock = component.getByTestId(testid)
-  act(() => clock.click())
-  fireEvent.click(component.getByText(time))
+  fireEvent.click(clock)
+  const timeOption = await component.findByText(time, {}, {timeout: 3000})
+  fireEvent.click(timeOption)
   return clock
 }
 
@@ -72,26 +73,26 @@ describe('CalendarEventDetailsForm', () => {
         important_dates: false,
         blackout_date: false,
       },
-      save: jest.fn().mockResolvedValue({}),
+      save: vi.fn().mockResolvedValue({}),
     }))
     $.ajaxJSON = (_url, _method, _params, onSuccess, _onError) => {
       onSuccess([])
     }
-    jest
-      .spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog')
-      .mockImplementation(() => Promise.resolve('all'))
+    vi.spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog').mockImplementation(
+      () => Promise.resolve('all'),
+    )
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   it('cannot have end time before start time', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    const start = setTime(component, 'event-form-start-time', '5:00 AM')
-    setTime(component, 'event-form-end-time', '4:00 AM')
+    const start = await setTime(component, 'event-form-start-time', '5:00 AM')
+    await setTime(component, 'event-form-end-time', '4:00 AM')
 
     const errMessage = component.getByText('End time cannot be before Start time')
     expect(errMessage).toBeInTheDocument()
@@ -103,8 +104,8 @@ describe('CalendarEventDetailsForm', () => {
   it('cannot have start time after end time', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    const end = setTime(component, 'event-form-end-time', '2:00 AM')
-    setTime(component, 'event-form-start-time', '2:30 AM')
+    const end = await setTime(component, 'event-form-end-time', '2:00 AM')
+    await setTime(component, 'event-form-start-time', '2:30 AM')
 
     const errMessage = component.getByText('Start Time cannot be after End Time')
     expect(errMessage).toBeInTheDocument()
@@ -119,8 +120,8 @@ describe('CalendarEventDetailsForm', () => {
     const startInput = getByTestId('event-form-start-time')
     const endInput = getByTestId('event-form-end-time')
     await user.type(startInput, '8:14 AM')
-    //this is necessary due to flaky insUI-jest interactions
-    await userEvent.type(
+    //this is necessary due to flaky insUI-vi interactions
+    await user.type(
       endInput,
       '{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}{Backspace}9:38 AM{Enter}',
     )
@@ -131,7 +132,7 @@ describe('CalendarEventDetailsForm', () => {
   it('cannot submit with an empty title', () => {
     const event = {...defaultProps.event, title: ''}
     const component = render(<CalendarEventDetailsForm {...defaultProps} event={event} />)
-    expect(component.getByRole('button', {name: 'Submit'})).toBeDisabled()
+    expect(component.getByTestId('edit-calendar-event-submit-button')).toBeDisabled()
     expect(component.queryByText('You must enter a title.')).not.toBeInTheDocument()
   })
 
@@ -139,11 +140,11 @@ describe('CalendarEventDetailsForm', () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
     changeValue(component, 'edit-calendar-event-form-title', 'avocado')
 
-    expect(component.getByRole('button', {name: 'Submit'})).toBeEnabled()
+    expect(component.getByTestId('edit-calendar-event-submit-button')).toBeEnabled()
 
     changeValue(component, 'edit-calendar-event-form-title', '')
 
-    expect(component.getByRole('button', {name: 'Submit'})).toBeDisabled()
+    expect(component.getByTestId('edit-calendar-event-submit-button')).toBeDisabled()
     expect(component.getByText('You must enter a title.')).toBeInTheDocument()
   })
 
@@ -151,18 +152,19 @@ describe('CalendarEventDetailsForm', () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
     changeValue(component, 'edit-calendar-event-form-date', '')
     fireEvent.blur(component.getByTestId('edit-calendar-event-form-date'))
+    // Accept both US format (Mon, Jan 6, 2026) and international format (Mon, 6 Jan 2026)
     expect(component.getByTestId('edit-calendar-event-form-date').value).toMatch(
-      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}, \d{4}$/,
+      /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (\d{1,2} )?(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ?(\d{1,2},?)? ?\d{4}$/,
     )
 
     const errMessage = component.queryByText('This date is invalid.')
     expect(errMessage).not.toBeInTheDocument()
-    expect(component.getByRole('button', {name: 'Submit'})).toBeEnabled()
+    expect(component.getByTestId('edit-calendar-event-submit-button')).toBeEnabled()
   })
 
   it('does not show error with when choosing another date time format', async () => {
     const user = userEvent.setup({delay: null})
-    jest.spyOn(window.navigator, 'language', 'get').mockReturnValue('en-AU')
+    vi.spyOn(window.navigator, 'language', 'get').mockReturnValue('en-AU')
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
     await user.click(component.getByTestId('edit-calendar-event-form-date'))
     await user.click(component.getByTestId('edit-calendar-event-form-title'))
@@ -172,6 +174,6 @@ describe('CalendarEventDetailsForm', () => {
 
     const errMessage = component.queryByText('This date is invalid.')
     expect(errMessage).not.toBeInTheDocument()
-    expect(component.getByRole('button', {name: 'Submit'})).toBeEnabled()
+    expect(component.getByTestId('edit-calendar-event-submit-button')).toBeEnabled()
   })
 })

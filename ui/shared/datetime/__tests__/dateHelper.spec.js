@@ -18,7 +18,7 @@
 
 import DateHelper from '../dateHelper'
 import {isMidnight} from '@instructure/moment-utils'
-import {isDate, isNull, isUndefined} from 'lodash'
+import {isDate, isNull, isUndefined} from 'es-toolkit/compat'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'

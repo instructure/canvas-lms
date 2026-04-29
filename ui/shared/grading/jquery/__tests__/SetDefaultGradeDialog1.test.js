@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import '@testing-library/jest-dom'
 import SetDefaultGradeDialog from '../SetDefaultGradeDialog'
 import {act} from '@testing-library/react'
 
@@ -100,9 +99,9 @@ describe('SetDefaultGradeDialog', () => {
       }
     }
 
-    $.flashError = jest.fn()
-    $.publish = jest.fn()
-    $.ajaxJSON = jest.fn()
+    $.flashError = vi.fn()
+    $.publish = vi.fn()
+    $.ajaxJSON = vi.fn()
   })
 
   afterEach(() => {

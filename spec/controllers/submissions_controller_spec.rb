@@ -306,8 +306,8 @@ describe SubmissionsController do
       course_with_student_logged_in(active_all: true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
-      att1 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
-      att2 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/txt.txt", "application/vnd.ms-excel", true))
+      att1 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", binary: true))
+      att2 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/txt.txt", "application/vnd.ms-excel", binary: true))
       post "create", params: { course_id: @course.id,
                                assignment_id: @assignment.id,
                                submission: { submission_type: "online_upload", attachment_ids: [att1.id, att2.id].join(",") },
@@ -362,7 +362,7 @@ describe SubmissionsController do
       request.path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
       post "create", params: { course_id: @course.id, assignment_id: @assignment.id, submission: { submission_type: "basic_lti_launch", url: "http://www.google.com" } }
       expect(response).to be_redirect
-      expect(assigns[:submission]).to_not be_nil
+      expect(assigns[:submission]).not_to be_nil
       expect(assigns[:submission].submission_type).to eq "basic_lti_launch"
       expect(assigns[:submission].url).to eq "http://www.google.com"
     end
@@ -686,7 +686,7 @@ describe SubmissionsController do
               submission: { submission_type: "online_url", url: "url" }
             }
             expect(response).to be_redirect
-            expect(response).to_not redirect_to(/[?&]confetti=true/)
+            expect(response).not_to redirect_to(/[?&]confetti=true/)
           end
         end
       end
@@ -700,7 +700,7 @@ describe SubmissionsController do
         it "redirects without confetti" do
           post "create", params: { course_id: @course.id, assignment_id: @assignment.id, submission: { submission_type: "online_url", url: "url" } }
           expect(response).to be_redirect
-          expect(response).to_not redirect_to(/[?&]confetti=true/)
+          expect(response).not_to redirect_to(/[?&]confetti=true/)
         end
       end
 
@@ -728,7 +728,7 @@ describe SubmissionsController do
               submission: { submission_type: "online_url", url: "url" }
             }
             expect(response).to be_redirect
-            expect(response).to_not redirect_to(/[?&]confetti=true/)
+            expect(response).not_to redirect_to(/[?&]confetti=true/)
           end
         end
       end
@@ -1191,27 +1191,6 @@ describe SubmissionsController do
       end
     end
 
-    it "includes asset reports and asset processors data when available" do
-      user_session(@student)
-
-      # Mock data for asset reports and processors
-      asset_reports_data = [
-        { title: "Asset Report 1", asset: { id: 101, attachment_id: 1, attachment_name: "test_attachment.pdf" } }
-      ]
-      asset_processors_data = [
-        { title: "Test Processor", icon_url: "https://example.com/icon.png" }
-      ]
-
-      # Mock helper methods
-      allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return(asset_reports_data)
-      allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_processors).and_return(asset_processors_data)
-
-      get :show, params: { course_id: @course.id, assignment_id: @assignment.id, id: @student.id }
-
-      expect(assigns(:asset_reports)).to eq(asset_reports_data)
-      expect(assigns(:asset_processors)).to eq(asset_processors_data)
-    end
-
     it "shows rubric assessments to peer reviewers" do
       @course.account.enable_service(:avatars)
       @assessor = @student
@@ -1647,7 +1626,7 @@ describe SubmissionsController do
         qsub.workflow_state = "complete"
         qsub.submission = quiz.assignment.find_or_create_submission(first_student)
         qsub.submission.audit_grade_changes = true
-        qsub.with_versioning(true) { qsub.save! }
+        qsub.with_versioning { qsub.save! }
 
         quiz
       end
@@ -1679,6 +1658,187 @@ describe SubmissionsController do
       it "returns the role of grader for a quiz" do
         get :audit_events, params: quiz_audit_params, format: :json
         expect(returned_quizzes).to include(hash_including({ "id" => quiz.id, "role" => "grader" }))
+      end
+    end
+  end
+
+  describe "PUT update with student_entered_score" do
+    before(:once) do
+      @course = course_factory(active_all: true)
+      @teacher = teacher_in_course(course: @course, active_all: true).user
+      @student = student_in_course(course: @course, active_all: true).user
+    end
+
+    context "with regular assignment" do
+      before(:once) do
+        @assignment = @course.assignments.create!(title: "Regular Assignment", points_possible: 10)
+        @submission = @assignment.grade_student(@student, grade: "5", grader: @teacher).first
+      end
+
+      before { user_session(@student) }
+
+      it "updates student_entered_score for regular assignment" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @assignment.id,
+              id: @student.id,
+              submission: { student_entered_score: 8 }
+            },
+            format: :json
+        expect(response).to have_http_status(:ok)
+        expect(@submission.reload.student_entered_score).to eq(8.0)
+      end
+
+      it "clears student_entered_score when set to null" do
+        @submission.update!(student_entered_score: 7)
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @assignment.id,
+              id: @student.id,
+              submission: { student_entered_score: nil }
+            },
+            format: :json
+        expect(response).to have_http_status(:ok)
+        expect(@submission.reload.student_entered_score).to be_nil
+      end
+
+      it "does not allow updating deleted assignments" do
+        @assignment.destroy
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @assignment.id,
+              id: @student.id,
+              submission: { comment: "test comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "with peer review sub assignment" do
+      before(:once) do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @parent_assignment = @course.assignments.create!(
+          title: "Assignment with Peer Review",
+          points_possible: 10,
+          peer_reviews: true,
+          peer_reviews_due_at: 1.day.from_now
+        )
+        @peer_review = PeerReviewSubAssignment.create!(
+          parent_assignment: @parent_assignment,
+          points_possible: 5
+        )
+        @reviewer = student_in_course(course: @course, active_all: true).user
+        @assessment_request = AssessmentRequest.create!(
+          user: @student,
+          asset: @parent_assignment.find_or_create_submission(@student),
+          assessor: @reviewer,
+          assessor_asset: @peer_review.find_or_create_submission(@reviewer),
+          peer_review_sub_assignment: @peer_review
+        )
+        @peer_review_submission = @peer_review.grade_student(@reviewer, grade: "3", grader: @teacher).first
+      end
+
+      before { user_session(@reviewer) }
+
+      it "allows finding peer review assignment in update action" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              id: @reviewer.id,
+              submission: { comment: "peer review comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:created)
+        expect(@peer_review_submission.reload.submission_comments.length).to be 1
+        expect(@peer_review_submission.submission_comments.first.comment).to eq("peer review comment")
+      end
+
+      it "does not allow updating deleted peer review assignments" do
+        @peer_review.destroy
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              id: @reviewer.id,
+              submission: { comment: "peer review comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "updates student_entered_score for peer review sub assignment" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              id: @reviewer.id,
+              submission: { student_entered_score: 4 }
+            },
+            format: :json
+        expect(response).to have_http_status(:ok)
+        expect(@peer_review_submission.reload.student_entered_score).to eq(4.0)
+      end
+
+      it "clears student_entered_score for peer review when set to null" do
+        @peer_review_submission.update!(student_entered_score: 2)
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              id: @reviewer.id,
+              submission: { student_entered_score: nil }
+            },
+            format: :json
+        expect(response).to have_http_status(:ok)
+        expect(@peer_review_submission.reload.student_entered_score).to be_nil
+      end
+
+      it "persists student_entered_score to database" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @peer_review.id,
+              id: @reviewer.id,
+              submission: { student_entered_score: 5 }
+            },
+            format: :json
+        expect(response).to have_http_status(:ok)
+        expect(@peer_review_submission.reload.student_entered_score).to eq(5.0)
+      end
+    end
+
+    context "with checkpoint sub assignment" do
+      before(:once) do
+        @course.account.enable_feature!(:discussion_checkpoints)
+        @discussion_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpoint Discussion")
+        @due_at = 1.week.from_now
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @discussion_topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: @due_at }],
+          points_possible: 10
+        )
+        @parent_assignment = @discussion_topic.assignment
+        @checkpoint_sub_assignment = @parent_assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      end
+
+      before { user_session(@student) }
+
+      it "does not allow updating checkpoint sub assignments directly" do
+        put :update,
+            params: {
+              course_id: @course.id,
+              assignment_id: @checkpoint_sub_assignment.id,
+              id: @student.id,
+              submission: { comment: "checkpoint comment" }
+            },
+            format: :json
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

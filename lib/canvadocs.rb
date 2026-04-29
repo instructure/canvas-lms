@@ -19,9 +19,9 @@
 
 module Canvadocs
   extend CanvadocsHelper
+
   RENDER_O365     = "office_365"
   RENDER_BOX      = "box_view"
-  RENDER_CROCODOC = "crocodoc"
   RENDER_PDFJS    = "pdfjs"
 
   # Public: A small ruby client that wraps the Box View api.
@@ -41,7 +41,7 @@ module Canvadocs
     #        :token - The api token to use to authenticate requests. Required.
     #
     # Examples
-    #   crocodoc = Canvadocs::API.new(:token => <token>)
+    #   canvadoc = Canvadocs::API.new(:token => <token>)
     #   # => <Canvadocs::API:<id>>
     def initialize(opts)
       self.token = opts[:token]
@@ -216,18 +216,11 @@ module Canvadocs
     enabled? && Canvas::Plugin.value_to_boolean(config["annotations_supported"])
   end
 
-  # annotations_supported? calls enabled?
-  def self.hijack_crocodoc_sessions?
-    annotations_supported? && Canvas::Plugin.value_to_boolean(config["hijack_crocodoc_sessions"])
-  end
-
   def self.user_session_params(current_user, attachment: nil, submission: nil, attempt: nil)
     if submission.nil?
       return {} if attachment.nil?
 
-      submission = Submission.find_by(
-        id: AttachmentAssociation.where(context_type: "Submission", attachment:).select(:context_id)
-      )
+      submission = Submission.referencing_linked_attachment(attachment).first
       return {} if submission.nil?
     end
     assignment = submission.assignment

@@ -47,7 +47,6 @@
 #       }
 #    }
 class AdminsController < ApplicationController
-  before_action :require_user
   before_action :get_context
 
   include Api::V1::Admin
@@ -121,7 +120,7 @@ class AdminsController < ApplicationController
   # @returns Admin
   def create
     user = api_find(User, params[:user_id])
-    raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{params[:user_id]}'") unless SisPseudonym.for(user, @context, type: :implicit, require_sis: false)
+    raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{params[:user_id]}'") unless SisPseudonym.for(user, @context, type: :implicit, require_sis: false, current_user: @current_user)
 
     require_role
     admin = @context.account_users.where(user_id: user.id, role_id: @role.id).first_or_initialize
@@ -163,6 +162,7 @@ class AdminsController < ApplicationController
     require_role
     admin = @context.account_users.where(user_id: user, role_id: @role.id).first!
     if authorized_action(admin, @current_user, :destroy)
+      admin.current_user = @current_user
       admin.destroy
       render json: admin_json(admin, @current_user, session)
     end

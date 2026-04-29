@@ -1,0 +1,276 @@
+/*
+ * Copyright (C) 2025 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {render, screen} from '@testing-library/react'
+
+import {ScanStateCell} from '../ScanStateCell'
+import {
+  AccessibilityResourceScan,
+  ResourceType,
+  ScanWorkflowState,
+} from '../../../../../../shared/react/types'
+import {useAccessibilityScansStore} from '../../../../../../shared/react/stores/AccessibilityScansStore'
+
+const mockSelectIssue = vi.fn()
+
+vi.mock('../../../../../../shared/react/hooks/useAccessibilityIssueSelect', () => ({
+  useAccessibilityIssueSelect: vi.fn(() => ({selectIssue: mockSelectIssue})),
+}))
+
+vi.mock('../../../../../../shared/react/stores/AccessibilityScansStore')
+
+describe('ScanStateCell', () => {
+  beforeEach(() => {
+    // Enable feature flag by default for tests
+    window.ENV = {FEATURES: {a11y_checker_close_issues: true}} as any
+    mockSelectIssue.mockClear()
+    ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
+      const state = {isCloseIssuesEnabled: true}
+      return selector ? selector(state) : state
+    })
+  })
+
+  describe('Unfinished Scans - ', () => {
+    it('renders in progress scan state', () => {
+      render(
+        <ScanStateCell
+          item={{workflowState: ScanWorkflowState.InProgress} as AccessibilityResourceScan}
+          isMobile={false}
+        />,
+      )
+      expect(screen.getByText(/Checking/i)).toBeInTheDocument()
+    })
+
+    it('makes no distinction for queued state (renders as in progress)', () => {
+      render(
+        <ScanStateCell
+          item={{workflowState: ScanWorkflowState.Queued} as AccessibilityResourceScan}
+          isMobile={false}
+        />,
+      )
+      expect(screen.getByText(/Checking/i)).toBeInTheDocument()
+    })
+  })
+
+  describe('Finished Scans, with issues - ', () => {
+    describe('Fixable - ', () => {
+      const baseItem = {
+        workflowState: ScanWorkflowState.Completed,
+        resourceType: ResourceType.WikiPage,
+        issueCount: 5,
+      } as AccessibilityResourceScan
+
+      it('renders the correct number of issues', () => {
+        render(<ScanStateCell item={baseItem} isMobile={false} />)
+        expect(screen.getByTestId('issue-count-badge')).toHaveTextContent('5')
+      })
+
+      it('renders the correct overflow number if issueCount exceeds the visual limit', () => {
+        render(<ScanStateCell item={{...baseItem, issueCount: 2000}} isMobile={false} />)
+        expect(screen.getByTestId('issue-count-badge')).toHaveTextContent('99+')
+      })
+
+      it('renders a working fix button', () => {
+        render(<ScanStateCell item={baseItem} isMobile={false} />)
+        expect(screen.getByTestId('issue-remediation-button')).toBeInTheDocument()
+        screen.getByTestId('issue-remediation-button').click()
+        expect(mockSelectIssue).toHaveBeenCalledWith(expect.objectContaining(baseItem))
+      })
+    })
+
+    describe('Unfixable - ', () => {
+      const baseItem = {
+        workflowState: ScanWorkflowState.Completed,
+        resourceType: ResourceType.Attachment,
+        issueCount: 5,
+      } as AccessibilityResourceScan
+
+      it('renders a working review button', () => {
+        render(<ScanStateCell item={baseItem} isMobile={false} />)
+        expect(screen.getByTestId('issue-review-button')).toBeInTheDocument()
+        screen.getByTestId('issue-review-button').click()
+        expect(mockSelectIssue).toHaveBeenCalledWith(expect.objectContaining(baseItem))
+      })
+    })
+  })
+
+  describe('- Finished Scans - ', () => {
+    it('renders zero issues correctly', () => {
+      render(
+        <ScanStateCell
+          item={
+            {workflowState: ScanWorkflowState.Completed, issueCount: 0} as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.getByText(/No issues/i)).toBeInTheDocument()
+    })
+
+    it('renders closed issues text when issueCount is 0 but closedIssueCount is present', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Completed,
+              issueCount: 0,
+              closedIssueCount: 3,
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.getByText(/Closed remediation \(3 issues set aside\)/i)).toBeInTheDocument()
+      expect(screen.getByText(/Closed \(3\)/i)).toBeInTheDocument()
+    })
+
+    it('does not render closed issues text when feature flag is disabled', () => {
+      window.ENV = {FEATURES: {a11y_checker_close_issues: false}} as any
+      ;(useAccessibilityScansStore as unknown as any).mockImplementation((selector: any) => {
+        const state = {isCloseIssuesEnabled: false}
+        return selector ? selector(state) : state
+      })
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Completed,
+              issueCount: 0,
+              closedIssueCount: 3,
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(
+        screen.queryByText(/Closed remediation \(3 issues set aside\)/i),
+      ).not.toBeInTheDocument()
+      expect(screen.getByText(/No issues/i)).toBeInTheDocument()
+    })
+
+    it('renders rescan button for failed scan', () => {
+      const baseFailedItem = {
+        workflowState: ScanWorkflowState.Failed,
+        errorMessage: 'other error',
+      } as AccessibilityResourceScan
+
+      const {container} = render(<ScanStateCell item={baseFailedItem} isMobile={false} />)
+
+      expect(container.querySelector('[data-pendo="resource-rescan-button"]')).toBeInTheDocument()
+    })
+
+    it('renders failed scan explanation tooltip', () => {
+      const baseFailedItem = {
+        workflowState: ScanWorkflowState.Failed,
+        errorMessage: 'other error',
+      } as AccessibilityResourceScan
+
+      render(<ScanStateCell item={baseFailedItem} isMobile={false} />)
+
+      const explanation = screen.getByTestId('scan-state-explanation-trigger')
+      expect(explanation).toBeInTheDocument()
+      explanation.focus()
+      expect(explanation).toHaveTextContent('Failed scan')
+    })
+
+    it('calls onRescan when rescan button is clicked', () => {
+      const mockOnRescan = vi.fn()
+      const baseFailedItem = {
+        workflowState: ScanWorkflowState.Failed,
+        errorMessage: 'other error',
+      } as AccessibilityResourceScan
+
+      const {container} = render(
+        <ScanStateCell item={baseFailedItem} isMobile={false} onRescan={mockOnRescan} />,
+      )
+
+      const rescanButton = container.querySelector(
+        '[data-pendo="resource-rescan-button"]',
+      ) as HTMLElement
+      rescanButton.click()
+
+      expect(mockOnRescan).toHaveBeenCalledWith(baseFailedItem)
+      expect(mockOnRescan).toHaveBeenCalledTimes(1)
+    })
+
+    it('has data-pendo attribute on rescan button', () => {
+      const baseFailedItem = {
+        workflowState: ScanWorkflowState.Failed,
+        errorMessage: 'other error',
+      } as AccessibilityResourceScan
+
+      const {container} = render(<ScanStateCell item={baseFailedItem} isMobile={false} />)
+
+      const rescanButton = container.querySelector('[data-pendo="resource-rescan-button"]')
+      expect(rescanButton).toHaveAttribute('data-pendo', 'resource-rescan-button')
+    })
+
+    it('renders limit reached text when errorMessage is issue_limit_reached', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Failed,
+              errorMessage: 'issue_limit_reached',
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.getByText(/Limit reached/i)).toBeInTheDocument()
+    })
+
+    it('renders limit reached tooltip when errorMessage is issue_limit_reached', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Failed,
+              errorMessage: 'issue_limit_reached',
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      const explanation = screen.getByTestId('scan-state-explanation-trigger')
+      expect(explanation).toBeInTheDocument()
+      explanation.focus()
+      expect(explanation).toHaveTextContent(
+        'Max issue count reached on course. Remediate found issues and update report to find additional issues.',
+      )
+    })
+
+    it('renders the normal failed scan state when errorMessage is not issue_limit_reached', () => {
+      render(
+        <ScanStateCell
+          item={
+            {
+              workflowState: ScanWorkflowState.Failed,
+              errorMessage: 'other error',
+            } as AccessibilityResourceScan
+          }
+          isMobile={false}
+        />,
+      )
+      expect(screen.queryByText(/Limit reached/i)).not.toBeInTheDocument()
+      const explanation = screen.getByTestId('scan-state-explanation-trigger')
+      explanation.focus()
+      expect(explanation).toHaveTextContent('Failed scan')
+    })
+  })
+})

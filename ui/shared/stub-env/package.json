@@ -4,5 +4,6 @@
   "description": "Stub window.ENV in test",
   "author": "Ahmad Amireh <ahmad@instructure.com>",
   "private": true,
-  "main": "./index.js"
+  "main": "./index.js",
+  "owner": "CFA"
 }

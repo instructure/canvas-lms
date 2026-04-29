@@ -106,12 +106,12 @@ describe "cross listing" do
       expect(response).to be_successful
 
       get "/api/v1/courses/#{Course.where(sis_source_id: "C2").first.id}"
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
 
       user_session(u2)
 
       get "/api/v1/courses/#{Course.where(sis_source_id: "C1").first.id}"
-      expect(response).to_not be_successful
+      expect(response).not_to be_successful
 
       get "/api/v1/courses/#{Course.where(sis_source_id: "C2").first.id}"
       expect(response).to be_successful

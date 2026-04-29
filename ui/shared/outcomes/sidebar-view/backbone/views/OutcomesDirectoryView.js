@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {map, each, isEmpty, last} from 'lodash'
+import {map, each, last, isEmpty} from 'es-toolkit/compat'
 import htmlEscape from '@instructure/html-escape'
 import PaginatedView from '@canvas/pagination/backbone/views/PaginatedView'
 import OutcomeGroup from '../../../backbone/models/OutcomeGroup'

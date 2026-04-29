@@ -23,16 +23,20 @@ import type {
   RubricRating,
 } from '@canvas/rubrics/react/types/rubric'
 import type {RubricQueryResponse} from '../queries/RubricFormQueries'
-import type {RubricFormProps} from '../types/RubricForm'
-import {isEqual} from 'lodash'
+import type {RubricFormProps, AssociationType} from '../types/RubricForm'
+import {isEqual} from 'es-toolkit/compat'
+import Big from 'big.js'
 
 export const translateRubricQueryResponse = (fields: RubricQueryResponse): RubricFormProps => {
   return {
+    associationType: (fields.rubricAssociationForContext?.associationType ??
+      'Assignment') as AssociationType,
+    associationTypeId: fields.rubricAssociationForContext?.associationId,
     id: fields.id,
     title: fields.title ?? '',
     hasRubricAssociations: fields.hasRubricAssociations ?? false,
     hidePoints: fields.rubricAssociationForContext?.hidePoints ?? false,
-    criteria: fields.criteria ?? [],
+    criteria: (fields.criteria ?? []) as RubricCriterion[],
     pointsPossible: fields.pointsPossible ?? 0,
     buttonDisplay: fields.buttonDisplay ?? 'numeric',
     ratingOrder: fields.ratingOrder ?? 'descending',
@@ -42,6 +46,7 @@ export const translateRubricQueryResponse = (fields: RubricQueryResponse): Rubri
     hideOutcomeResults: fields.rubricAssociationForContext?.hideOutcomeResults ?? false,
     hideScoreTotal: fields.rubricAssociationForContext?.hideScoreTotal ?? false,
     useForGrading: fields.rubricAssociationForContext?.useForGrading ?? false,
+    canUpdateRubric: fields.canUpdateRubric ?? false,
   }
 }
 
@@ -65,6 +70,9 @@ export const translateRubricData = (
     hideScoreTotal: rubricAssociation.hideScoreTotal ?? false,
     useForGrading: rubricAssociation.useForGrading ?? false,
     rubricAssociationId: rubricAssociation.id,
+    associationType: rubricAssociation.associationType,
+    associationTypeId: rubricAssociation.associationId,
+    canUpdateRubric: rubric.canUpdateRubric ?? false,
   }
 }
 
@@ -112,7 +120,7 @@ export const autoGeneratePoints = (ratings: RubricRating[], points: number) => {
     newPts = Math.max(0, newPts)
     lastPts = newPts
 
-    ratingList[i].points = newPts
+    ratingList[i].points = Big(newPts).round(2, 0).toNumber()
   }
 
   return ratingList
@@ -135,6 +143,8 @@ export const defaultRubricForm: RubricFormProps = {
   hideOutcomeResults: false,
   hideScoreTotal: false,
   useForGrading: false,
+  canUpdateRubric: false,
+  associationType: 'Assignment',
 }
 
 export const hasRubricChanged = (formData: RubricFormProps, rubric: Rubric): boolean => {

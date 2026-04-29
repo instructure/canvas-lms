@@ -22,7 +22,7 @@ module Lti
     # @API Line Items
     #
     # Line Item API for
-    # 1EdTech (IMS) <a href="/doc/api/file.assignment_tools.html">Assignment and Grade Services</a>.
+    # 1EdTech (IMS) <a href="file.assignment_tools.html">Assignment and Grade Services</a>.
     #
     # @model LineItem
     #     {
@@ -209,7 +209,7 @@ module Lti
         # the LineItem workflow_state still "active" even if the assignment is deleted
         head :not_found and return if line_item.assignment.deleted?
 
-        render json: LineItemsSerializer.new(line_item, line_item_id(line_item), include_launch_url?),
+        render json: LineItemsSerializer.new(line_item, line_item_id(line_item), include_launch_url: include_launch_url?),
                content_type: MIME_TYPE
       end
 
@@ -335,7 +335,7 @@ module Lti
       end
 
       def line_item_collection(line_items)
-        line_items.map { |li| LineItemsSerializer.new(li, line_item_id(li), include_launch_url?) }
+        line_items.map { |li| LineItemsSerializer.new(li, line_item_id(li), include_launch_url: include_launch_url?) }
       end
 
       def verify_valid_resource_link

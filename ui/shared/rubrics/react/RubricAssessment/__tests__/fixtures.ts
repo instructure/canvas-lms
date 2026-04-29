@@ -121,3 +121,14 @@ export const TEACHER_ASSESSMENT_DATA: RubricAssessmentData[] = [
     commentsEnabled: true,
   },
 ]
+
+export const OUTCOME_DATA = {
+  id: '1',
+  calculationInt: 65,
+  calculationMethod: 'standard_decaying_average',
+  displayName: 'Test Outcome',
+  description:
+    'Choose from a range of methods, philosophies, and materials to create original works of art.',
+  masteryPoints: 3,
+  title: 'Test Outcome',
+}

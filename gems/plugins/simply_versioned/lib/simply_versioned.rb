@@ -43,7 +43,8 @@ module SimplyVersioned
     when: nil,
     on_create: nil,
     on_update: nil,
-    on_load: nil
+    on_load: nil,
+    versioned_associations: []
   }.freeze
 
   module ClassMethods
@@ -84,7 +85,7 @@ module SimplyVersioned
       options[:exclude] = Array(options[:exclude]).map(&:to_s)
 
       has_many :versions,
-               -> { order("number DESC") },
+               -> { order(number: :desc) },
                class_name: "SimplyVersioned::Version",
                as: :versionable,
                dependent: :destroy,
@@ -93,7 +94,7 @@ module SimplyVersioned
       # INSTRUCTURE: Added to allow quick access to the most recent version
       # See 'current_version' below for the common use of current_version_unidirectional
       has_one :current_version_unidirectional,
-              -> { order("number DESC") },
+              -> { order(number: :desc) },
               class_name: "SimplyVersioned::Version",
               as: :versionable
       # INSTRUCTURE: Lets us ignore certain things when deciding whether to store a new version
@@ -147,22 +148,19 @@ module SimplyVersioned
       options[:except] = options[:except].map(&:to_s)
 
       update(YAML.load(version.yaml).except(*options[:except]))
+      (options[:versioned_associations] || DEFAULTS[:versioned_associations]).each do |va|
+        restore_associations_from_version(version, va)
+      end
     end
 
     # Invoke the supplied block passing the receiver as the sole block argument with
     # versioning enabled or disabled depending upon the value of the +enabled+ parameter
     # for the duration of the block.
-    def with_versioning(enabled = true)
+    def with_versioning(enabled: true, explicit: false)
       versioning_was_enabled = versioning_enabled?
       explicit_versioning_was_enabled = @simply_versioned_explicit_enabled
-      explicit_enabled = false
-      if enabled.is_a?(Hash)
-        opts = enabled
-        enabled = true
-        explicit_enabled = true if opts[:explicit]
-      end
       self.versioning_enabled = enabled
-      @simply_versioned_explicit_enabled = explicit_enabled
+      @simply_versioned_explicit_enabled = explicit
       # INSTRUCTURE: always create a version if explicitly told to do so
       @versioning_explicitly_enabled = enabled == true
       begin
@@ -175,7 +173,7 @@ module SimplyVersioned
     end
 
     def without_versioning(&)
-      with_versioning(false, &)
+      with_versioning(enabled: false, &)
     end
 
     def unversioned?
@@ -215,6 +213,26 @@ module SimplyVersioned
       end
     end
 
+    def capture_associations_for_version(association_name)
+      associated_items = send(association_name)
+      associated_items.map { |assoc| assoc.slice(*associated_items.klass.versioned_fields) }
+    end
+
+    def restore_associations_from_version(version, association_name)
+      associated_items = send(association_name)
+      klass = associated_items.klass
+      fields = klass.versioned_fields
+      yaml_items = YAML.load(version.yaml)[association_name.to_s] || []
+
+      to_create = yaml_items - associated_items.map { |item| item.slice(*fields) }
+      to_delete_ids = associated_items.reject { |item| yaml_items.include?(item.slice(*fields)) }.map(&:id)
+
+      shard.activate do
+        while klass.where(id: to_delete_ids).limit(1000).delete_all > 0; end if to_delete_ids.any?
+        to_create.each_slice(1000) { |batch| klass.insert_all(batch) }
+      end
+    end
+
     protected
 
     # INSTRUCTURE: If defined on a method, allow a check
@@ -233,14 +251,19 @@ module SimplyVersioned
       # INSTRUCTURE
       if versioning_enabled? && (@versioning_explicitly_enabled || @changes_are_worth_versioning)
         @changes_are_worth_versioning = nil
+        version_attributes = attributes.except(*simply_versioned_options[:exclude])
+        simply_versioned_options[:versioned_associations].each do |association_name|
+          version_attributes[association_name.to_s] = capture_associations_for_version(association_name)
+        end
+
         if simply_versioned_options[:explicit] && !@simply_versioned_explicit_enabled && versioned?
           version = versions.current
-          version.yaml = attributes.except(*simply_versioned_options[:exclude]).to_yaml
+          version.yaml = version_attributes.to_yaml
           if version.save
             simply_versioned_options[:on_update].try(:call, self, version)
           end
         else
-          version = versions.create(yaml: attributes.except(*simply_versioned_options[:exclude]).to_yaml)
+          version = versions.create(yaml: version_attributes.to_yaml)
           if version.valid?
             simply_versioned_options[:on_create].try(:call, self, version)
             versions.clean_old_versions(simply_versioned_options[:keep].to_i) if simply_versioned_options[:keep]

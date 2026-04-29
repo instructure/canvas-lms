@@ -42,7 +42,7 @@ describe('StudentRange', () => {
         },
       ],
     },
-    onStudentSelect: jest.fn(),
+    onStudentSelect: vi.fn(),
     ...overrides,
   })
 

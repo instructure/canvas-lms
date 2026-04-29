@@ -27,7 +27,7 @@ import {
   IconDeactivateUserLine,
   IconEditLine,
   IconTrashLine,
-  IconLinkLine
+  IconLinkLine,
 } from '@instructure/ui-icons'
 import useCoursePeopleContext from '../../hooks/useCoursePeopleContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -44,22 +44,10 @@ type MenuItemProps = {
   children: ReactNode
 }
 
-const MenuItem: FC<MenuItemProps> = ({
-  href,
-  label,
-  testId,
-  onSelectHandler,
-  children
-}) => (
-  <Menu.Item
-    href={href}
-    data-testid={testId}
-    onClick={onSelectHandler}
-  >
+const MenuItem: FC<MenuItemProps> = ({href, label, testId, onSelectHandler, children}) => (
+  <Menu.Item href={href} data-testid={testId} onClick={onSelectHandler}>
     {children}
-    <View margin="0 0 0 x-small">
-      {label}
-    </View>
+    <View margin="0 0 0 x-small">{label}</View>
   </Menu.Item>
 )
 
@@ -96,30 +84,34 @@ const UserMenu: FC<UserMenuProps> = ({
   onReactivateUser,
   onDeactivateUser,
   onRemoveUser,
-  onCustomLinkSelect
+  onCustomLinkSelect,
 }) => {
-  const {
-    activeGranularEnrollmentPermissions = [],
-    courseConcluded,
-  } = useCoursePeopleContext()
+  const {activeGranularEnrollmentPermissions = [], courseConcluded} = useCoursePeopleContext()
 
   const isInactive = enrollments.every(e => e.state === INACTIVE_ENROLLMENT)
-  const canResendInvitation = !isInactive &&
-    enrollments.some(e => activeGranularEnrollmentPermissions.includes(e.type))
+  const canResendInvitation =
+    !isInactive && enrollments.some(e => activeGranularEnrollmentPermissions.includes(e.type))
   const isObserver = enrollments.some(e => e.type === OBSERVER_ENROLLMENT)
   const canLinkStudents = isObserver && !courseConcluded
   const sectionEditableEnrollments = enrollments.filter(e => e.type !== OBSERVER_ENROLLMENT)
   const canEditSections = !isInactive && !(sectionEditableEnrollments?.length === 0)
-  const canEditRoles = canRemoveUsers &&
+  const canEditRoles =
+    canRemoveUsers &&
     !courseConcluded &&
-    !(enrollments.some(e => e.type === OBSERVER_ENROLLMENT && e.associatedUser?._id))
+    !enrollments.some(e => e.type === OBSERVER_ENROLLMENT && e.associatedUser?._id)
 
-  const renderCustomLinks = () => (customLinks || []).map(({_id, url, icon_class, text}) => (
-    <Menu.Item key={_id} href={url} onClick={onCustomLinkSelect} data-testid={`custom-link-${_id}-user-${uid}`}>
-      <i className={icon_class} />
-      <View margin="0 0 0 x-small">{text}</View>
-    </Menu.Item>
-  ))
+  const renderCustomLinks = () =>
+    (customLinks || []).map(({_id, url, icon_class, text}) => (
+      <Menu.Item
+        key={_id}
+        href={url}
+        onClick={onCustomLinkSelect}
+        data-testid={`custom-link-${_id}-user-${uid}`}
+      >
+        <i className={icon_class} />
+        <View margin="0 0 0 x-small">{text}</View>
+      </Menu.Item>
+    ))
 
   return (
     <Menu
@@ -170,16 +162,10 @@ const UserMenu: FC<UserMenuProps> = ({
           <IconEditLine size="x-small" />
         </MenuItem>
       )}
-      <MenuItem
-        href={htmlUrl}
-        label={I18n.t('User Details')}
-        testId={`details-user-${uid}`}
-      >
+      <MenuItem href={htmlUrl} label={I18n.t('User Details')} testId={`details-user-${uid}`}>
         <IconUserLine size="x-small" />
       </MenuItem>
-      {canRemoveUsers && (
-        <Menu.Separator />
-      )}
+      {canRemoveUsers && <Menu.Separator />}
       {canRemoveUsers && isInactive && (
         <MenuItem
           label={I18n.t('Re-activate User')}

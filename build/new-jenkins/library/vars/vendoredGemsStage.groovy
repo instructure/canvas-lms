@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2026 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,16 +17,26 @@
  */
 
 def setupNode() {
-  { ->
+  stage('Setup') {
     def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
     checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: refspecToCheckout, depth: 1)
 
-    credentials.withStarlordCredentials { ->
-      sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-    }
-
+    sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
     sh 'build/new-jenkins/docker-compose-build-up.sh'
+  }
+}
+
+def runTests() {
+  stage('Vendored Gems') {
+    def startTime = System.currentTimeMillis()
+    try {
+      timeout(time: 10, unit: 'MINUTES') {
+        sh 'build/new-jenkins/test-gems.sh'
+      }
+    } finally {
+      buildSummaryReport.trackStage('Vendored Gems', startTime)
+    }
   }
 }
 

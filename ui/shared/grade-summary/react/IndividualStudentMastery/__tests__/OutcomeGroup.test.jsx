@@ -89,7 +89,7 @@ it('renders outcomes in alphabetical order by title', () => {
 describe('handleToggle()', () => {
   it('calls the correct onExpansionChange callback', () => {
     const props = defaultProps()
-    props.onExpansionChange = jest.fn()
+    props.onExpansionChange = vi.fn()
     const {getByRole} = render(<OutcomeGroup {...props} />)
     const button = getByRole('button')
     fireEvent.click(button)

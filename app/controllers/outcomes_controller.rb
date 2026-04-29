@@ -22,9 +22,10 @@ class OutcomesController < ApplicationController
   include Api::V1::Outcome
   include Api::V1::Role
 
-  before_action :require_context, except: [:build_outcomes]
+  before_action :require_context
 
   include HorizonMode
+
   before_action :load_canvas_career, only: [:index, :show]
 
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, except: [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_outcomes_path }
@@ -41,31 +42,32 @@ class OutcomesController < ApplicationController
 
     @root_outcome_group = @context.root_outcome_group
 
-    js_env(
-      ROOT_OUTCOME_GROUP: outcome_group_json(@root_outcome_group, @current_user, session),
-      CONTEXT_URL_ROOT: polymorphic_path([@context]),
-      ACCOUNT_CHAIN_URL: polymorphic_path([:api_v1, @context, :account_chain]),
-      # Don't display state standards, global outcomes if in the context of a Course. Only at Account level.
-      STATE_STANDARDS_URL: @context.is_a?(Course) ? nil : api_v1_global_redirect_path,
-      GLOBAL_ROOT_OUTCOME_GROUP_ID:
+    js_env({
+             ROOT_OUTCOME_GROUP: outcome_group_json(@root_outcome_group, @current_user, session),
+             CONTEXT_URL_ROOT: polymorphic_path([@context]),
+             ACCOUNT_CHAIN_URL: polymorphic_path([:api_v1, @context, :account_chain]),
+             # Don't display state standards, global outcomes if in the context of a Course. Only at Account level.
+             STATE_STANDARDS_URL: @context.is_a?(Course) ? nil : api_v1_global_redirect_path,
+             GLOBAL_ROOT_OUTCOME_GROUP_ID:
         @context.is_a?(Course) ? nil : LearningOutcomeGroup.global_root_outcome_group.id,
-      PERMISSIONS: {
-        manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
-        manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics),
-        can_manage_courses: @context.grants_right?(@current_user, session, :manage_courses_admin),
-        import_outcomes: @context.grants_right?(@current_user, session, :import_outcomes),
-        manage_proficiency_scales:
+             PERMISSIONS: {
+               manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
+               manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics),
+               can_manage_courses: @context.grants_right?(@current_user, session, :manage_courses_admin),
+               import_outcomes: @context.grants_right?(@current_user, session, :import_outcomes),
+               manage_proficiency_scales:
           @context.grants_right?(@current_user, session, :manage_proficiency_scales),
-        manage_proficiency_calculations:
+               manage_proficiency_calculations:
           @context.grants_right?(@current_user, session, :manage_proficiency_calculations)
-      },
-      OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description),
-      OUTCOME_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcome_average_calculation),
-      MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE: Account.site_admin.feature_enabled?(:menu_option_for_outcome_details_page),
-      OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
-      ARCHIVE_OUTCOMES: Account.site_admin.feature_enabled?(:archive_outcomes),
-      PREVENT_DELETION_OUTCOMES_WITH_OS_ALIGNMENTS: Account.site_admin.feature_enabled?(:prevent_deletion_outcomes_with_os_alignments)
-    )
+             },
+             OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description),
+             OUTCOME_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcome_average_calculation),
+             MENU_OPTION_FOR_OUTCOME_DETAILS_PAGE: Account.site_admin.feature_enabled?(:menu_option_for_outcome_details_page),
+             OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
+             ARCHIVE_OUTCOMES: Account.site_admin.feature_enabled?(:archive_outcomes),
+             PREVENT_DELETION_OUTCOMES_WITH_OS_ALIGNMENTS: Account.site_admin.feature_enabled?(:prevent_deletion_outcomes_with_os_alignments),
+             LMGB_STUDENT_REPORTING: @context.feature_enabled?(:lmgb_student_reporting)
+           })
 
     set_tutorial_js_env
     mastery_scales_js_env
@@ -359,10 +361,10 @@ class OutcomesController < ApplicationController
           proficiency_scales_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
         end
       end
-      js_env(
-        PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: proficiency_calculation_roles,
-        PROFICIENCY_SCALES_ENABLED_ROLES: proficiency_scales_roles
-      )
+      js_env({
+               PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: proficiency_calculation_roles,
+               PROFICIENCY_SCALES_ENABLED_ROLES: proficiency_scales_roles
+             })
     end
   end
 end

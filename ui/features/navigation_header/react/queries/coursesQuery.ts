@@ -17,7 +17,7 @@
  */
 
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {Course} from '../../../../api.d'
@@ -38,6 +38,18 @@ export function getFirstPageUrl() {
     if (observedUserId) {
       return `${defaultFirstPageUrl}&observed_user_id=${observedUserId}`
     }
+
+    // If no cookie is set yet, default to the first observee in the list.
+    // If the observer is first in the list (has their own enrollments),
+    // don't filter by observee - return the default URL.
+    const observedUsersList = window.ENV.OBSERVED_USERS_LIST
+    if (observedUsersList && observedUsersList.length > 0) {
+      const firstObservee =
+        observedUsersList[0].id === ENV.current_user_id ? null : observedUsersList[0]
+      if (firstObservee) {
+        return `${defaultFirstPageUrl}&observed_user_id=${firstObservee.id}`
+      }
+    }
   }
   return defaultFirstPageUrl
 }
@@ -52,13 +64,12 @@ export const hideHomeroomCourseIfK5Student = (course: Pick<Course, 'homeroom_cou
 export default async function coursesQuery({signal}: QueryFunctionContext): Promise<Course[]> {
   const data: Array<Course> = []
   const fetchOpts = {signal}
-  let path = getFirstPageUrl()
+  let path: string | null = getFirstPageUrl()
 
   while (path) {
-    const {json, link} = await doFetchApi<Course[]>({path, fetchOpts})
-    if (json) data.push(...json)
-    // @ts-expect-error
-    path = link?.next?.url || null
+    const result: DoFetchApiResults<Course[]> = await doFetchApi<Course[]>({path, fetchOpts})
+    if (result.json) data.push(...result.json)
+    path = result.link?.next?.url ?? null
   }
   return data
 }

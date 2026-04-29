@@ -65,7 +65,6 @@ shared_examples_for "learning object with due dates" do
 
       context "differentiation tags" do
         before do
-          course.account.enable_feature!(:assign_to_differentiation_tags)
           course.account.tap do |a|
             a.settings[:allow_assign_to_differentiation_tags] = { value: true }
             a.save!
@@ -98,7 +97,6 @@ shared_examples_for "learning object with due dates" do
 
       context "differentiation tags" do
         before do
-          course.account.enable_feature!(:assign_to_differentiation_tags)
           course.account.tap do |a|
             a.settings[:allow_assign_to_differentiation_tags] = { value: true }
             a.save!
@@ -186,164 +184,166 @@ shared_examples_for "learning object with due dates" do
       @section2 = course.course_sections.create!(name: "Summer session")
     end
 
-    context "with standardize_assignment_date_formatting feature disabled" do
-      before do
-        Account.site_admin.disable_feature!(:standardize_assignment_date_formatting)
-      end
+    it "only returns active overrides" do
+      expect(overridable.dates_hash_visible_to(@teacher).size).to eq 2
+    end
 
-      it "only returns active overrides" do
-        expect(overridable.dates_hash_visible_to(@teacher).size).to eq 2
-      end
+    it "includes the original date as a hash" do
+      dates_hash = overridable.dates_hash_visible_to(@teacher)
+      expect(dates_hash.size).to eq 2
 
-      it "includes the original date as a hash" do
+      dates_hash.sort_by! { |d| d[:title].to_s }
+      expect(dates_hash[0][:title]).to eq "Everyone else"
+      expect(dates_hash[1][:title]).to eq "value for name"
+    end
+
+    it "translates the 'Everyone else' title based on locale" do
+      I18n.with_locale(:"fr-CA") do
         dates_hash = overridable.dates_hash_visible_to(@teacher)
-        expect(dates_hash.size).to eq 2
-
         dates_hash.sort_by! { |d| d[:title].to_s }
-        expect(dates_hash[0][:title]).to be_nil
-        expect(dates_hash[1][:title]).to eq "value for name"
-      end
-
-      it "not include original dates if all sections are overriden" do
-        override2 = assignment_override_model(overridable_type => overridable)
-        override2.set = @section2
-        override2.override_due_at(8.days.from_now)
-        override2.save!
-
-        dates_hash = overridable.dates_hash_visible_to(@teacher)
-        expect(dates_hash.size).to eq 2
-
-        dates_hash.sort_by! { |d| d[:title] }
-        expect(dates_hash[0][:title]).to eq "Summer session"
-        expect(dates_hash[1][:title]).to eq "value for name"
+        expect(dates_hash[0][:title]).to eq "Tous les autres"
       end
     end
 
-    context "with standardize_assignment_date_formatting feature enabled" do
+    it "translates the 'Everyone' title based on locale" do
+      override.destroy!
+      empty_course = Course.create!(name: "empty course")
+      Assignment.create!(course: empty_course, due_at: 1.week.from_now)
+      I18n.with_locale(:"fr-CA") do
+        dates_hash = overridable.dates_hash_visible_to(@admin)
+        expect(dates_hash[0][:title]).to eq "Tous"
+      end
+    end
+
+    it "not include original dates if all sections are overriden" do
+      override2 = assignment_override_model(overridable_type => overridable)
+      override2.set = @section2
+      override2.override_due_at(8.days.from_now)
+      override2.save!
+
+      dates_hash = overridable.dates_hash_visible_to(@teacher)
+      expect(dates_hash.size).to eq 2
+
+      dates_hash.sort_by! { |d| d[:title] }
+      expect(dates_hash[0][:title]).to eq "Summer session"
+      expect(dates_hash[1][:title]).to eq "value for name"
+    end
+
+    context "course with no enrollments" do
+      it "returns the base dates for a course with no enrollments" do
+        override.destroy!
+        empty_course = Course.create!(name: "empty course")
+        Assignment.create!(course: empty_course, due_at: 1.week.from_now)
+        dates_hash = overridable.dates_hash_visible_to(@admin)
+        expect(dates_hash.size).to eq 1
+        expect(dates_hash[0][:title]).to eq "Everyone"
+        expect(dates_hash[0][:base]).to be true
+      end
+
+      it "does not error for mastery path assignment" do
+        override.destroy!
+        empty_course = Course.create!(name: "empty course")
+        mastery_paths_assignment = Assignment.create!(course: empty_course, only_visible_to_overrides: true)
+        mastery_paths_assignment.assignment_overrides.create!(set_type: "Noop", title: "Mastery Paths")
+        dates_hash = mastery_paths_assignment.dates_hash_visible_to(@admin)
+        expect(dates_hash.size).to eq 1
+        expect(dates_hash[0][:title]).to eq "Mastery Paths"
+      end
+    end
+
+    context "with module overrides" do
       before do
-        Account.site_admin.enable_feature!(:standardize_assignment_date_formatting)
+        student_in_course(course:)
+        @module1 = course.context_modules.create!(name: "Module 1")
+        overridable.context_module_tags.create! context_module: @module1, context: course, tag_type: "context_module"
+
+        @module_adhoc_override = @module1.assignment_overrides.create!
+        override_student = @module_adhoc_override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
       end
 
-      it "only returns active overrides" do
-        expect(overridable.dates_hash_visible_to(@teacher).size).to eq 2
-      end
-
-      it "includes the original date as a hash" do
+      it "returns the module overrides" do
         dates_hash = overridable.dates_hash_visible_to(@teacher)
         expect(dates_hash.size).to eq 2
-
-        dates_hash.sort_by! { |d| d[:title].to_s }
-        expect(dates_hash[0][:title]).to eq "Everyone else"
-        expect(dates_hash[1][:title]).to eq "value for name"
+        expect(dates_hash[0][:set_type]).to eq "CourseSection"
+        expect(dates_hash[1][:set_type]).to eq "ADHOC"
+        expect(dates_hash[1][:id]).to eq @module_adhoc_override.id
       end
 
-      it "not include original dates if all sections are overriden" do
-        override2 = assignment_override_model(overridable_type => overridable)
-        override2.set = @section2
-        override2.override_due_at(8.days.from_now)
-        override2.save!
+      it "does not repeat overridden module overrides" do
+        # Create module override for default section
+        @module1.assignment_overrides.create!(set: course.default_section)
+        adhoc_override = overridable.assignment_overrides.create!(due_at: 7.days.from_now)
+        # Create ADHOC override on the overridable
+        override_student = adhoc_override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
 
+        # both module overrides should be overridden by the object's overrides
         dates_hash = overridable.dates_hash_visible_to(@teacher)
         expect(dates_hash.size).to eq 2
-
-        dates_hash.sort_by! { |d| d[:title] }
-        expect(dates_hash[0][:title]).to eq "Summer session"
-        expect(dates_hash[1][:title]).to eq "value for name"
+        expect(dates_hash[0][:set_type]).to eq "CourseSection"
+        expect(dates_hash[0][:id]).to eq override.id
+        expect(dates_hash[1][:set_type]).to eq "ADHOC"
+        expect(dates_hash[1][:id]).to eq adhoc_override.id
       end
 
-      context "with module overrides" do
-        before do
-          student_in_course(course:)
-          @module1 = course.context_modules.create!(name: "Module 1")
-          overridable.context_module_tags.create! context_module: @module1, context: course, tag_type: "context_module"
+      it "includes course overrides" do
+        course_override = overridable.assignment_overrides.create!(set: course, due_at: 7.days.from_now)
 
-          @module_adhoc_override = @module1.assignment_overrides.create!
-          override_student = @module_adhoc_override.assignment_override_students.build
-          override_student.user = @student
-          override_student.save!
-        end
+        dates_hash = overridable.dates_hash_visible_to(@teacher)
+        expect(dates_hash.size).to eq 3
+        expect(dates_hash[0][:set_type]).to eq "CourseSection"
+        expect(dates_hash[0][:id]).to eq override.id
+        expect(dates_hash[1][:set_type]).to eq "Course"
+        expect(dates_hash[1][:id]).to eq course_override.id
+        expect(dates_hash[2][:set_type]).to eq "ADHOC"
+        expect(dates_hash[2][:id]).to eq @module_adhoc_override.id
+      end
 
-        it "returns the module overrides" do
-          dates_hash = overridable.dates_hash_visible_to(@teacher)
-          expect(dates_hash.size).to eq 2
-          expect(dates_hash[0][:set_type]).to eq "CourseSection"
-          expect(dates_hash[1][:set_type]).to eq "ADHOC"
-          expect(dates_hash[1][:id]).to eq @module_adhoc_override.id
-        end
+      it "does not include unassigned module overrides" do
+        unassigned_override = overridable.assignment_overrides.create!(unassign_item: true)
+        override_student = unassigned_override.assignment_override_students.build
+        override_student.user = @student
+        override_student.save!
+        dates_hash = overridable.dates_hash_visible_to(@teacher)
+        expect(dates_hash.size).to eq 1
+        expect(dates_hash[0][:set_type]).to eq "CourseSection"
+        expect(dates_hash[0][:id]).to eq override.id
+      end
 
-        it "does not repeat overridden module overrides" do
-          # Create module override for default section
-          @module1.assignment_overrides.create!(set: course.default_section)
-          adhoc_override = overridable.assignment_overrides.create!(due_at: 7.days.from_now)
-          # Create ADHOC override on the overridable
-          override_student = adhoc_override.assignment_override_students.build
-          override_student.user = @student
-          override_student.save!
+      it "includes module overrides when not all students are overridden" do
+        # add a second student to the same module override
+        @student2 = student_in_course(course:).user
+        override_student2 = @module_adhoc_override.assignment_override_students.build
+        override_student2.user = @student2
+        override_student2.save!
 
-          # both module overrides should be overridden by the object's overrides
-          dates_hash = overridable.dates_hash_visible_to(@teacher)
-          expect(dates_hash.size).to eq 2
-          expect(dates_hash[0][:set_type]).to eq "CourseSection"
-          expect(dates_hash[0][:id]).to eq override.id
-          expect(dates_hash[1][:set_type]).to eq "ADHOC"
-          expect(dates_hash[1][:id]).to eq adhoc_override.id
-        end
+        # Create module assignment and override the first student
+        @module1.assignment_overrides.create!(set: course.default_section)
+        adhoc_override = overridable.assignment_overrides.create!(due_at: 7.days.from_now)
+        override_student1 = adhoc_override.assignment_override_students.build
+        override_student1.user = @student
+        override_student1.save!
 
-        it "includes course overrides" do
-          course_override = overridable.assignment_overrides.create!(set: course, due_at: 7.days.from_now)
-
-          dates_hash = overridable.dates_hash_visible_to(@teacher)
-          expect(dates_hash.size).to eq 3
-          expect(dates_hash[0][:set_type]).to eq "CourseSection"
-          expect(dates_hash[0][:id]).to eq override.id
-          expect(dates_hash[1][:set_type]).to eq "Course"
-          expect(dates_hash[1][:id]).to eq course_override.id
-          expect(dates_hash[2][:set_type]).to eq "ADHOC"
-          expect(dates_hash[2][:id]).to eq @module_adhoc_override.id
-        end
-
-        it "does not include unassigned module overrides" do
-          unassigned_override = overridable.assignment_overrides.create!(unassign_item: true)
-          override_student = unassigned_override.assignment_override_students.build
-          override_student.user = @student
-          override_student.save!
-          dates_hash = overridable.dates_hash_visible_to(@teacher)
-          expect(dates_hash.size).to eq 1
-          expect(dates_hash[0][:set_type]).to eq "CourseSection"
-          expect(dates_hash[0][:id]).to eq override.id
-        end
-
-        it "includes module overrides when not all students are overridden" do
-          # add a second student to the same module override
-          @student2 = student_in_course(course:).user
-          override_student2 = @module_adhoc_override.assignment_override_students.build
-          override_student2.user = @student2
-          override_student2.save!
-
-          # Create module assignment and override the first student
-          @module1.assignment_overrides.create!(set: course.default_section)
-          adhoc_override = overridable.assignment_overrides.create!(due_at: 7.days.from_now)
-          override_student1 = adhoc_override.assignment_override_students.build
-          override_student1.user = @student
-          override_student1.save!
-
-          # ensure the second student still appears in the dates hash
-          dates_hash = overridable.dates_hash_visible_to(@teacher)
-          expect(dates_hash.size).to eq 3
-          expect(dates_hash[0][:set_type]).to eq "CourseSection"
-          expect(dates_hash[0][:id]).to eq override.id
-          expect(dates_hash[1][:set_type]).to eq "ADHOC"
-          expect(dates_hash[1][:id]).to eq adhoc_override.id
-          expect(dates_hash[2][:set_type]).to eq "ADHOC"
-          expect(dates_hash[2][:id]).to eq @module_adhoc_override.id
-        end
+        # ensure the second student still appears in the dates hash
+        dates_hash = overridable.dates_hash_visible_to(@teacher)
+        expect(dates_hash.size).to eq 3
+        expect(dates_hash[0][:set_type]).to eq "CourseSection"
+        expect(dates_hash[0][:id]).to eq override.id
+        expect(dates_hash[1][:set_type]).to eq "ADHOC"
+        expect(dates_hash[1][:id]).to eq adhoc_override.id
+        expect(dates_hash[2][:set_type]).to eq "ADHOC"
+        expect(dates_hash[2][:id]).to eq @module_adhoc_override.id
       end
     end
   end
 
   describe "due_date_hash" do
     it "returns the due at, lock_at, unlock_at, all day, and all day fields" do
-      due = 5.days.from_now
+      # Use a specific time that won't trigger all_day logic (not 23:59 or 00:00)
+      due = 5.days.from_now.change(hour: 12, min: 0)
       due_params = { due_at: due, lock_at: due, unlock_at: due }
       a = overridable.class.new(due_params)
       if a.is_a?(Quizzes::Quiz)
@@ -534,7 +534,7 @@ shared_examples_for "all learning objects" do
         @override_student.user = @student_visible
         @override_student.save!
 
-        expect(overridable.overrides_for(@teacher)).to_not be_empty
+        expect(overridable.overrides_for(@teacher)).not_to be_empty
       end
 
       it "returns the correct student for override with students in same and different section" do
@@ -572,7 +572,7 @@ shared_examples_for "all learning objects" do
         @override_student.user = @student_invisible
         @override_student.save!
 
-        expect(overridable.overrides_for(@teacher)).to_not be_empty
+        expect(overridable.overrides_for(@teacher)).not_to be_empty
       end
 
       it "returns not empty for overrides of student in same section" do
@@ -581,7 +581,7 @@ shared_examples_for "all learning objects" do
         @override_student.user = @student_visible
         @override_student.save!
 
-        expect(overridable.overrides_for(@teacher)).to_not be_empty
+        expect(overridable.overrides_for(@teacher)).not_to be_empty
       end
 
       it "returns single override for students in different sections" do
@@ -827,30 +827,30 @@ describe Assignment do
   let(:overridable_type) { :assignment }
   let(:overridable) { assignment_model(due_at: 5.days.ago) }
 
-  include_examples "learning object with due dates"
-  include_examples "all learning objects"
+  it_behaves_like "learning object with due dates"
+  it_behaves_like "all learning objects"
 end
 
 describe Quizzes::Quiz do
   let(:overridable_type) { :quiz }
   let(:overridable) { quiz_model(due_at: 5.days.ago) }
 
-  include_examples "learning object with due dates"
-  include_examples "all learning objects"
+  it_behaves_like "learning object with due dates"
+  it_behaves_like "all learning objects"
 end
 
 describe WikiPage do
   let(:overridable_type) { :wiki_page }
   let(:overridable) { wiki_page_model(lock_at: 5.days.ago) }
 
-  include_examples "all learning objects"
+  it_behaves_like "all learning objects"
 end
 
 describe DiscussionTopic do
   let(:overridable_type) { :discussion_topic }
   let(:overridable) { discussion_topic_model(lock_at: 5.days.ago) }
 
-  include_examples "all learning objects"
+  it_behaves_like "all learning objects"
 end
 
 describe "preload_override_data_for_objects" do
@@ -957,6 +957,16 @@ describe "preload_override_data_for_objects" do
       expect(@discussion1.assignment.module_ids).to eq [@module1.id]
     end
 
+    it "works for assignments that are subassignments of a discussion" do
+      discussion_assignment = @discussion1.assignment = @course.assignments.create!(title: "discussion")
+      discussion_sub_assignment = discussion_assignment.sub_assignments.create!(title: "sub assignment", context: discussion_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @discussion1.save!
+      @discussion1.context_module_tags.create!(context_module: @module1, context: @course, tag_type: "context_module")
+      DatesOverridable.preload_module_ids([discussion_sub_assignment])
+      expect(discussion_sub_assignment.preloaded_module_ids).to eq [@module1.id]
+      expect(discussion_sub_assignment.module_ids).to eq [@module1.id]
+    end
+
     it "works for assignments that are part of a page" do
       @page1.assignment = @course.assignments.create!(title: "page")
       @page1.save!
@@ -1056,6 +1066,476 @@ describe "preload_override_data_for_objects" do
       expect(@quiz1.preloaded_all_overrides).to eq [ao2, ao5]
       expect(@discussion1.preloaded_all_overrides).to eq [ao3, ao5]
       expect(@page1.preloaded_all_overrides).to eq [ao4, ao5]
+    end
+  end
+
+  describe "#override_aware_due_date_hash with peer reviews" do
+    let(:course) { course_factory(active_all: true) }
+    let(:teacher) { teacher_in_course(course:, active_all: true).user }
+    let(:student) { student_in_course(course:, active_all: true).user }
+
+    context "with regular assignments without peer reviews" do
+      it "does not include unlock_at and lock_at in the hash" do
+        assignment = course.assignments.create!(
+          title: "Regular Assignment",
+          peer_reviews: false,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        )
+
+        hash = assignment.override_aware_due_date_hash(student, user_is_admin: false)
+
+        expect(hash).to have_key(:due_date)
+        expect(hash).not_to have_key(:unlock_at)
+        expect(hash).not_to have_key(:lock_at)
+      end
+    end
+
+    context "with assignments that have peer reviews enabled" do
+      it "includes unlock_at and lock_at in the hash" do
+        assignment = course.assignments.create!(
+          title: "Peer Review Assignment",
+          peer_reviews: true,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        )
+
+        hash = assignment.override_aware_due_date_hash(student, user_is_admin: false)
+
+        expect(hash).to have_key(:due_date)
+        expect(hash).to have_key(:unlock_at)
+        expect(hash).to have_key(:lock_at)
+      end
+
+      it "includes unlock_at and lock_at even when values are nil" do
+        assignment = course.assignments.create!(
+          title: "Peer Review Assignment",
+          peer_reviews: true,
+          due_at: 2.days.from_now
+        )
+
+        hash = assignment.override_aware_due_date_hash(student, user_is_admin: false)
+
+        expect(hash).to have_key(:unlock_at)
+        expect(hash).to have_key(:lock_at)
+        expect(hash[:unlock_at]).to be_nil
+        expect(hash[:lock_at]).to be_nil
+      end
+    end
+
+    context "with peer review sub-assignments" do
+      it "includes unlock_at and lock_at in the hash" do
+        course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: 3.days.from_now,
+          unlock_at: 2.days.from_now,
+          lock_at: 4.days.from_now
+        )
+
+        peer_review_sub = assignment.reload.peer_review_sub_assignment
+        hash = peer_review_sub.override_aware_due_date_hash(student, user_is_admin: false)
+
+        expect(hash).to have_key(:due_date)
+        expect(hash).to have_key(:unlock_at)
+        expect(hash).to have_key(:lock_at)
+      end
+    end
+
+    context "with section overrides" do
+      it "includes unlock_at and lock_at for assignments with peer reviews" do
+        section = course.course_sections.create!(name: "Section A")
+        student_in_section(section, user: student)
+
+        assignment = course.assignments.create!(
+          title: "Peer Review Assignment",
+          peer_reviews: true,
+          due_at: 2.days.from_now
+        )
+
+        override = assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section.id,
+          due_at: 3.days.from_now,
+          unlock_at: 2.days.from_now,
+          lock_at: 4.days.from_now
+        )
+
+        hash = assignment.override_aware_due_date_hash(student, user_is_admin: false)
+
+        expect(hash[:unlock_at]).to eq(override.unlock_at)
+        expect(hash[:lock_at]).to eq(override.lock_at)
+      end
+    end
+  end
+
+  describe "#context_module_tag_info with peer reviews" do
+    let(:course) { course_factory(active_all: true) }
+    let(:teacher) { teacher_in_course(course:, active_all: true).user }
+    let(:student) { student_in_course(course:, active_all: true).user }
+
+    before do
+      course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+    end
+
+    context "with assignments that have peer reviews" do
+      it "includes peer_review hash in tag_info" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true,
+          due_at: 1.day.from_now
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info).to have_key(:peer_review)
+        expect(tag_info[:peer_review]).to have_key(:id)
+        expect(tag_info[:peer_review]).to have_key(:points_possible)
+        expect(tag_info[:peer_review]).to have_key(:peer_review_count)
+        expect(tag_info[:peer_review]).to have_key(:due_date)
+      end
+
+      it "includes unlock_at and lock_at in peer_review hash" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true,
+          due_at: 1.day.from_now
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info[:peer_review]).to have_key(:unlock_at)
+        expect(tag_info[:peer_review]).to have_key(:lock_at)
+      end
+
+      it "converts due_date to ISO8601 format" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        due_date = Time.zone.parse("2025-12-17 06:59:59")
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: due_date
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info[:peer_review][:due_date]).to eq("2025-12-17T06:59:59Z")
+      end
+
+      it "converts unlock_at and lock_at to ISO8601 format" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        due_date = Time.zone.parse("2025-12-17 06:59:59")
+        unlock_date = Time.zone.parse("2025-12-16 06:59:59")
+        lock_date = Time.zone.parse("2025-12-18 06:59:59")
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: due_date,
+          unlock_at: unlock_date,
+          lock_at: lock_date
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info[:peer_review][:unlock_at]).to eq("2025-12-16T06:59:59Z")
+        expect(tag_info[:peer_review][:lock_at]).to eq("2025-12-18T06:59:59Z")
+      end
+
+      it "marks peer review as past_due when not submitted and due date passed" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        past_due_date = 1.day.ago
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: past_due_date,
+          unlock_at: past_due_date - 1.day,
+          lock_at: 1.day.from_now
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false,
+          peer_review_has_submission: false
+        )
+
+        expect(tag_info[:peer_review][:past_due]).to be true
+      end
+
+      it "does not mark as past_due when peer_review_has_submission is true" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        past_due_date = 1.day.ago
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: past_due_date,
+          unlock_at: past_due_date - 1.day,
+          lock_at: 1.day.from_now
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false,
+          peer_review_has_submission: true
+        )
+
+        expect(tag_info[:peer_review][:past_due]).to be_falsey
+      end
+
+      it "does not mark as past_due when peer_review_is_excused is true" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        past_due_date = 1.day.ago
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: past_due_date,
+          unlock_at: past_due_date - 1.day,
+          lock_at: 1.day.from_now
+        )
+
+        assignment.reload
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false,
+          peer_review_has_submission: false,
+          peer_review_is_excused: true
+        )
+
+        expect(tag_info[:peer_review][:past_due]).to be_falsey
+      end
+
+      it "does not include peer_review when feature flag is disabled" do
+        course.root_account.disable_feature!(:peer_review_allocation_and_grading)
+
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info).not_to have_key(:peer_review)
+      end
+
+      it "does not include peer_review for admin when feature flag is disabled" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: 2.days.from_now
+        )
+
+        assignment.reload
+
+        course.disable_feature!(:peer_review_allocation_and_grading)
+
+        tag_info = assignment.context_module_tag_info(
+          teacher,
+          course,
+          user_is_admin: true,
+          has_submission: false
+        )
+
+        expect(tag_info).not_to have_key(:peer_review)
+      end
+
+      it "does not include peer_review when assignment has no peer reviews" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: false
+        )
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info).not_to have_key(:peer_review)
+      end
+
+      it "does not include peer_review when no peer_review_sub_assignment exists" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        tag_info = assignment.context_module_tag_info(
+          student,
+          course,
+          user_is_admin: false,
+          has_submission: false
+        )
+
+        expect(tag_info).not_to have_key(:peer_review)
+      end
+
+      it "includes vdd_tooltip for peer reviews with multiple overrides" do
+        assignment = course.assignments.create!(
+          title: "Assignment",
+          peer_reviews: true
+        )
+
+        PeerReview::PeerReviewCreatorService.call(
+          parent_assignment: assignment,
+          points_possible: 5,
+          due_at: 2.days.from_now
+        )
+
+        peer_review_sub = assignment.reload.peer_review_sub_assignment
+        section1 = course.course_sections.create!(name: "Section A")
+        section2 = course.course_sections.create!(name: "Section B")
+
+        parent_override1 = assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id
+        )
+
+        parent_override2 = assignment.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id
+        )
+
+        peer_review_sub.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section1.id,
+          parent_override_id: parent_override1.id,
+          due_at: 2.days.from_now
+        )
+
+        peer_review_sub.assignment_overrides.create!(
+          set_type: "CourseSection",
+          set_id: section2.id,
+          parent_override_id: parent_override2.id,
+          due_at: 3.days.from_now
+        )
+
+        tag_info = assignment.context_module_tag_info(
+          teacher,
+          course,
+          user_is_admin: true,
+          has_submission: false
+        )
+
+        expect(tag_info[:peer_review]).to have_key(:vdd_tooltip)
+        expect(tag_info[:peer_review][:vdd_tooltip]).to have_key(:due_dates)
+      end
+    end
+  end
+
+  describe ".preload_overrides with peer reviews" do
+    it "includes PeerReviewSubAssignment objects in preloading" do
+      course = course_factory(active_all: true)
+      course.root_account.enable_feature!(:peer_review_allocation_and_grading)
+
+      assignment = course.assignments.create!(
+        title: "Assignment",
+        peer_reviews: true
+      )
+
+      PeerReview::PeerReviewCreatorService.call(
+        parent_assignment: assignment,
+        points_possible: 5
+      )
+
+      peer_review_sub = assignment.reload.peer_review_sub_assignment
+      learning_objects = [assignment, peer_review_sub]
+
+      expect do
+        DatesOverridable.preload_overrides(learning_objects)
+      end.not_to raise_error
     end
   end
 end

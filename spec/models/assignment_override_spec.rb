@@ -156,7 +156,6 @@ describe AssignmentOverride do
 
     context "with allow_assign_to_differentiation_tags setting enabled" do
       before do
-        @course.account.enable_feature! :assign_to_differentiation_tags
         @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
         @course.account.save!
         @course.account.reload
@@ -581,7 +580,7 @@ describe AssignmentOverride do
       it "requires a parent_override for new overrides" do
         override = AssignmentOverride.new(assignment: sub_assignment)
         expect(override).not_to be_valid
-        expect(override.errors[:parent_override_id]).to include("must be present for sub-assignment overrides")
+        expect(override.errors[:parent_override_id]).to include("must be present for overrides belonging to SubAssignment or PeerReviewSubAssignment")
       end
 
       it "is valid with a parent_override" do
@@ -593,7 +592,7 @@ describe AssignmentOverride do
         override = AssignmentOverride.create!(assignment: sub_assignment, parent_override:)
         override.parent_override = nil
         expect(override).not_to be_valid
-        expect(override.errors[:parent_override_id]).to include("must be present for sub-assignment overrides")
+        expect(override.errors[:parent_override_id]).to include("must be present for overrides belonging to SubAssignment or PeerReviewSubAssignment")
       end
 
       it "marks the child_override as deleted when the parent_override is destroyed" do
@@ -1215,7 +1214,6 @@ describe AssignmentOverride do
 
     context "differentiation tag overrides" do
       before do
-        @course.account.enable_feature!(:assign_to_differentiation_tags)
         @course.account.tap do |a|
           a.settings[:allow_assign_to_differentiation_tags] = { value: true }
           a.save!
@@ -1447,12 +1445,28 @@ describe AssignmentOverride do
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
     end
 
+    it "does not create a ScheduledSmartAlert if course is not active" do
+      override = assignment_override_model(course: @course)
+      @course.enrollment_term.update!(start_at: 1.month.from_now, end_at: 3.months.from_now)
+      expect(ScheduledSmartAlert).not_to receive(:upsert)
+
+      override.update!(due_at: 2.months.from_now, due_at_overridden: true)
+    end
+
+    it "does not create a ScheduledSmartAlert if assignment is not published" do
+      override = assignment_override_model(course: @course)
+      override.assignment.workflow_state = "unpublished"
+      expect(ScheduledSmartAlert).not_to receive(:upsert)
+
+      override.update!(due_at: 1.day.from_now, due_at_overridden: true)
+    end
+
     it "deletes the ScheduledSmartAlert if the due date is removed" do
       override = assignment_override_model(course: @course)
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
       expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       override.update!(due_at: nil)
-      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
+      expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
     end
 
     it "deletes the ScheduledSmartAlert if the due date is changed to the past" do
@@ -1460,7 +1474,7 @@ describe AssignmentOverride do
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
       expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       override.update!(due_at: 1.day.ago)
-      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
+      expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
     end
 
     it "deletes associated ScheduledSmartAlerts when the override is deleted" do
@@ -1468,7 +1482,7 @@ describe AssignmentOverride do
       override.update!(due_at: 1.day.from_now, due_at_overridden: true)
       expect(ScheduledSmartAlert.all).to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
       override.destroy
-      expect(ScheduledSmartAlert.all).to_not include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
+      expect(ScheduledSmartAlert.all).not_to include(an_object_having_attributes(context_type: "AssignmentOverride", context_id: override.id))
     end
   end
 
@@ -1490,6 +1504,135 @@ describe AssignmentOverride do
       checkpoint = topic.reply_to_topic_checkpoint
       override = create_group_override_for_assignment(checkpoint, { group: })
       expect(checkpoint.assignment_overrides).to include override
+    end
+  end
+
+  describe "peer review sub assignments" do
+    before :once do
+      course_model
+      @peer_review_sub_assignment = peer_review_model(course: @course)
+      @parent_assignment = @peer_review_sub_assignment.parent_assignment
+      @parent_override = @parent_assignment.assignment_overrides.create!
+    end
+
+    it "requires a parent override for new peer review sub assignment override" do
+      override = AssignmentOverride.new(assignment: @peer_review_sub_assignment)
+      expect(override).not_to be_valid
+      expect(override.errors[:parent_override_id]).to include("must be present for overrides belonging to SubAssignment or PeerReviewSubAssignment")
+    end
+
+    it "is valid with a parent override" do
+      override = AssignmentOverride.new(assignment: @peer_review_sub_assignment, parent_override: @parent_override)
+      expect(override).to be_valid
+    end
+
+    it "does not allow removing parent override from existing peer review sub assignment override" do
+      override = AssignmentOverride.create!(assignment: @peer_review_sub_assignment, parent_override: @parent_override)
+      override.parent_override = nil
+      expect(override).not_to be_valid
+      expect(override.errors[:parent_override_id]).to include("must be present for overrides belonging to SubAssignment or PeerReviewSubAssignment")
+    end
+
+    it "allows setting parent_override_id to another valid override" do
+      another_parent_override = @parent_assignment.assignment_overrides.create!
+      override = AssignmentOverride.create!(assignment: @peer_review_sub_assignment, parent_override: @parent_override)
+      override.parent_override = another_parent_override
+      expect(override).to be_valid
+    end
+
+    it "rejects parent_override_id on non-SubAssignment or non-PeerReviewSubAssignment overrides" do
+      regular_assignment = @course.assignments.create!
+      override = AssignmentOverride.new(assignment: regular_assignment, parent_override: @parent_override)
+      expect(override).not_to be_valid
+      expect(override.errors[:parent_override_id]).to include("can only be set for overrides belonging to SubAssignment or PeerReviewSubAssignment")
+    end
+  end
+
+  describe "#peer_review_dates_for_override" do
+    before :once do
+      @course = course_factory(active_all: true)
+      @assignment = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        peer_reviews: true
+      )
+      @section = @course.course_sections.create!(name: "Section 1")
+      @override = @assignment.assignment_overrides.create!(
+        set: @section,
+        due_at: 1.week.from_now
+      )
+    end
+
+    it "returns nil when assignment has no peer reviews" do
+      @assignment.update!(peer_reviews: false)
+      expect(@override.peer_review_dates_for_override).to be_nil
+    end
+
+    it "returns nil when feature flag is disabled" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      expect(@override.peer_review_dates_for_override).to be_nil
+    end
+
+    it "returns nil when peer review sub assignment does not exist" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      expect(@override.peer_review_dates_for_override).to be_nil
+    end
+
+    context "with peer review sub assignment" do
+      before :once do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        service = PeerReview::PeerReviewCreatorService.new(
+          parent_assignment: @assignment,
+          points_possible: 5
+        )
+        service.call
+        @peer_review_sub = @assignment.reload.peer_review_sub_assignment
+        @peer_review_sub.update!(
+          due_at: 2.weeks.from_now,
+          unlock_at: 1.5.weeks.from_now,
+          lock_at: 2.5.weeks.from_now
+        )
+      end
+
+      it "returns base peer review dates when no matching override exists" do
+        result = @override.peer_review_dates_for_override
+        expect(result).to be_a(Hash)
+        expect(result[:due_at]).to eq(@peer_review_sub.due_at)
+        expect(result[:unlock_at]).to eq(@peer_review_sub.unlock_at)
+        expect(result[:lock_at]).to eq(@peer_review_sub.lock_at)
+      end
+
+      it "returns override-specific dates when matching override exists" do
+        pr_override = @peer_review_sub.assignment_overrides.create!(
+          parent_override: @override,
+          set: @section,
+          due_at: 3.weeks.from_now,
+          unlock_at: 2.5.weeks.from_now,
+          lock_at: 3.5.weeks.from_now
+        )
+
+        result = @override.peer_review_dates_for_override
+        expect(result).to be_a(Hash)
+        expect(result[:due_at]).to eq(pr_override.due_at)
+        expect(result[:unlock_at]).to eq(pr_override.unlock_at)
+        expect(result[:lock_at]).to eq(pr_override.lock_at)
+      end
+
+      it "accepts preloaded peer review overrides hash" do
+        pr_override = @peer_review_sub.assignment_overrides.create!(
+          parent_override: @override,
+          set: @section,
+          due_at: 3.weeks.from_now
+        )
+
+        peer_review_overrides = {
+          overrides: { @override.id => pr_override },
+          peer_review_sub: @peer_review_sub
+        }
+
+        result = @override.peer_review_dates_for_override(peer_review_overrides)
+        expect(result[:due_at]).to eq(pr_override.due_at)
+      end
     end
   end
 end

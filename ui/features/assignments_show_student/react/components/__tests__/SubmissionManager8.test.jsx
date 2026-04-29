@@ -21,22 +21,20 @@ import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/re
 import {act, fireEvent, render, screen} from '@testing-library/react'
 import React from 'react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
-import StudentViewContext, {StudentViewContextDefaults} from '../Context'
+import StudentViewContext, {
+  StudentViewContextDefaults,
+} from '@canvas/assignments/react/StudentViewContext'
 import SubmissionManager from '../SubmissionManager'
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
+vi.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: vi.fn(),
 }))
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
-jest.mock('@canvas/rce/RichContentEditor')
+vi.mock('@canvas/rce/RichContentEditor')
 
-jest.mock('../../apis/ContextModuleApi')
-
-jest.mock('@canvas/do-fetch-api-effect')
-
-jest.useFakeTimers()
+vi.mock('../../apis/ContextModuleApi')
 
 function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
@@ -144,7 +142,11 @@ describe('SubmissionManager', () => {
       act(() => {
         fireEvent.click(submitButton)
       })
-      expect(getByLabelText(/You must agree to the submission pledge before you can submit the assignment/)).toBeInTheDocument()
+      expect(
+        getByLabelText(
+          /You must agree to the submission pledge before you can submit the assignment/,
+        ),
+      ).toBeInTheDocument()
     })
 
     it('removes the error message after the user agrees to the pledge', () => {
@@ -157,14 +159,21 @@ describe('SubmissionManager', () => {
       act(() => {
         fireEvent.click(submitButton)
       })
-      expect(getByLabelText(/You must agree to the submission pledge before you can submit the assignment/)).toBeInTheDocument()
+      expect(
+        getByLabelText(
+          /You must agree to the submission pledge before you can submit the assignment/,
+        ),
+      ).toBeInTheDocument()
 
       const agreementCheckbox = getByLabelText(/I agree to the tool's/)
       act(() => {
         fireEvent.click(agreementCheckbox)
       })
-      expect(queryByLabelText(/You must agree to the submission pledge before you can submit the assignment/)).not.toBeInTheDocument()
-
+      expect(
+        queryByLabelText(
+          /You must agree to the submission pledge before you can submit the assignment/,
+        ),
+      ).not.toBeInTheDocument()
     })
   })
 })

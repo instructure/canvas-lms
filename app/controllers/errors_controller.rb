@@ -71,6 +71,7 @@ class ErrorsController < ApplicationController
   before_action :require_view_error_reports, except: [:create]
   before_action :validate_captcha!, only: [:create]
   skip_before_action :verify_authenticity_token, only: [:create]
+  skip_before_action :require_user, only: :create
 
   def require_view_error_reports
     require_site_admin_with_permission(:view_error_reports)
@@ -90,7 +91,7 @@ class ErrorsController < ApplicationController
       @reports = @reports.where(category: params[:category])
     end
 
-    @reports = @reports.order("created_at DESC").paginate(per_page: PER_PAGE, page: params[:page], total_entries: nil)
+    @reports = @reports.order(created_at: :desc).paginate(per_page: PER_PAGE, page: params[:page], total_entries: nil)
   end
 
   def show

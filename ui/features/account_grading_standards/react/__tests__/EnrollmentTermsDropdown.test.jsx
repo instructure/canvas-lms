@@ -64,7 +64,7 @@ describe('EnrollmentTermsDropdown', () => {
   const renderDropdown = (props = {}) => {
     const defaultProps = {
       terms: mockTerms,
-      changeSelectedEnrollmentTerm: jest.fn(),
+      changeSelectedEnrollmentTerm: vi.fn(),
     }
     return render(<EnrollmentTermsDropdown {...defaultProps} {...props} />)
   }
@@ -98,7 +98,7 @@ describe('EnrollmentTermsDropdown', () => {
   })
 
   it('calls changeSelectedEnrollmentTerm when selection changes', async () => {
-    const handleChange = jest.fn()
+    const handleChange = vi.fn()
     renderDropdown({changeSelectedEnrollmentTerm: handleChange})
 
     const dropdown = screen.getByRole('combobox', {name: 'Enrollment Term', hidden: true})

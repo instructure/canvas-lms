@@ -167,10 +167,6 @@
   max-width: 100%;
 }
 
-.user_content iframe[data-media-id] {
-  background-color: #eee;
-}
-
 // copied from the instui Link focus ring style
 .user_content a:focus {
   outline-offset: 0.0625rem;
@@ -1788,7 +1784,7 @@ form.user_content_post_form {
   margin: 4px 0;
 }
 
-.with-fixed-bottom .ic-Layout-wrapper {
+.with-fixed-bottom:not(.content-only) .ic-Layout-wrapper {
   padding-bottom: 60px;
   box-sizing: border-box;
 }
@@ -1813,20 +1809,39 @@ form.user_content_post_form {
     }
   }
   .fixed_warning {
-    background-color: #fdd;
+    background-color: #ffcccc;
     border-width: 2px 0 0;
     border-style: solid;
-    border-color: black;
+    border-color: #000000;
     padding: 15px;
     opacity: 0.9;
-    color: black;
+    color: #000000;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
 
+    a {
+      color: #000000;
+      text-decoration: underline;
+      &:hover, &:focus {
+        color: #000000;
+      }
+    }
+
+    button, .Button--icon-action {
+      color: #000000;
+      &:hover, &:focus {
+        color: #000000;
+      }
+    }
+
     .warning_message {
       margin-#{direction(left)}: auto;
     }
+  }
+
+  body.content-only & {
+    display: none;
   }
 }
 

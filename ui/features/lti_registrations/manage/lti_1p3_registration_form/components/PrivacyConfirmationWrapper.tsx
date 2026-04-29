@@ -22,15 +22,23 @@ import {LtiPrivacyLevels} from '../../model/LtiPrivacyLevel'
 import {PrivacyConfirmation} from '../../registration_wizard_forms/PrivacyConfirmation'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
+import type {LtiRegistrationUpdateRequest} from '../../model/lti_ims_registration/LtiRegistrationUpdateRequest'
 
 export type PrivacyConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   internalConfig: InternalLtiConfiguration
+  registrationUpdateRequest?: LtiRegistrationUpdateRequest
+  /**
+   * Original configuration before updates (for comparison in update flow)
+   */
+  originalConfig?: InternalLtiConfiguration
 }
 
 export const PrivacyConfirmationWrapper = ({
   overlayStore,
   internalConfig,
+  registrationUpdateRequest,
+  originalConfig,
 }: PrivacyConfirmationWrapperProps) => {
   const {state, ...actions} = overlayStore()
 
@@ -43,6 +51,8 @@ export const PrivacyConfirmationWrapper = ({
         appName={internalConfig.title}
         privacyLevelOnChange={actions.setPrivacyLevel}
         selectedPrivacyLevel={value}
+        registrationUpdateRequest={registrationUpdateRequest}
+        internalConfiguration={originalConfig}
       />
     </RegistrationModalBody>
   )

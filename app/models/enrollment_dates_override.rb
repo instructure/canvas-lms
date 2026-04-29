@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class EnrollmentDatesOverride < ActiveRecord::Base
+class EnrollmentDatesOverride < ApplicationRecord
   belongs_to :root_account, class_name: "Account"
   belongs_to :context, polymorphic: [:account]
   belongs_to :enrollment_term
@@ -28,6 +28,7 @@ class EnrollmentDatesOverride < ActiveRecord::Base
   after_save :update_courses_and_states_if_necessary
 
   include StickySisFields
+
   are_sis_sticky :start_at, :end_at
 
   def infer_root_account

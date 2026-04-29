@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Rubric < ActiveRecord::Base
+class Rubric < ApplicationRecord
   class RubricUniqueAlignments < ActiveModel::Validator
     def validate(record)
       return if record.criteria.nil?
@@ -62,7 +62,7 @@ class Rubric < ActiveRecord::Base
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :title, length: { maximum: maximum_string_length, allow_blank: false }
-  validates :button_display, inclusion: { in: %w[numeric emoji letter] }
+  validates :button_display, inclusion: { in: %w[numeric emoji letter points] }
   validates :rating_order, inclusion: { in: %w[ascending descending] }
 
   validates_with RubricUniqueAlignments
@@ -280,7 +280,10 @@ class Rubric < ActiveRecord::Base
   end
 
   def alignments_need_update?
-    saved_change_to_data? || saved_change_to_workflow_state?
+    return true if saved_change_to_workflow_state?
+    return true if saved_change_to_data? && criteria_has_changed?(data_before_last_save)
+
+    false
   end
 
   def data_outcome_ids
@@ -321,6 +324,7 @@ class Rubric < ActiveRecord::Base
                                    use_for_grading: !!opts[:use_for_grading],
                                    purpose:)
     ra.skip_updating_points_possible = opts[:skip_updating_points_possible] || @skip_updating_points_possible
+    ra.skip_updating_rubric_association_count = opts[:skip_updating_rubric_association_count]
     ra.updating_user = opts[:current_user]
     if ra.save && association.is_a?(Assignment)
       association.mark_downstream_changes(["rubric"])
@@ -370,7 +374,7 @@ class Rubric < ActiveRecord::Base
     self
   end
 
-  def update_mastery_scales(save = true)
+  def update_mastery_scales(save: true)
     return unless context.root_account.feature_enabled?(:account_level_mastery_scales)
 
     mastery_scale = context.resolved_outcome_proficiency
@@ -449,9 +453,13 @@ class Rubric < ActiveRecord::Base
 
     data = generate_criteria(params)
     return true if data.title != title || data.points_possible != points_possible
-    return true if Rubric.normalize(data.criteria) != Rubric.normalize(criteria)
+    return true if criteria_has_changed?(data.criteria)
 
     false
+  end
+
+  def criteria_has_changed?(other_criteria)
+    Rubric.normalize(other_criteria) != Rubric.normalize(criteria)
   end
 
   def populate_rubric_title
@@ -459,8 +467,8 @@ class Rubric < ActiveRecord::Base
   end
 
   CriteriaData = Struct.new(:criteria, :points_possible, :title)
-  Criterion = Struct.new(:description, :long_description, :points, :id, :criterion_use_range, :learning_outcome_id, :mastery_points, :ignore_for_scoring, :ratings, :title, :migration_id, :percentage, :order, keyword_init: true)
-  Rating = Struct.new(:description, :long_description, :points, :id, :criterion_id, :migration_id, :percentage, keyword_init: true)
+  Criterion = Struct.new(:description, :long_description, :points, :id, :criterion_use_range, :learning_outcome_id, :mastery_points, :ignore_for_scoring, :ratings, :title, :migration_id, :percentage, :order, :generated)
+  Rating = Struct.new(:description, :long_description, :points, :id, :criterion_id, :migration_id, :percentage)
   # association_object is only needed for generating via llm
   def generate_criteria(params, association_object = nil)
     @used_ids = {}
@@ -468,7 +476,7 @@ class Rubric < ActiveRecord::Base
     title = params[:title] || t("context_name_rubric", "%{course_name} Rubric", course_name: context.name)
     criteria = []
     if Canvas::Plugin.value_to_boolean(params[:criteria_via_llm]) && Rubric.ai_rubrics_enabled?(context)
-      criteria = generate_criteria_via_llm(association_object)
+      criteria = RubricLLMService.new(self).generate_criteria_via_llm(association_object)
     else
       (params[:criteria] || {}).each do |idx, criterion_data|
         criterion = {}
@@ -490,7 +498,13 @@ class Rubric < ActiveRecord::Base
             criterion[:learning_outcome_id] = outcome.id
             criterion[:mastery_points] = (criterion_data[:mastery_points] || outcome.data&.dig(:rubric_criterion, :mastery_points))&.to_f
             criterion[:ignore_for_scoring] = valid_bools.include?(criterion_data[:ignore_for_scoring])
+            # Learning outcome criteria are never AI-generated
+            criterion[:generated] = false
           end
+        else
+          # Preserve generated if provided (for AI-generated criteria being saved),
+          # otherwise set to false for manually created criteria
+          criterion[:generated] = valid_bools.include?(criterion_data[:generated])
         end
 
         ratings = (criterion_data[:ratings] || {}).values.map do |rating_data|
@@ -511,113 +525,42 @@ class Rubric < ActiveRecord::Base
     CriteriaData.new(criteria, points_possible, title)
   end
 
-  DEFAULT_GENERATE_OPTIONS = {
-    criteria_count: 5,
-    rating_count: 4,
-    points_per_criterion: 20,
-    use_range: false,
-    grade_level: "higher-ed"
-  }.freeze
-  def generate_criteria_via_llm(association_object, generate_options = {})
-    unless association_object.is_a?(AbstractAssignment)
-      raise "LLM generation is only available for rubrics associated with an Assignment"
-    end
+  def self.fail_progress_with_error(progress, operation_name, error)
+    error_report = ErrorReport.log_exception(nil, error, message: "Error occurred during criteria #{operation_name}")
 
-    unless user
-      raise "User must be associated to rubric before LLM generation"
-    end
+    progress.set_results({ error: t("There was an error with the criteria %{operation}. Please try again later.", operation: operation_name) })
+    progress.message = "Error ID: #{error_report.global_id}" if error_report
+    progress.fail!
+  end
 
-    llm_config = LLMConfigs.config_for("rubric_create")
-    if llm_config.nil?
-      raise "No LLM config found for rubric creation"
-    end
-
-    assignment = association_object
-    dynamic_content = {
-      CONTENT: {
-        id: assignment.id,
-        title: assignment.title,
-        description: assignment.description,
-        grading_type: assignment.grading_type,
-        submission_types: assignment.submission_types,
-      }.to_json,
-      CRITERIA_COUNT: generate_options[:criteria_count] || DEFAULT_GENERATE_OPTIONS[:criteria_count],
-      RATING_COUNT: generate_options[:rating_count] || DEFAULT_GENERATE_OPTIONS[:rating_count],
-      ADDITIONAL_PROMPT_INFO: generate_options[:additional_prompt_info].present? ? "Also consider: #{generate_options[:additional_prompt_info]}" : "",
-      GRADE_LEVEL: generate_options[:grade_level] || DEFAULT_GENERATE_OPTIONS[:grade_level],
-    }
-
-    prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
-
-    response = nil
-    time = Benchmark.measure do
-      InstLLMHelper.with_rate_limit(user:, llm_config:) do
-        response = InstLLMHelper.client(llm_config.model_id).chat(
-          [{ role: "user", content: prompt }],
-          **options.symbolize_keys
-        )
-      end
-    end
-
-    LLMResponse.create!(
-      associated_assignment: association_object,
-      user:,
-      prompt_name: llm_config.name,
-      prompt_model_id: llm_config.model_id,
-      prompt_dynamic_content: dynamic_content,
-      raw_response: response.message[:content],
-      input_tokens: response.usage[:input_tokens],
-      output_tokens: response.usage[:output_tokens],
-      response_time: time.real.round(2),
-      root_account_id: association_object.root_account_id
-    )
-
-    ai_rubric = JSON.parse(response.message[:content], symbolize_names: true)
-
-    criteria = []
-    ai_rubric[:criteria].each do |criterion_data|
-      criterion = {}
-      criterion[:id] = unique_item_id
-      criterion[:description] = (criterion_data[:name].presence || t("no_description", "No Description")).strip
-      criterion[:long_description] = criterion_data[:description].presence
-
-      points = (generate_options[:points_per_criterion] || DEFAULT_GENERATE_OPTIONS[:points_per_criterion]).to_f
-      points_decrement = points / [(criterion_data[:ratings].length - 1), 1].max
-      ratings = criterion_data[:ratings].each_with_index.map do |rating_data, index|
-        {
-          description: (rating_data[:title].presence || t("no_description", "No Description")).strip,
-          long_description: rating_data[:description].presence,
-          points: (points - (points_decrement * index)).round,
-          criterion_id: criterion[:id],
-          id: unique_item_id
-        }
-      end
-      criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
-      criterion[:points] = criterion[:ratings].pluck(:points).max || 0
-      criterion[:criterion_use_range] = !!generate_options[:use_range]
-
-      criteria.push(criterion)
-    end
-    criteria
+  def self.process_llm_criteria_with_error_handling(progress, operation_name)
+    yield
+    progress.complete!
+  rescue InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError
+    progress.set_results({ error: t("You have made too many criteria generation requests. Please try again later.") })
+    progress.fail!
+  rescue => e
+    fail_progress_with_error(progress, operation_name, e)
   end
 
   def self.process_generate_criteria_via_llm(progress, course, user, association_object, generate_options)
     rubric = course.rubrics.build(user:)
-    if rubric.grants_right?(user, :update)
-      criteria = rubric.generate_criteria_via_llm(association_object, generate_options)
+    return unless rubric.grants_right?(user, :update)
+
+    process_llm_criteria_with_error_handling(progress, "generation") do
+      criteria = RubricLLMService.new(rubric).generate_criteria_via_llm(association_object, generate_options)
       progress.set_results({ criteria: })
-      progress.complete!
     end
-  rescue InstLLM::ServiceQuotaExceededError, InstLLM::ThrottlingError
-    progress.set_results({ error: t("There was an error with generation capacity. Please try again later.") })
-    progress.fail!
-  rescue InstLLMHelper::RateLimitExceededError
-    progress.set_results({ error: t("You have made too many criteria generation requests. Please try again later.") })
-    progress.fail!
-  rescue
-    progress.set_results({ error: t("There was an error with the criteria generation. Please try agian later.") })
-    progress.fail!
-    raise
+  end
+
+  def self.process_regenerate_criteria_via_llm(progress, course, user, association_object, regenerate_options, generate_options)
+    rubric = course.rubrics.build(user:)
+    return unless rubric.grants_right?(user, :update)
+
+    process_llm_criteria_with_error_handling(progress, "regeneration") do
+      criteria = RubricLLMService.new(rubric).regenerate_criteria_via_llm(association_object, regenerate_options, generate_options)
+      progress.set_results({ criteria: })
+    end
   end
 
   def reconstitute_criteria(criteria)
@@ -674,7 +617,13 @@ class Rubric < ActiveRecord::Base
       h = criteria.compact_blank.stringify_keys
       h.delete("title") if h["title"] == h["description"]
       h.each do |k, v|
-        h[k] = Rubric.normalize(v) if v.is_a?(Hash) || v.is_a?(Array)
+        h[k] = if v.is_a?(Hash) || v.is_a?(Array)
+                 Rubric.normalize(v)
+               elsif k == "long_description" && v.is_a?(String)
+                 v.gsub("\r\n", "\n")
+               else
+                 v
+               end
       end
       h
     else
@@ -700,7 +649,11 @@ class Rubric < ActiveRecord::Base
   end
 
   def learning_outcome_ids_from_results
-    learning_outcome_results.select(:learning_outcome_id).distinct.pluck(:learning_outcome_id)
+    if learning_outcome_alignments.exists?
+      learning_outcome_results.select(:learning_outcome_id).distinct.pluck(:learning_outcome_id)
+    else
+      []
+    end
   end
 
   def rubric_assignment_associations?
@@ -708,9 +661,26 @@ class Rubric < ActiveRecord::Base
   end
 
   def used_locations
-    associations = rubric_associations.active.where(association_type: "Assignment")
+    Assignment.active
+              .joins("INNER JOIN #{RubricAssociation.quoted_table_name} ON rubric_associations.association_id = assignments.id AND rubric_associations.association_type = 'Assignment'")
+              .joins("INNER JOIN #{Course.quoted_table_name} AS context_course ON assignments.context_id = context_course.id AND assignments.context_type = 'Course'")
+              .where(rubric_associations: { rubric_id: id, workflow_state: "active" })
+              .where.not("context_course.workflow_state": "deleted")
+  end
 
-    Assignment.where(id: associations.pluck(:association_id))
+  def update_association_count
+    cnt = rubric_associations.for_grading.count
+    without_versioning do
+      self.read_only = cnt > 1
+      self.association_count = cnt
+      begin
+        save!
+      rescue => e
+        Rails.logger.error "Failed to update rubric association count: #{e.message}"
+        Canvas::Errors.capture(e)
+      end
+      destroy if cnt == 0 && rubric_associations.none? && !public
+    end
   end
 
   def self.enhanced_rubrics_assignments_enabled?(context_to_check)

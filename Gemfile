@@ -75,7 +75,7 @@ module PreferGlobalRubyGemsSource
 end
 Bundler::SourceList.prepend(PreferGlobalRubyGemsSource)
 
-module GemOverride
+module GemOverride # rubocop:disable Style/OneClassPerFile
   def gem(name, *version, path: nil, **kwargs)
     # Bundler calls `gem` internally by passing a splat with a hash as the
     # last argument, instead of properly using kwargs. Detect that.
@@ -83,7 +83,7 @@ module GemOverride
       kwargs = version.pop
     end
     vendor_path = File.expand_path("vendor/#{name}", __dir__)
-    if File.directory?(vendor_path)
+    if File.directory?(vendor_path) && Dir.children(vendor_path).any?
       super(name, path: vendor_path, **kwargs)
     elsif pinned_github_gems.key?(name)
       repo, ref = pinned_github_gems[name].split(":")

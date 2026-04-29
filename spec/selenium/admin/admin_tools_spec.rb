@@ -168,7 +168,7 @@ describe "admin_tools" do
           dialog = f("[aria-label='Generate Activity for #{@student.name}'")
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesPane h2:nth-of-type(2)").text).to include("Notifications sent to #{@student.name}")
+          expect(f("#commMessagesPane h3").text).to include("Notifications sent to #{@student.name}")
           expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from the beginning of time to now")
           # Search with begin date and end date - should show time actually being used
           perform_view_user_search(@student.id)
@@ -177,7 +177,7 @@ describe "admin_tools" do
           replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "Mar 9, 2001")
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesPane h2:nth-of-type(2)").text).to include("Notifications sent to #{@student.name}")
+          expect(f("#commMessagesPane h3").text).to include("Notifications sent to #{@student.name}")
           expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from Mar 3, 2001, 12:00 AM to Mar 9, 2001, 12:00 AM")
           # Search with begin date/time and end date/time - should use and show given time
           perform_view_user_search(@student.id)
@@ -188,7 +188,7 @@ describe "admin_tools" do
           replace_and_proceed(dialog.find_element(:css, "[data-testid='to-time']"), "3:00 PM", { tab_out: true })
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesPane h2:nth-of-type(2)").text).to include("Notifications sent to #{@student.name}")
+          expect(f("#commMessagesPane h3").text).to include("Notifications sent to #{@student.name}")
           expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from Mar 3, 2001, 1:15 PM to Mar 9, 2001, 3:00 PM")
         end
 
@@ -683,25 +683,6 @@ describe "admin_tools" do
     it "does not appear if the user lacks permission" do
       load_admin_tools_page
       expect(f("#adminToolsTabNav")).not_to contain_css('a[href="#bouncedEmailsPane"]')
-    end
-
-    it "performs searches" do
-      skip "FOO-4092"
-      @account.settings[:admins_can_view_notifications] = true
-      @account.save!
-      load_admin_tools_page
-      f('a[href="#bouncedEmailsPane"]').click
-      replace_content fj('label:contains("Address") input'), "*@example.com"
-      replace_content fj('label:contains("Last bounced after") input'), 5.days.ago.iso8601
-      replace_content fj('label:contains("Last bounced before") input'), 3.days.ago.iso8601
-      fj('button:contains("Search")').click
-      wait_for_ajaximations
-      data = f("#bouncedEmailsPane").text
-      expect(data).not_to include "one@example.com"
-      expect(data).to include "two@example.com"
-      expect(data).not_to include "three@example.com"
-      csvLink = fj("#bouncedEmailsPane a:contains('Download these results as CSV')")["href"]
-      expect(csvLink).to include "/api/v1/accounts/#{@account.id}/bounced_communication_channels.csv?order=desc&pattern=*%40example.com"
     end
   end
 end

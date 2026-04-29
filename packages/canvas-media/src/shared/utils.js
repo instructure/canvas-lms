@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const AUDIO_PLAYER_SIZE = {width: '320px', height: '14.25rem'}
+export const AUDIO_PLAYER_SIZE = {width: 320, height: 228}
 
 export const NON_PREVIEWABLE_TYPES = [
   'audio/x-ms-wma',
   'video/avi',
   'video/x-msvideo',
   'video/x-ms-wma',
-  'video/x-ms-wmv'
+  'video/x-ms-wmv',
 ]
 
 export const isPreviewable = type => !NON_PREVIEWABLE_TYPES.includes(type)
@@ -42,12 +42,12 @@ export function isAudio(type) {
 // the available space
 export function sizeMediaPlayer(player, type, container) {
   if (isAudio(type)) {
-    return AUDIO_PLAYER_SIZE
+    return {width: `${AUDIO_PLAYER_SIZE.width}px`, height: `${AUDIO_PLAYER_SIZE.height}px`}
   }
 
   const sz = {
     width: player.videoWidth,
-    height: player.videoHeight
+    height: player.videoHeight,
   }
   if (container?.width && container?.height) {
     if (sz.width > sz.height) {

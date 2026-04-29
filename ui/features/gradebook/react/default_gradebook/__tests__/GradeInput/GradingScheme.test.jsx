@@ -19,7 +19,6 @@
 import React from 'react'
 import {render, cleanup, fireEvent} from '@testing-library/react'
 import GradeInput from '../../components/GradeInput'
-import '@testing-library/jest-dom/extend-expect'
 
 describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
   let props
@@ -53,7 +52,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       disabled: false,
       enterGradesAs: 'gradingScheme',
       gradingScheme,
-      onSubmissionUpdate: jest.fn(),
+      onSubmissionUpdate: vi.fn(),
       pendingGradeInfo: null,
       submission,
     }

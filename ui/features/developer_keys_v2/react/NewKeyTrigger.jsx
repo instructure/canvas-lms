@@ -48,6 +48,14 @@ export default class DeveloperKeyModalTrigger extends React.Component {
           color="primary"
           elementRef={this.props.setAddKeyButtonRef}
           renderIcon={IconPlusLine}
+          disabled={ENV.devKeysReadOnly}
+          title={
+            ENV.devKeysReadOnly
+              ? I18n.t(
+                  'You do not have permission to create or modify developer keys in this account',
+                )
+              : undefined
+          }
         >
           <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
           {I18n.t('Developer Key')}

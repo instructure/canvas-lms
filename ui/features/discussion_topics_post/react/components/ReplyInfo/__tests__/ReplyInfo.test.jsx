@@ -21,16 +21,16 @@ import {render} from '@testing-library/react'
 import {ReplyInfo} from '../ReplyInfo'
 import {responsiveQuerySizes} from '../../../utils'
 
-jest.mock('../../../utils')
+vi.mock('../../../utils')
 
 beforeAll(() => {
-  window.matchMedia = jest.fn().mockImplementation(() => {
+  window.matchMedia = vi.fn().mockImplementation(() => {
     return {
       matches: true,
       media: '',
       onchange: null,
-      addListener: jest.fn(),
-      removeListener: jest.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
     }
   })
 })

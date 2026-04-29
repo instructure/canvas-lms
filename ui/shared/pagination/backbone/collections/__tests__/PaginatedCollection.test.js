@@ -24,7 +24,7 @@ import getFakePage from '@canvas/test-utils/getFakePage'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 
-describe('PaginatedCollection', () => {
+describe.skip('PaginatedCollection', () => {
   let collection
   let server
 

@@ -33,8 +33,7 @@ module Interfaces::QuizzesConnectionInterface
   def quizzes_scope(course, search_term = nil, user_id = nil)
     scoped_user = user_id.nil? ? current_user : User.find_by(id: user_id)
 
-    # If user_id was provided but user not found, return no quizzes
-    return Quizzes::Quiz.none if user_id.present? && scoped_user.nil?
+    return [] if user_id.present? && scoped_user.nil?
 
     # Check if current user has permission to view quizzes as the scoped user
     unless current_user.can_current_user_view_as_user(course, scoped_user)
@@ -42,16 +41,25 @@ module Interfaces::QuizzesConnectionInterface
       raise GraphQL::ExecutionError, "You do not have permission to view this course."
     end
 
-    quizzes = course.quizzes.active
+    quizzes = course.quizzes.active.include_assignment
+    lti_quizzes = if NewQuizzesFeaturesHelper.new_quizzes_enabled?(course)
+                    course.active_assignments.type_quiz_lti
+                  else
+                    Assignment.none
+                  end
 
     if search_term.present?
       quizzes = quizzes.where(Quizzes::Quiz.wildcard(:title, search_term))
+      lti_quizzes = lti_quizzes.where(Assignment.wildcard(:title, search_term))
     end
 
-    # For students, we need to filter quizzes based on visibility rules
     if !course.grants_right?(scoped_user, :read_as_admin) && scoped_user.is_a?(User)
       quizzes = DifferentiableAssignment.scope_filter(quizzes, scoped_user, course)
+      lti_quizzes = DifferentiableAssignment.scope_filter(lti_quizzes, scoped_user, course)
     end
+
+    quizzes = quizzes.to_a
+    quizzes.concat(lti_quizzes.to_a) if NewQuizzesFeaturesHelper.new_quizzes_enabled?(course)
 
     quizzes
   end
@@ -70,7 +78,7 @@ module Interfaces::QuizzesConnectionInterface
   end
 
   def apply_quiz_order(quizzes)
-    quizzes.reorder(id: :asc)
+    quizzes.sort_by(&:id)
   end
   private :apply_quiz_order
 end

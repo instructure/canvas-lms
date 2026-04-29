@@ -84,6 +84,7 @@ module Quizzes
   #     }
   class QuizSubmissionUsersController < ::ApplicationController
     include ::Filters::Quizzes
+
     before_action :require_context, :require_quiz
 
     def index

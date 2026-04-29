@@ -37,7 +37,7 @@ import type {
   SortableColumn,
   StoreState,
 } from '../types'
-import ConfusedPanda from '@canvas/images/ConfusedPanda.svg'
+import ConfusedPanda from '@instructure/platform-images/assets/ConfusedPanda.svg'
 import type {Course} from '../shared/types'
 import PaceContextsTable from './pace_contexts_table'
 import {getResponsiveSize} from '../reducers/ui'
@@ -279,5 +279,5 @@ export default connect(mapStateToProps, {
   setSelectedContext: paceContextsActions.setSelectedContext,
   setSelectedModalContext: uiActions.setSelectedPaceContext,
   syncPublishingPaces: paceContextsActions.syncPublishingPaces,
-  // @ts-expect-error
+  // @ts-expect-error Redux connect type incompatibility
 })(PaceContent)

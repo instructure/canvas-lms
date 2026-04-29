@@ -57,7 +57,8 @@ module SearchHelper
                      :inactive
                    end,
             available: type == :current && course.available?,
-            default_section_id: course.default_section(no_create: true).try(:id)
+            default_section_id: course.default_section(no_create: true).try(:id),
+            allow_differentiation_tags: course.account.allow_assign_to_differentiation_tags?
           }.tap do |hash|
             hash[:permissions] =
               if include_all_permissions
@@ -153,7 +154,8 @@ module SearchHelper
                    end
         add_sections.call sections
         add_groups.call context.groups.active, context
-        if context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+        if context.account.allow_assign_to_differentiation_tags? &&
+           context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
           add_differentiation_tags.call context.differentiation_tags.active, context
         end
 
@@ -202,7 +204,8 @@ module SearchHelper
                         search_all_contexts: options[:search_all_contexts],
                         types: types[:context],
                         base_url: options[:base_url],
-                        include_concluded: options[:include_concluded]
+                        include_concluded: options[:include_concluded],
+                        restrict_to_teacher_recipients: options[:restrict_to_teacher_recipients]
                       )]
     end
 
@@ -213,7 +216,8 @@ module SearchHelper
                         exclude_ids: exclude_users,
                         context: options[:context],
                         weak_checks: options[:skip_visibility_checks],
-                        include_concluded: options[:include_concluded]
+                        include_concluded: options[:include_concluded],
+                        restrict_to_teacher_recipients: options[:restrict_to_teacher_recipients]
                       )]
     end
 
@@ -255,7 +259,7 @@ module SearchHelper
             found_custom_sections = sections.any? { |s| s[:id] != course[:default_section_id] }
             result << { id: "#{context_name}_sections", name: I18n.t(:course_sections, "Course Sections"), item_count: sections.size, type: :context } if found_custom_sections
             result << { id: "#{context_name}_groups", name: I18n.t(:student_groups, "Student Groups"), item_count: groups.size, type: :context } unless groups.empty?
-            result << { id: "#{context_name}_differentiation_tags", name: I18n.t(:differentiation_tags, "Differentiation Tags"), item_count: differentiation_tags.size, type: :context } unless differentiation_tags.empty?
+            result << { id: "#{context_name}_differentiation_tags", name: I18n.t(:differentiation_tags, "Differentiation Tags"), item_count: differentiation_tags.size, type: :context } if course[:allow_differentiation_tags] && !differentiation_tags.empty?
             return result
           end
         when /\Acourse_\d+_groups\z/
@@ -402,7 +406,13 @@ def synthetic_contexts_for(course, context, options)
   synthetic_context = { avatar_url:, type: :context, permissions: course[:permissions] }
   result << synthetic_context.merge({ id: "#{context}_teachers", name: I18n.t(:enrollments_teachers, "Teachers"), user_count: enrollment_counts["TeacherEnrollment"] }) if enrollment_counts["TeacherEnrollment"].to_i > 0
   result << synthetic_context.merge({ id: "#{context}_tas", name: I18n.t(:enrollments_tas, "Teaching Assistants"), user_count: enrollment_counts["TaEnrollment"] }) if enrollment_counts["TaEnrollment"].to_i > 0
-  result << synthetic_context.merge({ id: "#{context}_students", name: I18n.t(:enrollments_students, "Students"), user_count: enrollment_counts["StudentEnrollment"] }) if enrollment_counts["StudentEnrollment"].to_i > 0
+  if !options[:restrict_to_teacher_recipients] && enrollment_counts["StudentEnrollment"].to_i > 0
+    result << synthetic_context.merge(
+      id: "#{context}_students",
+      name: I18n.t(:enrollments_students, "Students"),
+      user_count: enrollment_counts["StudentEnrollment"]
+    )
+  end
   result << synthetic_context.merge({ id: "#{context}_observers", name: I18n.t(:enrollments_observers, "Observers"), user_count: enrollment_counts["ObserverEnrollment"] }) if enrollment_counts["ObserverEnrollment"].to_i > 0
   result
 end

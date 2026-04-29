@@ -20,6 +20,7 @@
 class EportfolioCategoriesController < ApplicationController
   include Api::V1::Eportfolio
   include EportfolioPage
+
   before_action :rce_js_env
   before_action :get_eportfolio
   def index

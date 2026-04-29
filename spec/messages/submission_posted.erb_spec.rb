@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec_helper"
 require_relative "messages_helper"
 
 describe "submission_posted" do
@@ -161,6 +160,43 @@ describe "submission_posted" do
     it "includes a message subject" do
       expected_subject = "Grade changes and new comments released for: #{assignment.title}, #{course.name}"
       expect(message.subject).to eql expected_subject
+    end
+  end
+
+  context "discussion checkpoint submissions" do
+    let_once(:teacher) { course.enroll_teacher(User.create!(name: "teacher"), enrollment_state: :active).user }
+
+    before :once do
+      course.account.enable_feature!(:discussion_checkpoints)
+
+      # Create a graded discussion with checkpoints
+      @discussion_topic = DiscussionTopic.create_graded_topic!(course:, title: "Checkpointed Discussion")
+      @parent_assignment = @discussion_topic.assignment
+
+      # Create checkpoints
+      @reply_to_topic_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @discussion_topic,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 1.day.from_now }],
+        points_possible: 5
+      )
+
+      # Student submits to the checkpoint
+      @checkpoint_submission = @reply_to_topic_checkpoint.grade_student(student, { grade: "4", grader: teacher }).first
+      @checkpoint_submission.workflow_state = "submitted"
+      @checkpoint_submission.save!
+    end
+
+    it "uses parent assignment ID in URLs for email notifications" do
+      email = generate_message(:submission_posted, :email, @checkpoint_submission, user: student)
+      expect(email.url).to include("assignments/#{@parent_assignment.id}")
+      expect(email.url).not_to include("assignments/#{@reply_to_topic_checkpoint.id}")
+    end
+
+    it "uses parent assignment ID in URLs for summary notifications" do
+      summary = generate_message(:submission_posted, :summary, @checkpoint_submission, user: student)
+      expect(summary.url).to include("assignments/#{@parent_assignment.id}")
+      expect(summary.url).not_to include("assignments/#{@reply_to_topic_checkpoint.id}")
     end
   end
 end

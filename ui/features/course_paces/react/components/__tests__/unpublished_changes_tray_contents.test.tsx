@@ -22,8 +22,8 @@ import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 
 import {UnpublishedChangesTrayContents} from '../unpublished_changes_tray_contents'
 
-const onTrayDismiss = jest.fn()
-const onResetPace = jest.fn()
+const onTrayDismiss = vi.fn()
+const onResetPace = vi.fn()
 
 const CHANGES = [
   {id: 'theme', summary: 'You changed the theme from Light Mode to Dark Mode.'},
@@ -44,7 +44,7 @@ beforeAll(() => {
 })
 
 afterEach(() => {
-  jest.clearAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('UnpublishedChangesTrayContents', () => {

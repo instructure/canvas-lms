@@ -34,8 +34,6 @@ describe "Differentiation Tag Management" do
     @third_student = student_in_course(active_all: true, name: "student@test.com").user
     ta_in_course(active_all: true)
 
-    # Enable FF
-    Account.default.enable_feature! :assign_to_differentiation_tags
     # Set account setting to true but not locked
     @sub2_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
     @sub2_account.save!
@@ -54,7 +52,9 @@ describe "Differentiation Tag Management" do
 
     @single_tag_with_long_name = @course.group_categories.create!(name: "tag with a really long truncated name", non_collaborative: true)
     @single_tag_with_long_name_1 = @course.groups.create!(name: "tag with a really long truncated name variant", group_category: @single_tag_with_long_name)
-    @single_tag_with_long_name_2 = @course.groups.create!(name: "tag with a really long truncated name variant", group_category: @single_tag_with_long_name)
+
+    # Add @single_tag_2 to the long name category so we have a second tag for testing without breaking single tag behavior
+    @single_tag_2 = @course.groups.create!(name: "my tag 2", group_category: @single_tag_with_long_name)
   end
 
   describe "in the people page" do
@@ -392,10 +392,25 @@ describe "Differentiation Tag Management" do
           f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
           wait_for_ajaximations
 
+          force_click("span:contains('#{@single_tag_2.name}')")
+          wait_for_ajaximations
+
+          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include @single_tag_2.id
+        end
+
+        it "Removes a single tag from the selected user" do
+          # First, add the tag to the student
+          @single_tag_1.add_user(@student)
+
+          f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
+          expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
+          f("button[data-testid='user-diff-tag-manager-tag-as-button']").click
+          wait_for_ajaximations
+
           force_click("span:contains('#{@single_tag_1.name}')")
           wait_for_ajaximations
 
-          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).to include @single_tag_1.id
+          expect(@student.current_differentiation_tag_memberships.pluck(:group_id)).not_to include @single_tag_1.id
         end
 
         it "Adds a multiple tag variant to the selected user" do
@@ -432,8 +447,12 @@ describe "Differentiation Tag Management" do
           # remove the user from the tag
           f("a[aria-label='View #{@student.name} user tags']").click
           wait_for_ajaximations
+
+          # Wait for the user tags modal to load and find the remove button for the specific tag
+          keep_trying_until { element_exists?("button[data-testid='user-tag-#{@multiple_tags_1.id}']") }
           f("button[data-testid='user-tag-#{@multiple_tags_1.id}']").click
           wait_for_ajaximations
+
           expect(fj("h2:contains('Remove Tag')")).to be_displayed
           fj("button:contains('Confirm')").click
           wait_for_ajaximations
@@ -654,6 +673,8 @@ describe "Differentiation Tag Management" do
             ff("button[data-testid='remove-tag']")[0].click
             wait_for_ajaximations
 
+            f("[data-testid='continue-warning-modal']").click
+
             fj("button:contains('Save')").click
             wait_for_ajaximations
 
@@ -674,6 +695,8 @@ describe "Differentiation Tag Management" do
             # Delete the second tag variant via its remove button (updated selector)
             ff("button[data-testid='remove-tag']")[0].click
             wait_for_ajaximations
+
+            f("[data-testid='continue-warning-modal']").click
 
             # Add a new tag variant (updated button text)
             fj("button:contains('+ Add another tag')").click
@@ -716,7 +739,7 @@ describe "Differentiation Tag Management" do
             expect(f(".flashalert-message")).to be_displayed
           end
 
-          it "Displays an error message if tag variant limit is reached", :ignore_js_errors do
+          it "Displays an info alert if tag variant limit is reached", :ignore_js_errors do
             multiple_tags_full = @course.group_categories.create!(name: "Project Tags", non_collaborative: true)
             (1..10).each do |x|
               @course.groups.create!(name: x, group_category: multiple_tags_full)
@@ -728,17 +751,9 @@ describe "Differentiation Tag Management" do
             f("button[aria-label='Edit tag set: #{multiple_tags_full.name}']").click
             wait_for_ajaximations
 
-            fj("button:contains('+ Add another tag')").click
-            wait_for_ajaximations
-            tag_inputs = ff("[data-testid='tag-name-input']")
-            new_input = tag_inputs.last
-            new_input.send_keys("11")
+            expect(f("body")).not_to contain_jqcss("button:contains('+ Add another tag')")
 
-            fj("button:contains('Save')").click
-            wait_for_ajaximations
-
-            expect(f(".flashalert-message")).to be_displayed
-            expect(fj("p:contains('Validation failed: Variant limit reached for tag')")).to be_displayed
+            expect(fj("div:contains('Variant limit reached. Current limit is #{Group.MAX_VARIANTS_PER_TAG_CATEGORY}')")).to be_displayed
           end
 
           it "Displays an error message for tag limit", :ignore_js_errors do
@@ -758,6 +773,45 @@ describe "Differentiation Tag Management" do
             wait_for_ajaximations
             expect(f(".flashalert-message")).to be_displayed
             expect(fj("p:contains('Validation failed: You have reached the tag limit for this course')")).to be_displayed
+          end
+
+          it "focus the edit button after tag creation" do
+            fj("button:contains('+ Tag')").click
+            wait_for_ajaximations
+
+            expect(fj("h2:contains('Create Tag')")).to be_displayed
+
+            tag_input = f("[data-testid='tag-name-input']")
+            tag_input.send_keys("New Single Tag")
+
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            # Verify that the modal is closed and the new tag is visible in the tray
+            expect(f("body")).not_to contain_jqcss("h2:contains('Create Tag')")
+            expect(fj("span:contains('New Single Tag')")).to be_displayed
+
+            active_element = driver.switch_to.active_element
+            expect(active_element.attribute("data-testid")).to eq "edit-button-tag-cat-#{GroupCategory.last.id}"
+
+            fj("button:contains('+ Tag')").click
+            wait_for_ajaximations
+
+            expect(fj("h2:contains('Create Tag')")).to be_displayed
+
+            tag_input = f("[data-testid='tag-name-input']")
+            tag_input.send_keys("New Single Tag 2")
+
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            # Verify that the modal is closed and the new tag is visible in the tray
+            expect(f("body")).not_to contain_jqcss("h2:contains('Create Tag')")
+            expect(fj("span:contains('New Single Tag 2')")).to be_displayed
+
+            # Verify that focus is returned to the new tag on another page
+            active_element = driver.switch_to.active_element
+            expect(active_element.attribute("data-testid")).to eq "edit-button-tag-cat-#{GroupCategory.last.id}"
           end
         end
       end
@@ -804,8 +858,8 @@ describe "Differentiation Tag Management" do
           f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
           expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
           # Use the role filter dropdown (assumed to have id 'role-filter') to filter by "Student"
-          student_role_id = Role.where(name: "StudentEnrollment", root_account_id: @course.account.root_account.id).first.id
-          click_option("select[name=enrollment_role_id]", student_role_id.to_s, :value)
+          student_role_name = Role.role_data(@course, @teacher).find { |r| r[:name] == "StudentEnrollment" }[:label]
+          click_option("#people-filter-select", student_role_name, :text)
           wait_for_ajaximations
 
           # Check the second student from the filtered results
@@ -813,7 +867,7 @@ describe "Differentiation Tag Management" do
           expect(f("input[type='checkbox'][aria-label='Select #{@other_student.name}']").attribute("checked")).to be_truthy
 
           # Clear the role filter by selecting "All"
-          click_option("select[name=enrollment_role_id]", "All Roles")
+          click_option("#people-filter-select", "All Roles")
           wait_for_ajaximations
 
           # Verify that both checkboxes remain checked
@@ -894,15 +948,7 @@ describe "Differentiation Tag Management" do
       end
     end
 
-    context "sub account setting and feature flag conditions" do
-      it "does not display 'Manage Tags' if the feature flag is off" do
-        Account.default.disable_feature!(:assign_to_differentiation_tags)
-
-        user_session @teacher
-        get "/courses/#{@course.id}/users"
-        expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
-      end
-
+    context "sub account settings" do
       context "when the parent account differentiation tags setting is on and locked" do
         before do
           Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true, locked: true }
@@ -918,7 +964,6 @@ describe "Differentiation Tag Management" do
 
       context "when the parent account setting is on and not locked" do
         before do
-          Account.default.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
           Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
           Account.default.save!
         end
@@ -930,7 +975,6 @@ describe "Differentiation Tag Management" do
         end
 
         it "does not show the 'Manage Tags' button when sub account setting is off" do
-          @sub1_account.disable_feature! :assign_to_differentiation_tags
           @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: false }
           @sub1_account.save!
           @teacher.clear_caches
@@ -942,7 +986,6 @@ describe "Differentiation Tag Management" do
 
       context "when the parent account setting is off and not locked" do
         before do
-          Account.default.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
           Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false }
           Account.default.save!
         end
@@ -954,31 +997,6 @@ describe "Differentiation Tag Management" do
         end
 
         it "does not show the 'Manage Tags' button when sub account setting is off" do
-          @sub1_account.disable_feature! :assign_to_differentiation_tags
-          user_session @teacher
-          get "/courses/#{@course_with_tags_disabled.id}/users"
-          expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")
-        end
-
-        it "does show 'Manage Tags' button when parent ff is off and unlocked" do
-          Account.default.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_OFF
-          @sub1_account.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
-          @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
-          @sub1_account.save!
-          @sub1_account.reload
-          user_session @teacher
-          get "/courses/#{@course_with_tags_disabled.id}/users"
-          expect(f("body")).to contain_jqcss("button:contains('Manage Tags')")
-        end
-
-        it "does not show 'Manage Tags' button when parent ff is off and locked" do
-          Account.default.disable_feature! :assign_to_differentiation_tags
-          # when you disable parent FF and lock it sub accounts FF and settings won't work even if
-          # enabled by code without using the ui
-          @sub1_account.set_feature_flag! :assign_to_differentiation_tags, Feature::STATE_DEFAULT_ON
-          @sub1_account.settings[:allow_assign_to_differentiation_tags] = { value: true }
-          @sub1_account.save!
-          @sub1_account.reload
           user_session @teacher
           get "/courses/#{@course_with_tags_disabled.id}/users"
           expect(f("body")).not_to contain_jqcss("button:contains('Manage Tags')")

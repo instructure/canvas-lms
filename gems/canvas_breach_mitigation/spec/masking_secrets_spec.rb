@@ -17,13 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
 describe CanvasBreachMitigation::MaskingSecrets do
-  before do
-    Rails = double("Rails") unless defined? Rails
-  end
-
   let(:masking_secrets) { CanvasBreachMitigation::MaskingSecrets }
 
   describe ".csrf_token" do

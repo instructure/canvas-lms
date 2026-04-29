@@ -22,6 +22,7 @@ import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
+import {formatLongDescriptionHTML} from '@canvas/rubrics/react/utils'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
@@ -57,7 +58,7 @@ export const LongDescriptionModal = ({
         <Text
           lineHeight="double"
           wrap="break-word"
-          dangerouslySetInnerHTML={{__html: longDescription ?? ''}}
+          dangerouslySetInnerHTML={{__html: formatLongDescriptionHTML(longDescription ?? '')}}
         />
       </Modal.Body>
     </Modal>

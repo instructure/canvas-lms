@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useEffect, useContext, useRef} from 'react'
+import React, {useState, useEffect, useContext, useRef, useMemo} from 'react'
 import {useApolloClient, useMutation} from '@apollo/client'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AlertManagerContext} from '@instructure/platform-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {
   CREATE_SUBMISSION,
@@ -33,11 +33,10 @@ import {
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import Confetti from '@canvas/confetti/react/Confetti'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {showConfirmationDialog} from '@canvas/dialogs/react/ConfirmationDialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {assignLocation} from '@canvas/util/globalUtils'
-import {clearAssetProcessorReports} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
@@ -51,7 +50,7 @@ import {
   getPeerReviewHeaderText,
   getPeerReviewSubHeaderText,
   getRedirectUrlToFirstPeerReview,
-} from '../helpers/PeerReviewHelpers'
+} from '@canvas/assignments/helpers/PeerReviewHelpers'
 import {shouldRenderSelfAssessment, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import {
   friendlyTypeName,
@@ -62,9 +61,9 @@ import {
   getPointsValue,
 } from '../helpers/SubmissionHelpers'
 import AttemptTab from './AttemptTab'
-import StudentViewContext from './Context'
+import StudentViewContext from '@canvas/assignments/react/StudentViewContext'
 import MarkAsDoneButton from './MarkAsDoneButton'
-import PeerReviewPromptModal from './PeerReviewPromptModal'
+import PeerReviewPromptModal from '@canvas/assignments/react/PeerReviewPromptModal'
 import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
 import StudentFooter from './StudentFooter'
 import useStore from './stores/index'
@@ -202,6 +201,8 @@ const SubmissionManager = ({
   const displayedAssessment = useStore(state => state.displayedAssessment)
   const isSavingRubricAssessment = useStore(state => state.isSavingRubricAssessment)
   const selfAssessment = useStore(state => state.selfAssessment)
+
+  const assignmentRubric = useMemo(() => assignment.rubric, [assignment.rubric?.id])
 
   const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)
   const {
@@ -468,6 +469,7 @@ const SubmissionManager = ({
   }
 
   const shouldRenderSubmit = () => {
+    const allowedAttempts = totalAllowedAttempts(assignment, latestSubmission)
     return (
       !assignment.env.peerReviewModeEnabled &&
       !uploadingFiles &&
@@ -477,7 +479,7 @@ const SubmissionManager = ({
       !assignment.lockInfo.isLocked &&
       !shouldRenderNewAttempt() &&
       submission.gradingStatus !== 'excused' &&
-      (assignment.allowedAttempts == null || assignment.allowedAttempts >= submission.attempt) &&
+      (assignment.allowedAttempts == null || allowedAttempts >= submission.attempt) &&
       submission.state === 'unsubmitted'
     )
   }
@@ -524,10 +526,6 @@ const SubmissionManager = ({
   const handleSubmitConfirmation = () => {
     submitAssignment()
     setDraftStatus(null)
-    // We clear the asset processor reports from ENV when a new attempt is submitted
-    // to ensure that the reports are not shown for the new attempt.
-    // User needs to reload the page to see the new reports.
-    clearAssetProcessorReports()
   }
 
   const handleSubmitButton = async () => {
@@ -549,7 +547,7 @@ const SubmissionManager = ({
     if (multipleTypesDrafted(submission)) {
       const confirmed = await showConfirmationDialog({
         body: I18n.t(
-          'You are submitting a %{submissionType} submission. Only one submission type is allowed. All other submission types will be deleted.',
+          "You are submitting a %{submissionType} submission. Only one submission type is allowed per submission. Submitting in this format will delete any work you've started in other submission types.",
           {submissionType: friendlyTypeName(activeSubmissionType)},
         ),
         confirmText: I18n.t('Okay'),
@@ -671,24 +669,26 @@ const SubmissionManager = ({
       I18n.t('Your work has been submitted.'),
       I18n.t('Check back later to view feedback.'),
     ])
-    setPeerReviewSubHeaderText([
-      {
-        props: {size: 'large', weight: 'bold'},
-        text: I18n.t(
-          {
-            one: 'You have 1 Peer Review to complete.',
-            other: 'You have %{count} Peer Reviews to complete.',
-          },
-          {count: availableCount + unavailableCount},
-        ),
-      },
-      {
-        props: {size: 'medium'},
-        text: I18n.t('Peer submissions ready for review: %{availableCount}', {availableCount}),
-      },
-    ])
-    setPeerReviewShowSubHeaderBorder(true)
-    setPeerReviewButtonText('Peer Review')
+    if (!window.ENV.peer_review_allocation_and_grading) {
+      setPeerReviewSubHeaderText([
+        {
+          props: {size: 'large', weight: 'bold'},
+          text: I18n.t(
+            {
+              one: 'You have 1 Peer Review to complete.',
+              other: 'You have %{count} Peer Reviews to complete.',
+            },
+            {count: availableCount + unavailableCount},
+          ),
+        },
+        {
+          props: {size: 'medium'},
+          text: I18n.t('Peer submissions ready for review: %{availableCount}', {availableCount}),
+        },
+      ])
+      setPeerReviewShowSubHeaderBorder(true)
+      setPeerReviewButtonText('Peer Review')
+    }
   }
 
   const handleOpenPeerReviewPromptModal = () => {
@@ -923,7 +923,7 @@ const SubmissionManager = ({
         isOpen={isSelfAssessmentOpen}
         isPreviewMode={!!selfAssessment}
         onDismiss={() => setIsSelfAssessmentOpen(false)}
-        rubric={assignment.rubric}
+        rubric={assignmentRubric}
         rubricAssociationId={rubricData?.assignment?.rubricAssociation?._id}
         handleOnSubmitting={handleOnSubmitSelfAssessment}
         handleOnSuccess={() => setIsSelfAssessmentOpen(false)}

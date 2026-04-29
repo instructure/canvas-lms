@@ -30,6 +30,7 @@ shared_examples "Enhanced Gradebook Filters" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookCommon
   include GradebookSetup
+
   include_context "late_policy_course_setup"
 
   def format_grading_period_title_with_date(grp)
@@ -101,6 +102,12 @@ shared_examples "Enhanced Gradebook Filters" do |ff_enabled|
     Submission.find_by(assignment_id: @a6.id, user_id: @student1).update!(custom_grade_status_id: @custom_status.id)
     @a2.grade_student(@student2, grade: 10, grader: @teacher)
     @a5.grade_student(@student2, grade: 10, grader: @teacher)
+  end
+
+  before do
+    if ff_enabled
+      allow(Services::PlatformServiceGradebook).to receive(:use_graphql?).and_return(true)
+    end
   end
 
   describe "feature flag OFF" do

@@ -23,6 +23,7 @@ class Quizzes::QuizQuestion::QuestionData
   attr_reader :answers
 
   extend Forwardable
+
   def_delegators :question, :[], :[]=, :merge, :merge!, :key?, :symbolize_keys
 
   def initialize(question)

@@ -93,11 +93,27 @@
 #           "description": "the tag identifying the type of checkpoint (only present for checkpoints)",
 #           "example": "reply_to_topic",
 #           "type": "string"
+#         },
+#         "peer_review_sub_assignment": {
+#           "description": "peer review sub assignment details. If a peer review sub assignment exists, it is returned regardless of the Peer Review Allocation and Grading feature state. If no peer review sub assignment exists, the feature must be enabled to receive a null value; otherwise the key is omitted.",
+#           "type": "object",
+#           "properties": {
+#             "id": {"type": "integer"},
+#             "due_at": {"type": "datetime"},
+#             "unlock_at": {"type": "datetime"},
+#             "lock_at": {"type": "datetime"},
+#             "only_visible_to_overrides": {"type": "boolean"},
+#             "visible_to_everyone": {"type": "boolean"},
+#             "overrides": {
+#               "description": "paginated list of AssignmentOverride objects specific to the peer review sub assignment",
+#               "type": "array",
+#               "items": {"$ref": "AssignmentOverride"}
+#             }
+#           }
 #         }
 #       }
 #     }
 class LearningObjectDatesController < ApplicationController
-  before_action :require_user
   before_action :require_context
   before_action :check_authorized_action
 
@@ -114,6 +130,28 @@ class LearningObjectDatesController < ApplicationController
   # Get a learning object's date-related information, including due date, availability dates,
   # override status, and a paginated list of all assignment overrides for the item.
   #
+  # @argument include[] [Array]
+  #   Array of strings indicating what additional data to include in the response.
+  #   Valid values:
+  #   - "peer_review": includes peer review sub assignment information and overrides in the response.
+  #     If a peer review sub assignment exists, it is returned regardless of the Peer Review
+  #     Allocation and Grading feature state. If no peer review sub assignment exists,
+  #     the feature must be enabled to receive a null value; otherwise the key is omitted.
+  #   - "child_peer_review_override_dates": each assignment override will include a peer_review_dates
+  #     field containing the matched peer review override data (id, due_at, unlock_at, lock_at)
+  #     for that override. The field will be present as null if no matching peer review override exists.
+  #
+  # @argument exclude[] [Array]
+  #   Array of strings indicating what data to exclude from the response.
+  #   Valid values:
+  #   - "peer_review_overrides": when include[]=peer_review is also specified, the
+  #     peer_review_sub_assignment object will not include the overrides array, reducing the
+  #     response payload size. This is useful when using include[]=child_peer_review_override_dates
+  #     since the peer review override data is already embedded in the parent assignment overrides.
+  #   - "child_override_due_dates": prevents the sub_assignment_due_dates field from being included
+  #     in assignment override responses, even when discussion checkpoints are enabled. This reduces
+  #     response payload size when checkpoint due date information is not needed.
+  #
   # @returns LearningObjectDates
   def show
     route = polymorphic_url([:api_v1, @context, asset, :date_details])
@@ -125,13 +163,22 @@ class LearningObjectDatesController < ApplicationController
                                  section_visibilities = overridable.discussion_topic_section_visibilities.active.where.not(course_section_id: section_overrides)
                                  Api.paginate(section_visibilities, self, route)
                                end
+
+    includes = Array(params[:include])
+    excludes = Array(params[:exclude])
+
     # @context here is always a course, which was requested by the API client
-    include_child_override_due_dates = @context.discussion_checkpoints_enabled?
-    all_overrides = assignment_overrides_json(overrides, @current_user, include_names: true, include_child_override_due_dates:)
+    include_child_override_due_dates = @context.discussion_checkpoints_enabled? &&
+                                       !excludes.include?("child_override_due_dates")
+    include_child_peer_review_override_dates = includes.include?("child_peer_review_override_dates")
+    all_overrides = assignment_overrides_json(overrides, @current_user, include_names: true, include_child_override_due_dates:, include_child_peer_review_override_dates:)
     all_overrides += section_visibility_to_override_json(section_visibilities, overridable) if visibilities_to_override
 
+    include_peer_review = includes.include?("peer_review")
+    exclude_peer_review_overrides = excludes.include?("peer_review_overrides")
+
     render json: {
-      **learning_object_dates_json(asset, overridable),
+      **learning_object_dates_json(asset, overridable, include_peer_review:, exclude_peer_review_overrides:),
       **blueprint_date_locks_json(asset),
       overrides: all_overrides,
     }
@@ -164,6 +211,25 @@ class LearningObjectDatesController < ApplicationController
   #   'title', 'due_at', 'unlock_at', 'lock_at', 'student_ids', and 'course_section_id', 'course_id',
   #   'noop_id', and 'unassign_item'.
   #
+  # @argument peer_review [Hash]
+  #   Optional peer review configuration for assignments with peer reviews enabled.
+  #   Requires the peer_review_allocation_and_grading feature flag.
+  #   Keys can include: 'due_at', 'unlock_at', 'lock_at', 'peer_review_overrides'
+  #
+  # @argument peer_review[due_at] [DateTime]
+  #   The peer review due date
+  #
+  # @argument peer_review[unlock_at] [DateTime]
+  #   The peer review unlock date (when peer reviews become available)
+  #
+  # @argument peer_review[lock_at] [DateTime]
+  #   The peer review lock date (when peer reviews are no longer available)
+  #
+  # @argument peer_review[peer_review_overrides][] [Array]
+  #   List of peer review overrides. Each override can include: 'id', 'due_at',
+  #   'unlock_at', 'lock_at', 'student_ids', 'course_section_id', 'course_id',
+  #   'group_id', 'unassign_item'
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/assignments/:assignment_id/date_details \
   #     -X PUT \
@@ -183,9 +249,41 @@ class LearningObjectDatesController < ApplicationController
   #               "title": "an assignment override",
   #               "student_ids": [1, 2, 3]
   #             }
-  #           ]
+  #           ],
+  #           "peer_review": {
+  #             "due_at": "2012-07-05T23:59:00-06:00",
+  #             "unlock_at": "2012-07-02T23:59:00-06:00",
+  #             "lock_at": "2012-07-10T23:59:00-06:00",
+  #             "peer_review_overrides": [
+  #               {
+  #                 "id": 312,
+  #                 "course_section_id": 3564,
+  #                 "due_at": "2012-07-06T23:59:00-06:00"
+  #               }
+  #             ]
+  #           }
   #         }'
   def update
+    if overridable.try(:is_child_content?)
+      updating_due_dates = false
+      updating_availability_dates = false
+
+      updating_due_dates = true if params.key?(:due_at) || params.key?("due_at") || params.key?(:reply_to_topic_due_at) || params.key?("reply_to_topic_due_at") || params.key?(:required_replies_due_at) || params.key?("required_replies_due_at")
+      updating_availability_dates = true if params.key?(:unlock_at) || params.key?("unlock_at") || params.key?(:lock_at) || params.key?("lock_at")
+
+      if params[:assignment_overrides].present?
+        params[:assignment_overrides].each do |override|
+          updating_due_dates = true if override.key?(:due_at) || override.key?("due_at") || override.key?(:reply_to_topic_due_at) || override.key?("reply_to_topic_due_at") || override.key?(:required_replies_due_at) || override.key?("required_replies_due_at")
+          updating_availability_dates = true if override.key?(:unlock_at) || override.key?("unlock_at") || override.key?(:lock_at) || override.key?("lock_at")
+        end
+      end
+
+      if (updating_due_dates && overridable.try(:editing_restricted?, :due_dates)) ||
+         (updating_availability_dates && overridable.try(:editing_restricted?, :availability_dates))
+        return render_unauthorized_action
+      end
+    end
+
     case asset.class_name
     when "Assignment"
       update_assignment(asset, object_update_params)
@@ -204,11 +302,10 @@ class LearningObjectDatesController < ApplicationController
         prefer_assignment_availability_dates(asset, overridable)
       end
     when "WikiPage"
-      if Account.site_admin.feature_enabled?(:create_wiki_page_mastery_path_overrides) || (asset == overridable && !wiki_page_needs_assignment?)
-
-        update_ungraded_object(asset, object_update_params)
-      elsif wiki_page_needs_assignment?
+      if wiki_page_needs_assignment?
         apply_assignment_parameters(object_update_params.merge(set_assignment: true), asset)
+      elsif asset == overridable
+        update_ungraded_object(asset, object_update_params)
       else
         update_assignment(overridable, object_update_params)
       end
@@ -284,14 +381,16 @@ class LearningObjectDatesController < ApplicationController
       discussion_topic: discussion,
       checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
       dates: checkpoint_dates[:reply_to_topic][:dates],
-      saved_by: :transaction
+      saved_by: :transaction,
+      updating_user: @current_user
     )
 
     checkpoint_service.call(
       discussion_topic: discussion,
       checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
       dates: checkpoint_dates[:reply_to_entry][:dates],
-      replies_required: discussion.reply_to_entry_required_count
+      replies_required: discussion.reply_to_entry_required_count,
+      updating_user: @current_user
     )
   end
 
@@ -404,6 +503,11 @@ class LearningObjectDatesController < ApplicationController
 
   def update_ungraded_object(object, params)
     overrides = params.delete :assignment_overrides
+
+    if object.is_a?(DiscussionTopic) && object.group_category_id.present? && overrides&.all? { |override| override[:group_id].present? }
+      params.delete(:only_visible_to_overrides)
+    end
+
     batch = prepare_assignment_overrides_for_batch_update(object, overrides, @current_user) if overrides
     object.transaction do
       object.update!(params)
@@ -447,9 +551,15 @@ class LearningObjectDatesController < ApplicationController
                       :lock_at,
                       :only_visible_to_overrides,
                       { assignment_overrides: strong_anything }]
+
     allowed_params.unshift(:due_at) if allow_due_at?
     allowed_params.unshift(:reply_to_topic_due_at) if allow_due_at?
     allowed_params.unshift(:required_replies_due_at) if allow_due_at?
+    allowed_params.push({ peer_review: strong_anything }) if allow_peer_reviews?
     params.permit(*allowed_params)
+  end
+
+  def allow_peer_reviews?
+    asset.is_a?(Assignment) && asset.peer_reviews? && @context.feature_enabled?(:peer_review_allocation_and_grading)
   end
 end

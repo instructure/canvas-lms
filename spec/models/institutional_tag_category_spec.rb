@@ -1,0 +1,268 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2026 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+describe InstitutionalTagCategory do
+  let(:account) { account_model }
+  let(:valid_params) { { name: "Category", account: } }
+
+  it_behaves_like "soft deletion" do
+    subject { InstitutionalTagCategory }
+
+    let(:creation_arguments) do
+      [
+        valid_params.merge(name: "Category A"),
+        valid_params.merge(name: "Category B"),
+      ]
+    end
+  end
+
+  describe "validations" do
+    it "requires a name" do
+      record = InstitutionalTagCategory.new(valid_params.except(:name))
+      expect(record).not_to be_valid
+      expect(record.errors[:name]).to be_present
+    end
+
+    it "requires name to be at most 255 characters" do
+      record = InstitutionalTagCategory.new(valid_params.merge(name: "a" * 256))
+      expect(record).not_to be_valid
+    end
+
+    it "requires an account" do
+      record = InstitutionalTagCategory.new(valid_params.except(:account))
+      expect(record).not_to be_valid
+    end
+
+    it "enforces unique name per root_account among active records (case-insensitive)" do
+      InstitutionalTagCategory.create!(valid_params)
+      expect do
+        InstitutionalTagCategory.create!(valid_params.merge(name: valid_params[:name].upcase))
+      end.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+
+    it "allows duplicate name if existing record is deleted" do
+      first = InstitutionalTagCategory.create!(valid_params)
+      first.destroy
+      duplicate = InstitutionalTagCategory.new(valid_params)
+      expect(duplicate).to be_valid
+    end
+
+    describe "category limit per account" do
+      it "allows up to 50 categories in an account" do
+        50.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        expect(InstitutionalTagCategory.active.where(root_account_id: account.resolved_root_account_id).count).to eq(50)
+      end
+
+      it "rejects the 51st category in an account" do
+        50.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        category = InstitutionalTagCategory.new(valid_params.merge(name: "Category 51"))
+        expect(category).not_to be_valid
+        expect(category.errors[:account]).to be_present
+      end
+
+      it "does not count soft-deleted categories toward the limit" do
+        50.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        InstitutionalTagCategory.active.where(root_account_id: account.resolved_root_account_id).first.destroy
+        category = InstitutionalTagCategory.new(valid_params.merge(name: "Replacement Category"))
+        expect(category).to be_valid
+      end
+
+      it "allows updating an existing category when the account is at the limit" do
+        50.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        existing_category = InstitutionalTagCategory.active.where(root_account_id: account.resolved_root_account_id).last
+        existing_category.name = "Updated Name"
+        expect(existing_category).to be_valid
+      end
+
+      it "prevents restoring a deleted category when the account is at the limit" do
+        50.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        deleted_cat = InstitutionalTagCategory.active.where(root_account_id: account.resolved_root_account_id).first
+        deleted_cat.destroy
+        InstitutionalTagCategory.create!(valid_params.merge(name: "Replacement"))
+        deleted_cat.workflow_state = "active"
+        expect(deleted_cat).not_to be_valid
+        expect(deleted_cat.errors[:account]).to be_present
+      end
+
+      it "respects the configurable limit from DynamicSettings" do
+        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+        allow(DynamicSettings).to receive(:find).with(tree: :private).and_return(
+          DynamicSettings::FallbackProxy.new({ "institutional_tag_categories_per_account_limit" => "3" })
+        )
+        3.times do |i|
+          InstitutionalTagCategory.create!(valid_params.merge(name: "Category #{i}"))
+        end
+        category = InstitutionalTagCategory.new(valid_params.merge(name: "Category 4"))
+        expect(category).not_to be_valid
+        expect(category.errors[:account]).to be_present
+      end
+    end
+  end
+
+  describe "associations" do
+    it "has many institutional_tags" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(
+        name: "Tag",
+        description: "desc",
+        category:
+      )
+      expect(category.institutional_tags).to include(tag)
+    end
+
+    it "raises FK error on hard-delete when tags exist" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      expect { category.destroy_permanently! }.to raise_error(ActiveRecord::InvalidForeignKey)
+    end
+
+    it "cascade-archives active tags on soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      category.destroy
+      expect(tag.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives active associations on soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      user = user_model
+      assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      category.destroy
+      expect(assoc.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives via InstitutionalTag.cascade_archive_associations_for" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      user = user_model
+      InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+
+      expect(InstitutionalTag).to receive(:cascade_archive_associations_for).with([tag.id]).and_call_original
+      category.destroy
+      expect(tag.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives associations via cascade_archive_associations_for on category soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag1 = InstitutionalTag.create!(name: "Tag 1", description: "desc", category:)
+      tag2 = InstitutionalTag.create!(name: "Tag 2", description: "desc", category:)
+      user = user_model
+      assoc1 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user)
+      assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag2, context: user)
+
+      expect(InstitutionalTag).to receive(:cascade_archive_associations_for)
+        .with(match_array([tag1.id, tag2.id]))
+        .and_call_original
+      category.destroy
+
+      expect(assoc1.reload.workflow_state).to eq "deleted"
+      expect(assoc2.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives associations across multiple tags on category soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag1 = InstitutionalTag.create!(name: "Tag 1", description: "desc", category:)
+      tag2 = InstitutionalTag.create!(name: "Tag 2", description: "desc", category:)
+      user1 = user_model
+      user2 = user_model
+      assoc1 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user1)
+      assoc2 = InstitutionalTagAssociation.create!(institutional_tag: tag1, context: user2)
+      assoc3 = InstitutionalTagAssociation.create!(institutional_tag: tag2, context: user1)
+
+      category.destroy
+
+      expect(assoc1.reload.workflow_state).to eq "deleted"
+      expect(assoc2.reload.workflow_state).to eq "deleted"
+      expect(assoc3.reload.workflow_state).to eq "deleted"
+    end
+
+    it "cascade-archives tags when workflow_state is set directly" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      user = user_model
+      assoc = InstitutionalTagAssociation.create!(institutional_tag: tag, context: user)
+      category.update!(workflow_state: "deleted")
+      expect(tag.reload.workflow_state).to eq "deleted"
+      expect(assoc.reload.workflow_state).to eq "deleted"
+    end
+
+    it "does not touch already-deleted tags on soft-delete" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      tag = InstitutionalTag.create!(name: "Tag", description: "desc", category:)
+      tag.destroy
+      category.destroy
+      expect(tag.reload.workflow_state).to eq "deleted"
+    end
+  end
+
+  describe "Account associations" do
+    it "account has many institutional_tag_categories" do
+      InstitutionalTagCategory.create!(valid_params)
+      expect(account.institutional_tag_categories).not_to be_empty
+    end
+  end
+
+  describe "root_account_id" do
+    it "resolves root_account from account" do
+      root_account = account_model
+      sub_account = account_model(parent_account: root_account)
+      category = InstitutionalTagCategory.create!(valid_params.merge(account: sub_account))
+      expect(category.root_account_id).to eq(root_account.resolved_root_account_id)
+    end
+  end
+
+  describe "sanitization" do
+    it "strips disallowed tags and their content from name" do
+      category = InstitutionalTagCategory.create!(valid_params.merge(name: "Safe <script>alert(1)</script>Name"))
+      expect(category.name).not_to include("<script>")
+      expect(category.name).not_to include("alert(1)")
+    end
+
+    it "strips disallowed tags and their content from description" do
+      category = InstitutionalTagCategory.create!(valid_params.merge(description: "<script>alert(1)</script>desc"))
+      expect(category.description).not_to include("<script>")
+      expect(category.description).not_to include("alert(1)")
+      expect(category.description).to eq "desc"
+    end
+
+    it "preserves allowed tags in description" do
+      category = InstitutionalTagCategory.create!(valid_params.merge(description: "<b>bold</b> text"))
+      expect(category.description).to include("<b>bold</b>")
+    end
+
+    it "re-sanitizes name on update" do
+      category = InstitutionalTagCategory.create!(valid_params)
+      category.update!(name: "Updated <script>evil()</script>Name")
+      expect(category.name).not_to include("<script>")
+      expect(category.name).not_to include("evil()")
+    end
+  end
+end
