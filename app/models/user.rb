@@ -2545,10 +2545,11 @@ class User < ApplicationRecord
     end
   end
 
-  # TODO: Optimize caching strategies (EGG-2540)
   def educator_dashboard_user?
-    Rails.cache.fetch_with_batched_keys(
-      "should_show_educator_dashboard",
+    return @_educator_dashboard_user if defined?(@_educator_dashboard_user)
+
+    @_educator_dashboard_user = Rails.cache.fetch_with_batched_keys(
+      ["should_show_educator_dashboard", ApplicationController.region].cache_key,
       batch_object: self,
       batched_keys: :enrollments,
       expires_in: 1.hour
