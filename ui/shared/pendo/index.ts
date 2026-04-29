@@ -55,6 +55,8 @@ function initializeLib(): void {
         })
         window.dispatchEvent(event)
       }
+    } else {
+      debuglog = (_message: string) => {}
     }
 
     window.addEventListener('OneTrustGroupsUpdated', (e: any) => {
