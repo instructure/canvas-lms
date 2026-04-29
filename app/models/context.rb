@@ -84,9 +84,9 @@ module Context
     end
   end
 
-  def self.sorted_rubrics(context)
+  def self.sorted_rubrics(context, search_term: nil)
     if Account.site_admin.feature_enabled?(:optimized_grading_rubrics)
-      sorted_rubrics_optimized(context)
+      sorted_rubrics_optimized(context, search_term:)
     else
       sorted_rubrics_legacy(context)
     end
@@ -100,12 +100,15 @@ module Context
   end
 
   # OPTIMIZED: Removed redundant .select(&:rubric) since .joins guarantees rubric exists
-  def self.sorted_rubrics_optimized(context)
+  def self.sorted_rubrics_optimized(context, search_term: nil)
     associations = RubricAssociation.active.bookmarked
                                     .for_context_codes(context.asset_string)
                                     .joins(:rubric)
                                     .where(rubrics: { workflow_state: "active" })
                                     .preload(:context, rubric: :context)
+    if search_term.present? && context.root_account.feature_enabled?(:grading_rubrics_pagination)
+      associations = associations.where("rubrics.title ILIKE ?", "%#{search_term.strip}%")
+    end
     Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id)) { |r| r.rubric.title || CanvasSort::Last }
   end
 
