@@ -70,6 +70,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   color: $ic-color-light;
 }
 .ic-Login__container {
+  width: 400px;
   margin-top: $ic-sp*2;
 }
 .ic-Login__content {
