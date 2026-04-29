@@ -272,10 +272,12 @@ module CC
                 graders_anonymous_to_graders
                 grader_names_visible_to_final_grader
                 anonymous_instructor_annotations
-                allowed_attempts]
+                allowed_attempts
+                integration_id]
       atts.each do |att|
         node.tag!(att, assignment.send(att)) if assignment.send(att) == false || assignment.send(att).present?
       end
+      node.tag!(:integration_data, assignment.integration_data.to_json) if assignment.integration_data.present?
       if assignment.external_tool_tag
         if (content = assignment.external_tool_tag.content) && content.is_a?(ContextExternalTool)
           if content.context == assignment.context

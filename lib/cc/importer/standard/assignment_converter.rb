@@ -147,9 +147,14 @@ module CC::Importer::Standard
          external_tool_data_json
          external_tool_link_settings_json
          turnitin_settings
-         time_zone_edited].each do |string_type|
+         time_zone_edited
+         integration_id].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
+      end
+      integration_data_val = get_node_val(meta_doc, "integration_data")
+      if integration_data_val.present?
+        assignment["integration_data"] = JSON.parse(integration_data_val)
       end
       %w[turnitin_enabled
          vericite_enabled

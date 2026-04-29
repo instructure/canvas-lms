@@ -3006,7 +3006,8 @@ class CoursesController < ApplicationController
              NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?,
              NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default,
              NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?,
-             NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?
+             NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?,
+             COPY_COURSE_INTEGRATION_INFO: Account.site_admin.feature_enabled?(:course_copy_allow_copying_integration_info)
            })
   end
 
@@ -3067,6 +3068,7 @@ class CoursesController < ApplicationController
       @content_migration.migration_settings[:source_course_id] = @context.id
       @content_migration.migration_settings[:import_quizzes_next] = true if params.dig(:settings, :import_quizzes_next)
       @content_migration.migration_settings[:import_blueprint_settings] = true if params.dig(:settings, :import_blueprint_settings)
+      @content_migration.migration_settings[:copy_integration_info] = true if params.dig(:settings, :copy_integration_info)
       @content_migration.workflow_state = "created"
       if (adjust_dates = params[:adjust_dates]) && Canvas::Plugin.value_to_boolean(adjust_dates[:enabled])
         params[:date_shift_options][adjust_dates[:operation]] = "1"
