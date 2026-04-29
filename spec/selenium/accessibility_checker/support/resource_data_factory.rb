@@ -71,6 +71,8 @@ module AccessibilityChecker
       missing_table_caption: { path: "single_issues/missing_table_caption.html", title: "Missing Table Caption", issue_count: 1 },
       table_no_headers: { path: "single_issues/table_no_headers.html", title: "Table No Headers", issue_count: 1 },
       missing_table_header_scope: { path: "single_issues/missing_table_header_scope.html", title: "Missing Table Header Scope", issue_count: 1 },
+      small_text_contrast: { path: "single_issues/small_text_contrast.html", title: "Small Text Contrast", issue_count: 1 },
+      large_text_contrast: { path: "single_issues/large_text_contrast.html", title: "Large Text Contrast", issue_count: 1 },
       multiple_issues: { path: "multiple_issues/incorrect_heading_hierarchy_and_missing_alt_text.html", title: "Multiple Issues", issue_count: 2 },
       two_alt_text_issues: { path: "multiple_issues/two_alt_text_issues.html", title: "Two Alt Text Issues", issue_count: 2 },
       valid_alt_text: { path: "valid/accessible_page_complete.html", title: "Accessible Page Complete", issue_count: 0 }
