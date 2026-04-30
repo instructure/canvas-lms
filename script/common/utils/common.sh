@@ -51,6 +51,17 @@ function run_command {
     "$@"
   fi
 }
+
+function run_command_once {
+  if is_running_on_jenkins; then
+    docker compose run --rm -T web "$@"
+  elif is_docker; then
+    $DOCKER_COMMAND run --rm -T -e TELEMETRY_OPT_IN web "$@"
+  else
+    "$@"
+  fi
+}
+
 # remove once https://github.com/docker/compose/issues/9104 is fixed
 function run_command_tty {
   if is_running_on_jenkins; then
@@ -202,6 +213,50 @@ function docker_running {
   echo "Docker is not running! Start docker daemon and try again."
   return 1
 fi
+}
+
+function check_for_running_containers {
+  running_containers=$($DOCKER_COMMAND ps -q 2>/dev/null)
+  if [[ -n "$running_containers" ]]; then
+    echo ""
+    echo "Warning: Canvas Docker containers are currently running."
+    echo "This may cause issues (e.g., database connections preventing db:drop)."
+    echo ""
+    $DOCKER_COMMAND ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null
+    echo ""
+    if ! is_running_on_jenkins; then
+      prompt "Stop running containers before continuing? [y/n]" stop_containers
+      if [[ ${stop_containers:-n} == 'y' ]]; then
+        start_spinner "Stopping running containers..."
+        _canvas_lms_track_with_log $DOCKER_COMMAND down
+        stop_spinner
+        message "Containers stopped."
+      else
+        echo "Continuing with containers running. This may cause errors."
+      fi
+    fi
+  fi
+}
+
+function running_canvas_app_services {
+  $DOCKER_COMMAND ps --services --status running 2>/dev/null | grep -vE '^(postgres|redis)$' || true
+}
+
+function stop_running_canvas_app_services {
+  STOPPED_CANVAS_APP_SERVICES=$(running_canvas_app_services)
+
+  if [[ -n "$STOPPED_CANVAS_APP_SERVICES" ]]; then
+    # shellcheck disable=SC2086
+    _canvas_lms_track_with_log $DOCKER_COMMAND stop $STOPPED_CANVAS_APP_SERVICES
+  fi
+}
+
+function restart_stopped_canvas_app_services {
+  if [[ -n "${STOPPED_CANVAS_APP_SERVICES:-}" ]]; then
+    # shellcheck disable=SC2086
+    _canvas_lms_track_with_log $DOCKER_COMMAND up -d $STOPPED_CANVAS_APP_SERVICES
+    STOPPED_CANVAS_APP_SERVICES=
+  fi
 }
 
 function os_setup {

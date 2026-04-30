@@ -74,9 +74,24 @@ This script will destroy ALL EXISTING DATA if it continues
 If you want to migrate the existing database, cancel now
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
       message 'About to run "bundle exec rake db:drop"'
-      start_spinner "Deleting db....."
-      _canvas_lms_track_with_log run_command bundle exec rake db:drop
+      start_spinner "Stopping app containers to release db connections..."
+      stop_running_canvas_app_services
       stop_spinner
+      start_spinner "Deleting db....."
+      drop_failed=0
+      if ! _canvas_lms_track_with_log run_command_once bundle exec rake db:drop; then
+        drop_failed=1
+      fi
+      stop_spinner
+      start_spinner "Restarting web..."
+      _canvas_lms_track_with_log $DOCKER_COMMAND up -d web
+      stop_spinner
+      if [[ $drop_failed -ne 0 ]]; then
+        start_spinner "Restarting app containers..."
+        restart_stopped_canvas_app_services
+        stop_spinner
+        return 1
+      fi
     fi
   fi
   stop_spinner
@@ -94,6 +109,11 @@ If you want to migrate the existing database, cancel now
   _canvas_lms_track_with_log run_command bundle exec rake db:migrate RAILS_ENV=test
   stop_spinner
   [[ ${dropped:-DROP} == 'migrate' ]] || _canvas_lms_track run_command_tty bundle exec rake db:initial_setup
+  if [[ ${dropped:-DROP} == 'DROP' ]]; then
+    start_spinner "Restarting app containers..."
+    restart_stopped_canvas_app_services
+    stop_spinner
+  fi
 }
 
 function bundle_install {
