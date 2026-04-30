@@ -96,24 +96,25 @@ class Accessibility::UserCourseScanService < ApplicationService
   private
 
   def educator_courses_with_a11y_enabled
-    # TODO: This permission check is also used in
+    # TODO: This lookup and course level feature flag check is also used in
     # accessibility_course_statistics_controller.rb. This should be
     # extracted to the user model or a shared concern when scaling.
     #
     # NOTE: This query runs on the user's home shard only. Users with
     # cross-shard enrollments will silently miss courses on other shards.
     # This will be corrected during scaling (ref EGG-2606)
-    candidate_courses = Course
-                        .where.not(workflow_state: %w[completed deleted])
-                        .where(id: @user.enrollments.active.select(:course_id))
-    educator_courses = candidate_courses.select do |course|
-      course.grants_any_right?(@user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
-    end
+    educator_course_ids = @user
+                          .enrollments
+                          .active
+                          .where(type: %w[TeacherEnrollment DesignerEnrollment])
+                          .joins(:course)
+                          .where.not(courses: { workflow_state: %w[completed deleted] })
+                          .select(:course_id)
 
     if @root_account.feature_enabled?(:a11y_checker_ga1)
-      educator_courses
+      Course.where(id: educator_course_ids)
     else
-      Course.where(id: educator_courses.map(&:id))
+      Course.where(id: educator_course_ids)
             .preload(:account)
             .select(&:a11y_checker_enabled?)
     end

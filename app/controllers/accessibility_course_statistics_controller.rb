@@ -100,11 +100,6 @@ class AccessibilityCourseStatisticsController < ApplicationController
   #   The ID of the user, or "self" for the current user.
   #   The requesting user may only retrieve their own statistics.
   #
-  # @argument include[] [String, "closed_issue_count"|"course_details"]
-  #   Optional information to include in each statistic record.
-  #   - "closed_issue_count": include closed_issue_count.
-  #   - "course_details": include course_name, course_code, and published.
-  #
   # @returns [AccessibilityCourseStatistic]
   def index
     return render_unauthorized_action unless @domain_root_account.feature_enabled?(:educator_dashboard) &&
@@ -113,16 +108,20 @@ class AccessibilityCourseStatisticsController < ApplicationController
     user = api_find(User, params[:user_id])
     return render_unauthorized_action unless user == @current_user
 
-    candidate_courses = Course
-                        .where.not(workflow_state: %w[completed deleted])
-                        .where(id: user.enrollments.active.select(:course_id))
-    educator_courses = candidate_courses.select do |course|
-      course.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
-    end
+    # TODO: Replace enrollment type check with grants_any_right? using
+    # RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS to mirror
+    # the permission check used to show the Accessibility tab in a course
+    # (see Course#tabs_available, course.rb:3696). Tracked in scale ticket.
+    # (refer to EGG-2452)
+    educator_course_ids = user
+                          .enrollments
+                          .active
+                          .where(type: %w[TeacherEnrollment DesignerEnrollment])
+                          .joins(:course)
+                          .where.not(courses: { workflow_state: %w[completed deleted] })
+                          .select(:course_id)
 
-    return render_unauthorized_action if educator_courses.empty?
-
-    educator_course_ids = educator_courses.map(&:id)
+    return render_unauthorized_action unless educator_course_ids.exists?
 
     # TODO: When a11y_checker_ga1 is on, all courses under the account are eligible —
     # keep educator_course_ids as a subquery and skip per-course flag lookups.
@@ -151,9 +150,8 @@ class AccessibilityCourseStatisticsController < ApplicationController
       api_v1_user_educator_accessibility_course_statistics_url(user)
     )
 
-    includes = Array(params[:include]) & Api::V1::AccessibilityCourseStatistic::ALLOWED_INCLUDES
     render json: paginated.map { |stat|
-      accessibility_course_statistic_json(stat, @current_user, session, includes:)
+      accessibility_course_statistic_json(stat, @current_user, session, include_closed: true, include_course_details: true)
     }
   end
 end
