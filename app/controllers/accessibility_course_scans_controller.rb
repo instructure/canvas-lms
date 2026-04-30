@@ -43,15 +43,16 @@ class AccessibilityCourseScansController < ApplicationController
     user = api_find(User, params[:user_id])
     return render_unauthorized_action unless user == @current_user
 
-    # TODO: This permission check is duplicated in AccessibilityCourseStatisticsController
+    # TODO: This enrollment check is duplicated in AccessibilityCourseStatisticsController
     # and UserCourseScanService. Extract to a shared concern when scaling. (ref EGG-2606)
-    candidate_courses = Course
-                        .where.not(workflow_state: %w[completed deleted])
-                        .where(id: user.enrollments.active.select(:course_id))
-    has_educator_access = candidate_courses.any? do |course|
-      course.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
-    end
-    return render_unauthorized_action unless has_educator_access
+    has_educator_enrollment = user
+                              .enrollments
+                              .active
+                              .where(type: %w[TeacherEnrollment DesignerEnrollment])
+                              .joins(:course)
+                              .where.not(courses: { workflow_state: %w[completed deleted] })
+                              .exists?
+    return render_unauthorized_action unless has_educator_enrollment
 
     progress = Accessibility::UserCourseScanService.queue_user_courses_scan(user, @domain_root_account)
     render json: progress_json(progress, @current_user, session)
