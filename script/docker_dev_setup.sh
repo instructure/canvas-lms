@@ -32,6 +32,7 @@ init_log_file "Docker Dev Setup"
 detect_local_canvas
 os_setup
 message 'Now we can set up Canvas!'
+check_for_running_containers
 copy_docker_config
 setup_docker_compose_override
 build_images
