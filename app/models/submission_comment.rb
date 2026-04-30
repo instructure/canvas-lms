@@ -63,6 +63,8 @@ class SubmissionComment < ApplicationRecord
   end
   validates :workflow_state, inclusion: { in: ["active"] }, allow_nil: true
 
+  sanitize_field :comment, CanvasSanitize::SANITIZE
+
   after_destroy :refresh_submission_comment_read_state
   before_save :infer_details
   before_save :set_root_account_id

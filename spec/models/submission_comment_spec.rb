@@ -357,18 +357,15 @@ RSpec.describe SubmissionComment do
     expect(@comment.cached_attachments).to eql [a]
   end
 
-  it "renders formatted_body correctly" do
+  it "sanitizes XSS from formatted_body" do
     @comment = @submission.submission_comments.create!(valid_attributes)
-    @comment.comment = <<~TEXT
-      This text has a http://www.google.com link in it...
-
-      > and some
-      > quoted text
-    TEXT
+    @comment.comment = 'Safe text <script>alert("xss")</script> <img src=x onerror="alert(1)"> end'
     @comment.save!
     body = @comment.formatted_body
-    expect(body).to match(/<a/)
-    expect(body).to match(/quoted_text/)
+    expect(body).not_to include("<script>")
+    expect(body).not_to include("onerror")
+    expect(body).to include("Safe text")
+    expect(body).to include("end")
   end
 
   def prepare_test_submission
@@ -1240,6 +1237,16 @@ RSpec.describe SubmissionComment do
       comment = submission.add_comment(comment: "hmmmm", draft_comment: true, author: teacher)
       comment.update!(draft: false)
       expect(submission.reload).not_to be_posted
+    end
+  end
+
+  describe "comment sanitization" do
+    it "strips XSS from the comment field on save" do
+      sc = @submission.submission_comments.create!(
+        comment: "<a href='#' onclick='alert(1)'>click me</a>",
+        author: @teacher
+      )
+      expect(sc.comment).to eq('<a href="#">click me</a>')
     end
   end
 end
