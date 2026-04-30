@@ -126,7 +126,7 @@ module Importers
       if new_record || item.deleted? || master_migration
         restore_lti_models(item) if item.deleted?
         item.workflow_state = if item.can_unpublish?
-                                hash[:workflow_state] || "published"
+                                hash[:workflow_state] || "unpublished"
                               else
                                 "published"
                               end

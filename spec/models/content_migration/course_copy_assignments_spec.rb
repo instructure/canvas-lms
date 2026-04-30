@@ -83,6 +83,17 @@ describe ContentMigration do
       end
     end
 
+    it "copies assignments as unpublished" do
+      from_assign = @copy_from.assignments.create!(title: "published assignment")
+      from_assign.publish!
+      expect(from_assign).to be_published
+
+      run_course_copy
+
+      to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
+      expect(to_assign).to be_unpublished
+    end
+
     it "links assignments to account rubrics and outcomes" do
       account = @copy_from.account
       lo = create_outcome(account)
