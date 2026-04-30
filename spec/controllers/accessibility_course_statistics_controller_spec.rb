@@ -90,7 +90,21 @@ describe AccessibilityCourseStatisticsController do
         expect(response.parsed_body).to eq([])
       end
 
-      it "includes course_name and course_code in the response" do
+      it "includes course_name and course_code when include[]=course_details" do
+        AccessibilityCourseStatistic.create!(
+          course: @course1,
+          workflow_state: "active",
+          active_issue_count: 5
+        )
+
+        get :index, params: { user_id: @teacher.id, include: ["course_details"] }, format: :json
+        expect(response).to be_successful
+        row = response.parsed_body.first
+        expect(row["course_name"]).to eq(@course1.name)
+        expect(row["course_code"]).to eq(@course1.course_code)
+      end
+
+      it "omits course_name and course_code by default" do
         AccessibilityCourseStatistic.create!(
           course: @course1,
           workflow_state: "active",
@@ -100,8 +114,9 @@ describe AccessibilityCourseStatisticsController do
         get :index, params: { user_id: @teacher.id }, format: :json
         expect(response).to be_successful
         row = response.parsed_body.first
-        expect(row["course_name"]).to eq(@course1.name)
-        expect(row["course_code"]).to eq(@course1.course_code)
+        expect(row).not_to have_key("course_name")
+        expect(row).not_to have_key("course_code")
+        expect(row).not_to have_key("published")
       end
 
       it "returns active statistics for the teacher's courses" do
@@ -120,7 +135,7 @@ describe AccessibilityCourseStatisticsController do
           closed_issue_count: 4
         )
 
-        get :index, params: { user_id: @teacher.id }, format: :json
+        get :index, params: { user_id: @teacher.id, include: ["closed_issue_count"] }, format: :json
         expect(response).to be_successful
         data = response.parsed_body
         expect(data.length).to eq(2)
@@ -134,7 +149,23 @@ describe AccessibilityCourseStatisticsController do
         expect(row1["closed_issue_count"]).to eq(2)
       end
 
-      it "includes closed_issue_count in the response" do
+      it "includes closed_issue_count when include[]=closed_issue_count" do
+        AccessibilityCourseStatistic.create!(
+          course: @course1,
+          workflow_state: "active",
+          active_issue_count: 1,
+          resolved_issue_count: 1,
+          closed_issue_count: 9
+        )
+
+        get :index, params: { user_id: @teacher.id, include: ["closed_issue_count"] }, format: :json
+        expect(response).to be_successful
+        row = response.parsed_body.first
+        expect(row).to have_key("closed_issue_count")
+        expect(row["closed_issue_count"]).to eq(9)
+      end
+
+      it "omits closed_issue_count by default" do
         AccessibilityCourseStatistic.create!(
           course: @course1,
           workflow_state: "active",
@@ -146,8 +177,21 @@ describe AccessibilityCourseStatisticsController do
         get :index, params: { user_id: @teacher.id }, format: :json
         expect(response).to be_successful
         row = response.parsed_body.first
-        expect(row.key?("closed_issue_count")).to be true
-        expect(row["closed_issue_count"]).to eq(9)
+        expect(row).not_to have_key("closed_issue_count")
+      end
+
+      it "ignores unknown include[] values" do
+        AccessibilityCourseStatistic.create!(
+          course: @course1,
+          workflow_state: "active",
+          active_issue_count: 5
+        )
+
+        get :index, params: { user_id: @teacher.id, include: ["bogus"] }, format: :json
+        expect(response).to be_successful
+        row = response.parsed_body.first
+        expect(row).not_to have_key("closed_issue_count")
+        expect(row).not_to have_key("course_name")
       end
 
       it "excludes statistics with non-active workflow states" do
