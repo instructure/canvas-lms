@@ -62,8 +62,8 @@ describe Api::V1::AccessibilityCourseStatistic do
         expect(json.key?("published")).to be false
       end
 
-      it "includes course_name, course_code, and published when include_course_details opt is true" do
-        json = accessibility_course_statistic_json(statistic, user, session, include_course_details: true)
+      it "includes course_name, course_code, and published when 'course_details' is in includes" do
+        json = accessibility_course_statistic_json(statistic, user, session, includes: ["course_details"])
         expect(json["course_name"]).to eq course.name
         expect(json["course_code"]).to eq course.course_code
         expect(json["published"]).to be false
@@ -71,7 +71,7 @@ describe Api::V1::AccessibilityCourseStatistic do
 
       it "returns published true for a published course" do
         course.offer!
-        json = accessibility_course_statistic_json(statistic, user, session, include_course_details: true)
+        json = accessibility_course_statistic_json(statistic, user, session, includes: ["course_details"])
         expect(json["published"]).to be true
       end
 
@@ -86,9 +86,15 @@ describe Api::V1::AccessibilityCourseStatistic do
         expect(json.key?("closed_issue_count")).to be false
       end
 
-      it "includes closed_issue_count when include_closed opt is true" do
-        json = accessibility_course_statistic_json(statistic, user, session, include_closed: true)
+      it "includes closed_issue_count when 'closed_issue_count' is in includes" do
+        json = accessibility_course_statistic_json(statistic, user, session, includes: ["closed_issue_count"])
         expect(json.key?("closed_issue_count")).to be true
+      end
+
+      it "ignores unknown values in includes" do
+        json = accessibility_course_statistic_json(statistic, user, session, includes: ["bogus"])
+        expect(json.key?("closed_issue_count")).to be false
+        expect(json.key?("course_name")).to be false
       end
     end
 
