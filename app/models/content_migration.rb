@@ -713,6 +713,10 @@ class ContentMigration < ApplicationRecord
     Canvas::Plugin.value_to_boolean(migration_settings[:import_quizzes_next])
   end
 
+  def copy_integration_info?
+    Canvas::Plugin.value_to_boolean(migration_settings[:copy_integration_info])
+  end
+
   def quizzes_next_migration?
     context.instance_of?(Course) &&
       context.feature_enabled?(:quizzes_next) &&

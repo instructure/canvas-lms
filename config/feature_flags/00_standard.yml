@@ -34,6 +34,17 @@ autodetect_field_separators_for_gradebook_exports:
     exports based on the number format for your language.
   applies_to: User
   custom_transition_proc: autodetect_field_separators_for_gradebook_exports_custom_transition_hook
+course_copy_allow_copying_integration_info:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: "Course Copy: allow copying integration_id and integration_data"
+  description: Adds opt-in settings to copy integration_id and integration_data
+    on assignments during course copy.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 common_cartridge_page_conversion:
   type: setting
   state: hidden
