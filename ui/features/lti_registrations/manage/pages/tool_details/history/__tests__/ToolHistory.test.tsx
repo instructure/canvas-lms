@@ -378,11 +378,11 @@ describe('ToolHistory', () => {
       render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
 
       expect(await screen.findByText('Configuration Update History')).toBeInTheDocument()
-      expect(screen.getByText('Status')).toBeInTheDocument()
       expect(screen.getByText('Updated On')).toBeInTheDocument()
       expect(screen.getByText('Updated By')).toBeInTheDocument()
+      expect(screen.getByText('Summary')).toBeInTheDocument()
 
-      expect(screen.getByText('Updated')).toBeInTheDocument()
+      expect(screen.getByText('Availability & Exceptions')).toBeInTheDocument()
       expect(screen.getByText('Test User')).toBeInTheDocument()
     })
   })

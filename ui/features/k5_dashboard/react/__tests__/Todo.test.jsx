@@ -80,6 +80,13 @@ describe('Todo', () => {
     expect(singlePoint.getByText('1 point')).toBeInTheDocument()
   })
 
+  it('renders without crashing when points_possible is null', () => {
+    const props = {...defaultProps, assignment: {...defaultProps.assignment, points_possible: null}}
+    const {queryByText} = render(<Todo {...props} />)
+    expect(queryByText('Grade Plant a plant')).toBeInTheDocument()
+    expect(queryByText(/points/)).not.toBeInTheDocument()
+  })
+
   it('renders the due date without the year if it is in the current year', () => {
     moment.mockImplementation(() => ({
       isSame: () => true,

@@ -737,6 +737,30 @@ describe "assignments" do
       expect(@assignment.due_at.strftime("%b %d")).to eq expected_date
     end
 
+    it "shows Due Date field as disabled with message in edit modal when assignment has peer review sub assignment and FF is enabled" do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+      assignment = @course.assignments.create!(
+        title: "Assignment with Graded Peer Reviews - Due Date Test",
+        due_at: 1.day.from_now,
+        peer_reviews: true,
+        peer_review_count: 2,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+      peer_review_model(parent_assignment: assignment)
+
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
+      fj("#assign_#{assignment.id}_manage_link").click
+      wait_for_ajaximations
+      f("#assignment_#{assignment.id} .edit_assignment").click
+      wait_for_ajaximations
+
+      due_date_field = f("[data-testid='multiple-due-dates-message']")
+      expect(due_date_field).to have_value("Peer Review Due Date")
+      expect(due_date_field).to be_disabled
+    end
+
     it "preserves assignment submission type when editing an assignment" do
       @assignment = @course.assignments.create!(
         title: "Test Assignment",

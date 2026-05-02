@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import React, {useState, useCallback} from 'react'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -29,12 +29,9 @@ import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 
 import {showFlashError} from '@instructure/platform-alerts'
-import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {CanvasAsyncSelect, InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {createNewCourse, getAccountsFromEnrollments} from './utils'
-
-const I18n = createI18nScope('create_course_modal')
 
 interface Account {
   id: string
@@ -59,6 +56,8 @@ interface CreateCourseModalProps {
   permissions: 'admin' | 'teacher' | 'student' | 'no_enrollments'
   restrictToMCCAccount: boolean
   isK5User: boolean
+  // null = non-admin (no restriction); string[] = account IDs where homerooms can be fetched
+  viewableAccountIds?: string[] | null
 }
 
 export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
@@ -67,7 +66,9 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
   permissions,
   restrictToMCCAccount,
   isK5User,
+  viewableAccountIds,
 }) => {
+  const {t} = useTranslation('create_course_modal')
   const [loading, setLoading] = useState(true)
   const [allAccounts, setAllAccounts] = useState<Account[]>([])
   const [allHomerooms, setAllHomerooms] = useState<Course[]>([])
@@ -77,18 +78,14 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
   const [accountSearchTerm, setAccountSearchTerm] = useState('')
   const [courseName, setCourseName] = useState('')
 
-  const errorMessage = isK5User
-    ? I18n.t('Error creating new subject')
-    : I18n.t('Error creating new course')
-  const modalLabel = isK5User ? I18n.t('Create Subject') : I18n.t('Create Course')
-  const loadingMessage = isK5User
-    ? I18n.t('Creating new subject...')
-    : I18n.t('Creating new course...')
-  const courseNameLabel = isK5User ? I18n.t('Subject Name') : I18n.t('Course Name')
+  const errorMessage = isK5User ? t('Error creating new subject') : t('Error creating new course')
+  const modalLabel = isK5User ? t('Create Subject') : t('Create Course')
+  const loadingMessage = isK5User ? t('Creating new subject...') : t('Creating new course...')
+  const courseNameLabel = isK5User ? t('Subject Name') : t('Course Name')
   const accountLabel = isK5User
-    ? I18n.t('Which account will this subject be associated with?')
-    : I18n.t('Which account will this course be associated with?')
-  const formDescription = isK5User ? I18n.t('Subject Details') : I18n.t('Course Details')
+    ? t('Which account will this subject be associated with?')
+    : t('Which account will this course be associated with?')
+  const formDescription = isK5User ? t('Subject Details') : t('Course Details')
 
   const clearModal = () => {
     setSelectedAccount(null)
@@ -148,7 +145,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
   }, [])
 
   const accountsError = useCallback(
-    (err: Error) => showFlashError(I18n.t('Unable to get accounts'))(err),
+    (err: Error) => showFlashError(t('Unable to get accounts'))(err),
     [],
   )
 
@@ -244,7 +241,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
   }, [])
 
   const homeroomsError = useCallback(
-    (err: Error) => showFlashError(I18n.t('Unable to get homerooms'))(err),
+    (err: Error) => showFlashError(t('Unable to get homerooms'))(err),
     [],
   )
 
@@ -258,7 +255,17 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
     error: homeroomsError,
     fetchAllPages: true,
     // don't let students/users with no enrollments sync homeroom data
-    forceResult: ['no_enrollments', 'student'].includes(permissions) ? [] : undefined,
+    // for admins, skip homerooms fetch if selected account lacks read_course_list:
+    //   viewableAccountIds=null → non-admin, no restriction
+    //   viewableAccountIds=[]   → admin with no viewable accounts
+    //   viewableAccountIds=[ids] → check if selectedAccount is included
+    forceResult: (() => {
+      if (['no_enrollments', 'student'].includes(permissions)) return []
+      if (viewableAccountIds !== null && viewableAccountIds !== undefined) {
+        if (!selectedAccount || !viewableAccountIds.includes(selectedAccount.id)) return []
+      }
+      return undefined
+    })(),
     path: homeOptionPath,
   })
 
@@ -299,9 +306,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
       <Modal.Body>
         {loading ? (
           <View as="div" textAlign="center">
-            <Spinner
-              renderTitle={allAccounts.length ? loadingMessage : I18n.t('Loading accounts...')}
-            />
+            <Spinner renderTitle={allAccounts.length ? loadingMessage : t('Loading accounts...')} />
           </View>
         ) : (
           <FormFieldGroup
@@ -313,8 +318,8 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
               <CanvasAsyncSelect
                 inputValue={accountSearchTerm}
                 renderLabel={accountLabel}
-                placeholder={I18n.t('Begin typing to search')}
-                noOptionsLabel={I18n.t('No Results')}
+                placeholder={t('Begin typing to search')}
+                noOptionsLabel={t('No Results')}
                 onInputChange={e => setAccountSearchTerm(e.target.value)}
                 onOptionSelected={(_e: any, id: string) => handleAccountSelected(id)}
                 isLoading={loading}
@@ -324,7 +329,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
             )}
             {showHomeroomSyncOptions && (
               <Checkbox
-                label={I18n.t('Sync enrollments and subject start/end dates from homeroom')}
+                label={t('Sync enrollments and subject start/end dates from homeroom')}
                 value="syncHomeroomEnrollments"
                 checked={syncHomeroomEnrollments}
                 onChange={handleSyncEnrollmentsChanged}
@@ -333,8 +338,8 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
             {showHomeroomSyncOptions && syncHomeroomEnrollments && (
               <SimpleSelect
                 data-testid="homeroom-select"
-                renderLabel={I18n.t('Select a homeroom')}
-                assistiveText={I18n.t('Use arrow keys to navigate options.')}
+                renderLabel={t('Select a homeroom')}
+                assistiveText={t('Use arrow keys to navigate options.')}
                 onChange={(_e: any, data: any) => handleHomeroomSelected(data.id as string)}
               >
                 {homeroomOptions}
@@ -342,7 +347,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
             )}
             <TextInput
               renderLabel={courseNameLabel}
-              placeholder={I18n.t('Name...')}
+              placeholder={t('Name...')}
               value={courseName}
               onChange={e => setCourseName(e.target.value)}
             />
@@ -355,7 +360,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
           onClick={clearModal}
           interaction={loading ? 'disabled' : 'enabled'}
         >
-          {I18n.t('Cancel')}
+          {t('Cancel')}
         </Button>
         &nbsp;
         <Button
@@ -367,7 +372,7 @@ export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
               : 'disabled'
           }
         >
-          {I18n.t('Create')}
+          {t('Create')}
         </Button>
       </Modal.Footer>
     </Modal>

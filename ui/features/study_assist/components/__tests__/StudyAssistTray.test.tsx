@@ -28,7 +28,7 @@ const mockResetChat = vi.fn()
 const mockUseAssistContext = vi.fn(() => ({showBackButton: false, resetChat: mockResetChat}))
 const mockTrack = vi.fn()
 
-vi.mock('@canvas/instui-bindings/react/AiInformation', () => ({
+vi.mock('@canvas/ai-information', () => ({
   default: ({triggerButton}: {triggerButton: React.ReactNode}) => (
     <div data-testid="ai-information">{triggerButton}</div>
   ),
@@ -95,6 +95,18 @@ describe('StudyAssistTray', () => {
     expect(screen.getByTestId('study-assist-ai-info-button')).toBeInTheDocument()
   })
 
+  it('renders inside a DrawerLayout so content sits side-by-side with the tray', () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    expect(screen.getByTestId('study-assist-drawer-layout')).toBeInTheDocument()
+    expect(screen.getByTestId('study-assist-drawer-tray')).toBeInTheDocument()
+  })
+
   it('renders the heading when open', () => {
     render(
       <StudyAssistTray
@@ -119,6 +131,39 @@ describe('StudyAssistTray', () => {
     const button = closeEl.tagName === 'BUTTON' ? closeEl : closeEl.querySelector('button')
     await user.click(button!)
     expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onDismiss when Escape is pressed while open', () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    window.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}))
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not call onDismiss on Escape when closed', () => {
+    render(
+      <StudyAssistTray
+        open={false}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    window.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'}))
+    expect(onDismiss).not.toHaveBeenCalled()
+  })
+
+  it('renders children inside the drawer content', () => {
+    render(
+      <StudyAssistTray open={true} onDismiss={onDismiss} fetchAssistResponse={fetchAssistResponse}>
+        <div data-testid="drawer-page-content" />
+      </StudyAssistTray>,
+    )
+    expect(screen.getByTestId('drawer-page-content')).toBeInTheDocument()
   })
 
   it('passes WIKI_PAGE_ID as pageId to AssistProvider', () => {
@@ -242,6 +287,35 @@ describe('StudyAssistTray', () => {
         cardHeight: '60vh',
       }),
     )
+  })
+
+  it('renderFlashCards forwards onAnalyticsEvent so flashcard thumbs fire Pendo events', async () => {
+    render(
+      <StudyAssistTray
+        open={true}
+        onDismiss={onDismiss}
+        fetchAssistResponse={fetchAssistResponse}
+      />,
+    )
+    const {renderFlashCards} = mockAssistContent.mock.calls[0][0] as {
+      renderFlashCards: (
+        cards: object[],
+        isFetching: boolean,
+        isError: boolean,
+        getFlashCards: () => void,
+      ) => React.ReactNode
+    }
+    render(<>{renderFlashCards([{question: 'Q', answer: 'A'}], false, false, vi.fn())}</>)
+
+    const flashCardsProps = mockAssistFlashCardsInteraction.mock.calls[0][0] as {
+      onAnalyticsEvent?: (event: string) => void
+    }
+    expect(typeof flashCardsProps.onAnalyticsEvent).toBe('function')
+
+    flashCardsProps.onAnalyticsEvent?.('chat-good-response')
+    await vi.waitFor(() => {
+      expect(mockTrack).toHaveBeenCalledWith('study_assist_chat-good-response', {type: 'track'})
+    })
   })
 
   describe('analytics events', () => {

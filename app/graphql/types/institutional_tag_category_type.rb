@@ -37,11 +37,11 @@ class Types::InstitutionalTagCategoryType < Types::ApplicationObjectType
   end
 
   field :tags_connection, Types::InstitutionalTagType.connection_type, null: true do
-    argument :workflow_state, String, required: false, default_value: "active"
+    argument :workflow_state, Types::InstitutionalTagWorkflowStateType, required: false, default_value: "active"
   end
   def tags_connection(workflow_state: "active")
     load_association(:institutional_tags).then do |tags|
-      tags.where(workflow_state:)
+      tags.select { |t| t.workflow_state == workflow_state }
     end
   end
 end

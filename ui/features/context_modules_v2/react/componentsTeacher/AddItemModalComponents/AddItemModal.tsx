@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useMemo, useEffect, useState, useCallback} from 'react'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -279,7 +280,9 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       shouldCloseOnDocumentClick
       size="medium"
       title={I18n.t('Add an item to %{module}', {module: moduleName})}
-      onKeyDown={(e: React.KeyboardEvent<HTMLFormElement>) => {
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
+      onKeyDown={((e: React.KeyboardEvent<HTMLFormElement>) => {
         if (e.key === 'Enter') {
           const t = e.target as HTMLElement
           const isSubmitButton =
@@ -289,7 +292,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             e.preventDefault()
           }
         }
-      }}
+      }) as React.KeyboardEventHandler}
       onSubmit={(e: React.FormEvent) => {
         e.preventDefault()
         const hasNameError = isNameRequiredAndMissing(state, itemType)

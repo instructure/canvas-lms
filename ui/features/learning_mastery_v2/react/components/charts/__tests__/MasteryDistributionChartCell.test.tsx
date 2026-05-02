@@ -79,10 +79,6 @@ describe('MasteryDistributionChartCell', () => {
     isLoading: false,
   })
 
-  const hoverCell = async () => {
-    await user.hover(screen.getByTestId('mastery-distribution-chart-cell-1'))
-  }
-
   it('renders the chart with distribution data', () => {
     render(<MasteryDistributionChartCell {...defaultProps()} />)
     expect(screen.getByTestId('mastery-distribution-chart')).toBeInTheDocument()
@@ -126,9 +122,8 @@ describe('MasteryDistributionChartCell', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('shows the expand button on hover', async () => {
-    render(<MasteryDistributionChartCell {...defaultProps()} />)
-    await hoverCell()
+  it('shows the expand button when isHovered is true', () => {
+    render(<MasteryDistributionChartCell {...defaultProps()} isHovered={true} />)
 
     const expandButton = screen.getByRole('button', {
       name: 'Expand distribution for outcome 1',
@@ -146,8 +141,7 @@ describe('MasteryDistributionChartCell', () => {
   })
 
   it('opens the popover when expand button is clicked', async () => {
-    render(<MasteryDistributionChartCell {...defaultProps()} />)
-    await hoverCell()
+    render(<MasteryDistributionChartCell {...defaultProps()} isHovered={true} />)
     await user.click(screen.getByRole('button', {name: 'Expand distribution for outcome 1'}))
 
     expect(screen.getByTestId('outcome-distribution-popover')).toBeInTheDocument()
@@ -156,8 +150,7 @@ describe('MasteryDistributionChartCell', () => {
   })
 
   it('closes the popover when close handler is called', async () => {
-    render(<MasteryDistributionChartCell {...defaultProps()} />)
-    await hoverCell()
+    render(<MasteryDistributionChartCell {...defaultProps()} isHovered={true} />)
     await user.click(screen.getByRole('button', {name: 'Expand distribution for outcome 1'}))
     expect(screen.getByTestId('outcome-distribution-popover')).toBeInTheDocument()
 
@@ -175,5 +168,38 @@ describe('MasteryDistributionChartCell', () => {
     expect(
       screen.queryByRole('button', {name: 'Expand distribution for outcome 1'}),
     ).not.toBeInTheDocument()
+  })
+
+  it('shows the expand button when the expand button is focused', async () => {
+    render(<MasteryDistributionChartCell {...defaultProps()} />)
+    const expandButton = screen.getByRole('button', {name: 'Expand distribution for outcome 1'})
+
+    await user.tab()
+    expect(expandButton).toHaveFocus()
+    expect(expandButton.closest('div[style]')).toHaveStyle({opacity: '1'})
+  })
+
+  it('hides the expand button after focus moves away', async () => {
+    render(<MasteryDistributionChartCell {...defaultProps()} />)
+    const expandButton = screen.getByRole('button', {name: 'Expand distribution for outcome 1'})
+
+    await user.tab()
+    expect(expandButton).toHaveFocus()
+    await user.tab()
+    expect(expandButton).not.toHaveFocus()
+    expect(expandButton.closest('div[style]')).toHaveStyle({opacity: '0'})
+  })
+
+  it('closes the popover without needing the cursor to re-enter the cell', async () => {
+    render(<MasteryDistributionChartCell {...defaultProps()} isHovered={true} />)
+    await user.click(screen.getByRole('button', {name: 'Expand distribution for outcome 1'}))
+    expect(screen.getByTestId('outcome-distribution-popover')).toBeInTheDocument()
+
+    await user.click(screen.getByTestId('popover-close'))
+    expect(screen.queryByTestId('outcome-distribution-popover')).not.toBeInTheDocument()
+    // button visibility is now driven by isHovered prop (true here), so button stays visible
+    expect(
+      screen.getByRole('button', {name: 'Expand distribution for outcome 1'}).closest('div[style]'),
+    ).toHaveStyle({opacity: '1'})
   })
 })

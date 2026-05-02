@@ -39,6 +39,10 @@ module Types
 
     alias_method :course, :object
 
+    def preload_course_permissions
+      Loaders::CoursePermissionsPreloader.for(current_user:).load(course)
+    end
+
     class CourseWorkflowState < BaseEnum
       graphql_name "CourseWorkflowState"
       description "States that Courses can be in"
@@ -234,7 +238,9 @@ module Types
 
     field :outcome_alignment_stats, CourseOutcomeAlignmentStatsType, null: true
     def outcome_alignment_stats
-      Loaders::CourseOutcomeAlignmentStatsLoader.load(course) if course&.grants_right?(current_user, session, :manage_outcomes)
+      preload_course_permissions.then do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(course) if course&.grants_right?(current_user, session, :manage_outcomes)
+      end
     end
 
     field :sections_connection, SectionType.connection_type, null: false do
@@ -261,13 +267,15 @@ module Types
                description: "Filter modules by various criteria"
     end
     def modules_connection(filter: nil)
-      scope = course.modules_visible_to(current_user)
+      preload_course_permissions.then do
+        scope = course.modules_visible_to(current_user)
 
-      if filter
-        scope = apply_module_filters(scope, filter)
+        if filter
+          scope = apply_module_filters(scope, filter)
+        end
+
+        scope.order(:name)
       end
-
-      scope.order(:name)
     end
 
     field :rubrics_connection, RubricType.connection_type, null: true do
@@ -307,40 +315,41 @@ module Types
     end
     def users_connection(user_ids: nil, filter: {}, sort: {})
       user_ids = filter[:user_ids] || user_ids
-      return nil unless course.grants_any_right?(
-        current_user,
-        session,
-        :read_roster,
-        :view_all_grades,
-        :manage_grades
-      ) || (user_ids&.length == 1 && Shard.global_id_for(user_ids&.first) == current_user.global_id)
-
       context.scoped_merge!(course:)
+      preload_course_permissions.then do
+        next nil unless course.grants_any_right?(
+          current_user,
+          session,
+          :read_roster,
+          :view_all_grades,
+          :manage_grades
+        ) || (user_ids&.length == 1 && Shard.global_id_for(user_ids&.first) == current_user.global_id)
 
-      options = {
-        enrollment_state: filter[:enrollment_states],
-        enrollment_type: filter[:enrollment_types],
-        enrollment_role_id: filter[:enrollment_role_ids],
-        include_inactive_enrollments: true,
-        sort: sort[:field],
-        order: sort[:direction]
-      }
+        options = {
+          enrollment_state: filter[:enrollment_states],
+          enrollment_type: filter[:enrollment_types],
+          enrollment_role_id: filter[:enrollment_role_ids],
+          include_inactive_enrollments: true,
+          sort: sort[:field],
+          order: sort[:direction]
+        }
 
-      search_term = filter[:search_term].presence
+        search_term = filter[:search_term].presence
 
-      scope = if search_term
-                UserSearch.for_user_in_context(search_term, course, current_user, session, options)
-              else
-                UserSearch.scope_for(course, current_user, options)
-              end
+        scope = if search_term
+                  UserSearch.for_user_in_context(search_term, course, current_user, session, options)
+                else
+                  UserSearch.scope_for(course, current_user, options)
+                end
 
-      if user_ids.present?
-        scope = scope.where(users: { id: user_ids })
+        if user_ids.present?
+          scope = scope.where(users: { id: user_ids })
+        end
+
+        scope = scope.not_fake_student if filter[:exclude_test_students]
+
+        scope
       end
-
-      scope = scope.not_fake_student if filter[:exclude_test_students]
-
-      scope
     end
 
     field :users_connection_count, Integer, null: true do
@@ -357,7 +366,7 @@ module Types
                required: false
     end
     def users_connection_count(user_ids: nil, filter: {}, sort: {})
-      users_connection(user_ids:, filter:, sort:).size
+      users_connection(user_ids:, filter:, sort:).then { |scope| scope&.size }
     end
 
     field :course_nickname, String, null: true
@@ -377,21 +386,23 @@ module Types
     end
 
     def enrollments_connection(filter: {})
-      return nil unless course.grants_any_right?(
-        current_user,
-        session,
-        :read_roster,
-        :view_all_grades,
-        :manage_grades
-      )
-
       context.scoped_merge!(course:)
-      scope = course.apply_enrollment_visibility(course.all_enrollments, current_user)
-      scope = filter[:states].present? ? scope.where(workflow_state: filter[:states]) : scope.active
-      scope = scope.where(associated_user_id: filter[:associated_user_ids]) if filter[:associated_user_ids].present?
-      scope = scope.where(user_id: filter[:user_ids]) if filter[:user_ids].present?
-      scope = scope.where(type: filter[:types]) if filter[:types].present?
-      scope
+      preload_course_permissions.then do
+        next nil unless course.grants_any_right?(
+          current_user,
+          session,
+          :read_roster,
+          :view_all_grades,
+          :manage_grades
+        )
+
+        scope = course.apply_enrollment_visibility(course.all_enrollments, current_user)
+        scope = filter[:states].present? ? scope.where(workflow_state: filter[:states]) : scope.active
+        scope = scope.where(associated_user_id: filter[:associated_user_ids]) if filter[:associated_user_ids].present?
+        scope = scope.where(user_id: filter[:user_ids]) if filter[:user_ids].present?
+        scope = scope.where(type: filter[:types]) if filter[:types].present?
+        scope
+      end
     end
 
     field :grading_periods_connection, GradingPeriodType.connection_type, null: false
@@ -419,13 +430,15 @@ module Types
                required: false
     end
     def submissions_connection(student_ids: nil, order_by: [], filter: {})
-      allowed_user_ids_promise = if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
-                                   Loaders::CourseVisibleStudentUserIdsLoader.for(current_user:).load(course)
-                                 elsif course.grants_right?(current_user, session, :read_grades)
-                                   Promise.resolve([current_user.id])
-                                 else
-                                   Promise.resolve([])
-                                 end
+      allowed_user_ids_promise = preload_course_permissions.then do
+        if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
+          Loaders::CourseVisibleStudentUserIdsLoader.for(current_user:).load(course)
+        elsif course.grants_right?(current_user, session, :read_grades)
+          Promise.resolve([current_user.id])
+        else
+          Promise.resolve([])
+        end
+      end
 
       allowed_user_ids_promise.then do |allowed_user_ids|
         if student_ids.present?
@@ -472,16 +485,16 @@ module Types
       argument :include_non_collaborative, Boolean, required: false, default_value: false
     end
     def groups_connection(include_non_collaborative: false)
-      show_non_collaborative = include_non_collaborative && course&.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
-      groups_scope = show_non_collaborative ? course.combined_groups_and_differentiation_tags.active : course.active_groups
+      preload_course_permissions.then do
+        show_non_collaborative = include_non_collaborative && course&.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+        groups_scope = show_non_collaborative ? course.combined_groups_and_differentiation_tags.active : course.active_groups
 
-      # TODO: share this with accounts when groups are added there
-      if course.grants_right?(current_user, session, :read_roster)
-        groups_scope
-          .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
-          .eager_load(:group_category)
-      else
-        nil
+        # TODO: share this with accounts when groups are added there
+        if course.grants_right?(current_user, session, :read_roster)
+          groups_scope
+            .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
+            .eager_load(:group_category)
+        end
       end
     end
 
@@ -517,7 +530,7 @@ module Types
       argument :include_non_collaborative, Boolean, required: false, default_value: false
     end
     def group_sets_connection(include_non_collaborative: false)
-      get_group_sets(course, include_non_collaborative:)
+      preload_course_permissions.then { get_group_sets(course, include_non_collaborative:) }
     end
 
     # TODO: this is only temporary until the group_sets_connection gets paginated
@@ -526,16 +539,18 @@ module Types
       argument :include_non_collaborative, Boolean, required: false, default_value: false
     end
     def group_sets(include_non_collaborative: false)
-      get_group_sets(course, include_non_collaborative:)
+      preload_course_permissions.then { get_group_sets(course, include_non_collaborative:) }
     end
 
     field :folders_connection, FolderType.connection_type, null: true do
       description "Folders for this course."
     end
     def folders_connection
-      return nil unless course.grants_right?(current_user, :read)
+      preload_course_permissions.then do
+        next nil unless course.grants_right?(current_user, :read)
 
-      course.active_folders
+        course.active_folders
+      end
     end
 
     implements Interfaces::ExternalToolsConnectionInterface
@@ -562,9 +577,11 @@ module Types
 
     field :post_policy, PostPolicyType, "A course-specific post policy", null: true
     def post_policy
-      return nil unless course.grants_right?(current_user, :manage_grades)
+      preload_course_permissions.then do
+        next nil unless course.grants_right?(current_user, :manage_grades)
 
-      load_association(:default_post_policy)
+        load_association(:default_post_policy)
+      end
     end
 
     field :assignment_post_policies,
@@ -574,9 +591,11 @@ module Types
           MD
           null: true
     def assignment_post_policies
-      return nil unless course.grants_right?(current_user, :manage_grades)
+      preload_course_permissions.then do
+        next nil unless course.grants_right?(current_user, :manage_grades)
 
-      course.assignment_post_policies
+        course.assignment_post_policies
+      end
     end
 
     field :image_url, UrlType, <<~MD, null: true
@@ -599,42 +618,48 @@ module Types
 
     field :sis_id, String, null: true
     def sis_id
-      return nil unless course.grants_any_right?(current_user, :read_sis, :manage_sis)
+      preload_course_permissions.then do
+        next nil unless course.grants_any_right?(current_user, :read_sis, :manage_sis)
 
-      course.sis_course_id
+        course.sis_course_id
+      end
     end
 
     field :submission_statistics, SubmissionStatisticsType, "Returns submission-related statistics for the current user", null: true do
       argument :observed_user_id, ID, "Optional observed user ID for observer statistics", required: false
     end
     def submission_statistics(observed_user_id: nil)
-      return nil unless course.grants_right?(current_user, :read)
+      preload_course_permissions.then do
+        next nil unless course.grants_right?(current_user, :read)
 
-      Loaders::ObservedStudentsLoader.for(current_user:, include_restricted_access: false).load(course).then do |observed_students_hash|
-        observed_students = observed_students_hash.keys
+        Loaders::ObservedStudentsLoader.for(current_user:, include_restricted_access: false).load(course).then do |observed_students_hash|
+          observed_students = observed_students_hash.keys
 
-        if observed_user_id.present?
-          observed_students.select! { |student| student.id.to_s == observed_user_id.to_s }
+          if observed_user_id.present?
+            observed_students.select! { |student| student.id.to_s == observed_user_id.to_s }
+          end
+
+          is_observer = !observed_students.empty?
+
+          loader_promise = if is_observer
+                             Loaders::ObserverCourseSubmissionDataLoader.for(current_user:, request: context[:request], observed_user_id:).load(course)
+                           elsif observed_user_id.nil?
+                             Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
+                           end
+
+          loader_promise&.then { |submissions| { course:, submissions: } }
         end
-
-        is_observer = !observed_students.empty?
-
-        loader_promise = if is_observer
-                           Loaders::ObserverCourseSubmissionDataLoader.for(current_user:, request: context[:request], observed_user_id:).load(course)
-                         elsif observed_user_id.nil?
-                           Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
-                         end
-
-        loader_promise&.then { |submissions| { course:, submissions: } }
       end
     end
 
     field :module_progression_statistics, ModuleProgressionStatisticsType, "Returns module progression statistics for the current user", null: true
     def module_progression_statistics
-      return nil unless course.grants_right?(current_user, :read)
-      return nil unless current_user
+      preload_course_permissions.then do
+        next nil unless course.grants_right?(current_user, :read)
+        next nil unless current_user
 
-      Loaders::CourseModuleProgressionDataLoader.for(current_user:).load(course)
+        Loaders::CourseModuleProgressionDataLoader.for(current_user:).load(course)
+      end
     end
 
     field :allow_final_grade_override, Boolean, null: true
@@ -659,23 +684,29 @@ module Types
 
     field :available_moderators, UserType.connection_type, null: true
     def available_moderators
-      return unless course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+      preload_course_permissions.then do
+        next unless course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
-      course.moderators
+        course.moderators
+      end
     end
 
     field :available_moderators_count, Integer, null: true
     def available_moderators_count
-      return unless course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+      preload_course_permissions.then do
+        next unless course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
-      course.moderators.size
+        course.moderators.size
+      end
     end
 
     field :settings, CourseSettingsType, "Settings for the course", null: true
     def settings
-      return nil unless course.grants_right?(current_user, :read)
+      preload_course_permissions.then do
+        next nil unless course.grants_right?(current_user, :read)
 
-      course
+        course
+      end
     end
 
     private

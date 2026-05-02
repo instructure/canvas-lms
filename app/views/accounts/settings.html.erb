@@ -591,6 +591,15 @@
           </fieldset>
         <% end %>
         <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) %>
+          <fieldset>
+            <legend><%= t("Content Privacy Settings") %></legend>
+            <%= f.fields_for :settings do |settings| %>
+              <%= settings.check_box :has_underage_users, :checked => @account.settings[:has_underage_users] %>
+              <%= settings.label :has_underage_users, t("This account has underage users")%>
+            <% end %>
+          </fieldset>
+        <% end %>
+        <% if !@account.site_admin? && @account.root_account? && @account.grants_right?(@current_user, :manage_site_settings) %>
           <% TermsOfService.ensure_terms_for_account(@account) %>
           <% js_bundle :terms_of_service_modal%>
           <fieldset>

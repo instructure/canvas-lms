@@ -61,4 +61,65 @@ describe WidgetDashboardLayoutValidator do
       end
     end
   end
+
+  describe ".sanitize_educator_layout" do
+    it "returns nil unchanged when config is nil" do
+      expect(described_class.sanitize_educator_layout(nil)).to be_nil
+    end
+
+    it "returns the config unchanged when the layout key is missing" do
+      input = { "other" => "stuff" }
+      expect(described_class.sanitize_educator_layout(input)).to eq(input)
+    end
+
+    it "drops non-educator widget types from a saved layout" do
+      polluted = {
+        "layout" => {
+          "columns" => 2,
+          "widgets" => [
+            { "type" => "educator_announcement_creation" },
+            { "type" => "course_work_combined" },
+            { "type" => "course_grades" },
+            { "type" => "educator_todo_list" }
+          ]
+        }
+      }
+      result = described_class.sanitize_educator_layout(polluted)
+      expect(result["layout"]["widgets"].pluck("type")).to contain_exactly(
+        "educator_announcement_creation",
+        "educator_todo_list"
+      )
+    end
+
+    it "does not mutate the input" do
+      input = { "layout" => { "widgets" => [{ "type" => "course_grades" }] } }
+      described_class.sanitize_educator_layout(input)
+      expect(input["layout"]["widgets"]).to eq([{ "type" => "course_grades" }])
+    end
+
+    it "returns the config unchanged when layout is not a hash" do
+      input = { "layout" => "garbage" }
+      expect(described_class.sanitize_educator_layout(input)).to eq(input)
+    end
+
+    it "drops widget entries that are not hashes" do
+      polluted = {
+        "layout" => {
+          "columns" => 2,
+          "widgets" => [
+            { "type" => "educator_announcement_creation" },
+            "not a widget",
+            nil,
+            42,
+            { "type" => "educator_todo_list" }
+          ]
+        }
+      }
+      result = described_class.sanitize_educator_layout(polluted)
+      expect(result["layout"]["widgets"].pluck("type")).to contain_exactly(
+        "educator_announcement_creation",
+        "educator_todo_list"
+      )
+    end
+  end
 end

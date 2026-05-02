@@ -21,9 +21,7 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import type {FormMessage} from '@instructure/ui-form-field'
-import {useScope as createI18nScope} from '@canvas/i18n'
-
-const I18n = createI18nScope('submit_online_url_assignment')
+import {useTranslation} from '@canvas/i18next'
 
 const OnlineUrlSubmission = ({
   setValue,
@@ -34,6 +32,7 @@ const OnlineUrlSubmission = ({
   getShouldShowUrlError: () => boolean
   setShouldShowUrlError: (value: boolean) => void
 }) => {
+  const {t} = useTranslation('submit_online_url_assignment')
   const [input, setInput] = useState('')
   const [onlineUrlErrors, setOnlineUrlErrors] = useState<FormMessage[]>([])
 
@@ -42,7 +41,7 @@ const OnlineUrlSubmission = ({
   }
 
   const showErrors = () => {
-    const errorMessage = I18n.t('A valid URL is required')
+    const errorMessage = t('A valid URL is required')
     setOnlineUrlErrors([
       {
         type: 'newError',
@@ -73,7 +72,7 @@ const OnlineUrlSubmission = ({
 
   const label = (
     <>
-      <Text>{I18n.t('Website URL')}</Text>
+      <Text>{t('Website URL')}</Text>
       <Text color={onlineUrlErrors.length > 0 ? 'danger' : 'primary'}>*</Text>
     </>
   )

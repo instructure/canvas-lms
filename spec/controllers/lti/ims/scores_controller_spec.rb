@@ -611,7 +611,7 @@ module Lti::IMS
                 attachment = Attachment.last
                 expect(attachment.user).to eq user
                 expect(attachment.display_name).to eq content_items.first[:title]
-                expect(result.submission.attachments).to include attachment
+                expect(result.submission.reload.attachments).to include attachment
               end
 
               let(:actual_progress_url) do

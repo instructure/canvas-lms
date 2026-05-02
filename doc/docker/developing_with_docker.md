@@ -298,6 +298,17 @@ Next, stop and start any running containers (a restart is not sufficient since e
 
 Finally, tail the statsd service logs to see what metrics Canvas is recording: `docker compose logs -ft statsd`.
 
+### Kafka
+To enable Kafka, add `docker-compose/kafka.override.yml` to your `COMPOSE_FILE` var in `.env`. The broker is reachable
+at `kafka:9092` from other containers and at `localhost:9094` from the host.
+
+Run the following in the Kafka container to subscribe to events:
+```
+kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic course.events
+```
+
 ## Tips
 
 It will likely be helpful to alias the various docker-compose commands like `docker compose run --rm web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.

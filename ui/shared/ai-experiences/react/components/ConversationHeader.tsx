@@ -20,6 +20,7 @@ import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {IconAiSolid} from '@instructure/ui-icons'
 import {BRAND_GRADIENT, RADIUS_MD} from '../brand'
 
 const I18n = createI18nScope('ai_experiences')
@@ -37,7 +38,10 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({action}) => (
   <div style={headerStyle}>
     <Flex alignItems="center" justifyItems="space-between">
       <Heading level="h3" margin="0" color="primary-inverse">
-        ✦ {I18n.t('Knowledge Chat')}
+        <Flex as="span" alignItems="center" gap="x-small">
+          <IconAiSolid />
+          {I18n.t('Knowledge Chat')}
+        </Flex>
       </Heading>
       {action}
     </Flex>

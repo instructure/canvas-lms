@@ -3394,6 +3394,7 @@ describe UsersController do
         get "user_dashboard"
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:teacher)
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:VIEWABLE_ACCOUNT_IDS]).to be_nil
       end
 
       it "sets correctly for a user with no enrollments" do
@@ -3402,6 +3403,7 @@ describe UsersController do
         get "user_dashboard"
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be_nil
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_truthy
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:VIEWABLE_ACCOUNT_IDS]).to be_nil
       end
 
       it "sets correctly for a student with enrollments in a sub-account" do
@@ -3411,6 +3413,7 @@ describe UsersController do
         get "user_dashboard"
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:student)
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:VIEWABLE_ACCOUNT_IDS]).to be_nil
       end
 
       it "sets correctly for an admin user" do
@@ -3420,6 +3423,7 @@ describe UsersController do
         get "user_dashboard"
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:admin)
         expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+        expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:VIEWABLE_ACCOUNT_IDS]).to include(Account.default.id.to_s)
       end
     end
 

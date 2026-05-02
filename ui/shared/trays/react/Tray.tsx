@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import React from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -29,8 +29,6 @@ import {ErrorBoundary} from '@instructure/platform-error-boundary'
 import {GenericErrorPage} from '@instructure/platform-generic-error-page'
 import {reportError, canvasErrorPageTranslations} from '@canvas/error-page-utils'
 import errorShipUrl from '@instructure/platform-images/assets/ErrorShip.svg'
-
-const I18n = createI18nScope('tray')
 
 /**
 This is a wrapper around an InstUi Tray component that provides:
@@ -87,6 +85,7 @@ export default function CanvasTray({
   children,
   ...otherTrayProps
 }: Props) {
+  const {t} = useTranslation('tray')
   if (headerPadding == null) {
     headerPadding = `0 0 ${padding} 0` as ViewProps['padding']
   }
@@ -101,7 +100,7 @@ export default function CanvasTray({
           </Heading>
         </Flex.Item>
         <Flex.Item>
-          <CloseButton onClick={onDismiss} size="small" screenReaderLabel={I18n.t('Close')} />
+          <CloseButton onClick={onDismiss} size="small" screenReaderLabel={t('Close')} />
         </Flex.Item>
       </Flex>
     )

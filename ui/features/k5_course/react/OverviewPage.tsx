@@ -17,7 +17,7 @@
  */
 
 import React, {useMemo} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine} from '@instructure/ui-icons'
@@ -25,8 +25,6 @@ import {Flex} from '@instructure/ui-flex'
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {ImmersiveReaderButton} from '@canvas/immersive-reader/ImmersiveReader'
-
-const I18n = createI18nScope('overview_page')
 
 interface OverviewPageProps {
   content: string
@@ -41,6 +39,7 @@ export default function OverviewPage({
   canEdit,
   showImmersiveReader,
 }: OverviewPageProps) {
+  const {t} = useTranslation('overview_page')
   const html = useMemo(() => apiUserContent.convert(content), [content])
   return (
     <>
@@ -48,7 +47,7 @@ export default function OverviewPage({
         {canEdit && (
           <Flex.Item>
             <IconButton
-              screenReaderLabel={I18n.t('Edit home page')}
+              screenReaderLabel={t('Edit home page')}
               renderIcon={IconEditLine}
               href={url}
               withBackground={false}
@@ -59,7 +58,7 @@ export default function OverviewPage({
         {showImmersiveReader && (
           <Flex.Item margin="0 0 0 small">
             <ImmersiveReaderButton
-              content={{content: () => html, title: I18n.t('Subject Home Page')}}
+              content={{content: () => html, title: t('Subject Home Page')}}
               readerSDK={undefined}
               breakpoints={undefined}
             />

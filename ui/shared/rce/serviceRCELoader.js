@@ -22,7 +22,7 @@ import editorOptions from './editorOptions'
 import polyfill from './polyfill'
 import getRCSProps from './getRCSProps'
 import shouldUseFeature, {Feature} from './shouldUseFeature'
-import {getTypography} from '@canvas/instui-bindings'
+import {getTypography} from '@instructure/platform-instui-bindings'
 
 window.INST = window.INST || {}
 

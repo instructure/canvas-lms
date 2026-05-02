@@ -26,11 +26,12 @@ import {type MockedFunction} from 'vitest'
 import {AccessTokensSection} from '../AccessTokensSection'
 import {ZTokenId, type Token} from '../Token'
 import {ZUserId} from '../UserId'
-import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+import {confirmDanger} from '@instructure/platform-instui-bindings'
 
 const mockConfirmDanger = confirmDanger as MockedFunction<typeof confirmDanger>
 
-vi.mock('@canvas/instui-bindings/react/Confirm', () => ({
+vi.mock('@instructure/platform-instui-bindings', async () => ({
+  ...(await vi.importActual<typeof import('@instructure/platform-instui-bindings')>('@instructure/platform-instui-bindings')),
   confirmDanger: vi.fn(),
 }))
 

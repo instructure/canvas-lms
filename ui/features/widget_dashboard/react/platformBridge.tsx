@@ -271,6 +271,23 @@ const TRANSLATION_THUNKS: Record<string, TranslationThunk> = {
     I18n.t('%{count} announcements failed to post. Please check your permissions and try again.', {
       count: opts.count,
     }),
+
+  // Educator ToDo Widget
+  educatorTodoListSpeedGraderButton: () => I18n.t('Open in SpeedGrader'),
+  educatorTodoListCompletionRate: (opts: Record<string, unknown> = {}) =>
+    I18n.t('%{rate} of assignments submitted', {
+      rate: opts.rate,
+    }),
+  educatorTodoListViewAllButton: () => I18n.t('Show all'),
+  educatorTodoListFailedToLoadItems: () => I18n.t('Failed to load ToDo items'),
+
+  // Educator ToDo Modal
+  educatorTodoListModalLabel: () => I18n.t('Full list of assignments to grade'),
+  educatorTodoListModalHeading: () => I18n.t('To grade'),
+  educatorTodoListModalPagination: () => I18n.t('Items to grade pagination'),
+  educatorTodoListModalFailedToLoadItems: () => I18n.t('Failed to load ToDo items'),
+  educatorTodoListModalMoreItemAlert: () =>
+    I18n.t('More assignments are available. Apply filter to see more.'),
 }
 
 const translations = new Proxy({} as WidgetDashboardTranslations, {

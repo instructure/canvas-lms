@@ -119,6 +119,7 @@ describe GradeSummaryAssignmentPresenter do
       AttachmentUploadStatus.success!(attachment_1)
       AttachmentUploadStatus.failed!(attachment_2, "bad things")
       AttachmentUploadStatus.pending!(attachment_3)
+      @submission.reload
       expect(presenter.upload_status).to eq("failed")
     end
   end

@@ -25,7 +25,7 @@ module AssignmentOverrideApplicator
   # pass skip_clone if you don't really care about the override attributes, and
   # it's okay to get back the passed in object - that you promise not to modify -
   # if there are no overrides
-  # valid learning objects are Assignment, Quizzes::Quiz, DiscussionTopic, and WikiPage
+  # valid learning objects are Assignment, PeerReviewSubAssignment, Quizzes::Quiz, DiscussionTopic, and WikiPage
   def self.assignment_overridden_for(learning_object, user, skip_clone: false)
     return learning_object if learning_object.overridden_for?(user)
 
@@ -60,7 +60,7 @@ module AssignmentOverrideApplicator
                                .applied_overrides.find { |o| o.set_type == "Course" }
                                                  &.due_at
 
-      if learning_object.is_a?(Assignment) || learning_object.is_a?(Quizzes::Quiz)
+      if learning_object.is_a?(Assignment) || learning_object.is_a?(Quizzes::Quiz) || learning_object.is_a?(PeerReviewSubAssignment)
         result_learning_object.due_at =
           # if only some sections are overridden, return the most due date for
           # teachers, if all sections are overridden, return the most lenient

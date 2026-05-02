@@ -23,9 +23,10 @@ module Api::V1::TodoItem
   include Api::V1::Quiz
   include Api::V1::Context
 
-  def todo_item_json(assignment_or_quiz, user, session, todo_type)
+  def todo_item_json(assignment_or_quiz, user, session, todo_type, include_grading_counts: false)
     context_data(assignment_or_quiz).merge({
                                              context_name: assignment_or_quiz&.context&.name,
+                                             context_short_name: assignment_or_quiz&.context&.short_name,
                                              type: todo_type,
                                              ignore: api_v1_users_todo_ignore_url(assignment_or_quiz.asset_string, todo_type, permanent: "0"),
                                              ignore_permanently: api_v1_users_todo_ignore_url(assignment_or_quiz.asset_string, todo_type, permanent: "1"),
@@ -52,6 +53,15 @@ module Api::V1::TodoItem
 
         if todo_type == "grading"
           hash["needs_grading_count"] = Assignments::NeedsGradingCountQuery.new([assignment], user).count[assignment.global_id]
+
+          if include_grading_counts && @domain_root_account&.feature_enabled?(:educator_dashboard)
+            metrics = Assignments::TeacherTodoMetricsQuery.new(assignment, user).metrics
+            hash["on_time_needs_grading_count"] = metrics[:on_time_needs_grading_count]
+            hash["late_needs_grading_count"] = metrics[:late_needs_grading_count]
+            hash["resubmitted_needs_grading_count"] = metrics[:resubmitted_needs_grading_count]
+            hash["submitted_submissions_count"] = metrics[:submitted_submissions_count]
+            hash["total_submissions_count"] = metrics[:total_submissions_count]
+          end
         end
       end
     end

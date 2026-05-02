@@ -378,6 +378,125 @@ describe AssignmentOverrideApplicator do
         expect(@teachers_assignment.due_at.to_i).to eq course_override_due_at.to_i
       end
     end
+
+    context "give teachers the more lenient of base or override due at for PeerReviewSubAssignment" do
+      before do
+        teacher_in_course
+        @section = @course.course_sections.create! name: "Overridden Section"
+        student_in_section(@section)
+        @student = @user
+        @peer_review_sub_assignment = peer_review_model(parent_assignment: @assignment)
+      end
+
+      def create_peer_review_override(set, due_at, parent_override:)
+        peer_review_override = @peer_review_sub_assignment.assignment_overrides.build(
+          set:,
+          parent_override:,
+          dont_touch_assignment: true
+        )
+        peer_review_override.override_due_at(due_at)
+        peer_review_override.save!
+        peer_review_override
+      end
+
+      def create_section_override(section, due_at)
+        parent_override = assignment_override_model(assignment: @assignment, set: section)
+        create_peer_review_override(section, due_at, parent_override:)
+      end
+
+      def create_course_override(course, due_at)
+        parent_override = assignment_override_model(assignment: @assignment, due_at:)
+        parent_override.set = course
+        parent_override.save!
+        create_peer_review_override(course, due_at, parent_override:)
+      end
+
+      it "uses base due_at when it is more lenient than the section override due_at" do
+        section_due_at = 5.days.from_now
+        base_due_at = 1.year.from_now
+        create_section_override(@section, section_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, base_due_at)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+        students_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @student)
+
+        expect(teachers_assignment.due_at.to_i).to eq base_due_at.to_i
+        expect(students_assignment.due_at.to_i).to eq section_due_at.to_i
+      end
+
+      it "uses section override due_at when it is more lenient than base due_at" do
+        section_due_at = 1.year.from_now
+        base_due_at = 5.days.from_now
+        create_section_override(@section, section_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, base_due_at)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+        students_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @student)
+
+        expect(teachers_assignment.due_at.to_i).to eq section_due_at.to_i
+        expect(students_assignment.due_at.to_i).to eq section_due_at.to_i
+      end
+
+      it "uses base due_at when multiple, but not all, sections are overridden" do
+        section2 = @course.course_sections.create! name: "Another Section"
+        section_due_at = 5.days.from_now
+        section2_due_at = 10.days.from_now
+        base_due_at = 1.year.from_now
+        create_section_override(@section, section_due_at)
+        create_section_override(section2, section2_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, base_due_at)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+        students_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @student)
+
+        expect(teachers_assignment.due_at.to_i).to eq base_due_at.to_i
+        expect(students_assignment.due_at.to_i).to eq section_due_at.to_i
+      end
+
+      it "uses most lenient override due_at when all sections are overridden" do
+        base_due_at = 5.days.from_now
+        lenient_due_at = 1.year.from_now
+        stricter_due_at = 6.months.from_now
+        create_section_override(@course.default_section, stricter_due_at)
+        create_section_override(@section, lenient_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, base_due_at)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+
+        expect(teachers_assignment.due_at.to_i).to eq lenient_due_at.to_i
+      end
+
+      it "returns nil when base due_at is nil and only some sections are overridden" do
+        section_due_at = 5.days.from_now
+        create_section_override(@section, section_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, nil)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+
+        expect(teachers_assignment.due_at).to be_nil
+      end
+
+      it "uses course override due_at when it is more lenient than base due_at" do
+        course_override_due_at = 1.year.from_now
+        base_due_at = 5.days.from_now
+        create_course_override(@course, course_override_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, base_due_at)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+
+        expect(teachers_assignment.due_at.to_i).to eq course_override_due_at.to_i
+      end
+
+      it "uses course override due_at when base due_at is nil" do
+        course_override_due_at = 5.days.from_now
+        create_course_override(@course, course_override_due_at)
+        @peer_review_sub_assignment.update_column(:due_at, nil)
+
+        teachers_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@peer_review_sub_assignment, @teacher)
+
+        expect(teachers_assignment.due_at.to_i).to eq course_override_due_at.to_i
+      end
+    end
   end
 
   describe "overrides_for_assignment_and_user" do

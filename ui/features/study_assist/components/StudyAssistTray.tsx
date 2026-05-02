@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useMemo, useRef} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, type ReactNode} from 'react'
 import {usePendoTracking} from '@canvas/pendo/react/hooks/usePendoTracking'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {Tray} from '@instructure/ui-tray'
+import {useTranslation} from '@canvas/i18next'
+import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -37,9 +37,7 @@ import type {
   AssistChatFlashCard,
 } from '@instructure/platform-study-assist'
 import {IconAiSolid, IconArrowStartLine, IconInfoLine} from '@instructure/ui-icons'
-import CanvasAiInformation from '@canvas/instui-bindings/react/AiInformation'
-
-const I18n = createI18nScope('study_assist')
+import CanvasAiInformation from '@canvas/ai-information'
 
 const GRADIENT = 'linear-gradient(135deg, #7b5ea7 0%, #5b7fa6 60%, #4a919e 100%)'
 
@@ -47,6 +45,7 @@ type Props = {
   open: boolean
   onDismiss: () => void
   fetchAssistResponse: (request: AssistRequest) => Promise<AssistResponse>
+  children?: ReactNode
 }
 
 type TrayHeaderProps = {
@@ -55,6 +54,7 @@ type TrayHeaderProps = {
 }
 
 function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
+  const {t} = useTranslation('study_assist')
   const {showBackButton, resetChat} = useAssistContext()
 
   return (
@@ -68,7 +68,7 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
                 color="primary-inverse"
                 withBackground={false}
                 withBorder={true}
-                screenReaderLabel={I18n.t('Back')}
+                screenReaderLabel={t('Back')}
                 onClick={resetChat}
                 data-testid="study-assist-back-button"
               >
@@ -80,7 +80,7 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
             <IconAiSolid />
           </Flex.Item>
           <Flex.Item>
-            <Heading themeOverride={{primaryColor: 'white'}}>{I18n.t('Study tools')}</Heading>
+            <Heading themeOverride={{primaryColor: 'white'}}>{t('Study tools')}</Heading>
           </Flex.Item>
         </Flex>
       </Flex.Item>
@@ -88,26 +88,26 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
         <Flex gap="small">
           <Flex.Item>
             <CanvasAiInformation
-              title={I18n.t('Nutrition Facts')}
-              privacyNoticeText={I18n.t('AI Privacy Notice')}
-              featureName={I18n.t('Study Tools')}
-              modelName={I18n.t('Claude 3 Haiku')}
+              title={t('Nutrition Facts')}
+              privacyNoticeText={t('AI Privacy Notice')}
+              featureName={t('Study Tools')}
+              modelName={t('Claude 3 Haiku')}
               isTrainedWithUserData={false}
-              dataSharedWithModel={I18n.t('Page')}
-              dataSharedWithModelDescription={I18n.t(
+              dataSharedWithModel={t('Page')}
+              dataSharedWithModelDescription={t(
                 'Page content is sent to the model to generate study materials.',
               )}
-              dataRetention={I18n.t('Data is not stored or reused by the model.')}
-              dataLogging={I18n.t('Does Not Log Data')}
-              regionsSupported={I18n.t('US')}
+              dataRetention={t('Data is not stored or reused by the model.')}
+              dataLogging={t('Does Not Log Data')}
+              regionsSupported={t('US')}
               isPIIExposed={false}
-              isPIIExposedDescription={I18n.t(
+              isPIIExposedDescription={t(
                 'PII in page content may be included, but no PII is intentionally sent to the model.',
               )}
               isFeatureBehindSetting={true}
               isHumanInTheLoop={true}
-              expectedRisks={I18n.t('Generated study content may be inaccurate or incomplete.')}
-              intendedOutcomes={I18n.t(
+              expectedRisks={t('Generated study content may be inaccurate or incomplete.')}
+              intendedOutcomes={t(
                 'Students are able to efficiently study course material through AI-generated summaries, quizzes, and flashcards.',
               )}
               permissionsLevel={2}
@@ -117,7 +117,7 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
                   color="primary-inverse"
                   withBackground={false}
                   withBorder={false}
-                  screenReaderLabel={I18n.t('AI information')}
+                  screenReaderLabel={t('AI information')}
                   data-testid="study-assist-ai-info-button"
                 >
                   <IconInfoLine />
@@ -133,7 +133,7 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
               onClick={onDismiss}
               size="small"
               color="primary-inverse"
-              screenReaderLabel={I18n.t('Close')}
+              screenReaderLabel={t('Close')}
               data-testid="study-assist-close-button"
             />
           </Flex.Item>
@@ -143,10 +143,23 @@ function TrayHeader({onDismiss, closeButtonRef}: TrayHeaderProps) {
   )
 }
 
-export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: Props) {
+export default function StudyAssistTray({open, onDismiss, fetchAssistResponse, children}: Props) {
+  const {t} = useTranslation('study_assist')
   const closeButtonRef = useRef<Element | null>(null)
   const allowedPrompts = useMemo(() => window.ENV.STUDY_ASSIST_TOOLS ?? [], [])
   const {trackEvent} = usePendoTracking()
+
+  // DrawerLayout.Tray's built-in ESC handling only fires in overlay mode
+  // (`shouldCloseOnEscape && shouldOverlayTray`); on wide viewports the tray
+  // sits side-by-side and never honors ESC. Add our own listener.
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onDismiss()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [open, onDismiss])
 
   const handleAnalyticsEvent = useCallback(
     (event: string) => {
@@ -172,57 +185,64 @@ export default function StudyAssistTray({open, onDismiss, fetchAssistResponse}: 
           isError={isError}
           getFlashCards={getFlashCards}
           cardHeight="60vh"
+          onAnalyticsEvent={handleAnalyticsEvent}
         />
       </div>
     ),
-    [],
+    [handleAnalyticsEvent],
   )
 
   return (
-    <Tray
-      label={I18n.t('Study tools')}
-      placement="end"
-      size="regular"
-      open={open}
-      onDismiss={onDismiss}
-      defaultFocusElement={() => closeButtonRef.current}
-    >
-      <div
-        style={{
-          background: GRADIENT,
-          color: 'white',
-          minHeight: '100vh',
-          padding: '1rem',
-          boxSizing: 'border-box',
-        }}
-      >
-        <AssistProvider
-          fetchAssistResponse={fetchAssistResponse}
-          courseId={window.ENV.COURSE_ID}
-          pageId={window.ENV.WIKI_PAGE_ID}
-          fileId={window.ENV.FILE_ID}
-          featureSlug="canvas-lms:study-assist"
+    <View as="div" display="block" height="100vh" data-testid="study-assist-drawer-layout">
+      <DrawerLayout minWidth="40rem">
+        <DrawerLayout.Content label={t('Course content')}>{children}</DrawerLayout.Content>
+        <DrawerLayout.Tray
+          label={t('Study tools')}
+          placement="end"
+          open={open}
+          onDismiss={onDismiss}
+          defaultFocusElement={() => closeButtonRef.current}
         >
-          <TrayHeader onDismiss={onDismiss} closeButtonRef={closeButtonRef} />
-          {allowedPrompts.length > 0 ? (
-            <div style={{padding: '0 1rem'}}>
-              <AssistContent
-                chatEnabled={false}
-                showLargePrompts={true}
-                onAnalyticsEvent={handleAnalyticsEvent}
-                allowedPrompts={allowedPrompts}
-                renderFlashCards={renderFlashCards}
-              />
-            </div>
-          ) : (
-            <View as="div" padding="large" textAlign="center">
-              <Text color="primary-inverse" data-testid="study-assist-no-tools">
-                {I18n.t('No study tools are currently available.')}
-              </Text>
-            </View>
-          )}
-        </AssistProvider>
-      </div>
-    </Tray>
+          <div
+            data-testid="study-assist-drawer-tray"
+            style={{
+              background: GRADIENT,
+              color: 'white',
+              width: '25rem',
+              minHeight: '100vh',
+              padding: '1rem',
+              boxSizing: 'border-box',
+            }}
+          >
+            <AssistProvider
+              fetchAssistResponse={fetchAssistResponse}
+              courseId={window.ENV.COURSE_ID}
+              pageId={window.ENV.WIKI_PAGE_ID}
+              fileId={window.ENV.FILE_ID}
+              featureSlug="canvas-lms:study-assist"
+            >
+              <TrayHeader onDismiss={onDismiss} closeButtonRef={closeButtonRef} />
+              {allowedPrompts.length > 0 ? (
+                <div style={{padding: '0 1rem'}}>
+                  <AssistContent
+                    chatEnabled={false}
+                    showLargePrompts={true}
+                    onAnalyticsEvent={handleAnalyticsEvent}
+                    allowedPrompts={allowedPrompts}
+                    renderFlashCards={renderFlashCards}
+                  />
+                </div>
+              ) : (
+                <View as="div" padding="large" textAlign="center">
+                  <Text color="primary-inverse" data-testid="study-assist-no-tools">
+                    {t('No study tools are currently available.')}
+                  </Text>
+                </View>
+              )}
+            </AssistProvider>
+          </div>
+        </DrawerLayout.Tray>
+      </DrawerLayout>
+    </View>
   )
 }

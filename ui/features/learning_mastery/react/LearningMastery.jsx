@@ -23,7 +23,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 
 import OutcomeGradebookView from '../backbone/views/OutcomeGradebookView'
 import GradebookMenu from '@canvas/gradebook-menu'
-import Paginator from '@canvas/instui-bindings/react/Paginator'
+import {Paginator} from '@instructure/platform-instui-bindings'
 
 function normalizeSections(options) {
   const sections = options.sections || []

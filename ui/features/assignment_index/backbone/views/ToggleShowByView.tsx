@@ -103,24 +103,28 @@ export default class ToggleShowByView extends Backbone.View {
           break
       }
     })
+    // @ts-expect-error TS7 migration
     const overdue_group = new AssignmentGroup({
       id: 'overdue',
       name: I18n.t('overdue_assignments', 'Overdue Assignments'),
       // @ts-expect-error
       assignments: overdue,
     })
+    // @ts-expect-error TS7 migration
     const upcoming_group = new AssignmentGroup({
       id: 'upcoming',
       name: I18n.t('upcoming_assignments', 'Upcoming Assignments'),
       // @ts-expect-error
       assignments: upcoming,
     })
+    // @ts-expect-error TS7 migration
     const undated_group = new AssignmentGroup({
       id: 'undated',
       name: I18n.t('undated_assignments', 'Undated Assignments'),
       // @ts-expect-error
       assignments: undated,
     })
+    // @ts-expect-error TS7 migration
     const past_group = new AssignmentGroup({
       id: 'past',
       name: I18n.t('past_assignments', 'Past Assignments'),

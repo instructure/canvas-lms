@@ -75,9 +75,7 @@ module Services
       end
 
       def config
-        config_file = ConfigFile.load("notification_service") || {}
-
-        config_file.dup
+        (Canvas.load_config_file_or_consul("notification_service", failsafe_cache: true) || {}).dup
       end
     end
   end

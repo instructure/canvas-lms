@@ -653,6 +653,14 @@ class DeveloperKey < ApplicationRecord
       ContextExternalTool.where(id: tool_ids).preload(:context).each do |tool|
         next unless tool.context
 
+        if (account.blank? || account.site_admin?) && !tool.root_account.feature_enabled?(:lti_registrations_templates)
+          Rails.logger.info(
+            "Replacing tool configuration for tool #{tool.global_id} " \
+            "(registration #{lti_registration.global_id}) with site admin configuration. " \
+            "Old settings: #{tool.settings.to_json}"
+          )
+        end
+
         lti_registration.new_external_tool(
           tool.context,
           existing_tool: tool

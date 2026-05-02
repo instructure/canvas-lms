@@ -414,8 +414,7 @@ class UsersController < ApplicationController
       if should_show_educator_dashboard?
         css_bundle :educator_dashboard
         add_body_class "educator-dashboard"
-        educator_config = @current_user.get_preference(:educator_dashboard_config) || {}
-        educator_config["layout"] ||= WidgetDashboardLayoutValidator.default_educator_layout
+        educator_config = @current_user.educator_dashboard_config
 
         # Widget composes announcement text across multiple courses. Scope the
         # RCE JWT to the user (no single course/account @context is available)
@@ -519,6 +518,7 @@ class UsersController < ApplicationController
              CREATE_COURSES_PERMISSIONS: {
                PERMISSION: course_permissions[:can_create],
                RESTRICT_TO_MCC_ACCOUNT: course_permissions[:restrict_to_mcc],
+               VIEWABLE_ACCOUNT_IDS: course_permissions[:viewable_account_ids],
              },
              OBSERVED_USERS_LIST: observed_users_list,
              CAN_ADD_OBSERVEE: @current_user
@@ -900,9 +900,22 @@ class UsersController < ApplicationController
   # @API List the TODO items
   # A paginated list of the current user's list of todo items.
   #
-  # @argument include[] [String, "ungraded_quizzes"]
+  # @argument include[] [String, "ungraded_quizzes"|"grading_counts"]
   #   "ungraded_quizzes":: Optionally include ungraded quizzes (such as practice quizzes and surveys) in the list.
   #                        These will be returned under a +quiz+ key instead of an +assignment+ key in response elements.
+  #   "grading_counts":: Optionally include segmented submission counts on grading-type items:
+  #                      +on_time_needs_grading_count+, +late_needs_grading_count+,
+  #                      +resubmitted_needs_grading_count+, +submitted_submissions_count+, and
+  #                      +total_submissions_count+. Only honored when the account has the
+  #                      +educator_dashboard+ feature enabled; otherwise silently ignored.
+  #
+  # @argument course_ids[] [String]
+  #   Restrict results to todo items in the given courses. Accepts numeric IDs
+  #   and SIS IDs of the form +sis_course_id:foo+. Applies to grading, submitting,
+  #   checkpoint, and ungraded quiz items alike. Courses the user is not enrolled
+  #   in (or that cannot be resolved) are silently dropped. When the parameter is
+  #   present but no valid courses resolve, an empty list is returned rather than
+  #   the unfiltered list.
   #
   # There is a limit to the number of items returned.
   #
@@ -948,13 +961,21 @@ class UsersController < ApplicationController
   def todo_items
     GuardRail.activate(:secondary) do
       bookmark = Plannable::Bookmarker.new(Assignment, false, [:due_at, :created_at], :id)
-      grading_scope = @current_user.assignments_needing_grading(scope_only: true)
-                                   .reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz, :duplicate_of)
+      include_grading_counts = Array(params[:include]).include?("grading_counts")
+      # Assumes Shard.current == @current_user.shard (true for /self/todo).
+      # Cross-shard callers would need Shard.relative_id_for translation here.
+      course_ids_filter = api_find_all(Course, Array(params[:course_ids])).pluck(:id) if params.key?(:course_ids)
+      submitting_course_ids = course_ids_filter || @current_user.courses.pluck(:id)
+
+      grading_scope = @current_user.assignments_needing_grading(
+        scope_only: true,
+        course_ids: course_ids_filter
+      ).reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz, :duplicate_of)
       submitting_scope = @current_user
                          .assignments_needing_submitting(
                            include_ungraded: true,
                            scope_only: true,
-                           course_ids: @current_user.courses.pluck(:id),
+                           course_ids: submitting_course_ids,
                            include_concluded: false
                          )
                          .reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
@@ -964,7 +985,7 @@ class UsersController < ApplicationController
         assignment.context.grants_right?(@current_user, session, :manage_grades)
       end
       grading_collection = BookmarkedCollection.transform(grading_collection) do |a|
-        todo_item_json(a, @current_user, session, "grading")
+        todo_item_json(a, @current_user, session, "grading", include_grading_counts:)
       end
       submitting_collection = BookmarkedCollection.wrap(bookmark, submitting_scope)
       submitting_collection = BookmarkedCollection.transform(submitting_collection) do |a|
@@ -977,18 +998,22 @@ class UsersController < ApplicationController
 
       # Add discussion checkpoint assignments for courses with checkpoints enabled
       course_ids_with_checkpoints = @current_user.course_ids_with_checkpoints_enabled
+      course_ids_with_checkpoints &= course_ids_filter if course_ids_filter
       unless course_ids_with_checkpoints.empty?
         sub_assignment_bookmark = Plannable::Bookmarker.new(SubAssignment, false, [:due_at, :created_at], :id)
 
         # Add checkpoint assignments needing grading
-        checkpoint_grading_scope = @current_user.assignments_needing_grading(scope_only: true, is_sub_assignment: true)
-                                                .reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :duplicate_of)
+        checkpoint_grading_scope = @current_user.assignments_needing_grading(
+          scope_only: true,
+          is_sub_assignment: true,
+          course_ids: course_ids_filter
+        ).reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :duplicate_of)
         checkpoint_grading_collection = BookmarkedCollection.wrap(sub_assignment_bookmark, checkpoint_grading_scope)
         checkpoint_grading_collection = BookmarkedCollection.filter(checkpoint_grading_collection) do |assignment|
           assignment.context.grants_right?(@current_user, session, :manage_grades)
         end
         checkpoint_grading_collection = BookmarkedCollection.transform(checkpoint_grading_collection) do |a|
-          todo_item_json(a, @current_user, session, "grading")
+          todo_item_json(a, @current_user, session, "grading", include_grading_counts:)
         end
         collections << ["checkpoint_grading", checkpoint_grading_collection]
 
@@ -1012,7 +1037,8 @@ class UsersController < ApplicationController
         quizzes_scope = @current_user
                         .ungraded_quizzes(
                           needing_submitting: true,
-                          scope_only: true
+                          scope_only: true,
+                          course_ids: course_ids_filter
                         )
                         .reorder(:due_at, :id)
         quizzes_collection = BookmarkedCollection.wrap(quizzes_bookmark, quizzes_scope)
@@ -1808,7 +1834,16 @@ class UsersController < ApplicationController
     when request.get?
       return unless authorized_action(user, @current_user, :read)
 
-      render json: BOOLEAN_PREFS.index_with { |pref| !!user.preferences[pref] }
+      results = BOOLEAN_PREFS.index_with { |pref| !!user.preferences[pref] }
+
+      if params.key?(:include) && params[:include].include?("mobile_settings")
+        results[:pendo_mobile_teacher_api_key] = DynamicSettings.find(tree: :private)[:pendo_mobile_api_key_teacher, failsafe: nil]
+        results[:pendo_mobile_parent_api_key] = DynamicSettings.find(tree: :private)[:pendo_mobile_api_key_parent, failsafe: nil]
+        results[:pendo_mobile_student_api_key] = DynamicSettings.find(tree: :private)[:pendo_mobile_api_key_student, failsafe: nil]
+        results[:usage_metrics] = should_track_usage
+      end
+
+      render json: results
     when request.put?
       return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
 

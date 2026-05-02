@@ -381,6 +381,8 @@ module.exports = {
           // TODO: remove these (revealed by TS 6.0 upgrade, see CFA-744)
           'ui/shared/global/env/EnvUserMerge.d.ts',
           'ui/shared/rubrics/react/RubricAssignment/components/RubricCreateModal.tsx',
+          // TODO: remove (pre-existing violation)
+          'ui/shared/rubrics/react/RubricForm/hooks/useSaveRubricForm.tsx',
         ],
       },
       to: {
@@ -403,7 +405,14 @@ module.exports = {
       name: 'no-feature-interdependence',
       comment: 'One feature should not depend on another feature (in a separate folder)',
       severity: 'error',
-      from: {path: '(^ui/features/)([^/]+)/'},
+      from: {
+        path: '(^ui/features/)([^/]+)/',
+        pathNot: [
+          // TODO: remove (pre-existing violations)
+          'ui/features/gradebook/react/AssignmentPostingPolicyTray/ScheduledReleasePolicy/utils/utils.ts',
+          'ui/features/assignment_edit/react/AssetProcessorsForAssignment.tsx',
+        ],
+      },
       to: {path: '^$1', pathNot: '$1$2'},
     },
   ],

@@ -165,6 +165,32 @@ module ConditionalRelease
         expect(visible_assmts).to include(@set1_assmt1)
       end
 
+      it "auto-assigns top range when overlapping ranges share a boundary at 100%" do
+        top_range = @rule.scoring_ranges.find_by(lower_bound: 0.7)
+        top_range.update!(lower_bound: 1.0)
+        middle_range = @rule.scoring_ranges.find_by(lower_bound: 0.4)
+        middle_range.update!(lower_bound: 0.0, upper_bound: 1.0)
+
+        @trigger_assmt.grade_student(@student, grade: 10, grader: @teacher)
+        run_jobs
+
+        visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
+        expect(visible_assmts).to include(@set1_assmt1)
+        expect(visible_assmts).not_to include(@set2_assmt1)
+      end
+
+      it "does not auto-assign when ranges intentionally overlap below 100%" do
+        middle_range = @rule.scoring_ranges.find_by(lower_bound: 0.4)
+        middle_range.update!(upper_bound: 0.9)
+
+        @trigger_assmt.grade_student(@student, grade: 8, grader: @teacher)
+        run_jobs
+
+        visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
+        expect(visible_assmts).not_to include(@set1_assmt1)
+        expect(visible_assmts).not_to include(@set2_assmt1)
+      end
+
       it "evaluates sequential module requirements after mastery paths assignment" do
         module_with_sequential = @course.context_modules.create!(
           name: "Sequential Module",

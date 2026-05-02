@@ -119,7 +119,7 @@ export const useShouldShowContent = (
 
   /* discussion moderators viewing a new or still unpublished discussion */
   const shouldShowSaveAndPublishButton =
-    !isAnnouncement && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published
+    !isAnnouncement && !!ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !published
 
   const shouldShowPodcastFeedOption =
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !ENV.K5_HOMEROOM_COURSE

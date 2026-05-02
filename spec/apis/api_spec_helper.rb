@@ -136,7 +136,7 @@ def params_from_with_nesting(method, path)
 end
 
 def api_json_response(objects, opts = nil)
-  JSON.parse(objects.to_json(opts.merge(include_root: false)))
+  JSON.parse(objects.as_json(opts.merge(include_root: false)).to_json)
 end
 
 def check_document(html, course, attachment, include_verifiers, location)

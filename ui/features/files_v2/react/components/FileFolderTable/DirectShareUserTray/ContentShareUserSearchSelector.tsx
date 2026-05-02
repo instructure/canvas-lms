@@ -20,9 +20,8 @@ import {forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState}
 import {useScope as createI18nScope} from '@canvas/i18n'
 import useContentShareUserSearchApi from '@canvas/direct-sharing/react/effects/useContentShareUserSearchApi'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
-import CanvasAsyncSelect, {
-  type CanvasAsyncSelectProps,
-} from '@canvas/instui-bindings/react/AsyncSelect'
+import {CanvasAsyncSelect, type CanvasAsyncSelectProps} from '@instructure/platform-instui-bindings'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 const MINIMUM_SEARCH_LENGTH = 3
 
@@ -42,7 +41,20 @@ type ContentShareUserSearchSelectorProps = {
   courseId: string
   onUserSelected: (user?: BasicUser) => void
   selectedUsers: BasicUser[]
-} & Omit<CanvasAsyncSelectProps, 'renderLabel' | 'inputRef' | 'messages' | 'isRequired'>
+} & Omit<
+  CanvasAsyncSelectProps,
+  | 'renderLabel'
+  | 'inputRef'
+  | 'messages'
+  | 'isRequired'
+  | 'isLoading'
+  | 'onInputChange'
+  | 'noOptionsLabel'
+  | 'onOptionSelected'
+  | 'inputValue'
+  | 'assistiveText'
+  | 'placeholder'
+>
 
 export type ContentShareUserSearchSelectorRef = {
   validate: () => boolean
@@ -136,7 +148,7 @@ const ContentShareUserSearchSelector = forwardRef<
       placeholder: I18n.t('Begin typing to search'),
       noOptionsLabel,
       isRequired: true,
-      messages: error ? [{text: error, type: 'newError'}] : [],
+      messages: (error ? [{text: error, type: 'newError'}] : []) as FormMessage[],
       onInputChange: handleInputChanged,
       onOptionSelected: handleUserSelected,
     }),

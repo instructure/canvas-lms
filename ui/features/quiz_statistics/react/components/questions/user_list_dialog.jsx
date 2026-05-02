@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 
@@ -41,6 +42,8 @@ const UserListDialog = ({answer_id, user_names}) => {
         open={displayingDialog}
         onDismiss={() => displayDialog(false)}
         label={I18n.t('user_names', 'User Names')}
+        closeButtonLabel={I18n.t('Close')}
+        errorComponent={canvasErrorComponent()}
       >
         <div key={'answer-users-' + answer_id} style={{width: 500}}>
           <ul className="answer-response-list">

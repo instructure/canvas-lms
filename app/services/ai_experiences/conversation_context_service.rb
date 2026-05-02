@@ -22,8 +22,8 @@ module AiExperiences
   class ConversationContextService
     PROMPT_CODE = "alpha"
 
-    def initialize
-      @client = LlmConversation::HttpClient.new
+    def initialize(account:)
+      @client = LlmConversation::HttpClient.new(account:)
     end
 
     def create(ai_experience:)

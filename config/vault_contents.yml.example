@@ -83,6 +83,9 @@ development:
         # app_host: "http://inst-fs-api.<your INST_DOMAIN>"
         app_host: "http://api.inst-fs.docker"
         secret: "YXN0cmluZ3RoYXRpc2FjdHVhbGx5MzJieXRlc2xvbmc="
+#      kafka_events:
+#        brokers: localhost:9094 # or `kafka:9092` inside docker network
+#        security_protocol: PLAINTEXT
 #      linked_in_creds:
 #        api_key: <api_key>
 #        secret_key: <secret_key>

@@ -20,6 +20,7 @@ import CollectionView from '@canvas/backbone-collection-view'
 import template from '../../jst/addUnassignedUsers.handlebars'
 import itemTemplate from '../../jst/addUnassignedUser.handlebars'
 
+// @ts-expect-error TS7 migration
 export default class AddUnassignedUsersView extends CollectionView {
   // @ts-expect-error - Legacy Backbone typing
   initialize(options) {
@@ -33,7 +34,9 @@ export default class AddUnassignedUsersView extends CollectionView {
   }
 
   attach() {
+    // @ts-expect-error TS7 migration
     this.collection.on('add remove change reset', this.render, this)
+    // @ts-expect-error TS7 migration
     this.collection.on('setParam deleteParam', this.checkParam, this)
   }
 
@@ -44,6 +47,7 @@ export default class AddUnassignedUsersView extends CollectionView {
       // @ts-expect-error - Backbone View property
       this.lastRequest.abort()
     }
+    // @ts-expect-error TS7 migration
     this.collection.termError = value === false
     if (value) {
       // @ts-expect-error - Backbone View property
@@ -53,9 +57,7 @@ export default class AddUnassignedUsersView extends CollectionView {
     }
   }
 
-  // @ts-expect-error - Legacy Backbone typing
   render() {
-    // @ts-expect-error - Legacy Backbone typing
     super.render()
 
     // If a parent view is provided then retain focus on it
@@ -72,13 +74,18 @@ export default class AddUnassignedUsersView extends CollectionView {
 
   toJSON() {
     return {
+      // @ts-expect-error TS7 migration
       users: this.collection.toJSON(),
       term:
+        // @ts-expect-error TS7 migration
         this.collection.options.params != null
-          ? this.collection.options.params.search_term
+          ? // @ts-expect-error TS7 migration
+            this.collection.options.params.search_term
           : undefined,
+      // @ts-expect-error TS7 migration
       termError: this.collection.termError,
     }
   }
 }
+// @ts-expect-error TS7 migration
 AddUnassignedUsersView.prototype.template = template

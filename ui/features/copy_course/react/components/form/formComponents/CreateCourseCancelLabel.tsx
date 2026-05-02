@@ -18,10 +18,9 @@
 
 import React from 'react'
 import {Text} from '@instructure/ui-text'
-import {useScope as createI18nScope} from '@canvas/i18n'
-
-const I18n = createI18nScope('content_copy_redesign')
+import {useTranslation} from '@canvas/i18next'
 
 export const CreateCourseCancelLabel = () => {
-  return <Text>{I18n.t('Cancel')}</Text>
+  const {t} = useTranslation('content_copy_redesign')
+  return <Text>{t('Cancel')}</Text>
 }

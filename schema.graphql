@@ -112,13 +112,14 @@ type Account implements LegacyIDInterface & Node {
     Returns the first _n_ elements from the list.
     """
     first: Int
+    hasTagsInState: InstitutionalTagWorkflowState
 
     """
     Returns the last _n_ elements from the list.
     """
     last: Int
     searchTerm: String
-    workflowState: String = "active"
+    workflowState: InstitutionalTagWorkflowState = active
   ): InstitutionalTagCategoryConnection
   institutionalTagsConnection(
     """
@@ -142,7 +143,7 @@ type Account implements LegacyIDInterface & Node {
     """
     last: Int
     searchTerm: String
-    workflowState: String = "active"
+    workflowState: InstitutionalTagWorkflowState = active
   ): InstitutionalTagConnection
   instructureIdentityOrganizationId: String
   name: String
@@ -5059,6 +5060,7 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   """
   published: Boolean
   size: String
+  sizeBytes: Int
   submissionPreviewUrl(submissionId: ID): URL
   thumbnailUrl: URL
   title: String
@@ -5890,7 +5892,7 @@ type InstitutionalTagCategory implements LegacyIDInterface & Node & Timestamped 
     Returns the last _n_ elements from the list.
     """
     last: Int
-    workflowState: String = "active"
+    workflowState: InstitutionalTagWorkflowState = active
   ): InstitutionalTagConnection
   updatedAt: DateTime
   workflowState: String!
@@ -5979,6 +5981,19 @@ Specify sort field and direction for results
 input InstitutionalTagUsersSortInput {
   direction: InstitutionalTagUsersSortDirection
   field: InstitutionalTagUsersSortField!
+}
+
+"""
+Workflow-state filter accepted by institutional tag queries
+"""
+enum InstitutionalTagWorkflowState {
+  active
+
+  """
+  Do not filter by workflow_state
+  """
+  any
+  deleted
 }
 
 type InstructorCourseInfo {

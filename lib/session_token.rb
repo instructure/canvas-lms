@@ -51,16 +51,48 @@ class SessionToken
     token.created_at = Time.zone.at(result["created_at"])
     token.signature = result["signature"]
     token
-  rescue JSON::ParserError, ArgumentError
+  rescue JSON::ParserError, ArgumentError => e
+    Rails.logger.error("[#{name}] #{e.message}")
     nil
+  end
+
+  def self.report_error(reason:)
+    return unless Account.site_admin.feature_enabled? :log_session_token_failures
+
+    title, message = case reason
+                     when :parsing_error
+                       ["Parsing Error", "failed to parse session token"]
+                     when :token_invalid
+                       ["Invalid Token", "session token failed validation"]
+                     else
+                       [reason.to_s, reason.to_s]
+                     end
+
+    InstStatsd::Statsd.event(
+      "#{name}: #{title}",
+      "#{name} #{message}. Request ID: #{RequestContext::Generator.request_id || '""'}",
+      tags: Utils::InstStatsdUtils::Tags.tags_for(Shard.current),
+      type: name,
+      alert_type: :error
+    )
   end
 
   VALIDITY_PERIOD = 30
 
   def valid?
     now = Time.now.utc
-    created_at.between?(now - VALIDITY_PERIOD.seconds, now + VALIDITY_PERIOD.seconds) &&
-      Canvas::Security.verify_hmac_sha1(signature, signature_string)
+
+    unless created_at.between?(now - VALIDITY_PERIOD.seconds, now + VALIDITY_PERIOD.seconds)
+      Rails.logger.error(
+        "[#{self.class.name}] Expired token. Expected a time between #{now - VALIDITY_PERIOD.seconds} and #{now + VALIDITY_PERIOD.seconds}, but got #{created_at}"
+      )
+      return false
+    end
+
+    return true if Canvas::Security.verify_hmac_sha1(signature, signature_string)
+
+    Rails.logger.error("[#{self.class.name}] HMAC validation failed.")
+    false
   end
 
   def as_json

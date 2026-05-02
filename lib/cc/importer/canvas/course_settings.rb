@@ -152,6 +152,17 @@ module CC::Importer::Canvas
       post_manually = get_bool_val(doc, "default_post_policy post_manually")
       course[:default_post_policy] = { post_manually: } unless post_manually.nil?
 
+      use_default = get_bool_val(doc, "use_default_discussion_settings")
+      course[:use_default_discussion_settings] = use_default unless use_default.nil?
+
+      if (dds_node = doc.at_css("default_discussion_settings"))
+        dds = {}
+        dds_node.children.each do |child|
+          dds[child.name] = child.text if child.element?
+        end
+        course[:default_discussion_settings] = dds if dds.present?
+      end
+
       course
     end
 

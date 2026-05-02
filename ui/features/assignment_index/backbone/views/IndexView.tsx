@@ -196,6 +196,7 @@ IndexView.prototype.afterRender = function () {
   }
   this.filterKeyBindings()
   if (!ENV.disable_keyboard_shortcuts) {
+    // @ts-expect-error TS7 migration
     this.kbDialog = new KeyboardNavDialog().render(
       keyboardNavTemplate({
         keyBindings: this.keyBindings,

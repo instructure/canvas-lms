@@ -3119,6 +3119,62 @@ describe Course do
         end
       end
 
+      describe "TAB_NOTEBOOK" do
+        let(:student) do
+          user_factory(active_all: true).tap do |s|
+            @course.enroll_student(s, enrollment_state: "active")
+          end
+        end
+
+        before do
+          @course.account.enable_feature!(:notebook)
+        end
+
+        after do
+          @course.account.disable_feature!(:notebook)
+        end
+
+        it "includes Notebook tab for students when feature flag is enabled" do
+          tabs = @course.tabs_available(student)
+          notebook_tab = tabs.find { |t| t[:id] == Course::TAB_NOTEBOOK }
+
+          expect(notebook_tab).not_to be_nil
+        end
+
+        it "does not include Notebook tab when feature flag is disabled" do
+          @course.account.disable_feature!(:notebook)
+
+          tabs = @course.tabs_available(student)
+          expect(tabs.find { |t| t[:id] == Course::TAB_NOTEBOOK }).to be_nil
+        end
+
+        it "does not include Notebook tab for teachers" do
+          tabs = @course.tabs_available(@user)
+          expect(tabs.find { |t| t[:id] == Course::TAB_NOTEBOOK }).to be_nil
+        end
+
+        it "respects a custom tab position when reordered" do
+          @course.tab_configuration = [
+            { id: Course::TAB_NOTEBOOK },
+            { id: Course::TAB_ANNOUNCEMENTS },
+            { id: Course::TAB_ASSIGNMENTS },
+            { id: Course::TAB_DISCUSSIONS },
+            { id: Course::TAB_GRADES },
+            { id: Course::TAB_PAGES },
+            { id: Course::TAB_FILES },
+            { id: Course::TAB_SYLLABUS },
+            { id: Course::TAB_OUTCOMES },
+            { id: Course::TAB_QUIZZES },
+            { id: Course::TAB_MODULES }
+          ]
+          @course.save!
+
+          tab_ids = @course.tabs_available(student).pluck(:id)
+          expect(tab_ids[0]).to eq(Course::TAB_HOME)
+          expect(tab_ids[1]).to eq(Course::TAB_NOTEBOOK)
+        end
+      end
+
       describe "TAB_SEARCH" do
         before do
           allow(SmartSearch).to receive(:bedrock_client).and_return(double)
@@ -6906,6 +6962,39 @@ describe Course do
         expect(@course.grants_right?(@teacher, :direct_share)).to be(true)
       end
     end
+
+    describe "update_course_details" do
+      context "when course_navigation_and_feature_options_permissions is disabled" do
+        it "grants :update_course_details when teacher has :manage_course_content_edit" do
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(true)
+        end
+
+        it "does not grant :update_course_details when :manage_course_content_edit is revoked" do
+          RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(false)
+        end
+      end
+
+      context "when course_navigation_and_feature_options_permissions is enabled" do
+        before do
+          @course.root_account.enable_feature!(:course_navigation_and_feature_options_permissions)
+        end
+
+        it "grants :update_course_details via :manage_course_details even when :manage_course_content_edit is revoked" do
+          RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(true)
+        end
+
+        it "does not grant :update_course_details when :manage_course_details is revoked" do
+          RoleOverride.create!(context: @course.account, permission: "manage_course_details", role: teacher_role, enabled: false)
+          teacher_in_course(active_all: true)
+          expect(@course.grants_right?(@teacher, :update_course_details)).to be(false)
+        end
+      end
+    end
   end
 
   context "sharding" do
@@ -8285,6 +8374,71 @@ describe Course do
         expect(course.can_stop_being_template?).to be false
         course.template = false
         expect(course).not_to be_valid
+      end
+    end
+
+    describe "#snapshot_account_default_discussion_settings" do
+      let(:account) { Account.default }
+      let(:template_defaults) do
+        {
+          anonymous_state: "full_anonymity",
+          require_initial_post: false,
+          allow_rating: false,
+          sort_order: "desc"
+        }
+      end
+      let(:template_course) do
+        Course.create!(template: true).tap do |c|
+          c.default_discussion_settings = template_defaults
+          c.save!
+        end
+      end
+
+      before do
+        account.enable_feature!(:default_discussion_options)
+        account.update!(course_template: template_course)
+      end
+
+      it "snapshots template default discussion settings onto new course" do
+        course = account.courses.create!
+        expect(course.default_discussion_settings).to include(
+          anonymous_state: "full_anonymity",
+          require_initial_post: false,
+          allow_rating: false,
+          sort_order: "desc"
+        )
+      end
+
+      it "snapshots use_default_discussion_settings from template when true" do
+        template_course.use_default_discussion_settings = true
+        template_course.save!
+
+        course = account.courses.create!
+        expect(course.use_default_discussion_settings).to be true
+      end
+
+      it "snapshots use_default_discussion_settings from template when false" do
+        template_course.use_default_discussion_settings = false
+        template_course.save!
+
+        course = account.courses.create!
+        expect(course.use_default_discussion_settings).to be false
+      end
+
+      it "does not snapshot when template has no default_discussion_settings" do
+        template_course.default_discussion_settings = nil
+        template_course.save!
+
+        course = account.courses.create!
+        expect(course.default_discussion_settings).to be_nil
+      end
+
+      it "does not snapshot when account has no course template" do
+        account.update!(course_template_id: 0)
+
+        course = account.courses.create!
+        expect(course.default_discussion_settings).to be_nil
+        expect(course.use_default_discussion_settings).to be false
       end
     end
 
@@ -10496,6 +10650,110 @@ describe Course do
         expect(Accessibility::ResourceScannerService).not_to receive(:call)
 
         course.update!(syllabus_body: "<h1>Test Syllabus</h1>")
+      end
+    end
+  end
+
+  describe ".preload_active_enrollments_for_permissions" do
+    let(:user) { user_model }
+    let(:courses) do
+      Array.new(3) do
+        c = course_factory(active_all: true)
+        c.enroll_teacher(user, enrollment_state: "active")
+        c
+      end
+    end
+
+    def count_enrollment_selects(&)
+      count = 0
+      counter = lambda do |_name, _start, _finish, _id, payload|
+        sql = payload[:sql].to_s
+        count += 1 if sql.match?(/FROM (?:"\w+"\.)?"enrollments"/) && sql.include?("enrollment_states")
+      end
+      ActiveSupport::Notifications.subscribed(counter, "sql.active_record", &)
+      count
+    end
+
+    before do
+      courses # force creation before measuring
+      Rails.cache.clear
+    end
+
+    it "collapses per-course permission checks to a single query" do
+      RequestCache.enable do
+        count = count_enrollment_selects do
+          Course.preload_active_enrollments_for_permissions(user, courses)
+          courses.each { |c| c.active_enrollment_allows(user, :manage_course_content_edit) }
+        end
+        expect(count).to eq(1)
+      end
+    end
+
+    it "issues a query per course without the preload (baseline)" do
+      RequestCache.enable do
+        count = count_enrollment_selects do
+          courses.each { |c| c.active_enrollment_allows(user, :manage_course_content_edit) }
+        end
+        expect(count).to eq(courses.size)
+      end
+    end
+
+    it "returns the same permission result as direct checks" do
+      expected = courses.map { |c| c.active_enrollment_allows(user, :manage_course_content_edit) }
+      Rails.cache.clear
+      RequestCache.enable do
+        Course.preload_active_enrollments_for_permissions(user, courses)
+        actual = courses.map { |c| c.active_enrollment_allows(user, :manage_course_content_edit) }
+        expect(actual).to eq(expected)
+      end
+    end
+
+    it "filters out non-admin enrollments for unpublished courses" do
+      unpublished = course_factory(account: Account.default)
+      unpublished.enroll_student(user, enrollment_state: "active")
+      unpublished.enroll_teacher(user, enrollment_state: "active")
+      expect(unpublished).to be_created.or be_claimed
+      RequestCache.enable do
+        Course.preload_active_enrollments_for_permissions(user, [unpublished])
+        cached = RequestCache.cache("active_enrollments_for_permissions2", user, unpublished, true) { :missing }
+        expect(cached).not_to eq(:missing)
+        expect(cached.map(&:type)).to contain_exactly("TeacherEnrollment")
+      end
+    end
+
+    it "no-ops with nil user" do
+      expect { Course.preload_active_enrollments_for_permissions(nil, courses) }.not_to raise_error
+    end
+
+    it "no-ops with empty courses" do
+      expect { Course.preload_active_enrollments_for_permissions(user, []) }.not_to raise_error
+    end
+
+    context "with courses on multiple shards" do
+      specs_require_sharding
+
+      it "groups by shard and returns correct permission results across shards" do
+        cross_shard_user = user_factory(active_all: true)
+        shard1_course = nil
+        shard2_course = nil
+
+        @shard1.activate do
+          shard1_course = course_factory(active_all: true, account: Account.create!)
+          shard1_course.enroll_teacher(cross_shard_user, enrollment_state: "active")
+        end
+
+        @shard2.activate do
+          shard2_course = course_factory(active_all: true, account: Account.create!)
+          shard2_course.enroll_teacher(cross_shard_user, enrollment_state: "active")
+        end
+
+        Rails.cache.clear
+
+        RequestCache.enable do
+          Course.preload_active_enrollments_for_permissions(cross_shard_user, [shard1_course, shard2_course])
+          expect(shard1_course.active_enrollment_allows(cross_shard_user, :manage_course_content_edit)).to be true
+          expect(shard2_course.active_enrollment_allows(cross_shard_user, :manage_course_content_edit)).to be true
+        end
       end
     end
   end

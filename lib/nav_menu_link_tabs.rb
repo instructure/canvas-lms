@@ -158,8 +158,12 @@ module NavMenuLinkTabs
 
   module HrefHelper
     # Interprets tabs created by tabs_for_context
-    def nav_menu_link_url(url, _opts = {})
-      url
+    def nav_menu_link_url(url, opts = {})
+      if opts[:host] && url.start_with?("/")
+        "#{HostUrl.protocol}://#{opts[:host]}#{url}"
+      else
+        url
+      end
     end
   end
 

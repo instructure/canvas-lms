@@ -400,7 +400,7 @@ describe "conversations new" do
           get "/conversations"
           f("button[data-testid='compose']").click
           wait_for_ajaximations
-          expect(f("#nutrition_facts_trigger")).to be_present
+          expect(f("[data-testid='nutrition-facts-trigger']")).to be_present
         end
       end
     end

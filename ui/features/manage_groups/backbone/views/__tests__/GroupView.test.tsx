@@ -34,13 +34,16 @@ describe('GroupView', () => {
   let container
 
   const createView = () => {
+    // @ts-expect-error TS7 migration
     group = new Group({
       id: 42,
       name: 'Foo Group',
       members_count: 7,
     })
 
+    // @ts-expect-error TS7 migration
     users = new GroupUserCollection(
+      // @ts-expect-error TS7 migration
       [
         {
           id: 1,
@@ -59,9 +62,9 @@ describe('GroupView', () => {
     users.loadedAll = true
     // @ts-expect-error - Legacy Backbone typing
     group.users = () => users
-    // @ts-expect-error - Backbone View property
     group.set('leader', {id: 1})
 
+    // @ts-expect-error TS7 migration
     const groupUsersView = new GroupUsersView({
       model: group,
       collection: users,

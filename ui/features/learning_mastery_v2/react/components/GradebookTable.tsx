@@ -16,47 +16,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo, useCallback} from 'react'
-import {StudentCell} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/StudentCell'
-import {StudentCellPopover} from './grid/StudentCellPopover'
-import {StudentHeader} from './grid/StudentHeader'
-import {OutcomeHeader} from './grid/OutcomeHeader'
-import {
-  STUDENT_COLUMN_WIDTH,
-  STUDENT_COLUMN_RIGHT_PADDING,
-  COLUMN_PADDING,
-  GradebookSettings,
-  DEFAULT_GRADEBOOK_SETTINGS,
-} from '@canvas/outcomes/react/utils/constants'
-import {
-  COLUMN_WIDTH,
-  DisplayFilter,
-  NameDisplayFormat,
-  CELL_HEIGHT,
-} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {
-  Student,
-  Outcome,
-  StudentRollupData,
-  OutcomeRollup,
-} from '@canvas/outcomes/react/types/rollup'
-import {Sorting} from '@canvas/outcomes/react/types/shapes'
 import {
   ContributingScoreAlignment,
   ContributingScoresManager,
 } from '@canvas/outcomes/react/hooks/useContributingScores'
-import {ContributingScoreHeader} from './grid/ContributingScoreHeader'
-import {BarChartRow} from './grid/BarChartRow'
-import {StudentOutcomeScore} from './grid/StudentOutcomeScore'
-import {keyBy} from 'es-toolkit'
-import {View} from '@instructure/ui-view'
+import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
+import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
+import {
+  Outcome,
+  OutcomeRollup,
+  Student,
+  StudentRollupData,
+} from '@canvas/outcomes/react/types/rollup'
+import {Sorting} from '@canvas/outcomes/react/types/shapes'
+import {
+  COLUMN_PADDING,
+  DEFAULT_GRADEBOOK_SETTINGS,
+  GradebookSettings,
+  STUDENT_COLUMN_RIGHT_PADDING,
+  STUDENT_COLUMN_WIDTH,
+} from '@canvas/outcomes/react/utils/constants'
+import {StudentCell} from '@instructure/outcomes-ui/es/components/Gradebook/gradebook-table/StudentCell'
 import {Table} from '@instructure/outcomes-ui/es/components/Gradebook/table/Table'
 import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
+import {
+  CELL_HEIGHT,
+  COLUMN_WIDTH,
+  DisplayFilter,
+  NameDisplayFormat,
+  SecondaryInfoDisplay,
+} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
+import {Breakpoints, WithBreakpoints} from '@instructure/platform-with-breakpoints'
+import {View} from '@instructure/ui-view'
+import {keyBy} from 'es-toolkit'
+import React, {useCallback, useMemo} from 'react'
+import {BarChartRow} from './grid/BarChartRow'
+import {ContributingScoreHeader} from './grid/ContributingScoreHeader'
+import {OutcomeHeader} from './grid/OutcomeHeader'
+import {StudentCellPopover} from './grid/StudentCellPopover'
+import {StudentHeader} from './grid/StudentHeader'
+import {StudentOutcomeScore} from './grid/StudentOutcomeScore'
 import {ContributingScoreCellContent} from './table/ContributingScoreCellContent'
-import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
-import {WithBreakpoints, Breakpoints} from '@instructure/platform-with-breakpoints'
-import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -176,17 +177,20 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
         ? `/courses/${courseId}/outcomes?student_id=${student.id}#reporting`
         : `/courses/${courseId}/grades/${student.id}#tab-outcomes`
 
+      const secondaryInfo = {
+        [SecondaryInfoDisplay.SIS_ID]: student.sis_id,
+        [SecondaryInfoDisplay.INTEGRATION_ID]: student.integration_id,
+        [SecondaryInfoDisplay.LOGIN_ID]: student.login_id,
+        [SecondaryInfoDisplay.NONE]: undefined,
+      }[gradebookSettings.secondaryInfoDisplay]
+
       return (
         <StudentCell
           student={{
             id: String(student.id),
-            name: student.name,
-            display_name: student.display_name,
-            sortable_name: student.sortable_name,
-            avatar_url: student.avatar_url,
-            sis_id: student.sis_id,
-            integration_id: student.integration_id,
-            login_id: student.login_id,
+            displayName: student.display_name,
+            sortableName: student.sortable_name,
+            avatarUrl: student.avatar_url,
             status: student.status,
           }}
           studentPopover={
@@ -200,7 +204,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
               rollups={rollups}
             />
           }
-          secondaryInfoDisplay={gradebookSettings.secondaryInfoDisplay}
+          secondaryInfo={secondaryInfo}
           showStudentAvatar={gradebookSettings.displayFilters.includes(
             DisplayFilter.SHOW_STUDENT_AVATARS,
           )}
@@ -309,6 +313,7 @@ const GradebookTableComponent: React.FC<GradebookTableComponentProps> = ({
       },
       cellProps: {
         height: CELL_HEIGHT,
+        padding: '0 0 0 small',
       },
     } as Column)
 

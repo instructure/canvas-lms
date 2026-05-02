@@ -140,7 +140,7 @@ const PeerReview = ({assessment, assignment, index, isSubAssignment}: PeerReview
             </View>
             <View as="span" margin="0 0 0 small">
               {isSubAssignment || workflow_state !== 'completed' ? (
-                <IconPeerReviewLine />
+                <IconPeerReviewLine aria-label={I18n.t('Peer Review')} />
               ) : (
                 <IconPeerGradedLine />
               )}

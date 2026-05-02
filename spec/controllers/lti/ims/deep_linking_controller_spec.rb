@@ -69,17 +69,7 @@ module Lti
         let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
         let(:course) { course_model(account:) }
 
-        let(:context_external_tool) do
-          ContextExternalTool.create!(
-            context: course.account,
-            url: "http://tool.url/login",
-            name: "test tool",
-            shared_secret: "secret",
-            consumer_key: "key",
-            developer_key:,
-            lti_version: "1.3"
-          )
-        end
+        let(:context_external_tool) { registration.deployments.first }
 
         it { is_expected.to be_ok }
 
@@ -173,15 +163,7 @@ module Lti
               { type: "link", url: "http://too.url/sample", title: "Item 2" }
             ]
           end
-          let!(:tool) do
-            external_tool_1_3_model(
-              context: account,
-              opts: {
-                url: "http://tool.url/login",
-                developer_key:
-              }
-            )
-          end
+          let!(:tool) { registration.deployments.first }
 
           shared_examples_for "creates resource links in context" do
             let(:context) { raise "set in examples " }
@@ -407,9 +389,7 @@ module Lti
 
         context "when the developer key binding is off" do
           before do
-            developer_key.developer_key_account_bindings.first.update!(
-              workflow_state: "off"
-            )
+            registration.deactivate!
           end
 
           it_behaves_like "errors" do
@@ -455,26 +435,7 @@ module Lti
             course_with_teacher(course:, active_all: true)
             @teacher
           end
-          let(:developer_key) do
-            key = DeveloperKey.create!(account: course.account)
-            key.generate_rsa_keypair!
-            key.developer_key_account_bindings.first.update!(
-              workflow_state: "on"
-            )
-            key.save!
-            key
-          end
-          let(:context_external_tool) do
-            ContextExternalTool.create!(
-              context: course.account,
-              url: "http://tool.url/login",
-              name: "test tool",
-              shared_secret: "secret",
-              consumer_key: "key",
-              developer_key:,
-              lti_version: "1.3"
-            )
-          end
+          let(:context_external_tool) { registration.deployments.first }
           let(:launch_url) { "http://tool.url/launch" }
           let(:params) { super().except(:account_id).merge({ course_id: course.id }) }
           let(:return_url_params) { super().merge({ placement: "course_assignments_menu" }) }

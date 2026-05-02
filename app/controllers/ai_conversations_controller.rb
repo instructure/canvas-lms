@@ -29,36 +29,6 @@ class AiConversationsController < ApplicationController
   before_action :load_experience
   before_action :load_conversation, only: %i[post_message destroy show evaluation create_feedback delete_feedback]
 
-  # Display the page for teachers to view all student AI conversations
-  # Returns HTML for teachers, JSON for students (their active conversation)
-  #
-  # @returns HTML page or JSON
-  def index
-    # Teacher view - show all student conversations
-    permissions = %i[manage_assignments_add manage_assignments_edit manage_assignments_delete]
-    unless @context.grants_any_right?(@current_user, *permissions)
-      return render_unauthorized_action
-    end
-
-    set_active_tab "ai_experiences"
-    add_crumb t("#crumbs.ai_experiences", "AI Experiences"), course_ai_experiences_path(@context)
-    add_crumb @experience.title, course_ai_experience_path(@context, @experience)
-    add_crumb t("#crumbs.ai_conversations", "AI Conversations")
-
-    @page_title = t("#page_title.ai_conversations", "%{title} - AI Conversations", title: @experience.title)
-    js_bundle :ai_experiences_ai_conversations
-
-    can_manage = @context.grants_any_right?(@current_user, *permissions)
-
-    js_env({
-             AI_EXPERIENCE: ai_experience_json(@experience, @current_user, session, can_manage:),
-             COURSE_ID: @context.id,
-             ai_experiences_evaluation_enabled: @context.feature_enabled?(:ai_experiences_evaluation)
-           })
-
-    render html: view_context.content_tag(:div, nil, id: "ai_experiences_ai_conversations"), layout: true
-  end
-
   # @API Show conversation
   #
   # Get a specific conversation by ID (for teachers viewing student conversations)
@@ -71,7 +41,7 @@ class AiConversationsController < ApplicationController
       return render_unauthorized_action
     end
 
-    messages_and_progress = AiExperiences::ConversationMessagesService.new.fetch_with_progress(
+    messages_and_progress = AiExperiences::ConversationMessagesService.new(account: @context.account).fetch_with_progress(
       conversation_id: @conversation.llm_conversation_id,
       requesting_user: @current_user
     )
@@ -102,7 +72,7 @@ class AiConversationsController < ApplicationController
                                        .first
 
     if existing_conversation
-      messages_and_progress = AiExperiences::ConversationMessagesService.new.fetch_with_progress(
+      messages_and_progress = AiExperiences::ConversationMessagesService.new(account: @context.account).fetch_with_progress(
         conversation_id: existing_conversation.llm_conversation_id,
         requesting_user: @current_user
       )
@@ -129,7 +99,7 @@ class AiConversationsController < ApplicationController
     # If active conversation exists, complete it before creating a new one
     existing_conversation&.complete!
 
-    result = AiExperiences::ConversationStartService.new.start(
+    result = AiExperiences::ConversationStartService.new(account: @context.account).start(
       current_user: @current_user,
       root_account_uuid: @context.root_account.uuid,
       conversation_context_id: @experience.llm_conversation_context_id,
@@ -170,7 +140,7 @@ class AiConversationsController < ApplicationController
       return render json: { error: "message is required" }, status: :bad_request
     end
 
-    result = AiExperiences::ConversationContinueService.new.continue(
+    result = AiExperiences::ConversationContinueService.new(account: @context.account).continue(
       conversation_id: @conversation.llm_conversation_id,
       new_user_message: params[:message],
       requesting_user: @current_user
@@ -204,7 +174,7 @@ class AiConversationsController < ApplicationController
       return render_unauthorized_action
     end
 
-    evaluation_data = AiExperiences::ConversationEvaluationService.new.evaluate(
+    evaluation_data = AiExperiences::ConversationEvaluationService.new(account: @context.account).evaluate(
       conversation_id: @conversation.llm_conversation_id
     )
 
@@ -226,7 +196,7 @@ class AiConversationsController < ApplicationController
   #
   # @returns {Object} Hash with feedback record
   def create_feedback
-    feedback = AiExperiences::ConversationMessageFeedbackService.new.create(
+    feedback = AiExperiences::ConversationMessageFeedbackService.new(account: @context.account).create(
       conversation_id: @conversation.llm_conversation_id,
       message_id: params[:message_id],
       user_id: @current_user.uuid,
@@ -244,7 +214,7 @@ class AiConversationsController < ApplicationController
   #
   # @returns {Object} Success response
   def delete_feedback
-    AiExperiences::ConversationMessageFeedbackService.new.delete(
+    AiExperiences::ConversationMessageFeedbackService.new(account: @context.account).delete(
       conversation_id: @conversation.llm_conversation_id,
       message_id: params[:message_id],
       feedback_id: params[:feedback_id]

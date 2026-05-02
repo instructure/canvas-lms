@@ -137,6 +137,7 @@ class Attachments::Verification
 
   # TODO: Remove this method once disable_file_verifier_access flag is enabled everywhere
   def monitor_cross_domain_access(request, files_domain)
+    return unless Account.site_admin.feature_enabled? :log_cross_domain_file_access
     return unless request&.referer.present?
     return if files_domain
 
@@ -147,8 +148,14 @@ class Attachments::Verification
 
       return if referrer_host == request_host
 
-      # Only monitor if the referrer is from another Canvas instance
-      return unless AccountDomain.where(host: referrer_host).exists?
+      # Only monitor if the referrer is from a different Canvas account
+      referrer_account = LoadAccount.from_host(referrer_host)
+      return unless referrer_account
+
+      request_account = LoadAccount.from_host(request_host)
+      return unless request_account
+
+      return if referrer_account.id == request_account.id
 
       InstStatsd::Statsd.event(
         "File accessed from different Canvas domain",
@@ -163,6 +170,8 @@ class Attachments::Verification
 
   # TODO: Remove this method once disable_file_verifier_access flag is enabled everywhere
   def monitor_uuid_verifier_usage(request)
+    return unless Account.site_admin.feature_enabled? :log_uuid_verifier_usage
+
     referrer = request&.referer
     request_url = request&.url
 

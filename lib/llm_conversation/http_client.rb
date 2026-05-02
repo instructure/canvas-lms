@@ -24,11 +24,20 @@ require "uri"
 
 module LlmConversation
   class HttpClient
-    def initialize(use_initial_token: false)
+    def initialize(account: nil, use_initial_token: false)
       @base_url = resolve_base_url
+      @account = account
+      @v2_auth = account&.feature_enabled?(:ai_experiences_v2_auth)
+
+      if use_initial_token && @account.present? && !@v2_auth
+        raise LlmConversation::Errors::ConversationError,
+              "Cannot use initial token: account does not have ai_experiences_v2_auth enabled"
+      end
 
       @bearer_token = if use_initial_token
                         Rails.application.credentials.dig(:llm_conversation_service, :initial_token)
+                      elsif @v2_auth
+                        LlmConversation::TokenCache.get_api_token(@account)
                       else
                         Rails.application.credentials.llm_conversation_bearer_token
                       end
@@ -51,6 +60,39 @@ module LlmConversation
     end
 
     private
+
+    def refresh_v2_token!
+      refresh_token = @account.settings.dig(:llm_conversation_service, :refresh_jwt_token)
+      raise LlmConversation::Errors::ConversationError, "No refresh token available for account" if refresh_token.blank?
+
+      uri = URI("#{@base_url}/token/refresh")
+      http = Net::HTTP.new(uri.host, uri.port)
+      if uri.scheme.casecmp?("https")
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      end
+
+      req = Net::HTTP::Post.new(uri.request_uri,
+                                "Content-Type" => "application/json",
+                                "Authorization" => "Bearer #{refresh_token}",
+                                "x-account-id" => @account.uuid)
+
+      response = http.request(req)
+      raise LlmConversation::Errors::ConversationError, "Token refresh failed" unless response.is_a?(Net::HTTPSuccess)
+
+      result = JSON.parse(response.body)
+      new_api_token = result["api_token"]
+      new_refresh_token = result["refresh_token"]
+
+      @account.settings[:llm_conversation_service] = {
+        api_jwt_token: new_api_token,
+        refresh_jwt_token: new_refresh_token
+      }
+      @account.save!
+
+      LlmConversation::TokenCache.set_api_token(@account, new_api_token)
+      @bearer_token = new_api_token
+    end
 
     def resolve_base_url
       region = ApplicationController.region
@@ -80,7 +122,7 @@ module LlmConversation
     end
 
     def request(method, path, payload: nil)
-      raise LlmConversation::Errors::ConversationError, "llm_conversation_bearer_token not found in vault secrets" if @bearer_token.nil?
+      raise LlmConversation::Errors::ConversationError, "Bearer token not configured for LLM Conversation Service" if @bearer_token.nil?
 
       uri = URI("#{@base_url}#{path}")
       http = Net::HTTP.new(uri.host, uri.port)
@@ -92,7 +134,8 @@ module LlmConversation
 
       headers = {
         "Content-Type" => "application/json",
-        "Authorization" => "Bearer #{@bearer_token}"
+        "Authorization" => "Bearer #{@bearer_token}",
+        "x-account-id" => @account&.uuid
       }
 
       req = case method
@@ -113,6 +156,11 @@ module LlmConversation
       response = http.request(req)
 
       unless response.is_a?(Net::HTTPSuccess)
+        if response.is_a?(Net::HTTPUnauthorized) && @v2_auth
+          refresh_v2_token!
+          return request(method, path, payload:)
+        end
+
         begin
           error_json = JSON.parse(response.body)
           error_detail = error_json["message"] || error_json["error"] || response.body

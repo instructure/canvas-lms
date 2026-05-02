@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import classSet from '@canvas/quiz-legacy-client-apps/util/class_set'
 import formatNumber from '../../../util/format_number'
 import Help from './help'
@@ -47,7 +48,7 @@ const DiscriminationIndex = ({discriminationIndex: di = 0}: DiscriminationIndexP
     <section className="discrimination-index-section">
       <div>
         <SightedUserContent>
-          <em className={classSet(className)}>
+          <em className={classSet(className) as string}>
             <span className="sign">{sign}</span>
             {formatNumber(Math.abs(di))}
           </em>
@@ -74,6 +75,8 @@ const DiscriminationIndex = ({discriminationIndex: di = 0}: DiscriminationIndexP
               onDismiss={() => displayHelp(false)}
               label={I18n.t('discrimination_index_dialog_title', 'The Discrimination Index Chart')}
               footer={null}
+              closeButtonLabel={I18n.t('Close')}
+              errorComponent={canvasErrorComponent()}
             >
               <Help style={{width: 480}} />
             </CanvasModal>

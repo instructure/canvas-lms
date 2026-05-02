@@ -17,7 +17,7 @@
  */
 import React, {useState} from 'react'
 import {arrayOf, bool, func} from 'prop-types'
-import CanvasSelect from '@canvas/instui-bindings/react/Select'
+import {CanvasSelect} from '@instructure/platform-instui-bindings'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ProficiencyRating} from '@canvas/assignments/graphql/student/ProficiencyRating'

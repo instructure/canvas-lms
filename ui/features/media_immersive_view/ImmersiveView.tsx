@@ -21,7 +21,7 @@ import {NoTranscript} from './components/NoTranscript'
 import styles from './ImmersiveView.module.css'
 import {ImmersiveViewBackButton} from './components/ImmersiveViewBackButton'
 import {useMedia} from 'react-use'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Heading} from '@instructure/ui-heading'
 
 export type ImmersiveViewProps = {
@@ -31,9 +31,8 @@ export type ImmersiveViewProps = {
   isAttachment?: boolean
 }
 
-const I18n = createI18nScope('media_immersive_view')
-
 export function ImmersiveView({id, title, attachmentId, isAttachment}: ImmersiveViewProps) {
+  const {t} = useTranslation('media_immersive_view')
   const rollingTranscriptElementId = 'immersive-view-transcript-root'
   const isTablet = !useMedia('(min-width: 769px)')
   const playerHeight = isTablet ? 'calc(100vw / (16 / 9) + 40px)' : '490px'
@@ -69,7 +68,7 @@ export function ImmersiveView({id, title, attachmentId, isAttachment}: Immersive
 
         {isTablet && (
           <Heading variant="titleCardRegular" level="h2" margin="small">
-            {I18n.t('Transcript')}
+            {t('Transcript')}
           </Heading>
         )}
 

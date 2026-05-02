@@ -481,6 +481,36 @@ describe NavMenuLinkTabs do
     end
   end
 
+  describe "HrefHelper#nav_menu_link_url" do
+    subject(:helper) do
+      obj = Object.new
+      obj.extend(NavMenuLinkTabs::HrefHelper)
+      obj
+    end
+
+    it "returns absolute URLs unchanged even with host opt" do
+      expect(helper.nav_menu_link_url("https://example.com/page", { host: "canvas.instructure.com" }))
+        .to eq("https://example.com/page")
+    end
+
+    it "returns relative URLs unchanged when no host opt" do
+      expect(helper.nav_menu_link_url("/courses/1/details#tab-navigation"))
+        .to eq("/courses/1/details#tab-navigation")
+    end
+
+    it "makes relative URLs absolute when host opt is present" do
+      allow(HostUrl).to receive(:protocol).and_return("https")
+      expect(helper.nav_menu_link_url("/courses/1/details#tab-navigation", { host: "canvas.instructure.com" }))
+        .to eq("https://canvas.instructure.com/courses/1/details#tab-navigation")
+    end
+
+    it "includes host port when host opt contains port" do
+      allow(HostUrl).to receive(:protocol).and_return("http")
+      expect(helper.nav_menu_link_url("/courses/1", { host: "localhost:3000" }))
+        .to eq("http://localhost:3000/courses/1")
+    end
+  end
+
   describe ".nav_menu_link_tab_id?" do
     it "returns true for nav menu link tab ids" do
       expect(NavMenuLinkTabs.nav_menu_link_tab_id?("nav_menu_link_123")).to be true

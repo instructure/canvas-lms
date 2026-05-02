@@ -50,6 +50,7 @@ interface RosterUserCollectionLike {
   sections?: SectionCollectionLike | null
 }
 
+// @ts-expect-error TS7 migration
 class RosterUser extends User {
   declare attributes: RosterUserAttributes
   declare collection?: RosterUserCollectionLike

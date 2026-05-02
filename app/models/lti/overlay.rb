@@ -110,18 +110,16 @@ class Lti::Overlay < ApplicationRecord
   end
 
   # @param [Hash] internal_config A Hash conforming to the InternalLtiConfiguration schema
-  # @param [Boolean] additive Whether the overlay can add new placements not in the base config
   # @return [Hash] The internal config with this overlay applied
   # @see Lti::Overlay.apply_to
-  def apply_to(internal_config, additive: true)
-    self.class.apply_to(data, internal_config, additive:)
+  def apply_to(internal_config)
+    self.class.apply_to(data, internal_config)
   end
 
   # @param [Hash] overlay A Hash conforming to the Lti::Overlay schema
   # @param [Hash] config A Hash conforming to the InternalLtiConfiguration schema
-  # @param [Boolean] additive Whether the overlay can add new placements not in the base config
   # @return [Hash] The internal configuration with the overlay applied
-  def self.apply_to(overlay, internal_config, additive: true)
+  def self.apply_to(overlay, internal_config)
     return internal_config.with_indifferent_access if overlay.blank?
 
     overlay = overlay.deep_dup.with_indifferent_access
@@ -148,21 +146,6 @@ class Lti::Overlay < ApplicationRecord
     disabled_placements&.each do |placement|
       placement = internal_config[:placements].find { |p| p[:placement] == placement }
       placement[:enabled] = false if placement.present?
-    end
-
-    # Only add additional placements if additive mode is enabled
-    if additive
-      # Add any additional placements that aren't in the base internal_config but are in the overlay
-      additional_placements = overlay[:placements]&.reject do |placement|
-        internal_config[:placements].any? { |p| p[:placement] == placement }
-      end&.map do |placement_name, placement_config|
-        {
-          placement: placement_name,
-          **placement_config
-        }
-      end
-
-      internal_config[:placements] += additional_placements if additional_placements.present?
     end
 
     internal_config.compact

@@ -41,6 +41,10 @@ describe Types::FileType do
     expect(file_type.resolve("size")).to eq "100 Bytes"
   end
 
+  it "has the file's size in bytes" do
+    expect(file_type.resolve("sizeBytes")).to eq 100
+  end
+
   it "has modules" do
     module1 = course.context_modules.create!(name: "Module 1")
     module2 = course.context_modules.create!(name: "Module 2")

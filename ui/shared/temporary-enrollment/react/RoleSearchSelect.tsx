@@ -23,7 +23,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {uid} from '@instructure/uid'
 import {string} from 'prop-types'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {MODULE_NAME} from './types'
 

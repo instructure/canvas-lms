@@ -17,7 +17,7 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {getUserMedia} from '../util/mediaUtils'
 import {IconVideoCameraOffSolid} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'

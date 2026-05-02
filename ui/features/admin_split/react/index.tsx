@@ -21,9 +21,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import React, {useCallback, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
-import {useScope as createI18nScope} from '@canvas/i18n'
-
-const I18n = createI18nScope('admin_split')
+import {useTranslation} from '@canvas/i18next'
 
 interface User {
   id: string
@@ -43,6 +41,7 @@ export default function AdminSplit({
   splitUrl,
   splitUsers,
 }: AdminSplitProps): React.JSX.Element {
+  const {t} = useTranslation('admin_split')
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<User[]>([])
   const [failed, setFailed] = useState(false)
@@ -72,7 +71,7 @@ export default function AdminSplit({
     return (
       <p>
         <IconWarningLine />
-        {I18n.t('Failed to split users.')}
+        {t('Failed to split users.')}
       </p>
     )
   }
@@ -80,7 +79,7 @@ export default function AdminSplit({
   if (results.length > 0) {
     return (
       <>
-        <p>{I18n.t('User split complete. Links to split user accounts follow:')}</p>
+        <p>{t('User split complete. Links to split user accounts follow:')}</p>
         <ul>
           {results.map(u => (
             <li key={u.id}>
@@ -90,7 +89,7 @@ export default function AdminSplit({
         </ul>
         {document.referrer ? (
           <Button margin="xx-small" color="primary" onClick={returnToReferrer}>
-            {I18n.t('OK')}
+            {t('OK')}
           </Button>
         ) : null}
       </>
@@ -98,12 +97,12 @@ export default function AdminSplit({
   }
 
   if (splitUsers.length === 0) {
-    return <p>{I18n.t('There are no user accounts to split from this user.')}</p>
+    return <p>{t('There are no user accounts to split from this user.')}</p>
   }
 
   return (
     <>
-      <p>{I18n.t('The following users will be split into separate user accounts:')}</p>
+      <p>{t('The following users will be split into separate user accounts:')}</p>
       <ul>
         <li key={user.id}>
           <a href={user.html_url}>{user.display_name}</a>
@@ -115,16 +114,16 @@ export default function AdminSplit({
         ))}
       </ul>
       <p>
-        {I18n.t(
+        {t(
           'NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.',
         )}
       </p>
       <Button disabled={loading} margin="xx-small" color="primary" onClick={performSplit}>
-        {I18n.t('Split')}
+        {t('Split')}
       </Button>
       {document.referrer ? (
         <Button margin="xx-small" color="secondary" onClick={returnToReferrer}>
-          {I18n.t('Cancel')}
+          {t('Cancel')}
         </Button>
       ) : null}
     </>

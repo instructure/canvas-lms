@@ -20,7 +20,8 @@ import $ from 'jquery'
 import React, {useState} from 'react'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {assignLocation, reloadWindow} from '@canvas/util/globalUtils'
 import {getCookie} from '@instructure/platform-get-cookie'
 import {Button} from '@instructure/ui-buttons'
@@ -142,6 +143,8 @@ function QuizEngineModal({setOpen, onDismiss}) {
       label={I18n.t('Choose a Quiz Engine')}
       footer={footer}
       aria-modal={true}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       {description}
       <RadioInputGroup

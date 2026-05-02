@@ -21,7 +21,7 @@
 require "webmock/rspec"
 
 describe AiExperiences::ConversationContextService do
-  subject(:service) { described_class.new }
+  subject(:service) { described_class.new(account: course.account) }
 
   let(:course) { course_model }
   let(:ai_experience) do
@@ -154,7 +154,7 @@ describe AiExperiences::ConversationContextService do
 
       expect do
         service.create(ai_experience:)
-      end.to raise_error(LlmConversation::Errors::ConversationError, /llm_conversation_bearer_token not found/)
+      end.to raise_error(LlmConversation::Errors::ConversationError, /Bearer token not configured/)
     end
 
     context "with ai_experiences_context_file_upload feature flag enabled" do

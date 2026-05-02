@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import Actions from '../actions'
 import preventDefault from '@canvas/util/preventDefault'
@@ -101,7 +101,7 @@ export default class FindAppointment extends React.Component {
         )}
         <Modal
           as="form"
-          onSubmit={preventDefault(() => this.handleSubmit())}
+          onSubmit={preventDefault(() => this.handleSubmit()) as unknown as React.FormEventHandler}
           open={this.state.isModalOpen}
           size="small"
           onDismiss={() => this.setState({isModalOpen: false})}

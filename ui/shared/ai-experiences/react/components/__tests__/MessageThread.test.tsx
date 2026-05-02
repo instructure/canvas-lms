@@ -117,6 +117,24 @@ describe('MessageThread', () => {
       expect(screen.queryByTestId('message-feedback-like')).not.toBeInTheDocument()
     })
 
+    it('like and dislike buttons reference the message text via aria-describedby', () => {
+      const text = 'Hello, how can I help?'
+      render(
+        <MessageThread
+          {...defaultProps}
+          messages={[systemMessage, assistantMessage({id: 'msg-1', text})]}
+        />,
+      )
+
+      const descId = 'llm-message-msg-1'
+      const likeBtn = screen.getByTestId('message-feedback-like')
+      const dislikeBtn = screen.getByTestId('message-feedback-dislike')
+
+      expect(likeBtn).toHaveAttribute('aria-describedby', descId)
+      expect(dislikeBtn).toHaveAttribute('aria-describedby', descId)
+      expect(document.getElementById(descId)).toHaveTextContent(text)
+    })
+
     it('does not show feedback when conversationId is null', () => {
       render(
         <MessageThread

@@ -30,6 +30,16 @@ import 'jquery-migrate'
 import {subscribe} from 'jquery-tinypubsub'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+const {mockShowFlashAlert} = vi.hoisted(() => ({mockShowFlashAlert: vi.fn()}))
+
+vi.mock('@instructure/platform-alerts', async () => {
+  const actual = await vi.importActual('@instructure/platform-alerts')
+  return {
+    ...actual,
+    showFlashAlert: mockShowFlashAlert,
+  }
+})
+
 const I18n = createI18nScope('calendar')
 
 const makeMockDataSource = () => ({
@@ -228,5 +238,79 @@ describe('Calendar', () => {
     // Wait for render
     vi.advanceTimersByTime(0)
     expect($eventDiv.attr('title')).toContain('Reserved By:  Foobar')
+  })
+
+  describe('_eventDrop with graded peer reviews', () => {
+    let cal
+    let revertFunc
+
+    beforeEach(() => {
+      cal = makeCal()
+      revertFunc = vi.fn()
+      mockShowFlashAlert.mockClear()
+    })
+
+    it('reverts and shows error when peer_review_sub_assignment_enabled is true', () => {
+      const event = {
+        eventType: 'assignment',
+        assignment: {peer_review_sub_assignment_enabled: true},
+      }
+      cal._eventDrop(event, 0, false, revertFunc)
+
+      expect(revertFunc).toHaveBeenCalled()
+      expect(mockShowFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'error',
+          message: expect.stringContaining(
+            'Assignments with graded peer reviews are not draggable',
+          ),
+        }),
+      )
+    })
+
+    it('reverts and shows error for assignment_override when peer_review_sub_assignment_enabled is true', () => {
+      const event = {
+        eventType: 'assignment_override',
+        assignment: {peer_review_sub_assignment_enabled: true},
+      }
+      cal._eventDrop(event, 0, false, revertFunc)
+
+      expect(revertFunc).toHaveBeenCalled()
+      expect(mockShowFlashAlert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'error',
+          message: expect.stringContaining(
+            'Assignments with graded peer reviews are not draggable',
+          ),
+        }),
+      )
+    })
+
+    it('does not prevent drag when peer_review_sub_assignment_enabled is false (legacy or flag off)', () => {
+      const event = {
+        eventType: 'assignment',
+        assignment: {peer_reviews: true, peer_review_sub_assignment_enabled: false},
+        midnightFudged: false,
+        allDay: false,
+        start: fcUtil.wrap(moment()),
+        end: null,
+        endDate() {
+          return null
+        },
+        isDueAtMidnight() {
+          return false
+        },
+        saveDates: vi.fn(),
+      }
+      cal._eventDrop(event, 0, false, revertFunc)
+      expect(revertFunc).not.toHaveBeenCalled()
+      expect(mockShowFlashAlert).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining(
+            'Assignments with graded peer reviews are not draggable',
+          ),
+        }),
+      )
+    })
   })
 })

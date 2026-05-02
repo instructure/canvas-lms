@@ -17,7 +17,7 @@
  */
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@instructure/platform-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {confirm} from '@instructure/platform-instui-bindings'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -54,6 +54,7 @@ import {ExceptionModal, type ExceptionModalOpenState} from './exception_modal/Ex
 import {renderExceptionCounts} from './renderExceptionCounts'
 import {buildControlsByPath, nearestParentControl} from './nearestParentControl'
 import {DeleteDeploymentModal} from './deployment_modal/DeleteDeploymentModal'
+import {refreshRegistrationHistory} from '../../../api/registrations'
 import type {DeleteDeployment} from '../../../api/deployments'
 
 import {Tag} from '@instructure/ui-tag'
@@ -243,6 +244,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         registrationId={registration.id}
         openState={exceptionModalOpenState}
         onClose={() => setExceptionModalOpenState({open: false})}
+        onSettled={() => refreshRegistrationHistory(accountId, registration.id)}
         onConfirm={contextControls => {
           const onError = showFlashError(
             I18n.t('There was an error adding the exceptions. Please try again later.'),
@@ -416,6 +418,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         <EditExceptionModal
           {...editControlInfo}
           onClose={() => setEditControlInfo(null)}
+          onSettled={() => refreshRegistrationHistory(accountId, registration.id)}
           onSave={async (...args) => {
             const result = await editControl(...args)
             if (isSuccessful(result)) {
@@ -432,6 +435,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
           registration={registration}
           controlsByPath={controls_with_ids}
           onClose={() => setOpenDeleteDeploymentModal(false)}
+          onSettled={() => refreshRegistrationHistory(accountId, registration.id)}
           onDelete={async (...args) => {
             const result = await deleteDeployment(...args)
             if (isSuccessful(result)) {

@@ -29,7 +29,10 @@ import {Alert} from '@instructure/ui-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@instructure/platform-alerts'
 import {addFlashNoticeForNextPage} from '@canvas/rails-flash-notifications'
-import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
+import {CanvasAsyncSelect as PlatformCanvasAsyncSelect} from '@instructure/platform-instui-bindings'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const CanvasAsyncSelect: any = PlatformCanvasAsyncSelect
+import type {FormMessage} from '@instructure/ui-form-field'
 import {useDebouncedCallback} from 'use-debounce'
 
 const I18n = createI18nScope('section')
@@ -399,11 +402,11 @@ export default function CrosslistForm({
               inputValue={state.courseSearchValue}
               isLoading={state.isLoadingCourses}
               noOptionsLabel={I18n.t('No courses found')}
-              onInputChange={(_e, value) => {
+              onInputChange={(_e: unknown, value: string) => {
                 dispatch({type: 'COURSE_SEARCH_CHANGED', payload: value})
                 searchCourses(value)
               }}
-              onOptionSelected={(_e, optionId) => {
+              onOptionSelected={(_e: unknown, optionId: string) => {
                 const course = state.courseOptions.find(c => c.id === optionId)
                 if (course) confirmCourse(course.id, course.label)
               }}
@@ -411,7 +414,7 @@ export default function CrosslistForm({
                 dispatch({type: 'SEARCH_FIELD_BLURRED'})
               }}
               isDisabled={state.isSubmitting}
-              messages={getSearchMessages()}
+              messages={getSearchMessages() as FormMessage[]}
               data-testid="course-search-input"
             >
               {state.courseOptions.map(course => (

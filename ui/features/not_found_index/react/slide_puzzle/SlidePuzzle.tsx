@@ -18,10 +18,8 @@
 
 import React, {useEffect, useState} from 'react'
 import {Img} from '@instructure/ui-img'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import imageSource from './StudiousPandaSource'
-
-const I18n = createI18nScope('not_found_page_slide_puzzle')
 
 const GRID_SIZE = 4
 const DIMENSION = 556
@@ -122,6 +120,7 @@ const Tile = ({value, x, y, translation}: TileData) => {
 }
 
 const SlidePuzzle = () => {
+  const {t} = useTranslation('not_found_page_slide_puzzle')
   const [tiles] = useState(shuffleTiles(generateTiles()))
   const [moveCount, setMoveCount] = useState(0)
 
@@ -157,7 +156,7 @@ const SlidePuzzle = () => {
           alignItems: 'flex-end',
         }}
       >
-        {I18n.t('Moves:')} {moveCount}
+        {t('Moves:')} {moveCount}
       </div>
       <div
         id="tile-container"
@@ -174,7 +173,7 @@ const SlidePuzzle = () => {
             return <Tile {...tileData} key={tileData.value} />
           })
         ) : (
-          <Img src={imageSource} alt={I18n.t('A studious panda')} />
+          <Img src={imageSource} alt={t('A studious panda')} />
         )}
       </div>
     </div>

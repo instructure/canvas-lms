@@ -49,6 +49,10 @@ class Mutations::UpdateWidgetDashboardLayout < Mutations::BaseMutation
 
   # TODO: Remove this entire helper method once platform-ui passes dashboard_type (EGG-2539)
   # The resolver should directly use input[:dashboard_type] after that.
+  # The role-based fallback below misroutes mixed-role users'
+  # student-dashboard saves into :educator_dashboard_config
+  # (EGG-2587). When EGG-2539 lands, also drop the load-side
+  # WidgetDashboardLayoutValidator.sanitize_educator_layout scrub.
   def educator_dashboard?(input)
     return input[:dashboard_type] == "educator" if input[:dashboard_type].present?
 

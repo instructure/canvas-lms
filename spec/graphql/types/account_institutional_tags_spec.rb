@@ -85,13 +85,44 @@ describe "AccountType institutional tag queries" do
     end
 
     it "returns only active categories when workflowState is active" do
-      result = account_type.resolve('institutionalTagCategoriesConnection(workflowState: "active") { nodes { name } }')
+      result = account_type.resolve("institutionalTagCategoriesConnection(workflowState: active) { nodes { name } }")
       expect(result).to eq ["Animals", "Colors"]
     end
 
     it "returns only deleted categories when workflowState is deleted" do
-      result = account_type.resolve('institutionalTagCategoriesConnection(workflowState: "deleted") { nodes { name } }')
+      result = account_type.resolve("institutionalTagCategoriesConnection(workflowState: deleted) { nodes { name } }")
       expect(result).to eq ["Archived Category"]
+    end
+
+    it "returns categories in any state when workflowState is any" do
+      result = account_type.resolve("institutionalTagCategoriesConnection(workflowState: any) { nodes { name } }")
+      expect(result).to eq ["Animals", "Archived Category", "Colors"]
+    end
+
+    it "with workflowState any and hasTagsInState deleted, keeps deleted categories and active categories with at least one deleted tag" do
+      result = account_type.resolve(
+        "institutionalTagCategoriesConnection(workflowState: any, hasTagsInState: deleted) { nodes { name } }"
+      )
+      expect(result).to eq ["Animals", "Archived Category"]
+    end
+
+    it "with a concrete workflowState and hasTagsInState, filters strictly by matching tags" do
+      result = account_type.resolve(
+        "institutionalTagCategoriesConnection(workflowState: active, hasTagsInState: deleted) { nodes { name } }"
+      )
+      expect(result).to eq ["Animals"]
+    end
+
+    it "rejects unknown workflowState values at the schema layer" do
+      result = run_query(<<~GQL)
+        query {
+          account(id: "#{@account.id}") {
+            institutionalTagCategoriesConnection(workflowState: bogus) { nodes { name } }
+          }
+        }
+      GQL
+      expect(result[:errors]).to be_present
+      expect(result[:errors].first[:message]).to match(/bogus/)
     end
 
     it "returns nil for non-admins" do
@@ -141,12 +172,12 @@ describe "AccountType institutional tag queries" do
     end
 
     it "returns only active tags when workflowState is active" do
-      result = account_type.resolve('institutionalTagsConnection(workflowState: "active") { nodes { name } }')
+      result = account_type.resolve("institutionalTagsConnection(workflowState: active) { nodes { name } }")
       expect(result).to eq %w[Blue Cat Dog]
     end
 
     it "returns only deleted tags when workflowState is deleted" do
-      result = account_type.resolve('institutionalTagsConnection(workflowState: "deleted") { nodes { name } }')
+      result = account_type.resolve("institutionalTagsConnection(workflowState: deleted) { nodes { name } }")
       expect(result).to eq ["Archived Tag"]
     end
 

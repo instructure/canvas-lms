@@ -109,7 +109,7 @@ export const mockRegistration = (
     workflow_state: 'active',
     developer_key_id: id as DeveloperKeyId,
     internal_service: false,
-    ims_registration_id: ZLtiImsRegistrationId.parse(id),
+    ims_registration_id: null,
     manual_configuration_id: null,
     icon_url: null,
     vendor: null,

@@ -58,6 +58,7 @@ export type ExceptionModalProps = {
   openState: ExceptionModalOpenState
   onClose: () => void
   onConfirm: (controls: ContextControlParameter[]) => Promise<void>
+  onSettled?: () => void
 }
 
 type ContextControlFormState = Array<{
@@ -71,11 +72,13 @@ export const ExceptionModal = ({
   accountId,
   onConfirm,
   registrationId,
+  onSettled,
 }: ExceptionModalProps) => {
   const [contextControlForm, setContextControlForm] = React.useState<ContextControlFormState>([])
 
   const confirmHandler = useMutation({
     mutationFn: onConfirm,
+    onSettled,
   })
 
   const close = () => {

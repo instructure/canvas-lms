@@ -538,7 +538,8 @@ class CoursesController < ApplicationController
           js_env({
                    CREATE_COURSES_PERMISSIONS: {
                      PERMISSION: course_permissions[:can_create],
-                     RESTRICT_TO_MCC_ACCOUNT: course_permissions[:restrict_to_mcc]
+                     RESTRICT_TO_MCC_ACCOUNT: course_permissions[:restrict_to_mcc],
+                     VIEWABLE_ACCOUNT_IDS: course_permissions[:viewable_account_ids]
                    }
                  })
 
@@ -1665,7 +1666,10 @@ class CoursesController < ApplicationController
         edit_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_edit),
         delete_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_delete),
         manage_course_content_edit: @context.grants_right?(@current_user, session, :manage_course_content_edit),
-        manage_nav_menu_links: @context.grants_right?(@current_user, session, :manage_nav_menu_links)
+        manage_nav_menu_links: @context.grants_right?(@current_user, session, :manage_nav_menu_links),
+        manage_course_details: @context.grants_right?(@current_user, session, :update_course_details),
+        manage_course_navigation: @context.grants_right?(@current_user, session, :update_nav),
+        manage_course_feature_options: @context.grants_right?(@current_user, session, :manage_feature_flags)
       }
 
       js_env({
@@ -1870,7 +1874,7 @@ class CoursesController < ApplicationController
     return unless api_request?
 
     @course = api_find(Course, params[:course_id])
-    return unless authorized_action(@course, @current_user, :manage_course_content_edit)
+    return unless authorized_action(@course, @current_user, :update_course_details)
 
     old_settings = @course.settings
 
@@ -1881,6 +1885,23 @@ class CoursesController < ApplicationController
     # Remove the conditional release param if the account is locking the feature
     params[:conditional_release] = nil if params.key?(:conditional_release) && @course.account.conditional_release[:locked]
 
+    if params.key?(:default_discussion_settings) &&
+       (dds_params = params[:default_discussion_settings]).is_a?(ActionController::Parameters)
+      @course.default_discussion_settings = dds_params.permit(
+        :anonymous_state,
+        :disallow_threaded_replies,
+        :require_initial_post,
+        :podcast_enabled,
+        :podcast_has_student_posts,
+        :allow_rating,
+        :only_graders_can_rate,
+        :expanded,
+        :expanded_locked,
+        :sort_order,
+        :sort_order_locked
+      ).to_h
+    end
+
     @course.attributes = params.permit(
       :allow_final_grade_override,
       :allow_student_discussion_topics,
@@ -1888,6 +1909,7 @@ class CoursesController < ApplicationController
       :allow_student_discussion_editing,
       :allow_student_discussion_reporting,
       :allow_student_anonymous_discussion_topics,
+      :use_default_discussion_settings,
       :filter_speed_grader_by_student_group,
       :show_total_grade_as_points,
       :allow_student_organized_groups,
@@ -1979,7 +2001,7 @@ class CoursesController < ApplicationController
 
   def update_nav
     get_context
-    if authorized_action(@context, @current_user, :update)
+    if authorized_action(@context, @current_user, :update_nav)
       @context.tab_configuration = NavMenuLinkTabs.sync_course_links_with_tabs(
         course: @context,
         tabs: JSON.parse(params[:tabs_json]).compact,
@@ -3332,11 +3354,10 @@ class CoursesController < ApplicationController
       return
     end
 
-    if authorized_action(@course, @current_user, :manage_course_content_edit)
+    if authorized_action(@course, @current_user, :update_course_details)
       return render_update_success if params[:for_reload]
 
       unless @course.grants_right?(@current_user, :update)
-        # let users with :manage_couse_content_edit only update the body
         params_for_update = params_for_update.slice(:syllabus_body)
       end
       if params_for_update.key?(:syllabus_body)

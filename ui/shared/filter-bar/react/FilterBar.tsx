@@ -26,9 +26,8 @@ import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import debounce from '@instructure/debounce'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 
-const I18n = createI18nScope('filter_bar')
 const SEARCH_DELAY = 350
 
 export interface FilterOption<T extends string> {
@@ -75,11 +74,12 @@ export default function FilterBar<T extends string>({
   searchPlaceholder,
   searchDebounceDelay = SEARCH_DELAY,
 }: FilterBarProps<T>) {
+  const {t} = useTranslation('filter_bar')
   const [filter, setFilter] = useState('all')
   const [searchInput, setSearchInput] = useState('')
 
-  const defaultOption: FilterOption<'all'> = {value: 'all', text: I18n.t('All')}
-  const defaultPlaceholder: string = I18n.t('Search')
+  const defaultOption: FilterOption<'all'> = {value: 'all', text: t('All')}
+  const defaultPlaceholder: string = t('Search')
 
   const updateSearchQuery: (query: string) => void = useCallback(
     debounce(
@@ -123,8 +123,8 @@ export default function FilterBar<T extends string>({
     <Flex justifyItems="start">
       <Flex.Item padding="small">
         <SimpleSelect
-          assistiveText={I18n.t('Use arrow keys to navigate options.')}
-          renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
+          assistiveText={t('Use arrow keys to navigate options.')}
+          renderLabel={<ScreenReaderContent>{t('Filter by')}</ScreenReaderContent>}
           onChange={updateFilter}
           width="10rem"
           value={filter}
@@ -153,7 +153,7 @@ export default function FilterBar<T extends string>({
       </Flex.Item>
       <Flex.Item padding="small">
         <Button color="primary" onClick={clearFilters}>
-          {I18n.t('Clear')}
+          {t('Clear')}
         </Button>
       </Flex.Item>
     </Flex>

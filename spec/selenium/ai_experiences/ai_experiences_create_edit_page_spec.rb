@@ -192,25 +192,6 @@ describe "ai experiences form" do
           expect(@existing_experience.description).to eq("Updated description")
         end
       end
-
-      describe "delete functionality" do
-        it "can delete an AI experience" do
-          AiExperiencesFormPage.click_delete
-          AiExperiencesFormPage.confirm_delete
-          wait_for_ajaximations
-
-          expect(@existing_experience.reload.workflow_state).to eq("deleted")
-        end
-
-        it "can cancel delete operation" do
-          AiExperiencesFormPage.click_delete
-          AiExperiencesFormPage.cancel_delete
-
-          # Should still be on edit page
-          expect(AiExperiencesFormPage.page_heading_text).to eq("Edit Existing Experience")
-          expect(@existing_experience.reload.workflow_state).not_to eq("deleted")
-        end
-      end
     end
 
     context "as a student" do

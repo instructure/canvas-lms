@@ -481,6 +481,7 @@ class CalendarEventsApiController < ApplicationController
         calendar_events, assignments = events.partition { |e| e.is_a?(CalendarEvent) }
         ActiveRecord::Associations.preload(calendar_events, [:context, :parent_event])
         ActiveRecord::Associations.preload(assignments, Api::V1::Assignment::PRELOADS)
+        preload_peer_review_sub_assignments(assignments)
         ActiveRecord::Associations.preload(assignments.map(&:context), %i[account grading_period_groups enrollment_term])
         log_event_count(events.count)
 
@@ -2197,6 +2198,7 @@ class CalendarEventsApiController < ApplicationController
     end
     # preload data used by assignment_json
     ActiveRecord::Associations.preload(events, :discussion_topic)
+    preload_peer_review_sub_assignments(events)
     Shard.partition_by_shard(events) do |shard_events|
       having_submission = assignment_or_sub_assignment(sub_assignment:).assignment_ids_with_submissions(shard_events.map(&:id))
       shard_events.each do |event|
@@ -2220,5 +2222,10 @@ class CalendarEventsApiController < ApplicationController
     events = Api.paginate(scope, self, route_url)
     ActiveRecord::Associations.preload(events, :child_events)
     events
+  end
+
+  def preload_peer_review_sub_assignments(collection)
+    assignments = collection.grep(Assignment)
+    ActiveRecord::Associations.preload(assignments, :peer_review_sub_assignment) if assignments.present?
   end
 end

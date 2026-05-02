@@ -38,15 +38,20 @@ document.body.appendChild(container)
 
 describe('AssignToGroupMenu', () => {
   beforeEach(() => {
+    // @ts-expect-error TS7 migration
     const groupCategory = new GroupCategory()
+    // @ts-expect-error TS7 migration
     user = new GroupUser({
       id: 1,
       name: 'bob',
       group: null,
       category: groupCategory,
     })
+    // @ts-expect-error TS7 migration
     const groups = new GroupCollection(
+      // @ts-expect-error TS7 migration
       [
+        // @ts-expect-error TS7 migration
         new Group({
           id: 1,
           name: 'a group',

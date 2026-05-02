@@ -18,9 +18,8 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
-import CanvasAsyncSelect, {
-  type CanvasAsyncSelectProps,
-} from '@canvas/instui-bindings/react/AsyncSelect'
+import {CanvasAsyncSelect, type CanvasAsyncSelectProps} from '@instructure/platform-instui-bindings'
+import type {FormMessage} from '@instructure/ui-form-field'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import useContentShareUserSearchApi from '../effects/useContentShareUserSearchApi'
 import UserSearchSelectorItem from './UserSearchSelectorItem'
@@ -95,7 +94,7 @@ export default function ContentShareUserSearchSelector({
     ? I18n.t('No Results')
     : I18n.t('Enter at least %{count} characters', {count: MINIMUM_SEARCH_LENGTH})
 
-  const requredErrorMessages = selectedUsersError
+  const requredErrorMessages: FormMessage[] = selectedUsersError
     ? [{type: 'newError', text: I18n.t('You must select at least one user')}]
     : []
 

@@ -45,7 +45,7 @@ RSpec.describe Lti::Registration do
       non_site_admin_template = lti_registration_model(account: account_model)
       registration.template_registration = non_site_admin_template
       expect(subject).to be false
-      expect(registration.errors[:template_registration]).to include("must be inherited from Site Admin")
+      expect(registration.errors[:template_registration]).to include(a_string_starting_with("must be inherited from Site Admin"))
     end
 
     it "allows site admin template registrations" do
@@ -211,7 +211,7 @@ RSpec.describe Lti::Registration do
           overlay.data["placements"] = { "new_placement" => { "text" => "New Placement" } }
           overlay.update_column(:data, overlay.data)
 
-          # The new placement should not be added since IMS registrations use additive: false
+          # The new placement should not be added
           placement_names = subject["placements"].pluck("placement")
           expect(placement_names).not_to include("new_placement")
         end
@@ -305,14 +305,17 @@ RSpec.describe Lti::Registration do
             title: "A Better Title",
             privacy_level: "anonymous",
             placements: {
+              course_navigation: {
+                icon_url: "https://example.com/icon.png",
+                text: "Updated Course Nav"
+              },
+              account_navigation: {
+                icon_url: "https://example.com/account-icon.png",
+                text: "Updated Account Nav"
+              },
+              # New placements that don't exist in the base config
               global_navigation: {
                 target_link_uri: "https://example.com/launch?placement=global_navigation",
-                icon_url: "https://example.com/icon.png",
-                title: "A Better Title",
-                message_type: "LtiDeepLinkingRequest"
-              },
-              module_index_menu_modal: {
-                target_link_uri: "https://example.com/launch?placement=module_index_menu_modal",
                 icon_url: "https://example.com/icon.png",
                 title: "A Better Title",
                 message_type: "LtiDeepLinkingRequest"
@@ -327,22 +330,24 @@ RSpec.describe Lti::Registration do
                                data:)
         end
 
-        it "overlays all fields on top of the configuration" do
+        it "overlays fields on existing placements but does not add new placements" do
           overlay
 
           expect(subject["privacy_level"]).to eq("anonymous")
           expect(subject["title"]).to eq("A Better Title")
-          global_nav_config = subject["placements"].find { |p| p["placement"] == "global_navigation" }
-          module_config = subject["placements"].find { |p| p["placement"] == "module_index_menu_modal" }
 
-          expect(global_nav_config).to include("target_link_uri" => "https://example.com/launch?placement=global_navigation",
-                                               "icon_url" => "https://example.com/icon.png",
-                                               "title" => "A Better Title",
-                                               "message_type" => "LtiDeepLinkingRequest")
-          expect(module_config).to include("target_link_uri" => "https://example.com/launch?placement=module_index_menu_modal",
-                                           "icon_url" => "https://example.com/icon.png",
-                                           "title" => "A Better Title",
-                                           "message_type" => "LtiDeepLinkingRequest")
+          course_nav_config = subject["placements"].find { |p| p["placement"] == "course_navigation" }
+          account_nav_config = subject["placements"].find { |p| p["placement"] == "account_navigation" }
+          global_nav_config = subject["placements"].find { |p| p["placement"] == "global_navigation" }
+
+          # Existing placements should be modified
+          expect(course_nav_config["icon_url"]).to eq("https://example.com/icon.png")
+          expect(course_nav_config["text"]).to eq("Updated Course Nav")
+          expect(account_nav_config["icon_url"]).to eq("https://example.com/account-icon.png")
+          expect(account_nav_config["text"]).to eq("Updated Account Nav")
+
+          # New placements should not be added
+          expect(global_nav_config).to be_nil
         end
 
         context "with include_overlay: false" do

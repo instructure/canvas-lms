@@ -70,6 +70,25 @@ declare module '@instructure/ui-media-player' {
   export const MediaPlayer: ComponentType<MediaPlayerProps & Record<string, any>>
 }
 
+declare module 'highcharts' {
+  const Highcharts: any
+  export default Highcharts
+  export = Highcharts
+  namespace Highcharts {
+    type Options = any
+    type PointOptionsObject = any
+    type Chart = any
+    type SVGElement = any
+    type Point = any
+  }
+}
+declare module 'highcharts/modules/accessibility'
+declare module 'highcharts-react-official' {
+  import type {ComponentType} from 'react'
+  const HighchartsReact: ComponentType<any>
+  export default HighchartsReact
+}
+
 // Auto-generated plugin bundles module (created at build time by webpack)
 declare module 'plugin-bundles-generated' {
   const pluginBundles: {

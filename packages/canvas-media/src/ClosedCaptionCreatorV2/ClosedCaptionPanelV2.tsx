@@ -186,12 +186,14 @@ export function ClosedCaptionPanelV2({
         <List isUnstyled aria-label={formatMessage('Captions')} margin="0">
           {state.subtitles.map(subtitle => {
             const language = closedCaptionLanguages.find(l => l.id === subtitle.locale)
+            const captionName = getCaptionName(subtitle, language)
             const deleteHandler = () => {
               trackPendoEvent('canvas_caption_item_action', {
                 action: 'delete',
                 caption_source: subtitle.asr ? 'automatic' : 'uploaded',
                 language: subtitle.locale,
               })
+              state.setAnnouncement(formatMessage('Deleting {captionName}', {captionName}))
               upload.deleteCaption(subtitle.locale)
             }
             // Client-side failures (failedOperation is set) get retry only.
@@ -204,12 +206,13 @@ export function ClosedCaptionPanelV2({
                   filename={subtitle.filename}
                   workflow_state={subtitle.workflow_state ?? 'ready'}
                   captionName={getCaptionName(subtitle, language)}
-                  errorMessage={subtitle.errorMessage}
+                  failedOperation={subtitle.failedOperation}
+                  asr={subtitle.asr}
                   onRetry={getRetryHandler(subtitle)}
                   isInherited={subtitle.inherited}
                   onDelete={showDelete ? deleteHandler : undefined}
                   deleteButtonRef={setDeleteButtonRef(subtitle.locale)}
-              />
+                />
               </List.Item>
             )
           })}
@@ -243,6 +246,9 @@ export function ClosedCaptionPanelV2({
                 language: languageId,
               })
               queueFocus({type: 'addNew'})
+              state.setAnnouncement(
+                formatMessage('Uploading {lang} caption', {lang: language.label}),
+              )
               state.handleCaptionProcessing({locale: languageId, file})
               upload.uploadCaption(languageId, file)
             }
@@ -271,6 +277,9 @@ export function ClosedCaptionPanelV2({
                 language: languageId,
               })
               queueFocus({type: 'addNew'})
+              state.setAnnouncement(
+                formatMessage('Requesting {lang} caption', {lang: language.label}),
+              )
               state.handleCaptionProcessing({locale: languageId, isAsr: true})
               doAsrRequest(uploadConfig, languageId).catch(() => {
                 trackPendoEvent('canvas_caption_result', {

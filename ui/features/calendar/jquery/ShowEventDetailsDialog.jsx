@@ -453,7 +453,9 @@ export default class ShowEventDetailsDialog {
     this.popover.el.find('.view_event_link').click(preventDefault(this.openShowPage))
 
     const editButton = this.popover.el.find('.edit_event_link')
-    if (subAssignmentOrOverride(this.event.eventType)) {
+    if (this.event.assignment?.peer_review_sub_assignment_enabled) {
+      editButton.click(preventDefault(this.editSubAssignment))
+    } else if (subAssignmentOrOverride(this.event.eventType)) {
       editButton.click(preventDefault(this.editSubAssignment))
     } else {
       editButton.click(preventDefault(this.showEditDialog))

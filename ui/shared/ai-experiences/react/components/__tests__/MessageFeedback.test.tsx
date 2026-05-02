@@ -44,6 +44,7 @@ const makeFeedback = (vote: 'liked' | 'disliked', id = 'fb-1'): FeedbackItem => 
 
 const defaultProps = {
   messageId,
+  messageContainerId: `llm-message-${messageId}`,
   initialFeedback: [] as FeedbackItem[],
   courseId,
   aiExperienceId,
@@ -206,6 +207,80 @@ describe('MessageFeedback', () => {
 
       expect(receivedBody!.feedback_message).toBe('Irrelevant answer')
       expect(receivedBody!.vote).toBe('disliked')
+    })
+  })
+
+  describe('like while dislike form or confirmation is open', () => {
+    it('closes dislike form when like is clicked', async () => {
+      const liked = makeFeedback('liked')
+      server.use(http.post(feedbackBasePath, () => HttpResponse.json({feedback: liked})))
+
+      render(<MessageFeedback {...defaultProps} />)
+      fireEvent.click(screen.getByTestId('message-feedback-dislike'))
+      expect(screen.getByTestId('message-feedback-text')).toBeInTheDocument()
+
+      fireEvent.click(screen.getByTestId('message-feedback-like'))
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('message-feedback-text')).not.toBeInTheDocument()
+      })
+    })
+
+    it('saves the like when clicking like while dislike form is open', async () => {
+      const disliked = makeFeedback('disliked', 'fb-old')
+      const liked = makeFeedback('liked', 'fb-new')
+
+      let postCalled = false
+      server.use(
+        http.delete(`${feedbackBasePath}/${disliked.id}`, () => HttpResponse.json({success: true})),
+        http.post(feedbackBasePath, () => {
+          postCalled = true
+          return HttpResponse.json({feedback: liked})
+        }),
+      )
+
+      render(<MessageFeedback {...defaultProps} initialFeedback={[disliked]} />)
+      fireEvent.click(screen.getByTestId('message-feedback-like'))
+
+      await waitFor(() => {
+        expect(postCalled).toBe(true)
+      })
+    })
+
+    it('closes submitted confirmation when like is clicked', async () => {
+      const disliked = makeFeedback('disliked', 'fb-old')
+      const liked = makeFeedback('liked', 'fb-new')
+
+      server.use(
+        http.delete(`${feedbackBasePath}/${disliked.id}`, () => HttpResponse.json({success: true})),
+        http.post(feedbackBasePath, () => HttpResponse.json({feedback: disliked})),
+      )
+
+      render(<MessageFeedback {...defaultProps} />)
+
+      // Open form, fill it, submit to reach 'submitted' state
+      fireEvent.click(screen.getByTestId('message-feedback-dislike'))
+      fireEvent.change(screen.getByTestId('message-feedback-text'), {
+        target: {value: 'Bad response'},
+      })
+
+      server.use(http.post(feedbackBasePath, () => HttpResponse.json({feedback: disliked})))
+      fireEvent.click(screen.getByTestId('message-feedback-submit'))
+
+      await waitFor(() => {
+        expect(screen.getByTestId('message-feedback-success')).toBeInTheDocument()
+      })
+
+      // Now click like — confirmation should disappear
+      server.use(
+        http.delete(`${feedbackBasePath}/${disliked.id}`, () => HttpResponse.json({success: true})),
+        http.post(feedbackBasePath, () => HttpResponse.json({feedback: liked})),
+      )
+      fireEvent.click(screen.getByTestId('message-feedback-like'))
+
+      await waitFor(() => {
+        expect(screen.queryByTestId('message-feedback-success')).not.toBeInTheDocument()
+      })
     })
   })
 

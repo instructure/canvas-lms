@@ -126,25 +126,114 @@ RSpec.describe GradeService do
       )
     end
 
-    # Test error handling for malformed JSON responses
-    it "wraps generic CedarClient errors in CedarAi::Errors::GraderError" do
-      allow(CedarClient).to receive(:grade_essay)
-        .and_raise(StandardError.new("Some low-level error"))
+    context "when an unexpected non-Cedar error occurs" do
+      it "wraps it in GraderError with a safe generic message" do
+        allow(CedarClient).to receive(:grade_essay)
+          .and_raise(StandardError.new("Some low-level error"))
 
-      service = described_class.new(
-        assignment:,
-        essay:,
-        rubric:,
-        root_account_uuid:,
-        current_user:
-      )
+        service = described_class.new(
+          assignment:,
+          essay:,
+          rubric:,
+          root_account_uuid:,
+          current_user:
+        )
 
-      expect do
-        service.call
-      end.to raise_error(
-        CedarAi::Errors::GraderError,
-        /Invalid response from gradeEssay: Some low-level error/
-      )
+        expect { service.call }.to raise_error(
+          CedarAi::Errors::GraderError,
+          "An unexpected error occurred while grading."
+        )
+      end
+
+      it "logs the original error details" do
+        allow(CedarClient).to receive(:grade_essay)
+          .and_raise(StandardError.new("Some low-level error"))
+
+        service = described_class.new(
+          assignment:,
+          essay:,
+          rubric:,
+          root_account_uuid:,
+          current_user:
+        )
+
+        expect(Rails.logger).to receive(:error).with(/\[GradeService\] Unexpected error: StandardError: Some low-level error/)
+        begin
+          service.call
+        rescue CedarAi::Errors::GraderError
+          nil
+        end
+      end
+    end
+
+    context "when a Cedar API error occurs" do
+      let(:service) do
+        described_class.new(assignment:, essay:, rubric:, root_account_uuid:, current_user:)
+      end
+
+      it "raises GraderError with a grading-specific message for CedarLimitReachedError" do
+        allow(CedarClient).to receive(:grade_essay)
+          .and_raise(InstructureMiscPlugin::Extensions::CedarClient::CedarLimitReachedError)
+
+        expect { service.call }.to raise_error(
+          CedarAi::Errors::GraderError,
+          "Grading is temporarily unavailable. Please try again later."
+        )
+      end
+
+      it "raises GraderError with a grading-specific message for ContentTooLongError" do
+        allow(CedarClient).to receive(:grade_essay)
+          .and_raise(InstructureMiscPlugin::Extensions::CedarClient::ContentTooLongError)
+
+        expect { service.call }.to raise_error(
+          CedarAi::Errors::GraderError,
+          "The submission is too long to be graded automatically."
+        )
+      end
+
+      it "raises GraderError with a grading-specific message for UnsupportedLanguageError" do
+        allow(CedarClient).to receive(:grade_essay)
+          .and_raise(InstructureMiscPlugin::Extensions::CedarClient::UnsupportedLanguageError)
+
+        expect { service.call }.to raise_error(
+          CedarAi::Errors::GraderError,
+          "The submission language is not supported for automatic grading."
+        )
+      end
+
+      it "raises GraderError with a generic message for ValidationError" do
+        allow(CedarClient).to receive(:grade_essay)
+          .and_raise(InstructureMiscPlugin::Extensions::CedarClient::ValidationError)
+
+        expect { service.call }.to raise_error(
+          CedarAi::Errors::GraderError,
+          "An unexpected error occurred while grading."
+        )
+      end
+
+      context "when the base CedarClientError is raised" do
+        it "raises GraderError with a generic message" do
+          allow(CedarClient).to receive(:grade_essay)
+            .and_raise(InstructureMiscPlugin::Extensions::CedarClient::CedarClientError.new("Cedar API errors (feature_slug: grading-assistance, root_account_uuid: abc):\nResponse: []"))
+
+          expect { service.call }.to raise_error(
+            CedarAi::Errors::GraderError,
+            "An unexpected error occurred while grading."
+          )
+        end
+
+        it "logs the original Cedar error details" do
+          cedar_error = InstructureMiscPlugin::Extensions::CedarClient::CedarClientError.new("verbose internal Cedar message")
+          allow(CedarClient).to receive(:grade_essay).and_raise(cedar_error)
+
+          expect(Rails.logger).to receive(:error).with(/\[GradeService\] Cedar API error: verbose internal Cedar message/)
+          begin
+            service.call
+          rescue CedarAi::Errors::GraderError
+            nil
+          end
+        end
+      end
     end
 
     # Test handling of partial responses from Cedar

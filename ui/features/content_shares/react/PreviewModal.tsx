@@ -17,12 +17,11 @@
  */
 
 import React from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Button} from '@instructure/ui-buttons'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import type {ContentShare} from '../types'
-
-const I18n = createI18nScope('content_share_preview_overlay')
 
 export interface PreviewModalProps {
   open?: boolean
@@ -35,6 +34,8 @@ export default function PreviewModal({
   share,
   onDismiss,
 }: PreviewModalProps): React.JSX.Element {
+  const {t} = useTranslation('content_share_preview_overlay')
+
   function sharePreviewUrl(): string | null {
     if (!share || !share.content_export?.attachment?.url) return null
     const downloadUrl = encodeURIComponent(share.content_export.attachment.url)
@@ -43,7 +44,7 @@ export default function PreviewModal({
   }
 
   function Footer(): React.JSX.Element {
-    return <Button onClick={onDismiss}>{I18n.t('Close')}</Button>
+    return <Button onClick={onDismiss}>{t('Close')}</Button>
   }
 
   return (
@@ -52,13 +53,15 @@ export default function PreviewModal({
       size="fullscreen"
       padding="0"
       closeButtonSize="medium"
-      label={I18n.t('Preview')}
+      label={t('Preview')}
       footer={Footer}
       onDismiss={onDismiss}
+      closeButtonLabel={t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <iframe
         style={{width: '100%', height: '100%', border: 'none', display: 'block'}}
-        title={I18n.t('Content Share Preview')}
+        title={t('Content Share Preview')}
         src={sharePreviewUrl() || undefined}
       />
     </CanvasModal>

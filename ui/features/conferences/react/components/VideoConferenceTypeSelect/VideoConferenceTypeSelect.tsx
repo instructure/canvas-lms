@@ -72,7 +72,6 @@ const VideoConferenceTypeSelect = ({conferenceTypes, onSetConferenceType, isEdit
 
   return (
     <View as="div" margin="medium" data-testid="conference-type-select">
-      {/* @ts-expect-error TS2769 (typescriptify) */}
       <Select
         renderLabel={I18n.t('Conference Type')}
         assistiveText={I18n.t('Use arrow keys to navigate options.')}
@@ -81,7 +80,9 @@ const VideoConferenceTypeSelect = ({conferenceTypes, onSetConferenceType, isEdit
         onBlur={handleBlur}
         onRequestShowOptions={handleShowOptions}
         onRequestHideOptions={handleHideOptions}
+        // @ts-expect-error TS7 migration
         onRequestHighlightOption={handleHighlightOption}
+        // @ts-expect-error TS7 migration
         onRequestSelectOption={handleSelectOption}
         disabled={isEditing}
       >

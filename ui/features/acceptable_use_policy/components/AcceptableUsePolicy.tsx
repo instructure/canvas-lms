@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Alert} from '@instructure/ui-alerts'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -30,9 +30,8 @@ import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 
 import styles from './AcceptableUsePolicy.module.css'
 
-const I18n = createI18nScope('acceptable_use_policy')
-
 const AcceptableUsePolicy = () => {
+  const {t} = useTranslation('acceptable_use_policy')
   const {content, loading, error} = useAUPContent()
   const navigate = useNavigate()
   const navigationType = useNavigationType()
@@ -49,7 +48,7 @@ const AcceptableUsePolicy = () => {
 
   const alertTermsUnavailable = () => (
     <Alert variant="error" transition="none" margin="none" hasShadow={false}>
-      {I18n.t(
+      {t(
         'Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.',
       )}
     </Alert>
@@ -57,14 +56,14 @@ const AcceptableUsePolicy = () => {
 
   const alertNoTerms = () => (
     <Alert variant="info" transition="none" margin="none" hasShadow={false}>
-      {I18n.t(
+      {t(
         'The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.',
       )}
     </Alert>
   )
 
   if (loading) {
-    return <Spinner renderTitle={I18n.t('Loading page')} />
+    return <Spinner renderTitle={t('Loading page')} />
   }
 
   return (
@@ -83,10 +82,10 @@ const AcceptableUsePolicy = () => {
               onClick={handleClose}
               placement="end"
               offset="none"
-              screenReaderLabel={I18n.t('Close')}
+              screenReaderLabel={t('Close')}
             />
 
-            <Heading>{I18n.t('Acceptable Use Policy')}</Heading>
+            <Heading>{t('Acceptable Use Policy')}</Heading>
           </View>
         </Flex.Item>
 

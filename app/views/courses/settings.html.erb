@@ -24,8 +24,16 @@
 
   can_manage = can_do(@context, @current_user, :manage)
   can_edit_course_content = can_do(@context, @current_user, :manage_course_content_edit)
-  can_manage = can_manage && can_edit_course_content
   can_set_grading_scheme = can_do(@context, @current_user, :set_grading_scheme)
+
+  if @context&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions)
+    can_edit_course_details = can_do(@context, @current_user, :manage_course_details)
+    can_manage &&= can_edit_course_details
+    can_set_grading_scheme &&= can_edit_course_details
+  else
+    can_manage &&= can_edit_course_content
+    can_set_grading_scheme &&= can_edit_course_content
+  end
 
   can_manage_courses = can_do(@context.account, @current_user, :manage_courses_admin)
   can_rename_course = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_renaming_by_teachers])
@@ -432,7 +440,7 @@
         </div>
         <div id="course_grading_scheme">
           <div class="checkbox-flex-container">
-            <%= f.check_box :course_grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_set_grading_scheme || !can_edit_course_content %>
+            <%= f.check_box :course_grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_set_grading_scheme %>
             <%= f.label :course_grading_standard_enabled, :en => "Enable course grading scheme" %>
           </div>
           <% if Account.site_admin.feature_enabled?(:grading_scheme_updates) %>

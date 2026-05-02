@@ -90,6 +90,7 @@ export default class GroupCategoryView extends View {
       // @ts-expect-error - Legacy Backbone typing
       addUnassignedMenu = new AddUnassignedMenu({collection: users})
     }
+    // @ts-expect-error TS7 migration
     return new GroupsView({
       // @ts-expect-error - Backbone View property
       collection: this.groups,
@@ -100,6 +101,7 @@ export default class GroupCategoryView extends View {
   // @ts-expect-error - Legacy Backbone typing
   unassignedUsersView(_options) {
     if (ENV.IS_LARGE_ROSTER) return false
+    // @ts-expect-error TS7 migration
     return new UnassignedUsersView({
       // @ts-expect-error - Backbone View property
       category: this.model,

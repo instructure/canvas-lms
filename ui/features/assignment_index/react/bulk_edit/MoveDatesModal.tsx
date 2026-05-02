@@ -24,7 +24,8 @@ import {NumberInput} from '@instructure/ui-number-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 
 const I18n = createI18nScope('assignments_bulk_edit')
 
@@ -193,6 +194,8 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
       onDismiss={handleCancel}
       size="small"
       padding="medium"
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
       {...otherModalProps}
     >
       <RadioInputGroup

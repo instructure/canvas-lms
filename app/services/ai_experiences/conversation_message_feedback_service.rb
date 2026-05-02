@@ -20,8 +20,8 @@
 
 module AiExperiences
   class ConversationMessageFeedbackService
-    def initialize
-      @client = LlmConversation::HttpClient.new
+    def initialize(account:)
+      @client = LlmConversation::HttpClient.new(account:)
     end
 
     def create(conversation_id:, message_id:, user_id:, vote:, feedback_message: nil)

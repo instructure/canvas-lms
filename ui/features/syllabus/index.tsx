@@ -80,6 +80,7 @@ ready(() => {
       const error = () => deferred.reject()
 
       const success = () => {
+        // @ts-expect-error TS7 migration
         if (collection.canFetch('next')) {
           return collection.fetch({page: 'next', success, error})
         }

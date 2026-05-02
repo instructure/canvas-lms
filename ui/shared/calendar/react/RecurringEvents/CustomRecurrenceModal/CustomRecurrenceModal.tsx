@@ -17,7 +17,8 @@
  */
 
 import React, {useCallback, useEffect, useState, type PropsWithChildren} from 'react'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import CustomRecurrence from '../CustomRecurrence/CustomRecurrence'
@@ -153,6 +154,8 @@ export default function CustomRecurrenceModal({
       padding="small medium"
       footer={<Footer canSave={isValidState} onDismiss={onDismiss} onSave={handleSave} />}
       shouldCloseOnDocumentClick={false}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
     >
       <div style={{minWidth: '28rem', minHeight: '21rem'}}>
         <CustomRecurrenceErrorBoundary>

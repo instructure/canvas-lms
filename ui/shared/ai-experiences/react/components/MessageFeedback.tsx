@@ -27,7 +27,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {FeedbackItem} from '../../types'
-import {navyButtonTheme, navyPillButtonTheme, RADIUS_PILL} from '../brand'
+import {navyButtonTheme, navyPillButtonTheme, lightBlueButtonTheme, RADIUS_PILL} from '../brand'
 
 const I18n = createI18nScope('ai_experiences')
 
@@ -37,6 +37,7 @@ const submitButtonTheme = navyButtonTheme
 
 interface MessageFeedbackProps {
   messageId: string
+  messageContainerId: string
   initialFeedback: FeedbackItem[]
   courseId: string | number
   aiExperienceId: string
@@ -51,6 +52,7 @@ interface FeedbackResponse {
 
 const MessageFeedback = ({
   messageId,
+  messageContainerId,
   initialFeedback,
   courseId,
   aiExperienceId,
@@ -124,6 +126,7 @@ const MessageFeedback = ({
       } else {
         await postFeedback('liked')
       }
+      setUiState('idle')
     } catch {
       // error state already set in postFeedback/removeFeedback
     }
@@ -175,6 +178,7 @@ const MessageFeedback = ({
           withBorder={true}
           color={isLiked ? 'primary' : 'secondary'}
           screenReaderLabel={I18n.t('Like this response')}
+          aria-describedby={messageContainerId}
           onClick={handleLike}
           interaction={buttonInteraction}
           data-testid="message-feedback-like"
@@ -189,6 +193,7 @@ const MessageFeedback = ({
             withBorder={true}
             color={isDisliked ? 'primary' : 'secondary'}
             screenReaderLabel={I18n.t('Dislike this response')}
+            aria-describedby={messageContainerId}
             onClick={handleDislike}
             interaction={buttonInteraction}
             data-testid="message-feedback-dislike"
@@ -247,6 +252,8 @@ const MessageFeedback = ({
             <Flex.Item>
               <Flex gap="small">
                 <Button
+                  color="primary"
+                  themeOverride={lightBlueButtonTheme}
                   interaction={buttonInteraction}
                   onClick={handleSkip}
                   data-testid="message-feedback-skip"

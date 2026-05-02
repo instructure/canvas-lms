@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import type {
   DeprecatedGradingScheme,
   FinalGradeOverride,
@@ -31,8 +31,6 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {scoreToGrade} from '@instructure/grading-utils'
 import {View} from '@instructure/ui-view'
 import {finalGradeOverrideUtils} from '../utils'
-
-const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export type FinalGradeOverrideTextBoxProps = {
   finalGradeOverride?: FinalGradeOverride
@@ -54,6 +52,7 @@ export function FinalGradeOverrideTextBox({
   restrictToTwoDigitsAfterSeparator = false,
   showPercentageLabel = false,
 }: FinalGradeOverrideTextBoxProps) {
+  const {t} = useTranslation('enhanced_individual_gradebook')
   const [inputValue, setInputValue] = useState<string>('')
   const [finalGradeOverridePercentage, setFinalGradeOverridePercentage] = useState<string>('')
 
@@ -124,7 +123,7 @@ export function FinalGradeOverrideTextBox({
     <>
       <TextInput
         display="inline-block"
-        renderLabel={<ScreenReaderContent>{I18n.t('Final Grade Override')}</ScreenReaderContent>}
+        renderLabel={<ScreenReaderContent>{t('Final Grade Override')}</ScreenReaderContent>}
         value={inputValue}
         onChange={handleFinalGradeOverrideChange}
         onBlur={handleFinalGradeOverrideBlur}

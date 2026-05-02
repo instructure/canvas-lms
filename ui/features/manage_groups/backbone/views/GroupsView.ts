@@ -23,13 +23,16 @@ import GroupDetailView from './GroupDetailView'
 import Filterable from '../mixins/Filterable'
 import template from '../../jst/groups.handlebars'
 
+// @ts-expect-error TS7 migration
 export default class GroupsView extends PaginatedCollectionView {
   static initClass() {
     // @ts-expect-error - Backbone View property
     this.mixin(Filterable)
 
+    // @ts-expect-error TS7 migration
     this.prototype.template = template
 
+    // @ts-expect-error TS7 migration
     this.prototype.els = {
       // override Filterable's els, since our filter is in another view
       ...PaginatedCollectionView.prototype.els,
@@ -69,6 +72,7 @@ export default class GroupsView extends PaginatedCollectionView {
 
   // @ts-expect-error - Legacy Backbone typing
   createItemView(group) {
+    // @ts-expect-error TS7 migration
     const groupUsersView = new GroupUsersView({
       model: group,
       collection: group.users(),
