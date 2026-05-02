@@ -98,6 +98,7 @@
 #         },
 #         "ratings": {
 #           "description": "possible ratings for this outcome. included only if the outcome embeds a rubric criterion. omitted in the abbreviated form.",
+#           "example": ["RubricRating"],
 #           "type": "array",
 #           "items": { "$ref" : "RubricRating" }
 #         },
@@ -120,6 +121,31 @@
 #           "description": "whether updates to this outcome will propagate to unassessed rubrics that have imported it",
 #           "example": true,
 #           "type": "boolean"
+#         }
+#       }
+#     }
+#
+# @model RubricRating
+#     {
+#       "id": "RubricRating",
+#       "properties": {
+#         "id": {
+#           "example": "name_2",
+#           "type": "string"
+#         },
+#         "criterion_id": {
+#           "example": "_10",
+#           "type": "string"
+#         },
+#         "description": {
+#           "type": "string"
+#         },
+#         "long_description": {
+#           "type": "string"
+#         },
+#         "points": {
+#           "example": "5",
+#           "type": "integer"
 #         }
 #       }
 #     }

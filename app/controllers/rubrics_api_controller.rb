@@ -323,7 +323,7 @@ class RubricsApiController < ApplicationController
 
   # @API Creates a rubric using a CSV file
   # Returns the rubric import object that was created
-  # @returns RubricImport
+  # @returns Rubric
   def upload
     return unless authorized_action(@context, @current_user, :manage_rubrics)
 
