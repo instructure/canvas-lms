@@ -81,6 +81,7 @@ ready(() => {
         themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
         useDyslexicFont: window.ENV.use_dyslexic_font ?? false,
         useHighContrast: window.ENV.use_high_contrast ?? false,
+        disableKeyboardShortcuts: window.ENV.disable_keyboard_shortcuts ?? false,
         commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
         lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
         ltiIframeAllowances: iframeAllowances(),

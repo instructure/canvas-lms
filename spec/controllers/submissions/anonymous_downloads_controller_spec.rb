@@ -87,10 +87,12 @@ describe Submissions::AnonymousDownloadsController do
     end
 
     it "sets attachment from attachments collection when attachment_id is not present" do
-      attachment = attachment_model(context: @context)
-      AttachmentAssociation.create!(context: @submission, attachment:)
+      attachment = attachment_model(context: @submission.user)
+      @submission.attachments = [attachment]
+      @submission.save!
+
       get :show, params: {
-        course_id: @context.id,
+        course_id: @course.id,
         assignment_id: @assignment.id,
         anonymous_id: @submission.anonymous_id,
         download: @submission.attachments.first.id

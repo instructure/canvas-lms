@@ -18,14 +18,24 @@
 import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import AssignmentInformation from '../index'
 import type {AssignmentInformationComponentProps} from '../index'
 import type {SubmissionConnection} from '../../../../types'
 import {assignmentInfoDefaultProps, defaultAssignment} from './fixtures'
 
+const mockShow = vi.fn()
+vi.mock('@canvas/assignment-posting-policy-tray', () => ({
+  default: React.forwardRef((_props: object, ref: React.Ref<{show: () => void}>) => {
+    React.useImperativeHandle(ref, () => ({show: mockShow}))
+    return <div data-testid="assignment-posting-policy-tray" />
+  }),
+}))
+
 describe('Assignment Information Tests', () => {
   beforeEach(() => {
     $.subscribe = vi.fn()
+    mockShow.mockClear()
   })
   const renderAssignmentInformation = (props: AssignmentInformationComponentProps) => {
     return render(<AssignmentInformation {...props} />)
@@ -248,6 +258,67 @@ describe('Assignment Information Tests', () => {
       const curveButton = getByTestId('curve-grades-button')
       expect(defaultButton).toBeEnabled()
       expect(curveButton).toBeEnabled()
+    })
+  })
+
+  describe('Grade Post Policy button', () => {
+    it('renders when an assignment is selected', () => {
+      const {getByTestId} = renderAssignmentInformation(assignmentInfoDefaultProps)
+      expect(getByTestId('grade-post-policy-button')).toBeInTheDocument()
+    })
+
+    it('does not render when no assignment is selected', () => {
+      const {queryByTestId} = renderAssignmentInformation({
+        ...assignmentInfoDefaultProps,
+        assignment: undefined,
+      })
+      expect(queryByTestId('grade-post-policy-button')).toBeNull()
+    })
+
+    it('opens the posting policy tray when clicked', async () => {
+      const {getByTestId} = renderAssignmentInformation(assignmentInfoDefaultProps)
+      await userEvent.click(getByTestId('grade-post-policy-button'))
+      expect(getByTestId('assignment-posting-policy-tray')).toBeInTheDocument()
+    })
+
+    it('reflects updated postManually state on subsequent tray opens', async () => {
+      const {getByTestId} = renderAssignmentInformation(assignmentInfoDefaultProps)
+      await userEvent.click(getByTestId('grade-post-policy-button'))
+      expect(mockShow).toHaveBeenCalledWith(
+        expect.objectContaining({assignment: expect.objectContaining({postManually: false})}),
+      )
+
+      mockShow.mock.calls[0][0].onAssignmentPostPolicyUpdated({
+        assignmentId: '1',
+        postManually: true,
+      })
+
+      await userEvent.click(getByTestId('grade-post-policy-button'))
+      expect(mockShow).toHaveBeenLastCalledWith(
+        expect.objectContaining({assignment: expect.objectContaining({postManually: true})}),
+      )
+    })
+
+    it('resets postManually when a different assignment is selected', async () => {
+      const {getByTestId, rerender} = renderAssignmentInformation(assignmentInfoDefaultProps)
+      await userEvent.click(getByTestId('grade-post-policy-button'))
+
+      mockShow.mock.calls[0][0].onAssignmentPostPolicyUpdated({
+        assignmentId: '1',
+        postManually: true,
+      })
+
+      rerender(
+        <AssignmentInformation
+          {...assignmentInfoDefaultProps}
+          assignment={{...defaultAssignment, id: '2', postManually: false}}
+        />,
+      )
+
+      await userEvent.click(getByTestId('grade-post-policy-button'))
+      expect(mockShow).toHaveBeenLastCalledWith(
+        expect.objectContaining({assignment: expect.objectContaining({postManually: false})}),
+      )
     })
   })
 })

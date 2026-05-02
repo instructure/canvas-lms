@@ -25,7 +25,7 @@ describe Submissions::AttachmentForSubmissionDownload do
 
   before :once do
     course_with_student(active_all: true)
-    assignment_model(course: @course)
+    assignment_model(course: @course, submission_types: "online_text_entry,online_upload")
     submission_model({
                        assignment: @assignment,
                        body: "here my assignment",
@@ -82,8 +82,12 @@ describe Submissions::AttachmentForSubmissionDownload do
 
     context "when download id is found in attachments collection ids" do
       before :once do
-        @attachment = attachment_model(context: @course)
-        AttachmentAssociation.create!(context: @submission, attachment: @attachment)
+        @attachment = attachment_model(context: @student)
+        @submission = @assignment.submit_homework(
+          @student,
+          attachments: [@attachment],
+          submission_type: "online_upload"
+        )
         @options = { download: @attachment.id }
       end
 

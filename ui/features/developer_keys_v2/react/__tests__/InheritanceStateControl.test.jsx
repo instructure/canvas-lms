@@ -22,13 +22,13 @@ import userEvent from '@testing-library/user-event'
 import storeCreator from '../store/store'
 import actions from '../actions/developerKeysActions'
 import InheritanceStateControl from '../InheritanceStateControl'
-import {confirm as confirmDialog} from '@canvas/instui-bindings/react/Confirm'
+import {confirm as confirmDialog} from '@instructure/platform-instui-bindings'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import $ from 'jquery'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-vi.mock('@canvas/instui-bindings/react/Confirm')
+vi.mock('@instructure/platform-instui-bindings')
 
 const server = setupServer(
   http.post(

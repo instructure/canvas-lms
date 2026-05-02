@@ -1,0 +1,306 @@
+{
+    "ConfirmationDialog": {
+        "Cancel": "Abbrechen",
+        "Confirm": "Bestätigen"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Als wichtiges Datum markieren und in Homeroom-Seitenleiste anzeigen"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Standard-Benotungsschema für Ihr Konto",
+        "Account default grading scheme was successfully saved.": "Das Standard-Benotungsschema für Ihr Konto wurde erfolgreich gespeichert.",
+        "Active Grading Schemes": "Aktive Benotungsschemata",
+        "Applied": "Übernommen",
+        "Apply": "Anwenden",
+        "Archive Grading Scheme": "Benotungsschema archivieren",
+        "Archived": "Archiviert",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Archivierte Benotungsschemata, die bereits in Gebrauch sind, können weiterhin verwendet werden, können aber nicht zu neuen Kursen oder Aufgaben hinzugefügt werden.",
+        "Are you sure you want to delete this grading scheme?": "Möchten Sie dieses Benotungssystem wirklich löschen?",
+        "Cancel": "Abbrechen",
+        "Canvas Default": "Canvas-Standard",
+        "Close": "Schließen",
+        "Confirm": "Bestätigen",
+        "Confirm Default Grading Scheme Change": "Änderung des Standard-Benotungsschemas bestätigen",
+        "Delete Grading Scheme": "Benotungssystem löschen",
+        "Duplicate Grading Scheme": "Benotungsschema duplizieren",
+        "Edit Grading Scheme": "Benotungssystem bearbeiten",
+        "Grading Scheme Name": "Name des Benotungsschemas",
+        "Grading scheme was successfully archived.": "Benotungsschema wurde erfolgreich archiviert.",
+        "Grading scheme was successfully created.": "Benotungsschema wurde erfolgreich erstellt.",
+        "Grading scheme was successfully removed.": "Benotungsschema wurde erfolgreich entfernt.",
+        "Grading scheme was successfully saved.": "Benotungsschema wurde erfolgreich gespeichert.",
+        "Grading scheme was successfully unarchived.": "Archivierung des Benotungsschemas wurde erfolgreich aufgehoben.",
+        "Locations Used": "Verwendete Standorte",
+        "Lower limit of range": "Untere Bereichsgrenze",
+        "New Grading Scheme": "Neues Benotungsschema",
+        "Next Page": "Nächste Seite",
+        "No account default": "Kein Standardkonto",
+        "Previous Page": "Vorherige Seite",
+        "Save": "Speichern",
+        "Search": "Suchen",
+        "Search...": "Suchen ...",
+        "Show courses and assignments": "Kurse und Aufgaben anzeigen",
+        "Show locations used": "Verwendete Orte anzeigen",
+        "Sort by": "Sortieren nach",
+        "There was an error while archiving the grading scheme": "Bei der Archivierung des Benotungsschemas ist ein Fehler aufgetreten",
+        "There was an error while creating the grading scheme": "Beim Erstellen des Benotungsschemas ist ein Fehler aufgetreten",
+        "There was an error while loading grading schemes": "Beim Laden der Benotungsschemata ist ein Fehler aufgetreten",
+        "There was an error while loading the default canvas grading scheme": "Beim Laden des standardmäßigen Canvas-Benotungsschemas ist ein Fehler aufgetreten",
+        "There was an error while loading the default grading scheme": "Beim Laden des standardmäßigen Benotungsschemas ist ein Fehler aufgetreten",
+        "There was an error while removing the grading scheme": "Beim Entfernen des Benotungsschemas ist ein Fehler aufgetreten",
+        "There was an error while unarchiving the grading scheme": "Bei der Aufhebung der Archivierung des Benotungsschemas ist ein Fehler aufgetreten",
+        "There was an error while updating the default grading scheme": "Beim Aktualisieren des standardmäßigen Benotungsschemas ist ein Fehler aufgetreten",
+        "There was an error while updating the grading scheme": "Beim Aktualisieren des Benotungsschemas ist ein Fehler aufgetreten",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Diese Änderung wirkt sich auf alle aktiven Kurse und Aufgaben aus, die derzeit den Kontostandard übernehmen. Diese Änderung wird einige Zeit in Anspruch nehmen, da alle Kurs- und Aufgabennoten unter Berücksichtigung des neuen Benotungsschemas für die Kontovorgabe neu berechnet werden.",
+        "Unarchive Grading Scheme": "Archivierung von Benotungsschema aufheben",
+        "Upper limit of range": "Obere Bereichsgrenze",
+        "View Grading Scheme": "Benotungssystem anzeigen",
+        "View/Copy Grading Scheme": "Benotungsschema anzeigen/kopieren",
+        "View/Edit Grading Scheme": "Benotungssystem anzeigen/bearbeiten",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "Sie können dieses Benotungsschema nicht archivieren, weil es als Standard für einen Kurs oder ein Konto eingestellt ist.",
+        "You can't delete this grading scheme because it is in use.": "Sie können dieses Benotungsschema nicht löschen, da es bereits verwendet wird.",
+        "You have no active grading schemes.": "Sie haben keine aktiven Benotungsschemata.",
+        "You have no archived grading schemes.": "Sie haben keine archivierten Benotungsschemata.",
+        "to": "bis"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Möchten Sie dieses Benotungssystem wirklich löschen?",
+        "Are you sure you want to duplicate this grading scheme?": "Sind Sie sicher, dass Sie dieses Benotungsschema duplizieren möchten?",
+        "Cancel": "Abbrechen",
+        "Close": "Schließen",
+        "Delete": "Löschen",
+        "Delete ": "Löschen ",
+        "Duplicate": "Duplizieren",
+        "Duplicate ": "Duplizieren ",
+        "Edit Grading Scheme": "Benotungssystem bearbeiten",
+        "New Grading Scheme": "Neues Benotungsschema",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Prozentsätze und Punkte können nicht bearbeitet werden, da es sich um ein Benotungsschema auf Kontoebene handelt.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Prozentsätze und Punkte können nicht bearbeitet werden, da es als Standard-Benotungsschema verwendet wird.",
+        "Percentages and points can't be edited because it is currently being used.": "Prozentsätze und Punkte können nicht bearbeitet werden, weil es gerade verwendet wird.",
+        "Save": "Speichern"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Eine Tabelle, die die Daten des standardmäßigen Canvas-Bewertungsschemas enthält.  Jede Zeile enthält einen Namen, einen maximalen und einen minimalen Prozentsatz.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Eine Tabelle, die Benotungsschemadaten enthält  Jede Zeile enthält einen Namen, einen maximalen und einen minimalen Prozentsatz.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Doppelte oder leere Zeilennamen sind nicht möglich. Korrigieren Sie die Namen und klicken Sie erneut auf „Speichern“.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Überlappende oder leere Bereiche sind nicht möglich. Korrigieren Sie die Bereiche und klicken Sie erneut auf „Speichern“.",
+        "Delete grading scheme": "Benotungsschema löschen",
+        "Edit Grading Scheme": "Benotungssystem bearbeiten",
+        "Edit a copy of this grading scheme": "Eine Kopie dieses Benotungsschemas bearbeiten",
+        "Edit grading scheme": "Benotungsschema bearbeiten",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Name des Benotungsschemas ist erforderlich. Fügen Sie einen Namen hinzu und klicken Sie erneut auf „Speichern“.",
+        "Grading scheme title": "Name des Benotungsschemas",
+        "Invalid grading scheme": "Ungültiges Benotungsschema",
+        "Letter Grade": "Buchstaben- oder Ziffernnote",
+        "Looks great!": "Sieht gut aus.",
+        "Percentage": "Prozentsatz",
+        "Points": "Punkte",
+        "Range": "Reichweite",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "Der Wert muss eine gültige Zahl sein. Negative Zahlen oder Zahlen, die größer als 100 sind, sind nicht möglich. Korrigieren Sie die Bereiche und klicken Sie erneut auf „Speichern“.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "Der Wert muss eine gültige Zahl sein. Der Bereich darf keine negativen Zahlen oder Zahlen enthalten, die größer als der obere Punktbereich sind. Korrigieren Sie die Bereiche und klicken Sie erneut auf „Speichern“.",
+        "edit a copy": "eine Kopie bearbeiten"
+    },
+    "OutcomeManagement": {
+        "Course": "Kurs",
+        "Institution": "Institution"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Konten",
+        "Close": "Schließen",
+        "Concluded": "Abgeschlossen",
+        "Courses": "Kurse",
+        "Failed to load account used locations": "Verwendete Kontostandorte konnten nicht geladen werden",
+        "Failed to load assignments used locations": "Verwendete Aufgabenstandorte konnten nicht geladen werden",
+        "Failed to load used locations": "Verwendete Orte konnten nicht geladen werden",
+        "Load Assignments ...": "Aufgaben laden ...",
+        "Load More Assignments ...": "Weitere Aufgaben laden ...",
+        "Loading": "Wird geladen",
+        "Locations Used": "Verwendete Standorte",
+        "Search": "Suchen",
+        "Search...": "Suchen ..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Nutzungsbedingungen für das Lernmanagementsystem Canvas",
+        "Close": "Schließen",
+        "Loading page": "Seite wird geladen",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Die Nutzungsbedingungen sind derzeit nicht verfügbar. Bitte versuchen Sie es später noch einmal oder wenden Sie sich an den Support, wenn Sie weitere Hilfe benötigen.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "Die Nutzungsbedingungen können nicht geladen werden. Bitte versuchen Sie es später noch einmal oder wenden Sie sich an den Support, wenn das Problem weiterhin besteht."
+    },
+    "account_reports": {
+        "Close": "Schließen",
+        "Invalid date and time.": "Ungültiges Datum und Uhrzeit.",
+        "Next month": "Nächster Monat",
+        "Previous month": "Voriger Monat",
+        "Time": "Zeit"
+    },
+    "admin_split": {
+        "Cancel": "Abbrechen",
+        "Failed to split users.": "Teilen der Benutzer\\\\*innen fehlgeschlagen",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "HINWEIS: Dies ist der Versuch, die Zusammenführung so vollständig wie möglich rückgängig zu machen. Die zusammengeführten Benutzer\\\\*innen werden möglicherweise nicht perfekt in ihren vorherigen Zustand versetzt.",
+        "OK": "OK",
+        "Split": "Teilen",
+        "The following users will be split into separate user accounts:": "Die folgenden Benutzer\\\\*innen werden auf getrennte Benutzerkonten aufgeteilt:",
+        "There are no user accounts to split from this user.": "Es gibt keine teilbaren Benutzerkonten von diesem/dieser Benutzer\\\\*in.",
+        "User split complete. Links to split user accounts follow:": "Teilen der Benutzer\\\\*in abgeschlossen Links zum Teilen von Benutzerkonten folgen:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Beschreibung"
+    },
+    "assignment_footer": {
+        "Next": "Weiter",
+        "Previous": "Vorherige/r/s"
+    },
+    "assignment_tabs": {
+        "Assignment": "Aufgabe",
+        "Peer Review": "Kollegenkorrektur"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(Kursstandard)",
+        "Account Level": "Kontoebene",
+        "Canvas Grading Scheme (course default)": "Canvas-Benotungsschema (Kursvorgabe)",
+        "Close": "Schließen",
+        "Course Level": "Kursebene",
+        "Default Canvas Grading Scheme": "Standardmäßiges Canvas-Benotungsschema",
+        "Grading scheme was successfully removed.": "Benotungsschema wurde erfolgreich entfernt.",
+        "Grading scheme was successfully updated.": "Das Benotungsschema wurde erfolgreich aktualisiert.",
+        "Manage All Grading Schemes": "Alle Benotungsschemata verwalten",
+        "New Grading Scheme": "Neues Benotungsschema",
+        "Select a grading scheme": "Benotungsschema auswählen",
+        "There was an error while loading grading schemes": "Beim Laden der Benotungsschemata ist ein Fehler aufgetreten",
+        "There was an error while loading the grading scheme": "Beim Laden des Benotungsschemas ist ein Fehler aufgetreten",
+        "There was an error while refreshing grading schemes": "Beim Aktualisieren der Benotungsschemata ist ein Fehler aufgetreten",
+        "There was an error while removing the grading scheme": "Beim Entfernen des Benotungsschemas ist ein Fehler aufgetreten",
+        "View": "Ansehen"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Aufgaben 2 Lehrende – Fehlerseite",
+        "Assignments 2 Teacher initial query error": "Aufgaben 2 Lehrende –  Fehler bei der Erstabfrage",
+        "Loading": "Wird geladen"
+    },
+    "catalog": {
+        "Course Catalog": "Kurskatalog"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Gute Arbeit! Von den Canvas-Entwicklern"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Abbrechen",
+        "Copy course": "Kurs kopieren",
+        "Course code": "Kurscode",
+        "Course code must be 255 characters or less": "Der Kurscode darf maximal 255 Zeichen lang sein",
+        "Course name must be 255 characters or less": "Der Kursname darf höchstens 255 Zeichen lang sein",
+        "Create course": "Kurs erstellen",
+        "Creating...": "wird erstellt ...",
+        "End date": "Enddatum",
+        "End date must be after start date": "Das Enddatum muss vor dem Startdatum liegen.",
+        "Name": "Name",
+        "No results": "Keine Ergebnisse",
+        "Please enter the details for the new course.": "Geben Sie die Details für den neuen Kurs ein.",
+        "Select a new beginning date": "Wählen Sie ein neues Anfangsdatum",
+        "Select a new end date": "Wählen Sie ein neues Enddatum",
+        "Select end date": "Enddatum auswählen",
+        "Select start date": "Startdatum auswählen",
+        "Start date": "Startdatum",
+        "Start date must be before end date": "Das Startdatum muss vor dem Enddatum liegen.",
+        "Start typing to search...": "Sucheingabe beginnen ...",
+        "Term": "Semester",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Die Start- und Enddaten des Semesters können hier nicht geändert werden, sondern nur auf der Seite „Semesterdetails“ unter „Admin“.",
+        "Use arrow keys to navigate options.": "Navigieren Sie mit den Pfeiltasten in den Optionen."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Schließen",
+        "Content Share Preview": "Vorschau der Inhalt-Freigabe",
+        "Preview": "Vorschau"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Achtung"
+    },
+    "course_logging_content": {
+        "No results": "Keine Ergebnisse",
+        "Type to search": "Eingabe zur Suche"
+    },
+    "create_course_modal": {
+        "Cancel": "Abbrechen",
+        "Course Details": "Kursdetails",
+        "Course Name": "Kursbezeichnung",
+        "Create": "Erstellen",
+        "Create Course": "Kurs erstellen",
+        "Create Subject": "Thema erstellen",
+        "Creating new course...": "Neuen Kurs erstellen ...",
+        "Creating new subject...": "Neues Thema erstellen ...",
+        "Error creating new course": "Fehler beim Erstellen eines neuen Kurses",
+        "Error creating new subject": "Fehler beim Erstellen eines neuen Themas",
+        "Loading accounts...": "Konten werden geladen ...",
+        "Name...": "Name ...",
+        "No Results": "Keine Ergebnisse",
+        "Select a homeroom": "Auswählen einer Organisationsstunde",
+        "Subject Name": "Name des Themas",
+        "Unable to get accounts": "Konten können nicht abgerufen werden",
+        "Unable to get homerooms": "Organisationsstunden können nicht abgerufen werden.",
+        "Use arrow keys to navigate options.": "Navigieren Sie mit den Pfeiltasten in den Optionen.",
+        "Which account will this course be associated with?": "Welchem Konto wird dieser Kurs zugeordnet?",
+        "Which account will this subject be associated with?": "Mit welchem Konto soll dieses Thema verknüpft werden?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Überschreiben der Gesamtnote"
+    },
+    "feature_flags": {
+        "Accept": "Akzeptieren",
+        "Cancel": "Abbrechen"
+    },
+    "filter_bar": {
+        "All": "Alle",
+        "Clear": "Löschen",
+        "Filter by": "Filtern nach",
+        "Search": "Suchen",
+        "Use arrow keys to navigate options.": "Navigieren Sie mit den Pfeiltasten in den Optionen."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Gruppe auswählen",
+        "Use arrow keys to navigate options.": "Navigieren Sie mit den Pfeiltasten in den Optionen."
+    },
+    "jobs": {
+        "Close": "Schließen"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Ein neues Modul erstellen"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Ein fleißiger Panda",
+        "Moves:": "Bewegungen:"
+    },
+    "overview_page": {
+        "Edit home page": "Homepage bearbeiten",
+        "Subject Home Page": "Betreff Startseite"
+    },
+    "pages_edit_title": {
+        "Page Title": "Seitentitel"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Abbrechen",
+        "Close": "Schließen"
+    },
+    "study_assist": {
+        "Back": "Zurück",
+        "Close": "Schließen",
+        "Page": "Seite"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "Eine gültige URL ist erforderlich",
+        "Website URL": "Website-URL"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Nutzungsbedingungen für das Lernmanagementsystem Canvas",
+        "Loading...": "Wird geladen ...",
+        "Preview": "Vorschau"
+    },
+    "todos_page": {
+        "Failed to load todos": "Laden von Todos fehlgeschlagen",
+        "Loading Additional Todo Details": "Zusätzliche Todo-Details werden geladen",
+        "Loading Todo Course Name": "Todo-Kursname laden",
+        "Loading Todo Title": "Todo-Titel laden"
+    },
+    "tray": {
+        "Close": "Schließen"
+    }
+}

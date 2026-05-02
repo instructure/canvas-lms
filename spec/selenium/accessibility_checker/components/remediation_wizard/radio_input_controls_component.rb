@@ -23,11 +23,11 @@ class RadioInputControlsComponent
   include SeleniumDependencies
 
   def select_option(label)
-    f("[data-testid='radio-#{label}']").find_element(:xpath, "following-sibling::label[1]").click
+    f("[data-testid=\"radio-#{label}\"]").find_element(:xpath, "following-sibling::label[1]").click
     wait_for_ajaximations
   end
 
   def option_displayed?(label)
-    element_exists?("[data-testid='radio-#{label}']")
+    element_exists?("[data-testid=\"radio-#{label}\"]")
   end
 end

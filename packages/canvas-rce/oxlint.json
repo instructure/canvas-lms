@@ -1,0 +1,84 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["react", "jsx_a11y", "import", "promise", "typescript"],
+  "jsPlugins": ["../../config/canvas-copyright.js"],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    "es/**/*",
+    "**/translations/**/*",
+    "**/node_modules/**"
+  ],
+  "rules": {
+    "no-console": "warn",
+    "no-undef": "warn",
+    "no-constant-binary-expression": "warn",
+    "no-dupe-class-members": "warn",
+    "no-dupe-keys": "warn",
+    "no-import-assign": "warn",
+    "no-loss-of-precision": "warn",
+    "no-prototype-builtins": "off",
+    "no-unexpected-multiline": "warn",
+    "no-unsafe-optional-chaining": "warn",
+    "no-unused-expressions": "off",
+    "no-unused-vars": "off",
+    "no-unused-private-class-members": "warn",
+    "no-useless-escape": "warn",
+    "prefer-const": "warn",
+    "no-redeclare": "warn",
+    "typescript/ban-ts-comment": "off",
+    "typescript/no-unused-vars": ["warn", {
+      "args": "all",
+      "argsIgnorePattern": "^_",
+      "caughtErrors": "all",
+      "caughtErrorsIgnorePattern": "^_",
+      "destructuredArrayIgnorePattern": "^_",
+      "varsIgnorePattern": "^_",
+      "ignoreRestSiblings": true
+    }],
+    "typescript/no-this-alias": "off",
+    "typescript/no-explicit-any": "off",
+    "typescript/no-unused-expressions": "warn",
+    "typescript/no-empty-object-type": "warn",
+    "typescript/no-unsafe-function-type": "warn",
+    "typescript/no-require-imports": "off",
+    "typescript/no-wrapper-object-types": "warn",
+    "typescript/no-non-null-asserted-optional-chain": "warn",
+    "react/jsx-key": "warn",
+    "react/no-string-refs": "warn",
+    "react/no-find-dom-node": "warn",
+    "react/jsx-no-target-blank": "warn",
+    "react/no-unknown-property": "warn",
+    "react/rules-of-hooks": "warn",
+    "react/exhaustive-deps": "warn",
+    "jsx_a11y/role-has-required-aria-props": "warn",
+    "jsx_a11y/no-autofocus": "warn",
+    "import/no-dynamic-require": "warn",
+    "import/no-nodejs-modules": "warn",
+    "promise/always-return": "off",
+    "promise/catch-or-return": "off"
+  },
+  "overrides": [
+    {
+      "files": ["src/**/*.{js,mjs,ts,jsx,tsx}"],
+      "rules": {
+        "canvas-copyright/notice": "error"
+      }
+    },
+    {
+      "files": [
+        "**/__tests__/**",
+        "src/**/__tests__/**",
+        "src/rce/plugins/tinymce-a11y-checker/rules/__mocks__/index.js"
+      ],
+      "plugins": ["jest"],
+      "rules": {
+        "jest/no-disabled-tests": "warn",
+        "jest/no-focused-tests": "error",
+        "jest/valid-expect": "error"
+      }
+    }
+  ]
+}

@@ -35,7 +35,8 @@ import {
 } from '@canvas/lti/model/AssetProcessor'
 import {IframeDimensions} from '@canvas/lti/model/common'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+import {getActiveCanvasTheme} from '@canvas/react'
+import {confirmDanger} from '@instructure/platform-instui-bindings'
 import {
   LtiLaunchDefinition,
   LtiLaunchPlacement,
@@ -212,6 +213,9 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
         message: null,
         messageDangerouslySetInnerHTML,
         confirmButtonLabel,
+        cancelButtonLabel: I18n.t('Cancel'),
+        closeButtonLabel: I18n.t('Close'),
+        theme: getActiveCanvasTheme(),
       })
     ) {
       set({attachedProcessors: get().attachedProcessors.filter((_, i) => i !== index)})

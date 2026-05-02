@@ -401,7 +401,6 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         },
       }
       const newEvent = commonEventFactory(objectData, event.possibleContexts())
-      // @ts-expect-error TS18047,TS2339 (typescriptify)
       newEvent.save(
         params,
         () => {

@@ -340,6 +340,7 @@ class Course < ApplicationRecord
   prepend Profile::Association
 
   before_create :set_restrict_quantitative_data_when_needed
+  before_create :snapshot_account_default_discussion_settings
 
   before_save :assign_uuid
   before_validation :assert_defaults
@@ -2149,7 +2150,6 @@ class Course < ApplicationRecord
       update
       read_outcomes
       view_unpublished_items
-      manage_feature_flags
       view_feature_flags
       read_rubrics
       use_student_view
@@ -2238,7 +2238,6 @@ class Course < ApplicationRecord
       manage
       update
       use_student_view
-      manage_feature_flags
       view_feature_flags
       set_grading_scheme
       manage_grading_schemes
@@ -2275,6 +2274,30 @@ class Course < ApplicationRecord
         (grants_right?(user, :manage) && !root_account.settings[:prevent_course_availability_editing_by_teachers])
     end
     can :edit_course_availability
+
+    given do |user|
+      # manage_feature_flags was extracted from the arrays where the :manage permission was granted.
+      # When the Feature flag is disabled and the user has the :manage permission, this means they also have the :manage_feature_flags permission
+      # Otherwise, also require the new permission
+      grants_right?(user, :manage) &&
+        (!account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions) || grants_right?(user, :manage_course_feature_options))
+    end
+    can :manage_feature_flags # match the permission name in the Account model (both models use the same controller)
+
+    given do |user|
+      grants_right?(user, :update) &&
+        (!account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions) || grants_right?(user, :manage_course_navigation))
+    end
+    can :update_nav
+
+    given do |user|
+      if account&.root_account&.feature_enabled?(:course_navigation_and_feature_options_permissions)
+        grants_right?(user, :manage_course_details)
+      else
+        grants_right?(user, :manage_course_content_edit)
+      end
+    end
+    can :update_course_details
   end
 
   def allows_gradebook_uploads?
@@ -2288,17 +2311,52 @@ class Course < ApplicationRecord
     !large_roster?
   end
 
+  UNPUBLISHED_PERMISSION_ENROLLMENT_TYPES = %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment].freeze
+
   def active_enrollment_allows(user, permission, allow_future: true)
     return false unless user && permission && !deleted?
 
     is_unpublished = created? || claimed?
     active_enrollments = fetch_on_enrollments("active_enrollments_for_permissions2", user, is_unpublished) do
       scope = enrollments.for_user(user).active_or_pending_by_date.select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
-      scope = scope.where(type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]) if is_unpublished
+      scope = scope.where(type: UNPUBLISHED_PERMISSION_ENROLLMENT_TYPES) if is_unpublished
       scope.to_a.each(&:clear_association_cache)
     end
     active_enrollments.each { |e| e.course = self } # set association so we don't requery
     active_enrollments.any? { |e| (allow_future || e.date_based_state_in_db == "active") && e.has_permission_to?(permission) }
+  end
+
+  def self.preload_active_enrollments_for_permissions(user, courses)
+    return unless user && courses.present?
+
+    Array(courses).group_by(&:shard).each do |shard, shard_courses|
+      shard.activate do
+        bulk_rows_by_course = nil
+        load_bulk = lambda do
+          bulk_rows_by_course ||= begin
+            rows = Enrollment
+                   .where(course_id: shard_courses.map(&:id))
+                   .where.not(workflow_state: "deleted")
+                   .for_user(user)
+                   .active_or_pending_by_date
+                   .select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
+                   .to_a
+            rows.each(&:clear_association_cache)
+            rows.group_by(&:course_id)
+          end
+        end
+
+        shard_courses.each do |course|
+          is_unpublished = course.created? || course.claimed?
+          course.fetch_on_enrollments("active_enrollments_for_permissions2", user, is_unpublished) do
+            load_bulk.call
+            for_course = bulk_rows_by_course[course.id] || []
+            for_course = for_course.select { |e| UNPUBLISHED_PERMISSION_ENROLLMENT_TYPES.include?(e.type) } if is_unpublished
+            for_course
+          end
+        end
+      end
+    end
   end
 
   def self.find_all_by_context_code(codes)
@@ -3476,6 +3534,7 @@ class Course < ApplicationRecord
   TAB_ITEM_BANKS = 23
   TAB_YOUTUBE_MIGRATION = 24
   TAB_AI_EXPERIENCES = 25
+  TAB_NOTEBOOK = 26
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3716,6 +3775,16 @@ class Course < ApplicationRecord
                           })
     end
 
+    if account.feature_enabled?(:notebook)
+      default_tabs << {
+        id: TAB_NOTEBOOK,
+        label: t("#tabs.notebook", "Notebook"),
+        css_class: "notebook",
+        href: :course_notebook_path,
+        visibility: "members"
+      }
+    end
+
     # Remove already cached tabs for Horizon courses
     if horizon_course?
       default_tabs.delete_if do |tab|
@@ -3920,6 +3989,7 @@ class Course < ApplicationRecord
 
         delete_unless.call([TAB_PEOPLE], :read_roster)
         delete_unless.call([TAB_DISCUSSIONS], :read_forum, :post_to_forum, :create_forum, :moderate_forum)
+        delete_unless.call([TAB_NOTEBOOK], :participate_as_student)
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
@@ -4050,6 +4120,8 @@ class Course < ApplicationRecord
   add_setting :allow_student_forum_attachments, boolean: true, default: true
   add_setting :allow_student_discussion_reporting, boolean: true, default: true
   add_setting :allow_student_anonymous_discussion_topics, boolean: true, default: false
+  add_setting :use_default_discussion_settings, boolean: true, default: false
+  add_setting :default_discussion_settings, arbitrary: true
   add_setting :show_total_grade_as_points, boolean: true, default: false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
   add_setting :default_student_gradebook_view, boolean: true, default: false
@@ -4932,6 +5004,18 @@ class Course < ApplicationRecord
        account.restrict_quantitative_data[:locked] == true
       self.restrict_quantitative_data = true
     end
+  end
+
+  def snapshot_account_default_discussion_settings
+    return unless account&.root_account&.feature_enabled?(:default_discussion_options)
+    # When a course is created, snapshot the course template's default
+    # discussion settings so that discussions use the defaults active at
+    # creation time.
+    return unless (template = account&.effective_course_template)
+
+    self.use_default_discussion_settings = template.use_default_discussion_settings?
+    defaults = template.default_discussion_settings
+    self.default_discussion_settings = defaults if defaults.present?
   end
 
   def log_create_to_publish_time

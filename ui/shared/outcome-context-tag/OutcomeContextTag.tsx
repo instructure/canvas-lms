@@ -22,11 +22,9 @@ import {Text} from '@instructure/ui-text'
 import {Tag} from '@instructure/ui-tag'
 import {View} from '@instructure/ui-view'
 import {IconCoursesLine} from '@instructure/ui-icons'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {colors} from '@instructure/canvas-theme'
 import IconInstitution from './IconInstitution'
-
-const I18n = createI18nScope('OutcomeManagement')
 
 interface OutcomeContextTagProps {
   outcomeContextType?: string
@@ -39,6 +37,7 @@ const OutcomeContextTag = ({
   outcomeContextId,
   margin = '0',
 }: OutcomeContextTagProps) => {
+  const {t} = useTranslation('OutcomeManagement')
   const trimmedContextType = outcomeContextType?.trim() || ''
   const trimmedContextId = outcomeContextId?.trim() || ''
 
@@ -47,11 +46,11 @@ const OutcomeContextTag = ({
   }
 
   const isAccount = trimmedContextType === 'Account'
-  const contextLabel = isAccount ? I18n.t('Institution') : I18n.t('Course')
+  const contextLabel = isAccount ? t('Institution') : t('Course')
 
   const ariaLabel = isAccount
-    ? I18n.t('This is an institution-level outcome')
-    : I18n.t('This is a course-level outcome')
+    ? t('This is an institution-level outcome')
+    : t('This is a course-level outcome')
   const icon = isAccount ? (
     <IconInstitution
       size="x-small"

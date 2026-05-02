@@ -17,7 +17,10 @@
       "#{DocumentationHelpers.topicize(current_object)}.html"
     end
 
-    mapping = options[:url_mappings].find { |m| m['old_url'].end_with?(current_filename) }
+    mapping = options[:url_mappings].find do |m|
+      # Extract filename from URL and compare exactly to avoid substring matches
+      m['old_url'].split('/').last == current_filename
+    end
 
     if mapping
       @redirect_url = mapping['new_url']

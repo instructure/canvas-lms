@@ -646,7 +646,7 @@ class AccountsController < ApplicationController
 
     ActiveRecord::Associations.preload(@accounts, [:root_account, :parent_account])
 
-    supported_includes = %w[course_count sub_account_count]
+    supported_includes = %w[course_count sub_account_count horizon_account]
     includes = Array(params[:include])
     includes &= supported_includes
 
@@ -2433,6 +2433,7 @@ class AccountsController < ApplicationController
                                    :external_notification_warning,
                                    :global_includes,
                                    :google_docs_domain,
+                                   :has_underage_users,
                                    :help_link_icon,
                                    :help_link_name,
                                    :include_integration_ids_in_gradebook_exports,

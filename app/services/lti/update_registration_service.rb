@@ -88,7 +88,6 @@ module Lti
                                                     comment: @comment) do
           update_registration!
 
-          # TEMPORARY: This is a temporary change. We'll revert this once we disable the old developer keys page.
           # For manual registrations, merge overlay into configuration instead of creating overlay.
           apply_overlay_to_manual_configuration!
 
@@ -112,13 +111,12 @@ module Lti
       registration.update!(@registration_params.merge({ updated_by: @updated_by }))
     end
 
-    # TEMPORARY: This is a temporary change. We'll revert this once we disable the old developer keys page.
     # For manual registrations (not dynamic), if an overlay is provided, merge it into the configuration
     # params instead of creating/updating an overlay. This allows manual registrations to be edited
     # directly rather than through overlays.
     def apply_overlay_to_manual_configuration!
       # Only apply if we have both a manual configuration and overlay params
-      return unless registration.manual_configuration.present? && @overlay_params.present?
+      return unless registration.manual_configuration.present? && !registration.template_registration_id && @overlay_params.present?
 
       # Validate overlay params before applying
       validation_errors = Schemas::Lti::Overlay.validation_errors(@overlay_params, allow_nil: true)
@@ -137,8 +135,8 @@ module Lti
                       current_config
                     end
 
-      # Apply overlay to the base configuration (additive: true for manual configs)
-      merged_config = Lti::Overlay.apply_to(@overlay_params, base_config, additive: true)
+      # Apply overlay to the base configuration
+      merged_config = Lti::Overlay.apply_to(@overlay_params, base_config)
 
       # Update configuration_params with the merged result
       @configuration_params = merged_config.slice(*Schemas::InternalLtiConfiguration.allowed_base_properties)

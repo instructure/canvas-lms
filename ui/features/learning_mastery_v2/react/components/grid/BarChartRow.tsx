@@ -16,22 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
 import {ContributingScoreAlignment} from '@canvas/outcomes/react/hooks/useContributingScores'
-import {colors} from '@instructure/canvas-theme'
+import {
+  OutcomeDistribution,
+  RatingDistribution,
+} from '@canvas/outcomes/react/types/mastery_distribution'
 import {Outcome, Student} from '@canvas/outcomes/react/types/rollup'
 import {
   BAR_CHART_HEIGHT,
   STUDENT_COLUMN_RIGHT_PADDING,
   STUDENT_COLUMN_WIDTH,
 } from '@canvas/outcomes/react/utils/constants'
-import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
-import {Row} from '@instructure/outcomes-ui/es/components/Gradebook/table/Row'
+import {colors} from '@instructure/canvas-theme'
 import {Cell} from '@instructure/outcomes-ui/es/components/Gradebook/table/Cell'
-import {
-  OutcomeDistribution,
-  RatingDistribution,
-} from '@canvas/outcomes/react/types/mastery_distribution'
+import {Row} from '@instructure/outcomes-ui/es/components/Gradebook/table/Row'
+import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {MasteryDistributionChartCell} from '../charts/MasteryDistributionChartCell'
 
 export interface BarChartRowProps {
@@ -54,6 +54,25 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
   isMobile,
 }) => {
   const rowIndex = -2 // Fixed row index for bar chart row
+  const [hoveredCellId, setHoveredCellId] = useState<string | null>(null)
+  const rowRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const rowEl = rowRef.current
+      if (!rowEl) return
+      const target = e.target as HTMLElement | null
+      if (!target || !rowEl.contains(target)) {
+        setHoveredCellId(prev => (prev !== null ? null : prev))
+        return
+      }
+      const cellEl = target.closest('[data-bar-chart-hover-id]') as HTMLElement | null
+      const newId = cellEl?.getAttribute('data-bar-chart-hover-id') ?? null
+      setHoveredCellId(prev => (prev !== newId ? newId : prev))
+    }
+    document.addEventListener('mousemove', handleMouseMove)
+    return () => document.removeEventListener('mousemove', handleMouseMove)
+  }, [])
 
   const getDistributionForOutcome = useCallback(
     (outcomeId: string | number): RatingDistribution[] | undefined => {
@@ -85,7 +104,11 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
   )
 
   return (
-    <Row>
+    <Row
+      setRef={(el: HTMLElement | null) => {
+        rowRef.current = el
+      }}
+    >
       {columns.map((column, columnIndex) => {
         if (column.key === 'student') {
           return (
@@ -104,11 +127,13 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
           )
         } else if (column.key.startsWith('outcome-')) {
           const outcome = column.data?.outcome as Outcome
+          const cellId = `bar-chart-outcome-${outcome.id}`
           return (
             <Cell
-              id={`bar-chart-outcome-${outcome.id}`}
-              key={`bar-chart-outcome-${outcome.id}`}
+              id={cellId}
+              key={cellId}
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
+              data-bar-chart-hover-id={cellId}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
               boxShadow={`-2px 0 0 0 ${colors.contrasts.grey1214}`}
@@ -123,17 +148,20 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
                 courseId={courseId}
                 isLoading={isLoading}
                 loadingTitle="Loading mastery distribution"
+                isHovered={hoveredCellId === cellId}
               />
             </Cell>
           )
         } else if (column.key.startsWith('contributing-score-')) {
           const outcome = column.data?.outcome as Outcome
           const alignment = column.data?.alignment as ContributingScoreAlignment
+          const cellId = `bar-chart-alignment-${outcome.id}-${alignment.alignment_id}`
           return (
             <Cell
-              id={`bar-chart-alignment-${outcome.id}-${alignment.alignment_id}`}
+              id={cellId}
               key={alignment.alignment_id}
               data-cell-id={`cell-${rowIndex}-${columnIndex}`}
+              data-bar-chart-hover-id={cellId}
               tabIndex={0}
               onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, rowIndex, columnIndex)}
               boxShadow={`-2px 0 0 0 ${colors.contrasts.grey1214}`}
@@ -151,6 +179,7 @@ export const BarChartRow: React.FC<BarChartRowProps> = ({
                 courseId={courseId}
                 isLoading={isLoading}
                 loadingTitle="Loading alignment distribution"
+                isHovered={hoveredCellId === cellId}
               />
             </Cell>
           )

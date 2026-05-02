@@ -154,7 +154,7 @@ module Importers
           end
 
           Assignment.suspend_due_date_caching do
-            Importers::DiscussionTopicImporter.process_migration(data, migration)
+            import_discussion_topics_with_permission_check(course, data, migration)
             migration.update_import_progress(70)
           end
           Importers::WikiPageImporter.process_migration(data, migration)
@@ -459,9 +459,10 @@ module Importers
       if assignments.any?
         Assignment.clear_cache_keys(assignments, :availability)
         skip_lpa = !!migration.date_shift_options || migration.should_skip_import?("LatePolicy")
+        sub_assignments = SubAssignment.active.where(parent_assignment_id: assignments.map(&:id)).to_a
         SubmissionLifecycleManager.recompute_course(
           migration.context,
-          assignments:,
+          assignments: assignments + sub_assignments,
           update_grades: true,
           executing_user: migration.user,
           skip_late_policy_applicator: skip_lpa,
@@ -534,6 +535,13 @@ module Importers
 
     def self.import_settings_from_migration(course, data, migration)
       return unless data[:course]
+
+      if course_settings_restricted?(course, migration)
+        migration.add_warning(
+          t("Course Settings were not imported because your role is restricted from modifying Course Settings.")
+        )
+        return
+      end
 
       settings = data[:course]
       if settings[:tab_configuration].is_a?(Array)
@@ -644,6 +652,15 @@ module Importers
       if course.course_sections.active.count > 1 && settings.key?(:hide_sections_on_course_users_page)
         course.hide_sections_on_course_users_page = settings[:hide_sections_on_course_users_page]
       end
+
+      if course.root_account.feature_enabled?(:default_discussion_options)
+        if settings.key?(:use_default_discussion_settings)
+          course.use_default_discussion_settings = settings[:use_default_discussion_settings]
+        end
+        if settings.key?(:default_discussion_settings)
+          course.default_discussion_settings = settings[:default_discussion_settings]
+        end
+      end
     end
 
     def self.shift_date_options(course, options = {})
@@ -742,6 +759,48 @@ module Importers
     def self.any_shift_date_missing?(date_shift_options_hash)
       date_shift_options_hash[:old_start_date].blank? || date_shift_options_hash[:old_end_date].blank? ||
         date_shift_options_hash[:new_start_date].blank? || date_shift_options_hash[:new_end_date].blank?
+    end
+
+    def self.course_settings_restricted?(course, migration)
+      return false unless migration.user
+      return false unless course.root_account.feature_enabled?(:course_navigation_and_feature_options_permissions)
+
+      !course.grants_right?(migration.user, :manage_course_details)
+    end
+
+    # Checks if the migrating user's role is restricted from modifying
+    # Discussion Settings. Only active when the default_discussion_options
+    # feature flag is enabled.
+    def self.discussion_settings_restricted?(course, migration)
+      return false unless migration.user
+      return false unless course.root_account.feature_enabled?(:default_discussion_options)
+
+      !course.grants_all_rights?(migration.user, *RoleOverride::GRANULAR_EDIT_DISCUSSION_TOPIC_PERMISSIONS)
+    end
+
+    # Imports Discussion Topics with a permission check:
+    # - If user is unrestricted, behaves as normal.
+    # - If user is restricted from modifying Discussion Settings, Discussion
+    #   Topics are skipped entirely and a warning is recorded. Announcements
+    #   are still imported.
+    def self.import_discussion_topics_with_permission_check(course, data, migration)
+      unless discussion_settings_restricted?(course, migration)
+        Importers::DiscussionTopicImporter.process_migration(data, migration)
+        return
+      end
+
+      Importers::DiscussionTopicImporter.process_announcements_migration(
+        Array(data["announcements"]), migration
+      )
+
+      discussion_topics_selected = !migration.copy_options ||
+                                   migration.is_set?(migration.copy_options[:everything]) ||
+                                   migration.is_set?(migration.copy_options[:all_discussion_topics])
+      if discussion_topics_selected
+        migration.add_warning(
+          t("Discussion Topics were not imported because your role is restricted from modifying Discussion Settings.")
+        )
+      end
     end
   end
 end

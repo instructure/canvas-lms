@@ -23,14 +23,30 @@ import React from 'react'
 import {legacyRender, render} from '@canvas/react'
 import DiscussionTopicKeyboardShortcutModal from './react/KeyboardShortcuts/DiscussionTopicKeyboardShortcutModal'
 import {Portal} from '@instructure/ui-portal'
-import {mountNutritionFacts} from '@canvas/nutrition-facts'
-import {NutritionFacts} from '@canvas/nutrition-facts/react/NutritionFacts'
+import {NutritionFacts} from '@instructure/platform-nutrition-facts'
 import {AiInfo} from '@instructure.ai/aiinfo'
 import type {FeatureInfo} from '@instructure.ai/aiinfo'
 import {captureException} from '@sentry/browser'
 import {createPortal} from 'react-dom'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('nutrition_facts')
+
+const nutritionFactsTranslations = () => ({
+  title: '',
+  triggerScreenReaderLabel: I18n.t('Nutrition facts'),
+  dataPermissionLevelsTitle: I18n.t('Data Permission Levels'),
+  dataPermissionLevelsCurrentFeatureText: I18n.t('Current Feature:'),
+  dataPermissionLevelsCloseIconButtonScreenReaderLabel: I18n.t('Close'),
+  dataPermissionLevelsCloseButtonText: I18n.t('Close'),
+  dataPermissionLevelsModalLabel: I18n.t('This is a Data Permission Levels modal'),
+  nutritionFactsModalLabel: I18n.t('This is a modal for AI facts'),
+  nutritionFactsTitle: I18n.t('Nutrition Facts'),
+  nutritionFactsCloseButtonText: I18n.t('Close'),
+  nutritionFactsCloseIconButtonScreenReaderLabel: I18n.t('Close'),
+})
 
 // @ts-expect-error TS7031 (typescriptify)
 function DiscussionPageLayout({navbarHeight}) {
@@ -124,7 +140,7 @@ const mergeFeatureData = (features: string[]) => {
   }
 }
 
-const mountMergedNutritionFacts = (features: string[]) => {
+const mountNutritionFacts = (features: string[]) => {
   const merged = mergeFeatureData(features)
   if (!merged) return
 
@@ -158,10 +174,14 @@ const mountMergedNutritionFacts = (features: string[]) => {
         }
         return createPortal(
           <NutritionFacts
-            responsiveProps={responsiveProps}
-            aiInformation={merged.aiInformation}
-            dataPermissionLevels={merged.dataPermissionLevels}
+            aiInformation={merged.aiInformation.data}
+            dataPermissionLevels={merged.dataPermissionLevels.data}
             nutritionFacts={merged.nutritionFacts}
+            translations={nutritionFactsTranslations()}
+            fullscreenModals={responsiveProps.fullscreenModals}
+            color={responsiveProps.color}
+            buttonColor={responsiveProps.buttonColor}
+            withBackground={responsiveProps.withBackground}
           />,
           node,
         )
@@ -184,10 +204,8 @@ ready(() => {
   if (ENV?.user_can_summarize) {
     nutritionFeatures.push('canvasdiscussionsummaries')
   }
-  if (nutritionFeatures.length === 1) {
-    mountNutritionFacts(nutritionFeatures[0])
-  } else if (nutritionFeatures.length > 1) {
-    mountMergedNutritionFacts(nutritionFeatures)
+  if (nutritionFeatures.length > 0) {
+    mountNutritionFacts(nutritionFeatures)
   }
   document.querySelector('body')?.classList.add('full-width')
   document.querySelector('div.ic-Layout-contentMain')?.classList.remove('ic-Layout-contentMain')

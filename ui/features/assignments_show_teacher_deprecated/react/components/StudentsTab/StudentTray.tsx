@@ -300,13 +300,14 @@ export default class StudentTray extends React.Component {
               </Flex.Item>
               <Flex.Item shouldGrow={true} textAlign="center">
                 <Heading level="h3" as="h2">
-                  {/* @ts-expect-error */}
                   <Link
+                    // @ts-expect-error TS7 migration
                     size="large"
                     href={studentProfileUrl}
                     isWithinText={false}
                     aria-label={I18n.t("Go to %{name}'s profile", {name: student.shortName})}
                     target="_blank"
+                    // @ts-expect-error TS7 migration
                     themeOverride={{largePadding: '0.75rem', largeHeight: 'normal'}}
                   >
                     {student.shortName}

@@ -1681,4 +1681,86 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "csp_context" do
+    describe "when attachment context_type is User" do
+      before(:once) do
+        @course = course_factory(active_all: true)
+        @student = user_factory(active_all: true)
+        @course.enroll_student(@student, enrollment_state: "active")
+        @assignment = @course.assignments.create!(title: "Test Assignment", submission_types: "online_upload")
+      end
+
+      let(:attachment) do
+        Attachment.create!(
+          filename: "test.txt",
+          context: @student,
+          uploaded_data: StringIO.new("test content")
+        )
+      end
+
+      it "returns the course when attachment has one submission association" do
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to eq(@course)
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(true)
+      end
+
+      it "returns nil when attachment has no submission associations" do
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to be_nil
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(false)
+      end
+
+      it "returns nil when attachment has submissions from multiple courses" do
+        course2 = course_factory(active_all: true)
+        course2.enroll_student(@student, enrollment_state: "active")
+        assignment2 = course2.assignments.create!(title: "Test Assignment 2", submission_types: "online_upload")
+
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+        assignment2.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to be_nil
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(false)
+      end
+
+      it "returns the course when attachment has multiple submissions from the same course" do
+        assignment2 = @course.assignments.create!(title: "Test Assignment 2", submission_types: "online_upload")
+
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+        assignment2.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to eq(@course)
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(true)
+      end
+
+      it "does not return courses where the attachment is only referenced in past, but not current, submission attempts" do
+        attachment2 = Attachment.create!(
+          filename: "file2.txt",
+          context: @student,
+          uploaded_data: StringIO.new("second attempt")
+        )
+
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment])
+        @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [attachment2])
+
+        @attachment = attachment
+        result = helper.csp_context
+
+        expect(result).to be_nil
+        expect(helper.instance_variable_get(:@csp_context_is_submission)).to be(false)
+      end
+    end
+  end
 end

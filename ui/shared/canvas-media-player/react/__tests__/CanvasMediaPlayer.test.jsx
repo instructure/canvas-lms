@@ -504,8 +504,7 @@ describe('CanvasMediaPlayer', () => {
             expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
           })
         })
-        // TODO: re-enable when @instructure/ui-media-player is updated for InstUI v11
-        it.skip('skips fullscreen button when not enabled', () => {
+        it('skips fullscreen button when not enabled', () => {
           document.webkitFullscreenEnabled = false
           const {queryAllByText, container} = render(
             <CanvasMediaPlayer
@@ -530,10 +529,7 @@ describe('CanvasMediaPlayer', () => {
           expect(queryByLabelText('Quality')).not.toBeInTheDocument()
         })
       })
-      // TODO: ui-media-player v11 changed how the Player component renders
-      // internally, causing controls to not mount in jsdom. Re-enable
-      // once upstream fix is released.
-      it.skip('includes the CC button when there are subtitle track(s)', () => {
+      it('includes the CC button when there are subtitle track(s)', () => {
         const {getAllByText, getByLabelText, queryByLabelText, container, getByRole} = render(
           <CanvasMediaPlayer
             media_id="dummy_media_id"

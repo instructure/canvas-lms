@@ -37,7 +37,6 @@ interface BaseCaptionRowProps {
  */
 interface ProcessingCaptionRowProps extends BaseCaptionRowProps {
   workflow_state: 'processing'
-  processingText?: string
 }
 
 /**
@@ -45,7 +44,8 @@ interface ProcessingCaptionRowProps extends BaseCaptionRowProps {
  */
 interface FailedCaptionRowProps extends BaseCaptionRowProps {
   workflow_state: 'failed'
-  errorMessage?: string
+  failedOperation?: 'upload' | 'delete' | 'asr'
+  asr?: boolean
   onRetry?: () => void
   onDelete?: () => void
 }
@@ -73,21 +73,43 @@ const CAPTIONS_MESSAGE =
   'Captions inherited from a parent course cannot be removed. You can replace by uploading a new caption file.'
 const DELETE_CAPTIONS_MESSAGE = 'Delete {captionName}'
 
+export function getStatusText(
+  workflow_state: CaptionRowProps['workflow_state'],
+  failedOperation?: 'upload' | 'delete' | 'asr',
+  asr?: boolean,
+): string | undefined {
+  if (workflow_state === 'processing') {
+    return formatMessage('Processing...')
+  }
+  if (workflow_state === 'failed') {
+    if (failedOperation === 'delete') return formatMessage('Delete failed')
+    if (failedOperation === 'asr' || asr) return formatMessage('Generation failed')
+    return formatMessage('Upload failed')
+  }
+  return undefined
+}
+
 /**
  * Displays a single caption row with status-specific UI
  */
 export function CaptionRow(props: CaptionRowProps) {
   const {workflow_state, captionName} = props
 
+  const {failedOperation, asr} = props as FailedCaptionRowProps
+  const statusText = getStatusText(workflow_state, failedOperation, asr)
+  const ariaLabel = statusText ? `${captionName}, ${statusText}` : captionName
+
   return (
-    <View as="div" padding="space8 0" borderWidth="0 0 small 0">
+    <View as="div" padding="space8 0" borderWidth="0 0 small 0" tabIndex={0} aria-label={ariaLabel}>
       <Flex justifyItems="space-between" alignItems="center">
         {/* Left side: Language and filename */}
         <Flex.Item shouldGrow shouldShrink>
           <View as="div">
             <View as="div" margin="xx-small 0 0 0">
               <TruncateText maxLines={1}>
-                <Text variant="contentImportant">{captionName}</Text>
+                <Text variant="contentImportant" aria-hidden="true">
+                  {captionName}
+                </Text>
               </TruncateText>
             </View>
           </View>
@@ -97,16 +119,16 @@ export function CaptionRow(props: CaptionRowProps) {
         <Flex.Item>
           {workflow_state === 'processing' && (
             <Flex alignItems="center" gap="small">
-              <Text variant="content">
-                {props.processingText || formatMessage('Processing...')}
+              <Text variant="content" aria-hidden="true">
+                {statusText}
               </Text>
             </Flex>
           )}
 
           {workflow_state === 'failed' && (
             <Flex alignItems="center" gap="small">
-              <Text size="small" color="danger">
-                {props.errorMessage || formatMessage('Upload Failed')}
+              <Text size="small" color="danger" aria-hidden="true">
+                {statusText}
               </Text>
               {props.onRetry && (
                 <IconButton

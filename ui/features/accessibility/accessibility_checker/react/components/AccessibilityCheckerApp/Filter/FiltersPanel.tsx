@@ -36,7 +36,7 @@ import FilterCheckboxGroup from './FilterCheckboxGroup'
 import AppliedFilters from './AppliedFilters'
 import CustomToggleGroup from './CustomToggleGroup'
 import {Alert} from '@instructure/ui-alerts'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
+import {getLiveRegion} from '@instructure/platform-instui-bindings'
 import {useAccessibilityScansStore} from '../../../../../shared/react/stores/AccessibilityScansStore'
 
 const I18n = createI18nScope('accessibility_checker')

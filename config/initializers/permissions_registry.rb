@@ -2265,7 +2265,6 @@ BASE_PERMISSIONS = {
     group: :manage_institutional_tags,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
-    account_only: :root,
     account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
     account_details: [
       { title: -> { I18n.t("Institutional Tags") },
@@ -2277,7 +2276,6 @@ BASE_PERMISSIONS = {
     group: :manage_institutional_tags,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
-    account_only: :root,
     account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
     account_details: [
       { title: -> { I18n.t("Institutional Tags") },
@@ -2289,7 +2287,6 @@ BASE_PERMISSIONS = {
     group: :manage_institutional_tags,
     available_to: %w[AccountAdmin AccountMembership],
     true_for: %w[AccountAdmin],
-    account_only: :root,
     account_allows: ->(a) { a.feature_enabled?(:institutional_tags) },
     account_details: [
       { title: -> { I18n.t("Institutional Tags") },
@@ -2409,6 +2406,80 @@ BASE_PERMISSIONS = {
     account_details: [
       { title: -> { I18n.t("Automation Rules") },
         description: -> { I18n.t("Allows user to delete automation rules on the account.") } }
+    ]
+  },
+  manage_course_details: {
+    label: -> { I18n.t("Manage Course Details") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:course_navigation_and_feature_options_permissions) },
+    course_details: [
+      { title: -> { I18n.t("Manage Course Details") },
+        description: -> { I18n.t("Allows the user to edit the Course Details tab in the Course Settings page.") } }
+    ]
+  },
+  manage_course_navigation: {
+    label: -> { I18n.t("Manage Course Navigation") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:course_navigation_and_feature_options_permissions) },
+    course_details: [
+      { title: -> { I18n.t("Manage Course Navigation") },
+        description: -> { I18n.t("Allows the user to reorder, enable, or disable items in the Course Navigation.") } }
+    ]
+  },
+  manage_course_feature_options: {
+    label: -> { I18n.t("Manage Course Feature Options") },
+    available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment],
+    true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:course_navigation_and_feature_options_permissions) },
+    course_details: [
+      { title: -> { I18n.t("Manage Course Feature Options") },
+        description: -> { I18n.t("Allows the user to toggle the state of feature options in the Course Settings.") } }
+    ]
+  },
+  edit_discussion_anonymity: {
+    label: -> { I18n.t("Discussions - edit anonymous discussion") },
+    available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
+    true_for: %w[TeacherEnrollment AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:default_discussion_options) },
+    course_details: [
+      { title: -> { I18n.t("Discussions - edit anonymous discussion") },
+        description: -> { I18n.t("Allows the user to edit anonymous discussion settings.") } }
+    ]
+  },
+  edit_discussion_options: {
+    label: -> { I18n.t("Discussions - edit options") },
+    available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
+    true_for: %w[TeacherEnrollment AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:default_discussion_options) },
+    course_details: [
+      { title: -> { I18n.t("Discussions - edit options") },
+        description: -> { I18n.t("Allows the user to edit discussion options (threaded replies, podcast, liking, etc.).") } }
+    ]
+  },
+  edit_discussion_views: {
+    label: -> { I18n.t("Discussions - edit view") },
+    available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
+    true_for: %w[TeacherEnrollment AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:default_discussion_options) },
+    course_details: [
+      { title: -> { I18n.t("Discussions - edit view") },
+        description: -> { I18n.t("Allows the user to edit discussion view settings (sort order, thread state).") } }
+    ]
+  },
+  apply_default_discussion_options: {
+    label: -> { I18n.t("Discussions - apply default options") },
+    available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
+    true_for: %w[TeacherEnrollment AccountAdmin],
+    account_allows: ->(a) { a.root_account.feature_enabled?(:default_discussion_options) },
+    course_details: [
+      { title: -> { I18n.t("Discussions - apply default options") },
+        description: -> { I18n.t("Allows the user to toggle whether or not a newly created discussion will have the selected default options applied to it.") } }
+    ],
+    course_considerations: [
+      # tbd - we may want to apply defaults to imported discussions
+      { description: -> { I18n.t("Importing a Discussion via the 'Import Course Content' feature will keep its original options selected.") } },
     ]
   }
 }.freeze

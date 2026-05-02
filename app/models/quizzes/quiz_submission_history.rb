@@ -52,7 +52,7 @@ class Quizzes::QuizSubmissionHistory
       hash[model.attempt] << model
     end
 
-    results = by_attempt.sort_by { |num, _| -num }.map do |_, attempt_models|
+    by_attempt.sort_by { |num, _| -num }.map do |_, attempt_models|
       model = attempt_models.last
       if model&.attempt == quiz_submission.attempt
         # Use the live record for the current attempt so score changes from
@@ -64,10 +64,6 @@ class Quizzes::QuizSubmissionHistory
         model
       end
     end
-
-    # In-progress attempt has no version yet; prepend the live record.
-    results.prepend(quiz_submission) unless by_attempt.key?(quiz_submission.attempt)
-    results
   end
 
   def version_models

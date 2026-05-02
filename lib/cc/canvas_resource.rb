@@ -264,6 +264,17 @@ module CC
         if @course.course_sections.active.count > 1
           c.hide_sections_on_course_users_page(@course.hide_sections_on_course_users_page)
         end
+
+        if @course.account.feature_enabled?(:default_discussion_options)
+          c.use_default_discussion_settings(@course.use_default_discussion_settings) unless @course.use_default_discussion_settings.nil?
+          if @course.default_discussion_settings.present?
+            c.default_discussion_settings do |dds|
+              @course.default_discussion_settings.each do |key, value|
+                dds.tag!(key, value)
+              end
+            end
+          end
+        end
       end
       course_file&.close
       rel_path

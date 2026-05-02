@@ -36,7 +36,8 @@ vi.mock('@instructure/platform-alerts', async () => {
 })
 
 // Mock the confirm dialog
-vi.mock('@canvas/instui-bindings/react/Confirm', () => ({
+vi.mock('@instructure/platform-instui-bindings', async () => ({
+  ...(await vi.importActual<typeof import('@instructure/platform-instui-bindings')>('@instructure/platform-instui-bindings')),
   confirmDanger: vi.fn(() => Promise.resolve(true)),
 }))
 

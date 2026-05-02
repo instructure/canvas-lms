@@ -1,0 +1,306 @@
+{
+    "ConfirmationDialog": {
+        "Cancel": "Cancelar",
+        "Confirm": "Confirmar"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Marcar como fecha importante y mostrar en la barra lateral del aula"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Esquema predeterminado de evaluaciones de la cuenta",
+        "Account default grading scheme was successfully saved.": "El esquema predeterminado de evaluaciones de la cuenta se ha guardado correctamente.",
+        "Active Grading Schemes": "Activar esquemas de evaluación",
+        "Applied": "Aplicado",
+        "Apply": "Aplicar",
+        "Archive Grading Scheme": "Esquema de evaluación guardado",
+        "Archived": "Archivado",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Les esquemas de evaluación guardados que estén usándose se pueden utilizar, pero no se pueden añadir a nuevos cursos ni actividades.",
+        "Are you sure you want to delete this grading scheme?": "¿Estás seguro de que quieres eliminar este esquema de evaluaciones?",
+        "Cancel": "Cancelar",
+        "Canvas Default": "Canvas predeterminado",
+        "Close": "Cerrar",
+        "Confirm": "Confirmar",
+        "Confirm Default Grading Scheme Change": "Confirmar cambio de esquema de evaluaciones predeterminado",
+        "Delete Grading Scheme": "Eliminar esquema de evaluación",
+        "Duplicate Grading Scheme": "Duplicar esquema de evaluación",
+        "Edit Grading Scheme": "Editar esquema de evaluación",
+        "Grading Scheme Name": "Nombre del esquema de evaluación",
+        "Grading scheme was successfully archived.": "El esquema de evaluación se ha guardado correctamente.",
+        "Grading scheme was successfully created.": "El esquema de evaluación se ha creado correctamente.",
+        "Grading scheme was successfully removed.": "El esquema de evaluación se ha eliminado correctamente.",
+        "Grading scheme was successfully saved.": "El esquema de evaluación se ha guardado correctamente.",
+        "Grading scheme was successfully unarchived.": "El esquema de evaluación no se ha guardado correctamente.",
+        "Locations Used": "Ubicaciones utilizadas",
+        "Lower limit of range": "Límite inferior del intervalo",
+        "New Grading Scheme": "Nuevo esquema de evaluación",
+        "Next Page": "Siguiente página",
+        "No account default": "No hay ninguna cuenta predeterminada",
+        "Previous Page": "Página anterior",
+        "Save": "Guardar",
+        "Search": "Buscar",
+        "Search...": "Buscar...",
+        "Show courses and assignments": "Mostrar cursos y actividades",
+        "Show locations used": "Mostrar ubicaciones utilizadas",
+        "Sort by": "Ordenar por",
+        "There was an error while archiving the grading scheme": "Ha habido un error al guardar el esquema de evaluación",
+        "There was an error while creating the grading scheme": "Ha habido un error al crear el esquema de evaluación",
+        "There was an error while loading grading schemes": "Ha habido un error al cargar los esquemas de evaluación",
+        "There was an error while loading the default canvas grading scheme": "Ha habido un error al cargar el esquema de evaluación predeterminado de Canvas",
+        "There was an error while loading the default grading scheme": "Ha habido un error al cargar el esquema de evaluación predeterminado",
+        "There was an error while removing the grading scheme": "Ha habido un error al eliminar el esquema de evaluación",
+        "There was an error while unarchiving the grading scheme": "Ha habido un error al no guardar el esquema de evaluación",
+        "There was an error while updating the default grading scheme": "Ha habido un error al actualizar el esquema de evaluaciones predeterminado",
+        "There was an error while updating the grading scheme": "Ha habido un error al actualizar el esquema de evaluación",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Este cambio afectará a todas las actividades y asignaturas activas que actualmente heredan la cuenta predeterminada. Este cambio tardará un tiempo en materializarse, dado que se recalculan todas las notas de las actividades y asignaturas según el nuevo esquema de evaluaciones predeterminado de la cuenta.",
+        "Unarchive Grading Scheme": "Esquema de evaluación sin guardar",
+        "Upper limit of range": "Límite superior del intervalo",
+        "View Grading Scheme": "Ver esquema de evaluación",
+        "View/Copy Grading Scheme": "Ver/Copiar esquema de evaluación",
+        "View/Edit Grading Scheme": "Ver/Editar esquema de evaluación",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "No puedes archivar este esquema de evaluaciones porque es el predeterminado para una asignatura o una cuenta.",
+        "You can't delete this grading scheme because it is in use.": "No puedes eliminar el esquema de evaluación porque se está utilizando.",
+        "You have no active grading schemes.": "Tienes esquemas de evaluación no activados.",
+        "You have no archived grading schemes.": "Tienes esquemas de evaluación no guardados.",
+        "to": "hasta"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "¿Estás seguro de que quieres eliminar este esquema de evaluaciones?",
+        "Are you sure you want to duplicate this grading scheme?": "¿Estás seguro de que quieres duplicar este esquema de evaluación?",
+        "Cancel": "Cancelar",
+        "Close": "Cerrar",
+        "Delete": "Eliminar",
+        "Delete ": "Eliminar ",
+        "Duplicate": "Duplicado",
+        "Duplicate ": "Duplicado ",
+        "Edit Grading Scheme": "Editar esquema de evaluación",
+        "New Grading Scheme": "Nuevo esquema de evaluación",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "Los porcentajes y la puntuación no se pueden editar porque es un esquema de evaluación del nivel de cuenta.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "Los porcentajes y la puntuación no se pueden editar porque se están utilizando como esquema de evaluación predeterminado.",
+        "Percentages and points can't be edited because it is currently being used.": "Los porcentajes y la puntuación no se pueden editar porque se están utilizando actualmente.",
+        "Save": "Guardar"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Una tabla que contiene información sobre el esquema de evaluación predeterminado de Canvas.  Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Una tabla que contiene información sobre el esquema de evaluación.  Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "No se pueden tener nombres de filas vacíos o duplicados. Corrige los nombres e intenta «Guardar» de nuevo.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "No puede haber intervalos superpuestos o vacíos. Corrige los intervalos e intenta «Guardar» de nuevo.",
+        "Delete grading scheme": "Eliminar esquema de evaluación",
+        "Edit Grading Scheme": "Editar esquema de evaluación",
+        "Edit a copy of this grading scheme": "Editar una copia de este esquema de evaluación",
+        "Edit grading scheme": "Editar esquema de evaluación",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "El nombre del esquema de evaluación es obligatorio. Añadir un nombre e intentar «Guardar» de nuevo.",
+        "Grading scheme title": "Título del esquema de evaluación",
+        "Invalid grading scheme": "Esquema de evaluación no válido",
+        "Letter Grade": "Nota por letra",
+        "Looks great!": "¡Se ve muy bien!",
+        "Percentage": "Porcentaje",
+        "Points": "Puntos",
+        "Range": "Intervalo",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "El intervalo debe ser un número correcto. No puede haber números negativos o superiores a 100. Corrige los intervalos e intenta «Guardar» de nuevo.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "El intervalo debe ser un número correcto. No puede haber números negativos o superiores a un intervalo de puntos superior. Corrige los intervalos e intenta «Guardar» de nuevo.",
+        "edit a copy": "Editar una copia"
+    },
+    "OutcomeManagement": {
+        "Course": "Asignatura",
+        "Institution": "Institución"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Cuentas",
+        "Close": "Cerrar",
+        "Concluded": "Finalizado",
+        "Courses": "Asignaturas",
+        "Failed to load account used locations": "Se ha producido un error al cargar las ubicaciones de cuenta utilizadas",
+        "Failed to load assignments used locations": "Se ha producido un error al cargar las ubicaciones de actividades utilizadas",
+        "Failed to load used locations": "Ha habido un error al cargar las ubicaciones utilizadas",
+        "Load Assignments ...": "Cargar actividades...",
+        "Load More Assignments ...": "Cargar más actividades...",
+        "Loading": "Cargando",
+        "Locations Used": "Ubicaciones utilizadas",
+        "Search": "Buscar",
+        "Search...": "Buscar..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Política de uso aceptable",
+        "Close": "Cerrar",
+        "Loading page": "Cargando página",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "La política de uso aceptable no está disponible en este momento. Vuelve a consultarla más tarde o ponte en contacto con el soporte técnico en caso de que necesites ayuda.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "No se ha podido cargar la política de uso aceptable. Vuelve a intentarlo más tarde o, si el problema persiste, ponte en contacto con el soporte técnico."
+    },
+    "account_reports": {
+        "Close": "Cerrar",
+        "Invalid date and time.": "Fecha y hora incorrectas.",
+        "Next month": "Mes siguiente",
+        "Previous month": "Mes anterior",
+        "Time": "Hora"
+    },
+    "admin_split": {
+        "Cancel": "Cancelar",
+        "Failed to split users.": "Ha habido un error al dividir usuarios.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NOTA: Esta acción intentará deshacer la agrupación de la manera más completa posible; sin embargo, es posible que los usuarios agrupados no se restablezcan perfectamente a su estado previo.",
+        "OK": "Aceptar",
+        "Split": "Dividir",
+        "The following users will be split into separate user accounts:": "Los siguientes usuarios se dividirán en cuentas de usuario separadas:",
+        "There are no user accounts to split from this user.": "No hay cuentas de usuario para dividir de este usuario.",
+        "User split complete. Links to split user accounts follow:": "División de usuarios completa. Enlaces para dividir cuentas de usuario a continuación:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Descripción"
+    },
+    "assignment_footer": {
+        "Next": "Siguiente",
+        "Previous": "Anterior"
+    },
+    "assignment_tabs": {
+        "Assignment": "Actividad",
+        "Peer Review": "Revisión entre compañeros"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(curso predeterminado)",
+        "Account Level": "Nivel de cuenta",
+        "Canvas Grading Scheme (course default)": "Esquema de evaluaciones de Canvas (curso predeterminado)",
+        "Close": "Cerrar",
+        "Course Level": "Nivel del curso",
+        "Default Canvas Grading Scheme": "Esquema predeterminado de evaluación de Canvas",
+        "Grading scheme was successfully removed.": "El esquema de evaluación se ha eliminado correctamente.",
+        "Grading scheme was successfully updated.": "El esquema de evaluación no se ha actualizado correctamente.",
+        "Manage All Grading Schemes": "Administrar todos los esquemas de evaluación",
+        "New Grading Scheme": "Nuevo esquema de evaluación",
+        "Select a grading scheme": "Seleccionar un esquema de evaluación",
+        "There was an error while loading grading schemes": "Ha habido un error al cargar los esquemas de evaluación",
+        "There was an error while loading the grading scheme": "Ha habido un error al guardar el esquema de evaluación",
+        "There was an error while refreshing grading schemes": "Ha habido un error al actualizar los esquemas de evaluación",
+        "There was an error while removing the grading scheme": "Ha habido un error al eliminar el esquema de evaluación",
+        "View": "Ver"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Página de error de Actividades 2 para el profesor",
+        "Assignments 2 Teacher initial query error": "Error de consulta inicial de Actividades 2 para el profesor",
+        "Loading": "Cargando"
+    },
+    "catalog": {
+        "Course Catalog": "Catálogo de la asignatura"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "¡Buen trabajo! De los desarrolladores de Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Cancelar",
+        "Copy course": "Copiar asignatura",
+        "Course code": "Código de la asignatura",
+        "Course code must be 255 characters or less": "El código de la asignatura debe tener un máximo de 255 caracteres",
+        "Course name must be 255 characters or less": "El nombre de la asignatura debe tener un máximo de 255 caracteres",
+        "Create course": "Crear una asignatura",
+        "Creating...": "Creando...",
+        "End date": "Fecha de finalización",
+        "End date must be after start date": "La fecha de finalización debe ser posterior a la fecha de inicio",
+        "Name": "Nombre",
+        "No results": "No hay resultados",
+        "Please enter the details for the new course.": "Introduce los detalles de la nueva asignatura.",
+        "Select a new beginning date": "Seleccionar una nueva fecha de inicio",
+        "Select a new end date": "Seleccionar una nueva fecha de finalización",
+        "Select end date": "Seleccionar la fecha de finalización",
+        "Select start date": "Seleccionar la fecha de inicio",
+        "Start date": "Fecha de inicio",
+        "Start date must be before end date": "La fecha de inicio debe ser anterior a la fecha de finalización",
+        "Start typing to search...": "Comienza a escribir para buscar...",
+        "Term": "Período",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "Las fechas de inicio y finalización del período no pueden modificarse aquí, solo en la página Detalles del período en Administración.",
+        "Use arrow keys to navigate options.": "Usar las flechas de dirección para desplazarse entre las opciones."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Cerrar",
+        "Content Share Preview": "Vista previa del contenido compartido",
+        "Preview": "Vista previa"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Atención"
+    },
+    "course_logging_content": {
+        "No results": "No hay resultados",
+        "Type to search": "Escribir para buscar"
+    },
+    "create_course_modal": {
+        "Cancel": "Cancelar",
+        "Course Details": "Detalles de la asignatura",
+        "Course Name": "Nombre de la asignatura",
+        "Create": "Crear",
+        "Create Course": "Crear una asignatura",
+        "Create Subject": "Crear tema",
+        "Creating new course...": "Creando nueva asignatura...",
+        "Creating new subject...": "Creando nueva materia...",
+        "Error creating new course": "Ha habido un error al crear una nueva asignatura",
+        "Error creating new subject": "Ha habido un error al crear un nuevo tema",
+        "Loading accounts...": "Cargando cuentas…",
+        "Name...": "Nombre…",
+        "No Results": "No hay resultados",
+        "Select a homeroom": "Seleccionar un aula principal",
+        "Subject Name": "Nombre del tema",
+        "Unable to get accounts": "No se pueden obtener las cuentas",
+        "Unable to get homerooms": "No se pueden obtener las aulas principales",
+        "Use arrow keys to navigate options.": "Usar las flechas de dirección para desplazarse entre las opciones.",
+        "Which account will this course be associated with?": "¿A qué cuenta se asociará esta asignatura?",
+        "Which account will this subject be associated with?": "¿A qué cuenta se asociará esta materia?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Anulación de la nota final"
+    },
+    "feature_flags": {
+        "Accept": "Aceptar",
+        "Cancel": "Cancelar"
+    },
+    "filter_bar": {
+        "All": "Todo",
+        "Clear": "Borrar",
+        "Filter by": "Filtrar por",
+        "Search": "Buscar",
+        "Use arrow keys to navigate options.": "Usar las flechas de dirección para desplazarse entre las opciones."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Seleccionar grupo",
+        "Use arrow keys to navigate options.": "Usar las flechas de dirección para desplazarse entre las opciones."
+    },
+    "jobs": {
+        "Close": "Cerrar"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Crear un nuevo contenido"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Un panda muy estudioso",
+        "Moves:": "Movimientos:"
+    },
+    "overview_page": {
+        "Edit home page": "Editar la página de inicio",
+        "Subject Home Page": "Página de inicio de la asignatura"
+    },
+    "pages_edit_title": {
+        "Page Title": "Título de la página"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Cancelar",
+        "Close": "Cerrar"
+    },
+    "study_assist": {
+        "Back": "Volver",
+        "Close": "Cerrar",
+        "Page": "Página"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "Es necesaria una URL válida",
+        "Website URL": "URL de la página web"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Política de uso aceptable",
+        "Loading...": "Cargando...",
+        "Preview": "Vista previa"
+    },
+    "todos_page": {
+        "Failed to load todos": "Ha habido un error al cargar las listas pendientes",
+        "Loading Additional Todo Details": "Cargando más información de pendientes",
+        "Loading Todo Course Name": "Cargando nombre de la asignatura pendiente",
+        "Loading Todo Title": "Cargando título de pendiente"
+    },
+    "tray": {
+        "Close": "Cerrar"
+    }
+}

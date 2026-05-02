@@ -20,6 +20,7 @@ import {useState, forwardRef} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {
+  IconAiSolid,
   IconArrowDownLine,
   IconArrowUpLine,
   IconDuplicateLine,
@@ -31,6 +32,7 @@ import {
 import {Popover} from '@instructure/ui-popover'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
+import RegenerateCriteriaModal from './AIGeneratedCriteria/RegenerateCriteriaModal'
 
 const I18n = createI18nScope('rubrics-criterion-row-popover')
 
@@ -44,6 +46,7 @@ type CriterionRowPopoverProps = {
   onEditCriterion?: () => void
   onDeleteCriterion?: () => void
   onDuplicateCriterion?: () => void
+  onRegenerate?: (additionalPrompt: string) => void
 }
 export const CriterionRowPopover = forwardRef<HTMLSpanElement, CriterionRowPopoverProps>(
   (
@@ -57,10 +60,23 @@ export const CriterionRowPopover = forwardRef<HTMLSpanElement, CriterionRowPopov
       onEditCriterion,
       onDeleteCriterion,
       onDuplicateCriterion,
+      onRegenerate,
     },
     ref,
   ) => {
     const [isPopoverOpen, setPopoverIsOpen] = useState(false)
+    const [isRegenerateModalOpen, setIsRegenerateModalOpen] = useState(false)
+    const [additionalPrompt, setAdditionalPrompt] = useState('')
+
+    const onRegenerateClose = () => {
+      setIsRegenerateModalOpen(false)
+      setAdditionalPrompt('')
+    }
+
+    const handleRegenerate = () => {
+      onRegenerate?.(additionalPrompt)
+      onRegenerateClose()
+    }
 
     const closeAndCall = (fn: () => void) => () => {
       fn()
@@ -73,6 +89,14 @@ export const CriterionRowPopover = forwardRef<HTMLSpanElement, CriterionRowPopov
 
     return (
       <span ref={ref}>
+        <RegenerateCriteriaModal
+          open={isRegenerateModalOpen}
+          isCriterion={true}
+          additionalPrompt={additionalPrompt}
+          onClose={onRegenerateClose}
+          onRegenerate={handleRegenerate}
+          onAdditionalPromptChange={setAdditionalPrompt}
+        />
         <Popover
           renderTrigger={
             <IconButton
@@ -157,6 +181,19 @@ export const CriterionRowPopover = forwardRef<HTMLSpanElement, CriterionRowPopov
                 <IconDuplicateLine />
                 <View as="span" margin="0 0 0 x-small">
                   {I18n.t('Duplicate Criterion')}
+                </View>
+              </Menu.Item>
+            )}
+            {onRegenerate && <Menu.Separator />}
+            {onRegenerate && (
+              <Menu.Item
+                value="regenerate"
+                onClick={closeAndCall(() => setIsRegenerateModalOpen(true))}
+                data-testid="regenerate-criterion-menu-item"
+              >
+                <IconAiSolid />
+                <View as="span" margin="0 0 0 x-small">
+                  {I18n.t('Regenerate')}
                 </View>
               </Menu.Item>
             )}

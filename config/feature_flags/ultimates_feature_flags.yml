@@ -11,7 +11,8 @@ pendo_extended:
 institutional_tags:
   type: setting
   state: hidden
-  applies_to: RootAccount
+  applies_to: Account
+  root_opt_in: true
   shadow: true
   display_name: Institutional Tags
-  description: Create user tags at the root account level.
+  description: Create and manage user tags at the account level.

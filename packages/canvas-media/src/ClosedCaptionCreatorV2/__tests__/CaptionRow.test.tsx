@@ -33,10 +33,10 @@ describe('<CaptionRow />', () => {
       onDelete,
     })
 
-    expect(screen.getByText('English Caption')).toBeInTheDocument()
-    expect(screen.getByText('Delete English Caption')).toBeInTheDocument()
+    expect(screen.getByText(/^english caption$/i)).toBeInTheDocument()
+    expect(screen.getByText(/^delete english caption$/i)).toBeInTheDocument()
 
-    fireEvent.click(screen.getByText('Delete English Caption'))
+    fireEvent.click(screen.getByText(/^delete english caption$/i))
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
@@ -51,7 +51,7 @@ describe('<CaptionRow />', () => {
       onDelete,
     })
 
-    const downloadLink = screen.getByText('Download Spanish Caption').closest('a')
+    const downloadLink = screen.getByText(/download spanish caption/i).closest('a')
     expect(downloadLink).toBeInTheDocument()
     expect(downloadLink).toHaveAttribute('href', 'https://example.com/es.srt')
     expect(downloadLink).toHaveAttribute('download', 'spanish_es.srt')
@@ -64,7 +64,7 @@ describe('<CaptionRow />', () => {
       onDelete: vi.fn(),
     })
 
-    expect(screen.getByText('Download Spanish Caption')).toBeInTheDocument()
+    expect(screen.getByText(/download spanish caption/i)).toBeInTheDocument()
   })
 
   it('renders processing state properly displaying text', () => {
@@ -73,21 +73,51 @@ describe('<CaptionRow />', () => {
       captionName: 'French Caption',
     })
 
-    expect(screen.getByText('French Caption')).toBeInTheDocument()
-    expect(screen.getByText('Processing...')).toBeInTheDocument()
+    expect(screen.getByText(/french caption/i)).toBeInTheDocument()
+    expect(screen.getByText(/processing\.\.\./i)).toBeInTheDocument()
     expect(screen.queryByText(/delete/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/download/i)).not.toBeInTheDocument()
   })
 
-  it('renders failed state', () => {
+  it('failed upload: shows "Upload failed"', () => {
     renderComponent({
       workflow_state: 'failed',
       captionName: 'German Caption',
-      errorMessage: 'File size too large',
+      failedOperation: 'upload',
     })
 
-    expect(screen.getByText('German Caption')).toBeInTheDocument()
-    expect(screen.getByText('File size too large')).toBeInTheDocument()
+    expect(screen.getByText(/german caption/i)).toBeInTheDocument()
+    expect(screen.getByText(/upload failed/i)).toBeInTheDocument()
+  })
+
+  it('failed ASR: shows "Generation failed"', () => {
+    renderComponent({
+      workflow_state: 'failed',
+      captionName: 'German Caption',
+      failedOperation: 'asr',
+    })
+
+    expect(screen.getByLabelText(/german caption, generation failed/i)).toBeInTheDocument()
+  })
+
+  it('failed delete: shows "Delete failed"', () => {
+    renderComponent({
+      workflow_state: 'failed',
+      captionName: 'German Caption',
+      failedOperation: 'delete',
+    })
+
+    expect(screen.getByLabelText(/german caption, delete failed/i)).toBeInTheDocument()
+  })
+
+  it('server-side ASR failure (no failedOperation): shows "Generation failed"', () => {
+    renderComponent({
+      workflow_state: 'failed',
+      captionName: 'German Caption',
+      asr: true,
+    })
+
+    expect(screen.getByLabelText(/german caption, generation failed/i)).toBeInTheDocument()
   })
 
   it('failed state: shows retry button and calls onRetry when clicked', () => {
@@ -95,14 +125,14 @@ describe('<CaptionRow />', () => {
     renderComponent({
       workflow_state: 'failed',
       captionName: 'Spanish Caption',
-      errorMessage: 'Upload Failed',
+      failedOperation: 'upload',
       onRetry,
     })
 
-    expect(screen.getByText('Spanish Caption')).toBeInTheDocument()
-    expect(screen.getByText('Upload Failed')).toBeInTheDocument()
+    expect(screen.getByText(/^spanish caption$/i)).toBeInTheDocument()
+    expect(screen.getByText(/^upload failed$/i)).toBeInTheDocument()
 
-    const retryButton = screen.getByText('Retry Spanish Caption')
+    const retryButton = screen.getByText(/^retry spanish caption$/i)
     expect(retryButton).toBeInTheDocument()
 
     fireEvent.click(retryButton)
@@ -114,11 +144,11 @@ describe('<CaptionRow />', () => {
     renderComponent({
       workflow_state: 'failed',
       captionName: 'Spanish Caption',
-      errorMessage: 'Caption generation failed',
+      failedOperation: 'asr',
       onDelete,
     })
 
-    const deleteButton = screen.getByText('Delete Spanish Caption')
+    const deleteButton = screen.getByText(/delete spanish caption/i)
     expect(deleteButton).toBeInTheDocument()
 
     fireEvent.click(deleteButton)
@@ -129,20 +159,49 @@ describe('<CaptionRow />', () => {
     renderComponent({
       workflow_state: 'failed',
       captionName: 'French Caption',
-      errorMessage: 'Caption generation failed',
+      failedOperation: 'asr',
     })
 
-    expect(screen.queryByText('Delete French Caption')).not.toBeInTheDocument()
+    expect(screen.queryByText(/delete french caption/i)).not.toBeInTheDocument()
   })
 
   it('failed state: does not show retry button when onRetry is not provided', () => {
     renderComponent({
       workflow_state: 'failed',
       captionName: 'French Caption',
-      errorMessage: 'Delete Failed',
+      failedOperation: 'delete',
     })
 
     expect(screen.queryByText(/retry/i)).not.toBeInTheDocument()
+  })
+
+  it('processing state: row aria-label includes caption name and status', () => {
+    renderComponent({
+      workflow_state: 'processing',
+      captionName: 'French Caption',
+    })
+
+    expect(screen.getByLabelText(/french caption, processing\.\.\./i)).toBeInTheDocument()
+  })
+
+  it('failed state: row aria-label includes caption name and status text', () => {
+    renderComponent({
+      workflow_state: 'failed',
+      captionName: 'German Caption',
+      failedOperation: 'asr',
+    })
+
+    expect(screen.getByLabelText(/german caption, generation failed/i)).toBeInTheDocument()
+  })
+
+  it('ready state: row aria-label is just the caption name', () => {
+    renderComponent({
+      workflow_state: 'ready',
+      captionName: 'English Caption',
+      onDelete: vi.fn(),
+    })
+
+    expect(screen.getByLabelText(/english caption/i)).toBeInTheDocument()
   })
 
   it('inherited state: disabled delete action and has proper aria label on delete button', () => {
@@ -154,7 +213,7 @@ describe('<CaptionRow />', () => {
       onDelete,
     })
 
-    expect(screen.getByText('Inherited Caption')).toBeInTheDocument()
+    expect(screen.getByText(/^inherited caption$/i)).toBeInTheDocument()
 
     const inheritedMessages = screen.getAllByText(
       /Captions inherited from a parent course cannot be removed/i,

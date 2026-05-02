@@ -17,6 +17,7 @@
  */
 import {ZLtiImsRegistrationId} from '../../../../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZLtiToolConfigurationId} from '../../../../model/lti_tool_configuration/LtiToolConfigurationId'
+import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
 import {ToolConfigurationEdit} from '../ToolConfigurationEdit'
 import {mockConfiguration, mockOverlay, renderApp} from './helpers'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
@@ -615,6 +616,74 @@ describe('ToolConfigurationEdit', () => {
       expect(overrideURIsIndex).not.toBe(-1)
       expect(eulaSettingsIndex).toBeGreaterThan(placementsIndex)
       expect(overrideURIsIndex).toBeGreaterThan(eulaSettingsIndex)
+    })
+  })
+
+  describe('Local Template Registrations', () => {
+    it('should not render the Launch Settings for local template registrations', () => {
+      const {getByText, queryAllByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          target_link_uri: 'https://example.com/target_link_uri',
+          redirect_uris: ['https://example.com/target_link_uri'],
+        },
+        registration: {
+          configuration: mockConfiguration({
+            target_link_uri: 'https://example.com/target_link_uri',
+            redirect_uris: ['https://example.com/target_link_uri'],
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+          template_registration_id: ZLtiRegistrationId.parse('999'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      expect(getByText('Permissions')).toBeInTheDocument()
+      expect(queryAllByText('Launch Settings')).toHaveLength(0)
+    })
+
+    it('should not validate launch settings when submitting local template registration', async () => {
+      const {getByText} = renderApp({
+        n: 'Test App',
+        i: 1,
+        configuration: {
+          target_link_uri: '',
+          redirect_uris: [],
+        },
+        registration: {
+          configuration: mockConfiguration({
+            target_link_uri: '',
+            redirect_uris: [],
+          }),
+          overlay: mockOverlay({}, {}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+          template_registration_id: ZLtiRegistrationId.parse('999'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const submitBtn = getByText('Update Configuration')
+      submitBtn.click()
+
+      // Should not focus on redirect URIs field since we're not validating launch settings
+      const redirectUrisElement = document.querySelector(`#${getInputIdForField('redirectURIs')}`)
+      expect(redirectUrisElement).not.toBeInTheDocument()
+    })
+
+    it('should enable the Update Configuration button for local template registrations', () => {
+      const {getByRole} = renderApp({
+        n: 'Test App',
+        i: 1,
+        registration: {
+          inherited: true,
+          overlaid_configuration: mockConfiguration({}),
+          manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
+          template_registration_id: ZLtiRegistrationId.parse('999'),
+        },
+      })(<ToolConfigurationEdit />)
+
+      const updateButton = getByRole('button', {name: 'Update Configuration'})
+      expect(updateButton).not.toHaveAttribute('disabled')
     })
   })
 

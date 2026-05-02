@@ -35,9 +35,9 @@ describe UsersController, type: :request do
   end
 
   before :once do
-    course_with_teacher(active_all: true, course_name: "Teacher Course", user: user_with_pseudonym(active_all: true))
+    course_with_teacher(active_all: true, course_name: "Teacher Course", course_code: "Teacher_C1", user: user_with_pseudonym(active_all: true))
     @teacher_course = @course
-    @student_course = course_factory(active_course: true, course_name: "Student Course")
+    @student_course = course_factory(active_course: true, course_name: "Student Course", course_code: "Student_C1")
     @student_course.enroll_student(@user).accept!
     # an assignment i need to submit (needs_submitting)
     @a1 = Assignment.create!(context: @student_course, due_at: 6.days.from_now, title: "required work", submission_types: "online_text_entry", points_possible: 10)
@@ -62,6 +62,7 @@ describe UsersController, type: :request do
         "html_url" => "#{course_assignment_url(@a1.context_id, @a1.id)}#submit",
         "context_type" => "Course",
         "context_name" => "Student Course",
+        "context_short_name" => "Student_C1",
         "course_id" => @student_course.id,
       }
     @a2_json =
@@ -74,6 +75,7 @@ describe UsersController, type: :request do
         "html_url" => speed_grader_course_gradebook_url(@a2.context_id, assignment_id: @a2.id),
         "context_type" => "Course",
         "context_name" => "Teacher Course",
+        "context_short_name" => "Teacher_C1",
         "course_id" => @teacher_course.id,
       }
   end
@@ -148,6 +150,112 @@ describe UsersController, type: :request do
     json = json.sort_by { |t| t["assignment"]["id"] }
     expect(strip_secure_params(json.first)).to eq strip_secure_params(@a1_json)
     expect(strip_secure_params(json.second)).to eq strip_secure_params(@a2_json)
+  end
+
+  context "educator_dashboard feature flag" do
+    let(:metrics_keys) do
+      %w[on_time_needs_grading_count
+         late_needs_grading_count
+         resubmitted_needs_grading_count
+         submitted_submissions_count
+         total_submissions_count]
+    end
+
+    context "when educator_dashboard flag is enabled" do
+      before do
+        Account.default.enable_feature!(:educator_dashboard)
+      end
+
+      it "includes teacher todo metrics in grading todo items when grading_counts is requested" do
+        json = api_call(:get,
+                        "/api/v1/users/self/todo?include[]=grading_counts",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json",
+                        include: ["grading_counts"])
+        grading_item = json.find { |t| t["type"] == "grading" }
+        expect(grading_item).not_to be_nil
+        metrics_keys.each { |key| expect(grading_item).to have_key(key) }
+        expect(grading_item["on_time_needs_grading_count"]).to be 1
+        expect(grading_item["submitted_submissions_count"]).to be 1
+        expect(grading_item["total_submissions_count"]).to be 1
+        expect(grading_item).to have_key("needs_grading_count")
+      end
+
+      it "omits metrics when grading_counts is not requested" do
+        json = api_call(:get,
+                        "/api/v1/users/self/todo",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json")
+        grading_item = json.find { |t| t["type"] == "grading" }
+        expect(grading_item).not_to be_nil
+        metrics_keys.each { |key| expect(grading_item).not_to have_key(key) }
+        expect(grading_item).to have_key("needs_grading_count")
+      end
+
+      it "does not include metrics in submitting todo items" do
+        json = api_call(:get,
+                        "/api/v1/users/self/todo?include[]=grading_counts",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json",
+                        include: ["grading_counts"])
+        submitting_item = json.find { |t| t["type"] == "submitting" }
+        expect(submitting_item).not_to be_nil
+        metrics_keys.each { |key| expect(submitting_item).not_to have_key(key) }
+      end
+
+      it "includes metrics on checkpoint grading todos" do
+        @teacher_course.account.enable_feature!(:discussion_checkpoints)
+        reply_to_topic_checkpoint, = graded_discussion_topic_with_checkpoints(context: @teacher_course)
+        student = @teacher_course.students.first
+        reply_to_topic_checkpoint.submit_homework(student, body: "checkpoint submission")
+
+        json = api_call(:get,
+                        "/api/v1/users/self/todo?include[]=grading_counts",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json",
+                        include: ["grading_counts"])
+
+        checkpoint_grading_todo = json.find do |item|
+          item["type"] == "grading" && item["checkpoint_label"] == CheckpointLabels::REPLY_TO_TOPIC
+        end
+        expect(checkpoint_grading_todo).to be_present
+        expect(checkpoint_grading_todo["on_time_needs_grading_count"]).to eq 1
+        expect(checkpoint_grading_todo["late_needs_grading_count"]).to eq 0
+        expect(checkpoint_grading_todo["resubmitted_needs_grading_count"]).to eq 0
+        expect(checkpoint_grading_todo["submitted_submissions_count"]).to eq 1
+        expect(checkpoint_grading_todo["total_submissions_count"]).to eq 1
+      end
+    end
+
+    context "when educator_dashboard flag is disabled" do
+      it "does not include teacher todo metrics" do
+        json = api_call(:get,
+                        "/api/v1/users/self/todo",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json")
+        grading_item = json.find { |t| t["type"] == "grading" }
+        expect(grading_item).not_to be_nil
+        metrics_keys.each { |key| expect(grading_item).not_to have_key(key) }
+        expect(grading_item).to have_key("needs_grading_count")
+      end
+
+      it "ignores include[]=grading_counts when flag is off" do
+        json = api_call(:get,
+                        "/api/v1/users/self/todo?include[]=grading_counts",
+                        controller: "users",
+                        action: "todo_items",
+                        format: "json",
+                        include: ["grading_counts"])
+        grading_item = json.find { |t| t["type"] == "grading" }
+        expect(grading_item).not_to be_nil
+        metrics_keys.each { |key| expect(grading_item).not_to have_key(key) }
+      end
+    end
   end
 
   it "returns a course-specific todo list for a student" do
@@ -849,6 +957,140 @@ describe UsersController, type: :request do
       # Should not include any checkpoint todos from the course without feature enabled
       checkpoint_todos = json.select { |item| item["checkpoint_label"].present? }
       expect(checkpoint_todos).to be_empty
+    end
+  end
+
+  describe "filtering" do
+    before :once do
+      me = @user
+      @other_teacher_course = course_factory(active_course: true, course_name: "Other Teacher Course")
+      @other_teacher_course.enroll_teacher(me).accept!
+      @a3 = Assignment.create!(context: @other_teacher_course, due_at: 2.days.from_now, title: "other grading", submission_types: "online_text_entry", points_possible: 10)
+      other_student = user_factory(active_all: true)
+      @other_teacher_course.enroll_student(other_student).accept!
+      @a3.reload.submit_homework(other_student, submission_type: "online_text_entry", body: "done")
+      @user = me
+    end
+
+    def todo_call(extra_params = {})
+      api_call(:get,
+               "/api/v1/users/self/todo",
+               { controller: "users", action: "todo_items", format: "json" },
+               extra_params)
+    end
+
+    def grading_assignment_ids(json)
+      json.select { |item| item["type"] == "grading" }.map { |item| item["assignment"]["id"] }
+    end
+
+    describe "course_ids[]" do
+      it "filters grading items by course" do
+        json = todo_call(course_ids: [@teacher_course.id])
+        assignment_ids = grading_assignment_ids(json)
+        expect(assignment_ids).to include(@a2.id)
+        expect(assignment_ids).not_to include(@a3.id)
+      end
+
+      it "silently drops courses the user is not enrolled in" do
+        unauthorized_course = course_factory(active_all: true)
+        json = todo_call(course_ids: [@teacher_course.id, unauthorized_course.id])
+        expect(response).to be_successful
+        assignment_ids = json.map { |item| item["assignment"]["id"] }
+        expect(assignment_ids).to include(@a2.id)
+      end
+
+      it "returns the unfiltered list when the param is absent" do
+        assignment_ids = todo_call.map { |item| item["assignment"]["id"] }
+        expect(assignment_ids).to include(@a2.id, @a3.id)
+      end
+
+      it "excludes courses where user lacks manage_grades from grading items" do
+        json = todo_call(course_ids: [@student_course.id])
+        expect(grading_assignment_ids(json)).to be_empty
+      end
+
+      it "filters submitting items by course" do
+        student_only = todo_call(course_ids: [@student_course.id]).map { |item| item["assignment"]["id"] }
+        expect(student_only).to include(@a1.id)
+
+        teacher_only = todo_call(course_ids: [@teacher_course.id]).map { |item| item["assignment"]["id"] }
+        expect(teacher_only).not_to include(@a1.id)
+      end
+
+      it "returns no results when all course_ids[] values resolve to nothing" do
+        garbage = todo_call(course_ids: ["abc"])
+        expect(garbage).to eq([])
+      end
+
+      it "accepts SIS course IDs via api_find_all" do
+        @teacher_course.update!(sis_source_id: "TEACHER-COURSE-SIS")
+        json = todo_call(course_ids: ["sis_course_id:TEACHER-COURSE-SIS"])
+        assignment_ids = json.map { |item| item["assignment"]["id"] }
+        expect(assignment_ids).to include(@a2.id)
+        expect(assignment_ids).not_to include(@a3.id)
+      end
+    end
+
+    context "with checkpoints" do
+      before :once do
+        me = @user
+        @teacher_course.account.enable_feature!(:discussion_checkpoints)
+        @rtt, @rte = graded_discussion_topic_with_checkpoints(context: @teacher_course)
+        ckpt_student = @teacher_course.students.first
+        @rtt.submit_homework(ckpt_student, body: "topic submission")
+        @rte.submit_homework(ckpt_student, body: "entry submission")
+        @student_rtt, @student_rte = graded_discussion_topic_with_checkpoints(context: @student_course)
+        @user = me
+      end
+
+      def checkpoint_grading_ids(json)
+        json.select { |item| item["checkpoint_label"].present? && item["type"] == "grading" }
+            .map { |item| item["assignment"]["id"] }
+      end
+
+      def checkpoint_submitting_ids(json)
+        json.select { |item| item["checkpoint_label"].present? && item["type"] == "submitting" }
+            .map { |item| item["assignment"]["id"] }
+      end
+
+      it "filters checkpoint grading items by course" do
+        in_scope = todo_call(course_ids: [@teacher_course.id])
+        expect(checkpoint_grading_ids(in_scope)).to match_array([@rtt.id, @rte.id])
+
+        out_of_scope = todo_call(course_ids: [@other_teacher_course.id])
+        expect(checkpoint_grading_ids(out_of_scope)).to be_empty
+      end
+
+      it "filters checkpoint submitting items by course" do
+        in_scope = todo_call(course_ids: [@student_course.id])
+        expect(checkpoint_submitting_ids(in_scope)).to match_array([@student_rtt.id, @student_rte.id])
+
+        out_of_scope = todo_call(course_ids: [@teacher_course.id])
+        expect(checkpoint_submitting_ids(out_of_scope)).to be_empty
+      end
+    end
+
+    context "with ungraded_quizzes" do
+      before :once do
+        @student_quiz = @student_course.quizzes.create!(
+          title: "ungraded student quiz",
+          quiz_type: "practice_quiz",
+          due_at: 1.day.from_now
+        )
+        @student_quiz.publish!
+      end
+
+      def quiz_ids(json)
+        json.select { |item| item["quiz"] }.map { |item| item["quiz"]["id"] }
+      end
+
+      it "filters ungraded quizzes by course" do
+        in_scope = todo_call(include: ["ungraded_quizzes"], course_ids: [@student_course.id])
+        expect(quiz_ids(in_scope)).to include(@student_quiz.id)
+
+        out_of_scope = todo_call(include: ["ungraded_quizzes"], course_ids: [@teacher_course.id])
+        expect(quiz_ids(out_of_scope)).not_to include(@student_quiz.id)
+      end
     end
   end
 end

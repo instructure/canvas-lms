@@ -210,6 +210,7 @@ const promiseToGetModuleSequenceFooter = import('@canvas/module-sequence-footer'
 $(() => {
   const $el = $('#assignment_publish_button')
   if ($el.length > 0) {
+    // @ts-expect-error TS7 migration
     const model = new Assignment({
       id: $el.attr('data-id'),
       unpublishable: !$el.hasClass('disabled'),
@@ -219,15 +220,14 @@ $(() => {
 
     // @ts-expect-error
     new SpeedgraderLinkView({model, el: '#assignment-speedgrader-link'}).render()
+    // @ts-expect-error TS7 migration
     const pbv = new PublishButtonView({model, el: $el})
     pbv.render()
 
-    // @ts-expect-error
     pbv.on('publish', () => {
       $('#moderated_grading_button').show()
       $('#speed-grader-link-container').removeClass('hidden')
     })
-    // @ts-expect-error
     pbv.on('unpublish', () => {
       $('#moderated_grading_button').hide()
       $('#speed-grader-link-container').addClass('hidden')

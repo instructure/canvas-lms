@@ -1,0 +1,306 @@
+{
+    "ConfirmationDialog": {
+        "Cancel": "Cancel·la",
+        "Confirm": "Confirma"
+    },
+    "DueDateOverrideView": {
+        "Mark as important date and show on homeroom sidebar": "Marca-la com a data important i mostra-la a la barra lateral de la tutoria"
+    },
+    "GradingSchemeManagement": {
+        "Account default grading scheme": "Esquema de qualificació per defecte del compte",
+        "Account default grading scheme was successfully saved.": "S’ha desat correctament l’esquema de qualificació per defecte del compte.",
+        "Active Grading Schemes": "Esquemes de qualificació actius",
+        "Applied": "Aplicat",
+        "Apply": "Aplica",
+        "Archive Grading Scheme": "Arxiva els esquemes de qualificació",
+        "Archived": "Arxivat",
+        "Archived grading schemes in use can still be used, but cannot be added to new courses or assignments.": "Es poden seguir utilitzant els esquemes de qualificació arxivats en ús, però no es poden afegir a les assignatures ni a les activitats noves.",
+        "Are you sure you want to delete this grading scheme?": "Segur que voleu suprimir aquest esquema de qualificació?",
+        "Cancel": "Cancel·la",
+        "Canvas Default": "Opció predeterminada del Canvas",
+        "Close": "Tanca",
+        "Confirm": "Confirma",
+        "Confirm Default Grading Scheme Change": "Confirma l'esquema de qualificació per defecte",
+        "Delete Grading Scheme": "Suprimeix l'esquema de qualificació",
+        "Duplicate Grading Scheme": "Duplica l’esquema de qualificació",
+        "Edit Grading Scheme": "Edita l'esquema de qualificació",
+        "Grading Scheme Name": "Nom de l’esquema de qualificació",
+        "Grading scheme was successfully archived.": "S’ha arxivat correctament l’esquema de qualificació.",
+        "Grading scheme was successfully created.": "S’ha creat correctament l’esquema de qualificació.",
+        "Grading scheme was successfully removed.": "S’ha suprimit correctament l’esquema de qualificació.",
+        "Grading scheme was successfully saved.": "S’ha desat correctament l’esquema de qualificació.",
+        "Grading scheme was successfully unarchived.": "S’ha cancel·lat correctament l’arxivament de l’esquema de qualificació.",
+        "Locations Used": "Ubicacions utilitzades",
+        "Lower limit of range": "Límit inferior de l'interval",
+        "New Grading Scheme": "Esquema de qualificació nou",
+        "Next Page": "Pàgina següent",
+        "No account default": "No hi ha cap compte per defecte",
+        "Previous Page": "Pàgina anterior",
+        "Save": "Desa",
+        "Search": "Cerca",
+        "Search...": "Cerca...",
+        "Show courses and assignments": "Mostra les assignatures i les activitats",
+        "Show locations used": "Mostra les ubicacions utilitzades",
+        "Sort by": "Ordena per",
+        "There was an error while archiving the grading scheme": "S'ha produït un error en arxivar l’esquema de qualificació",
+        "There was an error while creating the grading scheme": "S'ha produït un error en crear l’esquema de qualificació",
+        "There was an error while loading grading schemes": "S'ha produït un error en carregar els esquemes de qualificació",
+        "There was an error while loading the default canvas grading scheme": "S'ha produït un error en carregar l’esquema de qualificació del Canvas predeterminat",
+        "There was an error while loading the default grading scheme": "S'ha produït un error en carregar l’esquema de qualificació predeterminat",
+        "There was an error while removing the grading scheme": "S'ha produït un error en suprimir l’esquema de qualificació",
+        "There was an error while unarchiving the grading scheme": "S'ha produït un error en cancel·lar l'arxivament de l’esquema de qualificació",
+        "There was an error while updating the default grading scheme": "S'ha produït un error en actualitzar l’esquema de qualificació per defecte",
+        "There was an error while updating the grading scheme": "S'ha produït un error en actualitzar l’esquema de qualificació",
+        "This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.": "Aquest canvi afectarà totes les assignatures i activitats actives que actualment hereten el valor predeterminat del compte. Aquest canvi tardarà una mica a completar-se ja que es tornen a calcular totes les notes de les assignatures i activitats amb relació al nou esquema de qualificació predeterminat del compte.",
+        "Unarchive Grading Scheme": "Cancel·la l'arxivament de l'esquema de qualificació",
+        "Upper limit of range": "Límit superior de l'interval",
+        "View Grading Scheme": "Mostra l'esquema de qualificació",
+        "View/Copy Grading Scheme": "Mostra/copia l'esquema de qualificació",
+        "View/Edit Grading Scheme": "Mostra/edita l'esquema de qualificació",
+        "You can't archive this grading scheme because it is set as a default for a course or account.": "No podeu arxivar aquest esquema de qualificació perquè s’ha establert com a esquema per defecte per a una assignatura o un compte.",
+        "You can't delete this grading scheme because it is in use.": "No podeu suprimir aquest esquema de qualificació perquè s'està utilitzant.",
+        "You have no active grading schemes.": "No teniu cap esquema de qualificació actiu.",
+        "You have no archived grading schemes.": "No teniu cap esquema de qualificació arxivat.",
+        "to": "al"
+    },
+    "GradingSchemeViewModal": {
+        "Are you sure you want to delete this grading scheme?": "Segur que voleu suprimir aquest esquema de qualificació?",
+        "Are you sure you want to duplicate this grading scheme?": "Segur que voleu duplicar aquest esquema de qualificació?",
+        "Cancel": "Cancel·la",
+        "Close": "Tanca",
+        "Delete": "Suprimeix",
+        "Delete ": "Suprimeix ",
+        "Duplicate": "Duplica",
+        "Duplicate ": "Duplica ",
+        "Edit Grading Scheme": "Edita l'esquema de qualificació",
+        "New Grading Scheme": "Esquema de qualificació nou",
+        "Percentages and points can't be edited because it is an account level grading scheme.": "No es poden editar els percentatges ni els punts perquè es tracta d’un esquema de qualificació a nivell del compte.",
+        "Percentages and points can't be edited because it is being used as the default grading scheme.": "No es poden editar els percentatges ni els punts perquè s’està utilitzant com l’esquema de qualificació predeterminat.",
+        "Percentages and points can't be edited because it is currently being used.": "No es poden editar els percentatges ni els punts perquè s’està fent servir en aquest moment.",
+        "Save": "Desa"
+    },
+    "GradingSchemes": {
+        "A table that contains the default canvas grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Una taula que conté les dades de l'esquema de qualificació del Canvas predeterminat.  Cada fila conté un nom, un percentatge màxim i un percentatge mínim.",
+        "A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.": "Una taula que conté les dades de l'esquema de qualificació.  Cada fila conté un nom, un percentatge màxim i un percentatge mínim.",
+        "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.": "Els noms de les files no poden estar duplicats ni buits. Corregiu els noms i proveu de tornar a fer clic a “Desa”.",
+        "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.": "Els intervals no poden superposar-se ni estar buits. Corregiu els intervals i proveu de tornar a fer clic a “Desa”.",
+        "Delete grading scheme": "Suprimeix l'esquema de qualificació",
+        "Edit Grading Scheme": "Edita l'esquema de qualificació",
+        "Edit a copy of this grading scheme": "Editeu una còpia d'aquest esquema de qualificació",
+        "Edit grading scheme": "Edita l'esquema de qualificació",
+        "Grading Scheme Name is required. Add a name and try clicking 'Save' again.": "Cal indicar el nom de l’esquema de qualificació. Afegiu un nom i proveu de tornar a fer clic a “Desa”.",
+        "Grading scheme title": "Títol de l'esquema de qualificació",
+        "Invalid grading scheme": "L'esquema de qualificació no és vàlid",
+        "Letter Grade": "Nota amb lletra",
+        "Looks great!": "Molt bé!",
+        "Percentage": "Percentatge",
+        "Points": "Punts",
+        "Range": "Interval",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.": "L’interval ha de comprendre números vàlids. No poden tenir números negatius ni superiors a 100. Corregiu els intervals i proveu de tornar a fer clic a “Desa”.",
+        "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.": "L’interval ha de comprendre números vàlids. No poden tenir números negatius ni superiors a l’interval dels punts més alts. Corregiu els intervals i proveu de tornar a fer clic a “Desa”.",
+        "edit a copy": "edita una còpia"
+    },
+    "OutcomeManagement": {
+        "Course": "Assignatura",
+        "Institution": "Institució"
+    },
+    "UsedLocationsModal": {
+        "Accounts": "Comptes",
+        "Close": "Tanca",
+        "Concluded": "Ha finalitzat",
+        "Courses": "Assignatures",
+        "Failed to load account used locations": "No s’han pogut carregar les ubicacions utilitzades del compte",
+        "Failed to load assignments used locations": "No s’han pogut carregar les ubicacions utilitzades de les activitats",
+        "Failed to load used locations": "No s’han pogut carregar les ubicacions utilitzades",
+        "Load Assignments ...": "Carrega les activitats…",
+        "Load More Assignments ...": "Carrega més activitats…",
+        "Loading": "S'està carregant",
+        "Locations Used": "Ubicacions utilitzades",
+        "Search": "Cerca",
+        "Search...": "Cerca..."
+    },
+    "acceptable_use_policy": {
+        "Acceptable Use Policy": "Política d'ús acceptable",
+        "Close": "Tanca",
+        "Loading page": "S'està carregant la pàgina",
+        "The Acceptable Use Policy is currently unavailable. Please check back later or contact support if you need further assistance.": "Actualment, la política d’ús acceptable no està disponible. Torneu a comprovar-ho més endavant o poseu-vos en contacte amb el servei d’assistència tècnica si necessiteu més ajuda.",
+        "Unable to load the Acceptable Use Policy. Please try again later or contact support if the issue persists.": "No s’ha pogut carregar la política d’ús acceptable. Torneu-ho a provar més endavant o poseu-vos en contacte amb l'equip d’assistència tècnica si el problema persisteix."
+    },
+    "account_reports": {
+        "Close": "Tanca",
+        "Invalid date and time.": "La data i l’hora no són vàlides.",
+        "Next month": "El mes que ve",
+        "Previous month": "El mes passat",
+        "Time": "Hora"
+    },
+    "admin_split": {
+        "Cancel": "Cancel·la",
+        "Failed to split users.": "No s'han pogut dividir els usuaris.",
+        "NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.": "NOTA: Això intentarà desfer la fusió tant com sigui possible; tanmateix, els usuaris fusionats no es podran restaurar perfectament al seu estat anterior.",
+        "OK": "D'acord",
+        "Split": "Divideix",
+        "The following users will be split into separate user accounts:": "Els usuaris següents es dividiran en comptes d’usuari separats:",
+        "There are no user accounts to split from this user.": "No hi ha cap usuari d’usuari per dividir d'aquest usuari.",
+        "User split complete. Links to split user accounts follow:": "S’ha completat la divisió dels usuaris. Enllaços per dividir els comptes d’usuari a continuació:"
+    },
+    "assignment_2_teacher_assignment_details": {
+        "Description": "Descripció"
+    },
+    "assignment_footer": {
+        "Next": "Següent",
+        "Previous": "Anterior"
+    },
+    "assignment_tabs": {
+        "Assignment": "Activitat",
+        "Peer Review": "Revisió entre companys"
+    },
+    "assignments.grading_type_selector": {
+        "(course default)": "(valor per defecte de l'assignatura)",
+        "Account Level": "Nivell del compte",
+        "Canvas Grading Scheme (course default)": "Esquema de qualificació del Canvas (valor per defecte de l'assignatura)",
+        "Close": "Tanca",
+        "Course Level": "Nivell de l'assignatura",
+        "Default Canvas Grading Scheme": "Esquema de qualificació del Canvas predeterminat",
+        "Grading scheme was successfully removed.": "S’ha suprimit correctament l’esquema de qualificació.",
+        "Grading scheme was successfully updated.": "S’ha actualitzat correctament l’esquema de qualificació.",
+        "Manage All Grading Schemes": "Administra tots els esquemes de qualificació",
+        "New Grading Scheme": "Esquema de qualificació nou",
+        "Select a grading scheme": "Selecciona un esquema de qualificació",
+        "There was an error while loading grading schemes": "S'ha produït un error en carregar els esquemes de qualificació",
+        "There was an error while loading the grading scheme": "S'ha produït un error en carregar l’esquema de qualificació",
+        "There was an error while refreshing grading schemes": "S'ha produït un error en actualitzar els esquemes de qualificació",
+        "There was an error while removing the grading scheme": "S'ha produït un error en suprimir l’esquema de qualificació",
+        "View": "Mostra"
+    },
+    "assignments_2": {
+        "Assignments 2 Teacher Error Page": "Pàgina d'error del professor d'Activitats 2",
+        "Assignments 2 Teacher initial query error": "Error de consulta inicial del professor d'Activitats 2",
+        "Loading": "S'està carregant"
+    },
+    "catalog": {
+        "Course Catalog": "Catàleg d'assignatures"
+    },
+    "confetti": {
+        "Great work! From the Canvas developers": "Molt bé! Dels desenvolupadors del Canvas"
+    },
+    "content_copy_redesign": {
+        "Cancel": "Cancel·la",
+        "Copy course": "Copia l'assignatura",
+        "Course code": "Codi de l’assignatura",
+        "Course code must be 255 characters or less": "El codi de l’assignatura ha de tenir 255 caràcters com a màxim",
+        "Course name must be 255 characters or less": "El nom de l’assignatura ha de tenir 255 caràcters com a màxim",
+        "Create course": "Crea l'assignatura",
+        "Creating...": "S'està creant…",
+        "End date": "Data de finalització",
+        "End date must be after start date": "La data de finalització ha de ser posterior a la data d'inici",
+        "Name": "Nom",
+        "No results": "Sense resultats",
+        "Please enter the details for the new course.": "Introduïu la informació de l'assignatura nova.",
+        "Select a new beginning date": "Selecciona una data d'inici nova",
+        "Select a new end date": "Selecciona una data de finalització nova",
+        "Select end date": "Selecciona la data de finalització",
+        "Select start date": "Selecciona la data d’inici",
+        "Start date": "Data d'inici",
+        "Start date must be before end date": "La data d'inici ha de ser anterior a la data de finalització",
+        "Start typing to search...": "Comenceu a escriure per cercar…",
+        "Term": "Període acadèmic",
+        "Term start and end dates cannot be modified here, only on the Term Details page under Admin.": "No es poden modificar aquí les dates d’inici i de finalització del període acadèmic, només a la pàgina Informació del període acadèmic a Administrador.",
+        "Use arrow keys to navigate options.": "Utilitzeu les tecles de fletxes per desplaçar-vos per les opcions."
+    },
+    "content_share_preview_overlay": {
+        "Close": "Tanca",
+        "Content Share Preview": "Visualització prèvia de contingut compartit",
+        "Preview": "Visualització prèvia"
+    },
+    "copy_warnings_modal": {
+        "Attention": "Atenció"
+    },
+    "course_logging_content": {
+        "No results": "Sense resultats",
+        "Type to search": "Escriu per cercar"
+    },
+    "create_course_modal": {
+        "Cancel": "Cancel·la",
+        "Course Details": "Informació de l'assignatura",
+        "Course Name": "Nom de l'assignatura",
+        "Create": "Crea",
+        "Create Course": "Crea una assignatura",
+        "Create Subject": "Crea una matèria",
+        "Creating new course...": "S’està creant una assignatura nova...",
+        "Creating new subject...": "S’està creant una matèria nova...",
+        "Error creating new course": "S'ha produït un error en crear una assignatura nova",
+        "Error creating new subject": "S'ha produït un error en crear una matèria nova",
+        "Loading accounts...": "S'estan carregant els comptes...",
+        "Name...": "Nom...",
+        "No Results": "No hi ha cap resultat",
+        "Select a homeroom": "Selecciona una tutoria",
+        "Subject Name": "Nom de la matèria",
+        "Unable to get accounts": "No s’han pogut obtenir els comptes",
+        "Unable to get homerooms": "No s’han pogut obtenir tutories",
+        "Use arrow keys to navigate options.": "Utilitzeu les tecles de fletxes per desplaçar-vos per les opcions.",
+        "Which account will this course be associated with?": "Amb quin usuari s'associarà l'assignatura?",
+        "Which account will this subject be associated with?": "Amb quin usuari s'associarà aquesta matèria?"
+    },
+    "enhanced_individual_gradebook": {
+        "Final Grade Override": "Substitució de la nota final"
+    },
+    "feature_flags": {
+        "Accept": "Accepta",
+        "Cancel": "Cancel·la"
+    },
+    "filter_bar": {
+        "All": "Tot",
+        "Clear": "Suprimeix",
+        "Filter by": "Filtra per",
+        "Search": "Cerca",
+        "Use arrow keys to navigate options.": "Utilitzeu les tecles de fletxes per desplaçar-vos per les opcions."
+    },
+    "groupNavigationSelector": {
+        "Select Group": "Selecciona un grup",
+        "Use arrow keys to navigate options.": "Utilitzeu les tecles de fletxes per desplaçar-vos per les opcions."
+    },
+    "jobs": {
+        "Close": "Tanca"
+    },
+    "modules_home_page": {
+        "Create a new Module": "Crea un contingut nou"
+    },
+    "not_found_page_slide_puzzle": {
+        "A studious panda": "Un panda estudiós",
+        "Moves:": "Moviments:"
+    },
+    "overview_page": {
+        "Edit home page": "Edita la pàgina inicial",
+        "Subject Home Page": "Pàgina inicial de la matèria"
+    },
+    "pages_edit_title": {
+        "Page Title": "Títol de la pàgina"
+    },
+    "quizzes_regrade_modal": {
+        "Cancel": "Cancel·la",
+        "Close": "Tanca"
+    },
+    "study_assist": {
+        "Back": "Enrere",
+        "Close": "Tanca",
+        "Page": "Pàgina"
+    },
+    "submit_online_url_assignment": {
+        "A valid URL is required": "És obligatori un URL vàlid",
+        "Website URL": "URL del lloc web"
+    },
+    "terms_of_service_modal": {
+        "Acceptable Use Policy": "Política d'ús acceptable",
+        "Loading...": "S'està carregant…",
+        "Preview": "Visualització prèvia"
+    },
+    "todos_page": {
+        "Failed to load todos": "No s'han pogut carregar les tasques pendents",
+        "Loading Additional Todo Details": "S’estan penjant la informació de les tasques pendents addicionals",
+        "Loading Todo Course Name": "S'està penjant el nom de l'assignatura de tasques pendents",
+        "Loading Todo Title": "S'està penjant el títol de les tasques pendents"
+    },
+    "tray": {
+        "Close": "Tanca"
+    }
+}

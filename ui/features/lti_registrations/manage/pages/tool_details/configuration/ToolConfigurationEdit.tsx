@@ -82,7 +82,8 @@ export const ToolConfigurationEdit = () => {
    * because the user can't change them. We should also consider doing this
    * for inherited registrations, and manual registrations from LP.
    */
-  const showAllSettings = registration.manual_configuration_id !== null
+  const showAllSettings =
+    registration.manual_configuration_id !== null && registration.template_registration_id === null
 
   const useOverlayState = React.useMemo(
     () =>
@@ -113,7 +114,10 @@ export const ToolConfigurationEdit = () => {
     if (!updateMutation.isPending) {
       const {state, setDirty, setHasSubmitted} = useOverlayState.getState()
       setHasSubmitted(true)
-      const errors = validateLti1p3RegistrationOverlayState(state)
+      const errors = validateLti1p3RegistrationOverlayState({
+        state,
+        validateLaunchSettings: registration.template_registration_id === null,
+      })
       if (errors.length > 0) {
         // focus on the first invalid field
         document.getElementById(getInputIdForField(errors[0].field))?.focus()
@@ -226,21 +230,17 @@ export const ToolConfigurationEdit = () => {
         <IconConfirmationPerfWrapper overlayStore={useOverlayState} registration={registration} />
       </Section>
 
-      <Footer save={save} isInherited={isInherited} isSaving={updateMutation.isPending} />
+      <Footer
+        save={save}
+        canEdit={!isInherited || registration.template_registration_id !== null}
+        isSaving={updateMutation.isPending}
+      />
     </div>
   )
 }
 
 const Footer = React.memo(
-  ({
-    save,
-    isInherited,
-    isSaving,
-  }: {
-    save: () => Promise<void>
-    isInherited: boolean
-    isSaving: boolean
-  }) => {
+  ({save, canEdit, isSaving}: {save: () => Promise<void>; canEdit: boolean; isSaving: boolean}) => {
     const navigate = useNavigate()
     const [editTooltipShowing, setEditTooltipShowing] = React.useState(false)
     return (
@@ -266,7 +266,7 @@ const Footer = React.memo(
               isShowingContent={editTooltipShowing}
               onShowContent={() => {
                 // The tooltip should only be shown if they *can't* click the edit button
-                setEditTooltipShowing(isInherited)
+                setEditTooltipShowing(!canEdit)
               }}
               onHideContent={() => {
                 setEditTooltipShowing(false)
@@ -275,7 +275,7 @@ const Footer = React.memo(
               <Button
                 data-pendo="lti-registrations-update-tool-configuration"
                 color="primary"
-                interaction={isInherited || isSaving ? 'disabled' : 'enabled'}
+                interaction={!canEdit || isSaving ? 'disabled' : 'enabled'}
                 margin="0 0 0 xx-small"
                 onClick={save}
               >

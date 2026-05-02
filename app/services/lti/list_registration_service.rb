@@ -95,7 +95,7 @@ module Lti
     end
 
     def preloaded_account_bindings(registrations)
-      account_bindings = Lti::RegistrationAccountBinding.where(account:, registration: registrations).preload(:created_by, :updated_by)
+      account_bindings = Lti::RegistrationAccountBinding.active.where(account:, registration: registrations).preload(:created_by, :updated_by)
       # Only query site admin bindings when templates are disabled (inherited registrations exist)
       account_bindings += Lti::RegistrationAccountBinding.find_all_in_site_admin(registrations) unless templates_enabled?
       account_bindings.group_by(&:global_registration_id).transform_values(&:first)

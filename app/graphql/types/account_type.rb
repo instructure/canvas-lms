@@ -138,17 +138,33 @@ module Types
     field :institutional_tag_categories_connection,
           Types::InstitutionalTagCategoryType.connection_type,
           null: true do
+      argument :has_tags_in_state, Types::InstitutionalTagWorkflowStateType, required: false
       argument :search_term, String, required: false
-      argument :workflow_state, String, required: false, default_value: "active"
+      argument :workflow_state, Types::InstitutionalTagWorkflowStateType, required: false, default_value: "active"
     end
-    def institutional_tag_categories_connection(search_term: nil, workflow_state: "active")
+    def institutional_tag_categories_connection(search_term: nil, workflow_state: "active", has_tags_in_state: nil)
       root_account = account.root_account? ? account : nil
       return unless root_account
       raise GraphQL::ExecutionError, "feature flag is disabled" unless root_account.feature_enabled?(:institutional_tags)
       raise GraphQL::ExecutionError, "not authorized" unless root_account.grants_right?(current_user, session, :manage_institutional_tags_view)
 
-      cats = root_account.institutional_tag_categories.where(workflow_state:)
+      cats = root_account.institutional_tag_categories
+      cats = cats.where(workflow_state:) unless workflow_state == "any"
       cats = cats.search_by_name(search_term) if search_term.present?
+
+      if has_tags_in_state.present?
+        matching_category_ids = InstitutionalTag
+                                .where(root_account_id: root_account.id, workflow_state: has_tags_in_state)
+                                .select(:category_id)
+                                .distinct
+
+        cats = if workflow_state == "any"
+                 cats.where(workflow_state: has_tags_in_state).or(cats.where(id: matching_category_ids))
+               else
+                 cats.where(id: matching_category_ids)
+               end
+      end
+
       cats.order(:name)
     end
 
@@ -160,7 +176,7 @@ module Types
                required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("InstitutionalTagCategory")
       argument :search_term, String, required: false
-      argument :workflow_state, String, required: false, default_value: "active"
+      argument :workflow_state, Types::InstitutionalTagWorkflowStateType, required: false, default_value: "active"
     end
     def institutional_tags_connection(category_id: nil, search_term: nil, workflow_state: "active")
       root_account = account.root_account? ? account : nil

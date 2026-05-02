@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -37,8 +37,6 @@ import {Pill} from '@instructure/ui-pill'
 import {Spinner} from '@instructure/ui-spinner'
 import {showFlashError} from '@instructure/platform-alerts'
 import {Text} from '@instructure/ui-text'
-
-const I18n = createI18nScope('UsedLocationsModal')
 
 export type FetchUsedLocationResponse = {
   usedLocations: UsedLocation[]
@@ -77,6 +75,7 @@ export const UsedLocationsModal = ({
   fetchAccountUsedLocations,
   onClose,
 }: UsedLocationsModalProps) => {
+  const {t} = useTranslation('UsedLocationsModal')
   const [usedLocations, setUsedLocations] = useState<UsedLocation[]>([])
   const [accountUsedLocations, setAccountUsedLocations] = useState<AccountUsedLocation[] | null>(
     null,
@@ -105,7 +104,7 @@ export const UsedLocationsModal = ({
       moreLocationsLeft.current = !newLocations.isLastPage
       fetchingLocations.current = false
     } catch (error: any) {
-      showFlashError(I18n.t('Failed to load used locations'))(error)
+      showFlashError(t('Failed to load used locations'))(error)
     }
   }, [fetchUsedLocations, itemId])
 
@@ -141,7 +140,7 @@ export const UsedLocationsModal = ({
           })
         })
       } catch (error: any) {
-        showFlashError(I18n.t('Failed to load assignments used locations'))(error)
+        showFlashError(t('Failed to load assignments used locations'))(error)
       } finally {
         setLoadingAssignments(prev => ({...prev, [currentCourse.id]: false}))
       }
@@ -163,7 +162,7 @@ export const UsedLocationsModal = ({
 
       fetchingAccountLocations.current = false
     } catch (error: any) {
-      showFlashError(I18n.t('Failed to load account used locations'))(error)
+      showFlashError(t('Failed to load account used locations'))(error)
     }
   }, [fetchAccountUsedLocations, itemId])
 
@@ -219,30 +218,30 @@ export const UsedLocationsModal = ({
       open={isOpen}
       onClose={reset}
       onDismiss={reset}
-      label={I18n.t('Locations Used')}
+      label={t('Locations Used')}
       size="small"
       data-testid="used-locations-modal"
     >
       <Modal.Header>
         <CloseButton
-          screenReaderLabel={I18n.t('Close')}
+          screenReaderLabel={t('Close')}
           placement="end"
           offset="small"
           onClick={onClose}
           data-testid="used-locations-modal-close-button"
         />
-        <Heading>{I18n.t('Locations Used')}</Heading>
+        <Heading>{t('Locations Used')}</Heading>
       </Modal.Header>
       <Modal.Body>
         <View as="div" margin="0 0 medium">
           <TextInput
             type="search"
-            placeholder={I18n.t('Search...')}
+            placeholder={t('Search...')}
             renderBeforeInput={() => <IconSearchLine inline={false} />}
             width="22.5rem"
             value={filter}
             onChange={e => setFilter(e.target.value)}
-            renderLabel={<ScreenReaderContent>{I18n.t('Search')}</ScreenReaderContent>}
+            renderLabel={<ScreenReaderContent>{t('Search')}</ScreenReaderContent>}
             data-testid="used-locations-modal-search-input"
           />
         </View>
@@ -254,7 +253,7 @@ export const UsedLocationsModal = ({
               data-testid="used-locations-modal-account-title"
             >
               <Text size="small" weight="bold">
-                {I18n.t('Accounts')}
+                {t('Accounts')}
               </Text>
             </List.Item>
 
@@ -290,7 +289,7 @@ export const UsedLocationsModal = ({
               data-testid="used-locations-modal-course-title"
             >
               <Text size="small" weight="bold">
-                {I18n.t('Courses')}
+                {t('Courses')}
               </Text>
             </List.Item>
             {usedLocations.map(course => {
@@ -326,7 +325,7 @@ export const UsedLocationsModal = ({
                       {course['concluded?'] ? (
                         <Pill>
                           <View as="span" data-testid={`concluded-course-${course.id}-pill`}>
-                            {I18n.t('Concluded')}
+                            {t('Concluded')}
                           </View>
                         </Pill>
                       ) : (
@@ -362,8 +361,8 @@ export const UsedLocationsModal = ({
                             data-testid={`used-locations-modal-load-assignments-button-${course.id}`}
                           >
                             {course.assignments.length > 0
-                              ? I18n.t('Load More Assignments ...')
-                              : I18n.t('Load Assignments ...')}
+                              ? t('Load More Assignments ...')
+                              : t('Load Assignments ...')}
                           </Link>
                         </List.Item>
                       )}
@@ -373,7 +372,7 @@ export const UsedLocationsModal = ({
                           key={`loading-spinner-${course.id}`}
                           data-testid={`used-locations-modal-loading-spinner-${course.id}`}
                         >
-                          <Spinner renderTitle={I18n.t('Loading')} size="small" />
+                          <Spinner renderTitle={t('Loading')} size="small" />
                         </List.Item>
                       )}
                     </List>
@@ -387,14 +386,14 @@ export const UsedLocationsModal = ({
         ) : (
           <></>
         )}
-        {isLoading ? <Spinner renderTitle={I18n.t('Loading')} size="small" /> : <></>}
+        {isLoading ? <Spinner renderTitle={t('Loading')} size="small" /> : <></>}
         <div ref={sentinelRef} style={{height: '1px'}} />
       </Modal.Body>
       <Modal.Footer>
         <Flex justifyItems="end">
           <Flex.Item>
             <Button onClick={onClose} margin="0 x-small 0 x-small">
-              {I18n.t('Close')}
+              {t('Close')}
             </Button>
           </Flex.Item>
         </Flex>

@@ -41,6 +41,8 @@ interface CanvasFileUploadProps {
   maxFileSizeMB?: number // Maximum file size in MB, undefined = unlimited
   maxFiles?: number // Maximum number of files, undefined = unlimited
   initialFailedFileNames?: string[] // Pine indexing failures from the API
+  primaryButtonThemeOverride?: Record<string, unknown>
+  secondaryButtonThemeOverride?: Record<string, unknown>
 }
 
 const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
@@ -51,6 +53,8 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
   maxFileSizeMB,
   maxFiles,
   initialFailedFileNames,
+  primaryButtonThemeOverride,
+  secondaryButtonThemeOverride,
 }) => {
   const {uploadingFileNames, failedFileNames, clearFailedFile, handleDrop, isUploading} =
     useFileUpload({
@@ -182,6 +186,7 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
         <Flex.Item margin="0 small 0 0">
           <Button
             color="primary"
+            themeOverride={primaryButtonThemeOverride}
             onClick={() => fileInputRef.current?.click()}
             interaction={isUploading ? 'disabled' : 'enabled'}
           >
@@ -189,7 +194,11 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
           </Button>
         </Flex.Item>
         <Flex.Item>
-          <Button color="secondary" onClick={() => setShowBrowserModal(true)}>
+          <Button
+            color="primary"
+            themeOverride={secondaryButtonThemeOverride}
+            onClick={() => setShowBrowserModal(true)}
+          >
             {I18n.t('Choose from Canvas files')}
           </Button>
         </Flex.Item>
@@ -222,7 +231,12 @@ const CanvasFileUpload: React.FC<CanvasFileUploadProps> = ({
           </View>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => setShowBrowserModal(false)} margin="0 xx-small 0 0">
+          <Button
+            color="primary"
+            onClick={() => setShowBrowserModal(false)}
+            themeOverride={secondaryButtonThemeOverride}
+            margin="0 xx-small 0 0"
+          >
             {I18n.t('Cancel')}
           </Button>
         </Modal.Footer>

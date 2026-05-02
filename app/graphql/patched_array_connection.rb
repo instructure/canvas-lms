@@ -28,8 +28,9 @@ class PatchedArrayConnection < GraphQL::Pagination::ArrayConnection
   # by id so cursors don't break.
   def cursor_for_submission_node(submission)
     submission_idx = items.find_index { |i| i.submitted_at.to_i == submission.submitted_at.to_i }
-    idx = submission_idx + 1
-    encode(idx.to_s)
+    raise ArgumentError, "submission not found in connection items" unless submission_idx
+
+    encode((submission_idx + 1).to_s)
   end
 
   def cursor_for_quiz_submission_node(quiz_submission)
@@ -37,8 +38,9 @@ class PatchedArrayConnection < GraphQL::Pagination::ArrayConnection
     # in the array share the same quiz_submission id but represent different
     # attempts via simply_versioned deserialization.
     quiz_submission_idx = items.find_index { |i| i.equal?(quiz_submission) }
-    idx = quiz_submission_idx + 1
-    encode(idx.to_s)
+    raise ArgumentError, "quiz_submission not found in connection items" unless quiz_submission_idx
+
+    encode((quiz_submission_idx + 1).to_s)
   end
 
   def cursor_for(item)

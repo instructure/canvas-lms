@@ -240,6 +240,11 @@ module Api::V1::CalendarEvent
                                      end
     end
     hash["important_dates"] = assignment.important_dates
+
+    if assignment.is_a?(Assignment) && assignment.peer_reviews? && assignment.context.feature_enabled?(:peer_review_allocation_and_grading)
+      hash["assignment"]["peer_review_sub_assignment_enabled"] = assignment.peer_review_sub_assignment.present? if hash["assignment"]
+    end
+
     hash
   end
 

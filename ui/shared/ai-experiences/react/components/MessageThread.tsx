@@ -34,7 +34,6 @@ interface MessageThreadProps {
   aiExperienceId: string | number
   isLoading?: boolean
   isInitializing?: boolean
-  lastAssistantMessageRef?: React.MutableRefObject<HTMLElement | null>
   bottomRef?: React.MutableRefObject<HTMLDivElement | null>
 }
 
@@ -45,7 +44,6 @@ const MessageThread = ({
   aiExperienceId,
   isLoading = false,
   isInitializing = false,
-  lastAssistantMessageRef,
   bottomRef,
 }: MessageThreadProps) => {
   if (isInitializing) {
@@ -62,9 +60,6 @@ const MessageThread = ({
     <>
       {visibleMessages.map((message, index) => {
         const isUser = message.role === 'User'
-        const isLastMessage = index === visibleMessages.length - 1
-        const isLastAssistantMessage = isLastMessage && !isUser
-
         return (
           <View
             key={index}
@@ -83,23 +78,21 @@ const MessageThread = ({
               borderWidth={isUser ? 'small' : undefined}
               role="article"
               aria-label={isUser ? I18n.t('Your message') : I18n.t('Message from Assistant')}
-              tabIndex={isLastAssistantMessage ? -1 : undefined}
               textAlign="start"
-              elementRef={
-                isLastAssistantMessage && lastAssistantMessageRef
-                  ? el => {
-                      lastAssistantMessageRef.current = el as HTMLElement | null
-                    }
-                  : undefined
-              }
             >
               <Text data-testid={`llm-conversation-message-${message.role}`}>
-                <span style={{whiteSpace: 'pre-wrap'}}>{message.text}</span>
+                <span
+                  id={message.id ? `llm-message-${message.id}` : undefined}
+                  style={{whiteSpace: 'pre-wrap'}}
+                >
+                  {message.text}
+                </span>
               </Text>
             </View>
             {!isUser && message.id && conversationId && (
               <MessageFeedback
                 messageId={message.id}
+                messageContainerId={`llm-message-${message.id}`}
                 initialFeedback={message.feedback ?? []}
                 courseId={courseId}
                 aiExperienceId={String(aiExperienceId)}

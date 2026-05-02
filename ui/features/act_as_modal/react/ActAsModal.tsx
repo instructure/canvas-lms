@@ -20,7 +20,7 @@ import React from 'react'
 import keycode from 'keycode'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {Avatar} from '@instructure/ui-avatar'

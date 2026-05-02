@@ -597,6 +597,44 @@ shared_examples "Grade Detail Tray:" do |ff_enabled|
       end
     end
   end
+
+  context "peer review grading" do
+    before(:once) do
+      @course.enable_feature!(:peer_review_allocation_and_grading)
+
+      @pra = @course.assignments.create!(
+        title: "Peer Review Assignment",
+        points_possible: 10,
+        submission_types: "online_text_entry",
+        peer_reviews: true,
+        peer_review_count: 3
+      )
+
+      @pra.submit_homework(@students[0], body: "Student 1 submission")
+      @pra.submit_homework(@students[1], body: "Student 2 submission")
+
+      @pra.assign_peer_review(@students[0], @students[1])
+
+      peer_review_model(parent_assignment: @pra)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    let(:peer_review_column_name) { "#{@pra.title} Peer Review (#{@pra.peer_review_count})" }
+
+    it "displays peer review sub-assignment column in gradebook" do
+      Gradebook.visit(@course)
+      expect(Gradebook.assignment_header_cell_element(peer_review_column_name)).to be_displayed
+    end
+
+    it "does not display peer review sub-assignment column in gradebook when FF is disabled" do
+      @course.disable_feature!(:peer_review_allocation_and_grading)
+      Gradebook.visit(@course)
+      expect(f("body")).not_to contain_css(Gradebook.assignment_header_cell_selector(peer_review_column_name))
+    end
+  end
 end
 
 describe "Grade Detail Tray:" do

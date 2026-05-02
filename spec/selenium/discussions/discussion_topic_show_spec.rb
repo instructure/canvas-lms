@@ -1000,7 +1000,7 @@ describe "Discussion Topic Show" do
     it "loads nutrition facts element with content in the DOM" do
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       wait_for_ajaximations
-      expect(element_exists?("#nutrition_facts_trigger")).to be_truthy
+      expect(element_exists?("[data-testid='nutrition-facts-trigger']")).to be_truthy
     end
   end
 end

@@ -19,6 +19,7 @@
 import React, {useState, useRef, useEffect} from 'react'
 import {bool, object, string, func} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {getActiveCanvasTheme} from '@canvas/react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {
@@ -31,8 +32,9 @@ import {Menu} from '@instructure/ui-menu'
 import {IconButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {confirmWithPrompt} from '@canvas/instui-bindings/react/ConfirmWithPrompt'
+import {confirmWithPrompt} from '@instructure/platform-instui-bindings'
 import {showFlashAlert} from '@instructure/platform-alerts'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 import * as flagUtils from './util'
 
@@ -67,7 +69,26 @@ async function confirmSaveIfSiteAdmin(displayName) {
       env: ENV.RAILS_ENVIRONMENT,
     }),
     valueMatchesExpected: value => value.toLowerCase() === ENV.RAILS_ENVIRONMENT.toLowerCase(),
+    confirmButtonLabel: I18n.t('Confirm'),
+    cancelButtonLabel: I18n.t('Cancel'),
+    closeButtonLabel: I18n.t('Close'),
+    mismatchErrorText: I18n.t('The provided value is incorrect. Please try again.'),
+    theme: getActiveCanvasTheme(),
   })
+}
+
+function renderLockedTooltip(content, isLocked) {
+  if (!isLocked) return content
+  return (
+    <Tooltip
+      renderTip={I18n.t('Modifying this option has been disabled by administrators')}
+      on={['hover', 'focus']}
+      placement="top"
+      data-testid="locked-setting-tooltip"
+    >
+      <span style={{display: 'inline-block'}}>{content}</span>
+    </Tooltip>
+  )
 }
 
 function FeatureFlagButton({
@@ -132,7 +153,10 @@ function FeatureFlagButton({
     }
   }
 
-  const isReadonly = ENV.PERMISSIONS?.manage_feature_flags === false || effectiveFlag.locked
+  const isReadonly =
+    ENV.PERMISSIONS?.manage_feature_flags === false ||
+    ENV.PERMISSIONS?.manage_course_feature_options === false ||
+    effectiveFlag.locked
   const isEnabled = flagUtils.isEnabled(effectiveFlag)
 
   // Only some FFs at some levels can be be overridden at lower levels
@@ -165,7 +189,7 @@ function FeatureFlagButton({
     <div ref={enclosingDivEl} title={description}>
       <Flex direction="row">
         <Menu
-          trigger={
+          trigger={renderLockedTooltip(
             <IconButton
               interaction={isReadonly || apiBusy ? 'disabled' : 'enabled'}
               size="medium"
@@ -175,8 +199,9 @@ function FeatureFlagButton({
               screenReaderLabel={`${displayName}, ${I18n.t('current state:')} ${description}`}
             >
               {isEnabled ? <IconPublishSolid /> : <IconTroubleLine />}
-            </IconButton>
-          }
+            </IconButton>,
+            isReadonly,
+          )}
         >
           <Menu.Item
             value={transitions.enabled}

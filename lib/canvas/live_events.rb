@@ -138,6 +138,14 @@ module Canvas::LiveEvents
     post_event_stringified("discussion_entry_created", get_discussion_entry_data(entry))
   end
 
+  def self.discussion_entry_updated(entry)
+    post_event_stringified("discussion_entry_updated", get_discussion_entry_data(entry))
+  end
+
+  def self.discussion_entry_deleted(entry)
+    post_event_stringified("discussion_entry_deleted", get_discussion_entry_data(entry))
+  end
+
   def self.discussion_entry_submitted(entry, assignment_id, submission_id)
     payload = get_discussion_entry_data(entry)
     payload[:assignment_id] = assignment_id unless assignment_id.nil?
@@ -871,11 +879,18 @@ module Canvas::LiveEvents
   end
 
   def self.course_completed(context_module_progression)
-    post_event_stringified("course_completed",
-                           get_course_completed_data(
-                             context_module_progression.context_module.course,
-                             context_module_progression.user
-                           ))
+    course = context_module_progression.context_module.course
+    user = context_module_progression.user
+
+    post_event_stringified("course_completed", get_course_completed_data(course, user))
+
+    Canvas::KafkaEvents.post_event(
+      Canvas::KafkaEvents::Events::COURSE_COMPLETED,
+      root_account: course.root_account,
+      user:,
+      payload: { course_id: course.global_id.to_s },
+      occurred_at: context_module_progression.completed_at
+    )
   end
 
   def self.course_progress(context_module_progression)

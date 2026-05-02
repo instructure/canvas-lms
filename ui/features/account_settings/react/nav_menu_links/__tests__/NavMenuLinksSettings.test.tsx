@@ -21,14 +21,15 @@ import React from 'react'
 import {render, fireEvent, within, waitFor} from '@testing-library/react'
 import NavMenuLinksSettings from '../NavMenuLinksSettings'
 import {useNavMenuLinksStore} from '../useNavMenuLinksStore'
-import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+import {confirmDanger} from '@instructure/platform-instui-bindings'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock the store
 vi.mock('../useNavMenuLinksStore')
 
 // Mock confirmDanger
-vi.mock('@canvas/instui-bindings/react/Confirm', () => ({
+vi.mock('@instructure/platform-instui-bindings', async () => ({
+  ...(await vi.importActual<typeof import('@instructure/platform-instui-bindings')>('@instructure/platform-instui-bindings')),
   confirmDanger: vi.fn(),
 }))
 

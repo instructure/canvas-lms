@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useMemo, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {intersection, some} from 'es-toolkit/compat'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
@@ -42,6 +42,7 @@ import SubmissionDownloadModal from './SubmissionDownloadModal'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 import {disableGrading} from '../../../utils/gradeInputUtils'
+import AssignmentPostingPolicyTray from '@canvas/assignment-posting-policy-tray'
 
 const I18n = createI18nScope('enhanced_individual_gradebook')
 
@@ -257,7 +258,13 @@ function AssignmentActions({
 }: AssignmentActionsProps) {
   const [showMessageStudentsWhoModal, setShowMessageStudentsWhoModal] = useState(false)
   const [showSetDefaultGradeModal, setShowSetDefaultGradeModal] = useState(false)
+  const [postManually, setPostManually] = useState(assignment.postManually)
+  useEffect(() => {
+    setPostManually(assignment.postManually)
+  }, [assignment.id])
   const defaultGradeButtonRef = useRef<Element | null>(null)
+  const postingPolicyTrayRef = useRef<AssignmentPostingPolicyTray>(null)
+  const postPolicyButtonRef = useRef<Element | null>(null)
 
   const focusDefaultGradeButton = useCallback(() => {
     requestAnimationFrame(() => {
@@ -356,6 +363,44 @@ function AssignmentActions({
             </Text>
           </View>
         )}
+      </View>
+      <View as="div" className="pad-box no-sides">
+        <Button
+          color="secondary"
+          onClick={() =>
+            postingPolicyTrayRef.current?.show({
+              assignment: {
+                anonymousGrading: assignment.anonymousGrading,
+                gradesPublished: assignment.gradesPublished,
+                id: assignment.id,
+                moderatedGrading: assignment.moderatedGrading,
+                name: assignment.name,
+                postManually,
+              },
+              onAssignmentPostPolicyUpdated: ({
+                postManually: updated,
+              }: {
+                assignmentId: string
+                postManually: boolean
+              }) => {
+                setPostManually(updated)
+              },
+              onExited: () => {
+                requestAnimationFrame(() => {
+                  const el = postPolicyButtonRef.current
+                  if (el instanceof HTMLElement) el.focus()
+                })
+              },
+            })
+          }
+          elementRef={el => {
+            postPolicyButtonRef.current = el
+          }}
+          data-testid="grade-post-policy-button"
+        >
+          {I18n.t('Grade Post Policy')}
+        </Button>
+        <AssignmentPostingPolicyTray ref={postingPolicyTrayRef} />
       </View>
     </>
   )

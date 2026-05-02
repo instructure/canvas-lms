@@ -23,9 +23,7 @@ import {IconExternalLinkLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
 import {Text} from '@instructure/ui-text'
-import {useScope as createI18nScope} from '@canvas/i18n'
-
-const I18n = createI18nScope('assignment_tabs')
+import {useTranslation} from '@canvas/i18next'
 
 export default function PeerReviewDetailsView({
   assignment,
@@ -34,6 +32,7 @@ export default function PeerReviewDetailsView({
   assignment: TeacherAssignmentType
   canEdit: boolean
 }) {
+  const {t} = useTranslation('assignment_tabs')
   const [showRuleTray, setShowRuleTray] = useState(false)
 
   return (
@@ -46,7 +45,7 @@ export default function PeerReviewDetailsView({
           onClick={() => setShowRuleTray(true)}
           renderIcon={<IconExternalLinkLine />}
         >
-          <Text size="content">{I18n.t('Create Allocation Rules for Peer Reviews')}</Text>
+          <Text size="content">{t('Create Allocation Rules for Peer Reviews')}</Text>
         </Link>
       </Flex.Item>
       <Flex.Item>

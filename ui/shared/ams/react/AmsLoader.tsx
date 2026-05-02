@@ -64,10 +64,9 @@ export function AmsLoader({
     let stillMounting = true
 
     // Set window variables for AMS to consume
-    if (REMOTES?.ams?.api_url || ENV.RICH_CONTENT_APP_HOST) {
+    if (REMOTES?.ams?.api_url) {
       window.AMS_CONFIG = {
-        API_URL: REMOTES?.ams?.api_url || '',
-        ...(ENV.RICH_CONTENT_APP_HOST && {RCS_HOST: ENV.RICH_CONTENT_APP_HOST}),
+        API_URL: REMOTES?.ams?.api_url,
       }
     }
 
@@ -94,6 +93,33 @@ export function AmsLoader({
               createController: createRubricController,
             },
             customerAppVariant,
+            rcsConfig: {
+              RICH_CONTENT_APP_HOST: ENV.RICH_CONTENT_APP_HOST,
+              RICH_CONTENT_CAN_UPLOAD_FILES: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
+              RICH_CONTENT_INST_RECORD_TAB_DISABLED: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
+              RICH_CONTENT_FILES_TAB_DISABLED: ENV.RICH_CONTENT_FILES_TAB_DISABLED,
+              RICH_CONTENT_CAN_EDIT_FILES: ENV.RICH_CONTENT_CAN_EDIT_FILES,
+              K5_SUBJECT_COURSE: ENV.K5_SUBJECT_COURSE,
+              K5_HOMEROOM_COURSE: ENV.K5_HOMEROOM_COURSE,
+              context_asset_string: ENV.context_asset_string,
+              DEEP_LINKING_POST_MESSAGE_ORIGIN: ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN,
+              current_user_id: ENV.current_user_id,
+              disable_keyboard_shortcuts: ENV.disable_keyboard_shortcuts,
+              rce_auto_save_max_age_ms: ENV.rce_auto_save_max_age_ms,
+              editorButtons: window.INST?.editorButtons ?? [],
+              kalturaSettings: {
+                hide_rte_button: window.INST?.kalturaSettings?.hide_rte_button || false,
+              },
+              LOCALES: ENV.LOCALES,
+              LOCALE: ENV.LOCALE,
+              active_brand_config_json_url: ENV.active_brand_config_json_url,
+              url_for_high_contrast_tinymce_editor_css:
+                ENV.url_for_high_contrast_tinymce_editor_css ?? [],
+              url_to_what_gets_loaded_inside_the_tinymce_editor_css:
+                ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css ?? [],
+              FEATURES: ENV.FEATURES,
+              LTI_LAUNCH_FRAME_ALLOWANCES: ENV.LTI_LAUNCH_FRAME_ALLOWANCES,
+            },
             ...(gradingContext && {gradingContext}),
             ...(onSubmissionUpdate && {onSubmissionUpdate}),
           })

@@ -337,8 +337,16 @@ class GradebooksController < ApplicationController
                        else
                          @context
                        end
-      rubric_associations = rubric_context.shard.activate { Context.sorted_rubrics(rubric_context) }
-      data = rubric_associations.map do |ra|
+      has_pagination_params = params[:page].present? || params[:per_page].present?
+      associations_to_render = []
+      if @context.root_account.feature_enabled?(:grading_rubrics_pagination) && has_pagination_params
+        rubric_associations = rubric_context.shard.activate { Context.sorted_rubrics(rubric_context, search_term: params[:search_term]) }
+        base_url = "#{request.base_url}#{request.path}"
+        associations_to_render = Api.paginate(rubric_associations, self, base_url)
+      else
+        associations_to_render = rubric_context.shard.activate { Context.sorted_rubrics(rubric_context) }
+      end
+      data = associations_to_render.map do |ra|
         json = ra.as_json(methods: [:context_name], include: { rubric: { include_root: false } })
         # return shard-aware context codes
         json["rubric_association"]["context_code"] = ra.context.asset_string
@@ -365,6 +373,10 @@ class GradebooksController < ApplicationController
       if requested_gradebook_view.present?
         if requested_gradebook_view != preferred_gradebook_view
           update_preferred_gradebook_view!(requested_gradebook_view)
+        end
+        if requested_gradebook_view == "learning_mastery" && outcome_gradebook_enabled?
+          show_learning_mastery
+          return
         end
         redirect_to polymorphic_url([@context, :gradebook])
         return

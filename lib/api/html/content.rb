@@ -112,6 +112,9 @@ module Api
           APPLICABLE_ATTRS.each do |attr|
             next unless (link = node[attr])
 
+            # only process relative URLs or Canvas URLs
+            next unless canvas_url?(link)
+
             match = link.match ASSOCIABLE_ATTACHMENT_LINKS_REGEXP
             next unless match
 
@@ -243,6 +246,26 @@ module Api
 
       def apply_mathml(node)
         self.class.apply_mathml(node)
+      end
+
+      # check if a URL is a Canvas URL (relative/pointing to a Canvas host)
+      # Returns true for:
+      #   - Relative URLs (no host): /files/123
+      #   - Absolute URLs pointing to Canvas hosts: https://canvas.example.com/files/123
+      # Returns false for:
+      #   - External URLs: https://external.com/files/123
+      def canvas_url?(url)
+        uri = begin
+          URI.parse(url)
+        rescue URI::InvalidURIError
+          nil
+        end
+        return false unless uri
+
+        # Relative URLs (no host) are always Canvas URLs
+        return true unless uri&.host
+
+        LoadAccount.from_host(uri.host).present?
       end
     end
   end

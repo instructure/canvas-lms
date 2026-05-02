@@ -16,19 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
-import {BarChartRow, BarChartRowProps} from '../BarChartRow'
 import {ContributingScoresManager} from '@canvas/outcomes/react/hooks/useContributingScores'
-import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../../__fixtures__/rollups'
-import {MOCK_ALIGNMENTS} from '../../../__fixtures__/contributingScores'
-import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
+import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
 import {
   COLUMN_PADDING,
-  STUDENT_COLUMN_WIDTH,
   STUDENT_COLUMN_RIGHT_PADDING,
+  STUDENT_COLUMN_WIDTH,
 } from '@canvas/outcomes/react/utils/constants'
+import type {Column} from '@instructure/outcomes-ui/lib/components/Gradebook/table/Table'
 import {COLUMN_WIDTH} from '@instructure/outcomes-ui/lib/util/gradebook/constants'
-import {OutcomeDistribution} from '@canvas/outcomes/react/types/mastery_distribution'
+import {render, screen, within} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {MOCK_ALIGNMENTS} from '../../../__fixtures__/contributingScores'
+import {MOCK_OUTCOMES, MOCK_STUDENTS} from '../../../__fixtures__/rollups'
+import {BarChartRow, BarChartRowProps} from '../BarChartRow'
 
 const MOCK_OUTCOME_DISTRIBUTIONS: Record<string, OutcomeDistribution> = {
   '1': {
@@ -49,7 +50,6 @@ const MOCK_OUTCOME_DISTRIBUTIONS: Record<string, OutcomeDistribution> = {
   },
 }
 
-// Mock the MasteryDistributionChartCell component
 vi.mock('../../charts/MasteryDistributionChartCell', () => ({
   MasteryDistributionChartCell: ({
     outcome,
@@ -58,8 +58,9 @@ vi.mock('../../charts/MasteryDistributionChartCell', () => ({
     distributionStudents,
     courseId,
     isLoading,
+    isHovered,
   }: any) => (
-    <div data-testid={`mastery-chart-cell-${outcome.id}`}>
+    <div data-testid={`mastery-chart-cell-${outcome.id}`} data-hovered={String(!!isHovered)}>
       <span data-testid={`loading-${outcome.id}`}>{String(isLoading)}</span>
       {distributionData && (
         <span data-testid={`distribution-${outcome.id}`}>{JSON.stringify(distributionData)}</span>
@@ -80,6 +81,8 @@ vi.mock('../../charts/MasteryDistributionChartCell', () => ({
 }))
 
 describe('BarChartRow', () => {
+  const user = userEvent.setup()
+
   const mockContributingScores: ContributingScoresManager = {
     forOutcome: vi.fn(() => ({
       isVisible: () => false,
@@ -353,5 +356,69 @@ describe('BarChartRow', () => {
 
     expect(screen.getByTestId('course-id-1')).toHaveTextContent('5')
     expect(screen.getByTestId('course-id-2')).toHaveTextContent('5')
+  })
+
+  it('marks only one chart cell as hovered when the cursor moves quickly between cells', async () => {
+    render(<BarChartRow {...defaultProps()} />)
+
+    const cell1 = screen.getByTestId('mastery-chart-cell-1')
+    const cell2 = screen.getByTestId('mastery-chart-cell-2')
+    const cell1Wrapper = cell1.closest('[data-bar-chart-hover-id]') as HTMLElement
+    const cell2Wrapper = cell2.closest('[data-bar-chart-hover-id]') as HTMLElement
+
+    await user.pointer({target: cell1Wrapper})
+    expect(cell1).toHaveAttribute('data-hovered', 'true')
+    expect(cell2).toHaveAttribute('data-hovered', 'false')
+
+    // Simulate fast cursor: move to cell2 without mouseLeave on cell1
+    await user.pointer({target: cell2Wrapper})
+    expect(cell1).toHaveAttribute('data-hovered', 'false')
+    expect(cell2).toHaveAttribute('data-hovered', 'true')
+  })
+
+  it('clears hover when the cursor moves outside the row', async () => {
+    render(<BarChartRow {...defaultProps()} />)
+
+    const cell1 = screen.getByTestId('mastery-chart-cell-1')
+    const cell1Wrapper = cell1.closest('[data-bar-chart-hover-id]') as HTMLElement
+
+    await user.pointer({target: cell1Wrapper})
+    expect(cell1).toHaveAttribute('data-hovered', 'true')
+
+    await user.pointer({target: document.body})
+    expect(cell1).toHaveAttribute('data-hovered', 'false')
+  })
+
+  it('correctly hovers contributing-score cells', async () => {
+    const mockContributingScoresVisible: ContributingScoresManager = {
+      forOutcome: vi.fn((outcomeId: string | number) => ({
+        isVisible: () => outcomeId === '1',
+        toggleVisibility: vi.fn(),
+        data: {outcome: {id: '1', title: 'Outcome 1'}, alignments: MOCK_ALIGNMENTS, scores: []},
+        alignments: MOCK_ALIGNMENTS,
+        scoresForUser: vi.fn(() => []),
+        isLoading: false,
+        error: undefined,
+      })),
+    }
+
+    render(<BarChartRow {...defaultProps(mockContributingScoresVisible)} />)
+
+    const alignmentCellId = 'bar-chart-alignment-1-A_1'
+    const alignmentWrapper = document.getElementById(alignmentCellId) as HTMLElement
+    expect(alignmentWrapper).toHaveAttribute('data-bar-chart-hover-id', alignmentCellId)
+
+    // Use within() to scope queries since multiple cells share the same outcome id
+    const alignmentChartCell = within(alignmentWrapper).getByTestId('mastery-chart-cell-1')
+    const outcomeCellWrapper = document.getElementById('bar-chart-outcome-1') as HTMLElement
+    const outcomeChartCell = within(outcomeCellWrapper).getByTestId('mastery-chart-cell-1')
+
+    await user.pointer({target: alignmentWrapper})
+    expect(alignmentChartCell).toHaveAttribute('data-hovered', 'true')
+    expect(outcomeChartCell).toHaveAttribute('data-hovered', 'false')
+
+    await user.pointer({target: outcomeCellWrapper})
+    expect(alignmentChartCell).toHaveAttribute('data-hovered', 'false')
+    expect(outcomeChartCell).toHaveAttribute('data-hovered', 'true')
   })
 })

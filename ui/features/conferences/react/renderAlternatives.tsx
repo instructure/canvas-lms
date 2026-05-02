@@ -49,9 +49,10 @@ function ConferenceProvider({imageSource, title, text, responsiveSize}) {
   const skinny = responsiveSize === 'medium'
   return (
     <Flex direction={skinny ? 'row' : 'column'} alignItems="stretch">
-      {/* @ts-expect-error TS2769 (typescriptify) */}
       <Flex.Item
+        // @ts-expect-error TS7 migration
         height={skinny ? null : '10rem'}
+        // @ts-expect-error TS7 migration
         width={skinny ? '10rem' : null}
         background="secondary"
         margin="0 medium 0 0"

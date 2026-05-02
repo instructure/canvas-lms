@@ -19,7 +19,8 @@
 import {showFlashSuccess} from '@instructure/platform-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {CanvasModal} from '@instructure/platform-instui-bindings'
+import {canvasErrorComponent} from '@canvas/error-page-utils'
 import {reloadWindow} from '@canvas/util/globalUtils'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -177,6 +178,8 @@ export default function GroupCategoryCloneModal({
       size="small"
       shouldCloseOnDocumentClick={false}
       footer={<Footer />}
+      closeButtonLabel={I18n.t('Close')}
+      errorComponent={canvasErrorComponent()}
       {...modalProps}
     >
       <>

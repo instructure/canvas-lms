@@ -21,7 +21,7 @@ import React, {Component} from 'react'
 import {render} from '@canvas/react'
 import {func, instanceOf, array} from 'prop-types'
 
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'

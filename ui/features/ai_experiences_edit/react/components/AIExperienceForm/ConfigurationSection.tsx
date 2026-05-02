@@ -27,6 +27,10 @@ import {AIExperienceFormData} from '../../../types'
 import CanvasFileUpload from '@canvas/canvas-file-upload/react/CanvasFileUpload'
 import type {ContextFile} from '@canvas/canvas-file-upload/react/types'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {
+  lightBlueButtonTheme,
+  navyButtonTheme,
+} from '../../../../../shared/ai-experiences/react/brand'
 
 declare const ENV: GlobalEnv & {
   FEATURES?: {ai_experiences_context_file_upload?: boolean}
@@ -62,13 +66,13 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
     <View as="div" margin="large 0 0 0">
       <View
         as="div"
-        background="secondary"
+        background="primary"
         borderWidth="small"
         borderRadius="medium"
         padding="medium"
       >
         <Heading level="h2" margin="0 0 x-small 0">
-          {I18n.t('Configurations')}
+          <strong>{I18n.t('Configurations')}</strong>
         </Heading>
         <View as="div" margin="0 0 large 0">
           <Text size="medium">
@@ -81,12 +85,12 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
         {/* Completion rules section */}
         <View as="div">
           <Heading level="h3" margin="0 0 xx-small 0">
-            {I18n.t('Completion rules')}
+            <strong>{I18n.t('Completion rules')}</strong>
           </Heading>
           <View as="div" margin="0 0 small 0">
             <Text size="small" color="secondary">
               {I18n.t(
-                'Set the learning objectives that learners need to obtain in order to complete the activity.',
+                'Set the learning objectives that learners need to cover in order to complete the activity.',
               )}
             </Text>
           </View>
@@ -97,15 +101,20 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
               value={formData.learning_objective}
               onChange={onChange('learning_objective')}
               required
-              placeholder={I18n.t('Separate by semi-colon or next line.')}
               resize="vertical"
               height="80px"
               maxHeight="300px"
-              messages={
-                showErrors && errors.learning_objective
-                  ? [{type: 'newError', text: errors.learning_objective}]
-                  : []
-              }
+              messages={[
+                ...(showErrors && errors.learning_objective
+                  ? [{type: 'newError' as const, text: errors.learning_objective}]
+                  : []),
+                {
+                  type: 'hint' as const,
+                  text: I18n.t(
+                    'Add a learning objective on a new line or separate by semi-colon (;).',
+                  ),
+                },
+              ]}
             />
           </FormFieldGroup>
         </View>
@@ -113,7 +122,7 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
         {/* Pedagogical activity guidance section */}
         <View as="div" margin="large 0 0 0">
           <Heading level="h3" margin="0 0 xx-small 0">
-            {I18n.t('Pedagogical activity guidance')}
+            <strong>{I18n.t('Pedagogical activity guidance')}</strong>
           </Heading>
           <View as="div" margin="0 0 small 0">
             <Text size="small" color="secondary">
@@ -126,17 +135,20 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
               label={I18n.t('Pedagogical guidance')}
               value={formData.pedagogical_guidance}
               onChange={onChange('pedagogical_guidance')}
-              placeholder={I18n.t(
-                'Provide a prompt that tells the LLM (language learning model) how to facilitate the activity.',
-              )}
               resize="vertical"
               height="80px"
               maxHeight="300px"
-              messages={
-                showErrors && errors.pedagogical_guidance
-                  ? [{type: 'newError', text: errors.pedagogical_guidance}]
-                  : []
-              }
+              messages={[
+                ...(showErrors && errors.pedagogical_guidance
+                  ? [{type: 'newError' as const, text: errors.pedagogical_guidance}]
+                  : []),
+                {
+                  type: 'hint' as const,
+                  text: I18n.t(
+                    'Provide us a prompt that tells the LLM (language learning model) how to facilitate the activity.',
+                  ),
+                },
+              ]}
             />
           </FormFieldGroup>
         </View>
@@ -144,11 +156,11 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
         {/* Source materials section */}
         <View as="div" margin="large 0 0 0">
           <Heading level="h3" margin="0 0 xx-small 0">
-            {I18n.t('Source materials')}
+            <strong>{I18n.t('Source materials')}</strong>
           </Heading>
           <View as="div" margin="0 0 small 0">
             <Text size="small" color="secondary">
-              {I18n.t('Set up a closed-loop of sources to reference.')}
+              {I18n.t('Provide sources for the LLM to reference.')}
             </Text>
           </View>
           <FormFieldGroup description="" layout="stacked">
@@ -158,11 +170,18 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
               value={formData.facts}
               onChange={onChange('facts')}
               required
-              placeholder={I18n.t('Copy and paste information, data, key facts, etc.')}
               resize="vertical"
               height="80px"
               maxHeight="300px"
-              messages={showErrors && errors.facts ? [{type: 'newError', text: errors.facts}] : []}
+              messages={[
+                ...(showErrors && errors.facts
+                  ? [{type: 'newError' as const, text: errors.facts}]
+                  : []),
+                {
+                  type: 'hint' as const,
+                  text: I18n.t('Copy and paste information, data, key facts, etc.'),
+                },
+              ]}
             />
           </FormFieldGroup>
 
@@ -177,6 +196,8 @@ const ConfigurationSection: React.FC<ConfigurationSectionProps> = ({
                 maxFileSizeMB={ENV?.CONTEXT_FILE_MAX_SIZE_MB ?? 300}
                 maxFiles={10}
                 initialFailedFileNames={initialFailedFileNames}
+                primaryButtonThemeOverride={navyButtonTheme}
+                secondaryButtonThemeOverride={lightBlueButtonTheme}
               />
             </View>
           )}

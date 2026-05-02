@@ -314,7 +314,15 @@ class GradeChangeAuditApiController < AuditorApiController
                    :api_v1_audit_grade_change_course_student_url
                  end
 
-    events = Auditors::GradeChange.for_course_and_other_arguments(course, args, query_options)
+    events = if args[:assignment]&.checkpoints_parent?
+               assignment_ids = [args[:assignment].id, *args[:assignment].sub_assignments.pluck(:id)]
+               conditions = { context_id: course.id, context_type: "Course", assignment_id: assignment_ids }
+               conditions[:grader_id] = args[:grader].id if args[:grader]
+               conditions[:student_id] = args[:student].id if args[:student]
+               Auditors::GradeChange.for_scope_conditions(conditions, query_options)
+             else
+               Auditors::GradeChange.for_course_and_other_arguments(course, args, query_options)
+             end
 
     route_args = restrict_to_override_grades ? args.merge({ assignment: "override" }) : args
     render_events(events, send(url_method, route_args), course:, remove_anonymous: params[:student_id].present?)

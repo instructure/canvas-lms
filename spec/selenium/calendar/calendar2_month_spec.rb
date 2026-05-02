@@ -270,6 +270,90 @@ describe "calendar2" do
           checkpoint.reload
           expect(checkpoint.assignment_overrides.first.due_at).to eql(@initial_time)
         end
+
+        it "prevents drag and drop for assignments with graded peer reviews", priority: "1" do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+          assignment = @course.assignments.create!(
+            title: "Assignment with Graded Peer Reviews",
+            due_at: @initial_time,
+            peer_reviews: true,
+            peer_review_count: 1,
+            submission_types: "online_text_entry"
+          )
+          peer_review_model(parent_assignment: assignment)
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          drag_and_drop_element(find(".calendar .fc-event"),
+                                find(".calendar .fc-day.fc-widget-content.fc-fri.fc-past"))
+
+          expect_instui_flash_message("Assignments with graded peer reviews are not draggable. You can update their due dates by editing the assignment.")
+          wait_for_ajaximations
+
+          # Assignment should not be moved to Friday
+          expect(element_location).not_to eq @friday
+
+          # Due date should remain unchanged
+          assignment.reload
+          expect(assignment.start_at).to eql(@initial_time)
+        ensure
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "prevents drag and drop for assignment overrides with graded peer reviews", priority: "2" do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+          assignment = @course.assignments.create!(
+            title: "Assignment Override with Graded Peer Reviews",
+            peer_reviews: true,
+            peer_review_count: 1,
+            submission_types: "online_text_entry"
+          )
+          peer_review_model(parent_assignment: assignment)
+          assignment.assignment_overrides.create! do |override|
+            override.set = @course.course_sections.first
+            override.due_at = @initial_time
+            override.due_at_overridden = true
+          end
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          drag_and_drop_element(find(".calendar .fc-event"),
+                                find(".calendar .fc-day.fc-widget-content.fc-fri.fc-past"))
+
+          expect_instui_flash_message("Assignments with graded peer reviews are not draggable. You can update their due dates by editing the assignment.")
+          wait_for_ajaximations
+
+          # Override should not be moved to Friday
+          expect(element_location).not_to eq @friday
+
+          # Override due date should remain unchanged
+          assignment.reload
+          expect(assignment.assignment_overrides.first.due_at).to eql(@initial_time)
+        ensure
+          @course.disable_feature!(:peer_review_allocation_and_grading)
+        end
+
+        it "allows drag and drop for assignments with peer reviews when feature flag is disabled", priority: "2" do
+          assignment = @course.assignments.create!(
+            title: "Legacy Peer Review Assignment",
+            due_at: @initial_time,
+            peer_reviews: true,
+            peer_review_count: 1,
+            submission_types: "online_text_entry"
+          )
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          drag_and_drop_element(find(".calendar .fc-event"),
+                                find(".calendar .fc-day.fc-widget-content.fc-fri.fc-past"))
+
+          expect_no_flash_message :error
+
+          # Assignment should be moved to Friday
+          expect(element_location).to eq @friday
+          assignment.reload
+          expect(assignment.start_at).to eql(@one_day_later)
+        end
       end
 
       it "more options link should go to calendar event edit page", :ignore_js_errors do
@@ -299,6 +383,56 @@ describe "calendar2" do
         hover_and_click ".edit_event_link"
         expect_new_page_load { f(".more_options_link").click }
         expect(find("#assignment_name").attribute(:value)).to include(name)
+      end
+
+      it "redirects to assignment edit page when clicking edit on a peer review assignment with FF enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          title: "Assignment with Graded Peer Reviews - Calendar Test",
+          due_at: Time.zone.now.beginning_of_month + 15.days,
+          peer_reviews: true,
+          peer_review_count: 2,
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          workflow_state: "published"
+        )
+        peer_review_model(parent_assignment: assignment)
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f(".fc-event.assignment").click
+        wait_for_ajaximations
+
+        expect_new_page_load { hover_and_click ".edit_event_link" }
+
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{assignment.id}/edit")
+      end
+
+      it "redirects to assignment edit page when clicking edit on a peer review assignment override with FF enabled" do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        assignment = @course.assignments.create!(
+          title: "Assignment with Graded Peer Reviews - Override Test",
+          peer_reviews: true,
+          peer_review_count: 2,
+          points_possible: 10,
+          submission_types: "online_text_entry",
+          workflow_state: "published"
+        )
+        peer_review_model(parent_assignment: assignment)
+        assignment.assignment_overrides.create! do |override|
+          override.set = @course.course_sections.first
+          override.due_at = Time.zone.now.beginning_of_month + 15.days
+          override.due_at_overridden = true
+        end
+
+        get "/calendar2"
+        wait_for_ajaximations
+        f(".fc-event.assignment_override").click
+        wait_for_ajaximations
+
+        expect_new_page_load { hover_and_click ".edit_event_link" }
+
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{assignment.id}/edit")
       end
 
       it "publishes a new assignment when toggle is clicked" do

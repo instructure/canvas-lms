@@ -17,18 +17,17 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {useTranslation} from '@canvas/i18next'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-
-const I18n = createI18nScope('copy_warnings_modal')
 
 interface CopyWarningsModalProps {
   errorMessages: string[]
 }
 
 const CopyWarningsModal = ({errorMessages}: CopyWarningsModalProps) => {
+  const {t} = useTranslation('copy_warnings_modal')
   const [open, setOpen] = useState(true)
 
   const handleCloseModal = () => {
@@ -36,7 +35,7 @@ const CopyWarningsModal = ({errorMessages}: CopyWarningsModalProps) => {
   }
 
   return (
-    <Modal size="auto" open={open} onDismiss={handleCloseModal} label={I18n.t('Attention')}>
+    <Modal size="auto" open={open} onDismiss={handleCloseModal} label={t('Attention')}>
       <Modal.Body>
         <Flex direction="column">
           {errorMessages.map(warning => (

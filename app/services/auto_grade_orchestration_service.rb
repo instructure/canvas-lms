@@ -94,7 +94,8 @@ class AutoGradeOrchestrationService
       merged_data = merge_new_grade_data_with_existing(grade_data, auto_grade_result.grade_data || [])
 
       unless get_criteria_missing_grades(merged_data, rubric).empty?
-        raise CedarAi::Errors::GraderError, "Number of graded criteria (#{merged_data.length}) is less than the number of rubric criteria (#{rubric.data.length})"
+        Rails.logger.warn("[AutoGrade] Criteria count mismatch for submission #{submission.id}: got #{merged_data.length}, expected #{rubric.data.length}")
+        raise CedarAi::Errors::GraderError, I18n.t("Grading could not be completed. Please try again.")
       end
 
       auto_grade_result.update!(

@@ -1886,18 +1886,14 @@ describe GradebooksController do
           expect(preferred_gradebook_view).to eql("learning_mastery")
         end
 
-        it "redirects to the gradebook when the requested view is 'learning_mastery'" do
+        it "renders learning_mastery directly when the requested view is 'learning_mastery'" do
           get "show", params: { course_id: @course.id, view: "learning_mastery" }
-          expect(response).to redirect_to(action: "show")
+          expect(response).to render_template("gradebooks/learning_mastery")
         end
 
         it "increments inst_statsd when learning mastery gradebook is visited" do
-          # The initial show view will redirect to show without the view query param the first time,
-          #  and because RSpec doesn't follow redirects well, we stub out a few things to simulate
-          #  the redirects
           allow(InstStatsd::Statsd).to receive(:distributed_increment)
-          allow_any_instance_of(GradebooksController).to receive(:preferred_gradebook_view).and_return("learning_mastery")
-          get "show", params: { course_id: @course.id, view: "" }
+          get "show", params: { course_id: @course.id, view: "learning_mastery" }
           expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "outcomes_page_views",
             tags: { type: "teacher_lmgb" }
@@ -1932,9 +1928,9 @@ describe GradebooksController do
           expect(preferred_gradebook_view).to eql("learning_mastery")
         end
 
-        it "redirects to the gradebook when changing the requested view" do
+        it "renders 'learning_mastery' directly when changing the requested view" do
           get "show", params: { course_id: @course.id, view: "learning_mastery" }
-          expect(response).to redirect_to(action: "show")
+          expect(response).to render_template("gradebooks/learning_mastery")
         end
       end
 
@@ -1954,9 +1950,9 @@ describe GradebooksController do
           expect(response).to render_template("gradebooks/learning_mastery")
         end
 
-        it "redirects to the gradebook when requesting the preferred view" do
+        it "renders 'learning_mastery' directly when requesting the preferred view" do
           get "show", params: { course_id: @course.id, view: "learning_mastery" }
-          expect(response).to redirect_to(action: "show")
+          expect(response).to render_template("gradebooks/learning_mastery")
         end
 
         it "updates the user's preference when the requested view is 'gradebook'" do
@@ -4911,6 +4907,117 @@ describe GradebooksController do
       before { Account.site_admin.enable_feature!(:optimized_grading_rubrics) }
 
       it_behaves_like "grading_rubrics contract"
+    end
+
+    context "with :grading_rubrics_pagination enabled" do
+      before do
+        Account.site_admin.enable_feature!(:optimized_grading_rubrics)
+        @course.root_account.enable_feature!(:grading_rubrics_pagination)
+        user_session(@teacher)
+      end
+
+      context "with context_code param" do
+        it "returns a Link header when results span multiple pages" do
+          3.times { |i| create_rubric_with_association(title: "Rubric #{i}") }
+
+          get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string, per_page: 2 }
+
+          expect(response).to be_successful
+          expect(response.headers["Link"]).to be_present
+        end
+
+        it "paginates results using per_page and page params" do
+          3.times { |i| create_rubric_with_association(title: "Rubric #{i}") }
+
+          get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string, per_page: 2, page: 1 }
+          page1 = json_parse(response.body)
+
+          get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string, per_page: 2, page: 2 }
+          page2 = json_parse(response.body)
+
+          expect(page1.length).to be 2
+          expect(page2.length).to be 1
+          page1_ids = page1.map { |r| r["rubric_association"]["rubric_id"] }
+          page2_ids = page2.map { |r| r["rubric_association"]["rubric_id"] }
+          expect(page1_ids & page2_ids).to be_empty
+        end
+
+        it "filters rubrics by search_term (case-insensitive, partial match) when pagination params are present" do
+          create_rubric_with_association(title: "Math Rubric")
+          create_rubric_with_association(title: "Science Rubric")
+          create_rubric_with_association(title: "MATH Advanced")
+
+          get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string, search_term: "math", per_page: 10 }
+          titles = json_parse(response.body).map { |r| r["rubric_association"]["rubric"]["title"] }
+
+          expect(titles).to include("Math Rubric", "MATH Advanced")
+          expect(titles).not_to include("Science Rubric")
+        end
+
+        it "returns an empty array when search_term matches nothing" do
+          create_rubric_with_association(title: "Math Rubric")
+
+          get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string, search_term: "zzznomatch", per_page: 10 }
+
+          expect(json_parse(response.body)).to eql([])
+        end
+
+        it "ignores search_term and returns all rubrics when no pagination params are present" do
+          create_rubric_with_association(title: "Math Rubric")
+          create_rubric_with_association(title: "Science Rubric")
+
+          get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string, search_term: "math" }
+          titles = json_parse(response.body).map { |r| r["rubric_association"]["rubric"]["title"] }
+
+          expect(titles).to include("Math Rubric", "Science Rubric")
+        end
+
+        it "does not return a Link header when flag is on but no pagination params are passed" do
+          3.times { |i| create_rubric_with_association(title: "Rubric #{i}") }
+
+          get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string }
+
+          expect(response).to be_successful
+          expect(response.headers["Link"]).to be_nil
+        end
+      end
+
+      context "without context_code param" do
+        it "does not paginate context summaries" do
+          create_rubric_with_association
+
+          get "grading_rubrics", params: { course_id: @course, per_page: 1 }
+
+          expect(response).to be_successful
+          expect(response.headers["Link"]).to be_nil
+        end
+      end
+    end
+
+    context "with :grading_rubrics_pagination disabled" do
+      before do
+        Account.site_admin.enable_feature!(:optimized_grading_rubrics)
+        @course.root_account.disable_feature!(:grading_rubrics_pagination)
+        user_session(@teacher)
+      end
+
+      it "does not filter by search_term when flag is off" do
+        create_rubric_with_association(title: "Math Rubric")
+        create_rubric_with_association(title: "Science Rubric")
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string, search_term: "math", per_page: 10 }
+        titles = json_parse(response.body).map { |r| r["rubric_association"]["rubric"]["title"] }
+
+        expect(titles).to include("Math Rubric", "Science Rubric")
+      end
+
+      it "does not return a Link header when flag is off" do
+        3.times { |i| create_rubric_with_association(title: "Rubric #{i}") }
+
+        get "grading_rubrics", params: { course_id: @course, context_code: @course.asset_string, per_page: 1 }
+
+        expect(response.headers["Link"]).to be_nil
+      end
     end
   end
 

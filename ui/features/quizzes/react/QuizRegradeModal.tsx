@@ -25,10 +25,8 @@ import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {RegradeOption} from './QuizRegradeModal.utils'
-
-const I18n = createI18nScope('quizzes_regrade_modal')
 
 export interface QuizRegradeModalProps {
   open: boolean
@@ -47,6 +45,7 @@ export default function QuizRegradeModal({
   onUpdate,
   onDismiss,
 }: QuizRegradeModalProps) {
+  const {t} = useTranslation('quizzes_regrade_modal')
   const [selectedOption, setSelectedOption] = useState<RegradeOption | undefined>(regradeOption)
 
   const handleUpdate = () => {
@@ -58,10 +57,10 @@ export default function QuizRegradeModal({
   const updateDisabled = regradeDisabled || !selectedOption
 
   return (
-    <Modal open={open} onDismiss={onDismiss} size="medium" label={I18n.t('Regrade options modal')}>
+    <Modal open={open} onDismiss={onDismiss} size="medium" label={t('Regrade options modal')}>
       <Modal.Header>
-        <CloseButton placement="end" onClick={onDismiss} screenReaderLabel={I18n.t('Close')} />
-        <Heading>{I18n.t('Regrade Options')}</Heading>
+        <CloseButton placement="end" onClick={onDismiss} screenReaderLabel={t('Close')} />
+        <Heading>{t('Regrade Options')}</Heading>
       </Modal.Header>
 
       <Modal.Body>
@@ -71,45 +70,45 @@ export default function QuizRegradeModal({
           transition="none"
           data-testid="regrade-warning"
         >
-          {I18n.t(
+          {t(
             "Choose a regrade option for students who have already taken the quiz. Canvas will regrade all your submissions after you save the quiz (students' scores MAY be affected).",
           )}
         </Alert>
 
         {regradeDisabled ? (
           <Text>
-            {I18n.t(
+            {t(
               'Regrading is not allowed on this question because either an answer was removed or the question type was changed after a student completed a submission.',
             )}
           </Text>
         ) : (
           <RadioInputGroup
             name="regrade_option"
-            description={<ScreenReaderContent>{I18n.t('Regrade options')}</ScreenReaderContent>}
+            description={<ScreenReaderContent>{t('Regrade options')}</ScreenReaderContent>}
             value={selectedOption}
             onChange={(_event, value) => setSelectedOption(value as RegradeOption)}
           >
             {!multipleAnswer && (
               <RadioInput
                 value={RegradeOption.CurrentAndPreviousCorrect}
-                label={I18n.t(
+                label={t(
                   'Award points for both corrected and previously correct answers (no scores will be reduced)',
                 )}
               />
             )}
             <RadioInput
               value={RegradeOption.CurrentCorrectOnly}
-              label={I18n.t(
+              label={t(
                 "Only award points for the correct answer (some students' scores may be reduced)",
               )}
             />
             <RadioInput
               value={RegradeOption.FullCredit}
-              label={I18n.t('Give everyone full credit for this question')}
+              label={t('Give everyone full credit for this question')}
             />
             <RadioInput
               value={RegradeOption.NoRegrade}
-              label={I18n.t('Update question without regrading')}
+              label={t('Update question without regrading')}
             />
           </RadioInputGroup>
         )}
@@ -117,7 +116,7 @@ export default function QuizRegradeModal({
 
       <Modal.Footer>
         <Flex gap="buttons">
-          <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
+          <Button onClick={onDismiss}>{t('Cancel')}</Button>
           <Button
             type="button"
             color="primary"
@@ -125,7 +124,7 @@ export default function QuizRegradeModal({
             interaction={updateDisabled ? 'disabled' : 'enabled'}
             data-testid="update-button"
           >
-            {I18n.t('Update')}
+            {t('Update')}
           </Button>
         </Flex>
       </Modal.Footer>

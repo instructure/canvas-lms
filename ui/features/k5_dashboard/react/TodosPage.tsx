@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 
 import {showFlashError} from '@instructure/platform-alerts'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
@@ -26,8 +26,6 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 import EmptyTodos from './EmptyTodos'
 
 import Todo, {getBaseDueAt} from './Todo'
-
-const I18n = createI18nScope('todos_page')
 
 interface TodosPageProps {
   timeZone: string
@@ -66,6 +64,7 @@ export const sortTodos = (t1: TodoItem, t2: TodoItem) => {
 }
 
 export const TodosPage: React.FC<TodosPageProps> = ({timeZone, visible, openTodosInNewTab}) => {
+  const {t} = useTranslation('todos_page')
   const [loading, setLoading] = useState(true)
   const [todos, setTodos] = useState<TodoItem[] | null>(null)
 
@@ -78,7 +77,7 @@ export const TodosPage: React.FC<TodosPageProps> = ({timeZone, visible, openTodo
           setLoading(false)
         }
       }, []),
-      error: useCallback(() => showFlashError(I18n.t('Failed to load todos'))(), []),
+      error: useCallback(() => showFlashError(t('Failed to load todos'))(), []),
       forceResult: visible && !todos ? undefined : false,
       params: {
         per_page: '100',
@@ -93,19 +92,19 @@ export const TodosPage: React.FC<TodosPageProps> = ({timeZone, visible, openTodo
   }: {key: React.Key} & React.HTMLAttributes<HTMLDivElement>) => (
     <div key={key} data-testid="todo-loading-skeleton" {...otherProps}>
       <LoadingSkeleton
-        screenReaderLabel={I18n.t('Loading Todo Title')}
+        screenReaderLabel={t('Loading Todo Title')}
         margin="medium 0 0 large"
         height="1.2rem"
         width="27rem"
       />
       <LoadingSkeleton
-        screenReaderLabel={I18n.t('Loading Todo Course Name')}
+        screenReaderLabel={t('Loading Todo Course Name')}
         margin="x-small 0 0 large"
         height="1.1rem"
         width="8rem"
       />
       <LoadingSkeleton
-        screenReaderLabel={I18n.t('Loading Additional Todo Details')}
+        screenReaderLabel={t('Loading Additional Todo Details')}
         margin="x-small 0 large large"
         height="1.1rem"
         width="16rem"

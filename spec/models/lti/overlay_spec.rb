@@ -211,15 +211,15 @@ describe Lti::Overlay do
       end
     end
 
-    context "adding additional placements" do
+    context "with placements not in the original configuration" do
       let(:data) do
         super().tap do |s|
           s[:placements] = { global_navigation: { enabled: true, icon_url: "https://example.com/global" } }
         end
       end
 
-      it "should add the new placements" do
-        expect(subject[:placements].pluck(:placement)).to include("global_navigation")
+      it "should not add the new placements" do
+        expect(subject[:placements].pluck(:placement)).not_to include("global_navigation")
       end
     end
 

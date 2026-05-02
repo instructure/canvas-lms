@@ -19,6 +19,7 @@
 #
 
 describe AiExperiences::ConversationStartService do
+  let(:account) { account_model }
   let(:user) { user_model }
   let(:root_account_uuid) { "test-account-uuid" }
   let(:facts) { "Test facts" }
@@ -26,7 +27,7 @@ describe AiExperiences::ConversationStartService do
   let(:scenario) { "Test scenario" }
   let(:conversation_id) { "test-conversation-id" }
   let(:http_client) { instance_double(LlmConversation::HttpClient) }
-  let(:service) { described_class.new }
+  let(:service) { described_class.new(account:) }
   let(:create_response) do
     {
       "success" => true,

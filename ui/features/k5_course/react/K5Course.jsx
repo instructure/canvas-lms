@@ -45,7 +45,7 @@ import {View} from '@instructure/ui-view'
 
 import {showFlashError} from '@instructure/platform-alerts'
 import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import GroupsPage from '@canvas/k5/react/GroupsPage'
 import K5Announcement from '@canvas/k5/react/K5Announcement'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'

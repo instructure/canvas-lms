@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {SearchableContexts} from '../../../../model/SearchableContext'
-import TruncateWithTooltip from '@canvas/instui-bindings/react/TruncateWithTooltip'
+import {TruncateWithTooltip} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('lti_registrations')
 

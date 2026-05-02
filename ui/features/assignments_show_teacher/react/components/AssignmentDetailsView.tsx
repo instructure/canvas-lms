@@ -17,19 +17,18 @@
  */
 
 import React from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 
 import AssignmentDescription from '@canvas/assignments/react/AssignmentDescription'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 
-const I18n = createI18nScope('assignment_2_teacher_assignment_details')
-
 const AssignmentDetailsView = ({description}: {description?: string}) => {
+  const {t} = useTranslation('assignment_2_teacher_assignment_details')
   return (
     <Flex as="div" direction="column">
       <Flex.Item as="div" direction="column" margin="medium 0">
-        <Heading variant="label">{I18n.t('Description')}</Heading>
+        <Heading variant="label">{t('Description')}</Heading>
         <AssignmentDescription description={description} />
       </Flex.Item>
     </Flex>

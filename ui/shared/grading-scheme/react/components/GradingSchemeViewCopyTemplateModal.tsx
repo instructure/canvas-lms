@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -34,8 +34,6 @@ import type {GradingScheme, GradingSchemeSummary} from '../../gradingSchemeApiMo
 import {GradingSchemeTemplateView} from './view/GradingSchemeTemplateView'
 import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
 
-const I18n = createI18nScope('GradingSchemeManagement')
-
 export interface ComponentProps {
   contextType: 'Account' | 'Course'
   contextId: string
@@ -51,6 +49,7 @@ export const GradingSchemeViewCopyTemplateModal = ({
   onCancel,
   allowDuplication,
 }: ComponentProps) => {
+  const {t} = useTranslation('GradingSchemeManagement')
   const {createGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeCreate()
   const {loadDefaultGradingScheme /* deleteGradingSchemeStatus */} = useDefaultGradingScheme()
   const [defaultCanvasGradingSchemeTemplate, setDefaultCanvasGradingSchemeTemplate] = useState<
@@ -68,9 +67,9 @@ export const GradingSchemeViewCopyTemplateModal = ({
         setDefaultCanvasGradingSchemeTemplate(defaultCanvasTemplate)
       })
       .catch(error => {
-        showFlashError(
-          I18n.t('There was an error while loading the default canvas grading scheme'),
-        )(error)
+        showFlashError(t('There was an error while loading the default canvas grading scheme'))(
+          error,
+        )
       })
     return () => {
       // this is called when the component unmounts
@@ -88,7 +87,7 @@ export const GradingSchemeViewCopyTemplateModal = ({
       })
 
       setCopying(false)
-      showFlashSuccess(I18n.t('Grading scheme was successfully created.'))()
+      showFlashSuccess(t('Grading scheme was successfully created.'))()
       if (onCreate) {
         // if parent supplied a callback method, inform parent that grading scheme was created
         onCreate({
@@ -98,7 +97,7 @@ export const GradingSchemeViewCopyTemplateModal = ({
         })
       }
     } catch (error) {
-      showFlashError(I18n.t('There was an error while creating the grading scheme'))(error as Error)
+      showFlashError(t('There was an error while creating the grading scheme'))(error as Error)
     }
   }
 
@@ -113,9 +112,7 @@ export const GradingSchemeViewCopyTemplateModal = ({
       <Modal
         open={true}
         size="medium"
-        label={
-          allowDuplication ? I18n.t('View/Copy Grading Scheme') : I18n.t('View Grading Scheme')
-        }
+        label={allowDuplication ? t('View/Copy Grading Scheme') : t('View Grading Scheme')}
         shouldCloseOnDocumentClick={true}
       >
         <Modal.Header>
@@ -123,10 +120,10 @@ export const GradingSchemeViewCopyTemplateModal = ({
             placement="end"
             offset="small"
             onClick={cancelPressed}
-            screenReaderLabel={I18n.t('Close')}
+            screenReaderLabel={t('Close')}
           />
           <Heading>
-            {allowDuplication ? I18n.t('View/Copy Grading Scheme') : I18n.t('View Grading Scheme')}
+            {allowDuplication ? t('View/Copy Grading Scheme') : t('View Grading Scheme')}
           </Heading>
         </Modal.Header>
         <Modal.Body>
@@ -171,19 +168,19 @@ export const GradingSchemeViewCopyTemplateModal = ({
           {copying ? (
             <>
               <Button onClick={toggleCopying} margin="0 x-small 0 0">
-                {I18n.t('Cancel')}
+                {t('Cancel')}
               </Button>
               <Button
                 onClick={() => gradingSchemeCreateRef.current?.savePressed()}
                 color="primary"
                 type="submit"
               >
-                {I18n.t('Save')}
+                {t('Save')}
               </Button>
             </>
           ) : (
             <Button onClick={cancelPressed} margin="0 x-small 0 0">
-              {I18n.t('Close')}
+              {t('Close')}
             </Button>
           )}
         </Modal.Footer>

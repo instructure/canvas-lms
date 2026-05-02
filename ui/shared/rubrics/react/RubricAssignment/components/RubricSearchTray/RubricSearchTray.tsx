@@ -17,12 +17,12 @@
  */
 
 import React, {useEffect, useState} from 'react'
+import {useDebounce} from 'use-debounce'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {LoadingIndicator} from '@instructure/platform-loading-indicator'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
@@ -31,6 +31,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {RubricSearchFooter} from './RubricSearchFooter'
 import {RubricsForContext} from './RubricsForContext'
 import {RubricContextSelect} from './RubricContextSelect'
+import {RUBRIC_FOR_CONTEXT_PAGINATION_LIMIT} from '../../queries'
 
 const I18n = createI18nScope('enhanced-rubrics-assignment-search')
 
@@ -49,9 +50,14 @@ export const RubricSearchTray = ({
   onAddRubric,
 }: RubricSearchTrayProps) => {
   const [search, setSearch] = useState<string>('')
+  const [debouncedSearch] = useDebounce(search, 300)
   const [selectedContext, setSelectedContext] = useState<string>()
+  const [selectedRubricCount, setSelectedRubricCount] = useState<number>(0)
   const [selectedAssociation, setSelectedAssociation] = useState<RubricAssociation>()
   const [selectedRubricId, setSelectedRubricId] = useState<string>()
+  const paginationEnabled =
+    !!ENV.FEATURES.grading_rubrics_pagination &&
+    selectedRubricCount > RUBRIC_FOR_CONTEXT_PAGINATION_LIMIT
 
   useEffect(() => {
     if (isOpen) {
@@ -61,8 +67,9 @@ export const RubricSearchTray = ({
     }
   }, [isOpen])
 
-  const handleChangeContext = (contextCode: string) => {
+  const handleChangeContext = (contextCode: string, rubricsCount: number) => {
     setSelectedContext(contextCode)
+    setSelectedRubricCount(rubricsCount)
     setSelectedAssociation(undefined)
     setSelectedRubricId(undefined)
   }
@@ -95,6 +102,7 @@ export const RubricSearchTray = ({
 
       <View as="div" margin="x-small 0 0" padding="0 small">
         <TextInput
+          data-testid="rubric-search-input"
           autoComplete="off"
           renderLabel={<ScreenReaderContent>{I18n.t('search rubrics input')}</ScreenReaderContent>}
           placeholder={I18n.t('Search rubrics')}
@@ -111,6 +119,7 @@ export const RubricSearchTray = ({
             selectedContext={selectedContext}
             handleChangeContext={handleChangeContext}
             setSelectedContext={setSelectedContext}
+            setSelectedRubricCount={setSelectedRubricCount}
           />
 
           <View
@@ -126,7 +135,8 @@ export const RubricSearchTray = ({
                 courseId={courseId}
                 selectedAssociation={selectedAssociation}
                 selectedContext={selectedContext}
-                search={search}
+                search={debouncedSearch}
+                paginationEnabled={paginationEnabled}
                 onPreview={onPreview}
                 onSelect={(rubricAssociation, rubricId) => {
                   setSelectedAssociation(rubricAssociation)

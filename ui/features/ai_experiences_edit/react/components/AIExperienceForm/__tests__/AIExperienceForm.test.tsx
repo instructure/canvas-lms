@@ -19,13 +19,9 @@
 import '@instructure/canvas-theme'
 import React from 'react'
 import {cleanup, render, screen, fireEvent, waitFor} from '@testing-library/react'
-import {http, HttpResponse} from 'msw'
-import {setupServer} from 'msw/node'
 import AIExperienceForm from '../AIExperienceForm'
 import type {AIExperience} from '../../../../types'
 import fakeEnv from '@canvas/test-utils/fakeENV'
-
-const server = setupServer()
 
 const mockAiExperience: AIExperience = {
   id: '1',
@@ -41,11 +37,7 @@ describe('AIExperienceForm', () => {
   const mockOnSubmit = vi.fn()
   const mockOnCancel = vi.fn()
 
-  beforeAll(() => server.listen())
-  afterAll(() => server.close())
-
   afterEach(() => {
-    server.resetHandlers()
     cleanup()
     fakeEnv.teardown()
   })
@@ -97,7 +89,7 @@ describe('AIExperienceForm', () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
       expect(screen.getByText('Cancel')).toBeInTheDocument()
-      expect(screen.getByText('Save to preview')).toBeInTheDocument()
+      expect(screen.getByText('Save')).toBeInTheDocument()
     })
 
     it('renders not published status', () => {
@@ -123,7 +115,7 @@ describe('AIExperienceForm', () => {
   })
 
   describe('form submission', () => {
-    it('calls onSubmit with form data when Save to preview button is clicked', async () => {
+    it('calls onSubmit with form data when Save button is clicked', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
       const titleInput = screen.getByLabelText(/Knowledge chat name/) as HTMLInputElement
@@ -144,7 +136,7 @@ describe('AIExperienceForm', () => {
       fireEvent.change(learningObjectivesInput, {target: {value: 'New Learning Objectives'}})
       fireEvent.change(pedagogicalGuidanceInput, {target: {value: 'New Pedagogical Guidance'}})
 
-      const saveButton = screen.getByText('Save to preview')
+      const saveButton = screen.getByText('Save')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -183,7 +175,7 @@ describe('AIExperienceForm', () => {
     it('shows error when title is empty on submission', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const saveButton = screen.getByText('Save to preview')
+      const saveButton = screen.getByText('Save')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -199,7 +191,7 @@ describe('AIExperienceForm', () => {
       const titleInput = screen.getByLabelText(/Knowledge chat name/) as HTMLInputElement
       fireEvent.change(titleInput, {target: {value: 'Test Title'}})
 
-      const saveButton = screen.getByText('Save to preview')
+      const saveButton = screen.getByText('Save')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -215,7 +207,7 @@ describe('AIExperienceForm', () => {
       const titleInput = screen.getByLabelText(/Knowledge chat name/) as HTMLInputElement
       fireEvent.change(titleInput, {target: {value: 'Test Title'}})
 
-      const saveButton = screen.getByText('Save to preview')
+      const saveButton = screen.getByText('Save')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -233,7 +225,7 @@ describe('AIExperienceForm', () => {
       const titleInput = screen.getByLabelText(/Knowledge chat name/) as HTMLInputElement
       fireEvent.change(titleInput, {target: {value: 'Test Title'}})
 
-      const saveButton = screen.getByText('Save to preview')
+      const saveButton = screen.getByText('Save')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -246,7 +238,7 @@ describe('AIExperienceForm', () => {
     it('shows error banner when validation fails', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const saveButton = screen.getByText('Save to preview')
+      const saveButton = screen.getByText('Save')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -274,7 +266,7 @@ describe('AIExperienceForm', () => {
     it('clears error when field is filled', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
 
-      const saveButton = screen.getByText('Save to preview')
+      const saveButton = screen.getByText('Save')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -306,7 +298,7 @@ describe('AIExperienceForm', () => {
       fireEvent.change(learningObjectivesInput, {target: {value: 'New Learning Objectives'}})
       fireEvent.change(pedagogicalGuidanceInput, {target: {value: 'New Pedagogical Guidance'}})
 
-      const saveButton = screen.getByText('Save to preview')
+      const saveButton = screen.getByText('Save')
       fireEvent.click(saveButton)
 
       await waitFor(() => {
@@ -335,7 +327,7 @@ describe('AIExperienceForm', () => {
     it('includes context_file_ids as empty array in submit payload when no files', async () => {
       render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
       fillRequiredFields()
-      fireEvent.click(screen.getByText('Save to preview'))
+      fireEvent.click(screen.getByText('Save'))
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith(expect.objectContaining({context_file_ids: []}))
@@ -371,7 +363,7 @@ describe('AIExperienceForm', () => {
         />,
       )
 
-      fireEvent.click(screen.getByText('Save to preview'))
+      fireEvent.click(screen.getByText('Save'))
 
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -422,145 +414,6 @@ describe('AIExperienceForm', () => {
         />,
       )
       expect(screen.queryByTestId('ai-experience-edit-index-failed-notice')).not.toBeInTheDocument()
-    })
-  })
-
-  describe('delete functionality', () => {
-    it('renders three-dot menu button', () => {
-      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
-
-      const menuButton = screen.getAllByText('More options')[0].closest('button')
-      expect(menuButton).toBeInTheDocument()
-    })
-
-    it('shows delete option in menu', async () => {
-      render(
-        <AIExperienceForm
-          aiExperience={mockAiExperience}
-          onSubmit={mockOnSubmit}
-          isLoading={false}
-        />,
-      )
-
-      const menuButton = screen.getAllByText('More options')[0].closest('button')
-      fireEvent.click(menuButton!)
-
-      await waitFor(() => {
-        expect(screen.getByText('Delete')).toBeInTheDocument()
-      })
-    })
-
-    it('delete is disabled when creating new experience', async () => {
-      render(<AIExperienceForm onSubmit={mockOnSubmit} isLoading={false} />)
-
-      const menuButton = screen.getAllByText('More options')[0].closest('button')
-      fireEvent.click(menuButton!)
-
-      await waitFor(() => {
-        const deleteItem = screen.getByText('Delete').closest('[role="menuitem"]')
-        expect(deleteItem).toHaveAttribute('aria-disabled', 'true')
-      })
-    })
-
-    it('opens delete confirmation modal when Delete is clicked', async () => {
-      render(
-        <AIExperienceForm
-          aiExperience={mockAiExperience}
-          onSubmit={mockOnSubmit}
-          isLoading={false}
-        />,
-      )
-
-      const menuButton = screen.getAllByText('More options')[0].closest('button')
-      fireEvent.click(menuButton!)
-
-      await waitFor(() => {
-        expect(screen.getByText('Delete')).toBeInTheDocument()
-      })
-
-      const deleteMenuItem = screen.getByText('Delete')
-      fireEvent.click(deleteMenuItem)
-
-      await waitFor(() => {
-        expect(screen.getByText('Delete Knowledge Chat')).toBeInTheDocument()
-        expect(
-          screen.getByText(
-            'Are you sure you want to delete "Test Experience"? This action cannot be undone.',
-          ),
-        ).toBeInTheDocument()
-      })
-    })
-
-    it('closes delete modal when Cancel is clicked', async () => {
-      render(
-        <AIExperienceForm
-          aiExperience={mockAiExperience}
-          onSubmit={mockOnSubmit}
-          isLoading={false}
-        />,
-      )
-
-      const menuButton = screen.getAllByText('More options')[0].closest('button')
-      fireEvent.click(menuButton!)
-
-      await waitFor(() => {
-        expect(screen.getByText('Delete')).toBeInTheDocument()
-      })
-
-      const deleteMenuItem = screen.getByText('Delete')
-      fireEvent.click(deleteMenuItem)
-
-      await waitFor(() => {
-        expect(screen.getByText('Delete Knowledge Chat')).toBeInTheDocument()
-      })
-
-      const cancelButtons = screen.getAllByText('Cancel')
-      const modalCancelButton = cancelButtons[cancelButtons.length - 1].closest('button')
-      fireEvent.click(modalCancelButton!)
-
-      await waitFor(() => {
-        expect(screen.queryByText('Delete Knowledge Chat')).not.toBeInTheDocument()
-      })
-    })
-
-    it('calls delete API when confirmed', async () => {
-      let deleteCalled = false
-      server.use(
-        http.delete('/api/v1/courses/123/ai_experiences/1', () => {
-          deleteCalled = true
-          return HttpResponse.json({})
-        }),
-      )
-
-      render(
-        <AIExperienceForm
-          aiExperience={mockAiExperience}
-          onSubmit={mockOnSubmit}
-          isLoading={false}
-        />,
-      )
-
-      const menuButton = screen.getAllByText('More options')[0].closest('button')
-      fireEvent.click(menuButton!)
-
-      await waitFor(() => {
-        expect(screen.getByText('Delete')).toBeInTheDocument()
-      })
-
-      const deleteMenuItem = screen.getByText('Delete')
-      fireEvent.click(deleteMenuItem)
-
-      await waitFor(() => {
-        expect(screen.getByText('Delete Knowledge Chat')).toBeInTheDocument()
-      })
-
-      const deleteButtons = screen.getAllByText('Delete')
-      const confirmDeleteButton = deleteButtons[deleteButtons.length - 1].closest('button')
-      fireEvent.click(confirmDeleteButton!)
-
-      await waitFor(() => {
-        expect(deleteCalled).toBe(true)
-      })
     })
   })
 })

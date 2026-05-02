@@ -159,13 +159,21 @@ ready(() => {
     false,
   )
 
-  window?.top?.postMessage(
-    {
-      subject: 'media_player.iframe_ready',
-      mediaId: media_id,
-    },
-    {targetOrigin: window?.top?.location.origin},
-  )
+  try {
+    const topOrigin = window?.top?.location.origin
+    if (topOrigin) {
+      window?.top?.postMessage(
+        {
+          subject: 'media_player.iframe_ready',
+          mediaId: media_id,
+        },
+        {targetOrigin: topOrigin},
+      )
+    }
+  } catch {
+    // Parent frame is cross-origin; skip the unsolicited ready broadcast.
+    // The parent can still discover readiness via 'media_player.get_ready_state'.
+  }
 
   document.body.setAttribute('style', 'margin: 0; padding: 0; border-style: none')
   // if the user takes the video fullscreen and back, the documentElement winds up

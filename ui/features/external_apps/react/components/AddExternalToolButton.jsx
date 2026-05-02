@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import store from '../lib/ExternalAppsStore'
 import {bool, string} from 'prop-types'
 import ConfigurationForm from './configuration_forms/ConfigurationForm'

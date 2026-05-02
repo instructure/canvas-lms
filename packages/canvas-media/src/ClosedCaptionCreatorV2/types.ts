@@ -46,8 +46,7 @@ export interface Subtitle {
   filename?: string // Filename for download
   isNew?: boolean // Whether this is a newly added caption
   workflow_state?: WorkflowState // Mirrors backend workflow_state: processing, failed, or ready
-  errorMessage?: string // Error message if upload failed
-  failedOperation?: 'upload' | 'delete' | 'asr' // Which operation failed, used for retry
+  failedOperation?: 'upload' | 'delete' | 'asr' // Which operation failed, used for retry and display text
   rawFile?: File // In-memory file kept for upload retry; never persisted to server
 }
 

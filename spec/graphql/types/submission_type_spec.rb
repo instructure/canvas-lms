@@ -2797,23 +2797,6 @@ describe Types::SubmissionType do
                                                     "expected versionNumber (#{version_numbers[current_idx]}) to differ from attempt (#{attempts[current_idx]}) after regrade"
       end
     end
-
-    context "when current attempt has no version yet" do
-      before(:once) do
-        @quiz.update!(allowed_attempts: 3)
-        # Start a new attempt but do not complete/grade it (no version created)
-        @in_progress = @quiz.generate_submission(@student)
-      end
-
-      it "still includes the current in-progress attempt without creating a duplicate" do
-        @quiz_submission.reload
-        result = quiz_submission_type.resolve("submissionQuizHistoriesConnection { nodes { attempt } }")
-        attempts = result.flatten
-        expect(attempts).to include(@in_progress.attempt)
-        expect(attempts.uniq.length).to eq(attempts.length),
-                                        "expected no duplicate attempts but got: #{attempts.inspect}"
-      end
-    end
   end
 
   describe "aiGradeResult" do

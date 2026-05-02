@@ -843,13 +843,23 @@ class EnrollmentsApiController < ApplicationController
   # @argument enrollment_role_id [Integer]
   #   Optional custom course-level role id to apply to created enrollments.
   #
+  # @argument start_at [Optional, DateTime]
+  #   The start time of every created enrollment, in ISO8601 format.
+  #   e.g. 2012-04-18T23:08:51Z. When provided, applies to all enrollments in
+  #   the bulk creation.
+  #
+  # @argument end_at [Optional, DateTime]
+  #   The end time of every created enrollment, in ISO8601 format.
+  #   e.g. 2012-04-18T23:08:51Z. When provided, applies to all enrollments in
+  #   the bulk creation.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/bulk_enrollment \
   #     -X POST \
   #     -F 'user_ids[]=1' \
   #     -F 'user_ids[]=2' \
   #     -F 'course_ids[]=10' \
-  #     -F 'course_ids[]=11' \
+  #     -F 'course_ids[]=11'
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/bulk_enrollment \
@@ -859,6 +869,8 @@ class EnrollmentsApiController < ApplicationController
   #     -F 'course_ids[]=11' \
   #     -F 'course_ids[]=12' \
   #     -F 'enrollment_type=TeacherEnrollment' \
+  #     -F 'start_at=2026-03-01T07:00:00Z' \
+  #     -F 'end_at=2026-06-05T07:00:00Z'
   #
   # @returns Progress
   def bulk_enrollment
@@ -907,7 +919,9 @@ class EnrollmentsApiController < ApplicationController
       user_ids:,
       course_ids:,
       enrollment_type:,
-      role_id: role&.id
+      role_id: role&.id,
+      start_at: params[:start_at],
+      end_at: params[:end_at]
     }
 
     progress.process_job(Enrollment::BulkUpdate.new(@context, @current_user), :bulk_enrollment, { run_at: Time.zone.now, priority: Delayed::NORMAL_PRIORITY }, **process_params)

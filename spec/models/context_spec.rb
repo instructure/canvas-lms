@@ -580,6 +580,45 @@ describe Context do
 
       it_behaves_like "sorted_rubrics contract"
 
+      context "with :grading_rubrics_pagination enabled" do
+        before { @course.root_account.enable_feature!(:grading_rubrics_pagination) }
+
+        it "filters rubrics by search_term (case-insensitive, partial match)" do
+          result = Context.sorted_rubrics(@course, search_term: "rubric 1")
+
+          expect(result.map { |ra| ra.rubric.title }).to eql(["Rubric 1 Active"])
+        end
+
+        it "performs a partial match on search_term" do
+          result = Context.sorted_rubrics(@course, search_term: "active")
+
+          titles = result.map { |ra| ra.rubric.title }
+          expect(titles).to include("Rubric 1 Active", "Rubric 2 Active", "Rubric 4 Active")
+        end
+
+        it "returns an empty array when search_term matches nothing" do
+          result = Context.sorted_rubrics(@course, search_term: "zzznomatch")
+
+          expect(result).to eql([])
+        end
+
+        it "returns all rubrics when search_term is nil" do
+          result = Context.sorted_rubrics(@course, search_term: nil)
+
+          expect(result.length).to be 3
+        end
+      end
+
+      context "with :grading_rubrics_pagination disabled" do
+        before { @course.root_account.disable_feature!(:grading_rubrics_pagination) }
+
+        it "ignores search_term and returns all rubrics" do
+          result = Context.sorted_rubrics(@course, search_term: "rubric 1")
+
+          expect(result.length).to be 3
+        end
+      end
+
       it "preloads the association's own context" do
         result = Context.sorted_rubrics(@course)
 

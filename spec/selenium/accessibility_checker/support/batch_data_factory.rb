@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "test_data_factory"
+require_relative "resource_data_factory"
 
 module AccessibilityChecker
   module BatchDataFactory
-    include TestDataFactory
+    include ResourceDataFactory
 
     def create_paginated_content(course, count: 25)
       count.times do |i|

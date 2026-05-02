@@ -2138,6 +2138,145 @@ RSpec.describe Lti::RegistrationsController do
     end
   end
 
+  describe "DELETE bind", type: :request do
+    subject { delete "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/bind" }
+
+    let_once(:registration) { lti_registration_with_tool(account: Account.site_admin) }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "when lti_deactivate_registrations is disabled" do
+      before { account.disable_feature!(:lti_deactivate_registrations) }
+
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when context is site admin" do
+      subject { delete "/api/v1/accounts/#{Account.site_admin.id}/lti_registrations/#{registration.id}/bind" }
+
+      let(:site_admin_user) { account_admin_user(account: Account.site_admin) }
+
+      before { user_session(site_admin_user) }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+
+    context "when registration is owned by this account" do
+      let_once(:registration) { lti_registration_with_tool(account:) }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+    end
+
+    context "when registration does not belong to this account or site admin" do
+      subject { delete "/api/v1/accounts/#{account.id}/lti_registrations/#{other_registration.id}/bind" }
+
+      let(:other_account) { account_model }
+      let(:other_registration) { lti_registration_with_tool(account: other_account) }
+
+      it "returns 400" do
+        subject
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+
+    context "without an existing binding" do
+      it "returns 404" do
+        subject
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "with an existing binding" do
+      let(:rab) { Lti::RegistrationAccountBinding.find_by(registration:, account:) }
+      let(:local_copy) do
+        Lti::InstallTemplateRegistrationService.call(
+          account:,
+          user: admin,
+          template: registration
+        )[:local_copy]
+      end
+      let(:dkab) { rab.developer_key_account_binding }
+
+      before { local_copy }
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+
+      it "returns the deleted binding" do
+        subject
+        expect(response_json[:id]).to eql(rab.id)
+        expect(response_json[:workflow_state]).to eql("deleted")
+      end
+
+      it "soft-deletes the registration account binding" do
+        subject
+        expect(rab.reload.workflow_state).to eql("deleted")
+      end
+
+      it "soft-deletes the developer key account binding" do
+        subject
+        expect(dkab.reload.workflow_state).to eql("deleted")
+      end
+
+      it "soft-deletes the local copy registration" do
+        subject
+        expect(Lti::Registration.active.find_by(id: local_copy.id)).to be_nil
+      end
+
+      context "when called a second time (idempotency)" do
+        before { subject }
+
+        it "returns 404 on the second call" do
+          delete "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/bind"
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+
+    context "when context is a sub-account" do
+      subject { delete "/api/v1/accounts/#{sub_account.id}/lti_registrations/#{registration.id}/bind" }
+
+      let(:sub_account) { account_model(parent_account: account) }
+      let(:sub_account_admin) { account_admin_user(account: sub_account) }
+
+      before { user_session(sub_account_admin) }
+
+      it "returns 403" do
+        subject
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
+
   describe "POST install_from_template", type: :request do
     subject { post "/api/v1/accounts/#{account.id}/lti_registrations/#{template.id}/install_from_template", as: :json }
 

@@ -20,8 +20,8 @@
 
 module AiExperiences
   class ConversationContinueService
-    def initialize
-      @client = LlmConversation::HttpClient.new
+    def initialize(account:)
+      @client = LlmConversation::HttpClient.new(account:)
     end
 
     def continue(conversation_id:, new_user_message:, requesting_user: nil)

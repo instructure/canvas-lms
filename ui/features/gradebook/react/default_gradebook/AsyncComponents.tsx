@@ -21,7 +21,7 @@ import {render} from 'react-dom'
 import type {GradebookSettingsModalProps} from './components/GradebookSettingsModal'
 
 async function loadAssignmentPostingPolicyTray() {
-  return (await import('../AssignmentPostingPolicyTray/index')).default
+  return (await import('@canvas/assignment-posting-policy-tray')).default
 }
 
 async function loadCurveGradesDialog() {

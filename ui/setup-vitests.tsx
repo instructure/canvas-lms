@@ -81,6 +81,12 @@ const originalSetTimeout = globalThis.setTimeout
 const originalSetInterval = globalThis.setInterval
 const originalClearTimeout = globalThis.clearTimeout
 const originalClearInterval = globalThis.clearInterval
+// setImmediate is a Node.js global used by React's scheduler. We wrap it
+// here so that scheduler callbacks that fire after jsdom environment
+// teardown are dropped instead of crashing with "ReferenceError: window is not defined".
+const originalSetImmediate = typeof setImmediate !== 'undefined' ? setImmediate : undefined
+const originalClearImmediate = typeof clearImmediate !== 'undefined' ? clearImmediate : undefined
+const pendingImmediates = new Set<NodeJS.Immediate>()
 
 // Wrap setTimeout to track pending timers.
 // The document guard prevents InstUI BaseTransition callbacks from throwing
@@ -100,6 +106,23 @@ globalThis.setTimeout = ((
   pendingTimeouts.add(id)
   return id
 }) as typeof setTimeout
+
+// Wrap setImmediate to guard against React scheduler callbacks firing after
+// jsdom tears down the environment. React's scheduler (scheduler.development.js)
+// captures setImmediate at module-load time and uses it to schedule concurrent
+// work. If that work fires after jsdom removes window/document from scope,
+// react-dom throws "ReferenceError: window is not defined" in getActiveElementDeep.
+if (originalSetImmediate) {
+  globalThis.setImmediate = ((callback: (...args: unknown[]) => void, ...args: unknown[]) => {
+    const id: NodeJS.Immediate = originalSetImmediate(() => {
+      pendingImmediates.delete(id)
+      if (typeof document === 'undefined') return
+      callback(...args)
+    })
+    pendingImmediates.add(id)
+    return id
+  }) as typeof setImmediate
+}
 
 // Wrap setInterval to track pending intervals
 globalThis.setInterval = ((
@@ -128,6 +151,16 @@ globalThis.clearInterval = ((id?: ReturnType<typeof setInterval>) => {
   }
 }) as typeof clearInterval
 
+// Wrap clearImmediate to remove from tracking
+if (originalClearImmediate) {
+  globalThis.clearImmediate = (id?: NodeJS.Immediate) => {
+    if (id !== undefined) {
+      pendingImmediates.delete(id!)
+      originalClearImmediate(id)
+    }
+  }
+}
+
 // Reset ECONNREFUSED counter before each test to prevent test interference
 beforeEach(() => {
   pendingEconnrefusedCount = 0
@@ -152,6 +185,15 @@ afterEach(() => {
     originalClearInterval(id)
   }
   pendingIntervals.clear()
+
+  // Clear pending setImmediate callbacks — React's scheduler uses setImmediate
+  // in Node/jsdom and any uncleared callbacks can fire after environment teardown
+  if (originalClearImmediate) {
+    for (const id of pendingImmediates) {
+      originalClearImmediate(id)
+    }
+    pendingImmediates.clear()
+  }
 
   // Disconnect all MutationObservers to prevent InstUI ScreenReaderFocusRegion
   // callbacks from firing after jsdom tears down the environment globals.

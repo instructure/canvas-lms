@@ -285,7 +285,6 @@ export const ConferenceAddressBook = ({menuItemList, onChange, selectedItems, is
 
   return (
     <div>
-      {/* @ts-expect-error TS2769 (typescriptify) */}
       <Select
         data-testid="address-input"
         renderLabel={I18n.t('Course Members')}
@@ -298,7 +297,9 @@ export const ConferenceAddressBook = ({menuItemList, onChange, selectedItems, is
         onInputChange={handleInputChange}
         onRequestShowOptions={() => setIsOpen(true)}
         onRequestHideOptions={() => setIsOpen(false)}
+        // @ts-expect-error TS7 migration
         onRequestHighlightOption={handleHighlight}
+        // @ts-expect-error TS7 migration
         onRequestSelectOption={addSelectedItem}
         onKeyDown={handleKeyDown}
         renderBeforeInput={

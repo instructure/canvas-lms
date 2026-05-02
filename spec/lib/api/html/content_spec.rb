@@ -239,6 +239,47 @@ module Api
           notastring = { bob: "is your uncle" }
           expect(Content.collect_attachment_ids(notastring)).to eq([])
         end
+
+        it "filters out external URLs that happen to have Canvas-like paths" do
+          string = <<~HTML
+            <html>
+              <body>
+                <a href="/files/123/download">link</a>
+                <a href="https://external.example.edu/files/456/document.pdf">link</a>
+                <a href="https://another-site.com/files/789/download">link</a>
+                <iframe src="/media_attachments_iframe/111">
+              </body>
+            </html>
+          HTML
+
+          results = Content.collect_attachment_ids(string)
+
+          expect(results).to include("123", "111")
+          expect(results).not_to include("456", "789")
+        end
+
+        it "includes absolute Canvas URLs" do
+          allow(HostUrl).to receive(:default_host).and_return("canvas.example.com")
+          ad = Account.default.account_domains.find_or_initialize_by(host: "canvas.example.com")
+          ad.save(validate: false) if ad.new_record?
+          AccountDomain.reload
+          MultiCache.delete(AccountDomain.domain_lookup_cache_key("canvas.example.com", force_current_test_cluster: false))
+
+          string = <<~HTML
+            <html>
+              <body>
+                <a href="/files/123/download">Relative Canvas link</a>
+                <a href="https://canvas.example.com/files/456/download">Absolute Canvas link</a>
+                <a href="https://external.edu/files/789/document.pdf">External link</a>
+              </body>
+            </html>
+          HTML
+
+          results = Content.collect_attachment_ids(string)
+
+          expect(results).to include("123", "456")
+          expect(results).not_to include("789")
+        end
       end
 
       describe "#add_youtube_banner_if_needed" do

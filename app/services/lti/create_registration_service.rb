@@ -105,7 +105,6 @@ module Lti
           updated_by: created_by
         )
 
-        # TEMPORARY: This is a temporary change. We'll revert this once we disable the old developer keys page.
         # For manual registrations (which always have configuration_params),
         # merge overlay into configuration instead of creating overlay.
         final_config = configuration_params
@@ -121,7 +120,7 @@ module Lti
           # Manual registrations: merge overlay into config
           # (We know this is a manual registration because we're creating a ToolConfiguration,
           # not linking to an IMS registration)
-          merged_config = Lti::Overlay.apply_to(overlay_params, configuration_params, additive: true)
+          merged_config = Lti::Overlay.apply_to(overlay_params, configuration_params)
           final_config = merged_config.slice(*Schemas::InternalLtiConfiguration.allowed_base_properties)
           scopes = final_config[:scopes]
         end

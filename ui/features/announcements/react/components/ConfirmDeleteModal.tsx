@@ -21,7 +21,7 @@ import React, {Component} from 'react'
 import {legacyRender, legacyUnmountComponentAtNode} from '@canvas/react'
 import {func, number, node, object, oneOfType} from 'prop-types'
 
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 import {Button} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('announcements_v2')

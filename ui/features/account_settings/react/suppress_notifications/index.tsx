@@ -23,7 +23,7 @@ import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {InstUIModal as Modal} from '@instructure/platform-instui-bindings'
 
 const I18n = createI18nScope('suppress_notifications')
 

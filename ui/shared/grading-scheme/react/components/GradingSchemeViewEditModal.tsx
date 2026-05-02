@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTranslation} from '@canvas/i18next'
 import {Modal} from '@instructure/ui-modal'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -41,8 +41,6 @@ import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
 import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
 import {canManageAccountGradingSchemes} from '../helpers/gradingSchemePermissions'
 
-const I18n = createI18nScope('GradingSchemeManagement')
-
 export interface GradingSchemeViewEditModalProps {
   contextType: 'Account' | 'Course'
   contextId: string
@@ -62,6 +60,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
   onCancel,
   onDelete,
 }) => {
+  const {t} = useTranslation('GradingSchemeManagement')
   const {updateGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeUpdate()
   const {deleteGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeDelete()
   const {loadGradingScheme /* deleteGradingSchemeStatus */} = useGradingScheme()
@@ -82,7 +81,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
         setGradingScheme(loadedGradingScheme)
       })
       .catch(error => {
-        showFlashError(I18n.t('There was an error while loading grading schemes'))(error)
+        showFlashError(t('There was an error while loading grading schemes'))(error)
       })
 
     loadDefaultGradingScheme(contextType, contextId)
@@ -90,9 +89,9 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
         setDefaultCanvasGradingSchemeTemplate(defaultCanvasTemplate)
       })
       .catch(error => {
-        showFlashError(
-          I18n.t('There was an error while loading the default canvas grading scheme'),
-        )(error)
+        showFlashError(t('There was an error while loading the default canvas grading scheme'))(
+          error,
+        )
       })
     return () => {
       // this is called when the component unmounts
@@ -115,7 +114,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
       )
 
       setEditing(false)
-      showFlashSuccess(I18n.t('Grading scheme was successfully saved.'))()
+      showFlashSuccess(t('Grading scheme was successfully saved.'))()
       setGradingScheme(updatedGradingScheme)
       if (onUpdate) {
         // if parent supplied a callback method, inform parent that grading standard was updated
@@ -126,7 +125,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
         })
       }
     } catch (error) {
-      showFlashError(I18n.t('There was an error while updating the grading scheme'))(error as Error)
+      showFlashError(t('There was an error while updating the grading scheme'))(error as Error)
     }
   }
 
@@ -134,11 +133,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
     if (!gradingScheme) return
 
     // TODO: is there a good inst ui component for confirmation dialog?
-    if (
-      !window.confirm(
-        I18n.t('confirm.delete', 'Are you sure you want to delete this grading scheme?'),
-      )
-    ) {
+    if (!window.confirm(t('Are you sure you want to delete this grading scheme?'))) {
       return
     }
     try {
@@ -147,13 +142,13 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
         gradingScheme.context_id,
         gradingScheme.id,
       )
-      showFlashSuccess(I18n.t('Grading scheme was successfully removed.'))()
+      showFlashSuccess(t('Grading scheme was successfully removed.'))()
       if (onDelete) {
         // if parent supplied a callback method, inform parent that grading scheme was deleted
         onDelete()
       }
     } catch (error) {
-      showFlashError(I18n.t('There was an error while removing the grading scheme'))(error as Error)
+      showFlashError(t('There was an error while removing the grading scheme'))(error as Error)
     }
   }
 
@@ -179,7 +174,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
       <Modal
         open={true}
         size="medium"
-        label={I18n.t('View/Edit Grading Scheme')}
+        label={t('View/Edit Grading Scheme')}
         shouldCloseOnDocumentClick={true}
       >
         <Modal.Header>
@@ -187,9 +182,9 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
             placement="end"
             offset="small"
             onClick={cancelPressed}
-            screenReaderLabel={I18n.t('Close')}
+            screenReaderLabel={t('Close')}
           />
-          <Heading>{I18n.t('View/Edit Grading Scheme')}</Heading>
+          <Heading>{t('View/Edit Grading Scheme')}</Heading>
         </Modal.Header>
         <Modal.Body>
           {gradingScheme && defaultCanvasGradingSchemeTemplate ? (
@@ -242,19 +237,19 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
           {gradingScheme && defaultCanvasGradingSchemeTemplate && editing ? (
             <>
               <Button onClick={toggleEditing} margin="0 x-small 0 0">
-                {I18n.t('Cancel')}
+                {t('Cancel')}
               </Button>
               <Button
                 onClick={() => gradingSchemeUpdateRef.current?.savePressed()}
                 color="primary"
                 type="submit"
               >
-                {I18n.t('Save')}
+                {t('Save')}
               </Button>
             </>
           ) : (
             <Button onClick={cancelPressed} margin="0 x-small 0 0">
-              {I18n.t('Close')}
+              {t('Close')}
             </Button>
           )}
         </Modal.Footer>

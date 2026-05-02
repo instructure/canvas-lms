@@ -29,7 +29,7 @@ import type {AccountId} from '../../../model/AccountId'
 import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {useRegistrationHistory} from './useHistory'
 import {HistoryDiffModal} from './HistoryDiffModal'
-import {LtiHistoryEntryWithDiff} from './differ'
+import {isConfigChangeHistoryEntry, LtiHistoryEntryWithDiff} from './differ'
 import {RenderInfiniteApiResult} from '../../../../common/lib/apiResult/RenderInfiniteApiResult'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
@@ -42,32 +42,84 @@ export type RegistrationHistoryViewProps = {
   registrationId: LtiRegistrationId
 }
 
-/**
- * Generate a summary of affected fields for display in the table
- */
-const getAffectedFieldsSummary = (diff: LtiHistoryEntryWithDiff): string => {
-  if ('deploymentDiffs' in diff) {
-    return I18n.t('Availability & Exceptions')
-  }
+const possibleConfigFields = [
+  'launchSettings',
+  'permissions',
+  'privacyLevel',
+  'placements',
+  'naming',
+  'icons',
+  'locked',
+  'workflowState',
+] as const
 
-  const categories: string[] = []
-  if (diff.internalConfig?.launchSettings) categories.push(I18n.t('Launch Settings'))
-  if (diff.internalConfig?.permissions) categories.push(I18n.t('Permissions'))
-  if (diff.internalConfig?.privacyLevel) categories.push(I18n.t('Privacy Level'))
-  if (diff.internalConfig?.placements) categories.push(I18n.t('Placements'))
-  if (diff.internalConfig?.naming) categories.push(I18n.t('Naming'))
-  if (diff.internalConfig?.icons) categories.push(I18n.t('Icons'))
-  if (diff.internalConfig?.locked) categories.push(I18n.t('Lock Status'))
+type AffectedField = (typeof possibleConfigFields)[number] | 'availability' | 'unknown'
 
-  if (categories.length === 0) {
-    return I18n.t('Unknown')
-  }
+const affectedFieldLabels: Record<AffectedField, string> = {
+  launchSettings: I18n.t('Launch Settings'),
+  permissions: I18n.t('Permissions'),
+  privacyLevel: I18n.t('Privacy Level'),
+  placements: I18n.t('Placements'),
+  naming: I18n.t('Naming'),
+  icons: I18n.t('Icons'),
+  availability: I18n.t('Availability & Exceptions'),
+  locked: I18n.t('Lock Status'),
+  workflowState: I18n.t('Activation State'),
+  unknown: I18n.t('Unknown'),
+}
 
+const translateAffectedFields = (
+  fields: AffectedField[],
+  entry: LtiHistoryEntryWithDiff,
+): string => {
   const formatter = new Intl.ListFormat(I18n.currentLocale(), {
     style: 'narrow',
     type: 'conjunction',
   })
-  return formatter.format(categories)
+
+  const translatedArray = fields.map(f => {
+    if (f === 'workflowState' && isConfigChangeHistoryEntry(entry)) {
+      if (
+        entry.old_configuration.registration.workflow_state === 'inactive' &&
+        entry.new_configuration.registration.workflow_state === 'active'
+      ) {
+        return I18n.t('Turned On')
+      } else if (
+        entry.old_configuration.registration.workflow_state === 'active' &&
+        entry.new_configuration.registration.workflow_state === 'inactive'
+      ) {
+        return I18n.t('Turned Off')
+      } else {
+        // There are only three possible states, "active", "inactive", and "deleted", so if we didn't hit either
+        // of the other two branches and the differ says this field changed, the registration must have
+        // been deleted.
+        return I18n.t('Deleted')
+      }
+    } else {
+      return affectedFieldLabels[f]
+    }
+  })
+  return formatter.format(translatedArray)
+}
+
+/**
+ * Generate a summary of affected fields for display in the table
+ */
+const getEntrySummary = (diff: LtiHistoryEntryWithDiff): AffectedField[] => {
+  if ('deploymentDiffs' in diff) {
+    return ['availability']
+  }
+
+  const categories: AffectedField[] = []
+  possibleConfigFields.forEach(field => {
+    if (diff.internalConfig?.[field]) categories.push(field)
+  })
+
+  if (categories.length === 0) {
+    return ['unknown']
+  } else {
+    return categories
+  }
 }
 
 export const RegistrationHistoryView = (props: RegistrationHistoryViewProps) => {
@@ -120,17 +172,14 @@ export const RegistrationHistoryView = (props: RegistrationHistoryViewProps) => 
               <Table caption={I18n.t('Configuration Update History')}>
                 <Table.Head>
                   <Table.Row>
-                    <Table.ColHeader id="Status" width="20%">
-                      {I18n.t('Status')}
-                    </Table.ColHeader>
-                    <Table.ColHeader id="UpdatedOn" width="20%">
+                    <Table.ColHeader id="UpdatedOn" width="25%">
                       {I18n.t('Updated On')}
                     </Table.ColHeader>
-                    <Table.ColHeader id="UpdatedBy" width="30%">
+                    <Table.ColHeader id="UpdatedBy" width="35%">
                       {I18n.t('Updated By')}
                     </Table.ColHeader>
-                    <Table.ColHeader id="AffectedFields" width="30%">
-                      {I18n.t('Affected Fields')}
+                    <Table.ColHeader id="AffectedFields" width="40%">
+                      {I18n.t('Summary')}
                     </Table.ColHeader>
                   </Table.Row>
                 </Table.Head>
@@ -168,23 +217,34 @@ const TableRow = React.memo(
     entry: LtiHistoryEntryWithDiff
     onAffectedFieldsClick: (entry: LtiHistoryEntryWithDiff) => void
   }) => {
-    const status = I18n.t('Updated')
     const createdAt = entry.created_at
     const createdBy =
       entry.created_by === 'Instructure' ? I18n.t('Instructure') : entry.created_by.name
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - tz.format's third argument (zone) is optional at runtime but required by tsgo
     const formattedDate = tz.format(createdAt, 'date.formats.full')
 
-    const affectedFields = getAffectedFieldsSummary(entry)
+    const affectedFields = getEntrySummary(entry)
 
     return (
       <Table.Row>
-        <Table.Cell>{status}</Table.Cell>
         <Table.Cell>{formattedDate}</Table.Cell>
         <Table.Cell>{createdBy}</Table.Cell>
         <Table.Cell>
-          <Link onClick={() => onAffectedFieldsClick(entry)}>{affectedFields}</Link>
+          {/**
+           * When locked from the UI, the only change should be the workflow state and there's no
+           * need to show a modal. However, it's possible using the API to modify lock status and
+           * multiple other fields at the same time.
+           */}
+          {affectedFields.every(f => f === 'workflowState') ? (
+            <Text>{translateAffectedFields(affectedFields, entry)}</Text>
+          ) : (
+            <Link
+              onClick={() => {
+                onAffectedFieldsClick(entry)
+              }}
+            >
+              {translateAffectedFields(affectedFields, entry)}
+            </Link>
+          )}
         </Table.Cell>
       </Table.Row>
     )

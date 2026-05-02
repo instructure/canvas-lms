@@ -20,11 +20,8 @@
 
 module AiExperiences
   class ProvisionService
-    def initialize
-      @client = LlmConversation::HttpClient.new(use_initial_token: true)
-    end
-
     def provision(account)
+      @client = LlmConversation::HttpClient.new(account:, use_initial_token: true)
       result = call_provision_api(account)
 
       # TODO: We will wait and poll here when we get to PINE Provisioning
@@ -50,6 +47,7 @@ module AiExperiences
         refresh_jwt_token: provision_result["refresh_token"]
       }
       account.save!
+      LlmConversation::TokenCache.set_api_token(account, provision_result["api_token"])
     end
   end
 end

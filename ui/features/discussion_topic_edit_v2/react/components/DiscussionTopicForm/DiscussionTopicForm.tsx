@@ -162,6 +162,30 @@ function DiscussionTopicForm({
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
   const published = currentDiscussionTopic?.published ?? false
   const shouldMasteryPathsBeVisible = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement
+  const canManageDiscussionAnonymity =
+    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_EDIT_DISCUSSION_ANONYMITY ?? true
+  const canManageDiscussionOptions =
+    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_EDIT_DISCUSSION_OPTIONS ?? true
+  const canManageDiscussionViews =
+    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_EDIT_DISCUSSION_VIEWS ?? true
+  const isAnonymityDisabled = !canManageDiscussionAnonymity
+  const areOptionsDisabled = !canManageDiscussionOptions
+  const areViewsDisabled = !canManageDiscussionViews
+
+  const renderLockedTooltip = (content: React.ReactNode, isLocked: boolean) => {
+    if (!isLocked) return content
+    return (
+      <Tooltip
+        renderTip={I18n.t('Modifying this option has been disabled by administrators')}
+        on={['hover', 'focus']}
+        placement="top"
+        data-testid="locked-setting-tooltip"
+      >
+        <span style={{display: 'inline-block'}}>{content}</span>
+      </Tooltip>
+    )
+  }
+
   const masteryPathsWithCoursePaces =
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
     ENV.IN_PACED_COURSE &&
@@ -246,35 +270,78 @@ function DiscussionTopicForm({
 
   const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(sectionsDefault)
 
-  const [discussionAnonymousState, setDiscussionAnonymousState] = useState(
-    currentDiscussionTopic?.anonymousState || 'off',
-  )
+  const [discussionAnonymousState, setDiscussionAnonymousState] = useState(() => {
+    if (currentDiscussionTopic?.anonymousState) return currentDiscussionTopic.anonymousState
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.anonymous_state) {
+      return ENV.DEFAULT_DISCUSSION_SETTINGS.anonymous_state
+    }
+    return 'off'
+  })
   // default anonymousAuthorState to true, since it is the default selection for partial anonymity
   // otherwise, it is just ignored anyway
   const [anonymousAuthorState, setAnonymousAuthorState] = useState(
     currentDiscussionTopic?.isAnonymousAuthor || true,
   )
-  const [isThreaded, setIsThreaded] = useState(
-    currentDiscussionTopic?.discussionType === 'threaded' ||
-      (currentDiscussionTopic?.discussionType === 'side_comment' &&
-        ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies) ||
-      Object.keys(currentDiscussionTopic).length === 0,
-  )
-  const [requireInitialPost, setRequireInitialPost] = useState(
-    currentDiscussionTopic?.requireInitialPost || false,
-  )
-  const [enablePodcastFeed, setEnablePodcastFeed] = useState(
-    currentDiscussionTopic?.podcastEnabled || false,
-  )
-  const [includeRepliesInFeed, setIncludeRepliesInFeed] = useState(
-    currentDiscussionTopic?.podcastHasStudentPosts || false,
-  )
+  const [isThreaded, setIsThreaded] = useState(() => {
+    if (currentDiscussionTopic?.discussionType) {
+      return (
+        currentDiscussionTopic.discussionType === 'threaded' ||
+        (currentDiscussionTopic.discussionType === 'side_comment' &&
+          ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies)
+      )
+    }
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.disallow_threaded_replies) {
+      return !ENV.DEFAULT_DISCUSSION_SETTINGS.disallow_threaded_replies
+    }
+    return Object.keys(currentDiscussionTopic).length === 0
+  })
+  const [requireInitialPost, setRequireInitialPost] = useState(() => {
+    if (currentDiscussionTopic?.requireInitialPost !== undefined) {
+      return currentDiscussionTopic.requireInitialPost
+    }
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.require_initial_post) {
+      return !!ENV.DEFAULT_DISCUSSION_SETTINGS.require_initial_post
+    }
+    return false
+  })
+  const [enablePodcastFeed, setEnablePodcastFeed] = useState(() => {
+    if (currentDiscussionTopic?.podcastEnabled !== undefined) {
+      return currentDiscussionTopic.podcastEnabled
+    }
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.podcast_enabled) {
+      return !!ENV.DEFAULT_DISCUSSION_SETTINGS.podcast_enabled
+    }
+    return false
+  })
+  const [includeRepliesInFeed, setIncludeRepliesInFeed] = useState(() => {
+    if (currentDiscussionTopic?.podcastHasStudentPosts !== undefined) {
+      return currentDiscussionTopic.podcastHasStudentPosts
+    }
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.podcast_has_student_posts) {
+      return !!ENV.DEFAULT_DISCUSSION_SETTINGS.podcast_has_student_posts
+    }
+    return false
+  })
   const [isGraded, setIsGraded] = useState(!!currentDiscussionTopic?.assignment || false)
 
-  const [allowLiking, setAllowLiking] = useState(currentDiscussionTopic?.allowRating || false)
-  const [onlyGradersCanLike, setOnlyGradersCanLike] = useState(
-    currentDiscussionTopic?.onlyGradersCanRate || false,
-  )
+  const [allowLiking, setAllowLiking] = useState(() => {
+    if (currentDiscussionTopic?.allowRating !== undefined) {
+      return currentDiscussionTopic.allowRating
+    }
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.allow_rating) {
+      return !!ENV.DEFAULT_DISCUSSION_SETTINGS.allow_rating
+    }
+    return false
+  })
+  const [onlyGradersCanLike, setOnlyGradersCanLike] = useState(() => {
+    if (currentDiscussionTopic?.onlyGradersCanRate !== undefined) {
+      return currentDiscussionTopic.onlyGradersCanRate
+    }
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.only_graders_can_rate) {
+      return !!ENV.DEFAULT_DISCUSSION_SETTINGS.only_graders_can_rate
+    }
+    return false
+  })
   const [addToTodo, setAddToTodo] = useState(!!currentDiscussionTopic?.todoDate || false)
   const [todoDate, setTodoDate] = useState(currentDiscussionTopic?.todoDate || null)
   const [addToStudentToDoDateRef, setAddToStudentToDoDateRef] = useState()
@@ -402,18 +469,45 @@ function DiscussionTopicForm({
     !!currentDiscussionTopic?.assignment?.peerReviews?.intraReviews || false,
   )
 
-  const [expanded, setExpanded] = useState(
-    currentDiscussionTopic?.expanded ?? DEFAULT_EXPANDED_STATE,
-  )
-  const [expandedLocked, setExpandedLocked] = useState(
-    currentDiscussionTopic?.expandedLocked ?? DEFAULT_EXPANDED_LOCKED,
-  )
-  const [sortOrder, setSortOrder] = useState(
-    currentDiscussionTopic?.sortOrder ?? DEFAULT_SORT_ORDER,
-  )
-  const [sortOrderLocked, setSortOrderLocked] = useState(
-    currentDiscussionTopic?.sortOrderLocked ?? DEFAULT_SORT_ORDER_LOCKED,
-  )
+  const [expanded, setExpanded] = useState(() => {
+    if (currentDiscussionTopic?.expanded !== undefined) {
+      return currentDiscussionTopic.expanded
+    }
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.expanded !== undefined) {
+      return (
+        ENV.DEFAULT_DISCUSSION_SETTINGS.expanded === 'true' ||
+        ENV.DEFAULT_DISCUSSION_SETTINGS.expanded === true
+      )
+    }
+    return DEFAULT_EXPANDED_STATE
+  })
+  const [expandedLocked, setExpandedLocked] = useState(() => {
+    if (currentDiscussionTopic?.expandedLocked !== undefined) {
+      return currentDiscussionTopic.expandedLocked
+    }
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.expanded_locked) {
+      return !!ENV.DEFAULT_DISCUSSION_SETTINGS.expanded_locked
+    }
+    return DEFAULT_EXPANDED_LOCKED
+  })
+  const [sortOrder, setSortOrder] = useState(() => {
+    if (currentDiscussionTopic?.sortOrder) {
+      return currentDiscussionTopic.sortOrder
+    }
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.sort_order) {
+      return ENV.DEFAULT_DISCUSSION_SETTINGS.sort_order
+    }
+    return DEFAULT_SORT_ORDER
+  })
+  const [sortOrderLocked, setSortOrderLocked] = useState(() => {
+    if (currentDiscussionTopic?.sortOrderLocked !== undefined) {
+      return currentDiscussionTopic.sortOrderLocked
+    }
+    if (ENV.DEFAULT_DISCUSSION_SETTINGS?.sort_order_locked) {
+      return !!ENV.DEFAULT_DISCUSSION_SETTINGS.sort_order_locked
+    }
+    return DEFAULT_SORT_ORDER_LOCKED
+  })
 
   const [lastShouldPublish, setLastShouldPublish] = useState(false)
   const [shouldShowMissingSectionsWarning, setShouldShowMissingSectionsWarning] = useState(false)
@@ -1231,6 +1325,8 @@ function DiscussionTopicForm({
               setGroupCategoryId={setGroupCategoryId}
               shouldShowPartialAnonymousSelector={shouldShowPartialAnonymousSelector}
               setAnonymousAuthorState={setAnonymousAuthorState}
+              disabled={isAnonymityDisabled}
+              lockedTooltip={isAnonymityDisabled}
             />
           )}
           <FormFieldGroup description="" rowSpacing="small">
@@ -1242,21 +1338,25 @@ function DiscussionTopicForm({
                 data-testid="disallow_threaded_replies"
                 data-action-state={isThreaded ? 'disallowThreads' : 'allowThreads'}
               >
-                <Checkbox
-                  label={I18n.t('Disallow threaded replies')}
-                  value="disallow-threaded-replies"
-                  inline={true}
-                  checked={!locked && !isThreaded}
-                  onChange={() => {
-                    setIsThreaded(!isThreaded)
-                  }}
-                  disabled={
-                    isCheckpoints ||
-                    ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies ||
-                    (!shouldShowAllowParticipantsToCommentOption && isAnnouncement) ||
-                    locked
-                  }
-                />
+                {renderLockedTooltip(
+                  <Checkbox
+                    label={I18n.t('Disallow threaded replies')}
+                    value="disallow-threaded-replies"
+                    inline={true}
+                    checked={!locked && !isThreaded}
+                    onChange={() => {
+                      setIsThreaded(!isThreaded)
+                    }}
+                    disabled={
+                      isCheckpoints ||
+                      ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies ||
+                      (!shouldShowAllowParticipantsToCommentOption && isAnnouncement) ||
+                      locked ||
+                      areOptionsDisabled
+                    }
+                  />,
+                  areOptionsDisabled,
+                )}
               </View>
             )}
 
@@ -1269,15 +1369,19 @@ function DiscussionTopicForm({
                   requireInitialPost ? 'disableInitiatorRequirement' : 'enableInitiatorRequirement'
                 }
               >
-                <Checkbox
-                  label={I18n.t(
-                    'Participants must respond to the topic before viewing other replies',
-                  )}
-                  value="must-respond-before-viewing-replies"
-                  inline={true}
-                  checked={requireInitialPost}
-                  onChange={() => setRequireInitialPost(!requireInitialPost)}
-                />
+                {renderLockedTooltip(
+                  <Checkbox
+                    label={I18n.t(
+                      'Participants must respond to the topic before viewing other replies',
+                    )}
+                    value="must-respond-before-viewing-replies"
+                    inline={true}
+                    checked={requireInitialPost}
+                    onChange={() => setRequireInitialPost(!requireInitialPost)}
+                    disabled={areOptionsDisabled}
+                  />,
+                  areOptionsDisabled,
+                )}
               </View>
             )}
 
@@ -1287,16 +1391,20 @@ function DiscussionTopicForm({
                 data-testid="enable-podcast-checkbox"
                 data-action-state={enablePodcastFeed ? 'disablePodcast' : 'enablePodcast'}
               >
-                <Checkbox
-                  label={I18n.t('Enable podcast feed')}
-                  value="enable-podcast-feed"
-                  inline={true}
-                  checked={enablePodcastFeed}
-                  onChange={() => {
-                    setIncludeRepliesInFeed(!enablePodcastFeed && includeRepliesInFeed)
-                    setEnablePodcastFeed(!enablePodcastFeed)
-                  }}
-                />
+                {renderLockedTooltip(
+                  <Checkbox
+                    label={I18n.t('Enable podcast feed')}
+                    value="enable-podcast-feed"
+                    inline={true}
+                    checked={enablePodcastFeed}
+                    onChange={() => {
+                      setIncludeRepliesInFeed(!enablePodcastFeed && includeRepliesInFeed)
+                      setEnablePodcastFeed(!enablePodcastFeed)
+                    }}
+                    disabled={areOptionsDisabled}
+                  />,
+                  areOptionsDisabled,
+                )}
               </View>
             )}
             {enablePodcastFeed && !isGroupContext && (
@@ -1308,13 +1416,17 @@ function DiscussionTopicForm({
                   includeRepliesInFeed ? 'disableRepliesInFeed' : 'includeRepliesInFeed'
                 }
               >
-                <Checkbox
-                  label={I18n.t('Include student replies in podcast feed')}
-                  value="include-student-replies-in-podcast-feed"
-                  inline={true}
-                  checked={includeRepliesInFeed}
-                  onChange={() => setIncludeRepliesInFeed(!includeRepliesInFeed)}
-                />
+                {renderLockedTooltip(
+                  <Checkbox
+                    label={I18n.t('Include student replies in podcast feed')}
+                    value="include-student-replies-in-podcast-feed"
+                    inline={true}
+                    checked={includeRepliesInFeed}
+                    onChange={() => setIncludeRepliesInFeed(!includeRepliesInFeed)}
+                    disabled={areOptionsDisabled}
+                  />,
+                  areOptionsDisabled,
+                )}
               </View>
             )}
             {shouldShowGradedDiscussionOptions && (
@@ -1396,16 +1508,20 @@ function DiscussionTopicForm({
                   data-action-state={allowLiking ? 'disallowLiking' : 'allowLiking'}
                   display="block"
                 >
-                  <Checkbox
-                    label={I18n.t('Allow liking')}
-                    value="allow-liking"
-                    inline={true}
-                    checked={allowLiking}
-                    onChange={() => {
-                      setOnlyGradersCanLike(!allowLiking && onlyGradersCanLike)
-                      setAllowLiking(!allowLiking)
-                    }}
-                  />
+                  {renderLockedTooltip(
+                    <Checkbox
+                      label={I18n.t('Allow liking')}
+                      value="allow-liking"
+                      inline={true}
+                      checked={allowLiking}
+                      onChange={() => {
+                        setOnlyGradersCanLike(!allowLiking && onlyGradersCanLike)
+                        setAllowLiking(!allowLiking)
+                      }}
+                      disabled={areOptionsDisabled}
+                    />,
+                    areOptionsDisabled,
+                  )}
                 </View>
                 {allowLiking && (
                   <View
@@ -1417,13 +1533,17 @@ function DiscussionTopicForm({
                     }
                   >
                     <FormFieldGroup description="" rowSpacing="small">
-                      <Checkbox
-                        label={I18n.t('Only graders can like')}
-                        value="only-graders-can-like"
-                        inline={true}
-                        checked={onlyGradersCanLike}
-                        onChange={() => setOnlyGradersCanLike(!onlyGradersCanLike)}
-                      />
+                      {renderLockedTooltip(
+                        <Checkbox
+                          label={I18n.t('Only graders can like')}
+                          value="only-graders-can-like"
+                          inline={true}
+                          checked={onlyGradersCanLike}
+                          onChange={() => setOnlyGradersCanLike(!onlyGradersCanLike)}
+                          disabled={areOptionsDisabled}
+                        />,
+                        areOptionsDisabled,
+                      )}
                     </FormFieldGroup>
                   </View>
                 )}
@@ -1625,6 +1745,8 @@ function DiscussionTopicForm({
               setExpanded={setExpanded}
               setExpandedLocked={setExpandedLocked}
               setSortOrder={setSortOrder}
+              disabled={areViewsDisabled}
+              lockedTooltip={areViewsDisabled}
               setSortOrderLocked={setSortOrderLocked}
             />
           )}

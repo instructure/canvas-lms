@@ -61,27 +61,28 @@ module ConditionalRelease
           next unless score
 
           user = users_by_id[user_id]
-          user_details = nil
-          ranges.each do |b|
-            next unless b[:scoring_range].contains_score score
+          matching_range_records = rule.matching_scoring_ranges(score, preloaded: true)
+          matching_buckets = ranges.select { |b| matching_range_records.include?(b[:scoring_range]) }
+          next if matching_buckets.empty?
 
-            user_details ||= if assignment.anonymize_students?
-                               { name: t("Anonymous User") }
-                             else
-                               {
-                                 id: user.id,
-                                 name: user.short_name,
-                                 avatar_image_url: AvatarHelper.avatar_url_for_user(user, nil, root_account: rule.root_account)
-                               }
-                             end
-            student_record = {
-              score:,
-              submission_id: submission[:id],
-              user: user_details
-            }
-            if include_trend_data
-              student_record[:trend] = compute_trend_from_submissions(score, follow_on_submissions_hash[user_id], assignments_by_id)
-            end
+          user_details = if assignment.anonymize_students?
+                           { name: t("Anonymous User") }
+                         else
+                           {
+                             id: user.id,
+                             name: user.short_name,
+                             avatar_image_url: AvatarHelper.avatar_url_for_user(user, nil, root_account: rule.root_account)
+                           }
+                         end
+          student_record = {
+            score:,
+            submission_id: submission[:id],
+            user: user_details
+          }
+          if include_trend_data
+            student_record[:trend] = compute_trend_from_submissions(score, follow_on_submissions_hash[user_id], assignments_by_id)
+          end
+          matching_buckets.each do |b|
             b[:size] += 1
             b[:students] << student_record
           end
