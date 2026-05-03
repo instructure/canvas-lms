@@ -156,6 +156,6 @@ Sample:
 <pre>
 vendor_guid,object_type,title,description,display_name,calculation_method,calculation_int,workflow_state,parent_guids,ratings,,,,,,,
 a,group,Parent group,parent group description,G-1,,,active,,,,,,,,,
-b,group,Child group,child group description,G-1.1,,,active,a,,,,,,,,
-c,outcome,Learning Standard,outcome description,LS-100,decaying_average,40,active,a b,3,Excellent,2,Better,1,Good,,
+b,group,Child group,child group description,G-1.1,,a,active,,,,,,,,,
+c,outcome,Learning Standard,outcome description,LS-100,decaying_average,40,a b,active,3,Excellent,2,Better,1,Good,,
 </pre>
